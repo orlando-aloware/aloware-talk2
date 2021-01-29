@@ -22,6 +22,7 @@
     "@sentry/vue": "^6.0.3",
     "axios": "^0.21.1",
     "bowser": "^2.11.0",
+    "cleave.js": "^1.6.0",
     "core-js": "^3.6.5",
     "google-libphonenumber": "^3.2.16",
     "jstimezonedetect": "^1.0.7",
@@ -32,7 +33,8 @@
     "moment-timezone": "^0.5.32",
     "pusher": "^4.0.2",
     "quasar": "^1.0.0",
-    "twilio-client": "^1.14.0"
+    "twilio-client": "^1.14.0",
+    "vue-linkify": "^1.0.1"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

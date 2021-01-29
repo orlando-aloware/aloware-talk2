@@ -118,8 +118,6 @@ console.log(`%c
 ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
 `, 'color: #00BF50')
 
-export default async ({ Vue }) => {
-  Vue.prototype.$moment = window.moment
-  Vue.prototype.$Pusher = window.Pusher
-  Vue.prototype.$Sentry = window.Sentry
-}
+Vue.prototype.$moment = window.moment
+Vue.prototype.$Pusher = window.Pusher
+Vue.prototype.$Sentry = window.Sentry
