@@ -1,10 +1,33 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray } from 'electron'
+import { autoUpdater } from 'electron-updater'
+import path from 'path'
+import { Registry } from 'rage-edit'
 
-try {
-  if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    require('fs').unlinkSync(require('path').join(app.getPath('userData'), 'DevTools Extensions'))
-  }
-} catch (_) { }
+// register for tel: links in windows
+if (process.platform === 'win32') {
+  (async () => {
+    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities', 'ApplicationName', 'Aloware Talk')
+    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities', 'ApplicationDescription', 'Aloware Talk')
+    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities\\URLAssociations', 'tel', 'Aloware Talk.tel')
+    await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.tel\\DefaultIcon', '', process.execPath)
+    await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.tel\\shell\\open\\command', '', `"${process.execPath}" "%1"`)
+    await Registry.set('HKCU\\Software\\RegisteredApplications', 'Aloware Talk', 'Software\\Aloware Talk\\Capabilities')
+  })()
+}
+
+const log = require('electron-log')
+log.transports.file.level = 'info'
+log.transports.file.maxSize = 5 * 1024 * 1024
+
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let mainWindow
+
+// Deep linked url
+let deepLinkingUrl
+
+// keep a copy of badge count
+let badgeCount
 
 /**
  * Set `__statics` path to static files in production;
@@ -14,21 +37,34 @@ if (process.env.PROD) {
   global.__statics = __dirname
 }
 
-let mainWindow
+// for windows
+let isQuiting = false
+let tray
+
+app.on('before-quit', () => {
+  isQuiting = true
+})
 
 function createWindow () {
   /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 600,
+    width: 400,
+    height: 680,
+    minHeight: 630,
+    minWidth: 360,
+    maxWidth: 700,
+    resizable: true,
+    fullscreen: true,
+    center: true,
     useContentSize: true,
     webPreferences: {
       // Change from /quasar.conf.js > electron > nodeIntegration;
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: process.env.QUASAR_NODE_INTEGRATION,
       nodeIntegrationInWorker: process.env.QUASAR_NODE_INTEGRATION,
+      devTools: (process.env.APP_DEBUG === 'true' || process.env.NODE_ENV !== 'production')
 
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
       // preload: path.resolve(__dirname, 'electron-preload.js')
@@ -37,21 +73,344 @@ function createWindow () {
 
   mainWindow.loadURL(process.env.APP_URL)
 
+  // disable the menu
+  mainWindow.setMenu(null)
+
+  // set title
+  mainWindow.setTitle(require('../../package.json').productName)
+
+  // Protocol handler for win32
+  if (process.platform === 'win32') {
+    let cleanArg = process.argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('aloware') || arg.startsWith('tel') || arg.startsWith('callto')))
+    if (cleanArg.length > 0) {
+      // Keep only command line / deep linked arguments
+      deepLinkingUrl = cleanArg[0]
+    }
+  }
+  if (deepLinkingUrl) {
+    logEverywhere('createWindow# ' + deepLinkingUrl)
+    setTimeout(() => {
+      openUrl(deepLinkingUrl)
+    }, 5000)
+  }
+
+  // Emitted when the window is closed.
   mainWindow.on('closed', () => {
-    mainWindow = null
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    if (isQuiting) {
+      mainWindow = null
+    }
+  })
+
+  mainWindow.on('page-title-updated', (event) => {
+    event.preventDefault()
+  })
+
+  mainWindow.on('close', (event) => {
+    if (!isQuiting) {
+      event.preventDefault()
+      mainWindow.hide()
+      event.returnValue = false
+    }
+  })
+
+  mainWindow.webContents.on('new-window', function (event, url) {
+    event.preventDefault()
+    shell.openExternal(url)
   })
 }
 
-app.on('ready', createWindow)
+// Force Single Instance Application
+const gotTheLock = app.requestSingleInstanceLock()
+if (gotTheLock) {
+  app.on('second-instance', (e, argv) => {
+    // Someone tried to run a second instance, we should focus our window.
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+    // Protocol handler for win32
+    // argv: An array of the second instance’s (command line / deep linked) arguments
+    if (process.platform === 'win32') {
+      let cleanArg = argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('aloware') || arg.startsWith('tel') || arg.startsWith('callto')))
+      if (cleanArg.length > 0) {
+        // Keep only command line / deep linked arguments
+        deepLinkingUrl = cleanArg[0]
+      }
+    }
+    if (deepLinkingUrl) {
+      logEverywhere('app.makeSingleInstance# ' + deepLinkingUrl)
+      setTimeout(() => {
+        openUrl(deepLinkingUrl)
+      }, 5000)
+    }
+
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore()
+      }
+      mainWindow.focus()
+    }
+  })
+
+  app.on('activate', () => {
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) {
+      createWindow()
+      openUrl(deepLinkingUrl)
+      clearBadge()
+
+      if (process.env.NODE_ENV === 'production') {
+        log.info('Setup check for updates and notify')
+        autoUpdater.checkForUpdatesAndNotify()
+      }
+    } else {
+      mainWindow.show()
+      mainWindow.focus()
+      openUrl(deepLinkingUrl)
+      clearBadge()
+
+      if (process.env.NODE_ENV === 'production') {
+        log.info('Setup check for updates and notify')
+        autoUpdater.checkForUpdatesAndNotify()
+      }
+    }
+  })
+
+  app.on('ready', () => {
+    createWindow()
+    setTray()
+    openUrl(deepLinkingUrl)
+    clearBadge()
+
+    if (process.env.NODE_ENV === 'production') {
+      log.info('Setup check for updates and notify')
+      autoUpdater.checkForUpdatesAndNotify()
+    }
+  })
+} else {
+  app.quit()
+}
+
+if (!app.isDefaultProtocolClient('aloware')) {
+  // Define custom protocol handler. Deep linking works on packaged versions of the application!
+  app.setAsDefaultProtocolClient('aloware')
+}
+
+if (!app.isDefaultProtocolClient('tel')) {
+  // Define custom protocol handler. Deep linking works on packaged versions of the application!
+  app.setAsDefaultProtocolClient('tel')
+}
+
+if (!app.isDefaultProtocolClient('callto')) {
+  // Define custom protocol handler. Deep linking works on packaged versions of the application!
+  app.setAsDefaultProtocolClient('callto')
+}
+
+app.on('will-finish-launching', () => {
+  // Protocol handler for osx
+  app.on('open-url', (event, url) => {
+    event.preventDefault()
+    deepLinkingUrl = url
+    logEverywhere('open-url# ' + url)
+    mainWindow.show()
+    mainWindow.focus()
+    openUrl(url)
+    clearBadge()
+  })
+})
+
+function openUrl (url) {
+  if (!url) {
+    return
+  }
+  if (mainWindow && mainWindow.webContents) {
+    url = url.replace(/\/$/, '')
+    logEverywhere('Opening url: ' + url)
+    mainWindow.webContents.send('open-url', url)
+    deepLinkingUrl = null
+  } else {
+    logEverywhere('Rescheduling opening url: ' + url)
+    setTimeout(() => {
+      openUrl(url)
+    }, 1000)
+  }
+}
+
+// Log both at dev console and at running node console instance
+function logEverywhere (s) {
+  if (!s) {
+    return
+  }
+  log.info(s)
+}
+
+function sendStatusToWindow (channel, text) {
+  log.info(text)
+  if (mainWindow && mainWindow.webContents && channel && text) {
+    mainWindow.webContents.send(channel, text)
+  }
+}
+
+function clearBadge () {
+  try {
+    badgeCount = 0
+    app.setBadgeCount(0)
+    app.dock.setBadge('')
+  } catch (e) {
+    log.info('setBadge() does not work on windows. ' + e.message)
+  }
+}
+
+function setTray () {
+  const iconPath = path.join(__statics, '/trayTemplate.png')
+  tray = new Tray(iconPath)
+  try {
+    tray.setContextMenu(Menu.buildFromTemplate([
+      {
+        label: 'Show App',
+        click: function () {
+          mainWindow.show()
+          mainWindow.focus()
+        }
+      },
+      {
+        label: 'Quit',
+        click: function () {
+          isQuiting = true
+          mainWindow.destroy()
+          app.quit()
+        }
+      }
+    ]))
+
+    tray.on('click', () => {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide()
+      } else {
+        mainWindow.show()
+        mainWindow.focus()
+      }
+    })
+
+    // Ignore double click events for the tray icon
+    tray.setIgnoreDoubleClickEvents(true)
+  } catch (e) {
+    log.info('setContextMenu() does not work on windows. ' + e.message)
+  }
+}
+
+/**
+ * Auto Updater
+ *
+ * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
+ */
+autoUpdater.logger = log
+autoUpdater.logger.transports.file.level = 'info'
+log.info('App starting...')
+
+app.on('browser-window-focus', () => {
+  clearBadge()
+})
+
+autoUpdater.on('update-available', (info) => {
+  try {
+    app.dock.setBadge('⮃')
+  } catch (e) {
+    log.info('setBadge() does not work on windows. ' + e.message)
+  }
+  sendStatusToWindow('update_available', 'A new update is available. Downloading now...')
+})
+
+autoUpdater.on('error', (err) => {
+  log.info('Error in auto-update: ' + err)
+  sendStatusToWindow('update_error', 'Error in auto-update. Please restart the application.')
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
+})
+
+ipcMain.on('restart_app', () => {
+  isQuiting = true
+  autoUpdater.quitAndInstall()
+})
+
+ipcMain.on('quit_app', () => {
+  isQuiting = true
+  autoUpdater.quit()
+})
+
+ipcMain.on('restore_app', () => {
+  if (mainWindow) {
+    mainWindow.show()
+    mainWindow.focus()
   }
 })
 
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow()
+ipcMain.on('bounce', (event, arg = 'informational') => {
+  try {
+    app.dock.bounce(arg)
+  } catch (e) {
+    log.info('bounce() does not work on windows. ' + e.message)
   }
+})
+
+ipcMain.on('set_badge', (event, arg) => {
+  if (arg === undefined) {
+    return
+  }
+  try {
+    if (arg === '') {
+      badgeCount = 0
+      app.setBadgeCount(0)
+    }
+    app.dock.setBadge(arg)
+  } catch (e) {
+    log.info('setBadge() does not work on windows. ' + e.message)
+  }
+})
+
+ipcMain.on('increase_badge', (event, arg) => {
+  if (arg === undefined || arg === '') {
+    return
+  }
+  try {
+    badgeCount = app.getBadgeCount()
+    badgeCount = badgeCount + arg
+    app.setBadgeCount(badgeCount)
+  } catch (e) {
+    log.info('Error on increasing badge: ' + e.message)
+  }
+})
+
+ipcMain.on('decrease_badge', (event, arg) => {
+  if (arg === undefined || arg === '') {
+    return
+  }
+  try {
+    badgeCount = app.getBadgeCount()
+    badgeCount = badgeCount - arg
+    if (badgeCount <= 0) {
+      badgeCount = 0
+    }
+    app.setBadgeCount(badgeCount)
+  } catch (e) {
+    log.info('Error on decreasing badge: ' + e.message)
+  }
+})
+
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() })
+})
+
+try {
+  if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
+    require('fs').unlinkSync(require('path').join(app.getPath('userData'), 'DevTools Extensions'))
+  }
+} catch (_) {
+}
+
+process.on('uncaughtException', (err) => {
+  console.log(err)
+  sendStatusToWindow('reload_app')
 })
