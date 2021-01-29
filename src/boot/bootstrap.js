@@ -97,6 +97,9 @@ window.Sentry = Sentry
 if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') && process.env.APP_ENV !== 'local') {
   Sentry.init({
     Vue: Vue,
+    tracingOptions: {
+      trackComponents: true
+    },
     dsn: localStorage.getItem('sentry_dsn_public')
   })
 
