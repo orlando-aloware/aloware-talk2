@@ -19,8 +19,12 @@ module.exports = function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
-
-      'axios'
+      // 'bootstrap',
+      'axios',
+      // 'VueEvent',
+      // 'Push',
+      // 'filters',
+      // 'directives'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -38,13 +42,14 @@ module.exports = function (/* ctx */) {
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-      'roboto-font', // optional, you are not bound to it
-      'material-icons' // optional, you are not bound to it
+      'roboto-font',
+      'material-icons',
+      'fontawesome-v5',
     ],
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history',
 
       // transpile: false,
 
@@ -75,8 +80,15 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
-      https: false,
-      port: 8080,
+      before (app) {
+        const cors = require('cors')
+        app.use(cors())
+      },
+
+      https: true,
+      host: 'localhost',
+      port: 9090,
+      disableHostCheck: true,
       open: true // opens browser window automatically
     },
 
