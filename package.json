@@ -34,7 +34,8 @@
     "pusher": "^4.0.2",
     "quasar": "^1.0.0",
     "twilio-client": "^1.14.0",
-    "vue-linkify": "^1.0.1"
+    "vue-linkify": "^1.0.1",
+    "vuex-persistedstate": "^2.7.1"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
