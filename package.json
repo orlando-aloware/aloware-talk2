@@ -18,7 +18,7 @@
     "deploy-win32": "quasar build -m electron -T win32 -b builder -P always"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.9.15",
     "@sentry/vue": "^6.0.3",
     "axios": "^0.21.1",
     "bowser": "^2.11.0",
@@ -34,10 +34,10 @@
     "pusher": "^4.0.2",
     "quasar": "^1.0.0",
     "rage-edit": "^1.2.0",
+    "randomcolor": "^0.5.4",
     "twilio-client": "^1.14.0",
     "vue-linkify": "^1.0.1",
-    "vuex-persistedstate": "^2.7.1",
-    "randomcolor": "^0.5.4"
+    "vuex-persistedstate": "^2.7.1"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
