@@ -24,6 +24,7 @@
     "bowser": "^2.11.0",
     "cleave.js": "^1.6.0",
     "core-js": "^3.6.5",
+    "electron-notarize": "^0.3.0",
     "google-libphonenumber": "^3.2.16",
     "jstimezonedetect": "^1.0.7",
     "laravel-echo": "^1.10.0",

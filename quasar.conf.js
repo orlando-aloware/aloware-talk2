@@ -177,7 +177,7 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
     electron: {
-      bundler: 'packager', // 'packager' or 'builder'
+      bundler: 'builder', // 'packager' or 'builder'
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
@@ -194,8 +194,35 @@ module.exports = function (/* ctx */) {
 
       builder: {
         // https://www.electron.build/configuration/configuration
-
-        appId: 'aloware-talk2'
+        appId: 'com.aloware.talk2',
+        mac: {
+          target: ['dmg', 'zip'],
+          type: 'distribution',
+          category: 'public.app-category.business',
+          entitlements: './src-electron/build/entitlements.mac.plist',
+          entitlementsInherit: './src-electron/build/entitlements.mac.plist',
+          hardenedRuntime: true,
+          darkModeSupport: false,
+          extendInfo: {
+            'NSMicrophoneUsageDescription': 'Please give us access to your microphone'
+          }
+        },
+        win: {
+          target: 'nsis'
+        },
+        linux: {
+          target: 'AppImage'
+        },
+        publish: {
+          provider: 'github',
+          token: process.env.GH_TOKEN,
+          publishAutoUpdate: true
+        },
+        protocols: {
+          name: 'Aloware Talk',
+          schemes: ['aloware', 'tel', 'callto']
+        },
+        afterSign: './src-electron/build/afterSignHook.js'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
