@@ -35,7 +35,8 @@
     "quasar": "^1.0.0",
     "twilio-client": "^1.14.0",
     "vue-linkify": "^1.0.1",
-    "vuex-persistedstate": "^2.7.1"
+    "vuex-persistedstate": "^2.7.1",
+    "randomcolor": "^0.5.4"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
