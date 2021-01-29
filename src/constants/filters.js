@@ -39,11 +39,6 @@ export const DEFAULT_STATE = {
   call_dispositions: [],
   users: [],
   changelogs: [],
-  usage: [],
-  exports: {
-    data: [],
-    scope: 'user'
-  },
   filters: [],
   workflows: [],
   ring_groups: [],

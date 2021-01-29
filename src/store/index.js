@@ -63,11 +63,6 @@ export default function (/* { ssrContext } */) {
       changelogs: [],
       disposition_statuses: [],
       call_dispositions: [],
-      usage: [],
-      exports: {
-        data: [],
-        scope: 'user'
-      },
       filters: [],
       workflows: [],
       ring_groups: [],
@@ -303,10 +298,6 @@ export default function (/* { ssrContext } */) {
         commit('RESET_FILTERS')
       },
 
-      setUsage ({ commit }, usage) {
-        commit('SET_USAGE', usage)
-      },
-
       setSettings ({ commit }, settings) {
         commit('SET_SETTINGS', settings)
       },
@@ -345,22 +336,6 @@ export default function (/* { ssrContext } */) {
 
       setCommTableFields ({ commit }, fields) {
         commit('SET_COMM_TABLE_FIELDS', fields)
-      },
-
-      setExports ({ commit }, exports) {
-        commit('SET_EXPORTS', exports)
-      },
-
-      newExport ({ commit }, exports) {
-        commit('NEW_EXPORT', exports)
-      },
-
-      updateExport ({ commit }, exports) {
-        commit('UPDATE_EXPORT', exports)
-      },
-
-      deleteExport ({ commit }, exports) {
-        commit('DELETE_EXPORT', exports)
       },
 
       newUser ({ commit }, user) {
@@ -713,10 +688,6 @@ export default function (/* { ssrContext } */) {
         state.filter.changed = false
       },
 
-      SET_USAGE (state, usage) {
-        state.usage = usage
-      },
-
       SET_SETTINGS (state, settings) {
         state.settings = settings
       },
@@ -768,35 +739,6 @@ export default function (/* { ssrContext } */) {
 
       SET_CHANGELOGS (state, changelogs) {
         state.changelogs = changelogs
-      },
-
-      SET_EXPORTS (state, exports) {
-        state.exports.data = exports
-      },
-
-      NEW_EXPORT (state, exp) {
-        if (resourceExists(state.exports.data, exp)) {
-          return
-        }
-        // state.exports.data.splice(0, 0, exp)
-        state.exports.data.push(exp)
-      },
-
-      UPDATE_EXPORT (state, exp) {
-        let found = state.exports.data.find(item => {
-          return item.id === exp.id
-        })
-        if (!found) {
-          return
-        }
-        _.extend(found, exp)
-      },
-
-      DELETE_EXPORT (state, exp) {
-        let found = state.exports.data.find(o => o.id === exp.id)
-        if (found) {
-          state.exports.data.splice(state.exports.data.indexOf(found), 1)
-        }
       },
 
       NEW_USER (state, user) {
