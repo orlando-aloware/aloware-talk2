@@ -22,7 +22,7 @@ module.exports = function (/* ctx */) {
       'bootstrap',
       'axios',
       'VueEvent',
-      // 'Push',
+      'Push',
       'filters',
       'directives'
     ],
