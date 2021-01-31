@@ -650,33 +650,6 @@ export default {
       }
     },
 
-    getTags (page = 1) {
-      if (page === 1) {
-        this.loadingTags = true
-      }
-      let params = {
-        page: page
-      }
-      return this.$axios.get('/api/v1/tag', { params }).then(res => {
-        if (res.data.data && res.data.data.length) {
-          res.data.data.forEach((tag) => {
-            this.newTag(tag)
-          })
-        }
-        if (res.data.to !== res.data.total) {
-          this.getTags(page + 1)
-        } else {
-          window.VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-          return Promise.resolve()
-        }
-      }).catch(err => {
-        console.log(err)
-        this.loadingTags = false
-        return Promise.reject()
-      })
-    },
-
     getDispositionStatuses () {
       if (this.hasPermissionTo('list disposition status')) {
         this.loadingDispositionStatuses = true
@@ -881,7 +854,7 @@ export default {
 
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: '' + icon + '.png',
+          icon: 'notification-icons/' + icon + '.png',
           body: `From: ${this.$options.filters.fixName(this.sanitizeText(communication.contact.name))} ${this.$options.filters.fixPhone(communication.contact.phone_number)} on ${lineName} line.`,
           tag: 'communication-notification-' + communication.id,
           requireInteraction: (communication.type !== CommunicationTypes.CALL),
@@ -921,7 +894,7 @@ export default {
         }
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'voicemail.png',
+          icon: 'notification-icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(this.sanitizeText(communication.contact.name))} ${this.$options.filters.fixPhone(communication.contact.phone_number)} on ${lineName} line.`,
           tag: 'voicemail-notification-' + communication.id,
           requireInteraction: true,
@@ -958,7 +931,7 @@ export default {
           })
         }
         const options = {
-          icon: 'contact.png',
+          icon: 'notification-icons/contact.png',
           body: `Name: ${this.$options.filters.fixName(this.sanitizeText(contact.name))} Phone number: ${this.$options.filters.fixPhone(contact.phone_number)}.`,
           tag: 'contact-notification-' + contact.id,
           requireInteraction: true,
@@ -1001,7 +974,7 @@ export default {
           })
         }
         const options = {
-          icon: 'appointment.png',
+          icon: 'notification-icons/appointment.png',
           body: engagement.body + '\n\r' + `Name: ${this.$options.filters.fixName(this.sanitizeText(contact.name))} Phone number: ${this.$options.filters.fixPhone(contact.phone_number)}.`,
           tag: 'appointment-notification-' + contact.id,
           requireInteraction: true,
@@ -1044,7 +1017,7 @@ export default {
           })
         }
         const options = {
-          icon: 'reminder.png',
+          icon: 'notification-icons/reminder.png',
           body: engagement.body + '\n\r' + `Name: ${this.$options.filters.fixName(this.sanitizeText(contact.name))} Phone number: ${this.$options.filters.fixPhone(contact.phone_number)}.`,
           tag: 'reminder-notification-' + contact.id,
           requireInteraction: true,
@@ -1080,7 +1053,6 @@ export default {
       'setCurrentCompany',
       'setCampaigns',
       'setUsers',
-      'newTag',
       'setDispositionStatuses',
       'setCallDispositions',
       'setDialerToken',

@@ -2,15 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import _ from 'lodash'
-import jstz from 'jstimezonedetect'
-import * as Filters from '../constants/filters'
-
-if (process.env.APP_DEBUG) {
-  Vue.config.devtools = true
-}
+import * as Default from '../constants/default'
 
 Vue.use(Vuex)
-window.timezone = jstz.determine().name()
 
 function resourceExists (arr, resource) {
   return !!arr.find(item => item.id === resource.id)
@@ -24,49 +18,15 @@ function resourceExists (arr, resource) {
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     state: {
-      filter: {
-        from_date: null,
-        to_date: null,
-        type: 'all',
-        direction: 'all',
-        report_type: 'date_v_campaign',
-        chart_period: 'day',
-        answer_status: 'all',
-        export_type: 'json',
-        min_talk_time: 0,
-        contact_id: null,
-        campaign_id: null,
-        user_id: null,
-        workflow_id: null,
-        page: 1,
-        per_page: 20,
-        checked_table_fields: null,
-        first_time_only: 0,
-        untagged_only: 0,
-        is_blocked: 0,
-        is_dnc: 0,
-        has_unread: 0,
-        text_authorized: 0,
-        lrn_types: [],
-        tags: [],
-        campaigns: [],
-        workflows: [],
-        ring_groups: [],
-        incoming_numbers: [],
-        users: [],
-        timezone: window.timezone,
-        changed: false
-      },
-      tags: [],
+      filter: {},
       campaigns: [],
       users: [],
+      ring_groups: [],
+      workflows: [],
       changelogs: [],
       disposition_statuses: [],
       call_dispositions: [],
       filters: [],
-      workflows: [],
-      ring_groups: [],
-      settings: null,
       first_login: false,
       user_status: false,
       oldAgentStatus: false,
@@ -96,9 +56,7 @@ export default function (/* { ssrContext } */) {
       },
       // cached states
       sidebar_folded: false,
-      current_company: null,
-      comm_table_fields: ['disposition_status', 'incoming_number', 'created_at', 'talk_time', 'lead_number', 'recording_url', 'voicemail_url', 'destination_number', 'tags', 'notes', 'operations', 'user'],
-      dashboard_type: 'Call Tracking'
+      current_company: null
     },
 
     actions: {
@@ -250,22 +208,6 @@ export default function (/* { ssrContext } */) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
       },
 
-      newTag ({ commit }, tag) {
-        commit('NEW_TAG', tag)
-      },
-
-      updateTag ({ commit }, tag) {
-        commit('UPDATE_TAG', tag)
-      },
-
-      deleteTag ({ commit }, tag) {
-        commit('DELETE_TAG', tag)
-      },
-
-      setTags ({ commit }, tags) {
-        commit('SET_TAGS', tags)
-      },
-
       newRingGroup ({ commit }, ringGroup) {
         commit('NEW_RING_GROUP', ringGroup)
       },
@@ -298,10 +240,6 @@ export default function (/* { ssrContext } */) {
         commit('RESET_FILTERS')
       },
 
-      setSettings ({ commit }, settings) {
-        commit('SET_SETTINGS', settings)
-      },
-
       setFirstLogin ({ commit }, firstLogin) {
         commit('SET_FIRST_LOGIN', firstLogin)
       },
@@ -328,10 +266,6 @@ export default function (/* { ssrContext } */) {
 
       setChangelogs ({ commit }, changelogs) {
         commit('SET_CHANGELOGS', changelogs)
-      },
-
-      setDashboardType ({ commit }, type) {
-        commit('SET_DASHBOARD_TYPE', type)
       },
 
       setCommTableFields ({ commit }, fields) {
@@ -583,56 +517,6 @@ export default function (/* { ssrContext } */) {
         }
       },
 
-      NEW_DESTINATION_NUMBER (state, destinationNumber) {
-        if (resourceExists(state.destination_numbers, destinationNumber)) {
-          return
-        }
-        state.destination_numbers.push(destinationNumber)
-      },
-
-      UPDATE_DESTINATION_NUMBER (state, destinationNumber) {
-        let found = state.destination_numbers.find(o => o.id === destinationNumber.id)
-        if (found) {
-          Vue.set(state.destination_numbers, state.destination_numbers.indexOf(found), destinationNumber)
-        }
-      },
-
-      DELETE_DESTINATION_NUMBER (state, destinationNumber) {
-        let found = state.destination_numbers.find(o => o.id === destinationNumber.id)
-        if (found) {
-          state.destination_numbers.splice(state.destination_numbers.indexOf(found), 1)
-        }
-      },
-
-      SET_DESTINATION_NUMBERS (state, destinationNumbers) {
-        state.destination_numbers = destinationNumbers
-      },
-
-      NEW_TAG (state, tag) {
-        if (resourceExists(state.tags, tag)) {
-          return
-        }
-        state.tags.push(tag)
-      },
-
-      UPDATE_TAG (state, tag) {
-        let found = state.tags.find(o => o.id === tag.id)
-        if (found) {
-          Vue.set(state.tags, state.tags.indexOf(found), tag)
-        }
-      },
-
-      DELETE_TAG (state, tag) {
-        let found = state.tags.find(o => o.id === tag.id)
-        if (found) {
-          state.tags.splice(state.tags.indexOf(found), 1)
-        }
-      },
-
-      SET_TAGS (state, tags) {
-        state.tags = tags
-      },
-
       NEW_RING_GROUP (state, ringGroup) {
         if (resourceExists(state.ring_groups, ringGroup)) {
           return
@@ -668,28 +552,11 @@ export default function (/* { ssrContext } */) {
       },
 
       RESET_VUEX (state) {
-        state = Object.assign(state, Filters.DEFAULT_STATE)
+        state = Object.assign(state, Default.DEFAULT_STATE)
       },
 
       RESET_FILTERS (state) {
-        const campaignId = state.filter.campaign_id
-        const userId = state.filter.user_id
-        const workflowId = state.filter.workflow_id
-        state.filter = Object.assign(state.filter, Filters.DEFAULT_STATE.filter)
-        if (campaignId) {
-          state.filter.campaign_id = campaignId
-        }
-        if (userId) {
-          state.filter.user_id = userId
-        }
-        if (workflowId) {
-          state.filter.workflow_id = workflowId
-        }
-        state.filter.changed = false
-      },
-
-      SET_SETTINGS (state, settings) {
-        state.settings = settings
+        state.filter = Object.assign(state.filter, Default.DEFAULT_STATE.filter)
       },
 
       SET_FIRST_LOGIN (state, firstLogin) {
@@ -698,10 +565,6 @@ export default function (/* { ssrContext } */) {
 
       SET_SIDEBAR_FOLDED (state, status) {
         state.sidebar_folded = status
-      },
-
-      SET_DASHBOARD_TYPE (state, type) {
-        state.dashboard_type = type
       },
 
       SET_COMM_TABLE_FIELDS (state, fields) {
