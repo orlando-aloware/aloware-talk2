@@ -19,6 +19,7 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     state: {
       filter: {},
+      tags: [],
       campaigns: [],
       users: [],
       ring_groups: [],
@@ -208,6 +209,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
       },
 
+      newTag ({ commit }, tag) {
+        commit('NEW_TAG', tag)
+      },
+
       newRingGroup ({ commit }, ringGroup) {
         commit('NEW_RING_GROUP', ringGroup)
       },
@@ -238,6 +243,10 @@ export default function (/* { ssrContext } */) {
 
       resetFilters ({ commit }) {
         commit('RESET_FILTERS')
+      },
+
+      setUsage ({ commit }, usage) {
+        commit('SET_USAGE', usage)
       },
 
       setFirstLogin ({ commit }, firstLogin) {
@@ -517,6 +526,31 @@ export default function (/* { ssrContext } */) {
         }
       },
 
+      NEW_TAG (state, tag) {
+        if (resourceExists(state.tags, tag)) {
+          return
+        }
+        state.tags.push(tag)
+      },
+
+      UPDATE_TAG (state, tag) {
+        let found = state.tags.find(o => o.id === tag.id)
+        if (found) {
+          Vue.set(state.tags, state.tags.indexOf(found), tag)
+        }
+      },
+
+      DELETE_TAG (state, tag) {
+        let found = state.tags.find(o => o.id === tag.id)
+        if (found) {
+          state.tags.splice(state.tags.indexOf(found), 1)
+        }
+      },
+
+      SET_TAGS (state, tags) {
+        state.tags = tags
+      },
+
       NEW_RING_GROUP (state, ringGroup) {
         if (resourceExists(state.ring_groups, ringGroup)) {
           return
@@ -557,6 +591,10 @@ export default function (/* { ssrContext } */) {
 
       RESET_FILTERS (state) {
         state.filter = Object.assign(state.filter, Default.DEFAULT_STATE.filter)
+      },
+
+      SET_USAGE (state, usage) {
+        state.usage = usage
       },
 
       SET_FIRST_LOGIN (state, firstLogin) {

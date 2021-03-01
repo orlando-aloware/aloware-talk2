@@ -18,7 +18,15 @@ $accent    : #9C27B0;
 
 $dark      : #1D1D1D;
 
-$positive  : #21BA45;
+$positive  : #00BF4A;
 $negative  : #C10015;
 $info      : #31CCEC;
 $warning   : #F2C037;
+
+/*
+ Fonts
+ */
+$family-sans-serif: "Product Sans", BlinkMacSystemFont, -apple-system, "Roboto", "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+$family-primary: $family-sans-serif;
+$family-secondary: $family-sans-serif;
+$body-family: $family-primary;

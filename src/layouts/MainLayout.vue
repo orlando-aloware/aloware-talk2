@@ -1,6 +1,162 @@
 <template>
-  <div>
-    <dialer v-if="auth.user.authenticated"></dialer>
+  <div  class="h-100"
+        :class="[auth.user.authenticated ? 'dashboard' : 'guest']">
+    <div class="h-100"
+         v-if="!showUpgradeDialog">
+      <div v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
+        <app-header></app-header>
+        <app-sidebar></app-sidebar>
+      </div>
+      <section class="main-content section h-100">
+        <template v-if="!loading"
+                  class="h-100">
+          <transition :name="transitionName"
+                      mode="out-in"
+                      @beforeLeave="beforeLeave"
+                      @enter="enter"
+                      @afterEnter="afterEnter">
+            <keep-alive>
+              <router-view></router-view>
+            </keep-alive>
+          </transition>
+        </template>
+
+        <div v-else
+             class="d-flex justify-content-center align-items-center text-center text-black h-100">
+          <div class="container">
+            <q-spinner-bars color="success"
+                            size="40px"/>
+            <div>
+              <div v-if="!onlineStatus">
+                <span>Network is <b>offline</b></span>
+              </div>
+              <div v-else-if="!authCheckStatus">
+                <span>Checking authentication</span>
+                <div class="container"
+                     v-if="showRefreshButton">
+                  <b-button type="is-link"
+                            @click="refreshPage"
+                            expanded>
+                    Refresh
+                  </b-button>
+                </div>
+              </div>
+              <div v-else>
+                <span>Loading</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+                  ref="appFooter">
+      </app-footer>
+      <dialer v-if="auth.user.authenticated"></dialer>
+    </div>
+
+    <q-dialog v-model="showUpgradeDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-red text-white"
+              style="width: 300px">
+        <q-card-section>
+          <div class="text-h6">Oops!</div>
+        </q-card-section>
+
+        <q-card-section>
+          It looks like that you are using an outdated version of the app, please download and install the new version
+          to continue using it.
+        </q-card-section>
+
+        <q-card-actions align="right"
+                        class="bg-white text-danger">
+          <q-btn type="a"
+                 label="Visit Website"
+                 @click="openApps"
+                 flat>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showNewVersionDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-blue text-white"
+              style="width: 300px">
+        <q-card-section>
+          <div class="text-h6">Update Available</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none"
+                        v-html="updateDialogText">
+        </q-card-section>
+
+        <q-card-actions align="right"
+                        class="bg-white text-blue">
+          <q-btn label="Close"
+                 v-close-popup
+                 flat>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showUpdateErrorDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-red text-white"
+              style="width: 300px">
+        <q-card-section>
+          <div class="text-h6">Download Failed</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none"
+                        v-html="updateDialogText">
+        </q-card-section>
+
+        <q-card-actions align="right"
+                        class="bg-white">
+          <q-btn label="Close"
+                 text-color="red"
+                 v-close-popup
+                 flat>
+          </q-btn>
+          <q-btn label="Quit"
+                 text-color="red"
+                 @click="quitApp"
+                 flat>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showUpdateDownloadedDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-greenish text-white"
+              style="width: 300px">
+        <q-card-section>
+          <div class="text-h6">Update Downloaded</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none"
+                        v-html="updateDialogText">
+        </q-card-section>
+
+        <q-card-actions align="right"
+                        class="bg-white text-greenish">
+          <q-btn label="Restart"
+                 @click="restartApp"
+                 flat>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -11,6 +167,9 @@ import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mi
 import { Platform } from 'quasar'
 import broadcast from '../boot/broadcast'
 import Dialer from '../components/dialer'
+import AppHeader from '../components/layout/app-header'
+import AppSidebar from '../components/layout/app-sidebar'
+import AppFooter from '../components/layout/app-footer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
 
@@ -33,6 +192,9 @@ export default {
   mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
 
   components: {
+    AppHeader,
+    AppSidebar,
+    AppFooter,
     Dialer
   },
 
@@ -260,6 +422,7 @@ export default {
     }
 
     if (this.auth.user && this.auth.user.authenticated) {
+      console.log('authenticated')
       this.initAuth()
     } else {
       this.auth.check().then(() => {
@@ -269,11 +432,9 @@ export default {
       }).catch(() => {
         if (this.$route.name !== 'Login') {
           // @todo Go to login page
-          /*
           this.$router.push({ name: 'Login' }).catch(err => {
             console.log(err)
           })
-          */
         }
         this.loading = false
         this.authCheckStatus = false
@@ -648,6 +809,33 @@ export default {
           this.loadingUsers = false
         })
       }
+    },
+
+    getTags (page = 1) {
+      if (page === 1) {
+        this.loadingTags = true
+      }
+      let params = {
+        page: page
+      }
+      return this.$axios.get('/api/v1/tag', { params }).then(res => {
+        if (res.data.data && res.data.data.length) {
+          res.data.data.forEach((tag) => {
+            this.newTag(tag)
+          })
+        }
+        if (res.data.to !== res.data.total) {
+          this.getTags(page + 1)
+        } else {
+          window.VueEvent.fire('tags_loaded')
+          this.loadingTags = false
+          return Promise.resolve()
+        }
+      }).catch(err => {
+        console.log(err)
+        this.loadingTags = false
+        return Promise.reject()
+      })
     },
 
     getDispositionStatuses () {
@@ -1049,10 +1237,15 @@ export default {
       }
     },
 
+    logout () {
+      this.auth.logout()
+    },
+
     ...mapActions([
       'setCurrentCompany',
       'setCampaigns',
       'setUsers',
+      'newTag',
       'setDispositionStatuses',
       'setCallDispositions',
       'setDialerToken',
