@@ -21,9 +21,23 @@ const routes = [
       },
       {
         path: '',
-        alias: 'inbox',
         name: 'Inbox',
         component: () => import('pages/Inbox.vue')
+      },
+      {
+        path: 'contacts',
+        name: 'Contacts',
+        component: () => import('pages/Contacts.vue')
+      },
+      {
+        path: 'power-dialer',
+        name: 'Power Dialer',
+        component: () => import('pages/PowerDialer.vue')
+      },
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('pages/Dashboard.vue')
       }
     ]
   },

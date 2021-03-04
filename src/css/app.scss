@@ -19,17 +19,25 @@ html, body, #q-app {
   &.q-field__control-container,
   &.q-field__control,
   &.q-field__control-container,
-  &.q-notification,
   &.q-notification__wrapper,
   &.q-notification__content,
-  .q-field__inner {
+  &.q-btn__wrapper,
+  &.q-btn__content,
+  &.q-avatar__content,
+  &.q-item,
+  .q-field__inner, {
     padding-right: 0;
     padding-left: 0;
-    margin-left: 0px;
-    margin-right: 0px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  &.q-notification {
+    margin-left: 0;
+    margin-right: 15px;
   }
   .q-field__native,
-  .q-field:not(.q-field--float) .q-field__label {
+  .q-field:not(.q-field--float) .q-field__label,
+  .q-item__label {
     padding-right: 15px;
     padding-left: 15px;
   }
@@ -38,9 +46,9 @@ html, body, #q-app {
     padding-left: 20px;
   }
   .q-field__append {
-    margin-left: 0px;
-    margin-right: 0px;
-    padding-left: 0px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
     padding-right: 8px;
   }
   .q-field__bottom {
@@ -49,6 +57,13 @@ html, body, #q-app {
   .q-field__messages {
     flex: auto !important;
     width: 100% !important;
+  }
+}
+
+.guest {
+  .page-container {
+    padding: 0 0 0 0 !important;
+    margin: 0 0 0 0 !important;
   }
 }
 
@@ -83,9 +98,6 @@ html, body, #q-app {
   .q-carousel__navigation-icon--inactive {
     color: #D2D2D2 !important;
   }
-  .q-carousel__navigation button:not(first-child) {
-    padding-left: 20px;
-  }
 }
 
 .login-form {
@@ -103,17 +115,43 @@ html, body, #q-app {
   .login-info {
     display: none !important;
   }
+  .page-icon,
+  .mobile-menu {
+    display: block !important;
+  }
 }
 
 @media (min-width: 992px) {
   .login-form-logo {
     display: none !important;
   }
+  .dashboard {
+    header {
+      left: 60px;
+    }
+    .sidebar-wrapper,
+    .sidebar-wrapper > aside {
+      display: block !important;
+    }
+    .sidebar-wrapper {
+      width: 60px;
+    }
+    .sidebar-wrapper > aside {
+      transform: translateX(0px) !important;
+      visibility: visible !important;
+    }
+  }
 }
 
 @media (max-width: 480px) {
   .login-form-logo {
     width: 65%;
+  }
+  .sidebar-wrapper-sm {
+    max-width: 38px;
+  }
+  .page-title {
+    font-size: 22px;
   }
 }
 
@@ -253,4 +291,73 @@ html, body, #q-app {
 .rounded-icon-opaque {
   border-radius: 32px;
   box-shadow: 0 0 0 8px rgba(0,191,74,0.2);
+}
+
+.header {
+  width: auto;
+  height: 59px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.sidebar-wrapper,
+.sidebar-wrapper > aside {
+  max-width: 60px;
+}
+
+.separator-blur {
+  opacity: 0.2;
+}
+
+.sidebar {
+  height: 100%;
+  background-color: #15163F;
+  .nav-icons {
+    &:not(.active) {
+      opacity: 0.5;
+    }
+  }
+}
+
+.h1,
+.h2,
+.page-title {
+  font-family: Product Sans;
+  color: #202125;
+  letter-spacing: 0.29px;
+  margin-bottom: 0 !important;
+}
+
+.h1,
+.page-title {
+  font-size: 26px;
+  line-height: 28px;
+}
+
+.h2 {
+  font-size: 22px !important;
+  line-height: 28px !important;
+}
+
+.page-icon,
+.mobile-menu {
+  display: none;
+}
+
+.profile-menu {
+  .q-btn-dropdown__arrow {
+    font-size: 0.8em;
+  }
+}
+
+.avatar {
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  & > span {
+    vertical-align: middle;
+  }
 }

@@ -1,59 +1,76 @@
 <template>
-  <div  class="h-100"
-        :class="[auth.user.authenticated ? 'dashboard' : 'guest']">
-    <div class="h-100"
-         v-if="!showUpgradeDialog">
-      <div v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
-        <app-header></app-header>
-        <app-sidebar></app-sidebar>
-      </div>
-      <section class="main-content section h-100">
-        <template v-if="!loading"
-                  class="h-100">
-          <transition :name="transitionName"
-                      mode="out-in"
-                      @beforeLeave="beforeLeave"
-                      @enter="enter"
-                      @afterEnter="afterEnter">
-            <keep-alive>
-              <router-view></router-view>
-            </keep-alive>
-          </transition>
-        </template>
+  <div class="h-100"
+       :class="[auth.user.authenticated ? 'dashboard' : 'guest',
+       light_mode ? 'light-mode' : 'night-mode']">
+    <q-layout class="h-100"
+              view="lHh Lpr lff"
+              v-if="!showUpgradeDialog">
+      <q-header class="bg-transparent pl-1 pl-lg-4 ml-lg-1 pt-lg-1 pr-2 pr-lg-2 mr-lg-2"
+                v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
+        <app-header @toggleSidebar="toggleSidebar"/>
+      </q-header>
+      <q-drawer
+        v-model="sidebar_visibile"
+        v-show="sidebar_visibile && auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+        :breakpoint="0"
+        class="h-100 sidebar-wrapper-sm sidebar-wrapper"
+        :width="60"
+        content-class="sidebar-wrapper">
+        <q-list class="h-100">
+          <app-sidebar v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+                       class="sidebar"
+                       :light_mode="light_mode"
+                       @toggleMode="toggleMode" />
+        </q-list>
+      </q-drawer>
 
-        <div v-else
-             class="d-flex justify-content-center align-items-center text-center text-black h-100">
-          <div class="container">
-            <q-spinner-bars color="success"
-                            size="40px"/>
-            <div>
-              <div v-if="!onlineStatus">
-                <span>Network is <b>offline</b></span>
-              </div>
-              <div v-else-if="!authCheckStatus">
-                <span>Checking authentication</span>
-                <div class="container"
-                     v-if="showRefreshButton">
-                  <b-button type="is-link"
-                            @click="refreshPage"
-                            expanded>
-                    Refresh
-                  </b-button>
+      <q-page-container class="page-container h-100 pl-1 pl-sm-4 ml-sm-1 pt-sm-1 pr-2 pr-sm-2 mr-sm-2">
+        <section class="main-content section h-100">
+          <template v-if="!loading"
+                    class="h-100">
+            <transition :name="transitionName"
+                        mode="out-in"
+                        @beforeLeave="beforeLeave"
+                        @enter="enter"
+                        @afterEnter="afterEnter">
+              <keep-alive>
+                <router-view></router-view>
+              </keep-alive>
+            </transition>
+          </template>
+          <div v-else
+               class="d-flex justify-content-center align-items-center text-center text-black h-100">
+            <div class="container">
+              <q-spinner-bars color="success"
+                              size="40px"/>
+              <div>
+                <div v-if="!onlineStatus">
+                  <span>Network is <b>offline</b></span>
                 </div>
-              </div>
-              <div v-else>
-                <span>Loading</span>
+                <div v-else-if="!authCheckStatus">
+                  <span>Checking authentication</span>
+                  <div class="container"
+                       v-if="showRefreshButton">
+                    <b-button type="is-link"
+                              @click="refreshPage"
+                              expanded>
+                      Refresh
+                    </b-button>
+                  </div>
+                </div>
+                <div v-else>
+                  <span>Loading</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
-                  ref="appFooter">
-      </app-footer>
-      <dialer v-if="auth.user.authenticated"></dialer>
-    </div>
-
+        </section>
+        <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+                    ref="appFooter">
+        </app-footer>
+        <dialer v-if="auth.user.authenticated"></dialer>
+      </q-page-container>
+    </q-layout>
     <q-dialog v-model="showUpgradeDialog"
               transition-show="scale"
               transition-hide="scale"
@@ -79,7 +96,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
     <q-dialog v-model="showNewVersionDialog"
               transition-show="scale"
               transition-hide="scale"
@@ -103,7 +119,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
     <q-dialog v-model="showUpdateErrorDialog"
               transition-show="scale"
               transition-hide="scale"
@@ -133,7 +148,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
     <q-dialog v-model="showUpdateDownloadedDialog"
               transition-show="scale"
               transition-hide="scale"
@@ -166,12 +180,12 @@ import { mapActions, mapState } from 'vuex'
 import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
 import { Platform } from 'quasar'
 import broadcast from '../boot/broadcast'
-import Dialer from '../components/dialer'
-import AppHeader from '../components/layout/app-header'
-import AppSidebar from '../components/layout/app-sidebar'
-import AppFooter from '../components/layout/app-footer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
+import AppHeader from '../components/layout/app-header'
+import AppFooter from '../components/layout/app-footer'
+import AppSidebar from '../components/layout/app-sidebar'
+import Dialer from '../components/dialer'
 
 if (Platform.is.cordova) {
   document.addEventListener('deviceready', () => {
@@ -189,15 +203,14 @@ if (Platform.is.cordova) {
 export default {
   name: 'MyLayout',
 
-  mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
-
   components: {
     AppHeader,
-    AppSidebar,
     AppFooter,
+    AppSidebar,
     Dialer
   },
 
+  mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
   data () {
     return {
       auth: auth,
@@ -227,6 +240,8 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
+      sidebar_visibile: false,
+      light_mode: true,
       CommunicationTypes
     }
   },
@@ -477,6 +492,14 @@ export default {
   },
 
   methods: {
+    toggleMode () {
+      this.light_mode = !this.light_mode
+    },
+
+    toggleSidebar () {
+      this.sidebar_visibile = !this.sidebar_visibile
+    },
+
     setHubSpotDeal (phoneNumber) {
       let link = phoneNumber.replace('hs:', '').replace('deal=', '')
       let parts = link.split('?')
@@ -1238,7 +1261,30 @@ export default {
     },
 
     logout () {
-      this.auth.logout()
+      let deviceInfo = null
+      const isMobile = this.$q.platform.is.cordova
+      if (isMobile) {
+        deviceInfo = {
+          registration_id: localStorage.getItem('registrationId'),
+          registration_type: localStorage.getItem('registrationType'),
+          model: window.device.model,
+          platform: window.device.platform,
+          is_virtual: window.device.isVirtual,
+          uuid: window.device.uuid,
+          version: window.device.version,
+          manufacturer: window.device.manufacturer,
+          serial: window.device.serial,
+          app_version: localStorage.getItem('version')
+        }
+      }
+      this.auth.logout(deviceInfo).then(res => {
+        this.response = res.data
+        this.$router.push({ name: 'Login' }).catch(err => {
+          console.log(err)
+        })
+      }).catch(err => {
+        console.log(err)
+      })
     },
 
     ...mapActions([

@@ -3,6 +3,7 @@ import * as LrnTypes from '../constants/lrn-types'
 import * as CampaignCallRouterBehavior from '../constants/campaign-call-router-behaviors'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
+import * as AgentStatus from '../constants/agent-status'
 
 export default async ({ Vue }) => {
   // date / time / duration related
@@ -683,5 +684,34 @@ export default async ({ Vue }) => {
     } else {
       return ''
     }
+  })
+  Vue.filter('agentStatusClass', (agentStatus) => {
+    agentStatus = parseInt(agentStatus)
+    if (agentStatus !== null) {
+      switch (agentStatus) {
+        case AgentStatus.AGENT_STATUS_OFFLINE:
+          return 'bg-blue-grey-6'
+        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
+          return 'bg-green-6'
+        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
+          return 'bg-red-6'
+        case AgentStatus.AGENT_STATUS_ON_BREAK:
+          return 'bg-orange-6'
+        case AgentStatus.AGENT_STATUS_ON_CALL:
+          return 'bg-light-blue-6'
+        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
+          return 'bg-yellow-6'
+        case AgentStatus.AGENT_STATUS_RINGING:
+          return 'bg-lime-13'
+        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
+          return 'bg-white'
+        case AgentStatus.AGENT_STATUS_SENTRY:
+          return 'bg-dark'
+        default:
+          return 'bg-grey-6'
+      }
+    }
+
+    return 'bg-grey-6'
   })
 }

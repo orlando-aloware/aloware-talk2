@@ -13,7 +13,7 @@ import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 
 export default {
-  name: 'dialer',
+  name: 'Dialer',
 
   mixins: [aclMixin, agentMixin],
 
@@ -217,6 +217,7 @@ export default {
           this.$q.notify({
             timeout: 10000,
             type: 'negative',
+            textColor: 'white',
             message: 'Whoops! You have lost connection with the server. Check your internet connection and try again.'
           })
           this.setDialerIsReady(false)
