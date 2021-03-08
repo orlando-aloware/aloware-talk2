@@ -38,7 +38,7 @@
                 | {{ phoneNumber | fixPhone }}
               </template>
             </div>
-            <div class="xs-text status-label w-100 text-right">{{ statusLabel }}</div>
+            <div class="xs-text inactive status-label w-100 text-right">{{ statusLabel }}</div>
           </span>
         </div>
         <q-btn-dropdown avatar
@@ -118,7 +118,9 @@ export default {
         inbox: 'app-icons/menu/active/inbox.svg',
         contacts: 'app-icons/menu/active/contacts.svg',
         powerdialer: 'app-icons/menu/active/powerdialer.svg',
-        dashboard: 'app-icons/menu/active/dashboard.svg'
+        dashboard: 'app-icons/menu/active/dashboard.svg',
+        account: 'app-icons/menu/active/account.svg',
+        settings: 'app-icons/menu/active/settings.svg'
       },
       pageIcon: null,
       AgentStatus
@@ -171,6 +173,12 @@ export default {
 
     toggleSidebar () {
       this.$emit('toggleSidebar')
+    }
+  },
+
+  watch: {
+    '$route.name': function () {
+      this.updatePageIcon()
     }
   }
 }

@@ -12,7 +12,7 @@
                    label="Inbox"
                    to="/"
                    :icon="icons.inbox"
-                   content-class="tab-icons"
+                   content-class="tab-icons xs-text"
                    :ripple="false"
                    no-caps
                    exact>
