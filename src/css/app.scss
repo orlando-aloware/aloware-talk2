@@ -7,7 +7,6 @@ html {
 
 body {
   overflow-y: hidden;
-  position: fixed;
 }
 
 html, body, #q-app {
@@ -155,6 +154,10 @@ html, body, #q-app {
   }
 }
 
+.page-container {
+  padding-bottom: 70px;
+}
+
 .rectangle {
   box-sizing: border-box;
   height: 60px;
@@ -229,6 +232,25 @@ html, body, #q-app {
   a {
     color: $positive;
   }
+}
+
+.small-text {
+  color: #202125;
+  font-family: Roboto;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  line-height: 16px;
+  .status-label {
+    margin-top: -15px;
+  }
+}
+
+.xs-text {
+  color: #666666;
+  font-family: Roboto;
+  font-size: 10px;
+  letter-spacing: 0.25px;
+  line-height: 13px;
 }
 
 .link {
@@ -361,3 +383,42 @@ html, body, #q-app {
     vertical-align: middle;
   }
 }
+
+.footer {
+  .q-tab--inactive .tab-icons .q-tab__icon {
+    opacity: 0.5;
+  }
+  .tab-icons {
+    .q-tab__icon {
+      height: 20px;
+    }
+    .q-tab__label {
+      font-family: Roboto;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0;
+      line-height: 13px;
+      text-align: center;
+      margin-top:5px;
+    }
+  }
+  .q-tab {
+    padding: 0 0 0 0;
+    text-decoration: none;
+  }
+  .q-tabs {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+  .separator {
+    width: 134px;
+  }
+  .dialpad {
+    .q-tab__icon {
+      width: 40px;
+      height: 40px;
+      color: #ffffff;
+    }
+  }
+}
+

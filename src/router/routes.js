@@ -38,6 +38,16 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('pages/Dashboard.vue')
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('pages/Settings.vue')
+      },
+      {
+        path: 'account',
+        name: 'Account',
+        component: () => import('pages/Account.vue')
       }
     ]
   },
