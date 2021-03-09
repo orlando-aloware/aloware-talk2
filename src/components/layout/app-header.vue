@@ -10,7 +10,7 @@
       <q-img :src="pageIcon"
              height="15px"
              width="20px"
-             class="page-icon d-flex mr-1 d-none d-sm-block d-lg-none" />
+             class="page-icon mr-1 d-none d-sm-block d-lg-none" />
       <div class="page-title font-weight-bold ">
         {{ $route.name }}
       </div>
