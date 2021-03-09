@@ -118,6 +118,9 @@ html, body, #q-app {
   .mobile-menu {
     display: block !important;
   }
+  .page-title {
+    font-size: 22px !important;
+  }
 }
 
 @media (min-width: 992px) {
@@ -148,9 +151,6 @@ html, body, #q-app {
   }
   .sidebar-wrapper-sm {
     max-width: 38px;
-  }
-  .page-title {
-    font-size: 22px;
   }
 }
 
