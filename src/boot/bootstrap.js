@@ -8,10 +8,6 @@ import Bowser from 'bowser'
 import * as Sentry from '@sentry/vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
 localStorage.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
