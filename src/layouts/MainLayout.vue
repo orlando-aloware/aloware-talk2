@@ -5,7 +5,7 @@
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               v-if="!showUpgradeDialog">
-      <q-header class="bg-transparent p-3 py-sm-0 px-sm-0 pl-1 pl-lg-4 ml-lg-1 pt-lg-1 pr-2 pr-lg-2 mr-lg-2"
+      <q-header class="page-header bg-transparent p-3 py-sm-0 px-sm-0 pl-1 pl-lg-4 ml-lg-1 pt-lg-1 pr-2 pr-lg-2 mr-lg-2"
                 v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
         <app-header @toggleSidebar="toggleSidebar"/>
       </q-header>
@@ -13,12 +13,12 @@
         v-model="sidebar_visibile"
         v-show="sidebar_visibile && auth && auth.user && auth.user.authenticated && !isWidget && !loading"
         :breakpoint="0"
-        class="h-100 sidebar-wrapper-sm sidebar-wrapper"
+        class="h-100 sidebar-wrapper-sm sidebar-wrapper d-none d-sm-block"
         :width="60"
         content-class="sidebar-wrapper">
         <q-list class="h-100">
           <app-sidebar v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
-                       class="sidebar"
+                       class="page-sidebar"
                        :light_mode="light_mode"
                        @toggleMode="toggleMode" />
         </q-list>
@@ -68,7 +68,7 @@
         <dialer v-if="auth.user.authenticated"></dialer>
       </q-page-container>
       <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
-                  class="footer h-100 row d-block d-md-none w-100 m-0 px-3 pt-2"
+                  class="page-footer h-100 row d-block d-md-none w-100 m-0 px-3 pt-2"
                   ref="appFooter">
       </app-footer>
     </q-layout>

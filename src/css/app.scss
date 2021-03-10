@@ -145,6 +145,12 @@ html, body, #q-app {
   }
 }
 
+@media (max-width: 575px) {
+  .page-header {
+    left: 0 !important;
+  }
+}
+
 @media (max-width: 480px) {
   .login-form-logo {
     width: 65%;
@@ -323,13 +329,59 @@ html, body, #q-app {
   box-shadow: 0 0 0 8px rgba(0,191,74,0.2);
 }
 
-.header {
+.page-header {
   width: auto;
   height: 59px;
   padding-left: 0;
   padding-right: 0;
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+
+.page-sidebar {
+  height: 100%;
+  background-color: #15163F;
+  .nav-icons {
+    &:not(.active) {
+      opacity: 0.5;
+    }
+  }
+}
+
+.page-footer {
+  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);
+  .tab-icons {
+    .q-tab__icon {
+      height: 20px;
+    }
+    .q-tab__label {
+      font-family: Roboto;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0;
+      line-height: 13px;
+      text-align: center;
+      margin-top:5px;
+    }
+  }
+  .q-tab {
+    padding: 0 0 0 0;
+    text-decoration: none;
+  }
+  .q-tabs {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+  .separator {
+    width: 134px;
+  }
+  .dialpad {
+    .q-tab__icon {
+      width: 40px;
+      height: 40px;
+      color: #ffffff;
+    }
+  }
 }
 
 .sidebar-wrapper,
@@ -339,16 +391,6 @@ html, body, #q-app {
 
 .separator-blur {
   opacity: 0.2;
-}
-
-.sidebar {
-  height: 100%;
-  background-color: #15163F;
-  .nav-icons {
-    &:not(.active) {
-      opacity: 0.5;
-    }
-  }
 }
 
 .h1,
@@ -389,42 +431,6 @@ html, body, #q-app {
   display: inline-block;
   & > span {
     vertical-align: middle;
-  }
-}
-
-.footer {
-  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);
-  .tab-icons {
-    .q-tab__icon {
-      height: 20px;
-    }
-    .q-tab__label {
-      font-family: Roboto;
-      font-size: 10px;
-      font-weight: bold;
-      letter-spacing: 0;
-      line-height: 13px;
-      text-align: center;
-      margin-top:5px;
-    }
-  }
-  .q-tab {
-    padding: 0 0 0 0;
-    text-decoration: none;
-  }
-  .q-tabs {
-    margin-left: 0px;
-    margin-right: 0px;
-  }
-  .separator {
-    width: 134px;
-  }
-  .dialpad {
-    .q-tab__icon {
-      width: 40px;
-      height: 40px;
-      color: #ffffff;
-    }
   }
 }
 
