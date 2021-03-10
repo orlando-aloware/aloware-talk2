@@ -12,28 +12,28 @@
       <q-space class="p-2"/>
     </div>
     <q-btn flat
-           icon="img:app-icons/menu/inbox.svg"
+           icon="img:app-icons/menu/inbox_white.svg"
            size="0.9rem"
            align="center"
            :to="{ name: 'Inbox' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Inbox') ? 'active' : '' ]"/>
     <q-btn flat
-           icon="img:app-icons/menu/contacts.svg"
+           icon="img:app-icons/menu/contacts_white.svg"
            size="0.9rem"
            align="center"
            :to="{ name: 'Contacts' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Contacts') ? 'active' : '' ]"/>
     <q-btn flat
-           icon="img:app-icons/menu/powerdialer.svg"
+           icon="img:app-icons/menu/powerdialer_white.svg"
            size="0.9rem"
            align="center"
            :to="{ name: 'Power Dialer' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Power Dialer') ? 'active' : '' ]"/>
     <q-btn flat
-           icon="img:app-icons/menu/dashboard.svg"
+           icon="img:app-icons/menu/dashboard_white.svg"
            size="0.9rem"
            align="center"
            :to="{ name: 'Dashboard' }"
@@ -52,7 +52,7 @@
       <q-separator class="separator-blur"
                    color="white" />
       <q-btn flat
-             icon="img:app-icons/menu/settings.svg"
+             icon="img:app-icons/menu/settings_white.svg"
              size="0.9rem"
              align="center"
              class="nav-icons w-100 pt-2 pb-2"

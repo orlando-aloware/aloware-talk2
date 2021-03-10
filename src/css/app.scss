@@ -154,8 +154,17 @@ html, body, #q-app {
   }
 }
 
+.page-layout {
+  padding-bottom: 78px;
+}
+
 .page-container {
-  padding-bottom: 70px;
+  .row {
+    padding-right: 0;
+    padding-left: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 .rectangle {
@@ -384,6 +393,7 @@ html, body, #q-app {
 }
 
 .footer {
+  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);
   .tab-icons {
     .q-tab__icon {
       height: 20px;

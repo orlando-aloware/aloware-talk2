@@ -8,7 +8,7 @@
              icon="img:app-icons/header/nav_icon-burger.svg"
              class="mobile-menu d-none d-sm-block d-lg-none mr-2" />
       <q-img :src="pageIcon"
-             height="15px"
+             height="20px"
              width="20px"
              class="page-icon mr-1 d-none d-sm-block d-lg-none" />
       <div class="page-title font-weight-bold ">
@@ -117,12 +117,12 @@ export default {
     return {
       auth: auth,
       pageIcons: {
-        inbox: 'app-icons/menu/active/inbox.svg',
-        contacts: 'app-icons/menu/active/contacts.svg',
-        powerdialer: 'app-icons/menu/active/powerdialer.svg',
-        dashboard: 'app-icons/menu/active/dashboard.svg',
-        account: 'app-icons/menu/active/account.svg',
-        settings: 'app-icons/menu/active/settings.svg'
+        inbox: 'app-icons/menu/inbox_green.svg',
+        contacts: 'app-icons/menu/contacts_green.svg',
+        powerdialer: 'app-icons/menu/powerdialer_green.svg',
+        dashboard: 'app-icons/menu/dashboard_green.svg',
+        account: 'app-icons/menu/account_green.svg',
+        settings: 'app-icons/menu/settings_green.svg'
       },
       pageIcon: null,
       AgentStatus
@@ -168,7 +168,7 @@ export default {
   methods: {
     updatePageIcon () {
       if (this.$route.name) {
-        let pageIndex = this.$route.name.toLowerCase().replace(' ')
+        let pageIndex = this.$route.name.toLowerCase().replace(' ', '')
         this.pageIcon = this.pageIcons[pageIndex]
       }
     },

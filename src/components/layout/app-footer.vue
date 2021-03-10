@@ -92,8 +92,8 @@ export default {
         page = this.$route.name.toLowerCase().replace(' ')
       }
 
-      let iconState = page === icon ? 'active' : 'inactive'
-      this.icons[icon] = 'img:app-icons/menu/' + iconState + '/' + icon + '.svg'
+      let iconColor = page === icon ? '_green' : '_grey'
+      this.icons[icon] = 'img:app-icons/menu/' + icon + iconColor + '.svg'
     }
   },
 

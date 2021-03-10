@@ -2,7 +2,7 @@
   <div class="h-100"
        :class="[auth.user.authenticated ? 'dashboard' : 'guest',
        light_mode ? 'light-mode' : 'night-mode']">
-    <q-layout class="h-100"
+    <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               v-if="!showUpgradeDialog">
       <q-header class="bg-transparent p-3 py-sm-0 px-sm-0 pl-1 pl-lg-4 ml-lg-1 pt-lg-1 pr-2 pr-lg-2 mr-lg-2"
@@ -24,7 +24,7 @@
         </q-list>
       </q-drawer>
 
-      <q-page-container class="page-container h-100 px-3 px-sm-0 pl-1 pl-sm-4 ml-sm-1 pt-sm-1 pr-2 pr-sm-2 mr-sm-2 pb-sm-0">
+      <q-page-container class="page-container h-100 px-3 px-sm-0 pl-1 pl-sm-4 ml-sm-1 pt-sm-1 pr-2 pr-sm-2 mr-sm-2">
         <section class="main-content section h-100">
           <template v-if="!loading"
                     class="h-100">
@@ -65,12 +65,12 @@
             </div>
           </div>
         </section>
-        <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
-                    class="footer d-block d-md-none w-100"
-                    ref="appFooter">
-        </app-footer>
         <dialer v-if="auth.user.authenticated"></dialer>
       </q-page-container>
+      <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+                  class="footer h-100 row d-block d-md-none w-100 m-0 px-3 pt-2"
+                  ref="appFooter">
+      </app-footer>
     </q-layout>
     <q-dialog v-model="showUpgradeDialog"
               transition-show="scale"
