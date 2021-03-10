@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>C95F720D-0A06-46B2-B130-323ACDE10A15</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0.082353 0 0 0 0 0.086275 0 0 0 0 0.247059 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+        <rect id="path-2" x="0" y="0" width="24" height="24"></rect>
+    </defs>
+    <g id="Inbox-(with-Dialer-and-Notifications)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="nav_icon-dashboard" transform="translate(-258.000000, -20.000000)" filter="url(#filter-1)">
+            <g transform="translate(258.000000, 20.000000)" id="notification_outline">
+                <mask id="mask-3" fill="white">
+                    <use xlink:href="#path-2"></use>
+                </mask>
+                <g id="notification-/-notification_outline-(Background/Mask)"></g>
+                <path d="M18,16 L18,10.5 C18,7.43000031 16.8699999,4.86000013 14,4.18000007 L14,2 L10,2 L10,4.18000007 C7.1400001,4.86000013 6,7.42000008 6,10.5 L6,16 L4,17 L4,19 L20,19 L20,17 L18,16 L18,16 Z M12,22 C13.1000004,22 14,21.1000004 14,20 L10,20 C10,21.1000004 10.9000001,22 12,22 C12.7333336,22 12.7333336,22 12,22 Z M8,17 L16,17 L16,10.5 C16,8.01999998 15,5.75 12,5.75 C9,5.75 8,8.01999998 8,10.5 L8,17 L8,17 Z" id="notification-/-notification_outline" fill="#00BF4A" mask="url(#mask-3)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

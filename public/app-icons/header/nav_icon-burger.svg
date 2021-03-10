@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>C2815F09-500A-4CDF-A975-739B5E43B283</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0.082353 0 0 0 0 0.086275 0 0 0 0 0.247059 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+        <rect id="path-2" x="0" y="0" width="24" height="24"></rect>
+    </defs>
+    <g id="Inbox-(with-Dialer-and-Notifications)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="nav_icon-dashboard-copy-2" transform="translate(-58.000000, -21.000000)" filter="url(#filter-1)">
+            <g transform="translate(58.000000, 21.000000)" id="hamburger">
+                <mask id="mask-3" fill="white">
+                    <use xlink:href="#path-2"></use>
+                </mask>
+                <g id="menu-/-hamburger-(Background/Mask)"></g>
+                <path d="M3,6 L21,6 L21,8 L3,8 L3,6 Z M21,13 L21,11 L3,11 L3,13 L21,13 Z M21,18 L21,16 L3,16 L3,18 L21,18 Z" id="menu-/-hamburger" fill="#00BF4A" mask="url(#mask-3)"></path>
+            </g>
+        </g>
+    </g>
+</svg>
