@@ -5,70 +5,72 @@
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               v-if="!showUpgradeDialog">
-      <q-header class="page-header bg-transparent p-3 py-sm-0 px-sm-0 pl-1 pl-lg-4 ml-lg-1 pt-lg-1 pr-2 pr-lg-2 mr-lg-2"
-                v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
-        <app-header @toggleSidebar="toggleSidebar"/>
-      </q-header>
+      <div class="h-100"
+           :class="[sidebar_visibile ? 'sidebar-active' : '',
+           auth.user.authenticated ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2' : '']">
+        <q-header class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
+                  v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
+          <app-header @toggleSidebar="toggleSidebar"/>
+        </q-header>
+        <q-page-container class="page-container h-100 pl-lg-5 ml-lg-2 q-px-xs-md">
+          <section class="main-content section h-100 py-2">
+            <template v-if="!loading"
+                      class="h-100">
+              <transition :name="transitionName"
+                          mode="out-in"
+                          @beforeLeave="beforeLeave"
+                          @enter="enter"
+                          @afterEnter="afterEnter">
+                <keep-alive>
+                  <router-view></router-view>
+                </keep-alive>
+              </transition>
+            </template>
+            <div v-else
+                 class="d-flex justify-content-center align-items-center text-center text-black h-100">
+              <div class="container">
+                <q-spinner-bars color="success"
+                                size="40px"/>
+                <div>
+                  <div v-if="!onlineStatus">
+                    <span>Network is <b>offline</b></span>
+                  </div>
+                  <div v-else-if="!authCheckStatus">
+                    <span>Checking authentication</span>
+                    <div class="container"
+                         v-if="showRefreshButton">
+                      <b-button type="is-link"
+                                @click="refreshPage"
+                                expanded>
+                        Refresh
+                      </b-button>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <span>Loading</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <dialer v-if="auth.user.authenticated"></dialer>
+        </q-page-container>
+      </div>
       <q-drawer
         v-model="sidebar_visibile"
-        v-show="sidebar_visibile && auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+        v-show="sidebar_visibile && auth && auth.user && auth.user.authenticated && !loading"
         :breakpoint="0"
         class="h-100 sidebar-wrapper-sm sidebar-wrapper d-none d-sm-block"
         :width="60"
         content-class="sidebar-wrapper">
         <q-list class="h-100">
-          <app-sidebar v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
-                       class="page-sidebar"
+          <app-sidebar class="page-sidebar"
                        :light_mode="light_mode"
                        @toggleMode="toggleMode" />
         </q-list>
       </q-drawer>
-
-      <q-page-container class="page-container h-100 px-3 px-sm-0 pl-1 pl-sm-4 ml-sm-1 pt-sm-1 pr-2 pr-sm-2 mr-sm-2">
-        <section class="main-content section h-100">
-          <template v-if="!loading"
-                    class="h-100">
-            <transition :name="transitionName"
-                        mode="out-in"
-                        @beforeLeave="beforeLeave"
-                        @enter="enter"
-                        @afterEnter="afterEnter">
-              <keep-alive>
-                <router-view></router-view>
-              </keep-alive>
-            </transition>
-          </template>
-          <div v-else
-               class="d-flex justify-content-center align-items-center text-center text-black h-100">
-            <div class="container">
-              <q-spinner-bars color="success"
-                              size="40px"/>
-              <div>
-                <div v-if="!onlineStatus">
-                  <span>Network is <b>offline</b></span>
-                </div>
-                <div v-else-if="!authCheckStatus">
-                  <span>Checking authentication</span>
-                  <div class="container"
-                       v-if="showRefreshButton">
-                    <b-button type="is-link"
-                              @click="refreshPage"
-                              expanded>
-                      Refresh
-                    </b-button>
-                  </div>
-                </div>
-                <div v-else>
-                  <span>Loading</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <dialer v-if="auth.user.authenticated"></dialer>
-      </q-page-container>
       <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
-                  class="page-footer h-100 row d-block d-md-none w-100 m-0 px-3 pt-2"
+                  class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
                   ref="appFooter">
       </app-footer>
     </q-layout>

@@ -1,5 +1,5 @@
 <template>
-  <div class="login-info">
+  <div class="d-none d-lg-block">
     <div class="default-bg h-100 d-flex justify-content-center align-items-center text-center">
       <div>
         <img src="app-icons/misc/logo_white.svg"

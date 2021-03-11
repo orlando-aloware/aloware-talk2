@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="header">
+  <q-toolbar class="page-header">
     <div class="d-flex h-100 align-items-center">
       <q-btn flat
              @click="toggleSidebar"
@@ -11,7 +11,7 @@
              height="20px"
              width="20px"
              class="page-icon mr-1 d-none d-sm-block d-lg-none" />
-      <div class="page-title font-weight-bold ">
+      <div class="page-title font-weight-bold">
         {{ $route.name }}
       </div>
     </div>

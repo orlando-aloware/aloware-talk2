@@ -4,7 +4,7 @@
     <login-large-screens-info v-show="!success" class="col-5 px-0" />
     <div v-if="!success" class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-        <img src="app-icons/misc/logo.svg" class="col-6 col-sm-auto login-form-logo pb-5 px-0" />
+        <img src="app-icons/misc/logo.svg" class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0" />
         <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-2 mb-1">
           Reset Password
         </div>
@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import LoginLargeScreensInfo from 'components/login/login-large-screens-info'
+import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import { guestMixin } from '../boot/mixins'
 import { mapActions } from 'vuex'
 export default {
