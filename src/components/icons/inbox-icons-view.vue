@@ -1,83 +1,79 @@
 <template>
   <div class="icons-view">
     <div class="text-center">
-      <phone />
+      <phone-icon />
       <div class="small text-muted">phone</div>
     </div>
     <div class="text-center">
-      <hide-minimize />
+      <hide-minimize-icon />
       <div class="small text-muted">hide-minimize</div>
     </div>
     <div class="text-center">
-      <message />
+      <message-icon />
       <div class="small text-muted">message</div>
     </div>
     <div class="text-center">
-      <record />
+      <record-icon />
       <div class="small text-muted">record</div>
     </div>
     <div class="text-center">
-      <show-content />
+      <show-content-icon />
       <div class="small text-muted">show-content</div>
     </div>
     <div class="text-center">
-      <task />
+      <task-icon />
       <div class="small text-muted">task</div>
     </div>
     <div class="text-center">
-      <voice-mail />
+      <voice-mail-icon />
       <div class="small text-muted">voice-mail</div>
     </div>
     <!-- ACTIVE -->
     <div class="text-center">
-      <phone iconColor="#00bf4a" />
+      <phone-icon iconColor="#00bf4a" />
       <div class="small text-muted">phone</div>
     </div>
     <div class="text-center">
-      <hide-minimize iconColor="#00bf4a" />
-      <div class="small text-muted">hide-minimize</div>
-    </div>
-    <div class="text-center">
-      <message iconColor="#00bf4a" />
+      <message-icon iconColor="#00bf4a" />
       <div class="small text-muted">message</div>
     </div>
     <div class="text-center">
-      <record iconColor="#00bf4a" />
+      <record-icon iconColor="#00bf4a" />
       <div class="small text-muted">record</div>
     </div>
     <div class="text-center">
-      <show-content iconColor="#00bf4a" />
+      <show-content-icon iconColor="#00bf4a" />
       <div class="small text-muted">show-content</div>
     </div>
     <div class="text-center">
-      <task iconColor="#00bf4a" />
+      <task-icon iconColor="#00bf4a" />
       <div class="small text-muted">task</div>
     </div>
     <div class="text-center">
-      <voice-mail iconColor="#00bf4a" />
+      <voice-mail-icon iconColor="#00bf4a" />
       <div class="small text-muted">voice-mail</div>
     </div>
   </div>
 </template>
 
 <script>
-import Phone from './phone.vue'
-import HideMinimize from './hide-minimize.vue'
-import Message from './message.vue'
-import Record from './record.vue'
-import ShowContent from './show-content.vue'
-import Task from './task.vue'
-import VoiceMail from './voicemail.vue'
+import PhoneIcon from './phone-icon.vue'
+import HideMinimizeIcon from './hide-minimize-icon.vue'
+import MessageIcon from './message-icon.vue'
+import RecordIcon from './record-icon.vue'
+import ShowContentIcon from './show-content-icon.vue'
+import TaskIcon from './task-icon.vue'
+import VoiceMailIcon from './voicemail-icon.vue'
 
 export default {
   components: {
-    Phone,
-    HideMinimize,
-    Message,
-    Record,
-    ShowContent,
-    Task,
-    VoiceMail
+    PhoneIcon,
+    HideMinimizeIcon,
+    MessageIcon,
+    RecordIcon,
+    ShowContentIcon,
+    TaskIcon,
+    VoiceMailIcon
   }
 }
 </script>
