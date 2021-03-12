@@ -14,6 +14,6 @@ const withShadowCard = () => ({
   template: '<card shadow>test</card>'
 })
 
-storiesOf('Cards', module)
+storiesOf('Card', module)
   .add('common', commonCard)
   .add('shadow', withShadowCard)
