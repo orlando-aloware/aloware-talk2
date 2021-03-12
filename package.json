@@ -15,7 +15,8 @@
     "deploy-mac": "quasar build -m electron -T mac -b builder -P always",
     "deploy-linux": "quasar build -m electron -T linux -b builder -P always",
     "deploy-win": "quasar build -m electron -T win -b builder -P always",
-    "deploy-win32": "quasar build -m electron -T win32 -b builder -P always"
+    "deploy-win32": "quasar build -m electron -T win32 -b builder -P always",
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "dependencies": {
     "@quasar/extras": "^1.9.15",
@@ -48,10 +49,16 @@
     "vuex-persistedstate": "^2.7.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.13.10",
     "@quasar/app": "^2.0.0",
     "@quasar/quasar-app-extension-dotenv": "^1.0.5",
+    "@storybook/addon-actions": "^6.1.21",
+    "@storybook/addon-storysource": "^6.1.21",
+    "@storybook/vue": "^6.1.21",
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.2.2",
+    "babel-preset-vue": "^2.0.2",
     "cors": "^2.8.5",
     "devtron": "^1.4.0",
     "electron": "^9.4.2",
@@ -68,7 +75,9 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "^6.1.2"
+    "eslint-plugin-vue": "^6.1.2",
+    "vue-loader": "^15.9.6",
+    "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [
     "last 10 Chrome versions",
