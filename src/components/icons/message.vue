@@ -1,0 +1,48 @@
+<template>
+  <svg
+    :width="width"
+    :height="height"
+    viewBox="0 0 24 24"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+  >
+    <title>message</title>
+    <defs>
+      <rect id="path-1" x="0" y="0" width="24" height="24"></rect>
+    </defs>
+    <g id="message" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="chat">
+        <mask id="mask-2" fill="white">
+          <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="edit-/-comment-(Background/Mask)"></g>
+        <path
+          d="M5,3 C3.89699996,3 3,3.89699996 3,5 L3,21 L7.7996521,17.4000359 C8.14585301,17.1403689 8.5669392,17 8.99970007,17 L19,17 C20.103,17 21,16.103 21,15 L21,5 C21,3.89699996 20.103,3 19,3 L5,3 Z M8.33360004,15 C7.90090066,15 7.47987068,15.1403292 7.1336956,15.3999281 L5,17 L5,5 L19,5 L19,15 L8.33360004,15 Z"
+          id="edit-/-comment"
+          :fill="iconColor"
+          mask="url(#mask-2)"
+        ></path>
+      </g>
+    </g>
+  </svg>
+</template>
+
+<script>
+export default {
+  props: {
+    width: {
+      type: [Number, String],
+      default: 24
+    },
+    height: {
+      type: [Number, String],
+      default: 24
+    },
+    iconColor: {
+      type: String,
+      default: '#999999'
+    }
+  }
+}
+</script>
