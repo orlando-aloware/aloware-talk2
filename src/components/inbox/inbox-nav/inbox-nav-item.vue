@@ -112,8 +112,8 @@ export default {
     align-items: center;
     width: 100%;
     &--compressed {
-      padding-left: 0px;
-      padding-right: 0px;
+      padding-left: 0;
+      padding-right: 0;
       justify-content: center;
     }
   }
@@ -121,7 +121,7 @@ export default {
   &__icon {
     padding-right: 10px;
     &--compressed {
-      padding-right: 0px;
+      padding-right: 0;
     }
   }
 
