@@ -15,5 +15,5 @@ const withShadowCard = () => ({
 })
 
 storiesOf('Card', module)
-  .add('common', commonCard)
-  .add('shadow', withShadowCard)
+  .add('Common', commonCard)
+  .add('Shadow', withShadowCard)
