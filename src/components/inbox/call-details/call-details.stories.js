@@ -27,7 +27,7 @@ const card = () => ({
   template: '<call-details-card /> '
 })
 
-storiesOf('Inbox - Call Information', module)
+storiesOf('Inbox - Call Details', module)
   .add('Labels', labels)
   .add('Tags', tags)
   .add('Header', header)
