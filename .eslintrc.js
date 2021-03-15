@@ -64,7 +64,7 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
     'prefer-promise-reject-errors': 'off',
-
+    'space-before-function-paren': 'off',
     // allow console.log during development only
     'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
     // allow debugger during development only
