@@ -17,8 +17,14 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+a:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
 .edit-text {
   color: $black;
   font-size: 14px;
+  display: inline-block;
+  padding-left: 10px;
 }
 </style>
