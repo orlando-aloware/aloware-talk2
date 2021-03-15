@@ -3,9 +3,9 @@
     <div class="callheader__title">
       {{ name }}
     </div>
-    <a href="#">
+    <button>
       <close-icon />
-    </a>
+    </button>
   </div>
 </template>
 
@@ -27,6 +27,10 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+button {
+  border: none;
+  background-color: transparent;
+}
 .callheader {
   display: flex;
   align-items: center;

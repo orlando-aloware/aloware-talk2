@@ -1,6 +1,7 @@
 import CallDetailsLabel from './call-details-label.vue'
 import CallDetailsTag from './call-details-tag.vue'
 import CallDetailsHeader from './call-details-header.vue'
+import CallDetailsCard from './call-details-card.vue'
 
 import { storiesOf } from '@storybook/vue'
 
@@ -21,7 +22,13 @@ const header = () => ({
   template: '<call-details-header name="Anoosh R" /> '
 })
 
+const card = () => ({
+  components: { CallDetailsCard },
+  template: '<call-details-card /> '
+})
+
 storiesOf('Inbox - Call Information', module)
   .add('Labels', labels)
   .add('Tags', tags)
   .add('Header', header)
+  .add('Card', card)
