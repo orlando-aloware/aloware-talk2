@@ -2,8 +2,6 @@ import Card from './card.vue'
 
 import { storiesOf } from '@storybook/vue'
 
-export default { title: 'default' }
-
 const commonCard = () => ({
   components: { Card },
   template: '<card>test</card>'

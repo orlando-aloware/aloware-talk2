@@ -10,7 +10,7 @@
         <icon :icon="icon" :isActive="isActive" />
       </div>
       <div class="inbox-nav-item__label">{{ label }}</div>
-      <badge v-show="badge == true" :color="badgeColor" :value="badgeValue" />
+      <badge @if="badge" :color="badgeColor" :value="badgeValue" />
     </div>
   </a>
 </template>
@@ -40,12 +40,16 @@ export default {
       type: Boolean,
       default: false
     },
+    isCompressed: {
+      type: Boolean,
+      default: false
+    },
     badge: {
       type: Boolean,
       default: false
     },
     badgeValue: {
-      type: Number,
+      type: [Number, String],
       default: 0
     },
     badgeColor: {
@@ -69,6 +73,10 @@ export default {
   align-items: center;
   height: 40px;
   color: $black;
+
+  &__hide {
+    display: none;
+  }
 
   &__active {
     background-color: $flesh;

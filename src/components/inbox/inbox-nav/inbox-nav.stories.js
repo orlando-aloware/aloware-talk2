@@ -4,8 +4,6 @@ import InboxNavItemView from './inbox-nav-item-view.vue'
 import InboxNavIcon from './inbox-nav-icon.vue'
 import InboxNavBadge from './inbox-nav-badge.vue'
 
-export default { title: 'default' }
-
 const item = () => ({
   components: { InboxNavItemView },
   template: '<inbox-nav-item-view /> '

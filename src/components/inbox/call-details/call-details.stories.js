@@ -5,8 +5,6 @@ import CallDetailsCard from './call-details-card.vue'
 
 import { storiesOf } from '@storybook/vue'
 
-export default { title: 'default' }
-
 const labels = () => ({
   components: { CallDetailsLabel },
   template: '<call-details-label label="Phone" value="(111) 222-3333" />'
