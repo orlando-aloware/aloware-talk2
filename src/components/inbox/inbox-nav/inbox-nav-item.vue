@@ -1,16 +1,34 @@
 <template>
   <a
     class="inbox-nav-item"
-    v-bind:class="{ 'inbox-nav-item__active': isActive }"
+    v-bind:class="{
+      'inbox-nav-item__active': isActive,
+      'inbox-nav-item__compressed': isCompressed
+    }"
     href="/"
     @click.prevent="onClick"
   >
-    <div class="inbox-nav-item__inner">
-      <div class="inbox-nav-item__icon">
+    <div
+      class="inbox-nav-item__inner"
+      v-bind:class="{
+        'inbox-nav-item__inner--compressed': isCompressed
+      }"
+    >
+      <div
+        class="inbox-nav-item__icon"
+        v-bind:class="{
+          'inbox-nav-item__icon--compressed': isCompressed
+        }"
+      >
         <icon :icon="icon" :isActive="isActive" />
       </div>
-      <div class="inbox-nav-item__label">{{ label }}</div>
-      <badge @if="badge" :color="badgeColor" :value="badgeValue" />
+      <div class="inbox-nav-item__label" v-if="!isCompressed">{{ label }}</div>
+      <badge
+        v-if="badge"
+        :color="badgeColor"
+        :value="badgeValue"
+        :compressed="isCompressed"
+      />
     </div>
   </a>
 </template>
@@ -73,13 +91,14 @@ export default {
   align-items: center;
   height: 40px;
   color: $black;
-
-  &__hide {
-    display: none;
-  }
+  position: relative;
 
   &__active {
     background-color: $flesh;
+  }
+
+  &__compressed {
+    overflow: hidden;
   }
 
   &:hover {
@@ -92,10 +111,18 @@ export default {
     display: flex;
     align-items: center;
     width: 100%;
+    &--compressed {
+      padding-left: 0px;
+      padding-right: 0px;
+      justify-content: center;
+    }
   }
 
   &__icon {
     padding-right: 10px;
+    &--compressed {
+      padding-right: 0px;
+    }
   }
 
   &__label {

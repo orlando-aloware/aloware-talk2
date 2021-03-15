@@ -38,16 +38,18 @@
 
     <div class="mb-3">
       <div class="text-muted mb-1">Compressed</div>
-      <inbox-nav-item
-        label="Tasks"
-        value="tasks"
-        icon="task"
-        :isActive="true"
-        :badge="true"
-        :isCompressed="true"
-        badgeColor="danger"
-        badgeValue="10"
-      />
+      <div class="compressed">
+        <inbox-nav-item
+          label="Tasks"
+          value="tasks"
+          icon="task"
+          :isActive="true"
+          :badge="true"
+          :isCompressed="true"
+          badgeColor="danger"
+          badgeValue="10"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -64,4 +66,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+.compressed {
+  max-width: 40px;
+}
 </style>

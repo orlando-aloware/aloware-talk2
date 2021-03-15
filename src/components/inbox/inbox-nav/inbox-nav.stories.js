@@ -16,7 +16,7 @@ const icon = () => ({
 
 const badge = () => ({
   components: { InboxNavBadge },
-  template: '<div><inbox-nav-badge value="10" /> <inbox-nav-badge color="danger" value="10" /></div>'
+  template: '<div><inbox-nav-badge value="10" /> <inbox-nav-badge color="danger" value="10" /> <inbox-nav-badge color="danger" compressed="1" value="10" /></div>'
 })
 
 storiesOf('Inbox - Navigation', module)

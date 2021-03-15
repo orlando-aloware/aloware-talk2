@@ -1,7 +1,10 @@
 <template>
   <div
     class="inbox-nav-badge"
-    v-bind:class="{ 'inbox-nav-badge--danger': color === 'danger' }"
+    v-bind:class="{
+      'inbox-nav-badge--danger': color === 'danger',
+      'inbox-nav-badge--compressed': compressed
+    }"
   >
     {{ value }}
   </div>
@@ -17,6 +20,10 @@ export default {
     color: {
       type: String,
       default: 'default'
+    },
+    compressed: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -36,9 +43,22 @@ export default {
   color: $grey-dark;
   line-height: 20px;
   font-weight: bold;
-}
-.inbox-nav-badge--danger {
-  background-color: $red;
-  color: $white;
+  &--danger {
+    background-color: $red;
+    color: $white;
+  }
+  &--compressed {
+    padding: 0px;
+    overflow: hidden;
+    width: 8px;
+    height: 8px;
+    color: transparent;
+    border-radius: 50%;
+    line-height: 0px;
+    position: absolute;
+    top: 11px;
+    right: 9px;
+    border: solid 1px $white;
+  }
 }
 </style>
