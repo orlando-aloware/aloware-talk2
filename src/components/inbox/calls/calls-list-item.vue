@@ -86,25 +86,35 @@ export default {
     flex-grow: 1;
     padding-left: 10px;
     padding-right: 20px;
+    overflow: hidden;
   }
   &__name {
     font-size: 14px;
     font-weight: bold;
     color: $black;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   &__number {
     font-size: 12px;
     color: $grey-mid;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   &__time {
     font-size: 12px;
     color: $black;
-    width: 24px;
+    width: 46px;
+    text-align: right;
   }
   &__actions {
-    padding-left: 15px;
-    padding-right: 20px;
+    padding-right: 10px;
     display: flex;
+    width: 122px;
+    text-align: right;
+    justify-content: flex-end;
     &__item {
       :first-child {
         margin-right: 10px;
