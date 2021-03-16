@@ -1,5 +1,5 @@
 <template>
-  <div class="calltag">{{ name }}</div>
+  <div class="calls-tag">{{ name }}</div>
 </template>
 
 <script>
@@ -16,7 +16,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
-.calltag {
+.calls-tag {
   font-size: 12px;
   font-family: Roboto;
   color: $black;
