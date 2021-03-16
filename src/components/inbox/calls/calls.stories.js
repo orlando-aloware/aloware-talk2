@@ -1,11 +1,17 @@
 import CallsHeader from './calls-header.vue'
 import CallsListItem from './calls-list-item.vue'
+import CallsListSection from './calls-list-section.vue'
 
 import { storiesOf } from '@storybook/vue'
 
 const labels = () => ({
   components: { CallsHeader },
   template: '<calls-header label="Inbound Calls"/>'
+})
+
+const section = () => ({
+  components: { CallsListSection },
+  template: '<calls-list-section label="Inbound Calls" count="1" />'
 })
 
 const callListItem = () => ({
@@ -22,3 +28,4 @@ storiesOf('Inbox - Calls', module)
   .add('Header', labels)
   .add('Call Item', callListItem)
   .add('Call Item with Avatar', callListItemAvatar)
+  .add('Section', section)
