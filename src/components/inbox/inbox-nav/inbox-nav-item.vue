@@ -90,11 +90,12 @@ export default {
   display: flex;
   align-items: center;
   height: 40px;
-  color: $black;
+  color: $grey-dark;
   position: relative;
 
   &__active {
     background-color: $flesh;
+    color: $black;
   }
 
   &__compressed {
