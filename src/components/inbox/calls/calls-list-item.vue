@@ -1,26 +1,26 @@
 <template>
-<div class="calls-list-item">
-  <div class="calls-list-item__avatar">
-    <avatar :src="avatar">
-      {{initial}}
-    </avatar>
+  <div class="calls-list-item">
+    <div class="calls-list-item__avatar">
+      <avatar :src="avatar">
+        {{ initial }}
+      </avatar>
+    </div>
+    <div class="calls-list-item__content">
+      <div class="calls-list-item__name">{{ name }}</div>
+      <div class="calls-list-item__number">{{ number }}</div>
+    </div>
+    <div class="calls-list-item__time">
+      {{ time }}
+    </div>
+    <div class="calls-list-item__actions">
+      <a href="#" class="calls-list-item__actions__item" @click.prevent="decline">
+        <decline-icon/>
+      </a>
+      <a href="#" class="calls-list-item__actions__item" @click.prevent="answer">
+        <answer-icon/>
+      </a>
+    </div>
   </div>
-  <div class="calls-list-item__content">
-    <div class="calls-list-item__name">{{ name }}</div>
-    <div class="calls-list-item__number">{{ number }}</div>
-  </div>
-  <div class="calls-list-item__time">
-    {{ time }}
-  </div>
-  <div class="calls-list-item__actions">
-    <a href="#" class="calls-list-item__actions__item" @click.prevent="decline">
-      <decline-icon />
-    </a>
-    <a href="#" class="calls-list-item__actions__item" @click.prevent="answer">
-      <answer-icon />
-    </a>
-  </div>
-</div>
 </template>
 
 <script>
@@ -67,6 +67,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+
 .calls-list-item {
   display: flex;
   height: 60px;
@@ -74,20 +75,27 @@ export default {
   align-items: center;
   cursor: pointer;
   border-bottom: solid 1px $grey-light3;
+
   &:hover {
     background-color: $light-green;
   }
+
+  &:hover &__number {
+    color: $black;
+  }
+
   &__avatar {
     padding-left: 20px;
   }
+
   &__content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     padding-left: 10px;
-    padding-right: 20px;
     overflow: hidden;
   }
+
   &__name {
     font-size: 14px;
     font-weight: bold;
@@ -96,6 +104,7 @@ export default {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   &__number {
     font-size: 12px;
     color: $grey-mid;
@@ -103,18 +112,22 @@ export default {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   &__time {
     font-size: 12px;
     color: $black;
     width: 46px;
     text-align: right;
   }
+
   &__actions {
+    padding-left: 10px;
     padding-right: 10px;
     display: flex;
-    width: 122px;
+    width: 112px;
     text-align: right;
     justify-content: flex-end;
+
     &__item {
       :first-child {
         margin-right: 10px;
