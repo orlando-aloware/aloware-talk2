@@ -1,6 +1,6 @@
 <template>
-<div class="inbox-nav-list">
-  <nav-item
+  <div class="inbox-nav-list">
+    <nav-item
       v-for="item in items"
       :key="item.name"
       :label="item.label"
@@ -8,12 +8,13 @@
       :icon="item.icon"
       :is-active="active === item.value"
       @click="onItemClicked"
-  />
-</div>
+    />
+  </div>
 </template>
 
 <script>
 import NavItem from './inbox-nav-item.vue'
+
 export default {
   name: 'inbox-nav-list.vue',
   methods: {
