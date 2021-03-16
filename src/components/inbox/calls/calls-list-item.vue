@@ -13,10 +13,10 @@
       {{ time }}
     </div>
     <div class="calls-list-item__actions">
-      <a href="#" class="calls-list-item__actions__item" @click.prevent="decline">
+      <a href="#" class="calls-list-item__actions__item calls-list-item__actions__decline" @click.prevent="decline">
         <decline-icon/>
       </a>
-      <a href="#" class="calls-list-item__actions__item" @click.prevent="answer">
+      <a href="#" class="calls-list-item__actions__item calls-list-item__actions__answer" @click.prevent="answer">
         <answer-icon/>
       </a>
     </div>
@@ -73,13 +73,8 @@ export default {
   height: 60px;
   background-color: $white;
   align-items: center;
-  cursor: pointer;
   border-bottom: solid 1px $grey-light3;
   transition: background-color 100ms ease-in;
-
-  &:hover {
-    background-color: $light-green;
-  }
 
   &:hover &__number {
     color: $black;

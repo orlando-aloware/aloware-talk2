@@ -4,7 +4,7 @@
     <title>calls / add</title>
     <g id="calls-/-add" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g id="add">
-        <circle id="Oval" fill="#999999" cx="12" cy="12" r="12"></circle>
+        <circle id="Oval" cx="12" cy="12" r="12"></circle>
         <path
           d="M12.7142857,12.7142857 L12.7142857,17 L11.2857143,17 L11.2857143,12.7142857 L7,12.7142857 L7,11.2857143 L11.2857143,11.2857143 L11.2857143,7 L12.7142857,7 L12.7142857,11.2857143 L17,11.2857143 L17,12.7142857 L12.7142857,12.7142857 Z"
           id="edit-/-plus" fill="#FFFFFF" fill-rule="nonzero"></path>
@@ -27,3 +27,14 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+svg circle {
+  fill: $grey-mid;
+}
+svg:hover circle {
+  fill: darken($grey-mid, 7%);
+}
+</style>

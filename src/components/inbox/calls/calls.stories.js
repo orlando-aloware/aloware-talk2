@@ -11,7 +11,7 @@ const labels = () => ({
 
 const section = () => ({
   components: { CallsListSection },
-  template: '<calls-list-section label="Inbound Calls" count={2} />'
+  template: '<calls-list-section label="Inbound Calls" count="2" />'
 })
 
 const callListItem = () => ({

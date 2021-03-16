@@ -30,27 +30,27 @@
     </div>
     <!-- ACTIVE -->
     <div class="text-center">
-      <phone-icon iconColor="#00bf4a" />
+      <phone-icon iconColor="green" />
       <div class="small text-muted">phone</div>
     </div>
     <div class="text-center">
-      <message-icon iconColor="#00bf4a" />
+      <message-icon iconColor="green" />
       <div class="small text-muted">message</div>
     </div>
     <div class="text-center">
-      <record-icon iconColor="#00bf4a" />
+      <record-icon iconColor="green" />
       <div class="small text-muted">record</div>
     </div>
     <div class="text-center">
-      <show-content-icon iconColor="#00bf4a" />
+      <show-content-icon iconColor="green" />
       <div class="small text-muted">show-content</div>
     </div>
     <div class="text-center">
-      <task-icon iconColor="#00bf4a" />
+      <task-icon iconColor="green" />
       <div class="small text-muted">task</div>
     </div>
     <div class="text-center">
-      <voice-mail-icon iconColor="#00bf4a" />
+      <voice-mail-icon iconColor="green" />
       <div class="small text-muted">voice-mail</div>
     </div>
   </div>
