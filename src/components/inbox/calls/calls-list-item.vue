@@ -46,11 +46,11 @@ export default {
     },
     name: {
       type: String,
-      default: 'No Name'
+      required: true
     },
     number: {
       type: String,
-      default: 'unknown number'
+      required: true
     },
     time: {
       type: String,
@@ -75,6 +75,7 @@ export default {
   align-items: center;
   cursor: pointer;
   border-bottom: solid 1px $grey-light3;
+  transition: background-color 100ms ease-in;
 
   &:hover {
     background-color: $light-green;

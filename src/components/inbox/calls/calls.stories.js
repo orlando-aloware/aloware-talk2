@@ -11,12 +11,12 @@ const labels = () => ({
 
 const section = () => ({
   components: { CallsListSection },
-  template: '<calls-list-section label="Inbound Calls" count="1" />'
+  template: '<calls-list-section label="Inbound Calls" count={2} />'
 })
 
 const callListItem = () => ({
   components: { CallsListItem },
-  template: '<calls-list-item />'
+  template: '<calls-list-item name="Mariah Carey" number="(222) 111-3333" />'
 })
 
 const callListItemAvatar = () => ({
