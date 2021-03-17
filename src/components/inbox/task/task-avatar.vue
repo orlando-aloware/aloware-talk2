@@ -41,7 +41,6 @@ export default {
   align-items: center;
   justify-content: center;
   @include border-radius(50%);
-  background-color: transparentize($green, .93);
 
   &__inner {
     width: 160px;
@@ -49,7 +48,6 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: transparentize($green, .85);
     @include border-radius(50%);
   }
 
