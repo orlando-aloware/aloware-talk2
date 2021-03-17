@@ -53,6 +53,7 @@
     "@quasar/app": "^2.0.0",
     "@quasar/quasar-app-extension-dotenv": "^1.0.5",
     "@storybook/addon-actions": "^6.1.21",
+    "@storybook/addon-console": "^1.2.3",
     "@storybook/addon-storysource": "^6.1.21",
     "@storybook/vue": "^6.1.21",
     "@vue/eslint-config-standard": "^4.0.0",

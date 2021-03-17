@@ -1,10 +1,11 @@
 import { configure } from '@storybook/vue'
+import { setConsoleOptions } from '@storybook/addon-console'
 
 import Vue from 'vue'
 
 import Quasar from 'quasar'
 
-import 'bootstrap/scss/bootstrap.scss';
+import 'bootstrap/scss/bootstrap.scss'
 // import 'bootstrap-vue/src/index.scss';
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -25,3 +26,7 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
 configure(require.context('../src', true, /\.stories\.js$/), module)
+
+setConsoleOptions({
+  panelExclude: [],
+})
