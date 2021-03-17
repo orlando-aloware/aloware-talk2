@@ -1,5 +1,5 @@
 <template>
-  <div class="task-avatar" :class="{'animated-wrapper': animated}">
+  <div class="task-avatar" :class="{'animated-wrapper-2': animated}">
     <div class="task-avatar__inner" :class="{'animated-wrapper': animated}">
       <div class="task-avatar__main" :class="{'task-avatar__main--image': !!src}"
            :style="`background-image:url(${src});`">
@@ -32,6 +32,11 @@ export default {
 .animated-wrapper {
   animation-timing-function: ease-in-out;
   animation: wrapper-animate 1s infinite;
+}
+
+.animated-wrapper-2 {
+  animation-timing-function: ease-in-out;
+  animation: wrapper-animate 1.10s infinite;
 }
 
 .task-avatar {
