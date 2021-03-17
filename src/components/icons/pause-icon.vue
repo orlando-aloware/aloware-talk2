@@ -3,7 +3,7 @@
     <title>calls / pause</title>
     <g id="calls-/-pause" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g id="pause">
-        <circle id="Oval" fill="#FF9F1C" cx="12" cy="12" r="12"></circle>
+        <circle id="Oval" cx="12" cy="12" r="12"></circle>
         <rect id="Rectangle" fill="#FFFFFF" x="9" y="7" width="2" height="10" rx="1"></rect>
         <rect id="Rectangle-Copy-3" fill="#FFFFFF" x="13" y="7" width="2" height="10" rx="1"></rect>
       </g>
@@ -25,3 +25,14 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+svg circle {
+  fill: $orange;
+}
+svg:hover circle {
+  fill: darken($orange, 7%);
+}
+</style>

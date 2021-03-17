@@ -33,5 +33,5 @@ export default {
 </script>
 
 <template>
-  <component v-bind:is="icon" :iconColor="isActive ? '#00bf4a' : '#999999'"></component>
+  <component v-bind:is="icon" :iconColor="isActive ? 'green' : 'grey-mid'"></component>
 </template>
