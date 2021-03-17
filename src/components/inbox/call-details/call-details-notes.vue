@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex flex-column calldetails">
-    <div class="calldetails__label">{{ label }}</div>
-    <div class="calldetails__value">{{ value }}</div>
+  <div class="d-flex flex-column call-details">
+    <div class="call-details__label">{{ label }}</div>
+    <div class="call-details__value">{{ value }}</div>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
-.calldetails {
+.call-details {
   &__value {
     font-size: 14px;
     font-family: Roboto;
