@@ -7,6 +7,7 @@ import TaskAcceptBtn from './task-accept-btn'
 import TaskInfoBtn from './task-info-btn'
 import TaskContact from './task-contact'
 import TaskViewBtn from './task-view-btn'
+import TaskDropBtn from './task-drop-btn'
 
 const taskAvatarInitial = () => ({
   components: { TaskAvatar },
@@ -53,6 +54,11 @@ const taskViewBtn = () => ({
   template: '<task-view-btn />'
 })
 
+const taskDropBtn = () => ({
+  components: { TaskDropBtn },
+  template: '<task-drop-btn />'
+})
+
 storiesOf('Inbox - Task', module)
   .add('Avatar - Initial', taskAvatarInitial)
   .add('Avatar - Image', taskAvatarSrc)
@@ -62,4 +68,5 @@ storiesOf('Inbox - Task', module)
   .add('Action - Accept', taskAcceptBtn)
   .add('Action - Info', taskInfoBtn)
   .add('Action - Conversation', taskViewBtn)
+  .add('Action - Drop', taskDropBtn)
   .add('Contact Label', taskContact)
