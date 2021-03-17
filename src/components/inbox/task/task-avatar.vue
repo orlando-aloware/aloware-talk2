@@ -36,7 +36,7 @@ export default {
 
 .animated-wrapper-2 {
   animation-timing-function: ease-in-out;
-  animation: wrapper-animate 1.10s infinite;
+  animation: wrapper-animate 1.05s infinite;
 }
 
 .task-avatar {
