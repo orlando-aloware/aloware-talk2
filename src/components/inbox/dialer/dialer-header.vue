@@ -43,6 +43,7 @@ button {
     font-weight: bold;
     color: $black;
     font-size: 16px;
+    letter-spacing: 0.4px;
   }
 }
 </style>
