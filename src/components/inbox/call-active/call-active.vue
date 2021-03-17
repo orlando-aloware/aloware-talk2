@@ -42,6 +42,9 @@ export default {
     line-height: 16px;
     padding-left: 15px;
     font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
   &__time {
     color: $white;
