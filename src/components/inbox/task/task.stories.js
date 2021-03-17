@@ -4,7 +4,9 @@ import TaskAvatar from './task-avatar'
 import TaskDeclineBtn from './task-decline-btn'
 import TaskMessageBtn from './task-message-btn'
 import TaskAcceptBtn from './task-accept-btn'
+import TaskInfoBtn from './task-info-btn'
 import TaskContact from './task-contact'
+import TaskViewBtn from './task-view-btn'
 
 const taskAvatarInitial = () => ({
   components: { TaskAvatar },
@@ -36,9 +38,19 @@ const taskAcceptBtn = () => ({
   template: '<task-accept-btn />'
 })
 
+const taskInfoBtn = () => ({
+  components: { TaskInfoBtn },
+  template: '<task-info-btn />'
+})
+
 const taskContact = () => ({
   components: { TaskContact },
   template: '<task-contact name="Walter Bowman" number="(111) 222-3333" />'
+})
+
+const taskViewBtn = () => ({
+  components: { TaskViewBtn },
+  template: '<task-view-btn />'
 })
 
 storiesOf('Inbox - Task', module)
@@ -48,4 +60,6 @@ storiesOf('Inbox - Task', module)
   .add('Action - Decline', taskDeclineBtn)
   .add('Action - Message', taskMessageBtn)
   .add('Action - Accept', taskAcceptBtn)
+  .add('Action - Info', taskInfoBtn)
+  .add('Action - Conversation', taskViewBtn)
   .add('Contact Label', taskContact)
