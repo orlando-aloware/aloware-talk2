@@ -1,18 +1,22 @@
 <template>
-  <component v-bind:is="el" class="button"
-             :class="{'button--outline': outline,
-              'button--no-icon': noIcon,
-              'button--primary': variant === 'primary',
-              'button--secondary': variant === 'secondary',
-              'button--danger': variant === 'danger',
-              'button--warning': variant === 'warning',
-              'button--info': variant === 'info'
-  }">
+  <component
+    v-bind:is="el"
+    class="button"
+    :class="{
+      'button--outline': outline,
+      'button--no-icon': noIcon,
+      'button--primary': variant === 'primary',
+      'button--secondary': variant === 'secondary',
+      'button--danger': variant === 'danger',
+      'button--warning': variant === 'warning',
+      'button--info': variant === 'info'
+    }"
+  >
     <div class="button__icon" v-if="!noIcon">
-      <slot name="icon"/>
+      <slot name="icon" />
     </div>
-    <span class="button__text" :class="{'button__text--outline': outline}">
-      <slot name="text"/>
+    <span class="button__text" :class="{ 'button__text--outline': outline }">
+      <slot name="text" />
     </span>
   </component>
 </template>
@@ -94,6 +98,8 @@ export default {
 
   &__icon {
     padding-right: 5px;
+    display: flex;
+    align-items: center;
   }
 
   &__text {

@@ -20,7 +20,7 @@
         <path
           d="M3,6 L12,6 L12,8 L3,8 L3,6 Z M12,13 L12,11 L3,11 L3,13 L12,13 Z M12,18 L12,16 L3,16 L3,18 L12,18 Z"
           id="menu-/-hamburger"
-          :fill="iconColor"
+          fill="#15163F"
           opacity="0.300000012"
           mask="url(#mask-2)"
           transform="translate(7.500000, 12.000000) rotate(-180.000000) translate(-7.500000, -12.000000) "
@@ -28,7 +28,7 @@
         <path
           d="M6.82999992,11 L10.4100003,7.40999997 L9,6 L3,12 L9,18 L10.4099984,16.5900002 L6.82999992,13 L21,13 L21,11 L6.82999992,11 Z"
           id="arrow-/-short_left"
-          :fill="iconColor"
+          fill="#15163F"
           fill-rule="nonzero"
           mask="url(#mask-2)"
           transform="translate(12.000000, 12.000000) rotate(-180.000000) translate(-12.000000, -12.000000) "
@@ -48,10 +48,6 @@ export default {
     height: {
       type: [Number, String],
       default: 24
-    },
-    iconColor: {
-      type: String,
-      default: '#15163F'
     }
   }
 }

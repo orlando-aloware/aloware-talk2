@@ -20,6 +20,7 @@ import './../src/css/quasar.variables.scss'
 import './../src/css/mixins.scss'
 import './../src/css/fonts.scss'
 import './../src/css/variables.scss'
+import './../src/css/svg.scss'
 
 Vue.use(Quasar)
 Vue.use(BootstrapVue)

@@ -6,7 +6,7 @@ import { storiesOf } from '@storybook/vue'
 const primaryButton = () => ({
   components: { IconButton, PhoneIcon },
   template: '<icon-button>' +
-    '<template slot="icon"><phone-icon iconColor="#ffffff" width="16px" height="16px" /></template> ' +
+    '<template slot="icon"><phone-icon iconColor="white" width="16px" height="16px" /></template> ' +
     '<template slot="text">Add Contact</template> ' +
     '</icon-button>'
 })
@@ -21,7 +21,7 @@ const dangerButton = () => ({
 const outlineButton = () => ({
   components: { IconButton, PhoneIcon },
   template: '<icon-button outline>' +
-    '<template slot="icon"><phone-icon iconColor="#00bf4a" width="16px" height="16px" /></template> ' +
+    '<template slot="icon"><phone-icon iconColor="green" width="16px" height="16px" /></template> ' +
     '<template slot="text">Add Contact</template> ' +
     '</icon-button>'
 })

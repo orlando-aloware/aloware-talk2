@@ -7,16 +7,14 @@
     <div class="calls-list-section__time">
       {{ subLabel }}
     </div>
-    <div class="calls-list-section__actions">
-      Actions
-    </div>
+    <div class="calls-list-section__actions">Actions</div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'calls-list-section.vue',
-  components: { },
+  components: {},
   props: {
     label: {
       type: String,
@@ -27,7 +25,7 @@ export default {
       default: 'Wait Time'
     },
     count: {
-      type: Number,
+      type: [String, Number],
       default: 0
     }
   }

@@ -20,7 +20,7 @@
       </g>
       <g
         transform="translate(2.000000, 7.000000)"
-        :fill="iconColor"
+        :class="`svg-fill-${iconColor}`"
         fill-rule="nonzero"
         id="Shape"
       >
@@ -45,7 +45,7 @@ export default {
     },
     iconColor: {
       type: String,
-      default: '#999999'
+      default: 'grey-mid'
     }
   }
 }
