@@ -66,6 +66,7 @@ export default {
   justify-content: center;
   cursor: pointer;
   transition: background-color 100ms ease-in;
+  @include border-radius(10px);
 
   &:hover {
     background-color: $grey-light2;
