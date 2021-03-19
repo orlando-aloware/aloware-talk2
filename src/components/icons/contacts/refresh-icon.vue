@@ -1,0 +1,36 @@
+<template>
+  <svg :width="width" :height="height" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>refresh</title>
+    <defs>
+      <rect id="path-1" x="0" y="0" width="24" height="24"></rect>
+    </defs>
+    <g id="refresh" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g>
+        <mask id="mask-2" fill="white">
+          <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="basic-/-refresh-(Background/Mask)"></g>
+        <path d="M11.9949968,4 C7.57223239,4 4,7.57999992 4,12 C4,16.4200001 7.57223239,20 11.9949968,20 C15.7273295,20 18.839275,17.45 19.7298316,14 L17.6485309,14 C16.828018,16.3299999 14.606629,18 11.9949968,18 C8.68292672,18 5.99124457,15.3099999 5.99124457,12 C5.99124457,8.69000006 8.68292672,6 11.9949968,6 C13.6560349,6 15.1369608,6.68999994 16.2176362,7.77999997 L12.9956222,11 L20,11 L20,4 L17.6485309,6.3499999 C16.197624,4.89999986 14.2063789,4 11.9949968,4 Z" id="basic-/-refresh" :class="`svg-fill-${iconColor}`" fill-rule="nonzero" mask="url(#mask-2)"></path>
+      </g>
+    </g>
+  </svg>
+</template>
+
+<script>
+export default {
+  props: {
+    width: {
+      type: [Number, String],
+      default: 24
+    },
+    height: {
+      type: [Number, String],
+      default: 24
+    },
+    iconColor: {
+      type: String,
+      default: 'dark'
+    }
+  }
+}
+</script>
