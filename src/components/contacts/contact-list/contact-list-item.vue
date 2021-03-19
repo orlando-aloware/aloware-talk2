@@ -78,10 +78,6 @@ export default {
     background-color: $flesh !important;
   }
 
-  &:hover {
-    background-color: $grey-light2;
-  }
-
   &__icon {
     padding-left: 20px;
     display: flex;
