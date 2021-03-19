@@ -59,7 +59,7 @@ export default {
   display: flex;
   height: 42px;
   align-items: center;
-  border: solid 2px $grey-light5;
+  border: solid 2px $grey-light7;
   @include border-radius(8px);
   position: relative;
 
