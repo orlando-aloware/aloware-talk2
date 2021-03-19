@@ -8,6 +8,8 @@ import TaskInfoBtn from './task-info-btn'
 import TaskContact from './task-contact'
 import TaskViewBtn from './task-view-btn'
 import TaskDropBtn from './task-drop-btn'
+import TaskAction from './task-action'
+import TaskActions from './task-actions'
 
 const taskAvatarInitial = () => ({
   components: { TaskAvatar },
@@ -59,6 +61,21 @@ const taskDropBtn = () => ({
   template: '<task-drop-btn />'
 })
 
+const taskAction = () => ({
+  components: { TaskAction },
+  template: '<task-action label="Add" />'
+})
+
+const taskActions = () => ({
+  components: { TaskActions },
+  methods: {
+    action (payload) {
+      console.log(payload)
+    }
+  },
+  template: '<task-actions @action="action"/>'
+})
+
 storiesOf('Inbox - Task', module)
   .add('Avatar - Initial', taskAvatarInitial)
   .add('Avatar - Image', taskAvatarSrc)
@@ -69,4 +86,6 @@ storiesOf('Inbox - Task', module)
   .add('Action - Info', taskInfoBtn)
   .add('Action - Conversation', taskViewBtn)
   .add('Action - Drop', taskDropBtn)
+  .add('Action - Task', taskAction)
+  .add('Task Actions', taskActions)
   .add('Contact Label', taskContact)
