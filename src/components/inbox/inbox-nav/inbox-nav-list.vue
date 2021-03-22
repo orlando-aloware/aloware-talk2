@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-nav-list">
+  <div class="inbox-nav-list" :class="{'inbox-nav-list--closed': closed}">
     <nav-item
       v-for="item in items"
       :key="item.name"
@@ -7,6 +7,10 @@
       :value="item.value"
       :icon="item.icon"
       :is-active="active === item.value"
+      :closed="closed"
+      :badge="true"
+      badge-value="20"
+      badge-color="danger"
       @click="onItemClicked"
     />
   </div>
@@ -56,13 +60,27 @@ export default {
   },
   components: {
     NavItem
+  },
+  props: {
+    closed: {
+      type: Boolean,
+      default: false
+    }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+
 .inbox-nav-list {
   display: flex;
   flex-direction: column;
+  &--closed {
+    max-width: 40px;
+    overflow: hidden;
+  }
 }
 </style>

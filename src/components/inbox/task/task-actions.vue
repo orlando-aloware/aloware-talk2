@@ -29,7 +29,7 @@ export default {
           icon: 'plus'
         },
         {
-          label: 'Hold',
+          label: 'Hold ',
           icon: 'hold'
         },
         {
@@ -93,8 +93,8 @@ export default {
     grid-template-columns: 80px 80px 80px;
     grid-template-rows: 80px 80px 80px 80px;
 
-    @include screen('md') {
-      grid-template-rows: 80px 80px;
+    @include screen('lg') {
+      grid-template-rows: 50px 50px;
       grid-template-columns: 80px 80px 80px 80px 80px 80px;
     }
   }

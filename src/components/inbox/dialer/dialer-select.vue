@@ -47,7 +47,7 @@ export default {
   flex-direction: column;
   &__label {
     font-size: 12px;
-    color: $grey-light5;
+    color: $grey-light7;
     line-height: 16px;
     opacity: 0.9;
   }

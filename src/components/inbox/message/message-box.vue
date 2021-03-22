@@ -58,6 +58,7 @@ export default {
 .message-box {
   display: flex;
   height: 42px;
+  width: 100%;
   align-items: center;
   border: solid 2px $grey-light5;
   @include border-radius(8px);

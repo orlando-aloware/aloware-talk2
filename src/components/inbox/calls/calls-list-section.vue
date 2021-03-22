@@ -7,7 +7,7 @@
     <div class="calls-list-section__time">
       {{ subLabel }}
     </div>
-    <div class="calls-list-section__actions">Actions</div>
+    <div class="calls-list-section__actions">Action</div>
   </div>
 </template>
 
@@ -35,6 +35,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
 .calls-list-section {
   display: flex;
   height: 40px;
@@ -45,14 +46,18 @@ export default {
     letter-spacing: 0.25px;
     font-size: 10px;
     color: $grey-dark;
+    display: none;
+    @include screen('md') {
+      display: block;
+    }
   }
   &__actions {
-    width: 112px;
+    width: 100px;
     text-align: right;
     letter-spacing: 0.25px;
     font-size: 10px;
     color: $grey-dark;
-    padding-right: 15px;
+    padding-right: 20px;
     padding-left: 10px;
   }
   &__label {

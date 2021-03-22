@@ -3,7 +3,7 @@
     class="inbox-nav-badge"
     v-bind:class="{
       'inbox-nav-badge--danger': color === 'danger',
-      'inbox-nav-badge--compressed': compressed
+      'inbox-nav-badge--closed': closed
     }"
   >
     {{ value }}
@@ -21,7 +21,7 @@ export default {
       type: String,
       default: 'default'
     },
-    compressed: {
+    closed: {
       type: Boolean,
       default: false
     }
@@ -32,22 +32,28 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+
 .inbox-nav-badge {
+
+  background-color: $grey-light4;
+  color: $grey-dark;
+
   display: inline-block;
   padding-left: 16px;
   padding-right: 16px;
   height: 20px;
   border-radius: 20px;
   font-size: 12px;
-  background-color: $grey-light4;
-  color: $grey-dark;
   line-height: 20px;
   font-weight: bold;
+
   &--danger {
     background-color: $red;
     color: $white;
   }
-  &--compressed {
+
+  &--closed {
     padding: 0px;
     overflow: hidden;
     width: 8px;

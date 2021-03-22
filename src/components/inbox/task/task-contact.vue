@@ -2,6 +2,7 @@
   <div class="task-contact">
     <div class="task-contact__name">{{ name }}</div>
     <div class="task-contact__number">{{ number }}</div>
+    <div class="task-contact__time">{{ time }}</div>
   </div>
 </template>
 
@@ -16,6 +17,10 @@ export default {
     number: {
       type: String,
       required: true
+    },
+    time: {
+      type: String,
+      default: '00:00'
     }
   }
 }
@@ -42,6 +47,14 @@ export default {
     font-size: 16px;
     letter-spacing: 0;
     line-height: 21px;
+  }
+
+  &__time {
+    color: $black;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 21px;
+    padding-top: 20px;
   }
 }
 </style>
