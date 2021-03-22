@@ -106,12 +106,12 @@ export default {
   }
 
   &--grey {
-    border-color: $grey-light5;
+    border-color: $grey-light7;
     background-color: $grey-light6;
   }
 
   &--white {
-    border-color: $grey-light5;
+    border-color: $grey-light7;
     background-color: $white;
   }
 }
