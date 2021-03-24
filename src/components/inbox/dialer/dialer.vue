@@ -1,5 +1,5 @@
 <template>
-  <div class="dialer">
+  <div class="dialer animate__animated animate__fadeIn">
     <dialer-header></dialer-header>
     <div class="dialer__body">
       <div class="dialer__select">

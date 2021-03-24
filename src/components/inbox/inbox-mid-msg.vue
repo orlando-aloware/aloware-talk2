@@ -1,5 +1,5 @@
 <template>
-  <div class="message">
+  <div class="message animate__animated animate__fadeIn">
     <div class="message__top">
       <message-header name="May Kerr" status="live call" time="0:00"></message-header>
     </div>

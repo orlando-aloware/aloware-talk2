@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox">
+  <div class="inbox animate__animated animate__fadeIn">
     <inbox-side></inbox-side>
     <inbox-mid></inbox-mid>
     <inbox-end></inbox-end>

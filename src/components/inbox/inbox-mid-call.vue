@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-mid-call">
+  <div class="inbox-mid-call animate__animated animate__fadeIn">
     <div class="inbox-mid-call__top">
       <div class="inbox-mid-call__top__view">
         <div @click="toggle">
