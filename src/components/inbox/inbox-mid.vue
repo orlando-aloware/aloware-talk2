@@ -1,7 +1,7 @@
 <template>
   <div class="inbox-mid">
-    <inbox-mid-call v-if="!showMessage" @toggle="toggle" />
-    <inbox-mid-msg v-if="showMessage" @toggle="toggle" />
+    <inbox-mid-call v-if="showMessage" @toggle="toggle" />
+    <inbox-mid-msg v-if="!showMessage" @toggle="toggle" />
   </div>
 </template>
 

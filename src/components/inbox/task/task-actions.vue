@@ -94,7 +94,7 @@ export default {
     grid-template-rows: 80px 80px 80px 80px;
 
     @include screen('lg') {
-      grid-template-rows: 50px 50px;
+      grid-template-rows: 80px 80px;
       grid-template-columns: 80px 80px 80px 80px 80px 80px;
     }
   }
