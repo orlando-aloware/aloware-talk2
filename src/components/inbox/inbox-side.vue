@@ -115,6 +115,8 @@ export default {
     flex-grow: 1;
     border-left: solid 1px $grey-light3;
     overflow: hidden;
+    height: 100%;
+    overflow-y: auto;
 
     &--closed {
       box-shadow: none;

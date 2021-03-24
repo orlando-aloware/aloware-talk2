@@ -34,12 +34,15 @@ export default {
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
 .inbox {
+  height: calc(100vh - 170px);
   max-height: calc(100vh - 170px);
   width: 100%;
   display: flex;
   gap: 20px;
-  @include screen('lg') {
+
+  @include screen('md') {
     min-height: calc(100vh - 100px);
+    max-height: calc(100vh - 100px);
   }
 }
 </style>
