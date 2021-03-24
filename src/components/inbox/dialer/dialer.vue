@@ -47,6 +47,7 @@ export default {
 @import 'src/css/breakpoints.scss';
 
 .dialer {
+  overflow-y: auto;
   &__body {
     padding: 20px;
   }
