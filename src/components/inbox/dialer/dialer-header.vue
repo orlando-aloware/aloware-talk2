@@ -14,8 +14,7 @@ import CloseIcon from 'components/icons/close-icon'
 export default {
   props: {
     name: {
-      type: String,
-      required: true
+      type: String
     }
   },
   methods: {
