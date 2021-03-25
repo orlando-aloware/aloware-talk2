@@ -12,7 +12,7 @@
            class="dialer-select__dropdown"
            :class="{'dialer-select__dropdown--show animate__animated animate__fadeIn': showing, 'animate__animated animate__fadeOut': !showing}">
         <div class="dialer-select__dropdown__search">
-          <input type="text" class="form-control search-control" placeholder="Search...">
+          <input type="text" class="form-control form-control-sm search-control" placeholder="Search...">
         </div>
         <div class="dialer-select__dropdown__items" @click="toggle">
           <div class="dialer-select__dropdown__item">
@@ -65,6 +65,7 @@ export default {
     },
     onWindowResize () {
       this.showing = false
+      popper.forceUpdate()
     }
   },
   mounted () {
@@ -144,7 +145,8 @@ export default {
     overflow: hidden;
     border: solid 1px $grey-light3;
     @include border-radius(5px);
-    z-index: -1;
+    z-index: -5;
+    top: -3000px;
 
     &__items {
       padding-left: 10px;
@@ -185,7 +187,7 @@ export default {
 
     &--show {
       visibility: visible;
-      z-index: 3;
+      z-index: 1;
     }
   }
 

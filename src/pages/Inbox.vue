@@ -3,7 +3,7 @@
     <div class="call-active">
       <call-active name="May Kerr" time="00:00"/>
     </div>
-    <div class="inbox animate__animated animate__fadeIn">
+    <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side></inbox-side>
       <inbox-mid></inbox-mid>
       <inbox-end></inbox-end>

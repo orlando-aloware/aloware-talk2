@@ -17,7 +17,7 @@
       <div ref="actiondropdown" class="message-actions"
            :class="{
             'message-actions--show animate__animated animate__fadeIn': actionShowing,
-            'message-actions--show animate__animated animate__fadeOut': !actionShowing}">
+            'animate__animated animate__fadeOut': !actionShowing}">
         <a class="message-actions__item">
           <div class="message-actions__item__icon">
             <attach-icon></attach-icon>
@@ -124,7 +124,6 @@ export default {
   min-height: 100px;
   max-height: 200px;
   background-color: $white;
-  position: absolute;
   box-shadow: 0 0 10px 0 rgb(0 0 0 / 10%);
   display: flex;
   flex-direction: column;
@@ -133,11 +132,12 @@ export default {
   visibility: hidden;
   border: solid 1px $grey-light3;
   @include border-radius(10px);
-  z-index: -1;
+  z-index: -1 !important;
+  position: absolute;
 
   &--show {
     visibility: visible;
-    z-index: 3;
+    z-index: 3 !important;
   }
 
   &__item {
