@@ -132,7 +132,7 @@ export default {
   visibility: hidden;
   border: solid 1px $grey-light3;
   @include border-radius(10px);
-  z-index: -1 !important;
+  z-index: -1;
   position: absolute;
 
   &--show {
