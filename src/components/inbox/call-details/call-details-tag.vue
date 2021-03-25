@@ -26,5 +26,6 @@ export default {
   padding-left: 5px;
   padding-right: 5px;
   display: inline-block;
+  margin-right: 10px;
 }
 </style>

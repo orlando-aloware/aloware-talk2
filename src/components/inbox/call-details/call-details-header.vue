@@ -3,7 +3,7 @@
     <div class="callheader__title">
       {{ name }}
     </div>
-    <button>
+    <button @click="toggle">
       <close-icon />
     </button>
   </div>
@@ -16,6 +16,11 @@ export default {
     name: {
       type: String,
       required: true
+    }
+  },
+  methods: {
+    toggle () {
+      window.dispatchEvent(new CustomEvent('toggleContactInfo'))
     }
   },
   components: {
@@ -34,7 +39,7 @@ button {
 .callheader {
   display: flex;
   align-items: center;
-  height: 46px;
+  min-height: 46px;
   border-bottom: solid 1px $grey-light3;
   &__title {
     padding-left: 20px;

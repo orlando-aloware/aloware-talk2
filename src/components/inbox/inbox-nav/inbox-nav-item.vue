@@ -3,7 +3,7 @@
     class="inbox-nav-item"
     v-bind:class="{
       'inbox-nav-item__active': isActive,
-      'inbox-nav-item__compressed': isCompressed
+      'inbox-nav-item--closed': closed,
     }"
     href="/"
     @click.prevent="onClick"
@@ -11,23 +11,29 @@
     <div
       class="inbox-nav-item__inner"
       v-bind:class="{
-        'inbox-nav-item__inner--compressed': isCompressed
+        'inbox-nav-item__inner--closed': closed,
+         'inbox-nav-item__inner--opened': !closed
       }"
     >
       <div
         class="inbox-nav-item__icon"
         v-bind:class="{
-          'inbox-nav-item__icon--compressed': isCompressed
+          'inbox-nav-item__icon--closed': closed,
+          'inbox-nav-item__icon--opened': !closed
         }"
       >
-        <icon :icon="icon" :isActive="isActive" />
+        <icon :icon="icon" :isActive="isActive"/>
       </div>
-      <div class="inbox-nav-item__label" v-if="!isCompressed">{{ label }}</div>
+      <div class="inbox-nav-item__label" v-bind:class="{
+          'inbox-nav-item__label--closed': closed,
+          'inbox-nav-item__label--opened': !closed
+        }">{{ label }}
+      </div>
       <badge
         v-if="badge"
         :color="badgeColor"
         :value="badgeValue"
-        :compressed="isCompressed"
+        :closed="closed"
       />
     </div>
   </a>
@@ -36,6 +42,7 @@
 <script>
 import Icon from './inbox-nav-icon.vue'
 import Badge from './inbox-nav-badge.vue'
+
 export default {
   components: {
     Icon,
@@ -58,7 +65,7 @@ export default {
       type: Boolean,
       default: false
     },
-    isCompressed: {
+    closed: {
       type: Boolean,
       default: false
     },
@@ -86,20 +93,28 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+
 .inbox-nav-item {
   display: flex;
   align-items: center;
   height: 40px;
   color: $grey-dark;
   position: relative;
+  overflow: hidden;
+  transition: background-color 100ms ease-in;
+
+  &--closed {
+    overflow: hidden;
+  }
 
   &__active {
     background-color: $flesh;
     color: $black;
   }
 
-  &__compressed {
-    overflow: hidden;
+  @include screen('lg') {
+    overflow: auto;
   }
 
   &:hover {
@@ -107,28 +122,65 @@ export default {
   }
 
   &__inner {
-    padding-left: 20px;
-    padding-right: 20px;
     display: flex;
     align-items: center;
     width: 100%;
-    &--compressed {
+    padding-left: 0;
+    padding-right: 0;
+    justify-content: center;
+
+    &--opened {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    &--closed {
       padding-left: 0;
       padding-right: 0;
-      justify-content: center;
+    }
+
+    @include screen('lg') {
+      padding-left: 20px;
+      padding-right: 20px;
     }
   }
 
   &__icon {
-    padding-right: 10px;
-    &--compressed {
-      padding-right: 0;
+    padding-right: 0;
+    @include screen('lg') {
+      padding-right: 10px;
+    }
+
+    &--opened {
+      padding-right: 10px;;
+    }
+
+    &--closed {
+      padding-right: 0 !important;
     }
   }
 
   &__label {
+    font-size: 14px;
+    line-height: 19px;
     font-weight: bold;
     flex-grow: 1;
+    display: none;
+
+    &--opened {
+      display: block;
+    }
+
+    &--closed {
+      display: none;
+    }
+
+    @include screen('lg') {
+      display: block;
+      &--closed {
+        display: none;
+      }
+    }
   }
 }
 </style>

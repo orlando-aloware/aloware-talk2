@@ -3,7 +3,7 @@
     <div class="dialer-header__title">
       Dialer
     </div>
-    <button>
+    <button @click="toggle">
       <close-icon />
     </button>
   </div>
@@ -14,8 +14,12 @@ import CloseIcon from 'components/icons/close-icon'
 export default {
   props: {
     name: {
-      type: String,
-      required: true
+      type: String
+    }
+  },
+  methods: {
+    toggle () {
+      window.dispatchEvent(new CustomEvent('toggleContactInfo'))
     }
   },
   components: {
@@ -35,7 +39,6 @@ button {
   display: flex;
   align-items: center;
   height: 46px;
-  border-bottom: solid 1px $grey-light3;
   &__title {
     padding-left: 20px;
     padding-right: 10px;

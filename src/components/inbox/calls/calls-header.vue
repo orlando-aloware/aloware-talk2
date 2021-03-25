@@ -22,7 +22,7 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 .calls-header {
-  height: 60px;
+  height: 45px;
   display: flex;
   align-items: center;
   border-bottom: solid 1px $grey-light3;
@@ -30,8 +30,11 @@ export default {
     padding-left: 20px;
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     letter-spacing: 0.3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 </style>

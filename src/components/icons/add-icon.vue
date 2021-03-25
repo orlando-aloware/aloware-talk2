@@ -1,5 +1,5 @@
 <template>
-  <svg :width="width" :height="height" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
+  <svg class="svg" :width="width" :height="height" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
        xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>calls / add</title>
     <g id="calls-/-add" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -31,10 +31,10 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
-svg circle {
+.svg circle {
   fill: $grey-mid;
 }
-svg:hover circle {
+.svg:hover circle {
   fill: darken($grey-mid, 7%);
 }
 </style>

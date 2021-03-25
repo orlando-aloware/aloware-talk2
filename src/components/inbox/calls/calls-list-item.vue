@@ -1,7 +1,7 @@
 <template>
-  <div class="calls-list-item">
+  <div class="calls-list-item" :class="{'calls-list-item--active': active}">
     <div class="calls-list-item__avatar">
-      <avatar :src="avatar">
+      <avatar :src="avatar" :active="active">
         {{ initial }}
       </avatar>
     </div>
@@ -12,7 +12,15 @@
     <div class="calls-list-item__time">
       {{ time }}
     </div>
-    <div class="calls-list-item__actions">
+    <div v-if="active" class="calls-list-item__actions">
+      <a href="#" class="calls-list-item__actions__item calls-list-item__actions__decline" @click.prevent="decline">
+        <pause-icon />
+      </a>
+      <a href="#" class="calls-list-item__actions__item calls-list-item__actions__answer" @click.prevent="answer">
+        <drop-icon/>
+      </a>
+    </div>
+    <div v-if="!active" class="calls-list-item__actions">
       <a href="#" class="calls-list-item__actions__item calls-list-item__actions__decline" @click.prevent="decline">
         <decline-icon/>
       </a>
@@ -27,10 +35,12 @@
 import DeclineIcon from 'components/icons/decline-icon'
 import AnswerIcon from 'components/icons/answer-icon'
 import Avatar from 'components/avatar/avatar'
+import PauseIcon from 'components/icons/pause-icon'
+import DropIcon from 'components/icons/drop-icon'
 
 export default {
   name: 'calls-list-item.vue',
-  components: { Avatar, AnswerIcon, DeclineIcon },
+  components: { DropIcon, PauseIcon, Avatar, AnswerIcon, DeclineIcon },
   methods: {
     decline () {
       this.$emit('decline')
@@ -59,6 +69,10 @@ export default {
     avatar: {
       type: String,
       default: null
+    },
+    active: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -67,6 +81,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
 
 .calls-list-item {
   display: flex;
@@ -76,8 +91,8 @@ export default {
   border-bottom: solid 1px $grey-light3;
   transition: background-color 100ms ease-in;
 
-  &:hover &__number {
-    color: $black;
+  &--active {
+    background-color: $light-green;
   }
 
   &__avatar {
@@ -90,10 +105,11 @@ export default {
     flex-grow: 1;
     padding-left: 10px;
     overflow: hidden;
+    width: 100px;
   }
 
   &__name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     color: $black;
     overflow: hidden;
@@ -102,7 +118,7 @@ export default {
   }
 
   &__number {
-    font-size: 12px;
+    font-size: 13px;
     color: $grey-mid;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -45,7 +45,7 @@
           icon="task"
           :isActive="true"
           :badge="true"
-          :isCompressed="true"
+          :closed="true"
           badgeColor="danger"
           badgeValue="10"
         />

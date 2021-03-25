@@ -9,7 +9,7 @@
   >
     <title>edit</title>
     <defs>
-      <filter id="filter-1">
+      <filter id="edit-icon-filter">
         <feColorMatrix
           in="SourceGraphic"
           type="matrix"
@@ -19,16 +19,16 @@
       <rect id="path-2" x="0" y="0" width="16" height="16"></rect>
     </defs>
     <g id="edit" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-      <g filter="url(#filter-1)" id="edit-/-edit">
+      <g filter="url(#edit-icon-filter)" id="edit-/-edit">
         <g transform="translate(4.000000, 4.000000)">
-          <mask id="mask-3" fill="white">
+          <mask id="edit-icon-mask" fill="white">
             <use xlink:href="#path-2"></use>
           </mask>
           <g id="edit-/-edit-(Background/Mask)"></g>
           <path
             d="M2.44637997,11.196605 L2.28310625,12.9926154 C2.24541323,13.4072389 2.59276807,13.7545945 3.00739154,13.7169014 L4.80340257,13.5536276 L12.3458639,6.01116631 L9.98884128,3.6541437 L2.44637997,11.196605 Z M14.2314928,4.12553743 C14.491842,3.86518815 14.4918423,3.4430779 14.2314928,3.18272839 L12.8172792,1.76851483 C12.5569297,1.50816532 12.1348194,1.50816554 11.8744702,1.76851483 L10.4602458,3.18273918 L12.8172684,5.53976179 L14.2314928,4.12553743 Z"
-            :fill="iconColor"
-            mask="url(#mask-3)"
+            :class="`svg-fill-${iconColor}`"
+            mask="url(#edit-icon-mask)"
           ></path>
         </g>
       </g>
@@ -49,7 +49,7 @@ export default {
     },
     iconColor: {
       type: String,
-      default: '#2E3A59'
+      default: 'green'
     }
   }
 }

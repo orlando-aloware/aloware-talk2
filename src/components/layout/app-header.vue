@@ -17,13 +17,14 @@
     </div>
     <div class="ml-auto d-none d-lg-block">
       <div class="d-flex h-100 align-items-center">
-        <q-btn flat
-               @click="toggleSidebar"
-               round
-               dense
-               icon="img:app-icons/header/nav_icon-dialer.svg"
-               class="mr-2 ml-auto"
-               style="color: #202125;" />
+<!--        <q-btn flat-->
+<!--               @click="toggleSidebar"-->
+<!--               round-->
+<!--               dense-->
+<!--               icon="img:app-icons/header/nav_icon-dialer.svg"-->
+<!--               class="mr-2 ml-auto"-->
+<!--               style="color: #202125;" />-->
+        <call-active name="May Kerr" time="00:00" />
         <q-btn flat
                @click="toggleSidebar"
                round
@@ -106,9 +107,11 @@ import * as AgentStatus from '../../constants/agent-status'
 import { avatarMixin } from '../../boot/mixins'
 import { mapState } from 'vuex'
 
+import CallActive from 'components/inbox/call-active/call-active'
+
 export default {
   name: 'app-header',
-
+  components: { CallActive },
   mixins: [
     avatarMixin
   ],

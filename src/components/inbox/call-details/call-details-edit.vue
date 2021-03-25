@@ -1,6 +1,6 @@
 <template>
   <a class="d-flex align-items-center">
-    <edit-icon />
+    <edit-icon icon-color="green" />
     <span class="edit-text">Edit contact info</span>
   </a>
 </template>
