@@ -1,5 +1,5 @@
 <template>
-  <div class="calls-list-item" :class="{'calls-list-item--active': active}">
+  <div class="calls-list-item" :class="{'calls-list-item--active': active}" @click="select">
     <div class="calls-list-item__avatar">
       <avatar :src="avatar" :active="active">
         {{ initial }}
@@ -47,6 +47,9 @@ export default {
     },
     answer () {
       this.$emit('answer')
+    },
+    select () {
+      window.VueEvent.fire('make_call')
     }
   },
   props: {

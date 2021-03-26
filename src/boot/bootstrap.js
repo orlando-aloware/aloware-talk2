@@ -7,6 +7,7 @@ import momentDurationFormatSetup from 'moment-duration-format'
 import Bowser from 'bowser'
 import * as Sentry from '@sentry/vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import PortalVue from 'portal-vue'
 
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
@@ -18,6 +19,7 @@ localStorage.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
+Vue.use(PortalVue)
 
 window.Bowser = Bowser
 window.timezone = jstz.determine().name()
