@@ -22,12 +22,8 @@ export default {
     }
   },
   mounted () {
-    window.addEventListener('showMessage', this.toggle)
-    window.addEventListener('makeCall', this.showMid)
-  },
-  beforeDestroy () {
-    window.removeEventListener('showMessage', this.toggle)
-    window.removeEventListener('makeCall', this.showMid)
+    this.$VueEvent.listen('show_message', this.toggle)
+    this.$VueEvent.listen('make_call', this.showMid)
   },
   props: {
     contactInfoOpen: {
