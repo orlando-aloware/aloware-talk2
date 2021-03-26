@@ -1,0 +1,216 @@
+import * as CommunicationDirections from '../../constants/communication-direction'
+import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import * as CommunicationTypes from '../../constants/communication-types'
+
+export default {
+  methods: {
+    stateToTextColor: function (dispositionStatus, type) {
+      let color = ''
+      if (type === CommunicationTypes.CALL) {
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          color = 'has-text-info'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          color = 'has-text-success'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+          color = 'has-text-primary'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+          color = 'has-text-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          color = 'has-text-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          color = 'has-text-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
+          color = 'has-text-warn'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+          color = 'has-text-danger'
+        }
+      } else if (type === CommunicationTypes.SMS) {
+        // if type is sms
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          color = 'has-text-info'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          color = 'has-text-success'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          color = 'has-text-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          color = 'has-text-danger'
+        }
+      } else {
+        // if type is voicemail
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          color = 'has-text-info'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          color = 'has-text-success'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          color = 'has-text-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          color = 'has-text-danger'
+        }
+      }
+
+      return color
+    },
+
+    stateToColor: function (dispositionStatus, type) {
+      let color = ''
+      if (type === CommunicationTypes.CALL) {
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          color = 'is-info'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          color = 'is-success'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+          color = 'is-primary'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+          color = 'is-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          color = 'is-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          color = 'is-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
+          color = 'is-warn'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+          color = 'is-danger'
+        }
+      } else if (type === CommunicationTypes.SMS) {
+        // if type is sms
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          color = 'is-info'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          color = 'is-success'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          color = 'is-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          color = 'is-danger'
+        }
+      } else {
+        // if type is voicemail
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          color = 'is-info'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          color = 'is-success'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          color = 'is-danger'
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          color = 'is-danger'
+        }
+      }
+
+      return color
+    },
+
+    stateToIcon: function (dispositionStatus, type, direction = null) {
+      let icon = ''
+      if (type === CommunicationTypes.CALL) {
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          icon += `<i class="mdi mdi-phone-in-talk"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          icon += `<i class="mdi mdi-phone-hangup"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+          icon += `<i class="mdi mdi-phone-missed"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+          icon += `<i class="mdi mdi-phone-missed"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          icon += `<i class="mdi mdi-phone-locked"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          icon += `<i class="mdi mdi-phone-locked"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
+          icon += `<i class="mdi mdi-block-helper"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+          icon += `<i class="mdi mdi-voicemail"></i>`
+        } else {
+          icon += dispositionStatus
+        }
+      } else if (type === CommunicationTypes.SMS) {
+        // if type is sms
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          icon += `<i class="mdi mdi-message-text-outline"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          icon += `<i class="mdi mdi-message-text-outline"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          icon += `<i class="mdi mdi-message-text-outline"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          icon += `<i class="mdi mdi-message-text-outline"></i>`
+        } else {
+          icon += dispositionStatus
+        }
+      } else {
+        // if type is voicemail
+        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+          icon += `<i class="mdi mdi-voicemail"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          icon += `<i class="mdi mdi-voicemail"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+          icon += `<i class="mdi mdi-voicemail"></i>`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+          icon += `<i class="mdi mdi-voicemail"></i>`
+        } else {
+          icon += dispositionStatus
+        }
+      }
+
+      if (direction && direction === CommunicationDirections.INBOUND) {
+        icon += `<i class="mdi mdi-call-received"></i>`
+      }
+
+      if (direction && direction === CommunicationDirections.OUTBOUND) {
+        icon += `<i class="mdi mdi-call-made"></i>`
+      }
+
+      return icon
+    },
+
+    rejectionToIcon: function (rejectionReason) {
+      switch (rejectionReason) {
+        case this.REJECTION_REASON_BLOCKED:
+          return '<i class="mdi mdi-phone-locked"></i>'
+        case this.REJECTION_REASON_CREDITS:
+          return '<i class="mdi currency-usd-off"></i>'
+        case this.REJECTION_REASON_OTHER:
+          return '<i class="mdi alert"></i>'
+        case this.REJECTION_REASON_USER_NOT_FOUND:
+          return '<i class="mdi alert-circle"></i>'
+        case this.REJECTION_REASON_FAILED:
+          return '<i class="mdi alert-circle"></i>'
+      }
+    },
+
+    rejectionTooltipData (rejectionReason) {
+      switch (rejectionReason) {
+        case this.REJECTION_REASON_BLOCKED:
+          return 'Could not route: the contact is blocked, if you want to take the call please unblock the contact from either the contacts section or from blocked contacts tab in company page.'
+        case this.REJECTION_REASON_CREDITS:
+          return 'Could not route: account doesn\'t have enough credits, please recharge your account or contact support.'
+        case this.REJECTION_REASON_OTHER:
+          return 'Could not route: please contact support.'
+        case this.REJECTION_REASON_USER_NOT_FOUND:
+          return 'Could not route: no eligible users can be found, please check your line\'s routing settings. Check notes for more information.'
+        case this.REJECTION_REASON_FAILED:
+          return 'Could not route: our carrier could not route this communication, please make sure the phone number is in service'
+      }
+    },
+
+    getAttemptingClass (attemptingUser, dispositionStatus, userId) {
+      if (userId && userId === attemptingUser && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED) {
+        return 'text-dark-greenish'
+      } else if (userId && userId !== attemptingUser && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED) {
+        return 'text-muted'
+      } else if (userId && userId !== attemptingUser && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS) {
+        return 'text-muted'
+      } else if (userId && userId === attemptingUser && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS) {
+        return 'text-indigo-500'
+      } else {
+        return 'text-danger'
+      }
+    },
+
+    dispositionTooltipData (dispositionStatus, type, direction = null) {
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW && direction === CommunicationDirections.INBOUND) {
+        return 'Voicemail'
+      }
+      if (type === CommunicationTypes.RVM && direction === CommunicationDirections.OUTBOUND) {
+        return 'RVM'
+      }
+      return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateDispositionStatusText(dispositionStatus))) + ' ' + this.$options.filters.fixCommDirection(direction) + ' ' + this.$options.filters.fixCommType(type)
+    }
+  }
+}
