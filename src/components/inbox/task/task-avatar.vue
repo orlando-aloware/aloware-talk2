@@ -28,6 +28,7 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
 
 .animated-wrapper {
   animation-timing-function: ease-in-out;
@@ -40,16 +41,26 @@ export default {
 }
 
 .task-avatar {
-  width: 200px;
-  height: 200px;
+  width: 178px;
+  height: 178px;
   display: flex;
   align-items: center;
   justify-content: center;
   @include border-radius(50%);
 
+  @include screen('md') {
+    width: 190px;
+    height: 190px;
+  }
+
+  @include screen('md') {
+    width: 200px;
+    height: 200px;
+  }
+
   &__inner {
-    width: 160px;
-    height: 160px;
+    width: 75%;
+    height: 75%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,8 +68,8 @@ export default {
   }
 
   &__main {
-    width: 133px;
-    height: 133px;
+    width: 70%;
+    height: 70%;
     background-color: $green;
     @include border-radius(50%);
     display: flex;

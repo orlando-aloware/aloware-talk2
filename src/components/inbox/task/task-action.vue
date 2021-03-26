@@ -57,16 +57,22 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
 
 .task-action {
   display: flex;
-  width: 80px;
-  height: 80px;
+  width: 65px;
+  height: 65px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 100ms ease-in;
   @include border-radius(10px);
+
+  @include screen('md') {
+    width: 80px;
+    height: 80px;
+  }
 
   &:hover {
     background-color: $grey-light2;
@@ -85,10 +91,13 @@ export default {
 
   &__label {
     color: $grey-dark;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 0.35px;
     line-height: 19px;
     text-align: center;
+    @include screen('md') {
+      font-size: 14px;
+    }
   }
 }
 </style>

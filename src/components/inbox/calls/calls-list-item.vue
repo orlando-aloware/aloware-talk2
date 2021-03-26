@@ -49,7 +49,7 @@ export default {
       this.$emit('answer')
     },
     select () {
-      window.dispatchEvent(new CustomEvent('makeCall'))
+      window.VueEvent.fire('make_call')
     }
   },
   props: {

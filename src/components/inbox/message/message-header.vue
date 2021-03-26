@@ -58,10 +58,10 @@ export default {
       this.$emit('answer')
     },
     info () {
-      window.dispatchEvent(new CustomEvent('toggleContactInfo'))
+      window.VueEvent.fire('toggle_contact_info')
     },
     close () {
-      window.dispatchEvent(new CustomEvent('showMessage'))
+      window.VueEvent.fire('show_message')
     }
   }
 }

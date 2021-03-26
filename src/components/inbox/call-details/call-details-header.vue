@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     toggle () {
-      window.dispatchEvent(new CustomEvent('toggleContactInfo'))
+      window.VueEvent.fire('toggle_contact_info')
     }
   },
   components: {
