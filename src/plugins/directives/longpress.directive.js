@@ -1,6 +1,6 @@
 import { Platform } from 'quasar'
 
-export default {
+export default () => ({
   bind: function (el, binding, vNode) {
     // Make sure expression provided is a function
     if (typeof binding.value !== 'function') {
@@ -64,4 +64,4 @@ export default {
       el.addEventListener('click', cancel)
     }
   }
-}
+})

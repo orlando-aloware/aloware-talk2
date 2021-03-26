@@ -4,7 +4,7 @@ import holdpress from './holdpress.directive'
 import linkify from './linkify.directive'
 import longpress from './longpress.directive'
 
-export default async ({ Vue }) => {
+export default async ({ Vue, ...rest }) => {
   const directives = {
     cleave,
     focus,
@@ -16,6 +16,6 @@ export default async ({ Vue }) => {
   window.$directives = directives
 
   Object.keys(directives).map(k => {
-    Vue.directive(k, directives[k])
+    Vue.directive(k, directives[k]({ Vue, ...rest }))
   })
 }

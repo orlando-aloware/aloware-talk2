@@ -1,6 +1,6 @@
 import { Platform } from 'quasar'
 
-export default {
+export default () => ({
   bind: function (el, binding, vNode) {
     el.dataset.longPressTimeoutId = '0'
     let stop = (e) => {
@@ -56,4 +56,4 @@ export default {
       el.removeEventListener('mousedown', el.$_long_press_pointerdown_handler)
     }
   }
-}
+})

@@ -1,6 +1,6 @@
 import Cleave from 'cleave.js'
 
-export default {
+export default () => ({
   name: 'cleave',
   bind (el, binding) {
     const input = el.querySelector('input')
@@ -10,4 +10,4 @@ export default {
     const input = el.querySelector('input')
     input._vCleave.destroy()
   }
-}
+})

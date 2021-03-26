@@ -1,3 +1,3 @@
 import linkify from 'vue-linkify'
 
-export default linkify
+export default () => linkify

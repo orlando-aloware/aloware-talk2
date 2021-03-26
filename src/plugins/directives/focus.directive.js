@@ -1,8 +1,8 @@
-export default {
+export default ({ Vue }) => ({
   inserted: function (el) {
     el.focus()
   },
   update: function (el) {
-    this.$nextTick(() => el.focus())
+    Vue.nextTick(() => el.focus())
   }
-}
+})
