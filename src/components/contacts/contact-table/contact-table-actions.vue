@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 d-flex">
+  <div class="w-100">
     <div class="d-flex mr-auto">
       <icon-button>
         <template slot="icon">
@@ -8,8 +8,9 @@
         <template slot="text">Add Contact</template>
       </icon-button>
       <contact-list-search class="mx-3"/>
+      <contact-list-count class="ml-auto" />
     </div>
-    <contact-list-count />
+
   </div>
 </template>
 
