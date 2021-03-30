@@ -1,3 +1,8 @@
+/**
+ * Fix resource name
+ * @param {string} type
+ * @returns {string}
+ */
 const fixResourceName = (type) => {
   switch (type) {
     case 'subaccount_local_pn':
@@ -57,6 +62,11 @@ const fixResourceName = (type) => {
   }
 }
 
+/**
+ * Fix unit
+ * @param {string} type
+ * @returns {string}
+ */
 const fixUnit = (type) => {
   switch (type) {
     case 'local_min':
@@ -69,9 +79,15 @@ const fixUnit = (type) => {
       return ''
   }
 }
+
+/**
+ * Fix credit information
+ * @param {number} credit
+ * @returns {string|*}
+ */
 const fixCreditInfo = (credit) => {
-  if (credit !== undefined) {
-    if (credit === 0) {
+  if (typeof credit === 'number') {
+    if (credit <= 0) {
       return credit + ' (debited from plan)'
     } else {
       return credit
@@ -81,14 +97,24 @@ const fixCreditInfo = (credit) => {
   }
 }
 
+/**
+ * Fix rounding
+ * @param {string|number} amount
+ * @returns {string}
+ */
 const fixRounding = (amount) => {
-  if (amount !== undefined) {
-    return parseFloat(amount).toFixed(3)
-  } else {
-    return '-'
-  }
+  const parsed = parseFloat(amount)
+
+  if (isNaN(parsed)) return '-'
+
+  return parsed.toFixed(3)
 }
 
+/**
+ * Format to currency
+ * @param {number} amount
+ * @returns {string}
+ */
 const toCurrency = (amount) => {
   if ((!!amount) || amount === 0) {
     if (amount < 0) {
@@ -99,6 +125,12 @@ const toCurrency = (amount) => {
     return '-'
   }
 }
+
+/**
+ * Remove sign
+ * @param amount
+ * @returns {string|number}
+ */
 const removeSign = (amount) => {
   if (amount !== undefined) {
     return Math.abs(amount)

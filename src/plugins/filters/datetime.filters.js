@@ -1,3 +1,9 @@
+/**
+ * Fix date
+ * @param {date|string|Moment} dt
+ * @param format
+ * @returns {string|*}
+ */
 export const fixDate = (dt, format = 'YYYY-MM-DD') => {
   if (dt) {
     if (window.timezone) {
@@ -10,6 +16,11 @@ export const fixDate = (dt, format = 'YYYY-MM-DD') => {
   }
 }
 
+/**
+ * Fix date time
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
 export const fixDateTime = (dt) => {
   if (dt) {
     if (window.timezone) {
@@ -22,6 +33,12 @@ export const fixDateTime = (dt) => {
   }
 }
 
+/**
+ * Fix time
+ * @param {date|string|Moment} dt
+ * @param {string} format
+ * @returns {string|*}
+ */
 export const fixTime = (dt, format = 'h:mma') => {
   if (dt) {
     if (window.timezone) {
@@ -34,6 +51,12 @@ export const fixTime = (dt, format = 'h:mma') => {
   }
 }
 
+/**
+ * Fix time local
+ * @param {date|string|Moment} dt
+ * @param format
+ * @returns {string|*}
+ */
 export const fixTimeLocal = (dt, format = 'h:mma') => {
   if (dt) {
     if (window.timezone) {
@@ -46,6 +69,11 @@ export const fixTimeLocal = (dt, format = 'h:mma') => {
   }
 }
 
+/**
+ * Fix duration
+ * @param duration
+ * @returns {string|*}
+ */
 export const fixDuration = (duration) => {
   if (duration) {
     return window.moment.duration(duration, 'seconds').format('m:ss', {
@@ -56,6 +84,11 @@ export const fixDuration = (duration) => {
   }
 }
 
+/**
+ * Humanize duration
+ * @param duration
+ * @returns {string|*}
+ */
 export const humanizeDuration = (duration) => {
   let func = require('humanize-duration')
   if (duration) {
@@ -65,6 +98,11 @@ export const humanizeDuration = (duration) => {
   }
 }
 
+/**
+ * Fix full date UTC
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
 export const fixFullDateUTC = (dt) => {
   if (dt) {
     if (window.timezone) {
@@ -77,6 +115,11 @@ export const fixFullDateUTC = (dt) => {
   }
 }
 
+/**
+ * Fix full date local
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
 export const fixFullDateLocal = (dt) => {
   if (dt) {
     if (window.timezone) {
@@ -89,6 +132,11 @@ export const fixFullDateLocal = (dt) => {
   }
 }
 
+/**
+ * Fix full date URC relative
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
 export const fixFullDateUTCRelative = (dt) => {
   if (dt) {
     let now = window.moment.utc()

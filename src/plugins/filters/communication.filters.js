@@ -1,6 +1,14 @@
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 
+/**
+ *  Fix phone number
+ * @param phoneNumber
+ * @param format
+ * @param force
+ * @param includeSuffix
+ * @returns {string|boolean|*}
+ */
 const fixPhone = (
   phoneNumber,
   format = null,
@@ -100,6 +108,11 @@ const fixPhone = (
   }
 }
 
+/**
+ * Fix comm direction
+ * @param {string} direction
+ * @returns {string}
+ */
 const fixCommDirection = (direction) => {
   switch (direction) {
     case 1:
@@ -111,6 +124,11 @@ const fixCommDirection = (direction) => {
   }
 }
 
+/**
+ * Fix comm type
+ * @param {string} type
+ * @returns {string}
+ */
 const fixCommType = (type) => {
   switch (type) {
     case 1:
@@ -128,10 +146,20 @@ const fixCommType = (type) => {
   }
 }
 
+/**
+ * Area code filter
+ * @param Vue
+ * @returns {function(*=): string}
+ */
 const areaCode = ({ Vue }) => (phoneNumber) => {
   return /\d{3}/.exec(Vue.options.filters.fixPhone(phoneNumber))[0]
 }
 
+/**
+ * Translate current status text
+ * @param {string} status
+ * @returns {string}
+ */
 const translateCurrentStatusText = (status) => {
   switch (status) {
     // The call is currently ringing (relative to us)
@@ -196,6 +224,11 @@ const translateCurrentStatusText = (status) => {
   }
 }
 
+/**
+ * Translate disposition status text
+ * @param status
+ * @returns {string}
+ */
 const translateDispositionStatusText = (status) => {
   switch (status) {
     // Call is still going on.

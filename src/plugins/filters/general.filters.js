@@ -2,7 +2,11 @@ import _ from 'lodash'
 import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
 
-// general
+/**
+ * Convert to uppercase
+ * @param {string} text
+ * @returns {string|*|string|string}
+ */
 const toUpperCase = (text) => {
   if (text) {
     return text.toUpperCase()
@@ -11,6 +15,11 @@ const toUpperCase = (text) => {
   }
 }
 
+/**
+ * Capitalize text
+ * @param {string} text
+ * @returns {string}
+ */
 const capitalize = (text) => {
   if (text) {
     return _.capitalize(text)
@@ -19,6 +28,11 @@ const capitalize = (text) => {
   }
 }
 
+/**
+ * Initialise text
+ * @param {string} name
+ * @returns {string|*|string}
+ */
 const initials = (name) => {
   let initials = name.match(/\b\w/g) || []
   initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
@@ -26,6 +40,11 @@ const initials = (name) => {
   return initials
 }
 
+/**
+ * Convert to human readable boolean e.g yes,no
+ * @param {boolean} boolValue
+ * @returns {string}
+ */
 const humanReadableBool = (boolValue) => {
   if (boolValue) {
     return 'On'
@@ -34,6 +53,11 @@ const humanReadableBool = (boolValue) => {
   }
 }
 
+/**
+ * Convert to human readable dial mode
+ * @param {number} mode
+ * @returns {string}
+ */
 const humanReadableDialMode = (mode) => {
   switch (mode) {
     case 0:
@@ -46,6 +70,11 @@ const humanReadableDialMode = (mode) => {
   return '-'
 }
 
+/**
+ * Human readable call router behaviour
+ * @param {string} mode
+ * @returns {string}
+ */
 const humanReadableCallRouterBehavior = (mode) => {
   switch (mode) {
     case CampaignCallRouterBehavior.CALL_ROUTER_BEHAVIOR_MODE_FAST_FORWARD:
@@ -60,6 +89,11 @@ const humanReadableCallRouterBehavior = (mode) => {
   return '-'
 }
 
+/**
+ * Converts first character of the string to uppercase.
+ * @param {string} string
+ * @returns {string}
+ */
 const ucfirst = (string) => {
   if (!string) {
     return '-'
@@ -68,6 +102,11 @@ const ucfirst = (string) => {
   }
 }
 
+/**
+ * Checks if the value is empty
+ * @param {string} value
+ * @returns {string|*}
+ */
 const checkIfEmpty = (value) => {
   if (!value) {
     return '-'
@@ -76,6 +115,11 @@ const checkIfEmpty = (value) => {
   }
 }
 
+/**
+ * Checks if value is true. Returns HTML string.
+ * @param {string} value
+ * @returns {string}
+ */
 const checkIfTrue = (value) => {
   if (!value) {
     return '<i class="material-icons">&#xE876;</i>'
@@ -84,6 +128,11 @@ const checkIfTrue = (value) => {
   }
 }
 
+/**
+ * Prettify camel case
+ * @param {string} value
+ * @returns {string}
+ */
 const prettifyCamelCase = (value) => {
   let output = ''
   let len = value.length
@@ -106,6 +155,11 @@ const prettifyCamelCase = (value) => {
   return output
 }
 
+/**
+ * Converts first character of the words to uppercase.
+ * @param {string} value
+ * @returns {string}
+ */
 const ucwords = (value) => {
   return (value + '')
     .replace(/^(.)|\s+(.)/g, function ($1) {
@@ -113,6 +167,11 @@ const ucwords = (value) => {
     })
 }
 
+/**
+ * Filter domain
+ * @param {string} email
+ * @returns {string|*}
+ */
 const filterDomain = (email) => {
   if (email) {
     return email.replace(/.*@/, '')
@@ -121,6 +180,11 @@ const filterDomain = (email) => {
   }
 }
 
+/**
+ * Fix company role text
+ * @param {string} label
+ * @returns {string|*}
+ */
 const fixCompanyRole = (label) => {
   if (label) {
     return label.replace('Company ', '')
@@ -129,10 +193,22 @@ const fixCompanyRole = (label) => {
   }
 }
 
+/**
+ * Truncates text
+ * @param {string} text
+ * @param {number} stop
+ * @param {number} clamp
+ * @returns {*}
+ */
 const truncate = (text, stop, clamp) => {
   return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '')
 }
 
+/**
+ * Formats to integer
+ * @param {string|number} amount
+ * @returns {string|number}
+ */
 const toInt = (amount) => {
   if (amount !== undefined) {
     return parseInt(amount)
@@ -141,6 +217,11 @@ const toInt = (amount) => {
   }
 }
 
+/**
+ * Fix order
+ * @param {string|number} order
+ * @returns {string|number}
+ */
 const fixOrder = (order) => {
   if (order !== '' && order !== undefined) {
     return parseInt(order) + 1
@@ -149,6 +230,11 @@ const fixOrder = (order) => {
   }
 }
 
+/**
+ * Prettify JSON object
+ * @param {*} value
+ * @returns {string}
+ */
 const pretty = (value) => {
   if (value) {
     return JSON.stringify(value, null, 3)
@@ -157,6 +243,11 @@ const pretty = (value) => {
   }
 }
 
+/**
+ * Formats full name
+ * @param {string} fullName
+ * @returns {string|*}
+ */
 const firstName = (fullName) => {
   if (fullName) {
     if (fullName.indexOf(' ') > -1) {
@@ -170,6 +261,11 @@ const firstName = (fullName) => {
   return ''
 }
 
+/**
+ * Formats last name
+ * @param {string} fullName
+ * @returns {string|*}
+ */
 const lastName = (fullName) => {
   if (fullName) {
     if (fullName.indexOf(' ') > -1) {
@@ -183,6 +279,11 @@ const lastName = (fullName) => {
   return ''
 }
 
+/**
+ * Replace dashes
+ * @param {string} text
+ * @returns {string|*}
+ */
 const replaceDash = (text) => {
   if (text) {
     return text.replace('-', ' ')
@@ -191,6 +292,11 @@ const replaceDash = (text) => {
   }
 }
 
+/**
+ * Get bg class from agent status
+ * @param {number} agentStatus
+ * @returns {string}
+ */
 const agentStatusClass = (agentStatus) => {
   agentStatus = parseInt(agentStatus)
   if (agentStatus !== null) {

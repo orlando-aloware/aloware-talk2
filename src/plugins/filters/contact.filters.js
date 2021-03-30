@@ -1,6 +1,11 @@
 import _ from 'lodash'
 import * as LrnTypes from '../../constants/lrn-types'
 
+/**
+ * Fix date of birth
+ * @param {string} dateOfBirth
+ * @returns {string|*}
+ */
 const fixDateOfBirth = (dateOfBirth) => {
   if (dateOfBirth) {
     return dateOfBirth
@@ -9,6 +14,11 @@ const fixDateOfBirth = (dateOfBirth) => {
   return 'N/A'
 }
 
+/**
+ * Fix name
+ * @param {string} name
+ * @returns {string|*}
+ */
 const fixName = (name) => {
   if (name) {
     return name
@@ -17,6 +27,11 @@ const fixName = (name) => {
   return 'N/A'
 }
 
+/**
+ * Fix country
+ * @param {string} country
+ * @returns {string}
+ */
 const fixCountry = (country) => {
   if (country) {
     return _.capitalize(country)
@@ -25,6 +40,11 @@ const fixCountry = (country) => {
   return 'N/A'
 }
 
+/**
+ * Fix state
+ * @param {string} state
+ * @returns {string}
+ */
 const fixState = (state) => {
   if (state) {
     return _.capitalize(state)
@@ -33,6 +53,11 @@ const fixState = (state) => {
   return 'N/A'
 }
 
+/**
+ * Fix city
+ * @param {string} city
+ * @returns {string}
+ */
 const fixCity = (city) => {
   if (city) {
     return _.capitalize(city)
@@ -41,6 +66,11 @@ const fixCity = (city) => {
   return 'N/A'
 }
 
+/**
+ * Fix zipcode
+ * @param {string} zipcode
+ * @returns {string|*}
+ */
 const fixZipcode = (zipcode) => {
   if (zipcode) {
     return zipcode
@@ -49,6 +79,11 @@ const fixZipcode = (zipcode) => {
   return 'N/A'
 }
 
+/**
+ * Fix email address
+ * @param {string} email
+ * @returns {string|*}
+ */
 const fixEmail = (email) => {
   if (email) {
     return email
@@ -57,6 +92,11 @@ const fixEmail = (email) => {
   return 'N/A'
 }
 
+/**
+ * Fix timezone
+ * @param {string} timezone
+ * @returns {string|*}
+ */
 const fixTimezone = (timezone) => {
   if (timezone) {
     return timezone
@@ -65,6 +105,11 @@ const fixTimezone = (timezone) => {
   return 'N/A'
 }
 
+/**
+ * Fix lrn type
+ * @param {number} lrnType
+ * @returns {string}
+ */
 const fixLrnType = (lrnType) => {
   // LRN_TYPE_LANDLINE = 0 so it couldn't pass the if statement because 0 != true.
   if (lrnType !== null) {
