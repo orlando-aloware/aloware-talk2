@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import numeral from 'numeral'
+import numFormat from 'vue-filter-number-format'
 import * as LrnTypes from '../constants/lrn-types'
 import * as CampaignCallRouterBehavior from '../constants/campaign-call-router-behaviors'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
@@ -68,6 +70,18 @@ export default async ({ Vue }) => {
       return '-'
     }
   })
+  Vue.filter('fixDurationHumanize', (datetime) => {
+    if (datetime === undefined) {
+      return '-'
+    }
+
+    let now = window.timezone ? window.moment.utc(new Date()).tz(window.timezone) : window.moment.utc(new Date())
+    let end = window.timezone ? window.moment.utc(datetime).tz(window.timezone) : window.moment.utc(datetime)
+    let duration = window.moment.duration(now.diff(end))
+    let asSeconds = duration.asSeconds()
+
+    return window.moment.duration(asSeconds, 'seconds').humanize()
+  })
   Vue.filter('fixFullDateUTC', (dt) => {
     if (dt) {
       if (window.timezone) {
@@ -112,6 +126,26 @@ export default async ({ Vue }) => {
       return ''
     }
   })
+  Vue.filter('fixDurationUTCRelative', (dt) => {
+    if (dt) {
+      let now = window.moment.utc()
+      let datetime = window.moment.utc(dt)
+      let duration = now.diff(datetime, 'seconds')
+
+      if (window.moment.duration(duration, 'seconds').hours() >= 1) {
+        return window.moment.duration(duration, 'seconds').format('HH:mm:ss', {
+          trim: false
+        })
+      } else {
+        return window.moment.duration(duration, 'seconds').format('mm:ss', {
+          trim: false
+        })
+      }
+    } else {
+      return ''
+    }
+  })
+  Vue.filter('numFormat', numFormat(numeral))
 
   // credit related
   Vue.filter('fixResourceName', (type) => {

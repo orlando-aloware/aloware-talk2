@@ -9,7 +9,8 @@
       'button--secondary': variant === 'secondary',
       'button--danger': variant === 'danger',
       'button--warning': variant === 'warning',
-      'button--info': variant === 'info'
+      'button--info': variant === 'info',
+      'button--no-background': variant === 'plain'
     }"
   >
     <div class="button__icon" v-if="!noIcon">
@@ -33,7 +34,7 @@ export default {
     variant: {
       type: String,
       default: 'primary',
-      validator: (val) => ['primary', 'danger', 'info', 'warning'].includes(val)
+      validator: (val) => ['primary', 'danger', 'info', 'warning', 'plain'].includes(val)
     },
     outline: {
       type: Boolean,

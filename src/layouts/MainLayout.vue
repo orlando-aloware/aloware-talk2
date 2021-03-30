@@ -1,12 +1,13 @@
 <template>
   <div class="h-100"
        :class="[auth.user.authenticated ? 'dashboard' : 'guest',
-       light_mode ? 'light-mode' : 'night-mode']">
+       lightMode ? 'light-mode' : 'night-mode']">
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
+              :height="'100%'"
               v-if="!showUpgradeDialog">
       <div class="h-100"
-           :class="[sidebar_visibile ? 'sidebar-active' : '',
+           :class="[sidebarVisibile ? 'sidebar-active' : '',
            auth.user.authenticated ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2' : '']">
         <q-header class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
                   v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
@@ -14,8 +15,7 @@
         </q-header>
         <q-page-container class="page-container h-100 pl-lg-5 ml-lg-2 q-px-xs-md">
           <section class="main-content section h-100 py-2">
-            <template v-if="!loading"
-                      class="h-100">
+            <template v-if="!loading">
               <transition :name="transitionName"
                           mode="out-in"
                           @beforeLeave="beforeLeave"
@@ -57,15 +57,15 @@
         </q-page-container>
       </div>
       <q-drawer
-        v-model="sidebar_visibile"
-        v-show="sidebar_visibile && auth && auth.user && auth.user.authenticated && !loading"
+        v-model="sidebarVisibile"
+        v-show="sidebarVisibile && auth && auth.user && auth.user.authenticated && !loading"
         :breakpoint="0"
-        class="h-100 sidebar-wrapper-sm sidebar-wrapper d-none d-sm-block"
+        class="h-100 sidebar-wrapper d-none d-sm-block"
         :width="60"
-        content-class="sidebar-wrapper">
-        <q-list class="h-100">
+        content-class="sidebar">
+        <q-list>
           <app-sidebar class="page-sidebar"
-                       :light_mode="light_mode"
+                       :lightMode="lightMode"
                        @toggleMode="toggleMode" />
         </q-list>
       </q-drawer>
@@ -243,8 +243,8 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      sidebar_visibile: false,
-      light_mode: true,
+      sidebarVisibile: false,
+      lightMode: true,
       CommunicationTypes
     }
   },
@@ -495,11 +495,11 @@ export default {
 
   methods: {
     toggleMode () {
-      this.light_mode = !this.light_mode
+      this.lightMode = !this.lightMode
     },
 
     toggleSidebar () {
-      this.sidebar_visibile = !this.sidebar_visibile
+      this.sidebarVisibile = !this.sidebarVisibile
     },
 
     setHubSpotDeal (phoneNumber) {
@@ -691,7 +691,7 @@ export default {
     },
 
     afterEnter (element) {
-      element.style.height = 'auto'
+      element.style.height = '100%'
     },
 
     removeBehaviorsRestrictions () {
@@ -1325,3 +1325,20 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@media (min-height: 439px) {
+  .sidebar-wrapper {
+    & .sidebar {
+      & .q-list {
+        height: 100% !important;
+      }
+    }
+  }
+}
+.guest {
+  & .main-content {
+    padding: 0 !important;
+  }
+}
+</style>
