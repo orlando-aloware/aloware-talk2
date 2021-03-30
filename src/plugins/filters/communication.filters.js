@@ -2,7 +2,7 @@ import * as CommunicationCurrentStatus from '../../constants/communication-curre
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 
 /**
- *  Fix phone number
+ * Fix phone number
  * @param phoneNumber
  * @param format
  * @param force
