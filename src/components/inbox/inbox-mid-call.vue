@@ -43,7 +43,7 @@ export default {
       this.$emit('toggle')
     },
     toggleContactInfo () {
-      window.dispatchEvent(new CustomEvent('toggleContactInfo'))
+      window.VueEvent.fire('toggle_contact_info')
     }
   }
 }
@@ -90,14 +90,21 @@ export default {
   }
 
   &__actions {
-    padding-top: 25px;
+    padding-top: 15px;
+    @include screen('md') {
+      padding-top: 25px;
+    }
   }
 
   &__buttons {
-    padding-top: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    @include screen('lg') {
+      padding-top: 50px;
+    }
   }
 }
 </style>

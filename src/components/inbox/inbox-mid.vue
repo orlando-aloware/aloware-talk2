@@ -1,7 +1,7 @@
 <template>
-  <div class="inbox-mid">
-    <inbox-mid-call v-if="showMessage" @toggle="toggle" />
-    <inbox-mid-msg v-if="!showMessage" @toggle="toggle" />
+  <div class="inbox-mid" :class="{'inbox-mid--show': showingMid}">
+    <inbox-mid-call v-if="showMessage" @toggle="toggle"/>
+    <inbox-mid-msg v-if="!showMessage" @toggle="toggle"/>
   </div>
 </template>
 
@@ -16,13 +16,14 @@ export default {
     toggle () {
       this.showMessage = !this.showMessage
       console.log(this.showMessage)
+    },
+    showMid () {
+      this.showingMid = true
     }
   },
   mounted () {
-    window.addEventListener('showMessage', this.toggle)
-  },
-  beforeDestroy () {
-    window.removeEventListener('showMessage', this.toggle)
+    this.$VueEvent.listen('show_message', this.toggle)
+    this.$VueEvent.listen('make_call', this.showMid)
   },
   props: {
     contactInfoOpen: {
@@ -32,7 +33,8 @@ export default {
   },
   data () {
     return {
-      showMessage: false
+      showMessage: false,
+      showingMid: false
     }
   }
 }
@@ -51,6 +53,17 @@ export default {
   position: relative;
   overflow: hidden;
   flex-grow: 1;
+
+  &--show {
+    @include screen-max('sm') {
+      position: absolute;
+      display: flex;
+      z-index: 1000;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
   @include screen('md') {
     display: flex;
   }

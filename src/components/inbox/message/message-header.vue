@@ -58,10 +58,10 @@ export default {
       this.$emit('answer')
     },
     info () {
-      window.dispatchEvent(new CustomEvent('toggleContactInfo'))
+      window.VueEvent.fire('toggle_contact_info')
     },
     close () {
-      window.dispatchEvent(new CustomEvent('showMessage'))
+      window.VueEvent.fire('show_message')
     }
   }
 }
@@ -125,11 +125,7 @@ export default {
     font-weight: bold;
     letter-spacing: 0.4px;
     line-height: 21px;
-    display: none;
-
-    @include screen('md') {
-      display: flex;
-    }
+    display: flex;
   }
 
   &__meta {
@@ -139,11 +135,7 @@ export default {
     line-height: 16px;
     align-items: center;
     padding-top: 2px;
-    display: none;
-
-    @include screen('md') {
-      display: flex;
-    }
+    display: flex;
 
     &__status {
       color: $green;
