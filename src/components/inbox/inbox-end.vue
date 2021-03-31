@@ -20,10 +20,7 @@ export default {
     }
   },
   mounted () {
-    window.addEventListener('toggleContactInfo', this.toggleContactInfo)
-  },
-  destroy () {
-    window.removeEventListener('toggleContactInfo', this.toggleContactInfo)
+    this.$VueEvent.listen('toggle_contact_info', this.toggleContactInfo)
   },
   methods: {
     toggleContactInfo () {

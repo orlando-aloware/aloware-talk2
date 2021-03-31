@@ -3,43 +3,47 @@
     <div class="dialer-select__label">
       Call using:
     </div>
-    <div class="dialer-select__value">
-      <span class="dialer-select__item" @click="toggle">Aloware Main (000) 123-4567</span>
-      <div class="dialer-select__icon" ref="show" @click="toggle"><i class="gg-chevron-down"></i></div>
+    <div class="dialer-select__value" @click="toggle">
+      <span class="dialer-select__item">Aloware Main (000) 123-4567</span>
+      <div class="dialer-select__icon" ref="show"><i class="gg-chevron-down"></i></div>
     </div>
-    <div ref="drop"
-         class="dialer-select__dropdown"
-         :class="{'dialer-select__dropdown--show animate__animated animate__fadeIn': showing, 'animate__animated animate__fadeOut': !showing}">
-      <div class="dialer-select__dropdown__search">
-        <input type="text" class="form-control search-control" placeholder="Search...">
+    <portal to="app">
+      <div ref="drop"
+           :class="{
+            'dialer-select-dropdown--show animate__animated animate__fadeIn': showing,
+           'd-none animate__animated animate__fadeOut': !showing}
+        ">
+        <div class="dialer-select-dropdown__search">
+          <input type="text" class="form-control form-control-sm search-control" placeholder="Search...">
+        </div>
+        <div class="dialer-select-dropdown__items" @click="toggle">
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+          <div class="dialer-select-dropdown__item">
+            Aloware Main (000) 123-4567
+          </div>
+        </div>
       </div>
-      <div class="dialer-select__dropdown__items" @click="toggle">
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-        <div class="dialer-select__dropdown__item">
-          Aloware Main (000) 123-4567
-        </div>
-      </div>
-    </div>
+    </portal>
   </div>
 </template>
 
@@ -60,6 +64,10 @@ export default {
       this.showing = !this.showing
       console.log(this.showing)
       popper.forceUpdate()
+    },
+    onWindowResize () {
+      this.showing = false
+      popper.forceUpdate()
     }
   },
   mounted () {
@@ -70,17 +78,19 @@ export default {
           {
             name: 'offset',
             options: {
-              offset: [10, 15]
+              offset: [-200, 20]
             }
           }
         ]
       })
     })
+    window.addEventListener('resize', this.onWindowResize)
   },
   beforeDestroy () {
     if (popper && typeof popper.destroy === 'function') {
       popper.destroy()
     }
+    window.removeEventListener('resize', this.onWindowResize)
   }
 }
 </script>
@@ -121,64 +131,70 @@ export default {
   }
 }
 
-.dialer-select {
-  display: flex;
-  flex-direction: column;
+.dialer-select-dropdown {
+  position: absolute;
+  visibility: hidden;
+  z-index: -1 !important;
+  &__items {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 30px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: calc(200px - 30px);
+  }
 
-  &__dropdown {
-    width: 102%;
+  &__item {
+    min-height: 40px;
+    font-size: 12px;
+    width: 100%;
+    border-top: solid 1px $grey-light3;
+    display: flex;
+    align-items: center;
+    color: $black;
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+    transition: background-color 100ms ease-in;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &:hover {
+      background-color: $grey-light2;
+    }
+  }
+
+  &__search {
+    padding: 10px;
+    box-shadow: 0 0 10px 0 rgb(0 0 0 / 10%);
+  }
+
+  &--show {
+    min-width: 250px;
     min-height: 100px;
     max-height: 200px;
     background-color: $white;
     position: absolute;
     box-shadow: 0 0 10px 0 rgb(0 0 0 / 10%);
     display: block;
-    visibility: hidden;
     overflow: hidden;
     border: solid 1px $grey-light3;
-    @include border-radius(10px);
-
-    &__items {
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-bottom: 30px;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      overflow-y: auto;
-      max-height: calc(200px - 30px);
-    }
-
-    &__item {
-      min-height: 40px;
-      font-size: 12px;
-      width: 100%;
-      border-top: solid 1px $grey-light3;
-      display: flex;
-      align-items: center;
-      color: $black;
-      cursor: pointer;
-      padding-left: 10px;
-      padding-right: 10px;
-      transition: background-color 100ms ease-in;
-
-      &:hover {
-        background-color: $grey-light2;
-      }
-    }
-
-    &__search {
-      padding: 10px;
-    }
-
-    &--show {
-      visibility: visible;
-    }
+    @include border-radius(5px);
+    visibility: visible;
+    z-index: 2;
   }
+}
+
+.dialer-select {
+  display: flex;
+  flex-direction: column;
 
   &__label {
     font-size: 12px;
-    color: $grey-light7;
+    color: $grey-light5;
     line-height: 16px;
     opacity: 0.9;
   }
