@@ -1,13 +1,14 @@
 export default {
   user ({
     authenticated,
-    profile,
-    loading
+    profile
   }) {
     return {
       authenticated,
-      profile,
-      loading
+      profile
     }
+  },
+  loading (state) {
+    return state.loading
   }
 }
