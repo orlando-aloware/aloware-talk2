@@ -1,11 +1,9 @@
 import { Platform } from 'quasar'
-import auth from './../../boot/auth'
 import { mapActions } from 'vuex'
 
 export default {
   data () {
     return {
-      auth: auth,
       statics: {
         whitelabel: false,
         logo: null,
@@ -60,7 +58,7 @@ export default {
         this.loading = true
         // show fullscreen loading
         localStorage.setItem('api_token', this.$route.query.api_token)
-        auth.check()
+        this.check()
           .then((res) => {
             localStorage.setItem('company_id', res.data.user.company.id)
             this.setCurrentCompany(res.data.user.company)
@@ -95,7 +93,8 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setKeyboardScroll', 'setKeyboardResizeMode'])
+    ...mapActions(['setCurrentCompany', 'resetVuex', 'setKeyboardScroll', 'setKeyboardResizeMode']),
+    ...mapActions('auth', ['check'])
   },
 
   beforeRouteEnter (to, from, next) {
@@ -103,7 +102,7 @@ export default {
       return next()
     }
 
-    auth.check()
+    this.check()
       .then(() => {
         next({ name: 'Inbox' })
       })

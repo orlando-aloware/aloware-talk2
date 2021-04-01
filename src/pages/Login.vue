@@ -8,10 +8,8 @@
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
-import { guestMixin } from '../boot/mixins'
 export default {
   name: 'login',
-  mixins: [guestMixin],
   components: { LoginForm, LoginLargeScreensInfo }
 }
 </script>

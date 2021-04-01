@@ -1,12 +1,11 @@
 import { Platform } from 'quasar'
-import auth from './../../boot/auth'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
 
 export default {
   data () {
     return {
-      agentStatus: auth.user.profile.agent_status,
+      agentStatus: this.profile?.agent_status,
       loadingAgentStatus: false,
       AgentStatus
     }
@@ -14,9 +13,9 @@ export default {
 
   computed: {
     ...mapState(['oldAgentStatus']),
-
+    ...mapState('auth', ['profile', 'authenticated']),
     color () {
-      switch (this.auth.user.profile.agent_status) {
+      switch (this.profile.agent_status) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
           return 'blue-grey-6'
         case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
@@ -43,8 +42,8 @@ export default {
 
   created () {
     this.$VueEvent.listen('user_updated', (user) => {
-      if (this.auth && this.auth.user && this.auth.user.profile && user.id === this.auth.user.profile.id && this.auth.user.profile.agent_status !== user.agent_status) {
-        this.auth.user.profile.agent_status = user.agent_status
+      if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
+        this.profile.agent_status = user.agent_status
         this.agentStatus = user.agent_status
         console.log('Changed agent status: ' + user.agent_status)
       }
@@ -64,7 +63,7 @@ export default {
 
   methods: {
     getAgentStatus (getTry = 1) {
-      if (!this.auth.user.authenticated) {
+      if (!this.authenticated) {
         return
       }
       let deviceInfo = null
@@ -86,7 +85,7 @@ export default {
       this.$axios.post('/api/v1/profile/get-agent-status', {
         device_info: deviceInfo
       }).then(res => {
-        this.auth.user.profile.agent_status = res.data.agent_status
+        this.profile.agent_status = res.data.agent_status
         this.agentStatus = res.data.agent_status
       }).catch((err) => {
         console.log(err)
@@ -127,7 +126,7 @@ export default {
     },
 
     changeAgentStatus (val, changeAgentStatusTry = 1) {
-      if (!this.auth.user.authenticated) {
+      if (!this.authenticated) {
         return
       }
       if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
@@ -137,13 +136,13 @@ export default {
       console.log('Changing agent status: ' + val)
 
       // make sure that the session is valid
-      if (this.auth && this.auth.user && this.auth.user.profile) {
+      if (this.profile) {
         this.loadingAgentStatus = true
-        this.$axios.post('/api/v1/user/' + this.auth.user.profile.id + '/agent-status', {
+        this.$axios.post('/api/v1/user/' + this.profile.id + '/agent-status', {
           agent_status: val
         }).then(res => {
           this.loadingAgentStatus = false
-          this.auth.user.profile.agent_status = res.data.agent_status
+          this.profile.agent_status = res.data.agent_status
           this.agentStatus = res.data.agent_status
           console.log('Changed agent status: ' + res.data.agent_status)
           this.$VueEvent.fire('user_updated', res.data)
@@ -163,7 +162,6 @@ export default {
         })
       }
     },
-
     ...mapActions(['setOldAgentStatus'])
   }
 }

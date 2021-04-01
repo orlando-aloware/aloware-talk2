@@ -1,10 +1,11 @@
 <template>
   <section :class="[success ? 'default-bg' : '']"
            class="row w-100 h-100 mx-0">
-    <login-large-screens-info v-show="!success" class="col-5 px-0" />
-    <div v-if="!success" class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
+    <login-large-screens-info v-show="!success" class="col-5 px-0"/>
+    <div v-if="!success"
+         class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-        <img src="app-icons/misc/logo.svg" class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0" />
+        <img src="app-icons/misc/logo.svg" class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0"/>
         <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1">
           Reset Password
         </div>
@@ -26,7 +27,7 @@
                   <q-icon
                     :name="isPwdNew ? 'visibility_off' : 'visibility'"
                     class="cursor-pointer"
-                    @click="isPwdNew = !isPwdNew" />
+                    @click="isPwdNew = !isPwdNew"/>
                 </template>
               </q-input>
             </div>
@@ -58,7 +59,7 @@
               color="positive"
               type="submit"
               style="width: 190px; height: 50px;"
-              :loading="loading" />
+              :loading="loading"/>
           </div>
         </form>
       </div>
@@ -71,8 +72,8 @@
       <q-card
         class="thank-you-container">
         <q-card-section class="row items-center q-pb-none mx-1">
-          <q-space />
-          <q-btn icon="close" flat round dense />
+          <q-space/>
+          <q-btn icon="close" flat round dense/>
         </q-card-section>
 
         <q-card-section class="text-center">
@@ -80,7 +81,7 @@
             name="fas fa-check"
             color="positive"
             class="cursor-pointer rounded-icon-opaque p-2 mx-4 mb-4"
-            style="font-size: 1.3em" />
+            style="font-size: 1.3em"/>
           <div class="title w-100 pb-2">Success!</div>
           <div class="message pb-4 mb-1">Lets go ahead and login with that new password.</div>
         </q-card-section>
@@ -90,7 +91,6 @@
 </template>
 
 <script>
-import auth from '../boot/auth'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import { mapActions } from 'vuex'
 import { guestMixin } from 'boot/mixins'
@@ -104,7 +104,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       user: {
         email: null,
         password: null,
@@ -160,7 +159,7 @@ export default {
         this.success = true
         this.resetUser()
         setTimeout(() => {
-          this.login()
+          this.loginUser()
           this.closeDialog(isMobile)
         }, 2000)
       }).catch(err => {
@@ -182,45 +181,69 @@ export default {
         }
       })
     },
-
-    login (isMobile = false) {
-      this.auth.login(this.user.email, this.user.password, this.user.remember_me, isMobile, this.deviceInfo).then(res => {
-        let usage = res.data.data.usage
-        this.setCurrentCompany(res.data.data.company)
-        this.resetVuex()
-        this.setUsage(usage)
-        if (this.$q.platform.is.cordova) {
-          window.Keyboard.hide()
-          this.setKeyboardScroll(false)
-        }
-        localStorage.setItem('company_id', res.data.data.company.id)
-        this.loading = false
-        this.$router.push(this.$route.query.redirect || '/').then(() => {
-          setTimeout(() => {
-            this.resetUser()
-          }, 2000)
-        }).catch((err) => {
-          console.log(err)
+    async loginUser (isMobile = false) {
+      try {
+        const response = await this.login({
+          email: this.user.email,
+          password: this.user.password,
+          rememberMe: this.user.remember_me,
+          isMobile,
+          deviceInfo: this.deviceInfo
         })
-      }).catch(err => {
-        console.log(err)
-        this.loading = false
-        if (err.response.status !== 401) {
-          console.log(err)
-        } else {
-          // show notification
-          this.$buefy.snackbar.open({
-            duration: 1000,
-            message: err.response.data.error,
-            type: 'is-danger',
-            position: 'is-top',
-            actionText: 'Ok',
-            queue: false,
-            onAction: () => {
+        await this.onLoginSuccess(response)
+      } catch (err) {
+        this.onLoginFailed(err)
+      }
+    },
 
-            }
-          })
-        }
+    onLoginFailed (err) {
+      console.log(err)
+      this.loading = false
+      if (err.response.status !== 401) {
+        console.log(err)
+        return
+      }
+      // show notification
+      this.$buefy.snackbar.open({
+        duration: 1000,
+        message: err.response.data.error,
+        type: 'is-danger',
+        position: 'is-top',
+        actionText: 'Ok',
+        queue: false
+      })
+    },
+
+    async onLoginSuccess ({ data: { data } }) {
+      const { usage, company } = data
+
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+
+      if (this.$q.platform.is.cordova) {
+        window.Keyboard.hide()
+        this.setKeyboardScroll(false)
+      }
+
+      localStorage.setItem('company_id', company.id)
+
+      this.loading = false
+
+      const redirectPath = String(this.$route.query.redirect || '/')
+
+      await this.$router.push(redirectPath)
+
+      await this.resetTimeout()
+
+      this.resetUser()
+    },
+
+    resetTimeout () {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve()
+        }, 2000)
       })
     },
 
@@ -244,7 +267,8 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage', 'setKeyboardScroll'])
+    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage', 'setKeyboardScroll']),
+    ...mapActions('auth', ['login', 'resetPass'])
   }
 }
 </script>

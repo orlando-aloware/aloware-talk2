@@ -1,8 +1,13 @@
 import Echo from 'laravel-echo'
 import store from '../store/index'
-import auth from './auth'
 
 export default {
+  get profile () {
+    return store().getters['auth/profile']
+  },
+  get authenticated () {
+    return store().getters['auth/authenticated']
+  },
   init () {
     console.log('initiating broadcast')
     /**
@@ -27,7 +32,7 @@ export default {
   },
 
   listen () {
-    window.Echo.private('user-' + auth.user.profile.id)
+    window.Echo.private('user-' + this.profile.id)
       .listen('.user.status.updated', (event) => {
         store().commit('SET_USER_STATUS', event.status)
       })
@@ -162,7 +167,7 @@ export default {
           window.VueEvent.fire('new_desktop_fax', communication)
         }
       })
-    window.Echo.private('company-' + auth.user.profile.company_id)
+    window.Echo.private('company-' + this.profile.company_id)
       .listen('.company.updated', (event) => {
         if (store().state.current_company && store().state.current_company.id === event.company.id) {
           store().dispatch('setCurrentCompany', event.company)
@@ -355,12 +360,12 @@ export default {
         store().commit('DELETE_WORKFLOW', event.workflow)
         window.VueEvent.fire('workflow_deleted', event.workflow)
       })
-    window.Echo.join('online-users-company-' + auth.user.profile.company_id)
+    window.Echo.join('online-users-company-' + this.profile.company_id)
   },
 
   leave () {
-    window.Echo.leave('user-' + auth.user.profile.id)
-    window.Echo.leave('company-' + auth.user.profile.company_id)
-    window.Echo.leave('online-users-company-' + auth.user.profile.company_id)
+    window.Echo.leave('user-' + this.profile.id)
+    window.Echo.leave('company-' + this.profile.company_id)
+    window.Echo.leave('online-users-company-' + this.profile.company_id)
   }
 }

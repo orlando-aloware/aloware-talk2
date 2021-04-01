@@ -4,9 +4,8 @@
 
 <script>
 import TwilioDevice from './communication/twilio/device'
-import auth from '../boot/auth'
 import _ from 'lodash'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import { aclMixin, agentMixin } from '../boot/mixins'
 import * as WebrtcEvents from '../constants/webrtc-events'
 import * as AgentStatus from '../constants/agent-status'
@@ -19,7 +18,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loadingCommunication: false,
       callNotification: null,
       desktopNotification: null,
@@ -37,7 +35,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer', 'current_company'])
+    ...mapState(['dialer', 'current_company']),
+    ...mapGetters('auth', ['user'])
   },
 
   created () {
@@ -173,7 +172,7 @@ export default {
 
       // ping getMobileToken every 24 hours
       this.$options.mobileTokenRegenerateInterval = setInterval(() => {
-        if (this.auth.user.authenticated) {
+        if (this.user.authenticated) {
           this.getMobileToken()
         }
       }, 24 * 60 * 60 * 1000)
@@ -328,7 +327,7 @@ export default {
 
       // ping getMobileToken every 24 hours
       this.$options.webrtcTokenRegenerateInterval = setInterval(() => {
-        if (this.auth.user.authenticated) {
+        if (this.user.authenticated) {
           this.getDesktopToken()
         }
       }, 24 * 60 * 60 * 1000)
@@ -501,7 +500,7 @@ export default {
       let params = {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
         'CampaignId': outboundCampaignId.toString(),
-        'UserId': this.auth.user.profile.id.toString()
+        'UserId': this.user.profile.id.toString()
       }
 
       console.log('Making call', params)
@@ -733,7 +732,7 @@ export default {
     },
 
     startWrapUpTimer () {
-      let wrapUpTimer = this.current_company.force_wrap_up ? this.current_company.wrap_up_seconds : this.auth.user.profile.wrap_up_seconds
+      let wrapUpTimer = this.current_company.force_wrap_up ? this.current_company.wrap_up_seconds : this.user.profile.wrap_up_seconds
       if (wrapUpTimer < 0) {
         this.backToDial()
         return

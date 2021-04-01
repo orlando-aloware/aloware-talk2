@@ -1,13 +1,14 @@
 <template>
-  <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
+  <div
+    class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
     <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-      <img src="app-icons/misc/logo.svg" class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0" />
+      <img src="app-icons/misc/logo.svg" class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"/>
       <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1">
         Login
       </div>
       <form class="login-form w-100 px-2"
             ref="myForm"
-            @submit.prevent="login">
+            @submit.prevent="submit">
         <div class="field pb-2">
           <div class="control has-icons-left">
             <q-input outlined
@@ -17,7 +18,7 @@
                      autocomplete="username"
                      v-model="user.email"
                      @keyup.enter="goToNextInput"
-                     required />
+                     required/>
           </div>
         </div>
         <div class="field">
@@ -49,7 +50,7 @@
           <q-checkbox class="checkbox pl-1 remember-me"
                       label="Remember me"
                       color="positive"
-                      v-model="user.remember_me" />
+                      v-model="user.remember_me"/>
         </div>
         <div class="field mt-2 text-left">
           <q-btn
@@ -58,7 +59,7 @@
             color="positive"
             type="submit"
             style="width: 148px; height: 50px;"
-            :loading="loading" />
+            :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1">
           Don’t have an account?
@@ -73,12 +74,10 @@
 </template>
 
 <script>
-import auth from '../../boot/auth'
 import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'login-form',
-
   data () {
     return {
       user: {
@@ -92,17 +91,13 @@ export default {
       isPwd: true
     }
   },
-
   computed: {
     ...mapState(['current_company'])
   },
-
   methods: {
-    login () {
-      this.loading = true
-      const isMobile = this.$q.platform.is.cordova
+    getDeviceInfo (isMobile) {
       if (isMobile) {
-        this.deviceInfo = {
+        return {
           registration_id: localStorage.getItem('registrationId'),
           registration_type: localStorage.getItem('registrationType'),
           model: window.device.model,
@@ -115,42 +110,86 @@ export default {
           app_version: localStorage.getItem('version')
         }
       }
-      auth.login(this.user.email, this.user.password, this.user.remember_me, isMobile, this.deviceInfo).then(res => {
-        let usage = res.data.data.usage
-        this.setCurrentCompany(res.data.data.company)
-        this.resetVuex()
-        this.setUsage(usage)
-        if (this.$q.platform.is.cordova) {
-          window.Keyboard.hide()
-          this.setKeyboardScroll(false)
-        }
-        localStorage.setItem('company_id', res.data.data.company.id)
-        this.loading = false
-        this.$router.push(this.$route.query.redirect || '/').then(() => {
-          setTimeout(() => {
-            this.resetUser()
-          }, 2000)
-        }).catch((err) => {
-          console.log(err)
+    },
+    getLoginParams () {
+      return {
+        email: this.user.email,
+        password: this.user.password,
+        rememberMe: this.user.remember_me
+      }
+    },
+    async submit () {
+      try {
+        this.loading = true
+
+        const isMobile = this.$q.platform.is.cordova
+
+        this.deviceInfo = this.getDeviceInfo(isMobile)
+
+        const response = await this.login({
+          ...this.getLoginParams(),
+          deviceInfo: this.deviceInfo,
+          isMobile
         })
-      }).catch(err => {
-        console.log(err)
+
+        console.log(response)
+
+        await this.onLoginSuccess(response)
+
         this.loading = false
-        if (err.response.status !== 401) {
-          console.log(err)
-        } else {
-          // show notification
-          this.$q.notify({
-            message: err.response.data.error,
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
-        }
+      } catch (err) {
+        console.error(err)
+        this.loading = false
+        this.onLoginError(err)
+      }
+    },
+
+    onLoginError (err) {
+      this.loading = false
+      if (err.response?.status !== 401) {
+        console.log(err)
+      } else {
+        // show notification
+        this.$q.notify({
+          message: err.response?.data?.error,
+          type: 'negative',
+          textColor: 'white',
+          actions: [
+            {
+              icon: 'close'
+            }
+          ]
+        })
+      }
+    },
+
+    async onLoginSuccess ({ data: { data } }) {
+      const { usage, company } = data
+
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+
+      if (this.$q.platform.is.cordova) {
+        window.Keyboard.hide()
+        this.setKeyboardScroll(false)
+      }
+
+      localStorage.setItem('company_id', company.id)
+
+      const redirectPath = this.$route.query.redirect || '/'
+
+      await this.$router.push(String(redirectPath))
+      await this.redirectTimeout()
+
+      this.resetUser()
+    },
+
+    redirectTimeout () {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve()
+        }, 2000)
       })
     },
 
@@ -172,7 +211,8 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage', 'setKeyboardScroll'])
+    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage', 'setKeyboardScroll']),
+    ...mapActions('auth', ['login'])
   }
 }
 </script>
