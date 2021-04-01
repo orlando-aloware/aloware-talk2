@@ -32,8 +32,6 @@ export default {
   },
 
   listen () {
-    console.log()
-
     window.Echo.private('user-' + this.profile.id)
       .listen('.user.status.updated', (event) => {
         store().commit('SET_USER_STATUS', event.status)
