@@ -5,8 +5,8 @@ import actions from './auth.actions'
 
 export default {
   namespaced: true,
+  state,
   getters,
   mutations,
-  actions,
-  state
+  actions
 }

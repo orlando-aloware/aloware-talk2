@@ -87,6 +87,8 @@ const login = async ({ commit }, {
     commit('SET_LOADING', false)
 
     await check({ commit }, {})
+
+    return response
   } catch (err) {
     commit('SET_LOADING', false)
     return Promise.reject(err)
@@ -97,7 +99,7 @@ const logout = async ({ commit }, { deviceInfo = null }) => {
   try {
     commit('SET_LOADING', true)
 
-    await window.axios.post('/logout', {
+    const response = await window.axios.post('/logout', {
       device_info: deviceInfo
     })
 
@@ -111,6 +113,8 @@ const logout = async ({ commit }, { deviceInfo = null }) => {
     commit('SET_LOADING', false)
     commit('SET_AUTHENTICATED', false)
     commit('SET_PROFILE', null)
+
+    return response
   } catch (err) {
     commit('SET_LOADING', false)
     return Promise.reject(err)

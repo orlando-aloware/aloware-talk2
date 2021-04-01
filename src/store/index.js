@@ -4,6 +4,8 @@ import createPersistedState from 'vuex-persistedstate'
 import _ from 'lodash'
 import * as Default from '../constants/default'
 
+import auth from './auth'
+
 Vue.use(Vuex)
 
 function resourceExists (arr, resource) {
@@ -17,6 +19,9 @@ function resourceExists (arr, resource) {
 
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
+    modules: {
+      auth
+    },
     state: {
       filter: {},
       tags: [],

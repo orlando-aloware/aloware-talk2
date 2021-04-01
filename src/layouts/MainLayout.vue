@@ -1,15 +1,15 @@
 <template>
   <div class="h-100"
-       :class="[auth.user.authenticated ? 'dashboard' : 'guest',
+       :class="[authenticated ? 'dashboard' : 'guest',
        light_mode ? 'light-mode' : 'night-mode']">
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               v-if="!showUpgradeDialog">
       <div class="h-100"
            :class="[sidebar_visibile ? 'sidebar-active' : '',
-           auth.user.authenticated ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2' : '']">
+           authenticated ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2' : '']">
         <q-header class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
-                  v-show="auth && auth.user && auth.user.authenticated && !isWidget && !loading">
+                  v-show="authenticated && !isWidget && !loading">
           <app-header @toggleSidebar="toggleSidebar"/>
         </q-header>
         <q-page-container class="page-container h-100 pl-lg-5 ml-lg-2 q-px-xs-md">
@@ -53,12 +53,12 @@
               </div>
             </div>
           </section>
-          <dialer v-if="auth.user.authenticated"></dialer>
+          <dialer v-if="authenticated"></dialer>
         </q-page-container>
       </div>
       <q-drawer
         v-model="sidebar_visibile"
-        v-show="sidebar_visibile && auth && auth.user && auth.user.authenticated && !loading"
+        v-show="sidebar_visibile && authenticated && !loading"
         :breakpoint="0"
         class="h-100 sidebar-wrapper-sm sidebar-wrapper d-none d-sm-block"
         :width="60"
@@ -69,7 +69,7 @@
                        @toggleMode="toggleMode" />
         </q-list>
       </q-drawer>
-      <app-footer v-if="auth && auth.user && auth.user.authenticated && !isWidget && !loading"
+      <app-footer v-if="authenticated && !isWidget && !loading"
                   class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
                   ref="appFooter">
       </app-footer>
@@ -178,7 +178,6 @@
 </template>
 
 <script>
-import auth from '../boot/auth'
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
 import { Platform } from 'quasar'
@@ -216,7 +215,6 @@ export default {
   mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
   data () {
     return {
-      auth: auth,
       loading: true,
       loadingCampaigns: false,
       loadingUsers: false,
@@ -250,7 +248,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['current_company', 'dialer', 'campaigns'])
+    ...mapState(['current_company', 'dialer', 'campaigns']),
+    ...mapState('auth', ['profile', 'authenticated'])
   },
 
   created () {
@@ -438,11 +437,10 @@ export default {
       this.registerPush()
     }
 
-    if (this.auth.user && this.auth.user.authenticated) {
-      console.log('authenticated')
+    if (this.authenticated) {
       this.initAuth()
     } else {
-      this.auth.check().then(() => {
+      this.check().then(() => {
         this.loading = false
         this.authCheckStatus = true
         this.showRefreshButton = false
@@ -543,7 +541,7 @@ export default {
         this.increaseAppBadge()
         // Will be true if the notification was received while the app was in the foreground
         if (data.additionalData.foreground) {
-          if (this.auth.user.authenticated) {
+          if (this.authenticated) {
             this.decreaseAppBadge()
             const dismiss = this.$q.notify({
               timeout: 5000,
@@ -588,7 +586,7 @@ export default {
             })
           }
         } else if (data.additionalData.coldstart) { // Will be true if the application is started by clicking on the push notification, false if the app is already started.
-          if (this.auth.user.authenticated) {
+          if (this.authenticated) {
             this.decreaseAppBadge()
             if (data.additionalData.contact_id) {
               // @todo Go to contact page
@@ -611,7 +609,7 @@ export default {
         } else if (data.additionalData.dismissed) { // Is set to true if the notification was dismissed by the user
           // @todo
         } else {
-          if (this.auth.user.authenticated) {
+          if (this.authenticated) {
             this.decreaseAppBadge()
             if (data.additionalData.contact_id) {
               // @todo Go to contact page
@@ -639,7 +637,7 @@ export default {
     },
 
     call (phoneNumber) {
-      if (this.auth && this.auth.user && this.auth.user.authenticated && !this.dialer.call) {
+      if (this.authenticated && !this.dialer.call) {
         // @todo Go to dial page
         /*
         this.$router.push({ name: 'Dial', query: { phone_number: phoneNumber } }).catch(err => {
@@ -650,14 +648,14 @@ export default {
     },
 
     unsubscribeFromPusher () {
-      if (this.auth.user.authenticated) {
+      if (this.authenticated) {
         // just leave the channels
         broadcast.leave()
       }
     },
 
     resetCall () {
-      if (!this.auth.user.authenticated) {
+      if (!this.authenticated) {
         this.setDialerToken()
       }
       this.setDialerCall()
@@ -719,7 +717,7 @@ export default {
 
     initAuth () {
       this.loading = true
-      this.initAccount(this.auth.user).then(() => {
+      this.initAccount().then(() => {
         this.loading = false
         if (this.$q.platform.is.cordova) {
           if (this.$q.platform.is.android) {
@@ -735,13 +733,13 @@ export default {
           }
         }
 
-        if (this.auth.user.profile.live_calls === 0 && this.dialer.call) {
-          if (!this.auth.user.profile.go_to_available_after_login) {
+        if (this.profile.live_calls === 0 && this.dialer.call) {
+          if (!this.profile.go_to_available_after_login) {
             this.$VueEvent.fire('change_agent_status', AgentStatus.AGENT_STATUS_OFFLINE)
           }
         }
 
-        if (this.auth.user.profile.go_to_available_after_login && !this.dialer.call) {
+        if (this.profile.go_to_available_after_login && !this.dialer.call) {
           this.$VueEvent.fire('change_agent_status', AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
         }
 
@@ -750,8 +748,8 @@ export default {
     },
 
     checkAuth (authTry = 1) {
-      if (this.auth.user.profile !== null) {
-        this.auth.check(true).then(() => {
+      if (this.profile !== null) {
+        this.check(true).then(() => {
           this.loading = false
           this.authCheckStatus = true
           this.showRefreshButton = false
@@ -774,8 +772,8 @@ export default {
 
     testFailedAuth () {
       // error
-      this.auth.user.authenticated = false
-      this.auth.user.profile = null
+      this.authenticated = false
+      this.profile = null
       window.location.href = '/login'
     },
 
@@ -918,17 +916,17 @@ export default {
       return v1.length === v2.length ? 0 : (v1.length < v2.length ? -1 : 1)
     },
 
-    async initAccount (user) {
-      if (user.profile) {
+    async initAccount () {
+      if (this.profile) {
         this.$Sentry.configureScope((scope) => {
-          scope.setTag('id', user.profile.id)
-          scope.setTag('name', user.profile.name)
-          scope.setTag('company_name', user.profile.company_name)
+          scope.setTag('id', this.profile.id)
+          scope.setTag('name', this.profile.name)
+          scope.setTag('company_name', this.profile.company_name)
           scope.setTag('version', localStorage.getItem('version'))
         })
-        if (user.profile.company_id) {
+        if (this.profile.company_id) {
           this.$Sentry.configureScope((scope) => {
-            scope.setTag('company_id', user.profile.company_id)
+            scope.setTag('company_id', this.profile.company_id)
           })
         }
         let getCurrentCompany = this.getCurrentCompany()
@@ -957,7 +955,7 @@ export default {
       if (!phoneNumber) {
         return
       }
-      if (this.auth.user.authenticated) {
+      if (this.authenticated) {
         console.log('Calling phone number: ' + phoneNumber)
         this.call(phoneNumber)
       } else {
@@ -1279,7 +1277,7 @@ export default {
           app_version: localStorage.getItem('version')
         }
       }
-      this.auth.logout(deviceInfo).then(res => {
+      this.logoutUser(deviceInfo).then(res => {
         this.response = res.data
         this.$router.push({ name: 'Login' }).catch(err => {
           console.log(err)
@@ -1303,7 +1301,8 @@ export default {
       'setDialerContact',
       'setDialerCurrentNumber',
       'setDialerIsMuted'
-    ])
+    ]),
+    ...mapActions('auth', { logoutUser: 'logout', check: 'check' })
   },
 
   watch: {
@@ -1313,12 +1312,12 @@ export default {
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     },
 
-    'auth.user.authenticated' (newVal, oldVal) {
+    'authenticated' (newVal, oldVal) {
       if (newVal && !oldVal) {
         this.initAuth()
       }
 
-      if (!this.auth.user.authenticated) {
+      if (!this.authenticated) {
         this.resetCall()
       }
     }
