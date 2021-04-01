@@ -6,9 +6,9 @@
              size="1.1rem"
              align="center"
              to="/"
-             class="w-100 p-2" />
+             class="w-100 p-2"/>
       <q-separator class="separator-blur mt-1"
-                   color="white" />
+                   color="white"/>
       <q-space class="p-2"/>
     </div>
     <q-btn flat
@@ -41,16 +41,16 @@
            :class="[ isActive('Dashboard') ? 'active' : '' ]"/>
     <div class="mt-auto w-100">
       <q-separator class="separator-blur mt-1"
-                   color="white" />
+                   color="white"/>
       <q-btn flat
              :icon="mode_icon"
              size="0.9rem"
              align="center"
              class="nav-icons w-100 pt-2 pb-2"
              :class="[ isActive('Dashboard') ? 'active' : '' ]"
-             @click="$emit('toggleMode')" />
+             @click="$emit('toggleMode')"/>
       <q-separator class="separator-blur"
-                   color="white" />
+                   color="white"/>
       <q-btn flat
              icon="img:app-icons/menu/settings_white.svg"
              size="0.9rem"
@@ -68,7 +68,7 @@
             </q-item-section>
           </q-item>
           <q-separator class="separator-blur"
-                       color="black" />
+                       color="black"/>
           <q-item clickable
                   v-close-popup
                   @click="logoutAction"
@@ -106,7 +106,6 @@ export default {
     isActive (name) {
       return this.$route.name === name
     },
-
     getDeviceInfo (isMobile) {
       let deviceInfo = null
       if (isMobile) {
