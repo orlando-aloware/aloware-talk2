@@ -182,6 +182,11 @@ export default {
         height: 60px;
       }
 
+      td:before, td:after {
+        background: $orange-light;
+        opacity: 0.34;
+      }
+
       .action-buttons {
         background-color: $white;
         border: 0;
