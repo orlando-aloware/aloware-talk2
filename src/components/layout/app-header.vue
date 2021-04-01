@@ -32,11 +32,11 @@
                icon="img:app-icons/header/nav_icon-notification.svg"
                class="mr-2 ml-auto"
                style="color: #202125;" />
-        <div v-if="auth.user.profile"
+        <div v-if="user.profile"
              class="d-none d-lg-block mr-2 ml-auto">
           <span>
             <div class="small-text">
-              <strong>{{ auth.user.profile.name }}</strong>
+              <strong>{{ user.profile.name }}</strong>
               <template v-if="phoneNumber">
                 | {{ phoneNumber | fixPhone }}
               </template>
@@ -50,15 +50,15 @@
                         dropdown-icon="img:app-icons/header/arrow-down.svg"
                         class="profile-menu ml-auto d-none d-lg-block"
                         content-style="{ padding: '0' }">
-          <template v-if="auth.user.profile"
+          <template v-if="user.profile"
                     v-slot:label>
             <div class="items-center no-wrap">
               <div class="text-center">
                 <span class="w-40 avatar agent-avatar grey-300"
-                      v-bind:style="avatarStyle(auth.user.profile.name)">
-                    <span>{{ auth.user.profile.name | initials }}</span>
+                      v-bind:style="avatarStyle(user.profile.name)">
+                    <span>{{ user.profile.name | initials }}</span>
                     <i class="b-white bottom"
-                       :class="[ $options.filters.agentStatusClass(auth.user.profile.agent_status) ]">
+                       :class="[ $options.filters.agentStatusClass(user.profile.agent_status) ]">
                     </i>
                 </span>
               </div>
@@ -102,10 +102,9 @@
 </template>
 
 <script>
-import auth from 'boot/auth'
 import * as AgentStatus from '../../constants/agent-status'
 import { avatarMixin } from '../../boot/mixins'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 import CallActive from 'components/inbox/call-active/call-active'
 
@@ -115,10 +114,8 @@ export default {
   mixins: [
     avatarMixin
   ],
-
   data () {
     return {
-      auth: auth,
       pageIcons: {
         inbox: 'app-icons/menu/inbox_green.svg',
         contacts: 'app-icons/menu/contacts_green.svg',
@@ -134,9 +131,9 @@ export default {
 
   computed: {
     ...mapState(['dialer', 'campaigns']),
-
+    ...mapGetters('auth', ['user']),
     statusLabel () {
-      switch (this.auth.user.profile.agent_status) {
+      switch (this.user.profile.agent_status) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
           return 'Offline'
         case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
@@ -156,7 +153,7 @@ export default {
     },
 
     phoneNumber () {
-      let found = this.campaigns.find(campaign => campaign.id === this.auth.user.profile.campaign_id)
+      let found = this.campaigns.find(campaign => campaign.id === this.user.profile.campaign_id)
       if (found && found.incoming_numbers.length) {
         return found.incoming_numbers[0].phone_number
       }

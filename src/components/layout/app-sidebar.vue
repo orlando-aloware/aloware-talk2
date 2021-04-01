@@ -71,7 +71,7 @@
                        color="black" />
           <q-item clickable
                   v-close-popup
-                  @click="logout"
+                  @click="logoutAction"
                   class="pl-3 pr-3">
             <q-item-section>
               Log-out
@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import auth from 'boot/auth'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'app-sidebar',
@@ -98,7 +98,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       mode_icon: 'img:app-icons/menu/light_mode.svg'
     }
   },
@@ -108,9 +107,8 @@ export default {
       return this.$route.name === name
     },
 
-    logout () {
+    getDeviceInfo (isMobile) {
       let deviceInfo = null
-      const isMobile = this.$q.platform.is.cordova
       if (isMobile) {
         deviceInfo = {
           registration_id: localStorage.getItem('registrationId'),
@@ -125,15 +123,24 @@ export default {
           app_version: localStorage.getItem('version')
         }
       }
-      this.auth.logout(deviceInfo).then(res => {
-        this.response = res.data
-        this.$router.push({ name: 'Login' }).catch(err => {
-          console.log(err)
-        })
-      }).catch(err => {
-        console.log(err)
-      })
-    }
+      return deviceInfo
+    },
+    async logoutAction () {
+      try {
+        const isMobile = this.$q.platform.is.cordova
+
+        const deviceInfo = this.getDeviceInfo(isMobile)
+
+        const response = await this.logout({ deviceInfo })
+
+        this.response = response?.data
+
+        await this.$router.push({ name: 'Login' })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    ...mapActions('auth', ['logout'])
   },
 
   watch: {
