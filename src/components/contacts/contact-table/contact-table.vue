@@ -183,8 +183,18 @@ export default {
       }
 
       td:before, td:after {
+        background: transparent;
+      }
+
+      tr:hover {
         background: $orange-light;
-        opacity: 0.34;
+        td {
+          font-weight: 500;
+        }
+
+        td:nth-child(2) {
+          font-weight: 900;
+        }
       }
 
       .action-buttons {
