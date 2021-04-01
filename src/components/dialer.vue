@@ -4,7 +4,6 @@
 
 <script>
 import TwilioDevice from './communication/twilio/device'
-import auth from '../boot/auth'
 import _ from 'lodash'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { aclMixin, agentMixin } from '../boot/mixins'
@@ -19,7 +18,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loadingCommunication: false,
       callNotification: null,
       desktopNotification: null,

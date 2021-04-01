@@ -1,13 +1,13 @@
 import _ from 'lodash'
-
-import auth from './../../boot/auth'
+import { mapGetters } from 'vuex'
 import * as Carriers from '../../constants/carriers'
 
 export default {
   computed: {
+    ...mapGetters('auth', ['user']),
     supportsWebrtc () {
       const browser = window.Bowser.getParser(window.navigator.userAgent)
-      if (_.get(auth, 'user.profile.carrier_name') === Carriers.TWILIO) {
+      if (_.get(this.user, 'profile.carrier_name') === Carriers.TWILIO) {
         return browser.satisfies({
           chrome: '>=56',
           firefox: '>=51',
