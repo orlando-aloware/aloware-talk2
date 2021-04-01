@@ -7,6 +7,9 @@
   <list-new-lead-icon />
   <more-options-icon />
   <refresh-icon />
+  <headphone-icon />
+  <chevron-left />
+  <chevron-right />
 </div>
 </template>
 
@@ -18,9 +21,12 @@ import ListCustomIcon from 'components/icons/contacts/list-custom-icon'
 import ListNewLeadIcon from 'components/icons/contacts/list-new-lead-icon'
 import MoreOptionsIcon from 'components/icons/contacts/more-options-icon'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
+import HeadphoneIcon from 'components/icons/contacts/headphone-icon'
+import ChevronLeft from 'components/icons/contacts/chevron-left'
+import ChevronRight from 'components/icons/contacts/chevron-right'
 export default {
   name: 'contacts-icons-view.vue',
-  components: { RefreshIcon, MoreOptionsIcon, ListNewLeadIcon, ListCustomIcon, ListAnswerLeadIcon, ListAllIcon, DeleteIcon }
+  components: { ChevronRight, ChevronLeft, HeadphoneIcon, RefreshIcon, MoreOptionsIcon, ListNewLeadIcon, ListCustomIcon, ListAnswerLeadIcon, ListAllIcon, DeleteIcon }
 }
 </script>
 

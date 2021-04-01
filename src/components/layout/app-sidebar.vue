@@ -91,7 +91,7 @@ export default {
 
   props: {
     light_mode: {
-      required: true,
+      required: false,
       type: Boolean
     }
   },

@@ -3,7 +3,9 @@ import ContactTableHeader from './contact-table-header'
 import { storiesOf } from '@storybook/vue'
 
 const header = () => ({
-  components: { ContactTableHeader },
+  components: {
+    ContactTableHeader
+  },
   template: '<contact-table-header />'
 })
 

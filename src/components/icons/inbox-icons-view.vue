@@ -53,6 +53,14 @@
       <voice-mail-icon iconColor="green" />
       <div class="small text-muted">voice-mail</div>
     </div>
+    <div class="text-center">
+      <round-bg-icon>
+        <message-icon width="14"
+                      height="14"
+                      iconColor="white" />
+      </round-bg-icon>
+      <div class="small text-muted">round-bg-icon</div>
+    </div>
   </div>
 </template>
 
@@ -64,6 +72,7 @@ import RecordIcon from './record-icon.vue'
 import ShowContentIcon from './show-content-icon.vue'
 import TaskIcon from './task-icon.vue'
 import VoiceMailIcon from './voicemail-icon.vue'
+import RoundBgIcon from './round-bg-icon'
 
 export default {
   components: {
@@ -73,7 +82,8 @@ export default {
     RecordIcon,
     ShowContentIcon,
     TaskIcon,
-    VoiceMailIcon
+    VoiceMailIcon,
+    RoundBgIcon
   }
 }
 </script>

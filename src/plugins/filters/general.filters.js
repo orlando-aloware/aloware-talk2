@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import numeral from 'numeral'
+import numFormat from 'vue-filter-number-format'
 import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
 
@@ -218,6 +220,13 @@ const toInt = (amount) => {
 }
 
 /**
+ * Formats the number
+ * @param {string|number} numeral
+ * @returns {string}
+ */
+const numberFormat = numFormat(numeral)
+
+/**
  * Fix order
  * @param {string|number} order
  * @returns {string|number}
@@ -344,6 +353,7 @@ export default ({ Vue }) => {
     fixCompanyRole,
     truncate,
     toInt,
+    'numFormat': numberFormat,
     fixOrder,
     pretty,
     firstName,

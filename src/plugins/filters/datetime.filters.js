@@ -99,6 +99,49 @@ export const humanizeDuration = (duration) => {
 }
 
 /**
+ * Fix duration humanize
+ * @param {string} datetime
+ * @returns {string}
+ */
+export const fixDurationHumanize = (datetime) => {
+  if (datetime === undefined) {
+    return '-'
+  }
+
+  let now = window.timezone ? window.moment.utc(new Date()).tz(window.timezone) : window.moment.utc(new Date())
+  let end = window.timezone ? window.moment.utc(datetime).tz(window.timezone) : window.moment.utc(datetime)
+  let duration = window.moment.duration(now.diff(end))
+  let asSeconds = duration.asSeconds()
+
+  return window.moment.duration(asSeconds, 'seconds').humanize()
+}
+
+/**
+ * Fix Duration UTC Relative
+ * @param {string} dt
+ * @returns {string}
+ */
+export const fixDurationUTCRelative = (dt) => {
+  if (dt) {
+    let now = window.moment.utc()
+    let datetime = window.moment.utc(dt)
+    let duration = now.diff(datetime, 'seconds')
+
+    if (window.moment.duration(duration, 'seconds').hours() >= 1) {
+      return window.moment.duration(duration, 'seconds').format('HH:mm:ss', {
+        trim: false
+      })
+    } else {
+      return window.moment.duration(duration, 'seconds').format('mm:ss', {
+        trim: false
+      })
+    }
+  } else {
+    return ''
+  }
+}
+
+/**
  * Fix full date UTC
  * @param {date|string|Moment} dt
  * @returns {string|*}
@@ -168,6 +211,8 @@ export default ({ Vue }) => {
     fixTimeLocal,
     fixDuration,
     humanizeDuration,
+    fixDurationHumanize,
+    fixDurationUTCRelative,
     fixFullDateUTC,
     fixFullDateLocal,
     fixFullDateUTCRelative

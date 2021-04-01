@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import 'highlight.js/styles/github.css'
 import googlePhone from 'google-libphonenumber'
 import jstz from 'jstimezonedetect'
 import moment from 'moment'
