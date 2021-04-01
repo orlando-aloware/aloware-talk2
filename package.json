@@ -37,6 +37,7 @@
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.32",
+    "numeral": "^2.0.6",
     "portal-vue": "^2.1.7",
     "push.js": "^1.0.9",
     "pusher": "^4.0.2",
@@ -46,6 +47,7 @@
     "randomcolor": "^0.5.4",
     "twilio-client": "^1.14.0",
     "vue": "^2.6.12",
+    "vue-filter-number-format": "^3.0.1",
     "vue-linkify": "^1.0.1",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^2.7.1"

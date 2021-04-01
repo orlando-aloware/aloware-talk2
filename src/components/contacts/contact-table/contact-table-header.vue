@@ -28,6 +28,7 @@ export default {
 @import 'src/css/variables.scss';
 
 .contact-table-header {
+  background: $grey-light6;
   &__tr {
     height: 40px;
   }
@@ -36,7 +37,6 @@ export default {
     font-weight: bold;
     letter-spacing: 0.25px;
     text-transform: uppercase;
-    background-color: $grey-light7;
     color: $grey-dark;
     vertical-align: middle;
     margin: 0;
