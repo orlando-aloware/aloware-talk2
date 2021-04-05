@@ -1,13 +1,13 @@
 <template>
   <div class="h-100"
        :class="[authenticated ? 'dashboard' : 'guest',
-       light_mode ? 'light-mode' : 'night-mode']">
+       lightMode ? 'light-mode' : 'night-mode']">
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               :height="'100%'"
               v-if="!showUpgradeDialog">
       <div class="h-100"
-           :class="[sidebar_visibile ? 'sidebar-active' : '',
+           :class="[sidebarVisibile ? 'sidebar-active' : '',
            authenticated ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2' : '']">
         <q-header class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
                   v-show="authenticated && !isWidget && !loading">
@@ -57,8 +57,8 @@
         </q-page-container>
       </div>
       <q-drawer
-        v-model="sidebar_visibile"
-        v-show="sidebar_visibile && authenticated && !loading"
+        v-model="sidebarVisibile"
+        v-show="sidebarVisibile && authenticated && !loading"
         :breakpoint="0"
         class="h-100 sidebar-wrapper d-none d-sm-block"
         :width="60"
