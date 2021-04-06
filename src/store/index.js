@@ -5,6 +5,7 @@ import _ from 'lodash'
 import * as Default from '../constants/default'
 
 import auth from './auth'
+import contacts from './contacts'
 
 Vue.use(Vuex)
 
@@ -20,7 +21,8 @@ function resourceExists (arr, resource) {
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      auth
+      auth,
+      contacts
     },
     state: {
       filter: {},
