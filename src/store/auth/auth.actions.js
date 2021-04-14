@@ -15,7 +15,7 @@ const getDeviceInfo = () => {
   }
 }
 
-const check = async ({ commit }, { preventLogout = false }) => {
+const check = async ({ commit }, preventLogout = false) => {
   try {
     let deviceInfo = null
 

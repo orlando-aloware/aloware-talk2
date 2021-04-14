@@ -6,10 +6,12 @@
 </template>
 
 <script>
+import { guestMixin } from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
 export default {
   name: 'login',
+  mixins: [guestMixin],
   components: { LoginForm, LoginLargeScreensInfo }
 }
 </script>

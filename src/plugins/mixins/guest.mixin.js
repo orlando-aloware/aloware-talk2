@@ -1,5 +1,6 @@
 import { Platform } from 'quasar'
 import { mapActions } from 'vuex'
+import store from '../../store'
 
 export default {
   data () {
@@ -102,7 +103,7 @@ export default {
       return next()
     }
 
-    this.check()
+    store().dispatch('auth/check')
       .then(() => {
         next({ name: 'Inbox' })
       })
