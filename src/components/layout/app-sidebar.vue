@@ -43,7 +43,7 @@
       <q-separator class="separator-blur mt-1"
                    color="white"/>
       <q-btn flat
-             :icon="mode_icon"
+             :icon="modeIcon"
              size="0.9rem"
              align="center"
              class="nav-icons w-100 pt-2 pb-2"
@@ -90,7 +90,7 @@ export default {
   name: 'app-sidebar',
 
   props: {
-    light_mode: {
+    lightMode: {
       required: false,
       type: Boolean
     }
@@ -98,7 +98,7 @@ export default {
 
   data () {
     return {
-      mode_icon: 'img:app-icons/menu/light_mode.svg'
+      modeIcon: 'img:app-icons/menu/light_mode.svg'
     }
   },
 
@@ -143,8 +143,8 @@ export default {
   },
 
   watch: {
-    light_mode () {
-      this.mode_icon = this.light_mode ? 'img:app-icons/menu/light_mode.svg' : 'img:app-icons/menu/night_mode.svg'
+    lightMode () {
+      this.modeIcon = this.lightMode ? 'img:app-icons/menu/light_mode.svg' : 'img:app-icons/menu/night_mode.svg'
     }
   }
 }
