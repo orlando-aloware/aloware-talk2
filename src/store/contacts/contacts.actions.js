@@ -1,1 +1,32 @@
-export default {}
+export default {
+  toggleFolder: ({ commit }, id) => {
+    commit('TOGGLE_FOLDER', id)
+  },
+  openFolder: ({ commit }, id) => {
+    commit('OPEN_FOLDER', id)
+  },
+  closeFolder: ({ commit }, id) => {
+    commit('CLOSE_FOLDER', id)
+  },
+  removeListOpen: ({ commit }, list) => {
+    commit('REMOVE_LIST_OPEN', list)
+  },
+  removeFolderOpen: ({ commit }, folder) => {
+    commit('REMOVE_FOLDER_OPEN', folder)
+  },
+  removeListClose: ({ commit }) => {
+    commit('REMOVE_LIST_CLOSE')
+  },
+  removeFolderClose: ({ commit }) => {
+    commit('REMOVE_FOLDER_CLOSE')
+  },
+  openFilters: ({ commit }) => {
+    commit('FILTERS_OPEN')
+  },
+  closeFilters: ({ commit }) => {
+    commit('FILTERS_CLOSE')
+  },
+  contactsLoaded: ({ commit }, payload) => {
+    commit('CONTACTS_LOADED', payload)
+  }
+}

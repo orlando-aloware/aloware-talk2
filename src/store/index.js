@@ -1,16 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import createPersistedState from 'vuex-persistedstate'
 import _ from 'lodash'
 import * as Default from '../constants/default'
-
+// import createPersistedState from 'vuex-persistedstate'
 import auth from './auth'
 import contacts from './contacts'
 
 Vue.use(Vuex)
 
 function resourceExists (arr, resource) {
-  return !!arr.find(item => item.id === resource.id)
+  return !!arr.find((item) => item.id === resource.id)
 }
 
 /*
@@ -112,7 +111,7 @@ export default function (/* { ssrContext } */) {
         commit('SET_DIALER_DURATION', duration)
       },
 
-      setDialerTimer  ({ commit }, timer) {
+      setDialerTimer ({ commit }, timer) {
         commit('SET_DIALER_TIMER', timer)
       },
 
@@ -399,14 +398,20 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_KEYBOARD_SCROLL (state, status) {
-        if (state.keyboard.scroll !== null || state.keyboard.scroll !== status) {
+        if (
+          state.keyboard.scroll !== null ||
+          state.keyboard.scroll !== status
+        ) {
           state.keyboard.scroll = status
           window.Keyboard.disableScroll(!status)
         }
       },
 
       SET_KEYBOARD_RESIZE_MODE (state, mode) {
-        if (state.keyboard.resizeMode !== null || state.keyboard.resizeMode !== mode) {
+        if (
+          state.keyboard.resizeMode !== null ||
+          state.keyboard.resizeMode !== mode
+        ) {
           state.keyboard.resizeMode = mode
           window.Keyboard.setResizeMode(mode)
         }
@@ -424,15 +429,19 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_CAMPAIGN (state, campaign) {
-        let found = state.campaigns.find(cmp => cmp.id === campaign.id)
+        let found = state.campaigns.find((cmp) => cmp.id === campaign.id)
         let updatedCampaign = _.extend(found, campaign)
         if (found) {
-          Vue.set(state.campaigns, state.campaigns.indexOf(found), updatedCampaign)
+          Vue.set(
+            state.campaigns,
+            state.campaigns.indexOf(found),
+            updatedCampaign
+          )
         }
       },
 
       DELETE_CAMPAIGN (state, campaign) {
-        let found = state.campaigns.find(cmp => cmp.id === campaign.id)
+        let found = state.campaigns.find((cmp) => cmp.id === campaign.id)
         if (found) {
           state.campaigns.splice(state.campaigns.indexOf(found), 1)
         }
@@ -450,17 +459,28 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_DISPOSITION_STATUS (state, dispositionStatus) {
-        let found = state.disposition_statuses.find(o => o.id === dispositionStatus.id)
+        let found = state.disposition_statuses.find(
+          (o) => o.id === dispositionStatus.id
+        )
         if (found) {
           let updatedDispositionStatus = _.extend(found, dispositionStatus)
-          Vue.set(state.disposition_statuses, state.disposition_statuses.indexOf(found), updatedDispositionStatus)
+          Vue.set(
+            state.disposition_statuses,
+            state.disposition_statuses.indexOf(found),
+            updatedDispositionStatus
+          )
         }
       },
 
       DELETE_DISPOSITION_STATUS (state, dispositionStatus) {
-        let found = state.disposition_statuses.find(o => o.id === dispositionStatus.id)
+        let found = state.disposition_statuses.find(
+          (o) => o.id === dispositionStatus.id
+        )
         if (found) {
-          state.disposition_statuses.splice(state.disposition_statuses.indexOf(found), 1)
+          state.disposition_statuses.splice(
+            state.disposition_statuses.indexOf(found),
+            1
+          )
         }
       },
 
@@ -472,7 +492,10 @@ export default function (/* { ssrContext } */) {
         if (callDispositions.length === 0) {
           return
         }
-        state.call_dispositions = _.union(state.call_dispositions, callDispositions)
+        state.call_dispositions = _.union(
+          state.call_dispositions,
+          callDispositions
+        )
       },
 
       NEW_CALL_DISPOSITION (state, callDisposition) {
@@ -483,17 +506,28 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_CALL_DISPOSITION (state, callDisposition) {
-        let found = state.call_dispositions.find(o => o.id === callDisposition.id)
+        let found = state.call_dispositions.find(
+          (o) => o.id === callDisposition.id
+        )
         if (found) {
           let updatedCallDisposition = _.extend(found, callDisposition)
-          Vue.set(state.call_dispositions, state.call_dispositions.indexOf(found), updatedCallDisposition)
+          Vue.set(
+            state.call_dispositions,
+            state.call_dispositions.indexOf(found),
+            updatedCallDisposition
+          )
         }
       },
 
       DELETE_CALL_DISPOSITION (state, callDisposition) {
-        let found = state.call_dispositions.find(o => o.id === callDisposition.id)
+        let found = state.call_dispositions.find(
+          (o) => o.id === callDisposition.id
+        )
         if (found) {
-          state.call_dispositions.splice(state.call_dispositions.indexOf(found), 1)
+          state.call_dispositions.splice(
+            state.call_dispositions.indexOf(found),
+            1
+          )
         }
       },
 
@@ -520,14 +554,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_FILTER (state, filter) {
-        let found = state.filters.find(o => o.id === filter.id)
+        let found = state.filters.find((o) => o.id === filter.id)
         if (found) {
           Vue.set(state.filters, state.filters.indexOf(found), filter)
         }
       },
 
       DELETE_FILTER (state, filter) {
-        let found = state.filters.find(o => o.id === filter.id)
+        let found = state.filters.find((o) => o.id === filter.id)
         if (found) {
           state.filters.splice(state.filters.indexOf(found), 1)
         }
@@ -541,14 +575,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_TAG (state, tag) {
-        let found = state.tags.find(o => o.id === tag.id)
+        let found = state.tags.find((o) => o.id === tag.id)
         if (found) {
           Vue.set(state.tags, state.tags.indexOf(found), tag)
         }
       },
 
       DELETE_TAG (state, tag) {
-        let found = state.tags.find(o => o.id === tag.id)
+        let found = state.tags.find((o) => o.id === tag.id)
         if (found) {
           state.tags.splice(state.tags.indexOf(found), 1)
         }
@@ -566,15 +600,19 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_RING_GROUP (state, ringGroup) {
-        let found = state.ring_groups.find(o => o.id === ringGroup.id)
+        let found = state.ring_groups.find((o) => o.id === ringGroup.id)
         let updatedRingGroup = _.extend(found, ringGroup)
         if (found) {
-          Vue.set(state.ring_groups, state.ring_groups.indexOf(found), updatedRingGroup)
+          Vue.set(
+            state.ring_groups,
+            state.ring_groups.indexOf(found),
+            updatedRingGroup
+          )
         }
       },
 
       DELETE_RING_GROUP (state, ringGroup) {
-        let found = state.ring_groups.find(o => o.id === ringGroup.id)
+        let found = state.ring_groups.find((o) => o.id === ringGroup.id)
         if (found) {
           state.ring_groups.splice(state.ring_groups.indexOf(found), 1)
         }
@@ -632,14 +670,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_WORKFLOW (state, workflow) {
-        let found = state.workflows.find(wf => wf.id === workflow.id)
+        let found = state.workflows.find((wf) => wf.id === workflow.id)
         if (found) {
           Vue.set(state.workflows, state.workflows.indexOf(found), workflow)
         }
       },
 
       DELETE_WORKFLOW (state, workflow) {
-        let found = state.workflows.find(wf => wf.id === workflow.id)
+        let found = state.workflows.find((wf) => wf.id === workflow.id)
         if (found) {
           state.workflows.splice(state.workflows.indexOf(found), 1)
         }
@@ -661,14 +699,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_USER (state, user) {
-        let found = state.users.find(u => u.id === user.id)
+        let found = state.users.find((u) => u.id === user.id)
         if (found) {
           Vue.set(state.users, state.users.indexOf(found), user)
         }
       },
 
       DELETE_USER (state, user) {
-        let found = state.users.find(wf => wf.id === user.id)
+        let found = state.users.find((wf) => wf.id === user.id)
         if (found) {
           state.users.splice(state.users.indexOf(found), 1)
         }
@@ -686,11 +724,10 @@ export default function (/* { ssrContext } */) {
         state.addedParty = addedParty
       }
     },
-
     plugins: [
-      createPersistedState({
-        key: 'AloWare_vuex'
-      })
+      // createPersistedState({
+      //   key: 'AloWare_vuex'
+      // })
     ]
   })
 

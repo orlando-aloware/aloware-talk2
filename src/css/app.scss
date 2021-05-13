@@ -1,8 +1,8 @@
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'bootstrap-vue/src/index.scss';
-@import "fonts.scss";
-@import "variables.scss";
-@import "svg.scss";
+@import 'fonts.scss';
+@import 'variables.scss';
+@import 'svg.scss';
 
 html {
   overflow-y: hidden;
@@ -10,9 +10,12 @@ html {
 
 body {
   overflow-y: hidden;
+  font-family: 'Inter', sans-serif;
 }
 
-html, body, #q-app {
+html,
+body,
+#q-app {
   height: 100%;
 }
 
@@ -27,7 +30,7 @@ html, body, #q-app {
   &.q-btn__content,
   &.q-avatar__content,
   &.q-item,
-  .q-field__inner, {
+  .q-field__inner {
     padding-right: 0;
     padding-left: 0;
     margin-left: 0;
@@ -103,7 +106,7 @@ html, body, #q-app {
     left: 0 !important;
   }
   .sidebar-active {
-    .page-container  {
+    .page-container {
       padding-left: 0 !important;
     }
   }
@@ -134,9 +137,9 @@ html, body, #q-app {
   box-sizing: border-box;
   height: 60px;
   border-radius: 10px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   &:not(.q-field--highlighted) {
-    border: 1px solid #D2D2D2;
+    border: 1px solid #d2d2d2;
   }
   input {
     color: #202125;
@@ -169,7 +172,7 @@ html, body, #q-app {
     border-radius: 4px;
   }
   .q-checkbox__inner:not(.text-positive) .q-checkbox__bg {
-    border: 1px solid #D2D2D2;
+    border: 1px solid #d2d2d2;
   }
   .q-checkbox__inner.text-positive .q-checkbox__bg {
     border: 1px solid $positive;
@@ -178,7 +181,7 @@ html, body, #q-app {
 
 .title {
   color: #202125;
-  font-family: "Product Sans";
+  font-family: 'Product Sans';
   font-size: 26px;
   font-weight: bold;
   letter-spacing: 0.35px;
@@ -186,7 +189,7 @@ html, body, #q-app {
 }
 
 .description {
-  color: #E4E4E4;
+  color: #e4e4e4;
   font-family: Roboto;
   font-size: 14px;
   letter-spacing: 0.19px;
@@ -227,7 +230,7 @@ html, body, #q-app {
 .link {
   height: 18px;
   width: 107px;
-  color: #256EFF;
+  color: #256eff;
   font-family: Roboto;
   font-size: 13px;
   letter-spacing: 0;
@@ -243,11 +246,11 @@ html, body, #q-app {
   font-family: Roboto;
   font-size: 13px;
   letter-spacing: 0;
-  line-height: 18px
+  line-height: 18px;
 }
 
 .button {
-  color: #FFFFFF;
+  color: #ffffff;
   font-family: Roboto;
   font-size: 14px;
   font-weight: bold;
@@ -270,8 +273,8 @@ html, body, #q-app {
 .thank-you-container {
   width: 380px;
   border-radius: 8px;
-  background-color: #FFFFFF;
-  box-shadow: 2px 4px 20px 0 rgba(21,22,63,0.2);
+  background-color: #ffffff;
+  box-shadow: 2px 4px 20px 0 rgba(21, 22, 63, 0.2);
   .message {
     color: #666666;
     font-family: Roboto;
@@ -283,7 +286,7 @@ html, body, #q-app {
 
 .rounded-icon-opaque {
   border-radius: 32px;
-  box-shadow: 0 0 0 8px rgba(0,191,74,0.2);
+  box-shadow: 0 0 0 8px rgba(0, 191, 74, 0.2);
 }
 
 .page-header {
@@ -293,7 +296,7 @@ html, body, #q-app {
 
 .page-sidebar {
   height: 100%;
-  background-color: #15163F;
+  background-color: #15163f;
   .nav-icons {
     &:not(.active) {
       opacity: 0.5;
@@ -303,7 +306,7 @@ html, body, #q-app {
 
 .page-footer {
   height: 78px;
-  box-shadow: 0 0px 15px 0px rgba(0,0,0,0.1);
+  box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.1);
   .tab-icons {
     .q-tab__icon {
       height: 20px;
@@ -315,7 +318,7 @@ html, body, #q-app {
       letter-spacing: 0;
       line-height: 13px;
       text-align: center;
-      margin-top:5px;
+      margin-top: 5px;
     }
   }
   .q-tab {

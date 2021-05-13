@@ -1,0 +1,52 @@
+<template>
+  <confirm-dialog
+    title="Remove List"
+    :isOpen="isRemoveListOpen"
+    id="remove-list-dialog"
+    @close="removeListClose"
+  >
+    <div slot="content">
+      <div class="text-left">
+        <div class="text-dark">
+          Are you sure you want to remove
+          <span class="font-weight-bold">{{ listToRemove.name }}</span
+          >? Please be reminded that this will also delete all its contacts.
+        </div>
+      </div>
+    </div>
+    <div slot="footer" class="w-100">
+      <div class="d-flex w-100">
+        <div class="flex-grow-1"></div>
+        <button class="btn btn-sm btn-outline-dark mr-2" @click="removeListClose">Cancel</button>
+        <button class="btn btn-sm btn-danger mr-2">Remove</button>
+      </div>
+    </div>
+  </confirm-dialog>
+</template>
+
+<script>
+import ConfirmDialog from 'src/pages/contacts/_components/confirm-dialog.vue'
+
+import { mapActions, mapGetters } from 'vuex'
+
+export default {
+  components: {
+    ConfirmDialog
+  },
+  computed: {
+    ...mapGetters('contacts', ['isRemoveListOpen', 'listToRemove'])
+  },
+  watch: {
+    isRemoveListOpen (isOpen) {
+      if (isOpen) {
+        this.$bvModal.show('remove-list-dialog')
+      } else {
+        this.$bvModal.hide('remove-list-dialog')
+      }
+    }
+  },
+  methods: {
+    ...mapActions('contacts', ['removeListClose'])
+  }
+}
+</script>

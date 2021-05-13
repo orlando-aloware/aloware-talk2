@@ -16,9 +16,7 @@ localStorage.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 localStorage.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 localStorage.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 
-// Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
-// Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
 
@@ -44,7 +42,10 @@ window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
 
   try {
     for (let validCountry of validCountries) {
-      let number = window.phoneUtil.parseAndKeepRawInput(phoneNumber, validCountry)
+      let number = window.phoneUtil.parseAndKeepRawInput(
+        phoneNumber,
+        validCountry
+      )
       let isPossible = window.phoneUtil.isPossibleNumber(number)
       if (isPossible) {
         if (window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
@@ -65,7 +66,9 @@ window.guessLocale = function (phoneNumber) {
 
   try {
     // handle US and CA as an special case
-    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(phoneNumber)
+    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(
+      phoneNumber
+    )
     if (northAmericaLocale) {
       return northAmericaLocale
     }
@@ -104,7 +107,11 @@ window.moment = moment
 
 window.Sentry = Sentry
 
-if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') && process.env.APP_ENV !== 'local') {
+if (
+  (process.env.NODE_ENV === 'production' ||
+    process.env.NODE_ENV === 'development') &&
+  process.env.APP_ENV !== 'local'
+) {
   Sentry.init({
     Vue: Vue,
     tracingOptions: {
@@ -119,14 +126,17 @@ if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developm
 }
 
 // Branding :D
-console.log(`%c
+console.log(
+  `%c
  █████╗ ██╗      ██████╗ ██╗    ██╗ █████╗ ██████╗ ███████╗
 ██╔══██╗██║     ██╔═══██╗██║    ██║██╔══██╗██╔══██╗██╔════╝
 ███████║██║     ██║   ██║██║ █╗ ██║███████║██████╔╝█████╗
 ██╔══██║██║     ██║   ██║██║███╗██║██╔══██║██╔══██╗██╔══╝
 ██║  ██║███████╗╚██████╔╝╚███╔███╔╝██║  ██║██║  ██║███████╗
 ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
-`, 'color: #00BF50')
+`,
+  'color: #00BF50'
+)
 
 Vue.prototype.$moment = window.moment
 Vue.prototype.$Pusher = window.Pusher

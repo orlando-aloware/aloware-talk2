@@ -1,4 +1,3 @@
-
 const routes = [
   {
     path: '/',
@@ -26,8 +25,34 @@ const routes = [
       },
       {
         path: 'contacts',
-        name: 'Contacts',
-        component: () => import('pages/Contacts.vue')
+        component: () => import('src/pages/contacts/Contacts.vue'),
+        children: [
+          {
+            path: '',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/AllContacts.vue')
+          },
+          {
+            path: 'mycontacts',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/MyContacts.vue')
+          },
+          {
+            path: 'unanswered',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/UnansweredContacts.vue')
+          },
+          {
+            path: 'unassigned',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/UnassignedContacts.vue')
+          },
+          {
+            path: 'newleads',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/NewLeads.vue')
+          }
+        ]
       },
       {
         path: 'power-dialer',

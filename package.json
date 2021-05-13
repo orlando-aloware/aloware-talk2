@@ -47,8 +47,10 @@
     "randomcolor": "^0.5.4",
     "twilio-client": "^1.14.0",
     "vue": "^2.6.12",
+    "vue-custom-scrollbar": "^1.4.0",
     "vue-filter-number-format": "^3.0.1",
     "vue-linkify": "^1.0.1",
+    "vuedraggable": "^2.24.3",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^2.7.1"
   },

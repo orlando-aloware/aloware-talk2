@@ -1,22 +1,36 @@
 <template>
-  <div class="avatar"
-       :class="{'avatar--src': src, 'avatar--active': active }"
-       :style="{width: `${width}px`, height: `${height}px`}"
+  <div
+    class="avatar"
+    :class="{ 'avatar--src': src, 'avatar--active': active }"
+    :style="computedStyle"
   >
-    <div class="avatar__inner" :class="{'avatar__inner--active': active }"
-         :style="{'background-image': `url(${src})` }">
-      <slot/>
+    <div
+      class="avatar__inner"
+      :class="{ 'avatar__inner--active': active }"
+      :style="{ 'background-image': `url(${src})` }"
+    >
+      {{ getInitials(name || 'No Name') }}
     </div>
   </div>
 </template>
 
 <script>
+import { avatarMixin } from 'src/plugins/mixins'
 export default {
   name: 'avatar.vue',
+  mixins: [avatarMixin],
+  computed: {
+    computedStyle () {
+      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle(this.name) }
+    }
+  },
   props: {
     active: {
       type: Boolean,
       default: false
+    },
+    name: {
+      type: String
     },
     src: {
       type: String
@@ -47,7 +61,6 @@ export default {
   font-size: 13px;
   font-weight: bold;
   line-height: 0;
-  border: solid 1px $grey-light;
   letter-spacing: 0.35px;
 
   &--src {

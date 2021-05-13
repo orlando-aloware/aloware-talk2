@@ -1,0 +1,129 @@
+<template>
+  <contact-menu title="Actions">
+    <contact-menu-item @click="$emit('rename')">
+      <template slot="icon">
+        <pencil-icon></pencil-icon>
+      </template>
+      <template slot="title">
+        <span>Rename</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item
+      v-if="type === 'dynamic'"
+      @click="$emit('clone_static')"
+    >
+      <template slot="icon">
+        <plus-icon></plus-icon>
+      </template>
+      <template slot="title">
+        <span>Clone as Static List</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item @click="$emit('duplicate')">
+      <template slot="icon">
+        <duplicate-icon></duplicate-icon>
+      </template>
+      <template slot="title">
+        <span>Duplicate</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item @click="$emit('remove')">
+      <template slot="icon">
+        <trash-icon></trash-icon>
+      </template>
+      <template slot="title">
+        <span>Remove</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item @click="$emit('pin')">
+      <template slot="icon">
+        <pin-icon></pin-icon>
+      </template>
+      <template slot="title">
+        <span>Pin</span>
+      </template>
+    </contact-menu-item>
+  </contact-menu>
+</template>
+
+<script>
+import contactMenu from './contact-menu.vue'
+import contactMenuItem from './contact-menu-item.vue'
+import pencilIcon from 'src/components/icons/pencil-icon.vue'
+import plusIcon from 'src/components/icons/plus-icon.vue'
+import duplicateIcon from 'src/components/icons/duplicate-icon.vue'
+import TrashIcon from 'src/components/icons/trash-icon.vue'
+import PinIcon from 'src/components/icons/pin-icon.vue'
+
+export default {
+  components: {
+    contactMenu,
+    contactMenuItem,
+    pencilIcon,
+    plusIcon,
+    duplicateIcon,
+    TrashIcon,
+    PinIcon
+  },
+  props: {
+    id: {
+      type: Number
+    },
+    type: {
+      type: String,
+      required: true
+    }
+  },
+  data () {
+    return {}
+  },
+  methods: {
+    onClickOption (action) {
+      alert(action)
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+.folder {
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: 34px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 100ms ease-in-out;
+  &__arrow {
+    margin-top: -5px;
+    margin-right: 5px;
+  }
+  &__icon {
+    margin-top: -5px;
+    margin-right: 5px;
+  }
+  &:hover {
+    background-color: $light-green2;
+  }
+  &__name {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__sub {
+    padding-left: 10px;
+  }
+  &__indent {
+    width: 10px;
+  }
+  &__option {
+    margin-top: -5px;
+  }
+}
+</style>
