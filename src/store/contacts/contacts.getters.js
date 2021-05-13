@@ -10,5 +10,6 @@ export default {
   mycontacts: (state) => state.lists.mycontacts,
   unassigned: (state) => state.lists.unassigned,
   newleads: (state) => state.lists.newleads,
-  unanswered: (state) => state.lists.unanswered
+  unanswered: (state) => state.lists.unanswered,
+  pinnedCounts: (state) => state.pinnedCounts
 }

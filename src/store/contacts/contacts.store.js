@@ -145,6 +145,13 @@ export default function () {
     opened: [],
     removeList: null,
     removeFolder: null,
-    isFiltersOpen: false
+    isFiltersOpen: false,
+    pinnedCounts: {
+      allcontacts: 0,
+      mycontacts: 0,
+      unassigned: 0,
+      unanswered: 0,
+      newleads: 0
+    }
   }
 }

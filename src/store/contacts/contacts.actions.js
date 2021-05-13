@@ -28,5 +28,8 @@ export default {
   },
   contactsLoaded: ({ commit }, payload) => {
     commit('CONTACTS_LOADED', payload)
+  },
+  pinnedCountLoaded: ({ commit }, payload) => {
+    commit('PINNED_COUNT_LOADED', payload)
   }
 }

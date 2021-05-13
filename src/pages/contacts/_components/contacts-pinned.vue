@@ -5,103 +5,195 @@
         Pinned
       </div>
     </div>
-    <div class="d-flex flex-grow-1 flex-column">
-      <router-link
-        v-for="item in defaultList"
-        :to="item.link"
-        :key="item.id"
-        v-slot="{ href, route, navigate, isActive, isExactActive }"
-      >
-        <a
-          :href="href"
-          @click="navigate"
-          class="d-flex align-items-center item"
-          :class="[
-            isActive && 'router-link-active',
-            isExactActive && 'router-link-exact-active'
-          ]"
+    <b-overlay
+      :show="loading"
+      spinner-variant="success"
+      spinner-type="grow"
+      spinner-small
+      rounded="sm"
+    >
+      <div class="d-flex flex-grow-1 flex-column">
+        <router-link
+          v-for="item in defaultList"
+          :to="item.link"
+          :key="item.id"
+          v-slot="{ href, route, navigate, isActive, isExactActive }"
         >
-          <div class="px-2 icon">
-            <folder-dynamic-icon></folder-dynamic-icon>
-          </div>
-          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-        </a>
-      </router-link>
+          <a
+            :href="href"
+            @click="navigate"
+            class="d-flex align-items-center item"
+            :class="[
+              isActive && 'router-link-active',
+              isExactActive && 'router-link-exact-active'
+            ]"
+          >
+            <div class="px-2 icon">
+              <folder-dynamic-icon></folder-dynamic-icon>
+            </div>
+            <div class="pr-3 flex-grow-1">{{ item.name }}</div>
+            <div class="pr-2">
+              <b-badge pill variant="danger">{{
+                pinnedCounts[item.count] | fixCount
+              }}</b-badge>
+            </div>
+          </a>
+        </router-link>
 
-      <router-link
-        v-for="item in pinned"
-        :to="`/contacts/list/${item.id}`"
-        :key="item.id"
-        v-slot="{ href, route, navigate, isActive, isExactActive }"
-      >
-        <a
-          :href="href"
-          @click="navigate"
-          class="d-flex align-items-center item"
-          :class="[
-            isActive && 'router-link-active',
-            isExactActive && 'router-link-exact-active'
-          ]"
+        <router-link
+          v-for="item in pinned"
+          :to="`/contacts/list/${item.id}`"
+          :key="item.id"
+          v-slot="{ href, route, navigate, isActive, isExactActive }"
         >
-          <div class="px-2 icon">
-            <folder-static-icon
-              v-if="item.type === 'static'"
-            ></folder-static-icon>
-            <folder-dynamic-icon
-              v-if="item.type === 'dynamic'"
-            ></folder-dynamic-icon>
-          </div>
-          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-        </a>
-      </router-link>
-    </div>
+          <a
+            :href="href"
+            @click="navigate"
+            class="d-flex align-items-center item"
+            :class="[
+              isActive && 'router-link-active',
+              isExactActive && 'router-link-exact-active'
+            ]"
+          >
+            <div class="px-2 icon">
+              <folder-static-icon
+                v-if="item.type === 'static'"
+              ></folder-static-icon>
+              <folder-dynamic-icon
+                v-if="item.type === 'dynamic'"
+              ></folder-dynamic-icon>
+            </div>
+            <div class="pr-3 flex-grow-1">{{ item.name }}</div>
+          </a>
+        </router-link>
+      </div>
+    </b-overlay>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 
 export default {
-  methods: {},
+  methods: {
+    loadPinnedCounts () {
+      return Promise.all([
+        this.loadAllCount(),
+        this.loadMyContactsCount(),
+        this.loadNewLeadsCount(),
+        this.loadUnansweredCount(),
+        this.loadUnassignedCount()
+      ])
+        .then(([allcontacts, mycontacts, newleads, unanswered, unassigned]) => {
+          this.pinnedCountLoaded({
+            name: 'allcontacts',
+            count: allcontacts.total_contact_count
+          })
+          this.pinnedCountLoaded({
+            name: 'mycontacts',
+            count: mycontacts.total_contact_count
+          })
+          this.pinnedCountLoaded({
+            name: 'newleads',
+            count: newleads.total_contact_count
+          })
+          this.pinnedCountLoaded({
+            name: 'unanswered',
+            count: unanswered.total_contact_count
+          })
+          this.pinnedCountLoaded({
+            name: 'unassigned',
+            count: unassigned.total_contact_count
+          })
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+    loadAllCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count')
+        .then((response) => response.data)
+    },
+    loadMyContactsCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { user_id: this.profile.id }
+        })
+        .then((response) => response.data)
+    },
+    loadNewLeadsCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { is_new_lead: 1 }
+        })
+        .then((response) => response.data)
+    },
+    loadUnansweredCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { has_unread: 1 }
+        })
+        .then((response) => response.data)
+    },
+    loadUnassignedCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { unassigned_leads: 1 }
+        })
+        .then((response) => response.data)
+    },
+    ...mapActions('contacts', ['pinnedCountLoaded'])
+  },
   components: {
     folderStaticIcon,
     folderDynamicIcon
   },
   computed: {
-    ...mapState('contacts', ['pinned'])
+    ...mapGetters('auth', ['profile']),
+    ...mapState('contacts', ['pinned', 'pinnedCounts'])
   },
   data () {
     return {
+      loading: false,
       defaultList: [
         {
           id: 1,
           name: 'All Contacts',
-          link: '/contacts'
+          link: '/contacts',
+          count: 'allcontacts'
         },
         {
           id: 2,
           name: 'My Contacts',
-          link: '/contacts/mycontacts'
+          link: '/contacts/mycontacts',
+          count: 'mycontacts'
         },
         {
           id: 3,
           name: 'Unassigned Contacts',
-          link: '/contacts/unassigned'
+          link: '/contacts/unassigned',
+          count: 'unassigned'
         },
         {
           id: 4,
           name: 'Unanswered Contacts',
-          link: '/contacts/unanswered'
+          link: '/contacts/unanswered',
+          count: 'unanswered'
         },
         {
           id: 5,
           name: 'New Leads',
-          link: '/contacts/newleads'
+          link: '/contacts/newleads',
+          count: 'newleads'
         }
       ]
     }
+  },
+  mounted () {
+    this.loadPinnedCounts()
   }
 }
 </script>
@@ -113,6 +205,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: auto;
+  position: relative;
   &__header {
     min-height: 40px;
     font-size: 10px;

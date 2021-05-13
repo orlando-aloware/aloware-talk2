@@ -2,6 +2,17 @@ import _ from 'lodash'
 import * as LrnTypes from '../../constants/lrn-types'
 
 /**
+ * Fix count format to have k suffix
+ * @param {string} dateOfBirth
+ * @returns {string|*}
+ */
+const fixCount = (num) => {
+  return Math.abs(num) > 999
+    ? Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + 'k'
+    : Math.sign(num) * Math.abs(num)
+}
+
+/**
  * Fix date of birth
  * @param {string} dateOfBirth
  * @returns {string|*}
@@ -140,7 +151,8 @@ export default ({ Vue }) => {
     fixZipcode,
     fixEmail,
     fixTimezone,
-    fixLrnType
+    fixLrnType,
+    fixCount
   }
-  Object.keys(filters).map(k => Vue.filter(k, filters[k]))
+  Object.keys(filters).map((k) => Vue.filter(k, filters[k]))
 }

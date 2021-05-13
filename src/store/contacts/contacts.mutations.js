@@ -47,5 +47,8 @@ export default {
     } else {
       state.lists = { ...state.lists, [type]: { data, ...rest } }
     }
+  },
+  PINNED_COUNT_LOADED: (state, { name, count }) => {
+    state.pinnedCounts[name] = count
   }
 }
