@@ -71,11 +71,11 @@
           <b-popover
             :target="'popover-tags-' + contact.id"
             triggers="hover"
-            placement="top"
+            placement="left"
             boundary="window"
           >
             <template #title>
-              <div class="contact-tags-title">Contact Tags</div>
+              <div class="contact-tags-title">Tags</div>
             </template>
             <span
               :id="'popover-tags-' + contact.id"
