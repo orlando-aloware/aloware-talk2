@@ -147,11 +147,27 @@ export default function () {
     removeFolder: null,
     isFiltersOpen: false,
     pinnedCounts: {
-      allcontacts: 0,
-      mycontacts: 0,
-      unassigned: 0,
-      unanswered: 0,
-      newleads: 0
+      allcontacts: {
+        new_leads_count: 0,
+        total_contact_count: 0,
+        unreads_count: 0
+      },
+      mycontacts: {
+        new_leads_count: 0,
+        total_contact_count: 0,
+        unreads_count: 0
+      },
+      unassigned: {
+        new_leads_count: 0,
+        total_contact_count: 0,
+        unreads_count: 0
+      },
+      unanswered: {
+        new_leads_count: 0,
+        total_contact_count: 0,
+        unreads_count: 0
+      },
+      newleads: { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
     }
   }
 }

@@ -33,9 +33,15 @@
             </div>
             <div class="pr-3 flex-grow-1">{{ item.name }}</div>
             <div class="pr-2">
-              <b-badge pill variant="light text-muted">{{
-                pinnedCounts[item.count] | fixCount
-              }}</b-badge>
+              <b-badge
+                pill
+                :variant="
+                  pinnedCounts[item.count].unreads_count ? 'danger' : 'light text-muted'
+                "
+                >{{
+                  pinnedCounts[item.count].total_contact_count | fixCount
+                }}</b-badge
+              >
             </div>
           </a>
         </router-link>
@@ -89,23 +95,23 @@ export default {
         .then(([allcontacts, mycontacts, newleads, unanswered, unassigned]) => {
           this.pinnedCountLoaded({
             name: 'allcontacts',
-            count: allcontacts.total_contact_count
+            count: allcontacts
           })
           this.pinnedCountLoaded({
             name: 'mycontacts',
-            count: mycontacts.total_contact_count
+            count: mycontacts
           })
           this.pinnedCountLoaded({
             name: 'newleads',
-            count: newleads.total_contact_count
+            count: newleads
           })
           this.pinnedCountLoaded({
             name: 'unanswered',
-            count: unanswered.total_contact_count
+            count: unanswered
           })
           this.pinnedCountLoaded({
             name: 'unassigned',
-            count: unassigned.total_contact_count
+            count: unassigned
           })
         })
         .finally(() => {
