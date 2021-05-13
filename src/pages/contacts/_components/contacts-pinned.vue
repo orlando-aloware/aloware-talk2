@@ -5,75 +5,69 @@
         Pinned
       </div>
     </div>
-    <b-overlay
-      :show="loading"
-      spinner-variant="success"
-      spinner-type="grow"
-      spinner-small
-      rounded="sm"
-    >
-      <div class="d-flex flex-grow-1 flex-column">
-        <router-link
-          v-for="item in defaultList"
-          :to="item.link"
-          :key="item.id"
-          v-slot="{ href, route, navigate, isActive, isExactActive }"
+    <div class="d-flex pinned__content flex-column">
+      <router-link
+        v-for="item in defaultList"
+        :to="item.link"
+        :key="item.id"
+        v-slot="{ href, route, navigate, isActive, isExactActive }"
+      >
+        <a
+          :href="href"
+          @click="navigate"
+          class="d-flex align-items-center item"
+          :class="[
+            isActive && 'router-link-active',
+            isExactActive && 'router-link-exact-active'
+          ]"
         >
-          <a
-            :href="href"
-            @click="navigate"
-            class="d-flex align-items-center item"
-            :class="[
-              isActive && 'router-link-active',
-              isExactActive && 'router-link-exact-active'
-            ]"
-          >
-            <div class="px-2 icon">
-              <folder-dynamic-icon></folder-dynamic-icon>
-            </div>
-            <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-            <div class="pr-2">
-              <b-badge
-                pill
-                :variant="
-                  pinnedCounts[item.count].unreads_count ? 'danger' : 'light text-muted'
-                "
-                >{{
-                  pinnedCounts[item.count].total_contact_count | fixCount
-                }}</b-badge
-              >
-            </div>
-          </a>
-        </router-link>
+          <div class="px-2 icon">
+            <folder-dynamic-icon></folder-dynamic-icon>
+          </div>
+          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
+          <div class="pr-2">
+            <b-badge
+              pill
+              :variant="
+                pinnedCounts[item.count].unreads_count
+                  ? 'danger'
+                  : 'light text-muted'
+              "
+              >{{
+                pinnedCounts[item.count].total_contact_count | fixCount
+              }}</b-badge
+            >
+          </div>
+        </a>
+      </router-link>
 
-        <router-link
-          v-for="item in pinned"
-          :to="`/contacts/list/${item.id}`"
-          :key="item.id"
-          v-slot="{ href, route, navigate, isActive, isExactActive }"
+      <router-link
+        v-for="item in pinned"
+        :to="`/contacts/list/${item.id}`"
+        :key="item.id"
+        v-slot="{ href, route, navigate, isActive, isExactActive }"
+      >
+        <a
+          :href="href"
+          @click="navigate"
+          class="d-flex align-items-center item"
+          :class="[
+            isActive && 'router-link-active',
+            isExactActive && 'router-link-exact-active'
+          ]"
         >
-          <a
-            :href="href"
-            @click="navigate"
-            class="d-flex align-items-center item"
-            :class="[
-              isActive && 'router-link-active',
-              isExactActive && 'router-link-exact-active'
-            ]"
-          >
-            <div class="px-2 icon">
-              <folder-static-icon
-                v-if="item.type === 'static'"
-              ></folder-static-icon>
-              <folder-dynamic-icon
-                v-if="item.type === 'dynamic'"
-              ></folder-dynamic-icon>
-            </div>
-            <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-          </a>
-        </router-link>
-      </div>
-    </b-overlay>
+          <div class="px-2 icon">
+            <folder-static-icon
+              v-if="item.type === 'static'"
+            ></folder-static-icon>
+            <folder-dynamic-icon
+              v-if="item.type === 'dynamic'"
+            ></folder-dynamic-icon>
+          </div>
+          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
+        </a>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -212,12 +206,18 @@ export default {
   flex-direction: column;
   overflow: auto;
   position: relative;
+
   &__header {
     min-height: 40px;
     font-size: 10px;
     font-weight: bold;
     letter-spacing: 1px;
     text-transform: uppercase;
+  }
+  &__content {
+    min-height: 200px;
+    max-height: 400px;
+    overflow: auto;
   }
 }
 .icon {
@@ -226,7 +226,9 @@ export default {
 .item {
   color: $dark;
   cursor: pointer;
-  line-height: 25px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
   overflow: hidden;
   text-decoration: none;
   text-overflow: ellipsis;

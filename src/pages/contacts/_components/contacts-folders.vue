@@ -52,7 +52,7 @@
       </button>
     </div>
 
-    <div class="d-flex flex-grow-1 flex-column">
+    <div class="d-flex folders__content flex-column">
       <tree-folder-create
         v-if="isCreatingFolder"
         :layer="0"
@@ -119,11 +119,17 @@ export default {
 .folders {
   display: flex;
   flex-direction: column;
+  height: calc(100% / 2);
   &__header {
-    height: 40px;
+    min-height: 40px;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .5px;
+  }
+  &__content {
+    min-height: 400px;
+    max-height: calc(100% - 40px);
+    overflow: auto;
   }
 }
 .item {

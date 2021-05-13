@@ -1,9 +1,9 @@
 <template>
-  <div class="row mx-0 min-h-100 max-h-100 overflow-auto">
+  <div class="row mx-0 overflow-auto">
     <div class="col-lg-2 px-0 pl-lg-2 pr-lg-3 mb-3">
       <contacts-sidebar></contacts-sidebar>
     </div>
-    <div class="col-lg-10 px-0 pr-lg-3 mb-3">
+    <div class="col-lg-10 px-0 pr-lg-3 mb-3 main">
       <router-view></router-view>
     </div>
     <remove-folder-dialog />
@@ -28,3 +28,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+</style>
