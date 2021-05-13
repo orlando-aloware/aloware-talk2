@@ -33,7 +33,7 @@
             </div>
             <div class="pr-3 flex-grow-1">{{ item.name }}</div>
             <div class="pr-2">
-              <b-badge pill variant="danger">{{
+              <b-badge pill variant="light text-muted">{{
                 pinnedCounts[item.count] | fixCount
               }}</b-badge>
             </div>
