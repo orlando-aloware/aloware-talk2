@@ -121,7 +121,93 @@ export default function () {
           },
           {
             id: 9,
-            name: 'Folder 2'
+            name: 'Sohrabs Folder',
+            child_folders: [
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              },
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              },
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              },
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              },
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              },
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              },
+              {
+                id: 3,
+                name: 'Folder 1'
+              },
+              {
+                id: 4,
+                name: 'Folder 2'
+              },
+              {
+                id: 5,
+                name: 'Folder 3'
+              }
+            ]
           },
           {
             id: 10,

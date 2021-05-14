@@ -1,5 +1,5 @@
 <template>
-  <div :data-layer="layer" class="overflow-hidden">
+  <div :data-layer="layer">
     <div class="folder d-flex align-items-center">
       <div
         class="folder__indent"
@@ -14,7 +14,7 @@
         <folder-icon></folder-icon>
       </div>
 
-      <div class="flex-grow-1 d-flex align-items-center overflow-hidden">
+      <div class="flex-grow-1 d-flex align-items-center">
         <div v-if="!isEditing" @click="onToggleFolder" class="folder__name">
           {{ name }}
         </div>

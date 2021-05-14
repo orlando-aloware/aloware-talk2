@@ -119,7 +119,9 @@ export default {
 .folders {
   display: flex;
   flex-direction: column;
-  height: calc(100% / 2);
+  flex-grow: 1;
+  min-height: 500px;
+  max-height: calc(100vh - 400px);
   &__header {
     min-height: 40px;
     font-size: 10px;
@@ -127,7 +129,7 @@ export default {
     letter-spacing: .5px;
   }
   &__content {
-    min-height: 400px;
+    height: calc(100% - 40px);
     max-height: calc(100% - 40px);
     overflow: auto;
   }
