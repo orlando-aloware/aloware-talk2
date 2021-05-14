@@ -31,5 +31,8 @@ export default {
   },
   pinnedCountLoaded: ({ commit }, payload) => {
     commit('PINNED_COUNT_LOADED', payload)
+  },
+  foldersLoaded: ({ commit }, payload) => {
+    commit('FOLDERS_LOADED', payload)
   }
 }

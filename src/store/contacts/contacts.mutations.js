@@ -50,5 +50,8 @@ export default {
   },
   PINNED_COUNT_LOADED: (state, { name, count }) => {
     state.pinnedCounts[name] = count
+  },
+  FOLDERS_LOADED: (state, folders) => {
+    state.folders = folders
   }
 }

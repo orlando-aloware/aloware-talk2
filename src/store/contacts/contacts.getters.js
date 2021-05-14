@@ -1,7 +1,5 @@
 export default {
-  opened: (state) => {
-    return new Set(state.opened)
-  },
+  opened: (state) => new Set(state.opened),
   isRemoveFolderOpen: (state) => !!state.removeFolder,
   folderToRemove: (state) => state.removeFolder || {},
   isRemoveListOpen: (state) => !!state.removeList,
@@ -11,5 +9,6 @@ export default {
   unassigned: (state) => state.lists.unassigned,
   newleads: (state) => state.lists.newleads,
   unanswered: (state) => state.lists.unanswered,
-  pinnedCounts: (state) => state.pinnedCounts
+  pinnedCounts: (state) => state.pinnedCounts,
+  folders: (state) => state.folders
 }

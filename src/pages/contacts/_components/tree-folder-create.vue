@@ -16,6 +16,7 @@
           class="folder-create__input d-inline"
           ref="input"
           @blur="onInputBlur"
+          @keydown="onKeyDown"
           autofocus
         />
       </div>
@@ -58,29 +59,73 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['toggleFolder']),
+    ...mapActions('contacts', ['toggleFolder', 'foldersLoaded']),
     onInputBlur () {
       if (!this.text) {
-        this.$emit('blur')
+        this.resetInputState()
       } else {
         this.createNewFolder()
       }
     },
-    createFolderAction () {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve()
-        }, 1000)
-      })
+    onKeyDown (evt) {
+      if (evt.keyCode === 13) {
+        this.onInputBlur()
+      } else if (evt.keyCode === 27) {
+        this.resetInputState()
+      }
+    },
+    createFolderAction (name) {
+      return window.axios
+        .post('/api/v1/contact-folders', {
+          name,
+          order: 0,
+          parent_id: this.parent_id
+        })
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((err) => {
+          console.error(err)
+          this.$q.notify({
+            message: 'Unable to load folders please try again.',
+            type: 'negative',
+            textColor: 'white'
+          })
+        })
+    },
+    resetInputState () {
+      this.isCreating = false
+      this.text = ''
+      this.$emit('blur')
     },
     async createNewFolder () {
       try {
+        if (this.isCreating) return
         this.isCreating = true
-        await this.createFolderAction()
-        this.isCreating = false
+        await this.createFolderAction(this.text)
+        await this.loadFolders()
+        this.resetInputState()
       } catch (err) {
-        this.isCreating = false
+        this.resetInputState()
       }
+    },
+    loadFolders () {
+      return window.axios
+        .get('/api/v1/contact-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((err) => {
+          console.error(err)
+          this.$q.notify({
+            message: 'Unable to load folders please try again.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
     }
   },
   mounted () {

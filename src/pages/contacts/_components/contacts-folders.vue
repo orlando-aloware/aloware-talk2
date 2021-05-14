@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import treeFolder from './tree-folder.vue'
 import contactMenu from './contact-menu.vue'
 import contactMenuItem from './contact-menu-item.vue'
@@ -94,21 +94,44 @@ export default {
   },
   data () {
     return {
-      isCreatingFolder: false
+      isCreatingFolder: false,
+      isLoading: false
     }
   },
   methods: {
+    ...mapActions('contacts', ['foldersLoaded']),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
+    },
+    loadFolders () {
+      this.isLoading = false
+      window.axios
+        .get('/api/v1/contact-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .finally(() => {
+          this.isLoading = false
+        })
+        .catch((err) => {
+          console.error(err)
+          this.$q.notify({
+            message: 'Unable to load folders please try again.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
     }
   },
   computed: {
     ...mapState('contacts', ['folders'])
   },
-  watch: {
-    folders: function (val) {
-      console.log(val)
-    }
+  mounted () {
+    this.loadFolders()
   }
 }
 </script>
@@ -126,7 +149,7 @@ export default {
     min-height: 40px;
     font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: .5px;
+    letter-spacing: 0.5px;
   }
   &__content {
     height: calc(100% - 40px);
