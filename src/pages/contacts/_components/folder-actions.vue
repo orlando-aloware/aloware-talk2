@@ -1,6 +1,6 @@
 <template>
   <contact-menu title="Actions">
-    <contact-menu-item @click="$emit('edit')">
+    <contact-menu-item @click="$emit('edit')" v-if="hasEdit">
       <template slot="icon">
         <pencil-icon></pencil-icon>
       </template>
@@ -8,7 +8,7 @@
         <span>Rename</span>
       </template>
     </contact-menu-item>
-    <contact-menu-item @click="$emit('create')">
+    <contact-menu-item @click="$emit('create')" v-if="hasEdit">
       <template slot="icon">
         <folder-icon></folder-icon>
       </template>
@@ -24,7 +24,7 @@
         <span>Permissions</span>
       </template>
     </contact-menu-item> -->
-    <contact-menu-item @click="$emit('remove')">
+    <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
       <template slot="icon">
         <trash-icon></trash-icon>
       </template>
@@ -56,6 +56,12 @@ export default {
   props: {
     id: {
       type: Number
+    },
+    hasEdit: {
+      type: Boolean
+    },
+    hasDelete: {
+      type: Boolean
     }
   },
   methods: {

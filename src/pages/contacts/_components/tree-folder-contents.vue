@@ -9,6 +9,8 @@
       :layer="layer"
       :folders="folder.child_folders"
       :lists="folder.lists"
+      :hasEdit="hasEdit"
+      :hasDelete="hasDelete"
     />
   </div>
 </template>
@@ -24,6 +26,12 @@ export default {
     },
     layer: {
       type: Number
+    },
+    hasEdit: {
+      type: Boolean
+    },
+    hasDelete: {
+      type: Boolean
     }
   }
 }

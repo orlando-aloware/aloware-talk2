@@ -54,6 +54,8 @@
     >
       <tree-folder-contents
         :folders="folders"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
         :layer="layer + 1"
       ></tree-folder-contents>
       <tree-list-contents
@@ -74,6 +76,8 @@
         @create="onCreateFolder"
         @edit="onEditFolder"
         @remove="onRemoveFolder"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
       />
     </b-popover>
   </div>
@@ -119,6 +123,12 @@ export default {
     },
     name: {
       type: String
+    },
+    hasEdit: {
+      type: Boolean
+    },
+    hasDelete: {
+      type: Boolean
     },
     folders: {
       type: Array,

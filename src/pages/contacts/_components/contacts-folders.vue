@@ -65,6 +65,8 @@
         :key="folder.id"
         :id="folder.id"
         :order="folder.order"
+        :hasEdit="folder.has_edit"
+        :hasDelete="folder.has_delete"
         :folders="folder.child_folders"
         :lists="folder.lists"
         :layer="0"
