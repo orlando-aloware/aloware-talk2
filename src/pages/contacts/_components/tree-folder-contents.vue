@@ -28,10 +28,10 @@ export default {
       type: Number
     },
     hasEdit: {
-      type: Boolean
+      type: Number
     },
     hasDelete: {
-      type: Boolean
+      type: Number
     }
   }
 }
