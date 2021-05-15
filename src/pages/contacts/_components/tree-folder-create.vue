@@ -62,10 +62,11 @@ export default {
   methods: {
     ...mapActions('contacts', ['toggleFolder', 'foldersLoaded']),
     onInputBlur () {
-      if (!this.text) {
-        this.resetState()
-      } else {
+      if (this.text) {
         this.createNewFolder()
+      } else {
+        this.$emit('blur')
+        this.resetState()
       }
     },
     onKeyDown (evt) {
@@ -73,6 +74,7 @@ export default {
         this.onInputBlur()
       } else if (evt.keyCode === 27) {
         this.resetState()
+        this.$refs.input.blur()
       }
     },
     createFolderRequest (params) {
@@ -99,6 +101,7 @@ export default {
         }),
         this.reloadFolders()
       ]).finally(() => {
+        this.$emit('blur')
         this.resetState()
       })
     },
@@ -123,7 +126,6 @@ export default {
     resetState () {
       this.isCreating = false
       this.text = ''
-      this.$emit('blur')
     }
   },
   mounted () {
