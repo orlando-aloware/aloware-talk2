@@ -22,9 +22,11 @@
           :id="'folder-input-' + id"
           v-if="isEditing"
           type="text"
-          v-model="name"
+          :value="name"
+          :disabled="isRenaming"
           class="folder__input d-inline"
           @blur="onInputBlur"
+          @keydown="onKeyDown"
           autofocus
         />
       </div>
@@ -85,6 +87,7 @@ import FolderArrowCloseIcon from 'src/components/icons/folder-arrow-close-icon.v
 import FolderOption from 'src/components/icons/folder-option.vue'
 import FolderActions from './folder-actions.vue'
 import TreeFolderCreate from './tree-folder-create.vue'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let inputTimeout
 
@@ -115,8 +118,7 @@ export default {
       type: Number
     },
     name: {
-      type: String,
-      required: true
+      type: String
     },
     folders: {
       type: Array,
@@ -130,12 +132,16 @@ export default {
       type: Number,
       required: false,
       default: 1
+    },
+    order: {
+      type: Number
     }
   },
   data () {
     return {
       isCreatingFolder: false,
-      isEditing: false
+      isEditing: false,
+      isRenaming: false
     }
   },
   methods: {
@@ -143,22 +149,73 @@ export default {
       'toggleFolder',
       'openFolder',
       'closeFolder',
-      'removeFolderOpen'
+      'removeFolderOpen',
+      'foldersLoaded'
     ]),
-    onToggleFolder () {
-      this.toggleFolder(this.id)
+    onKeyDown (evt) {
+      if (evt.keyCode === 13) {
+        this.updateFolderName(evt.target.value)
+      } else if (evt.keyCode === 27) {
+        this.isEditing = false
+        evt.target.value = this.name
+      }
     },
-    onCloseFolder () {
-      this.isCreatingFolder = false
+    onInputBlur (evt) {
+      if (evt.target.value !== this.name && evt.target.value !== '') {
+        this.updateFolderName(evt.target.value)
+      } else {
+        this.$nextTick(() => {
+          evt.target.value = this.name
+          this.isEditing = false
+        })
+      }
+    },
+    updateFolderName (name) {
+      if (this.isRenaming) return
+      this.isRenaming = true
+      return Promise.all([
+        this.updateFolderRequest(this.id, { name, order: this.order }),
+        this.reloadFolders()
+      ]).finally(() => {
+        this.$nextTick(() => {
+          this.isEditing = false
+        })
+      })
+    },
+    updateFolderRequest (id, params) {
+      return window.axios
+        .patch('/api/v1/contact-folders/' + id, params)
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          this.$q.notify({
+            message,
+            type: 'negative',
+            textColor: 'white',
+            html
+          })
+        })
+    },
+    reloadFolders () {
+      return window.axios
+        .get('/api/v1/contact-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$q.notify({
+            message: 'Unable to load folders please try again.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
     },
     onCreateFolder () {
       this.isCreatingFolder = true
       this.openFolder(this.id)
-    },
-    onInputBlur () {
-      this.$nextTick(() => {
-        this.isEditing = false
-      })
     },
     onEditFolder () {
       this.isEditing = true
@@ -170,6 +227,12 @@ export default {
       this.$nextTick(() => {
         this.removeFolderOpen({ id: this.id, name: this.name })
       })
+    },
+    onToggleFolder () {
+      this.toggleFolder(this.id)
+    },
+    onCloseFolder () {
+      this.isCreatingFolder = false
     }
   },
   destroyed () {

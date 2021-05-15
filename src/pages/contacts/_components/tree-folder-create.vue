@@ -1,5 +1,5 @@
 <template>
-  <div :data-layer="layer" class="overflow-hidden">
+  <div :data-layer="layer">
     <div class="folder-create d-flex align-items-center">
       <div class="folder-create__indent" :style="indentStyle"></div>
       <div class="folder-create__arrow">
@@ -28,6 +28,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import folderIcon from 'src/components/icons/folder-icon.vue'
 import folderArrowCloseIcon from 'src/components/icons/folder-arrow-close-icon.vue'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   components: {
@@ -62,7 +63,7 @@ export default {
     ...mapActions('contacts', ['toggleFolder', 'foldersLoaded']),
     onInputBlur () {
       if (!this.text) {
-        this.resetInputState()
+        this.resetState()
       } else {
         this.createNewFolder()
       }
@@ -71,50 +72,42 @@ export default {
       if (evt.keyCode === 13) {
         this.onInputBlur()
       } else if (evt.keyCode === 27) {
-        this.resetInputState()
+        this.resetState()
       }
     },
-    createFolderAction (name) {
+    createFolderRequest (params) {
       return window.axios
-        .post('/api/v1/contact-folders', {
-          name,
-          order: 0,
-          parent_id: this.parent_id
-        })
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch((err) => {
-          console.error(err)
+        .post('/api/v1/contact-folders', params)
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
           this.$q.notify({
-            message: 'Unable to load folders please try again.',
+            message,
             type: 'negative',
-            textColor: 'white'
+            textColor: 'white',
+            html
           })
         })
     },
-    resetInputState () {
-      this.isCreating = false
-      this.text = ''
-      this.$emit('blur')
+    createNewFolder () {
+      if (this.isCreating) return Promise.resolve()
+      this.isCreating = true
+      return Promise.all([
+        this.createFolderRequest({
+          name: this.text,
+          order: 0 - Math.abs(new Date().getTime() / 1000).toFixed(0),
+          parent_id: this.parent_id
+        }),
+        this.reloadFolders()
+      ]).finally(() => {
+        this.resetState()
+      })
     },
-    async createNewFolder () {
-      try {
-        if (this.isCreating) return
-        this.isCreating = true
-        await this.createFolderAction(this.text)
-        await this.loadFolders()
-        this.resetInputState()
-      } catch (err) {
-        this.resetInputState()
-      }
-    },
-    loadFolders () {
+    reloadFolders () {
       return window.axios
         .get('/api/v1/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
-        .catch((err) => {
-          console.error(err)
+        .catch((_err) => {
           this.$q.notify({
             message: 'Unable to load folders please try again.',
             type: 'negative',
@@ -126,6 +119,11 @@ export default {
             ]
           })
         })
+    },
+    resetState () {
+      this.isCreating = false
+      this.text = ''
+      this.$emit('blur')
     }
   },
   mounted () {
@@ -140,7 +138,7 @@ export default {
 .folder-create {
   padding-left: 10px;
   padding-right: 10px;
-  line-height: 34px;
+  height: 34px;
   cursor: pointer;
   &:hover {
     background-color: white;

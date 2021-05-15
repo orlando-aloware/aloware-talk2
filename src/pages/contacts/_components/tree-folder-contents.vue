@@ -5,6 +5,7 @@
       :name="folder.name"
       :key="folder.id"
       :id="folder.id"
+      :order="folder.order"
       :layer="layer"
       :folders="folder.child_folders"
       :lists="folder.lists"

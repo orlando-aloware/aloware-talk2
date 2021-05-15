@@ -64,6 +64,7 @@
         :name="folder.name"
         :key="folder.id"
         :id="folder.id"
+        :order="folder.order"
         :folders="folder.child_folders"
         :lists="folder.lists"
         :layer="0"
