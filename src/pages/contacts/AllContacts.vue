@@ -97,7 +97,11 @@ export default {
     TableRow
   },
   methods: {
-    ...mapActions('contacts', ['openFilters', 'contactsLoaded']),
+    ...mapActions('contacts', [
+      'columnHeadersOpen',
+      'openFilters',
+      'contactsLoaded'
+    ]),
     onSortByField (orderBy) {
       this.isLoaded = false
       this.fetch({
@@ -201,7 +205,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allcontacts', 'columnHeadersOpen']),
+    ...mapGetters('contacts', ['allcontacts']),
     hasMore () {
       return (
         this.allcontacts.next_page_url && !this.isLoadingMore && !this.isLoading
