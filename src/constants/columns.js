@@ -1,5 +1,5 @@
 export const COLUMN_CATEGORIES = [
-  'default Information',
+  'Default Information',
   'Contact Location',
   'Contact Relevance',
   'Contact Communication Metadata',

@@ -7,40 +7,51 @@
     scrollable
   >
     <b-overlay :show="loading" rounded="sm" variant="primary">
-      <div class="w-100 column-headers-modal__inner d-flex position-relative px-2">
+      <div
+        class="w-100 column-headers-modal__inner d-flex position-relative px-2"
+      >
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
-            <contacts-table-search @search="onSearch" :searchOnKeyup="true" placeholder="Search available columns..."/>
+            <contacts-table-search
+              @search="onSearch"
+              :searchOnKeyup="true"
+              placeholder="Search available columns..."
+            />
           </div>
           <div class="column-headers-modal__checkboxes">
             <div
               class="d-flex align-items-center justify-content-center p-4 border my-3"
-              v-if="!allColumns.length"
+              v-if="!allColumns.results"
             >
               <div class="text-muted">No results found</div>
             </div>
-            <div
-              class="column-headers-modal__item d-flex align-items-center"
-              v-for="column in allColumns"
-              :key="column.name"
-              :class="{
-                'column-headers-modal__item--hidden': isHidden(column)
-              }"
-            >
-              <div class="pl-2 checkbox">
-                <input
-                  type="checkbox"
-                  :checked="selected.has(column.name)"
-                  :disabled="column.required"
-                  :value="column.name"
-                  @click="onClickedColumn(column, selected.has(column.name))"
-                />
+            <div v-for="(items, index) in allColumns.items" :key="index">
+              <div class="category-name">
+                {{ categories[index] }}
               </div>
               <div
-                class="flex-grow-1 pl-2 column-headers-modal__label"
-                @click="onClickedColumn(column, selected.has(column.name))"
+                class="column-headers-modal__item d-flex align-items-center"
+                v-for="column in items"
+                :key="column.name"
+                :class="{
+                  'column-headers-modal__item--hidden': isHidden(column)
+                }"
               >
-                {{ column.label }}
+                <div class="pl-2 checkbox">
+                  <input
+                    type="checkbox"
+                    :checked="selected.has(column.name)"
+                    :disabled="column.required"
+                    :value="column.name"
+                    @click="onClickedColumn(column, selected.has(column.name))"
+                  />
+                </div>
+                <div
+                  class="flex-grow-1 pl-2 column-headers-modal__label"
+                  @click="onClickedColumn(column, selected.has(column.name))"
+                >
+                  {{ column.label }}
+                </div>
               </div>
             </div>
           </div>
@@ -49,7 +60,7 @@
           <div
             class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
           >
-            Selected Columns ({{ columns.length - 2}})
+            Selected Columns ({{ columns.length - 2 }})
           </div>
           <div class="d-flex flex-column">
             <draggable
@@ -131,7 +142,11 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { ALL_COLUMNS, DEFAULT_COLUMNS } from 'src/constants/columns'
+import {
+  ALL_COLUMNS,
+  DEFAULT_COLUMNS,
+  COLUMN_CATEGORIES
+} from 'src/constants/columns'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
@@ -150,7 +165,8 @@ export default {
       searchText: '',
       columns: [],
       loading: false,
-      isOpen: false
+      isOpen: false,
+      categories: COLUMN_CATEGORIES
     }
   },
   methods: {
@@ -244,17 +260,27 @@ export default {
   computed: {
     ...mapGetters('contacts', ['columnHeaders']),
     allColumns () {
-      const sorted = sortBy(ALL_COLUMNS, ['name'])
-      if (this.searchText && this.searchText.length > 1) {
-        return sorted.filter(
-          (i) =>
-            (i.name + i.label)
+      const columns = []
+      let results = 0
+
+      const matches = sortBy(ALL_COLUMNS, ['name']).filter((item) => {
+        if (this.searchText && this.searchText.length > 1) {
+          return (
+            (item.name + item.label)
               .toLowerCase()
               .indexOf(this.searchText.toLowerCase()) !== -1
-        )
-      } else {
-        return sorted
+          )
+        } else {
+          return true
+        }
+      })
+
+      for (let i = 0; i < COLUMN_CATEGORIES.length; i++) {
+        columns[i] = matches.filter((c) => c.category === i)
+        results = results + columns[i].length
       }
+
+      return { items: columns, results }
     },
     selected () {
       if (Array.isArray(this.columns) && this.columns.length) {
@@ -296,8 +322,16 @@ export default {
   .ghost {
     border: dashed 1px $green !important;
   }
+  .category-name {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-weight: bold;
+  }
   &__checkboxes {
-    max-height:500px;
+    max-height: 500px;
     overflow: auto;
   }
   &__remove {
