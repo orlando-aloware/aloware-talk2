@@ -63,7 +63,7 @@ export default {
       required: true
     },
     type: {
-      type: String,
+      type: Number,
       required: true
     },
     layer: {

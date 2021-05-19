@@ -34,5 +34,8 @@ export default {
   },
   foldersLoaded: ({ commit }, payload) => {
     commit('FOLDERS_LOADED', payload)
+  },
+  pinnedContactlistsLoaded: ({ commit }, payload) => {
+    commit('PINNED_CONTACT_LISTS_LOADED', payload)
   }
 }

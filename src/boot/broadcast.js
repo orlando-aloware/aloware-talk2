@@ -1,5 +1,6 @@
 import Echo from 'laravel-echo'
 import store from '../store/index'
+import _ from 'lodash'
 
 export default {
   get profile () {
@@ -32,6 +33,12 @@ export default {
   },
 
   listen () {
+    const userId = _.get(this.profile, 'id', null)
+
+    if (!userId) {
+      return
+    }
+
     window.Echo.private('user-' + this.profile.id)
       .listen('.user.status.updated', (event) => {
         store().commit('SET_USER_STATUS', event.status)

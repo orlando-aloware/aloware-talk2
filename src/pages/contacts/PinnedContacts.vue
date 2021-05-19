@@ -1,9 +1,9 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled">
     <template slot="title">
-      <div class="pr-2">All Contacts</div>
+      <div class="pr-2">{{ currentPinnedContactListName }}</div>
       <span class="small text-muted"
-        >{{ allcontacts.total_contact_count }} contacts found</span
+        >{{ totalContactsCount }} contacts found</span
       >
     </template>
     <template slot="actions">
@@ -58,7 +58,7 @@
         @more="onLoadMore"
       >
         <table-row
-          v-for="(contact, index) in allcontacts.data"
+          v-for="(contact, index) in contactsListItems"
           :key="contact.id + index + Math.random()"
           :contact="contact"
           :columns="columns"
@@ -78,6 +78,7 @@
 <script>
 import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
+import * as ContactListTypes from '../../constants/contacts-list-types'
 import ColumnsConfigModal from 'src/pages/contacts/_components/columns-config-modal.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
@@ -85,6 +86,7 @@ import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-s
 import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
 import moment from 'moment'
+import _ from 'lodash'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 
 export default {
@@ -131,13 +133,17 @@ export default {
     onLoadMore () {
       if (this.hasMore) {
         this.isLoadingMore = true
-        const nextPage = this.allcontacts.current_page + 1
+        const nextPage = this.allContacts.current_page + 1
         this.fetchContacts({
           page: nextPage,
           search_text: this.searchText
         })
           .then((data) => {
-            this.contactsLoaded({ type: 'allcontacts', append: true, ...data })
+            this.contactsLoaded({
+              id: this.$route.params.id,
+              append: true,
+              ...data
+            })
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -149,7 +155,7 @@ export default {
       this.fetch({
         user_id: checked ? this.profile.id : undefined,
         search_text: this.searchText,
-        page: this.allcontacts.page
+        page: this.allContacts.page
       })
     },
     onSearch (searchText) {
@@ -162,7 +168,7 @@ export default {
       Promise.all([this.fetchContacts(params), this.fetchContactsCount(params)])
         .then(([data, count]) => {
           this.contactsLoaded({
-            type: 'allcontacts',
+            id: this.$route.params.id,
             append: false,
             ...data,
             ...count
@@ -177,33 +183,73 @@ export default {
         })
     },
     fetchContacts (params = {}) {
-      return window.axios
-        .get('api/v1/contact', {
-          params: createContactFilters(params)
-        })
-        .then((response) => response.data)
+      const type = _.get(this.currentPinnedContactList, 'type', null)
+
+      if (!type) {
+        return []
+      }
+
+      if (type === ContactListTypes.STATIC) {
+        return window.axios
+          .get(`api/v1/contacts-list/${this.currentPinnedContactList.id}/items`)
+          .then((response) => response.data)
+      }
+
+      if (type === ContactListTypes.DYNAMIC) {
+        return window.axios
+          .get('api/v1/contact', {
+            params: createContactFilters(params)
+          })
+          .then((response) => response.data)
+      }
     },
     fetchContactsCount (params) {
-      return window.axios
-        .get('api/v1/contact/get-contacts-count', {
-          params: createContactFilters(params)
-        })
-        .then((response) => response.data)
+      return 0
     }
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allcontacts']),
+    ...mapGetters('contacts', ['allContacts', 'pinnedLists']),
     hasMore () {
       return (
-        this.allcontacts.next_page_url && !this.isLoadingMore && !this.isLoading
+        this.allContacts.next_page_url && !this.isLoadingMore && !this.isLoading
       )
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
     },
+    contactsListItems () {
+      return _.get(this.allContacts, `${this.currentPinnedContactListId}.data`, [])
+    },
     isEmpty () {
-      return this.isLoaded && !this.allcontacts.data.length
+      console.log('this.allContacts: ', this.allContacts)
+      const count = _.get(this.allContacts, `${this.currentPinnedContactListId}.data.length`, 0)
+      return this.isLoaded && !count
+    },
+    totalContactsCount () {
+      return _.get(this.pinnedLists, this.$route.params.id, []).length
+    },
+    currentPinnedContactListId () {
+      return _.get(this.$route, 'params.id', null)
+    },
+    currentPinnedContactList () {
+      let id = this.currentPinnedContactListId
+
+      if (!id) {
+        return {}
+      }
+
+      id = parseInt(id)
+      const index = this.pinnedLists.findIndex(list => list.id === id)
+
+      if (index === -1) {
+        return {}
+      }
+
+      return _.get(this.pinnedLists, index, {})
+    },
+    currentPinnedContactListName () {
+      return _.get(this.currentPinnedContactList, 'name', '')
     }
   },
   data () {
@@ -275,11 +321,14 @@ export default {
           maxWidth: 120,
           minWidth: 120
         }
-      ]
+      ],
+      ContactListTypes
     }
   },
-  mounted () {
-    this.fetch()
+  watch: {
+    currentPinnedContactList (newValue, oldValue) {
+      this.fetch()
+    }
   }
 }
 </script>

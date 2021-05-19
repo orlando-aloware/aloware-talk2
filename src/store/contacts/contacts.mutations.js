@@ -34,24 +34,31 @@ export default {
   FILTERS_OPEN: (state) => {
     state.isFiltersOpen = true
   },
-  CONTACTS_LOADED: (state, { type, append, data, ...rest }) => {
+  CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
-      state.lists = {
-        ...state.lists,
-        [type]: {
-          ...state.lists[type],
+      state.lists.contacts = {
+        ...state.lists.contacts,
+        [id]: {
+          ...state.lists.contacts[id],
           ...rest,
-          data: state.lists[type].data.concat(data)
+          data: state.lists.contacts[id].data.concat(data)
         }
       }
     } else {
-      state.lists = { ...state.lists, [type]: { data, ...rest } }
+      state.lists.contacts = { ...state.lists.contacts, [id]: { data, ...rest } }
     }
   },
-  PINNED_COUNT_LOADED: (state, { name, count }) => {
-    state.pinnedCounts[name] = count
+  PINNED_COUNT_LOADED: (state, payload) => {
+    let index = state.pinnedCounts.findIndex(count => count.id === payload.id)
+
+    if (index === -1) {
+      state.pinnedCounts.push(payload)
+    }
   },
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
+  },
+  PINNED_CONTACT_LISTS_LOADED: (state, pinnedContactLists) => {
+    state.pinned = pinnedContactLists
   }
 }

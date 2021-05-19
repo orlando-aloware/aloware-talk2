@@ -4,11 +4,8 @@ export default {
   folderToRemove: (state) => state.removeFolder || {},
   isRemoveListOpen: (state) => !!state.removeList,
   listToRemove: (state) => state.removeList || {},
-  allcontacts: (state) => state.lists.allcontacts,
-  mycontacts: (state) => state.lists.mycontacts,
-  unassigned: (state) => state.lists.unassigned,
-  newleads: (state) => state.lists.newleads,
-  unanswered: (state) => state.lists.unanswered,
+  pinnedLists: (state) => state.pinned,
+  allContacts: (state) => state.lists.contacts,
   pinnedCounts: (state) => state.pinnedCounts,
   folders: (state) => state.folders
 }
