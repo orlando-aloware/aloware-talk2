@@ -30,12 +30,15 @@
                 class="column-headers-modal__item d-flex align-items-center"
                 v-for="column in allColumns"
                 :key="column.id"
+                :class="{
+                  'column-headers-modal__item--hidden': isHidden(column)
+                }"
               >
                 <div class="pl-2 checkbox">
                   <input
                     type="checkbox"
-                    :checked="isChecked(column) || selected.has(column.name)"
-                    :disabled="!isColumn(column.name)"
+                    :checked="selected.has(column.name)"
+                    :disabled="column.default"
                     :value="column.id"
                     @click="onClickedColumn(column, selected.has(column.name))"
                   />
@@ -68,20 +71,23 @@
               >
                 <div
                   class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
-                  :class="{ handle: column.draggable }"
+                  :class="{
+                    handle: column.draggable,
+                    'column-headers-modal__item--hidden': isHidden(column)
+                  }"
                   v-for="column in columns"
                   :key="column.id"
                 >
                   <i
                     class="fa fa-align-justify"
                     aria-hidden="true"
-                    v-if="column.draggable && isColumn(column.name)"
+                    v-if="column.draggable"
                   ></i>
                   <div class="flex-grow-1 pl-2 column-headers-modal__label">
                     {{ column.label }}
                   </div>
                   <button
-                    v-if="column.draggable && isColumn(column.name)"
+                    v-if="column.draggable && !column.default"
                     @click="onClickedColumn(column, true)"
                     class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
                   >
@@ -128,6 +134,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
 import allColumns from './allcolumns'
@@ -155,13 +162,10 @@ export default {
     onSearch (searchText) {
       this.searchText = searchText
     },
-    isColumn: (name) => {
-      return name !== 'checkbox' && name !== 'actions'
-    },
     onCheckMove (evt) {
       return evt.relatedContext.element.draggable
     },
-    isChecked ({ name }) {
+    isHidden ({ name }) {
       return name === 'checkbox' || name === 'actions'
     },
     onClickedColumn (column, selected) {
@@ -244,15 +248,16 @@ export default {
   computed: {
     ...mapGetters('contacts', ['columnHeaders']),
     allColumns () {
+      const sorted = sortBy(allColumns, ['name'])
       if (this.searchText && this.searchText.length > 1) {
-        return allColumns.filter(
+        return sorted.filter(
           (i) =>
             (i.name + i.label)
               .toLowerCase()
               .indexOf(this.searchText.toLowerCase()) !== -1
         )
       } else {
-        return allColumns
+        return sorted
       }
     },
     selected () {
@@ -317,6 +322,11 @@ export default {
   }
   &__item {
     height: 35px;
+    &--hidden {
+      height: 0;
+      visibility: hidden;
+      overflow: hidden;
+    }
     i {
       color: $grey-2;
       font-size: 10px;

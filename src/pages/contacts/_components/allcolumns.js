@@ -11,8 +11,9 @@ export default [
     id: '349a2e77-9f5c-4981-be61-693f48156acf',
     label: 'Name',
     name: 'name',
+    default: true,
     sortable: true,
-    draggable: true,
+    draggable: false,
     resizable: true,
     minWidth: 225
   },
@@ -76,6 +77,7 @@ export default [
     id: '06a5dad0-4a4f-48c4-b3ac-a9a6e606a9a1',
     label: 'Phone Number',
     name: 'phone_number',
+    default: true,
     sortable: true,
     draggable: true,
     resizable: true
