@@ -6,7 +6,7 @@ export const COLUMN_CATEGORIES = [
   'Custom Fields'
 ]
 
-const ALL_COLUMNS = [
+export const ALL_COLUMNS = [
   {
     default: true,
     sticky: true,
@@ -19,7 +19,7 @@ const ALL_COLUMNS = [
     category: 0,
     required: true,
     sortable: true,
-    draggable: true,
+    draggable: false,
     resizable: true,
     default: true,
     minWidth: 225

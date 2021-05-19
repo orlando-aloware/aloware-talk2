@@ -81,13 +81,20 @@
                   <i
                     class="fa fa-align-justify"
                     aria-hidden="true"
-                    v-if="column.draggable"
+                    v-if="column.draggable && !column.required"
                   ></i>
+
+                  <i
+                    class="fa fa-chevron-right"
+                    aria-hidden="true"
+                    v-if="column.required"
+                  ></i>
+
                   <div class="flex-grow-1 pl-2 column-headers-modal__label">
                     {{ column.label }}
                   </div>
                   <button
-                    v-if="column.draggable && !column.default"
+                    v-if="column.draggable && !column.required"
                     @click="onClickedColumn(column, true)"
                     class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
                   >
@@ -134,13 +141,13 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { ALL_COLUMNS, DEFAULT_COLUMNS } from 'src/constants/columns'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { ALL_COLUMNS, DEFAULT_COLUMNS } from 'src/constants/columns'
 
-const MIN_COLUMNS = 7
+const MIN_COLUMNS = 4
 
 export default {
   components: {
@@ -248,6 +255,7 @@ export default {
     ...mapGetters('contacts', ['columnHeaders']),
     allColumns () {
       const sorted = sortBy(ALL_COLUMNS, ['name'])
+      console.log(sorted)
       if (this.searchText && this.searchText.length > 1) {
         return sorted.filter(
           (i) =>
@@ -278,7 +286,7 @@ export default {
     },
     columns: function (value) {
       if (value.length < MIN_COLUMNS) {
-        this.errorMessage = 'You need to have atleast 4 columns enabled'
+        this.errorMessage = `You need to have atleast ${MIN_COLUMNS} columns enabled`
       } else {
         this.errorMessage = ''
       }
