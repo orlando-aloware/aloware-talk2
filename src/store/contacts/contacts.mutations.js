@@ -60,5 +60,11 @@ export default {
   },
   PINNED_CONTACT_LISTS_LOADED: (state, pinnedContactLists) => {
     state.pinned = pinnedContactLists
+  },
+  COLUMN_HEADERS_OPEN: (state, payload) => {
+    state.columnHeaders = payload
+  },
+  COLUMN_HEADERS_CLOSE: (state) => {
+    state.columnHeaders = null
   }
 }

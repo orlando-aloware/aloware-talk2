@@ -1,7 +1,7 @@
 export default (err) => {
   let message = err.message
 
-  if (err.response.data && err.response.data.errors) {
+  if (err.response && err.response.data && err.response.data.errors) {
     message = []
 
     const errObject = err.response.data.errors
@@ -13,7 +13,7 @@ export default (err) => {
     return { message: message.join('<br />'), html: true }
   }
 
-  if (err.response.data && err.response.data.message) {
+  if (err.response && err.response.data && err.response.data.message) {
     message = err.response.data.message
     return { message, html: false }
   }

@@ -5,14 +5,11 @@ export default function () {
     },
     pinned: [],
     folders: [],
-    list: {
-      columns: [],
-      contacts: []
-    },
     opened: [],
     removeList: null,
     removeFolder: null,
     isFiltersOpen: false,
-    pinnedCounts: []
+    pinnedCounts: [],
+    columnHeaders: null
   }
 }

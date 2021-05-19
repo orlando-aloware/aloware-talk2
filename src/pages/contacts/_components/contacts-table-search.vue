@@ -21,10 +21,19 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    searchOnKeyup: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
     onKeyUp (evt) {
+      if (this.searchOnKeyup) {
+        this.$emit('search', evt.target.value)
+        return
+      }
+
       if (evt.keyCode === 13 || evt.target.value === '') {
         this.$emit('search', evt.target.value)
       }

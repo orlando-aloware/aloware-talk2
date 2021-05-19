@@ -37,5 +37,11 @@ export default {
   },
   pinnedContactlistsLoaded: ({ commit }, payload) => {
     commit('PINNED_CONTACT_LISTS_LOADED', payload)
+  },
+  columnHeadersOpen: ({ commit }, payload) => {
+    commit('COLUMN_HEADERS_OPEN', payload)
+  },
+  columnHeadersClose: ({ commit }) => {
+    commit('COLUMN_HEADERS_CLOSE')
   }
 }

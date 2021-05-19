@@ -7,5 +7,6 @@ export default {
   pinnedLists: (state) => state.pinned,
   allContacts: (state) => state.lists.contacts,
   pinnedCounts: (state) => state.pinnedCounts,
-  folders: (state) => state.folders
+  folders: (state) => state.folders,
+  columnHeaders: (state) => state.columnHeaders
 }
