@@ -6,103 +6,108 @@
     modal-class="column-headers-modal"
     scrollable
   >
-    <div class="column-headers-modal__inner row">
-      <div class="col-md-12">
-        <div class="alert alert-danger" v-if="errorMessage.length">
-          {{ errorMessage }}
+    <b-overlay :show="loading" rounded="sm">
+      <div class="column-headers-modal__inner row">
+        <div class="col-md-12">
+          <div class="alert alert-danger" v-if="errorMessage.length">
+            {{ errorMessage }}
+          </div>
         </div>
-      </div>
 
-      <div class="col-lg-6 px-0">
-        <div class="flex flex-column pr-2 pl-4">
-          <div class="mb-2">
-            <contacts-table-search @search="onSearch" :searchOnKeyup="true" />
-          </div>
-          <div class="column-headers-modal__checkboxes">
-            <div
-              class="d-flex align-items-center justify-content-center p-4 border my-3"
-              v-if="!allColumns.length"
-            >
-              <div class="text-muted">No results found</div>
+        <div class="col-lg-6 px-0">
+          <div class="flex flex-column pr-2 pl-4">
+            <div class="mb-2">
+              <contacts-table-search @search="onSearch" :searchOnKeyup="true" />
             </div>
-            <div
-              class="column-headers-modal__item d-flex align-items-center"
-              v-for="column in allColumns"
-              :key="column.id"
-            >
-              <div class="pl-2 checkbox">
-                <input
-                  type="checkbox"
-                  :checked="isChecked(column) || selected.has(column.name)"
-                  :disabled="!isColumn(column.name)"
-                  :value="column.id"
-                  @click="onClickedColumn(column, selected.has(column.name))"
-                />
-              </div>
+            <div class="column-headers-modal__checkboxes">
               <div
-                class="flex-grow-1 pl-2 column-headers-modal__label"
-                @click="onClickedColumn(column, selected.has(column.name))"
+                class="d-flex align-items-center justify-content-center p-4 border my-3"
+                v-if="!allColumns.length"
               >
-                {{ column.label }}
+                <div class="text-muted">No results found</div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 px-0">
-        <div class="px-3">
-          <div
-            class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
-          >
-            Selected Columns
-          </div>
-          <div class="d-flex flex-column">
-            <draggable
-              v-model="columns"
-              ghost-class="ghost"
-              handle=".handle"
-              :move="onCheckMove"
-              @start="isDragging = true"
-              @end="isDragging = false"
-            >
               <div
-                class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
-                :class="{ handle: column.draggable }"
-                v-for="column in columns"
+                class="column-headers-modal__item d-flex align-items-center"
+                v-for="column in allColumns"
                 :key="column.id"
               >
-                <i
-                  class="fa fa-align-justify"
-                  aria-hidden="true"
-                  v-if="column.draggable && isColumn(column.name)"
-                ></i>
-                <div class="flex-grow-1 pl-2 column-headers-modal__label">
+                <div class="pl-2 checkbox">
+                  <input
+                    type="checkbox"
+                    :checked="isChecked(column) || selected.has(column.name)"
+                    :disabled="!isColumn(column.name)"
+                    :value="column.id"
+                    @click="onClickedColumn(column, selected.has(column.name))"
+                  />
+                </div>
+                <div
+                  class="flex-grow-1 pl-2 column-headers-modal__label"
+                  @click="onClickedColumn(column, selected.has(column.name))"
+                >
                   {{ column.label }}
                 </div>
-                <button
-                  v-if="column.draggable && isColumn(column.name)"
-                  class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
-                >
-                  <i class="fa fa-times"></i>
-                </button>
               </div>
-            </draggable>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 px-0">
+          <div class="px-3">
+            <div
+              class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
+            >
+              Selected Columns
+            </div>
+            <div class="d-flex flex-column">
+              <draggable
+                v-model="columns"
+                ghost-class="ghost"
+                handle=".handle"
+                :move="onCheckMove"
+                @start="isDragging = true"
+                @end="isDragging = false"
+              >
+                <div
+                  class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
+                  :class="{ handle: column.draggable }"
+                  v-for="column in columns"
+                  :key="column.id"
+                >
+                  <i
+                    class="fa fa-align-justify"
+                    aria-hidden="true"
+                    v-if="column.draggable && isColumn(column.name)"
+                  ></i>
+                  <div class="flex-grow-1 pl-2 column-headers-modal__label">
+                    {{ column.label }}
+                  </div>
+                  <button
+                    v-if="column.draggable && isColumn(column.name)"
+                    @click="onClickedColumn(column, true)"
+                    class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </draggable>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </b-overlay>
     <template slot="modal-footer">
       <div class="w-100 d-flex align-items-center">
         <div class="d-flex align-items-center">
           <b-button
             variant="success mr-2"
             class="custom-btn"
-            @click="columnHeadersClose"
+            :disabled="loading"
+            @click="onApplyChanges"
             >Apply</b-button
           >
           <b-button
             variant="outline-success mr-2"
             class="custom-btn"
+            :disabled="loading"
             @click="columnHeadersClose"
             >Cancel</b-button
           >
@@ -111,8 +116,9 @@
         <b-button
           variant="link"
           size="sm"
+          :disabled="loading"
           class="font-weight-bold text-danger text-decoration-none"
-          @click="columnHeadersClose"
+          @click="onResetAllColumns"
           >Reset all columns</b-button
         >
       </div>
@@ -125,6 +131,10 @@ import { mapActions, mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
 import allColumns from './allcolumns'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import columns from 'src/constants/columns'
+
+const MIN_COLUMNS = 7
 
 export default {
   components: {
@@ -135,7 +145,8 @@ export default {
     return {
       errorMessage: '',
       searchText: '',
-      columns: []
+      columns: [],
+      loading: false
     }
   },
   methods: {
@@ -169,6 +180,64 @@ export default {
         }
         this.columns = newItems
       }
+    },
+    onApplyChanges () {
+      this.loading = true
+      window.axios
+        .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
+          ...this.columnHeaders,
+          headers: this.columns,
+          filters: [] // TODO: use a
+        })
+        .then(() => {
+          this.$q.notify({
+            message: 'Columns were successfully saved!',
+            type: 'positive',
+            textColor: 'white'
+          })
+          this.columnHeadersClose()
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          this.$q.notify({
+            message,
+            type: 'negative',
+            textColor: 'white',
+            html
+          })
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+    onResetAllColumns () {
+      this.loading = true
+      window.axios
+        .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
+          ...this.columnHeaders,
+          headers: columns,
+          filters: [] // TODO: use actual values
+        })
+        .then(() => {
+          this.$q.notify({
+            message: 'Columns were successfully saved!',
+            type: 'positive',
+            textColor: 'white'
+          })
+          this.columnHeadersClose()
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          this.$q.notify({
+            message,
+            type: 'negative',
+            textColor: 'white',
+            html
+          })
+        })
+        .finally(() => {
+          this.loading = false
+        })
     }
   },
   computed: {
@@ -203,7 +272,7 @@ export default {
       }
     },
     columns: function (value) {
-      if (value.length < 7) {
+      if (value.length < MIN_COLUMNS) {
         this.errorMessage = 'You need to have atleast 4 columns enabled'
       } else {
         this.errorMessage = ''
