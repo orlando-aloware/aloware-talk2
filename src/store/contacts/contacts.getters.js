@@ -4,6 +4,8 @@ export default {
   folderToRemove: (state) => state.removeFolder || {},
   isRemoveListOpen: (state) => !!state.removeList,
   listToRemove: (state) => state.removeList || {},
+  isRemoveContactOpen: (state) => !!state.removeContact,
+  contactToRemove: (state) => state.removeContact || {},
   allcontacts: (state) => state.lists.allcontacts,
   mycontacts: (state) => state.lists.mycontacts,
   unassigned: (state) => state.lists.unassigned,

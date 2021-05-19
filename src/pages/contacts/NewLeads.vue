@@ -63,6 +63,7 @@
           :contact="contact"
           :columns="columns"
           :checked="checked"
+          :contactListId="3"
           @checked="onCheckedRows"
         />
       </datatable>

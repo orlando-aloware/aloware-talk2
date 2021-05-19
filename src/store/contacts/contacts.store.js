@@ -83,6 +83,7 @@ export default function () {
     opened: [],
     removeList: null,
     removeFolder: null,
+    removeContact: null,
     isFiltersOpen: false,
     pinnedCounts: {
       allcontacts: {

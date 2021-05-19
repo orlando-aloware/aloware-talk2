@@ -37,9 +37,7 @@
                 <template v-if="contact.name">
                   {{ contact.name | ucwords }}
                 </template>
-                <template v-if="!contact.name">
-                  No Name
-                </template>
+                <template v-if="!contact.name"> No Name </template>
               </a>
             </router-link>
           </div>
@@ -125,6 +123,7 @@
             <i class="fa fa-comment"></i>
           </button>
           <button
+            @click="onRemove"
             class="btn btn-sm btn-link datatable-row__actions__action--trash"
           >
             <i class="fa fa-trash-alt"></i>
@@ -139,6 +138,8 @@
 import moment from 'moment'
 
 import Avatar from 'src/components/avatar/avatar.vue'
+
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -155,9 +156,13 @@ export default {
     },
     checked: {
       type: Array
+    },
+    contactListId: {
+      type: Number
     }
   },
   methods: {
+    ...mapActions('contacts', ['removeContactOpen']),
     onCheckerClicked () {
       const checked = new Set([...this.checked])
 
@@ -168,6 +173,12 @@ export default {
       }
 
       this.$emit('checked', [...checked])
+    },
+    onRemove () {
+      this.removeContactOpen({
+        ...this.contact,
+        contactListId: this.contactListId
+      })
     }
   },
   data () {

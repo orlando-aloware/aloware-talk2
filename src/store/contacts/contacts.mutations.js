@@ -22,11 +22,17 @@ export default {
   REMOVE_LIST_OPEN: (state, list) => {
     state.removeList = list
   },
+  REMOVE_CONTACT_OPEN: (state, contact) => {
+    state.removeContact = contact
+  },
   REMOVE_FOLDER_CLOSE: (state) => {
     state.removeFolder = null
   },
   REMOVE_LIST_CLOSE: (state) => {
     state.removeList = null
+  },
+  REMOVE_CONTACT_CLOSE: (state) => {
+    state.removeContact = null
   },
   FILTERS_CLOSE: (state) => {
     state.isFiltersOpen = false

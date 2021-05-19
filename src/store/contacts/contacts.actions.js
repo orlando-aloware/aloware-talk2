@@ -14,11 +14,17 @@ export default {
   removeFolderOpen: ({ commit }, folder) => {
     commit('REMOVE_FOLDER_OPEN', folder)
   },
+  removeContactOpen: ({ commit }, contact) => {
+    commit('REMOVE_CONTACT_OPEN', contact)
+  },
   removeListClose: ({ commit }) => {
     commit('REMOVE_LIST_CLOSE')
   },
   removeFolderClose: ({ commit }) => {
     commit('REMOVE_FOLDER_CLOSE')
+  },
+  removeContactClose: ({ commit }) => {
+    commit('REMOVE_CONTACT_CLOSE')
   },
   openFilters: ({ commit }) => {
     commit('FILTERS_OPEN')
