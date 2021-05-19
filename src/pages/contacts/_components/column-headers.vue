@@ -6,17 +6,11 @@
     modal-class="column-headers-modal"
     scrollable
   >
-    <b-overlay :show="loading" rounded="sm">
-      <div class="col-md-12">
-        <div class="alert alert-danger" v-if="errorMessage.length">
-          {{ errorMessage }}
-        </div>
-      </div>
-
+    <b-overlay :show="loading" rounded="sm" variant="primary">
       <div class="w-100 column-headers-modal__inner d-flex position-relative px-2">
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
-            <contacts-table-search @search="onSearch" :searchOnKeyup="true" />
+            <contacts-table-search @search="onSearch" :searchOnKeyup="true" placeholder="Search available columns..."/>
           </div>
           <div class="column-headers-modal__checkboxes">
             <div
@@ -37,7 +31,7 @@
                 <input
                   type="checkbox"
                   :checked="selected.has(column.name)"
-                  :disabled="column.default"
+                  :disabled="column.required"
                   :value="column.name"
                   @click="onClickedColumn(column, selected.has(column.name))"
                 />
@@ -315,7 +309,6 @@ export default {
   }
   &__selecteds {
     font-size: 14px;
-    margin-bottom: 15px;
   }
   .handle:hover {
     background-color: $light-green2;
