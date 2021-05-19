@@ -211,10 +211,11 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allcontacts', 'columnHeadersOpen', 'pinnedLists']),
+    ...mapGetters('contacts', ['allContacts', 'columnHeadersOpen', 'pinnedLists']),
     hasMore () {
+      const hasNextPage = _.get(this.allContacts, 'next_page_url', null)
       return (
-        this.allContacts.next_page_url && !this.isLoadingMore && !this.isLoading
+        hasNextPage && !this.isLoadingMore && !this.isLoading
       )
     },
     isLoadingDisabled () {
@@ -224,7 +225,6 @@ export default {
       return _.get(this.allContacts, `${this.currentPinnedContactListId}.data`, [])
     },
     isEmpty () {
-      console.log('this.allContacts: ', this.allContacts)
       const count = _.get(this.allContacts, `${this.currentPinnedContactListId}.data.length`, 0)
       return this.isLoaded && !count
     },
