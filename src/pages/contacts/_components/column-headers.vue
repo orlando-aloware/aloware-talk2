@@ -49,7 +49,7 @@
           <div
             class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
           >
-            Selected Columns
+            Selected Columns ({{ columns.length - 2}})
           </div>
           <div class="d-flex flex-column">
             <draggable
