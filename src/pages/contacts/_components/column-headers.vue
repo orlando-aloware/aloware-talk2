@@ -146,7 +146,8 @@ export default {
       errorMessage: '',
       searchText: '',
       columns: [],
-      loading: false
+      loading: false,
+      isOpen: false
     }
   },
   methods: {
@@ -242,9 +243,6 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['columnHeaders']),
-    isOpen: function () {
-      return !!this.columnHeaders
-    },
     allColumns () {
       if (this.searchText && this.searchText.length > 1) {
         return allColumns.filter(
@@ -269,6 +267,9 @@ export default {
     columnHeaders: function (value) {
       if (value && value.headers) {
         this.columns = value.headers
+        this.isOpen = true
+      } else {
+        this.isOpen = false
       }
     },
     columns: function (value) {
