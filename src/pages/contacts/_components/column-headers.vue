@@ -29,7 +29,7 @@
               <div
                 class="column-headers-modal__item d-flex align-items-center"
                 v-for="column in allColumns"
-                :key="column.id"
+                :key="column.name"
                 :class="{
                   'column-headers-modal__item--hidden': isHidden(column)
                 }"
@@ -39,7 +39,7 @@
                     type="checkbox"
                     :checked="selected.has(column.name)"
                     :disabled="column.default"
-                    :value="column.id"
+                    :value="column.name"
                     @click="onClickedColumn(column, selected.has(column.name))"
                   />
                 </div>
@@ -76,7 +76,7 @@
                     'column-headers-modal__item--hidden': isHidden(column)
                   }"
                   v-for="column in columns"
-                  :key="column.id"
+                  :key="column.name"
                 >
                   <i
                     class="fa fa-align-justify"
@@ -137,9 +137,8 @@ import { mapActions, mapGetters } from 'vuex'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
-import allColumns from './allcolumns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import columns from 'src/constants/columns'
+import { ALL_COLUMNS, DEFAULT_COLUMNS } from 'src/constants/columns'
 
 const MIN_COLUMNS = 7
 
@@ -220,7 +219,7 @@ export default {
       window.axios
         .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
           ...this.columnHeaders,
-          headers: columns,
+          headers: DEFAULT_COLUMNS,
           filters: [] // TODO: use actual values
         })
         .then(() => {
@@ -248,7 +247,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['columnHeaders']),
     allColumns () {
-      const sorted = sortBy(allColumns, ['name'])
+      const sorted = sortBy(ALL_COLUMNS, ['name'])
       if (this.searchText && this.searchText.length > 1) {
         return sorted.filter(
           (i) =>

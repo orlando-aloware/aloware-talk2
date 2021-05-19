@@ -1,57 +1,276 @@
-export default [
+export const COLUMN_CATEGORIES = [
+  'default Information',
+  'Contact Location',
+  'Contact Relevance',
+  'Contact Communication Metadata',
+  'Custom Fields'
+]
+
+const ALL_COLUMNS = [
   {
-    id: 'c52e2b52-df23-4ae4-aa0b-c80735fa9620',
-    checkbox: true,
-    draggable: false,
+    default: true,
     sticky: true,
     label: 'Checkbox',
     name: 'checkbox'
   },
   {
-    id: '349a2e77-9f5c-4981-be61-693f48156acf',
-    label: 'Name',
     name: 'name',
-    default: true,
+    label: 'Name',
+    category: 0,
+    required: true,
     sortable: true,
-    draggable: false,
+    draggable: true,
     resizable: true,
+    default: true,
     minWidth: 225
   },
   {
-    id: '06a5dad0-4a4f-48c4-b3ac-a9a6e606a9a1',
-    label: 'Phone Number',
+    name: 'first_name',
+    label: 'First Name',
+    category: 0,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false,
+    minWidth: 225
+  },
+  {
+    name: 'last_name',
+    label: 'Last Name',
+    category: 0,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false,
+    minWidth: 225
+  },
+  {
     name: 'phone_number',
-    default: true,
+    label: 'Phone Number',
+    category: 0,
     sortable: true,
     draggable: true,
-    resizable: true
+    resizable: true,
+    default: true
   },
   {
-    id: 'f72c3d8d-0c0e-486f-aaf9-b751e8ebe4eb',
-    label: 'Last Engagement',
-    name: 'last_engagement_text',
+    name: 'email',
+    label: 'Email',
+    category: 0,
     sortable: true,
     draggable: true,
-    resizable: true
+    resizable: true,
+    default: false
   },
   {
-    id: 'e0cfa7f9-4cd8-4b51-a18f-1dc6e18aa38c',
-    label: 'Tags',
+    name: 'created_at',
+    label: 'Date Added',
+    category: 0,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'date_of_birth',
+    label: 'DOB',
+    category: 0,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'text_authorized_at',
+    label: 'TCPA Approved',
+    category: 0,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'address',
+    label: 'Address',
+    category: 1,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'cnam_state',
+    label: 'State',
+    category: 1,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'cnam_city',
+    label: 'City',
+    category: 1,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'cnam_zipcode',
+    label: 'Zip Code',
+    category: 1,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'cnam_country',
+    label: 'Country',
+    category: 1,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'timezone',
+    label: 'Timezone',
+    category: 1,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'website',
+    label: 'Website',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'company_name',
+    label: 'Company Name',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'lead_source',
+    label: 'Lead Source',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'intake_source',
+    label: 'Intake Source',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
     name: 'tags',
+    label: 'Tags',
+    category: 2,
     sortable: false,
     draggable: true,
     resizable: true,
+    default: true,
     minWidth: 200
   },
   {
-    id: 'ecb958b4-48ef-4d7e-8d5b-0fed9d2fca79',
-    label: 'Unreads',
-    name: 'unread_count',
-    sortable: true,
+    name: 'initial_campaign_id',
+    label: 'Initial Line',
+    category: 2,
+    sortable: false,
     draggable: true,
-    resizable: false,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'unread_count',
+    label: 'Unreads',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
     maxWidth: 120,
     minWidth: 120
+  },
+  {
+    name: 'inbound_call_count',
+    label: 'Inbound Calls',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'outbound_call_count',
+    label: 'Outbound Calls',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'outbound_sms_count',
+    label: 'Outbound Texts',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'last_engagement_at',
+    label: 'Last Engagement',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'disposition_status_id',
+    label: 'Call Disposition',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'csf1',
+    label: 'Custom Field 1',
+    category: 4,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'csf2',
+    label: 'Custom Field 2',
+    category: 4,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
   },
   {
     id: '426108ce-7d6e-43e1-b13e-e406a9362db0',
@@ -60,7 +279,10 @@ export default [
     sortable: false,
     draggable: false,
     resizable: false,
+    default: true,
     maxWidth: 120,
     minWidth: 120
   }
 ]
+
+export const DEFAULT_COLUMNS = ALL_COLUMNS.filter((c) => c.default)

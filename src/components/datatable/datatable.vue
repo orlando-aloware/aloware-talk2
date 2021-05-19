@@ -12,10 +12,10 @@
         >
           <th
             v-for="column in columns"
-            :key="column.id"
-            :data-column-id="column.id"
+            :key="column.name"
+            :data-column-id="column.name"
             :class="{
-              checkbox: column.checkbox,
+              checkbox: column.name === 'checkbox',
               sticky: column.sticky
             }"
             :style="{
@@ -25,10 +25,10 @@
           >
             <input
               type="checkbox"
-              v-if="column.checkbox"
+              v-if="column.name === 'checkbox'"
               @click="onCheckboxClicked"
             />
-            <template v-if="column.id && !column.checkbox">
+            <template v-if="column.name && column.name !== 'checkbox'">
               <span :class="{ handle: column.draggable }"
                 ><i
                   class="fa fa-bars mr-2 text-muted"
@@ -48,7 +48,7 @@
               ></a>
               <div
                 class="tableResizer"
-                :data-resizer-id="column.id"
+                :data-resizer-id="column.name"
                 v-if="column.resizable"
                 @mousedown="onResizerMouseDown"
               >
@@ -133,8 +133,7 @@ export default {
       } else {
         this.sorts = {
           ...this.sorts,
-          [column.name]:
-            this.sorts[column.name] === 'asc' ? 'desc' : 'asc'
+          [column.name]: this.sorts[column.name] === 'asc' ? 'desc' : 'asc'
         }
       }
 

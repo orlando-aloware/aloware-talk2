@@ -67,7 +67,7 @@
 <script>
 import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
-import columns from 'src/constants/columns'
+import { DEFAULT_COLUMNS } from 'src/constants/columns'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
 import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
@@ -213,7 +213,7 @@ export default {
       isLoadingMore: false,
       searchText: '',
       checked: [],
-      columns
+      columns: DEFAULT_COLUMNS
     }
   },
   mounted () {

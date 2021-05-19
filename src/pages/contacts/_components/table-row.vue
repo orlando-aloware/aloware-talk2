@@ -2,9 +2,9 @@
   <tr class="datatable-row">
     <template v-for="column in columns">
       <td
-        :key="column.id"
+        :key="column.name"
         class="text-center align-middle datatable-row__checkbox"
-        v-if="column.checkbox"
+        v-if="column.name === 'checkbox'"
       >
         <input
           type="checkbox"
@@ -16,7 +16,7 @@
       </td>
 
       <td
-        :key="column.id"
+        :key="column.name"
         class="datatable-row__name"
         v-if="column.name === 'name'"
       >
@@ -45,7 +45,7 @@
       </td>
 
       <td
-        :key="column.id"
+        :key="column.name"
         v-if="column.name === 'phone_number'"
         class="datatable-row__phone"
       >
@@ -54,14 +54,14 @@
         </span>
       </td>
 
-      <td :key="column.id" v-if="column.name === 'last_engagement_text'">
+      <td :key="column.name" v-if="column.name === 'last_engagement_text'">
         <div>{{ contact.last_engagement_text }}</div>
         <div class="small text-muted">
           {{ moment(contact.last_engagement_at).format('LLL') }}
         </div>
       </td>
 
-      <td class="tags-cell" :key="column.id" v-if="column.name === 'tags'">
+      <td class="tags-cell" :key="column.name" v-if="column.name === 'tags'">
         <template v-if="!contact.tags.length">
           <span class="text-muted">no tags available</span>
         </template>
@@ -98,7 +98,7 @@
 
       <td
         class="text-center"
-        :key="column.id"
+        :key="column.name"
         v-if="column.name === 'unread_count'"
       >
         <span class="badge badge-danger">
@@ -108,7 +108,7 @@
 
       <td
         class="text-center datatable-row__actions"
-        :key="column.id"
+        :key="column.name"
         v-if="column.name === 'actions'"
       >
         <div>
@@ -244,19 +244,22 @@ export default {
       })
     },
     makeTwoLeggedCall () {
-      window.axios.post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
-        phone_number: this.contact.phone_number
-      }).then(res => {
-        // this.$notify({
-        //   offset: 95,
-        //   title: 'Call Lead',
-        //   message: `We are calling your phone to connect you to ${this.contact.name}`,
-        //   type: 'success',
-        //   showClose: true
-        // })
-      }).catch(_err => {
-        // this.$root.handleErrors(err.response)
-      })
+      window.axios
+        .post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
+          phone_number: this.contact.phone_number
+        })
+        .then((res) => {
+          // this.$notify({
+          //   offset: 95,
+          //   title: 'Call Lead',
+          //   message: `We are calling your phone to connect you to ${this.contact.name}`,
+          //   type: 'success',
+          //   showClose: true
+          // })
+        })
+        .catch((_err) => {
+          // this.$root.handleErrors(err.response)
+        })
     }
   },
   data () {
