@@ -11,6 +11,8 @@ export default {
   unassigned: (state) => state.lists.unassigned,
   newleads: (state) => state.lists.newleads,
   unanswered: (state) => state.lists.unanswered,
+  pinnedLists: (state) => state.pinned,
+  allContacts: (state) => state.lists.contacts,
   pinnedCounts: (state) => state.pinnedCounts,
   folders: (state) => state.folders,
   columnHeaders: (state) => state.columnHeaders
