@@ -114,11 +114,13 @@
         <div>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--call"
+            @click="onCall"
           >
             <i class="fa fa-phone"></i>
           </button>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--chat"
+            @click="onMessage"
           >
             <i class="fa fa-comment"></i>
           </button>
@@ -139,7 +141,7 @@ import moment from 'moment'
 
 import Avatar from 'src/components/avatar/avatar.vue'
 
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -179,12 +181,91 @@ export default {
         ...this.contact,
         contactListId: this.contactListId
       })
+    },
+    onMessage () {
+      this.$router.push(`/contacts/show/${this.contact.id}?show=messages`)
+    },
+    onCall () {
+      // check contact has timezone or not
+      if (this.contact.timezone) {
+        // if have timezone check is it day time?
+        const startDay = moment()
+          .tz(this.contact.timezone)
+          .hour(8)
+          .minute(0)
+          .second(0)
+        const endDay = moment()
+          .tz(this.contact.timezone)
+          .hour(18)
+          .minute(0)
+          .second(0)
+        const contactLocalTime = moment().tz(this.contact.timezone)
+        if (!contactLocalTime.isBetween(startDay, endDay)) {
+          return this.$confirm(
+            `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
+              'hh:mm A'
+            )} for ${this.contact.name}.`,
+            'Call Lead',
+            {
+              confirmButtonText: 'OK',
+              cancelButtonText: 'Cancel',
+              customClass: 'width-500 fixed',
+              type: 'warning'
+            }
+          )
+            .then(() => {
+              this.makeCall()
+            })
+            .catch(() => {})
+        }
+      }
+      this.makeCall()
+    },
+
+    makeCall () {
+      if (this.profile.enabled_two_legged_outbound) {
+        let message = 'We will call your secondary phone'
+        message += ' on ' + this.profile.secondary_phone_number
+        message += ` and connect you with ${this.contact.name}. Proceed?`
+
+        return this.$confirm(message, 'Going old school?', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          customClass: 'width-500 fixed',
+          type: 'warning'
+        })
+          .then(() => {
+            this.makeTwoLeggedCall()
+          })
+          .catch(() => {})
+      }
+      window.VueEvent.fire('make_new_call', {
+        phone_number: this.contact.phone_number
+      })
+    },
+    makeTwoLeggedCall () {
+      window.axios.post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
+        phone_number: this.contact.phone_number
+      }).then(res => {
+        // this.$notify({
+        //   offset: 95,
+        //   title: 'Call Lead',
+        //   message: `We are calling your phone to connect you to ${this.contact.name}`,
+        //   type: 'success',
+        //   showClose: true
+        // })
+      }).catch(_err => {
+        // this.$root.handleErrors(err.response)
+      })
     }
   },
   data () {
     return {
       moment
     }
+  },
+  computed: {
+    ...mapGetters('auth', ['profile'])
   }
 }
 </script>
