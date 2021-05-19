@@ -7,102 +7,98 @@
     scrollable
   >
     <b-overlay :show="loading" rounded="sm">
-      <div class="column-headers-modal__inner row">
-        <div class="col-md-12">
-          <div class="alert alert-danger" v-if="errorMessage.length">
-            {{ errorMessage }}
-          </div>
+      <div class="col-md-12">
+        <div class="alert alert-danger" v-if="errorMessage.length">
+          {{ errorMessage }}
         </div>
+      </div>
 
-        <div class="col-lg-6 px-0">
-          <div class="flex flex-column pr-2 pl-4">
-            <div class="mb-2">
-              <contacts-table-search @search="onSearch" :searchOnKeyup="true" />
+      <div class="w-100 column-headers-modal__inner d-flex position-relative px-2">
+        <div class="d-flex flex-column flex-grow-1 pr-3">
+          <div class="mb-2">
+            <contacts-table-search @search="onSearch" :searchOnKeyup="true" />
+          </div>
+          <div class="column-headers-modal__checkboxes">
+            <div
+              class="d-flex align-items-center justify-content-center p-4 border my-3"
+              v-if="!allColumns.length"
+            >
+              <div class="text-muted">No results found</div>
             </div>
-            <div class="column-headers-modal__checkboxes">
-              <div
-                class="d-flex align-items-center justify-content-center p-4 border my-3"
-                v-if="!allColumns.length"
-              >
-                <div class="text-muted">No results found</div>
+            <div
+              class="column-headers-modal__item d-flex align-items-center"
+              v-for="column in allColumns"
+              :key="column.name"
+              :class="{
+                'column-headers-modal__item--hidden': isHidden(column)
+              }"
+            >
+              <div class="pl-2 checkbox">
+                <input
+                  type="checkbox"
+                  :checked="selected.has(column.name)"
+                  :disabled="column.default"
+                  :value="column.name"
+                  @click="onClickedColumn(column, selected.has(column.name))"
+                />
               </div>
               <div
-                class="column-headers-modal__item d-flex align-items-center"
-                v-for="column in allColumns"
-                :key="column.name"
+                class="flex-grow-1 pl-2 column-headers-modal__label"
+                @click="onClickedColumn(column, selected.has(column.name))"
+              >
+                {{ column.label }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="w-50">
+          <div
+            class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
+          >
+            Selected Columns
+          </div>
+          <div class="d-flex flex-column">
+            <draggable
+              v-model="columns"
+              ghost-class="ghost"
+              handle=".handle"
+              :move="onCheckMove"
+              @start="isDragging = true"
+              @end="isDragging = false"
+            >
+              <div
+                class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
                 :class="{
+                  handle: column.draggable,
                   'column-headers-modal__item--hidden': isHidden(column)
                 }"
+                v-for="column in columns"
+                :key="column.name"
               >
-                <div class="pl-2 checkbox">
-                  <input
-                    type="checkbox"
-                    :checked="selected.has(column.name)"
-                    :disabled="column.default"
-                    :value="column.name"
-                    @click="onClickedColumn(column, selected.has(column.name))"
-                  />
-                </div>
-                <div
-                  class="flex-grow-1 pl-2 column-headers-modal__label"
-                  @click="onClickedColumn(column, selected.has(column.name))"
-                >
+                <i
+                  class="fa fa-align-justify"
+                  aria-hidden="true"
+                  v-if="column.draggable && !column.required"
+                ></i>
+
+                <i
+                  class="fa fa-chevron-right"
+                  aria-hidden="true"
+                  v-if="column.required"
+                ></i>
+
+                <div class="flex-grow-1 pl-2 column-headers-modal__label">
                   {{ column.label }}
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 px-0">
-          <div class="px-3">
-            <div
-              class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
-            >
-              Selected Columns
-            </div>
-            <div class="d-flex flex-column">
-              <draggable
-                v-model="columns"
-                ghost-class="ghost"
-                handle=".handle"
-                :move="onCheckMove"
-                @start="isDragging = true"
-                @end="isDragging = false"
-              >
-                <div
-                  class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
-                  :class="{
-                    handle: column.draggable,
-                    'column-headers-modal__item--hidden': isHidden(column)
-                  }"
-                  v-for="column in columns"
-                  :key="column.name"
+                <button
+                  v-if="column.draggable && !column.required"
+                  @click="onClickedColumn(column, true)"
+                  class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
                 >
-                  <i
-                    class="fa fa-align-justify"
-                    aria-hidden="true"
-                    v-if="column.draggable && !column.required"
-                  ></i>
-
-                  <i
-                    class="fa fa-chevron-right"
-                    aria-hidden="true"
-                    v-if="column.required"
-                  ></i>
-
-                  <div class="flex-grow-1 pl-2 column-headers-modal__label">
-                    {{ column.label }}
-                  </div>
-                  <button
-                    v-if="column.draggable && !column.required"
-                    @click="onClickedColumn(column, true)"
-                    class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
-                  >
-                    <i class="fa fa-times"></i>
-                  </button>
-                </div>
-              </draggable>
-            </div>
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </draggable>
           </div>
         </div>
       </div>
@@ -255,7 +251,6 @@ export default {
     ...mapGetters('contacts', ['columnHeaders']),
     allColumns () {
       const sorted = sortBy(ALL_COLUMNS, ['name'])
-      console.log(sorted)
       if (this.searchText && this.searchText.length > 1) {
         return sorted.filter(
           (i) =>
@@ -308,7 +303,8 @@ export default {
     border: dashed 1px $green !important;
   }
   &__checkboxes {
-    max-height: calc(100% - 50px);
+    max-height:500px;
+    overflow: auto;
   }
   &__remove {
     width: 10px;
