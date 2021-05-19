@@ -40,8 +40,8 @@
                 href="#"
                 class="sorter"
                 :class="{
-                  'sorter-asc': sorts[column.fieldName] === 'asc',
-                  'sorter-desc': sorts[column.fieldName] === 'desc'
+                  'sorter-asc': sorts[column.name] === 'asc',
+                  'sorter-desc': sorts[column.name] === 'desc'
                 }"
                 v-if="column.sortable"
                 @click.prevent="onColumnSort(column)"
@@ -125,16 +125,16 @@ export default {
       this.$emit('sort', Object.assign({}, this.getColumnSorts(column)))
     },
     getColumnSorts (column) {
-      if (!this.sorts[column.fieldName]) {
+      if (!this.sorts[column.name]) {
         this.sorts = {
           ...this.sorts,
-          [column.fieldName]: 'asc'
+          [column.name]: 'asc'
         }
       } else {
         this.sorts = {
           ...this.sorts,
-          [column.fieldName]:
-            this.sorts[column.fieldName] === 'asc' ? 'desc' : 'asc'
+          [column.name]:
+            this.sorts[column.name] === 'asc' ? 'desc' : 'asc'
         }
       }
 

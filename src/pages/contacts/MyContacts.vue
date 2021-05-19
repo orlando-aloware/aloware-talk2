@@ -85,9 +85,18 @@ export default {
     TableRow
   },
   methods: {
-    ...mapActions('contacts', ['openFilters', 'contactsLoaded', 'columnHeadersOpen']),
-    onSortByField (nextSorts) {
-      console.log(nextSorts)
+    ...mapActions('contacts', [
+      'openFilters',
+      'contactsLoaded',
+      'columnHeadersOpen'
+    ]),
+    onSortByField (orderBy) {
+      this.isLoaded = false
+      this.fetch({
+        search_text: this.searchText,
+        page: this.mycontacts.current_page,
+        comm_sort_by: Object.keys(orderBy).map((i) => `${i}:${orderBy[i]}`)
+      })
     },
     onColumnsReordered (nextColumns) {
       this.columns = nextColumns
