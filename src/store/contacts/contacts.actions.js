@@ -34,5 +34,11 @@ export default {
   },
   foldersLoaded: ({ commit }, payload) => {
     commit('FOLDERS_LOADED', payload)
+  },
+  columnHeadersOpen: ({ commit }, payload) => {
+    commit('COLUMN_HEADERS_OPEN', payload)
+  },
+  columnHeadersClose: ({ commit }) => {
+    commit('COLUMN_HEADERS_CLOSE')
   }
 }

@@ -69,7 +69,6 @@
     </template>
 
     <template slot="footer">
-      <columns-config-modal ref="columnConfig" />
       <import-contacts-modal ref="importContacts" />
     </template>
   </contacts-screen>
@@ -78,7 +77,7 @@
 <script>
 import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
-import ColumnsConfigModal from 'src/pages/contacts/_components/columns-config-modal.vue'
+import columns from 'src/constants/columns'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
 import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
@@ -89,7 +88,6 @@ import TableRow from 'src/pages/contacts/_components/table-row.vue'
 
 export default {
   components: {
-    ColumnsConfigModal,
     CompactBtn,
     ContactsScreen,
     ContactsTableSearch,
@@ -120,7 +118,11 @@ export default {
       this.checked = checked
     },
     onEditColumnsClicked () {
-      this.$refs.columnConfig.open()
+      this.columnHeadersOpen({
+        id: 1,
+        headers: this.columns,
+        name: 'All Contacts'
+      })
     },
     onImportContactsClicked () {
       this.$refs.importContacts.open()
@@ -193,7 +195,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allcontacts']),
+    ...mapGetters('contacts', ['allcontacts', 'columnHeadersOpen']),
     hasMore () {
       return (
         this.allcontacts.next_page_url && !this.isLoadingMore && !this.isLoading
@@ -215,67 +217,7 @@ export default {
       myContacts: false,
       searchText: '',
       checked: [],
-      columns: [
-        {
-          checkbox: true,
-          draggable: false,
-          sticky: true
-        },
-        {
-          id: 1,
-          label: 'Name',
-          name: 'name',
-          sortable: true,
-          draggable: true,
-          resizable: true,
-          minWidth: 225
-        },
-        {
-          id: 2,
-          label: 'Phone Number',
-          name: 'phone_number',
-          sortable: true,
-          draggable: true,
-          resizable: true
-        },
-        {
-          id: 3,
-          label: 'Last Engagement',
-          name: 'last_engagement_text',
-          sortable: true,
-          draggable: true,
-          resizable: true
-        },
-        {
-          id: 6,
-          label: 'Tags',
-          name: 'tags',
-          sortable: false,
-          draggable: true,
-          resizable: true,
-          minWidth: 200
-        },
-        {
-          id: 7,
-          label: 'Unreads',
-          name: 'unread_count',
-          sortable: true,
-          draggable: true,
-          resizable: false,
-          maxWidth: 120,
-          minWidth: 120
-        },
-        {
-          id: 8,
-          label: 'Actions',
-          name: 'actions',
-          sortable: false,
-          draggable: false,
-          resizable: false,
-          maxWidth: 120,
-          minWidth: 120
-        }
-      ]
+      columns
     }
   },
   mounted () {

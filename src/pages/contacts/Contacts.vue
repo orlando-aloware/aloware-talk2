@@ -9,6 +9,7 @@
     <remove-folder-dialog />
     <remove-list-dialog />
     <contacts-filters />
+    <column-headers />
   </div>
 </template>
 
@@ -17,6 +18,7 @@ import ContactsSidebar from 'src/pages/contacts/_components/contacts-sidebar.vue
 import RemoveListDialog from 'src/pages/contacts/_components/remove-list.vue'
 import RemoveFolderDialog from 'src/pages/contacts/_components/remove-folder.vue'
 import ContactsFilters from 'src/pages/contacts/_components/contacts-filters.vue'
+import ColumnHeaders from './_components/column-headers.vue'
 
 export default {
   name: 'Contacts',
@@ -24,7 +26,8 @@ export default {
     ContactsSidebar,
     RemoveListDialog,
     RemoveFolderDialog,
-    ContactsFilters
+    ContactsFilters,
+    ColumnHeaders
   }
 }
 </script>

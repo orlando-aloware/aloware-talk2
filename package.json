@@ -46,6 +46,7 @@
     "rage-edit": "^1.2.0",
     "randomcolor": "^0.5.4",
     "twilio-client": "^1.14.0",
+    "uuid": "^8.3.2",
     "vue": "^2.6.12",
     "vue-custom-scrollbar": "^1.4.0",
     "vue-filter-number-format": "^3.0.1",

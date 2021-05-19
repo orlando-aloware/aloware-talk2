@@ -10,5 +10,6 @@ export default {
   newleads: (state) => state.lists.newleads,
   unanswered: (state) => state.lists.unanswered,
   pinnedCounts: (state) => state.pinnedCounts,
-  folders: (state) => state.folders
+  folders: (state) => state.folders,
+  columnHeaders: (state) => state.columnHeaders
 }

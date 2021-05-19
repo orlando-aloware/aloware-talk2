@@ -80,10 +80,6 @@ export default function () {
       }
     ],
     folders: [],
-    list: {
-      columns: [],
-      contacts: []
-    },
     opened: [],
     removeList: null,
     removeFolder: null,
@@ -110,6 +106,7 @@ export default function () {
         unreads_count: 0
       },
       newleads: { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
-    }
+    },
+    columnHeaders: null
   }
 }

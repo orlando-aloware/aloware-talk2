@@ -53,5 +53,11 @@ export default {
   },
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
+  },
+  COLUMN_HEADERS_OPEN: (state, payload) => {
+    state.columnHeaders = payload
+  },
+  COLUMN_HEADERS_CLOSE: (state) => {
+    state.columnHeaders = null
   }
 }
