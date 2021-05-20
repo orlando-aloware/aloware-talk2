@@ -41,8 +41,11 @@ export default {
   foldersLoaded: ({ commit }, payload) => {
     commit('FOLDERS_LOADED', payload)
   },
-  pinnedContactlistsLoaded: ({ commit }, payload) => {
-    commit('PINNED_CONTACT_LISTS_LOADED', payload)
+  pinnedLoaded: ({ commit }, payload) => {
+    commit('PINNED_LOADED', payload)
+  },
+  listLoaded: ({ commit }, payload) => {
+    commit('LIST_LOADED', payload)
   },
   columnHeadersOpen: ({ commit }, payload) => {
     commit('COLUMN_HEADERS_OPEN', payload)

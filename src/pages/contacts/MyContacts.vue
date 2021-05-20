@@ -3,7 +3,7 @@
     <template slot="title">
       <div class="pr-2">My Contacts</div>
       <span class="small text-muted"
-        >{{ mycontacts.total_contact_count }} contacts found</span
+        >{{ myContacts.total_contact_count }} contacts found</span
       >
     </template>
     <template slot="actions">
@@ -47,7 +47,7 @@
         @more="onLoadMore"
       >
         <table-row
-          v-for="(contact, index) in mycontacts.data"
+          v-for="(contact, index) in myContacts.data"
           :key="contact.id + index + Math.random()"
           :contact="contact"
           :columns="columns"
@@ -95,7 +95,7 @@ export default {
       this.isLoaded = false
       this.fetch({
         search_text: this.searchText,
-        page: this.mycontacts.current_page,
+        page: this.myContacts.current_page,
         comm_sort_by: Object.keys(orderBy).map((i) => `${i}:${orderBy[i]}`)
       })
     },
@@ -132,13 +132,13 @@ export default {
     onLoadMore () {
       if (this.hasMore) {
         this.isLoadingMore = true
-        const nextPage = this.mycontacts.current_page + 1
+        const nextPage = this.myContacts.current_page + 1
         this.fetchContacts({
           page: nextPage,
           search_text: this.searchText
         })
           .then((data) => {
-            this.contactsLoaded({ type: 'mycontacts', append: true, ...data })
+            this.contactsLoaded({ type: 'myContacts', append: true, ...data })
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -155,7 +155,7 @@ export default {
       Promise.all([this.fetchContacts(params), this.fetchContactsCount(params)])
         .then(([data, count]) => {
           this.contactsLoaded({
-            type: 'mycontacts',
+            type: 'myContacts',
             append: false,
             ...data,
             ...count
@@ -192,17 +192,17 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['mycontacts']),
+    ...mapGetters('contacts', ['myContacts']),
     hasMore () {
       return (
-        this.mycontacts.next_page_url && !this.isLoadingMore && !this.isLoading
+        this.myContacts.next_page_url && !this.isLoadingMore && !this.isLoading
       )
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
     },
     isEmpty () {
-      return this.isLoaded && !this.mycontacts.data.length
+      return this.isLoaded && !this.myContacts.data.length
     }
   },
   data () {

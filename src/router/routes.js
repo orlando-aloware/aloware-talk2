@@ -28,9 +28,39 @@ const routes = [
         component: () => import('src/pages/contacts/Contacts.vue'),
         children: [
           {
-            path: 'pinned/:id',
+            path: '',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactIndex.vue')
+          },
+          {
+            path: 'my-contacts',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/MyContacts.vue')
+          },
+          {
+            path: 'newleads',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/NewLeads.vue')
+          },
+          {
+            path: 'unanswered',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/UnansweredContacts.vue')
+          },
+          {
+            path: 'unassigned',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/UnassignedContacts.vue')
+          },
+          {
+            path: 'list/:id',
             name: 'Contacts',
             component: () => import('src/pages/contacts/PinnedContacts.vue')
+          },
+          {
+            path: ':id',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/Contact.vue')
           }
         ]
       },

@@ -181,6 +181,7 @@ export default {
       return name === 'checkbox' || name === 'actions'
     },
     onClickedColumn (column, selected) {
+      if (column.required) return
       if (selected) {
         this.columns = this.columns.filter((c) => c.name !== column.name)
       } else {
@@ -201,8 +202,8 @@ export default {
     onApplyChanges () {
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
-          ...this.columnHeaders,
+        .patch(`/api/v1/contacts-list/${this.columnsUpdating.id}`, {
+          ...this.columnsUpdating,
           headers: this.columns,
           filters: [] // TODO: use a
         })
@@ -230,8 +231,8 @@ export default {
     onResetAllColumns () {
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
-          ...this.columnHeaders,
+        .patch(`/api/v1/contacts-list/${this.columnsUpdating.id}`, {
+          ...this.columnsUpdating,
           headers: DEFAULT_COLUMNS,
           filters: [] // TODO: use actual values
         })
@@ -258,7 +259,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['columnHeaders']),
+    ...mapGetters('contacts', ['columnsUpdating']),
     allColumns () {
       const columns = []
       let results = 0
@@ -291,7 +292,8 @@ export default {
     }
   },
   watch: {
-    columnHeaders: function (value) {
+    columnsUpdating: function (value) {
+      console.log(value)
       if (value && value.headers) {
         this.columns = value.headers
         this.isOpen = true

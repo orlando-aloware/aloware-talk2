@@ -26,7 +26,7 @@
           </div>
           <div class="flex-grow-1">
             <router-link
-              :to="`/contacts/show/${contact.id}`"
+              :to="`/contacts/${contact.id}`"
               v-slot="{ href, route, navigate }"
             >
               <a
@@ -183,7 +183,7 @@ export default {
       })
     },
     onMessage () {
-      this.$router.push(`/contacts/show/${this.contact.id}?show=messages`)
+      this.$router.push(`/contacts/${this.contact.id}`)
     },
     onCall () {
       // check contact has timezone or not

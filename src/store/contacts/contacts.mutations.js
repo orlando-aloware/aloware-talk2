@@ -42,35 +42,37 @@ export default {
   },
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
-      state.lists.contacts = {
-        ...state.lists.contacts,
+      state.listItems = {
+        ...state.listItems,
         [id]: {
-          ...state.lists.contacts[id],
+          ...state.listItems[id],
           ...rest,
-          data: state.lists.contacts[id].data.concat(data)
+          data: state.listItems[id].data.concat(data)
         }
       }
     } else {
-      state.lists.contacts = { ...state.lists.contacts, [id]: { data, ...rest } }
+      state.listItems = { ...state.listItems, [id]: { data, ...rest } }
     }
   },
   PINNED_COUNT_LOADED: (state, payload) => {
-    let index = state.pinnedCounts.findIndex(count => count.id === payload.id)
-
-    if (index === -1) {
-      state.pinnedCounts.push(payload)
-    }
+    state.pinnedCounts[payload.id] = payload.count
   },
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
   },
-  PINNED_CONTACT_LISTS_LOADED: (state, pinnedContactLists) => {
-    state.pinned = pinnedContactLists
+  LIST_LOADED: (state, list) => {
+    state.lists = {
+      ...state.lists,
+      [list.id]: { ...list }
+    }
+  },
+  PINNED_LOADED: (state, pinned) => {
+    state.pinned = pinned
   },
   COLUMN_HEADERS_OPEN: (state, payload) => {
-    state.columnHeaders = payload
+    state.columsUpdating = payload
   },
   COLUMN_HEADERS_CLOSE: (state) => {
-    state.columnHeaders = null
+    state.columsUpdating = null
   }
 }

@@ -108,7 +108,7 @@ export default {
       this.isLoaded = false
       this.fetch({
         search_text: this.searchText,
-        page: this.mycontacts.current_page,
+        page: this.myContacts.current_page,
         comm_sort_by: Object.keys(orderBy).map((i) => `${i}:${orderBy[i]}`)
       })
     },
@@ -221,7 +221,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allContacts', 'columnHeadersOpen', 'pinnedLists']),
+    ...mapGetters('contacts', ['allContacts', 'pinnedLists']),
     hasMore () {
       const hasNextPage = _.get(this.allContacts, 'next_page_url', null)
       return (

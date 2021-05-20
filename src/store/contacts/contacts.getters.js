@@ -6,14 +6,14 @@ export default {
   listToRemove: (state) => state.removeList || {},
   isRemoveContactOpen: (state) => !!state.removeContact,
   contactToRemove: (state) => state.removeContact || {},
-  allcontacts: (state) => state.lists.allcontacts,
-  mycontacts: (state) => state.lists.mycontacts,
-  unassigned: (state) => state.lists.unassigned,
-  newleads: (state) => state.lists.newleads,
-  unanswered: (state) => state.lists.unanswered,
   pinnedLists: (state) => state.pinned,
-  allContacts: (state) => state.lists.contacts,
   pinnedCounts: (state) => state.pinnedCounts,
   folders: (state) => state.folders,
-  columnHeaders: (state) => state.columnHeaders
+  columnsUpdating: (state) => state.columnsUpdating,
+  lists: (state) => state.lists,
+  allContacts: (state) => state.listItems.allContacts,
+  myContacts: (state) => state.listItems.myContacts,
+  unassigned: (state) => state.listItems.unassigned,
+  newleads: (state) => state.listItems.newleads,
+  unanswered: (state) => state.listItems.unanswered
 }

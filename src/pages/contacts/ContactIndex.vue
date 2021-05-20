@@ -3,7 +3,7 @@
     <template slot="title">
       <div class="pr-2">All Contacts</div>
       <span class="small text-muted"
-        >{{ allcontacts.total_contact_count }} contacts found</span
+        >{{ allContacts.total_contact_count }} contacts found</span
       >
     </template>
     <template slot="actions">
@@ -58,7 +58,7 @@
         @more="onLoadMore"
       >
         <table-row
-          v-for="(contact, index) in allcontacts.data"
+          v-for="(contact, index) in allContacts.data"
           :key="contact.id + index + Math.random()"
           :contact="contact"
           :columns="columns"
@@ -78,7 +78,6 @@
 <script>
 import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
-import { DEFAULT_COLUMNS } from 'src/constants/columns'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
 import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
@@ -106,7 +105,7 @@ export default {
       this.isLoaded = false
       this.fetch({
         search_text: this.searchText,
-        page: this.mycontacts.current_page,
+        page: this.allContacts.current_page,
         comm_sort_by: Object.keys(orderBy).map((i) => `${i}:${orderBy[i]}`)
       })
     },
@@ -129,7 +128,7 @@ export default {
     },
     onEditColumnsClicked () {
       this.columnHeadersOpen({
-        id: 1,
+        id: 'allContacts',
         headers: this.columns,
         name: 'All Contacts'
       })
@@ -143,13 +142,13 @@ export default {
     onLoadMore () {
       if (this.hasMore) {
         this.isLoadingMore = true
-        const nextPage = this.allcontacts.current_page + 1
+        const nextPage = this.allContacts.current_page + 1
         this.fetchContacts({
           page: nextPage,
           search_text: this.searchText
         })
           .then((data) => {
-            this.contactsLoaded({ type: 'allcontacts', append: true, ...data })
+            this.contactsLoaded({ id: 'allContacts', append: true, ...data })
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -161,7 +160,7 @@ export default {
       this.fetch({
         user_id: checked ? this.profile.id : undefined,
         search_text: this.searchText,
-        page: this.allcontacts.page
+        page: this.allContacts.page
       })
     },
     onSearch (searchText) {
@@ -174,7 +173,7 @@ export default {
       Promise.all([this.fetchContacts(params), this.fetchContactsCount(params)])
         .then(([data, count]) => {
           this.contactsLoaded({
-            type: 'allcontacts',
+            id: 'allContacts',
             append: false,
             ...data,
             ...count
@@ -205,17 +204,20 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allcontacts']),
+    ...mapGetters('contacts', ['allContacts', 'lists']),
     hasMore () {
       return (
-        this.allcontacts.next_page_url && !this.isLoadingMore && !this.isLoading
+        this.allContacts.next_page_url && !this.isLoadingMore && !this.isLoading
       )
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
     },
     isEmpty () {
-      return this.isLoaded && !this.allcontacts.data.length
+      return this.isLoaded && !this.allContacts.data.length
+    },
+    columns () {
+      return this.lists.allContacts.headers
     }
   },
   data () {
@@ -226,8 +228,7 @@ export default {
       isLoadingMore: false,
       myContacts: false,
       searchText: '',
-      checked: [],
-      columns: DEFAULT_COLUMNS
+      checked: []
     }
   },
   mounted () {
