@@ -6,7 +6,7 @@
     modal-class="column-headers-modal"
     scrollable
   >
-    <b-overlay :show="loading" rounded="sm" variant="primary">
+    <b-overlay :show="loading" rounded="sm" variant="white">
       <div
         class="w-100 column-headers-modal__inner d-flex position-relative px-2"
       >

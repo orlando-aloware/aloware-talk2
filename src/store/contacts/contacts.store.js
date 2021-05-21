@@ -1,78 +1,16 @@
-import { DEFAULT_COLUMNS } from 'src/constants/contacts-list-types'
+import {
+  DEFAULT_COLUMNS,
+  DEFAULT_CONTACT_LIST_ITEMS
+} from 'src/constants/contacts-list-types'
 
 export default function () {
   return {
     listItems: {
-      allContacts: {
-        current_page: 1,
-        data: [],
-        first_page_url: null,
-        from: 1,
-        new_leads_count: 0,
-        next_page_url: null,
-        path: null,
-        per_page: 20,
-        prev_page_url: null,
-        to: 20,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      myContacts: {
-        current_page: 1,
-        data: [],
-        first_page_url: null,
-        from: 1,
-        new_leads_count: 0,
-        next_page_url: null,
-        path: null,
-        per_page: 20,
-        prev_page_url: null,
-        to: 20,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      unassigned: {
-        current_page: 1,
-        data: [],
-        first_page_url: null,
-        from: 1,
-        new_leads_count: 0,
-        next_page_url: null,
-        path: null,
-        per_page: 20,
-        prev_page_url: null,
-        to: 20,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      unanswered: {
-        current_page: 1,
-        data: [],
-        first_page_url: null,
-        from: 1,
-        new_leads_count: 0,
-        next_page_url: null,
-        path: null,
-        per_page: 20,
-        prev_page_url: null,
-        to: 20,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      newLeads: {
-        current_page: 1,
-        data: [],
-        first_page_url: null,
-        from: 1,
-        new_leads_count: 0,
-        next_page_url: null,
-        path: null,
-        per_page: 20,
-        prev_page_url: null,
-        to: 20,
-        total_contact_count: 0,
-        unreads_count: 0
-      }
+      allContacts: DEFAULT_CONTACT_LIST_ITEMS,
+      myContacts: DEFAULT_CONTACT_LIST_ITEMS,
+      unassigned: DEFAULT_CONTACT_LIST_ITEMS,
+      unanswered: DEFAULT_CONTACT_LIST_ITEMS,
+      newLeads: DEFAULT_CONTACT_LIST_ITEMS
     },
     lists: {
       allContacts: {

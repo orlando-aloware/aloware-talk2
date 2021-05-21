@@ -305,6 +305,11 @@ export default {
   },
   mounted () {
     this.fetch()
+  },
+  watch: {
+    '$route.params.id': function (id) {
+      this.fetch(id)
+    }
   }
 }
 </script>

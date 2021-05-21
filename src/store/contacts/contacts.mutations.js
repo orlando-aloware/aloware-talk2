@@ -44,14 +44,14 @@ export default {
     if (append) {
       state.listItems = {
         ...state.listItems,
-        [id]: {
-          ...state.listItems[id],
+        [String(id)]: {
+          ...state.listItems[String(id)],
           ...rest,
-          data: state.listItems[id].data.concat(data)
+          data: state.listItems[String(id)].data.concat(data)
         }
       }
     } else {
-      state.listItems = { ...state.listItems, [id]: { data, ...rest } }
+      state.listItems = { ...state.listItems, [String(id)]: { data, ...rest } }
     }
   },
   PINNED_COUNT_LOADED: (state, payload) => {
@@ -63,7 +63,7 @@ export default {
   LIST_LOADED: (state, list) => {
     state.lists = {
       ...state.lists,
-      [list.id]: { ...list }
+      [String(list.id)]: { ...list }
     }
   },
   PINNED_LOADED: (state, pinned) => {
@@ -75,20 +75,20 @@ export default {
   COLUMNS_CLOSE: (state) => {
     state.columns = null
   },
-  COLUMNS_REORDERED: (state, payload) => {
+  COLUMNS_REORDERED: (state, { id, headers }) => {
     state.lists = {
       ...state.lists,
-      [payload.id]: {
-        ...(state.lists[payload.id] || {}),
-        headers: payload.headers
+      [String(id)]: {
+        ...(state.lists[String(id)] || {}),
+        headers
       }
     }
   },
   COLUMNS_UPDATED: (state, { id, ...rest }) => {
     state.lists = {
       ...state.lists,
-      [id]: {
-        ...(state.lists[id] || {}),
+      [String(id)]: {
+        ...(state.lists[String(id)] || {}),
         ...rest
       }
     }
