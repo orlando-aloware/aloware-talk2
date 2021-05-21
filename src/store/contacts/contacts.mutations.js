@@ -69,11 +69,11 @@ export default {
   PINNED_LOADED: (state, pinned) => {
     state.pinned = pinned
   },
-  COLUMN_HEADERS_OPEN: (state, payload) => {
-    state.columsUpdating = payload
+  COLUMNS_OPEN: (state, payload) => {
+    state.columns = payload
   },
-  COLUMN_HEADERS_CLOSE: (state) => {
-    state.columsUpdating = null
+  COLUMNS_CLOSE: (state) => {
+    state.columns = null
   },
   COLUMNS_REORDERED: (state, payload) => {
     state.lists = {
@@ -81,6 +81,15 @@ export default {
       [payload.id]: {
         ...(state.lists[payload.id] || {}),
         headers: payload.headers
+      }
+    }
+  },
+  COLUMNS_UPDATED: (state, { id, ...rest }) => {
+    state.lists = {
+      ...state.lists,
+      [id]: {
+        ...(state.lists[id] || {}),
+        ...rest
       }
     }
   }

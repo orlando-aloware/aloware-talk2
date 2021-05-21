@@ -11,5 +11,6 @@ export default {
   folders: (state) => state.folders,
   columnsUpdating: (state) => state.columnsUpdating,
   lists: (state) => state.lists,
-  listItems: (state) => state.listItems
+  listItems: (state) => state.listItems,
+  columns: (state) => state.columns
 }

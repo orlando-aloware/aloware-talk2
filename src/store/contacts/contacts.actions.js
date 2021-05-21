@@ -47,14 +47,16 @@ export default {
   listLoaded: ({ commit }, payload) => {
     commit('LIST_LOADED', payload)
   },
-  columnHeadersOpen: ({ commit }, payload) => {
-    commit('COLUMN_HEADERS_OPEN', payload)
+  columnsOpen: ({ commit }, payload) => {
+    commit('COLUMNS_OPEN', payload)
   },
-  columnHeadersClose: ({ commit }) => {
-    commit('COLUMN_HEADERS_CLOSE')
+  columnsClose: ({ commit }) => {
+    commit('COLUMNS_CLOSE')
   },
   columnsReordered: ({ commit }, payload) => {
-    console.log(11111)
     commit('COLUMNS_REORDERED', payload)
+  },
+  columnsUpdated: ({ commit }, payload) => {
+    commit('COLUMNS_UPDATED', payload)
   }
 }

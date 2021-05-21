@@ -96,7 +96,7 @@ export default function () {
         filters: []
       }
     },
-    columnsUpdating: null,
+    columns: null,
     folders: [],
     isFiltersOpen: false,
     opened: [],

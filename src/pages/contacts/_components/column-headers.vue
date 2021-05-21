@@ -2,7 +2,7 @@
   <b-modal
     v-model="isOpen"
     size="lg"
-    title="Choose which columns you see"
+    :title="title"
     modal-class="column-headers-modal"
     scrollable
   >
@@ -60,11 +60,11 @@
           <div
             class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
           >
-            Selected Columns ({{ columns.length - 2 }})
+            Selected Columns ({{ currentColumns.length - 2 }})
           </div>
           <div class="d-flex flex-column">
             <draggable
-              v-model="columns"
+              v-model="currentColumns"
               ghost-class="ghost"
               handle=".handle"
               :move="onCheckMove"
@@ -77,7 +77,7 @@
                   handle: column.draggable,
                   'column-headers-modal__item--hidden': isHidden(column)
                 }"
-                v-for="column in columns"
+                v-for="column in currentColumns"
                 :key="column.name"
               >
                 <i
@@ -122,7 +122,7 @@
             variant="outline-success mr-2"
             class="custom-btn"
             :disabled="loading"
-            @click="columnHeadersClose"
+            @click="columnsClose"
             >Cancel</b-button
           >
         </div>
@@ -147,12 +147,17 @@ import {
   DEFAULT_COLUMNS,
   COLUMN_CATEGORIES
 } from 'src/constants/columns'
+
+import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
-const MIN_COLUMNS = 4
+const DEFAULT_CONTACT_LIST_IDS = Object.keys(DEFAULT_CONTACT_LIST).map(
+  (i) => DEFAULT_CONTACT_LIST[i].id
+)
 
 export default {
   components: {
@@ -161,16 +166,15 @@ export default {
   },
   data () {
     return {
-      errorMessage: '',
       searchText: '',
-      columns: [],
       loading: false,
       isOpen: false,
-      categories: COLUMN_CATEGORIES
+      categories: COLUMN_CATEGORIES,
+      currentColumns: DEFAULT_COLUMNS
     }
   },
   methods: {
-    ...mapActions('contacts', ['columnHeadersClose']),
+    ...mapActions('contacts', ['columnsClose', 'columnsUpdated']),
     onSearch (searchText) {
       this.searchText = searchText
     },
@@ -183,28 +187,48 @@ export default {
     onClickedColumn (column, selected) {
       if (column.required) return
       if (selected) {
-        this.columns = this.columns.filter((c) => c.name !== column.name)
+        this.currentColumns = this.currentColumns.filter(
+          (c) => c.name !== column.name
+        )
       } else {
-        const lastIndex = this.columns.length - 1
-        const lastItem = this.columns[lastIndex]
+        const lastIndex = this.currentColumns.length - 1
+        const lastItem = this.currentColumns[lastIndex]
         const newItems = []
-        for (let i = 0; i < this.columns.length; i++) {
+        for (let i = 0; i < this.currentColumns.length; i++) {
           if (i === lastIndex) {
             newItems[lastIndex] = column
             newItems[lastIndex + 1] = lastItem
           } else {
-            newItems[i] = this.columns[i]
+            newItems[i] = this.currentColumns[i]
           }
         }
-        this.columns = newItems
+        this.currentColumns = newItems
       }
     },
+    closeAndMutate () {
+      this.columnsUpdated({
+        id: this.columns.id,
+        headers: this.currentColumns
+      })
+      this.columnsClose()
+    },
+    closeAndReset () {
+      this.columnsUpdated({
+        id: this.columns.id,
+        headers: DEFAULT_COLUMNS
+      })
+      this.columnsClose()
+    },
     onApplyChanges () {
+      if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+        this.closeAndMutate()
+        return
+      }
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columnsUpdating.id}`, {
-          ...this.columnsUpdating,
-          headers: this.columns,
+        .patch(`/api/v1/contacts-list/${this.columns.id}`, {
+          ...this.columns,
+          headers: this.currentColumns,
           filters: [] // TODO: use a
         })
         .then(() => {
@@ -213,7 +237,7 @@ export default {
             type: 'positive',
             textColor: 'white'
           })
-          this.columnHeadersClose()
+          this.closeAndMutate()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -229,10 +253,15 @@ export default {
         })
     },
     onResetAllColumns () {
+      if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+        this.closeAndReset()
+        return
+      }
+
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columnsUpdating.id}`, {
-          ...this.columnsUpdating,
+        .patch(`/api/v1/contacts-list/${this.columns.id}`, {
+          ...this.columns,
           headers: DEFAULT_COLUMNS,
           filters: [] // TODO: use actual values
         })
@@ -242,7 +271,7 @@ export default {
             type: 'positive',
             textColor: 'white'
           })
-          this.columnHeadersClose()
+          this.columnsClose()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -259,7 +288,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['columnsUpdating']),
+    ...mapGetters('contacts', ['columns']),
+    title () {
+      return `Manage ${String(this.columns?.name).toLowerCase()} columns`
+    },
     allColumns () {
       const columns = []
       let results = 0
@@ -284,28 +316,21 @@ export default {
       return { items: columns, results }
     },
     selected () {
-      if (Array.isArray(this.columns) && this.columns.length) {
-        return new Set([...this.columns.map((i) => i.name)])
+      if (Array.isArray(this.currentColumns) && this.currentColumns.length) {
+        return new Set([...this.currentColumns.map((i) => i.name)])
       } else {
         return new Set()
       }
     }
   },
   watch: {
-    columnsUpdating: function (value) {
-      console.log(value)
+    columns: function (value) {
       if (value && value.headers) {
-        this.columns = value.headers
+        this.currentColumns = value.headers
         this.isOpen = true
       } else {
         this.isOpen = false
-      }
-    },
-    columns: function (value) {
-      if (value.length < MIN_COLUMNS) {
-        this.errorMessage = `You need to have atleast ${MIN_COLUMNS} columns enabled`
-      } else {
-        this.errorMessage = ''
+        this.currentColumns = []
       }
     }
   }

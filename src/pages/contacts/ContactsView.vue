@@ -41,7 +41,6 @@
         >
           <i class="fa fa-chevron-down text-success mr-1"></i> Edit Columns
         </compact-btn>
-        <compact-btn variant="success">Save</compact-btn>
       </div>
     </template>
 
@@ -107,7 +106,7 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'columnHeadersOpen',
+      'columnsOpen',
       'openFilters',
       'contactsLoaded',
       'columnsReordered'
@@ -141,7 +140,7 @@ export default {
       this.checked = checked
     },
     onEditColumnsClicked () {
-      this.columnHeadersOpen({
+      this.columnsOpen({
         id: this.id,
         headers: this.columns,
         name: this.name

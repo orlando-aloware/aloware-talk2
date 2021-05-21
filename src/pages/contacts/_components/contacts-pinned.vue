@@ -7,7 +7,7 @@
     </div>
     <div class="d-flex pinned__content flex-column">
       <router-link
-        v-for="item in defaultList"
+        v-for="item in defaultContactList"
         :to="item.link"
         :key="item.id"
         v-slot="{ href, route, navigate, isActive, isExactActive }"
@@ -52,10 +52,10 @@
         >
           <div class="px-2 icon">
             <folder-static-icon
-              v-if="item.type === ContactListTypes.STATIC"
+              v-if="item.type === contactListType.STATIC"
             ></folder-static-icon>
             <folder-dynamic-icon
-              v-if="item.type === ContactListTypes.DYNAMIC"
+              v-if="item.type === contactListType.DYNAMIC"
             ></folder-dynamic-icon>
           </div>
           <div class="pr-3 flex-grow-1">{{ item.name }}</div>
@@ -76,7 +76,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
-import { STATIC, DYNAMIC } from 'src/constants/contacts-list-types'
+import { STATIC, DYNAMIC, DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
 
 export default {
   methods: {
@@ -102,23 +102,23 @@ export default {
       ])
         .then(([allContacts, myContacts, newleads, unanswered, unassigned]) => {
           this.pinnedCountLoaded({
-            id: 'allContacts',
+            id: DEFAULT_CONTACT_LIST.ALL_CONTACTS.id,
             count: allContacts
           })
           this.pinnedCountLoaded({
-            id: 'myContacts',
+            id: DEFAULT_CONTACT_LIST.MY_CONTACTS.id,
             count: myContacts
           })
           this.pinnedCountLoaded({
-            id: 'newleads',
+            id: DEFAULT_CONTACT_LIST.NEWLEADS.id,
             count: newleads
           })
           this.pinnedCountLoaded({
-            id: 'unanswered',
+            id: DEFAULT_CONTACT_LIST.UNANSWERED.id,
             count: unanswered
           })
           this.pinnedCountLoaded({
-            id: 'unassigned',
+            id: DEFAULT_CONTACT_LIST.UNASSIGNED.id,
             count: unassigned
           })
         })
@@ -223,34 +223,8 @@ export default {
   data () {
     return {
       loading: false,
-      ContactListTypes: { STATIC, DYNAMIC },
-      defaultList: [
-        {
-          id: 'allContacts',
-          link: '/contacts',
-          name: 'All Contacts'
-        },
-        {
-          id: 'myContacts',
-          link: '/contacts/my-contacts',
-          name: 'My Contacts'
-        },
-        {
-          id: 'unassigned',
-          name: 'Unassigned Contacts',
-          link: '/contacts/unassigned'
-        },
-        {
-          id: 'unanswered',
-          name: 'Unanswered Contacts',
-          link: '/contacts/unanswered'
-        },
-        {
-          id: 'newleads',
-          name: 'New Leads',
-          link: '/contacts/new-leads'
-        }
-      ]
+      contactListType: { STATIC, DYNAMIC },
+      defaultContactList: Object.values(DEFAULT_CONTACT_LIST)
     }
   },
   mounted () {
