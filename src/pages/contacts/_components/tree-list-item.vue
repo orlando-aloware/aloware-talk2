@@ -3,8 +3,12 @@
     <div class="folder d-flex align-items-center">
       <div class="folder__indent" :style="indentStyle"></div>
       <div class="folder__icon">
-        <folder-static-icon v-if="type === 'static'"></folder-static-icon>
-        <folder-dynamic-icon v-if="type === 'dynamic'"></folder-dynamic-icon>
+        <folder-static-icon
+          v-if="type === ContactListTypes.STATIC"
+        ></folder-static-icon>
+        <folder-dynamic-icon
+          v-if="type === ContactListTypes.DYNAMIC"
+        ></folder-dynamic-icon>
       </div>
       <div class="folder__name flex-grow-1" @click.prevent="onClickItem">
         {{ name }}
@@ -35,6 +39,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderOption from 'src/components/icons/folder-option.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
@@ -73,7 +78,9 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      ContactListTypes
+    }
   },
   methods: {
     ...mapActions('contacts', ['removeListOpen']),
