@@ -284,11 +284,12 @@ export default {
     filters () {
       return {
         ...DEFAULT_FILTERS,
-        ...this.lists[this.id].filters,
+        ...this.listFilters,
         user_id:
           this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
             ? this.profile.id
-            : undefined
+            : undefined,
+        contact_list_id: this.$route.params.id ? this.$route.params.id : undefined
       }
     }
   },
