@@ -59,7 +59,7 @@ export default function () {
         total_contact_count: 0,
         unreads_count: 0
       },
-      newleads: {
+      newLeads: {
         current_page: 1,
         data: [],
         first_page_url: null,
@@ -91,7 +91,7 @@ export default function () {
         headers: DEFAULT_COLUMNS,
         filters: []
       },
-      newleads: {
+      newLeads: {
         headers: DEFAULT_COLUMNS,
         filters: []
       }
@@ -122,7 +122,7 @@ export default function () {
         total_contact_count: 0,
         unreads_count: 0
       },
-      newleads: { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
+      newLeads: { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
     },
     removeContact: null,
     removeFolder: null,

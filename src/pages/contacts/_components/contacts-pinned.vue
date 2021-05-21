@@ -254,7 +254,7 @@ export default {
         {
           id: 'newleads',
           name: 'New Leads',
-          link: '/contacts/newleads'
+          link: '/contacts/new-leads'
         }
       ]
     }

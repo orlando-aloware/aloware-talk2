@@ -7,7 +7,7 @@
           tag="tr"
           ghost-class="ghost"
           handle=".handle"
-          @ended="onOrderChanged"
+          @change="onOrderChanged"
           :move="onCheckMove"
         >
           <th

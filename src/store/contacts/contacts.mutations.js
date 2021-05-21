@@ -74,5 +74,14 @@ export default {
   },
   COLUMN_HEADERS_CLOSE: (state) => {
     state.columsUpdating = null
+  },
+  COLUMNS_REORDERED: (state, payload) => {
+    state.lists = {
+      ...state.lists,
+      [payload.id]: {
+        ...(state.lists[payload.id] || {}),
+        headers: payload.headers
+      }
+    }
   }
 }

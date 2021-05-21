@@ -52,5 +52,9 @@ export default {
   },
   columnHeadersClose: ({ commit }) => {
     commit('COLUMN_HEADERS_CLOSE')
+  },
+  columnsReordered: ({ commit }, payload) => {
+    console.log(11111)
+    commit('COLUMNS_REORDERED', payload)
   }
 }

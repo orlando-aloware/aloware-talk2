@@ -30,37 +30,43 @@ const routes = [
           {
             path: '',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/ContactIndex.vue')
+            component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
             path: 'my-contacts',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/MyContacts.vue')
+            component: () => import('src/pages/contacts/ContactsViewMy.vue')
           },
           {
-            path: 'newleads',
+            path: 'new-leads',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/NewLeads.vue')
+            component: () => import('src/pages/contacts/ContactsViewNew.vue')
           },
           {
             path: 'unanswered',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/UnansweredContacts.vue')
+            component: () => import('src/pages/contacts/ContactsViewUnanswered.vue')
           },
           {
             path: 'unassigned',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/UnassignedContacts.vue')
+            component: () =>
+              import('src/pages/contacts/ContactsViewUnassigned.vue')
           },
           {
-            path: 'list/:id',
+            path: 'list/:id(\\d+)+',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/PinnedContacts.vue')
+            component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
-            path: ':id',
+            path: ':id(\\d+)+',
             name: 'Contacts',
             component: () => import('src/pages/contacts/Contact.vue')
+          },
+          {
+            path: '*',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactsNotFound.vue')
           }
         ]
       },
