@@ -1,4 +1,4 @@
-import { DEFAULT_COLUMNS } from 'src/constants/columns'
+import { DEFAULT_COLUMNS } from 'src/constants/contacts-list-types'
 
 export default function () {
   return {
@@ -77,23 +77,31 @@ export default function () {
     lists: {
       allContacts: {
         headers: DEFAULT_COLUMNS,
-        filters: []
+        filters: {}
       },
       myContacts: {
         headers: DEFAULT_COLUMNS,
-        filters: []
+        filters: {
+          user_id: null
+        }
       },
       unassigned: {
         headers: DEFAULT_COLUMNS,
-        filters: []
+        filters: {
+          unassigned_leads: 1
+        }
       },
       unanswered: {
         headers: DEFAULT_COLUMNS,
-        filters: []
+        filters: {
+          has_unread: 1
+        }
       },
       newLeads: {
         headers: DEFAULT_COLUMNS,
-        filters: []
+        filters: {
+          is_new_lead: 1
+        }
       }
     },
     columns: null,

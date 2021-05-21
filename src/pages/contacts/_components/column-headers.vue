@@ -142,13 +142,13 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+
 import {
   ALL_COLUMNS,
   DEFAULT_COLUMNS,
-  COLUMN_CATEGORIES
-} from 'src/constants/columns'
-
-import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+  COLUMN_CATEGORIES,
+  DEFAULT_CONTACT_LIST
+} from 'src/constants/contacts-list-types'
 
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'

@@ -12,7 +12,7 @@
           @search="onSearch"
           :disabled="isLoadingDisabled"
         ></contacts-table-search>
-        <div class="px-3">
+        <div class="px-3" v-if="!isMyContactsView">
           <b-form-checkbox
             v-model="myContacts"
             name="check-button"
@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
@@ -84,6 +83,8 @@ import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
 import moment from 'moment'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
+import { DEFAULT_CONTACT_LIST, DEFAULT_FILTERS } from 'src/constants/contacts-list-types'
+import isPlainObject from 'lodash/isPlainObject'
 
 export default {
   components: {
@@ -203,16 +204,19 @@ export default {
     fetchContacts (params = {}) {
       return window.axios
         .get('api/v1/contact', {
-          params: createContactFilters(params)
+          params: this.createContactFilters(params)
         })
         .then((response) => response.data)
     },
     fetchContactsCount (params) {
       return window.axios
         .get('api/v1/contact/get-contacts-count', {
-          params: createContactFilters(params)
+          params: this.createContactFilters(params)
         })
         .then((response) => response.data)
+    },
+    createContactFilters (params) {
+      return Object.assign(this.filters, params)
     }
   },
   computed: {
@@ -231,8 +235,58 @@ export default {
     isEmpty () {
       return this.isLoaded && !this.listItems[this.id].data.length
     },
+    isMyContactsView () {
+      return DEFAULT_CONTACT_LIST.MY_CONTACTS.id === this.id
+    },
     columns () {
-      return this.lists[this.id].headers
+      try {
+        let headers = []
+        if (this.lists[this.id] && this.lists[this.id].headers) {
+          headers = this.lists[this.id].headers
+          if (typeof headers === 'string') {
+            headers = JSON.parse(headers)
+          }
+        }
+
+        if (!Array.isArray(headers)) {
+          throw new Error('Headers field is broken')
+        }
+
+        return headers
+      } catch (err) {
+        console.error(err)
+        return []
+      }
+    },
+    listFilters () {
+      try {
+        let filters = {}
+        if (this.lists[this.id] && this.lists[this.id].filters) {
+          filters = this.lists[this.id].filters
+          if (typeof filters === 'string') {
+            filters = JSON.parse(filters)
+          }
+        }
+
+        if (!isPlainObject(filters)) {
+          throw new Error('Filters field is broken')
+        }
+
+        return filters
+      } catch (err) {
+        console.error(err)
+        return {}
+      }
+    },
+    filters () {
+      return {
+        ...DEFAULT_FILTERS,
+        ...this.lists[this.id].filters,
+        user_id:
+          this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
+            ? this.profile.id
+            : undefined
+      }
     }
   },
   data () {

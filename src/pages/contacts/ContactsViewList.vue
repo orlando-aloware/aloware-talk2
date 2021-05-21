@@ -1,9 +1,9 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled">
     <template slot="title">
-      <div class="pr-2">{{ currentPinnedContactListName }}</div>
+      <div class="pr-2">{{ name }}</div>
       <span class="small text-muted"
-        >{{ totalContactsCount }} contacts found</span
+        >{{ listItems[id].total_contact_count }} contacts found</span
       >
     </template>
     <template slot="actions">
@@ -41,7 +41,6 @@
         >
           <i class="fa fa-chevron-down text-success mr-1"></i> Edit Columns
         </compact-btn>
-        <compact-btn variant="success">Save</compact-btn>
       </div>
     </template>
 
@@ -58,7 +57,7 @@
         @more="onLoadMore"
       >
         <table-row
-          v-for="(contact, index) in contactsListItems"
+          v-for="(contact, index) in listItems[id].data"
           :key="contact.id + index + Math.random()"
           :contact="contact"
           :columns="columns"
@@ -76,18 +75,15 @@
 </template>
 
 <script>
-import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
-import { DEFAULT_COLUMNS } from 'src/constants/columns'
-import * as ContactListTypes from '../../constants/contacts-list-types'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
 import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
 import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
 import moment from 'moment'
-import _ from 'lodash'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
+import { DEFAULT_CONTACT_LIST, DEFAULT_FILTERS } from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -98,22 +94,36 @@ export default {
     ImportContactsModal,
     TableRow
   },
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    }
+  },
   methods: {
     ...mapActions('contacts', [
-      'columnHeadersOpen',
+      'columnsOpen',
       'openFilters',
-      'contactsLoaded'
+      'contactsLoaded',
+      'columnsReordered'
     ]),
     onSortByField (orderBy) {
       this.isLoaded = false
       this.fetch({
         search_text: this.searchText,
-        page: this.myContacts.current_page,
+        page: this.listItems[this.id].current_page,
         comm_sort_by: Object.keys(orderBy).map((i) => `${i}:${orderBy[i]}`)
       })
     },
     onColumnsReordered (nextColumns) {
-      this.columns = nextColumns
+      this.columnsReordered({
+        id: this.id,
+        headers: nextColumns
+      })
     },
     onCheckAllItems (checked) {
       const items = []
@@ -130,10 +140,10 @@ export default {
       this.checked = checked
     },
     onEditColumnsClicked () {
-      this.columnHeadersOpen({
-        id: 1,
+      this.columnsOpen({
+        id: this.id,
         headers: this.columns,
-        name: 'All Contacts'
+        name: this.name
       })
     },
     onImportContactsClicked () {
@@ -145,17 +155,13 @@ export default {
     onLoadMore () {
       if (this.hasMore) {
         this.isLoadingMore = true
-        const nextPage = this.allContacts.current_page + 1
+        const nextPage = this.listItems[this.id].current_page + 1
         this.fetchContacts({
           page: nextPage,
           search_text: this.searchText
         })
           .then((data) => {
-            this.contactsLoaded({
-              id: this.$route.params.id,
-              append: true,
-              ...data
-            })
+            this.contactsLoaded({ id: this.id, append: true, ...data })
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -167,7 +173,7 @@ export default {
       this.fetch({
         user_id: checked ? this.profile.id : undefined,
         search_text: this.searchText,
-        page: this.allContacts.page
+        page: this.listItems[this.id].page
       })
     },
     onSearch (searchText) {
@@ -180,7 +186,7 @@ export default {
       Promise.all([this.fetchContacts(params), this.fetchContactsCount(params)])
         .then(([data, count]) => {
           this.contactsLoaded({
-            id: this.$route.params.id,
+            id: this.id,
             append: false,
             ...data,
             ...count
@@ -195,73 +201,50 @@ export default {
         })
     },
     fetchContacts (params = {}) {
-      const type = _.get(this.currentPinnedContactList, 'type', null)
-
-      if (!type) {
-        return []
-      }
-
-      if (type === ContactListTypes.STATIC) {
-        return window.axios
-          .get(`api/v1/contacts-list/${this.currentPinnedContactList.id}/items`)
-          .then((response) => response.data)
-      }
-
-      if (type === ContactListTypes.DYNAMIC) {
-        return window.axios
-          .get('api/v1/contact', {
-            params: createContactFilters(params)
-          })
-          .then((response) => response.data)
-      }
+      return window.axios
+        .get('api/v1/contact', {
+          params: this.createContactFilters(params)
+        })
+        .then((response) => response.data)
     },
     fetchContactsCount (params) {
-      return 0
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: this.createContactFilters(params)
+        })
+        .then((response) => response.data)
+    },
+    createContactFilters (params) {
+      return Object.assign(this.filters, params)
     }
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['allContacts', 'pinnedLists']),
+    ...mapGetters('contacts', ['lists', 'listItems']),
     hasMore () {
-      const hasNextPage = _.get(this.allContacts, 'next_page_url', null)
       return (
-        hasNextPage && !this.isLoadingMore && !this.isLoading
+        this.listItems[this.id].next_page_url &&
+        !this.isLoadingMore &&
+        !this.isLoading
       )
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
     },
-    contactsListItems () {
-      return _.get(this.allContacts, `${this.currentPinnedContactListId}.data`, [])
-    },
     isEmpty () {
-      const count = _.get(this.allContacts, `${this.currentPinnedContactListId}.data.length`, 0)
-      return this.isLoaded && !count
+      return this.isLoaded && !this.listItems[this.id].data.length
     },
-    totalContactsCount () {
-      return _.get(this.pinnedLists, this.$route.params.id, []).length
+    columns () {
+      return this.lists[this.id].headers
     },
-    currentPinnedContactListId () {
-      return _.get(this.$route, 'params.id', null)
-    },
-    currentPinnedContactList () {
-      let id = this.currentPinnedContactListId
-
-      if (!id) {
-        return {}
+    filters () {
+      return {
+        ...DEFAULT_FILTERS,
+        user_id:
+          this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
+            ? this.profile.id
+            : undefined
       }
-
-      id = parseInt(id)
-      const index = this.pinnedLists.findIndex(list => list.id === id)
-
-      if (index === -1) {
-        return {}
-      }
-
-      return _.get(this.pinnedLists, index, {})
-    },
-    currentPinnedContactListName () {
-      return _.get(this.currentPinnedContactList, 'name', '')
     }
   },
   data () {
@@ -272,15 +255,11 @@ export default {
       isLoadingMore: false,
       myContacts: false,
       searchText: '',
-      checked: [],
-      columns: DEFAULT_COLUMNS,
-      ContactListTypes
+      checked: []
     }
   },
-  watch: {
-    currentPinnedContactList (newValue, oldValue) {
-      this.fetch()
-    }
+  mounted () {
+    this.fetch()
   }
 }
 </script>
