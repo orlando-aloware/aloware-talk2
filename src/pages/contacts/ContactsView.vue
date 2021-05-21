@@ -83,7 +83,10 @@ import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
 import moment from 'moment'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
-import { DEFAULT_CONTACT_LIST, DEFAULT_FILTERS } from 'src/constants/contacts-list-types'
+import {
+  DEFAULT_CONTACT_LIST,
+  DEFAULT_FILTERS
+} from 'src/constants/contacts-list-types'
 import isPlainObject from 'lodash/isPlainObject'
 
 export default {
@@ -112,12 +115,12 @@ export default {
       'contactsLoaded',
       'columnsReordered'
     ]),
-    onSortByField (orderBy) {
+    onSortByField (sorts) {
       this.isLoaded = false
       this.fetch({
         search_text: this.searchText,
         page: this.listItems[this.id].current_page,
-        comm_sort_by: Object.keys(orderBy).map((i) => `${i}:${orderBy[i]}`)
+        comm_sort_by: `${sorts.orderBy}:${sorts.order}`
       })
     },
     onColumnsReordered (nextColumns) {
