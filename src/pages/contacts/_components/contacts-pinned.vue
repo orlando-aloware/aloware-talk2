@@ -28,14 +28,8 @@
           <div class="pr-2">
             <b-badge
               pill
-              :variant="
-                pinnedCounts[item.id].unreads_count
-                  ? 'danger'
-                  : 'light text-muted'
-              "
-              >{{
-                pinnedCounts[item.id].total_contact_count | fixCount
-              }}</b-badge
+              :variant="hasUnreads(item.id) ? 'danger' : 'light text-muted'"
+              >{{ getCount(item.id) | fixCount }}</b-badge
             >
           </div>
         </a>
@@ -180,7 +174,7 @@ export default {
         })
     },
     loadPinnedCounts (ids) {
-      return Promise.all(ids.map(id => this.loadPinnedCount(id)))
+      return Promise.all(ids.map((id) => this.loadPinnedCount(id)))
     },
     loadPinned () {
       this.loading = true
