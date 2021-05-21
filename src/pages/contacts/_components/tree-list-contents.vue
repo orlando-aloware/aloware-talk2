@@ -7,6 +7,8 @@
       :id="list.id"
       :layer="layer"
       :type="list.type"
+      :hasEdit="hasEdit"
+      :hasDelete="hasDelete"
     />
   </div>
 </template>
@@ -21,6 +23,12 @@ export default {
       type: Array
     },
     layer: {
+      type: Number
+    },
+    hasEdit: {
+      type: Number
+    },
+    hasDelete: {
       type: Number
     }
   }

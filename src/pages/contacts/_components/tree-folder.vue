@@ -61,6 +61,8 @@
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
       ></tree-list-contents>
     </div>
 

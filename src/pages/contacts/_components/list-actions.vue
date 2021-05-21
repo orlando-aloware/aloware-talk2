@@ -1,6 +1,6 @@
 <template>
   <contact-menu title="Actions">
-    <contact-menu-item @click="$emit('rename')">
+    <contact-menu-item @click="$emit('rename')" v-if="hasEdit">
       <template slot="icon">
         <pencil-icon></pencil-icon>
       </template>
@@ -10,7 +10,7 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="type === 'dynamic'"
+      v-if="type === ListTypes.DYNAMIC"
       @click="$emit('clone_static')"
     >
       <template slot="icon">
@@ -30,7 +30,7 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item @click="$emit('remove')">
+    <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
       <template slot="icon">
         <trash-icon></trash-icon>
       </template>
@@ -58,6 +58,7 @@ import plusIcon from 'src/components/icons/plus-icon.vue'
 import duplicateIcon from 'src/components/icons/duplicate-icon.vue'
 import TrashIcon from 'src/components/icons/trash-icon.vue'
 import PinIcon from 'src/components/icons/pin-icon.vue'
+import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -69,21 +70,24 @@ export default {
     TrashIcon,
     PinIcon
   },
-  props: {
-    id: {
-      type: Number
-    },
-    type: {
-      type: String,
-      required: true
+  data () {
+    return {
+      ListTypes: {
+        DYNAMIC,
+        STATIC
+      }
     }
   },
-  data () {
-    return {}
-  },
-  methods: {
-    onClickOption (action) {
-      alert(action)
+  props: {
+    type: {
+      type: Number,
+      required: true
+    },
+    hasEdit: {
+      type: Number
+    },
+    hasDelete: {
+      type: Number
     }
   }
 }

@@ -10,8 +10,21 @@
           v-if="type === ContactListTypes.DYNAMIC"
         ></folder-dynamic-icon>
       </div>
-      <div class="folder__name flex-grow-1" @click.prevent="onClickItem">
-        {{ name }}
+      <div class="folder__name flex-grow-1">
+        <input
+          :id="'folder-input-' + id"
+          v-if="isEditing"
+          type="text"
+          :value="name"
+          :disabled="isRenaming"
+          class="folder__input d-inline"
+          @blur="onInputBlur"
+          @keydown="onKeyDown"
+          autofocus
+        />
+        <span @click.prevent="onClickItem" v-if="!isEditing">
+          {{ name }}
+        </span>
       </div>
       <b-popover
         :target="'folder-option-' + id + '-' + layer"
@@ -21,9 +34,11 @@
         custom-class="contact-popover"
       >
         <list-actions
-          :id="id"
           :type="type"
           @remove="onRemoveList"
+          @rename="onRenameList"
+          :hasEdit="hasEdit"
+          :hasDelete="hasDelete"
         ></list-actions>
       </b-popover>
       <button
@@ -44,6 +59,9 @@ import FolderOption from 'src/components/icons/folder-option.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 import ListActions from './list-actions.vue'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+
+let inputTimeout
 
 export default {
   components: {
@@ -75,15 +93,96 @@ export default {
       type: Number,
       required: false,
       default: 1
+    },
+    hasEdit: {
+      type: Number
+    },
+    hasDelete: {
+      type: Number
     }
   },
   data () {
     return {
-      ContactListTypes
+      ContactListTypes,
+      isEditing: false,
+      isRenaming: false
     }
   },
+  beforeDestroy () {
+    clearTimeout(inputTimeout)
+  },
   methods: {
-    ...mapActions('contacts', ['removeListOpen']),
+    ...mapActions('contacts', ['removeListOpen', 'foldersLoaded', 'listLoaded']),
+    onRenameList () {
+      this.isEditing = true
+      inputTimeout = setTimeout(() => {
+        document.getElementById('folder-input-' + this.id).focus()
+      })
+    },
+    onKeyDown (evt) {
+      if (evt.keyCode === 13) {
+        this.updateListName(evt.target.value)
+      } else if (evt.keyCode === 27) {
+        this.isEditing = false
+        evt.target.value = this.name
+      }
+    },
+    onInputBlur (evt) {
+      if (evt.target.value !== this.name && evt.target.value !== '') {
+        this.updateListName(evt.target.value)
+      } else {
+        this.$nextTick(() => {
+          evt.target.value = this.name
+          this.isEditing = false
+        })
+      }
+    },
+    updateListName (name) {
+      if (this.isRenaming) return
+      this.isRenaming = true
+      return Promise.all([
+        this.updateListRequest(this.id, { name, order: this.order }),
+        this.reloadFolders()
+      ]).then(([listResponse]) => {
+        const list = listResponse.data.data
+        this.listLoaded(list)
+      }).finally(() => {
+        this.$nextTick(() => {
+          this.isEditing = false
+        })
+      })
+    },
+    updateListRequest (id, params) {
+      return window.axios
+        .patch('/api/v1/contacts-list/' + id, params)
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          this.$q.notify({
+            message,
+            type: 'negative',
+            textColor: 'white',
+            html
+          })
+        })
+    },
+    reloadFolders () {
+      return window.axios
+        .get('/api/v1/contact-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$q.notify({
+            message: 'Unable to load folders please try again.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
+    },
     onClickItem () {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
@@ -129,6 +228,17 @@ export default {
   }
   &__option {
     margin-top: -5px;
+  }
+  &__input {
+    font-size: 12px;
+    height: 100%;
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    &:focus {
+      outline-color: $green;
+      -moz-outline-radius: 0;
+    }
   }
 }
 </style>
