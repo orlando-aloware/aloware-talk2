@@ -135,18 +135,18 @@ export default {
 
       const isPinned = !this.isPinned
 
+      this.listPinToggled({
+        id: this.id,
+        isPinned
+      })
+
+      this.listLoaded({
+        id: this.id,
+        name: this.name,
+        type: this.type
+      })
+
       this.pinRequest(this.id, isPinned).then(() => {
-        this.listPinToggled({
-          id: this.id,
-          isPinned
-        })
-
-        this.listLoaded({
-          id: this.id,
-          name: this.name,
-          type: this.type
-        })
-
         this.$q.notify({
           message: isPinned ? 'Successfully pinned' : 'Successfully unpinned',
           type: 'positive',
