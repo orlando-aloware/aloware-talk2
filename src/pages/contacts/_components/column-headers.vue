@@ -253,8 +253,9 @@ export default {
         })
     },
     onResetAllColumns () {
+      this.closeAndReset()
+
       if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
-        this.closeAndReset()
         return
       }
 

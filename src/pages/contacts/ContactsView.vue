@@ -257,7 +257,7 @@ export default {
 
         return headers
       } catch (err) {
-        console.error(err)
+        console.log(err)
         return []
       }
     },
@@ -277,7 +277,7 @@ export default {
 
         return filters
       } catch (err) {
-        console.error(err)
+        console.log(err)
         return {}
       }
     },

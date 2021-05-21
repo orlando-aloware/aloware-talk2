@@ -18,7 +18,7 @@
       <td
         :key="column.name"
         class="datatable-row__name"
-        v-if="column.name === 'name'"
+        v-else-if="column.name === 'name'"
       >
         <div class="d-flex align-items-center">
           <div class="pr-2">
@@ -46,7 +46,7 @@
 
       <td
         :key="column.name"
-        v-if="column.name === 'phone_number'"
+        v-else-if="column.name === 'phone_number'"
         class="datatable-row__phone"
       >
         <span>
@@ -54,14 +54,18 @@
         </span>
       </td>
 
-      <td :key="column.name" v-if="column.name === 'last_engagement_text'">
+      <td :key="column.name" v-else-if="column.name === 'last_engagement_text'">
         <div>{{ contact.last_engagement_text }}</div>
         <div class="small text-muted">
           {{ moment(contact.last_engagement_at).format('LLL') }}
         </div>
       </td>
 
-      <td class="tags-cell" :key="column.name" v-if="column.name === 'tags'">
+      <td
+        class="tags-cell"
+        :key="column.name"
+        v-else-if="column.name === 'tags'"
+      >
         <template v-if="!contact.tags.length">
           <span class="text-muted">no tags available</span>
         </template>
@@ -99,7 +103,7 @@
       <td
         class="text-center"
         :key="column.name"
-        v-if="column.name === 'unread_count'"
+        v-else-if="column.name === 'unread_count'"
       >
         <span class="badge badge-danger">
           {{ contact.unread_count }}
@@ -109,7 +113,7 @@
       <td
         class="text-center datatable-row__actions"
         :key="column.name"
-        v-if="column.name === 'actions'"
+        v-else-if="column.name === 'actions'"
       >
         <div>
           <button
@@ -131,6 +135,10 @@
             <i class="fa fa-trash-alt"></i>
           </button>
         </div>
+      </td>
+
+      <td :key="column.name" v-else>
+        <div>{{ contact[column.name] }}</div>
       </td>
     </template>
   </tr>
