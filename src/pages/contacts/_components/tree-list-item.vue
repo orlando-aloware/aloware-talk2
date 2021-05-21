@@ -22,7 +22,11 @@
           @keydown="onKeyDown"
           autofocus
         />
-        <span @click.prevent="onClickItem" v-if="!isEditing">
+        <span
+          @click.prevent="onClickItem"
+          v-if="!isEditing"
+          class="d-block w-100 h-100"
+        >
           {{ name }}
         </span>
       </div>
@@ -37,8 +41,10 @@
           :type="type"
           @remove="onRemoveList"
           @rename="onRenameList"
+          @pin="onPin"
           :hasEdit="hasEdit"
           :hasDelete="hasDelete"
+          :isPinned="isPinned"
         ></list-actions>
       </b-popover>
       <button
@@ -53,7 +59,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderOption from 'src/components/icons/folder-option.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
@@ -71,10 +77,16 @@ export default {
     ListActions
   },
   computed: {
+    ...mapGetters('contacts', ['pinnedLists']),
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
       }
+    },
+    isPinned () {
+      return Array.isArray(this.pinnedLists)
+        ? this.pinnedLists.includes(this.id)
+        : false
     }
   },
   props: {
@@ -112,7 +124,40 @@ export default {
     clearTimeout(inputTimeout)
   },
   methods: {
-    ...mapActions('contacts', ['removeListOpen', 'foldersLoaded', 'listLoaded']),
+    ...mapActions('contacts', [
+      'removeListOpen',
+      'foldersLoaded',
+      'listLoaded',
+      'listPinToggled'
+    ]),
+    onPin () {
+      this.$root.$emit('bv::hide::popover')
+
+      const isPinned = !this.isPinned
+
+      this.pinRequest(this.id, isPinned).then(() => {
+        this.listPinToggled({
+          id: this.id,
+          isPinned
+        })
+
+        this.listLoaded({
+          id: this.id,
+          name: this.name,
+          type: this.type
+        })
+
+        this.$q.notify({
+          message: isPinned ? 'Successfully pinned' : 'Successfully unpinned',
+          type: 'positive',
+          textColor: 'white'
+        })
+      })
+    },
+    pinRequest (id, isPinned) {
+      const request = isPinned ? window.axios.post : window.axios.delete
+      return request('/api/v1/contact-list-bookmark/' + id)
+    },
     onRenameList () {
       this.isEditing = true
       inputTimeout = setTimeout(() => {
@@ -143,14 +188,16 @@ export default {
       return Promise.all([
         this.updateListRequest(this.id, { name, order: this.order }),
         this.reloadFolders()
-      ]).then(([listResponse]) => {
-        const list = listResponse.data.data
-        this.listLoaded(list)
-      }).finally(() => {
-        this.$nextTick(() => {
-          this.isEditing = false
+      ])
+        .then(([listResponse]) => {
+          const list = listResponse.data.data
+          this.listLoaded(list)
         })
-      })
+        .finally(() => {
+          this.$nextTick(() => {
+            this.isEditing = false
+          })
+        })
     },
     updateListRequest (id, params) {
       return window.axios

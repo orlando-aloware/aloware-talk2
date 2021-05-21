@@ -58,5 +58,8 @@ export default {
   },
   columnsUpdated: ({ commit }, payload) => {
     commit('COLUMNS_UPDATED', payload)
+  },
+  listPinToggled: ({ commit }, { id, isPinned }) => {
+    commit(isPinned ? 'LIST_PINNED' : 'LIST_UNPINNED', id)
   }
 }

@@ -44,7 +44,7 @@
         <pin-icon></pin-icon>
       </template>
       <template slot="title">
-        <span>Pin</span>
+        <span>{{ isPinned ? 'Unpin' : 'Pin'}}</span>
       </template>
     </contact-menu-item>
   </contact-menu>
@@ -88,6 +88,9 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    isPinned: {
+      type: Boolean
     }
   }
 }

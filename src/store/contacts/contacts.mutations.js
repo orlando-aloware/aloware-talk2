@@ -92,5 +92,11 @@ export default {
         ...rest
       }
     }
+  },
+  LIST_UNPINNED: (state, id) => {
+    state.pinned = state.pinned.filter((v) => v !== id)
+  },
+  LIST_PINNED: (state, id) => {
+    state.pinned = [...new Set(state.pinned.concat(id))]
   }
 }
