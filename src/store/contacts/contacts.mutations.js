@@ -63,7 +63,10 @@ export default {
   LIST_LOADED: (state, list) => {
     state.lists = {
       ...state.lists,
-      [String(list.id)]: { ...list }
+      [String(list.id)]: {
+        ...(state.lists[String[list.id]] || {}),
+        ...list
+      }
     }
   },
   PINNED_LOADED: (state, pinned) => {

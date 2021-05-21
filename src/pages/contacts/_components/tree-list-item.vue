@@ -1,35 +1,48 @@
 <template>
-  <div :data-layer="layer">
-    <div class="folder d-flex align-items-center">
-      <div class="folder__indent" :style="indentStyle"></div>
-      <div class="folder__icon">
-        <folder-static-icon
-          v-if="type === ContactListTypes.STATIC"
-        ></folder-static-icon>
-        <folder-dynamic-icon
-          v-if="type === ContactListTypes.DYNAMIC"
-        ></folder-dynamic-icon>
-      </div>
-      <div class="folder__name flex-grow-1">
-        <input
-          :id="'folder-input-' + id"
-          v-if="isEditing"
-          type="text"
-          :value="name"
-          :disabled="isRenaming"
-          class="folder__input d-inline"
-          @blur="onInputBlur"
-          @keydown="onKeyDown"
-          autofocus
-        />
-        <span
-          @click.prevent="onClickItem"
-          v-if="!isEditing"
-          class="d-block w-100 h-100"
+  <router-link
+    :to="'/contacts/list/' + id"
+    v-slot="{ navigate, isExactActive }"
+  >
+    <div :data-layer="layer">
+      <div
+        class="folder d-flex align-items-center"
+        :class="{ 'folder--active': isExactActive }"
+      >
+        <div class="folder__indent" :style="indentStyle"></div>
+        <div class="folder__icon">
+          <folder-static-icon
+            v-if="type === ContactListTypes.STATIC"
+          ></folder-static-icon>
+          <folder-dynamic-icon
+            v-if="type === ContactListTypes.DYNAMIC"
+          ></folder-dynamic-icon>
+        </div>
+        <div class="folder__name flex-grow-1">
+          <input
+            :id="'folder-input-' + id"
+            v-if="isEditing"
+            type="text"
+            :value="name"
+            :disabled="isRenaming"
+            class="folder__input d-inline"
+            @blur="onInputBlur"
+            @keydown="onKeyDown"
+            autofocus
+          />
+          <span @click="navigate" v-if="!isEditing" class="d-block w-100 h-100">
+            {{ name }}
+          </span>
+        </div>
+
+        <button
+          :tabindex="id"
+          :id="'folder-option-' + id + '-' + layer"
+          class="folder__option btn btn-link p-0"
         >
-          {{ name }}
-        </span>
+          <folder-option></folder-option>
+        </button>
       </div>
+
       <b-popover
         :target="'folder-option-' + id + '-' + layer"
         triggers="click blur"
@@ -47,15 +60,8 @@
           :isPinned="isPinned"
         ></list-actions>
       </b-popover>
-      <button
-        :tabindex="id"
-        :id="'folder-option-' + id + '-' + layer"
-        class="folder__option btn btn-link p-0"
-      >
-        <folder-option></folder-option>
-      </button>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script>
@@ -146,11 +152,14 @@ export default {
         type: this.type
       })
 
-      this.pinRequest(this.id, isPinned).then(() => {
-        this.$q.notify({
-          message: isPinned ? 'Successfully pinned' : 'Successfully unpinned',
-          type: 'positive',
-          textColor: 'white'
+      this.pinRequest(this.id, isPinned).finally(() => {
+        this.getContactList(this.id).then(response => {
+          this.listLoaded(response)
+          this.$q.notify({
+            message: isPinned ? 'Successfully pinned' : 'Successfully unpinned',
+            type: 'positive',
+            textColor: 'white'
+          })
         })
       })
     },
@@ -212,6 +221,20 @@ export default {
           })
         })
     },
+    getContactList (id) {
+      return window.axios
+        .get('/api/v1/contacts-list/' + id)
+        .then(response => response.data)
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          this.$q.notify({
+            message,
+            type: 'negative',
+            textColor: 'white',
+            html
+          })
+        })
+    },
     reloadFolders () {
       return window.axios
         .get('/api/v1/contact-folders')
@@ -258,7 +281,8 @@ export default {
     margin-top: -5px;
     margin-right: 5px;
   }
-  &:hover {
+  &:hover,
+  &--active {
     background-color: $light-green2;
   }
   &__name {
