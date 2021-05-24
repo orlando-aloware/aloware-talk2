@@ -30,6 +30,15 @@
       </template>
     </contact-menu-item>
 
+    <contact-menu-item @click="$emit('move')">
+      <template slot="icon">
+        <move-icon></move-icon>
+      </template>
+      <template slot="title">
+        <span class="move-item">Move</span>
+      </template>
+    </contact-menu-item>
+
     <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
       <template slot="icon">
         <trash-icon></trash-icon>
@@ -44,31 +53,33 @@
         <pin-icon></pin-icon>
       </template>
       <template slot="title">
-        <span>{{ isPinned ? 'Unpin' : 'Pin'}}</span>
+        <span>{{ isPinned ? 'Unpin' : 'Pin' }}</span>
       </template>
     </contact-menu-item>
   </contact-menu>
 </template>
 
 <script>
-import contactMenu from './contact-menu.vue'
-import contactMenuItem from './contact-menu-item.vue'
-import pencilIcon from 'src/components/icons/pencil-icon.vue'
-import plusIcon from 'src/components/icons/plus-icon.vue'
-import duplicateIcon from 'src/components/icons/duplicate-icon.vue'
+import ContactMenu from './contact-menu.vue'
+import ContactMenuItem from './contact-menu-item.vue'
+import PencilIcon from 'src/components/icons/pencil-icon.vue'
+import PlusIcon from 'src/components/icons/plus-icon.vue'
+import DuplicateIcon from 'src/components/icons/duplicate-icon.vue'
 import TrashIcon from 'src/components/icons/trash-icon.vue'
 import PinIcon from 'src/components/icons/pin-icon.vue'
 import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import MoveIcon from 'src/components/icons/move-icon.vue'
 
 export default {
   components: {
-    contactMenu,
-    contactMenuItem,
-    pencilIcon,
-    plusIcon,
-    duplicateIcon,
+    ContactMenu,
+    ContactMenuItem,
+    PencilIcon,
+    PlusIcon,
+    DuplicateIcon,
     TrashIcon,
-    PinIcon
+    PinIcon,
+    MoveIcon
   },
   data () {
     return {

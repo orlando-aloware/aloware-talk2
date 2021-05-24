@@ -12,5 +12,6 @@ export default {
   columnsUpdating: (state) => state.columnsUpdating,
   lists: (state) => state.lists,
   listItems: (state) => state.listItems,
-  columns: (state) => state.columns
+  columns: (state) => state.columns,
+  moveDialog: (state) => state.moveDialog
 }

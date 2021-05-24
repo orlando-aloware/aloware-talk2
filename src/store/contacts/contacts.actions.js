@@ -61,5 +61,11 @@ export default {
   },
   listPinToggled: ({ commit }, { id, isPinned }) => {
     commit(isPinned ? 'LIST_PINNED' : 'LIST_UNPINNED', id)
+  },
+  openMoveDialog: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_OPEN', payload)
+  },
+  closeMoveDialog: ({ commit }) => {
+    commit('MOVE_DIALOG_CLOSE')
   }
 }

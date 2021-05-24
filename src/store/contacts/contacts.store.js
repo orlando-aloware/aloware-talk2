@@ -72,6 +72,11 @@ export default function () {
     },
     removeContact: null,
     removeFolder: null,
-    removeList: null
+    removeList: null,
+    moveDialog: {
+      open: false,
+      id: null,
+      type: 'folder' // or list
+    }
   }
 }

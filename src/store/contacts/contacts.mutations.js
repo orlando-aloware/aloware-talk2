@@ -101,5 +101,11 @@ export default {
   },
   LIST_PINNED: (state, id) => {
     state.pinned = [...new Set(state.pinned.concat(id))]
+  },
+  MOVE_DIALOG_OPEN: (state, { id, type }) => {
+    state.moveDialog = { open: true, id, type }
+  },
+  MOVE_DIALOG_CLOSE: (state) => {
+    state.moveDialog = { open: false }
   }
 }

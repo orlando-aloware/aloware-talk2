@@ -36,6 +36,7 @@
 
         <button
           :tabindex="id"
+          :data-popper-target="'list-' + id"
           :id="'folder-option-' + id + '-' + layer"
           class="folder__option btn btn-link p-0"
         >
@@ -55,6 +56,7 @@
           @remove="onRemoveList"
           @rename="onRenameList"
           @pin="onPin"
+          @move="onMove"
           :hasEdit="hasEdit"
           :hasDelete="hasDelete"
           :isPinned="isPinned"
@@ -134,8 +136,16 @@ export default {
       'removeListOpen',
       'foldersLoaded',
       'listLoaded',
-      'listPinToggled'
+      'listPinToggled',
+      'openMoveDialog'
     ]),
+    onMove () {
+      this.$root.$emit('bv::hide::popover')
+      this.openMoveDialog({
+        id: this.id,
+        type: 'list'
+      })
+    },
     onPin () {
       this.$root.$emit('bv::hide::popover')
 
@@ -153,7 +163,7 @@ export default {
       })
 
       this.pinRequest(this.id, isPinned).finally(() => {
-        this.getContactList(this.id).then(response => {
+        this.getContactList(this.id).then((response) => {
           this.listLoaded(response)
           this.$q.notify({
             message: isPinned ? 'Successfully pinned' : 'Successfully unpinned',
@@ -224,7 +234,7 @@ export default {
     getContactList (id) {
       return window.axios
         .get('/api/v1/contacts-list/' + id)
-        .then(response => response.data)
+        .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
