@@ -77,23 +77,23 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import treeFolder from './tree-folder.vue'
-import contactMenu from './contact-menu.vue'
-import contactMenuItem from './contact-menu-item.vue'
-import folderIcon from 'src/components/icons/folder-icon.vue'
-import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
-import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
-import treeFolderCreate from './tree-folder-create.vue'
+import TreeFolder from './tree-folder.vue'
+import ContactMenu from './contact-menu.vue'
+import ContactMenuItem from './contact-menu-item.vue'
+import FolderIcon from 'src/components/icons/folder-icon.vue'
+import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
+import FolderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
+import TreeFolderCreate from './tree-folder-create.vue'
 
 export default {
   components: {
-    treeFolder,
-    contactMenu,
-    contactMenuItem,
-    folderIcon,
-    folderStaticIcon,
-    folderDynamicIcon,
-    treeFolderCreate
+    TreeFolder,
+    ContactMenu,
+    ContactMenuItem,
+    FolderIcon,
+    FolderStaticIcon,
+    FolderDynamicIcon,
+    TreeFolderCreate
   },
   data () {
     return {
