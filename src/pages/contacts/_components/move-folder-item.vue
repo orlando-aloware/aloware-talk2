@@ -75,13 +75,16 @@ export default {
   },
   data () {
     return {
-      isOpen: true
+      isOpen: false
     }
   },
   methods: {
     onToggleFolder () {
       this.isOpen = !this.isOpen
     }
+  },
+  mounted () {
+    this.isOpen = this.layer < 1
   }
 }
 </script>

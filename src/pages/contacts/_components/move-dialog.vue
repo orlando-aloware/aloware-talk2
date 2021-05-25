@@ -1,5 +1,8 @@
 <template>
   <div class="move-dialog shadow-sm" ref="moveDialog">
+    <div class="move-dialog-title">
+      Move {{ moveDialog.type === 'folder' ? 'Folder' : 'List' }}
+    </div>
     <div class="move-dialog-input">
       <div>
         <contacts-table-search
@@ -20,6 +23,9 @@
         :layer="0"
       />
     </div>
+    <div class="move-dialog-footer">
+      <compact-btn variant="success">Confirm</compact-btn>
+    </div>
   </div>
 </template>
 
@@ -28,13 +34,15 @@ import { createPopper } from '@popperjs/core'
 import { mapActions, mapGetters } from 'vuex'
 import MoveFolderItem from './move-folder-item.vue'
 import ContactsTableSearch from './contacts-table-search.vue'
+import CompactBtn from 'src/components/buttons/compact-btn.vue'
 
 let popperInstance
 
 export default {
   components: {
     MoveFolderItem,
-    ContactsTableSearch
+    ContactsTableSearch,
+    CompactBtn
   },
   data () {
     return {
@@ -50,7 +58,7 @@ export default {
           this.filterBySearchValue(this.itemsList, this.searchValue)
         )
       }
-      return this.filterByActiveId(this.folders)
+      return this.filterByActiveId(this.itemsList)
     }
   },
   methods: {
@@ -120,7 +128,7 @@ export default {
       this.$refs.moveDialog.classList.add('d-flex')
 
       popperInstance = createPopper(reference, this.$refs.moveDialog, {
-        placement: 'right-start'
+        placement: 'auto'
       })
 
       document.body.addEventListener('click', this.handleClick)
@@ -157,8 +165,13 @@ export default {
       }
     },
     folders: function (value) {
-      const itemsList = this.createFolders('', value)
-      console.log(itemsList)
+      const itemsList = this.createFolders('', [
+        {
+          id: null,
+          name: 'Root Folder',
+          child_folders: value
+        }
+      ])
       this.itemsList = itemsList
     }
   }
@@ -170,9 +183,8 @@ export default {
 @import 'src/css/variables.scss';
 .move-dialog {
   width: 258px;
-  height: 250px;
-  max-height: 435px;
-  overflow: hidden;
+  min-height: 300px;
+  max-height: calc(100vh - 200px);
   background: $white;
   border: solid 1px $grey-light;
   position: absolute;
@@ -180,6 +192,30 @@ export default {
   font-size: 12px;
   display: none;
   flex-direction: column;
+  z-index: 100;
+  &-title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-bottom: solid 1px $grey-light;
+    background-color: $grey-light2;
+    font-size: 12px;
+    min-height: 35px;
+  }
+  &-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top: solid 1px $grey-light;
+    background-color: $grey-light2;
+    font-size: 12px;
+    min-height: 35px;
+    letter-spacing: 0.5px;
+  }
   &-input {
     display: flex;
     align-items: center;
@@ -197,8 +233,8 @@ export default {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    height: 200px;
-    max-height: calc(100% - 50px);
+    min-height: calc(300px - 120px);
+    max-height: calc(100vh - 200px);
   }
 }
 </style>

@@ -5,6 +5,7 @@
       :name="folder.name"
       :key="folder.id"
       :id="folder.id"
+      :folders="folder.child_folders"
       :layer="layer"
     />
   </div>
