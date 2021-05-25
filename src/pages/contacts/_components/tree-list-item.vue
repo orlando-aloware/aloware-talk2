@@ -6,7 +6,7 @@
     <div :data-layer="layer">
       <div
         class="folder d-flex align-items-center"
-        :class="{ 'folder--active': isExactActive }"
+        :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
       >
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon">
@@ -85,7 +85,7 @@ export default {
     ListActions
   },
   computed: {
-    ...mapGetters('contacts', ['pinnedLists']),
+    ...mapGetters('contacts', ['pinnedLists', 'moveDialog']),
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
@@ -95,6 +95,9 @@ export default {
       return Array.isArray(this.pinnedLists)
         ? this.pinnedLists.includes(this.id)
         : false
+    },
+    isMoving () {
+      return this.id === this.moveDialog.id && this.moveDialog.type === 'list'
     }
   },
   props: {
@@ -292,6 +295,7 @@ export default {
     margin-right: 5px;
   }
   &:hover,
+  &--moving,
   &--active {
     background-color: $light-green2;
   }

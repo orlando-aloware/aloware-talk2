@@ -1,5 +1,5 @@
 <template>
-  <contact-menu title="Actions">
+  <contact-menu>
     <contact-menu-item @click="$emit('rename')" v-if="hasEdit">
       <template slot="icon">
         <pencil-icon></pencil-icon>
