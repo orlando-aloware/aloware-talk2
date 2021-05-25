@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="move-dialog shadow-sm"
-    ref="moveDialog"
-  >
+  <div class="move-dialog shadow-sm" ref="moveDialog">
     <div class="move-dialog-input">
       <div>
         <contacts-table-search
@@ -49,20 +46,35 @@ export default {
     ...mapGetters('contacts', ['moveDialog', 'folders']),
     searchedItemsList () {
       if (this.searchValue) {
-        return this.filterItems(this.itemsList, this.searchValue)
+        return this.filterByActiveId(
+          this.filterBySearchValue(this.itemsList, this.searchValue)
+        )
       }
-      return this.folders
+      return this.filterByActiveId(this.folders)
     }
   },
   methods: {
     ...mapActions('contacts', ['closeMoveDialog']),
-    filterItems (items, searchValue) {
+    filterByActiveId (items) {
+      return items
+        .filter((i) => i.id !== this.moveDialog.id)
+        .map((i) => {
+          return {
+            ...i,
+            child_folders: this.filterByActiveId(i.child_folders)
+          }
+        })
+    },
+    filterBySearchValue (items, searchValue) {
       return items
         .filter((i) => i.searchText.toLowerCase().indexOf(searchValue) !== -1)
         .map((i) => {
           return {
             ...i,
-            child_folders: this.filterItems(i.child_folders, searchValue)
+            child_folders: this.filterBySearchValue(
+              i.child_folders,
+              searchValue
+            )
           }
         })
     },
