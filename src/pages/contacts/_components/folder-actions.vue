@@ -16,14 +16,14 @@
         <span>New Folder</span>
       </template>
     </contact-menu-item>
-    <!-- <contact-menu-item>
+    <contact-menu-item @click="$emit('move')" v-if="hasEdit">
       <template slot="icon">
-        <permission-icon></permission-icon>
+        <move-icon></move-icon>
       </template>
       <template slot="title">
-        <span>Permissions</span>
+        <span class="move-item">Move</span>
       </template>
-    </contact-menu-item> -->
+    </contact-menu-item>
     <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
       <template slot="icon">
         <trash-icon></trash-icon>
@@ -37,21 +37,21 @@
 
 <script>
 import { mapActions } from 'vuex'
-import contactMenu from './contact-menu.vue'
-import contactMenuItem from './contact-menu-item.vue'
-import folderIcon from 'src/components/icons/folder-2-icon'
-import pencilIcon from 'src/components/icons/pencil-icon.vue'
-// import permissionIcon from 'src/components/icons/permission-icon.vue'
-import trashIcon from 'src/components/icons/trash-icon.vue'
+import ContactMenu from './contact-menu.vue'
+import ContactMenuItem from './contact-menu-item.vue'
+import FolderIcon from 'src/components/icons/folder-2-icon'
+import PencilIcon from 'src/components/icons/pencil-icon.vue'
+import MoveIcon from 'src/components/icons/move-icon.vue'
+import TrashIcon from 'src/components/icons/trash-icon.vue'
 
 export default {
   components: {
-    contactMenu,
-    contactMenuItem,
-    folderIcon,
-    pencilIcon,
-    // permissionIcon,
-    trashIcon
+    ContactMenu,
+    ContactMenuItem,
+    FolderIcon,
+    PencilIcon,
+    TrashIcon,
+    MoveIcon
   },
   props: {
     id: {

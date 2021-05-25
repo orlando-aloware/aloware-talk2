@@ -1,6 +1,9 @@
 <template>
   <div :data-layer="layer">
-    <div class="folder d-flex align-items-center">
+    <div
+      class="folder d-flex align-items-center"
+      :class="{ 'folder--moving': isMoving }"
+    >
       <div
         class="folder__indent"
         :style="indentStyle"
@@ -32,6 +35,7 @@
       </div>
 
       <button
+        :data-popper-target="'folder-' + id"
         :id="'folder-option-' + id"
         class="folder__option btn btn-link p-0"
         :class="{ 'folder__option--hide': isEditing }"
@@ -78,6 +82,7 @@
         @create="onCreateFolder"
         @edit="onEditFolder"
         @remove="onRemoveFolder"
+        @move="onMove"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
       />
@@ -114,9 +119,12 @@ export default {
         width: `${this.layer * 10}px`
       }
     },
-    ...mapGetters('contacts', ['opened']),
+    ...mapGetters('contacts', ['opened', 'moveDialog']),
     isOpen () {
       return this.opened.has(this.id)
+    },
+    isMoving () {
+      return this.id === this.moveDialog.id && this.moveDialog.type === 'folder'
     }
   },
   props: {
@@ -162,8 +170,16 @@ export default {
       'openFolder',
       'closeFolder',
       'removeFolderOpen',
-      'foldersLoaded'
+      'foldersLoaded',
+      'openMoveDialog'
     ]),
+    onMove () {
+      this.$root.$emit('bv::hide::popover')
+      this.openMoveDialog({
+        id: this.id,
+        type: 'folder'
+      })
+    },
     onKeyDown (evt) {
       if (evt.keyCode === 13) {
         this.updateFolderName(evt.target.value)
@@ -270,6 +286,9 @@ export default {
   &__icon {
     margin-top: -5px;
     margin-right: 5px;
+  }
+  &--moving {
+    background-color: $light-green2;
   }
   &:hover {
     background-color: $light-green2;

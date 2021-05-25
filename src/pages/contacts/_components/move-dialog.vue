@@ -1,5 +1,8 @@
 <template>
-  <div class="move-dialog shadow-sm" ref="moveDialog">
+  <div
+    class="move-dialog shadow-sm"
+    ref="moveDialog"
+  >
     <div class="move-dialog-input">
       <div>
         <contacts-table-search
@@ -96,8 +99,10 @@ export default {
     createDialogInstance (state) {
       this.searchValue = ''
 
+      const elId = state.type + '-' + state.id
+
       const reference = document.querySelector(
-        '[data-popper-target="list-' + state.id + '"]'
+        '[data-popper-target="' + elId + '"]'
       )
 
       this.$refs.moveDialog.classList.add('d-flex')
@@ -128,7 +133,7 @@ export default {
     }
   },
   beforeDestroy () {
-    document.body.removeEventListener('click', this.handleClick)
+    document.body.removeEventListener('focus', this.handleClick)
     this.destroyDialogInstance()
   },
   watch: {
