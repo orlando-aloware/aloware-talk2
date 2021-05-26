@@ -76,7 +76,8 @@ export default function () {
     moveDialog: {
       open: false,
       id: null,
-      type: 'folder' // or list
+      type: 'folder',
+      target: null
     }
   }
 }

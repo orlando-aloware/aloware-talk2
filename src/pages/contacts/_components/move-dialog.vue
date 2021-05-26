@@ -1,7 +1,12 @@
 <template>
   <div class="move-dialog shadow-sm" ref="moveDialog">
     <div class="move-dialog-title">
-      Move {{ moveDialog.type === 'folder' ? 'Folder' : 'List' }}
+      <div class="flex-grow-1">
+        Move {{ moveDialog.type === 'folder' ? 'Folder' : 'List' }}
+      </div>
+      <button class="btn btn-link move-dialog-close" @click="closeMoveDialog">
+        <i class="fa fa-times"></i>
+      </button>
     </div>
     <div class="move-dialog-input">
       <div>
@@ -24,7 +29,18 @@
       />
     </div>
     <div class="move-dialog-footer">
-      <compact-btn variant="success">Confirm</compact-btn>
+      <div class="text-muted small pr-2" v-if="hasSelected">
+        Would you like to continue?
+      </div>
+      <compact-btn variant="danger" v-if="hasSelected" class="mr-2"
+        >Yes</compact-btn
+      >
+      <compact-btn
+        variant="outlined-light"
+        v-if="hasSelected"
+        :onClick="closeMoveDialog"
+        >No</compact-btn
+      >
     </div>
   </div>
 </template>
@@ -59,6 +75,12 @@ export default {
         )
       }
       return this.filterByActiveId(this.itemsList)
+    },
+    hasSelected () {
+      return (
+        typeof this.moveDialog.target === 'number' &&
+        this.moveDialog.target >= 0
+      )
     }
   },
   methods: {
@@ -143,6 +165,7 @@ export default {
     },
     handleClick (evt) {
       if (
+        evt.target &&
         !this.$refs.moveDialog.contains(evt.target) &&
         !evt.target.classList.contains('contact-menu-item') &&
         !evt.target.classList.contains('move-item')
@@ -167,7 +190,7 @@ export default {
     folders: function (value) {
       const itemsList = this.createFolders('', [
         {
-          id: null,
+          id: 0,
           name: 'Root Folder',
           child_folders: value
         }
@@ -193,10 +216,21 @@ export default {
   display: none;
   flex-direction: column;
   z-index: 100;
+  &-close {
+    margin-right: -5px;
+    padding: 5px 5px 5px 5px;
+    display: inline-flex;
+    align-items: center;
+    color: $grey-mid;
+    text-decoration: none;
+    &:hover,
+    &:active {
+      text-decoration: none;
+    }
+  }
   &-title {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     padding-left: 10px;
     padding-right: 10px;
     border-bottom: solid 1px $grey-light;
@@ -214,7 +248,6 @@ export default {
     background-color: $grey-light2;
     font-size: 12px;
     min-height: 35px;
-    letter-spacing: 0.5px;
   }
   &-input {
     display: flex;

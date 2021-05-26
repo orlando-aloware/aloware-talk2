@@ -1,6 +1,9 @@
 <template>
   <div :data-layer="layer">
-    <div class="folder d-flex align-items-center">
+    <div
+      class="folder d-flex align-items-center"
+      :class="{ 'folder--target': isTarget }"
+    >
       <div
         class="folder__indent"
         :style="indentStyle"
@@ -19,6 +22,11 @@
           {{ name }}
         </div>
       </div>
+
+      <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
+        <i class="fa fa-circle small" v-if="!isTarget"></i>
+        <i class="fa fa-check-circle text-success small" v-if="isTarget"></i>
+      </button>
     </div>
 
     <div
@@ -38,6 +46,7 @@
 import FolderIcon from 'src/components/icons/folder-icon.vue'
 import FolderArrowOpenIcon from 'src/components/icons/folder-arrow-open-icon.vue'
 import FolderArrowCloseIcon from 'src/components/icons/folder-arrow-close-icon.vue'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -47,11 +56,40 @@ export default {
     MoveFolderLists: () => import('./move-folder-lists.vue')
   },
   computed: {
+    ...mapGetters('contacts', ['moveDialog']),
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
       }
+    },
+    isTarget () {
+      return this.moveDialog.target === this.id
+    },
+    isTargetable () {
+      if (this.moveDialog.type === 'list') {
+        return this.id > 0
+      }
+      return true
     }
+  },
+  data () {
+    return {
+      isOpen: false
+    }
+  },
+  methods: {
+    ...mapActions('contacts', ['setMoveDialogTarget']),
+    onToggleFolder () {
+      this.isOpen = !this.isOpen
+    },
+    onTarget () {
+      this.setMoveDialogTarget({
+        target: this.id
+      })
+    }
+  },
+  mounted () {
+    this.isOpen = this.layer < 1
   },
   props: {
     id: {
@@ -72,19 +110,6 @@ export default {
     order: {
       type: Number
     }
-  },
-  data () {
-    return {
-      isOpen: false
-    }
-  },
-  methods: {
-    onToggleFolder () {
-      this.isOpen = !this.isOpen
-    }
-  },
-  mounted () {
-    this.isOpen = this.layer < 1
   }
 }
 </script>
@@ -94,7 +119,7 @@ export default {
 @import 'src/css/variables.scss';
 .folder {
   padding-left: 10px;
-  padding-right: 10px;
+  padding-right: 0px;
   min-height: 34px;
   cursor: pointer;
   user-select: none;
@@ -106,6 +131,9 @@ export default {
   &__icon {
     margin-top: -5px;
     margin-right: 5px;
+  }
+  &--target {
+    background-color: $light-green2;
   }
   &:hover {
     background-color: $light-green2;
@@ -127,10 +155,20 @@ export default {
     width: 10px;
   }
   &__option {
-    margin-top: -5px;
-    &--hide {
-      width: 0;
-      overflow: hidden;
+    line-height: 0;
+    height: 34px;
+    width: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    &:hover,
+    &:active,
+    &:focus {
+      text-decoration: none !important;
+    }
+    i {
+      margin-top: 5px;
+      color: $grey-light4;
     }
   }
   &__input {

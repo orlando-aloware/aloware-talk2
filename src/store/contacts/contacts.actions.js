@@ -67,5 +67,8 @@ export default {
   },
   closeMoveDialog: ({ commit }) => {
     commit('MOVE_DIALOG_CLOSE')
+  },
+  setMoveDialogTarget: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_TARGET', payload)
   }
 }

@@ -107,5 +107,11 @@ export default {
   },
   MOVE_DIALOG_CLOSE: (state) => {
     state.moveDialog = { open: false }
+  },
+  MOVE_DIALOG_TARGET: (state, { target }) => {
+    state.moveDialog = {
+      ...state.moveDialog,
+      target: target === state.moveDialog.target ? null : target
+    }
   }
 }

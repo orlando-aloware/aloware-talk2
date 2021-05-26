@@ -30,7 +30,7 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item @click="$emit('move')">
+    <contact-menu-item @click="$emit('move')" v-if="hasEdit">
       <template slot="icon">
         <move-icon></move-icon>
       </template>
