@@ -99,7 +99,7 @@ export default {
     moveFolderRequest () {
       return window.axios
         .patch('/api/v1/contact-folder/move/' + this.moveDialog.id, {
-          parent_id: this.moveDialog.target
+          parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
         .then(this.reloadFolders)
         .catch(this.handleRequestError)
