@@ -43,10 +43,10 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'src/components/icons/folder-icon.vue'
 import FolderArrowOpenIcon from 'src/components/icons/folder-arrow-open-icon.vue'
 import FolderArrowCloseIcon from 'src/components/icons/folder-arrow-close-icon.vue'
-import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
