@@ -70,5 +70,11 @@ export default {
   },
   setMoveDialogTarget: ({ commit }, payload) => {
     commit('MOVE_DIALOG_TARGET', payload)
+  },
+  createListOpen: ({ commit }, payload) => {
+    commit('CREATE_LIST_OPEN', payload)
+  },
+  createListClose: ({ commit }) => {
+    commit('CREATE_LIST_CLOSE')
   }
 }

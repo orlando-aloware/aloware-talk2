@@ -20,30 +20,48 @@
         </button>
       </div>
 
-      <div class="mt-4 mb-4">
-        <input type="text" class="form-control" placeholder="Name..." autofocus />
+      <div class="pt-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Untitled List"
+          autofocus
+          v-model="name"
+        />
       </div>
 
-      <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" id="dynamicList" />
-        <label for="dynamicList">
-          <div class="create-list-modal__list-title">Dynamic List</div>
-          <div class="create-list-modal__list-desc">
-            Automatically updates based off a filter; contacts join or leave as
-            their properties change
-          </div>
-        </label>
-      </div>
+      <div class="flex-grow-1 py-4">
+        <div class="form-check mb-2" @click="type = 'dynamic'">
+          <input
+            class="form-check-input"
+            type="radio"
+            id="dynamicList"
+            :checked="type === 'dynamic'"
+          />
+          <label for="dynamicList">
+            <div class="create-list-modal__list-title">Dynamic List</div>
+            <div class="create-list-modal__list-desc">
+              Automatically updates based off a filter; contacts join or leave
+              as their properties change
+            </div>
+          </label>
+        </div>
 
-      <div class="form-check mb-4">
-        <input class="form-check-input" type="radio" id="staticList" />
-        <label for="staticList">
-          <div class="create-list-modal__list-title">Static List</div>
-          <div class="create-list-modal__list-desc">
-            Automatically updates based off a filter; contacts join or leave as
-            their properties change
-          </div>
-        </label>
+        <div class="form-check" @click="type = 'static'">
+          <input
+            class="form-check-input"
+            type="radio"
+            id="staticList"
+            :checked="type === 'static'"
+          />
+          <label for="staticList">
+            <div class="create-list-modal__list-title">Static List</div>
+            <div class="create-list-modal__list-desc">
+              Automatically updates based off a filter; contacts join or leave
+              as their properties change
+            </div>
+          </label>
+        </div>
       </div>
 
       <div class="d-flex align-items-center">
@@ -69,7 +87,9 @@ export default {
   },
   data () {
     return {
-      isOpen: true
+      isOpen: true,
+      name: null,
+      type: 'dynamic'
     }
   }
 }
@@ -85,8 +105,11 @@ export default {
       max-width: 650px;
     }
   }
+  .modal-body {
+    padding: 0;
+  }
   &__body {
-    padding: 20px;
+    padding: 40px;
   }
   &__title {
     font-size: 18px;
@@ -95,7 +118,7 @@ export default {
   }
   &__close {
     margin-right: -15px;
-    margin-top: -15px;
+    margin-top: -30px;
   }
   &__list-title {
     font-size: 14px;

@@ -113,5 +113,11 @@ export default {
       ...state.moveDialog,
       target: target === state.moveDialog.target ? null : target
     }
+  },
+  CREATE_LIST_OPEN: (state, payload) => {
+    state.createList = { ...state.createList, ...payload }
+  },
+  CREATE_LIST_CLOSE: (state) => {
+    state.createList = { folderId: null, open: false }
   }
 }

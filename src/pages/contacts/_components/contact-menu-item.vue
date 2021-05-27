@@ -9,6 +9,9 @@
     <div class="contact-menu-item__title flex-grow-1 move-item">
       <slot name="title"></slot>
     </div>
+    <div class="contact-menu-item__suffix">
+      <slot name="suffix"></slot>
+    </div>
   </div>
 </template>
 

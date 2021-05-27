@@ -78,6 +78,10 @@ export default function () {
       id: null,
       type: 'folder',
       target: null
+    },
+    createList: {
+      open: false,
+      folderId: null
     }
   }
 }

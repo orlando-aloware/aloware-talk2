@@ -13,5 +13,6 @@ export default {
   lists: (state) => state.lists,
   listItems: (state) => state.listItems,
   columns: (state) => state.columns,
-  moveDialog: (state) => state.moveDialog
+  moveDialog: (state) => state.moveDialog,
+  createList: (state) => state.createList
 }

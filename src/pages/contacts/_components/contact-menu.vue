@@ -29,7 +29,6 @@ export default {
 @import 'src/css/variables.scss';
 .contact-menu {
   width: 200px;
-  min-height: 130px;
   padding-top: 5px;
   &__title {
     padding-left: 2px;

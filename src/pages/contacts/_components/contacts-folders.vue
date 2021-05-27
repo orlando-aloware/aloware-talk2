@@ -14,7 +14,7 @@
         boundary="window"
         custom-class="contact-popover"
       >
-        <contact-menu title="New">
+        <contact-menu>
           <contact-menu-item @click="onCreateFolderToggle">
             <template slot="icon">
               <folder-icon></folder-icon>
