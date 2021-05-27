@@ -115,7 +115,7 @@ export default {
     }
   },
   CREATE_LIST_OPEN: (state, payload) => {
-    state.createList = { ...state.createList, ...payload }
+    state.createList = { ...state.createList, ...payload, open: true }
   },
   CREATE_LIST_CLOSE: (state) => {
     state.createList = { folderId: null, open: false }

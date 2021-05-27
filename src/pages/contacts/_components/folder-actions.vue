@@ -43,7 +43,7 @@
         </template>
       </contact-menu-item>
 
-      <contact-menu-item @click="$emit('create-list')" v-if="hasEdit">
+      <contact-menu-item @click="$emit('createlist')" v-if="hasEdit">
         <template slot="icon">
           <people-icon></people-icon>
         </template>

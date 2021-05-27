@@ -2,7 +2,7 @@
   <div :data-layer="layer">
     <div
       class="folder d-flex align-items-center"
-      :class="{ 'folder--moving': isMoving }"
+      :class="{ 'folder--selected': isSelected }"
     >
       <div
         class="folder__indent"
@@ -83,6 +83,7 @@
         @edit="onEditFolder"
         @remove="onRemoveFolder"
         @move="onMove"
+        @createlist="onCreateList"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
       />
@@ -103,30 +104,6 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 let inputTimeout
 
 export default {
-  components: {
-    FolderIcon,
-    FolderArrowOpenIcon,
-    FolderArrowCloseIcon,
-    treeFolderContents: () => import('./tree-folder-contents.vue'),
-    treeListContents: () => import('./tree-list-contents.vue'),
-    FolderOption,
-    FolderActions,
-    TreeFolderCreate
-  },
-  computed: {
-    indentStyle () {
-      return {
-        width: `${this.layer * 10}px`
-      }
-    },
-    ...mapGetters('contacts', ['opened', 'moveDialog']),
-    isOpen () {
-      return this.opened.has(this.id)
-    },
-    isMoving () {
-      return this.id === this.moveDialog.id && this.moveDialog.type === 'folder'
-    }
-  },
   props: {
     id: {
       type: Number
@@ -157,6 +134,33 @@ export default {
       type: Number
     }
   },
+  components: {
+    FolderIcon,
+    FolderArrowOpenIcon,
+    FolderArrowCloseIcon,
+    treeFolderContents: () => import('./tree-folder-contents.vue'),
+    treeListContents: () => import('./tree-list-contents.vue'),
+    FolderOption,
+    FolderActions,
+    TreeFolderCreate
+  },
+  computed: {
+    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList']),
+    indentStyle () {
+      return {
+        width: `${this.layer * 10}px`
+      }
+    },
+    isOpen () {
+      return this.opened.has(this.id)
+    },
+    isSelected () {
+      return (
+        (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
+        (this.createList.open && this.createList.folderId === this.id)
+      )
+    }
+  },
   data () {
     return {
       isCreatingFolder: false,
@@ -171,7 +175,8 @@ export default {
       'closeFolder',
       'removeFolderOpen',
       'foldersLoaded',
-      'openMoveDialog'
+      'openMoveDialog',
+      'createListOpen'
     ]),
     onMove () {
       this.$root.$emit('bv::hide::popover')
@@ -179,6 +184,15 @@ export default {
         id: this.id,
         type: 'folder'
       })
+    },
+    onCreateList () {
+      this.$root.$emit('bv::hide::popover')
+
+      this.createListOpen({
+        folderId: this.id
+      })
+
+      this.onToggleFolder()
     },
     onKeyDown (evt) {
       if (evt.keyCode === 13) {
@@ -287,7 +301,7 @@ export default {
     margin-top: -5px;
     margin-right: 5px;
   }
-  &--moving {
+  &--selected {
     background-color: $light-green2;
   }
   &:hover {
