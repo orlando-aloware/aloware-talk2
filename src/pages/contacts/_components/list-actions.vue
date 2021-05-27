@@ -11,7 +11,7 @@
 
     <contact-menu-item
       v-if="type === ListTypes.DYNAMIC"
-      @click="$emit('clone_static')"
+      @click="$emit('clonestatic')"
     >
       <template slot="icon">
         <plus-icon></plus-icon>

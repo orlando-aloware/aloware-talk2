@@ -5,8 +5,9 @@
   >
     <div :data-layer="layer">
       <div
-        class="folder d-flex align-items-center"
+        :title="name"
         :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
+        class="folder d-flex align-items-center"
       >
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon">
@@ -17,7 +18,7 @@
             v-if="type === ContactListTypes.DYNAMIC"
           ></folder-dynamic-icon>
         </div>
-        <div class="folder__name flex-grow-1">
+        <div class="folder__name">
           <input
             :id="'folder-input-' + id"
             v-if="isEditing"
@@ -29,7 +30,7 @@
             @keydown="onKeyDown"
             autofocus
           />
-          <span @click="navigate" v-if="!isEditing" class="d-block w-100 h-100">
+          <span @click="navigate" v-if="!isEditing">
             {{ name }}
           </span>
         </div>
@@ -57,6 +58,8 @@
           @rename="onRenameList"
           @pin="onPin"
           @move="onMove"
+          @duplicate="onDuplicate"
+          @clonestatic="onCloneStatic"
           :hasEdit="hasEdit"
           :hasDelete="hasDelete"
           :isPinned="isPinned"
@@ -142,6 +145,47 @@ export default {
       'listPinToggled',
       'openMoveDialog'
     ]),
+    onDuplicate () {
+      this.$root.$emit('bv::hide::popover')
+      this.createList({
+        id: this.id,
+        type: this.type
+      })
+    },
+    onCloneStatic () {
+      this.$root.$emit('bv::hide::popover')
+      this.createList({
+        id: this.id,
+        type: ContactListTypes.STATIC
+      })
+    },
+    createList (params) {
+      window.axios
+        .post('/api/v1/contacts-list/' + this.id + '/duplicate', params)
+        .then((response) => {
+          const data = response.data.data
+          const message = response.data.message
+
+          this.$router.push(`/contacts/list/${data.id}`)
+
+          this.$q.notify({
+            message,
+            type: 'positive',
+            textColor: 'white'
+          })
+
+          this.reloadFolders()
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          this.$q.notify({
+            message,
+            type: 'negative',
+            textColor: 'white',
+            html
+          })
+        })
+    },
     onMove () {
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
@@ -280,8 +324,6 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 .folder {
-  padding-left: 10px;
-  padding-right: 10px;
   line-height: 34px;
   cursor: pointer;
   user-select: none;
@@ -300,10 +342,17 @@ export default {
     background-color: $light-green2;
   }
   &__name {
-    font-size: 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    width: calc(100% - 54px);
+    display: flex;
+    align-items: center;
+    span {
+      display: inline-block;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
   }
   &__sub {
     padding-left: 10px;
@@ -313,6 +362,7 @@ export default {
   }
   &__option {
     margin-top: -5px;
+    margin-left: -5px;
   }
   &__input {
     font-size: 12px;
