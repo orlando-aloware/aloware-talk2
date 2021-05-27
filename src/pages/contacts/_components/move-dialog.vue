@@ -33,7 +33,7 @@
         Would you like to continue?
       </div>
       <compact-btn
-        @click="onConfirmMove"
+        :onClick="onConfirmMove"
         variant="danger"
         v-if="hasSelected"
         class="mr-2"

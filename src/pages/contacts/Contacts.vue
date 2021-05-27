@@ -12,6 +12,7 @@
     <column-headers />
     <remove-contact />
     <move-dialog />
+    <create-list-modal />
   </div>
 </template>
 
@@ -23,6 +24,7 @@ import ContactsFilters from 'src/pages/contacts/_components/contacts-filters.vue
 import ColumnHeaders from './_components/column-headers.vue'
 import RemoveContact from './_components/remove-contact.vue'
 import MoveDialog from './_components/move-dialog.vue'
+import CreateListModal from './_components/create-list-modal.vue'
 
 export default {
   name: 'Contacts',
@@ -33,7 +35,8 @@ export default {
     RemoveContact,
     ContactsFilters,
     ColumnHeaders,
-    MoveDialog
+    MoveDialog,
+    CreateListModal
   }
 }
 </script>
