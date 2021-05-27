@@ -2,6 +2,8 @@
   <div
     class="contact-menu-item align-items-center d-flex px-2 move-item"
     @click="onClick"
+    @mouseover="onMouseOver"
+    @mouseleave="onMouseLeave"
   >
     <div class="contact-menu-item__icon pr-2">
       <slot name="icon"></slot>
@@ -20,6 +22,12 @@ export default {
   methods: {
     onClick () {
       this.$emit('click')
+    },
+    onMouseOver () {
+      this.$emit('mouseover')
+    },
+    onMouseLeave () {
+      this.$emit('mouseleave')
     }
   }
 }
