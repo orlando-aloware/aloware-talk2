@@ -1,13 +1,32 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled">
     <template slot="title">
-      <div>
-        <div class="pr-2">Add contacts to {{ contactList.name }}</div>
-        <div class="text-muted small">
+      <div class="d-flex flex-column">
+        <div class="d-flex align-items-center">
+          <router-link
+            :to="'/contacts/list/' + $route.params.id"
+            v-slot="{ href, navigate }"
+          >
+            <a
+              class="btn btn-link p-0 text-muted pr-2"
+              :href="href"
+              @click="navigate"
+            >
+              <i class="fa fa-chevron-left"></i>
+            </a>
+          </router-link>
+          Add contacts to
+          <span class="title-icon"
+            ><folder-static-icon height="20" width="20"
+          /></span>
+          {{ contactList.name }}
+        </div>
+        <div class="text-muted small action-desc">
           Manually select contacts or create a filter
         </div>
       </div>
     </template>
+
     <template slot="options">
       <div class="d-flex align-items-center">
         <div class="selected-contacts text-muted mr-2">
@@ -106,7 +125,7 @@ import ContactsScreen from './_components/contacts-screen.vue'
 import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
 import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
-
+import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 
 import {
@@ -124,7 +143,8 @@ export default {
     ContactsTableSearch,
     Datatable,
     ImportContactsModal,
-    TableRow
+    TableRow,
+    FolderStaticIcon
   },
   props: {
     contactList: {
@@ -260,8 +280,9 @@ export default {
         })
     },
     getSelectedContacts () {
-      return this.listItems[this.id].data
-        .filter((i) => this.checked.includes(i.id))
+      return this.listItems[this.id].data.filter((i) =>
+        this.checked.includes(i.id)
+      )
     },
     onCancel () {
       this.$router.push('/contacts/list/' + this.contactList.id)
@@ -384,8 +405,26 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+
+.title-icon {
+  padding-left: 5px;
+  padding-right: 5px;
+  svg {
+    path {
+      stroke: $dark;
+    }
+  }
+}
+
 .selected-contacts {
   font-size: 11px;
+}
+
+.action-desc {
+  padding-left: 20px;
 }
 </style>
