@@ -1,6 +1,6 @@
 <template>
   <confirm-dialog
-    title="Remove Contact"
+    :title="title"
     :isOpen="isRemoveContactOpen"
     id="remove-contact-dialog"
     @close="removeContactClose"
@@ -8,9 +8,7 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Are you sure you want to remove
-          <span class="font-weight-bold">{{ contactToRemove.name }}</span> from
-          this list?
+         <div v-html="message"></div>
         </div>
       </div>
     </div>
@@ -18,13 +16,14 @@
       <div class="d-flex w-100">
         <div class="flex-grow-1"></div>
         <button
-          class="btn btn-sm btn-outline-dark mr-2"
-          @click="removeContactClose"
+          class="btn btn-sm btn-outline-success mr-2"
+          @click="onRemoveFromList"
+          v-if="selectedList.type === '1'"
         >
-          Cancel
+          Remove From List Only
         </button>
-        <button class="btn btn-sm btn-danger mr-2" @click="onConfirm">
-          Remove
+        <button class="btn btn-sm btn-danger mr-2" @click="onRemoveFromContacts">
+          Remove Contact
         </button>
       </div>
     </div>
@@ -41,7 +40,25 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['isRemoveContactOpen', 'contactToRemove'])
+    ...mapGetters('contacts', ['isRemoveContactOpen', 'contactToRemove', 'selectedContacts', 'selectedList']),
+    title () {
+      if (this.contactToRemove) {
+        return 'Remove ' + (this.contactToRemove.contact.name ? this.contactToRemove.name : 'No Name') + '?'
+      }
+      // if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
+      //   return 'Remove ' + this.selectedContacts[this.selectedList.id].length + ' contacts?'
+      // }
+      return ''
+    },
+    message () {
+      if (this.contactToRemove) {
+        return 'Are you sure you want to remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
+      }
+      // if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
+      //   return `Are you sure you want to remove <span>${this.selectedContacts[this.selectedList.id].length}</span> contacts?`
+      // }
+      return ''
+    }
   },
   watch: {
     isRemoveContactOpen (isOpen) {
@@ -53,30 +70,16 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactClose']),
-    onConfirm () {
-      // TODO: refresh list
-      return window.axios
-        .delete(
-          '/api/v1/contact-list/' +
-            this.contactToRemove.contactListId +
-            '/items/' +
-            this.contactToRemove.id
-        )
-        .then(() => {
-          this.$q.notify({
-            message: 'Contact was successfully removed',
-            type: 'positive',
-            textColor: 'white'
-          })
-        })
-        .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to remove contact please try again.',
-            type: 'negative',
-            textColor: 'white'
-          })
-        }).finally(() => this.removeContactClose())
+    ...mapActions('contacts', ['removeContactClose', 'setContactRemoveActionType']),
+    onRemoveFromList () {
+      this.setContactRemoveActionType('remove_from_list')
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$bvModal.hide('remove-contact-dialog')
+    },
+    onRemoveFromContacts () {
+      this.setContactRemoveActionType('remove_from_contacts')
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$bvModal.hide('remove-contact-dialog')
     }
   }
 }

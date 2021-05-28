@@ -11,6 +11,7 @@
     <contacts-filters />
     <column-headers />
     <remove-contact />
+    <remove-contact-confirmation />
     <move-dialog />
   </div>
 </template>
@@ -22,6 +23,7 @@ import RemoveFolderDialog from 'src/pages/contacts/_components/remove-folder.vue
 import ContactsFilters from 'src/pages/contacts/_components/contacts-filters.vue'
 import ColumnHeaders from './_components/column-headers.vue'
 import RemoveContact from './_components/remove-contact.vue'
+import RemoveContactConfirmation from './_components/remove-contact-confirmation.vue'
 import MoveDialog from './_components/move-dialog.vue'
 
 export default {
@@ -31,6 +33,7 @@ export default {
     RemoveListDialog,
     RemoveFolderDialog,
     RemoveContact,
+    RemoveContactConfirmation,
     ContactsFilters,
     ColumnHeaders,
     MoveDialog

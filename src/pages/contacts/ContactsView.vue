@@ -43,6 +43,9 @@
         </compact-btn>
       </div>
     </template>
+    <template slot="actions">
+      <bulk-action-menu :id="id" v-if="checked.length > 0"></bulk-action-menu>
+    </template>
 
     <template slot="table">
       <datatable
@@ -88,9 +91,11 @@ import {
   DEFAULT_FILTERS
 } from 'src/constants/contacts-list-types'
 import isPlainObject from 'lodash/isPlainObject'
+import BulkActionMenu from 'pages/contacts/_components/bulk-action-menu'
 
 export default {
   components: {
+    BulkActionMenu,
     CompactBtn,
     ContactsScreen,
     ContactsTableSearch,
@@ -106,6 +111,10 @@ export default {
     name: {
       type: String,
       required: true
+    },
+    type: {
+      type: String,
+      required: true
     }
   },
   methods: {
@@ -113,7 +122,9 @@ export default {
       'columnsOpen',
       'openFilters',
       'contactsLoaded',
-      'columnsReordered'
+      'columnsReordered',
+      'setListSelectedContacts',
+      'setSelectedList'
     ]),
     onSortByField (sorts) {
       this.isLoaded = false
@@ -137,11 +148,10 @@ export default {
           .querySelectorAll('.checker')
           .forEach((checkbox) => items.push(Number(checkbox.value)))
       }
-
-      this.checked = items
+      this.setListSelectedContacts({ id: this.id, contacts: items })
     },
     onCheckedRows (checked) {
-      this.checked = checked
+      this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {
       this.columnsOpen({
@@ -224,7 +234,10 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts']),
+    checked () {
+      return this.selectedContacts[this.id] || []
+    },
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&
@@ -300,11 +313,11 @@ export default {
       isLoaded: false,
       isLoadingMore: false,
       myContacts: false,
-      searchText: '',
-      checked: []
+      searchText: ''
     }
   },
   mounted () {
+    this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
     this.fetch()
   },
   watch: {
