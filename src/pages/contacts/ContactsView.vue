@@ -1,11 +1,27 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled">
     <template slot="title">
-      <div class="pr-2">{{ name }}</div>
-      <span class="small text-muted"
-        >{{ listItems[id].total_contact_count }} contacts found</span
-      >
+      <div class="d-flex flex-column">
+        <div class="pr-2">{{ name }}</div>
+        <div class="small text-muted">
+          {{ listItems[id].total_contact_count }} contacts found
+        </div>
+      </div>
     </template>
+    <template slot="options">
+      <compact-btn variant="primary" v-if="type === ContactListType.STATIC">
+        <i class="fa fa-plus mr-2"></i> Add Contacts
+      </compact-btn>
+
+      <compact-btn
+        variant="primary"
+        v-if="type === ContactListType.DYNAMIC"
+        :onClick="onFiltersClicked"
+      >
+        <i class="fa fa-plus mr-2"></i> Add Filters
+      </compact-btn>
+    </template>
+
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <contacts-table-search
@@ -26,19 +42,19 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
-        <!-- <compact-btn
+        <compact-btn
           variant="primary"
           customClass="mr-2"
           :onClick="onFiltersClicked"
         >
-          <span class="px-2">Filters</span>
-        </compact-btn> -->
+          <i class="fa fa-list mr-2"></i> Manage Filters
+        </compact-btn>
         <compact-btn
           variant="outlined-light"
           customClass="mr-2"
           :onClick="onEditColumnsClicked"
         >
-          <i class="fa fa-chevron-down text-success mr-1"></i> Edit Columns
+          <i class="fa fa-cog text-success mr-1"></i> Edit Columns
         </compact-btn>
       </div>
     </template>
@@ -84,7 +100,9 @@ import moment from 'moment'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 import {
   DEFAULT_CONTACT_LIST,
-  DEFAULT_FILTERS
+  DEFAULT_FILTERS,
+  DYNAMIC,
+  STATIC
 } from 'src/constants/contacts-list-types'
 import isPlainObject from 'lodash/isPlainObject'
 
@@ -105,6 +123,18 @@ export default {
     name: {
       type: String,
       required: true
+    }
+  },
+  data () {
+    return {
+      moment,
+      isLoading: false,
+      isLoaded: false,
+      isLoadingMore: false,
+      myContacts: false,
+      searchText: '',
+      checked: [],
+      ContactListType: { STATIC, DYNAMIC }
     }
   },
   methods: {
@@ -260,6 +290,12 @@ export default {
         return []
       }
     },
+    type () {
+      if (this.lists[this.id]) {
+        return this.lists[this.id].type
+      }
+      return null
+    },
     listFilters () {
       try {
         let filters = {}
@@ -288,19 +324,10 @@ export default {
           this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
             ? this.profile.id
             : undefined,
-        contact_list_id: this.$route.params.id ? this.$route.params.id : undefined
+        contact_list_id: this.$route.params.id
+          ? this.$route.params.id
+          : undefined
       }
-    }
-  },
-  data () {
-    return {
-      moment,
-      isLoading: false,
-      isLoaded: false,
-      isLoadingMore: false,
-      myContacts: false,
-      searchText: '',
-      checked: []
     }
   },
   mounted () {

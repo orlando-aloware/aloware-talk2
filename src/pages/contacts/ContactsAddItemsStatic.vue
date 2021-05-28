@@ -70,20 +70,6 @@
             >{{ totalCount }} Contacts</span
           >
         </div>
-        <!-- <compact-btn
-          variant="primary"
-          customClass="mr-2"
-          :onClick="onFiltersClicked"
-        >
-          <span class="px-2">Filters</span>
-        </compact-btn>
-        <compact-btn
-          variant="outlined-light"
-          customClass="mr-2"
-          :onClick="onFiltersClicked"
-        >
-          <span class="px-2">Clear All</span>
-        </compact-btn> -->
       </div>
     </template>
 
