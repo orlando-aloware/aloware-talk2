@@ -13,8 +13,7 @@ export default {
   data () {
     return {
       id: 'all',
-      name: 'All Contacts',
-      type: 2
+      name: 'All Contacts'
     }
   },
   computed: {

@@ -128,10 +128,6 @@ export default {
     name: {
       type: String,
       required: true
-    },
-    type: {
-      type: String,
-      required: true
     }
   },
   data () {
@@ -142,7 +138,6 @@ export default {
       isLoadingMore: false,
       myContacts: false,
       searchText: '',
-      checked: [],
       ContactListType: { STATIC, DYNAMIC }
     }
   },
