@@ -250,7 +250,12 @@ export default {
           contacts: this.getSelectedContacts()
         })
         .then(() => {
-          this.$router.resolve('/contacts/list/' + this.contactList.id)
+          this.$router.push('/contacts/list/' + this.contactList.id)
+          this.$q.notify({
+            message: 'Selected contacts were successfully added',
+            type: 'positive',
+            textColor: 'white'
+          })
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)
