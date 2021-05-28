@@ -23,7 +23,7 @@ export default {
     state.removeList = list
   },
   REMOVE_CONTACT_OPEN: (state, contact) => {
-    state.removeContact = { ...state.removeContact, contact: contact }
+    state.removeContact = contact
   },
   REMOVE_FOLDER_CLOSE: (state) => {
     state.removeFolder = null
@@ -32,7 +32,7 @@ export default {
     state.removeList = null
   },
   REMOVE_CONTACT_CLOSE: (state) => {
-    state.removeContact = { ...state.removeContact, contact: null }
+    state.removeContact = null
   },
   FILTERS_CLOSE: (state) => {
     state.isFiltersOpen = false

@@ -142,7 +142,6 @@ export default {
       isLoadingMore: false,
       myContacts: false,
       searchText: '',
-      checked: [],
       ContactListType: { STATIC, DYNAMIC }
     }
   },
@@ -303,7 +302,7 @@ export default {
         return []
       }
     },
-    type () {
+    list_type () {
       if (this.lists[this.id]) {
         return this.lists[this.id].type
       }
@@ -349,6 +348,7 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
+      this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
       this.fetch(id)
     }
   }

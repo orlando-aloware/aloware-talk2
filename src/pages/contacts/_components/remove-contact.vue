@@ -43,20 +43,20 @@ export default {
     ...mapGetters('contacts', ['isRemoveContactOpen', 'contactToRemove', 'selectedContacts', 'selectedList']),
     title () {
       if (this.contactToRemove) {
-        return 'Remove ' + (this.contactToRemove.contact.name ? this.contactToRemove.name : 'No Name') + '?'
+        return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
-      // if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
-      //   return 'Remove ' + this.selectedContacts[this.selectedList.id].length + ' contacts?'
-      // }
+      if (this.selectedContacts[this.selectedList.id]) {
+        return 'Remove ' + this.selectedContacts[this.selectedList.id].length + ' contacts?'
+      }
       return ''
     },
     message () {
       if (this.contactToRemove) {
         return 'Are you sure you want to remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
-      // if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
-      //   return `Are you sure you want to remove <span>${this.selectedContacts[this.selectedList.id].length}</span> contacts?`
-      // }
+      if (this.selectedContacts[this.selectedList.id]) {
+        return `Are you sure you want to remove <span>${this.selectedContacts[this.selectedList.id].length}</span> contacts?`
+      }
       return ''
     }
   },

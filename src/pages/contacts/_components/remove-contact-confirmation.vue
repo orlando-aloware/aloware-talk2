@@ -53,7 +53,7 @@ export default {
         return 1
       }
 
-      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
+      if (this.selectedContacts[this.selectedList.id]) {
         return this.selectedContacts[this.selectedList.id].length
       }
 
@@ -84,13 +84,13 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case 'remove_from_list':
-          url = '/api/v1/contact-list/' +
-            this.contactToRemove.contact.contactListId +
+          url = '/api/v1/contact-list-item/' +
+            this.selectedList.id +
             '/items/' +
-            this.contactToRemove.contact.id
+            this.contactToRemove.id
           break
         case 'remove_from_contacts':
-          url = `/api/v1/contact/${this.contactToRemove.contact.id}`
+          url = `/api/v1/contact/${this.contactToRemove.id}`
           break
       }
       return window.axios
@@ -116,16 +116,14 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case 'remove_from_list':
-          url = '/api/v1/contact-list-item/bulk-delete'
+          url = `/api/v1/contact-list-item/bulk/${this.selectedList.id}`
           break
         case 'remove_from_contacts':
-          url = `/api/v1/contact/bulk-delete`
+          url = `/api/v1/contact/bulk`
           break
       }
       return window.axios
-        .delete(
-          url
-        )
+        .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id] } })
         .then(() => {
           this.$q.notify({
             message: 'Contacts was successfully removed.',
@@ -139,7 +137,10 @@ export default {
             type: 'negative',
             textColor: 'white'
           })
-        }).finally(() => this.$bvModal.hide('remove-contact-confirmation-dialog'))
+        }).finally(() => {
+          this.removeContactClose()
+          this.$bvModal.hide('remove-contact-confirmation-dialog')
+        })
     },
     onConfirm () {
       if (this.contactToRemove) {
