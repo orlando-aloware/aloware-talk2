@@ -141,7 +141,7 @@ export default {
   flex-direction: column;
   flex-grow: 1;
   min-height: 500px;
-  max-height: calc(100vh - 350px);
+  max-height: calc(100vh - 360px);
   &__header {
     min-height: 40px;
     font-size: 10px;
