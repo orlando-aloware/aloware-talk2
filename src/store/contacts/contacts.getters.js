@@ -5,7 +5,8 @@ export default {
   isRemoveListOpen: (state) => !!state.removeList,
   listToRemove: (state) => state.removeList || {},
   isRemoveContactOpen: (state) => !!state.removeContact,
-  contactToRemove: (state) => state.removeContact || {},
+  contactToRemove: (state) => state.removeContact,
+  removeContactActionType: (state) => state.removeContactActionType,
   pinnedLists: (state) => state.pinned,
   pinnedCounts: (state) => state.pinnedCounts,
   folders: (state) => state.folders,
@@ -14,5 +15,7 @@ export default {
   listItems: (state) => state.listItems,
   columns: (state) => state.columns,
   moveDialog: (state) => state.moveDialog,
+  selectedContacts: (state) => state.selectedContacts,
+  selectedList: (state) => state.selectedList,
   createList: (state) => state.createList
 }

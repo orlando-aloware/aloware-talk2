@@ -7,40 +7,50 @@ import {
 export default function () {
   return {
     listItems: {
-      allContacts: DEFAULT_CONTACT_LIST_ITEMS,
-      myContacts: DEFAULT_CONTACT_LIST_ITEMS,
+      all: DEFAULT_CONTACT_LIST_ITEMS,
+      'my-contacts': DEFAULT_CONTACT_LIST_ITEMS,
       unassigned: DEFAULT_CONTACT_LIST_ITEMS,
       unanswered: DEFAULT_CONTACT_LIST_ITEMS,
-      newLeads: DEFAULT_CONTACT_LIST_ITEMS
+      'new-leads': DEFAULT_CONTACT_LIST_ITEMS
     },
     lists: {
-      allContacts: {
+      all: {
         headers: DEFAULT_COLUMNS,
-        filters: {}
+        filters: {},
+        type: 2,
+        name: 'All Contacts'
       },
-      myContacts: {
+      'my-contacts': {
         headers: DEFAULT_COLUMNS,
         filters: {
           user_id: null
-        }
+        },
+        type: 2,
+        name: 'My Contacts'
       },
       unassigned: {
         headers: DEFAULT_COLUMNS,
         filters: {
           unassigned_leads: 1
-        }
+        },
+        type: 2,
+        name: 'Unassigned'
       },
       unanswered: {
         headers: DEFAULT_COLUMNS,
         filters: {
           has_unread: 1
-        }
+        },
+        type: 2,
+        name: 'Unanswered'
       },
-      newLeads: {
+      'new-leads': {
         headers: DEFAULT_COLUMNS,
         filters: {
           is_new_lead: 1
-        }
+        },
+        type: 2,
+        name: 'New Leads'
       },
       static: {
         headers: STATIC_COLUMNS,
@@ -53,12 +63,12 @@ export default function () {
     opened: [],
     pinned: [],
     pinnedCounts: {
-      allContacts: {
+      all: {
         new_leads_count: 0,
         total_contact_count: 0,
         unreads_count: 0
       },
-      myContacts: {
+      'my-contacts': {
         new_leads_count: 0,
         total_contact_count: 0,
         unreads_count: 0
@@ -73,9 +83,10 @@ export default function () {
         total_contact_count: 0,
         unreads_count: 0
       },
-      newLeads: { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
+      'new-leads': { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
     },
     removeContact: null,
+    removeContactActionType: null,
     removeFolder: null,
     removeList: null,
     moveDialog: {
@@ -83,6 +94,11 @@ export default function () {
       id: null,
       type: 'folder',
       target: null
+    },
+    selectedContacts: {},
+    selectedList: {
+      id: 'all',
+      name: 'All Contacts'
     },
     createList: {
       open: false,

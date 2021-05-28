@@ -33,25 +33,9 @@ const routes = [
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
-            path: 'my-contacts',
+            path: ':id(my-contacts|new-leads|unanswered|unassigned)+',
             name: 'Contacts',
-            component: () => import('src/pages/contacts/ContactsViewMy.vue')
-          },
-          {
-            path: 'new-leads',
-            name: 'Contacts',
-            component: () => import('src/pages/contacts/ContactsViewNew.vue')
-          },
-          {
-            path: 'unanswered',
-            name: 'Contacts',
-            component: () => import('src/pages/contacts/ContactsViewUnanswered.vue')
-          },
-          {
-            path: 'unassigned',
-            name: 'Contacts',
-            component: () =>
-              import('src/pages/contacts/ContactsViewUnassigned.vue')
+            component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
             path: 'list/:id(\\d+)+',

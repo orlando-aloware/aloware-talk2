@@ -71,6 +71,15 @@ export default {
   setMoveDialogTarget: ({ commit }, payload) => {
     commit('MOVE_DIALOG_TARGET', payload)
   },
+  setContactRemoveActionType: ({ commit }, payload) => {
+    commit('SET_CONTACT_REMOVE_ACTION_TYPE', payload)
+  },
+  setListSelectedContacts: ({ commit }, payload) => {
+    commit('SET_LIST_SELECTED_CONTACTS', payload)
+  },
+  setSelectedList: ({ commit }, payload) => {
+    commit('SET_SELECTED_LIST', payload)
+  },
   createListOpen: ({ commit }, payload) => {
     commit('CREATE_LIST_OPEN', payload)
   },

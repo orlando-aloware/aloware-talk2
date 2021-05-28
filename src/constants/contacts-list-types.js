@@ -3,12 +3,12 @@ export const DYNAMIC = 2
 
 export const DEFAULT_CONTACT_LIST = {
   ALL_CONTACTS: {
-    id: 'allContacts',
+    id: 'all',
     link: '/contacts',
     name: 'All Contacts'
   },
   MY_CONTACTS: {
-    id: 'myContacts',
+    id: 'my-contacts',
     link: '/contacts/my-contacts',
     name: 'My Contacts'
   },
@@ -23,7 +23,7 @@ export const DEFAULT_CONTACT_LIST = {
     link: '/contacts/unanswered'
   },
   NEWLEADS: {
-    id: 'newLeads',
+    id: 'new-leads',
     name: 'New Leads',
     link: '/contacts/new-leads'
   }
