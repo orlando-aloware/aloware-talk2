@@ -51,7 +51,7 @@
             >{{ totalCount }} Contacts</span
           >
         </div>
-        <compact-btn
+        <!-- <compact-btn
           variant="primary"
           customClass="mr-2"
           :onClick="onFiltersClicked"
@@ -64,7 +64,7 @@
           :onClick="onFiltersClicked"
         >
           <span class="px-2">Clear All</span>
-        </compact-btn>
+        </compact-btn> -->
       </div>
     </template>
 
@@ -239,7 +239,10 @@ export default {
     addSelectedContacts () {
       this.isLoading = true
       return window.axios
-        .post('api/v1/contact-list-item/bulk', this.getSelectedContacts())
+        .post('api/v1/contact-list-items', {
+          contact_list_id: this.contactList.id,
+          contacts: this.getSelectedContacts()
+        })
         .then(() => {
           this.$router.resolve('/contacts/list/' + this.contactList.id)
         })
@@ -259,15 +262,9 @@ export default {
     getSelectedContacts () {
       return this.listItems[this.id].data
         .filter((i) => this.checked.includes(i.id))
-        .map((i) => ({
-          contact_list_id: this.contactList.id,
-          contact_id: i.id,
-          contact_phone_number_id: i.contact_phone_number_id,
-          incoming_number_id: i.incoming_number_id
-        }))
     },
     onCancel () {
-      this.$router.resolve('/contacts/list/' + this.contactList.id)
+      this.$router.push('/contacts/list/' + this.contactList.id)
     },
     onSortByField (sorts) {
       this.isLoaded = false

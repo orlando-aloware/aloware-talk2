@@ -26,14 +26,13 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
-        <compact-btn
+        <!-- <compact-btn
           variant="primary"
           customClass="mr-2"
           :onClick="onFiltersClicked"
         >
-          <span class="mr-2">Filters</span>
-          <b-badge variant="light">4</b-badge>
-        </compact-btn>
+          <span class="px-2">Filters</span>
+        </compact-btn> -->
         <compact-btn
           variant="outlined-light"
           customClass="mr-2"
