@@ -318,6 +318,10 @@ export const ALL_COLUMNS = [
 
 export const DEFAULT_COLUMNS = ALL_COLUMNS.filter((c) => c.default)
 
+export const STATIC_COLUMNS = ALL_COLUMNS.filter(
+  (c) => c.default && c.name !== 'actions'
+)
+
 export const DEFAULT_FILTERS = {
   date_field: 'last_engagement_at',
   type: 'all',

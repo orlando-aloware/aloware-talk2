@@ -122,5 +122,11 @@ export default {
   },
   SET_SELECTED_LIST: (state, payload) => {
     state.selectedList = { ...state.selectedList, ...payload }
+  },
+  CREATE_LIST_OPEN: (state, payload) => {
+    state.createList = { ...state.createList, ...payload, open: true }
+  },
+  CREATE_LIST_CLOSE: (state) => {
+    state.createList = { folderId: null, open: false }
   }
 }

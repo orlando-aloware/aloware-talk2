@@ -14,7 +14,7 @@
         boundary="window"
         custom-class="contact-popover"
       >
-        <contact-menu title="New">
+        <contact-menu>
           <contact-menu-item @click="onCreateFolderToggle">
             <template slot="icon">
               <folder-icon></folder-icon>
@@ -24,21 +24,12 @@
             </template>
           </contact-menu-item>
 
-          <contact-menu-item>
+          <contact-menu-item @click="onCreateList">
             <template slot="icon">
-              <folder-static-icon></folder-static-icon>
+              <people-icon></people-icon>
             </template>
             <template slot="title">
-              <span>Static List</span>
-            </template>
-          </contact-menu-item>
-
-          <contact-menu-item>
-            <template slot="icon">
-              <folder-dynamic-icon></folder-dynamic-icon>
-            </template>
-            <template slot="title">
-              <span>Dynamic List</span>
+              <span>List</span>
             </template>
           </contact-menu-item>
         </contact-menu>
@@ -81,9 +72,8 @@ import TreeFolder from './tree-folder.vue'
 import ContactMenu from './contact-menu.vue'
 import ContactMenuItem from './contact-menu-item.vue'
 import FolderIcon from 'src/components/icons/folder-icon.vue'
-import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
-import FolderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 import TreeFolderCreate from './tree-folder-create.vue'
+import PeopleIcon from 'src/components/icons/people-icon.vue'
 
 export default {
   components: {
@@ -91,9 +81,8 @@ export default {
     ContactMenu,
     ContactMenuItem,
     FolderIcon,
-    FolderStaticIcon,
-    FolderDynamicIcon,
-    TreeFolderCreate
+    TreeFolderCreate,
+    PeopleIcon
   },
   data () {
     return {
@@ -102,9 +91,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['foldersLoaded']),
+    ...mapActions('contacts', ['foldersLoaded', 'createListOpen']),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
+    },
+    onCreateList () {
+      this.createListOpen({
+        folderId: null
+      })
     },
     loadFolders () {
       this.isLoading = false
@@ -147,7 +141,7 @@ export default {
   flex-direction: column;
   flex-grow: 1;
   min-height: 500px;
-  max-height: calc(100vh - 150px);
+  max-height: calc(100vh - 350px);
   &__header {
     min-height: 40px;
     font-size: 10px;

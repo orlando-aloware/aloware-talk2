@@ -80,6 +80,11 @@ import { STATIC, DYNAMIC, DEFAULT_CONTACT_LIST } from 'src/constants/contacts-li
 
 export default {
   methods: {
+    ...mapActions('contacts', [
+      'pinnedCountLoaded',
+      'pinnedLoaded',
+      'listLoaded'
+    ]),
     hasUnreads (id) {
       if (this.pinnedCounts[id] && this.pinnedCounts[id].unreads_count) {
         return true
@@ -202,12 +207,7 @@ export default {
 
           this.loading = false
         })
-    },
-    ...mapActions('contacts', [
-      'pinnedCountLoaded',
-      'pinnedLoaded',
-      'listLoaded'
-    ])
+    }
   },
   components: {
     folderStaticIcon,

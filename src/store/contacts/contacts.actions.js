@@ -79,5 +79,11 @@ export default {
   },
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
+  },
+  createListOpen: ({ commit }, payload) => {
+    commit('CREATE_LIST_OPEN', payload)
+  },
+  createListClose: ({ commit }) => {
+    commit('CREATE_LIST_CLOSE')
   }
 }

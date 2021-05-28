@@ -11,7 +11,7 @@
 
     <contact-menu-item
       v-if="type === ListTypes.DYNAMIC"
-      @click="$emit('clone_static')"
+      @click="$emit('clonestatic')"
     >
       <template slot="icon">
         <plus-icon></plus-icon>
@@ -39,21 +39,21 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
-      <template slot="icon">
-        <trash-icon></trash-icon>
-      </template>
-      <template slot="title">
-        <span>Remove</span>
-      </template>
-    </contact-menu-item>
-
     <contact-menu-item @click="$emit('pin')">
       <template slot="icon">
         <pin-icon></pin-icon>
       </template>
       <template slot="title">
         <span>{{ isPinned ? 'Unpin' : 'Pin' }}</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
+      <template slot="icon">
+        <trash-icon></trash-icon>
+      </template>
+      <template slot="title">
+        <span>Delete</span>
       </template>
     </contact-menu-item>
   </contact-menu>

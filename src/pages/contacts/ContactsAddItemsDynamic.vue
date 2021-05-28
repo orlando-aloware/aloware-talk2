@@ -1,10 +1,40 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled">
     <template slot="title">
-      <div class="pr-2">{{ name }}</div>
-      <span class="small text-muted"
-        >{{ listItems[id].total_contact_count }} contacts found</span
+      <div class="d-flex flex-column">
+        <div class="d-flex align-items-center">
+          <router-link
+            :to="'/contacts/list/' + $route.params.id"
+            v-slot="{ href, navigate }"
+          >
+            <a
+              class="btn btn-link p-0 text-muted pr-2"
+              :href="href"
+              @click="navigate"
+            >
+              <i class="fa fa-chevron-left"></i>
+            </a>
+          </router-link>
+
+          Add contacts to
+          <span class="title-icon"
+            ><folder-dynamic-icon height="20" width="20"
+          /></span>
+          {{ name }}
+        </div>
+        <div class="text-muted small action-desc">
+          Add contacts to this dynamic list by creating a filter
+        </div>
+      </div>
+    </template>
+    <template slot="options">
+      <compact-btn
+        variant="primary"
+        customClass="mr-2"
+        :onClick="onFiltersClicked"
       >
+        <span class="px-2">Attach Filter</span>
+      </compact-btn>
     </template>
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
@@ -12,38 +42,22 @@
           @search="onSearch"
           :disabled="isLoadingDisabled"
         ></contacts-table-search>
-        <div class="px-3" v-if="!isMyContactsView">
-          <b-form-checkbox
-            v-model="myContacts"
-            name="check-button"
-            size="sm"
-            switch
-            @change="onFetchMyContacts"
+        <div class="px-3">
+          <span class="small text-muted"
+            >{{ listItems[id].total_contact_count }} contacts</span
           >
-            <span class="small text-muted text-uppercase">My Contacts</span>
-          </b-form-checkbox>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
-        <!-- <compact-btn
-          variant="primary"
-          customClass="mr-2"
-          :onClick="onFiltersClicked"
-        >
-          <span class="px-2">Filters</span>
-        </compact-btn> -->
         <compact-btn
           variant="outlined-light"
           customClass="mr-2"
           :onClick="onEditColumnsClicked"
         >
-          <i class="fa fa-chevron-down text-success mr-1"></i> Edit Columns
+          More <i class="fa fa-chevron-down text-dark ml-1"></i>
         </compact-btn>
       </div>
-    </template>
-    <template slot="actions">
-      <bulk-action-menu :id="id" v-if="checked.length > 0"></bulk-action-menu>
     </template>
 
     <template slot="table">
@@ -78,29 +92,31 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import moment from 'moment'
+import isPlainObject from 'lodash/isPlainObject'
+
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
 import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
 import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
-import moment from 'moment'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
+import FolderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
+
 import {
   DEFAULT_CONTACT_LIST,
   DEFAULT_FILTERS
 } from 'src/constants/contacts-list-types'
-import isPlainObject from 'lodash/isPlainObject'
-import BulkActionMenu from 'pages/contacts/_components/bulk-action-menu'
 
 export default {
   components: {
-    BulkActionMenu,
     CompactBtn,
     ContactsScreen,
     ContactsTableSearch,
     Datatable,
     ImportContactsModal,
-    TableRow
+    TableRow,
+    FolderDynamicIcon
   },
   props: {
     id: {
@@ -110,10 +126,6 @@ export default {
     name: {
       type: String,
       required: true
-    },
-    type: {
-      type: String,
-      required: true
     }
   },
   methods: {
@@ -121,9 +133,7 @@ export default {
       'columnsOpen',
       'openFilters',
       'contactsLoaded',
-      'columnsReordered',
-      'setListSelectedContacts',
-      'setSelectedList'
+      'columnsReordered'
     ]),
     onSortByField (sorts) {
       this.isLoaded = false
@@ -147,10 +157,11 @@ export default {
           .querySelectorAll('.checker')
           .forEach((checkbox) => items.push(Number(checkbox.value)))
       }
-      this.setListSelectedContacts({ id: this.id, contacts: items })
+
+      this.checked = items
     },
     onCheckedRows (checked) {
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
+      this.checked = checked
     },
     onEditColumnsClicked () {
       this.columnsOpen({
@@ -233,10 +244,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts']),
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
+    ...mapGetters('contacts', ['lists', 'listItems']),
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&
@@ -301,7 +309,9 @@ export default {
           this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
             ? this.profile.id
             : undefined,
-        contact_list_id: this.$route.params.id ? this.$route.params.id : undefined
+        contact_list_id: this.$route.params.id
+          ? this.$route.params.id
+          : undefined
       }
     }
   },
@@ -312,11 +322,11 @@ export default {
       isLoaded: false,
       isLoadingMore: false,
       myContacts: false,
-      searchText: ''
+      searchText: '',
+      checked: []
     }
   },
   mounted () {
-    this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
     this.fetch()
   },
   watch: {
@@ -326,3 +336,23 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+
+.title-icon {
+  padding-left: 5px;
+  padding-right: 5px;
+  svg {
+    path {
+      stroke: $dark;
+    }
+  }
+}
+
+.action-desc {
+  padding-left: 20px;
+}
+</style>

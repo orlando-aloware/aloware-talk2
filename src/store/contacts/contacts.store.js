@@ -1,6 +1,7 @@
 import {
   DEFAULT_COLUMNS,
-  DEFAULT_CONTACT_LIST_ITEMS
+  DEFAULT_CONTACT_LIST_ITEMS,
+  STATIC_COLUMNS
 } from 'src/constants/contacts-list-types'
 
 export default function () {
@@ -50,6 +51,10 @@ export default function () {
         },
         type: 2,
         name: 'New Leads'
+      },
+      static: {
+        headers: STATIC_COLUMNS,
+        filters: {}
       }
     },
     columns: null,
@@ -94,6 +99,10 @@ export default function () {
     selectedList: {
       id: 'all',
       name: 'All Contacts'
+    },
+    createList: {
+      open: false,
+      folderId: null
     }
   }
 }

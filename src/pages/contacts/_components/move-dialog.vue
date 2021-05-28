@@ -32,7 +32,11 @@
       <div class="text-muted small pr-2" v-if="hasSelected">
         Would you like to continue?
       </div>
-      <compact-btn variant="danger" v-if="hasSelected" class="mr-2"
+      <compact-btn
+        :onClick="onConfirmMove"
+        variant="danger"
+        v-if="hasSelected"
+        class="mr-2"
         >Yes</compact-btn
       >
       <compact-btn
@@ -51,6 +55,7 @@ import { mapActions, mapGetters } from 'vuex'
 import MoveFolderItem from './move-folder-item.vue'
 import ContactsTableSearch from './contacts-table-search.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let popperInstance
 
@@ -84,7 +89,58 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['closeMoveDialog']),
+    ...mapActions('contacts', ['closeMoveDialog', 'foldersLoaded']),
+    onConfirmMove () {
+      if (this.moveDialog.type === 'list') {
+        return this.moveListRequest()
+      }
+      return this.moveFolderRequest()
+    },
+    moveFolderRequest () {
+      return window.axios
+        .patch('/api/v1/contact-folder/move/' + this.moveDialog.id, {
+          parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
+        })
+        .then(this.reloadFolders)
+        .catch(this.handleRequestError)
+        .finally(this.closeMoveDialog)
+    },
+    moveListRequest () {
+      return window.axios
+        .patch('/api/v1/contacts-list/' + this.moveDialog.id, {
+          contact_folder_id: this.moveDialog.target
+        })
+        .then(this.reloadFolders)
+        .catch(this.handleRequestError)
+        .finally(this.closeMoveDialog)
+    },
+    handleRequestError (err) {
+      const { message, html } = extractErrorMessage(err)
+      this.$q.notify({
+        message,
+        type: 'negative',
+        textColor: 'white',
+        html
+      })
+    },
+    reloadFolders () {
+      return window.axios
+        .get('/api/v1/contact-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$q.notify({
+            message: 'Unable to load folders please try again.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
+    },
     filterByActiveId (items) {
       return items
         .filter((i) => i.id !== this.moveDialog.id)

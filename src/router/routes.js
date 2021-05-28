@@ -43,6 +43,11 @@ const routes = [
             component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
+            path: 'list/:id(\\d+)+/add',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactsAddView.vue')
+          },
+          {
             path: ':id(\\d+)+',
             name: 'Contacts',
             component: () => import('src/pages/contacts/Contact.vue')
