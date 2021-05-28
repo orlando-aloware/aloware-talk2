@@ -85,15 +85,17 @@
         @sort="onSortByField"
         @more="onLoadMore"
       >
-        <table-row
-          v-for="(contact, index) in items"
-          :key="contact.id + index + Math.random()"
-          :contact="contact"
-          :columns="columns"
-          :checked="checked"
-          :contactListId="1"
-          @checked="onCheckedRows"
-        />
+        <template slot="tbody">
+          <table-row
+            v-for="(contact, index) in items"
+            :key="contact.id + index + Math.random()"
+            :contact="contact"
+            :columns="columns"
+            :checked="checked"
+            :contactListId="1"
+            @checked="onCheckedRows"
+          />
+        </template>
       </datatable>
     </template>
 

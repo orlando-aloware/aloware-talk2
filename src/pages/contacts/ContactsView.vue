@@ -9,9 +9,15 @@
       </div>
     </template>
     <template slot="options">
-      <compact-btn variant="primary" v-if="type === ContactListType.STATIC">
-        <i class="fa fa-plus mr-2"></i> Add Contacts
-      </compact-btn>
+      <router-link
+        v-if="type === ContactListType.STATIC"
+        v-slot="{ navigate }"
+        :to="'/contacts/list/' + $route.params.id + '/add'"
+      >
+        <compact-btn variant="primary" :onClick="navigate">
+          <i class="fa fa-plus mr-2"></i> Add Contacts
+        </compact-btn>
+      </router-link>
 
       <compact-btn
         variant="primary"
@@ -67,22 +73,42 @@
         :stickyHeaders="true"
         :columns="columns"
         :hasMore="hasMore"
-        :isEmpty="isEmpty"
+        :isEmpty="isEmpty || isStartState"
         :isLoadingMore="isLoadingMore"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
         @more="onLoadMore"
       >
-        <table-row
-          v-for="(contact, index) in listItems[id].data"
-          :key="contact.id + index + Math.random()"
-          :contact="contact"
-          :columns="columns"
-          :checked="checked"
-          :contactListId="1"
-          @checked="onCheckedRows"
-        />
+        <template slot="tbody">
+          <table-row
+            v-for="(contact, index) in listItems[id].data"
+            :key="contact.id + index + Math.random()"
+            :contact="contact"
+            :columns="columns"
+            :checked="checked"
+            :contactListId="id"
+            @checked="onCheckedRows"
+          />
+        </template>
+
+        <template slot="empty" v-if="isStartState">
+          <router-link
+            v-slot="{ navigate }"
+            :to="'/contacts/list/' + $route.params.id + '/add'"
+          >
+            <div class="start-state" @click="navigate">
+              <div class="p-4 bg-light w-100 text-center border-bottom text-primary">
+                <template v-if="type === ContactListType.STATIC">
+                  Add contacts <i class="fa fa-plus"></i>
+                </template>
+                <template v-if="type === ContactListType.DYNAMIC">
+                  Add Contacts through a Filter <i class="fa fa-plus"></i>
+                </template>
+              </div>
+            </div>
+          </router-link>
+        </template>
       </datatable>
     </template>
 
@@ -272,6 +298,9 @@ export default {
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
     },
+    isStartState () {
+      return this.$route.query.start
+    },
     isEmpty () {
       return this.isLoaded && !this.listItems[this.id].data.length
     },
@@ -339,7 +368,7 @@ export default {
     }
   },
   mounted () {
-    this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
+    this.setSelectedList({ id: this.id, name: this.name, type: this.type })
     this.fetch()
   },
   watch: {
@@ -349,3 +378,25 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
+
+.start-state {
+  align-items: center;
+  background: $white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-start;
+  left: 0;
+  padding-top: 36px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 0;
+}
+</style>

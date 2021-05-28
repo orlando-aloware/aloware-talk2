@@ -1,5 +1,9 @@
 <template>
-  <div ref="scrollableArea" class="scrollableArea position-relative">
+  <div
+    ref="scrollableArea"
+    class="scrollableArea position-relative"
+    :class="{ 'overflow-hidden': isEmpty }"
+  >
     <table :class="computedClass" ref="table">
       <thead>
         <draggable
@@ -40,8 +44,10 @@
                 href="#"
                 class="sorter"
                 :class="{
-                  'sorter-asc': sorts.order === 'asc' && sorts.orderBy === column.name,
-                  'sorter-desc': sorts.order === 'desc' && sorts.orderBy === column.name
+                  'sorter-asc':
+                    sorts.order === 'asc' && sorts.orderBy === column.name,
+                  'sorter-desc':
+                    sorts.order === 'desc' && sorts.orderBy === column.name
                 }"
                 v-if="column.sortable"
                 @click.prevent="onColumnSort(column)"
@@ -59,7 +65,7 @@
         </draggable>
       </thead>
       <tbody>
-        <slot />
+        <slot name="tbody" />
       </tbody>
     </table>
     <div class="relative py-4" v-b-visible.100="onVisibilityChanged">
@@ -71,7 +77,11 @@
       >
       </b-overlay>
     </div>
-    <div class="empty-state" v-if="isEmpty">
+
+    <template v-if="hasEmptySlot && isEmpty">
+      <slot name="empty" />
+    </template>
+    <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty">
       <div class="h5">No contacts found based on the current filters</div>
     </div>
   </div>
@@ -165,6 +175,9 @@ export default {
         [this.customClass]: !!this.customClass,
         'datatable--sticky-columns': this.stickyHeaders
       }
+    },
+    hasEmptySlot () {
+      return !!this.$slots.empty
     }
   },
   props: {
@@ -202,7 +215,7 @@ export default {
     document.removeEventListener('mousemove', this.onResizeMouseMove)
   },
   watch: {
-    'columns': function (id) {
+    columns: function (id) {
       console.log(id)
     }
   }
@@ -223,6 +236,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: $white;
+  z-index: 0;
 }
 
 .scrollableArea {

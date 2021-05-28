@@ -53,7 +53,6 @@
         <compact-btn
           variant="outlined-light"
           customClass="mr-2"
-          :onClick="onEditColumnsClicked"
         >
           More <i class="fa fa-chevron-down text-dark ml-1"></i>
         </compact-btn>
@@ -72,15 +71,17 @@
         @sort="onSortByField"
         @more="onLoadMore"
       >
-        <table-row
-          v-for="(contact, index) in listItems[id].data"
-          :key="contact.id + index + Math.random()"
-          :contact="contact"
-          :columns="columns"
-          :checked="checked"
-          :contactListId="1"
-          @checked="onCheckedRows"
-        />
+        <template slot="tbody">
+          <table-row
+            v-for="(contact, index) in listItems[id].data"
+            :key="contact.id + index + Math.random()"
+            :contact="contact"
+            :columns="columns"
+            :checked="checked"
+            :contactListId="1"
+            @checked="onCheckedRows"
+          />
+        </template>
       </datatable>
     </template>
 
