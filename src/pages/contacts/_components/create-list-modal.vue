@@ -131,7 +131,7 @@ export default {
           const data = response.data.data
           const message = response.data.message
 
-          this.$router.push(`/contacts/list/${data.id}/add`)
+          this.$router.push(`/contacts/list/${data.id}?start=1`)
 
           this.createListClose()
 
