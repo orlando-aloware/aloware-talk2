@@ -18,7 +18,7 @@
         <button
           class="btn btn-sm btn-outline-success mr-2"
           @click="onRemoveFromList"
-          v-if="selectedList.type === '1'"
+          v-if="selectedList.type === String(ContactListType.STATIC)"
         >
           Remove From List Only
         </button>
@@ -32,8 +32,8 @@
 
 <script>
 import ConfirmDialog from 'src/pages/contacts/_components/confirm-dialog.vue'
-
 import { mapActions, mapGetters } from 'vuex'
+import * as ContactListType from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -60,6 +60,11 @@ export default {
       return ''
     }
   },
+  data () {
+    return {
+      ContactListType
+    }
+  },
   watch: {
     isRemoveContactOpen (isOpen) {
       if (isOpen) {
@@ -72,12 +77,12 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeContactClose', 'setContactRemoveActionType']),
     onRemoveFromList () {
-      this.setContactRemoveActionType('remove_from_list')
+      this.setContactRemoveActionType(ContactListType.REMOVE_FROM_LIST_ONLY)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     },
     onRemoveFromContacts () {
-      this.setContactRemoveActionType('remove_from_contacts')
+      this.setContactRemoveActionType(ContactListType.REMOVE_FROM_CONTACTS)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     }

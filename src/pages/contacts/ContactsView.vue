@@ -154,6 +154,10 @@ export default {
     name: {
       type: String,
       required: true
+    },
+    type: {
+      type: String,
+      required: true
     }
   },
   data () {

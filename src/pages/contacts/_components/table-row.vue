@@ -168,7 +168,7 @@ export default {
       type: Array
     },
     contactListId: {
-      type: Number
+      type: String
     }
   },
   methods: {

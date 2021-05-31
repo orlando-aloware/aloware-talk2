@@ -25,8 +25,14 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="contactsToDelete != contactToDeleteCount"
+                :disabled="(contactsToDelete != contactToDeleteCount) || isBusy"
                 @click="onConfirm">
+          <b-spinner variant="warning"
+                     type="grow"
+                     label="Spinning"
+                     small
+                     v-if="isBusy">
+          </b-spinner>
           Delete
         </button>
       </div>
@@ -36,8 +42,8 @@
 
 <script>
 import ConfirmDialog from 'src/pages/contacts/_components/confirm-dialog.vue'
-
 import { mapActions, mapGetters } from 'vuex'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -62,7 +68,9 @@ export default {
   },
   data () {
     return {
-      contactsToDelete: null
+      isBusy: false,
+      contactsToDelete: null,
+      ContactListTypes
     }
   },
   watch: {
@@ -83,16 +91,17 @@ export default {
     handleSingleDeletion () {
       let url = null
       switch (this.removeContactActionType) {
-        case 'remove_from_list':
+        case ContactListTypes.REMOVE_FROM_LIST_ONLY:
           url = '/api/v1/contact-list-item/' +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
           break
-        case 'remove_from_contacts':
+        case ContactListTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v1/contact/${this.contactToRemove.id}`
           break
       }
+      this.isBusy = true
       return window.axios
         .delete(
           url
@@ -110,18 +119,22 @@ export default {
             type: 'negative',
             textColor: 'white'
           })
-        }).finally(() => this.$bvModal.hide('remove-contact-confirmation-dialog'))
+        }).finally(() => {
+          this.isBusy = false
+          this.$bvModal.hide('remove-contact-confirmation-dialog')
+        })
     },
     handleBulkDeletion () {
       let url = null
       switch (this.removeContactActionType) {
-        case 'remove_from_list':
+        case ContactListTypes.REMOVE_FROM_LIST_ONLY:
           url = `/api/v1/contact-list-item/bulk/${this.selectedList.id}`
           break
-        case 'remove_from_contacts':
+        case ContactListTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v1/contact/bulk`
           break
       }
+      this.isBusy = true
       return window.axios
         .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id] } })
         .then(() => {
@@ -138,6 +151,7 @@ export default {
             textColor: 'white'
           })
         }).finally(() => {
+          this.isBusy = false
           this.removeContactClose()
           this.$bvModal.hide('remove-contact-confirmation-dialog')
         })
