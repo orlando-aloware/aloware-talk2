@@ -193,13 +193,13 @@ export default {
 
       if (type === ContactListTypes.STATIC) {
         return window.axios
-          .get(`api/v1/contacts-list/${this.currentPinnedContactList.id}/items`)
+          .get(`api/v2/contacts-list/${this.currentPinnedContactList.id}/items`)
           .then((response) => response.data)
       }
 
       if (type === ContactListTypes.DYNAMIC) {
         return window.axios
-          .get('api/v1/contact', {
+          .get('api/v2/contact', {
             params: createContactFilters(params)
           })
           .then((response) => response.data)

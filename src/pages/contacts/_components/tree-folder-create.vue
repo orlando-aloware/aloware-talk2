@@ -79,7 +79,7 @@ export default {
     },
     createFolderRequest (params) {
       return window.axios
-        .post('/api/v1/contact-folders', params)
+        .post('/api/v2/contact-folders', params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
@@ -107,7 +107,7 @@ export default {
     },
     reloadFolders () {
       return window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

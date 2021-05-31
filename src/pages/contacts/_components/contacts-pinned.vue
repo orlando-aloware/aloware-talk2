@@ -57,7 +57,7 @@ export default {
   methods: {
     loadPinnedLists () {
       this.loading = true
-      return window.axios.get('api/v1/contact-list-bookmark')
+      return window.axios.get('api/v2/contact-list-bookmark')
         .then((data) => {
           this.pinnedContactlistsLoaded(data.data)
           this.initializePinnedListsCount(data.data)
@@ -70,7 +70,7 @@ export default {
       }
     },
     fetchCount (id) {
-      return window.axios.get(`api/v1/contacts-list/${id}/items`)
+      return window.axios.get(`api/v2/contacts-list/${id}/items`)
         .then((response) => {
           this.pinnedCountLoaded({
             id: id,

@@ -185,7 +185,7 @@ export default {
     onApplyChanges () {
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
+        .patch(`/api/v2/contacts-list/${this.columnHeaders.id}`, {
           ...this.columnHeaders,
           headers: this.columns,
           filters: [] // TODO: use a
@@ -214,7 +214,7 @@ export default {
     onResetAllColumns () {
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columnHeaders.id}`, {
+        .patch(`/api/v2/contacts-list/${this.columnHeaders.id}`, {
           ...this.columnHeaders,
           headers: columns,
           filters: [] // TODO: use actual values
