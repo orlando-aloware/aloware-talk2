@@ -2,9 +2,9 @@
   <tr class="datatable-row">
     <template v-for="column in columns">
       <td
-        :key="column.id"
+        :key="column.name"
         class="text-center align-middle datatable-row__checkbox"
-        v-if="column.checkbox"
+        v-if="column.name === 'checkbox'"
       >
         <input
           type="checkbox"
@@ -16,9 +16,9 @@
       </td>
 
       <td
-        :key="column.id"
+        :key="column.name"
         class="datatable-row__name"
-        v-if="column.name === 'name'"
+        v-else-if="column.name === 'name'"
       >
         <div class="d-flex align-items-center">
           <div class="pr-2">
@@ -26,7 +26,7 @@
           </div>
           <div class="flex-grow-1">
             <router-link
-              :to="`/contacts/show/${contact.id}`"
+              :to="`/contacts/${contact.id}`"
               v-slot="{ href, route, navigate }"
             >
               <a
@@ -37,9 +37,7 @@
                 <template v-if="contact.name">
                   {{ contact.name | ucwords }}
                 </template>
-                <template v-if="!contact.name">
-                  No Name
-                </template>
+                <template v-if="!contact.name"> No Name </template>
               </a>
             </router-link>
           </div>
@@ -47,8 +45,8 @@
       </td>
 
       <td
-        :key="column.id"
-        v-if="column.name === 'phone_number'"
+        :key="column.name"
+        v-else-if="column.name === 'phone_number'"
         class="datatable-row__phone"
       >
         <span>
@@ -56,14 +54,18 @@
         </span>
       </td>
 
-      <td :key="column.id" v-if="column.name === 'last_engagement_text'">
+      <td :key="column.name" v-else-if="column.name === 'last_engagement_text'">
         <div>{{ contact.last_engagement_text }}</div>
         <div class="small text-muted">
           {{ moment(contact.last_engagement_at).format('LLL') }}
         </div>
       </td>
 
-      <td class="tags-cell" :key="column.id" v-if="column.name === 'tags'">
+      <td
+        class="tags-cell"
+        :key="column.name"
+        v-else-if="column.name === 'tags'"
+      >
         <template v-if="!contact.tags.length">
           <span class="text-muted">no tags available</span>
         </template>
@@ -100,8 +102,8 @@
 
       <td
         class="text-center"
-        :key="column.id"
-        v-if="column.name === 'unread_count'"
+        :key="column.name"
+        v-else-if="column.name === 'unread_count'"
       >
         <span class="badge badge-danger">
           {{ contact.unread_count }}
@@ -110,26 +112,33 @@
 
       <td
         class="text-center datatable-row__actions"
-        :key="column.id"
-        v-if="column.name === 'actions'"
+        :key="column.name"
+        v-else-if="column.name === 'actions'"
       >
         <div>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--call"
+            @click="onCall"
           >
             <i class="fa fa-phone"></i>
           </button>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--chat"
+            @click="onMessage"
           >
             <i class="fa fa-comment"></i>
           </button>
           <button
+            @click="onRemove"
             class="btn btn-sm btn-link datatable-row__actions__action--trash"
           >
             <i class="fa fa-trash-alt"></i>
           </button>
         </div>
+      </td>
+
+      <td :key="column.name" v-else>
+        <div>{{ contact[column.name] }}</div>
       </td>
     </template>
   </tr>
@@ -139,6 +148,8 @@
 import moment from 'moment'
 
 import Avatar from 'src/components/avatar/avatar.vue'
+
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -155,9 +166,13 @@ export default {
     },
     checked: {
       type: Array
+    },
+    contactListId: {
+      type: String
     }
   },
   methods: {
+    ...mapActions('contacts', ['removeContactOpen']),
     onCheckerClicked () {
       const checked = new Set([...this.checked])
 
@@ -168,12 +183,100 @@ export default {
       }
 
       this.$emit('checked', [...checked])
+    },
+    onRemove () {
+      this.removeContactOpen({
+        ...this.contact,
+        contactListId: this.contactListId
+      })
+    },
+    onMessage () {
+      this.$router.push(`/contacts/${this.contact.id}`)
+    },
+    onCall () {
+      // check contact has timezone or not
+      if (this.contact.timezone) {
+        // if have timezone check is it day time?
+        const startDay = moment()
+          .tz(this.contact.timezone)
+          .hour(8)
+          .minute(0)
+          .second(0)
+        const endDay = moment()
+          .tz(this.contact.timezone)
+          .hour(18)
+          .minute(0)
+          .second(0)
+        const contactLocalTime = moment().tz(this.contact.timezone)
+        if (!contactLocalTime.isBetween(startDay, endDay)) {
+          return this.$confirm(
+            `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
+              'hh:mm A'
+            )} for ${this.contact.name}.`,
+            'Call Lead',
+            {
+              confirmButtonText: 'OK',
+              cancelButtonText: 'Cancel',
+              customClass: 'width-500 fixed',
+              type: 'warning'
+            }
+          )
+            .then(() => {
+              this.makeCall()
+            })
+            .catch(() => {})
+        }
+      }
+      this.makeCall()
+    },
+
+    makeCall () {
+      if (this.profile.enabled_two_legged_outbound) {
+        let message = 'We will call your secondary phone'
+        message += ' on ' + this.profile.secondary_phone_number
+        message += ` and connect you with ${this.contact.name}. Proceed?`
+
+        return this.$confirm(message, 'Going old school?', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          customClass: 'width-500 fixed',
+          type: 'warning'
+        })
+          .then(() => {
+            this.makeTwoLeggedCall()
+          })
+          .catch(() => {})
+      }
+      window.VueEvent.fire('make_new_call', {
+        phone_number: this.contact.phone_number
+      })
+    },
+    makeTwoLeggedCall () {
+      window.axios
+        .post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
+          phone_number: this.contact.phone_number
+        })
+        .then((res) => {
+          // this.$notify({
+          //   offset: 95,
+          //   title: 'Call Lead',
+          //   message: `We are calling your phone to connect you to ${this.contact.name}`,
+          //   type: 'success',
+          //   showClose: true
+          // })
+        })
+        .catch((_err) => {
+          // this.$root.handleErrors(err.response)
+        })
     }
   },
   data () {
     return {
       moment
     }
+  },
+  computed: {
+    ...mapGetters('auth', ['profile'])
   }
 }
 </script>

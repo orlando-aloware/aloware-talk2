@@ -22,11 +22,17 @@ export default {
   REMOVE_LIST_OPEN: (state, list) => {
     state.removeList = list
   },
+  REMOVE_CONTACT_OPEN: (state, contact) => {
+    state.removeContact = contact
+  },
   REMOVE_FOLDER_CLOSE: (state) => {
     state.removeFolder = null
   },
   REMOVE_LIST_CLOSE: (state) => {
     state.removeList = null
+  },
+  REMOVE_CONTACT_CLOSE: (state) => {
+    state.removeContact = null
   },
   FILTERS_CLOSE: (state) => {
     state.isFiltersOpen = false
@@ -36,35 +42,91 @@ export default {
   },
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
-      state.lists.contacts = {
-        ...state.lists.contacts,
-        [id]: {
-          ...state.lists.contacts[id],
+      state.listItems = {
+        ...state.listItems,
+        [String(id)]: {
+          ...state.listItems[String(id)],
           ...rest,
-          data: state.lists.contacts[id].data.concat(data)
+          data: state.listItems[String(id)].data.concat(data)
         }
       }
     } else {
-      state.lists.contacts = { ...state.lists.contacts, [id]: { data, ...rest } }
+      state.listItems = { ...state.listItems, [String(id)]: { data, ...rest } }
     }
   },
   PINNED_COUNT_LOADED: (state, payload) => {
-    let index = state.pinnedCounts.findIndex(count => count.id === payload.id)
-
-    if (index === -1) {
-      state.pinnedCounts.push(payload)
-    }
+    state.pinnedCounts[payload.id] = payload.count
   },
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
   },
-  PINNED_CONTACT_LISTS_LOADED: (state, pinnedContactLists) => {
-    state.pinned = pinnedContactLists
+  LIST_LOADED: (state, list) => {
+    state.lists = {
+      ...state.lists,
+      [String(list.id)]: {
+        ...(state.lists[String[list.id]] || {}),
+        ...list
+      }
+    }
   },
-  COLUMN_HEADERS_OPEN: (state, payload) => {
-    state.columnHeaders = payload
+  PINNED_LOADED: (state, pinned) => {
+    state.pinned = pinned
   },
-  COLUMN_HEADERS_CLOSE: (state) => {
-    state.columnHeaders = null
+  COLUMNS_OPEN: (state, payload) => {
+    state.columns = payload
+  },
+  COLUMNS_CLOSE: (state) => {
+    state.columns = null
+  },
+  COLUMNS_REORDERED: (state, { id, headers }) => {
+    state.lists = {
+      ...state.lists,
+      [String(id)]: {
+        ...(state.lists[String(id)] || {}),
+        headers
+      }
+    }
+  },
+  COLUMNS_UPDATED: (state, { id, ...rest }) => {
+    state.lists = {
+      ...state.lists,
+      [String(id)]: {
+        ...(state.lists[String(id)] || {}),
+        ...rest
+      }
+    }
+  },
+  LIST_UNPINNED: (state, id) => {
+    state.pinned = state.pinned.filter((v) => v !== id)
+  },
+  LIST_PINNED: (state, id) => {
+    state.pinned = [...new Set(state.pinned.concat(id))]
+  },
+  MOVE_DIALOG_OPEN: (state, { id, type }) => {
+    state.moveDialog = { open: true, id, type }
+  },
+  MOVE_DIALOG_CLOSE: (state) => {
+    state.moveDialog = { open: false }
+  },
+  MOVE_DIALOG_TARGET: (state, { target }) => {
+    state.moveDialog = {
+      ...state.moveDialog,
+      target: target === state.moveDialog.target ? null : target
+    }
+  },
+  SET_CONTACT_REMOVE_ACTION_TYPE: (state, type) => {
+    state.removeContactActionType = type
+  },
+  SET_LIST_SELECTED_CONTACTS: (state, payload) => {
+    state.selectedContacts = { ...state.selectedContacts, [payload.id]: payload.contacts }
+  },
+  SET_SELECTED_LIST: (state, payload) => {
+    state.selectedList = { ...state.selectedList, ...payload }
+  },
+  CREATE_LIST_OPEN: (state, payload) => {
+    state.createList = { ...state.createList, ...payload, open: true }
+  },
+  CREATE_LIST_CLOSE: (state) => {
+    state.createList = { folderId: null, open: false }
   }
 }

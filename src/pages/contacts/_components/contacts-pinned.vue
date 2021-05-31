@@ -7,8 +7,37 @@
     </div>
     <div class="d-flex pinned__content flex-column">
       <router-link
-        v-for="item in pinned"
-        :to="`/contacts/pinned/${item.id}`"
+        v-for="item in defaultContactList"
+        :to="item.link"
+        :key="item.id"
+        v-slot="{ href, route, navigate, isActive, isExactActive }"
+      >
+        <a
+          :href="href"
+          @click="navigate"
+          class="d-flex align-items-center item"
+          :class="[
+            isActive && 'router-link-active',
+            isExactActive && 'router-link-exact-active'
+          ]"
+        >
+          <div class="px-2 icon">
+            <folder-dynamic-icon></folder-dynamic-icon>
+          </div>
+          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
+          <div class="pr-2">
+            <b-badge
+              pill
+              :variant="hasUnreads(item.id) ? 'danger' : 'light text-muted'"
+              >{{ getCount(item.id) | fixCount }}</b-badge
+            >
+          </div>
+        </a>
+      </router-link>
+
+      <router-link
+        v-for="item in pinnedLists"
+        :to="`/contacts/list/${item.id}`"
         :key="item.id"
         v-slot="{ href, route, navigate, isActive, isExactActive }"
       >
@@ -23,21 +52,18 @@
         >
           <div class="px-2 icon">
             <folder-static-icon
-              v-if="item.type === ContactListTypes.STATIC"
+              v-if="item.type === contactListType.STATIC"
             ></folder-static-icon>
             <folder-dynamic-icon
-              v-if="item.type === ContactListTypes.DYNAMIC"
+              v-if="item.type === contactListType.DYNAMIC"
             ></folder-dynamic-icon>
           </div>
           <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-          <div v-if="getPinnedCountById(item.id)"
-               class="pr-2">
+          <div class="pr-2">
             <b-badge
               pill
-              :variant="pinnedCountsVariant(item)"
-              >{{
-                getPinnedCountById(item.id) | fixCount
-              }}</b-badge
+              :variant="hasUnreads(item.id) ? 'danger' : 'light text-muted'"
+              >{{ getCount(item.id) | fixCount }}</b-badge
             >
           </div>
         </a>
@@ -48,56 +74,140 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import * as ContactListTypes from '../../../constants/contacts-list-types'
 import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
-import _ from 'lodash'
+import { STATIC, DYNAMIC, DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
 
 export default {
   methods: {
-    loadPinnedLists () {
-      this.loading = true
-      return window.axios.get('api/v2/contact-list-bookmark')
-        .then((data) => {
-          this.pinnedContactlistsLoaded(data.data)
-          this.initializePinnedListsCount(data.data)
+    ...mapActions('contacts', [
+      'pinnedCountLoaded',
+      'pinnedLoaded',
+      'listLoaded'
+    ]),
+    hasUnreads (id) {
+      if (this.pinnedCounts[id] && this.pinnedCounts[id].unreads_count) {
+        return true
+      }
+      return false
+    },
+    getCount (id) {
+      if (this.pinnedCounts[id] && this.pinnedCounts[id].total_contact_count) {
+        return this.pinnedCounts[id].total_contact_count
+      }
+      return 0
+    },
+    loadDefaultCounts () {
+      return Promise.all([
+        this.loadAllCount(),
+        this.loadMyContactsCount(),
+        this.loadNewLeadsCount(),
+        this.loadUnansweredCount(),
+        this.loadUnassignedCount()
+      ])
+        .then(([allContacts, myContacts, newleads, unanswered, unassigned]) => {
+          this.pinnedCountLoaded({
+            id: DEFAULT_CONTACT_LIST.ALL_CONTACTS.id,
+            count: allContacts
+          })
+          this.pinnedCountLoaded({
+            id: DEFAULT_CONTACT_LIST.MY_CONTACTS.id,
+            count: myContacts
+          })
+          this.pinnedCountLoaded({
+            id: DEFAULT_CONTACT_LIST.NEWLEADS.id,
+            count: newleads
+          })
+          this.pinnedCountLoaded({
+            id: DEFAULT_CONTACT_LIST.UNANSWERED.id,
+            count: unanswered
+          })
+          this.pinnedCountLoaded({
+            id: DEFAULT_CONTACT_LIST.UNASSIGNED.id,
+            count: unassigned
+          })
+        })
+        .finally(() => {
           this.loading = false
         })
     },
-    initializePinnedListsCount (lists) {
-      for (let list of lists) {
-        this.fetchCount(list.id)
-      }
+    loadAllCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count')
+        .then((response) => response.data)
     },
-    fetchCount (id) {
-      return window.axios.get(`api/v2/contacts-list/${id}/items`)
+    loadMyContactsCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { user_id: this.profile.id }
+        })
+        .then((response) => response.data)
+    },
+    loadNewLeadsCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { is_new_lead: 1 }
+        })
+        .then((response) => response.data)
+    },
+    loadUnansweredCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { has_unread: 1 }
+        })
+        .then((response) => response.data)
+    },
+    loadUnassignedCount () {
+      return window.axios
+        .get('api/v1/contact/get-contacts-count', {
+          params: { unassigned_leads: 1 }
+        })
+        .then((response) => response.data)
+    },
+    loadPinnedCount (id) {
+      return window.axios
+        .get(`api/v2/contacts-list/${id}/items`)
         .then((response) => {
           this.pinnedCountLoaded({
             id: id,
-            count: response.data.total
+            count: {
+              new_leads_count: 0,
+              total_contact_count: response.data.total,
+              unreads_count: 0
+            }
           })
         })
     },
-    getPinnedCountById (id) {
-      const index = this.pinnedCounts.findIndex(count => count.id === id)
-
-      if (index !== -1) {
-        return this.pinnedCounts[index].count
-      }
-
-      return 0
+    loadPinnedCounts (ids) {
+      return Promise.all(ids.map((id) => this.loadPinnedCount(id)))
     },
-    pinnedCountsVariant (list) {
-      const name = _.get(list, 'name', '').toLowerCase()
+    loadPinned () {
+      this.loading = true
+      return window.axios
+        .get('api/v2/contact-list-bookmark')
+        .then((response) => response.data)
+        .then((data) => {
+          const pinnedIds = []
 
-      if (name.includes('unanswered') ||
-        name.includes('new leads')) {
-        return 'danger'
-      }
+          for (let i = 0; i < data.length; i++) {
+            pinnedIds.push(data[i].contact_list_id)
+            this.listLoaded({
+              id: data[i].contact_list_id,
+              name: data[i].name,
+              headers: data[i].headers,
+              filters: data[i].filters,
+              type: data[i].type,
+              order: data[i].order
+            })
+          }
 
-      return 'light text-muted'
-    },
-    ...mapActions('contacts', ['pinnedCountLoaded', 'pinnedContactlistsLoaded'])
+          this.pinnedLoaded(pinnedIds)
+
+          this.loadPinnedCounts(pinnedIds)
+
+          this.loading = false
+        })
+    }
   },
   components: {
     folderStaticIcon,
@@ -105,17 +215,21 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState('contacts', ['pinned', 'pinnedCounts'])
+    ...mapState('contacts', ['pinned', 'pinnedCounts', 'lists']),
+    pinnedLists () {
+      return this.pinned.map((i) => this.lists[i] || {})
+    }
   },
   data () {
     return {
       loading: false,
-      defaultList: [],
-      ContactListTypes
+      contactListType: { STATIC, DYNAMIC },
+      defaultContactList: Object.values(DEFAULT_CONTACT_LIST)
     }
   },
   mounted () {
-    this.loadPinnedLists()
+    this.loadDefaultCounts()
+    this.loadPinned()
   }
 }
 </script>

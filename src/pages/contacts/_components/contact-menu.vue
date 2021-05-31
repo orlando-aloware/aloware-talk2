@@ -1,6 +1,9 @@
 <template>
   <div class="contact-menu d-flex flex-column">
-    <div class="contact-menu__title d-flex align-items-center mb-2">
+    <div
+      class="contact-menu__title d-flex align-items-center mb-2"
+      v-if="title"
+    >
       <div
         class="border-bottom contact-menu__title__inner w-100 d-flex align-items-center"
       >
@@ -15,8 +18,7 @@
 export default {
   props: {
     title: {
-      type: String,
-      default: 'Actions'
+      type: String
     }
   }
 }
@@ -27,7 +29,7 @@ export default {
 @import 'src/css/variables.scss';
 .contact-menu {
   width: 200px;
-  min-height: 133px;
+  padding-top: 5px;
   &__title {
     padding-left: 2px;
     padding-right: 2px;

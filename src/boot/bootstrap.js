@@ -9,6 +9,7 @@ import Bowser from 'bowser'
 import * as Sentry from '@sentry/vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
+import 'vue-popperjs/dist/vue-popper.css'
 
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)

@@ -1,6 +1,9 @@
 <template>
   <div :data-layer="layer">
-    <div class="folder d-flex align-items-center">
+    <div
+      class="folder d-flex align-items-center"
+      :class="{ 'folder--selected': isSelected }"
+    >
       <div
         class="folder__indent"
         :style="indentStyle"
@@ -32,6 +35,7 @@
       </div>
 
       <button
+        :data-popper-target="'folder-' + id"
         :id="'folder-option-' + id"
         class="folder__option btn btn-link p-0"
         :class="{ 'folder__option--hide': isEditing }"
@@ -61,6 +65,8 @@
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
       ></tree-list-contents>
     </div>
 
@@ -76,6 +82,8 @@
         @create="onCreateFolder"
         @edit="onEditFolder"
         @remove="onRemoveFolder"
+        @move="onMove"
+        @createlist="onCreateList"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
       />
@@ -96,27 +104,6 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 let inputTimeout
 
 export default {
-  components: {
-    FolderIcon,
-    FolderArrowOpenIcon,
-    FolderArrowCloseIcon,
-    treeFolderContents: () => import('./tree-folder-contents.vue'),
-    treeListContents: () => import('./tree-list-contents.vue'),
-    FolderOption,
-    FolderActions,
-    TreeFolderCreate
-  },
-  computed: {
-    indentStyle () {
-      return {
-        width: `${this.layer * 10}px`
-      }
-    },
-    ...mapGetters('contacts', ['opened']),
-    isOpen () {
-      return this.opened.has(this.id)
-    }
-  },
   props: {
     id: {
       type: Number
@@ -147,6 +134,33 @@ export default {
       type: Number
     }
   },
+  components: {
+    FolderIcon,
+    FolderArrowOpenIcon,
+    FolderArrowCloseIcon,
+    treeFolderContents: () => import('./tree-folder-contents.vue'),
+    treeListContents: () => import('./tree-list-contents.vue'),
+    FolderOption,
+    FolderActions,
+    TreeFolderCreate
+  },
+  computed: {
+    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList']),
+    indentStyle () {
+      return {
+        width: `${this.layer * 10}px`
+      }
+    },
+    isOpen () {
+      return this.opened.has(this.id)
+    },
+    isSelected () {
+      return (
+        (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
+        (this.createList.open && this.createList.folderId === this.id)
+      )
+    }
+  },
   data () {
     return {
       isCreatingFolder: false,
@@ -160,8 +174,26 @@ export default {
       'openFolder',
       'closeFolder',
       'removeFolderOpen',
-      'foldersLoaded'
+      'foldersLoaded',
+      'openMoveDialog',
+      'createListOpen'
     ]),
+    onMove () {
+      this.$root.$emit('bv::hide::popover')
+      this.openMoveDialog({
+        id: this.id,
+        type: 'folder'
+      })
+    },
+    onCreateList () {
+      this.$root.$emit('bv::hide::popover')
+
+      this.createListOpen({
+        folderId: this.id
+      })
+
+      this.onToggleFolder()
+    },
     onKeyDown (evt) {
       if (evt.keyCode === 13) {
         this.updateFolderName(evt.target.value)
@@ -268,6 +300,9 @@ export default {
   &__icon {
     margin-top: -5px;
     margin-right: 5px;
+  }
+  &--selected {
+    background-color: $light-green2;
   }
   &:hover {
     background-color: $light-green2;

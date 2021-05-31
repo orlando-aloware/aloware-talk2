@@ -44,16 +44,16 @@ export default {
 @import 'src/css/breakpoints.scss';
 .confirm-dialog {
   .modal-title {
-    color: $white;
+    color: $dark;
     font-size: 16px;
     font-weight: bold;
   }
   .modal-header {
-    background-color: $dark;
+    background-color: $white;
     border-radius: 0;
     padding: 15px;
     .close {
-      color: $white;
+      color: $dark;
     }
   }
   .modal-content {

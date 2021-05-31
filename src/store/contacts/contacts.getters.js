@@ -4,9 +4,18 @@ export default {
   folderToRemove: (state) => state.removeFolder || {},
   isRemoveListOpen: (state) => !!state.removeList,
   listToRemove: (state) => state.removeList || {},
+  isRemoveContactOpen: (state) => !!state.removeContact,
+  contactToRemove: (state) => state.removeContact,
+  removeContactActionType: (state) => state.removeContactActionType,
   pinnedLists: (state) => state.pinned,
-  allContacts: (state) => state.lists.contacts,
   pinnedCounts: (state) => state.pinnedCounts,
   folders: (state) => state.folders,
-  columnHeaders: (state) => state.columnHeaders
+  columnsUpdating: (state) => state.columnsUpdating,
+  lists: (state) => state.lists,
+  listItems: (state) => state.listItems,
+  columns: (state) => state.columns,
+  moveDialog: (state) => state.moveDialog,
+  selectedContacts: (state) => state.selectedContacts,
+  selectedList: (state) => state.selectedList,
+  createList: (state) => state.createList
 }

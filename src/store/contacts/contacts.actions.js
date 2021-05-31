@@ -14,11 +14,17 @@ export default {
   removeFolderOpen: ({ commit }, folder) => {
     commit('REMOVE_FOLDER_OPEN', folder)
   },
+  removeContactOpen: ({ commit }, contact) => {
+    commit('REMOVE_CONTACT_OPEN', contact)
+  },
   removeListClose: ({ commit }) => {
     commit('REMOVE_LIST_CLOSE')
   },
   removeFolderClose: ({ commit }) => {
     commit('REMOVE_FOLDER_CLOSE')
+  },
+  removeContactClose: ({ commit }) => {
+    commit('REMOVE_CONTACT_CLOSE')
   },
   openFilters: ({ commit }) => {
     commit('FILTERS_OPEN')
@@ -35,13 +41,49 @@ export default {
   foldersLoaded: ({ commit }, payload) => {
     commit('FOLDERS_LOADED', payload)
   },
-  pinnedContactlistsLoaded: ({ commit }, payload) => {
-    commit('PINNED_CONTACT_LISTS_LOADED', payload)
+  pinnedLoaded: ({ commit }, payload) => {
+    commit('PINNED_LOADED', payload)
   },
-  columnHeadersOpen: ({ commit }, payload) => {
-    commit('COLUMN_HEADERS_OPEN', payload)
+  listLoaded: ({ commit }, payload) => {
+    commit('LIST_LOADED', payload)
   },
-  columnHeadersClose: ({ commit }) => {
-    commit('COLUMN_HEADERS_CLOSE')
+  columnsOpen: ({ commit }, payload) => {
+    commit('COLUMNS_OPEN', payload)
+  },
+  columnsClose: ({ commit }) => {
+    commit('COLUMNS_CLOSE')
+  },
+  columnsReordered: ({ commit }, payload) => {
+    commit('COLUMNS_REORDERED', payload)
+  },
+  columnsUpdated: ({ commit }, payload) => {
+    commit('COLUMNS_UPDATED', payload)
+  },
+  listPinToggled: ({ commit }, { id, isPinned }) => {
+    commit(isPinned ? 'LIST_PINNED' : 'LIST_UNPINNED', id)
+  },
+  openMoveDialog: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_OPEN', payload)
+  },
+  closeMoveDialog: ({ commit }) => {
+    commit('MOVE_DIALOG_CLOSE')
+  },
+  setMoveDialogTarget: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_TARGET', payload)
+  },
+  setContactRemoveActionType: ({ commit }, payload) => {
+    commit('SET_CONTACT_REMOVE_ACTION_TYPE', payload)
+  },
+  setListSelectedContacts: ({ commit }, payload) => {
+    commit('SET_LIST_SELECTED_CONTACTS', payload)
+  },
+  setSelectedList: ({ commit }, payload) => {
+    commit('SET_SELECTED_LIST', payload)
+  },
+  createListOpen: ({ commit }, payload) => {
+    commit('CREATE_LIST_OPEN', payload)
+  },
+  createListClose: ({ commit }) => {
+    commit('CREATE_LIST_CLOSE')
   }
 }

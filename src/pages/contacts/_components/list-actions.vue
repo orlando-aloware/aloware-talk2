@@ -1,6 +1,6 @@
 <template>
-  <contact-menu title="Actions">
-    <contact-menu-item @click="$emit('rename')">
+  <contact-menu>
+    <contact-menu-item @click="$emit('rename')" v-if="hasEdit">
       <template slot="icon">
         <pencil-icon></pencil-icon>
       </template>
@@ -10,8 +10,8 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="type === 'dynamic'"
-      @click="$emit('clone_static')"
+      v-if="type === ListTypes.DYNAMIC"
+      @click="$emit('clonestatic')"
     >
       <template slot="icon">
         <plus-icon></plus-icon>
@@ -30,12 +30,12 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item @click="$emit('remove')">
+    <contact-menu-item @click="$emit('move')" v-if="hasEdit">
       <template slot="icon">
-        <trash-icon></trash-icon>
+        <move-icon></move-icon>
       </template>
       <template slot="title">
-        <span>Remove</span>
+        <span class="move-item">Move</span>
       </template>
     </contact-menu-item>
 
@@ -44,46 +44,64 @@
         <pin-icon></pin-icon>
       </template>
       <template slot="title">
-        <span>Pin</span>
+        <span>{{ isPinned ? 'Unpin' : 'Pin' }}</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
+      <template slot="icon">
+        <trash-icon></trash-icon>
+      </template>
+      <template slot="title">
+        <span>Delete</span>
       </template>
     </contact-menu-item>
   </contact-menu>
 </template>
 
 <script>
-import contactMenu from './contact-menu.vue'
-import contactMenuItem from './contact-menu-item.vue'
-import pencilIcon from 'src/components/icons/pencil-icon.vue'
-import plusIcon from 'src/components/icons/plus-icon.vue'
-import duplicateIcon from 'src/components/icons/duplicate-icon.vue'
+import ContactMenu from './contact-menu.vue'
+import ContactMenuItem from './contact-menu-item.vue'
+import PencilIcon from 'src/components/icons/pencil-icon.vue'
+import PlusIcon from 'src/components/icons/plus-icon.vue'
+import DuplicateIcon from 'src/components/icons/duplicate-icon.vue'
 import TrashIcon from 'src/components/icons/trash-icon.vue'
 import PinIcon from 'src/components/icons/pin-icon.vue'
+import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import MoveIcon from 'src/components/icons/move-icon.vue'
 
 export default {
   components: {
-    contactMenu,
-    contactMenuItem,
-    pencilIcon,
-    plusIcon,
-    duplicateIcon,
+    ContactMenu,
+    ContactMenuItem,
+    PencilIcon,
+    PlusIcon,
+    DuplicateIcon,
     TrashIcon,
-    PinIcon
-  },
-  props: {
-    id: {
-      type: Number
-    },
-    type: {
-      type: String,
-      required: true
-    }
+    PinIcon,
+    MoveIcon
   },
   data () {
-    return {}
+    return {
+      ListTypes: {
+        DYNAMIC,
+        STATIC
+      }
+    }
   },
-  methods: {
-    onClickOption (action) {
-      alert(action)
+  props: {
+    type: {
+      type: Number,
+      required: true
+    },
+    hasEdit: {
+      type: Number
+    },
+    hasDelete: {
+      type: Number
+    },
+    isPinned: {
+      type: Boolean
     }
   }
 }

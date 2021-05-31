@@ -2,41 +2,47 @@
   <b-modal
     v-model="isOpen"
     size="lg"
-    title="Choose which columns you see"
+    :title="title"
     modal-class="column-headers-modal"
     scrollable
   >
-    <b-overlay :show="loading" rounded="sm">
-      <div class="column-headers-modal__inner row">
-        <div class="col-md-12">
-          <div class="alert alert-danger" v-if="errorMessage.length">
-            {{ errorMessage }}
+    <b-overlay :show="loading" rounded="sm" variant="white">
+      <div
+        class="w-100 column-headers-modal__inner d-flex position-relative px-2"
+      >
+        <div class="d-flex flex-column flex-grow-1 pr-3">
+          <div class="mb-2">
+            <contacts-table-search
+              @search="onSearch"
+              :searchOnKeyup="true"
+              placeholder="Search available columns..."
+            />
           </div>
-        </div>
-
-        <div class="col-lg-6 px-0">
-          <div class="flex flex-column pr-2 pl-4">
-            <div class="mb-2">
-              <contacts-table-search @search="onSearch" :searchOnKeyup="true" />
+          <div class="column-headers-modal__checkboxes">
+            <div
+              class="d-flex align-items-center justify-content-center p-4 border my-3"
+              v-if="!allColumns.results"
+            >
+              <div class="text-muted">No results found</div>
             </div>
-            <div class="column-headers-modal__checkboxes">
-              <div
-                class="d-flex align-items-center justify-content-center p-4 border my-3"
-                v-if="!allColumns.length"
-              >
-                <div class="text-muted">No results found</div>
+            <div v-for="(items, index) in allColumns.items" :key="index">
+              <div class="category-name">
+                {{ categories[index] }}
               </div>
               <div
                 class="column-headers-modal__item d-flex align-items-center"
-                v-for="column in allColumns"
-                :key="column.id"
+                v-for="column in items"
+                :key="column.name"
+                :class="{
+                  'column-headers-modal__item--hidden': isHidden(column)
+                }"
               >
                 <div class="pl-2 checkbox">
                   <input
                     type="checkbox"
-                    :checked="isChecked(column) || selected.has(column.name)"
-                    :disabled="!isColumn(column.name)"
-                    :value="column.id"
+                    :checked="selected.has(column.name)"
+                    :disabled="column.required"
+                    :value="column.name"
                     @click="onClickedColumn(column, selected.has(column.name))"
                   />
                 </div>
@@ -50,46 +56,54 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-6 px-0">
-          <div class="px-3">
-            <div
-              class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
+        <div class="w-50">
+          <div
+            class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
+          >
+            Selected Columns ({{ currentColumns.length - 2 }})
+          </div>
+          <div class="d-flex flex-column">
+            <draggable
+              v-model="currentColumns"
+              ghost-class="ghost"
+              handle=".handle"
+              :move="onCheckMove"
+              @start="isDragging = true"
+              @end="isDragging = false"
             >
-              Selected Columns
-            </div>
-            <div class="d-flex flex-column">
-              <draggable
-                v-model="columns"
-                ghost-class="ghost"
-                handle=".handle"
-                :move="onCheckMove"
-                @start="isDragging = true"
-                @end="isDragging = false"
+              <div
+                class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
+                :class="{
+                  handle: column.draggable,
+                  'column-headers-modal__item--hidden': isHidden(column)
+                }"
+                v-for="column in currentColumns"
+                :key="column.name"
               >
-                <div
-                  class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
-                  :class="{ handle: column.draggable }"
-                  v-for="column in columns"
-                  :key="column.id"
-                >
-                  <i
-                    class="fa fa-align-justify"
-                    aria-hidden="true"
-                    v-if="column.draggable && isColumn(column.name)"
-                  ></i>
-                  <div class="flex-grow-1 pl-2 column-headers-modal__label">
-                    {{ column.label }}
-                  </div>
-                  <button
-                    v-if="column.draggable && isColumn(column.name)"
-                    @click="onClickedColumn(column, true)"
-                    class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
-                  >
-                    <i class="fa fa-times"></i>
-                  </button>
+                <i
+                  class="fa fa-align-justify"
+                  aria-hidden="true"
+                  v-if="column.draggable && !column.required"
+                ></i>
+
+                <i
+                  class="fa fa-chevron-right"
+                  aria-hidden="true"
+                  v-if="column.required"
+                ></i>
+
+                <div class="flex-grow-1 pl-2 column-headers-modal__label">
+                  {{ column.label }}
                 </div>
-              </draggable>
-            </div>
+                <button
+                  v-if="column.draggable && !column.required"
+                  @click="onClickedColumn(column, true)"
+                  class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0"
+                >
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </draggable>
           </div>
         </div>
       </div>
@@ -108,7 +122,7 @@
             variant="outline-success mr-2"
             class="custom-btn"
             :disabled="loading"
-            @click="columnHeadersClose"
+            @click="columnsClose"
             >Cancel</b-button
           >
         </div>
@@ -128,13 +142,22 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+
+import {
+  ALL_COLUMNS,
+  DEFAULT_COLUMNS,
+  COLUMN_CATEGORIES,
+  DEFAULT_CONTACT_LIST
+} from 'src/constants/contacts-list-types'
+
+import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import ContactsTableSearch from './contacts-table-search.vue'
-import allColumns from './allcolumns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import columns from 'src/constants/columns'
 
-const MIN_COLUMNS = 7
+const DEFAULT_CONTACT_LIST_IDS = Object.keys(DEFAULT_CONTACT_LIST).map(
+  (i) => DEFAULT_CONTACT_LIST[i].id
+)
 
 export default {
   components: {
@@ -143,51 +166,69 @@ export default {
   },
   data () {
     return {
-      errorMessage: '',
       searchText: '',
-      columns: [],
       loading: false,
-      isOpen: false
+      isOpen: false,
+      categories: COLUMN_CATEGORIES,
+      currentColumns: DEFAULT_COLUMNS
     }
   },
   methods: {
-    ...mapActions('contacts', ['columnHeadersClose']),
+    ...mapActions('contacts', ['columnsClose', 'columnsUpdated']),
     onSearch (searchText) {
       this.searchText = searchText
-    },
-    isColumn: (name) => {
-      return name !== 'checkbox' && name !== 'actions'
     },
     onCheckMove (evt) {
       return evt.relatedContext.element.draggable
     },
-    isChecked ({ name }) {
+    isHidden ({ name }) {
       return name === 'checkbox' || name === 'actions'
     },
     onClickedColumn (column, selected) {
+      if (column.required) return
       if (selected) {
-        this.columns = this.columns.filter((c) => c.name !== column.name)
+        this.currentColumns = this.currentColumns.filter(
+          (c) => c.name !== column.name
+        )
       } else {
-        const lastIndex = this.columns.length - 1
-        const lastItem = this.columns[lastIndex]
+        const lastIndex = this.currentColumns.length - 1
+        const lastItem = this.currentColumns[lastIndex]
         const newItems = []
-        for (let i = 0; i < this.columns.length; i++) {
+        for (let i = 0; i < this.currentColumns.length; i++) {
           if (i === lastIndex) {
             newItems[lastIndex] = column
             newItems[lastIndex + 1] = lastItem
           } else {
-            newItems[i] = this.columns[i]
+            newItems[i] = this.currentColumns[i]
           }
         }
-        this.columns = newItems
+        this.currentColumns = newItems
       }
     },
+    closeAndMutate () {
+      this.columnsUpdated({
+        id: this.columns.id,
+        headers: this.currentColumns
+      })
+      this.columnsClose()
+    },
+    closeAndReset () {
+      this.columnsUpdated({
+        id: this.columns.id,
+        headers: DEFAULT_COLUMNS
+      })
+      this.columnsClose()
+    },
     onApplyChanges () {
+      if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+        this.closeAndMutate()
+        return
+      }
       this.loading = true
       window.axios
-        .patch(`/api/v2/contacts-list/${this.columnHeaders.id}`, {
-          ...this.columnHeaders,
-          headers: this.columns,
+        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
+          ...this.columns,
+          headers: this.currentColumns,
           filters: [] // TODO: use a
         })
         .then(() => {
@@ -196,7 +237,7 @@ export default {
             type: 'positive',
             textColor: 'white'
           })
-          this.columnHeadersClose()
+          this.closeAndMutate()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -212,11 +253,17 @@ export default {
         })
     },
     onResetAllColumns () {
+      this.closeAndReset()
+
+      if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+        return
+      }
+
       this.loading = true
       window.axios
-        .patch(`/api/v2/contacts-list/${this.columnHeaders.id}`, {
-          ...this.columnHeaders,
-          headers: columns,
+        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
+          ...this.columns,
+          headers: DEFAULT_COLUMNS,
           filters: [] // TODO: use actual values
         })
         .then(() => {
@@ -225,7 +272,7 @@ export default {
             type: 'positive',
             textColor: 'white'
           })
-          this.columnHeadersClose()
+          this.columnsClose()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -242,41 +289,49 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['columnHeaders']),
+    ...mapGetters('contacts', ['columns']),
+    title () {
+      return `Manage ${String(this.columns?.name).toLowerCase()} columns`
+    },
     allColumns () {
-      if (this.searchText && this.searchText.length > 1) {
-        return allColumns.filter(
-          (i) =>
-            (i.name + i.label)
+      const columns = []
+      let results = 0
+
+      const matches = sortBy(ALL_COLUMNS, ['name']).filter((item) => {
+        if (this.searchText && this.searchText.length > 1) {
+          return (
+            (item.name + item.label)
               .toLowerCase()
               .indexOf(this.searchText.toLowerCase()) !== -1
-        )
-      } else {
-        return allColumns
+          )
+        } else {
+          return true
+        }
+      })
+
+      for (let i = 0; i < COLUMN_CATEGORIES.length; i++) {
+        columns[i] = matches.filter((c) => c.category === i)
+        results = results + columns[i].length
       }
+
+      return { items: columns, results }
     },
     selected () {
-      if (Array.isArray(this.columns) && this.columns.length) {
-        return new Set([...this.columns.map((i) => i.name)])
+      if (Array.isArray(this.currentColumns) && this.currentColumns.length) {
+        return new Set([...this.currentColumns.map((i) => i.name)])
       } else {
         return new Set()
       }
     }
   },
   watch: {
-    columnHeaders: function (value) {
+    columns: function (value) {
       if (value && value.headers) {
-        this.columns = value.headers
+        this.currentColumns = value.headers
         this.isOpen = true
       } else {
         this.isOpen = false
-      }
-    },
-    columns: function (value) {
-      if (value.length < MIN_COLUMNS) {
-        this.errorMessage = 'You need to have atleast 4 columns enabled'
-      } else {
-        this.errorMessage = ''
+        this.currentColumns = []
       }
     }
   }
@@ -295,8 +350,17 @@ export default {
   .ghost {
     border: dashed 1px $green !important;
   }
+  .category-name {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-weight: bold;
+  }
   &__checkboxes {
-    max-height: calc(100% - 50px);
+    max-height: 500px;
+    overflow: auto;
   }
   &__remove {
     width: 10px;
@@ -307,7 +371,6 @@ export default {
   }
   &__selecteds {
     font-size: 14px;
-    margin-bottom: 15px;
   }
   .handle:hover {
     background-color: $light-green2;
@@ -317,6 +380,11 @@ export default {
   }
   &__item {
     height: 35px;
+    &--hidden {
+      height: 0;
+      visibility: hidden;
+      overflow: hidden;
+    }
     i {
       color: $grey-2;
       font-size: 10px;

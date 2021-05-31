@@ -1,5 +1,9 @@
 <template>
-  <div ref="scrollableArea" class="scrollableArea position-relative">
+  <div
+    ref="scrollableArea"
+    class="scrollableArea position-relative"
+    :class="{ 'overflow-hidden': isEmpty }"
+  >
     <table :class="computedClass" ref="table">
       <thead>
         <draggable
@@ -7,15 +11,15 @@
           tag="tr"
           ghost-class="ghost"
           handle=".handle"
-          @ended="onOrderChanged"
+          @change="onOrderChanged"
           :move="onCheckMove"
         >
           <th
             v-for="column in columns"
-            :key="column.id"
-            :data-column-id="column.id"
+            :key="column.name"
+            :data-column-id="column.name"
             :class="{
-              checkbox: column.checkbox,
+              checkbox: column.name === 'checkbox',
               sticky: column.sticky
             }"
             :style="{
@@ -25,10 +29,10 @@
           >
             <input
               type="checkbox"
-              v-if="column.checkbox"
+              v-if="column.name === 'checkbox'"
               @click="onCheckboxClicked"
             />
-            <template v-if="column.id && !column.checkbox">
+            <template v-if="column.name && column.name !== 'checkbox'">
               <span :class="{ handle: column.draggable }"
                 ><i
                   class="fa fa-bars mr-2 text-muted"
@@ -40,15 +44,17 @@
                 href="#"
                 class="sorter"
                 :class="{
-                  'sorter-asc': sorts[column.fieldName] === 'asc',
-                  'sorter-desc': sorts[column.fieldName] === 'desc'
+                  'sorter-asc':
+                    sorts.order === 'asc' && sorts.orderBy === column.name,
+                  'sorter-desc':
+                    sorts.order === 'desc' && sorts.orderBy === column.name
                 }"
                 v-if="column.sortable"
                 @click.prevent="onColumnSort(column)"
               ></a>
               <div
                 class="tableResizer"
-                :data-resizer-id="column.id"
+                :data-resizer-id="column.name"
                 v-if="column.resizable"
                 @mousedown="onResizerMouseDown"
               >
@@ -59,7 +65,7 @@
         </draggable>
       </thead>
       <tbody>
-        <slot />
+        <slot name="tbody" />
       </tbody>
     </table>
     <div class="relative py-4" v-b-visible.100="onVisibilityChanged">
@@ -71,7 +77,11 @@
       >
       </b-overlay>
     </div>
-    <div class="empty-state" v-if="isEmpty">
+
+    <template v-if="hasEmptySlot && isEmpty">
+      <slot name="empty" />
+    </template>
+    <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty">
       <div class="h5">No contacts found based on the current filters</div>
     </div>
   </div>
@@ -125,19 +135,10 @@ export default {
       this.$emit('sort', Object.assign({}, this.getColumnSorts(column)))
     },
     getColumnSorts (column) {
-      if (!this.sorts[column.fieldName]) {
-        this.sorts = {
-          ...this.sorts,
-          [column.fieldName]: 'asc'
-        }
-      } else {
-        this.sorts = {
-          ...this.sorts,
-          [column.fieldName]:
-            this.sorts[column.fieldName] === 'asc' ? 'desc' : 'asc'
-        }
+      this.sorts = {
+        orderBy: column.name,
+        order: this.sorts.order === 'asc' ? 'desc' : 'asc'
       }
-
       return this.sorts
     },
     onCheckMove (evt) {
@@ -159,7 +160,7 @@ export default {
   },
   data () {
     return {
-      sorts: {},
+      sorts: { order: 'asc' },
       tableColumns: [],
       startOffset: 0,
       loading: true,
@@ -174,6 +175,9 @@ export default {
         [this.customClass]: !!this.customClass,
         'datatable--sticky-columns': this.stickyHeaders
       }
+    },
+    hasEmptySlot () {
+      return !!this.$slots.empty
     }
   },
   props: {
@@ -199,8 +203,8 @@ export default {
   mounted () {
     if (this.$refs.scrollableArea) {
       this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
+      this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
-    this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },
@@ -227,6 +231,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: $white;
+  z-index: 0;
 }
 
 .scrollableArea {
