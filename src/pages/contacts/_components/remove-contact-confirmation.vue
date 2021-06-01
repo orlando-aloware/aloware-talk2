@@ -25,8 +25,14 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="contactsToDelete != contactToDeleteCount"
+                :disabled="(contactsToDelete != contactToDeleteCount) || isBusy"
                 @click="onConfirm">
+          <b-spinner variant="warning"
+                     type="grow"
+                     label="Spinning"
+                     small
+                     v-if="isBusy">
+          </b-spinner>
           Delete
         </button>
       </div>
@@ -36,15 +42,15 @@
 
 <script>
 import ConfirmDialog from 'src/pages/contacts/_components/confirm-dialog.vue'
-
 import { mapActions, mapGetters } from 'vuex'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   components: {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['contactToRemove', 'selectedContacts', 'removeContactActionType', 'selectedList']),
+    ...mapGetters('contacts', ['contactToRemove', 'selectedContacts', 'removeContactActionType', 'selectedList', 'isBulkDelete']),
     title () {
       return `Delete ${this.contactToDeleteCount} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
     },
@@ -53,7 +59,7 @@ export default {
         return 1
       }
 
-      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
+      if (this.selectedContacts[this.selectedList.id]) {
         return this.selectedContacts[this.selectedList.id].length
       }
 
@@ -62,7 +68,9 @@ export default {
   },
   data () {
     return {
-      contactsToDelete: null
+      isBusy: false,
+      contactsToDelete: null,
+      ContactListTypes
     }
   },
   watch: {
@@ -83,16 +91,17 @@ export default {
     handleSingleDeletion () {
       let url = null
       switch (this.removeContactActionType) {
-        case 'remove_from_list':
-          url = '/api/v1/contact-list/' +
-            this.contactToRemove.contact.contactListId +
+        case ContactListTypes.REMOVE_FROM_LIST_ONLY:
+          url = '/api/v2/contact-list-item/' +
+            this.selectedList.id +
             '/items/' +
-            this.contactToRemove.contact.id
+            this.contactToRemove.id
           break
-        case 'remove_from_contacts':
-          url = `/api/v1/contact/${this.contactToRemove.contact.id}`
+        case ContactListTypes.REMOVE_FROM_CONTACTS:
+          url = `/api/v2/contacts/${this.contactToRemove.id}`
           break
       }
+      this.isBusy = true
       return window.axios
         .delete(
           url
@@ -110,22 +119,25 @@ export default {
             type: 'negative',
             textColor: 'white'
           })
-        }).finally(() => this.$bvModal.hide('remove-contact-confirmation-dialog'))
+        }).finally(() => {
+          this.isBusy = false
+          this.contactsToDelete = null
+          this.$bvModal.hide('remove-contact-confirmation-dialog')
+        })
     },
     handleBulkDeletion () {
       let url = null
       switch (this.removeContactActionType) {
-        case 'remove_from_list':
-          url = '/api/v1/contact-list-item/bulk-delete'
+        case ContactListTypes.REMOVE_FROM_LIST_ONLY:
+          url = `/api/v2/contact-list-item/bulk/${this.selectedList.id}`
           break
-        case 'remove_from_contacts':
-          url = `/api/v1/contact/bulk-delete`
+        case ContactListTypes.REMOVE_FROM_CONTACTS:
+          url = `/api/v2/contacts/bulk-delete`
           break
       }
+      this.isBusy = true
       return window.axios
-        .delete(
-          url
-        )
+        .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id] } })
         .then(() => {
           this.$q.notify({
             message: 'Contacts was successfully removed.',
@@ -139,14 +151,19 @@ export default {
             type: 'negative',
             textColor: 'white'
           })
-        }).finally(() => this.$bvModal.hide('remove-contact-confirmation-dialog'))
+        }).finally(() => {
+          this.contactsToDelete = null
+          this.isBusy = false
+          this.removeContactClose()
+          this.$bvModal.hide('remove-contact-confirmation-dialog')
+        })
     },
     onConfirm () {
-      if (this.contactToRemove) {
+      if (this.contactToRemove && !this.isBulkDelete) {
         this.handleSingleDeletion()
       }
 
-      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
+      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
     }

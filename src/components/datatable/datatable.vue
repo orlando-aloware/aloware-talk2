@@ -213,11 +213,6 @@ export default {
     this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)
-  },
-  watch: {
-    columns: function (id) {
-      console.log(id)
-    }
   }
 }
 </script>

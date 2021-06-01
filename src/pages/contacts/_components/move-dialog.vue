@@ -107,7 +107,7 @@ export default {
     },
     moveListRequest () {
       return window.axios
-        .patch('/api/v1/contacts-list/' + this.moveDialog.id, {
+        .patch('/api/v2/contacts-list/' + this.moveDialog.id, {
           contact_folder_id: this.moveDialog.target
         })
         .then(this.reloadFolders)
@@ -125,7 +125,7 @@ export default {
     },
     reloadFolders () {
       return window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

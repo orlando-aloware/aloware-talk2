@@ -66,7 +66,7 @@
         :key="column.name"
         v-else-if="column.name === 'tags'"
       >
-        <template v-if="!contact.tags.length">
+        <template v-if="!contact.tags">
           <span class="text-muted">no tags available</span>
         </template>
         <template v-if="Array.isArray(contact.tags) && contact.tags.length">
@@ -172,7 +172,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactOpen']),
+    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete']),
     onCheckerClicked () {
       const checked = new Set([...this.checked])
 
@@ -185,6 +185,7 @@ export default {
       this.$emit('checked', [...checked])
     },
     onRemove () {
+      this.setBulkDelete(false)
       this.removeContactOpen({
         ...this.contact,
         contactListId: this.contactListId

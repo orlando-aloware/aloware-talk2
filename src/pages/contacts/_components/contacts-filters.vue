@@ -26,27 +26,11 @@
             >
             <b-list-group-item
               class="filter-list-item"
-              v-for="item in items"
-              :key="item"
-              >Lead status</b-list-group-item
-            >
-            <b-list-group-item class="filter-divider"
-              >Most used properties</b-list-group-item
-            >
-            <b-list-group-item
-              class="filter-list-item"
-              v-for="item in items"
-              :key="item"
-              >Hubspot Score</b-list-group-item
-            >
-            <b-list-group-item class="filter-divider"
-              >Most used properties</b-list-group-item
-            >
-            <b-list-group-item
-              class="filter-list-item"
-              v-for="item in items"
-              :key="item"
-              >First conversion</b-list-group-item
+              v-for="filter in filters"
+              :key="filter.key"
+              >
+              {{ filter.label }}
+            </b-list-group-item
             >
           </b-list-group>
         </div>
@@ -67,10 +51,32 @@ export default {
     }
   },
   computed: {
-    ...mapState('contacts', ['isFiltersOpen'])
+    ...mapState('contacts', ['isFiltersOpen', 'filters'])
   },
   methods: {
-    ...mapActions('contacts', ['openFilters', 'closeFilters'])
+    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters']),
+    getFilters: function () {
+      window.axios
+        .get('/api/v2/contacts/filters')
+        .then((response) => response.data.filters)
+        .then(this.setFilters)
+        .finally(() => {
+          this.show = false
+        })
+        .catch((err) => {
+          console.error(err)
+          this.$q.notify({
+            message: 'Unable to load filters please try again.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
+    }
   },
   mounted () {
     this.$refs.modal.$on('hide', () => {
@@ -78,9 +84,7 @@ export default {
     })
     this.$refs.modal.$on('show', () => {
       // load filters here...
-      setTimeout(() => {
-        this.show = false
-      }, 2000)
+      this.getFilters()
     })
   },
   watch: {

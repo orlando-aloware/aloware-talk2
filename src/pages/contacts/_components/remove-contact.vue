@@ -18,7 +18,7 @@
         <button
           class="btn btn-sm btn-outline-success mr-2"
           @click="onRemoveFromList"
-          v-if="selectedList.type === '1'"
+          v-if="selectedList.type === String(ContactListType.STATIC)"
         >
           Remove From List Only
         </button>
@@ -32,8 +32,8 @@
 
 <script>
 import ConfirmDialog from 'src/pages/contacts/_components/confirm-dialog.vue'
-
 import { mapActions, mapGetters } from 'vuex'
+import * as ContactListType from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -43,21 +43,26 @@ export default {
     ...mapGetters('contacts', ['isRemoveContactOpen', 'contactToRemove', 'selectedContacts', 'selectedList']),
     title () {
       if (this.contactToRemove) {
-        return 'Remove ' + (this.contactToRemove.contact.name ? this.contactToRemove.name : 'No Name') + '?'
+        return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
-      // if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
-      //   return 'Remove ' + this.selectedContacts[this.selectedList.id].length + ' contacts?'
-      // }
+      if (this.selectedContacts[this.selectedList.id]) {
+        return 'Remove ' + this.selectedContacts[this.selectedList.id].length + ' contacts?'
+      }
       return ''
     },
     message () {
       if (this.contactToRemove) {
         return 'Are you sure you want to remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
-      // if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
-      //   return `Are you sure you want to remove <span>${this.selectedContacts[this.selectedList.id].length}</span> contacts?`
-      // }
+      if (this.selectedContacts[this.selectedList.id]) {
+        return `Are you sure you want to remove <span>${this.selectedContacts[this.selectedList.id].length}</span> contacts?`
+      }
       return ''
+    }
+  },
+  data () {
+    return {
+      ContactListType
     }
   },
   watch: {
@@ -72,12 +77,12 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeContactClose', 'setContactRemoveActionType']),
     onRemoveFromList () {
-      this.setContactRemoveActionType('remove_from_list')
+      this.setContactRemoveActionType(ContactListType.REMOVE_FROM_LIST_ONLY)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     },
     onRemoveFromContacts () {
-      this.setContactRemoveActionType('remove_from_contacts')
+      this.setContactRemoveActionType(ContactListType.REMOVE_FROM_CONTACTS)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     }

@@ -71,6 +71,7 @@ export default function () {
     },
     removeContact: null,
     removeContactActionType: null,
+    isBulkDelete: false,
     removeFolder: null,
     removeList: null,
     moveDialog: {
@@ -87,6 +88,7 @@ export default function () {
     createList: {
       open: false,
       folderId: null
-    }
+    },
+    filters: []
   }
 }

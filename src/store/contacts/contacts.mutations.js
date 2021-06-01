@@ -23,7 +23,7 @@ export default {
     state.removeList = list
   },
   REMOVE_CONTACT_OPEN: (state, contact) => {
-    state.removeContact = { ...state.removeContact, contact: contact }
+    state.removeContact = contact
   },
   REMOVE_FOLDER_CLOSE: (state) => {
     state.removeFolder = null
@@ -32,7 +32,7 @@ export default {
     state.removeList = null
   },
   REMOVE_CONTACT_CLOSE: (state) => {
-    state.removeContact = { ...state.removeContact, contact: null }
+    state.removeContact = null
   },
   FILTERS_CLOSE: (state) => {
     state.isFiltersOpen = false
@@ -117,6 +117,9 @@ export default {
   SET_CONTACT_REMOVE_ACTION_TYPE: (state, type) => {
     state.removeContactActionType = type
   },
+  SET_BULK_DELETE: (state, payload) => {
+    state.isBulkDelete = payload
+  },
   SET_LIST_SELECTED_CONTACTS: (state, payload) => {
     state.selectedContacts = {
       ...state.selectedContacts,
@@ -131,5 +134,8 @@ export default {
   },
   CREATE_LIST_CLOSE: (state) => {
     state.createList = { folderId: null, open: false }
+  },
+  SET_FILTERS: (state, filters) => {
+    state.filters = filters
   }
 }

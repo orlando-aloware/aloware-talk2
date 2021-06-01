@@ -61,7 +61,7 @@ export default {
       }
 
       window.axios
-        .get('/api/v1/contacts-list/' + stringId)
+        .get('/api/v2/contacts-list/' + stringId)
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })

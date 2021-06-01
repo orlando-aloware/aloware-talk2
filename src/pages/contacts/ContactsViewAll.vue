@@ -4,7 +4,7 @@
 
 <script>
 import ContactsView from './ContactsView.vue'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -14,17 +14,17 @@ export default {
     return {
       id: 'all',
       name: 'All Contacts',
-      type: 1
+      type: 2
     }
   },
   computed: {
     ...mapGetters('contacts', ['lists', 'listItems'])
   },
   methods: {
+    ...mapActions('contacts', ['setSelectedList']),
     setData (id) {
       if (!id) { return }
       const list = this.lists[id]
-      console.log(list, this.listItems[id], id)
       this.id = id
       this.name = list.name
       this.type = list.type
@@ -37,6 +37,7 @@ export default {
   },
   mounted () {
     this.setData(this.$route.params.id)
+    this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
   }
 }
 </script>

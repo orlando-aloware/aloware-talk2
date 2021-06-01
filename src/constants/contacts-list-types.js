@@ -1,6 +1,9 @@
 export const STATIC = 1
 export const DYNAMIC = 2
 
+export const REMOVE_FROM_LIST_ONLY = 1
+export const REMOVE_FROM_CONTACTS = 2
+
 export const DEFAULT_CONTACT_LIST = {
   ALL_CONTACTS: {
     id: 'all',

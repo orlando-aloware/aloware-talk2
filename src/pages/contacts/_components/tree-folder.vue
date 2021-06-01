@@ -226,7 +226,7 @@ export default {
     },
     updateFolderRequest (id, params) {
       return window.axios
-        .patch('/api/v1/contact-folders/' + id, params)
+        .patch('/api/v2/contact-folders/' + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
@@ -239,7 +239,7 @@ export default {
     },
     reloadFolders () {
       return window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
