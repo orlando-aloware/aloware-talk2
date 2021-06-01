@@ -117,6 +117,9 @@ export default {
   SET_CONTACT_REMOVE_ACTION_TYPE: (state, type) => {
     state.removeContactActionType = type
   },
+  SET_BULK_DELETE: (state, payload) => {
+    state.isBulkDelete = payload
+  },
   SET_LIST_SELECTED_CONTACTS: (state, payload) => {
     state.selectedContacts = { ...state.selectedContacts, [payload.id]: payload.contacts }
   },

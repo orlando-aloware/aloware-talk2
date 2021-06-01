@@ -87,6 +87,7 @@ export default function () {
     },
     removeContact: null,
     removeContactActionType: null,
+    isBulkDelete: false,
     removeFolder: null,
     removeList: null,
     moveDialog: {

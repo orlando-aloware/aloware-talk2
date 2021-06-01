@@ -172,7 +172,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactOpen']),
+    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete']),
     onCheckerClicked () {
       const checked = new Set([...this.checked])
 
@@ -185,6 +185,7 @@ export default {
       this.$emit('checked', [...checked])
     },
     onRemove () {
+      this.setBulkDelete(false)
       this.removeContactOpen({
         ...this.contact,
         contactListId: this.contactListId

@@ -18,5 +18,6 @@ export default {
   selectedContacts: (state) => state.selectedContacts,
   selectedList: (state) => state.selectedList,
   createList: (state) => state.createList,
-  filters: (state) => state.filters
+  filters: (state) => state.filters,
+  isBulkDelete: (state) => state.isBulkDelete
 }

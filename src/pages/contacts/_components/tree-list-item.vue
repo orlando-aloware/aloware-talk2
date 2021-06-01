@@ -161,7 +161,7 @@ export default {
     },
     createList (params) {
       window.axios
-        .post('/api/v1/contacts-list/' + this.id + '/duplicate', params)
+        .post('/api/v2/contacts-list/' + this.id + '/duplicate', params)
         .then((response) => {
           const data = response.data.data
           const message = response.data.message
@@ -267,7 +267,7 @@ export default {
     },
     updateListRequest (id, params) {
       return window.axios
-        .patch('/api/v1/contacts-list/' + id, params)
+        .patch('/api/v2/contacts-list/' + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
@@ -280,7 +280,7 @@ export default {
     },
     getContactList (id) {
       return window.axios
-        .get('/api/v1/contacts-list/' + id)
+        .get('/api/v2/contacts-list/' + id)
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)

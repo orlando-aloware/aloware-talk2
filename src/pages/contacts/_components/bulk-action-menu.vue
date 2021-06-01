@@ -44,8 +44,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactOpen']),
+    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete']),
     onDelete (e) {
+      this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()
     }

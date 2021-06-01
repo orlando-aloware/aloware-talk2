@@ -50,7 +50,7 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['contactToRemove', 'selectedContacts', 'removeContactActionType', 'selectedList']),
+    ...mapGetters('contacts', ['contactToRemove', 'selectedContacts', 'removeContactActionType', 'selectedList', 'isBulkDelete']),
     title () {
       return `Delete ${this.contactToDeleteCount} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
     },
@@ -92,13 +92,13 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case ContactListTypes.REMOVE_FROM_LIST_ONLY:
-          url = '/api/v1/contact-list-item/' +
+          url = '/api/v2/contact-list-item/' +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
           break
         case ContactListTypes.REMOVE_FROM_CONTACTS:
-          url = `/api/v1/contact/${this.contactToRemove.id}`
+          url = `/api/v2/contacts/${this.contactToRemove.id}`
           break
       }
       this.isBusy = true
@@ -121,6 +121,7 @@ export default {
           })
         }).finally(() => {
           this.isBusy = false
+          this.contactsToDelete = null
           this.$bvModal.hide('remove-contact-confirmation-dialog')
         })
     },
@@ -128,10 +129,10 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case ContactListTypes.REMOVE_FROM_LIST_ONLY:
-          url = `/api/v1/contact-list-item/bulk/${this.selectedList.id}`
+          url = `/api/v2/contact-list-item/bulk/${this.selectedList.id}`
           break
         case ContactListTypes.REMOVE_FROM_CONTACTS:
-          url = `/api/v1/contact/bulk`
+          url = `/api/v2/contacts/bulk-delete`
           break
       }
       this.isBusy = true
@@ -151,17 +152,18 @@ export default {
             textColor: 'white'
           })
         }).finally(() => {
+          this.contactsToDelete = null
           this.isBusy = false
           this.removeContactClose()
           this.$bvModal.hide('remove-contact-confirmation-dialog')
         })
     },
     onConfirm () {
-      if (this.contactToRemove) {
+      if (this.contactToRemove && !this.isBulkDelete) {
         this.handleSingleDeletion()
       }
 
-      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object) {
+      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
     }

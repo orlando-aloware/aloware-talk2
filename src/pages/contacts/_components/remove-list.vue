@@ -56,7 +56,7 @@ export default {
     ...mapActions('contacts', ['removeListClose', 'foldersLoaded']),
     onRemoveList () {
       return window.axios
-        .delete('/api/v1/contacts-list/' + this.listToRemove.id)
+        .delete('/api/v2/contacts-list/' + this.listToRemove.id)
         .then(() => {
           this.reloadFolders()
         })

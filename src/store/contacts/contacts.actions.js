@@ -74,6 +74,9 @@ export default {
   setContactRemoveActionType: ({ commit }, payload) => {
     commit('SET_CONTACT_REMOVE_ACTION_TYPE', payload)
   },
+  setBulkDelete: ({ commit }, payload) => {
+    commit('SET_BULK_DELETE', payload)
+  },
   setListSelectedContacts: ({ commit }, payload) => {
     commit('SET_LIST_SELECTED_CONTACTS', payload)
   },
