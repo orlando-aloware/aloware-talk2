@@ -166,7 +166,7 @@ export default {
     },
     loadPinnedCount (id) {
       return window.axios
-        .get(`api/v1/contacts-list/${id}/items`)
+        .get(`api/v2/contacts-list/${id}/items`)
         .then((response) => {
           this.pinnedCountLoaded({
             id: id,

@@ -226,7 +226,7 @@ export default {
       }
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columns.id}`, {
+        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
           ...this.columns,
           headers: this.currentColumns,
           filters: [] // TODO: use a
@@ -261,7 +261,7 @@ export default {
 
       this.loading = true
       window.axios
-        .patch(`/api/v1/contacts-list/${this.columns.id}`, {
+        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
           ...this.columns,
           headers: DEFAULT_COLUMNS,
           filters: [] // TODO: use actual values
