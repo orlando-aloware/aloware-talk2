@@ -118,7 +118,10 @@ export default {
     state.removeContactActionType = type
   },
   SET_LIST_SELECTED_CONTACTS: (state, payload) => {
-    state.selectedContacts = { ...state.selectedContacts, [payload.id]: payload.contacts }
+    state.selectedContacts = {
+      ...state.selectedContacts,
+      [payload.id]: payload.contacts
+    }
   },
   SET_SELECTED_LIST: (state, payload) => {
     state.selectedList = { ...state.selectedList, ...payload }

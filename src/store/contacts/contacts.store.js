@@ -63,27 +63,11 @@ export default function () {
     opened: [],
     pinned: [],
     pinnedCounts: {
-      all: {
-        new_leads_count: 0,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      'my-contacts': {
-        new_leads_count: 0,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      unassigned: {
-        new_leads_count: 0,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      unanswered: {
-        new_leads_count: 0,
-        total_contact_count: 0,
-        unreads_count: 0
-      },
-      'new-leads': { new_leads_count: 0, total_contact_count: 0, unreads_count: 0 }
+      all: 0,
+      'my-contacts': 0,
+      unassigned: 0,
+      unanswered: 0,
+      'new-leads': 0
     },
     removeContact: null,
     removeContactActionType: null,

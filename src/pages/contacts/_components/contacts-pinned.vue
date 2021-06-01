@@ -26,11 +26,9 @@
           </div>
           <div class="pr-3 flex-grow-1">{{ item.name }}</div>
           <div class="pr-2">
-            <b-badge
-              pill
-              :variant="hasUnreads(item.id) ? 'danger' : 'light text-muted'"
-              >{{ getCount(item.id) | fixCount }}</b-badge
-            >
+            <b-badge pill variant="light text-muted">{{
+              getCount(item.id) | fixCount
+            }}</b-badge>
           </div>
         </a>
       </router-link>
@@ -60,11 +58,9 @@
           </div>
           <div class="pr-3 flex-grow-1">{{ item.name }}</div>
           <div class="pr-2">
-            <b-badge
-              pill
-              :variant="hasUnreads(item.id) ? 'danger' : 'light text-muted'"
-              >{{ getCount(item.id) | fixCount }}</b-badge
-            >
+            <b-badge pill variant="danger">{{
+              getCount(item.id) | fixCount
+            }}</b-badge>
           </div>
         </a>
       </router-link>
@@ -76,7 +72,11 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
-import { STATIC, DYNAMIC, DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+import {
+  STATIC,
+  DYNAMIC,
+  DEFAULT_CONTACT_LIST
+} from 'src/constants/contacts-list-types'
 
 export default {
   methods: {
@@ -85,15 +85,9 @@ export default {
       'pinnedLoaded',
       'listLoaded'
     ]),
-    hasUnreads (id) {
-      if (this.pinnedCounts[id] && this.pinnedCounts[id].unreads_count) {
-        return true
-      }
-      return false
-    },
     getCount (id) {
-      if (this.pinnedCounts[id] && this.pinnedCounts[id].total_contact_count) {
-        return this.pinnedCounts[id].total_contact_count
+      if (this.pinnedCounts[id] && this.pinnedCounts[id]) {
+        return this.pinnedCounts[id]
       }
       return 0
     },
@@ -101,11 +95,10 @@ export default {
       return Promise.all([
         this.loadAllCount(),
         this.loadMyContactsCount(),
-        this.loadNewLeadsCount(),
-        this.loadUnansweredCount(),
-        this.loadUnassignedCount()
+        this.loadStatusCounts()
       ])
-        .then(([allContacts, myContacts, newleads, unanswered, unassigned]) => {
+        .then(([allContacts, myContacts, statusCounts]) => {
+          console.log({ allContacts, myContacts })
           this.pinnedCountLoaded({
             id: DEFAULT_CONTACT_LIST.ALL_CONTACTS.id,
             count: allContacts
@@ -116,15 +109,15 @@ export default {
           })
           this.pinnedCountLoaded({
             id: DEFAULT_CONTACT_LIST.NEWLEADS.id,
-            count: newleads
+            count: statusCounts['new_contacts_count']
           })
           this.pinnedCountLoaded({
             id: DEFAULT_CONTACT_LIST.UNANSWERED.id,
-            count: unanswered
+            count: statusCounts['unanswered_contacts_count']
           })
           this.pinnedCountLoaded({
             id: DEFAULT_CONTACT_LIST.UNASSIGNED.id,
-            count: unassigned
+            count: statusCounts['unassigned_contacts_count']
           })
         })
         .finally(() => {
@@ -133,40 +126,24 @@ export default {
     },
     loadAllCount () {
       return window.axios
-        .get('api/v1/contact/get-contacts-count')
-        .then((response) => response.data)
+        .get('api/v2/contacts/count')
+        .then((response) => response.data.count)
     },
     loadMyContactsCount () {
       return window.axios
-        .get('api/v1/contact/get-contacts-count', {
+        .get('api/v2/contacts/count', {
           params: { user_id: this.profile.id }
         })
-        .then((response) => response.data)
+        .then((response) => response.data.count)
     },
-    loadNewLeadsCount () {
+    loadStatusCounts () {
       return window.axios
-        .get('api/v1/contact/get-contacts-count', {
-          params: { is_new_lead: 1 }
-        })
-        .then((response) => response.data)
-    },
-    loadUnansweredCount () {
-      return window.axios
-        .get('api/v1/contact/get-contacts-count', {
-          params: { has_unread: 1 }
-        })
-        .then((response) => response.data)
-    },
-    loadUnassignedCount () {
-      return window.axios
-        .get('api/v1/contact/get-contacts-count', {
-          params: { unassigned_leads: 1 }
-        })
+        .get('api/v2/contacts/status-counts')
         .then((response) => response.data)
     },
     loadPinnedCount (id) {
       return window.axios
-        .get(`api/v1/contacts-list/${id}/items`)
+        .get(`api/v2/contacts-list/${id}/items`)
         .then((response) => {
           this.pinnedCountLoaded({
             id: id,
@@ -184,7 +161,7 @@ export default {
     loadPinned () {
       this.loading = true
       return window.axios
-        .get('api/v1/contact-list-bookmark')
+        .get('api/v2/contact-list-bookmark')
         .then((response) => response.data)
         .then((data) => {
           const pinnedIds = []
