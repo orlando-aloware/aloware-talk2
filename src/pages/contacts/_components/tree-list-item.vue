@@ -222,7 +222,7 @@ export default {
     },
     pinRequest (id, isPinned) {
       const request = isPinned ? window.axios.post : window.axios.delete
-      return request('/api/v1/contact-list-bookmark/' + id)
+      return request('/api/v2/contact-list-bookmark/' + id)
     },
     onRenameList () {
       this.isEditing = true
@@ -294,7 +294,7 @@ export default {
     },
     reloadFolders () {
       return window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

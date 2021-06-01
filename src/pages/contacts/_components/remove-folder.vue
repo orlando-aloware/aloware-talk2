@@ -80,7 +80,7 @@ export default {
     },
     removeFolderRequest (id) {
       return window.axios
-        .delete('/api/v1/contact-folders/' + id)
+        .delete('/api/v2/contact-folders/' + id)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
@@ -93,7 +93,7 @@ export default {
     },
     reloadFoldersRequest () {
       return window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

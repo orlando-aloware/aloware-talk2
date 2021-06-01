@@ -103,6 +103,7 @@ export default function () {
     createList: {
       open: false,
       folderId: null
-    }
+    },
+    filters: []
   }
 }

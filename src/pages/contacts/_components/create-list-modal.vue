@@ -158,7 +158,7 @@ export default {
     },
     loadFolders () {
       window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

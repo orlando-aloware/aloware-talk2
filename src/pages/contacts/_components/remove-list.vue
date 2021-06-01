@@ -76,7 +76,7 @@ export default {
     },
     reloadFolders () {
       return window.axios
-        .get('/api/v1/contact-folders')
+        .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then((response) => {
           this.foldersLoaded(response)

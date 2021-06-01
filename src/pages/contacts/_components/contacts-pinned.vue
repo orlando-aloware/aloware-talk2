@@ -184,7 +184,7 @@ export default {
     loadPinned () {
       this.loading = true
       return window.axios
-        .get('api/v1/contact-list-bookmark')
+        .get('api/v2/contact-list-bookmark')
         .then((response) => response.data)
         .then((data) => {
           const pinnedIds = []

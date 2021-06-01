@@ -128,5 +128,8 @@ export default {
   },
   CREATE_LIST_CLOSE: (state) => {
     state.createList = { folderId: null, open: false }
+  },
+  SET_FILTERS: (state, filters) => {
+    state.filters = filters
   }
 }

@@ -85,5 +85,8 @@ export default {
   },
   createListClose: ({ commit }) => {
     commit('CREATE_LIST_CLOSE')
+  },
+  setFilters: ({ commit }, filters) => {
+    commit('SET_FILTERS', filters)
   }
 }

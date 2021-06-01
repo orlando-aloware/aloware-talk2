@@ -270,7 +270,7 @@ export default {
     },
     fetchContacts (params = {}) {
       return window.axios
-        .get('api/v1/contact', {
+        .get('api/v2/contacts', {
           params: this.createContactFilters(params)
         })
         .then((response) => response.data)

@@ -66,7 +66,7 @@
         :key="column.name"
         v-else-if="column.name === 'tags'"
       >
-        <template v-if="!contact.tags.length">
+        <template v-if="!contact.tags">
           <span class="text-muted">no tags available</span>
         </template>
         <template v-if="Array.isArray(contact.tags) && contact.tags.length">
