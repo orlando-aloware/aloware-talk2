@@ -4,6 +4,13 @@ export const DYNAMIC = 2
 export const REMOVE_FROM_LIST_ONLY = 1
 export const REMOVE_FROM_CONTACTS = 2
 
+export const OPERATORS = {
+  IS_ANY_OF: 1,
+  IS_KNOWN: 2,
+  IS_NONE_OF: 3,
+  IS_UNKNOWN: 4
+}
+
 export const DEFAULT_CONTACT_LIST = {
   ALL_CONTACTS: {
     id: 'all',
@@ -324,42 +331,6 @@ export const DEFAULT_COLUMNS = ALL_COLUMNS.filter((c) => c.default)
 export const STATIC_COLUMNS = ALL_COLUMNS.filter(
   (c) => c.default && c.name !== 'actions'
 )
-
-export const DEFAULT_FILTERS = {
-  date_field: 'last_engagement_at',
-  type: 'all',
-  direction: 'all',
-  report_type: 'date_v_campaign',
-  chart_period: 'day',
-  answer_status: 'all',
-  export_type: 'json',
-  min_talk_time: '0',
-  page: '1',
-  per_page: '20',
-  first_time_only: '0',
-  untagged_only: '0',
-  exclude_automated_communications: '0',
-  has_untagged_call: '0',
-  is_blocked: '0',
-  is_dnc: '0',
-  has_unread: '0',
-  is_new_lead: '0',
-  unassigned_leads: '0',
-  should_follow_the_sun: '0',
-  not_contacted: '0',
-  not_responded: '0',
-  responded: '0',
-  text_authorized: '0',
-  has_appointments: '0',
-  has_reminders: '0',
-  timezone: 'Asia/Manila',
-  contact_country: '',
-  contact_timezone: '',
-  changed: 'true',
-  states_limit: '{"us":[],"ca":[]}',
-  initial_line_only: '0',
-  search_text: ''
-}
 
 export const DEFAULT_CONTACT_LIST_ITEMS = {
   current_page: 1,

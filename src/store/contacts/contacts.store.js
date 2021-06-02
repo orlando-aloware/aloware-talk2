@@ -23,7 +23,7 @@ export default function () {
       'my-contacts': {
         headers: DEFAULT_COLUMNS,
         filters: {
-          user_id: null
+          contact_owner: null
         },
         type: 2,
         name: 'My Contacts'
@@ -31,7 +31,7 @@ export default function () {
       unassigned: {
         headers: DEFAULT_COLUMNS,
         filters: {
-          unassigned_leads: 1
+          is_unassigned: 1
         },
         type: 2,
         name: 'Unassigned'
@@ -39,7 +39,7 @@ export default function () {
       unanswered: {
         headers: DEFAULT_COLUMNS,
         filters: {
-          has_unread: 1
+          is_unanswered_contact: true
         },
         type: 2,
         name: 'Unanswered'
@@ -47,7 +47,7 @@ export default function () {
       'new-leads': {
         headers: DEFAULT_COLUMNS,
         filters: {
-          is_new_lead: 1
+          is_new_contact: true
         },
         type: 2,
         name: 'New Leads'

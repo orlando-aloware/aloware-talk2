@@ -119,7 +119,7 @@ export default {
     onSubmit () {
       this.isLoading = true
       window.axios
-        .post('/api/v1/contacts-list', {
+        .post('/api/v2/contacts-list', {
           contact_folder_id: this.createList.folderId,
           name: this.name,
           type: this.type,

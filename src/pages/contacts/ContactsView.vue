@@ -4,7 +4,7 @@
       <div class="d-flex flex-column">
         <div class="pr-2">{{ name }}</div>
         <div class="small text-muted">
-          {{ listItems[id].total_contact_count }} contacts found
+          {{ listItems[id].total }} contacts found
         </div>
       </div>
     </template>
@@ -98,11 +98,13 @@
             :to="'/contacts/list/' + $route.params.id + '/add'"
           >
             <div class="start-state" @click="navigate">
-              <div class="p-4 bg-light w-100 text-center border-bottom text-primary">
-                <template v-if="type === ContactListType.STATIC">
+              <div
+                class="p-4 bg-light w-100 text-center border-bottom text-primary"
+              >
+                <template v-if="type == ContactListType.STATIC">
                   Add contacts <i class="fa fa-plus"></i>
                 </template>
-                <template v-if="type === ContactListType.DYNAMIC">
+                <template v-else-if="type == ContactListType.DYNAMIC">
                   Add Contacts through a Filter <i class="fa fa-plus"></i>
                 </template>
               </div>
@@ -119,6 +121,7 @@
 </template>
 
 <script>
+import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
@@ -129,8 +132,8 @@ import moment from 'moment'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 import {
   DEFAULT_CONTACT_LIST,
-  DEFAULT_FILTERS,
   DYNAMIC,
+  OPERATORS,
   STATIC
 } from 'src/constants/contacts-list-types'
 import isPlainObject from 'lodash/isPlainObject'
@@ -183,7 +186,7 @@ export default {
     onSortByField (sorts) {
       this.isLoaded = false
       this.fetch({
-        search_text: this.searchText,
+        search: this.searchText,
         page: this.listItems[this.id].current_page,
         comm_sort_by: `${sorts.orderBy}:${sorts.order}`
       })
@@ -226,7 +229,7 @@ export default {
         const nextPage = this.listItems[this.id].current_page + 1
         this.fetchContacts({
           page: nextPage,
-          search_text: this.searchText
+          search: this.searchText
         })
           .then((data) => {
             this.contactsLoaded({ id: this.id, append: true, ...data })
@@ -239,25 +242,29 @@ export default {
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
-        user_id: checked ? this.profile.id : undefined,
-        search_text: this.searchText,
+        contact_owner: checked ? this.profile.id : undefined,
+        search: this.searchText,
         page: this.listItems[this.id].page
       })
     },
     onSearch (searchText) {
       this.isLoaded = false
       this.searchText = searchText
-      this.fetch({ search_text: this.searchText })
+      this.fetch({ search: this.searchText })
     },
     fetch (params = {}) {
       this.isLoading = true
-      Promise.all([this.fetchContacts(params), this.fetchContactsCount(params)])
-        .then(([data, count]) => {
+      window.axios
+        .get('api/v2/contacts', {
+          params: this.buildQueryString(params),
+          paramsSerializer: qs.stringify
+        })
+        .then((response) => response.data)
+        .then((data) => {
           this.contactsLoaded({
             id: this.id,
             append: false,
-            ...data,
-            ...count
+            ...data
           })
         })
         .finally(() => {
@@ -268,22 +275,57 @@ export default {
           console.log(err)
         })
     },
-    fetchContacts (params = {}) {
-      return window.axios
-        .get('api/v2/contacts', {
-          params: this.createContactFilters(params)
-        })
-        .then((response) => response.data)
-    },
-    fetchContactsCount (params) {
-      return window.axios
-        .get('api/v1/contact/get-contacts-count', {
-          params: this.createContactFilters(params)
-        })
-        .then((response) => response.data)
-    },
-    createContactFilters (params) {
-      return Object.assign(this.filters, params)
+    buildQueryString (params) {
+      const invalidIds = Object.keys(DEFAULT_CONTACT_LIST).map(
+        (k) => DEFAULT_CONTACT_LIST[k].id
+      )
+
+      const query = {
+        page: 1
+      }
+
+      query.filters = { ...this.listFilters }
+
+      if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
+        query.filters.is_unanswered_contact = {}
+        query.filters.is_unanswered_contact.value = 1
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.UNASSIGNED.id) {
+        query.filters.is_unassigned = {}
+        query.filters.is_unassigned.value = 1
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.NEWLEADS.id) {
+        query.filters.is_new_contact = {}
+        query.filters.is_new_contact.value = 1
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.MY_CONTACTS.id || this.myContacts) {
+        query.filters.contact_owner = {}
+        query.filters.contact_owner.value = [this.profile.id]
+        query.filters.contact_owner.operator = OPERATORS.IS_ANY_OF
+      }
+
+      if (
+        this.$route.params.id &&
+        !invalidIds.includes(this.$route.params.id)
+      ) {
+        query.filters.contact_lists = {}
+        query.filters.contact_lists.value = [this.$route.params.id]
+        query.filters.contact_lists.operator = OPERATORS.IS_ANY_OF
+      }
+
+      if (params.search) {
+        query.filters.search = {}
+        query.filters.search.value = [params.search]
+      }
+
+      if (params.page) {
+        query.page = params.page
+      }
+
+      return query
     }
   },
   computed: {
@@ -356,19 +398,6 @@ export default {
         console.log(err)
         return {}
       }
-    },
-    filters () {
-      return {
-        ...DEFAULT_FILTERS,
-        ...this.listFilters,
-        user_id:
-          this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
-            ? this.profile.id
-            : undefined,
-        contact_list_id: this.$route.params.id
-          ? this.$route.params.id
-          : undefined
-      }
     }
   },
   mounted () {
@@ -377,8 +406,8 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
-      this.fetch(id)
+      this.setSelectedList({ id, name: this.name, type: this.type })
+      this.fetch({ contact_list_id: id })
     }
   }
 }

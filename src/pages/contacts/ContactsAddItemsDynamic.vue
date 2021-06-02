@@ -44,7 +44,7 @@
         ></contacts-table-search>
         <div class="px-3">
           <span class="small text-muted"
-            >{{ listItems[id].total_contact_count }} contacts</span
+            >{{ listItems[id].count }} contacts</span
           >
         </div>
       </div>
@@ -105,8 +105,7 @@ import TableRow from 'src/pages/contacts/_components/table-row.vue'
 import FolderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 
 import {
-  DEFAULT_CONTACT_LIST,
-  DEFAULT_FILTERS
+  DEFAULT_CONTACT_LIST
 } from 'src/constants/contacts-list-types'
 
 export default {
@@ -139,7 +138,7 @@ export default {
     onSortByField (sorts) {
       this.isLoaded = false
       this.fetch({
-        search_text: this.searchText,
+        search: this.searchText,
         page: this.listItems[this.id].current_page,
         comm_sort_by: `${sorts.orderBy}:${sorts.order}`
       })
@@ -183,7 +182,7 @@ export default {
         const nextPage = this.listItems[this.id].current_page + 1
         this.fetchContacts({
           page: nextPage,
-          search_text: this.searchText
+          search: this.searchText
         })
           .then((data) => {
             this.contactsLoaded({ id: this.id, append: true, ...data })
@@ -196,15 +195,15 @@ export default {
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
-        user_id: checked ? this.profile.id : undefined,
-        search_text: this.searchText,
+        contact_owner: checked ? this.profile.id : undefined,
+        search: this.searchText,
         page: this.listItems[this.id].page
       })
     },
     onSearch (searchText) {
       this.isLoaded = false
       this.searchText = searchText
-      this.fetch({ search_text: this.searchText })
+      this.fetch({ search: this.searchText })
     },
     fetch (params = {}) {
       this.isLoading = true
@@ -227,14 +226,14 @@ export default {
     },
     fetchContacts (params = {}) {
       return window.axios
-        .get('api/v1/contact', {
+        .get('api/v2/contact', {
           params: this.createContactFilters(params)
         })
         .then((response) => response.data)
     },
     fetchContactsCount (params) {
       return window.axios
-        .get('api/v1/contact/get-contacts-count', {
+        .get('api/v2/contacts/count', {
           params: this.createContactFilters(params)
         })
         .then((response) => response.data)
@@ -303,17 +302,36 @@ export default {
       }
     },
     filters () {
-      return {
-        ...DEFAULT_FILTERS,
-        ...this.listFilters,
-        user_id:
-          this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
-            ? this.profile.id
-            : undefined,
-        contact_list_id: this.$route.params.id
-          ? this.$route.params.id
-          : undefined
+      const invalidIds = Object.keys(DEFAULT_CONTACT_LIST).map(
+        (k) => DEFAULT_CONTACT_LIST[k].id
+      )
+
+      const filters = { ...this.listFilters }
+
+      if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
+        filters.is_unanswered_contact = true
       }
+
+      if (this.id === DEFAULT_CONTACT_LIST.UNASSIGNED.id) {
+        filters.is_unassigned = true
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.NEWLEADS.id) {
+        filters.is_new_contact = true
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.MY_CONTACTS.id || this.myContacts) {
+        filters.contact_owner = this.profile.id
+      }
+
+      if (
+        this.$route.params.id &&
+        !invalidIds.includes(this.$route.params.id)
+      ) {
+        filters.contact_list_id = this.$route.params.id
+      }
+
+      return filters
     }
   },
   data () {

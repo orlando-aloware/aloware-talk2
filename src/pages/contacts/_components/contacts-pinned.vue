@@ -69,13 +69,15 @@
 </template>
 
 <script>
+import qs from 'qs'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 import {
   STATIC,
   DYNAMIC,
-  DEFAULT_CONTACT_LIST
+  DEFAULT_CONTACT_LIST,
+  OPERATORS
 } from 'src/constants/contacts-list-types'
 
 export default {
@@ -132,7 +134,15 @@ export default {
     loadMyContactsCount () {
       return window.axios
         .get('api/v2/contacts/count', {
-          params: { user_id: this.profile.id }
+          params: {
+            filters: {
+              contact_owner: {
+                operator: OPERATORS.IS_ANY_OF,
+                value: [this.profile.id]
+              }
+            }
+          },
+          paramsSerializer: qs.stringify
         })
         .then((response) => response.data.count)
     },

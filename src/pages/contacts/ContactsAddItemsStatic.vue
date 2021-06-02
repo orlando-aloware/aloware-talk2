@@ -117,8 +117,7 @@ import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 
 import {
-  DEFAULT_CONTACT_LIST,
-  DEFAULT_FILTERS
+  DEFAULT_CONTACT_LIST
 } from 'src/constants/contacts-list-types'
 
 import isPlainObject from 'lodash/isPlainObject'
@@ -163,7 +162,7 @@ export default {
     },
     totalCount () {
       if (!this.listItems[this.id]) return 0
-      return this.listItems[this.id].total_contact_count
+      return this.listItems[this.id].count
     },
     currentPage () {
       if (!this.listItems[this.id]) return 1
@@ -224,17 +223,36 @@ export default {
       }
     },
     filters () {
-      return {
-        ...DEFAULT_FILTERS,
-        ...this.listFilters,
-        user_id:
-          this.myContacts || this.id === DEFAULT_CONTACT_LIST.ALL_CONTACTS.id
-            ? this.profile.id
-            : undefined,
-        contact_list_id: this.$route.params.id
-          ? this.$route.params.id
-          : undefined
+      const invalidIds = Object.keys(DEFAULT_CONTACT_LIST).map(
+        (k) => DEFAULT_CONTACT_LIST[k].id
+      )
+
+      const filters = { ...this.listFilters }
+
+      if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
+        filters.is_unanswered_contact = true
       }
+
+      if (this.id === DEFAULT_CONTACT_LIST.UNASSIGNED.id) {
+        filters.is_unassigned = true
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.NEWLEADS.id) {
+        filters.is_new_contact = true
+      }
+
+      if (this.id === DEFAULT_CONTACT_LIST.MY_CONTACTS.id || this.myContacts) {
+        filters.contact_owner = this.profile.id
+      }
+
+      if (
+        this.$route.params.id &&
+        !invalidIds.includes(this.$route.params.id)
+      ) {
+        filters.contact_list_id = this.$route.params.id
+      }
+
+      return filters
     }
   },
   methods: {
@@ -247,7 +265,7 @@ export default {
     addSelectedContacts () {
       this.isLoading = true
       return window.axios
-        .post('api/v1/contact-list-items', {
+        .post('api/v2/contact-list-items', {
           contact_list_id: this.contactList.id,
           contacts: this.getSelectedContacts()
         })
@@ -340,7 +358,7 @@ export default {
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
-        user_id: checked ? this.profile.id : undefined,
+        contact_owner: checked ? this.profile.id : undefined,
         search_text: this.searchText,
         page: this.listItems[this.id].page
       })
@@ -371,14 +389,14 @@ export default {
     },
     fetchContacts (params = {}) {
       return window.axios
-        .get('api/v1/contact', {
+        .get('api/v2/contacts', {
           params: this.createContactFilters(params)
         })
         .then((response) => response.data)
     },
     fetchContactsCount (params) {
       return window.axios
-        .get('api/v1/contact/get-contacts-count', {
+        .get('api/v2/contacts/count', {
           params: this.createContactFilters(params)
         })
         .then((response) => response.data)

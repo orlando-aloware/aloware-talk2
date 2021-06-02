@@ -1,5 +1,10 @@
 <template>
-  <contacts-view :id="String(contactList.id)" :name="contactList.name" :type="String(contactList.type)" v-if="isLoaded" />
+  <contacts-view
+    :id="String(contactList.id)"
+    :name="contactList.name"
+    :type="String(contactList.type)"
+    v-if="isLoaded"
+  />
 </template>
 
 <script>

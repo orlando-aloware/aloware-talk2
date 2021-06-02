@@ -1,5 +1,5 @@
 <template>
-  <contacts-view :id="id" :name="name" :type="String(type)"/>
+  <contacts-view :id="this.id" :name="name" :type="String(type)"/>
 </template>
 
 <script>
@@ -12,20 +12,24 @@ export default {
   },
   data () {
     return {
-      id: 'all',
       name: 'All Contacts',
       type: 2
     }
   },
   computed: {
-    ...mapGetters('contacts', ['lists', 'listItems'])
+    ...mapGetters('contacts', ['lists', 'listItems']),
+    id () {
+      if (this.$route.params.id) {
+        return this.$route.params.id
+      }
+      return 'all'
+    }
+
   },
   methods: {
     ...mapActions('contacts', ['setSelectedList']),
     setData (id) {
-      if (!id) { return }
-      const list = this.lists[id]
-      this.id = id
+      const list = this.lists[id] || {}
       this.name = list.name
       this.type = list.type
     }
@@ -36,7 +40,7 @@ export default {
     }
   },
   mounted () {
-    this.setData(this.$route.params.id)
+    this.setData(this.id)
     this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
   }
 }
