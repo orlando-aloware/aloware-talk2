@@ -1,3 +1,5 @@
+import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+
 export default {
   opened: (state) => new Set(state.opened),
   isRemoveFolderOpen: (state) => !!state.removeFolder,
@@ -7,8 +9,8 @@ export default {
   isRemoveContactOpen: (state) => !!state.removeContact,
   contactToRemove: (state) => state.removeContact,
   removeContactActionType: (state) => state.removeContactActionType,
-  pinnedLists: (state) => state.pinned,
   pinnedCounts: (state) => state.pinnedCounts,
+  pinned: (state) => state.pinned,
   folders: (state) => state.folders,
   columnsUpdating: (state) => state.columnsUpdating,
   lists: (state) => state.lists,
@@ -19,5 +21,26 @@ export default {
   selectedList: (state) => state.selectedList,
   createList: (state) => state.createList,
   filters: (state) => state.filters,
-  isBulkDelete: (state) => state.isBulkDelete
+  isBulkDelete: (state) => state.isBulkDelete,
+  pinnedLists: (state) => {
+    const pinnedLists = Object.values(DEFAULT_CONTACT_LIST)
+      .map((item) => {
+        return {
+          ...item,
+          to: item.id === 'all' ? '/contacts' : `/contacts/${item.id}`
+        }
+      })
+      .concat(state.pinned.map((item) => {
+        const list = state.lists[item] || {}
+        return { ...list, to: `/contacts/list/${list.id}` }
+      }))
+      .map((item) => {
+        return {
+          ...item,
+          count: state.pinnedCounts[item.id] || 0
+        }
+      })
+
+    return pinnedLists
+  }
 }

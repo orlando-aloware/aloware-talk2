@@ -7,35 +7,8 @@
     </div>
     <div class="d-flex pinned__content flex-column">
       <router-link
-        v-for="item in defaultContactList"
-        :to="item.link"
-        :key="item.id"
-        v-slot="{ href, route, navigate, isActive, isExactActive }"
-      >
-        <a
-          :href="href"
-          @click="navigate"
-          class="d-flex align-items-center item"
-          :class="[
-            isActive && 'router-link-active',
-            isExactActive && 'router-link-exact-active'
-          ]"
-        >
-          <div class="px-2 icon">
-            <folder-dynamic-icon></folder-dynamic-icon>
-          </div>
-          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-          <div class="pr-2">
-            <b-badge pill variant="light text-muted">{{
-              getCount(item.id) | fixCount
-            }}</b-badge>
-          </div>
-        </a>
-      </router-link>
-
-      <router-link
         v-for="item in pinnedLists"
-        :to="`/contacts/list/${item.id}`"
+        :to="item.to"
         :key="item.id"
         v-slot="{ href, route, navigate, isActive, isExactActive }"
       >
@@ -53,13 +26,13 @@
               v-if="item.type === contactListType.STATIC"
             ></folder-static-icon>
             <folder-dynamic-icon
-              v-if="item.type === contactListType.DYNAMIC"
+              v-if="item.type === contactListType.DYNAMIC || !item.type"
             ></folder-dynamic-icon>
           </div>
           <div class="pr-3 flex-grow-1">{{ item.name }}</div>
           <div class="pr-2">
-            <b-badge pill variant="danger">{{
-              getCount(item.id) | fixCount
+            <b-badge pill variant="light text-muted">{{
+              item.count | fixCount
             }}</b-badge>
           </div>
         </a>
@@ -70,7 +43,7 @@
 
 <script>
 import qs from 'qs'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 import {
@@ -87,12 +60,6 @@ export default {
       'pinnedLoaded',
       'listLoaded'
     ]),
-    getCount (id) {
-      if (this.pinnedCounts[id] && this.pinnedCounts[id]) {
-        return this.pinnedCounts[id]
-      }
-      return 0
-    },
     loadDefaultCounts () {
       return Promise.all([
         this.loadAllCount(),
@@ -153,44 +120,40 @@ export default {
     },
     loadPinnedCount (id) {
       return window.axios
-        .get(`api/v2/contacts-list/${id}/items`)
+        .get(`api/v2/contacts-list/${id}/items?per_page=1`)
         .then((response) => {
           this.pinnedCountLoaded({
             id: id,
-            count: {
-              new_leads_count: 0,
-              total_contact_count: response.data.total,
-              unreads_count: 0
-            }
+            count: response.data.total
           })
         })
-    },
-    loadPinnedCounts (ids) {
-      return Promise.all(ids.map((id) => this.loadPinnedCount(id)))
     },
     loadPinned () {
       this.loading = true
       return window.axios
         .get('api/v2/contact-list-bookmark')
         .then((response) => response.data)
-        .then((data) => {
+        .then(async (data) => {
           const pinnedIds = []
 
           for (let i = 0; i < data.length; i++) {
-            pinnedIds.push(data[i].contact_list_id)
+            const contactListId = data[i].contact_list_id
+
+            pinnedIds.push(contactListId)
+
             this.listLoaded({
-              id: data[i].contact_list_id,
+              id: contactListId,
               name: data[i].name,
               headers: data[i].headers,
               filters: data[i].filters,
               type: data[i].type,
               order: data[i].order
             })
+
+            await this.loadPinnedCount(contactListId)
           }
 
           this.pinnedLoaded(pinnedIds)
-
-          this.loadPinnedCounts(pinnedIds)
 
           this.loading = false
         })
@@ -202,16 +165,12 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState('contacts', ['pinned', 'pinnedCounts', 'lists']),
-    pinnedLists () {
-      return this.pinned.map((i) => this.lists[i] || {})
-    }
+    ...mapGetters('contacts', ['pinnedLists', 'pinned'])
   },
   data () {
     return {
       loading: false,
-      contactListType: { STATIC, DYNAMIC },
-      defaultContactList: Object.values(DEFAULT_CONTACT_LIST)
+      contactListType: { STATIC, DYNAMIC }
     }
   },
   mounted () {

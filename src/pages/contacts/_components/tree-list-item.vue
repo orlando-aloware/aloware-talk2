@@ -88,15 +88,15 @@ export default {
     ListActions
   },
   computed: {
-    ...mapGetters('contacts', ['pinnedLists', 'moveDialog']),
+    ...mapGetters('contacts', ['pinned', 'moveDialog']),
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
       }
     },
     isPinned () {
-      return Array.isArray(this.pinnedLists)
-        ? this.pinnedLists.includes(this.id)
+      return Array.isArray(this.pinned)
+        ? this.pinned.includes(this.id)
         : false
     },
     isMoving () {
@@ -224,7 +224,7 @@ export default {
       if (isPinned) {
         return window.axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
       } else {
-        return window.axios.post('/api/v2/contact-list-bookmark/' + id)
+        return window.axios.delete('/api/v2/contact-list-bookmark/' + id)
       }
     },
     onRenameList () {
