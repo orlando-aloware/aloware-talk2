@@ -399,13 +399,11 @@ export default {
     }
   },
   mounted () {
-    this.setSelectedList({ id: this.id, name: this.name, type: this.type })
     this.fetch()
   },
   watch: {
     '$route.params.id': function (id) {
-      this.setSelectedList({ id, name: this.name, type: this.type })
-      this.fetch({ contact_list_id: id })
+      this.fetch()
     }
   }
 }
