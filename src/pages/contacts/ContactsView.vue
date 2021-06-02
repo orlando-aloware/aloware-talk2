@@ -179,7 +179,7 @@ export default {
     },
     onEditColumnsClicked () {
       this.columnsOpen({
-        id: this.list.id,
+        id: this.id,
         headers: this.columns,
         name: this.list.name
       })

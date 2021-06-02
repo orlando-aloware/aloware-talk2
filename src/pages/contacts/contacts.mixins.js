@@ -131,7 +131,6 @@ export default {
 
       if (params.search) {
         query.filters.search = {}
-        query.filters.search.operator = OPERATORS.IS_ANY_OF
         query.filters.search.value = params.search
       }
 
