@@ -2,7 +2,7 @@
   <contacts-screen :loading="isLoadingDisabled">
     <template slot="title">
       <div class="d-flex flex-column">
-        <div class="pr-2">{{ name }}</div>
+        <div class="pr-2">{{ list.name }}</div>
         <div class="small text-muted">
           {{ listItems[id].total }} contacts found
         </div>
@@ -10,7 +10,7 @@
     </template>
     <template slot="options">
       <router-link
-        v-if="type === ContactListType.STATIC"
+        v-if="list.type === ContactListType.STATIC && isEditable"
         v-slot="{ navigate }"
         :to="'/contacts/list/' + $route.params.id + '/add'"
       >
@@ -21,7 +21,7 @@
 
       <compact-btn
         variant="primary"
-        v-if="type === ContactListType.DYNAMIC"
+        v-if="list.type === ContactListType.DYNAMIC && isEditable"
         :onClick="onFiltersClicked"
       >
         <i class="fa fa-plus mr-2"></i> Add Filters
@@ -101,10 +101,10 @@
               <div
                 class="p-4 bg-light w-100 text-center border-bottom text-primary"
               >
-                <template v-if="type == ContactListType.STATIC">
+                <template v-if="list.type == ContactListType.STATIC">
                   Add contacts <i class="fa fa-plus"></i>
                 </template>
-                <template v-else-if="type == ContactListType.DYNAMIC">
+                <template v-else-if="list.type == ContactListType.DYNAMIC">
                   Add Contacts through a Filter <i class="fa fa-plus"></i>
                 </template>
               </div>
@@ -151,14 +151,6 @@ export default {
   },
   props: {
     id: {
-      type: String,
-      required: true
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    type: {
       type: String,
       required: true
     }
@@ -276,9 +268,7 @@ export default {
         })
     },
     buildQueryString (params) {
-      const invalidIds = Object.keys(DEFAULT_CONTACT_LIST).map(
-        (k) => DEFAULT_CONTACT_LIST[k].id
-      )
+      const invalidIds = this.commonIds
 
       const query = {
         page: 1
@@ -353,6 +343,14 @@ export default {
     isMyContactsView () {
       return DEFAULT_CONTACT_LIST.MY_CONTACTS.id === this.id
     },
+    isEditable () {
+      return !this.commonIds.includes(this.list.id)
+    },
+    commonIds () {
+      return Object.keys(DEFAULT_CONTACT_LIST).map(
+        (k) => DEFAULT_CONTACT_LIST[k].id
+      )
+    },
     columns () {
       try {
         let headers = []
@@ -373,12 +371,6 @@ export default {
         return []
       }
     },
-    list_type () {
-      if (this.lists[this.id]) {
-        return this.lists[this.id].type
-      }
-      return null
-    },
     listFilters () {
       try {
         let filters = {}
@@ -398,6 +390,12 @@ export default {
         console.log(err)
         return {}
       }
+    },
+    list () {
+      if (!this.$route.params.id) {
+        return this.lists['all']
+      }
+      return this.lists[this.$route.params.id]
     }
   },
   mounted () {

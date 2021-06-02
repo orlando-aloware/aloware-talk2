@@ -1,6 +1,7 @@
 import {
   DEFAULT_COLUMNS,
   DEFAULT_CONTACT_LIST_ITEMS,
+  OPERATORS,
   STATIC_COLUMNS
 } from 'src/constants/contacts-list-types'
 
@@ -15,44 +16,59 @@ export default function () {
     },
     lists: {
       all: {
+        id: 'all',
         headers: DEFAULT_COLUMNS,
         filters: {},
         type: 2,
         name: 'All Contacts'
       },
       'my-contacts': {
+        all: 'my-contacts',
         headers: DEFAULT_COLUMNS,
         filters: {
-          contact_owner: null
+          contact_owner: {
+            value: null,
+            operator: OPERATORS.IS_ANY_OF
+          }
         },
         type: 2,
         name: 'My Contacts'
       },
       unassigned: {
+        id: 'unassigned',
         headers: DEFAULT_COLUMNS,
         filters: {
-          is_unassigned: 1
+          is_unassigned: {
+            value: 1
+          }
         },
         type: 2,
         name: 'Unassigned'
       },
       unanswered: {
+        id: 'unanswered',
         headers: DEFAULT_COLUMNS,
         filters: {
-          is_unanswered_contact: true
+          is_unanswered_contact: {
+            value: 1
+          }
         },
         type: 2,
         name: 'Unanswered'
       },
       'new-leads': {
+        id: 'new-leads',
         headers: DEFAULT_COLUMNS,
         filters: {
-          is_new_contact: true
+          is_new_contact: {
+            value: 1
+          }
         },
         type: 2,
         name: 'New Leads'
       },
       static: {
+        id: 'static',
         headers: STATIC_COLUMNS,
         filters: {}
       }
