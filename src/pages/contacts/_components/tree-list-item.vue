@@ -221,8 +221,11 @@ export default {
       })
     },
     pinRequest (id, isPinned) {
-      const request = isPinned ? window.axios.post : window.axios.delete
-      return request('/api/v2/contact-list-bookmark/' + id)
+      if (isPinned) {
+        return window.axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
+      } else {
+        return window.axios.post('/api/v2/contact-list-bookmark/' + id)
+      }
     },
     onRenameList () {
       this.isEditing = true
