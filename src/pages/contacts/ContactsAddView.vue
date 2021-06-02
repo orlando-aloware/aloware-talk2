@@ -3,7 +3,7 @@
     v-if="isLoaded && contactList.type === ContactListType.STATIC"
     :contactList="contactList"
   />
-  <contacts-view-list
+  <contacts-view
     v-else-if="isLoaded && contactList.type === ContactListType.DYNAMIC"
     :id="contactList.id"
     :name="contactList.name"
@@ -20,13 +20,13 @@ import {
 } from 'src/constants/contacts-list-types'
 
 import ContactsAddItemsStatic from './ContactsAddItemsStatic.vue'
-import ContactsViewList from './ContactsViewList.vue'
+import ContactsView from './ContactsView.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   components: {
     ContactsAddItemsStatic,
-    ContactsViewList
+    ContactsView
   },
   computed: {
     ...mapGetters('contacts', ['lists', 'listItems']),

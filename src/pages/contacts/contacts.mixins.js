@@ -33,15 +33,27 @@ export default {
       if (this.hasMore) {
         this.isLoadingMore = true
         const nextPage = this.listItems[this.id].current_page + 1
-        this.fetchContacts({
-          page: nextPage,
-          search: this.searchText
-        })
+        return window.axios
+          .get('api/v2/contacts', {
+            params: this.buildQueryString({
+              page: nextPage,
+              search: this.searchText
+            }),
+            paramsSerializer: qs.stringify
+          })
+          .then((response) => response.data)
           .then((data) => {
-            this.contactsLoaded({ id: this.id, append: true, ...data })
+            this.contactsLoaded({
+              id: this.id,
+              append: true,
+              ...data
+            })
           })
           .finally(() => {
             this.isLoadingMore = false
+          })
+          .catch((err) => {
+            console.log(err)
           })
       }
     },
@@ -60,7 +72,7 @@ export default {
     },
     fetch (params = {}) {
       this.isLoading = true
-      window.axios
+      return window.axios
         .get('api/v2/contacts', {
           params: this.buildQueryString(params),
           paramsSerializer: qs.stringify
@@ -111,10 +123,7 @@ export default {
         query.filters.contact_owner.operator = OPERATORS.IS_ANY_OF
       }
 
-      if (
-        this.id &&
-        !invalidIds.includes(this.id)
-      ) {
+      if (this.id && !invalidIds.includes(this.id)) {
         query.filters.contact_lists = {}
         query.filters.contact_lists.value = [this.id]
         query.filters.contact_lists.operator = OPERATORS.IS_ANY_OF
@@ -159,9 +168,9 @@ export default {
       return !this.defaultIds.includes(this.list.id)
     },
     defaultIds () {
-      return Object.keys(DEFAULT_CONTACT_LIST).map(
-        (k) => DEFAULT_CONTACT_LIST[k].id
-      ).concat(['static'])
+      return Object.keys(DEFAULT_CONTACT_LIST)
+        .map((k) => DEFAULT_CONTACT_LIST[k].id)
+        .concat(['static'])
     },
     columns () {
       try {
