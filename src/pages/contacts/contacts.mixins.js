@@ -214,7 +214,7 @@ export default {
     this.fetch()
   },
   watch: {
-    '$route.params.id': function (id) {
+    '$route.params.id': function () {
       this.fetch()
     }
   }
