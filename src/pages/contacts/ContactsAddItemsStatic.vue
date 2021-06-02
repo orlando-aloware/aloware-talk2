@@ -106,7 +106,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { mapActions, mapGetters } from 'vuex'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
@@ -116,14 +115,11 @@ import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 
-import {
-  DEFAULT_CONTACT_LIST
-} from 'src/constants/contacts-list-types'
-
-import isPlainObject from 'lodash/isPlainObject'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import contactsMixins from './contacts.mixins'
 
 export default {
+  mixins: [contactsMixins],
   components: {
     CompactBtn,
     ContactsScreen,
@@ -141,12 +137,6 @@ export default {
   },
   data () {
     return {
-      moment,
-      isLoading: false,
-      isLoaded: false,
-      isLoadingMore: false,
-      myContacts: false,
-      searchText: '',
       checked: [],
       id: 'static'
     }
@@ -161,98 +151,16 @@ export default {
       return []
     },
     totalCount () {
-      if (!this.listItems[this.id]) return 0
-      return this.listItems[this.id].count
+      if (this.listItems[this.id]) {
+        return this.listItems[this.id].total
+      }
+      return 0
     },
     currentPage () {
-      if (!this.listItems[this.id]) return 1
-      return this.listItems[this.id].current_page
-    },
-    hasMore () {
-      return (
-        this.listItems[this.id] &&
-        this.listItems[this.id].next_page_url &&
-        !this.isLoadingMore &&
-        !this.isLoading
-      )
-    },
-    isLoadingDisabled () {
-      return this.isLoading || !this.isLoaded
-    },
-    isEmpty () {
-      return this.isLoaded && !this.listItems[this.id].data.length
-    },
-    columns () {
-      try {
-        let headers = []
-        if (this.lists[this.id] && this.lists[this.id].headers) {
-          headers = this.lists[this.id].headers
-          if (typeof headers === 'string') {
-            headers = JSON.parse(headers)
-          }
-        }
-
-        if (!Array.isArray(headers)) {
-          throw new Error('Headers field is broken')
-        }
-
-        return headers
-      } catch (err) {
-        console.log(err)
-        return []
+      if (this.listItems[this.id]) {
+        return this.listItems[this.id].current_page
       }
-    },
-    listFilters () {
-      try {
-        let filters = {}
-        if (this.lists[this.id] && this.lists[this.id].filters) {
-          filters = this.lists[this.id].filters
-          if (typeof filters === 'string') {
-            filters = JSON.parse(filters)
-          }
-        }
-
-        if (!isPlainObject(filters)) {
-          throw new Error('Filters field is broken')
-        }
-
-        return filters
-      } catch (err) {
-        console.log(err)
-        return {}
-      }
-    },
-    filters () {
-      const invalidIds = Object.keys(DEFAULT_CONTACT_LIST).map(
-        (k) => DEFAULT_CONTACT_LIST[k].id
-      )
-
-      const filters = { ...this.listFilters }
-
-      if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
-        filters.is_unanswered_contact = true
-      }
-
-      if (this.id === DEFAULT_CONTACT_LIST.UNASSIGNED.id) {
-        filters.is_unassigned = true
-      }
-
-      if (this.id === DEFAULT_CONTACT_LIST.NEWLEADS.id) {
-        filters.is_new_contact = true
-      }
-
-      if (this.id === DEFAULT_CONTACT_LIST.MY_CONTACTS.id || this.myContacts) {
-        filters.contact_owner = this.profile.id
-      }
-
-      if (
-        this.$route.params.id &&
-        !invalidIds.includes(this.$route.params.id)
-      ) {
-        filters.contact_list_id = this.$route.params.id
-      }
-
-      return filters
+      return 1
     }
   },
   methods: {
@@ -298,14 +206,6 @@ export default {
     onCancel () {
       this.$router.push('/contacts/list/' + this.contactList.id)
     },
-    onSortByField (sorts) {
-      this.isLoaded = false
-      this.fetch({
-        search_text: this.searchText,
-        page: this.currentPage,
-        comm_sort_by: `${sorts.orderBy}:${sorts.order}`
-      })
-    },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
         id: this.id,
@@ -325,84 +225,6 @@ export default {
     },
     onCheckedRows (checked) {
       this.checked = checked
-    },
-    onEditColumnsClicked () {
-      this.columnsOpen({
-        id: this.id,
-        headers: this.columns,
-        name: this.name
-      })
-    },
-    onImportContactsClicked () {
-      this.$refs.importContacts.open()
-    },
-    onFiltersClicked () {
-      this.openFilters()
-    },
-    onLoadMore () {
-      if (this.hasMore) {
-        this.isLoadingMore = true
-        const nextPage = this.listItems[this.id].current_page + 1
-        this.fetchContacts({
-          page: nextPage,
-          search_text: this.searchText
-        })
-          .then((data) => {
-            this.contactsLoaded({ id: this.id, append: true, ...data })
-          })
-          .finally(() => {
-            this.isLoadingMore = false
-          })
-      }
-    },
-    onFetchMyContacts (checked) {
-      this.isLoading = true
-      this.fetch({
-        contact_owner: checked ? this.profile.id : undefined,
-        search_text: this.searchText,
-        page: this.listItems[this.id].page
-      })
-    },
-    onSearch (searchText) {
-      this.isLoaded = false
-      this.searchText = searchText
-      this.fetch({ search_text: this.searchText })
-    },
-    fetch (params = {}) {
-      this.isLoading = true
-      Promise.all([this.fetchContacts(params), this.fetchContactsCount(params)])
-        .then(([data, count]) => {
-          this.contactsLoaded({
-            id: this.id,
-            append: false,
-            ...data,
-            ...count
-          })
-        })
-        .finally(() => {
-          this.isLoading = false
-          this.isLoaded = true
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-    fetchContacts (params = {}) {
-      return window.axios
-        .get('api/v2/contacts', {
-          params: this.createContactFilters(params)
-        })
-        .then((response) => response.data)
-    },
-    fetchContactsCount (params) {
-      return window.axios
-        .get('api/v2/contacts/count', {
-          params: this.createContactFilters(params)
-        })
-        .then((response) => response.data)
-    },
-    createContactFilters (params) {
-      return Object.assign(this.filters, params)
     }
   },
   mounted () {
@@ -410,7 +232,7 @@ export default {
   },
   watch: {
     '$route.params.id': function () {
-      this.fetch(this.id)
+      this.fetch()
     }
   }
 }
