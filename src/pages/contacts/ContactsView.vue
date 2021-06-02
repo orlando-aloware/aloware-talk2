@@ -179,9 +179,9 @@ export default {
     },
     onEditColumnsClicked () {
       this.columnsOpen({
-        id: this.id,
+        id: this.list.id,
         headers: this.columns,
-        name: this.name
+        name: this.list.name
       })
     },
     onImportContactsClicked () {
