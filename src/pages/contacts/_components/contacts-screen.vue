@@ -8,26 +8,29 @@
       </div>
       <slot name="options" />
     </div>
-    <card class="flex-grow-1">
-      <div class="table-header d-flex align-items-center border-bottom">
-        <div class="px-3 py-3 py-lg-0 w-100">
-          <div class="row mx-0">
-            <slot name="actions" />
+    <div class="d-inline-flex">
+      <card class="flex-grow-1">
+        <div class="table-header d-flex align-items-center border-bottom">
+          <div class="px-3 py-3 py-lg-0 w-100">
+            <div class="row mx-0">
+              <slot name="actions" />
+            </div>
           </div>
         </div>
-      </div>
-      <b-overlay
-        :show="loading"
-        spinner-variant="success"
-        spinner-type="grow"
-        rounded="sm"
-      >
-        <div class="datatable-wrapper">
-          <slot name="table" />
-        </div>
-      </b-overlay>
-      <slot name="footer" />
-    </card>
+        <b-overlay
+          :show="loading"
+          spinner-variant="success"
+          spinner-type="grow"
+          rounded="sm"
+        >
+          <div class="datatable-wrapper">
+            <slot name="table" />
+          </div>
+        </b-overlay>
+        <slot name="footer" />
+      </card>
+      <slot name="filters" />
+    </div>
   </div>
 </template>
 
