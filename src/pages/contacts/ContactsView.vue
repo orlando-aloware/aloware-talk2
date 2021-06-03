@@ -53,7 +53,7 @@
           customClass="mr-2"
           :onClick="onFiltersClicked"
         >
-          <i class="fa fa-list mr-2"></i> Manage Filters
+          Filters
         </compact-btn>
         <compact-btn
           variant="outlined-light"
@@ -113,7 +113,9 @@
         </template>
       </datatable>
     </template>
-
+    <template slot="filters">
+      <contacts-filters/>
+    </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
     </template>
@@ -131,9 +133,11 @@ import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 
 import contactsMixins from './contacts.mixins'
+import ContactsFilters from 'pages/contacts/_components/contacts-filters'
 
 export default {
   components: {
+    ContactsFilters,
     BulkActionMenu,
     CompactBtn,
     ContactsScreen,

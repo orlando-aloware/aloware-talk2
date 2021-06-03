@@ -1,17 +1,10 @@
 <template>
-  <b-modal
-    ref="modal"
-    title="Manage Filters"
-    modal-class="filters-modal"
-    id="filters-modal"
-    hide-footer
-  >
+  <div class="contacts-filter-sidebar" v-if="show">
     <b-overlay
-      :show="show"
       spinner-variant="success"
       spinner-type="grow"
       rounded="sm"
-      style="max-width: 324px"
+      style="width: 100%"
     >
       <div class="filter-contents">
         <div class="p-4">
@@ -78,7 +71,7 @@
         </div>
       </div>
     </b-overlay>
-  </b-modal>
+  </div>
 </template>
 
 <script>
@@ -119,9 +112,6 @@ export default {
         .get('/api/v2/contacts/filters')
         .then((response) => response.data.filters)
         .then(this.setFilters)
-        .finally(() => {
-          this.show = false
-        })
         .catch((err) => {
           console.error(err)
           this.$q.notify({
@@ -153,22 +143,19 @@ export default {
         console.log('aww3')
         done(value, 'add-unique')
       }
+    },
+    onCloseFilter () {
+      this.show = false
+      this.closeFilters()
     }
   },
   mounted () {
-    this.$refs.modal.$on('hide', () => {
-      this.closeFilters()
-    })
-    this.$refs.modal.$on('show', () => {
-      // load filters here...
-      this.step = 1
-      this.getFilters()
-    })
+    this.step = 1
+    this.getFilters()
   },
   watch: {
     isFiltersOpen (isFiltersOpen) {
       if (isFiltersOpen) {
-        this.$bvModal.show('filters-modal')
         this.show = true
       }
     },
@@ -183,11 +170,26 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
-.filters-modal {
+.contacts-filter-sidebar {
   height: 100%;
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  padding-left: 10px;
+
+  .card {
+    -webkit-border-radius: 10px;
+
+    .card-header {
+      border-top-right-radius: 10px;
+      border-top-left-radius: 10px;
+
+      .header-buttons {
+        color: #fff;
+        margin-top: -6px;
+      }
+    }
+  }
 
   .filter-list {
     border: none;
@@ -200,12 +202,9 @@ export default {
     font-size: 10px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin: 0;
-    padding: 0;
+    margin: 0 0 5px 0;
+    padding: 0 5px;
     font-weight: bold;
-    padding-left: 5px;
-    padding-right: 5px;
-    margin-bottom: 5px;
   }
 
   .filter-divider:not(:first-child) {
@@ -214,11 +213,9 @@ export default {
 
   .filter-list-item {
     border: none;
-    padding: 0;
+    padding: 0 5px;
     font-size: 13px;
     line-height: 30px;
-    padding-left: 5px;
-    padding-right: 5px;
     cursor: pointer;
     transition: background-color 100ms ease-in-out;
     &:hover {
@@ -235,51 +232,16 @@ export default {
     border-radius: 0;
   }
 
-  .modal-title {
-    font-size: 16px;
-    color: $white;
-  }
-  .modal-header {
-    background-color: $dark;
-    border-radius: 0;
-    padding: 15px;
-    .close {
-      color: $white;
-    }
-  }
-  .modal-dialog {
-    margin: 0;
-    height: 100vh;
-    min-width: 100vw;
-    max-width: 100vw;
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .modal-body {
-    padding: 0px;
-    margin: 0;
-  }
-
-  .modal-content {
-    border-radius: 0;
-    border: none;
-    height: 100%;
-    overflow: hidden;
-
-    @include screen('lg') {
-      max-width: 324px;
-    }
-  }
   .filter-contents {
     width: 100%;
-    height: calc(100vh - 61px);
+    height: calc(100vh - 200px);
     overflow: auto;
   }
-  .modal-footer {
-    .custom-btn {
-      min-width: 120px;
-    }
+
+  .contact-prop-label {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
   }
   .add-filters {
     font-size: 13px;
