@@ -118,7 +118,7 @@ export default {
 
       .header-buttons {
         color: #fff;
-        margin-top: -5px;
+        margin-top: -6px;
       }
     }
   }
@@ -134,12 +134,9 @@ export default {
     font-size: 10px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin: 0;
-    padding: 0;
+    margin: 0 0 5px 0;
+    padding: 0 5px;
     font-weight: bold;
-    padding-left: 5px;
-    padding-right: 5px;
-    margin-bottom: 5px;
   }
 
   .filter-divider:not(:first-child) {
@@ -148,11 +145,9 @@ export default {
 
   .filter-list-item {
     border: none;
-    padding: 0;
+    padding: 0 5px;
     font-size: 13px;
     line-height: 30px;
-    padding-left: 5px;
-    padding-right: 5px;
     cursor: pointer;
     transition: background-color 100ms ease-in-out;
     &:hover {
@@ -171,7 +166,7 @@ export default {
 
   .filter-contents {
     width: 100%;
-    height: calc(100vh - 61px);
+    height: calc(100vh - 200px);
     overflow: auto;
   }
 
