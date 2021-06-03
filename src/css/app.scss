@@ -47,11 +47,17 @@ body,
   &.q-btn__content,
   &.q-avatar__content,
   &.q-item,
+  &.q-field__native,
+  &.q-chip__content,
   .q-field__inner {
     padding-right: 0;
     padding-left: 0;
     margin-left: 0;
     margin-right: 0;
+  }
+  &.q-chip {
+    margin-left: 0;
+    margin-right: 5px;
   }
   &.q-notification {
     margin-left: 0;
