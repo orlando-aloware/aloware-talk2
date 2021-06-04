@@ -56,8 +56,10 @@ body,
     margin-right: 0;
   }
   &.q-chip {
-    margin-left: 0;
-    margin-right: 5px;
+    padding-left: 5.6px !important;
+    padding-right: 5.6px !important;
+    margin-left: 0 !important;
+    margin-right: 5px !important;
   }
   &.q-notification {
     margin-left: 0;
@@ -66,8 +68,8 @@ body,
   .q-field__native,
   .q-field:not(.q-field--float) .q-field__label,
   .q-item__label {
-    padding-right: 15px;
-    padding-left: 15px;
+    padding-right: 15px !important;
+    padding-left: 15px !important;
   }
   .q-field.q-field--float .q-field__label {
     padding-right: 20px;

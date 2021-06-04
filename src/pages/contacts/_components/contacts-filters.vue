@@ -1,17 +1,22 @@
 <template>
   <div class="contacts-filter-sidebar" v-if="show">
-    <b-overlay
-      spinner-variant="success"
-      spinner-type="grow"
-      rounded="sm"
+    <b-overlay class="full-width"
+               spinner-variant="success"
+               spinner-type="grow"
+               rounded="sm"
     >
       <b-card header="Primary"
               header-bg-variant="primary"
               header-text-variant="white">
-        <template #header >
+        <template #header>
           <div class="d-flex justify-content-between">
             <div class="d-inline-flex">
-              <b-button variant="outline-primary header-buttons" size="sm"><i class="fa fa-arrow-left"></i> </b-button>
+              <b-button variant="outline-primary header-buttons"
+                        size="sm"
+                        @click="backToStep"
+              >
+                <i class="fa fa-arrow-left"></i>
+              </b-button>
               <h6 class="mb-0">Filters</h6>
             </div>
 
@@ -19,7 +24,7 @@
           </div>
         </template>
         <div class="filter-contents">
-          <div class="p-4">
+          <div class="p-2">
             <!-- Using slots -->
             <div class="pt-2"
                  v-if="step == 1">
@@ -59,13 +64,15 @@
                 <div v-for="operator in selectedFilter.operators"
                         :key="(selectedFilter.key + '-' + operator.value)"
                 >
-                  <q-radio class="m-0"
+                  <q-radio class="my-2"
+                           dense
                            :val="operator.value"
                            :label="operator.label"
                            v-model="filterOperator"
                   >
                   </q-radio>
                   <q-select
+                    ref="filterOperation"
                     class="filter-operation border"
                     borderless
                     dense
@@ -76,7 +83,9 @@
                     v-if="operator.value == filterOperator && hasValue"
                     v-model="filterOperatorValue"
                     :options="filterOptions"
+                    option-disable="disabled"
                     @new-value="createValue"
+                    @input-value="showFilterOperationOptions"
                   />
                 </div>
               </div>
@@ -94,6 +103,12 @@ import contactsTableSearch from './contacts-table-search.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 export default {
   components: { contactsTableSearch, CompactBtn },
+  props: {
+    listFilters: {
+      required: false,
+      type: Array
+    }
+  },
   data () {
     return {
       items: Array.from(new Array(10)),
@@ -103,7 +118,12 @@ export default {
       selectedFilter: null,
       filterOperator: 1,
       filterOperatorValue: null,
-      filterOptions: []
+      filterOptions: [
+        {
+          label: 'Add a new option',
+          disabled: true
+        }
+      ]
     }
   },
   computed: {
@@ -151,16 +171,30 @@ export default {
       this.step = 3
     },
     createValue (value, done) {
-      console.log('aww')
       if (value && (!this.filterOperatorValue ||
         (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
-        console.log('aww3')
         done(value, 'add-unique')
       }
+    },
+    showFilterOperationOptions (event) {
+      if (!event) {
+        this.filterOptions[0].disabled = false
+        this.filterOptions[0].label = 'Add a new option'
+      }
+      if (this.filterOptions[0].disabled) {
+        this.filterOptions[0].disabled = false
+      }
+      this.filterOptions[0].label = `Create option "${event}"`
+      this.$refs.filterOperation[0].showPopup()
     },
     onCloseFilter () {
       this.show = false
       this.closeFilters()
+    },
+    backToStep () {
+      if (this.step > 1) {
+        this.step -= 1
+      }
     }
   },
   mounted () {
@@ -184,6 +218,7 @@ export default {
 @import 'src/css/breakpoints.scss';
 .contacts-filter-sidebar {
   height: 100%;
+  width: 300px;
   display: flex;
   justify-content: flex-end;
   padding-left: 10px;
@@ -261,6 +296,7 @@ export default {
     }
   }
   .step-3 {
+    font-size: 13px;
     .filter-label {
       font-weight: 600;
     }
