@@ -60,35 +60,10 @@
             <div class="step-3"
                  v-else-if="step == 3">
               <span class="filter-label">{{ selectedFilter.label }}</span>
-              <div v-if="selectedFilter.type == 'string'">
-                <div v-for="operator in selectedFilter.operators"
-                        :key="(selectedFilter.key + '-' + operator.value)"
-                >
-                  <q-radio class="my-2"
-                           dense
-                           :val="operator.value"
-                           :label="operator.label"
-                           v-model="filterOperator"
-                  >
-                  </q-radio>
-                  <q-select
-                    ref="filterOperation"
-                    class="filter-operation border"
-                    borderless
-                    dense
-                    use-input
-                    use-chips
-                    multiple
-                    input-debounce="0"
-                    v-if="operator.value == filterOperator && hasValue"
-                    v-model="filterOperatorValue"
-                    :options="filterOptions"
-                    option-disable="disabled"
-                    @new-value="createValue"
-                    @input-value="showFilterOperationOptions"
-                  />
-                </div>
-              </div>
+              <contacts-string-filter v-if="selectedFilter.type == 'string'"
+                                      :filter="selectedFilter"
+              >
+              </contacts-string-filter>
             </div>
           </div>
         </div>
@@ -100,9 +75,10 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import contactsTableSearch from './contacts-table-search.vue'
+import contactsStringFilter from './contacts-string-filter.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 export default {
-  components: { contactsTableSearch, CompactBtn },
+  components: { contactsTableSearch, CompactBtn, contactsStringFilter },
   props: {
     listFilters: {
       required: false,
@@ -115,15 +91,7 @@ export default {
       show: false,
       filterSearch: '',
       step: 1,
-      selectedFilter: null,
-      filterOperator: 1,
-      filterOperatorValue: null,
-      filterOptions: [
-        {
-          label: 'Add a new option',
-          disabled: true
-        }
-      ]
+      selectedFilter: null
     }
   },
   computed: {
@@ -134,9 +102,6 @@ export default {
       }
 
       return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
-    },
-    hasValue () {
-      return [1, 2].includes(this.filterOperator)
     }
   },
   methods: {
@@ -170,23 +135,6 @@ export default {
       this.selectedFilter = filter
       this.step = 3
     },
-    createValue (value, done) {
-      if (value && (!this.filterOperatorValue ||
-        (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
-        done(value, 'add-unique')
-      }
-    },
-    showFilterOperationOptions (event) {
-      if (!event) {
-        this.filterOptions[0].disabled = false
-        this.filterOptions[0].label = 'Add a new option'
-      }
-      if (this.filterOptions[0].disabled) {
-        this.filterOptions[0].disabled = false
-      }
-      this.filterOptions[0].label = `Create option "${event}"`
-      this.$refs.filterOperation[0].showPopup()
-    },
     onCloseFilter () {
       this.show = false
       this.closeFilters()
@@ -204,9 +152,6 @@ export default {
   watch: {
     isFiltersOpen (isFiltersOpen) {
       this.show = isFiltersOpen
-    },
-    filterOperator () {
-      this.filterOperatorValue = null
     }
   }
 }
