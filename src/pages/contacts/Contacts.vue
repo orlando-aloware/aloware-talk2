@@ -1,5 +1,5 @@
 <template>
-  <div class="row mx-0 overflow-auto">
+  <div class="row mx-0 overflow-auto content-row">
     <div class="col-lg-2 px-0 pl-lg-2 pr-lg-3 mb-3">
       <contacts-sidebar></contacts-sidebar>
     </div>
@@ -40,3 +40,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .content-row {
+    height: auto !important;
+  }
+</style>

@@ -140,9 +140,8 @@ export default {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  //min-height: 500px;
-  max-height: 70vh;
-  min-height: calc(100vh - 330px);
+  height: calc(100vh - 410px);
+  padding-bottom: 5px;
   &__header {
     min-height: 40px;
     font-size: 10px;
@@ -151,7 +150,6 @@ export default {
   }
   &__content {
     height: calc(100% - 40px);
-    max-height: calc(100% - 40px);
     overflow: auto;
   }
 }

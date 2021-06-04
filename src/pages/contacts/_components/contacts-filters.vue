@@ -245,7 +245,7 @@ export default {
 
   .filter-contents {
     width: 100%;
-    height: 75vh;
+    height: calc(100vh - 232px);
     overflow: auto;
   }
 
