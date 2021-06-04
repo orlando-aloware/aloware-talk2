@@ -315,10 +315,7 @@ table.datatable {
         font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        padding-left: 8px;
-        padding-right: 30px;
-        padding-bottom: 10px;
-        padding-top: 10px;
+        padding: 10px 30px 10px 8px;
         text-align: left;
         z-index: 1;
         overflow: hidden;

@@ -186,9 +186,7 @@ export default {
 .pinned {
   display: flex;
   flex-direction: column;
-  overflow: auto;
-  position: relative;
-
+  height: 20rem;
   &__header {
     min-height: 40px;
     font-size: 10px;
@@ -197,8 +195,7 @@ export default {
     text-transform: uppercase;
   }
   &__content {
-    min-height: 200px;
-    max-height: 400px;
+    height: calc(100% - 40px);
     overflow: auto;
   }
 }
