@@ -157,6 +157,7 @@ export default {
     ...mapActions('contacts', [
       'columnsOpen',
       'openFilters',
+      'closeFilters',
       'contactsLoaded',
       'columnsReordered',
       'setListSelectedContacts',
@@ -192,12 +193,16 @@ export default {
       this.$refs.importContacts.open()
     },
     onFiltersClicked () {
-      this.openFilters()
+      if (this.isFiltersOpen) {
+        this.closeFilters()
+      } else {
+        this.openFilters()
+      }
     }
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen']),
     checked () {
       return this.selectedContacts[this.id] || []
     }

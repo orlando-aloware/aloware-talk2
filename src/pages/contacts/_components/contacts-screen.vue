@@ -9,10 +9,10 @@
       <slot name="options" />
     </div>
     <div class="d-inline-flex">
-      <card class="flex-grow-1">
+      <card class="flex-grow-1" style="width: auto">
         <div class="table-header d-flex align-items-center border-bottom">
           <div class="px-3 py-3 py-lg-0 w-100">
-            <div class="row mx-0">
+            <div class="row mx-0 relative-position">
               <slot name="actions" />
             </div>
           </div>
@@ -58,6 +58,6 @@ export default {
   min-height: 58px;
 }
 .datatable-wrapper {
-  height: calc(100vh - 200px);
+  height: calc(100vh - 198px);
 }
 </style>

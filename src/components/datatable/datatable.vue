@@ -239,7 +239,7 @@ export default {
   position: relative;
   margin: auto;
   overflow: auto;
-  min-height: 600px;
+  max-height: calc(100vh - 210px);
 }
 
 div.tableResizer {

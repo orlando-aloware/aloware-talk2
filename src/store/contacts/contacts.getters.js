@@ -21,6 +21,7 @@ export default {
   selectedList: (state) => state.selectedList,
   createList: (state) => state.createList,
   filters: (state) => state.filters,
+  isFiltersOpen: (state) => state.isFiltersOpen,
   isBulkDelete: (state) => state.isBulkDelete,
   pinnedLists: (state) => {
     const pinnedLists = Object.values(DEFAULT_CONTACT_LIST)

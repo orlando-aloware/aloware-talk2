@@ -4,7 +4,6 @@
       spinner-variant="success"
       spinner-type="grow"
       rounded="sm"
-      style="width: 100%"
     >
       <b-card header="Primary"
               header-bg-variant="primary"
@@ -170,9 +169,7 @@ export default {
   },
   watch: {
     isFiltersOpen (isFiltersOpen) {
-      if (isFiltersOpen) {
-        this.show = true
-      }
+      this.show = isFiltersOpen
     },
     filterOperator () {
       this.filterOperatorValue = null
@@ -187,7 +184,6 @@ export default {
 @import 'src/css/breakpoints.scss';
 .contacts-filter-sidebar {
   height: 100%;
-  width: 100%;
   display: flex;
   justify-content: flex-end;
   padding-left: 10px;
@@ -249,7 +245,7 @@ export default {
 
   .filter-contents {
     width: 100%;
-    height: calc(100vh - 200px);
+    height: 75vh;
     overflow: auto;
   }
 
