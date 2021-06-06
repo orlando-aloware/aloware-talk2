@@ -14,6 +14,7 @@
               <b-button variant="outline-primary header-buttons"
                         size="sm"
                         @click="backToStep"
+                        v-if="step !== 1"
               >
                 <i class="fa fa-arrow-left"></i>
               </b-button>
@@ -27,7 +28,7 @@
           <div class="p-2">
             <!-- Using slots -->
             <div class="pt-2"
-                 v-if="step == 1">
+                 v-if="step === 1">
               <compact-btn
                 variant="primary"
                 customClass="px-4 add-filters"
@@ -36,7 +37,7 @@
                 <i class="material-icons mr-1 add-icon">add</i> Add a Filter
               </compact-btn>
             </div>
-            <div v-else-if="step == 2">
+            <div v-else-if="step === 2">
               <div class="mb-3">
                 <h6 class="contact-prop-label">Contact properties</h6>
                 <contacts-table-search placeholder="Search"
@@ -58,13 +59,21 @@
               </b-list-group>
             </div>
             <div class="step-3"
-                 v-else-if="step == 3">
+                 v-else-if="step === 3">
               <span class="filter-label">{{ selectedFilter.label }}</span>
               <contacts-string-filter v-if="selectedFilter.type == 'string'"
                                       :filter="selectedFilter"
                                       @filtersApplied="filtersApplied"
               >
               </contacts-string-filter>
+              <number-filter v-if="selectedFilter.type === 'number'"
+                             :filter="selectedFilter"/>
+              <date-filter v-if="selectedFilter.type === 'date'"
+                           :filter="selectedFilter"/>
+              <multi-relation-filter v-if="selectedFilter.type === 'multi_relation'"
+                           :filter="selectedFilter"/>
+              <relation-filter v-if="selectedFilter.type === 'relation'"
+                               :filter="selectedFilter"/>
             </div>
           </div>
         </div>
@@ -78,8 +87,12 @@ import { mapActions, mapState } from 'vuex'
 import contactsTableSearch from './contacts-table-search.vue'
 import contactsStringFilter from './contacts-string-filter.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
+import NumberFilter from 'pages/contacts/_components/filters/number-filter'
+import DateFilter from 'pages/contacts/_components/filters/date-filter'
+import MultiRelationFilter from 'pages/contacts/_components/filters/multi-relation-filter'
+import RelationFilter from 'pages/contacts/_components/filters/relation-filter'
 export default {
-  components: { contactsTableSearch, CompactBtn, contactsStringFilter },
+  components: { RelationFilter, MultiRelationFilter, DateFilter, NumberFilter, contactsTableSearch, CompactBtn, contactsStringFilter },
   props: {
     listFilters: {
       required: false,
@@ -98,7 +111,7 @@ export default {
   computed: {
     ...mapState('contacts', ['isFiltersOpen', 'filters']),
     filtersFiltered () {
-      if (!this.filterSearch) {
+      if (!this.filterSearch || this.filterSearch.length < 1) {
         return this.filters
       }
 
@@ -143,6 +156,8 @@ export default {
     backToStep () {
       if (this.step > 1) {
         this.step -= 1
+        // make all filters visible
+        if (this.step === 2) { this.filterSearch = '' }
       }
     },
     filtersApplied () {
