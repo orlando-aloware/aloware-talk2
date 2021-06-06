@@ -137,5 +137,8 @@ export default {
   },
   SET_FILTERS: (state, filters) => {
     state.filters = filters
+  },
+  UPDATE_LIST_FILTERS_BY_ID: (state, payload) => {
+    state.filters[payload.id].push(payload.filter)
   }
 }

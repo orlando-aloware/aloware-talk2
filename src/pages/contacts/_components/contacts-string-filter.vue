@@ -24,15 +24,27 @@
         :options="filterOptions"
         option-disable="disabled"
         @new-value="createValue"
+        @input="addValue"
         @input-value="showFilterOperationOptions"
       />
     </div>
+    <compact-btn
+      :onClick="applyFilter"
+      :disabled="validated"
+      variant="success"
+      class="mr-2 mt-3 p-3"
+    >
+      Apply filter
+    </compact-btn>
   </div>
 </template>
 
 <script>
+import CompactBtn from 'components/buttons/compact-btn'
+import { mapActions } from 'vuex'
 export default {
   name: 'contacts-string-filter',
+  components: { CompactBtn },
   props: {
     filter: {
       required: true,
@@ -46,9 +58,11 @@ export default {
       filterOptions: [
         {
           label: 'Add a new option',
+          originalLabel: '',
           disabled: true
         }
-      ]
+      ],
+      validated: false
     }
   },
   computed: {
@@ -57,27 +71,51 @@ export default {
     }
   },
   methods: {
+    addValue () {
+      if (typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object') {
+        this.filterOperatorValue.pop()
+        this.$refs.filterOperation[0].add(this.filterOptions[0].originalLabel, true)
+        this.$refs.filterOperation[0].updateInputValue('')
+      }
+    },
     createValue (value, done) {
       if (value && (!this.filterOperatorValue ||
         (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
         done(value, 'add-unique')
+        this.$nextTick(() => {
+          this.$refs.filterOperation[0].showPopup()
+        })
       }
     },
     showFilterOperationOptions (event) {
-      if (!event) {
-        this.filterOptions[0].disabled = false
+      if (!event || (event && this.filterOperatorValue && this.filterOperatorValue.includes(event))) {
+        this.filterOptions[0].disabled = true
         this.filterOptions[0].label = 'Add a new option'
+        return
       }
       if (this.filterOptions[0].disabled) {
         this.filterOptions[0].disabled = false
       }
-      this.filterOptions[0].label = `Create option "${event}"`
+      this.$set(this.filterOptions[0], 'label', `Create option "${event}"`)
+      this.filterOptions[0].originalLabel = event
+      this.$refs.filterOperation[0].hidePopup()
       this.$refs.filterOperation[0].showPopup()
-    }
+      this.$refs.filterOperation[0].focus()
+    },
+    applyFilter () {
+      this.$emit('filtersApplied')
+    },
+    ...mapActions('contacts', [ 'updateListFiltersById' ])
   },
   watch: {
     filterOperator () {
       this.filterOperatorValue = null
+      if (this.hasValue && this.filterOperatorValue) {
+        this.validated = true
+      }
+    },
+    filterOperatorValue () {
+      this.addValue()
     }
   }
 }

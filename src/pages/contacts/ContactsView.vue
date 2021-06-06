@@ -114,7 +114,7 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters/>
+      <contacts-filters :listFilters="list.filters"/>
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />

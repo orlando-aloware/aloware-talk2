@@ -91,5 +91,8 @@ export default {
   },
   setFilters: ({ commit }, filters) => {
     commit('SET_FILTERS', filters)
+  },
+  updateListFiltersById: ({ commit }, payload) => {
+    commit('UPDATE_LIST_FILTERS_BY_ID', payload)
   }
 }

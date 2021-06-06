@@ -62,6 +62,7 @@
               <span class="filter-label">{{ selectedFilter.label }}</span>
               <contacts-string-filter v-if="selectedFilter.type == 'string'"
                                       :filter="selectedFilter"
+                                      @filtersApplied="filtersApplied"
               >
               </contacts-string-filter>
             </div>
@@ -82,7 +83,7 @@ export default {
   props: {
     listFilters: {
       required: false,
-      type: Array
+      type: Object
     }
   },
   data () {
@@ -143,6 +144,9 @@ export default {
       if (this.step > 1) {
         this.step -= 1
       }
+    },
+    filtersApplied () {
+      this.step = 1
     }
   },
   mounted () {
