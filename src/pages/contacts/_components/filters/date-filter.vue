@@ -12,6 +12,9 @@
       </q-radio>
       <q-select dense
                 outlined
+                option-value="value"
+                emit-value
+                map-options
                 v-model="filterOperatorValue"
                 :options="operator.options"
                 v-if="operator.value === filterOperator && hasValue"
@@ -35,12 +38,24 @@
         v-if="operator.value === filterOperator && hasSecondaryOperator"
       ></b-form-datepicker>
     </div>
-    <b-button size="sm">Apply filter</b-button>
+    <compact-btn
+      :onClick="applyFilter"
+      :disabled="!validated"
+      variant="success"
+      class="mr-2 mt-3 p-3"
+    >
+      Apply filter
+    </compact-btn>
   </div>
 </template>
 
 <script>
+import CompactBtn from 'components/buttons/compact-btn'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+
 export default {
+  components: { CompactBtn },
   props: {
     filter: {
       required: true,
@@ -64,15 +79,54 @@ export default {
     },
     hasSecondaryOperator () {
       return [5].includes(this.filterOperator)
+    },
+    validated () {
+      return (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
+        ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
     }
   },
   methods: {
+    ...mapActions('contacts', [ 'setCurrentListFilters' ]),
+    setFilters () {
+      let allFilters = {}
 
+      if (!this.validated) {
+        return
+      }
+
+      if (!_.isEmpty(this.initialListFilters)) {
+        allFilters = this.initialListFilters
+      }
+
+      allFilters[this.filter.key] = {
+        operator: this.filterOperator,
+        value: this.getValue()
+      }
+
+      this.setCurrentListFilters(allFilters)
+    },
+    getValue () {
+      switch (true) {
+        case this.filterOperator === 5:
+          return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
+        default:
+          return this.filterOperatorValue
+      }
+    },
+    applyFilter () {
+      this.$emit('filtersApplied')
+    }
   },
   watch: {
     filterOperator () {
       this.filterOperatorValue = null
       this.secondaryFilterOperatorValue = null
+    },
+    filterOperatorValue () {
+      this.setFilters()
+    },
+    secondaryFilterOperatorValue () {
+      this.setFilters()
     }
   }
 }
@@ -83,8 +137,4 @@ export default {
     min-width: 215px !important;
     width: 215px !important;
   }
-
-  /*#datepicker-buttons__dialog_ {*/
-  /*  left: 53px !important;*/
-  /*}*/
 </style>

@@ -1,6 +1,7 @@
 <template>
   <button
     :class="computedClass"
+    :disabled="disabled"
     @click="onClick"
   >
     <slot />
@@ -49,6 +50,10 @@ export default {
     onClick: {
       type: Function,
       default: () => {}
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   }
 }

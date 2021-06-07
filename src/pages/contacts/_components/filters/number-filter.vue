@@ -23,12 +23,24 @@
                v-if="operator.value === filterOperator && hasSecondaryOperator"
       />
     </div>
-    <b-button size="sm">Apply filter</b-button>
+    <compact-btn
+      :onClick="applyFilter"
+      :disabled="!validated"
+      variant="success"
+      class="mr-2 mt-3 p-3"
+    >
+      Apply filter
+    </compact-btn>
   </div>
 </template>
 
 <script>
+import CompactBtn from 'components/buttons/compact-btn'
+import { mapActions, mapState } from 'vuex'
+import _ from 'lodash'
+
 export default {
+  components: { CompactBtn },
   props: {
     filter: {
       required: true,
@@ -39,29 +51,77 @@ export default {
     return {
       filterOperator: 1,
       filterOperatorValue: null,
-      secondaryFilterOperatorValue: null
+      secondaryFilterOperatorValue: null,
+      initialListFilters: null
     }
   },
   computed: {
+    ...mapState('contacts', ['currentListFilters']),
     hasValue () {
       return [1, 2, 3, 4, 5, 6, 7].includes(this.filterOperator)
     },
     hasSecondaryOperator () {
       return [7].includes(this.filterOperator)
+    },
+    validated () {
+      return (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
+        (this.filterOperatorValue && !this.hasSecondaryOperator) || this.filterOperator === 8
     }
   },
+
   methods: {
-    createValue (value, done) {
-      if (value && (!this.filterOperatorValue ||
-        (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
-        done(value, 'add-unique')
+    ...mapActions('contacts', [ 'setCurrentListFilters' ]),
+    getValue () {
+      switch (true) {
+        case this.filterOperator === 8:
+          return 0
+        case this.filterOperator === 7:
+          return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
+        default:
+          return this.filterOperatorValue
       }
+    },
+    setFilter () {
+      let allFilters = {}
+
+      if (!this.validated) {
+        return
+      }
+
+      if (!_.isEmpty(this.initialListFilters)) {
+        allFilters = this.initialListFilters
+      }
+
+      allFilters[this.filter.key] = {
+        operator: this.filterOperator,
+        value: this.getValue()
+      }
+
+      this.setCurrentListFilters(allFilters)
+    },
+    applyFilter () {
+      this.$emit('filtersApplied')
     }
   },
   watch: {
     filterOperator () {
       this.filterOperatorValue = null
+      this.secondaryFilterOperatorValue = null
+
+      // is zero, then send request
+      if (this.filterOperator === 8) {
+        this.setFilter()
+      }
+    },
+    filterOperatorValue () {
+      this.setFilter()
+    },
+    secondaryFilterOperatorValue () {
+      this.setFilter()
     }
+  },
+  created () {
+    this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
   }
 }
 </script>
