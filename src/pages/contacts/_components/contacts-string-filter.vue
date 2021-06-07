@@ -75,10 +75,14 @@ export default {
   },
   created () {
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+    this.$VueEvent.listen('filters-back', () => {
+      this.setCurrentListFilters(this.initialListFilters)
+    })
   },
   methods: {
     addValue () {
-      if (typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object') {
+      if (this.filterOperatorValue &&
+        typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object') {
         this.filterOperatorValue.pop()
         this.$refs.filterOperation[0].add(this.filterOptions[0].originalLabel, true)
         this.$refs.filterOperation[0].updateInputValue('')
