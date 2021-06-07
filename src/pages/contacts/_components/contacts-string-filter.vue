@@ -75,10 +75,6 @@ export default {
   },
   created () {
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
-    this.$VueEvent.listen('filters-back', () => {
-      console.log('filters-back')
-      this.setCurrentListFilters(this.initialListFilters)
-    })
   },
   methods: {
     addValue () {
@@ -97,6 +93,10 @@ export default {
         value: this.filterOperatorValue
       }
       this.setCurrentListFilters(allFilters)
+      this.$VueEvent.unlisten('filters-back')
+      this.$VueEvent.listen('filters-back', () => {
+        this.setCurrentListFilters(this.initialListFilters)
+      })
     },
     createValue (value, done) {
       if (value && (!this.filterOperatorValue ||

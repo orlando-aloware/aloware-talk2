@@ -203,6 +203,7 @@ export default {
       this.filterSearch = filterName
     },
     toAddFiltersStep () {
+      this.$VueEvent.unlisten('filters-back')
       this.step = 2
     },
     selectFilter (filter) {

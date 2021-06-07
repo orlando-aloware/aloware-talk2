@@ -12,6 +12,10 @@ window.VueEvent = new class {
   listen (event, callback) {
     this.vue.$on(event, callback)
   }
+
+  unlisten (event, callback) {
+    this.vue.$off(event, callback)
+  }
 }()
 
 Vue.prototype.$VueEvent = window.VueEvent
