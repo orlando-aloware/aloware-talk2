@@ -336,6 +336,23 @@ const agentStatusClass = (agentStatus) => {
   return 'bg-grey-6'
 }
 
+/**
+ * readableArrayValue
+ * @param {Array} value
+ * @returns {string|*}
+ */
+const readableArrayValue = (value) => {
+  if (value.length === 0) {
+    return ''
+  }
+  if (value.length >= 2) {
+    const last = value.pop()
+    return value.join(', ') + ', or ' + last
+  } else {
+    return value.pop()
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -359,7 +376,8 @@ export default ({ Vue }) => {
     firstName,
     lastName,
     replaceDash,
-    agentStatusClass
+    agentStatusClass,
+    readableArrayValue
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

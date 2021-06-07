@@ -105,6 +105,7 @@ export default function () {
       open: false,
       folderId: null
     },
-    filters: []
+    filters: [],
+    currentListFilters: {}
   }
 }

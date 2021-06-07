@@ -1,6 +1,7 @@
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import qs from 'qs'
 import isPlainObject from 'lodash/isPlainObject'
+import _ from 'lodash'
 
 import {
   DEFAULT_CONTACT_LIST,
@@ -142,8 +143,9 @@ export default {
     }
   },
   computed: {
+    ...mapState('contacts', ['currentListFilters']),
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', '']),
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&
@@ -194,11 +196,16 @@ export default {
     listFilters () {
       try {
         let filters = {}
+
         if (this.lists[this.id] && this.lists[this.id].filters) {
           filters = this.lists[this.id].filters
           if (typeof filters === 'string') {
             filters = JSON.parse(filters)
           }
+        }
+
+        if (!_.isEmpty(this.currentListFilters)) {
+          filters = { ...filters, ...this.currentListFilters }
         }
 
         if (!isPlainObject(filters)) {
@@ -224,6 +231,9 @@ export default {
   watch: {
     '$route.params.id': function () {
       this.fetch()
+    },
+    currentListFilters () {
+      this.fetch(this.currentListFilters)
     }
   }
 }

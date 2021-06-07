@@ -41,7 +41,8 @@
 
 <script>
 import CompactBtn from 'components/buttons/compact-btn'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import _ from 'lodash'
 export default {
   name: 'contacts-string-filter',
   components: { CompactBtn },
@@ -62,13 +63,18 @@ export default {
           disabled: true
         }
       ],
-      validated: false
+      validated: false,
+      initialListFilters: null
     }
   },
   computed: {
+    ...mapState('contacts', ['currentListFilters']),
     hasValue () {
       return [1, 2].includes(this.filterOperator)
     }
+  },
+  created () {
+    this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
   },
   methods: {
     addValue () {
@@ -77,18 +83,30 @@ export default {
         this.$refs.filterOperation[0].add(this.filterOptions[0].originalLabel, true)
         this.$refs.filterOperation[0].updateInputValue('')
       }
+      let allFilters = {}
+      if (!_.isEmpty(this.initialListFilters)) {
+        allFilters = this.initialListFilters
+      }
+      allFilters[this.filter.key] = {
+        operator: this.filterOperator,
+        value: this.filterOperatorValue
+      }
+      this.setCurrentListFilters(allFilters)
     },
     createValue (value, done) {
       if (value && (!this.filterOperatorValue ||
         (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
         done(value, 'add-unique')
-        this.$nextTick(() => {
-          this.$refs.filterOperation[0].showPopup()
-        })
       }
+      this.$nextTick(() => {
+        this.$refs.filterOperation[0].showPopup()
+      })
     },
     showFilterOperationOptions (event) {
-      if (!event || (event && this.filterOperatorValue && this.filterOperatorValue.includes(event))) {
+      if (!event ||
+        (event &&
+          this.filterOperatorValue &&
+          this.filterOperatorValue.includes(event))) {
         this.filterOptions[0].disabled = true
         this.filterOptions[0].label = 'Add a new option'
         return
@@ -105,7 +123,7 @@ export default {
     applyFilter () {
       this.$emit('filtersApplied')
     },
-    ...mapActions('contacts', [ 'updateListFiltersById' ])
+    ...mapActions('contacts', [ 'setCurrentListFilters' ])
   },
   watch: {
     filterOperator () {
