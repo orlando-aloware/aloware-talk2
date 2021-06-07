@@ -76,6 +76,7 @@ export default {
   created () {
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.$VueEvent.listen('filters-back', () => {
+      console.log('filters-back')
       this.setCurrentListFilters(this.initialListFilters)
     })
   },
@@ -125,6 +126,7 @@ export default {
       this.$refs.filterOperation[0].focus()
     },
     applyFilter () {
+      this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')
     },
     ...mapActions('contacts', [ 'setCurrentListFilters' ])

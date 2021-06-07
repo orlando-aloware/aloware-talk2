@@ -25,21 +25,21 @@
           </div>
         </template>
         <div class="filter-contents">
-          <div class="p-2">
+          <div>
             <!-- Using slots -->
-            <div class="pt-2"
+            <div class="step-1 pt-2"
                  v-if="step === 1">
               <compact-btn
                 v-if="isEmptyListFilters"
                 variant="primary"
-                customClass="px-4 add-filters"
+                customClass="px-4 add-filters m-2"
                 :onClick="toAddFiltersStep"
               >
                 <i class="material-icons mr-1 add-icon">add</i> Add a Filter
               </compact-btn>
               <div class="textual-filter"
                    v-else>
-                <b-card>
+                <b-card class="p-1">
                   <template v-for="filter in visibleListFilters">
                     <b-card :key="filter.key">
                       <span class="filter-name">{{ filter.label }}</span>
@@ -81,7 +81,8 @@
                 </compact-btn>
               </div>
             </div>
-            <div v-else-if="step === 2">
+            <div class="p-2"
+                 v-else-if="step === 2">
               <div class="mb-3">
                 <h6 class="contact-prop-label">Contact properties</h6>
                 <contacts-table-search placeholder="Search"
@@ -102,7 +103,7 @@
                 </b-list-group-item>
               </b-list-group>
             </div>
-            <div class="step-3"
+            <div class="step-3 p-2"
                  v-else-if="step === 3">
               <span class="filter-label">{{ selectedFilter.label }}</span>
               <contacts-string-filter v-if="selectedFilter.type == 'string'"
@@ -111,13 +112,25 @@
               >
               </contacts-string-filter>
               <number-filter v-if="selectedFilter.type === 'number'"
-                             :filter="selectedFilter"/>
+                             :filter="selectedFilter"
+                             @filtersApplied="filtersApplied"
+              >
+              </number-filter>
               <date-filter v-if="selectedFilter.type === 'date'"
-                           :filter="selectedFilter"/>
+                           :filter="selectedFilter"
+                           @filtersApplied="filtersApplied"
+              >
+              </date-filter>
               <multi-relation-filter v-if="selectedFilter.type === 'multi_relation'"
-                           :filter="selectedFilter"/>
+                                     :filter="selectedFilter"
+                                     @filtersApplied="filtersApplied"
+              >
+              </multi-relation-filter>
               <relation-filter v-if="selectedFilter.type === 'relation'"
-                               :filter="selectedFilter"/>
+                               :filter="selectedFilter"
+                               @filtersApplied="filtersApplied"
+              >
+              </relation-filter>
             </div>
           </div>
         </div>
@@ -135,6 +148,7 @@ import NumberFilter from 'pages/contacts/_components/filters/number-filter'
 import DateFilter from 'pages/contacts/_components/filters/date-filter'
 import MultiRelationFilter from 'pages/contacts/_components/filters/multi-relation-filter'
 import RelationFilter from 'pages/contacts/_components/filters/relation-filter'
+import _ from 'lodash'
 export default {
   components: { RelationFilter, MultiRelationFilter, DateFilter, NumberFilter, contactsTableSearch, CompactBtn, contactsStringFilter },
   data () {
@@ -150,10 +164,15 @@ export default {
   computed: {
     ...mapState('contacts', ['isFiltersOpen', 'filters', 'currentListFilters']),
     filtersFiltered () {
-      if (!this.filterSearch || this.filterSearch.length < 1) {
+      if (_.isEmpty(this.visibleListFilters) &&
+        (!this.filterSearch || !this.filterSearch.length)) {
         return this.filters
       }
-      return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
+      let filtered = this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
+      if (!_.isEmpty(this.visibleListFilters)) {
+        filtered = filtered.filter(filter => typeof this.visibleListFilters[filter.key] === 'undefined')
+      }
+      return filtered
     },
     isEmptyListFilters () {
       return !Object.keys(this.visibleListFilters).length
@@ -212,6 +231,7 @@ export default {
       }
       for (let index in filters) {
         const found = this.filters.find(filter => filter.key === index)
+
         if (found) {
           const operator = found.operators.find(operator => operator.value === filters[index].operator)
           filters[index] = {
@@ -323,8 +343,10 @@ export default {
       font-size: 16px;
     }
   }
-  .step-3 {
+  .step-1, step-3 {
     font-size: 13px;
+  }
+  .step-3 {
     .filter-label {
       font-weight: 600;
     }
