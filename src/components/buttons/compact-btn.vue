@@ -75,5 +75,8 @@ export default {
 .btn-outlined-light {
   border-color: $grey-light11;
   color: $black;
+  &.with-border {
+    background-color: #EFF6FE;
+  }
 }
 </style>

@@ -30,7 +30,7 @@
             <div class="pt-2"
                  v-if="step === 1">
               <compact-btn
-                v-if="!Object.keys(visibleListFilters).length"
+                v-if="isEmptyListFilters"
                 variant="primary"
                 customClass="px-4 add-filters"
                 :onClick="toAddFiltersStep"
@@ -39,29 +39,46 @@
               </compact-btn>
               <div class="textual-filter"
                    v-else>
-                <template v-for="filter in visibleListFilters">
-                  <b-card :key="filter.key">
-                    <span class="filter-name">{{ filter.label }}</span>
-                    <span class="text-lowercase"> {{ filter.operator }}</span>
-                    <span v-if="filter.value.length > 1">
-                      <template v-for="(value, key) in filter.value.splice(-1,1)">
-                        <span class="font-weight-bold"
-                              :key="`filter-value-${key}`">
-                          {{ value }}
-                        </span>,
-                      </template>
-                      or
-                      <span class="font-weight-bold">
-                        {{ filter.value[filter.value.length - 1] }}
+                <b-card>
+                  <template v-for="filter in visibleListFilters">
+                    <b-card :key="filter.key">
+                      <span class="filter-name">{{ filter.label }}</span>
+                      <span class="text-lowercase"> {{ filter.operator }}</span>
+                      <span v-if="filter.value.length > 1">
+
+                        <template v-for="(value, key) in JSON.parse(filter.value).slice(0, -1)">
+                          <span class="font-weight-bold"
+                                :key="`filter-value-${key}`">
+                            {{ value }}
+                          </span>,
+                        </template>
+                        or
+                        <span class="font-weight-bold">
+                          {{ JSON.parse(filter.value).pop() }}
+                        </span>
                       </span>
-                    </span>
-                    <span v-else>
-                      <span class="font-weight-bold">
-                        {{ filter.value[0] }}
+                      <span v-else>
+                        <span class="font-weight-bold">
+                          {{ filter.value[0] }}
+                        </span>
                       </span>
-                    </span>
-                  </b-card>
-                </template>
+                    </b-card>
+                  </template>
+                  <compact-btn
+                    variant="outlined-light"
+                    customClass="my-2 add-filters with-border"
+                    :onClick="toAddFiltersStep"
+                  >
+                    AND
+                  </compact-btn>
+                </b-card>
+                <compact-btn
+                  variant="outlined-light"
+                  customClass="my-2 add-filters with-border"
+                  :onClick="toAddFiltersStep"
+                >
+                  OR
+                </compact-btn>
               </div>
             </div>
             <div v-else-if="step === 2">
@@ -126,7 +143,8 @@ export default {
       show: false,
       filterSearch: '',
       step: 1,
-      selectedFilter: null
+      selectedFilter: null,
+      visibleListFilters: ''
     }
   },
   computed: {
@@ -137,24 +155,8 @@ export default {
       }
       return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
     },
-    visibleListFilters () {
-      let filters = { ...this.currentListFilters }
-      if (typeof filters.contact_list_id !== 'undefined') {
-        delete filters.contact_list_id
-      }
-      for (let index in filters) {
-        const found = this.filters.find(filter => filter.key === index)
-        if (found) {
-          const operator = found.operators.find(operator => operator.value === filters[index].operator)
-          filters[index] = {
-            key: index,
-            label: found.label,
-            operator: operator.label,
-            value: filters[index].value
-          }
-        }
-      }
-      return filters
+    isEmptyListFilters () {
+      return !Object.keys(this.visibleListFilters).length
     }
   },
   methods: {
@@ -193,6 +195,7 @@ export default {
       this.closeFilters()
     },
     backToStep () {
+      this.$VueEvent.fire('filters-back')
       if (this.step > 1) {
         this.step -= 1
         // make all filters visible
@@ -201,6 +204,25 @@ export default {
     },
     filtersApplied () {
       this.step = 1
+    },
+    generateListFilters () {
+      let filters = JSON.parse(JSON.stringify(this.currentListFilters))
+      if (typeof filters.contact_lists !== 'undefined') {
+        delete filters.contact_lists
+      }
+      for (let index in filters) {
+        const found = this.filters.find(filter => filter.key === index)
+        if (found) {
+          const operator = found.operators.find(operator => operator.value === filters[index].operator)
+          filters[index] = {
+            key: index,
+            label: found.label,
+            operator: operator.label,
+            value: JSON.stringify(filters[index].value)
+          }
+        }
+      }
+      return filters
     }
   },
   mounted () {
@@ -210,6 +232,9 @@ export default {
   watch: {
     isFiltersOpen (isFiltersOpen) {
       this.show = isFiltersOpen
+    },
+    currentListFilters () {
+      this.visibleListFilters = this.generateListFilters()
     }
   }
 }
