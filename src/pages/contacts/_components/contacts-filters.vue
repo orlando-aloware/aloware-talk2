@@ -44,23 +44,8 @@
                     <b-card :key="filter.key">
                       <span class="filter-name">{{ filter.label }}</span>
                       <span class="text-lowercase"> {{ filter.operator }}</span>
-                      <span v-if="filter.value.length > 1">
-
-                        <template v-for="(value, key) in JSON.parse(filter.value).slice(0, -1)">
-                          <span class="font-weight-bold"
-                                :key="`filter-value-${key}`">
-                            {{ value }}
-                          </span>,
-                        </template>
-                        or
-                        <span class="font-weight-bold">
-                          {{ JSON.parse(filter.value).pop() }}
-                        </span>
-                      </span>
-                      <span v-else>
-                        <span class="font-weight-bold">
-                          {{ filter.value[0] }}
-                        </span>
+                      <span class="font-weight-bold">
+                        {{ getFormattedFilterSummary(filter) }}
                       </span>
                     </b-card>
                   </template>
@@ -228,18 +213,35 @@ export default {
       }
       for (let index in filters) {
         const found = this.filters.find(filter => filter.key === index)
-
         if (found) {
           const operator = found.operators.find(operator => operator.value === filters[index].operator)
           filters[index] = {
             key: index,
             label: found.label,
             operator: operator.label,
+            trueValue: filters[index].value,
             value: JSON.stringify(filters[index].value)
           }
         }
       }
       return filters
+    },
+    getFormattedFilterSummary (filter) {
+      if (typeof filter.trueValue === 'object') {
+        switch (true) {
+          case filter.trueValue.length === 1:
+            return filter.trueValue[0]
+          case filter.trueValue.length === 2 && filter.operator !== 'Is between':
+            return filter.trueValue.join(' or ')
+          case filter.trueValue.length === 2 && filter.operator === 'Is between':
+            return filter.trueValue.join(' and ')
+          case filter.trueValue.length >= 3:
+            let joinedValues = filter.trueValue.join(', ')
+            return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+        }
+      } else {
+        return filter.trueValue
+      }
     }
   },
   mounted () {
@@ -252,6 +254,9 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+    },
+    visibleListFilters () {
+      this.generateListFilters()
     }
   }
 }
@@ -263,7 +268,7 @@ export default {
 @import 'src/css/breakpoints.scss';
 .contacts-filter-sidebar {
   height: 100%;
-  width: 300px;
+  width: 400px;
   display: flex;
   justify-content: flex-end;
   padding-left: 10px;
