@@ -30,7 +30,7 @@
     </div>
     <compact-btn
       :onClick="applyFilter"
-      :disabled="validated"
+      :disabled="!validated"
       variant="success"
       class="mr-2 mt-3 p-3"
     >
@@ -133,12 +133,17 @@ export default {
   },
   watch: {
     filterOperator () {
-      this.filterOperatorValue = null
-      if (this.hasValue && this.filterOperatorValue) {
-        this.validated = true
+      if (this.hasValue) {
+        this.validated = false
+        return
       }
+      this.validated = true
+      this.addValue()
     },
     filterOperatorValue () {
+      if (this.filterOperatorValue) {
+        this.validated = true
+      }
       this.addValue()
     }
   }

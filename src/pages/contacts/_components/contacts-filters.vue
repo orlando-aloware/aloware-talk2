@@ -168,11 +168,7 @@ export default {
         (!this.filterSearch || !this.filterSearch.length)) {
         return this.filters
       }
-      let filtered = this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
-      if (!_.isEmpty(this.visibleListFilters)) {
-        filtered = filtered.filter(filter => typeof this.visibleListFilters[filter.key] === 'undefined')
-      }
-      return filtered
+      return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
     },
     isEmptyListFilters () {
       return !Object.keys(this.visibleListFilters).length
