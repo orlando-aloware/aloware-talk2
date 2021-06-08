@@ -41,7 +41,7 @@
                    v-else>
                 <b-card class="p-1">
                   <template v-for="filter in visibleListFilters">
-                    <b-card :key="filter.key">
+                    <b-card :key="filter.key" class="mb-2">
                       <span class="filter-name">{{ filter.label }}</span>
                       <span class="text-lowercase"> {{ filter.operator }}</span>
                       <span class="font-weight-bold">
@@ -51,7 +51,7 @@
                   </template>
                   <compact-btn
                     variant="outlined-light"
-                    customClass="my-2 add-filters with-border"
+                    customClass="add-filters with-border"
                     :onClick="toAddFiltersStep"
                   >
                     AND
@@ -227,6 +227,9 @@ export default {
       return filters
     },
     getFormattedFilterSummary (filter) {
+      if (!filter.trueValue) {
+        return ''
+      }
       if (typeof filter.trueValue === 'object') {
         switch (true) {
           case filter.trueValue.length === 1:
