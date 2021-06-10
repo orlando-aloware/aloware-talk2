@@ -100,7 +100,7 @@ export default {
         page: 1
       }
 
-      let filters = { ...this.listFilters }
+      let filters = {}
 
       if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
         filters.is_unanswered_contact = {}
