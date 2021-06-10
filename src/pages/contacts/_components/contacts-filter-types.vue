@@ -137,7 +137,8 @@ export default {
         }
       ],
       initialListFilters: [],
-      validated: false
+      validated: false,
+      debounceDelay: 0
     }
   },
   computed: {
@@ -170,12 +171,13 @@ export default {
     }
   },
   created () {
+    this.debounceDelay = this.filter.type === 'string' ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
     this.filterOperatorValue = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
   },
   methods: {
-    addValue: _.debounce(function () {
+    addValue () {
       if (this.filterOperatorValue &&
         typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object' &&
         !['relation', 'multi_relation'].includes(this.filter.type)) {
@@ -230,7 +232,7 @@ export default {
       this.$VueEvent.listen('filters-back', () => {
         this.setCurrentListFilters(this.initialListFilters)
       })
-    }, 500),
+    },
     createValue (value, done) {
       if (value && (!this.filterOperatorValue ||
         (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
@@ -316,16 +318,25 @@ export default {
       this.filterOperatorValue = null
       this.secondaryFilterOperatorValue = null
       if (!this.hasValue) {
-        this.addValue()
+        const debounce = _.debounce(() => {
+          this.addValue()
+        }, this.debounceDelay)
+        debounce()
       }
       this.validateValue()
     },
     filterOperatorValue () {
-      this.addValue()
+      const debounce = _.debounce(() => {
+        this.addValue()
+      }, this.debounceDelay)
+      debounce()
       this.validateValue()
     },
     secondaryFilterOperatorValue () {
-      this.addValue()
+      const debounce = _.debounce(() => {
+        this.addValue()
+      }, this.debounceDelay)
+      debounce()
       this.validateValue()
     }
   }

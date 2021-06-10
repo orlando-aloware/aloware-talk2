@@ -37,13 +37,13 @@
               >
                 <i class="material-icons mr-1 add-icon">add</i> Add a Filter
               </compact-btn>
-              <div class="textual-filter"
+              <div class="textual-filters"
                    v-else>
                 <template v-for="(group, groupIndex) in visibleListFilters">
                   <div class="d-flex full-width mb-2"
                        :key="`group-remove-${groupIndex}`">
                     <div v-if="visibleListFilters.length >= 2 && groupIndex >= 1"
-                         class="font-weight-bold"
+                         class="font-weight-bold group-conjunction"
                     >
                       {{ group.is_conjunction ? 'AND' : 'OR'}}
                     </div>
@@ -66,7 +66,7 @@
                           {{ getFormattedFilterSummary(filter) }}
                         </span>
                         <compact-btn class="py-0 delete-filter"
-                                     @clicked="onDeleteFilter(index, filter.key)">
+                                     @clicked="onDeleteFilter(groupIndex, filter.key)">
                           <i class="fa fa-trash"></i>
                           <q-tooltip>
                             Remove this condition
@@ -74,10 +74,10 @@
                         </compact-btn>
                       </b-card>
                       <div v-if="getFilterLength(group.filters) >= 2 && index < (getFilterLength(group.filters) - 1)"
-                            class="mb-2"
+                            class="mb-2 font-weight-bold"
                             :key="`filter-${filter.key}`"
                       >
-                        and
+                        AND
                       </div>
                     </template>
                     <compact-btn
@@ -282,8 +282,15 @@ export default {
       return Object.keys(filter).length
     },
     onDeleteFilter (index, key) {
+      console.log('index: ', index)
+      console.log('key: ', key)
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
+      console.log('_.isEmpty(updatedFilter[index].filters): ', _.isEmpty(updatedFilter[index].filters))
+      console.log('updatedFilter[index].filters: ', updatedFilter[index].filters)
+      if (_.isEmpty(updatedFilter[index].filters)) {
+        updatedFilter.splice(index, 1)
+      }
       this.setCurrentListFilters(updatedFilter)
     },
     onDeleteGroupFilter (index) {
@@ -439,6 +446,9 @@ export default {
   .delete-group-filter {
     color: #0090AF;
     font-weight: bold;
+  }
+  .group-conjunction {
+    line-height: 2.1em;
   }
 }
 </style>
