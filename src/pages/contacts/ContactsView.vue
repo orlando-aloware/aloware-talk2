@@ -44,14 +44,16 @@
             switch
             @change="onFetchMyContacts"
           >
-            <span class="small text-muted text-uppercase">My Contacts</span>
+            <div class="small text-muted text-uppercase my-contacts-label">My Contacts</div>
           </b-form-checkbox>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
-        <div class="mr-4">
-          <span class="small text-muted">{{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts</span>
+        <div class="mr-4 num-contacts">
+          <div class="small text-muted">
+            {{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts
+          </div>
         </div>
         <compact-btn
           borderless
@@ -328,7 +330,7 @@ export default {
     },
     saveFilterButtonClass () {
       return {
-        'disabledButton': this.selectedList.type === this.ContactListType.STATIC ||
+        'disabled-button': this.selectedList.type === this.ContactListType.STATIC ||
           (this.selectedList.type === this.ContactListType.DYNAMIC &&
             !this.filterHasChanges)
       }
@@ -382,10 +384,16 @@ export default {
   width: 100%;
   z-index: 0;
 }
-.disabledButton {
+.disabled-button {
   & .btn:not(.dropdown-toggle-split) {
     pointer-events: none;
     cursor: not-allowed;
   }
+}
+.num-contacts {
+  font-size: 0.875rem;
+}
+.my-contacts-label {
+  margin-top: 2px;
 }
 </style>
