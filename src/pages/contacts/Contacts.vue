@@ -13,6 +13,7 @@
     <remove-contact-confirmation />
     <move-dialog />
     <create-list-modal />
+    <select-list-modal />
   </div>
 </template>
 
@@ -25,10 +26,12 @@ import RemoveContact from './_components/remove-contact.vue'
 import RemoveContactConfirmation from './_components/remove-contact-confirmation.vue'
 import MoveDialog from './_components/move-dialog.vue'
 import CreateListModal from './_components/create-list-modal.vue'
+import SelectListModal from 'pages/contacts/_components/select-list-modal'
 
 export default {
   name: 'Contacts',
   components: {
+    SelectListModal,
     ContactsSidebar,
     RemoveListDialog,
     RemoveFolderDialog,

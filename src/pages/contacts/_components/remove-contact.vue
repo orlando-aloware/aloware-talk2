@@ -18,7 +18,7 @@
         <button
           class="btn btn-sm btn-outline-success mr-2"
           @click="onRemoveFromList"
-          v-if="selectedList.type === String(ContactListType.STATIC)"
+          v-if="selectedList.type === ContactListType.STATIC"
         >
           Remove From List Only
         </button>

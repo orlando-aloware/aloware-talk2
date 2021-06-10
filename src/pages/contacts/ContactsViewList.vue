@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-types'
+import { DEFAULT_CONTACT_LIST_ITEMS, DYNAMIC } from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters } from 'vuex'
 import ContactsView from './ContactsView.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -33,7 +33,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters']),
+    ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters', 'setSelectedList']),
     loadList (id) {
       const stringId = String(id)
 
@@ -49,12 +49,18 @@ export default {
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })
-          this.setCurrentListFilters({
+          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          let filters = {
             contact_lists: {
               operator: 1,
               value: [stringId]
             }
-          })
+          }
+
+          if (response.type === DYNAMIC) {
+            filters = response.filters
+          }
+          this.setCurrentListFilters(filters)
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)

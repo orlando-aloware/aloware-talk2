@@ -83,12 +83,27 @@ export default {
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
   },
+  setSelectedStaticList: ({ commit }, payload) => {
+    commit('SET_SELECTED_STATIC_LIST', payload)
+  },
   createListOpen: ({ commit }, payload) => {
     commit('CREATE_LIST_OPEN', payload)
   },
   createListClose: ({ commit }) => {
     commit('CREATE_LIST_CLOSE')
   },
+
+  selectListOpen: ({ commit }, payload) => {
+    commit('SELECT_LIST_OPEN', payload)
+  },
+  selectListClose: ({ commit }) => {
+    commit('SELECT_LIST_CLOSE')
+  },
+
+  setSelectListSearchValue: ({ commit }, value) => {
+    commit('SET_SELECT_LIST_SEARCH_VALUE', value)
+  },
+
   setFilters: ({ commit }, filters) => {
     commit('SET_FILTERS', filters)
   },

@@ -41,7 +41,7 @@ export default {
   },
   mounted () {
     this.setData(this.id)
-    this.setSelectedList({ id: this.id, name: this.name, 'type': this.type })
+    this.setSelectedList({ id: this.id, name: this.name, type: this.type })
   }
 }
 </script>

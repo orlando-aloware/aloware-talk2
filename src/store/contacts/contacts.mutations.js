@@ -129,12 +129,28 @@ export default {
   SET_SELECTED_LIST: (state, payload) => {
     state.selectedList = { ...state.selectedList, ...payload }
   },
+
+  SET_SELECTED_STATIC_LIST: (state, payload) => {
+    state.selectedStaticList = { ...state.selectedStaticList, ...payload }
+  },
   CREATE_LIST_OPEN: (state, payload) => {
     state.createList = { ...state.createList, ...payload, open: true }
   },
   CREATE_LIST_CLOSE: (state) => {
-    state.createList = { folderId: null, open: false }
+    state.createList = { folderId: null, open: false, mode: '', type: 1, contact_folder_id: null, name: '', filters: [] }
   },
+
+  SELECT_LIST_OPEN: (state, payload) => {
+    state.selectList = { ...state.selectList, ...payload, open: true }
+  },
+  SELECT_LIST_CLOSE: (state) => {
+    state.selectList = { contact_list_id: null, open: false, search_value: '' }
+  },
+
+  SET_SELECT_LIST_SEARCH_VALUE: (state, value) => {
+    state.selectList = { ...state.selectList, search_value: value }
+  },
+
   SET_FILTERS: (state, filters) => {
     state.filters = filters
   },

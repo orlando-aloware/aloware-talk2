@@ -101,9 +101,26 @@ export default function () {
       id: 'all',
       name: 'All Contacts'
     },
+    selectedStaticList: {
+      id: null,
+      name: '',
+      type: null,
+      hasEdit: 0,
+      hasDelete: 0
+    },
     createList: {
+      name: '',
+      mode: '', // from_filters, from_bulk_menu, from_folders
+      type: 1,
       open: false,
-      folderId: null
+      folderId: null,
+      contact_folder_id: null,
+      filters: []
+    },
+    selectList: {
+      contact_list_id: null,
+      open: false,
+      search_value: ''
     },
     filters: [],
     currentListFilters: {}

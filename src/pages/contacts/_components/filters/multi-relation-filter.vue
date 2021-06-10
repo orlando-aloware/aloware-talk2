@@ -86,10 +86,6 @@ export default {
     },
     getValue () {
       switch (true) {
-        case this.filterOperator === 3:
-          return 1
-        case this.filterOperator === 4:
-          return 2
         default:
           return this.filterOperatorValue
       }

@@ -62,6 +62,25 @@
         >
           <i class="fa fa-cog text-success mr-1"></i> Edit Columns
         </compact-btn>
+        <b-dropdown
+          split
+          split-variant="outline-primary"
+          variant="primary"
+          text="Save"
+          class="m-2 b-compact-dropdown-button"
+          size="sm"
+          @click="onUpdateContactList"
+        >
+          <b-dropdown-item href="#"
+                           @click="onCreateStaticList">
+            Save as New Static List
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           v-if="String(selectedList.type) === '2'"
+                           @click="onCreateDynamicList">
+            Save as New Dynamic List
+          </b-dropdown-item>
+        </b-dropdown>
       </div>
     </template>
     <template slot="actions">
@@ -135,6 +154,8 @@ import TableRow from 'src/pages/contacts/_components/table-row.vue'
 import contactsMixins from './contacts.mixins'
 import ContactsFilters from 'pages/contacts/_components/contacts-filters'
 
+import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
+
 export default {
   components: {
     ContactsFilters,
@@ -161,7 +182,8 @@ export default {
       'contactsLoaded',
       'columnsReordered',
       'setListSelectedContacts',
-      'setSelectedList'
+      'setSelectedList',
+      'createListOpen'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -198,11 +220,53 @@ export default {
       } else {
         this.openFilters()
       }
+    },
+    onCreateStaticList () {
+      this.createListOpen({
+        type: 1,
+        mode: FROM_FILTERS,
+        contact_folder_id: null
+      })
+    },
+    onCreateDynamicList () {
+      this.createListOpen({
+        type: 2,
+        mode: FROM_FILTERS,
+        contact_folder_id: null
+      })
+    },
+    onUpdateContactList () {
+      return window.axios
+        .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
+        .then(() => {
+          this.$q.notify({
+            message: 'Changes to contact list has been saved.',
+            type: 'positive',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
+        .catch((_err) => {
+          this.$q.notify({
+            message: 'Unable to update contact list.',
+            type: 'negative',
+            textColor: 'white',
+            actions: [
+              {
+                icon: 'close'
+              }
+            ]
+          })
+        })
     }
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
     checked () {
       return this.selectedContacts[this.id] || []
     }

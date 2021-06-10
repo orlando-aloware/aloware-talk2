@@ -97,7 +97,7 @@ export default {
     },
     onCreateList () {
       this.createListOpen({
-        folderId: null
+        contact_folder_id: null
       })
     },
     loadFolders () {

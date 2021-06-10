@@ -19,7 +19,7 @@
     >
       <div class="d-flex flex-column create-list-modal__body position-relative">
         <div class="d-flex align-items-center">
-          <div class="flex-grow-1 create-list-modal__title">New List</div>
+          <div class="flex-grow-1 create-list-modal__title">{{ getTitle }}</div>
           <button
             class="btn btn-link small text-muted create-list-modal__close"
             @click="onClose"
@@ -35,17 +35,17 @@
             placeholder="Untitled List"
             :disabled="isLoading"
             autofocus
-            v-model="name"
+            v-model="createList.name"
           />
         </div>
 
-        <div class="flex-grow-1 py-4">
-          <div class="form-check mb-2" @click="type = ContactListTypes.DYNAMIC">
+        <div class="flex-grow-1 py-4" v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode)">
+          <div class="form-check mb-2" @click="createList.type = ContactListTypes.DYNAMIC">
             <input
               class="form-check-input"
               type="radio"
               id="dynamicList"
-              :checked="type === ContactListTypes.DYNAMIC"
+              :checked="createList.type === ContactListTypes.DYNAMIC"
             />
             <label for="dynamicList">
               <div class="create-list-modal__list-title">Dynamic List</div>
@@ -55,12 +55,12 @@
               </div>
             </label>
           </div>
-          <div class="form-check" @click="type = ContactListTypes.STATIC">
+          <div class="form-check" @click="createList.type = ContactListTypes.STATIC">
             <input
               class="form-check-input"
               type="radio"
               id="staticList"
-              :checked="type === ContactListTypes.STATIC"
+              :checked="createList.type === ContactListTypes.STATIC"
             />
             <label for="staticList">
               <div class="create-list-modal__list-title">Static List</div>
@@ -72,7 +72,7 @@
           </div>
         </div>
 
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center pt-3">
           <button
             class="btn btn-block btn-light mt-0 mr-2"
             @click="onClose"
@@ -102,12 +102,20 @@ import {
 } from 'src/constants/contacts-list-types'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 
 const ContactListTypes = { STATIC, DYNAMIC }
-
 export default {
   computed: {
-    ...mapGetters('contacts', ['createList'])
+    ...mapGetters('contacts', ['createList', 'currentListFilters', 'selectedList', 'selectedContacts']),
+    getTitle () {
+      if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
+        let typeText = (this.createList.type === STATIC) ? 'Static' : 'Dynamic'
+        return `New ${typeText} Lists`
+      }
+
+      return 'New Lists'
+    }
   },
   methods: {
     ...mapActions('contacts', ['createListClose', 'foldersLoaded']),
@@ -116,17 +124,44 @@ export default {
         this.createListClose()
       }
     },
+    getParams () {
+      let params = {
+        contact_folder_id: this.createList.contact_folder_id,
+        name: this.createList.name,
+        type: this.createList.type,
+        headers: DEFAULT_COLUMNS,
+        mode: this.createList.mode,
+        order: 0
+      }
+
+      switch (true) {
+        case this.createList.mode === FROM_FILTERS:
+          let clonedCurrentListFilters = { ...this.currentListFilters }
+          if (this.createList.type === DYNAMIC) {
+            // remove contact_lists filter since we are creating dynamic one
+            delete clonedCurrentListFilters.contact_lists
+          }
+          params = { ...params, filters: clonedCurrentListFilters }
+
+          break
+        case this.createList.mode === FROM_BULK_MENU:
+          let contacts = []
+
+          if (this.selectedContacts[this.selectedList.id]) {
+            contacts = this.selectedContacts[this.selectedList.id]
+          }
+          params = { ...params, contacts: contacts }
+          break
+        case this.createList.mode === FROM_FOLDERS:
+        default:
+      }
+
+      return params
+    },
     onSubmit () {
       this.isLoading = true
       window.axios
-        .post('/api/v2/contacts-list', {
-          contact_folder_id: this.createList.folderId,
-          name: this.name,
-          type: this.type,
-          headers: DEFAULT_COLUMNS,
-          filters: [],
-          order: 0
-        })
+        .post('/api/v2/contacts-list', this.getParams())
         .then((response) => {
           const data = response.data.data
           const message = response.data.message
@@ -181,7 +216,8 @@ export default {
       name: null,
       type: ContactListTypes.DYNAMIC,
       isLoading: false,
-      ContactListTypes
+      ContactListTypes,
+      CreateListMode: { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU }
     }
   },
   watch: {

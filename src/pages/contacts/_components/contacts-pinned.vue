@@ -67,7 +67,6 @@ export default {
         this.loadStatusCounts()
       ])
         .then(([allContacts, myContacts, statusCounts]) => {
-          console.log({ allContacts, myContacts })
           this.pinnedCountLoaded({
             id: DEFAULT_CONTACT_LIST.ALL_CONTACTS.id,
             count: allContacts

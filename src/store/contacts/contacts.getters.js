@@ -19,7 +19,9 @@ export default {
   moveDialog: (state) => state.moveDialog,
   selectedContacts: (state) => state.selectedContacts,
   selectedList: (state) => state.selectedList,
+  selectedStaticList: (state) => state.selectedStaticList,
   createList: (state) => state.createList,
+  selectList: (state) => state.selectList,
   filters: (state) => state.filters,
   isFiltersOpen: (state) => state.isFiltersOpen,
   isBulkDelete: (state) => state.isBulkDelete,
@@ -43,5 +45,6 @@ export default {
       })
 
     return pinnedLists
-  }
+  },
+  currentListFilters: (state) => state.currentListFilters
 }

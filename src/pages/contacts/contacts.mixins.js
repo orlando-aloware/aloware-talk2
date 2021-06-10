@@ -124,7 +124,7 @@ export default {
         query.filters.contact_owner.operator = OPERATORS.IS_ANY_OF
       }
 
-      if (this.id && !invalidIds.includes(this.id)) {
+      if (this.id && !invalidIds.includes(this.id) && this.list.type !== DYNAMIC) {
         query.filters.contact_lists = {}
         query.filters.contact_lists.value = [this.id]
         query.filters.contact_lists.operator = OPERATORS.IS_ANY_OF
