@@ -130,33 +130,12 @@
             <div class="step-3 p-2"
                  v-else-if="step === 3">
               <span class="filter-label">{{ selectedFilter.label }}</span>
-              <contacts-string-filter v-if="selectedFilter.type == 'string'"
-                                      :filter="selectedFilter"
-                                      :filterGroupIndex="filterGroupIndex"
-                                      :filterConjunction="filterConjunction"
-                                      @filtersApplied="filtersApplied"
-              >
-              </contacts-string-filter>
-              <number-filter v-if="selectedFilter.type === 'number'"
-                             :filter="selectedFilter"
-                             @filtersApplied="filtersApplied"
-              >
-              </number-filter>
-              <date-filter v-if="selectedFilter.type === 'date'"
-                           :filter="selectedFilter"
-                           @filtersApplied="filtersApplied"
-              >
-              </date-filter>
-              <multi-relation-filter v-if="selectedFilter.type === 'multi_relation'"
-                                     :filter="selectedFilter"
+              <contacts-filter-types :filter="selectedFilter"
+                                     :filterGroupIndex="filterGroupIndex"
+                                     :filterConjunction="filterConjunction"
                                      @filtersApplied="filtersApplied"
               >
-              </multi-relation-filter>
-              <relation-filter v-if="selectedFilter.type === 'relation'"
-                               :filter="selectedFilter"
-                               @filtersApplied="filtersApplied"
-              >
-              </relation-filter>
+              </contacts-filter-types>
             </div>
           </div>
         </div>
@@ -167,16 +146,12 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import contactsTableSearch from './contacts-table-search.vue'
-import contactsStringFilter from './contacts-string-filter.vue'
+import ContactsTableSearch from './contacts-table-search.vue'
+import ContactsFilterTypes from './contacts-filter-types.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
-import NumberFilter from 'pages/contacts/_components/filters/number-filter'
-import DateFilter from 'pages/contacts/_components/filters/date-filter'
-import MultiRelationFilter from 'pages/contacts/_components/filters/multi-relation-filter'
-import RelationFilter from 'pages/contacts/_components/filters/relation-filter'
 import _ from 'lodash'
 export default {
-  components: { RelationFilter, MultiRelationFilter, DateFilter, NumberFilter, contactsTableSearch, CompactBtn, contactsStringFilter },
+  components: { ContactsTableSearch, CompactBtn, ContactsFilterTypes },
   data () {
     return {
       items: Array.from(new Array(10)),
