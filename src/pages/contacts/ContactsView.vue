@@ -56,6 +56,11 @@
           @clicked="onFiltersClicked"
         >
           Filters
+          <b-badge class="ml-1 mt-1"
+                   pill
+                   variant="light text-muted">
+            {{ filtersCount }}
+          </b-badge>
         </compact-btn>
         <compact-btn
           variant="outlined-light"
@@ -116,7 +121,8 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters :listFilters="list.filters"/>
+      <contacts-filters :listFilters="list.filters"
+                        @filtersCount="updateFiltersCount"/>
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
@@ -153,6 +159,11 @@ export default {
     id: {
       type: String,
       required: true
+    }
+  },
+  data () {
+    return {
+      filtersCount: 0
     }
   },
   methods: {
@@ -200,6 +211,9 @@ export default {
       } else {
         this.openFilters()
       }
+    },
+    updateFiltersCount (count) {
+      this.filtersCount = count
     }
   },
   computed: {

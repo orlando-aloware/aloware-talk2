@@ -290,6 +290,16 @@ export default {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       updatedFilter.splice(index, 1)
       this.setCurrentListFilters(updatedFilter)
+    },
+    emitFiltersCount () {
+      let filtersCount = 0
+      if (this.currentListFilters.length) {
+        for (let group of this.currentListFilters) {
+          const filter = _.get(group, 'filters', null)
+          filtersCount += filter ? Object.keys(filter).length : 0
+        }
+      }
+      this.$emit('filtersCount', filtersCount)
     }
   },
   mounted () {
@@ -302,6 +312,7 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+      this.emitFiltersCount()
     }
   }
 }
