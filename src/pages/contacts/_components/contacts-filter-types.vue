@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div v-for="operator in filter.operators"
+    <div class="filter-types"
+         v-for="operator in filter.operators"
          :key="(filter.key + '-' + operator.value)"
     >
       <q-radio class="my-2"
@@ -343,9 +344,16 @@ export default {
 }
 </script>
 
-<style scoped>
-.b-calendar-inner{
-  min-width: 215px !important;
-  width: 215px !important;
+<style lang="scss">
+.filter-types {
+  .q-field__native.row {
+    .q-field__input {
+      padding-left: 0 !important;
+    }
+  }
+  .b-calendar-inner {
+    min-width: 215px !important;
+    width: 215px !important;
+  }
 }
 </style>
