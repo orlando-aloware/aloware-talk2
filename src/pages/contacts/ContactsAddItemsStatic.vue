@@ -33,14 +33,18 @@
           {{ checked.length }} Selected Contact
         </div>
         <compact-btn
-          :onClick="addSelectedContacts"
-          :disabled="!checked.length"
-          variant="primary"
           class="mr-2"
-          >Add Selected Contacts</compact-btn
+          variant="primary"
+          :disabled="!checked.length"
+          @clicked="addSelectedContacts"
         >
-        <compact-btn variant="outlined-light" :onClick="onCancel"
-          >Cancel</compact-btn
+          Add Selected Contacts
+        </compact-btn>
+        <compact-btn variant="outlined-light"
+                     @clicked="onCancel"
+          >
+          Cancel
+        </compact-btn
         >
       </div>
     </template>

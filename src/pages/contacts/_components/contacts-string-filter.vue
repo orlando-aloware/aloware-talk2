@@ -29,10 +29,10 @@
       />
     </div>
     <compact-btn
-      :onClick="applyFilter"
-      :disabled="!validated"
-      variant="success"
       class="mr-2 mt-3 p-3"
+      variant="success"
+      @clicked="applyFilter"
+      :disabled="!validated"
     >
       Apply filter
     </compact-btn>
@@ -41,7 +41,7 @@
 
 <script>
 import CompactBtn from 'components/buttons/compact-btn'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import _ from 'lodash'
 export default {
   name: 'contacts-string-filter',
@@ -50,6 +50,16 @@ export default {
     filter: {
       required: true,
       type: Object
+    },
+    filterGroupIndex: {
+      required: false,
+      type: Number,
+      default: 0
+    },
+    filterConjunction: {
+      requried: false,
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -64,17 +74,19 @@ export default {
         }
       ],
       validated: false,
-      initialListFilters: null
+      initialListFilters: []
     }
   },
   computed: {
-    ...mapState('contacts', ['currentListFilters']),
+    ...mapGetters('contacts', ['currentListFilters']),
     hasValue () {
       return [1, 2].includes(this.filterOperator)
     }
   },
   created () {
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+    this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
+    this.filterOperatorValue = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
   },
   methods: {
     addValue () {
@@ -84,13 +96,21 @@ export default {
         this.$refs.filterOperation[0].add(this.filterOptions[0].originalLabel, true)
         this.$refs.filterOperation[0].updateInputValue('')
       }
-      let allFilters = {}
+      let allFilters = []
       if (!_.isEmpty(this.initialListFilters)) {
-        allFilters = this.initialListFilters
+        allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
       }
-      allFilters[this.filter.key] = {
+      allFilters[this.filterGroupIndex] = {
+        is_conjunction: this.filterConjunction,
+        filters: {}
+      }
+      const filterGroup = _.get(this.initialListFilters, this.filterGroupIndex, null)
+      if (filterGroup) {
+        allFilters[this.filterGroupIndex].filters = JSON.parse(JSON.stringify(filterGroup.filters))
+      }
+      allFilters[this.filterGroupIndex].filters[this.filter.key] = {
         operator: this.filterOperator,
-        value: this.filterOperatorValue
+        value: JSON.parse(JSON.stringify(this.filterOperatorValue))
       }
       this.setCurrentListFilters(allFilters)
       this.$VueEvent.unlisten('filters-back')

@@ -39,10 +39,10 @@
       ></b-form-datepicker>
     </div>
     <compact-btn
-      :onClick="applyFilter"
-      :disabled="!validated"
-      variant="success"
       class="mr-2 mt-3 p-3"
+      variant="success"
+      @clicked="applyFilter"
+      :disabled="!validated"
     >
       Apply filter
     </compact-btn>

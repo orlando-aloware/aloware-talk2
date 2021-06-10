@@ -33,18 +33,20 @@
         Would you like to continue?
       </div>
       <compact-btn
-        :onClick="onConfirmMove"
         variant="danger"
-        v-if="hasSelected"
         class="mr-2"
-        >Yes</compact-btn
+        v-if="hasSelected"
+        @clicked="onConfirmMove"
       >
+        Yes
+      </compact-btn>
       <compact-btn
         variant="outlined-light"
         v-if="hasSelected"
-        :onClick="closeMoveDialog"
-        >No</compact-btn
+        @clicked="closeMoveDialog"
       >
+        No
+      </compact-btn>
     </div>
   </div>
 </template>

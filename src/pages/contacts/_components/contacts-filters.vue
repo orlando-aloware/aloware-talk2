@@ -33,34 +33,73 @@
                 v-if="isEmptyListFilters"
                 variant="primary"
                 customClass="px-4 add-filters m-2"
-                :onClick="toAddFiltersStep"
+                @clicked="toAddFiltersStep"
               >
                 <i class="material-icons mr-1 add-icon">add</i> Add a Filter
               </compact-btn>
               <div class="textual-filter"
                    v-else>
-                <b-card class="p-1">
-                  <template v-for="filter in visibleListFilters">
-                    <b-card :key="filter.key" class="mb-2">
-                      <span class="filter-name">{{ filter.label }}</span>
-                      <span class="text-lowercase"> {{ filter.operator }}</span>
-                      <span class="font-weight-bold">
-                        {{ getFormattedFilterSummary(filter) }}
-                      </span>
-                    </b-card>
-                  </template>
-                  <compact-btn
-                    variant="outlined-light"
-                    customClass="add-filters with-border"
-                    :onClick="toAddFiltersStep"
-                  >
-                    AND
-                  </compact-btn>
-                </b-card>
+                <template v-for="(group, groupIndex) in visibleListFilters">
+                  <div class="d-flex full-width mb-2"
+                       :key="`group-remove-${groupIndex}`">
+                    <div v-if="visibleListFilters.length >= 2 && groupIndex >= 1"
+                         class="font-weight-bold"
+                    >
+                      {{ group.is_conjunction ? 'AND' : 'OR'}}
+                    </div>
+                    <compact-btn class="py-0 delete-group-filter ml-auto"
+                                 @clicked="onDeleteGroupFilter(groupIndex)"
+                    >
+                      Remove
+                    </compact-btn>
+                  </div>
+                  <b-card class="p-1 mb-2"
+                          :key="groupIndex">
+                    <template v-for="(filter, key, index) in group.filters">
+                      <b-card class="mb-2 filter-item"
+                              role="button"
+                              :key="filter.key"
+                              @click="selectFilterByKey(filter.key, groupIndex, group.is_conjunction)">
+                        <span class="filter-name">{{ filter.label }}</span>
+                        <span class="text-lowercase"> {{ filter.operator }}</span>
+                        <span class="font-weight-bold">
+                          {{ getFormattedFilterSummary(filter) }}
+                        </span>
+                        <compact-btn class="py-0 delete-filter"
+                                     @clicked="onDeleteFilter(index, filter.key)">
+                          <i class="fa fa-trash"></i>
+                          <q-tooltip>
+                            Remove this condition
+                          </q-tooltip>
+                        </compact-btn>
+                      </b-card>
+                      <div v-if="getFilterLength(group.filters) >= 2 && index < (getFilterLength(group.filters) - 1)"
+                            class="mb-2"
+                            :key="`filter-${filter.key}`"
+                      >
+                        and
+                      </div>
+                    </template>
+                    <compact-btn
+                      variant="outlined-light"
+                      customClass="add-filters with-border conjunction-button"
+                      @clicked="toAddFiltersStep(groupIndex)"
+                    >
+                      AND
+                    </compact-btn>
+                  </b-card>
+                </template>
                 <compact-btn
                   variant="outlined-light"
-                  customClass="my-2 add-filters with-border"
-                  :onClick="toAddFiltersStep"
+                  customClass="mb-2 mr-2 add-filters with-border conjunction-button"
+                  @clicked="toAddFiltersStep(visibleListFilters.length, true)"
+                >
+                  AND
+                </compact-btn>
+                <compact-btn
+                  variant="outlined-light"
+                  customClass="mb-2 add-filters with-border conjunction-button"
+                  @clicked="toAddFiltersStep(visibleListFilters.length, false)"
                 >
                   OR
                 </compact-btn>
@@ -93,6 +132,8 @@
               <span class="filter-label">{{ selectedFilter.label }}</span>
               <contacts-string-filter v-if="selectedFilter.type == 'string'"
                                       :filter="selectedFilter"
+                                      :filterGroupIndex="filterGroupIndex"
+                                      :filterConjunction="filterConjunction"
                                       @filtersApplied="filtersApplied"
               >
               </contacts-string-filter>
@@ -125,7 +166,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import contactsTableSearch from './contacts-table-search.vue'
 import contactsStringFilter from './contacts-string-filter.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
@@ -143,11 +184,14 @@ export default {
       filterSearch: '',
       step: 1,
       selectedFilter: null,
-      visibleListFilters: ''
+      visibleListFilters: '',
+      filterGroupIndex: 0,
+      filterConjunction: true
     }
   },
   computed: {
-    ...mapState('contacts', ['isFiltersOpen', 'filters', 'currentListFilters']),
+    ...mapState('contacts', ['isFiltersOpen', 'filters']),
+    ...mapGetters('contacts', ['currentListFilters']),
     filtersFiltered () {
       if (_.isEmpty(this.visibleListFilters) &&
         (!this.filterSearch || !this.filterSearch.length)) {
@@ -156,11 +200,11 @@ export default {
       return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
     },
     isEmptyListFilters () {
-      return !Object.keys(this.visibleListFilters).length
+      return _.isEmpty(this.visibleListFilters)
     }
   },
   methods: {
-    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters']),
+    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
     getFilters: function () {
       window.axios
         .get('/api/v2/contacts/filters')
@@ -183,13 +227,27 @@ export default {
     searchFilter (filterName) {
       this.filterSearch = filterName
     },
-    toAddFiltersStep () {
+    toAddFiltersStep (index, conjunction = true, skipStep = false) {
+      if (typeof index === 'number') {
+        this.filterGroupIndex = index
+      }
+      this.filterConjunction = conjunction
       this.$VueEvent.unlisten('filters-back')
-      this.step = 2
+      if (!skipStep) {
+        this.step = 2
+      }
     },
     selectFilter (filter) {
       this.selectedFilter = filter
       this.step = 3
+    },
+    selectFilterByKey (key, index, conjunction) {
+      const found = this.filters.find(filter => filter.key === key)
+      if (found) {
+        this.selectedFilter = found
+        this.toAddFiltersStep(index, conjunction, true)
+        this.step = 3
+      }
     },
     onCloseFilter () {
       this.show = false
@@ -207,24 +265,23 @@ export default {
       this.step = 1
     },
     generateListFilters () {
-      let filters = JSON.parse(JSON.stringify(this.currentListFilters))
-      if (typeof filters.contact_lists !== 'undefined') {
-        delete filters.contact_lists
-      }
-      for (let index in filters) {
-        const found = this.filters.find(filter => filter.key === index)
-        if (found) {
-          const operator = found.operators.find(operator => operator.value === filters[index].operator)
-          filters[index] = {
-            key: index,
-            label: found.label,
-            operator: operator.label,
-            trueValue: filters[index].value,
-            value: JSON.stringify(filters[index].value)
+      let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
+      for (let groupIndex in filterGroups) {
+        for (let filterIndex in filterGroups[groupIndex].filters) {
+          const found = this.filters.find(filter => filter.key === filterIndex)
+          if (found) {
+            const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
+            filterGroups[groupIndex].filters[filterIndex] = {
+              key: filterIndex,
+              label: found.label,
+              operator: operator.label,
+              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
+              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+            }
           }
         }
       }
-      return filters
+      return filterGroups
     },
     getFormattedFilterSummary (filter) {
       if (!filter.trueValue) {
@@ -245,6 +302,19 @@ export default {
       } else {
         return filter.trueValue
       }
+    },
+    getFilterLength (filter) {
+      return Object.keys(filter).length
+    },
+    onDeleteFilter (index, key) {
+      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      delete updatedFilter[index].filters[key]
+      this.setCurrentListFilters(updatedFilter)
+    },
+    onDeleteGroupFilter (index) {
+      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      updatedFilter.splice(index, 1)
+      this.setCurrentListFilters(updatedFilter)
     }
   },
   mounted () {
@@ -257,9 +327,6 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
-    },
-    visibleListFilters () {
-      this.generateListFilters()
     }
   }
 }
@@ -348,8 +415,10 @@ export default {
       font-size: 16px;
     }
   }
-  .step-1, step-3 {
-    font-size: 13px;
+  .step-1,
+  .step-3,
+  .conjunction-button {
+    font-size: 12px;
   }
   .step-3 {
     .filter-label {
@@ -362,6 +431,28 @@ export default {
   .filter-name {
     color: #0090AF;
     font-weight: bold
+  }
+  .filter-item {
+    position: relative;
+    &:not(:hover) {
+      .delete-filter {
+        display: none;
+        z-index: 0;
+      }
+    }
+    &:hover {
+      .delete-filter {
+        margin-top: 1rem;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 2;
+      }
+    }
+  }
+  .delete-group-filter {
+    color: #0090AF;
+    font-weight: bold;
   }
 }
 </style>

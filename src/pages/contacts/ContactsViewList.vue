@@ -33,7 +33,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters']),
+    ...mapActions('contacts', ['listLoaded', 'contactsLoaded']),
     loadList (id) {
       const stringId = String(id)
 
@@ -49,12 +49,6 @@ export default {
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })
-          this.setCurrentListFilters({
-            contact_lists: {
-              operator: 1,
-              value: [stringId]
-            }
-          })
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)

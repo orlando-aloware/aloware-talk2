@@ -43,5 +43,6 @@ export default {
       })
 
     return pinnedLists
-  }
+  },
+  currentListFilters: (state) => state.currentListFilters
 }

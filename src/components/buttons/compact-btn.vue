@@ -2,7 +2,7 @@
   <button
     :class="computedClass"
     :disabled="disabled"
-    @click="onClick"
+    @click.stop="onClickEvent"
   >
     <slot />
   </button>
@@ -54,6 +54,11 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    }
+  },
+  methods: {
+    onClickEvent () {
+      this.$emit('clicked')
     }
   }
 }

@@ -29,7 +29,7 @@
         <compact-btn
           variant="primary"
           customClass="mr-2"
-          :onClick="onFiltersClicked"
+          @clicked="onFiltersClicked"
         >
           <span class="mr-2">Filters</span>
           <b-badge variant="light">4</b-badge>
@@ -37,11 +37,13 @@
         <compact-btn
           variant="outlined-light"
           customClass="mr-2"
-          :onClick="onEditColumnsClicked"
+          @clicked="onEditColumnsClicked"
         >
           <i class="fa fa-chevron-down text-success mr-1"></i> Edit Columns
         </compact-btn>
-        <compact-btn variant="success">Save</compact-btn>
+        <compact-btn variant="success">
+          Save
+        </compact-btn>
       </div>
     </template>
 
