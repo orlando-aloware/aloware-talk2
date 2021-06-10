@@ -155,7 +155,7 @@ export default {
     },
     filterBySearchValue (items, searchValue) {
       return items
-        .filter((i) => i.searchText.toLowerCase().indexOf(searchValue) !== -1)
+        .filter((i) => i.searchText.toLowerCase().includes(searchValue.toLowerCase()))
         .map((i) => {
           return {
             ...i,

@@ -1,6 +1,5 @@
 <template>
   <div class="position-relative">
-    <i class="fa fa-search position-absolute form-control-search__icon"></i>
     <q-input
       class="form-control form-control-search mt-2"
       borderless
@@ -9,7 +8,11 @@
       :placeholder="placeholder"
       :disabled="disabled"
       @input="onInput"
-      />
+    >
+      <template v-slot:prepend>
+        <i class="fa fa-search form-control-search__icon"></i>
+      </template>
+    </q-input>
   </div>
 </template>
 
@@ -47,17 +50,11 @@ export default {
 @import 'src/css/variables.scss';
 .form-control-search {
   width: 100%;
-  height: auto !important;
+  height: 32px !important;
   font-size: 12px;
-  padding-left: 12px !important;
-  padding-right: 10px;
-  padding-top: 0px;
-  padding-bottom: 0px;
   &__icon {
     font-size: 12.5px;
     color: $grey-mid;
-    top: 15px;
-    left: 10px;
   }
 }
 .form-control-search::-webkit-input-placeholder {
