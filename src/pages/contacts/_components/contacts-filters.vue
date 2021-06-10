@@ -282,12 +282,8 @@ export default {
       return Object.keys(filter).length
     },
     onDeleteFilter (index, key) {
-      console.log('index: ', index)
-      console.log('key: ', key)
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
-      console.log('_.isEmpty(updatedFilter[index].filters): ', _.isEmpty(updatedFilter[index].filters))
-      console.log('updatedFilter[index].filters: ', updatedFilter[index].filters)
       if (_.isEmpty(updatedFilter[index].filters)) {
         updatedFilter.splice(index, 1)
       }
