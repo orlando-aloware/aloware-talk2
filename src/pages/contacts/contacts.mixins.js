@@ -1,6 +1,5 @@
 import { mapGetters } from 'vuex'
 import qs from 'qs'
-import isPlainObject from 'lodash/isPlainObject'
 import _ from 'lodash'
 
 import {
@@ -169,7 +168,8 @@ export default {
       return this.isLoading || !this.isLoaded
     },
     isStartState () {
-      return this.$route.query.start
+      const start = _.get(this.$route, 'query.start', null)
+      return start !== null
     },
     isEmpty () {
       return this.isLoaded && !this.listItems[this.id].data.length
@@ -206,25 +206,16 @@ export default {
       }
     },
     listFilters () {
-      try {
-        let filters = {}
+      let filters = {}
 
-        if (this.lists[this.id] && this.lists[this.id].filters) {
-          filters = this.lists[this.id].filters
-          if (typeof filters === 'string') {
-            filters = JSON.parse(filters)
-          }
+      if (this.lists[this.id] && this.lists[this.id].filters) {
+        filters = this.lists[this.id].filters
+        if (typeof filters === 'string') {
+          filters = JSON.parse(filters)
         }
-
-        if (!isPlainObject(filters)) {
-          throw new Error('Filters field is broken')
-        }
-
-        return filters
-      } catch (err) {
-        console.log(err)
-        return {}
       }
+
+      return filters
     },
     list () {
       if (!this.$route.params.id) {

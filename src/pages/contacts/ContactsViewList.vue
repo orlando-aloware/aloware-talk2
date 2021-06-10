@@ -33,7 +33,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['listLoaded', 'contactsLoaded']),
+    ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters']),
     loadList (id) {
       const stringId = String(id)
 
@@ -68,6 +68,7 @@ export default {
   watch: {
     '$route.params.id': function (id) {
       this.loadList(id)
+      this.setCurrentListFilters({})
     }
   }
 }
