@@ -11,9 +11,9 @@
     <div class="move-dialog-input">
       <div>
         <contacts-table-search
-          @search="onSearch"
+          ref="folder-search"
           placeholder="Search..."
-          searchOnKeyup
+          @search="onSearch"
         ></contacts-table-search>
       </div>
     </div>
@@ -242,6 +242,8 @@ export default {
       if (open) {
         this.createDialogInstance(state)
       } else {
+        this.$refs['folder-search'].clearSearch()
+        document.body.removeEventListener('focus', this.handleClick)
         this.destroyDialogInstance(state)
       }
     },

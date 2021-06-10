@@ -80,6 +80,7 @@ export default {
     createFolderRequest (params) {
       return window.axios
         .post('/api/v2/contact-folders', params)
+        .then(() => this.reloadFolders())
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
@@ -98,8 +99,7 @@ export default {
           name: this.text,
           order: 0 - Math.abs(new Date().getTime() / 1000).toFixed(0),
           parent_id: this.parent_id
-        }),
-        this.reloadFolders()
+        })
       ]).finally(() => {
         this.$emit('blur')
         this.resetState()

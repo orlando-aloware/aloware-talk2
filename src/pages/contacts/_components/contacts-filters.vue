@@ -110,7 +110,6 @@
               <div class="mb-3">
                 <h6 class="contact-prop-label">Contact properties</h6>
                 <contacts-table-search placeholder="Search"
-                                       searchOnKeyup
                                        @search="searchFilter"/>
               </div>
               <b-list-group class="filter-list">

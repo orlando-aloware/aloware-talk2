@@ -14,7 +14,6 @@
           <div class="mb-2">
             <contacts-table-search
               @search="onSearch"
-              :searchOnKeyup="true"
               placeholder="Search available columns..."
             />
           </div>
