@@ -80,6 +80,7 @@ export default {
   watch: {
     '$route.params.id': function (id) {
       this.loadList(id)
+      this.setCurrentListFilters({})
     }
   }
 }

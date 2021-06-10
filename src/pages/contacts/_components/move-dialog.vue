@@ -11,9 +11,9 @@
     <div class="move-dialog-input">
       <div>
         <contacts-table-search
-          @search="onSearch"
+          ref="folder-search"
           placeholder="Search..."
-          searchOnKeyup
+          @search="onSearch"
         ></contacts-table-search>
       </div>
     </div>
@@ -33,18 +33,20 @@
         Would you like to continue?
       </div>
       <compact-btn
-        :onClick="onConfirmMove"
         variant="danger"
-        v-if="hasSelected"
         class="mr-2"
-        >Yes</compact-btn
+        v-if="hasSelected"
+        @clicked="onConfirmMove"
       >
+        Yes
+      </compact-btn>
       <compact-btn
         variant="outlined-light"
         v-if="hasSelected"
-        :onClick="closeMoveDialog"
-        >No</compact-btn
+        @clicked="closeMoveDialog"
       >
+        No
+      </compact-btn>
     </div>
   </div>
 </template>
@@ -153,7 +155,7 @@ export default {
     },
     filterBySearchValue (items, searchValue) {
       return items
-        .filter((i) => i.searchText.toLowerCase().indexOf(searchValue) !== -1)
+        .filter((i) => i.searchText.toLowerCase().includes(searchValue.toLowerCase()))
         .map((i) => {
           return {
             ...i,
@@ -240,6 +242,8 @@ export default {
       if (open) {
         this.createDialogInstance(state)
       } else {
+        this.$refs['folder-search'].clearSearch()
+        document.body.removeEventListener('focus', this.handleClick)
         this.destroyDialogInstance(state)
       }
     },

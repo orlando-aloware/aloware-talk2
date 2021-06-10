@@ -1,6 +1,5 @@
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import qs from 'qs'
-import isPlainObject from 'lodash/isPlainObject'
 import _ from 'lodash'
 
 import {
@@ -101,27 +100,27 @@ export default {
         page: 1
       }
 
-      query.filters = { ...this.listFilters }
+      let filters = { ...this.listFilters }
 
       if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
-        query.filters.is_unanswered_contact = {}
-        query.filters.is_unanswered_contact.value = 1
+        filters.is_unanswered_contact = {}
+        filters.is_unanswered_contact.value = 1
       }
 
       if (this.id === DEFAULT_CONTACT_LIST.UNASSIGNED.id) {
-        query.filters.is_unassigned = {}
-        query.filters.is_unassigned.value = 1
+        filters.is_unassigned = {}
+        filters.is_unassigned.value = 1
       }
 
       if (this.id === DEFAULT_CONTACT_LIST.NEWLEADS.id) {
-        query.filters.is_new_contact = {}
-        query.filters.is_new_contact.value = 1
+        filters.is_new_contact = {}
+        filters.is_new_contact.value = 1
       }
 
       if (this.id === DEFAULT_CONTACT_LIST.MY_CONTACTS.id || this.myContacts) {
-        query.filters.contact_owner = {}
-        query.filters.contact_owner.value = [this.profile.id]
-        query.filters.contact_owner.operator = OPERATORS.IS_ANY_OF
+        filters.contact_owner = {}
+        filters.contact_owner.value = [this.profile.id]
+        filters.contact_owner.operator = OPERATORS.IS_ANY_OF
       }
 
       if (this.id && !invalidIds.includes(this.id) && this.list.type !== DYNAMIC) {
@@ -131,21 +130,33 @@ export default {
       }
 
       if (params.search) {
-        query.filters.search = {}
-        query.filters.search.value = params.search
+        filters.search = {}
+        filters.search.value = params.search
       }
 
       if (params.page) {
         query.page = params.page
       }
 
+      query.filter_groups = []
+
+      if (!_.isEmpty(filters)) {
+        query.filter_groups.push({
+          is_conjunction: true,
+          filters: filters
+        })
+      }
+
+      if (!_.isEmpty(this.currentListFilters)) {
+        query.filter_groups = query.filter_groups.concat(this.currentListFilters)
+      }
+
       return query
     }
   },
   computed: {
-    ...mapState('contacts', ['currentListFilters']),
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', '']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters']),
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&
@@ -157,7 +168,8 @@ export default {
       return this.isLoading || !this.isLoaded
     },
     isStartState () {
-      return this.$route.query.start
+      const start = _.get(this.$route, 'query.start', null)
+      return start !== null
     },
     isEmpty () {
       return this.isLoaded && !this.listItems[this.id].data.length
@@ -194,29 +206,16 @@ export default {
       }
     },
     listFilters () {
-      try {
-        let filters = {}
+      let filters = {}
 
-        if (this.lists[this.id] && this.lists[this.id].filters) {
-          filters = this.lists[this.id].filters
-          if (typeof filters === 'string') {
-            filters = JSON.parse(filters)
-          }
+      if (this.lists[this.id] && this.lists[this.id].filters) {
+        filters = this.lists[this.id].filters
+        if (typeof filters === 'string') {
+          filters = JSON.parse(filters)
         }
-
-        if (!_.isEmpty(this.currentListFilters)) {
-          filters = { ...filters, ...this.currentListFilters }
-        }
-
-        if (!isPlainObject(filters)) {
-          throw new Error('Filters field is broken')
-        }
-
-        return filters
-      } catch (err) {
-        console.log(err)
-        return {}
       }
+
+      return filters
     },
     list () {
       if (!this.$route.params.id) {
@@ -232,8 +231,11 @@ export default {
     '$route.params.id': function () {
       this.fetch()
     },
-    currentListFilters () {
-      this.fetch(this.currentListFilters)
+    currentListFilters: {
+      deep: true,
+      handler: function () {
+        this.fetch(this.currentListFilters)
+      }
     }
   }
 }

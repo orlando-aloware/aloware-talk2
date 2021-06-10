@@ -10,11 +10,15 @@
         <span class="small text-muted">{{ totalContacts }} contacts found</span>
       </div>
 
-      <compact-btn variant="outlined-light" customClass="mr-2"
-        >Import Contacts</compact-btn
-      >
+      <compact-btn variant="outlined-light"
+                   customClass="mr-2"
+        >
+        Import Contacts
+      </compact-btn>
 
-      <compact-btn variant="outlined-light" customClass="mr-2">
+      <compact-btn variant="outlined-light"
+                   customClass="mr-2"
+      >
         <i class="fa fa-plus text-success mr-1"></i> Add Contact
       </compact-btn>
 
@@ -31,15 +35,21 @@
             </div>
             <div class="col-lg-6 px-0 d-flex align-items-center">
               <div class="flex-grow-1"></div>
-              <compact-btn variant="primary" customClass="mr-2">
+              <compact-btn variant="primary"
+                           customClass="mr-2"
+              >
                 <span class="mr-2">Filters</span>
                 <b-badge variant="light">4</b-badge>
               </compact-btn>
-              <compact-btn variant="outlined-light" customClass="mr-2">
+              <compact-btn variant="outlined-light"
+                           customClass="mr-2"
+              >
                 <i class="fa fa-chevron-down text-success mr-1"></i> Edit
                 Columns
               </compact-btn>
-              <compact-btn variant="success">Save</compact-btn>
+              <compact-btn variant="success">
+                Save
+              </compact-btn>
             </div>
           </div>
         </div>

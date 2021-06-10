@@ -14,7 +14,9 @@
         v-slot="{ navigate }"
         :to="'/contacts/list/' + $route.params.id + '/add'"
       >
-        <compact-btn variant="primary" :onClick="navigate">
+        <compact-btn variant="primary"
+                     @clicked="navigate"
+        >
           <i class="fa fa-plus mr-2"></i> Add Contacts
         </compact-btn>
       </router-link>
@@ -22,7 +24,7 @@
       <compact-btn
         variant="primary"
         v-if="list.type === ContactListType.DYNAMIC && isEditable"
-        :onClick="onFiltersClicked"
+        @clicked="onFiltersClicked"
       >
         <i class="fa fa-plus mr-2"></i> Add Filters
       </compact-btn>
@@ -51,14 +53,19 @@
         <compact-btn
           variant="primary"
           customClass="mr-2"
-          :onClick="onFiltersClicked"
+          @clicked="onFiltersClicked"
         >
           Filters
+          <b-badge class="ml-1 mt-1"
+                   pill
+                   variant="light text-muted">
+            {{ filtersCount }}
+          </b-badge>
         </compact-btn>
         <compact-btn
           variant="outlined-light"
           customClass="mr-2"
-          :onClick="onEditColumnsClicked"
+          @clicked="onEditColumnsClicked"
         >
           <i class="fa fa-cog text-success mr-1"></i> Edit Columns
         </compact-btn>
@@ -133,7 +140,8 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters :listFilters="list.filters"/>
+      <contacts-filters :listFilters="list.filters"
+                        @filtersCount="updateFiltersCount"/>
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
@@ -172,6 +180,11 @@ export default {
     id: {
       type: String,
       required: true
+    }
+  },
+  data () {
+    return {
+      filtersCount: 0
     }
   },
   methods: {
@@ -262,6 +275,9 @@ export default {
             ]
           })
         })
+    },
+    updateFiltersCount (count) {
+      this.filtersCount = count
     }
   },
   computed: {
