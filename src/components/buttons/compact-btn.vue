@@ -90,4 +90,9 @@ export default {
     background-color: #EFF6FE;
   }
 }
+.button-disabled {
+  background-color: #E0E0E0 !important;
+  border-color: #E0E0E0 !important;
+  color: #828282;
+}
 </style>

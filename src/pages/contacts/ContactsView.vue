@@ -105,6 +105,7 @@
         <compact-btn
           variant="primary"
           :disabled="!filterHasChanges"
+          :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList"
         >
           Save
@@ -348,6 +349,12 @@ export default {
     },
     resetButtonVariant () {
       return this.hasFilterChanges() ? 'primary' : 'outlined-light'
+    },
+    saveFilterButtonVariant () {
+      return this.filterHasChanges ? 'primary' : 'secondary'
+    },
+    saveFilterButtonCustomClass () {
+      return !this.filterHasChanges ? 'button-disabled' : ''
     },
     isResetDisabled () {
       return !this.hasFilterChanges()
