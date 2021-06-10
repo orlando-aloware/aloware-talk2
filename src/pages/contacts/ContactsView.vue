@@ -75,6 +75,7 @@
           variant="primary"
           text="Save"
           class="m-2 b-compact-dropdown-button"
+          :class="saveFilterButtonClass"
           size="sm"
           @click="onUpdateContactList"
         >
@@ -141,6 +142,7 @@
     </template>
     <template slot="filters">
       <contacts-filters :listFilters="list.filters"
+                        @filtersUpdated="updateFilterHasChanges"
                         @filtersCount="updateFiltersCount"/>
     </template>
     <template slot="footer">
@@ -184,7 +186,7 @@ export default {
   },
   data () {
     return {
-      filtersCount: 0
+      filterHasChanges: false
     }
   },
   methods: {
@@ -249,6 +251,10 @@ export default {
       })
     },
     onUpdateContactList () {
+      if (this.selectedList.type === this.ContactListType.STATIC) {
+        return
+      }
+
       return window.axios
         .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
         .then(() => {
@@ -278,6 +284,9 @@ export default {
     },
     updateFiltersCount (count) {
       this.filtersCount = count
+    },
+    updateFilterHasChanges () {
+      this.filterHasChanges = JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     }
   },
   computed: {
@@ -285,12 +294,19 @@ export default {
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
     checked () {
       return this.selectedContacts[this.id] || []
+    },
+    saveFilterButtonClass () {
+      return {
+        'disabledButton': this.selectedList.type === this.ContactListType.STATIC ||
+          (this.selectedList.type === this.ContactListType.DYNAMIC &&
+            !this.filterHasChanges)
+      }
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
@@ -308,5 +324,11 @@ export default {
   top: 0;
   width: 100%;
   z-index: 0;
+}
+.disabledButton {
+  & .btn:not(.dropdown-toggle-split) {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 </style>

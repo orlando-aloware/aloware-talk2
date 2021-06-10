@@ -237,6 +237,7 @@ export default {
     },
     filtersApplied () {
       this.step = 1
+      this.$emit('filtersUpdated')
     },
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
