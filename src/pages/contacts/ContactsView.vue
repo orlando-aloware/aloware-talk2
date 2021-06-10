@@ -4,7 +4,7 @@
       <div class="d-flex flex-column">
         <div class="pr-2">{{ list.name }}</div>
         <div class="small text-muted">
-          {{ listItems[id].total }} contacts found
+          {{ listItemsTotalContacts | numFormat }} contacts found
         </div>
       </div>
     </template>
@@ -50,17 +50,30 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
+        <div class="mr-4">
+          <span class="small text-muted">{{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts</span>
+        </div>
         <compact-btn
-          variant="primary"
+          borderless
+          :variant="filterButtonVariant"
           customClass="mr-2"
           @clicked="onFiltersClicked"
         >
           Filters
           <b-badge class="ml-1 mt-1"
                    pill
-                   variant="light text-muted">
+                   :variant="filterBadgeVariant">
             {{ filtersCount }}
           </b-badge>
+        </compact-btn>
+        <compact-btn
+          customClass="mr-2"
+          borderless
+          :variant="resetButtonVariant"
+          :disabled="isResetDisabled"
+          @clicked="resetFilters"
+        >
+          Reset
         </compact-btn>
         <compact-btn
           variant="outlined-light"
@@ -69,7 +82,7 @@
         >
           <i class="fa fa-cog text-success mr-1"></i> Edit Columns
         </compact-btn>
-        <b-dropdown
+        <!--b-dropdown
           split
           split-variant="outline-primary"
           variant="primary"
@@ -88,7 +101,14 @@
                            @click="onCreateDynamicList">
             Save as New Dynamic List
           </b-dropdown-item>
-        </b-dropdown>
+        </b-dropdown-->
+        <compact-btn
+          variant="primary"
+          :disabled="!filterHasChanges"
+          @clicked="onUpdateContactList"
+        >
+          Save
+        </compact-btn>
       </div>
     </template>
     <template slot="actions">
@@ -153,6 +173,8 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import contactsMixins from './contacts.mixins'
+import _ from 'lodash'
 import BulkActionMenu from 'pages/contacts/_components/bulk-action-menu'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import ContactsScreen from './_components/contacts-screen.vue'
@@ -160,10 +182,7 @@ import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-s
 import Datatable from 'src/components/datatable/datatable.vue'
 import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
-
-import contactsMixins from './contacts.mixins'
 import ContactsFilters from 'pages/contacts/_components/contacts-filters'
-
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 
 export default {
@@ -198,7 +217,8 @@ export default {
       'columnsReordered',
       'setListSelectedContacts',
       'setSelectedList',
-      'createListOpen'
+      'createListOpen',
+      'setCurrentListFilters'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -258,6 +278,8 @@ export default {
       return window.axios
         .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
         .then(() => {
+          this.initialListFilters = this.currentListFilters
+          this.updateFilterHasChanges()
           this.$q.notify({
             message: 'Changes to contact list has been saved.',
             type: 'positive',
@@ -285,8 +307,16 @@ export default {
     updateFiltersCount (count) {
       this.filtersCount = count
     },
+    hasFilterChanges () {
+      return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
+    },
     updateFilterHasChanges () {
-      this.filterHasChanges = JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
+      this.filterHasChanges = this.hasFilterChanges()
+    },
+    resetFilters () {
+      this.setCurrentListFilters(this.initialListFilters)
+      this.$VueEvent.fire('filters-reset')
+      this.filterHasChanges = false
     }
   },
   computed: {
@@ -301,6 +331,26 @@ export default {
           (this.selectedList.type === this.ContactListType.DYNAMIC &&
             !this.filterHasChanges)
       }
+    },
+    listItemsDataCount () {
+      const total = _.get(this.listItems, `[${this.id}].data.length`, null)
+      return total !== null ? total : 0
+    },
+    listItemsTotalContacts () {
+      const total = _.get(this.listItems, `[${this.id}].total`, null)
+      return total !== null ? total : 0
+    },
+    filterButtonVariant () {
+      return this.isFiltersOpen ? 'primary' : 'outlined-light'
+    },
+    filterBadgeVariant () {
+      return this.isFiltersOpen ? 'light' : 'primary'
+    },
+    resetButtonVariant () {
+      return this.hasFilterChanges() ? 'primary' : 'outlined-light'
+    },
+    isResetDisabled () {
+      return !this.hasFilterChanges()
     }
   }
 }

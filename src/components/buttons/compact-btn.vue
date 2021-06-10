@@ -23,6 +23,7 @@ export default {
         'btn-danger': this.variant === 'danger',
         'btn-info': this.variant === 'info',
         'btn-outlined-light': this.variant === 'outlined-light',
+        'border-0': this.borderless,
         [this.customClass]: !!this.customClass
       }
     }
@@ -52,6 +53,11 @@ export default {
       default: () => {}
     },
     disabled: {
+      type: Boolean,
+      default: false
+    },
+    borderless: {
+      required: false,
       type: Boolean,
       default: false
     }
