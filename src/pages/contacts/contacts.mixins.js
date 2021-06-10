@@ -124,9 +124,9 @@ export default {
       }
 
       if (this.id && !invalidIds.includes(this.id) && this.list.type !== DYNAMIC) {
-        query.filters.contact_lists = {}
-        query.filters.contact_lists.value = [this.id]
-        query.filters.contact_lists.operator = OPERATORS.IS_ANY_OF
+        filters.contact_lists = {}
+        filters.contact_lists.value = [this.id]
+        filters.contact_lists.operator = OPERATORS.IS_ANY_OF
       }
 
       if (params.search) {

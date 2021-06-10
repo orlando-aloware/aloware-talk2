@@ -120,7 +120,7 @@ export default {
       default: 0
     },
     filterConjunction: {
-      requried: false,
+      required: false,
       type: Boolean,
       default: true
     }
