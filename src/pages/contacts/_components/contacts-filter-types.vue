@@ -176,6 +176,9 @@ export default {
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
     this.filterOperatorValue = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
+    this.$VueEvent.listen('filters-reset', () => {
+      this.resetForm()
+    })
   },
   methods: {
     addValue () {
@@ -191,8 +194,8 @@ export default {
         allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
       }
       allFilters[this.filterGroupIndex] = {
-        is_conjunction: this.filterConjunction,
-        filters: {}
+        filters: {},
+        is_conjunction: this.filterConjunction
       }
       const filterGroup = _.get(this.initialListFilters, this.filterGroupIndex, null)
       if (filterGroup) {
@@ -221,8 +224,8 @@ export default {
       const currentFilter = _.get(allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
       if (value) {
         allFilters[this.filterGroupIndex].filters[this.filter.key] = {
-          operator: this.filterOperator,
-          value: JSON.parse(JSON.stringify(value))
+          value: JSON.parse(JSON.stringify(value)),
+          operator: this.filterOperator
         }
       } else if (!value && currentFilter && !this.validated) {
         delete allFilters[this.filterGroupIndex].filters[this.filter.key]
@@ -311,6 +314,14 @@ export default {
         default:
           this.validated = false
       }
+    },
+    resetForm () {
+      const filterOperator = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
+      const filterValue = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, [])
+      this.filterOperator = filterOperator
+      this.$nextTick(() => {
+        this.filterOperatorValue = filterValue
+      })
     },
     ...mapActions('contacts', [ 'setCurrentListFilters' ])
   },

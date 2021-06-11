@@ -51,6 +51,7 @@
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <contacts-table-search
+          placeholder="Search All Contacts"
           @search="onSearch"
           :disabled="isLoadingDisabled"
         ></contacts-table-search>

@@ -89,13 +89,13 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <compact-btn
+                <!--compact-btn
                   variant="outlined-light"
                   customClass="mb-2 mr-2 add-filters with-border conjunction-button"
                   @clicked="toAddFiltersStep(visibleListFilters.length, true)"
                 >
                   AND
-                </compact-btn>
+                </compact-btn-->
                 <compact-btn
                   variant="outlined-light"
                   customClass="mb-2 add-filters with-border conjunction-button"
@@ -237,6 +237,7 @@ export default {
     },
     filtersApplied () {
       this.step = 1
+      this.$emit('filtersUpdated')
     },
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))

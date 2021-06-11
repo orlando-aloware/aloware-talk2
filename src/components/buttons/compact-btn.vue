@@ -23,6 +23,7 @@ export default {
         'btn-danger': this.variant === 'danger',
         'btn-info': this.variant === 'info',
         'btn-outlined-light': this.variant === 'outlined-light',
+        'border-0': this.borderless,
         [this.customClass]: !!this.customClass
       }
     }
@@ -54,6 +55,11 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    borderless: {
+      required: false,
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -83,5 +89,10 @@ export default {
   &.with-border {
     background-color: #EFF6FE;
   }
+}
+.button-disabled {
+  background-color: #E0E0E0 !important;
+  border-color: #E0E0E0 !important;
+  color: #828282;
 }
 </style>

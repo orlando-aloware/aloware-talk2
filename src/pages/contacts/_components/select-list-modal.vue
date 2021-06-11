@@ -31,14 +31,11 @@
         <div class="pt-3">
           <b-form-row>
             <b-col md="10">
-              <b-form-group>
-
-                <contacts-table-search
-                  @search="onSearch"
-                  placeholder="Search static list..."
-                  searchOnKeyup
-                />
-              </b-form-group>
+              <contacts-table-search
+                @search="onSearch"
+                placeholder="Search static list..."
+                searchOnKeyup
+              />
             </b-col>
             <b-col md="2">
               <b-form-group>
@@ -46,8 +43,9 @@
                   block
                   variant="primary"
                   size="sm"
-                  @click="onSubmit"
+                  class="mt-2"
                   :disabled="isLoading || !selectedStaticList.id"
+                  @click="onSubmit"
                 >
                   Add to
                 </b-button>
@@ -191,11 +189,14 @@ export default {
 .select-list-modal {
   .modal-lg {
     @media (min-width: 992px) {
-      max-width: 650px;
+      max-width: 550px;
     }
   }
   .modal-body {
     padding: 0;
+    min-height: 90vh;
+    max-height: 90vh;
+    overflow: hidden !important;
   }
   &__body {
     padding: 40px;

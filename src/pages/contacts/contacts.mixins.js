@@ -17,8 +17,14 @@ export default {
       isLoadingMore: false,
       myContacts: false,
       searchText: '',
-      ContactListType: { STATIC, DYNAMIC }
+      ContactListType: { STATIC, DYNAMIC },
+      initialListFilters: null,
+      filtersCount: 0
     }
+  },
+  created () {
+    this.initialListFilters = this.currentListFilters
+    this.filtersCount = this.getFiltersCount(this.currentListFilters)
   },
   methods: {
     onSortByField (sorts) {
@@ -100,7 +106,7 @@ export default {
         page: 1
       }
 
-      let filters = { ...this.listFilters }
+      let filters = {}
 
       if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
         filters.is_unanswered_contact = {}
@@ -152,6 +158,17 @@ export default {
       }
 
       return query
+    },
+
+    getFiltersCount (filters) {
+      let filtersCount = 0
+      if (filters.length) {
+        for (let group of filters) {
+          const filter = _.get(group, 'filters', null)
+          filtersCount += filter ? Object.keys(filter).length : 0
+        }
+      }
+      return filtersCount
     }
   },
   computed: {
@@ -229,6 +246,8 @@ export default {
   },
   watch: {
     '$route.params.id': function () {
+      this.initialListFilters = this.currentListFilters
+      this.filtersCount = this.getFiltersCount(this.currentListFilters)
       this.fetch()
     },
     currentListFilters: {
