@@ -9,18 +9,6 @@
       </div>
     </template>
     <template slot="options">
-      <router-link
-        v-if="list.type === ContactListType.STATIC && isEditable"
-        v-slot="{ navigate }"
-        :to="'/contacts/list/' + $route.params.id + '/add'"
-      >
-        <compact-btn variant="primary"
-                     @clicked="navigate"
-        >
-          <i class="fa fa-plus mr-2"></i> Add Contacts
-        </compact-btn>
-      </router-link>
-
       <compact-btn
         variant="primary"
         v-if="list.type === ContactListType.DYNAMIC && isEditable"
