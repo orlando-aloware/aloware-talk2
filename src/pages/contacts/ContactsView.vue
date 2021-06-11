@@ -9,18 +9,6 @@
       </div>
     </template>
     <template slot="options">
-      <router-link
-        v-if="list.type === ContactListType.STATIC && isEditable"
-        v-slot="{ navigate }"
-        :to="'/contacts/list/' + $route.params.id + '/add'"
-      >
-        <compact-btn variant="primary"
-                     @clicked="navigate"
-        >
-          <i class="fa fa-plus mr-2"></i> Add Contacts
-        </compact-btn>
-      </router-link>
-
       <compact-btn
         variant="primary"
         v-if="list.type === ContactListType.DYNAMIC && isEditable"
@@ -33,8 +21,9 @@
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <contacts-table-search
-          @search="onSearch"
+          placeholder="Search All Contacts"
           :disabled="isLoadingDisabled"
+          @search="onSearch"
         ></contacts-table-search>
         <div class="px-3" v-if="!isMyContactsView">
           <b-form-checkbox
@@ -62,13 +51,6 @@
             {{ filtersCount }}
           </b-badge>
         </compact-btn>
-        <compact-btn
-          variant="outlined-light"
-          customClass="mr-2"
-          @clicked="onEditColumnsClicked"
-        >
-          <i class="fa fa-cog text-success mr-1"></i> Edit Columns
-        </compact-btn>
         <b-dropdown
           split
           split-variant="outline-primary"
@@ -87,6 +69,21 @@
                            @click="onCreateDynamicList">
             Save as New Dynamic List
           </b-dropdown-item>
+        </b-dropdown>
+        <compact-btn variant="secondary">Reset</compact-btn>
+
+        <b-dropdown text="More"
+                    variant="outline-primary"
+                    class="m-2 b-compact-dropdown-button">
+          <b-dropdown-item href="" v-on:click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
+          <b-dropdown-item href=""
+                           :disabled="!(list.type === ContactListType.STATIC && isEditable)"
+                           v-on:click="onAddContactsToList">
+            <i class="fa fa-list-ul"></i> Add Contacts to this List
+          </b-dropdown-item>
+          <b-dropdown-item href="#"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
+          <b-dropdown-item href="#"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
+          <b-dropdown-item href="#"><i class="fa fa-trash-alt"></i> Delete</b-dropdown-item>
         </b-dropdown>
       </div>
     </template>
@@ -217,12 +214,14 @@ export default {
     onCheckedRows (checked) {
       this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
-    onEditColumnsClicked () {
+    onEditColumnsClicked (e) {
       this.columnsOpen({
         id: this.id,
         headers: this.columns,
         name: this.list.name
       })
+
+      e.preventDefault()
     },
     onImportContactsClicked () {
       this.$refs.importContacts.open()
@@ -278,6 +277,9 @@ export default {
     },
     updateFiltersCount (count) {
       this.filtersCount = count
+    },
+    onAddContactsToList () {
+      this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
     }
   },
   computed: {

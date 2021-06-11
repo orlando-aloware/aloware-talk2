@@ -76,7 +76,7 @@ export default {
 <style scoped lang="scss">
   .bulk-action-menu{
     margin-left: 34px;
-    margin-top: 50px;
+    margin-top: 55px;
     position: absolute;
     z-index: 9;
     background: white;

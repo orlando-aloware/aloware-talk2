@@ -142,7 +142,7 @@ export default {
   data () {
     return {
       checked: [],
-      id: 'static'
+      id: 'all'
     }
   },
   computed: {
