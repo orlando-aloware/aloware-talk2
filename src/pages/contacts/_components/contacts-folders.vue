@@ -50,30 +50,31 @@
         :parent_id="null"
         @blur="onCreateFolderToggle"
       />
-      <tree-folder
-        v-for="folder in foldersWithoutRoot"
-        :name="folder.name"
-        :key="folder.id"
-        :id="folder.id"
-        :order="folder.order"
-        :hasEdit="folder.has_edit"
-        :hasDelete="folder.has_delete"
-        :folders="folder.child_folders"
-        :lists="folder.lists"
-        :layer="0"
-      />
-      <tree-folder
-        :name="rootFolder.name"
-        :key="rootFolder.id"
-        :id="rootFolder.id"
-        :order="rootFolder.order"
-        :hasEdit="rootFolder.has_edit"
-        :hasDelete="rootFolder.has_delete"
-        :isRoot="true"
-        :folders="[]"
-        :lists="rootFolder.lists"
-        :layer="0"
-      />
+      <template v-if="folders.length">
+        <tree-folder
+          v-for="folder in folders[0].child_folders"
+          :name="folder.name"
+          :key="folder.id"
+          :id="folder.id"
+          :order="folder.order"
+          :hasEdit="folders[0].has_edit"
+          :hasDelete="folders[0].has_delete"
+          :folders="folder.child_folders"
+          :lists="folder.lists"
+          :layer="0"
+        />
+        <tree-folder
+          :name="folders[0].name"
+          :id="folders[0].id"
+          :order="folders[0].order"
+          :hasEdit="folders[0].has_edit"
+          :hasDelete="folders[0].has_delete"
+          :isRootList="true"
+          :folders="[]"
+          :lists="folders[0].lists"
+          :layer="0"
+        />
+      </template>
     </div>
   </div>
 </template>
