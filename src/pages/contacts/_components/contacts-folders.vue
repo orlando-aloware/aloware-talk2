@@ -51,7 +51,7 @@
         @blur="onCreateFolderToggle"
       />
       <tree-folder
-        v-for="folder in folders"
+        v-for="folder in foldersWithoutRoot"
         :name="folder.name"
         :key="folder.id"
         :id="folder.id"
@@ -60,6 +60,18 @@
         :hasDelete="folder.has_delete"
         :folders="folder.child_folders"
         :lists="folder.lists"
+        :layer="0"
+      />
+      <tree-folder
+        :name="rootFolder.name"
+        :key="rootFolder.id"
+        :id="rootFolder.id"
+        :order="rootFolder.order"
+        :hasEdit="rootFolder.has_edit"
+        :hasDelete="rootFolder.has_delete"
+        :isRoot="true"
+        :folders="[]"
+        :lists="rootFolder.lists"
         :layer="0"
       />
     </div>
@@ -125,7 +137,13 @@ export default {
     }
   },
   computed: {
-    ...mapState('contacts', ['folders'])
+    ...mapState('contacts', ['folders']),
+    foldersWithoutRoot () {
+      return this.folders.filter(folder => folder.name !== 'Root')
+    },
+    rootFolder () {
+      return this.folders.find(folder => folder.name === 'Root')
+    }
   },
   mounted () {
     this.loadFolders()

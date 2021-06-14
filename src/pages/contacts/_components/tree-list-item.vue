@@ -379,4 +379,14 @@ export default {
     }
   }
 }
+.sublists {
+  &.is-root {
+    .folder__indent {
+      display: none;
+    }
+    .folder {
+      padding-right: 4px;
+    }
+  }
+}
 </style>

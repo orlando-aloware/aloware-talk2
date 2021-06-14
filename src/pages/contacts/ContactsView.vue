@@ -265,7 +265,7 @@ export default {
       })
     },
     onUpdateContactList () {
-      if (this.selectedList.type === this.ContactListType.STATIC) {
+      if (this.selectedList.type === this.ContactListType.STATIC || this.defaultIds.includes(this.id)) {
         return
       }
       return window.axios
@@ -307,7 +307,11 @@ export default {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
     updateFilterHasChanges () {
-      this.filterHasChanges = this.hasFilterChanges()
+      if (!this.defaultIds.includes(this.id)) {
+        this.filterHasChanges = this.hasFilterChanges()
+      } else {
+        this.filterHasChanges = false
+      }
     },
     resetFilters () {
       this.setCurrentListFilters(this.initialListFilters)
@@ -325,7 +329,8 @@ export default {
       return {
         'disabledButton': this.selectedList.type === this.ContactListType.STATIC ||
           (this.selectedList.type === this.ContactListType.DYNAMIC &&
-            !this.filterHasChanges)
+            !this.filterHasChanges) ||
+          this.defaultIds.includes(this.id)
       }
     },
     listItemsDataCount () {
