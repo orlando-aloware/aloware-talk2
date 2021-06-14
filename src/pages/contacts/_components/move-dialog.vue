@@ -248,6 +248,7 @@ export default {
       }
     },
     folders: function (value) {
+      value = value.filter(folder => folder.name !== 'Root')
       const itemsList = this.createFolders('', [
         {
           id: 0,
