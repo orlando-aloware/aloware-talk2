@@ -9,8 +9,7 @@
       <div class="text-left">
         <div class="text-dark">
           Are you sure you want to remove
-          <span class="font-weight-bold">{{ listToRemove.name }}</span
-          >? Please be reminded that this will also delete all its contacts.
+          <span class="font-weight-bold">{{ listToRemove.name }}</span>?
         </div>
       </div>
     </div>
@@ -19,12 +18,12 @@
         <div class="flex-grow-1"></div>
         <button
           class="btn btn-sm btn-outline-dark mr-2"
-          @click="removeListClose"
+          @click="onRemoveListOnly"
         >
-          Cancel
+          Delete List, But Save Contacts
         </button>
-        <button class="btn btn-sm btn-danger mr-2" @click="onRemoveList">
-          Remove
+        <button class="btn btn-sm btn-danger mr-2" @click="onRemoveListAndContact">
+          Delete List and Contacts
         </button>
       </div>
     </div>
@@ -35,6 +34,7 @@
 import ConfirmDialog from 'src/pages/contacts/_components/confirm-dialog.vue'
 
 import { mapActions, mapGetters } from 'vuex'
+import { LIST_ONLY, LIST_AND_CONTACT } from 'src/constants/remove-list-action-types'
 
 export default {
   components: {
@@ -42,6 +42,11 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['isRemoveListOpen', 'listToRemove'])
+  },
+  data () {
+    return {
+      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT }
+    }
   },
   watch: {
     isRemoveListOpen (isOpen) {
@@ -53,7 +58,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeListClose', 'foldersLoaded']),
+    ...mapActions('contacts', ['removeListClose', 'removeListOpen', 'foldersLoaded', 'setRemoveListActionType']),
     onRemoveList () {
       return window.axios
         .delete('/api/v2/contacts-list/' + this.listToRemove.id)
@@ -96,6 +101,17 @@ export default {
             ]
           })
         })
+    },
+    onRemoveListOnly () {
+      this.showConfirmDialog(this.ActionTypes.LIST_ONLY)
+    },
+    onRemoveListAndContact () {
+      this.showConfirmDialog(this.ActionTypes.LIST_AND_CONTACT)
+    },
+    showConfirmDialog (actionType) {
+      this.setRemoveListActionType(actionType)
+      this.$bvModal.show('remove-list-confirmation-dialog')
+      this.$bvModal.hide('remove-list-dialog')
     }
   }
 }

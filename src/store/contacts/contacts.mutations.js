@@ -22,6 +22,9 @@ export default {
   REMOVE_LIST_OPEN: (state, list) => {
     state.removeList = list
   },
+  SET_REMOVE_LIST_ACTION_TYPE: (state, type) => {
+    state.removeListActionType = type
+  },
   REMOVE_CONTACT_OPEN: (state, contact) => {
     state.removeContact = contact
   },

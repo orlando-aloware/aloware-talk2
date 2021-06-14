@@ -103,7 +103,11 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
           <b-dropdown-item href="#"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
-          <b-dropdown-item href="#"><i class="fa fa-trash-alt"></i> Delete</b-dropdown-item>
+          <b-dropdown-item href=""
+                           :disabled="isListDeletable"
+                           v-on:click="onRemoveList">
+            <i class="fa fa-trash-alt"></i> Delete
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </template>
@@ -180,6 +184,8 @@ import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-
 import TableRow from 'src/pages/contacts/_components/table-row.vue'
 import ContactsFilters from 'pages/contacts/_components/contacts-filters'
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
+import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+
 export default {
   components: {
     ContactsFilters,
@@ -200,7 +206,8 @@ export default {
   },
   data () {
     return {
-      filterHasChanges: false
+      filterHasChanges: false,
+      defaultContactLists: DEFAULT_CONTACT_LIST
     }
   },
   methods: {
@@ -213,7 +220,8 @@ export default {
       'setListSelectedContacts',
       'setSelectedList',
       'createListOpen',
-      'setCurrentListFilters'
+      'setCurrentListFilters',
+      'removeListOpen'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -303,6 +311,9 @@ export default {
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
     },
+    onRemoveList () {
+      this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
+    },
     hasFilterChanges () {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
@@ -353,6 +364,16 @@ export default {
     },
     isResetDisabled () {
       return !this.hasFilterChanges()
+    },
+    isListDeletable () {
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, list] of Object.entries(this.defaultContactLists)) {
+        if (list.id === this.selectedList.id) {
+          return true
+        }
+      }
+
+      return false
     }
   }
 }

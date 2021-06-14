@@ -221,8 +221,12 @@ export default {
   }
 
   .tree-container {
-    max-height: 60vh;
+    max-height: 65vh;
     overflow: auto;
+  }
+
+  .row.q-input .q-field__prepend + .q-field__control-container .q-field__native {
+    padding-left: 15px !important;
   }
 }
 </style>
