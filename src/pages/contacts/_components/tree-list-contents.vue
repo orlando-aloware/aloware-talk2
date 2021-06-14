@@ -1,5 +1,6 @@
 <template>
-  <div class="sublists">
+  <div class="sublists"
+       :class="{'is-root': isRootList}">
     <tree-list-item
       v-for="list in lists"
       :name="list.name"
@@ -30,6 +31,11 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    isRootList: {
+      type: Boolean,
+      requried: false,
+      default: false
     }
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <div :data-layer="layer">
     <div
+      v-if="!isRoot"
       class="folder d-flex align-items-center"
       :class="{ 'folder--selected': isSelected }"
     >
@@ -52,7 +53,7 @@
     />
 
     <div
-      v-if="isOpen"
+      v-if="isOpen && !isRoot"
       class="animated"
       v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }"
     >
@@ -69,6 +70,15 @@
         :hasDelete="hasDelete"
       ></tree-list-contents>
     </div>
+
+    <tree-list-contents
+      v-if="isRoot"
+      :lists="lists"
+      :layer="layer + 1"
+      :hasEdit="hasEdit"
+      :hasDelete="hasDelete"
+      :isRootList="isRoot"
+    ></tree-list-contents>
 
     <b-popover
       :target="'folder-option-' + id"
@@ -116,6 +126,11 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    isRoot: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     folders: {
       type: Array,
