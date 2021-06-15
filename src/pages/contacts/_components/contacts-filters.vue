@@ -116,14 +116,19 @@
                 <b-list-group-item class="filter-divider">
                   All properties
                 </b-list-group-item>
-                <b-list-group-item
-                  class="filter-list-item"
-                  v-for="filter in filtersFiltered"
-                  :key="filter.key"
-                  @click="selectFilter(filter)"
-                  >
-                  {{ filter.label }}
-                </b-list-group-item>
+                <div v-for="filter in filterGroups" :key="filter">
+                  <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup(filter).filters.length > 0">
+                    {{ filterByGroup(filter).label }}
+                  </b-list-group-item>
+                  <b-list-group-item
+                    class="filter-list-item"
+                    v-for="filter in filterByGroup(filter).filters"
+                    :key="filter.key"
+                    @click="selectFilter(filter)"
+                    >
+                    {{ filter.label }}
+                  </b-list-group-item>
+                </div>
               </b-list-group>
             </div>
             <div class="step-3 p-2"
@@ -149,6 +154,12 @@ import ContactsTableSearch from './contacts-table-search.vue'
 import ContactsFilterTypes from './contacts-filter-types.vue'
 import CompactBtn from 'src/components/buttons/compact-btn.vue'
 import _ from 'lodash'
+import {
+  GROUP_PRIMARY_INFO,
+  GROUP_CONTACT_LOCATION,
+  GROUP_CONTACT_RELEVANCE,
+  GROUP_CONTACT_COMM_METADATA } from 'src/constants/contact-filter-groups'
+
 export default {
   components: { ContactsTableSearch, CompactBtn, ContactsFilterTypes },
   data () {
@@ -160,7 +171,13 @@ export default {
       selectedFilter: null,
       visibleListFilters: '',
       filterGroupIndex: 0,
-      filterConjunction: true
+      filterConjunction: true,
+      filterGroups: {
+        GROUP_PRIMARY_INFO,
+        GROUP_CONTACT_LOCATION,
+        GROUP_CONTACT_RELEVANCE,
+        GROUP_CONTACT_COMM_METADATA
+      }
     }
   },
   computed: {
@@ -175,6 +192,45 @@ export default {
     },
     isEmptyListFilters () {
       return _.isEmpty(this.visibleListFilters)
+    },
+    filterByGroup () {
+      // eslint-disable-next-line camelcase
+      return function (group_id) {
+        let label = ''
+        // eslint-disable-next-line camelcase
+        switch (group_id) {
+          case this.filterGroups.GROUP_PRIMARY_INFO:
+            label = 'Primary Information'
+            break
+          case this.filterGroups.GROUP_CONTACT_LOCATION:
+            label = 'Contact Location'
+            break
+          case this.filterGroups.GROUP_CONTACT_RELEVANCE:
+            label = 'Contact Relevance'
+            break
+          case this.filterGroups.GROUP_CONTACT_COMM_METADATA:
+            label = 'Contact Communication'
+        }
+
+        const compare = function (a, b) {
+          // Use toUpperCase() to ignore character casing
+          const bandA = a.label.toUpperCase()
+          const bandB = b.label.toUpperCase()
+
+          let comparison = 0
+          if (bandA > bandB) {
+            comparison = 1
+          } else if (bandA < bandB) {
+            comparison = -1
+          }
+          return comparison
+        }
+
+        // eslint-disable-next-line camelcase
+        let filters = !group_id ? this.filtersFiltered.filter(list => !list.group_id) : this.filtersFiltered.filter(list => list.group_id === group_id)
+
+        return { filters: filters.sort(compare), label: label }
+      }
     }
   },
   methods: {
