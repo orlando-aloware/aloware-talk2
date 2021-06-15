@@ -248,14 +248,17 @@ export default {
       }
     },
     folders: function (value) {
-      value = value.filter(folder => folder.name !== 'Root')
-      const itemsList = this.createFolders('', [
-        {
-          id: 0,
-          name: 'Root Folder',
-          child_folders: value
-        }
-      ])
+      let itemsList = []
+      if (value.length) {
+        value = value[0].child_folders
+        itemsList = this.createFolders('', [
+          {
+            id: 0,
+            name: 'Root Folder',
+            child_folders: value
+          }
+        ])
+      }
       this.itemsList = itemsList
     }
   }
