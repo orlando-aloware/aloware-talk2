@@ -81,7 +81,7 @@ export default {
     handleDeletion (params) {
       this.isBusy = true
       return window.axios
-        .delete(`/api/v2/contacts-list/${this.listToRemove.id}`, params)
+        .delete(`/api/v2/contacts-list/${this.listToRemove.id}`, { params })
         .then(() => {
           this.$q.notify({
             message: 'Contact list was successfully removed.',

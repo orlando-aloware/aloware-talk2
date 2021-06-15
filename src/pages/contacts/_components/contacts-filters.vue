@@ -129,6 +129,20 @@
                     {{ filter.label }}
                   </b-list-group-item>
                 </div>
+                <div>
+                  <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup(filter).filters.length > 0">
+                    Custom
+                  </b-list-group-item>
+                  <b-list-group-item
+                    class="filter-list-item"
+                    v-for="filter in filterByGroup().filters"
+                    :key="filter.key"
+                    @click="selectFilter(filter)"
+                  >
+                    {{ filter.label }}
+                  </b-list-group-item>
+                </div>
+
               </b-list-group>
             </div>
             <div class="step-3 p-2"
@@ -214,20 +228,20 @@ export default {
 
         const compare = function (a, b) {
           // Use toUpperCase() to ignore character casing
-          const bandA = a.label.toUpperCase()
-          const bandB = b.label.toUpperCase()
+          const filterA = a.label.toUpperCase()
+          const filterB = b.label.toUpperCase()
 
           let comparison = 0
-          if (bandA > bandB) {
+          if (filterA > filterB) {
             comparison = 1
-          } else if (bandA < bandB) {
+          } else if (filterA < filterB) {
             comparison = -1
           }
           return comparison
         }
 
         // eslint-disable-next-line camelcase
-        let filters = !group_id ? this.filtersFiltered.filter(list => !list.group_id) : this.filtersFiltered.filter(list => list.group_id === group_id)
+        let filters = !group_id ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1) : this.filtersFiltered.filter(list => list.group_id === group_id)
 
         return { filters: filters.sort(compare), label: label }
       }
