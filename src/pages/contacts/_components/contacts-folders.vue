@@ -62,7 +62,7 @@
         :lists="folder.lists"
         :layer="0"
       />
-      <tree-folder
+      <tree-folder v-if="rootFolder"
         :name="rootFolder.name"
         :key="rootFolder.id"
         :id="rootFolder.id"

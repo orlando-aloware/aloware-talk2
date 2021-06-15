@@ -6,37 +6,7 @@
       </div>
     </div>
     <div class="d-flex pinned__content flex-column">
-      <router-link
-        v-for="item in pinnedLists"
-        :to="item.to"
-        :key="item.id"
-        v-slot="{ href, route, navigate, isActive, isExactActive }"
-      >
-        <a
-          :href="href"
-          @click="navigate"
-          class="d-flex align-items-center item"
-          :class="[
-            isActive && 'router-link-active',
-            isExactActive && 'router-link-exact-active'
-          ]"
-        >
-          <div class="px-2 icon">
-            <folder-static-icon
-              v-if="item.type === contactListType.STATIC"
-            ></folder-static-icon>
-            <folder-dynamic-icon
-              v-if="item.type === contactListType.DYNAMIC || !item.type"
-            ></folder-dynamic-icon>
-          </div>
-          <div class="pr-3 flex-grow-1">{{ item.name }}</div>
-          <div class="pr-2">
-            <b-badge pill variant="light text-muted">{{
-              item.count | fixCount
-            }}</b-badge>
-          </div>
-        </a>
-      </router-link>
+      <contacts-pinned-item v-for="item in pinnedLists" :item="item" :key="item.id"></contacts-pinned-item>
     </div>
   </div>
 </template>
@@ -44,14 +14,13 @@
 <script>
 import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
-import folderStaticIcon from 'src/components/icons/folder-static-icon.vue'
-import folderDynamicIcon from 'src/components/icons/folder-dynamic-icon.vue'
 import {
   STATIC,
   DYNAMIC,
   DEFAULT_CONTACT_LIST,
   OPERATORS
 } from 'src/constants/contacts-list-types'
+import ContactsPinnedItem from 'pages/contacts/_components/contacts-pinned-item'
 
 export default {
   methods: {
@@ -159,8 +128,7 @@ export default {
     }
   },
   components: {
-    folderStaticIcon,
-    folderDynamicIcon
+    ContactsPinnedItem
   },
   computed: {
     ...mapGetters('auth', ['profile']),

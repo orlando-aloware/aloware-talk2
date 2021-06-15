@@ -50,7 +50,7 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['removeListActionType', 'selectedList', 'listToRemove', 'isRemoveListOpen', 'folders']),
+    ...mapGetters('contacts', ['removeListActionType', 'selectedList', 'listToRemove', 'isRemoveListOpen', 'folders', 'pinnedLists', 'pinned']),
     title () {
       return `Delete ${this.listToRemove.name} ?`
     }
@@ -73,7 +73,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeListClose', 'foldersLoaded']),
+    ...mapActions('contacts', ['removeListClose', 'foldersLoaded', 'listPinToggled']),
     onCancel () {
       this.removeListClose()
       this.$bvModal.hide('remove-list-confirmation-dialog')
@@ -89,7 +89,7 @@ export default {
             textColor: 'white'
           })
           this.removeListFromFolders(this.listToRemove.id, this.folders)
-
+          this.removeListFromPinned(this.listToRemove.id)
           // if current route is equals to list page being deleted then redirect to all contacts
           if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {
             this.$router.push('/contacts')
@@ -122,6 +122,15 @@ export default {
       }
 
       this.foldersLoaded(this.folders)
+    },
+    removeListFromPinned (id) {
+      if (this.pinned.includes(id)) {
+        const isPinned = false
+        this.listPinToggled({
+          id: id,
+          isPinned
+        })
+      }
     },
     refreshFoldersList () {
       window.axios

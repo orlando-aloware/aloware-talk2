@@ -142,7 +142,7 @@ export default {
       this.$root.$emit('bv::hide::popover')
 
       this.createListOpen({
-        folderId: this.id
+        contact_folder_id: this.id
       })
 
       this.onToggleFolder()

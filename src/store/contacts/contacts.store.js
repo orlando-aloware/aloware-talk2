@@ -114,7 +114,6 @@ export default function () {
       mode: '', // from_filters, from_bulk_menu, from_folders
       type: 1,
       open: false,
-      folderId: null,
       contact_folder_id: null,
       filters: []
     },

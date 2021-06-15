@@ -143,7 +143,8 @@ export default {
       'foldersLoaded',
       'listLoaded',
       'listPinToggled',
-      'openMoveDialog'
+      'openMoveDialog',
+      'pinnedCountLoaded'
     ]),
     onDuplicate () {
       this.$root.$emit('bv::hide::popover')
@@ -197,11 +198,21 @@ export default {
       this.$root.$emit('bv::hide::popover')
 
       const isPinned = !this.isPinned
-
       this.listPinToggled({
         id: this.id,
         isPinned
       })
+
+      if (isPinned) {
+        window.axios
+          .get(`api/v2/contacts-list/${this.id}/items?per_page=1`)
+          .then((response) => {
+            this.pinnedCountLoaded({
+              id: this.id,
+              count: response.data.total
+            })
+          })
+      }
 
       this.listLoaded({
         id: this.id,
@@ -294,6 +305,10 @@ export default {
             html
           })
         })
+    },
+    getItems (id) {
+      return window.axios
+        .get(`api/v2/contacts-list/${id}/items?per_page=1`)
     },
     reloadFolders () {
       return window.axios
