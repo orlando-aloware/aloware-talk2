@@ -1,12 +1,12 @@
 <template>
-  <div class="row mx-0 content-row contact-details-wrapper">
-    <div class="col-lg-3 px-0 mb-3">
+  <div class="row mx-0 content-row contact-view-wrapper pl-lg-4">
+    <div class="px-0 mb-3 width-300">
       <contact-list-sidebar></contact-list-sidebar>
     </div>
-    <div class="col-lg-6 px-0 mb-3 main">
+    <div class="px-0 mb-3 contact-activity-wrapper">
       <contact-activity></contact-activity>
     </div>
-    <div class="col-lg-3 px-0 mb-3 main">
+    <div class="px-0 mb-3 width-300">
       <contact-details></contact-details>
     </div>
   </div>
@@ -36,9 +36,18 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
-  .contact-details-wrapper {
+  .contact-view-wrapper {
     border-top: 1px solid #dee2e6;
     overflow: hidden;
     position: relative;
+    background: #F4F4F6;
+
+    .width-300 {
+      width: 300px;
+    }
+
+    .contact-activity-wrapper {
+      width: calc(100% - 600px)
+    }
   }
 </style>

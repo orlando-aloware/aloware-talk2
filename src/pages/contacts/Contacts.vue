@@ -1,5 +1,5 @@
 <template>
-  <div class="row mx-0 overflow-auto content-row">
+  <div class="row mx-0 overflow-auto content-row pl-lg-5 ml-lg-2 q-px-xs-md">
     <div class="col-lg-2 px-0 pl-lg-2 pr-lg-3 mb-3">
       <contacts-sidebar></contacts-sidebar>
     </div>

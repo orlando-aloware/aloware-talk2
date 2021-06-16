@@ -1,53 +1,54 @@
 <template>
   <div class="contact-details-wrapper">
-    <b-card title="Card title" sub-title="Card subtitle" class="mt-2 mb-2">
-      <b-card-text>
-        Some quick example text to build on the <em>card title</em> and make up the bulk of the card's
-        content.
-      </b-card-text>
-
-      <b-card-text>A second paragraph of text in the card.</b-card-text>
-
-      <a href="#" class="card-link">Card link</a>
-      <b-link href="#" class="card-link">Another link</b-link>
-    </b-card>
-    <b-card title="Card title" sub-title="Card subtitle" class="mt-2 mb-2">
-      <b-card-text>
-        Some quick example text to build on the <em>card title</em> and make up the bulk of the card's
-        content.
-      </b-card-text>
-
-      <b-card-text>A second paragraph of text in the card.</b-card-text>
-
-      <a href="#" class="card-link">Card link</a>
-      <b-link href="#" class="card-link">Another link</b-link>
-    </b-card>
-    <b-card title="Card title" sub-title="Card subtitle" class="mt-2 mb-2">
-      <b-card-text>
-        Some quick example text to build on the <em>card title</em> and make up the bulk of the card's
-        content.
-      </b-card-text>
-
-      <b-card-text>A second paragraph of text in the card.</b-card-text>
-
-      <a href="#" class="card-link">Card link</a>
-      <b-link href="#" class="card-link">Another link</b-link>
-    </b-card>
+    <div class="details-component-container">
+      <contact-info></contact-info>
+      <contact-phones></contact-phones>
+      <contact-summary></contact-summary>
+      <contact-tags></contact-tags>
+      <contact-notes></contact-notes>
+      <contact-activity-counts></contact-activity-counts>
+      <contact-lines></contact-lines>
+      <contact-ring-groups></contact-ring-groups>
+      <contact-broadcast></contact-broadcast>
+    </div>
   </div>
 </template>
 
 <script>
+import ContactPhones from 'pages/contacts/_components/contacts-view/contact-phones'
+import ContactInfo from 'pages/contacts/_components/contacts-view/contact-info'
+import ContactSummary from 'pages/contacts/_components/contacts-view/contact-summary'
+import ContactTags from 'pages/contacts/_components/contacts-view/contact-tags'
+import ContactNotes from 'pages/contacts/_components/contacts-view/contact-notes'
+import ContactActivityCounts from 'pages/contacts/_components/contacts-view/contact-activity-counts'
+import ContactLines from 'pages/contacts/_components/contacts-view/contact-lines'
+import ContactRingGroups from 'pages/contacts/_components/contacts-view/contact-ring-groups'
+import ContactBroadcast from 'pages/contacts/_components/contacts-view/contact-broadcast'
 export default {
-  name: 'contact-details'
+  name: 'contact-details',
+  components: {
+    ContactBroadcast,
+    ContactRingGroups,
+    ContactLines,
+    ContactActivityCounts,
+    ContactNotes,
+    ContactTags,
+    ContactSummary,
+    ContactInfo,
+    ContactPhones }
 }
 </script>
 
 <style lang="scss" scoped>
 .contact-details-wrapper {
-  max-height: 87vh;
-  min-height: 87vh;
-  border-right: 1px solid #dee2e6;
-  overflow: auto;
-  padding: 0 10px;
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+
+  .details-component-container {
+    height: calc(100vh - 80px);
+    overflow: auto;
+  }
 }
 </style>
