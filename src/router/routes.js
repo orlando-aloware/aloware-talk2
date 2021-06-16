@@ -60,6 +60,11 @@ const routes = [
         ]
       },
       {
+        path: 'contact/:id(\\d+)+',
+        name: 'Contact',
+        component: () => import('src/pages/contacts/Contact.vue')
+      },
+      {
         path: 'power-dialer',
         name: 'Power Dialer',
         component: () => import('pages/PowerDialer.vue')
