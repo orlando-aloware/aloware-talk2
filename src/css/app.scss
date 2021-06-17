@@ -451,3 +451,22 @@ body,
     font-size: 0.75rem;
   }
 }
+
+.badge-tag{
+  background: transparent;
+  font-weight: 500;
+  border: 1px solid #dee2e6;
+  margin-right: 5px;
+}
+
+.badge-tag-primary {
+  color: #1976D2;
+}
+
+.btn-bg-transparent{
+  background: transparent;
+}
+
+.btn-b-0 {
+  border: none;
+}

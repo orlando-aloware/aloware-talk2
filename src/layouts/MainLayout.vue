@@ -17,7 +17,7 @@
         :class="[
           sidebarVisibile ? 'sidebar-active' : '',
           authenticated
-            ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2'
+            ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2'
             : ''
         ]"
       >
@@ -28,7 +28,7 @@
           <app-header @toggleSidebar="toggleSidebar" />
         </q-header>
         <q-page-container
-          class="page-container h-100 pl-lg-5 ml-lg-2 q-px-xs-md"
+          class="page-container h-100 "
         >
           <section class="main-content section h-100 py-2">
             <template v-if="!loading">

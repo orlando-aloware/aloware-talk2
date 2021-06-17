@@ -1,23 +1,30 @@
 <template>
   <div class="contact-list-sidebar-wrapper">
-    <q-list>
-      <q-item v-for="contact in contacts" :key="contact.id" class="q-my-sm p-2" clickable v-ripple>
-        <q-item-section avatar>
-          <q-avatar color="primary" text-color="white">
-            {{ contact.letter }}
-          </q-avatar>
-        </q-item-section>
-
-        <q-item-section>
-          <q-item-label>{{ contact.name }}</q-item-label>
-          <q-item-label caption lines="1">{{ contact.phone }}</q-item-label>
-        </q-item-section>
-
-        <q-item-section side>
-          <q-badge rounded color="red" label="1" />
-        </q-item-section>
-      </q-item>
-    </q-list>
+    <b-card no-body class="no-border">
+      <b-list-group>
+        <b-list-group-item href="#" class="d-flex align-items-center border-0 pb-0" v-for="contact in contacts" :key="contact.id">
+          <b-avatar class="mr-2 contact-avatar"
+                    size="2.5rem"
+                    :text="contact.letter">
+          </b-avatar>
+          <div class="d-inline-flex justify-content-between full-width contact-details">
+            <div class="mr-auto">
+              <p class="text-bold contact-name mb-0">{{ contact.name }}</p>
+              <p class="text-sm-left contact-phone">
+                {{ contact.phone }}
+              </p>
+            </div>
+            <p>
+              <b-badge pill
+                        class="contact-badge"
+                        variant="danger">
+                5
+              </b-badge>
+            </p>
+          </div>
+        </b-list-group-item>
+      </b-list-group>
+    </b-card>
   </div>
 </template>
 
@@ -34,12 +41,12 @@ export default {
           letter: 'SD'
         }, {
           id: 2,
-          name: 'Mallorie Alessandrini',
+          name: 'Walter Bowman',
           phone: '(514) 423 3566',
           letter: 'MA'
         }, {
           id: 3,
-          name: 'Elisabetta Wicklen',
+          name: 'Elisabetta Wicklen Smith Goldhammer',
           phone: '(514) 423 3566',
           letter: 'EW'
         }, {
@@ -93,7 +100,6 @@ export default {
           avatar: 'WS'
         }
       ]
-
     }
   }
 }
@@ -101,9 +107,39 @@ export default {
 
 <style lang="scss" scoped>
   .contact-list-sidebar-wrapper {
-    max-height: 85vh;
-    min-height: 85vh;
+    height: 100%;
     border-right: 1px solid #dee2e6;
-    overflow: auto;
+    display: flex;
+    justify-content: flex-end;
+
+    .card {
+      height: calc(100vh - 80px);
+      overflow: auto;
+    }
+
+    .contact-details {
+      border-bottom: 1px solid #dee2e6;
+
+      .contact-name{
+        font-size: 0.85em;
+        display: inline-block;
+        width: 190px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .contact-phone {
+        font-size: 0.70em;
+      }
+
+      .contact-badge{
+        margin-top: 15px;
+      }
+    }
+
+    .contact-avatar {
+      margin-top: -8px !important;
+    }
+
   }
 </style>
