@@ -33,6 +33,7 @@ export default function (/* { ssrContext } */) {
       changelogs: [],
       dispositionStatuses: [],
       callDispositions: [],
+      broadcasts: [],
       filters: [],
       firstLogin: false,
       userStatus: false,
