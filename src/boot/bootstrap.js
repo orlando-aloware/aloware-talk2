@@ -142,3 +142,69 @@ console.log(
 Vue.prototype.$moment = window.moment
 Vue.prototype.$Pusher = window.Pusher
 Vue.prototype.$Sentry = window.Sentry
+
+Vue.prototype.$handleErrors = function (response, title = null) {
+  if (response && response.status) {
+    let message = ''
+    switch (response.status) {
+      case 401:
+        if (response.data.error) {
+          message += '<p class="pt-1 pb-1">- ' + response.data.error + '</p>'
+        }
+        for (let error of response.data.errors) {
+          message += '<p class="pt-1 pb-1">- ' + error + '</p>'
+        }
+        break
+      case 403:
+        message = 'You do not have enough permissions to make this request.'
+        if (response.data && response.data.error) {
+          message = response.data.error
+        }
+        break
+      case 404:
+        message = 'Requested resource not found.'
+        break
+      case 400:
+        message = response.data.error
+        break
+      case 422:
+        message = ''
+        for (let error of response.data.errors) {
+          message += '<p class="pt-1 pb-1">- ' + error + '</p>'
+        }
+        break
+      case 500:
+        message = 'Oops! We are having some problems right now, please try again later.'
+        break
+    }
+    this.$q.notify({
+      offset: 95,
+      title: title || 'Error',
+      dangerouslyUseHTMLString: true,
+      message: message,
+      type: 'error',
+      showClose: true
+    })
+  }
+}
+
+Vue.prototype.$handleUploadErrors = function (error) {
+  if (typeof error === 'string') {
+    error = JSON.parse(error)
+  }
+  let err
+  if (error.message === 'This action is unauthorized.') {
+    err = {
+      status: 403
+    }
+  } else {
+    err = {
+      status: 422,
+      data: {
+        errors: error.errors.file
+      }
+    }
+  }
+
+  this.$handleErrors(err)
+}

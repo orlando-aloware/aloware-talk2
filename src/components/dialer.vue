@@ -35,7 +35,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer', 'current_company']),
+    ...mapState(['dialer', 'currentCompany']),
     ...mapGetters('auth', ['user'])
   },
 
@@ -732,7 +732,7 @@ export default {
     },
 
     startWrapUpTimer () {
-      let wrapUpTimer = this.current_company.force_wrap_up ? this.current_company.wrap_up_seconds : this.user.profile.wrap_up_seconds
+      let wrapUpTimer = this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.user.profile.wrap_up_seconds
       if (wrapUpTimer < 0) {
         this.backToDial()
         return

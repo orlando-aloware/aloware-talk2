@@ -261,7 +261,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['current_company', 'dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -865,7 +865,7 @@ export default {
       return null
     },
 
-    // refresh the current_company state
+    // refresh the currentCompany state
     getCurrentCompany () {
       return this.$axios
         .get('/api/v1/company/' + this.profile.company_id, {

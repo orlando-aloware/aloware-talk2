@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['current_company'])
+    ...mapState(['currentCompany'])
   },
   methods: {
     getDeviceInfo (isMobile) {
