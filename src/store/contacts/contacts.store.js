@@ -123,6 +123,9 @@ export default function () {
       search_value: ''
     },
     filters: [],
-    currentListFilters: {}
+    currentListFilters: {},
+
+    contact: {},
+    isSidebarCollapsed: false
   }
 }

@@ -26,7 +26,7 @@
           </div>
           <div class="flex-grow-1">
             <router-link
-              :to="`/contacts/${contact.id}`"
+              :to="`/contact/${contact.id}`"
               v-slot="{ href, route, navigate }"
             >
               <a

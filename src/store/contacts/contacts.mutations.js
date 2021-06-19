@@ -159,5 +159,11 @@ export default {
   },
   SET_CURRENT_LIST_FILTERS: (state, filters) => {
     state.currentListFilters = filters
+  },
+  SET_CONTACT: (state, contact) => {
+    state.contact = contact
+  },
+  SET_SIDEBAR_COLLAPSED: (state, isCollapsed) => {
+    state.isSidebarCollapsed = isCollapsed
   }
 }

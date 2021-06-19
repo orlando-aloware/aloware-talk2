@@ -73,10 +73,12 @@ module.exports = function (/* ctx */) {
     devServer: {
       before (app) {
         const cors = require('cors')
-        app.use(cors())
+        if (process.env.USE_CORS) {
+          app.use(cors())
+        }
       },
 
-      https: true,
+      https: process.env.USE_HTTPS,
       host: 'localhost',
       port: 9090,
       disableHostCheck: true,

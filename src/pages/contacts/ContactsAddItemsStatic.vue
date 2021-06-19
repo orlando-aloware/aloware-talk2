@@ -239,6 +239,12 @@ export default {
     '$route.params.id': function () {
       this.fetch()
     }
+  },
+  currentListFilters: {
+    deep: true,
+    handler: function () {
+      this.fetch(this.currentListFilters)
+    }
   }
 }
 </script>

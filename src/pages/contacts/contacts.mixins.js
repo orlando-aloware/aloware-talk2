@@ -22,10 +22,12 @@ export default {
       filtersCount: 0
     }
   },
+
   created () {
     this.initialListFilters = this.currentListFilters
     this.filtersCount = this.getFiltersCount(this.currentListFilters)
   },
+
   methods: {
     onSortByField (sorts) {
       this.isLoaded = false
@@ -50,7 +52,7 @@ export default {
           .then((response) => response.data)
           .then((data) => {
             this.contactsLoaded({
-              id: this.id,
+              id: this.id || 'all',
               append: true,
               ...data
             })
@@ -86,7 +88,7 @@ export default {
         .then((response) => response.data)
         .then((data) => {
           this.contactsLoaded({
-            id: this.id,
+            id: this.id || 'all',
             append: false,
             ...data
           })
@@ -159,7 +161,6 @@ export default {
 
       return query
     },
-
     getFiltersCount (filters) {
       let filtersCount = 0
       if (filters.length) {
@@ -171,6 +172,7 @@ export default {
       return filtersCount
     }
   },
+
   computed: {
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters']),
@@ -239,22 +241,6 @@ export default {
         return this.lists['all']
       }
       return this.lists[this.$route.params.id]
-    }
-  },
-  mounted () {
-    this.fetch()
-  },
-  watch: {
-    '$route.params.id': function () {
-      this.initialListFilters = this.currentListFilters
-      this.filtersCount = this.getFiltersCount(this.currentListFilters)
-      this.fetch()
-    },
-    currentListFilters: {
-      deep: true,
-      handler: function () {
-        this.fetch(this.currentListFilters)
-      }
     }
   }
 }

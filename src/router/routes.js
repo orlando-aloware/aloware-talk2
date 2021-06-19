@@ -33,7 +33,7 @@ const routes = [
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
-            path: ':id(my-contacts|new-leads|unanswered|unassigned)+',
+            path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
             name: 'Contacts',
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
@@ -50,7 +50,7 @@ const routes = [
         ]
       },
       {
-        path: 'contacts/:id(\\d+)+',
+        path: 'contact/:id',
         name: 'Contact',
         component: () => import('src/pages/contacts/Contact.vue')
       },

@@ -14,8 +14,31 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import contactApi from '../../contacts.api'
+
 export default {
-  name: 'contact-ring-groups'
+  name: 'contact-ring-groups',
+  computed: {
+    ...mapGetters('contacts', ['contact'])
+  },
+  data () {
+    return {
+      ring_groups: []
+    }
+  },
+  methods: {
+    getContactRingGroups () {
+      return contactApi.getRingGroups(this.contact.id).then(response => {
+        this.ring_groups = response.data
+      })
+    }
+  },
+  watch: {
+    contact: function () {
+
+    }
+  }
 }
 </script>
 

@@ -6,20 +6,31 @@
       <i class="material-icons">edit</i>
     </b-button>
     <div>
-      <b-badge variant="primary contact-tag-badge custom-badge-primary"><span class="mid-dot">&#183;</span> Primary</b-badge>
-      <b-badge variant="secondary contact-tag-badge custom-badge-secondary"><span class="mid-dot">&#183;</span> Secondary</b-badge>
-      <b-badge variant="success contact-tag-badge custom-badge-success"><span class="mid-dot">&#183;</span> Success</b-badge>
-      <b-badge variant="danger contact-tag-badge custom-badge-danger"><span class="mid-dot">&#183;</span> Danger</b-badge>
-      <b-badge variant="warning contact-tag-badge custom-badge-warning"><span class="mid-dot">&#183;</span> Warning</b-badge>
-      <b-badge variant="info contact-tag-badge custom-badge-info"><span class="mid-dot">&#183;</span> Info</b-badge>
-      <b-badge variant="dark contact-tag-badge custom-badge-dark"><span class="mid-dot">&#183;</span> Dark</b-badge>
+      <b-badge variant="primary contact-tag-badge custom-badge-primary" v-for="tag in tags" :key="tag.id" >
+        <span class="mid-dot">&#183;</span>
+        {{ tag.name }}
+      </b-badge>
     </div>
+    <b-button
+              variant="light"
+              size="sm"
+              class="custom-action-button">
+      <i class="material-icons">add</i> Add tag
+    </b-button>
   </b-card>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  name: 'contact-tags'
+  name: 'contact-tags',
+  computed: {
+    ...mapGetters('contacts', ['contact']),
+    tags () {
+      return this.contact.tags
+    }
+  }
 }
 </script>
 

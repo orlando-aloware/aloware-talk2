@@ -31,7 +31,7 @@ export default {
       .map((item) => {
         return {
           ...item,
-          to: item.id === 'all' ? '/contacts' : `/contacts/${item.id}`
+          to: item.id === 'all' ? '/contacts' : `/contacts/list/${item.id}`
         }
       })
       .concat(state.pinned.map((item) => {
@@ -47,5 +47,7 @@ export default {
 
     return pinnedLists
   },
-  currentListFilters: (state) => state.currentListFilters
+  currentListFilters: (state) => state.currentListFilters,
+  contact: (state) => state.contact,
+  isSidebarCollapsed: (state) => state.isSidebarCollapsed
 }

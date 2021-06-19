@@ -112,5 +112,12 @@ export default {
   },
   setCurrentListFilters: ({ commit }, filters) => {
     commit('SET_CURRENT_LIST_FILTERS', filters)
+  },
+
+  setContact: ({ commit }, contact) => {
+    commit('SET_CONTACT', contact)
+  },
+  setSidebarCollapsed: ({ commit }, isCollapsed) => {
+    commit('SET_SIDEBAR_COLLAPSED', isCollapsed)
   }
 }

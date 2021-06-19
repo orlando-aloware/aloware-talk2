@@ -10,33 +10,49 @@
 
       <div class="d-flex justify-content-between relative-position">
         <div>
-          <h6 class="mt-0">Walter Bowman</h6>
+          <h6 class="mt-0 contact-name">{{ contact.name }}</h6>
           <p class="contact-phone">
-            (514) 423 3566 <i class="material-icons">content_copy</i>
+            {{ contact.phone_number | fixPhone }} <i class="material-icons">content_copy</i>
           </p>
         </div>
-        <b-button class="btn-edit-contact-info" size="sm"
+        <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
+                  size="sm"
                   variant="light">
           <i class="material-icons">edit</i>
         </b-button>
       </div>
     </b-media>
-    <div class="d-flex justify-between">
+    <div class="d-inline-flex flex-wrap contact-action-button">
       <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">call</i></b-button>
       <b-button variant="secondary" size="sm" class="custom-action-button"><span class="material-icons">calendar_today</span></b-button>
       <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">timer</i></b-button>
+      <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">add_ic_call</i></b-button>
       <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">add_ic_call</i></b-button>
     </div>
   </b-card>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  name: 'contact-info'
+  name: 'contact-info',
+  computed: {
+    ...mapGetters('contacts', ['contact'])
+  }
 }
 </script>
 
 <style lang="scss" scoped>
+  .contact-name{
+    font-size: 0.85em;
+    display: inline-block;
+    width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .contact-phone{
     font-size: 0.80rem;
     margin-top: -5px;
@@ -47,12 +63,17 @@ export default {
     position: absolute;
     right: 0;
     top: 5px;
-    background-color: transparent !important;
   }
 
-  .custom-action-button {
-    background: #F4F4F6;
-    color: #62666E;
-    border: none;
+  .contact-action-button {
+    button {
+      margin-right: 10px;
+    }
+
+    .custom-action-button {
+      background: #F4F4F6;
+      color: #62666E;
+      border: none;
+    }
   }
 </style>

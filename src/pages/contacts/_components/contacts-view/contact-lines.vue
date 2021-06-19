@@ -14,8 +14,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  name: 'contact-lines'
+  name: 'contact-lines',
+  computed: {
+    ...mapGetters('contacts', ['contact']),
+    lines () {
+      return this.contact.lines
+    }
+  }
 }
 </script>
 

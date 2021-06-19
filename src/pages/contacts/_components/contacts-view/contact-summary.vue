@@ -17,7 +17,7 @@
           <i class="material-icons">mail_outline</i> Email:
         </div>
         <div class="value">
-          walterb@company.io
+          {{ contact.email }}
         </div>
       </div>
 
@@ -38,6 +38,14 @@
           www.website.com
         </div>
       </div>
+      <div class="d-inline-flex">
+        <div class="label">
+          <i class="material-icons">system_update_alt</i> Intake Source:
+        </div>
+        <div class="value">
+          {{ contact.intake_source }}
+        </div>
+      </div>
     </div>
 
     <b-button pill
@@ -50,8 +58,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'contact-summary',
+  computed: {
+    ...mapGetters('contacts', ['contact'])
+  },
   data () {
     return {
       is_expanded: false

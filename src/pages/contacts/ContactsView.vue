@@ -380,6 +380,22 @@ export default {
 
       return false
     }
+  },
+  mounted () {
+    this.fetch()
+  },
+  watch: {
+    '$route.params.id': function () {
+      this.initialListFilters = this.currentListFilters
+      this.filtersCount = this.getFiltersCount(this.currentListFilters)
+      this.fetch()
+    },
+    currentListFilters: {
+      deep: true,
+      handler: function () {
+        this.fetch(this.currentListFilters)
+      }
+    }
   }
 }
 </script>

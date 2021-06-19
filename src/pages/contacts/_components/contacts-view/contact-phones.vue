@@ -1,21 +1,24 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
     <h6>Other Numbers</h6>
-    <div>
+    <div v-for="phone_number in phone_numbers" :key="phone_number.id">
       <div>
-        <small class="text-muted">Wireless</small>
+        <small class="text-muted">{{ phone_number.title }}</small>
       </div>
       <div class="d-flex justify-content-between">
-        <p class="phone-number m-0">775-895-2264</p>
+        <p class="phone-number m-0">
+          {{ phone_number.phone_number | fixPhone }}
+        </p>
         <div class="options p-0">
-          <b-button size="sm"
+          <b-button class="btn-bg-transparent btn-b-0"
+                    size="sm"
                     variant="light">
             <i class="material-icons">edit</i>
           </b-button>
 
           <b-dropdown no-caret
                       variant="light"
-                      class="m-md-2"
+                      class="m-md-2 bg-transparent b-0"
                       size="sm"
                       offset="-125">
             <template slot="button-content">
@@ -29,12 +32,40 @@
         </div>
       </div>
     </div>
+    <b-button v-if="phone_numbers.length < 1"
+              variant="light"
+              size="sm"
+              class="custom-action-button">
+      <i class="material-icons">add</i> Add Phone Number
+    </b-button>
   </b-card>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import contactApi from '../../contacts.api'
 export default {
-  name: 'contact-phones'
+  name: 'contact-phones',
+  computed: {
+    ...mapGetters('contacts', ['contact'])
+  },
+  data () {
+    return {
+      phone_numbers: []
+    }
+  },
+  methods: {
+    getPhoneNumbers () {
+      return contactApi.getPhoneNumbers(this.contact.id).then(response => {
+        this.phone_numbers = response.data
+      })
+    }
+  },
+  watch: {
+    contact: function () {
+
+    }
+  }
 }
 </script>
 

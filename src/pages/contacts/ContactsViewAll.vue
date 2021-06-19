@@ -30,8 +30,11 @@ export default {
     ...mapActions('contacts', ['setSelectedList']),
     setData (id) {
       const list = this.lists[id] || {}
-      this.name = list.name
-      this.type = list.type
+      if (Object.values(list).length > 0) {
+        this.name = list.name
+        this.type = list.type
+        this.setSelectedList({ id: this.id, name: this.name, type: this.type })
+      }
     }
   },
   watch: {

@@ -470,3 +470,28 @@ body,
 .btn-b-0 {
   border: none;
 }
+
+.dropdown.bg-transparent > button.dropdown-toggle {
+  background: transparent;
+}
+
+.dropdown.b-0 > button.dropdown-toggle {
+  border: none;
+}
+
+.dropdown.bg-transparent > button.dropdown-toggle:hover,
+.dropdown.b-0 > button.dropdown-toggle:hover {
+  color: #212529;
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+.width-300 {
+  width: 300px;
+}
+
+.width-0 {
+  width: 0;
+}
+
+
