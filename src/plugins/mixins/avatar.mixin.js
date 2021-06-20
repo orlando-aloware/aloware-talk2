@@ -3,7 +3,7 @@ import * as CommunicationDirection from '../../constants/communication-direction
 
 export default {
   methods: {
-    avatarTooltip(contact, communication = null) {
+    avatarTooltip (contact, communication = null) {
       const avatarStyle = this.avatarStyle(contact, communication)
 
       if ((communication !== null && communication.direction === CommunicationDirection.OUTBOUND) || !avatarStyle) {

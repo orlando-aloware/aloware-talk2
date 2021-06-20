@@ -8,7 +8,7 @@ export default {
   },
 
   methods: {
-    getUser(id) {
+    getUser (id) {
       const users = _.get(this, 'users', null)
 
       if (!id || !users) {
@@ -24,7 +24,7 @@ export default {
       return null
     },
 
-    getUserName(user) {
+    getUserName (user) {
       if (!user) {
         return
       }

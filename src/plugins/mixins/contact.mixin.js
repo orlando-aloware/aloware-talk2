@@ -5,7 +5,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
-  data() {
+  data () {
     return {
       auth: auth,
       hasMoreCommunications: true,
@@ -93,7 +93,7 @@ export default {
       activityTypes: [
         'communication',
         'contact-audit'
-      ],
+      ]
     }
   },
 
@@ -127,7 +127,7 @@ export default {
       return communications
     },
 
-    contactCampaignsFromCommunications() {
+    contactCampaignsFromCommunications () {
       if (this.selectedContact && this.campaigns.length) {
         let contactCampaigns = this.campaignsAlphabeticalOrder.filter((cmp) => {
           if (this.selectedContactCampaigns.includes(cmp.id)) {
@@ -227,7 +227,7 @@ export default {
 
     updateCommunication (data) {
       // checks if contact is the same in communication
-      if (this.selectedContact && data.contact && this.selectedContact.id != data.contact.id) {
+      if (this.selectedContact && data.contact && this.selectedContact.id !== data.contact.id) {
         return false
       }
 
@@ -245,7 +245,7 @@ export default {
 
     deleteCommunication (data) {
       // checks if contact is the same in communication
-      if (this.selectedContact && data.contact && this.selectedContact.id != data.contact.id) {
+      if (this.selectedContact && data.contact && this.selectedContact.id !== data.contact.id) {
         return false
       }
 
@@ -261,13 +261,13 @@ export default {
     },
 
     async fetchContactInfo (contactId = null) {
-      const id = contactId || this.contact_id;
+      const id = contactId || this.contact_id
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
-      return this.$axios.get('/api/v1/contact/' + id).then(res => {
+      return this.$axios.get(`/api/v1/contact/${id}`).then(res => {
         this.fetchContactCommunications(id, false)
           .then(() => {
             this.loadingContact = false
@@ -497,7 +497,7 @@ export default {
       this.loadingSendMessage = true
       this.$axios.post('/api/v1/campaign/send-message/' + this.selectedCampaignId + '/' + this.selectedContact.id, {
         message: this.reply_text,
-        phone_number: this.selectedPhoneNumber,
+        phone_number: this.selectedPhoneNumber
       }).then(res => {
         this.reply_text = ''
         this.loadingSendMessage = false
@@ -522,21 +522,21 @@ export default {
       })
     },
 
-    openSendMediaModal() {
+    openSendMediaModal () {
       this.sendMediaDialogVisible = true
       this.resetSendMediaContactsForm('media')
     },
 
-    closeSendMediaModal() {
+    closeSendMediaModal () {
       this.sendMediaDialogVisible = false
       this.resetSendMediaContactsForm('media')
     },
 
-    openGiphyMediaModal() {
+    openGiphyMediaModal () {
       this.giphyMediaDialogVisible = true
     },
 
-    closeGiphyMediaModal() {
+    closeGiphyMediaModal () {
       this.giphyMediaDialogVisible = false
     },
 
@@ -558,6 +558,7 @@ export default {
         })
         .catch(err => {
           // An error occurred
+          console.log(err)
           done()
         })
     },
@@ -566,20 +567,20 @@ export default {
       this.uploadFileList.upload = fileList
     },
 
-    onSuccessSendMedia(res) {
+    onSuccessSendMedia (res) {
       this.$q.notify({
         offset: 95,
         title: 'Media Upload',
         message: 'Media file has been uploaded successfully.',
         type: 'success',
-        showClose: true,
+        showClose: true
       })
       this.$set(this.media, 'file_name', res.file_name)
       this.uploadStatus.upload = 'success'
       // TODO: validate the form
     },
 
-    onFailedSendMedia(err) {
+    onFailedSendMedia (err) {
       this.$handleUploadErrors(err.message)
       this.uploadStatus.upload = 'exception'
       this.uploadPercentage.upload = 0
