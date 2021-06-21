@@ -116,7 +116,8 @@
                 <b-list-group-item class="filter-divider">
                   All properties
                 </b-list-group-item>
-                <div v-for="filter in filterGroups" :key="filter">
+                <div v-for="filter in filterGroups"
+                     :key="filter">
                   <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup(filter).filters.length > 0">
                     {{ filterByGroup(filter).label }}
                   </b-list-group-item>
@@ -130,7 +131,7 @@
                   </b-list-group-item>
                 </div>
                 <div>
-                  <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup(filter).filters.length > 0">
+                  <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup().filters.length > 0">
                     Custom
                   </b-list-group-item>
                   <b-list-group-item
