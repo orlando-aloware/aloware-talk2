@@ -25,6 +25,14 @@ const fixDateOfBirth = (dateOfBirth) => {
   return 'N/A'
 }
 
+const fixContactName = (name) => {
+  if (name) {
+    return name.capitalize()
+  }
+
+  return 'No Name'
+}
+
 /**
  * Fix name
  * @param {string} name
@@ -144,6 +152,7 @@ const fixLrnType = (lrnType) => {
 export default ({ Vue }) => {
   const filters = {
     fixDateOfBirth,
+    fixContactName,
     fixName,
     fixCountry,
     fixState,
