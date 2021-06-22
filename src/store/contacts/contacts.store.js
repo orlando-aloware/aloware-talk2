@@ -126,6 +126,8 @@ export default function () {
     currentListFilters: {},
 
     contact: {},
-    isSidebarCollapsed: false
+    contact_phone_numbers: [],
+    isSidebarCollapsed: false,
+    isContactNameEditOpen: false
   }
 }

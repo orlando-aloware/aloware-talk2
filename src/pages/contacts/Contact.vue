@@ -15,11 +15,11 @@ import ContactListSidebar from 'pages/contacts/_components/contacts-view/contact
 import ContactActivity from 'pages/contacts/_components/contacts-view/contact-activity'
 import ContactDetails from 'pages/contacts/_components/contacts-view/contact-details'
 import contactsMixins from './contacts.mixins'
+import contactMixins from '../../plugins/mixins/contact.mixin'
 import { mapActions, mapGetters } from 'vuex'
-import contactsApi from './contacts.api'
 
 export default {
-  mixins: [contactsMixins],
+  mixins: [contactsMixins, contactMixins],
   components: {
     ContactDetails,
     ContactActivity,
@@ -40,7 +40,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setContact']),
     getContact (id) {
-      return contactsApi.get(id).then(response => {
+      return this.fetchContactInfo(id).then(response => {
         this.setContact(response.data)
       })
     }

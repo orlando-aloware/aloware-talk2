@@ -1,25 +1,29 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
     <h6>Broadcast</h6>
-    <b-button class="btn-edit-action btn-bg-transparent btn-b-0 position-absolute" size="sm"
-              variant="light">
-      <i class="material-icons">edit</i>
-    </b-button>
     <div>
-      <b-badge variant="primary badge-tag badge-tag-primary">Test Broadcast</b-badge>
+      <b-badge v-for="broadcast in contact.broadcasts"
+               variant="primary"
+               class="badge-tag badge-tag-primary ellipsis"
+               v-b-tooltip="broadcast.name"
+               :key="broadcast.id">
+        {{ broadcast.name }}
+      </b-badge>
     </div>
   </b-card>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  name: 'contact-broadcast'
+  name: 'contact-broadcast',
+  computed: {
+    ...mapGetters('contacts', ['contact'])
+  }
 }
 </script>
 
-<style scoped>
-.btn-edit-action {
-  right: 10px;
-  top: 10px;
-}
+<style lang="scss" scoped>
+
 </style>

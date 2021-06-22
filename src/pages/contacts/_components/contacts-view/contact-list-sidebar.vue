@@ -12,15 +12,19 @@
               class="no-border position-relative"
               ref="scrollableArea">
         <b-list-group class="p-2">
-          <b-list-group-item :to="`/contact/${contact.id}`" :class="getActiveClass(contact)" v-for="contact in contacts" :key="contact.id">
+          <b-list-group-item v-for="contact in contacts"
+                             :key="contact.id"
+                             :to="`/contact/${contact.id}`"
+                             :class="`d-flex align-items-center border-0 ${getActiveClass(contact)}`">
             <avatar class="mr-2 contact-avatar"
                     width="40"
                     height="36"
                     :name="contact.name" />
             <div class="d-inline-flex justify-content-between full-width contact-details">
               <div class="mr-auto">
-                <p class="text-bold contact-name mb-0">{{ contact.name }}</p>
-                <p class="text-sm-left contact-phone">
+                <p class="text-bold contact-name mb-0"
+                   v-b-tooltip="contact.name">{{ contact.name }}</p>
+                <p class="text-sm-left contact-phone mb-1">
                   {{ contact.phone_number | fixPhone }}
                 </p>
               </div>
@@ -84,7 +88,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed']),
     getActiveClass (contact) {
-      return `d-flex align-items-center border-0 pb-0 ${(this.$route.params.id === String(contact.id) ? 'active' : '')}`
+      return `${(this.$route.params.id === String(contact.id) ? 'active' : '')}`
     },
     onBottomScroll () {
       clearTimeout(scrollTimeout)
@@ -142,6 +146,11 @@ export default {
       overflow: auto;
       position: relative;
       width: 300px;
+
+      .list-group-item {
+        padding: 0.75rem 0.5rem;
+        margin-top: 2px;
+      }
 
       .list-group-item.active,
       .list-group-item:hover {

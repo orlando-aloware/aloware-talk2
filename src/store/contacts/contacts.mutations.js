@@ -163,7 +163,16 @@ export default {
   SET_CONTACT: (state, contact) => {
     state.contact = contact
   },
+  SET_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {
+    state.contact_phone_numbers = phoneNumbers
+  },
+  ADD_CONTACT_PHONE_NUMBER: (state, phoneNumber) => {
+    state.contact_phone_numbers = [...state.contact_phone_numbers, phoneNumber]
+  },
   SET_SIDEBAR_COLLAPSED: (state, isCollapsed) => {
     state.isSidebarCollapsed = isCollapsed
+  },
+  SET_CONTACT_NAME_EDIT_OPEN: (state, isOpen) => {
+    state.isContactNameEditOpen = isOpen
   }
 }
