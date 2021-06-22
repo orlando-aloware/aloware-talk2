@@ -93,7 +93,13 @@ export default {
       activityTypes: [
         'communication',
         'contact-audit'
-      ]
+      ],
+      // push to CRM feature exclusive for ss, just in case new company is added, then just add the reseller id here
+      resellerIdToPushContactToCrm: [357],
+      messageObject: {
+        phone_number: null
+      },
+      activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups']
     }
   },
 
@@ -170,6 +176,22 @@ export default {
       }
 
       return []
+    },
+
+    integrationsDisabled () {
+      if (!this.currentCompany) {
+        return true
+      }
+
+      if (this.currentCompany.id === 460) {
+        return false
+      }
+
+      return !this.currentCompany.pipedrive_integration_enabled && !this.currentCompany.hubspot_integration_enabled && !this.currentCompany.stripe_integration_enabled && !this.currentCompany.zoho_integration_enabled && !this.currentCompany.helpscout_integration_enabled && !this.currentCompany.guesty_integration_enabled
+    },
+
+    isPushContactToCrmEnabled () {
+      return this.resellerIdToPushContactToCrm.includes(this.currentCompany.reseller_id)
     }
   },
 
@@ -261,7 +283,7 @@ export default {
     },
 
     async fetchContactInfo (contactId = null) {
-      const id = contactId || this.contact_id
+      const id = contactId || this.contactId
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
@@ -761,6 +783,69 @@ export default {
       if (this.selectedCampaign && this.selectedCampaign.id && this.selectedContact && this.selectedContact.id) {
         this.fetchIncomingNumber()
         this.checkEmailCapability()
+      }
+    },
+
+    processFetchContactInfo () {
+      this.loadingContactInProgress()
+      this.fetchContactInfo().then(res => {
+        this.processFetchedContactInfo(res.data)
+      }).catch(() => {
+        this.loadingContactsFailed()
+      })
+    },
+
+    loadingContactInProgress () {
+      if (!this.integrationsDisabled) {
+        this.activeNames.push('integrations')
+        this.activeNames.push('integration-cards')
+      } else {
+        this.activeNames = this.activeNames.filter(name => name !== 'integrations' && name !== 'integration-cards')
+      }
+
+      if (this.isPushContactToCrmEnabled) {
+        this.activeNames.push('push-to-crm')
+      } else {
+        this.activeNames = this.activeNames.filter(name => name !== 'push-to-crm')
+      }
+
+      this.resetSelectedContact()
+    },
+
+    processFetchedContactInfo (selectedContact) {
+      this.messageObject.contact = selectedContact
+      this.fetchedContactInfo(selectedContact)
+      this.contact.first_name = selectedContact.first_name
+      this.contact.last_name = selectedContact.last_name
+      // TODO: update contact name in title?
+      // this.updateBreadcrumbContactName(this.contact)
+      this.contact_phone_numbers = []
+      this.$VueEvent.fire('contact_selected', this.contact_id)
+    },
+
+    loadingContactsFailed () {
+      // TODO: do we need to do anything here?
+    },
+
+    loadMoreContacts () {
+      if (this.pagination && this.pagination.to && this.filter.page <= this.pagination.to) {
+        this.filter.page += 1
+        this.getContacts()
+          .then(res => {
+            this.loadingContact = false
+            this.$router.push({
+              name: 'Contact',
+              params: { contact_id: res.data.data[0].id }
+            }).catch(err => {
+              console.log(err)
+            })
+          })
+          .catch(err => {
+            this.loadingContact = false
+            console.log(err)
+          })
+      } else {
+        this.loadingContact = false
       }
     }
   },

@@ -2,7 +2,7 @@
   <div class="row mx-0 content-row contact-view-wrapper d-flex">
     <contact-list-sidebar></contact-list-sidebar>
     <div :class="`px-0 mb-3 contact-activity-wrapper ${widthClass}`">
-      <contact-activity></contact-activity>
+      <contact-activities :communications="filteredCommunications"></contact-activities>
     </div>
     <div class="px-0 mb-3 width-300">
       <contact-details></contact-details>
@@ -12,17 +12,18 @@
 
 <script>
 import ContactListSidebar from 'pages/contacts/_components/contacts-view/contact-list-sidebar'
-import ContactActivity from 'pages/contacts/_components/contacts-view/contact-activity'
+import ContactActivities from 'pages/contacts/_components/contacts-view/contact-activities'
 import ContactDetails from 'pages/contacts/_components/contacts-view/contact-details'
 import contactsMixins from './contacts.mixins'
 import contactMixins from '../../plugins/mixins/contact.mixin'
+
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
   components: {
     ContactDetails,
-    ContactActivity,
+    ContactActivities,
     ContactListSidebar
   },
   computed: {
@@ -46,7 +47,8 @@ export default {
     }
   },
   mounted () {
-    this.getContact(this.$route.params.id)
+    this.contactId = this.$route.params.id
+    this.processFetchContactInfo()
   },
   watch: {
     '$route.params.id': function (id) {
