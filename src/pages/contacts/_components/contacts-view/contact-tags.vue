@@ -1,30 +1,31 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
     <h6>Tags</h6>
-    <b-button class="btn-edit-action btn-bg-transparent btn-b-0 position-absolute" size="sm"
-              variant="light">
-      <i class="material-icons">edit</i>
-    </b-button>
     <div>
-      <b-badge variant="primary contact-tag-badge custom-badge-primary" v-for="tag in tags" :key="tag.id" >
-        <span class="mid-dot">&#183;</span>
-        {{ tag.name }}
+      <b-badge v-for="tag in tags"
+               variant="primary"
+               class="badge-tag custom-badge-primary ellipsis"
+               v-b-tooltip="tag.name"
+               :key="tag.id" >
+        <i class="fa fa-circle" :style="`color: ${tag.color};font-size:100%;`"></i> {{ tag.name }}
       </b-badge>
     </div>
-    <b-button
-              variant="light"
-              size="sm"
-              class="custom-action-button">
+
+    <b-link href="#" class="custom-link text-decoration-none" id="btn-add-tag">
       <i class="material-icons">add</i> Add tag
-    </b-button>
+    </b-link>
+
+    <add-tag-popover target="btn-add-tag" triggers="click"></add-tag-popover>
   </b-card>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import AddTagPopover from 'pages/contacts/_components/popover/contact/add-tag-popover'
 
 export default {
   name: 'contact-tags',
+  components: { AddTagPopover },
   computed: {
     ...mapGetters('contacts', ['contact']),
     tags () {
@@ -38,11 +39,12 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
-  .contact-tag-badge {
+  .badge-tag {
     background: transparent;
     font-weight: 500;
     border: 1px solid #dee2e6;
     margin-right: 5px;
+    font-size: 0.80em;
   }
 
   .custom-badge-primary {
@@ -78,5 +80,13 @@ export default {
   .btn-edit-action {
     right: 10px;
     top: 10px;
+  }
+
+  .tags-form-popover {
+    left: -280px !important;
+  }
+
+  .q-tags-menu {
+    width: 300px !important;
   }
 </style>

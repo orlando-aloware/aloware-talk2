@@ -1,5 +1,5 @@
 <template>
-  <contacts-screen :loading="isLoadingDisabled">
+  <contacts-screen v-if="list" :loading="isLoadingDisabled">
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="pr-2">{{ list.name }}</div>

@@ -188,7 +188,7 @@ body,
   }
   input {
     color: #202125;
-    font-family: Roboto;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: bold;
     letter-spacing: 0.35px;
@@ -197,7 +197,7 @@ body,
   .q-field__label {
     opacity: 0.9;
     color: #666666;
-    font-family: Roboto;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     letter-spacing: 0;
     line-height: 16px;
@@ -226,7 +226,7 @@ body,
 
 .title {
   color: #202125;
-  font-family: 'Product Sans';
+  font-family: 'Inter', sans-serif;
   font-size: 26px;
   font-weight: bold;
   letter-spacing: 0.35px;
@@ -235,7 +235,7 @@ body,
 
 .description {
   color: #e4e4e4;
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   letter-spacing: 0.19px;
   line-height: 22px;
@@ -244,7 +244,7 @@ body,
 
 .description-sm {
   color: #999999;
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0;
@@ -256,7 +256,7 @@ body,
 
 .small-text {
   color: #202125;
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   letter-spacing: 0.3px;
   line-height: 16px;
@@ -266,7 +266,7 @@ body,
 }
 
 .xs-text {
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   letter-spacing: 0.25px;
   line-height: 13px;
@@ -276,7 +276,7 @@ body,
   height: 18px;
   width: 107px;
   color: #256eff;
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   letter-spacing: 0;
   line-height: 18px;
@@ -288,7 +288,7 @@ body,
 
 .remember-me {
   color: #666666;
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   letter-spacing: 0;
   line-height: 18px;
@@ -296,7 +296,7 @@ body,
 
 .button {
   color: #ffffff;
-  font-family: Roboto;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 0.5px;
@@ -322,7 +322,7 @@ body,
   box-shadow: 2px 4px 20px 0 rgba(21, 22, 63, 0.2);
   .message {
     color: #666666;
-    font-family: Roboto;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     letter-spacing: 0;
     line-height: 18px;
@@ -357,7 +357,7 @@ body,
       height: 20px;
     }
     .q-tab__label {
-      font-family: Roboto;
+      font-family: 'Inter', sans-serif;
       font-size: 10px;
       font-weight: bold;
       letter-spacing: 0;
@@ -371,8 +371,8 @@ body,
     text-decoration: none;
   }
   .q-tabs {
-    margin-left: 0px;
-    margin-right: 0px;
+    margin-left: 0;
+    margin-right: 0;
   }
   .separator {
     width: 134px;
@@ -398,7 +398,7 @@ body,
 .h1,
 .h2,
 .page-title {
-  font-family: Product Sans;
+  font-family: 'Inter', sans-serif;
   color: #202125;
   letter-spacing: 0.29px;
   margin-bottom: 0 !important;
@@ -494,4 +494,33 @@ body,
   width: 0;
 }
 
+.popover {
+  font-family: 'Inter', sans-serif !important;
+}
 
+.ellipse {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
+.badge-tag {
+  font-size: 0.80em;
+  max-width: 250px;
+  padding-right: 8px;
+  text-align: left;
+}
+
+.custom-link{
+  font-size: 0.8em;
+  color: $blue;
+  i {
+    margin-top: -1px;
+  }
+}
+
+.contact-edit-popovers {
+  left: -298px !important;
+  width: 300px;
+}

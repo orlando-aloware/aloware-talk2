@@ -10,16 +10,24 @@
 
       <div class="d-flex justify-content-between relative-position">
         <div>
-          <h6 class="mt-0 contact-name">{{ contact.name }}</h6>
+          <h6 class="mt-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
           <p class="contact-phone">
             {{ contact.phone_number | fixPhone }} <i class="material-icons">content_copy</i>
           </p>
         </div>
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                   size="sm"
-                  variant="light">
+                  variant="light"
+                  id="btn-edit-contact-info">
           <i class="material-icons">edit</i>
         </b-button>
+        <b-popover custom-class="edit-form-popover"
+                   target="btn-edit-contact-info"
+                   triggers="focus"
+                   @show="onShow"
+                   @hidden="onHidden">
+            <edit-contact-name-form></edit-contact-name-form>
+        </b-popover>
       </div>
     </b-media>
     <div class="d-inline-flex flex-wrap contact-action-button">
@@ -33,12 +41,26 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
+import EditContactNameForm from 'pages/contacts/_components/forms/edit-contact-name-form'
 
 export default {
   name: 'contact-info',
+  components: { EditContactNameForm },
   computed: {
-    ...mapGetters('contacts', ['contact'])
+    ...mapGetters('contacts', ['contact', 'isContactNameEditOpen'])
+  },
+  methods: {
+    ...mapActions('contacts', ['setContactNameEditOpen']),
+    onHidden () {
+      // this.setContactNameEditOpen(false)
+    },
+    onShow () {
+      // this.setContactNameEditOpen(true)
+    },
+    showEditForm () {
+      // this.setContactNameEditOpen(true)
+    }
   }
 }
 </script>
@@ -53,7 +75,13 @@ export default {
     text-overflow: ellipsis;
   }
 
-  .contact-phone{
+  .card:hover {
+    .btn-edit-contact-info {
+      opacity: 1;
+    }
+  }
+
+  .contact-phone {
     font-size: 0.80rem;
     margin-top: -5px;
     right: 0;
@@ -63,6 +91,7 @@ export default {
     position: absolute;
     right: 0;
     top: 5px;
+    opacity: 0;
   }
 
   .contact-action-button {
@@ -75,5 +104,10 @@ export default {
       color: #62666E;
       border: none;
     }
+  }
+
+  .edit-form-popover{
+    left: -251px !important;
+    width: 300px;
   }
 </style>

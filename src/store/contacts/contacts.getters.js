@@ -49,5 +49,7 @@ export default {
   },
   currentListFilters: (state) => state.currentListFilters,
   contact: (state) => state.contact,
-  isSidebarCollapsed: (state) => state.isSidebarCollapsed
+  contact_phone_numbers: (state) => state.contact_phone_numbers,
+  isSidebarCollapsed: (state) => state.isSidebarCollapsed,
+  isContactNameEditOpen: (state) => state.isContactNameEditOpen
 }

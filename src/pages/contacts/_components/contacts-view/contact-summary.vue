@@ -4,34 +4,34 @@
 
     <div class="pb-4 summary-container">
       <div class="d-inline-flex">
-        <div class="label">
+        <div class="label ellipsis">
           <i class="material-icons">person_outline</i> Owner:
         </div>
-        <div class="value">
+        <div class="value ellipsis" v-b-tooltip="`Hubspot Integration`">
           Hubspot Integration
         </div>
       </div>
 
       <div class="d-inline-flex">
-        <div class="label">
+        <div class="label ellipsis">
           <i class="material-icons">mail_outline</i> Email:
         </div>
-        <div class="value">
+        <div class="value ellipsis" v-b-tooltip="contact.email">
           {{ contact.email }}
         </div>
       </div>
 
       <div class="d-inline-flex">
-        <div class="label">
-          <i class="material-icons">fmd_good</i> City &amp; State:
+        <div class="label ellipsis" v-b-tooltip="`City &amp;amp; State`">
+          <i class="material-icons">fmd_good</i> City &amp;amp; State:
         </div>
-        <div class="value">
+        <div class="value ellipsis" v-b-tooltip="`San Francisco, CA`">
           San Francisco, CA
         </div>
       </div>
 
       <div class="d-inline-flex">
-        <div class="label">
+        <div class="label ellipsis">
           <i class="material-icons">language</i> Website:
         </div>
         <div class="value">
@@ -39,10 +39,10 @@
         </div>
       </div>
       <div class="d-inline-flex">
-        <div class="label">
+        <div class="label ellipsis" v-b-tooltip="`Intake Source`">
           <i class="material-icons">system_update_alt</i> Intake Source:
         </div>
-        <div class="value">
+        <div class="value ellipsis" v-b-tooltip="contact.intake_source">
           {{ contact.intake_source }}
         </div>
       </div>
@@ -97,9 +97,14 @@ export default {
     font-size: 1em;
     display: inline-block;
     width: 90px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: #6c757d !important;
+    padding-right: 8px;
+  }
+
+  div.value {
+    font-size: 1em;
+    display: inline-block;
+    width: 180px;
     color: #6c757d !important;
     padding-right: 8px;
   }

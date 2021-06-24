@@ -131,7 +131,7 @@ export default {
         filters.contact_owner.operator = OPERATORS.IS_ANY_OF
       }
 
-      if (this.id && !invalidIds.includes(this.id) && this.list.type !== DYNAMIC) {
+      if (this.id && !invalidIds.includes(this.id) && this.list && this.list.type !== DYNAMIC) {
         filters.contact_lists = {}
         filters.contact_lists.value = [this.id]
         filters.contact_lists.operator = OPERATORS.IS_ANY_OF

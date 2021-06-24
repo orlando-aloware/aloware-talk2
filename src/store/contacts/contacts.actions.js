@@ -117,7 +117,16 @@ export default {
   setContact: ({ commit }, contact) => {
     commit('SET_CONTACT', contact)
   },
+  setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
+    commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
+  },
+  addContactPhoneNumber: ({ commit }, phoneNumber) => {
+    commit('ADD_CONTACT_PHONE_NUMBER', phoneNumber)
+  },
   setSidebarCollapsed: ({ commit }, isCollapsed) => {
     commit('SET_SIDEBAR_COLLAPSED', isCollapsed)
+  },
+  setContactNameEditOpen: ({ commit }, isOpen) => {
+    commit('SET_CONTACT_NAME_EDIT_OPEN', isOpen)
   }
 }
