@@ -131,7 +131,7 @@
         <q-badge :rounded-dot="!communication.is_read" color="red" />
       </div>
 
-      <el-badge class="item width-400"
+      <div class="item width-400"
                 v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
         <div class="inline r-2x message-body text-xs effect7 mt-1"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
@@ -140,28 +140,29 @@
                     </span>
 
           <div class="p-y-sm">
-            <communication-info :communication="communication"
+            <!--communication-info :communication="communication"
                                 :contact="contact"
-                                :activity_mode="true"
+                                :activityMode="true"
                                 :campaignId="communication.campaign_id">
-            </communication-info>
+            </communication-info-->
           </div>
         </div>
-      </el-badge>
+        <q-badge :rounded-dot="!communication.is_read" color="red" />
+      </div>
 
-      <el-button type="text"
-                 class="pl-2 p-y-sm inline text-blue mark-read _400"
-                 v-if="markable(communication) && !communication.is_read"
-                 @click="markAsRead">
+      <b-button variant="link"
+                class="pl-2 p-y-sm inline text-blue mark-read _400"
+                v-if="markable(communication) && !communication.is_read"
+                @click="markAsRead">
         Mark as read
-      </el-button>
+      </b-button>
 
-      <el-button type="text"
-                 class="pl-2 p-y-sm inline text-blue mark-read _400"
-                 v-if="markable(communication) && communication.is_read"
-                 @click="markAsUnread">
+      <b-button variant="link"
+                class="pl-2 p-y-sm inline text-blue mark-read _400"
+                v-if="markable(communication) && communication.is_read"
+                @click="markAsUnread">
         Mark as unread
-      </el-button>
+      </b-button>
 
       <div class="text-xxs m-t-xs width-500 m-b"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"

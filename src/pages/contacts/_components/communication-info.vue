@@ -1,9 +1,13 @@
 <template>
   <div v-if="communication">
-    <el-collapse v-model="activeName"
-                 class="border-0 contact-activity"
-                 accordion>
-      <el-collapse-item name="main">
+    <q-expansion-item
+      v-model="activeName"
+      icon="perm_identity"
+      label="Account settings"
+      caption="John Doe"
+      class="border-0 contact-activity"
+    >
+      <div name="main">
         <template slot="title">
           <div class="text-lt p-x">
                         <span>
@@ -30,18 +34,20 @@
         <div class="p-a b-t b-light">
           <template
             v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-            <vue-load-image
-              v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
-              v-for="(image, index) in communication.attachments"
-              :key="index">
-              <img slot="image"
-                   class="img-fluid d-block r-2x"
-                   :class="index > 0 ? 'mb-1' : ''"
-                   :src="image.url"/>
-              <img slot="preloader"
-                   src="/assets/images/loading.svg"/>
-              <div slot="error">Error!</div>
-            </vue-load-image>
+            <template v-for="(image, index) in communication.attachments">
+              <q-img
+                class="img-fluid d-block r-2x"
+                v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
+                :class="index > 0 ? 'mb-1' : ''"
+                :key="index"
+                :src="image.url">
+                <template v-slot:error>
+                  <div class="absolute-full flex flex-center bg-negative text-white">
+                    Error!
+                  </div>
+                </template>
+              </q-img>
+            </template>
 
             <div v-if="communication.body">
                             <span class="text-muted"
@@ -273,18 +279,19 @@
                    class="d-flex align-items-center">
                         <span class="text-greyish">
                             <ul class="list list-unstyled inset mb-0">
-                                <li v-for="(attempting_user, index) in communication.attempting_users"
-                                    :key="attempting_user + '-user-' + index"
-                                    v-if="getUser(attempting_user) && getUser(attempting_user).id"
-                                    class="pb-1">
-                                    <router-link
-                                      :to="{ name: 'User Activity', params: {user_id: getUser(attempting_user).id }}">
-                                        <span :class="getAttemptingClass(attempting_user, communication.disposition_status2, communication.user_id)"
-                                              :title="getUserName(getUser(attempting_user))">
-                                            {{ getUserName(getUser(attempting_user)) }}
-                                        </span>
-                                    </router-link>
-                                </li>
+                              <template v-for="(attempting_user, index) in communication.attempting_users">
+                                  <li :key="attempting_user + '-user-' + index"
+                                      v-if="getUser(attempting_user) && getUser(attempting_user).id"
+                                      class="pb-1">
+                                      <router-link
+                                        :to="{ name: 'User Activity', params: {user_id: getUser(attempting_user).id }}">
+                                          <span :class="getAttemptingClass(attempting_user, communication.disposition_status2, communication.user_id)"
+                                                :title="getUserName(getUser(attempting_user))">
+                                              {{ getUserName(getUser(attempting_user)) }}
+                                          </span>
+                                      </router-link>
+                                  </li>
+                              </template>
                             </ul>
                         </span>
               </div>
@@ -501,21 +508,22 @@
               <div :class="[dialer_mode ? 'col-7' : 'col-xl-7 col-12']"
                    class="d-flex align-items-center"
                    v-if="communication.transfer_prior_user_ids">
-                <router-link
-                  v-for="(user_id, index) in communication.transfer_prior_user_ids"
-                  v-if="getUser(user_id)"
-                  :key="user_id + '-user-' + index"
-                  :to="{ name: 'User Activity', params: {user_id: user_id }}">
-                  <el-tooltip class="item pull-left"
-                              effect="dark"
-                              content="Click For More Info"
-                              placement="top">
-                                        <span class="text-dark-greenish"
-                                              :title="getUserName(getUser(user_id))">
-                                            {{ getUserName(getUser(user_id)) }}
-                                        </span>
-                  </el-tooltip>
-                </router-link>
+                <template v-for="(user_id, index) in communication.transfer_prior_user_ids">
+                  <router-link
+                    v-if="getUser(user_id)"
+                    :key="user_id + '-user-' + index"
+                    :to="{ name: 'User Activity', params: {user_id: user_id }}">
+                    <el-tooltip class="item pull-left"
+                                effect="dark"
+                                content="Click For More Info"
+                                placement="top">
+                                          <span class="text-dark-greenish"
+                                                :title="getUserName(getUser(user_id))">
+                                              {{ getUserName(getUser(user_id)) }}
+                                          </span>
+                    </el-tooltip>
+                  </router-link>
+                </template>
               </div>
 
               <label :class="[dialer_mode ? 'col-5' : 'col-xl-5 col-12']"
@@ -526,21 +534,22 @@
               <div :class="[dialer_mode ? 'col-7' : 'col-xl-7 col-12']"
                    class="d-flex align-items-center"
                    v-if="communication.transfer_target_user_ids">
-                <router-link
-                  v-for="(user_id, index) in communication.transfer_target_user_ids"
-                  v-if="getUser(user_id)"
-                  :key="user_id + '-user-' + index"
-                  :to="{ name: 'User Activity', params: {user_id: user_id }}">
-                  <el-tooltip class="item pull-left"
-                              effect="dark"
-                              content="Click For More Info"
-                              placement="top">
-                                        <span class="text-dark-greenish"
-                                              :title="getUserName(getUser(user_id))">
-                                            {{ getUserName(getUser(user_id)) }}
-                                        </span>
-                  </el-tooltip>
-                </router-link>
+                <template v-for="(user_id, index) in communication.transfer_target_user_ids">
+                  <router-link
+                    v-if="getUser(user_id)"
+                    :key="user_id + '-user-' + index"
+                    :to="{ name: 'User Activity', params: {user_id: user_id }}">
+                    <el-tooltip class="item pull-left"
+                                effect="dark"
+                                content="Click For More Info"
+                                placement="top">
+                                          <span class="text-dark-greenish"
+                                                :title="getUserName(getUser(user_id))">
+                                              {{ getUserName(getUser(user_id)) }}
+                                          </span>
+                    </el-tooltip>
+                  </router-link>
+                </template>
               </div>
 
               <label :class="[dialer_mode ? 'col-5' : 'col-xl-5 col-12']"
@@ -807,14 +816,14 @@
                 </el-button>
               </router-link>
             </div>
-            <sms-reminders :communication_id="communication.id"
-                           :campaign_id="campaign_id"
-                           :appointment_datetime="communication.engagement_data.appointment_datetime">
+            <sms-reminders :communicationId="communication.id"
+                           :campaignId="campaign_id"
+                           :appointmentDatetime="communication.engagement_data.appointment_datetime">
             </sms-reminders>
           </div>
         </div>
-      </el-collapse-item>
-    </el-collapse>
+      </div>
+    </q-expansion-item>
     <div class="p-x-sm p-y-sm b-t width-300"
          v-if="communication.notes && !activeName">
       <strong>Notes:</strong>
@@ -829,39 +838,37 @@
 </template>
 
 <script>
-import auth from '../../../../boot/auth'
+import auth from '../../../boot/auth'
 import {
-  acl_mixin,
-  avatar_mixin,
-  communication_info_mixin,
-  user_info_mixin
-} from '../mixins'
-import {mapState} from 'vuex'
-import VueLoadImage from 'vue-load-image'
-import * as AnswerTypes from '../constants/answer-types'
-import * as CommunicationCurrentStatus from '../constants/communication-current-status'
-import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
-import * as CommunicationTypes from '../constants/communication-types'
-import * as CommunicationDirections from '../constants/communication-direction'
-import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import ContactDispositionSelector from "./contact-disposition-selector"
-import SmsReminders from '../components/sms-reminders'
-import TargetUsersTree from "./target-users-tree";
+  aclMixin,
+  avatarMixin,
+  communicationInfoMixin,
+  userMixin
+} from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import * as AnswerTypes from '../../../constants/answer-types'
+import * as CommunicationCurrentStatus from '../../../constants/communication-current-status'
+import * as CommunicationDispositionStatus from '../../../constants/communication-disposition-status'
+import * as CommunicationTypes from '../../../constants/communication-types'
+import * as CommunicationDirections from '../../../constants/communication-direction'
+import * as UploadedFileTypes from '../../../constants/uploaded-file-types'
+import ContactDispositionSelector from './contact-disposition-selector'
+import SmsReminders from './sms-reminders'
+import TargetUsersTree from './target-users-tree'
 
 export default {
   name: 'communication-info',
   mixins: [
-    acl_mixin,
-    avatar_mixin,
-    communication_info_mixin,
-    user_info_mixin
+    aclMixin,
+    avatarMixin,
+    communicationInfoMixin,
+    userMixin
   ],
 
   components: {
     TargetUsersTree,
     ContactDispositionSelector,
-    SmsReminders,
-    'vue-load-image': VueLoadImage
+    SmsReminders
   },
 
   props: {
@@ -879,52 +886,52 @@ export default {
       type: Boolean
     },
 
-    display_contact: {
+    displayContact: {
       required: false,
       default: false,
       type: Boolean
     },
 
-    activity_mode: {
+    activityMode: {
       required: false,
       default: false,
       type: Boolean
     },
 
-    dialer_mode: {
+    dialerMode: {
       required: false,
       default: false,
       type: Boolean
     },
 
-    hide_contact_disposition: {
+    hideContactDisposition: {
       required: false,
       default: false,
       type: Boolean
     },
 
-    is_widget: {
+    isWidget: {
       required: false,
       default: false,
       type: Boolean
     },
 
-    campaign_id: {
+    campaignId: {
       required: false
-    },
+    }
   },
 
-  data() {
+  data () {
     return {
       auth: auth,
-      loading_dispose: false,
+      loadingDispose: false,
       REJECTION_REASON_CREDITS: 1, // A call/SMS was received by our system but not shown to user because company was out of credit
       REJECTION_REASON_BLOCKED: 2, // A call/SMS was received by our system but was blocked because caller's phone number is blocked.
       REJECTION_REASON_OTHER: 3, // A call/SMS was received by our system but was blocked because because of other reasons, e.g.: .
       REJECTION_REASON_USER_NOT_FOUND: 4, // A call/SMS was received by our system but it doesn't have a user
       REJECTION_REASON_FAILED: 5, // A call/SMS was failed
       activeName: '',
-      loading_update_engagement: false,
+      loadingUpdateEngagement: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -934,11 +941,11 @@ export default {
       CommunicationCurrentStatus,
       CommunicationDispositionStatus,
       CommunicationTypes,
-      UploadedFileTypes,
+      UploadedFileTypes
     }
   },
 
-  created() {
+  created () {
     if (!this.activity_mode) {
       this.activeName = 'main'
     }
@@ -954,7 +961,7 @@ export default {
   },
 
   methods: {
-    getCampaign(id) {
+    getCampaign (id) {
       if (!id) {
         return null
       }
@@ -966,11 +973,11 @@ export default {
       return null
     },
 
-    getRingGroup(id) {
+    getRingGroup (id) {
       if (!id) {
         return null
       }
-      let found = this.ring_groups.find(ring_group => ring_group.id === id)
+      let found = this.ring_groups.find(ringGroup => ringGroup.id === id)
       if (found) {
         return found
       }
@@ -978,7 +985,7 @@ export default {
       return null
     },
 
-    getWorkflow(id) {
+    getWorkflow (id) {
       if (!id) {
         return null
       }
@@ -990,7 +997,7 @@ export default {
       return null
     },
 
-    getBroadcast(id) {
+    getBroadcast (id) {
       if (!id) {
         return null
       }
@@ -1002,33 +1009,33 @@ export default {
       return null
     },
 
-    dispose(disposition_status) {
-      this.loading_dispose = true
-      axios.post('/api/v1/contact/' + this.communication.contact_id + '/dispose', {disposition_status}).then((res) => {
-        this.loading_dispose = false
-        this.$notify({
+    dispose (dispositionStatus) {
+      this.loadingDispose = true
+      this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/dispose`, { dispositionStatus }).then((res) => {
+        this.loadingDispose = false
+        this.$q.notify({
           offset: 95,
           title: 'Contact',
           message: 'Contact disposed',
           type: 'success',
-          showClose: true,
+          showClose: true
         })
         this.communication.contact.disposition_status_id = res.data.disposition_status_id
       }).catch((err) => {
-        this.loading_dispose = false
-        this.$root.handleErrors(err.response)
+        this.loadingDispose = false
+        this.$handleErrors(err.response)
       })
     },
 
-    changeEngagementStatus(status) {
+    changeEngagementStatus (status) {
       const params = {
         status: status
       }
 
-      this.loading_update_engagement = true
-      axios.post(`/api/v1/contact/${this.communication.contact_id}/${this.communication.id}/update-engagement`, params).then(res => {
-        this.loading_update_engagement = false
-        this.$notify({
+      this.loadingUpdateEngagement = true
+      this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/${this.communication.id}/update-engagement`, params).then(res => {
+        this.loadingUpdateEngagement = false
+        this.$q.notify({
           offset: 95,
           title: 'Contact',
           message: 'Engagement updated.',
@@ -1037,28 +1044,28 @@ export default {
         })
         this.$emit('update', res.data)
       }).catch(err => {
-        this.loading_update_engagement = false
-        this.$root.handleErrors(err.response)
+        this.loadingUpdateEngagement = false
+        this.$handleErrors(err.response)
       })
     },
 
-    callDisposed(call_disposition_id) {
-      if (typeof call_disposition_id !== 'undefined') {
-        this.communication.call_disposition_id = call_disposition_id
+    callDisposed (callDispositionId) {
+      if (typeof callDispositionId !== 'undefined') {
+        this.communication.call_disposition_id = callDispositionId
       }
       this.$emit('callDisposed')
     },
 
-    contactDisposed(disposition_status_id) {
-      if (typeof disposition_status_id !== 'undefined') {
-        this.communication.contact.disposition_status_id = disposition_status_id
+    contactDisposed (dispositionStatusId) {
+      if (typeof dispositionStatusId !== 'undefined') {
+        this.communication.contact.disposition_status_id = dispositionStatusId
       }
       if (this.communication.contact.disposition_status_id) {
         this.$emit('contactDisposed')
       } else {
         this.$emit('contactNotDisposed')
       }
-    },
+    }
   }
 }
 </script>
