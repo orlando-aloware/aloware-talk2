@@ -3,7 +3,7 @@
     <b-card class="mt-2 mb-2 border-0" id="card-contact-phone">
       <h6>Other Numbers</h6>
       <div class="phone-number-wrapper"
-           v-for="phone_number in contact_phone_numbers"
+           v-for="phone_number in otherNumbers"
            :key="phone_number.id">
         <div>
           <small class="text-muted">{{ phone_number.title }}</small>
@@ -15,7 +15,7 @@
           <div class="options phone-options p-0">
             <b-button class="btn-bg-transparent btn-b-0"
                       size="sm"
-                      variant="light">
+                      variant="light" v-on:click="onEditPhone(phone_number)">
               <i class="material-icons">edit</i>
             </b-button>
 
@@ -35,39 +35,61 @@
           </div>
         </div>
       </div>
-      <b-link id="btn-add-contact-phone"
+      <b-link id="btn-show-phone-form"
+              ref="phone_form"
               href="#" class="custom-link text-decoration-none">
         <i class="material-icons">add</i> Add Phone Number
       </b-link>
     </b-card>
-    <add-phone-popover target="btn-add-contact-phone" triggers="focus"></add-phone-popover>
+    <b-popover custom-class="contact-phone-popover"
+               id="contact-phone-form-popover"
+               target="btn-show-phone-form"
+               triggers="click blur"
+               :show.sync="showPhonesForm"
+               @hidden="onPopoverHidden">
+      <contact-phones-form @close="onClosePhoneForm"></contact-phones-form>
+    </b-popover>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import contactApi from '../../contacts.api'
-import AddPhonePopover from 'pages/contacts/_components/popover/contact/add-phone-popover'
+import ContactPhonesForm from 'pages/contacts/_components/forms/contact-phones-form'
 export default {
   name: 'contact-phones',
-  components: { AddPhonePopover },
+  components: { ContactPhonesForm },
   computed: {
-    ...mapGetters('contacts', ['contact', 'contact_phone_numbers'])
+    ...mapGetters('contacts', ['contact', 'contact_phone_numbers']),
+    otherNumbers () {
+      return this.contact_phone_numbers.filter(phone => phone.phone_number !== this.contact.phone_number)
+    }
   },
   data () {
     return {
+      showPhonesForm: false
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContactPhoneNumbers']),
+    ...mapActions('contacts', ['setContactPhoneNumbers', 'setContactSelectedPhone']),
     getPhoneNumbers () {
       return contactApi.getPhoneNumbers(this.contact.id).then(response => {
         this.setContactPhoneNumbers(response.data)
       })
+    },
+    onEditPhone (phoneNumber) {
+      this.setContactSelectedPhone(phoneNumber)
+      this.$root.$emit('bv::show::popover', 'contact-phone-form-popover')
+    },
+    onClosePhoneForm () {
+      this.showPhonesForm = false
+    },
+    onPopoverHidden () {
+      this.setContactSelectedPhone(null)
     }
   },
   watch: {
-    contact: function () {
+    'contact.id': function () {
       this.getPhoneNumbers()
     }
   },
@@ -99,5 +121,10 @@ export default {
     i {
       margin-top: -3px;
     }
+  }
+
+  .contact-phone-popover {
+    left: -340px !important;
+    width: 300px;
   }
 </style>

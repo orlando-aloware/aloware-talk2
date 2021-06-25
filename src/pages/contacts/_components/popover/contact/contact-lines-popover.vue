@@ -1,7 +1,7 @@
 <template>
   <b-popover ref="popover"
              placement="rightbottom"
-             :custom-class="custom_class"
+             custom-class="contact-lines-popover"
              :target="target"
              :triggers="triggers"
              :show.sync="show"
@@ -29,7 +29,7 @@
       </q-select>
       <div class="d-flex justify-content-between">
         <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
-        <b-button type="submit" size="sm" variant="success">Save</b-button>
+        <b-button type="submit" size="sm" variant="primary">Save</b-button>
       </div>
     </b-form>
   </b-popover>
@@ -39,7 +39,7 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  name: 'update-lines-popover',
+  name: 'contact-lines-popover',
   props: {
     target: String,
     triggers: {
@@ -52,7 +52,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['contact'])
+    ...mapGetters('contacts', ['contact', 'lines'])
   },
   data () {
     return {
@@ -116,5 +116,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+  .contact-lines-popover{
+    width: 300px;
+    left: -252px !important;
+  }
 </style>

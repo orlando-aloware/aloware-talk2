@@ -7,5 +7,9 @@ export default {
   },
   getRingGroups (id) {
     return window.axios.get(`/api/v2/contact/${id}/ring-groups`)
+  },
+  getTags () {
+    return window.axios.get(`/api/v1/tag?full_load=true`)
   }
+
 }

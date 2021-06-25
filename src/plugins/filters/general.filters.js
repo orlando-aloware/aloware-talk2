@@ -353,6 +353,10 @@ const readableArrayValue = (value) => {
   }
 }
 
+const fixBooleanType = (val) => {
+  return val ? 'Yes' : 'No'
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -377,7 +381,8 @@ export default ({ Vue }) => {
     lastName,
     replaceDash,
     agentStatusClass,
-    readableArrayValue
+    readableArrayValue,
+    fixBooleanType
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

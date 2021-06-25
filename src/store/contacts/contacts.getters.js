@@ -49,7 +49,12 @@ export default {
   },
   currentListFilters: (state) => state.currentListFilters,
   contact: (state) => state.contact,
+  lines: (state) => state.lines,
+  ring_groups: (state) => state.ring_groups,
+  contact_attributes: (state) => state.contact_attributes,
   contact_phone_numbers: (state) => state.contact_phone_numbers,
+  contact_ring_groups: (state) => state.contact_ring_groups,
   isSidebarCollapsed: (state) => state.isSidebarCollapsed,
-  isContactNameEditOpen: (state) => state.isContactNameEditOpen
+  isContactNameEditOpen: (state) => state.isContactNameEditOpen,
+  contact_selected_phone: (state) => state.contact_selected_phone
 }
