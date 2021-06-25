@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <el-select v-if="contact"
+    <q-select v-if="contact"
                v-model="dispositionStatusId"
                :disabled="disabled || loading_dispose"
                :multiple="false"
@@ -24,7 +24,7 @@
         </template>
         <span>{{ dispositionStatus.name }}</span>
       </el-option>
-    </el-select>
+    </q-select>
   </div>
 </template>
 

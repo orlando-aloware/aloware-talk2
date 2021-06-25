@@ -21,7 +21,7 @@ export default {
   mixins: [avatarMixin],
   computed: {
     computedStyle () {
-      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle(this.name) }
+      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     }
   },
   props: {

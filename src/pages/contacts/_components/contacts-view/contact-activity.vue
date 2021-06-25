@@ -2,7 +2,7 @@
   <div class="message">
     <span class="w-40 avatar grey-300 m-b"
           :class="[ communication.direction === CommunicationDirection.INBOUND ? 'pull-left' : 'pull-right' ]"
-          v-bind:style="avatarStyle(contact, communication)"
+          v-bind:style="avatarStyle()"
           v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span v-if="communication.direction === CommunicationDirection.OUTBOUND && currentCompany">{{ currentCompany.name | fixContactName | initials }}</span>
         <span v-else>{{ contact.name | fixContactName | initials }}</span>
@@ -120,9 +120,9 @@
           <div class="inline r-2x message-body effect7 mt-1"
                :class="getCommunicationClass"
                v-if="communication.body">
-                      <span class="arrow pull-top"
-                            :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
-                      </span>
+            <span class="arrow pull-top"
+                  :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
+            </span>
             <div class="p-a p-y-sm handle-whitespace">
               <span v-linkified:options="{ target: '_blank' }">{{ communication.body }}</span>
             </div>
@@ -132,19 +132,19 @@
       </div>
 
       <div class="item width-400"
-                v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
+           v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
         <div class="inline r-2x message-body text-xs effect7 mt-1"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
-                    <span class="arrow pull-top"
-                          :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
-                    </span>
+          <span class="arrow pull-top"
+                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
+          </span>
 
           <div class="p-y-sm">
-            <!--communication-info :communication="communication"
+            <communication-info :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
                                 :campaignId="communication.campaign_id">
-            </communication-info-->
+            </communication-info>
           </div>
         </div>
         <q-badge :rounded-dot="!communication.is_read" color="red" />
@@ -167,36 +167,37 @@
       <div class="text-xxs m-t-xs width-500 m-b"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
            :class="[ communication.direction === CommunicationDirection.INBOUND ? 'ml-2' : 'mr-2' ]">
-                <span class="text-muted"
-                      v-html="relative_datetime"></span>
+        <span class="text-muted"
+              v-html="relative_datetime">
+        </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND">
-                    from {{ communication.lead_number | fixPhone }}
-                </span>
+            from {{ communication.lead_number | fixPhone }}
+        </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
-                    to {{ getCampaign(communication.campaign_id).name }}
-                </span>
+            to {{ getCampaign(communication.campaign_id).name }}
+        </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
-                    from {{ getCampaign(communication.campaign_id).name }}
-                </span>
+            from {{ getCampaign(communication.campaign_id).name }}
+        </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND">
-                    to {{ communication.lead_number | fixPhone }}
-                </span>
+            to {{ communication.lead_number | fixPhone }}
+        </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id)">
-                    sent by {{ getWorkflow(communication.workflow_id).name }} sequence
-                </span>
+            sent by {{ getWorkflow(communication.workflow_id).name }} sequence
+        </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.broadcast_id && getBroadcast(communication.broadcast_id)">
-                    sent by {{ getBroadcast(communication.broadcast_id).name }} broadcast
-                </span>
+            sent by {{ getBroadcast(communication.broadcast_id).name }} broadcast
+        </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length">
-                    sent by {{ getUser(communication.user_id).name }}
-                </span>
+            sent by {{ getUser(communication.user_id).name }}
+        </span>
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
           <router-link :to="{ name: 'Communication', params: {communication_id: communication.id }}">
             <template
@@ -243,6 +244,7 @@ import * as CommunicationDispositionStatus from '../../../../constants/communica
 import * as CommunicationCurrentStatus from '../../../../constants/communication-current-status'
 import * as CommunicationTypes from '../../../../constants/communication-types'
 import * as ContactThreadStatusTypes from '../../../../constants/contact-thread-status-types'
+import CommunicationInfo from 'src/pages/contacts/_components/communication-info'
 
 export default {
   mixins: [
@@ -250,6 +252,10 @@ export default {
     avatarMixin,
     userMixin
   ],
+
+  components: {
+    CommunicationInfo
+  },
 
   props: {
     communication: {

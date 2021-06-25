@@ -4,6 +4,7 @@
       <div v-if="!campaignId">
         <q-select class="p-1"
                   use-input
+                  clearable
                   input-debounce="0"
                   label="Send from"
                   option-value="id"
