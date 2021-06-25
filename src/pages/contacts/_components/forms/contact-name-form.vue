@@ -19,8 +19,19 @@
       ></b-form-input>
     </b-form-group>
     <div class="d-flex justify-content-between">
-      <b-button type="button" size="sm" variant="light">Cancel</b-button>
-      <b-button type="submit" size="sm" variant="success">Submit</b-button>
+      <b-button type="button"
+                size="sm"
+                variant="light"
+                v-on:click="onCancel">Cancel</b-button>
+      <b-button type="submit"
+                size="sm"
+                variant="primary"
+                :disabled="is_busy">
+        <b-spinner v-if="is_busy"
+                   small label="Small Spinner"
+                   type="grow"></b-spinner>
+        Submit
+      </b-button>
     </div>
   </b-form>
 </template>
@@ -29,7 +40,7 @@
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  name: 'edit-contact-name-form',
+  name: 'contact-name-form',
   computed: {
     ...mapGetters('contacts', ['contact'])
   },
@@ -44,7 +55,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactNameEditOpen']),
+    ...mapActions('contacts', ['setContact']),
     onSubmit (e) {
       this.is_busy = true
       window.axios.patch('/api/v1/contact/' + this.contact.id, {
@@ -52,15 +63,26 @@ export default {
         last_name: this.selected_contact.last_name
       }).then(response => {
         this.setContact(response.data)
-        this.is_busy = false
-        this.setContactNameEditOpen(false)
+        this.$emit('close')
       }).catch(err => {
         this.$root.handleErrors(err.response)
+      }).finally(() => {
         this.is_busy = false
       })
 
       e.preventDefault()
+    },
+    onCancel () {
+      this.$emit('close')
     }
+  },
+  mounted () {
+    this.selected_contact = {
+      first_name: this.contact.first_name,
+      last_name: this.contact.last_name
+    }
+
+    this.$refs.first_name.focus()
   }
 }
 </script>

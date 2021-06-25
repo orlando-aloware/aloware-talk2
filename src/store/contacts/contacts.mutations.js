@@ -164,6 +164,18 @@ export default {
   SET_CONTACT: (state, contact) => {
     state.contact = contact
   },
+  SET_LINES: (state, lines) => {
+    state.lines = lines
+  },
+  SET_RING_GROUPS: (state, ringGroups) => {
+    state.ring_groups = ringGroups
+  },
+  SET_CONTACT_RING_GROUPS: (state, ringGroups) => {
+    state.contact_ring_groups = ringGroups
+  },
+  SET_CONTACT_ATTRIBUTES: (state, attributes) => {
+    state.contact_attributes = attributes
+  },
   SET_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {
     state.contact_phone_numbers = phoneNumbers
   },
@@ -175,5 +187,20 @@ export default {
   },
   SET_CONTACT_NAME_EDIT_OPEN: (state, isOpen) => {
     state.isContactNameEditOpen = isOpen
+  },
+  SET_CONTACT_TAGS: (state, tags) => {
+    state.contact.tags = tags
+  },
+  SET_CONTACT_LINES: (state, lines) => {
+    state.contact.campaign_ids = lines
+  },
+  PUSH_CONTACT_LINE: (state, lineId) => {
+    state.contact.campaign_ids = [...state.contact.campaign_ids, lineId]
+  },
+  SET_CONTACT_SELECTED_PHONE: (state, phone) => {
+    state.contact_selected_phone = phone
+  },
+  UPDATE_CONTACT_SELECTED_PHONE: (state, phone) => {
+    state.contact_phone_numbers = state.contact_phone_numbers.map(item => item.id === phone.id ? { ...item, ...{ phone_number: phone.phone_number, title: phone.title } } : item)
   }
 }

@@ -529,3 +529,150 @@ body,
   display: flex;
   justify-content: flex-start;
 }
+
+.q-custom-select {
+  .q-field__control-container {
+    border: 1px solid #256EFF;
+    border-radius: 5px;
+  }
+
+  .q-field__append {
+    display: none;
+  }
+
+  .q-chip {
+    height: auto;
+    border: 1px solid #EBEBEB;
+    border-radius: 6px;
+    background: transparent;
+  }
+
+}
+
+.q-menu {
+  max-height: 32vh !important;
+  font-size: 90%;
+
+  .q-virtual-scroll__content {
+    padding: 5px;
+
+    .q-item.q-item-type {
+      padding: 5px;
+      border-radius: 6px;
+      max-width: 240px!important;
+    }
+
+    .q-item__label {
+      padding-left: 0 !important;
+    }
+
+    .q-item__section--avatar {
+      min-width: 10px !important;
+    }
+  }
+}
+
+.inline-select.q-field--disabled .q-field__control > div {
+  opacity: 1 !important;
+}
+
+.inline-select {
+    margin-top: -10px;
+    width: 100%;
+
+  .q-field__control,
+  .q-field__native {
+    height: 29px !important;
+    min-height: 1px !important;
+  }
+  .q-field__native, .q-field__label, .q-field__input {
+
+    padding-left: 0 !important;
+  }
+
+  .q-field__marginal {
+    height: 29px !important;
+    opacity: 0;
+  }
+
+  .q-field__control:before {
+    border-bottom: none !important;
+  }
+
+  .q-select__dropdown-icon {
+    color: #256EFF;
+  }
+
+  .q-anchor--skip {
+    font-size: 100% !important;
+    color: #256EFF !important;
+  }
+}
+
+.inline-select:focus-within{
+  .q-field__control:before {
+    border-bottom: 0.5px solid #256EFF !important;
+  }
+
+  .q-field__marginal {
+    opacity: 1;
+  }
+}
+
+.inline-select:hover{
+  .q-field__control:before {
+    border-bottom: 0.5px solid #256EFF !important;
+  }
+
+  .q-field__marginal {
+    opacity: 1;
+  }
+}
+
+.inline-input {
+  margin-top: -10px;
+  width: 100%;
+
+  .q-field__native {
+    padding-left: 0 !important;
+    height: 29px !important;
+  }
+
+  .q-field__marginal {
+    height: 29px !important;
+    opacity: 0;
+  }
+
+  .q-field__control:before {
+    border-bottom: none !important;
+  }
+
+  .input-edit-icon {
+    color: #256EFF;
+  }
+
+  .q-anchor--skip {
+    font-size: 100% !important;
+    color: #256EFF !important;
+  }
+}
+
+.inline-input:focus-within{
+  .q-field__control:before {
+    border-bottom: 0.5px solid #256EFF !important;
+  }
+
+  .q-field__marginal {
+    opacity: 1;
+  }
+}
+
+.inline-input:hover{
+  .q-field__control:before {
+    border-bottom: 0.5px solid #256EFF !important;
+  }
+
+  .q-field__marginal {
+    opacity: 1;
+  }
+}

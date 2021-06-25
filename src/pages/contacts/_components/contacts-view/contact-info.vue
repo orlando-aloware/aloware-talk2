@@ -2,10 +2,10 @@
   <b-card class="mt-2 mb-2 border-0">
     <b-media>
       <template #aside>
-        <b-avatar class="mr-2 contact-avatar"
-                  size="2.5rem"
-                  text="WB">
-        </b-avatar>
+        <avatar class="mr-2 contact-avatar"
+                width="40"
+                height="40"
+                :name="contact.name" />
       </template>
 
       <div class="d-flex justify-content-between relative-position">
@@ -24,9 +24,8 @@
         <b-popover custom-class="edit-form-popover"
                    target="btn-edit-contact-info"
                    triggers="focus"
-                   @show="onShow"
-                   @hidden="onHidden">
-            <edit-contact-name-form></edit-contact-name-form>
+                   :show.sync="showEditForm">
+            <contact-name-form @close="onCloseEditForm"></contact-name-form>
         </b-popover>
       </div>
     </b-media>
@@ -42,24 +41,24 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import EditContactNameForm from 'pages/contacts/_components/forms/edit-contact-name-form'
+import ContactNameForm from 'pages/contacts/_components/forms/contact-name-form'
+import Avatar from 'src/components/avatar/avatar.vue'
 
 export default {
   name: 'contact-info',
-  components: { EditContactNameForm },
+  components: { Avatar, ContactNameForm },
   computed: {
     ...mapGetters('contacts', ['contact', 'isContactNameEditOpen'])
   },
+  data () {
+    return {
+      showEditForm: false
+    }
+  },
   methods: {
     ...mapActions('contacts', ['setContactNameEditOpen']),
-    onHidden () {
-      // this.setContactNameEditOpen(false)
-    },
-    onShow () {
-      // this.setContactNameEditOpen(true)
-    },
-    showEditForm () {
-      // this.setContactNameEditOpen(true)
+    onCloseEditForm () {
+      this.showEditForm = false
     }
   }
 }
@@ -73,6 +72,10 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .contact-avatar {
+    background-color: #95989E !important;
   }
 
   .card:hover {

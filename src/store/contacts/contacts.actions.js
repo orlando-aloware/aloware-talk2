@@ -117,8 +117,20 @@ export default {
   setContact: ({ commit }, contact) => {
     commit('SET_CONTACT', contact)
   },
+  setLines: ({ commit }, lines) => {
+    commit('SET_LINES', lines)
+  },
+  setRingGroups: ({ commit }, ringGroups) => {
+    commit('SET_RING_GROUPS', ringGroups)
+  },
   setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
     commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
+  },
+  setContactRingGroups: ({ commit }, ringGroups) => {
+    commit('SET_CONTACT_RING_GROUPS', ringGroups)
+  },
+  setContactAttributes: ({ commit }, attributes) => {
+    commit('SET_CONTACT_ATTRIBUTES', attributes)
   },
   addContactPhoneNumber: ({ commit }, phoneNumber) => {
     commit('ADD_CONTACT_PHONE_NUMBER', phoneNumber)
@@ -128,5 +140,17 @@ export default {
   },
   setContactNameEditOpen: ({ commit }, isOpen) => {
     commit('SET_CONTACT_NAME_EDIT_OPEN', isOpen)
+  },
+  setContactTags: ({ commit }, tags) => {
+    commit('SET_CONTACT_TAGS', tags)
+  },
+  setContactLines: ({ commit }, lines) => {
+    commit('SET_CONTACT_LINES', lines)
+  },
+  setContactSelectedPhone: ({ commit }, phone) => {
+    commit('SET_CONTACT_SELECTED_PHONE', phone)
+  },
+  updateContactSelectedPhone: ({ commit }, phone) => {
+    commit('UPDATE_CONTACT_SELECTED_PHONE', phone)
   }
 }

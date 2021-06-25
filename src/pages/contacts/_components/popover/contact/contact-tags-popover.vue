@@ -15,13 +15,18 @@
         outlined
         use-chips
         use-input
+        multiple
         input-debounce="0"
         behavior="menu"
-        multiple
+        map-options
+        emit-value
+        option-value="id"
+        option-label="name"
         style="width: 100%;"
         v-model="tags"
         :options="options"
         @filter="filterTagFn"
+        @add="onAdd"
       >
         <template v-slot:no-option>
           <q-item>
@@ -33,7 +38,7 @@
       </q-select>
       <div class="d-flex justify-content-between">
         <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
-        <b-button type="submit" size="sm" variant="success">Save</b-button>
+        <b-button type="submit" size="sm" variant="primary">Save</b-button>
       </div>
     </b-form>
   </b-popover>
@@ -41,6 +46,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import talk2Api from '../../../../../plugins/api/api'
 
 export default {
   name: 'add-tag-popover',
@@ -66,17 +72,21 @@ export default {
         title: null,
         number: null
       },
-      stringOptions: ['Google', 'Facebook', 'Twitter', 'Apple', 'Oracle'],
-      options: this.stringOptions,
+      stringOptions: [],
+      options: [],
       tags: []
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact', 'addContactPhoneNumber']),
+    ...mapActions('contacts', ['setContact', 'setContactTags']),
     onClose () {
       this.show = false
     },
     onShow () {
+      this.getTags().finally(() => {
+        this.tags = this.contact.tags.map(tag => tag.id)
+      })
+
       // reset form here
     },
     onShown () {
@@ -89,19 +99,23 @@ export default {
       // Bring focus back to the button
       // this.focusRef(this.$refs.button)
     },
+    onAdd (details) {
+      console.log(details)
+    },
+    onRemove () {
+
+    },
     onSubmit (e) {
       this.is_busy = true
-      window.axios.post(`/api/v1/contact/${this.contact.id}/phone-number`, {
-        title: this.phone.title,
-        phone_number: this.phone.number
-      }).then(response => {
-        this.addContactPhoneNumber(response.data)
-        this.is_busy = false
-        this.onClose()
-      }).catch(err => {
-        this.$root.handleErrors(err.response)
-        this.is_busy = false
-      })
+      talk2Api.V1.contact.storeTags(this.contact.id, { tags: this.tags })
+        .then(response => {
+          this.setContactTags(response.data)
+          this.is_busy = false
+          this.onClose()
+        }).catch(err => {
+          this.$root.handleErrors(err.response)
+          this.is_busy = false
+        })
 
       e.preventDefault()
     },
@@ -112,21 +126,27 @@ export default {
       // updated & popover positioned first
       this.$nextTick(() => {
         this.$nextTick(() => {
-          (ref.$el || ref).focus()
+          // (ref.$el || ref).focus()
         })
       })
     },
     filterTagFn (val, update) {
       if (val === '') {
         update(() => {
-          this.options.value = this.stringOptions
+          this.options = this.stringOptions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options.value = this.stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+        this.options = this.stringOptions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    getTags () {
+      return talk2Api.V1.tags.get().then(response => {
+        this.stringOptions = response.data
+        this.options = this.stringOptions
       })
     }
   }

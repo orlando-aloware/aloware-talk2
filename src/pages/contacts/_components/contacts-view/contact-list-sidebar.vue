@@ -183,6 +183,8 @@ export default {
     .contact-avatar {
       margin-top: -8px !important;
       min-width: 40px;
+      background-color: #95989E !important;
+      color: #ffffff !important;
     }
 
   }

@@ -127,7 +127,12 @@ export default function () {
 
     contact: {},
     contact_phone_numbers: [],
+    contact_ring_groups: [],
+    contact_attributes: [],
     isSidebarCollapsed: false,
-    isContactNameEditOpen: false
+    isContactNameEditOpen: false,
+    lines: [],
+    ring_groups: [],
+    contact_selected_phone: null
   }
 }
