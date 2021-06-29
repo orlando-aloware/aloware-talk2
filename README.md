@@ -49,7 +49,7 @@ npm run deploy-mac
 
 ### Build the windows app
 ```bash
-npm run build-mac
+npm run build-win
 ```
 
 ### Deploy the windows app
