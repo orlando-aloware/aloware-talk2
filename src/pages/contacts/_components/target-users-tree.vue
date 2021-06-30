@@ -22,7 +22,7 @@
       <span v-else>-</span>
       <br>
     </template>
-    <template v-else>
+    <template v-else-if="isForm">
       <label class="form-control-label col-xl-5 col-12">
         Target Users
         <span v-if="communication.target_users && communication.target_users.length">({{attemptLabel}})</span>:

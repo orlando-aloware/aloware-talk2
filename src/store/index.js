@@ -64,7 +64,10 @@ export default function (/* { ssrContext } */) {
       },
       // cached states
       sidebarFolded: false,
-      currentCompany: null
+      currentCompany: null,
+      tagOptions: {
+        isReset: false
+      }
     },
 
     actions: {

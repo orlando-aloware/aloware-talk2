@@ -1,14 +1,14 @@
 <template>
   <div class="w-full">
     <q-select v-if="contact"
-               v-model="dispositionStatusId"
-               :disabled="disabled || loading_dispose"
-               :multiple="false"
-               class="w-full"
-               clearable
-               filterable
-               :placeholder="placeholder"
-               @change="dispose">
+              v-model="dispositionStatusId"
+              :disabled="disabled || loading_dispose"
+              :multiple="false"
+              class="w-full"
+              clearable
+              filterable
+              :placeholder="placeholder"
+              @change="dispose">
       <el-option
         v-for="(dispositionStatus, index) in dispositionStatusesAlphabeticalOrder"
         :key="dispositionStatus.id + '-disp-' + index"

@@ -1,61 +1,9 @@
 import randomColor from 'randomcolor'
-import * as CommunicationDirection from '../../constants/communication-direction'
 
 export default {
-  data () {
-    return {
-      blueDispositionStatus: null,
-      greenDispositionStatuses: []
-    }
-  },
-
-  created () {
-    let dispositionMatchStatusIds = []
-    let appointmentSetStatus = null
-
-    for (let dispositionStatus of this.dispositionStatuses) {
-      // check for blue disposition status
-      if (dispositionStatus.name === 'Appointment-Set') {
-        appointmentSetStatus = dispositionStatus
-      }
-
-      // check for green disposition status
-      if (dispositionStatus.name === 'Appointment-Showed' || dispositionStatus.name.toLowerCase().startsWith('sold')) {
-        dispositionMatchStatusIds.push(dispositionStatus.id)
-      }
-    }
-
-    this.blueDispositionStatus = appointmentSetStatus
-    this.greenDispositionStatuses = dispositionMatchStatusIds
-  },
   methods: {
-    avatarTooltip (contact, communication = null) {
-      const avatarStyle = this.avatarStyle(contact, communication)
-
-      if ((communication !== null && communication.direction === CommunicationDirection.OUTBOUND) || !avatarStyle) {
-        return ''
-      }
-
-      switch (avatarStyle.backgroundColor) {
-        // Red = New unanswered lead
-        case '#FF0000':
-          return 'New unanswered lead'
-        // Orange = Answered lead that came in 7 days or newer
-        case '#FFA500':
-          return 'Answered lead that came in 7 days or newer'
-        // Yellow = Answered lead that came in between 8 to 30 days
-        case '#FFFF00':
-          return 'Answered lead that came in between 8 to 30 days'
-        // Blue = Pending appointment
-        case '#0000FF':
-          return 'Pending appointment'
-        // Green = Sold
-        case '#00FF00':
-          return 'Sold'
-        // Grey = Default Color
-        default:
-          return ''
-      }
+    avatarTooltip (contact) {
+      return contact.name
     },
 
     avatarStyle (isSender = false) {

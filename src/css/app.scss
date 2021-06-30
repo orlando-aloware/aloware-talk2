@@ -427,10 +427,11 @@ body,
 }
 
 .avatar {
-  border-radius: 15px;
-  width: 30px;
-  height: 30px;
+  border-radius: 17px;
+  width: 34px;
+  height: 34px;
   display: inline-block;
+  font-size: 13px;
   & > span {
     vertical-align: middle;
   }
@@ -528,6 +529,10 @@ body,
 .message {
   display: flex;
   justify-content: flex-start;
+  .text-xxs {
+    font-size: 12px;
+    color: #62666E !important;
+  }
 }
 
 .q-custom-select {
@@ -675,4 +680,58 @@ body,
   .q-field__marginal {
     opacity: 1;
   }
+}
+
+.contact-activity {
+  max-width: 380px;
+  &.q-expansion-item--expanded {
+    &.q-expansion-item {
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+    .q-item {
+      border-bottom: 1px solid #EBEBEB;
+      width: 100%;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+  }
+  &.q-expansion-item--collapsed {
+    .q-item {
+      background: linear-gradient(0deg, #FFFFFF, #FFFFFF), rgba(37, 110, 255, 0.1);
+      box-sizing: border-box;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+  }
+}
+
+.communication-info {
+  font-size: 14px;
+  line-height: 18px;
+
+  .communication-header {
+    display: flex;
+    align-items: center;
+  }
+  .form-control-label {
+    color: #62666E;
+    font-size: 12px;
+    line-height: 15px;
+    padding-left: 0px;
+    vertical-align: top;
+    white-space: initial;
+  }
+  .q-item__section--side {
+    padding-left: 0px;
+    padding-right: 0.5rem !important;
+  }
+}
+
+.contact-activity-sender {
+  border: 1px solid rgba(47, 128, 237, 0.25);
+}
+
+.font-weight-light-bold {
+  font-weight: 500;
 }

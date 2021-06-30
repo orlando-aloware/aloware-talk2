@@ -11,6 +11,7 @@
     >
       {{ getInitials(name || 'No Name') }}
     </div>
+    <slot></slot>
   </div>
 </template>
 

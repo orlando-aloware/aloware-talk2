@@ -1,5 +1,5 @@
 <template>
-  <div class="contact-activity">
+  <div class="contact-activities">
     <contact-activities-header :label="contactName"/>
     <div class="p-3 contact-activity-container">
       <contact-activity v-for="(communication, index) in communications"
@@ -73,7 +73,7 @@ export default {
   height: 100vh;
   overflow-y: scroll;
 }
-.contact-activity {
+.contact-activities {
   margin-right: 10px;
   background-color: #fff;
  }

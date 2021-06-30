@@ -1,16 +1,18 @@
 <template>
-  <div class="message">
-    <span class="w-40 avatar grey-300 m-b"
-          :class="[ communication.direction === CommunicationDirection.INBOUND ? 'pull-left' : 'pull-right' ]"
-          v-bind:style="avatarStyle()"
-          v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
-        <span v-if="communication.direction === CommunicationDirection.OUTBOUND && currentCompany">{{ currentCompany.name | fixContactName | initials }}</span>
-        <span v-else>{{ contact.name | fixContactName | initials }}</span>
-        <q-tooltip content-class="bg-grey-light11"
-                   anchor="top middle" self="bottom middle">
-          {{ avatarTooltip(contact, communication) }}
-        </q-tooltip>
-    </span>
+  <div class="message mb-3"
+       :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
+    <avatar class="mt-2 contact-avatar"
+            width="34"
+            height="34"
+            :style="avatarStyle(isSender)"
+            :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
+            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
+            :name="contact.name">
+      <q-tooltip content-class="bg-grey-light11"
+                 anchor="top middle" self="bottom middle">
+        {{ avatarTooltip(contact, communication) }}
+      </q-tooltip>
+    </avatar>
 
     <div class="clear"
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
@@ -117,23 +119,23 @@
               </div>
             </a>
           </div>
-          <div class="inline r-2x message-body effect7 mt-1"
+          <div class="inline r-2x message-body effect7"
                :class="getCommunicationClass"
                v-if="communication.body">
             <span class="arrow pull-top"
                   :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
             </span>
             <div class="p-a p-y-sm handle-whitespace">
-              <span v-linkified:options="{ target: '_blank' }">{{ communication.body }}</span>
+              <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
             </div>
           </div>
         </div>
-        <q-badge :rounded-dot="!communication.is_read" color="red" />
+        <q-badge rounded v-if="!communication.is_read" color="red" />
       </div>
 
       <div class="item width-400"
            v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
-        <div class="inline r-2x message-body text-xs effect7 mt-1"
+        <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
           <span class="arrow pull-top"
                 :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
@@ -147,7 +149,6 @@
             </communication-info>
           </div>
         </div>
-        <q-badge :rounded-dot="!communication.is_read" color="red" />
       </div>
 
       <b-button variant="link"
@@ -164,9 +165,8 @@
         Mark as unread
       </b-button>
 
-      <div class="text-xxs m-t-xs width-500 m-b"
-           v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
-           :class="[ communication.direction === CommunicationDirection.INBOUND ? 'ml-2' : 'mr-2' ]">
+      <div class="text-xxs mt-2 width-500 m-b"
+           v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
               v-html="relative_datetime">
         </span>
@@ -239,12 +239,13 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import * as CommunicationDirection from '../../../../constants/communication-direction'
-import * as CommunicationDispositionStatus from '../../../../constants/communication-disposition-status'
-import * as CommunicationCurrentStatus from '../../../../constants/communication-current-status'
-import * as CommunicationTypes from '../../../../constants/communication-types'
-import * as ContactThreadStatusTypes from '../../../../constants/contact-thread-status-types'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-types'
 import CommunicationInfo from 'src/pages/contacts/_components/communication-info'
+import Avatar from 'src/components/avatar/avatar.vue'
 
 export default {
   mixins: [
@@ -254,7 +255,8 @@ export default {
   ],
 
   components: {
-    CommunicationInfo
+    CommunicationInfo,
+    Avatar
   },
 
   props: {
@@ -347,6 +349,9 @@ export default {
       }
 
       return ''
+    },
+    isSender () {
+      return this.communication.direction === CommunicationDirection.OUTBOUND
     }
   },
 

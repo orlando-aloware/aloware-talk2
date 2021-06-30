@@ -44,7 +44,6 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        console.log(val)
         this.options = this.countries.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
