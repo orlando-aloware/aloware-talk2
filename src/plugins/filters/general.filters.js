@@ -357,6 +357,15 @@ const fixBooleanType = (val) => {
   return val ? 'Yes' : 'No'
 }
 
+const nl2br = (value) => {
+  if (!value) {
+    return '-'
+  } else {
+    let breakTag = '<br />'
+    return (value + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -382,7 +391,8 @@ export default ({ Vue }) => {
     replaceDash,
     agentStatusClass,
     readableArrayValue,
-    fixBooleanType
+    fixBooleanType,
+    nl2br
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

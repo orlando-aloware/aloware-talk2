@@ -1,47 +1,25 @@
 import randomColor from 'randomcolor'
-import * as CommunicationDirection from '../../constants/communication-direction'
 
 export default {
   methods: {
-    avatarTooltip (contact, communication = null) {
-      const avatarStyle = this.avatarStyle(contact, communication)
-
-      if ((communication !== null && communication.direction === CommunicationDirection.OUTBOUND) || !avatarStyle) {
-        return ''
-      }
-
-      switch (avatarStyle.backgroundColor) {
-        // Red = New unanswered lead
-        case '#FF0000':
-          return 'New unanswered lead'
-        // Orange = Answered lead that came in 7 days or newer
-        case '#FFA500':
-          return 'Answered lead that came in 7 days or newer'
-        // Yellow = Answered lead that came in between 8 to 30 days
-        case '#FFFF00':
-          return 'Answered lead that came in between 8 to 30 days'
-        // Blue = Pending appointment
-        case '#0000FF':
-          return 'Pending appointment'
-        // Green = Sold
-        case '#00FF00':
-          return 'Sold'
-        // Grey = Default Color
-        default:
-          return ''
-      }
+    avatarTooltip (contact) {
+      return contact.name
     },
 
-    avatarStyle (name) {
-      if (!name) {
-        return
+    avatarStyle (isSender = false) {
+      let style = {
+        backgroundColor: '#95989E',
+        color: '#fff'
       }
 
-      let bg = this.intToRGB(this.hashCode(name))
-      return {
-        backgroundColor: bg,
-        color: this.overlayColor(bg)
+      if (isSender) {
+        style = {
+          backgroundColor: '#859ED1',
+          color: '#fff'
+        }
       }
+
+      return style
     },
 
     gradientGenerator (name) {
@@ -67,14 +45,6 @@ export default {
       return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
     },
 
-    intToRGB (i) {
-      let c = (i & 0x00FFFFFF)
-        .toString(16)
-        .toUpperCase()
-
-      return '#' + '00000'.substring(0, 6 - c.length) + c
-    },
-
     hashCode (str) {
       let hash = 0
       for (let i = 0; i < str.length; i++) {
@@ -89,6 +59,17 @@ export default {
         color += color.slice(1)
       }
       return (color.replace('#', '0x')) > (0xffffff / 2) ? '#333' : '#fff'
+    },
+
+    daysPassedSinceCreated (contact) {
+      if (!contact.created_at) {
+        return 0
+      }
+
+      let createdAtDate = this.$moment(contact.created_at)
+      let now = this.$moment()
+
+      return now.diff(createdAtDate, 'days')
     }
   }
 }

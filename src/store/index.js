@@ -65,7 +65,10 @@ export default function (/* { ssrContext } */) {
       // cached states
       sidebarFolded: false,
       currentCompany: null,
-      sms_templates: []
+      sms_templates: [],
+      tagOptions: {
+        isReset: false
+      }
     },
 
     actions: {

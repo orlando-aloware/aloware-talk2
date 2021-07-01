@@ -16,11 +16,11 @@
                              :key="contact.id"
                              :to="`/contact/${contact.id}`"
                              :class="`d-flex align-items-center border-0 ${getActiveClass(contact)}`">
-            <avatar class="mr-2 contact-avatar"
-                    width="40"
-                    height="36"
+            <avatar class="contact-avatar"
+                    width="34"
+                    height="34"
                     :name="contact.name" />
-            <div class="d-inline-flex justify-content-between full-width contact-details">
+            <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
               <div class="mr-auto">
                 <p class="text-bold contact-name mb-0"
                    v-b-tooltip="contact.name">{{ contact.name }}</p>
@@ -182,7 +182,6 @@ export default {
 
     .contact-avatar {
       margin-top: -8px !important;
-      min-width: 40px;
       background-color: #95989E !important;
       color: #ffffff !important;
     }

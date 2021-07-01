@@ -203,6 +203,22 @@ export const fixFullDateUTCRelative = (dt) => {
   }
 }
 
+export const fixCommunicationDateTime = (dt, duration = 0) => {
+  if (dt) {
+    if (window.timezone) {
+      if (window.timezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm:ss a') + ' MNL'
+      }
+
+      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm:ss a z')
+    } else {
+      return window.moment.utc(dt).local().add(duration, 'seconds').format('MM/DD h:mm:ss a z')
+    }
+  } else {
+    return '-'
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixDate,
@@ -215,7 +231,8 @@ export default ({ Vue }) => {
     fixDurationUTCRelative,
     fixFullDateUTC,
     fixFullDateLocal,
-    fixFullDateUTCRelative
+    fixFullDateUTCRelative,
+    fixCommunicationDateTime
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

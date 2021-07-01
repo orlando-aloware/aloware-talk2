@@ -1,6 +1,233 @@
 <template>
-  <div class="message">
+  <div class="message mb-3"
+       :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
+    <avatar class="mt-2 contact-avatar"
+            width="34"
+            height="34"
+            :style="avatarStyle(isSender)"
+            :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
+            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
+            :name="contact.name">
+      <q-tooltip content-class="bg-grey-light11"
+                 anchor="top middle" self="bottom middle">
+        {{ avatarTooltip(contact, communication) }}
+      </q-tooltip>
+    </avatar>
 
+    <div class="clear"
+         v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
+      <div class="pt-3 pb-3 m-b audit-separator">
+        <q-separator />
+        <div class="contact-audit">
+          <span>
+            {{ communication.body }}
+          </span>
+          <span v-if="communication.user_id && getUser(communication.user_id).name.length">
+              by {{ getUser(communication.user_id).name }}
+          </span>
+          <span>
+            -
+          </span>
+          <span class="text-muted"
+                v-html="relative_datetime"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="clear"
+         v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) && (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
+      <div class="pt-3 pb-3 m-b audit-separator">
+        <q-separator />
+        <div class="contact-audit">
+          <span v-if="hasAuditNotes(communication)">
+            {{ communication.notes }}
+          </span>
+          <span v-if="generalAuditsConditions(communication)">
+            {{ generalAuditMessages(communication) }}
+          </span>
+          <span v-if="customAuditsConditions(communication)">
+            {{ generateCustomAuditMessage(communication) + (communication.notes ? ' (Reason: ' + communication.notes + ')' : '') }}
+          </span>
+          <span v-if="communication.user_id && getUser(communication.user_id).name.length">
+            by {{ getUser(communication.user_id).name }}
+          </span>
+          <span v-else>
+            by System
+          </span>
+          <span>
+            -
+          </span>
+          <span v-if="communication.property"
+                class="text-muted"
+                v-html="relative_datetime" />
+        </div>
+      </div>
+    </div>
+    <div class="clear d-flex flex-column"
+         :class="[ communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end text-right' ]"
+         v-else>
+      <div class="item px-2 d-flex flex-column"
+           :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
+           v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
+        <div class=""
+             v-if="communication.attachments && communication.attachments.length > 0">
+          <div class="px-2"
+               v-for="(attachment, index) in communication.attachments"
+               :key="index">
+            <q-img
+              class="img-fluid d-block r-2x width-400"
+              :src="attachment.url"
+              :class="index > 0 ? 'mb-1' : ''"
+            >
+              <template v-slot:error>
+                <div class="absolute-full flex flex-center bg-negative text-white">
+                  Error!
+                </div>
+              </template>
+            </q-img>
+
+            <div v-if="isAttachmentAudio(attachment.mime_type)">
+              <audio style="height: 25px;width: 300px;margin-top: 10px;"
+                     controls>
+                <source :src="attachment.url"
+                        :type="attachment.mime_type">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+
+            <div v-if="isAttachmentVideo(attachment.mime_type)">
+              <video width="320"
+                     class="rounded"
+                     controls>
+                <source :src="attachment.url"
+                        :type="attachment.mime_type">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            <a :href="attachment.url"
+               target="_blank">
+              <div class="p-2 text-center"
+                   v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
+                <img height="100"
+                     width="100"
+                     src="/assets/images/app-icons/file.svg">
+                <p class="mb-0 mt-2"
+                   style="font-size:.7rem;max-width: 6rem;word-break: break-all;">
+                  {{ attachment.name }}
+                </p>
+              </div>
+            </a>
+          </div>
+          <div class="inline r-2x message-body effect7"
+               :class="getCommunicationClass"
+               v-if="communication.body">
+            <span class="arrow pull-top"
+                  :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
+            </span>
+            <div class="p-a p-y-sm handle-whitespace">
+              <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
+            </div>
+          </div>
+        </div>
+        <q-badge rounded v-if="!communication.is_read" color="red" />
+      </div>
+
+      <div class="item width-400"
+           v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
+        <div class="inline r-2x message-body text-xs effect7"
+             :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
+          <span class="arrow pull-top"
+                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
+          </span>
+
+          <div class="p-y-sm">
+            <communication-info :communication="communication"
+                                :contact="contact"
+                                :activityMode="true"
+                                :campaignId="communication.campaign_id">
+            </communication-info>
+          </div>
+        </div>
+      </div>
+
+      <b-button variant="link"
+                class="pl-2 p-y-sm inline text-blue mark-read _400"
+                v-if="markable(communication) && !communication.is_read"
+                @click="markAsRead">
+        Mark as read
+      </b-button>
+
+      <b-button variant="link"
+                class="pl-2 p-y-sm inline text-blue mark-read _400"
+                v-if="markable(communication) && communication.is_read"
+                @click="markAsUnread">
+        Mark as unread
+      </b-button>
+
+      <div class="text-xxs mt-2 width-500 m-b"
+           v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
+        <span class="text-muted"
+              v-html="relative_datetime">
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.INBOUND">
+            from {{ communication.lead_number | fixPhone }}
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.INBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
+            to {{ getCampaign(communication.campaign_id).name }}
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
+            from {{ getCampaign(communication.campaign_id).name }}
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND">
+            to {{ communication.lead_number | fixPhone }}
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id)">
+            sent by {{ getWorkflow(communication.workflow_id).name }} sequence
+        </span>
+        <span class="text-muted"
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.broadcast_id && getBroadcast(communication.broadcast_id)">
+            sent by {{ getBroadcast(communication.broadcast_id).name }} broadcast
+        </span>
+        <span class="text-muted"
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length">
+            sent by {{ getUser(communication.user_id).name }}
+        </span>
+        <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
+          <router-link :to="{ name: 'Communication', params: {communication_id: communication.id }}">
+            <template
+              v-if="communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+              <template
+                v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_DELIVERED_NEW].includes(communication.current_status2)">
+                <i class="material-icons help text-bluish"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName">done_all</i>
+              </template>
+
+              <i class="material-icons help text-bluish"
+                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENT_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_ACCEPTED_NEW].includes(communication.current_status2)">done</i>
+
+              <i class="material-icons help text-blue"
+                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
+
+              <i class="material-icons help text-red-500"
+                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
+            </template>
+
+            <i class="material-icons help text-red-500"
+               :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
+               v-else>error</i>
+          </router-link>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -12,11 +239,13 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import * as CommunicationDirection from '../../../../constants/communication-direction'
-import * as CommunicationDispositionStatus from '../../../../constants/communication-disposition-status'
-import * as CommunicationCurrentStatus from '../../../../constants/communication-current-status'
-import * as CommunicationTypes from '../../../../constants/communication-types'
-import * as ContactThreadStatusTypes from '../../../../constants/contact-thread-status-types'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-types'
+import CommunicationInfo from 'src/pages/contacts/_components/communication-info'
+import Avatar from 'src/components/avatar/avatar.vue'
 
 export default {
   mixins: [
@@ -24,6 +253,11 @@ export default {
     avatarMixin,
     userMixin
   ],
+
+  components: {
+    CommunicationInfo,
+    Avatar
+  },
 
   props: {
     communication: {
@@ -115,6 +349,9 @@ export default {
       }
 
       return ''
+    },
+    isSender () {
+      return this.communication.direction === CommunicationDirection.OUTBOUND
     }
   },
 

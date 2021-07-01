@@ -45,6 +45,7 @@ export default {
   },
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
+      state.listItems =
       state.listItems = {
         ...state.listItems,
         [String(id)]: {
