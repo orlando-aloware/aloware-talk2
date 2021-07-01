@@ -64,7 +64,8 @@ export default function (/* { ssrContext } */) {
       },
       // cached states
       sidebarFolded: false,
-      currentCompany: null
+      currentCompany: null,
+      sms_templates: []
     },
 
     actions: {
@@ -314,6 +315,14 @@ export default function (/* { ssrContext } */) {
 
       setAddedParty ({ commit }, addedParty) {
         commit('SET_ADDED_PARTY', addedParty)
+      },
+
+      setSmsTemplates ({ commit }, smsTemplates) {
+        commit('SET_SMS_TEMPLATES', smsTemplates)
+      },
+
+      deleteSmsTemplate ({ commit }, smsTemplate) {
+        commit('DELETE_SMS_TEMPLATE', smsTemplate)
       }
     },
 
@@ -723,6 +732,16 @@ export default function (/* { ssrContext } */) {
 
       SET_ADDED_PARTY (state, addedParty) {
         state.addedParty = addedParty
+      },
+
+      SET_SMS_TEMPLATES (state, smsTemplates) {
+        state.sms_templates = smsTemplates
+      },
+      DELETE_SMS_TEMPLATE (state, smsTemplate) {
+        let found = state.sms_templates.find(template => template.id === smsTemplate.id)
+        if (found) {
+          state.sms_templates.splice(state.sms_templates.indexOf(found), 1)
+        }
       }
     },
     plugins: [

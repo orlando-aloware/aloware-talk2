@@ -6,6 +6,7 @@
       <contact-information></contact-information>
       <contact-tags></contact-tags>
       <contact-notes></contact-notes>
+      <contact-integrations></contact-integrations>
       <contact-activity-counts></contact-activity-counts>
       <contact-lines></contact-lines>
       <contact-ring-groups></contact-ring-groups>
@@ -24,9 +25,11 @@ import ContactLines from 'pages/contacts/_components/contacts-view/contact-lines
 import ContactRingGroups from 'pages/contacts/_components/contacts-view/contact-ring-groups'
 import ContactBroadcast from 'pages/contacts/_components/contacts-view/contact-broadcast'
 import ContactInformation from 'pages/contacts/_components/contacts-view/contact-information'
+import ContactIntegrations from 'pages/contacts/_components/contacts-view/contact-integrations'
 export default {
   name: 'contact-details',
   components: {
+    ContactIntegrations,
     ContactInformation,
     ContactBroadcast,
     ContactRingGroups,

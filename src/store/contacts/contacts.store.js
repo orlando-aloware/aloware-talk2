@@ -133,6 +133,32 @@ export default function () {
     isContactNameEditOpen: false,
     lines: [],
     ring_groups: [],
-    contact_selected_phone: null
+    contact_selected_phone: null,
+    selected_line: null,
+    message_composer: {
+      sms: {
+        body: '',
+        phone_number: null,
+        attachments: [],
+        gif_url: ''
+      },
+
+      fax: {
+        filename: ''
+      },
+
+      email: {
+        subject: '',
+        body: '',
+        attachments: []
+      },
+      note: {
+        body: '',
+        type: 10,
+        date: null,
+        time: null,
+        timezone: null
+      }
+    }
   }
 }

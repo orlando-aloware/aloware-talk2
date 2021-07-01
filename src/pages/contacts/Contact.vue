@@ -1,7 +1,7 @@
 <template>
   <div class="row mx-0 content-row contact-view-wrapper d-flex">
     <contact-list-sidebar></contact-list-sidebar>
-    <div :class="`px-0 mb-3 contact-activity-wrapper ${widthClass}`">
+    <div :class="`pr-2 mb-3 contact-activity-wrapper ${widthClass}`">
       <contact-activities :communications="filteredCommunications"></contact-activities>
     </div>
     <div class="px-0 mb-3 width-300">

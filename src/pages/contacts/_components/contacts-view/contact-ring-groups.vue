@@ -55,7 +55,7 @@
             href="#"
             class="custom-link text-decoration-none"
             v-on:click="onModifyRingGroups">
-      <i class="material-icons">edit</i> Modify Ring Groups
+      <pencil-o-icon></pencil-o-icon> Modify Ring Groups
     </b-link>
   </b-card>
 </template>
@@ -63,8 +63,10 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from '../../../../plugins/api/api'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 export default {
   name: 'contact-ring-groups',
+  components: { PencilOIcon },
   computed: {
     ...mapGetters('contacts', ['contact', 'ring_groups', 'contact_ring_groups']),
     appliedRingGroups () {

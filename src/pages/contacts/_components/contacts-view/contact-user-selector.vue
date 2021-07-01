@@ -145,6 +145,9 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.formattedOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
       })
+    },
+    getLabel () {
+
     }
   },
   watch: {
@@ -155,6 +158,9 @@ export default {
           this.is_busy = false
         } })
     }
+  },
+  mounted () {
+    this.options = this.formattedOptions
   }
 }
 </script>

@@ -32,6 +32,18 @@ export default {
       },
       updatePhone (id, phoneId, params) {
         return window.axios.post(`${suffixV1}contact/${id}/phone-number/${phoneId}`, params)
+      },
+      dispose (id, params) {
+        return window.axios.post(`${suffixV1}contact/${id}/dispose`, params)
+      },
+      sendEmail (id, params) {
+        return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
+      },
+      addEngagement (id, params) {
+        return window.axios.post(`${suffixV1}contact/${id}/add-engagement`, params)
+      },
+      getLineIncomingNumber (contactId, lineId) {
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
       }
     },
     tags: {
@@ -42,11 +54,34 @@ export default {
     lines: {
       get () {
         return window.axios.get(`${suffixV1}campaign`)
+      },
+      fileUpload (lineId, params, events) {
+        return window.axios.post(`${suffixV1}uploaded-files/${lineId}`, params, events)
+      },
+      pdfUpload (lineId, params, events) {
+        return window.axios.post(`${suffixV1}campaign/${lineId}/upload/pdf`, params, events)
+      },
+
+      sendFax (lineId, contactId, params) {
+        return window.axios.post(`${suffixV1}campaign/send-fax/${lineId}/${contactId}`, params)
       }
     },
     ring_groups: {
       get () {
         return window.axios.get(`${suffixV1}ring-group`)
+      }
+    },
+    message: {
+      send (params) {
+        return window.axios.post(`${suffixV1}messages`, params)
+      }
+    },
+    sms_template: {
+      get () {
+        return window.axios.get(`${suffixV1}sms-template`)
+      },
+      delete (id) {
+        return window.axios.delete(`${suffixV1}sms-template/${id}`)
       }
     }
 

@@ -56,7 +56,7 @@
             href="#"
             class="custom-link text-decoration-none"
             v-on:click="onModifyLines">
-      <i class="material-icons">edit</i> Modify Lines
+      <pencil-o-icon></pencil-o-icon> Modify Lines
     </b-link>
   </b-card>
 </template>
@@ -64,8 +64,10 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from '../../../../plugins/api/api'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 export default {
   name: 'contact-lines',
+  components: { PencilOIcon },
   computed: {
     ...mapGetters('contacts', ['contact', 'lines']),
     appliedLines () {

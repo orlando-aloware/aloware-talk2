@@ -152,5 +152,51 @@ export default {
   },
   updateContactSelectedPhone: ({ commit }, phone) => {
     commit('UPDATE_CONTACT_SELECTED_PHONE', phone)
+  },
+  setSelectedLine: ({ commit }, line) => {
+    commit('SET_SELECTED_LINE', line)
+  },
+  setMessageComposerSmsPhoneNumber: ({ commit }, phoneNumber) => {
+    commit('SET_MESSAGE_COMPOSER_PHONE_SMS_NUMBER', phoneNumber)
+  },
+  setMessageComposerSmsBody: ({ commit }, body) => {
+    commit('SET_MESSAGE_COMPOSER_SMS_BODY', body)
+  },
+  setMessageComposerSmsGif: ({ commit }, gif) => {
+    commit('SET_MESSAGE_COMPOSER_SMS_GIF', gif)
+  },
+  setMessageComposerAttachments: ({ commit }, attachments) => {
+    commit('SET_MESSAGE_COMPOSER_ATTACHMENTS', attachments)
+  },
+  setMessageComposerFaxFilename: ({ commit }, filename) => {
+    commit('SET_MESSAGE_COMPOSER_FAX_FILENAME', filename)
+  },
+  appendMessageComposerSmsAttachments: ({ commit }, attachment) => {
+    commit('APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS', attachment)
+  },
+  removeMessageComposerSmsAttachment: ({ commit }, attachment) => {
+    commit('REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT', attachment)
+  },
+  resetMessageComposerSms: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_SMS')
+  },
+  resetMessageComposerFax: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_FAX')
+  },
+
+  resetMessageComposerEmail: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_EMAIL')
+  },
+
+  setMessageComposerEmailBody: ({ commit }, body) => {
+    commit('SET_MESSAGE_COMPOSER_EMAIL_BODY', body)
+  },
+
+  resetMessageComposerNote: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_NOTE')
+  },
+
+  setMessageComposerNoteBody: ({ commit }, body) => {
+    commit('SET_MESSAGE_COMPOSER_NOTE_BODY', body)
   }
 }

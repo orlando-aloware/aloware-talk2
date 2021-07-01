@@ -105,7 +105,5 @@ export default {
 </script>
 
 <style scoped>
-/*is_primary: true*/
-/*phone_number: "+18187977544"*/
-/*title: "Sample"*/
+
 </style>

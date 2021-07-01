@@ -201,5 +201,54 @@ export default {
   },
   UPDATE_CONTACT_SELECTED_PHONE: (state, phone) => {
     state.contact_phone_numbers = state.contact_phone_numbers.map(item => item.id === phone.id ? { ...item, ...{ phone_number: phone.phone_number, title: phone.title } } : item)
+  },
+  SET_SELECTED_LINE: (state, line) => {
+    state.selected_line = line
+  },
+  SET_MESSAGE_COMPOSER_PHONE_SMS_NUMBER: (state, phoneNumber) => {
+    state.message_composer.sms = { ...state.message_composer.sms, phone_number: phoneNumber }
+  },
+  SET_MESSAGE_COMPOSER_SMS_BODY: (state, body) => {
+    state.message_composer.sms = { ...state.message_composer.sms, body: body }
+  },
+  SET_MESSAGE_COMPOSER_SMS_GIF: (state, gif) => {
+    state.message_composer.sms = { ...state.message_composer.sms, gif_url: gif }
+  },
+  SET_MESSAGE_COMPOSER_ATTACHMENTS: (state, attachments) => {
+    state.message_composer.sms.attachments = attachments
+  },
+  APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS: (state, attachment) => {
+    state.message_composer.sms.attachments.push(attachment)
+  },
+
+  REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT: (state, attachment) => {
+    let found = state.message_composer.sms.attachments.find(item => item.id === attachment.id)
+    if (found) {
+      state.message_composer.sms.attachments.splice(state.message_composer.sms.attachments.indexOf(found), 1)
+    }
+  },
+  RESET_MESSAGE_COMPOSER_SMS: (state) => {
+    state.message_composer.sms = { ...state.message_composer.sms, body: '', attachments: [], gif_url: '' }
+  },
+
+  SET_MESSAGE_COMPOSER_FAX_FILENAME: (state, filename) => {
+    state.message_composer.fax.filename = filename
+  },
+  RESET_MESSAGE_COMPOSER_FAX: (state) => {
+    state.message_composer.fax = { ...state.message_composer.fax, filename: '' }
+  },
+
+  SET_MESSAGE_COMPOSER_EMAIL_BODY: (state, body) => {
+    state.message_composer.email.body = body
+  },
+  RESET_MESSAGE_COMPOSER_EMAIL: (state) => {
+    state.message_composer.email = { ...state.message_composer.email, body: '', subject: '' }
+  },
+
+  RESET_MESSAGE_COMPOSER_NOTE: (state) => {
+    state.message_composer.note = { ...state.message_composer.note, body: '', date: null, time: null, timezone: null }
+  },
+  SET_MESSAGE_COMPOSER_NOTE_BODY: (state, body) => {
+    state.message_composer.note.body = body
   }
 }

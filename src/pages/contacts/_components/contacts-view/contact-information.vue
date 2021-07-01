@@ -10,6 +10,11 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-2">Contact Disposition</p>
+        <contact-disposition @updateField="onUpdateOwner" />
+      </div>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Email</p>
         <contact-input-field v-model="contact.email"
                              placeholder="Enter email here..."
@@ -86,10 +91,11 @@ import ContactUserSelector from 'pages/contacts/_components/contacts-view/contac
 import LocationStateSelector from 'pages/contacts/_components/contacts-view/location-state-selector'
 import LocationCountrySelector from 'pages/contacts/_components/contacts-view/location-country-selector'
 import ContactInputField from 'pages/contacts/_components/contacts-view/contact-input-field'
+import ContactDisposition from 'pages/contacts/_components/contacts-view/contact-disposition'
 
 export default {
   name: 'contact-information',
-  components: { ContactInputField, LocationCountrySelector, LocationStateSelector, ContactUserSelector },
+  components: { ContactDisposition, ContactInputField, LocationCountrySelector, LocationStateSelector, ContactUserSelector },
   computed: {
     ...mapGetters('contacts', ['contact', 'contact_attributes']),
     autoHeightClass () {

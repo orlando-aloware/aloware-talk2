@@ -56,5 +56,7 @@ export default {
   contact_ring_groups: (state) => state.contact_ring_groups,
   isSidebarCollapsed: (state) => state.isSidebarCollapsed,
   isContactNameEditOpen: (state) => state.isContactNameEditOpen,
-  contact_selected_phone: (state) => state.contact_selected_phone
+  contact_selected_phone: (state) => state.contact_selected_phone,
+  selected_line: (state) => state.selected_line,
+  message_composer: (state) => state.message_composer
 }

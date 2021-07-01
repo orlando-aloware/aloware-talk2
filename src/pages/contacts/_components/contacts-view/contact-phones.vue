@@ -16,7 +16,7 @@
             <b-button class="btn-bg-transparent btn-b-0"
                       size="sm"
                       variant="light" v-on:click="onEditPhone(phone_number)">
-              <i class="material-icons">edit</i>
+              <pencil-o-icon color="#62666E"></pencil-o-icon>
             </b-button>
 
             <b-dropdown no-caret
@@ -38,7 +38,7 @@
       <b-link id="btn-show-phone-form"
               ref="phone_form"
               href="#" class="custom-link text-decoration-none">
-        <i class="material-icons">add</i> Add Phone Number
+        <plus-circle-icon></plus-circle-icon> Add Phone Number
       </b-link>
     </b-card>
     <b-popover custom-class="contact-phone-popover"
@@ -54,11 +54,13 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import contactApi from '../../contacts.api'
+import talk2Api from 'src/plugins/api/api'
 import ContactPhonesForm from 'pages/contacts/_components/forms/contact-phones-form'
+import PencilOIcon from 'components/icons/pencil-o-icon'
+import PlusCircleIcon from 'components/icons/plus-circle-icon'
 export default {
   name: 'contact-phones',
-  components: { ContactPhonesForm },
+  components: { PlusCircleIcon, PencilOIcon, ContactPhonesForm },
   computed: {
     ...mapGetters('contacts', ['contact', 'contact_phone_numbers']),
     otherNumbers () {
@@ -73,7 +75,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['setContactPhoneNumbers', 'setContactSelectedPhone']),
     getPhoneNumbers () {
-      return contactApi.getPhoneNumbers(this.contact.id).then(response => {
+      return talk2Api.V1.contact.getPhoneNumbers(this.contact.id).then(response => {
         this.setContactPhoneNumbers(response.data)
       })
     },

@@ -25,6 +25,7 @@ body,
 
 ::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
   background-color: transparent;
 }
 
@@ -571,6 +572,12 @@ body,
   opacity: 1 !important;
 }
 
+.inline-select.q-select--with-input {
+  .q-field__native {
+    margin-top: -3.8px;
+  }
+}
+
 .inline-select {
     margin-top: -10px;
     width: 100%;
@@ -602,6 +609,45 @@ body,
     font-size: 100% !important;
     color: #256EFF !important;
   }
+
+  .selected-option-container {
+    position: relative;
+    //max-width: 200px;
+    //text-overflow: ellipsis;
+    //overflow: hidden;
+    //white-space: nowrap;
+
+    .selected-option-separator{
+      color: #D8D8D8;
+      font-size: 40%;
+      position: absolute;
+      top: 5px;
+    }
+
+    .selected-option-title {
+      color: #D8D8D8;
+      font-size: 13px;
+      font-weight: 500;
+      margin-left: 10px;
+      position: relative;
+      top: -4px;
+    }
+
+    .selected-option {
+      color: #040404;
+      font-size: 13px;
+      font-weight: 500;
+
+      max-width: 150px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      margin-top: -1px;
+    }
+  }
+
+
 }
 
 .inline-select:focus-within{
@@ -670,4 +716,88 @@ body,
   .q-field__marginal {
     opacity: 1;
   }
+}
+
+
+.q-input-borderless {
+
+  textarea{
+    min-height: 500px;
+  }
+
+  .q-field__control:before {
+    border: none !important;
+  }
+}
+
+.fax-file-wrapper {
+  height: 80px;
+  width: 100%;
+  border-radius: 4px;
+  padding: 0 !important;
+  border: 1px dashed #D8D8D8;
+
+  #fileInput {
+    position: relative;
+  }
+
+  .uploader-label {
+    position: absolute;
+    width: 100%;
+    top: 7px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  form {
+    height: 14vh;
+  }
+
+  #fileInput.dragdrop .custom-file,
+  #fileInput.dragdrop .custom-file-input {
+    height: 100px;
+  }
+
+  #fileInput.dragdrop .custom-file-label {
+    height: 80px;
+    line-height: 90px;
+    text-align: center;
+    padding: 0;
+    border: 1px dashed #D8D8D8;
+    background: transparent;
+  }
+
+  #fileInput.dragdrop .custom-file-label span {
+    visibility: hidden;
+  }
+
+  #fileInput.dragdrop label.custom-file-label:after {
+    display: none !important;
+  }
+}
+
+.q-field__native.q-input-pl-0{
+  padding-left: 0 !important;
+}
+
+.q-field__native.q-input-pr-0{
+  padding-right: 0 !important;
+}
+
+.q-field__native.q-input-pl-4{
+  padding-left: 4px !important;
+}
+
+.q-field__native.q-input-pr-4{
+  padding-right: 4px !important;
+}
+
+.q-input-composer {
+  height: 30px;
+}
+
+.q-input-composer textarea {
+  resize: none !important;
+  height: 30px;
+  overflow: hidden !important;
 }

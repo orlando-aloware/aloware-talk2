@@ -12,14 +12,16 @@
         <div>
           <h6 class="mt-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
           <p class="contact-phone">
-            {{ contact.phone_number | fixPhone }} <i class="material-icons">content_copy</i>
+            {{ contact.phone_number | fixPhone }}
+            <b-link href="#" class="copy-phone-number" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
+            <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
           </p>
         </div>
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                   size="sm"
                   variant="light"
                   id="btn-edit-contact-info">
-          <i class="material-icons">edit</i>
+          <pencil-o-icon></pencil-o-icon>
         </b-button>
         <b-popover custom-class="edit-form-popover"
                    target="btn-edit-contact-info"
@@ -30,11 +32,21 @@
       </div>
     </b-media>
     <div class="d-inline-flex flex-wrap contact-action-button">
-      <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">call</i></b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button"><span class="material-icons">calendar_today</span></b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">timer</i></b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">add_ic_call</i></b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button"><i class="material-icons">add_ic_call</i></b-button>
+      <b-button variant="secondary" size="sm" class="custom-action-button">
+        <call-icon></call-icon>
+      </b-button>
+      <b-button variant="secondary" size="sm" class="custom-action-button">
+        <calendar-icon></calendar-icon>
+      </b-button>
+      <b-button variant="secondary" size="sm" class="custom-action-button">
+        <timer-icon></timer-icon>
+      </b-button>
+      <b-button variant="secondary" size="sm" class="custom-action-button">
+        <add-sequence-icon></add-sequence-icon>
+      </b-button>
+      <b-button variant="secondary" size="sm" class="custom-action-button">
+        <add-call-icon></add-call-icon>
+      </b-button>
     </div>
   </b-card>
 </template>
@@ -43,10 +55,16 @@
 import { mapActions, mapGetters } from 'vuex'
 import ContactNameForm from 'pages/contacts/_components/forms/contact-name-form'
 import Avatar from 'src/components/avatar/avatar.vue'
+import AddSequenceIcon from 'components/icons/add-sequence-icon'
+import TimerIcon from 'components/icons/timer-icon'
+import CalendarIcon from 'components/icons/calendar-icon'
+import CallIcon from 'components/icons/call-icon'
+import AddCallIcon from 'components/icons/add-call-icon'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 
 export default {
   name: 'contact-info',
-  components: { Avatar, ContactNameForm },
+  components: { PencilOIcon, AddCallIcon, CallIcon, CalendarIcon, TimerIcon, AddSequenceIcon, Avatar, ContactNameForm },
   computed: {
     ...mapGetters('contacts', ['contact', 'isContactNameEditOpen'])
   },
@@ -59,6 +77,40 @@ export default {
     ...mapActions('contacts', ['setContactNameEditOpen']),
     onCloseEditForm () {
       this.showEditForm = false
+    },
+    copyPhoneNumber () {
+      let phoneNumberClone = document.querySelector('#phone-number-clone')
+      phoneNumberClone.setAttribute('type', 'text')
+      phoneNumberClone.select()
+
+      try {
+        document.execCommand('copy')
+        this.$q.notify({
+          message: 'Phone number copied to clipboard.',
+          type: 'positive',
+          textColor: 'white',
+          actions: [
+            {
+              icon: 'close'
+            }
+          ]
+        })
+      } catch (err) {
+        this.$q.notify({
+          message: 'Error copying phone number to clipboard.',
+          type: 'negative',
+          textColor: 'white',
+          actions: [
+            {
+              icon: 'close'
+            }
+          ]
+        })
+      }
+
+      /* unselect the range */
+      phoneNumberClone.setAttribute('type', 'hidden')
+      window.getSelection().removeAllRanges()
     }
   }
 }
@@ -88,6 +140,11 @@ export default {
     font-size: 0.80rem;
     margin-top: -5px;
     right: 0;
+
+    .copy-phone-number {
+      text-decoration: none;
+      color: #62666E;
+    }
   }
 
   .btn-edit-contact-info {
