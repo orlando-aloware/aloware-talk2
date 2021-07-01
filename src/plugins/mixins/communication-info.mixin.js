@@ -111,6 +111,10 @@ export default {
         icon += 'call-'
       } else if (type === CommunicationTypes.SMS) {
         icon += 'sms-'
+      } else if (type === CommunicationTypes.EMAIL) {
+        icon += 'email-'
+      } else if (type === CommunicationTypes.FAX) {
+        icon += 'fax-'
       }
 
       if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
@@ -126,7 +130,7 @@ export default {
       } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
         icon += `failed-`
       } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
-        icon += `failed-`
+        icon += `deadend-`
       } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
         icon += `voicemail-`
       } else {

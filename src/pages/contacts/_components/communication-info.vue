@@ -10,7 +10,7 @@
         <template slot="header">
           <q-item-section class="communication-header flex-row">
             <div class="ml-3 pr-2">
-              <component :is="stateToIcon(communication.disposition_status2, communication.direction, communication.type)"
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
                          v-if="communication.disposition_status2">
               </component>
             </div>

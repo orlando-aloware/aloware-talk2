@@ -18,9 +18,6 @@ export default {
       type: [Number, String],
       default: 24
     }
-  },
-  created () {
-    console.log('aww')
   }
 }
 </script>
