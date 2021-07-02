@@ -88,8 +88,6 @@ export default {
     background: #ffffff;
 
     .composer-wrapper {
-      min-height: 142px;
-      max-height: 260px;
       position: relative;
       border: 1px solid #D8D8D8;
       border-radius: 8px;

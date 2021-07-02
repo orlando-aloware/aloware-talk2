@@ -2,12 +2,12 @@
   <div>
     <q-select class="inline-select"
               use-input
-              input-debounce="0"
+              input-debounce="500"
               option-value="id"
               option-label="name"
               behavior="menu"
               v-model="selected_line"
-              :options="lineOptions"
+              :options="line_options"
               :loading="is_busy"
               @filter="filterLineFn">
       <template v-slot:option="scope">
@@ -74,23 +74,31 @@ export default {
     return {
       is_busy: false,
       selected_line: null,
-      lineOptions: this.formattedLineOptions,
-      incoming_number: null
+      line_options: this.formattedLineOptions,
+      incoming_number: null,
+      search_text: ''
     }
   },
   methods: {
     ...mapActions('contacts', ['setSelectedLine']),
+    onSearch (value) {
+      if (value) {
+        this.line_options = this.formattedLineOptions.filter(v => v.name && v.name.toLowerCase().indexOf(value.toLowerCase()) > -1)
+      } else {
+        this.line_options = this.formattedLineOptions
+      }
+    },
     filterLineFn (val, update) {
       if (val === '') {
         update(() => {
-          this.lineOptions = this.formattedLineOptions
+          this.line_options = this.formattedLineOptions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.lineOptions = this.formattedLineOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
+        this.line_options = this.formattedLineOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     getSelectedLineLabel () {
@@ -108,7 +116,7 @@ export default {
     }
   },
   mounted () {
-    this.lineOptions = this.formattedLineOptions
+    this.line_options = this.formattedLineOptions
     this.selected_line = this.formattedLineOptions[1]
     this.getIncomingNumber()
   },

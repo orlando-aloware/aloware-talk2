@@ -648,7 +648,7 @@ body,
       font-size: 13px;
       font-weight: 500;
 
-      max-width: 150px;
+      max-width: 105px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -656,8 +656,6 @@ body,
       margin-top: -1px;
     }
   }
-
-
 }
 
 .inline-select:focus-within{
@@ -802,13 +800,21 @@ body,
 }
 
 .q-input-composer {
-  height: 30px;
+  max-height: 31vh;
+
+  ::-webkit-scrollbar {
+   display: none;
+  }
 }
 
 .q-input-composer textarea {
   resize: none !important;
-  height: 30px;
-  overflow: hidden !important;
+  max-height: 31vh;
+  overflow-y: auto !important;
+}
+.q-input-composer .q-field__native,
+.q-input-composer .q-field__control {
+  min-height: 0;
 }
 
 .contact-activity {

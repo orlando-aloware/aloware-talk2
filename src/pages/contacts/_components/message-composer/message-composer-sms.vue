@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="pt-3 pb-4">
+    <div class="pt-2">
       <div v-if="message_composer.sms.gif_url || message_composer.sms.attachments.length > 0" class="mb-2 d-inline-flex media-preview-wrapper">
         <div v-if="message_composer.sms.gif_url" class="media-preview">
           <img class="img-preview"
@@ -39,9 +39,10 @@
 
       </div>
       <q-input borderless
+               autogrow
                ref="smsMessageBody"
                class="q-input-composer"
-               input-class="q-input-pl-0 q-input-pr-0 pt-0"
+               input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                type="textarea"
                placeholder="Type your message"
                v-model="message_composer.sms.body"
@@ -223,8 +224,9 @@ export default {
   .popover {
     max-width: 100%;
   }
-
-  a.dropdown-item {
+  .b-dropdown a.dropdown-item.disabled,
+  .b-dropdown a.dropdown-item:disabled,
+  .b-dropdown a.dropdown-item {
     font-size: 80%;
   }
 

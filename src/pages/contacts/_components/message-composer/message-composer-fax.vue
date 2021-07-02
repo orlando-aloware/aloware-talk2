@@ -154,6 +154,7 @@ export default {
 <style lang="scss" scoped>
   .file-info {
     font-size: 12px;
+    margin-bottom: 0 !important;
   }
 
   .custom-progress-bar {

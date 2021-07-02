@@ -44,6 +44,9 @@ export default {
       },
       getLineIncomingNumber (contactId, lineId) {
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
+      },
+      getIntegrationData (contactId, params) {
+        return window.axios.get(`${suffixV1}contact/${contactId}/integration-data`, params)
       }
     },
     tags: {
