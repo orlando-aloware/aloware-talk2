@@ -21,7 +21,7 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapState(['currentCompany']),
     isHubspotEnabled () {
-      return this.currentCompany && this.currentCompany.hubspot_integration_enabled
+      return true// this.currentCompany && this.currentCompany.hubspot_integration_enabled
     }
   }
 }

@@ -73,8 +73,14 @@
             <q-spinner-bars v-if="is_sending" color="white" />
             {{ is_sending ? 'Sending Text...' : 'Send Text' }}
           </b-button>
-          <b-dropdown variant="primary" size="sm" right>
-            <b-dropdown-item disabled>Schedule Send</b-dropdown-item>
+          <b-dropdown class="message-composer-dropdown"
+                      variant="primary"
+                      size="sm"
+                      right>
+            <b-dropdown-item :disabled="!validSms"
+                             @click="showScheduleMessage">
+              Schedule Send
+            </b-dropdown-item>
           </b-dropdown>
         </b-button-group>
       </div>
@@ -112,6 +118,8 @@
                @show="onPopoverShown">
       <message-templates @templateSelected="templateSelected"></message-templates>
     </b-popover>
+
+    <scheduled-message></scheduled-message>
   </div>
 </template>
 
@@ -126,13 +134,14 @@ import Variables from 'pages/contacts/_components/message-composer/options/varia
 import { mapActions, mapGetters } from 'vuex'
 import MessageTemplates from 'pages/contacts/_components/message-composer/options/message-templates'
 import talk2Api from 'src/plugins/api/api'
+import ScheduledMessage from 'pages/contacts/_components/message-composer/scheduled-message'
 export default {
   name: 'message-composer-sms',
-  components: { MessageTemplates, Variables, Attachments, SearchGiphy, VariableIcon, CalendarTodayIcon, AttachmentIcon, GifIcon },
+  components: { ScheduledMessage, MessageTemplates, Variables, Attachments, SearchGiphy, VariableIcon, CalendarTodayIcon, AttachmentIcon, GifIcon },
   computed: {
     ...mapGetters('contacts', ['contact', 'message_composer', 'selected_line']),
     validSms: function () {
-      return this.message_composer.sms.body && this.message_composer.sms.body.length > 0 && this.selected_line
+      return this.message_composer.sms.body && this.message_composer.sms.body.length > 0 && this.selected_line && this.message_composer.sms.phone_number && this.message_composer.sms.phone_number.length > 0
     }
   },
   data () {
@@ -141,7 +150,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setMessageComposerSmsGif', 'removeMessageComposerSmsAttachment', 'setMessageComposerSmsBody', 'resetMessageComposerSms', 'appendMessageComposerSmsAttachments']),
+    ...mapActions('contacts', [
+      'setMessageComposerSmsGif',
+      'removeMessageComposerSmsAttachment',
+      'setMessageComposerSmsBody',
+      'resetMessageComposerSms',
+      'appendMessageComposerSmsAttachments',
+      'scheduleMessageOpen'
+    ]),
     updateMessage (value) {
       this.setMessageComposerSmsBody(value)
     },
@@ -196,6 +212,9 @@ export default {
     },
     onPopoverShown () {
       this.$root.$emit('bv::hide::popover')
+    },
+    showScheduleMessage () {
+      this.scheduleMessageOpen(true)
     }
   }
 }

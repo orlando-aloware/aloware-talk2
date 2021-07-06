@@ -584,7 +584,7 @@ body,
 
 .inline-select.q-select--with-input {
   .q-field__native {
-    margin-top: -3.8px;
+    margin-top: 0;
   }
 }
 
@@ -620,8 +620,8 @@ body,
     color: #256EFF !important;
   }
 
-  .selected-option-container {
-    position: relative;
+  //.selected-option-container {
+  //  position: relative;
     //max-width: 200px;
     //text-overflow: ellipsis;
     //overflow: hidden;
@@ -631,7 +631,7 @@ body,
       color: #D8D8D8;
       font-size: 40%;
       position: absolute;
-      top: 5px;
+      top: 11px;
     }
 
     .selected-option-title {
@@ -655,8 +655,14 @@ body,
       display: inline-block;
       margin-top: -1px;
     }
+
+    .q-field__input {
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: -4px;
+    }
   }
-}
+//}
 
 .inline-select:focus-within{
   .q-field__control:before {
@@ -869,4 +875,10 @@ body,
 
 .font-weight-light-bold {
   font-weight: 500;
+}
+
+.message-composer-dropdown {
+  .dropdown-menu {
+    font-size: 0.85rem;
+  }
 }

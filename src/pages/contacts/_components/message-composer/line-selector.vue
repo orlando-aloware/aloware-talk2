@@ -2,13 +2,17 @@
   <div>
     <q-select class="inline-select"
               use-input
-              input-debounce="500"
+              ref="lineSelector"
+              input-debounce="100"
               option-value="id"
               option-label="name"
               behavior="menu"
               v-model="selected_line"
               :options="line_options"
               :loading="is_busy"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
               @filter="filterLineFn">
       <template v-slot:option="scope">
         <q-item v-if="!scope.opt.group"
@@ -76,17 +80,24 @@ export default {
       selected_line: null,
       line_options: this.formattedLineOptions,
       incoming_number: null,
-      search_text: ''
+      is_focused: false
     }
   },
   methods: {
     ...mapActions('contacts', ['setSelectedLine']),
-    onSearch (value) {
-      if (value) {
-        this.line_options = this.formattedLineOptions.filter(v => v.name && v.name.toLowerCase().indexOf(value.toLowerCase()) > -1)
-      } else {
-        this.line_options = this.formattedLineOptions
-      }
+    onFocus () {
+      this.is_focused = true
+      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selected_line ? this.selected_line.name : 'Select line'
+      this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
+    },
+    onBlur () {
+      this.is_focused = false
+      this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
+      this.$el.querySelector('.inline-select .selected-option-container').style.display = ''
+    },
+    onInput () {
+      console.log('input')
+      this.$el.querySelector('.inline-select .q-field__input').blur()
     },
     filterLineFn (val, update) {
       if (val === '') {
@@ -102,6 +113,9 @@ export default {
       })
     },
     getSelectedLineLabel () {
+      if (!this.selected_line && Object.keys(this.selected_line).length < 1) {
+        return 'Select line...'
+      }
       let title = this.incoming_number ? this.$options.filters.fixPhone(this.incoming_number.phone_number) : ''
       let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.selected_line.name}</span> ${titleText}`
@@ -138,7 +152,7 @@ export default {
   }
 
   .inline-select.q-select--with-input {
-    padding-top: 11.6px;
+    padding-top: 10px;
     width: 300px;
   }
 </style>

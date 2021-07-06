@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-select clearable
+              dense
               outlined
               use-input
               map-options
