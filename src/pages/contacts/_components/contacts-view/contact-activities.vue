@@ -1,20 +1,22 @@
 <template>
-  <div class="contact-activities">
-        <contact-activities-header :label="contactName"/>
-        <div class="p-3 contact-activity-container">
-          <div class="d-flex flex-row w-100 justify-content-center align-items-center">
-            <slot name="moreActivities">
-            </slot>
+  <div class="contact-activity-container">
+      <contact-activities-header :label="contactName"/>
+      <div class="contact-activities">
+        <div class="inner-1">
+          <div class="p-3  inner-2">
+            <contact-activity v-for="(communication, index) in communications"
+                              :key="communication.id + '-comm-' + index"
+                              :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
+                              :communication="communication"
+                              :contact="contact">
+            </contact-activity>
           </div>
-          <contact-activity v-for="(communication, index) in communications"
-                            :key="communication.id + '-comm-' + index"
-                            :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
-                            :communication="communication"
-                            :contact="contact">
-          </contact-activity>
         </div>
+      </div>
+      <div class="composer-container-wrapper">
         <message-composer></message-composer>
       </div>
+    </div>
 </template>
 
 <script>
@@ -79,13 +81,42 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-   .contact-activity-container {
-     height: 100vh;
-     overflow-y: scroll;
-   }
 
-   .contact-activities {
-     margin-right: 10px;
-     background-color: #fff;
-   }
+  .contact-activity-container {
+    display: table;
+    table-layout: fixed;
+    border-spacing: 0;
+    width: 100%;
+    height: 100%;
+    margin-right: 10px;
+    background-color: #fff;
+    position: relative;
+
+    .contact-activities {
+      height: 100%;
+      display: table-row;
+      flex-direction: column;
+      flex-grow: 1;
+
+      .inner-1 {
+        position: relative;
+        height: 100%;
+        width: 100%;
+
+        .inner-2 {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          overflow: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+      }
+    }
+
+    .composer-container-wrapper {
+      width: 100%;
+    }
+  }
 </style>

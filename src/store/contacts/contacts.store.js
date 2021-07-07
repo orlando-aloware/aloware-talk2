@@ -140,7 +140,8 @@ export default function () {
         body: '',
         phone_number: null,
         attachments: [],
-        gif_url: ''
+        gif_url: '',
+        schedule_date: null
       },
 
       fax: {
@@ -159,6 +160,7 @@ export default function () {
         time: null,
         timezone: null
       }
-    }
+    },
+    isScheduleMessageOpen: false
   }
 }

@@ -1,11 +1,12 @@
 <template>
   <div>
-    <div class="pt-3 pb-4 form-input-container">
+    <div class="pt-2 form-input-container">
       <form>
         <q-input borderless
+                 autogrow
                  ref="noteMessageBody"
                  class="q-input-composer"
-                 input-class="q-input-pl-0 q-input-pr-0 pt-0"
+                 input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                  type="textarea"
                  placeholder="Type @ to mention someone"
                  v-model="message_composer.note.body"

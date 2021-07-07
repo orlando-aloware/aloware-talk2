@@ -251,5 +251,8 @@ export default {
   },
   SET_MESSAGE_COMPOSER_NOTE_BODY: (state, body) => {
     state.message_composer.note.body = body
+  },
+  SCHEDULE_MESSAGE_OPEN: (state, isOpen) => {
+    state.isScheduleMessageOpen = isOpen
   }
 }

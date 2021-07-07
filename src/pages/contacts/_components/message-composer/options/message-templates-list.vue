@@ -42,13 +42,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['sms_templates']),
+    ...mapState(['smsTemplates']),
     ...mapGetters('contacts', ['message_composer']),
     agentTemplates () {
-      return this.sms_templates.filter(template => template.is_on_user)
+      return this.smsTemplates.filter(template => template.is_on_user)
     },
     accountTemplates () {
-      return this.sms_templates.filter(template => template.is_on_company)
+      return this.smsTemplates.filter(template => template.is_on_company)
     },
     templates () {
       return this.template_scope === 'user' ? this.agentTemplates : this.accountTemplates

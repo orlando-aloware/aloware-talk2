@@ -44,6 +44,9 @@ export default {
       },
       getLineIncomingNumber (contactId, lineId) {
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
+      },
+      getIntegrationData (contactId, params) {
+        return window.axios.get(`${suffixV1}contact/${contactId}/integration-data`, params)
       }
     },
     tags: {
@@ -74,6 +77,9 @@ export default {
     message: {
       send (params) {
         return window.axios.post(`${suffixV1}messages`, params)
+      },
+      scheduled (params) {
+        return window.axios.post(`${suffixV1}scheduled-messages`, params)
       }
     },
     sms_template: {
@@ -83,8 +89,17 @@ export default {
       delete (id) {
         return window.axios.delete(`${suffixV1}sms-template/${id}`)
       }
+    },
+    integrations: {
+      hubspot: {
+        getWorkflows () {
+          return window.axios.get(`${suffixV1}integration/hubspot/workflows`)
+        },
+        enrollToWorkflow (params) {
+          return window.axios.post(`${suffixV1}integration/hubspot/enroll-contact`, params)
+        }
+      }
     }
-
   },
   V2: {
     contact: {

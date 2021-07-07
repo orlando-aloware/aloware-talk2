@@ -38,7 +38,8 @@ export default {
     ContactNotes,
     ContactTags,
     ContactInfo,
-    ContactPhones }
+    ContactPhones
+  }
 }
 </script>
 

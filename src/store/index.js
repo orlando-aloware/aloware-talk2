@@ -65,7 +65,7 @@ export default function (/* { ssrContext } */) {
       // cached states
       sidebarFolded: false,
       currentCompany: null,
-      sms_templates: [],
+      smsTemplates: [],
       tagOptions: {
         isReset: false
       }
@@ -738,12 +738,12 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_SMS_TEMPLATES (state, smsTemplates) {
-        state.sms_templates = smsTemplates
+        state.smsTemplates = smsTemplates
       },
       DELETE_SMS_TEMPLATE (state, smsTemplate) {
-        let found = state.sms_templates.find(template => template.id === smsTemplate.id)
+        let found = state.smsTemplates.find(template => template.id === smsTemplate.id)
         if (found) {
-          state.sms_templates.splice(state.sms_templates.indexOf(found), 1)
+          state.smsTemplates.splice(state.smsTemplates.indexOf(found), 1)
         }
       }
     },

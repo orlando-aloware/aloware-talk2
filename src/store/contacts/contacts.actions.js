@@ -198,5 +198,9 @@ export default {
 
   setMessageComposerNoteBody: ({ commit }, body) => {
     commit('SET_MESSAGE_COMPOSER_NOTE_BODY', body)
+  },
+
+  scheduleMessageOpen: ({ commit }, isOpen) => {
+    commit('SCHEDULE_MESSAGE_OPEN', isOpen)
   }
 }
