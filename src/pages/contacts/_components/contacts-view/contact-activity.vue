@@ -7,10 +7,10 @@
             :style="avatarStyle(isSender)"
             :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
             v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
-            :name="contact.name">
+            :name="avatarName">
       <q-tooltip content-class="bg-grey-light11"
-                 anchor="top middle" self="bottom middle">
-        {{ avatarTooltip(contact, communication) }}
+                 anchor="top middle" self="center middle">
+        {{ avatarName }}
       </q-tooltip>
     </avatar>
 
@@ -119,15 +119,15 @@
               </div>
             </a>
           </div>
-          <div class="inline r-2x message-body effect7"
-               :class="getCommunicationClass"
-               v-if="communication.body">
-            <span class="arrow pull-top"
-                  :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
-            </span>
-            <div class="p-a p-y-sm handle-whitespace">
-              <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
-            </div>
+        </div>
+        <div class="sms-activity "
+             :class="getCommunicationClass"
+             v-if="communication.body">
+          <span class="arrow pull-top"
+                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'inbound arrow-dker left' : 'outbound arrow-dker right' ]">
+          </span>
+          <div class="p-a p-y-sm handle-whitespace">
+            <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
           </div>
         </div>
         <q-badge rounded v-if="!communication.is_read" color="red" />
@@ -232,7 +232,6 @@
 </template>
 
 <script>
-import auth from '../../../../boot/auth'
 import {
   aclMixin,
   avatarMixin,
@@ -275,7 +274,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       relative_datetime: null,
       excluded_audits: [
         'thread_status',
@@ -352,6 +350,10 @@ export default {
     },
     isSender () {
       return this.communication.direction === CommunicationDirection.OUTBOUND
+    },
+    avatarName () {
+      return this.communication.direction === CommunicationDirection.OUTBOUND && this.currentCompany
+        ? this.currentCompany.name : this.contact.name
     }
   },
 

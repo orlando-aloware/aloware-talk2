@@ -74,11 +74,13 @@ export const fixTimeLocal = (dt, format = 'h:mma') => {
  * @param duration
  * @returns {string|*}
  */
-export const fixDuration = (duration) => {
+export const fixDuration = (duration, forceDuration = false) => {
   if (duration) {
     return window.moment.duration(duration, 'seconds').format('m:ss', {
       trim: false
     })
+  } else if (duration === 0 && forceDuration) {
+    return '0:00'
   } else {
     return '-'
   }
@@ -207,12 +209,12 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
   if (dt) {
     if (window.timezone) {
       if (window.timezone === 'Asia/Manila') {
-        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm:ss a') + ' MNL'
+        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm A') + ' MNL'
       }
 
-      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm:ss a z')
+      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm A z')
     } else {
-      return window.moment.utc(dt).local().add(duration, 'seconds').format('MM/DD h:mm:ss a z')
+      return window.moment.utc(dt).local().add(duration, 'seconds').format('MM/DD h:mm A z')
     }
   } else {
     return '-'

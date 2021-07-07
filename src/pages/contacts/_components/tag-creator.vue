@@ -83,7 +83,6 @@
 
 <script>
 import _ from 'lodash'
-import auth from 'boot/auth'
 import {
   aclMixin,
   formValidationMixin
@@ -123,7 +122,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loadingBtn: false,
       loadingTag: false,
       hideAdd: false,

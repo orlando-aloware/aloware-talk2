@@ -10,6 +10,7 @@ import * as Sentry from '@sentry/vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
+import VueWaveSurfer from 'vue-wave-surfer'
 
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
@@ -20,6 +21,7 @@ localStorage.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
+Vue.use(VueWaveSurfer)
 
 window.Bowser = Bowser
 window.timezone = jstz.determine().name()

@@ -1,8 +1,7 @@
 <template>
   <div class="communication-info"
        v-if="communication">
-    <q-list class="rounded-contact-activity"
-            :class="[ communication.direction === CommunicationDirections.INBOUND ? 'contact-activity-sender' : '' ]">
+    <q-list class="rounded-contact-activity">
       <q-expansion-item
         class="contact-activity"
         v-model="activeName"
@@ -26,7 +25,7 @@
               </span>
             </q-item-section>
           </q-item-section>
-          <q-tooltip anchor="top middle" self="top middle">
+          <q-tooltip anchor="top middle" self="center middle">
             {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash | capitalize }}
           </q-tooltip>
         </template>
@@ -70,12 +69,12 @@
               {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash }}.
             </div>
 
-            <div class="w-100 pt-2 d-flex flex-row">
-              <div class="form-horizontal col-6 pl-0"
+            <div class="w-100 pt-2 d-flex flex-row pb-2 mb-2 border-bottom">
+              <div class="w-50"
                    v-if="(verbose || activityMode) && ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
                 <div class="form-group row mb-0">
                   <div class="w-100">
-                    <label class="form-control-label w-100">From:</label>
+                    <label class="form-control-label w-100">From</label>
                     <div class="d-flex align-items-center"
                          v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                       {{ communication.lead_number | fixPhone }}
@@ -96,14 +95,15 @@
                 </div>
               </div>
 
-              <div class="form-horizontal col-6 pl-0"
+              <div class="w-50"
                    v-if="(verbose || activityMode) && ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
                 <div class="w-100">
                   <div class="form-group row mb-0">
-                    <label class="form-control-label w-100">To:</label>
+                    <label class="form-control-label w-100">To</label>
                     <div class="d-flex align-items-center"
                          v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                       {{ getCommunicationCampaignName() }}
+                      <br>
                       {{ communication.incoming_number | fixPhone }}
                     </div>
                     <div class="d-flex align-items-center"
@@ -123,16 +123,70 @@
               </div>
             </div>
 
-            <div class="form-horizontal b-b"
+            <div class="mb-2 pb-2 border-bottom d-flex flex-row"
                  v-if="communication.type === CommunicationTypes.CALL">
-              <target-users-tree class="form-group row mb-0 pt-2 pb-2"
-                                 :communication="communication"
-                                 :is-form="true"/>
+              <div class="w-50">
+                <label class="form-control-label">Ring Group</label>
+                <div v-if="communication.ring_group_id">
+                  {{ getRingGroup(communication.ring_group_id, true) }}
+                </div>
+                <div else>
+                  -
+                </div>
+                <target-users-tree class="w-100"
+                                   :communication="communication"
+                                   :is-form="true"/>
+              </div>
+              <div class="w-50">
+                <label class="form-control-label w-100">Answered By</label>
+                <div class="d-flex align-items-center w-100">
+                  <div class="status-icon d-inline-block"
+                       :state="communication.rejected_by_app"
+                       v-if="communication.rejected_by_app !== 0"
+                       v-html="rejectionToIcon(communication.rejected_by_app)">
+                    <q-tooltip anchor="bottom middle" self="top middle">
+                      {{ rejectionTooltipData(communication.rejected_by_app) }}
+                    </q-tooltip>
+                  </div>
+
+                  <q-tooltip class="item"
+                             content-class="bg-grey-light11"
+                             anchor="top middle"
+                             self="top middle"
+                             v-if="communication.rejected_by_app !== 0">
+                    {{ rejectionTooltipData(communication.rejected_by_app) }}
+                    <component class="status-icon d-inline-block"
+                               v-bind:is="icon"
+                               :name="rejectionToIcon(communication.rejected_by_app)">
+                    </component>
+                  </q-tooltip>
+                  <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
+                    <router-link
+                      :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
+                      <span class="text-black"
+                            :title="getUserName(getUser(communication.user_id))">
+                        <q-tooltip class="item"
+                                   content-class="bg-grey-light11"
+                                   anchor="top left"
+                                   self="center middle">
+                          Click For More Info
+                        </q-tooltip>
+                        {{ getUserName(getUser(communication.user_id)) }}
+                      </span>
+                    </router-link>
+                  </div>
+                  <div v-else>
+                    <span class="text-greyish">
+                      Not Answered
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="form-horizontal"
                  :class="[communication.type !== CommunicationTypes.NOTE ? 'b-b': '']"
-                 v-if="[CommunicationTypes.CALL, CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                 v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="form-group row mb-0 pt-2 pb-2"
                    v-if="communication.type !== CommunicationTypes.NOTE">
                 <label class="form-control-label col-12">User:</label>
@@ -208,15 +262,28 @@
               </div>
             </div>
 
-            <div class="form-horizontal"
+            <div class="pb-2 mb-2 border-bottom"
                  v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <div class="form-group row mb-0">
-                <label class="form-control-label col-12"
-                       v-if="communication.type === CommunicationTypes.CALL">
-                  Started at:
-                </label>
-                <label class="form-control-label col-12"
-                       v-else>
+              <div class="d-flex flex-row w-100"
+                   v-if="communication.type === CommunicationTypes.CALL">
+                <div class="w-50">
+                  <label class="form-control-label">
+                    Started at:
+                  </label>
+                  <div class="d-flex align-items-center">
+                    {{ communication.created_at | fixCommunicationDateTime }}
+                  </div>
+                </div>
+                <div class="w-50">
+                  <label class="form-control-label">Duration:</label>
+                  <div class="d-flex align-items-center">
+                    {{ communication.duration | fixDuration }}
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row mb-0"
+                   v-if="communication.type === CommunicationTypes.SMS">
+                <label class="form-control-label col-12">
                   Sent at:
                 </label>
                 <div class="d-flex align-items-center col-12">
@@ -253,31 +320,11 @@
             </div>
 
             <div class="form-horizontal"
-                 v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && verbose">
-              <div class="form-group row mb-0">
-                <label class="form-control-label col-12">Duration:</label>
-                <div class="d-flex align-items-center col-12">
-                  {{ communication.duration | fixDuration }}
-                </div>
-              </div>
-            </div>
-
-            <div class="form-horizontal"
                  v-if="(communication.type === CommunicationTypes.SMS) && verbose">
               <div class="form-group row mb-0">
                 <label class="form-control-label col-12">Parts:</label>
                 <div class="d-flex align-items-center col-12">
                   {{ communication.duration }}
-                </div>
-              </div>
-            </div>
-
-            <div class="form-horizontal b-b"
-                 v-if="communication.type === CommunicationTypes.CALL">
-              <div class="form-group row mb-0">
-                <label class="form-control-label col-12">Talk time:</label>
-                <div class="d-flex align-items-center col-12">
-                  {{ communication.talk_time | fixDuration }}
                 </div>
               </div>
             </div>
@@ -296,28 +343,6 @@
             <div class="form-horizontal"
                  v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="form-group row mb-0">
-                <template v-if="communication.campaign_id">
-                  <label class="form-control-label col-12">
-                    Line:
-                  </label>
-                  <div class="d-flex align-items-center col-12">
-                    <router-link
-                      :to="{ name: 'Line Activity', params: { campaignId: communication.campaign_id }}"
-                      v-if="getCampaign(communication.campaign_id)">
-                      <q-tooltip anchor="top left"
-                                 self="top left">
-                        Click For More Info
-                        <span class="text-dark-greenish">
-                          {{ getCampaign(communication.campaign_id).name }}
-                        </span>
-                      </q-tooltip>
-                    </router-link>
-                    <template v-else>
-                      Deleted Line
-                    </template>
-                  </div>
-                </template>
-
                 <template v-if="communication.ring_group_id">
                   <label class="form-control-label col-12">
                     Ring Group:
@@ -330,7 +355,7 @@
                                  self="top left">
                         Click For More Info
                         <span class="text-dark-greenish">
-                          {{ getRingGroup(communication.ring_group_id).name }}
+                          {{ getRingGroup(communication.ring_group_id, true) }}
                         </span>
                       </q-tooltip>
                     </router-link>
@@ -384,57 +409,63 @@
                   </div>
                 </template>
 
-                <label class="form-control-label col-12"
-                       v-if="communication.transfer_prior_user_ids">
-                  Transferred from:
-                </label>
-                <div class="d-flex align-items-center col-12"
-                     v-if="communication.transfer_prior_user_ids">
-                  <template v-for="(userId, index) in communication.transfer_prior_user_ids">
-                    <router-link
-                      v-if="getUser(userId)"
-                      :key="userId + '-user-' + index"
-                      :to="{ name: 'User Activity', params: {userId: userId }}">
-                      <q-tooltip anchor="top left"
-                                 self="top left">
-                        Click For More Info
-                        <span class="text-dark-greenish"
-                              :title="getUserName(getUser(userId))">
-                          {{ getUserName(getUser(userId)) }}
-                        </span>
-                      </q-tooltip>
-                    </router-link>
-                  </template>
-                </div>
-
-                <label class="form-control-label col-12"
-                       v-if="communication.transfer_target_user_ids">
-                  Transferred to:
-                </label>
-                <div class="d-flex align-items-center col-12"
-                     v-if="communication.transfer_target_user_ids">
-                  <template v-for="(userId, index) in communication.transfer_target_user_ids">
-                    <router-link
-                      v-if="getUser(userId)"
-                      :key="userId + '-user-' + index"
-                      :to="{ name: 'User Activity', params: {userId: userId }}">
-                      <q-tooltip anchor="top left"
-                                 self="top left">
-                        Click For More Info
-                        <span class="text-dark-greenish"
-                              :title="getUserName(getUser(userId))">
-                          {{ getUserName(getUser(userId)) }}
-                        </span>
-                      </q-tooltip>
-                    </router-link>
-                  </template>
+                <div class="d-flex flex-row w-100 pb-2 mb-2 border-bottom"
+                     v-if="communication.transfer_prior_user_ids || communication.transfer_target_user_ids">
+                  <div class="w-50">
+                    <label class="form-control-label w-100"
+                           v-if="communication.transfer_prior_user_ids">
+                      Transferred from:
+                    </label>
+                    <div class="d-flex align-items-center w-100"
+                         v-if="communication.transfer_prior_user_ids">
+                      <template v-for="(userId, index) in communication.transfer_prior_user_ids">
+                        <router-link
+                          v-if="getUser(userId)"
+                          :key="userId + '-user-' + index"
+                          :to="{ name: 'User Activity', params: {userId: userId }}">
+                          <q-tooltip anchor="top left"
+                                     self="top left">
+                            Click For More Info
+                            <span class="text-dark-greenish"
+                                  :title="getUserName(getUser(userId))">
+                              {{ getUserName(getUser(userId)) }}
+                            </span>
+                          </q-tooltip>
+                        </router-link>
+                      </template>
+                    </div>
+                  </div>
+                  <div class="w-50">
+                    <label class="form-control-label W-100"
+                           v-if="communication.transfer_target_user_ids">
+                      Transferred to:
+                    </label>
+                    <div class="d-flex align-items-center w-100"
+                         v-if="communication.transfer_target_user_ids">
+                      <template v-for="(userId, index) in communication.transfer_target_user_ids">
+                        <router-link
+                          v-if="getUser(userId)"
+                          :key="userId + '-user-' + index"
+                          :to="{ name: 'User Activity', params: {userId: userId }}">
+                          <q-tooltip anchor="top left"
+                                     self="top left">
+                            Click For More Info
+                            <span class="text-dark-greenish"
+                                  :title="getUserName(getUser(userId))">
+                              {{ getUserName(getUser(userId)) }}
+                            </span>
+                          </q-tooltip>
+                        </router-link>
+                      </template>
+                    </div>
+                  </div>
                 </div>
 
                 <label class="form-control-label col-12"
                        v-if="communication.transfer_target_user_ids">
                   Cold transferred?
                 </label>
-                <div class="d-flex align-items-center col-12"
+                <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom"
                      v-if="communication.transfer_target_user_ids">
                   <span class="text-dark">
                     {{ communication.in_cold_transfer | fixBooleanType }}
@@ -504,18 +535,16 @@
                   </span>
                 </div>
 
-                <label class="form-control-label col-12"
+                <label class="form-control-label w-100"
                        v-if="communication.type === CommunicationTypes.CALL">
-                  Recording:
+                  Call Recording
                 </label>
-                <div class="d-flex align-items-center col-12"
+                <div class="d-flex align-items-center w-100 mb-2 border-bottom"
                      v-if="communication.type === CommunicationTypes.CALL">
-                  <span class="text-dark-greenish">
-                      <communication-audio :communication="communication"
-                                           :type="UploadedFileTypes.TYPE_CALL_RECORDING"
-                                           :popoverDirection="communication.direction === CommunicationDirections.INBOUND ? 'right' : 'left'">
-                      </communication-audio>
-                  </span>
+                    <communication-audio :communication="communication"
+                                         :type="UploadedFileTypes.TYPE_CALL_RECORDING"
+                                         :uniqueId="communication.id + '1'">
+                    </communication-audio>
                 </div>
 
                 <template v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
@@ -535,95 +564,53 @@
                   </div>
                 </template>
 
-                <label class="form-control-label col-12"
+                <label class="form-control-label w-100"
                        v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
-                  Voicemail:
+                  Voicemail
                 </label>
-                <div class="d-flex align-items-center col-12"
+                <div class="d-flex align-items-center w-100 mb-2 border-bottom"
                      v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
                   <span class="text-dark-greenish">
                     <communication-audio :communication="communication"
-                                         :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL">
+                                         :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
+                                         :uniqueId="communication.id + '2'">
                     </communication-audio>
                   </span>
                 </div>
 
-                <label class="form-control-label col-12">Notes:</label>
-                <div class="d-flex flex-column justify-content-center pt-2 col-12">
-                  <template v-if="activityMode || verbose">
-                    <div class="w-full"
-                         v-if="communication.notes">
-                      {{ communication.notes }}
-                    </div>
-                    <div>
-                      <communication-note ref="communication_notes"
-                                          :small="dialerMode"
-                                          :communication="communication">
-                        <template v-slot:trigger>
-                          <div id="notes-btn">
-                            <q-icon name="fa fa-file-alt"
-                                    class="text-dark-greenish">
-                            </q-icon>
-                            <span class="text-dark-greenish _700 pointer"
-                                  v-if="communication.notes">
-                              Change Notes
-                            </span>
-                            <span class="text-dark-greenish _700 pointer"
-                                  v-else>
-                              Add Notes
-                            </span>
-                          </div>
-                        </template>
-                      </communication-note>
-                    </div>
-                  </template>
-
-                  <communication-note ref="communication_notes"
-                                      :small="dialerMode"
-                                      :communication="communication"
-                                      v-else>
-                    <template v-slot:trigger>
-                      <div id="notes-btn">
-                        <q-icon name="fa fa-file-alt"
-                                class="text-dark-greenish">
-                        </q-icon>
-                        <span class="text-dark-greenish _700 pointer"
-                              v-if="communication.notes">
-                          Change Notes
-                        </span>
-                        <span class="text-dark-greenish _700 pointer"
-                              v-else>
-                          Add Notes
-                        </span>
-                      </div>
-                    </template>
-                  </communication-note>
+                <label class="form-control-label col-12">Tags</label>
+                <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom">
+                  <communication-tags :communication="communication" />
                 </div>
 
-                <label class="form-control-label col-12">Tags:</label>
-                <div class="d-flex align-items-center pt-2 col-12">
-                  <communication-tags :communication="communication" />
+                <label class="form-control-label">Notes</label>
+                <div class="d-flex flex-column justify-content-center pb-2 w-100">
+                  <communication-note ref="communication_notes"
+                                      :communication="communication">
+                  </communication-note>
                 </div>
 
                 <template
                   v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions.length > 0 && !dialerMode">
                   <div class="d-flex align-items-center co-12">
                     <label class="form-control-label">Call Disposition:</label>
-                    <b-button id="audio-btn"
-                              type="link"
-                              class="p-0">
-                      <q-icon name=""
-                              class="text-danger">
-                      </q-icon>
-                    </b-button>
-                    <b-popover target="audio-btn"
-                               triggers="click blur"
-                               :placement="right"
-                               boundary="window"
-                               delay="100"
-                               v-if="currentCompany.force_call_disposition">
-                      Your account admin as mandated call dispositions.
-                    </b-popover>
+                    <label class="ml-1 d-flex align-items-center"
+                         v-if="!currentCompany.force_call_disposition">
+                      <b-button id="audio-btn"
+                                size="sm"
+                                variant="link"
+                                class="p-0">
+                        <q-icon name="info"
+                                class="text-danger">
+                        </q-icon>
+                      </b-button>
+                      <b-popover target="audio-btn"
+                                 triggers="focus"
+                                 placement="right"
+                                 delay="100">
+                        Your account admin as mandated call dispositions.
+                      </b-popover>
+                    </label>
                   </div>
                   <div class="d-flex align-items-center pt-2 col-12">
                     <call-disposition-selector :communication="communication"></call-disposition-selector>
@@ -649,32 +636,29 @@
                v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
             <div class="col-12 text-center">
               <div class="text-center pb-3 b-b">
-                <el-radio-group v-model="communication.disposition_status2"
-                                :disabled="loadingUpdateEngagement"
-                                @change="changeEngagementStatus">
-                  <template v-if="communication.type == CommunicationTypes.APPOINTMENT">
-                    <el-radio-button :label="CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET">
-                      Set
-                    </el-radio-button>
-                    <el-radio-button :label="CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SHOWN">
-                      Shown
-                    </el-radio-button>
-                    <el-radio-button :label="CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED">
-                      Canceled
-                    </el-radio-button>
-                  </template>
-                  <template v-else>
-                    <el-radio-button :label="CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW">
-                      Pending
-                    </el-radio-button>
-                    <el-radio-button :label="CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW">
-                      Completed
-                    </el-radio-button>
-                    <el-radio-button :label="CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-                      Canceled
-                    </el-radio-button>
-                  </template>
-                </el-radio-group>
+                <q-btn-toggle
+                  no-caps
+                  rounded
+                  unelevated
+                  toggle-color="primary"
+                  color="white"
+                  text-color="primary"
+                  :options="appointmentOptions"
+                  :disabled="loadingUpdateEngagement"
+                  v-model="communication.disposition_status2"
+                  v-if="communication.type === CommunicationTypes.APPOINTMENT"
+                />
+                <q-btn-toggle
+                  no-caps
+                  rounded
+                  unelevated
+                  toggle-color="primary"
+                  color="white"
+                  text-color="primary"
+                  :options="appointmentOptions"
+                  :disabled="loadingUpdateEngagement"
+                  v-model="communication.disposition_status2"
+                  v-else/>
               </div>
               <div class="text-center pt-3">
                 <router-link
@@ -711,7 +695,6 @@
 
 <script>
 import _ from 'lodash'
-import auth from '../../../boot/auth'
 import {
   aclMixin,
   avatarMixin,
@@ -733,6 +716,7 @@ import ChevronRight from 'components/icons/contact-activity/chevron-right'
 import CommunicationAudio from 'src/pages/contacts/_components/communication-audio'
 import CommunicationNote from 'src/pages/contacts/_components/communication-note'
 import CommunicationTags from 'src/pages/contacts/_components/communication-tags'
+import CallDispositionSelector from 'src/pages/contacts/_components/call-disposition-selector'
 
 export default {
   name: 'communication-info',
@@ -746,6 +730,7 @@ export default {
 
   components: {
     ChevronRight,
+    CallDispositionSelector,
     CommunicationAudio,
     CommunicationNote,
     CommunicationTags,
@@ -806,7 +791,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loadingDispose: false,
       REJECTION_REASON_CREDITS: 1, // A call/SMS was received by our system but not shown to user because company was out of credit
       REJECTION_REASON_BLOCKED: 2, // A call/SMS was received by our system but was blocked because caller's phone number is blocked.
@@ -819,6 +803,34 @@ export default {
         children: 'children',
         label: 'label'
       },
+      appointmentOptions: [
+        {
+          label: 'Set',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET
+        },
+        {
+          label: 'Attended',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SHOWN
+        },
+        {
+          label: 'Cancelled',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED
+        }
+      ],
+      reminderOptions: [
+        {
+          label: 'Pending',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW
+        },
+        {
+          label: 'Completed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW
+        },
+        {
+          label: 'Cancelled',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
+        }
+      ],
       AnswerTypes,
       CommunicationDirections,
       CommunicationCurrentStatus,
@@ -866,16 +878,16 @@ export default {
       }
     },
 
-    getRingGroup (id) {
+    getRingGroup (id, getName = false) {
       if (!id) {
-        return null
+        return getName ? '' : null
       }
       let found = this.ringGroups.find(ringGroup => ringGroup.id === id)
       if (found) {
-        return found
+        return getName ? found.name : found
       }
 
-      return null
+      return getName ? '' : null
     },
 
     getWorkflow (id) {

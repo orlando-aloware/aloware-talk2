@@ -2,6 +2,10 @@
   <div class="contact-activities">
         <contact-activities-header :label="contactName"/>
         <div class="p-3 contact-activity-container">
+          <div class="d-flex flex-row w-100 justify-content-center align-items-center">
+            <slot name="moreActivities">
+            </slot>
+          </div>
           <contact-activity v-for="(communication, index) in communications"
                             :key="communication.id + '-comm-' + index"
                             :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
@@ -32,7 +36,8 @@ export default {
   },
   data () {
     return {
-      contactName: 'Contact Name'
+      contactName: 'Contact Name',
+      isLoadingPreviousActivities: false
     }
   },
   computed: {

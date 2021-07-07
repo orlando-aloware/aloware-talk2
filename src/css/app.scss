@@ -813,6 +813,9 @@ body,
 
 .contact-activity {
   max-width: 380px;
+  .q-item {
+    min-height: 41px;
+  }
   &.q-expansion-item--expanded {
     &.q-expansion-item {
       border-radius: 12px;
@@ -863,4 +866,63 @@ body,
 
 .font-weight-light-bold {
   font-weight: 500;
+}
+
+.play-button {
+  width: 26px;
+  height: 26px;
+  background: $blue;
+  border: 0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  i {
+    font-size: 10.83px;
+    color: #fff;
+    padding-left: 2px;
+  }
+}
+
+.waveform {
+  wave {
+    height: 25px !important;
+    overflow: hidden !important;
+  }
+}
+
+.waveform-timeline {
+  font-size: 11px;
+  line-height: 13px;
+  letter-spacing: 0.004em;
+  color: #62666E;
+}
+
+.audio-player {
+  background: #F4F4F6;
+  border-radius: 8px;
+}
+
+@-webkit-keyframes rotating {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  -webkit-animation: rotating 2s linear infinite;
+}
+
+.inbound-sms-activity {
+  background: $blue;
+  color: #F4F4F6;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 12px;
+  padding: 15px 15px;
 }
