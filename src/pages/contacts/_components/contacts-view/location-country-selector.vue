@@ -10,7 +10,7 @@
               behavior="menu"
               v-model="contact.cnam_country"
               :options="options"
-              :loading="is_busy"
+              :loading="isBusy"
               @filter="filterFn"/>
   </div>
 </template>
@@ -23,8 +23,7 @@ export default {
   name: 'location-country-selector',
   data () {
     return {
-      is_busy: false,
-      user_id: this.value,
+      isBusy: false,
       countries: Countries.COUNTRIES,
       options: Countries.COUNTRIES
     }
@@ -48,11 +47,11 @@ export default {
       })
     },
     onUpdate () {
-      this.is_busy = true
+      this.isBusy = true
       talk2Api.V1.contact.update(this.contact.id, { 'cnam_country': this.contact.cnam_country }).then(response => {
         this.setContact(response.data)
       }).finally(() => {
-        this.is_busy = false
+        this.isBusy = false
       })
     }
   },

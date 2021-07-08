@@ -757,9 +757,19 @@ body,
   .uploader-label {
     position: absolute;
     width: 100%;
-    top: 7px;
+    top: 3px;
     font-size: 14px;
     font-weight: 500;
+  }
+
+  .uploading-label {
+    position: absolute;
+    top: 28px;
+    width: 100%;
+
+    p {
+      font-size: 12px;
+    }
   }
 
   form {
@@ -950,7 +960,7 @@ body,
   }
 }
 
-.shedule-button-toggle {
+.schedule-button-toggle {
   display: flex;
   border-radius: 6px !important;
   button {
@@ -960,4 +970,71 @@ body,
     padding-right: 5px;
     border-right: 1px;
   }
+}
+
+.custom-multi-select.always-open {
+  .multiselect__content-wrapper {
+    display: block !important;
+    position: relative;
+  }
+}
+
+
+.custom-multi-select.multiselect--above.multiselect--active .multiselect__current,
+.custom-multi-select.multiselect--above.multiselect--active .multiselect__input,
+.custom-multi-select.multiselect--above.multiselect--active .multiselect__tags {
+  border-top-left-radius: 5px !important;
+  border-top-right-radius: 5px !important;
+}
+
+.custom-multi-select {
+  .multiselect__content-wrapper {
+    margin-top: 4px;
+    position: absolute;
+    border: none !important;
+  }
+
+  .multiselect__tags {
+    border-bottom-left-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+  }
+
+  .multiselect__option {
+    padding: 5px !important;
+    border-radius: 8px;
+    min-height: 28px !important;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .multiselect__option--highlight {
+    background: $grey-50;
+    color: $grey-100;
+    border-radius: 8px;
+  }
+
+  .multiselect__option--selected.multiselect__option--highlight {
+    background: $grey-50;
+    color: $grey-100;
+  }
+
+  .multiselect__placeholder {
+    margin-bottom: 8px !important;
+    padding-top: 0 !important;
+    font-size: 13px;
+  }
+
+  .multiselect__element {
+    margin-right: 4px;
+  }
+}
+
+.badge-phone-info {
+  font-size: 10px;
+  font-weight: normal;
+  color: $white;
+}
+
+.multiselect, .multiselect__input, .multiselect__single {
+  font-size: 13px !important;
 }

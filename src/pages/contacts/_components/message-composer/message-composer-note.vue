@@ -22,10 +22,10 @@
         <b-button-group>
           <b-button variant="primary"
                     size="sm"
-                    :disabled="!validNote"
+                    :disabled="isAdding || !validNote"
                     v-on:click="onAdd">
-            <q-spinner-bars v-if="is_adding" color="white" />
-            {{ is_adding ? 'Adding Note...' : 'Add Note' }}
+            <q-spinner-bars v-if="isAdding" color="white" />
+            {{ isAdding ? 'Adding Note...' : 'Add Note' }}
           </b-button>
         </b-button-group>
       </div>
@@ -46,7 +46,7 @@ export default {
   },
   data () {
     return {
-      is_adding: false
+      isAdding: false
     }
   },
   methods: {
@@ -61,24 +61,26 @@ export default {
       }
     },
     onAdd () {
-      this.is_adding = true
+      this.isAdding = true
       talk2Api.V1.contact.addEngagement(this.contact.id, this.formatMessage())
         .then(response => {
           this.resetMessageComposerNote()
+          this.$q.notify({
+            message: 'Note has been added.',
+            type: 'positive',
+            textColor: 'white',
+            position: 'bottom-right'
+          })
         }).catch(error => {
           console.log(error)
           this.$q.notify({
             message: 'Error while adding note.',
             type: 'negative',
             textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
+            position: 'bottom-right'
           })
         }).finally(() => {
-          this.is_adding = false
+          this.isAdding = false
           this.$refs.noteMessageBody.focus()
         })
     }

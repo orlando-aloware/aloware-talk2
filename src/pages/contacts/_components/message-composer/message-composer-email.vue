@@ -34,10 +34,10 @@
         <b-button-group>
           <b-button variant="primary"
                     size="sm"
-                    :disabled="!validEmail"
+                    :disabled="isSending || !validEmail"
                     v-on:click="onSend">
-            <q-spinner-bars v-if="is_sending" color="white" />
-            {{ is_sending ? 'Sending...' : 'Send Email' }}
+            <q-spinner-bars v-if="isSending" color="white" />
+            {{ isSending ? 'Sending Email...' : 'Send Email' }}
           </b-button>
         </b-button-group>
       </div>
@@ -83,7 +83,7 @@ export default {
   },
   data () {
     return {
-      is_sending: false,
+      isSending: false,
       message: ''
     }
   },
@@ -101,8 +101,25 @@ export default {
       }
     },
     onSend () {
+      this.isSending = true
       talk2Api.V1.contact.sendEmail(this.contact.id, this.formatMessage()).then(response => {
         this.resetMessageComposerEmail()
+        this.$q.notify({
+          message: 'Email has been sent.',
+          type: 'positive',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
+      }).catch(error => {
+        console.log(error)
+        this.$q.notify({
+          message: 'Error while sending email.',
+          type: 'negative',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
+      }).finally(() => {
+        this.isSending = false
       })
     },
     templateSelected (template) {

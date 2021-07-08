@@ -2,7 +2,8 @@
   <div class="giphy-wrapper">
     <div>
       <q-input dense
-               outlined v-model="search_text"
+               outlined
+               v-model="search_text"
                placeholder="Search"
                @input="findGif">
         <template v-slot:append>

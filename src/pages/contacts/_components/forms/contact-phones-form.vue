@@ -23,8 +23,8 @@
       <b-button type="submit"
                 size="sm"
                 variant="primary"
-                :disabled="is_busy">
-        <b-spinner v-if="is_busy"
+                :disabled="isBusy">
+        <b-spinner v-if="isBusy"
                    small label="Small Spinner"
                    type="grow"></b-spinner>
         Save
@@ -43,25 +43,29 @@ export default {
   },
   data () {
     return {
-      is_busy: false,
+      isBusy: false,
       phone: {
         title: null,
-        number: null
+        number: null,
+        isPrimary: false
       }
     }
   },
   methods: {
     ...mapActions('contacts', ['setContact', 'addContactPhoneNumber', 'setContactSelectedPhone', 'updateContactSelectedPhone']),
     onSubmit (e) {
-      this.is_busy = true
+      this.isBusy = true
       let request = null
 
       if (this.contact_selected_phone) {
         request = talk2Api.V1.contact.updatePhone(this.contact.id, this.contact_selected_phone.id, {
           title: this.phone.title,
-          phone_number: this.phone.number
+          phone_number: this.phone.number,
+          is_primary: this.phone.isPrimary
         }).then(response => {
           this.updateContactSelectedPhone(response.data)
+          this.removeSelectedPhone()
+          this.onClose()
         })
       } else {
         request = talk2Api.V1.contact.storePhone(this.contact.id, {
@@ -69,16 +73,21 @@ export default {
           phone_number: this.phone.number
         }).then(response => {
           this.addContactPhoneNumber(response.data)
+          this.removeSelectedPhone()
+          this.onClose()
         })
       }
 
       request.catch(err => {
-        this.$root.handleErrors(err.response)
-      }).then(() => {
-        this.removeSelectedPhone()
-        this.onClose()
+        console.log(err)
+        this.$q.notify({
+          message: 'Error while updating phone number.',
+          type: 'negative',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
       }).finally(() => {
-        this.is_busy = false
+        this.isBusy = false
       })
 
       e.preventDefault()
@@ -97,7 +106,8 @@ export default {
       this.phone = {
         id: this.contact_selected_phone.id,
         title: this.contact_selected_phone.title,
-        number: this.contact_selected_phone.phone_number
+        number: this.contact_selected_phone.phone_number,
+        isPrimary: this.contact_selected_phone ? this.contact_selected_phone.phone_number === this.contact.phone_number : false
       }
     }
   }

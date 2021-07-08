@@ -1,16 +1,35 @@
 <template>
   <div class="pt-2">
-    <div class="fax-file-wrapper cursor-pointer"
+    <div v-if="validFax" class="d-inline-flex media-preview-wrapper">
+      <div class="media-preview">
+        <div class="pdf-thumbnail-wrapper">
+          <div class="text-center media-icon-wrapper mt-2">
+            <i class="far fa-file-pdf media-icon"></i>
+          </div>
+          <p class="ellipsis mt-1 text-center">{{ message_composer.fax.filename }}</p>
+          <b-button pill size="sm" class="btn-remove-attachments" v-on:click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
+        </div>
+      </div>
+    </div>
+    <div v-if="!validFax" class="fax-file-wrapper cursor-pointer"
          @click="onBrowse"
          @drop.prevent="onDrop"
          @dragover.prevent>
-      <form class="mt-1" ref="fax_form">
+      <form ref="faxForm">
         <b-form-group id="fileInput" class="dragdrop">
-          <div class="text-center uploader-label">
-            <upload-icon class="pb-2"></upload-icon>
-            <p>Drop files here, or <span style="color: #256EFF;">Browse</span></p>
+          <div class="text-center uploader-label" v-if="!isUploading">
+            <upload-icon height="32" width="32" class="pb-1"></upload-icon>
+            <p class="mb-0">Drop PDF files here, or <span style="color: #256EFF;">Browse</span></p>
+            <p class="file-info">Maximum PDF file size is 8MB</p>
           </div>
-          <input v-cloak
+          <div v-if="isUploading" class="text-center uploading-label pl-2 pr-2">
+            <b-progress :max="100" variant="success" class="100">
+              <b-progress-bar :value="uploadPercentage" :label="`${uploadPercentage}%`"></b-progress-bar>
+            </b-progress>
+            <p class="mb-0">Uploading PDF File...</p>
+          </div>
+          <input v-if="!isUploading"
+                 v-cloak
                  multiple
                  type="file"
                  class="w-px h-px opacity-0 overflow-hidden absolute d-none"
@@ -20,27 +39,15 @@
         </b-form-group>
       </form>
     </div>
-    <div class="pt-2">
-      <p class="file-info">Upload PDF file <small>(Less than 8MB)</small></p>
-      <b-progress v-if="is_uploading" :max="100" variant="success">
-        <b-progress-bar :value="uploadPercentage" :label="`${uploadPercentage}%`"></b-progress-bar>
-      </b-progress>
-      <div v-if="message_composer.fax.filename" class="d-flex justify-content-between">
-        <b-progress :max="100" variant="success" class="custom-progress-bar w-75">
-          <b-progress-bar :value="100"></b-progress-bar>
-        </b-progress>
-        <b-link href="#" class="btn-remove-file" @click="onRemoveFile"><i class="far fa-times-circle"></i></b-link>
-      </div>
-    </div>
     <div class="pt-2 d-flex justify-between">
       <div></div>
       <b-button-group>
         <b-button variant="primary"
                   size="sm"
-                  :disabled="!validFax"
+                  :disabled="isSending || !validFax"
                   v-on:click="send">
-          <q-spinner-bars v-if="is_sending" color="white" />
-          {{ is_sending ? 'Sending Fax...' : 'Send Fax' }}
+          <q-spinner-bars v-if="isSending" color="white" />
+          {{ isSending ? 'Sending Fax...' : 'Send Fax' }}
         </b-button>
       </b-button-group>
     </div>
@@ -66,10 +73,10 @@ export default {
   data () {
     return {
       uploadPercentage: 0,
-      is_sending: false,
-      is_uploading: false,
+      isSending: false,
+      isUploading: false,
       files: [],
-      selected_file: null,
+      selectedFile: null,
       notifications: []
     }
   },
@@ -79,16 +86,16 @@ export default {
       this.setMessageComposerFaxFilename('')
     },
     onDrop (e) {
-      this.selected_file = e.dataTransfer.files
+      this.selectedFile = e.dataTransfer.files
     },
     onBrowse () {
       this.$refs.file.click()
     },
     onSelect (e) {
-      this.selected_file = event.target.files
+      this.selectedFile = event.target.files
     },
     onUpload (file) {
-      this.is_uploading = true
+      this.isUploading = true
       let formData = new FormData()
       formData.append('file', file)
       talk2Api.V1.lines.pdfUpload(
@@ -102,13 +109,13 @@ export default {
       )
         .then(response => {
           this.setMessageComposerFaxFilename(response.data.file_name)
+          this.$refs.faxForm.reset()
         }).finally(() => {
-          this.is_uploading = false
+          this.isUploading = false
         })
     },
     sendCallback () {
       this.resetMessageComposerFax()
-      this.$refs.fax_form.reset()
       this.notifications = []
     },
     formatMessage () {
@@ -118,11 +125,17 @@ export default {
       }
     },
     send () {
-      this.is_sending = true
+      this.isSending = true
       return talk2Api.V1.lines.sendFax(this.selected_line.id, this.contact.id, this.formatMessage())
         .then(response => {
           if (response.status === 201) {
             this.sendCallback()
+            this.$q.notify({
+              message: 'Fax has been sent.',
+              type: 'positive',
+              textColor: 'white',
+              position: 'bottom-right'
+            })
           }
         }).catch(error => {
           console.log(error)
@@ -130,21 +143,17 @@ export default {
             message: 'Error while sending fax.',
             type: 'negative',
             textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
+            position: 'bottom-right'
           })
         }).finally(() => {
-          this.is_sending = false
+          this.isSending = false
         })
     }
   },
   watch: {
-    selected_file: function () {
-      if (this.selected_file) {
-        this.onUpload(this.selected_file[0])
+    selectedFile: function () {
+      if (this.selectedFile) {
+        this.onUpload(this.selectedFile[0])
       }
     }
   }
@@ -155,6 +164,7 @@ export default {
   .file-info {
     font-size: 12px;
     margin-bottom: 0 !important;
+    font-weight: normal;
   }
 
   .custom-progress-bar {
@@ -169,6 +179,69 @@ export default {
 
   .btn-remove-file {
     color: #62666E;
+  }
+
+  .media-preview-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0;
+    padding-right: 1px;
+
+    .media-preview {
+      position: relative;
+
+      .btn-remove-attachments {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        padding: 0.015rem 0.2rem;
+        font-size: 50%;
+        opacity: 0;
+      }
+
+      .pdf-thumbnail-wrapper {
+        padding: 4px;
+        width: 100px;
+        height: 76px;
+        border-radius: 8px;
+        border: 1px solid #EBEBEB;
+
+        i.media-icon {
+          color: #FE2216;
+        }
+
+        p {
+          font-size: 10px;
+          max-width: 90px;
+        }
+
+        .pdf-preview {
+          overflow: hidden !important;
+        }
+      }
+    }
+
+    .media-preview:hover{
+      .btn-remove-attachments {
+        opacity: 1;
+      }
+    }
+
+    .media-icon-wrapper {
+      height: 42px;
+      width: 42px;
+      background: #EBEBEB;
+      border-radius: 6px;
+      text-align: center;
+      margin: auto;
+
+      i.media-icon {
+        margin-top: 10px;
+        font-size: 20px;
+        color: #B5B7BB;;
+      }
+    }
+
   }
 
 </style>

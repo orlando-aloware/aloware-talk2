@@ -1,77 +1,103 @@
 <template>
   <div v-if="integration_data"
        class="hubspot-integration-wrapper">
-    <h5 class="integration-title">
-      <b-link :href="integration_data['profile-url']">
-        <i class="fab fa-hubspot"></i> Hubspot
-      </b-link>
 
-    </h5>
-    <p v-if="integration_data.properties.firstname && integration_data.properties.lastname"
-       class="name-wrapper">
-      {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
-    </p>
+    <q-card class="my-card" flat bordered>
+      <q-item>
 
-    <p v-if="integration_data.properties.email">
-      <span class="data-icon-label">
-        <i class="far fa-envelope"></i> Email:
-      </span>
-      <span class="data-value">
-        {{ integration_data.properties.email.value }}
-      </span>
-    </p>
-    <p v-if="integration_data.properties.company">
-       <span class="data-icon-label">
-        <i class="far fa-building"></i> Company:
-      </span>
-      <span class="data-value">
-        {{ integration_data.properties.company.value }}
-      </span>
-    </p>
-    <p v-if="integration_data.properties.hubspot_owner">
-       <span class="data-icon-label">
-        <i class="far fa-user"></i> Owner:
-      </span>
-      <span class="data-value">
-        {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
-      </span>
-    </p>
+        <q-item-section>
+          <b-link class="ml-2" :href="integration_data['profile-url']">
+            <i class="fab fa-hubspot hubspot-icon"></i> <span class="integration-title">Hubspot</span>
+          </b-link>
+        </q-item-section>
+      </q-item>
 
-    <b-card-body v-if="integration_data.properties.deals">
-      <div v-for="(deal, index) in integration_data.properties.deals" :key="index">
-        <h6><b-link :href="hubspotContactBaseLink + 'deal/' + deal.dealId" target="_blank">{{ deal.properties.dealname.value }}</b-link></h6>
-        <p class="d-flex justify-content-between"><span class="text-bold text-muted">Amount</span> <span>{{ deal.properties.amount.value | toCurrency }}</span></p>
-        <p class="d-flex justify-content-between"><span class="text-bold text-muted">Pipeline</span> <span>{{ deal.properties.pipeline.label }}</span></p>
-        <p class="d-flex justify-content-between"><span class="text-bold text-muted">Stage</span> <span>{{ deal.properties.dealstage.label }}</span></p>
-        <hr/>
-      </div>
-    </b-card-body>
-    <b-row>
-      <b-button class="text-white text-uppercase btn-block"
+      <q-separator />
+
+      <q-card-section>
+          <p class="mb-0" v-if="integration_data.properties.firstname && integration_data.properties.lastname">
+             <span class="data-icon-label">
+              Name:
+            </span>
+            <span class="data-value" v-b-tooltip="integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value">
+              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            </span>
+          </p>
+          <p class="mb-0" v-if="integration_data.properties.email">
+            <span class="data-icon-label">
+              Email:
+            </span>
+            <span class="data-value" v-b-tooltip="integration_data.properties.email.value">
+              {{ integration_data.properties.email.value }}
+            </span>
+          </p>
+          <p class="mb-0" v-if="integration_data.properties.company">
+             <span class="data-icon-label">
+              Company:
+            </span>
+            <span class="data-value" v-b-tooltip="integration_data.properties.company.value">
+              {{ integration_data.properties.company.value }}
+            </span>
+          </p>
+          <p class="mb-0" v-if="integration_data.properties.hubspot_owner">
+             <span class="data-icon-label">
+              Owner:
+            </span>
+            <span class="data-value" v-b-tooltip="integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName">
+              {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
+            </span>
+          </p>
+        </q-card-section>
+
+      <q-card-section horizontal>
+        <q-card class="my-card mr-3 ml-3 deals" flat bordered v-for="(deal, index) in integration_data.properties.deals" :key="index">
+          <q-card-section horizontal>
+            <q-card-section>
+                <h6><b-link class="deals-title" :href="hubspotContactBaseLink() + 'deal/' + deal.dealId" target="_blank">{{ deal.properties.dealname.value }}</b-link></h6>
+                <p class="mb-0">
+                  <span class="data-icon-label">Amount: </span>
+                  <span class="data-value" v-b-tooltip="$options.filters.toCurrency(deal.properties.amount.value)">{{ deal.properties.amount.value | toCurrency }}</span>
+                </p>
+                <p class="mb-0">
+                  <span class="data-icon-label">Pipeline: </span>
+                  <span class="data-value" v-b-tooltip="deal.properties.pipeline.label">{{ deal.properties.pipeline.label }}</span>
+                </p>
+                <p class="mb-0">
+                  <span class="data-icon-label">Stage: </span>
+                  <span class="data-value" v-b-tooltip="deal.properties.dealstage.label">{{ deal.properties.dealstage.label }}</span>
+                </p>
+            </q-card-section>
+          </q-card-section>
+        </q-card>
+      </q-card-section>
+      <q-card-section>
+        <b-row>
+          <b-button class="text-white text-uppercase btn-block"
+                    size="sm"
+                    variant="warning"
+                    tabindex="0"
+                    id="btn-workflow-enroll">
+            <i class="fa fa-user-plus"></i>
+            Enroll to Workflow
+          </b-button>
+        </b-row>
+      </q-card-section>
+    </q-card>
+    <b-popover custom-class="workflow-enroll-popover"
+               id="hubspot-workflow-popover"
+               target="btn-workflow-enroll"
+               triggers="click">
+      <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
+      <b-button class="btn-block"
                 size="sm"
-                variant="warning"
-                tabindex="0"
-                id="btn-workflow-enroll">
-        <i class="fa fa-user-plus"></i>
-        Enroll to Workflow
+                variant="primary"
+                :disabled="isEnrolling || !isWorkflowValid"
+                @click.prevent="enrollToWorkflow"
+      >
+        <q-spinner-bars v-if="isEnrolling" color="white" />
+        {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
       </b-button>
-
-      <b-popover custom-class="workflow-enroll-popover"
-                 id="hubspot-workflow-popover"
-                 target="btn-workflow-enroll"
-                 triggers="click">
-        <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
-        <b-button class="btn-block"
-                  size="sm"
-                  variant="primary"
-                  :disabled="isEnrolling || !isWorkflowValid"
-                  @click.prevent="enrollToWorkflow"
-        >
-          <q-spinner-bars v-if="isEnrolling" color="white" />
-          {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
-        </b-button>
-      </b-popover>
-    </b-row>
+    </b-popover>
   </div>
 </template>
 
@@ -1109,13 +1135,9 @@ export default {
 
 <style lang="scss" scoped>
 .hubspot-integration-wrapper {
-  .integration-title {
-    font-size: 14px;
-    font-weight: 500;
 
-    i {
-      color: #FF7A59;
-    }
+  a {
+    text-decoration: none;
   }
 
   .name-wrapper {
@@ -1132,8 +1154,51 @@ export default {
     }
 
     .data-value{
-      font-weight: 500;
+      font-weight: 400;
     }
+  }
+
+  .deals {
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 5px;
+
+    .data-value {
+      max-width: 139px !important;
+    }
+
+    .deals-title {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #303133;
+    }
+  }
+
+  .integration-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #303133;
+  }
+
+  .hubspot-icon {
+    color: #FF7A59;
+    margin-right: 5px;
+    font-size: 20px;
+  }
+
+  .data-value {
+    max-width: 177px;
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    top: 5px;
+  }
+
+  .data-icon-label{
+    font-weight: 500;
+    color: #6c757d !important;
   }
 }
 

@@ -93,7 +93,7 @@
               <div class="w-100 text-center">
                 <div class="text-center pb-3 b-b">
                   <q-btn-toggle
-                    class="shedule-button-toggle border w-100"
+                    class="schedule-button-toggle border w-100"
                     no-caps
                     unelevated
                     toggle-color="primary"

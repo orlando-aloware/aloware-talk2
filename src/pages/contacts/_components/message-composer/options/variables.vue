@@ -1,56 +1,52 @@
 <template>
   <div>
-    <q-select clearable
-              dense
-              outlined
-              use-input
-              map-options
-              emit-value
-              option-value="value"
-              option-label="label"
-              ref="variableSelector"
-              v-model="variable"
-              :loading="is_busy"
-              :options="options"
-              @filter="filterFn">
-      <template v-slot:option="scope">
-        <q-item v-if="!scope.opt.group"
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-        >
-          <q-item-section>
-            <q-item-label v-html="scope.opt.label" ></q-item-label>
-            <q-item-label caption>{{ scope.opt.description }}</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item v-if="scope.opt.group"
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-        >
-          <q-item-label header class="group-label">{{ scope.opt.group }}</q-item-label>
-        </q-item>
+    <vue-multiselect
+                 v-model="variable"
+                 track-by="value"
+                 label="label"
+                 class="custom-multi-select custom-multi-select-single always-open"
+                 placeholder="Select a variable"
+                 :options="multiselectOptions"
+                 :searchable="true"
+                 :showNoResults="false"
+                 :close-on-select="false"
+                 :show-labels="false"
+                 tagPosition="bottom"
+                 ref="multiselect"
+                 :maxHeight="130"
+                 group-label="type"
+                 group-values="variables"
+                 :group-select="false"
+                 @select="onSelect"
+                 @remove="onRemove">
+      <template slot="caret">
+        <i class="fa fa-search search-icon"></i>
       </template>
-      <template v-slot:no-option>
-        <q-item>
-          <q-item-section class="text-grey p-2">
-            No results
-          </q-item-section>
-        </q-item>
+      <template v-slot:option="props">
+        <div v-if=" props.option.hasOwnProperty('$groupLabel')" class="option__group_header">
+          <span class="option__title">{{ props.option.$groupLabel }}</span>
+        </div>
+        <div v-else class="option__desc">
+          <span class="option__title">{{ props.option.label }}</span>
+          <br/>
+          <p class="option__small mb-0">{{ props.option.description }}</p>
+        </div>
       </template>
-    </q-select>
+    </vue-multiselect>
   </div>
 </template>
-
 <script>
 
 import { mapGetters } from 'vuex'
+import VueMultiselect from 'vue-multiselect'
 
 export default {
   name: 'variables',
+  components: { VueMultiselect },
   computed: {
     ...mapGetters('contacts', ['message_composer']),
     formattedOptions () {
-      let contactVariables = [...this.contact_variables]
+      let contactVariables = [...this.contactVariables]
 
       contactVariables.unshift({
         group: 'Contact Variables',
@@ -59,8 +55,8 @@ export default {
 
       let variablesArray = contactVariables
 
-      if (this.agent_variables && this.agent_variables.length > 0) {
-        let agentVariables = [...this.agent_variables]
+      if (this.agentVariables && this.agentVariables.length > 0) {
+        let agentVariables = [...this.agentVariables]
         agentVariables.unshift({
           group: 'Agent Variables',
           disable: true
@@ -68,8 +64,8 @@ export default {
         variablesArray = [...contactVariables, ...agentVariables]
       }
 
-      if (this.line_variables && this.line_variables.length > 0) {
-        let lineVariables = [...this.line_variables]
+      if (this.lineVariables && this.lineVariables.length > 0) {
+        let lineVariables = [...this.lineVariables]
         lineVariables.unshift({
           group: 'Line Variables',
           disable: true
@@ -77,8 +73,8 @@ export default {
         variablesArray = [...contactVariables, ...lineVariables]
       }
 
-      if (this.account_variables && this.account_variables.length > 0) {
-        let accountVariables = [...this.account_variables]
+      if (this.accountVariables && this.accountVariables.length > 0) {
+        let accountVariables = [...this.accountVariables]
         accountVariables.unshift({
           group: 'Account Variables',
           disable: true
@@ -86,8 +82,8 @@ export default {
         variablesArray = [...contactVariables, ...accountVariables]
       }
 
-      if (this.csf_variables && this.csf_variables.length > 0) {
-        let csfVariables = [...this.csf_variables]
+      if (this.csfVariables && this.csfVariables.length > 0) {
+        let csfVariables = [...this.csfVariables]
         csfVariables.unshift({
           group: 'CSF Variables',
           disable: true
@@ -96,6 +92,50 @@ export default {
       }
 
       return variablesArray
+    },
+    multiselectOptions () {
+      let groups = [
+        {
+          type: 'Contact Variables',
+          variables: this.contactVariables
+        }
+      ]
+
+      if (this.agentVariables && this.agentVariables.length > 0) {
+        groups.push(
+          {
+            type: 'Agent Variables',
+            variables: this.agentVariables
+          }
+        )
+      }
+
+      if (this.lineVariables && this.lineVariables.length > 0) {
+        groups.push(
+          {
+            type: 'Line Variables',
+            variables: this.lineVariables
+          }
+        )
+      }
+      if (this.accountVariables && this.accountVariables.length > 0) {
+        groups.push(
+          {
+            type: 'Account Variables',
+            variables: this.accountVariables
+          }
+        )
+      }
+      if (this.csfVariables && this.csfVariables.length > 0) {
+        groups.push(
+          {
+            type: 'CSF Variables',
+            variables: this.csfVariables
+          }
+        )
+      }
+
+      return groups
     }
   },
   data () {
@@ -103,7 +143,7 @@ export default {
       is_busy: false,
       variable: null,
       options: this.formattedOptions,
-      contact_variables: [
+      contactVariables: [
         {
           label: '[FirstName]',
           value: '[FirstName]',
@@ -200,7 +240,7 @@ export default {
           description: 'to include the id of the contact (this is mostly used in tracking individual contacts through links)'
         }
       ],
-      agent_variables: [
+      agentVariables: [
         {
           label: '[AgentName]',
           value: '[AgentName]',
@@ -217,7 +257,7 @@ export default {
           description: 'to include agent’s last name'
         }
       ],
-      line_variables: [
+      lineVariables: [
         {
           label: '[LineName]',
           value: '[LineName]',
@@ -229,14 +269,14 @@ export default {
           description: 'to include tracking number of this line'
         }
       ],
-      account_variables: [
+      accountVariables: [
         {
           label: '[AccountName]',
           value: '[AccountName]',
           description: 'to include the name of your account'
         }
       ],
-      csf_variables: [
+      csfVariables: [
         {
           label: '[CSF1]',
           value: '[CSF1]',
@@ -263,26 +303,75 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.formattedOptions.filter(v => v.label && v.label.toLowerCase().indexOf(needle) > -1)
       })
+    },
+    onSelect (selectedOption, id) {
+      this.$el.querySelector('.custom-multi-select-single input.multiselect__input').placeholder = (selectedOption) || this.placeholder
+    },
+    onRemove () {
+      this.$el.querySelector('.custom-multi-select-single input.multiselect__input').placeholder = this.placeholder
     }
   },
   watch: {
     'variable': function (value) {
       if (value) {
-        this.$emit('variableSelected', value)
+        this.$emit('variableSelected', value.value)
       }
     }
   },
   mounted () {
     this.options = this.formattedOptions
-    this.$nextTick(function () {
-      this.$refs.variableSelector.focus()
-    })
   }
 }
 </script>
 
-<style scoped>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style lang="scss" scoped>
+@import 'src/css/mixins.scss';
+@import 'src/css/variables.scss';
+@import 'src/css/breakpoints.scss';
   .group-label {
     font-size: 90%;
+  }
+
+  .custom-multi-select {
+    .multiselect__content-wrapper {
+      overflow: hidden;
+    }
+
+    .multiselect__option {
+      padding: 5px !important;
+    }
+
+    i.search-icon {
+      right: 14px;
+      position: absolute;
+      top: 12px;
+    }
+  }
+
+  .option__desc {
+    padding-left: 20px;
+
+    .option__title {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 16.94px;
+    }
+
+    .option__small {
+      font-size: 11px;
+      font-weight: 400;
+      color: $grey-90;
+      max-width: 240px;
+      white-space: normal;
+    }
+  }
+
+  .option__group_header {
+    font-size: 13px;
+    font-weight: 500;
+    color: $grey-100;
+    padding-top: 0;
+    margin-left: 5px;
   }
 </style>
