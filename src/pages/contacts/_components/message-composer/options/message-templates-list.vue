@@ -6,15 +6,30 @@
           :key="template.id">
         <div class="template-title ellipsis">{{ template.name }}</div>
         <div class="d-flex justify-content-between template-actions">
-          <b-link href="#" class="active" v-on:click="templateSelected(template)"><add-icon-square></add-icon-square></b-link>
-          <b-link href="#" :id="`template-view-${template.id}`"><eye-icon></eye-icon></b-link>
-          <b-link href="#"><pencil-o-icon/></b-link>
-          <b-link href="#" v-on:click="deleteTemplate(template)"><trash-o-icon/></b-link>
+          <b-link href="#"
+                  class="active"
+                  v-b-tooltip="`Use`"
+                  v-on:click="templateSelected(template)">
+            <add-icon-square></add-icon-square>
+          </b-link>
+          <b-link href="#"
+                  :id="`template-view-${template.id}`"
+                  v-b-tooltip="`View`">
+            <eye-icon height="16" width="16"></eye-icon>
+          </b-link>
+          <b-link href="#"
+                  v-b-tooltip="`Edit`">
+            <pencil-o-icon color="#62666E"/>
+          </b-link>
+          <b-link href="#" v-b-tooltip="`Delete`"
+                  v-on:click="deleteTemplate(template)">
+            <trash-o-icon/>
+          </b-link>
 
           <b-popover ref="popover"
                      placement="topright"
                      :target="`template-view-${template.id}`"
-                     triggers="focus">
+                     triggers="click blur">
             {{ template.body }}
           </b-popover>
         </div>

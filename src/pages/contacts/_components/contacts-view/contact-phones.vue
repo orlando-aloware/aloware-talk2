@@ -1,12 +1,17 @@
 <template>
   <div>
     <b-card class="mt-2 mb-2 border-0" id="card-contact-phone">
-      <h6>Other Numbers</h6>
+      <h6>All Numbers</h6>
       <div class="phone-number-wrapper"
            v-for="phone_number in otherNumbers"
            :key="phone_number.id">
         <div>
-          <small class="text-muted">{{ phone_number.title }}</small>
+          <span v-if="phone_number.title" class="text-muted phone-number-title mr-2">{{ phone_number.title }} </span>
+          <b-badge v-if="phone_number.lrn_type && phone_number.lrn_type !== undefined"
+                   variant="primary"
+                   class="badge-phone-info">
+            {{ phone_number.lrn_type }}
+          </b-badge>
         </div>
         <div class="d-flex justify-content-between">
           <p class="phone-number m-0">
@@ -44,7 +49,7 @@
     <b-popover custom-class="contact-phone-popover"
                id="contact-phone-form-popover"
                target="btn-show-phone-form"
-               triggers="click blur"
+               triggers="click"
                :show.sync="showPhonesForm"
                @hidden="onPopoverHidden">
       <contact-phones-form @close="onClosePhoneForm"></contact-phones-form>
@@ -64,7 +69,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'contact_phone_numbers']),
     otherNumbers () {
-      return this.contact_phone_numbers.filter(phone => phone.phone_number !== this.contact.phone_number)
+      return this.contact_phone_numbers // .filter(phone => phone.phone_number !== this.contact.phone_number)
     }
   },
   data () {
@@ -104,6 +109,15 @@ export default {
 <style lang="scss" scoped>
   .phone-number {
     font-size: 0.90rem;
+  }
+
+  .phone-number-title {
+    font-size: 10px;
+    font-weight: normal;
+    color: #FFFFFF;
+    display: inline-block;
+    top: -2px;
+    position: relative;
   }
 
   .phone-number-wrapper:hover {

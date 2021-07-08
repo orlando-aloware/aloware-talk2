@@ -70,8 +70,8 @@
                     size="sm"
                     :disabled="!validSms"
                     v-on:click="onSend">
-            <q-spinner-bars v-if="is_sending" color="white" />
-            {{ is_sending ? 'Sending Text...' : 'Send Text' }}
+            <q-spinner-bars v-if="isSending" color="white" />
+            {{ isSending ? 'Sending Text...' : 'Send Text' }}
           </b-button>
           <b-dropdown class="message-composer-dropdown"
                       variant="primary"
@@ -105,9 +105,9 @@
                id="sms-variables-popover"
                placement="topright"
                target="smsVariables"
-               triggers="click"
+               triggers="click blur"
                @show="onPopoverShown">
-      <variables @variableSelected="variableSelected"></variables>
+        <variables @variableSelected="variableSelected"></variables>
     </b-popover>
 
     <b-popover ref="popover"
@@ -146,7 +146,7 @@ export default {
   },
   data () {
     return {
-      is_sending: false
+      isSending: false
     }
   },
   methods: {
@@ -170,12 +170,26 @@ export default {
       }
     },
     onSend () {
-      this.is_sending = true
+      this.isSending = true
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
           this.resetMessageComposerSms()
+          this.$q.notify({
+            message: 'Text has been sent.',
+            type: 'positive',
+            textColor: 'white',
+            position: 'bottom-right'
+          })
+        }).catch(error => {
+          console.log(error)
+          this.$q.notify({
+            message: 'Error while sending text.',
+            type: 'negative',
+            textColor: 'white',
+            position: 'bottom-right'
+          })
         }).finally(() => {
-          this.is_sending = false
+          this.isSending = false
         })
     },
     closeVariablesPopover () {

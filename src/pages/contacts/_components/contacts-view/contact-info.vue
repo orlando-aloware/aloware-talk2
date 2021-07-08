@@ -13,7 +13,8 @@
           <h6 class="mt-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
           <p class="contact-phone">
             {{ contact.phone_number | fixPhone }}
-            <b-link href="#" class="copy-phone-number" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
+            <b-badge variant="warning" class="badge-phone-info">Primary</b-badge>
+            <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
             <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
           </p>
         </div>
@@ -89,22 +90,14 @@ export default {
           message: 'Phone number copied to clipboard.',
           type: 'positive',
           textColor: 'white',
-          actions: [
-            {
-              icon: 'close'
-            }
-          ]
+          position: 'bottom-right'
         })
       } catch (err) {
         this.$q.notify({
           message: 'Error copying phone number to clipboard.',
           type: 'negative',
           textColor: 'white',
-          actions: [
-            {
-              icon: 'close'
-            }
-          ]
+          position: 'bottom-right'
         })
       }
 
@@ -149,8 +142,8 @@ export default {
 
   .btn-edit-contact-info {
     position: absolute;
-    right: 0;
-    top: 5px;
+    right: -7px;
+    top: -9px;
     opacity: 0;
   }
 
