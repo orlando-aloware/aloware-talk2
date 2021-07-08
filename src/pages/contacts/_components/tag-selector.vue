@@ -1,20 +1,16 @@
 <template>
-  <q-select ref="tag-select"
-            class="w-full"
-            option-value="id"
-            option-label="name"
-            :use-chips="multiple"
-            :use-input="multiple"
-            :placeholder="placeholder"
-            :multiple="multiple"
-            :max-values="multipleLimit"
-            :clearable="clearable"
-            :collapse-tags="!noCollapse"
-            :options="combinedFilteredTags"
-            v-model="tagId"
-            v-loading="loadingTags"
-            @change="selectTag"
-            @filter="filterTagFn">
+  <q-select
+    outlined
+    :multiple="multiple"
+    v-model="tagId"
+    :options="combinedFilteredTags"
+    :use-input="multiple"
+    :clearable="clearable"
+    stack-label
+    color="secondary"
+    :loading="loadingTags"
+    @change="selectTag"
+    @filter="filterTagFn">
     <template v-slot:option="scope">
       <q-item class="text-muted"
               :label="scope.opt.title">
@@ -26,14 +22,30 @@
           clickable
           v-ripple
           v-close-popup
-          @click="model = child"
-          :class="{ 'bg-light-blue-1': model === child.id }"
+          @click="tagId = child.id"
+          :class="{ 'bg-light-blue-1': tagId === child.id }"
         >
           <q-item-section>
             <q-item-label v-html="child.name" class="q-ml-md" ></q-item-label>
           </q-item-section>
+          <q-item-section side>
+          </q-item-section>
         </q-item>
       </template>
+    </template>
+    <template v-slot:selected-item="scope">
+      <q-chip
+        removable
+        dense
+        @remove="scope.removeAtIndex(scope.index)"
+        :tabindex="scope.tabindex"
+        color="white"
+        text-color="secondary"
+        class="q-ma-none"
+      >
+        <q-avatar color="secondary" text-color="white" :icon="scope.opt.icon" />
+        {{ scope.opt.label }}
+      </q-chip>
     </template>
   </q-select>
 </template>
@@ -42,7 +54,6 @@
 import _ from 'lodash'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
-import auth from 'boot/auth'
 import * as TagTypes from 'src/constants/tag-types'
 import * as TagCategory from 'src/constants/tag-categories'
 export default {
@@ -52,7 +63,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       tagId: this.value,
       loadingTags: false,
       tags: [],

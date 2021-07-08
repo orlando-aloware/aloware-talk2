@@ -38,7 +38,8 @@ export default {
   },
   data () {
     return {
-      contactName: 'Contact Name'
+      contactName: 'Contact Name',
+      isLoadingPreviousActivities: false
     }
   },
   computed: {

@@ -2,10 +2,6 @@ import randomColor from 'randomcolor'
 
 export default {
   methods: {
-    avatarTooltip (contact) {
-      return contact.name
-    },
-
     avatarStyle (isSender = false) {
       let style = {
         backgroundColor: '#95989E',

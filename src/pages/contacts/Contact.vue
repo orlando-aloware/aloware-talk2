@@ -2,7 +2,25 @@
   <div class="row mx-0 content-row contact-view-wrapper d-flex">
     <contact-list-sidebar></contact-list-sidebar>
     <div :class="`pr-2 mb-3 contact-activity-wrapper ${widthClass}`">
-      <contact-activities :communications="filteredCommunications"></contact-activities>
+      <contact-activities :communications="filteredCommunications">
+        <template v-slot:moreActivities>
+          <q-btn outline
+                 dense
+                 rounded
+                 no-caps
+                 class="prev-activities mx-2"
+                 color="primary"
+                 size="md"
+                 :loading="isLoadingPreviousActivities"
+                 :disable="isLoadingPreviousActivities"
+                 v-if="hasMoreCommunications"
+                 @click="loadMorePreviousActivities">
+            <div class="px-2">
+              Previous Activities
+            </div>
+          </q-btn>
+        </template>
+      </contact-activities>
     </div>
     <div class="px-0 mb-3 width-300">
       <contact-details></contact-details>
@@ -75,6 +93,13 @@ export default {
 
     .contact-activity-wrapper.w-less-315px {
       width: calc(100% - 315px)
+    }
+
+    .prev-activities {
+      .q-btn__wrapper {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
     }
   }
 </style>

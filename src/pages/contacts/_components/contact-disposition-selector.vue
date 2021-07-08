@@ -30,7 +30,6 @@
 
 <script>
 import _ from 'lodash'
-import auth from '../../../boot/auth'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import * as Roles from 'src/constants/roles'
@@ -65,7 +64,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loadingDispose: false,
       recentdispositionStatusId: null,
       Roles

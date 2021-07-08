@@ -1,27 +1,26 @@
 <template>
-  <div class="waveform-container"
-       v-loading="!ready">
-    <button class="play-button"
+  <div class="waveform-container d-flex align-items-center flex-row flex-grow-1">
+    <button class="play-button mr-2 px-0"
             :disabled="!ready"
             @click.prevent="handlePlay">
       <i class="fa fa-pause"
-         v-show="playing"></i>
+         v-if="playing"></i>
       <i class="fa fa-play"
-         v-show="!playing"></i>
+         v-if="!playing"></i>
     </button>
-    <div id="waveform"></div>
-    <div class="waveform-timeline">
-      <span class="text-xxs">{{ current_time | fixDuration }} / {{ duration | fixDuration }}</span>
+    <div :id="'waveform-' + uniqueId"
+         class="waveform flex-grow-1 mr-2"></div>
+    <div class="waveform-timeline mr-2">
+      <span class="text-xxs">{{ currentTime | fixDuration(true) }}/{{ duration | fixDuration(true) }}</span>
     </div>
     <vue-wave-surfer ref="surf"
-                     :src="remote_url"
+                     :src="remoteUrl"
                      :options="options">
     </vue-wave-surfer>
   </div>
 </template>
 
 <script>
-import auth from 'boot/auth'
 import { aclMixin } from 'src/plugins/mixins'
 export default {
   name: 'waveform',
@@ -31,23 +30,26 @@ export default {
   props: {
     remoteUrl: {
       required: true
+    },
+
+    uniqueId: {
+      required: true
     }
   },
 
   data () {
     return {
-      auth: auth,
       options: {
         barRadius: 2,
         barWidth: 2,
         barGap: null,
         cursorWidth: 1,
-        container: '#waveform',
+        container: '#waveform-' + this.uniqueId,
         backend: 'WebAudio',
         height: 40,
         progressColor: '#2D5BFF',
         responsive: true,
-        waveColor: '#EFEFEF',
+        waveColor: '#C9C9C9',
         cursorColor: '#2D5BFF'
       },
       playing: false,
@@ -66,6 +68,7 @@ export default {
   mounted () {
     this.player.on('ready', () => {
       this.ready = true
+      this.$emit('ready')
       this.duration = this.player.getDuration()
     })
 

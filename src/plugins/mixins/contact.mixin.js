@@ -99,7 +99,8 @@ export default {
       messageObject: {
         phone_number: null
       },
-      activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups']
+      activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups'],
+      contact_id: null
     }
   },
 
@@ -196,6 +197,7 @@ export default {
   },
 
   created () {
+    this.contact_id = _.get(this.$route, 'params.id', null)
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })

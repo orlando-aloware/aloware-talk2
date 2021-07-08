@@ -3,44 +3,46 @@
     <template v-if="!isForm">
       <p class="_600 mb-0">
         Target Users
-        <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>:
+        <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>
       </p>
       <template v-if="isTargetUsersWithAttempts">
-        <el-tree node-key="id"
-                 :data="generateTargetUsersTree"
-                 :props="default_props"
-                 :default-expanded-keys="[communication.attempt]"
-                 :indent="5">
-        </el-tree>
+        <q-tree
+          :nodes="generateTargetUsersTree"
+          node-key="label"
+          selected-color="primary"
+          :expanded="[communication.attempt]">
+        </q-tree>
       </template>
       <template v-else-if="isTargetUsersWithNoAttempts">
-        <el-tree :data="generateTargetUsersTree"
-                 :props="default_props"
-                 :indent="5">
-        </el-tree>
+        <q-tree
+          :nodes="generateTargetUsersTree"
+          node-key="label"
+          selected-color="primary">
+        </q-tree>
       </template>
       <span v-else>-</span>
       <br>
     </template>
     <template v-else-if="isForm">
-      <label class="form-control-label col-xl-5 col-12">
+      <label class="form-control-label">
         Target Users
-        <span v-if="communication.target_users && communication.target_users.length">({{attemptLabel}})</span>:
+        <span v-if="communication.target_users && communication.target_users.length">({{attemptLabel}})</span>
       </label>
-      <div class="d-flex align-items-center col-xl-7 col-12">
+      <div class="d-flex align-items-center">
         <template v-if="isTargetUsersWithAttempts">
-          <el-tree node-key="id"
-                   :data="generateTargetUsersTree"
-                   :props="default_props"
-                   :default-expanded-keys="[communication.attempt]"
-                   :indent="5">
-          </el-tree>
+          <q-tree
+            :nodes="generateTargetUsersTree"
+            node-key="label"
+            selected-color="primary"
+            :expanded="[communication.attempt]">
+          </q-tree>
         </template>
         <template v-else-if="isTargetUsersWithNoAttempts">
-          <el-tree :data="generateTargetUsersTree"
-                   :props="default_props"
-                   :indent="5">
-          </el-tree>
+          <q-tree
+            :nodes="generateTargetUsersTree"
+            node-key="label"
+            selected-color="primary">
+          </q-tree>
         </template>
         <span v-else>-</span>
       </div>
@@ -68,15 +70,6 @@ export default {
       required: false,
       type: Boolean,
       default: false
-    }
-  },
-
-  data () {
-    return {
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      }
     }
   },
 
