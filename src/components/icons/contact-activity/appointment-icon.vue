@@ -6,15 +6,15 @@
 
 <script>
 export default {
-  name: 'appointment',
+  name: 'appointment-icon',
   props: {
     width: {
       type: [Number, String],
-      default: 24
+      default: 16
     },
     height: {
       type: [Number, String],
-      default: 24
+      default: 16
     }
   }
 }

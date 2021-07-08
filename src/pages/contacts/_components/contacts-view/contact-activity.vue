@@ -1,7 +1,7 @@
 <template>
   <div class="message mb-3"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
-    <avatar class="mt-2 contact-avatar"
+    <avatar class="mt-1 contact-avatar"
             width="34"
             height="34"
             :style="avatarStyle(isSender)"
@@ -124,7 +124,7 @@
              :class="getCommunicationClass"
              v-if="communication.body">
           <span class="arrow pull-top"
-                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'inbound arrow-dker left' : 'outbound arrow-dker right' ]">
+                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
           </span>
           <div class="p-a p-y-sm handle-whitespace">
             <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
@@ -335,15 +335,15 @@ export default {
 
     getCommunicationClass () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
-        return 'dker'
+        return 'inbound dker'
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && ![CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'blue-800 text-left'
+        return 'outbound blue-800 text-left'
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'red-500 text-left'
+        return 'outbound red-500 text-left'
       }
 
       return ''

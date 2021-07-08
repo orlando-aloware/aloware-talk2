@@ -33,8 +33,21 @@ Vue.component('outbound-email-inprogress-icon', require('src/components/icons/co
 
 // contact email disposition icons
 Vue.component('inbound-fax-completed-icon', require('src/components/icons/contact-activity/inbound-fax-completed-icon').default)
-Vue.component('inbound-fax-failed-icon', require('src/components/icons/contact-activity/inbound-fax-failed-icon').default)
+Vue.component('inbound-fax-missed-icon', require('src/components/icons/contact-activity/inbound-fax-missed-icon').default)
 Vue.component('inbound-fax-inprogress-icon', require('src/components/icons/contact-activity/inbound-fax-inprogress-icon').default)
 Vue.component('outbound-fax-completed-icon', require('src/components/icons/contact-activity/outbound-fax-completed-icon').default)
-Vue.component('outbound-fax-failed-icon', require('src/components/icons/contact-activity/outbound-fax-failed-icon').default)
+Vue.component('outbound-fax-missed-icon', require('src/components/icons/contact-activity/outbound-fax-missed-icon').default)
 Vue.component('outbound-fax-inprogress-icon', require('src/components/icons/contact-activity/outbound-fax-inprogress-icon').default)
+
+// appointment
+Vue.component('appointment-icon', require('src/components/icons/contact-activity/appointment-icon').default)
+
+// reminder
+Vue.component('reminder-icon', require('src/components/icons/contact-activity/reminder-icon').default)
+
+// voicemail
+Vue.component('inbound-voicemail-icon', require('src/components/icons/contact-activity/inbound-voicemail-icon').default)
+Vue.component('outbound-voicemail-icon', require('src/components/icons/contact-activity/inbound-voicemail-icon').default)
+
+// note
+Vue.component('note-icon', require('src/components/icons/contact-activity/note-icon').default)

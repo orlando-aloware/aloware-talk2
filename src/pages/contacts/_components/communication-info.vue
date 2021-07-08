@@ -3,9 +3,8 @@
        v-if="communication">
     <q-list class="rounded-contact-activity">
       <q-expansion-item
-        class="contact-activity"
         v-model="activeName"
-        :default-opened="false">
+        class="contact-activity">
         <template slot="header">
           <q-item-section class="communication-header flex-row">
             <div class="ml-3 pr-2">
@@ -49,11 +48,19 @@
               </template>
 
               <div v-if="communication.body">
-                <span class="text-muted"
-                      v-if="communication.type !== CommunicationTypes.SMS"
-                      v-html="$options.filters.nl2br(communication.body)"
+                <div class="text-muted mb-2"
+                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
+                      v-html="$options.filters.nl2br(communication.body) + '<h1>TESTING</h1>'"
                       v-linkify:options="{ target: '_blank' }">
-                </span>
+                </div>
+                <div class="font-weight-light-bold my-2"
+                     v-else-if="communication.type === CommunicationTypes.APPOINTMENT">
+                  Appointment has been set
+                </div>
+                <div class="font-weight-light-bold my-2"
+                     v-else-if="communication.type === CommunicationTypes.REMINDER">
+                  Reminder has been set
+                </div>
                 <span class="text-muted"
                       v-else
                       v-linkify:options="{ target: '_blank' }">
@@ -69,9 +76,74 @@
               {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash }}.
             </div>
 
-            <div class="w-100 pt-2 d-flex flex-row pb-2 mb-2 border-bottom">
-              <div class="w-50"
-                   v-if="(verbose || activityMode) && ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+            <div class="w-100"
+                 v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              <div class="form-group row mb-0 pt-2 pb-2">
+                <div class="d-flex align-items-center w-100">
+                  <div class="w-50">
+                    <label class="form-control-label w-100 mb-1">Date</label>
+                    {{ communication.engagement_data.appointment_datetime | fixScheduleDate}}
+                  </div>
+                  <div class="w-50">
+                    <label class="form-control-label w-100 mb-1">Time</label>
+                    {{ communication.engagement_data.appointment_datetime | fixScheduleTime}}
+                  </div>
+                </div>
+              </div>
+              <div class="w-100 text-center">
+                <div class="text-center pb-3 b-b">
+                  <q-btn-toggle
+                    class="shedule-button-toggle border w-100"
+                    no-caps
+                    unelevated
+                    toggle-color="primary"
+                    color="white"
+                    text-color="primary"
+                    :options="appointmentOptions"
+                    :disabled="loadingUpdateEngagement"
+                    v-model="communication.disposition_status2"
+                    v-if="communication.type === CommunicationTypes.APPOINTMENT"
+                  />
+                  <q-btn-toggle
+                    class="border"
+                    no-caps
+                    rounded
+                    unelevated
+                    toggle-color="primary"
+                    color="white"
+                    text-color="primary"
+                    :options="appointmentOptions"
+                    :disabled="loadingUpdateEngagement"
+                    v-model="communication.disposition_status2"
+                    v-else/>
+                </div>
+                <div class="d-flex flex-row pt-3 w-100 align-items-start">
+                  <router-link class="w-50"
+                               :to="{ name: 'Calendar', query: { communicationId: communication.id, view: 'month' }}">
+                    <q-btn class="border"
+                           no-caps
+                           outlined
+                           unelevated
+                           size="md">
+                      <div class="mx-1">
+                        <calendar-icon class="mr-1"/>
+                        Open in Calendar
+                      </div>
+                    </q-btn>
+                  </router-link>
+                  <sms-reminders v-if="communication.type === CommunicationTypes.APPOINTMENT"
+                                 class="w-50"
+                                 :communicationId="communication.id"
+                                 :campaignId="campaignId"
+                                 :appointmentDatetime="communication.engagement_data.appointment_datetime">
+                  </sms-reminders>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-100 pt-2 d-flex flex-row pb-2 mb-2 border-bottom"
+                 v-if="(verbose || activityMode) && ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              <div class="w-50">
                 <div class="form-group row mb-0">
                   <div class="w-100">
                     <label class="form-control-label w-100">From</label>
@@ -95,8 +167,7 @@
                 </div>
               </div>
 
-              <div class="w-50"
-                   v-if="(verbose || activityMode) && ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              <div class="w-50">
                 <div class="w-100">
                   <div class="form-group row mb-0">
                     <label class="form-control-label w-100">To</label>
@@ -159,6 +230,9 @@
                                v-bind:is="icon"
                                :name="rejectionToIcon(communication.rejected_by_app)">
                     </component>
+                    <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+                               v-if="communication.disposition_status2">
+                    </component>
                   </q-tooltip>
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
                     <router-link
@@ -187,9 +261,9 @@
             <div class="form-horizontal"
                  :class="[communication.type !== CommunicationTypes.NOTE ? 'b-b': '']"
                  v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <div class="form-group row mb-0 pt-2 pb-2"
+              <div class="w-100 mb-0 pt-2 pb-2"
                    v-if="communication.type !== CommunicationTypes.NOTE">
-                <label class="form-control-label col-12">User:</label>
+                <label class="form-control-label col-12">User</label>
                 <div class="d-flex align-items-center col-12">
                   <div class="status-icon d-inline-block"
                        :state="communication.rejected_by_app"
@@ -263,7 +337,7 @@
             </div>
 
             <div class="pb-2 mb-2 border-bottom"
-                 v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                 v-if="![CommunicationTypes.FAX, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="d-flex flex-row w-100"
                    v-if="communication.type === CommunicationTypes.CALL">
                 <div class="w-50">
@@ -548,19 +622,21 @@
                 </div>
 
                 <template v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
-                  <label class="form-control-label col-12">
-                    Files:
-                  </label>
-                  <div class="d-flex align-items-center col-12">
-                    <span v-for="(attachment, index) in communication.attachments"
-                          :key="index"
-                          class="text-dark-greenish">
-                      <a class="text-dark-greenish"
-                         target="_blank"
-                         :href="attachment.url">
-                        Click Here To Download
-                      </a>
-                    </span>
+                  <div class="border-bottom pb-2 mb-2 w-100">
+                    <label class="form-control-label col-12">
+                      Files:
+                    </label>
+                    <div class="d-flex align-items-center col-12">
+                      <span v-for="(attachment, index) in communication.attachments"
+                            :key="index"
+                            class="text-dark-greenish">
+                        <a class="text-dark-greenish"
+                           target="_blank"
+                           :href="attachment.url">
+                          Click Here To Download
+                        </a>
+                      </span>
+                    </div>
                   </div>
                 </template>
 
@@ -595,7 +671,7 @@
                   <div class="d-flex align-items-center co-12">
                     <label class="form-control-label">Call Disposition:</label>
                     <label class="ml-1 d-flex align-items-center"
-                         v-if="!currentCompany.force_call_disposition">
+                         v-if="currentCompany.force_call_disposition">
                       <b-button id="audio-btn"
                                 size="sm"
                                 variant="link"
@@ -630,51 +706,6 @@
                   <chevron-right width="5" height="8" />
                 </button>
               </router-link>
-            </div>
-          </div>
-          <div class="row p-l p-r"
-               v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-            <div class="col-12 text-center">
-              <div class="text-center pb-3 b-b">
-                <q-btn-toggle
-                  no-caps
-                  rounded
-                  unelevated
-                  toggle-color="primary"
-                  color="white"
-                  text-color="primary"
-                  :options="appointmentOptions"
-                  :disabled="loadingUpdateEngagement"
-                  v-model="communication.disposition_status2"
-                  v-if="communication.type === CommunicationTypes.APPOINTMENT"
-                />
-                <q-btn-toggle
-                  no-caps
-                  rounded
-                  unelevated
-                  toggle-color="primary"
-                  color="white"
-                  text-color="primary"
-                  :options="appointmentOptions"
-                  :disabled="loadingUpdateEngagement"
-                  v-model="communication.disposition_status2"
-                  v-else/>
-              </div>
-              <div class="text-center pt-3">
-                <router-link
-                  :to="{ name: 'Calendar', query: { communicationId: communication.id, view: 'month' }}">
-                  <q-btn size="">
-                    <q-icon name="fa fa-calendar"
-                            class="mr-1">
-                    </q-icon>
-                    Open in Calendar
-                  </q-btn>
-                </router-link>
-              </div>
-              <sms-reminders :communicationId="communication.id"
-                             :campaignId="campaignId"
-                             :appointmentDatetime="communication.engagement_data.appointment_datetime">
-              </sms-reminders>
             </div>
           </div>
         </div>
@@ -717,6 +748,7 @@ import CommunicationAudio from 'src/pages/contacts/_components/communication-aud
 import CommunicationNote from 'src/pages/contacts/_components/communication-note'
 import CommunicationTags from 'src/pages/contacts/_components/communication-tags'
 import CallDispositionSelector from 'src/pages/contacts/_components/call-disposition-selector'
+import CalendarIcon from 'components/icons/calendar-icon'
 
 export default {
   name: 'communication-info',
@@ -729,6 +761,7 @@ export default {
   ],
 
   components: {
+    CalendarIcon,
     ChevronRight,
     CallDispositionSelector,
     CommunicationAudio,
@@ -797,7 +830,7 @@ export default {
       REJECTION_REASON_OTHER: 3, // A call/SMS was received by our system but was blocked because because of other reasons, e.g.: .
       REJECTION_REASON_USER_NOT_FOUND: 4, // A call/SMS was received by our system but it doesn't have a user
       REJECTION_REASON_FAILED: 5, // A call/SMS was failed
-      activeName: '',
+      activeName: false,
       loadingUpdateEngagement: false,
       defaultProps: {
         children: 'children',
@@ -842,11 +875,11 @@ export default {
 
   created () {
     if (!this.activityMode) {
-      this.activeName = 'main'
+      this.activeName = true
     }
     // Default to Expand/Open this component collapse component if comm type is appointment, reminder or note
     if (this.communication && [CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER, CommunicationTypes.NOTE].includes(this.communication.type)) {
-      this.activeName = 'main'
+      this.activeName = true
     }
   },
 

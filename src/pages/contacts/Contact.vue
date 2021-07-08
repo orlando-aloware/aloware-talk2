@@ -65,6 +65,7 @@ export default {
     }
   },
   mounted () {
+    console.log('test5')
     this.contactId = this.$route.params.id
     this.processFetchContactInfo()
   },

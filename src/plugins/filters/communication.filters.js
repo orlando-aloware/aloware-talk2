@@ -138,9 +138,17 @@ const fixCommType = (type) => {
     case 3:
       return 'Conference'
     case 4:
-      return 'RVM'
+      return 'Voicemail'
     case 5:
       return 'Email'
+    case 8:
+      return 'Fax'
+    case 10:
+      return 'Note'
+    case 12:
+      return 'Appointment'
+    case 13:
+      return 'Reminder'
     default:
       return 'N/A'
   }

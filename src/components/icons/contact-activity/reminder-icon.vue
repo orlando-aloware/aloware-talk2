@@ -8,15 +8,15 @@
 
 <script>
 export default {
-  name: 'reminder',
+  name: 'reminder-icon',
   props: {
     width: {
       type: [Number, String],
-      default: 24
+      default: 16
     },
     height: {
       type: [Number, String],
-      default: 24
+      default: 16
     }
   }
 }

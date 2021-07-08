@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'outbound-fax-failed-icon',
+  name: 'outbound-fax-missed-icon',
   props: {
     width: {
       type: [Number, String],

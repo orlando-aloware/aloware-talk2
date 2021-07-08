@@ -1,4 +1,38 @@
 /**
+ * Fix schedule date
+ * @param {date|string|Moment} dt
+ * @param format
+ * @returns {string|*}
+ */
+export const fixScheduleDate = (dt, format = 'dddd, D MMMM YYYY') => {
+  if (dt) {
+    if (window.timezone) {
+      return window.moment.utc(dt).tz(window.timezone).format(format)
+    } else {
+      return window.moment.utc(dt).local().format(format)
+    }
+  } else {
+    return '-'
+  }
+}
+
+export const fixScheduleTime = (dt, duration = 0) => {
+  if (dt) {
+    if (window.timezone) {
+      if (window.timezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('h:mm A') + ' MNL'
+      }
+
+      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('h:mm A z')
+    } else {
+      return window.moment.utc(dt).local().add(duration, 'seconds').format('h:mm A z')
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
  * Fix date
  * @param {date|string|Moment} dt
  * @param format
@@ -223,6 +257,8 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
 
 export default ({ Vue }) => {
   const filters = {
+    fixScheduleDate,
+    fixScheduleTime,
     fixDate,
     fixDateTime,
     fixTime,

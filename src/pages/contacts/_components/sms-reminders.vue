@@ -1,5 +1,5 @@
 <template>
-  <div class="sms-reminders-wrapper mt-4 border-0 p-0">
+  <div class="sms-reminders-wrapper border-0 p-0">
     <div class="text-center">
       <div v-if="!campaignId">
         <q-select class="p-1"
