@@ -12,7 +12,8 @@
                               :key="communication.id + '-comm-' + index"
                               :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
                               :communication="communication"
-                              :contact="contact">
+                              :contact="contact"
+                              :campaignId="campaignId">
             </contact-activity>
           </div>
         </div>
@@ -38,6 +39,9 @@ export default {
       required: true,
       type: Array,
       default: () => []
+    },
+    campaignId: {
+      required: false
     }
   },
   data () {

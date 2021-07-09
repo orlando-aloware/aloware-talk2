@@ -109,7 +109,7 @@ export default {
 
     selectedCampaign () {
       if (this.campaigns) {
-        return this.campaigns.find(campaign => campaign.id === this.selected_campaign_id)
+        return this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
       }
 
       return null
@@ -754,7 +754,7 @@ export default {
 
     fetchIncomingNumber () {
       this.contactIncomingNumber = null
-      this.$axios.get(`/api/v1/contact/${this.selected_contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
+      this.$axios.get(`/api/v1/contact/${this.selectedContact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
         this.contact_incoming_number = res.data
       }).catch(err => {
         this.$handleErrors(err.response)

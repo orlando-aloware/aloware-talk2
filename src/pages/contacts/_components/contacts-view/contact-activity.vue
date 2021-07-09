@@ -1,24 +1,29 @@
 <template>
-  <div class="message mb-3"
+  <div class="message mb-3 pb-1 d-flex flex-row align-items-start"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
-    <avatar class="mt-1 contact-avatar"
-            width="34"
-            height="34"
-            :style="avatarStyle(isSender)"
-            :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
-            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
-            :name="avatarName">
-      <q-tooltip content-class="bg-grey-light11"
-                 anchor="top middle" self="center middle">
-        {{ avatarName }}
-      </q-tooltip>
-    </avatar>
+    <div class="d-flex flex-row align-items-center">
+      <q-badge class="is-dot mx-1 blue"
+               rounded
+               v-if="communication.direction === CommunicationDirection.INBOUND && !communication.is_read">
+      </q-badge>
+      <avatar class="contact-avatar"
+              width="34"
+              height="34"
+              :style="avatarStyle(isSender)"
+              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
+              v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
+              :name="avatarName">
+        <q-tooltip content-class="bg-grey-light11"
+                   anchor="top middle" self="center middle">
+          {{ avatarName }}
+        </q-tooltip>
+      </avatar>
+    </div>
 
-    <div class="clear"
+    <div class="w-100"
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
-      <div class="pt-3 pb-3 m-b audit-separator">
-        <q-separator />
-        <div class="contact-audit">
+      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+        <div class="contact-audit text-xxs">
           <span>
             {{ communication.body }}
           </span>
@@ -26,19 +31,17 @@
               by {{ getUser(communication.user_id).name }}
           </span>
           <span>
-            -
           </span>
           <span class="text-muted"
-                v-html="relative_datetime"/>
+                v-html="datetimeTimePassed"/>
         </div>
       </div>
     </div>
 
-    <div class="clear"
+    <div class="w-100"
          v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) && (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
-      <div class="pt-3 pb-3 m-b audit-separator">
-        <q-separator />
-        <div class="contact-audit">
+      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+        <div class="contact-audit text-xxs">
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
           </span>
@@ -55,18 +58,17 @@
             by System
           </span>
           <span>
-            -
           </span>
           <span v-if="communication.property"
                 class="text-muted"
-                v-html="relative_datetime" />
+                v-html="datetimePassed" />
         </div>
       </div>
     </div>
     <div class="clear d-flex flex-column"
-         :class="[ communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end text-right' ]"
+         :class="[ communication.direction === CommunicationDirection.INBOUND ? 'align-items-start pl-1' : 'align-items-end text-right pr-1' ]"
          v-else>
-      <div class="item px-2 d-flex flex-column"
+      <div class="item d-flex flex-column"
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
         <div class=""
@@ -75,7 +77,7 @@
                v-for="(attachment, index) in communication.attachments"
                :key="index">
             <q-img
-              class="img-fluid d-block r-2x width-400"
+              class="border-rounded img-fluid d-block r-2x width-380"
               :src="attachment.url"
               :class="index > 0 ? 'mb-1' : ''"
             >
@@ -97,7 +99,7 @@
 
             <div v-if="isAttachmentVideo(attachment.mime_type)">
               <video width="320"
-                     class="rounded"
+                     class="border-rounded"
                      controls>
                 <source :src="attachment.url"
                         :type="attachment.mime_type">
@@ -107,20 +109,19 @@
 
             <a :href="attachment.url"
                target="_blank">
-              <div class="p-2 text-center"
+              <div class="py-2 text-right"
                    v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
-                <img height="100"
-                     width="100"
-                     src="/assets/images/app-icons/file.svg">
+                <file-icon width="100" height="100" />
                 <p class="mb-0 mt-2"
-                   style="font-size:.7rem;max-width: 6rem;word-break: break-all;">
+                   style="font-size:.7rem;word-break: break-all;">
                   {{ attachment.name }}
                 </p>
               </div>
             </a>
           </div>
         </div>
-        <div class="sms-activity "
+
+        <div class="sms-activity border-rounded"
              :class="getCommunicationClass"
              v-if="communication.body">
           <span class="arrow pull-top"
@@ -130,10 +131,9 @@
             <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
           </div>
         </div>
-        <q-badge rounded v-if="!communication.is_read" color="red" />
       </div>
 
-      <div class="item width-400"
+      <div class="item width-380"
            v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
         <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
@@ -141,65 +141,80 @@
                 :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
           </span>
 
-          <div class="p-y-sm">
+          <div class="p-y-sm"
+               :class="[communication.direction === CommunicationDirection.INBOUND ? 'text-left' : 'text-right']">
             <communication-info :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
-                                :campaignId="communication.campaign_id">
+                                :campaignId="campaignId">
             </communication-info>
           </div>
         </div>
       </div>
 
-      <b-button variant="link"
-                class="pl-2 p-y-sm inline text-blue mark-read _400"
-                v-if="markable(communication) && !communication.is_read"
-                @click="markAsRead">
-        Mark as read
-      </b-button>
-
-      <b-button variant="link"
-                class="pl-2 p-y-sm inline text-blue mark-read _400"
-                v-if="markable(communication) && communication.is_read"
-                @click="markAsUnread">
-        Mark as unread
-      </b-button>
-
-      <div class="text-xxs mt-2 width-500 m-b"
+      <div class="activity-bottom-info text-xxs mt-2 width-500 m-b d-flex align-items-center"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
-              v-html="relative_datetime">
-        </span>
-        <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.INBOUND">
-            from {{ communication.lead_number | fixPhone }}
-        </span>
-        <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.INBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
-            to {{ getCampaign(communication.campaign_id).name }}
-        </span>
-        <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
-            from {{ getCampaign(communication.campaign_id).name }}
-        </span>
-        <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND">
-            to {{ communication.lead_number | fixPhone }}
-        </span>
-        <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id)">
-            sent by {{ getWorkflow(communication.workflow_id).name }} sequence
+            {{ getWorkflow(communication.workflow_id).name }} sequence
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.broadcast_id && getBroadcast(communication.broadcast_id)">
-            sent by {{ getBroadcast(communication.broadcast_id).name }} broadcast
+            {{ getBroadcast(communication.broadcast_id).name }} broadcast
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length">
-            sent by {{ getUser(communication.user_id).name }}
+            {{ getUser(communication.user_id).name }}
         </span>
+
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.INBOUND">
+            Sent from {{ communication.lead_number | fixPhone }}
+        </span>
+
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
+            &nbsp;used {{ getCampaign(communication.campaign_id).name }} to send
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.INBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
+            &nbsp;to {{ getCampaign(communication.campaign_id).name }}
+        </span>
+
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND">
+            &nbsp;to {{ communication.lead_number | fixPhone }}
+        </span>
+
+        <q-badge class="is-dot mx-1 grey-light"
+                 rounded>
+        </q-badge>
+
+        <span class="text-muted">
+          {{ datetimePassed }}
+          <q-tooltip content-class="bg-grey-light11"
+                     anchor="top middle" self="center middle">
+            {{ relativeDatetime }}
+          </q-tooltip>
+        </span>
+
+        <b-button variant="link"
+                  class="pl-2 p-y-sm inline mark-as mark-read _400 d-none"
+                  v-if="markable(communication) && !communication.is_read"
+                  @click="markAsRead">
+          Mark as read
+        </b-button>
+
+        <b-button variant="link"
+                  class="pl-2 p-y-sm inline mark-as mark-read _400 d-none"
+                  v-if="markable(communication) && communication.is_read"
+                  @click="markAsUnread">
+          Mark as unread
+        </b-button>
+
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
-          <router-link :to="{ name: 'Communication', params: {communication_id: communication.id }}">
+          <router-link :to="{ name: 'Communication', params: {communication_id: communication.id }}"
+                       :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
             <template
               v-if="communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
               <template
@@ -245,6 +260,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-types'
 import CommunicationInfo from 'src/pages/contacts/_components/communication-info'
 import Avatar from 'src/components/avatar/avatar.vue'
+import FileIcon from 'components/icons/contact-activity/file-icon'
 
 export default {
   mixins: [
@@ -254,6 +270,7 @@ export default {
   ],
 
   components: {
+    FileIcon,
     CommunicationInfo,
     Avatar
   },
@@ -269,12 +286,16 @@ export default {
       default: false,
       type: Boolean,
       required: false
+    },
+    campaignId: {
+      required: false
     }
   },
 
   data () {
     return {
-      relative_datetime: null,
+      datetimePassed: null,
+      relativeDatetime: null,
       excluded_audits: [
         'thread_status',
         'email',
@@ -360,10 +381,13 @@ export default {
   created () {
     this.getRelativeDateTime()
     setInterval(this.getRelativeDateTime, 10000)
+    this.getDateTimePassed()
+    setInterval(this.getDateTimePassed, 10000)
   },
 
   destroyed () {
     clearInterval(this.getRelativeDateTime)
+    clearInterval(this.getDateTimePassed)
   },
 
   methods: {
@@ -504,7 +528,11 @@ export default {
     },
 
     getRelativeDateTime () {
-      this.relative_datetime = this.$options.filters.fixFullDateUTCRelative(this.communication.created_at)
+      this.relativeDatetime = this.$options.filters.fixRelativeDatetimeFormat(this.communication.created_at)
+    },
+
+    getDateTimePassed () {
+      this.datetimePassed = this.$options.filters.dateTimePassed(this.communication.created_at)
     },
 
     markAsRead () {
@@ -627,10 +655,5 @@ export default {
 @import 'src/css/variables.scss';
 .bg-grey-light11 {
   background: $grey-light11;
-}
-.audit-separator {
-  .contact-audit {
-    transform: translateY(-12px);
-  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full"
+  <div class="w-full flex-grow-1"
        v-if="hasPermissionTo('list disposition status')">
     <q-select v-model="callDispositionId"
               class="w-full"

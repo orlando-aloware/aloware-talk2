@@ -11,6 +11,7 @@ html {
 body {
   overflow-y: hidden;
   font-family: 'Inter', sans-serif;
+  color: $grey-100;
 }
 
 html,
@@ -37,6 +38,9 @@ body,
   background-color: $green;
 }
 
+.text-black {
+  color: $grey-100 !important;
+}
 .row {
   &.q-field,
   &.q-field__control-container,
@@ -108,6 +112,12 @@ body,
   .q-field__messages {
     flex: auto !important;
     width: 100% !important;
+  }
+}
+.q-notifications {
+  .q-notification__message.col {
+    padding-left: 0px;
+    padding-right: 0px;
   }
 }
 
@@ -276,11 +286,19 @@ body,
 .link {
   height: 18px;
   width: 107px;
-  color: #256eff;
+  color: $blue;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   letter-spacing: 0;
   line-height: 18px;
+}
+
+.mark-as {
+  color: $blue;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.0025em;
+  line-height: 16px;
 }
 
 .mb-30 {
@@ -293,6 +311,16 @@ body,
   font-size: 13px;
   letter-spacing: 0;
   line-height: 18px;
+}
+
+.q-btn {
+  .q-btn__wrapper {
+    padding: 0;
+    .q-btn__content {
+      align-items: center;
+      flex: auto;
+    }
+  }
 }
 
 .button {
@@ -492,6 +520,10 @@ body,
   width: 300px;
 }
 
+.width-380 {
+  width: 380px;
+}
+
 .width-0 {
   width: 0;
 }
@@ -532,7 +564,12 @@ body,
   justify-content: flex-start;
   .text-xxs {
     font-size: 12px;
-    color: #62666E !important;
+    color: $grey-90 !important;
+  }
+  &:hover {
+    .mark-as {
+      display: block !important;
+    }
   }
 }
 
@@ -644,7 +681,7 @@ body,
     }
 
     .selected-option {
-      color: #040404;
+      color: $grey-100;
       font-size: 13px;
       font-weight: 500;
 
@@ -861,6 +898,7 @@ body,
 }
 
 .communication-info {
+  display: inline-block;
   font-size: 14px;
   line-height: 18px;
 
@@ -938,12 +976,15 @@ body,
   -webkit-animation: rotating 2s linear infinite;
 }
 
+.border-rounded {
+  border-radius: 12px;
+}
+
 .sms-activity {
   font-style: normal;
   font-weight: normal;
   font-size: 14px;
   line-height: 20px;
-  border-radius: 12px;
   padding: 11.2px 21.5px;
   &.outbound {
     background: $blue;
@@ -960,15 +1001,24 @@ body,
   }
 }
 
-.schedule-button-toggle {
+.q-btn-toggle {
   display: flex;
   border-radius: 6px !important;
+  .q-btn__wrapper {
+    padding: 0;
+  }
   button {
     font-size: 13px;
     flex: 1;
     padding-left: 5px;
     padding-right: 5px;
-    border-right: 1px;
+  }
+  button.text-primary {
+    color: #000 !important;
+  }
+  button:nth-child(2) {
+    border-left: 1px solid $grey-70;
+    border-right: 1px solid $grey-70;
   }
 }
 
@@ -978,7 +1028,6 @@ body,
     position: relative;
   }
 }
-
 
 .custom-multi-select.multiselect--above.multiselect--active .multiselect__current,
 .custom-multi-select.multiselect--above.multiselect--active .multiselect__input,
@@ -1037,4 +1086,28 @@ body,
 
 .multiselect, .multiselect__input, .multiselect__single {
   font-size: 13px !important;
+}
+
+.contact-audit {
+  width: 100%;
+}
+
+.is-dot {
+  padding: 3px 3px;
+}
+
+.grey-light {
+  background: $grey-light;
+}
+
+.blue {
+  background: $blue;
+}
+
+.contact-avatar {
+  margin: 4.2px 0;
+}
+
+.activity-bottom-info {
+  height: 30px;
 }
