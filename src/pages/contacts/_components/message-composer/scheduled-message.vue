@@ -3,7 +3,7 @@
            size="sm"
            modal-class="column-headers-modal"
            scrollable
-           v-model="isScheduleMessageOpen"
+           v-model="isOpen"
            :title="title"
             @hidden="onHidden">
     <div>
@@ -39,7 +39,7 @@
           variant="primary"
           class="custom-btn"
           size="sm"
-          :disabled="!isScheduleDeliverable"
+          :disabled="isSending || !isScheduleDeliverable"
           @click="onSend"
         >
           <q-spinner-bars v-if="isSending" color="white" />
@@ -51,12 +51,13 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'scheduled-message',
   computed: {
-    ...mapState('contacts', ['contact', 'isScheduleMessageOpen', 'message_composer', 'selected_line']),
+    ...mapGetters('contacts', ['isScheduleMessageOpen']),
+    ...mapState('contacts', ['contact', 'messageComposer', 'selectedLine']),
     minDate () {
       return new Date()
     }
@@ -64,6 +65,7 @@ export default {
   data () {
     return {
       isSending: false,
+      isOpen: false,
       title: 'Schedule Message',
       date: new Date(),
       time: '',
@@ -95,11 +97,13 @@ export default {
     },
     formatMessage () {
       return {
-        body: this.message_composer.sms.body,
+        body: this.messageComposer.sms.body,
         contact_id: this.contact.id,
-        campaign_id: this.selected_line.id,
-        phone_number: this.message_composer.sms.phone_number,
-        schedule_date: this.scheduleDate
+        campaign_id: this.selectedLine.id,
+        phone_number: this.messageComposer.sms.phone_number,
+        schedule_date: this.scheduleDate,
+        gif: this.messageComposer.sms.gif_url,
+        attachments: this.messageComposer.sms.attachments
       }
     },
     setNow () {
@@ -134,6 +138,9 @@ export default {
         .set('hour', time.slice(0, 2))
         .set('minute', time.slice(3, 5))
       this.validateScheduleDate()
+    },
+    'isScheduleMessageOpen': function (value) {
+      this.isOpen = value
     }
   },
   mounted () {

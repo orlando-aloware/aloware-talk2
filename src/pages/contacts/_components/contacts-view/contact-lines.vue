@@ -1,58 +1,29 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
     <h6>Lines</h6>
-    <div v-if="!is_edit">
+    <div v-if="!isEdit">
       <b-badge variant="primary"
                class="badge-tag badge-tag-primary ellipsis"
                v-b-tooltip="line.name"
                v-for="line in appliedLines" :key="line.id">{{ line.name }}</b-badge>
     </div>
 
-    <q-select
-      v-if="is_edit"
-      ref="contactLinesSelect"
-      compact
-      outlined
-      use-chips
-      use-input
-      multiple
-      input-debounce="0"
-      behavior="menu"
-      map-options
-      emit-value
-      option-value="id"
-      option-label="name"
-      style="width: 100%;"
-      class="q-custom-select contact-tags-select"
-      v-model="linesArray"
-      :options="options"
-      @filter="filterTagFn"
-      @blur="onSelectBlur"
-    >
-      <template v-slot:selected-item="scope">
-        <q-chip
-          v-if="linesArray"
-          removable
-          dense
-          square
-          color="white"
-          :tabindex="scope.tabindex"
-          @remove="scope.removeAtIndex(scope.index)"
-          v-b-tooltip="scope.opt.name"
-        >
-          <div :style="`color:#256EFF;margin-left:5px;max-width: 11vw;overflow: hidden;text-overflow: ellipsis;`">{{ scope.opt.name }}</div>
-        </q-chip>
-      </template>
-      <template v-slot:no-option>
-        <q-item>
-          <q-item-section class="text-grey pl-3">
-            No results
-          </q-item-section>
-        </q-item>
-      </template>
-    </q-select>
+    <vue-multiselect v-show="isEdit"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative b-radius__equal"
+                     track-by="id"
+                     label="name"
+                     ref="linesSelect"
+                     placeholder="Select line"
+                     openDirection="bottom"
+                     :closeOnSelect="false"
+                     :showLabels="false"
+                     :multiple="true"
+                     :options="options"
+                     v-model="selectedLines"
+                     @close="onSelectBlur">
+    </vue-multiselect>
 
-    <b-link v-if="!is_edit"
+    <b-link v-if="!isEdit"
             href="#"
             class="custom-link text-decoration-none"
             v-on:click="onModifyLines">
@@ -65,33 +36,37 @@
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from '../../../../plugins/api/api'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import VueMultiselect from 'vue-multiselect'
+
 export default {
   name: 'contact-lines',
-  components: { PencilOIcon },
+  components: { PencilOIcon, VueMultiselect },
   computed: {
     ...mapGetters('contacts', ['contact', 'lines']),
     appliedLines () {
-      return this.lines.filter(line => this.contact.campaign_ids.includes(line.id))
+      return this.lines.filter(line => this.linesArray.includes(line.id))
     }
   },
   data () {
     return {
-      is_edit: false,
+      isEdit: false,
       linesArray: [],
       options: [],
-      stringOptions: []
+      stringOptions: [],
+      selectedLines: []
     }
   },
   methods: {
     ...mapActions('contacts', ['setLines', 'setContactLines']),
     onModifyLines () {
-      this.is_edit = true
+      this.isEdit = true
       this.$nextTick(function () {
-        this.$refs.contactLinesSelect.focus()
+        this.$refs.linesSelect.$el.focus()
       })
     },
     onSelectBlur () {
-      this.is_edit = false
+      this.isEdit = false
+      this.submitLines()
     },
     filterTagFn (val, update) {
       if (val === '') {
@@ -114,20 +89,23 @@ export default {
           console.log(err)
           this.$root.handleErrors(err.response)
         })
+    },
+    getLines () {
+      talk2Api.V1.lines.get().then(response => {
+        this.setLines(response.data)
+        this.stringOptions = response.data
+        this.options = this.stringOptions
+      }).finally(() => {
+        this.linesArray = this.contact.campaign_ids
+      })
     }
   },
   mounted () {
-    talk2Api.V1.lines.get().then(response => {
-      this.setLines(response.data)
-      this.stringOptions = response.data
-      this.options = this.stringOptions
-    }).finally(() => {
-      this.linesArray = this.contact.campaign_ids
-    })
+    this.getLines()
   },
   watch: {
-    linesArray: function () {
-      this.submitLines()
+    selectedLines: function () {
+      this.linesArray = this.selectedLines.map(line => line.id)
     }
   }
 }

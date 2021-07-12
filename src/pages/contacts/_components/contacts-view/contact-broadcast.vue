@@ -9,6 +9,10 @@
                :key="broadcast.id">
         {{ broadcast.name }}
       </b-badge>
+      <p v-if="!contact.broadcasts"
+         class="status-notice text-muted">
+        No broadcast data available.
+      </p>
     </div>
   </b-card>
 </template>
@@ -25,5 +29,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.status-notice {
+  font-size: 12px;
+}
 </style>

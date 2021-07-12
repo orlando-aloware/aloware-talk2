@@ -44,7 +44,7 @@ export default {
   name: 'variables',
   components: { VueMultiselect },
   computed: {
-    ...mapGetters('contacts', ['message_composer']),
+    ...mapGetters('contacts', ['messageComposer']),
     formattedOptions () {
       let contactVariables = [...this.contactVariables]
 

@@ -6,7 +6,7 @@
         size="sm"
         class="sidebar-toggle"
         v-on:click="onSidebarToggle">
-        <i class="material-icons">{{ is_expanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
+        <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
       <b-card no-body
               class="no-border position-relative"
@@ -41,7 +41,7 @@
         </b-list-group>
         <div class="relative py-4" >
           <b-overlay
-            :show="isLoaderVisible"
+            :show="isLoadingMore"
             spinner-variant="success"
             spinner-type="grow"
             rounded="sm"
@@ -66,7 +66,7 @@ export default {
   },
   data () {
     return {
-      is_expanded: true,
+      isExpanded: true,
       isLoaderVisible: false
     }
   },
@@ -82,7 +82,7 @@ export default {
       return this.listItems[this.selectedList.id].data
     },
     widthClass () {
-      return this.is_expanded ? 'width-300' : 'width-0'
+      return this.isExpanded ? 'width-300' : 'width-0'
     }
   },
   methods: {
@@ -91,7 +91,6 @@ export default {
       return `${(this.$route.params.id === String(contact.id) ? 'active' : '')}`
     },
     onBottomScroll () {
-      console.log('test')
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
       scrollTimeout = setTimeout(() => {
@@ -102,8 +101,8 @@ export default {
       }, 66)
     },
     onSidebarToggle () {
-      this.is_expanded = !this.is_expanded
-      this.setSidebarCollapsed(!this.is_expanded)
+      this.isExpanded = !this.isExpanded
+      this.setSidebarCollapsed(!this.isExpanded)
     }
   },
   mounted () {

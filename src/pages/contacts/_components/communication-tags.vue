@@ -66,7 +66,6 @@ export default {
     },
 
     saveTags () {
-      console.log('test3')
       this.loadingTag = true
       this.$axios.post('/api/v1/communication/' + this.communication.id + '/tag', {
         tags: this.communication.tag_ids
@@ -92,9 +91,7 @@ export default {
     },
 
     changeTags (event, model) {
-      console.log('test')
       if (this.hasPermissionTo('tag communication')) {
-        console.log('test2')
         model.tag_ids = event
         this.saveTags()
       }

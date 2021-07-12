@@ -1,6 +1,6 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
-    <h6>Integrations</h6>
+    <h6 class="mb-3">Integrations</h6>
     <p v-if="!isHubspotEnabled"
        class="status-notice text-muted">
       Enable your favorite CRM integration and push contacts from the
@@ -21,7 +21,7 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapState(['currentCompany']),
     isHubspotEnabled () {
-      return true// this.currentCompany && this.currentCompany.hubspot_integration_enabled
+      return this.currentCompany && this.currentCompany.hubspot_integration_enabled
     }
   }
 }

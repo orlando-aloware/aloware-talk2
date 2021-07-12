@@ -2,25 +2,25 @@
   <div class="composer-container">
     <div class="composer-wrapper p-2">
       <div class="composer-links d-flex justify-content-between">
-        <b-link href="#" :class="{ active : composer_mode === 'sms' }" v-on:click="setMode('sms')">Text</b-link>
-        <b-link href="#" :class="{ active : composer_mode === 'fax' }" v-on:click="setMode('fax')">Fax</b-link>
-        <b-link href="#" :class="{ active : composer_mode === 'email' }" v-on:click="setMode('email')">Email</b-link>
-        <b-link href="#" :class="{ active : composer_mode === 'note' }" v-on:click="setMode('note')">Note</b-link>
+        <b-link href="#" :class="{ active : messageComposer.mode === 'sms' }" v-on:click="setMode('sms')">Text</b-link>
+        <b-link href="#" :class="{ active : messageComposer.mode === 'fax' }" v-on:click="setMode('fax')">Fax</b-link>
+        <b-link href="#" :class="{ active : messageComposer.mode === 'email' }" v-on:click="setMode('email')">Email</b-link>
+        <b-link href="#" :class="{ active : messageComposer.mode === 'note' }" v-on:click="setMode('note')">Note</b-link>
       </div>
       <div>
-        <message-composer-sms v-if="composer_mode === 'sms'" />
-        <message-composer-fax v-if="composer_mode === 'fax'" />
-        <message-composer-email v-if="composer_mode === 'email'" />
-        <message-composer-note v-if="composer_mode === 'note'" />
+        <message-composer-sms v-if="messageComposer.mode === 'sms'" />
+        <message-composer-fax v-if="messageComposer.mode === 'fax'" />
+        <message-composer-email v-if="messageComposer.mode === 'email'" />
+        <message-composer-note v-if="messageComposer.mode === 'note'" />
       </div>
     </div>
     <div class="composer-variables d-flex justify-content-between pt-1">
       <div class="w-40 d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
-        <phone-number-selector @setSelectedPhone="setSelectedPhone" v-model="message_composer"></phone-number-selector>
+        <phone-number-selector @setSelectedPhone="setSelectedPhone"></phone-number-selector>
       </div>
 
-      <div class="w-40 d-inline-flex">
+      <div class="w-35 d-inline-flex">
         <span class="pr-2 pt-1">From:</span>
        <line-selector></line-selector>
       </div>
@@ -44,19 +44,14 @@ export default {
   mixins: [contactMixin],
   components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, PhoneNumberSelector, MessageComposerSms },
   computed: {
-    ...mapGetters('contacts', ['contact', 'selected_line', 'message_composer'])
-  },
-  data () {
-    return {
-      composer_mode: 'sms'
-    }
+    ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer'])
   },
   methods: {
     ...mapActions(
-      'contacts', ['setMessageComposerSmsPhoneNumber', 'setMessageComposerAttachments']
+      'contacts', ['setMessageComposerSmsPhoneNumber', 'setMessageComposerAttachments', 'setMessageComposerMode']
     ),
     setMode (mode) {
-      this.composer_mode = mode
+      this.setMessageComposerMode(mode)
     },
     ...mapActions(['setSmsTemplates']),
     setSelectedPhone (phoneNumber) {
@@ -83,17 +78,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import 'src/css/variables.scss';
   .composer-container {
     padding: 10px;
-    background: #ffffff;
+    background: $white;
 
     .composer-wrapper {
       position: relative;
-      border: 1px solid #D8D8D8;
+      border: 1px solid $grey-70;
       border-radius: 8px;
 
       .composer-links {
-        color: #256EFF;
+        color: $blue;
         font-weight: 600;
         font-size: 13px;
         width: 20%;
@@ -103,22 +99,26 @@ export default {
         }
 
         a:hover {
-          border-bottom: 2px solid #256EFF;
-          color: #256EFF;
+          border-bottom: 2px solid $blue;
+          color: $blue;
         }
 
         a.active {
-          border-bottom: 2px solid #256EFF;
+          border-bottom: 2px solid $blue;
         }
       }
     }
 
     .composer-variables {
       font-size: 13px;
+      height: 26px;
     }
 
     .w-30 {
       width: 30%;
+    }
+    .w-35 {
+      width: 35%;
     }
     .w-40 {
       width: 40%;

@@ -1,5 +1,6 @@
 <template>
-  <multiselect v-model="tagId"
+  <multiselect class="chip__clear-blue border-blue shrink-options options__no-border options__relative b-radius__equal"
+               v-model="tagId"
                label="name"
                track-by="id"
                placeholder="Type to search"
@@ -50,7 +51,7 @@
     </template>
     <template slot="clear" slot-scope="props">
       <div class="multiselect__clear"
-           v-if="tagId.length"
+           v-if="tagId && tagId.length"
            @mousedown.prevent.stop="clearAll(props.search)"></div>
     </template>
     <span slot="noResult">
@@ -296,10 +297,35 @@ export default {
       return `and ${count} other tags`
     },
 
+    initializeTagValues () {
+      let found = null
+      if (this.value instanceof Array) {
+        this.tagId = []
+        for (let item of this.value) {
+          found = this.availableTags.find(tag => tag.id === item)
+          if (found !== null) {
+            this.tagId.push(found)
+          }
+        }
+      } else {
+        found = this.availableTags.find(tag => tag.id === this.value)
+        if (found !== null) {
+          this.tagId = found
+        }
+      }
+    },
+
     selectTag (tag) {
-      console.log('testasd')
-      this.tagId = tag
-      this.$emit('change', tag)
+      let tagIds = null
+      if (tag instanceof Array) {
+        tagIds = []
+        for (let item of tag) {
+          tagIds.push(item.id)
+        }
+      } else {
+        tagIds = tag.id
+      }
+      this.$emit('change', tagIds)
     },
 
     getTags () {
@@ -313,6 +339,7 @@ export default {
           this.options = res.data
           this.filteredOptions = this.combinedTags
           this.loadingTags = false
+          this.initializeTagValues()
         }).catch(err => {
           console.log(err)
           this.loadingTags = false
@@ -356,7 +383,7 @@ export default {
 
   watch: {
     value () {
-      this.tagId = this.value
+      this.initializeTagValues()
     },
 
     'tagOptions.isReset': function () {

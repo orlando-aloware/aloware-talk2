@@ -1,4 +1,4 @@
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import qs from 'qs'
 import _ from 'lodash'
 
@@ -29,6 +29,7 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', ['selectedContactChanging']),
     onSortByField (sorts) {
       this.isLoaded = false
       this.fetch({
@@ -175,7 +176,7 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact']),
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&

@@ -7,7 +7,7 @@
 
         <q-item-section>
           <b-link class="ml-2" :href="integration_data['profile-url']">
-            <i class="fab fa-hubspot hubspot-icon"></i> <span class="integration-title">Hubspot</span>
+            <i class="fab fa-hubspot hubspot-icon mr-3"></i> <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
       </q-item>
@@ -52,7 +52,7 @@
       <q-card-section horizontal>
         <q-card class="my-card mr-3 ml-3 deals" flat bordered v-for="(deal, index) in integration_data.properties.deals" :key="index">
           <q-card-section horizontal>
-            <q-card-section>
+            <q-card-section class="pl-2 pr-2">
                 <h6><b-link class="deals-title" :href="hubspotContactBaseLink() + 'deal/' + deal.dealId" target="_blank">{{ deal.properties.dealname.value }}</b-link></h6>
                 <p class="mb-0">
                   <span class="data-icon-label">Amount: </span>
@@ -1123,7 +1123,7 @@ export default {
     }
   },
   mounted () {
-    // this.getData()
+    this.getData()
   },
   watch: {
     'contact': function () {
@@ -1134,6 +1134,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/variables.scss';
 .hubspot-integration-wrapper {
 
   a {
@@ -1164,7 +1165,7 @@ export default {
     border-radius: 5px;
 
     .data-value {
-      max-width: 139px !important;
+      max-width: 156px !important;
     }
 
     .deals-title {
@@ -1182,7 +1183,7 @@ export default {
 
   .hubspot-icon {
     color: #FF7A59;
-    margin-right: 5px;
+    margin-right: 10px;
     font-size: 20px;
   }
 
@@ -1198,7 +1199,7 @@ export default {
 
   .data-icon-label{
     font-weight: 500;
-    color: #6c757d !important;
+    color: $grey-100 !important;
   }
 }
 

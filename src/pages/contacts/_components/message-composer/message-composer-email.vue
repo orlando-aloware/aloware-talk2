@@ -6,7 +6,7 @@
         <q-input placeholder="Subject"
                  input-class="q-input-pl-0 q-input-pr-0"
                  bottom-slots
-                 v-model="message_composer.email.subject" >
+                 v-model="messageComposer.email.subject" >
         </q-input>
 
         <q-input borderless
@@ -16,7 +16,7 @@
                  input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                  type="textarea"
                  placeholder="Type your message"
-                 v-model="message_composer.email.body"
+                 v-model="messageComposer.email.body"
                  @input="updateMessage"
         />
       </form>
@@ -33,6 +33,7 @@
       <div>
         <b-button-group>
           <b-button variant="primary"
+                    class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="isSending || !validEmail"
                     v-on:click="onSend">
@@ -73,12 +74,12 @@ export default {
   name: 'message-composer-email',
   components: { MessageTemplates, Variables, VariableIcon, CalendarTodayIcon },
   computed: {
-    ...mapGetters('contacts', ['contact', 'message_composer', 'selected_line']),
+    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validEmail () {
-      return (this.message_composer.email.body && this.message_composer.email.body.length > 0) && (this.message_composer.email.subject && this.message_composer.email.subject.length > 0)
+      return (this.messageComposer.email.body && this.messageComposer.email.body.length > 0) && (this.messageComposer.email.subject && this.messageComposer.email.subject.length > 0)
     },
     isSubjectValid () {
-      return this.message_composer.email.subject.length > 2
+      return this.messageComposer.email.subject.length > 2
     }
   },
   data () {
@@ -94,10 +95,10 @@ export default {
     },
     formatMessage () {
       return {
-        campaign_id: this.selected_line.id,
+        campaign_id: this.selectedLine.id,
         from_name: this.contact.name,
-        message: this.message_composer.email.body,
-        subject: this.message_composer.email.subject
+        message: this.messageComposer.email.body,
+        subject: this.messageComposer.email.subject
       }
     },
     onSend () {
@@ -123,7 +124,7 @@ export default {
       })
     },
     templateSelected (template) {
-      this.setMessageComposerEmailBody((this.message_composer.email.body ?? '') + ' ' + template.body)
+      this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + template.body)
       this.closeTemplatesPopover()
     },
     closeTemplatesPopover () {
@@ -131,7 +132,7 @@ export default {
       this.$refs.emailMessageBody.focus()
     },
     variableSelected (variable) {
-      this.setMessageComposerEmailBody((this.message_composer.email.body ?? '') + ' ' + variable)
+      this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + variable)
       this.closeVariablesPopover()
     },
     closeVariablesPopover () {

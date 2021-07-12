@@ -156,6 +156,9 @@ export default {
   setSelectedLine: ({ commit }, line) => {
     commit('SET_SELECTED_LINE', line)
   },
+  setMessageComposerMode: ({ commit }, mode) => {
+    commit('SET_MESSAGE_COMPOSER_MODE', mode)
+  },
   setMessageComposerSmsPhoneNumber: ({ commit }, phoneNumber) => {
     commit('SET_MESSAGE_COMPOSER_PHONE_SMS_NUMBER', phoneNumber)
   },
@@ -202,5 +205,26 @@ export default {
 
   scheduleMessageOpen: ({ commit }, isOpen) => {
     commit('SCHEDULE_MESSAGE_OPEN', isOpen)
+  },
+  scheduledMessageListOpen: ({ commit }, isOpen) => {
+    commit('SCHEDULE_MESSAGE_LIST_OPEN', isOpen)
+  },
+  addAppointmentOpen: ({ commit }, isOpen) => {
+    commit('ADD_APPOINTMENT_OPEN', isOpen)
+  },
+
+  appointmentSubmit: ({ commit }, isOpen) => {
+    commit('ADD_APPOINTMENT_OPEN', isOpen)
+  },
+
+  enrollSequenceOpen: ({ commit }, isOpen) => {
+    commit('ENROLL_SEQUENCE_OPEN', isOpen)
+  },
+  addReminderOpen: ({ commit }, isOpen) => {
+    commit('ADD_REMINDER_OPEN', isOpen)
+  },
+  selectedContactChanging: ({ commit }, isChanging) => {
+    commit('CHANGING_SELECTED_CONTACT', isChanging)
   }
+
 }

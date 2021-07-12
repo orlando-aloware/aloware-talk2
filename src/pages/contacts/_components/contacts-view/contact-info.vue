@@ -1,19 +1,23 @@
 <template>
-  <b-card class="mt-2 mb-2 border-0">
+  <b-card class="mt-2 mb-2 border-0" id="card-contact-info">
     <b-media>
       <template #aside>
-        <avatar class="mr-2 contact-avatar"
-                width="40"
-                height="40"
-                :name="contact.name" />
+        <q-item-section avatar>
+          <avatar class="contact-avatar"
+                  width="40"
+                  height="40"
+                  :name="contact.name" />
+        </q-item-section>
+
       </template>
 
       <div class="d-flex justify-content-between relative-position">
         <div>
+
           <h6 class="mt-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
           <p class="contact-phone">
             {{ contact.phone_number | fixPhone }}
-            <b-badge variant="warning" class="badge-phone-info">Primary</b-badge>
+            <b-badge v-if="phone && phone.lrn_type !== 'undefined'" variant="warning" class="badge-phone-info">{{ phone.lrn_type }}</b-badge>
             <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
             <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
           </p>
@@ -36,19 +40,22 @@
       <b-button variant="secondary" size="sm" class="custom-action-button">
         <call-icon></call-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button">
+      <b-button variant="secondary" size="sm" class="custom-action-button" @click="openAppointmentModal">
         <calendar-icon></calendar-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button">
+      <b-button variant="secondary" size="sm" class="custom-action-button" @click="openAddReminderModal">
         <timer-icon></timer-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button">
+      <b-button variant="secondary" size="sm" class="custom-action-button"  @click="openEnrollSequenceModal">
         <add-sequence-icon></add-sequence-icon>
       </b-button>
       <b-button variant="secondary" size="sm" class="custom-action-button">
         <add-call-icon></add-call-icon>
       </b-button>
     </div>
+    <appointment-form-modal :contact="contact"></appointment-form-modal>
+    <enroll-sequence-modal></enroll-sequence-modal>
+    <contact-add-reminder-modal></contact-add-reminder-modal>
   </b-card>
 </template>
 
@@ -62,20 +69,43 @@ import CalendarIcon from 'components/icons/calendar-icon'
 import CallIcon from 'components/icons/call-icon'
 import AddCallIcon from 'components/icons/add-call-icon'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import AppointmentFormModal from 'pages/contacts/_components/appointments/appointment-form-modal'
+import EnrollSequenceModal from 'pages/contacts/_components/enroll-sequence-modal'
+import ContactAddReminderModal from 'pages/contacts/_components/contact-add-reminder-modal'
 
 export default {
   name: 'contact-info',
-  components: { PencilOIcon, AddCallIcon, CallIcon, CalendarIcon, TimerIcon, AddSequenceIcon, Avatar, ContactNameForm },
+  components: { ContactAddReminderModal, EnrollSequenceModal, AppointmentFormModal, PencilOIcon, AddCallIcon, CallIcon, CalendarIcon, TimerIcon, AddSequenceIcon, Avatar, ContactNameForm },
   computed: {
-    ...mapGetters('contacts', ['contact', 'isContactNameEditOpen'])
+    ...mapGetters('contacts', ['contact', 'isContactNameEditOpen', 'contactPhoneNumbers', 'changingSelectedContact']),
+    phone () {
+      return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
+    }
   },
   data () {
     return {
-      showEditForm: false
+      showEditForm: false,
+      showEnrollSequenceForm: false
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContactNameEditOpen']),
+    ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'enrollSequenceOpen', 'addReminderOpen']),
+    openAddReminderModal () {
+      this.addReminderOpen(true)
+    },
+    openEnrollSequenceModal () {
+      this.enrollSequenceOpen(true)
+    },
+    openAppointmentModal () {
+      this.addAppointmentOpen(true)
+    },
+    onCloseAddReminderPopover () {
+      this.$root.$emit('bv::hide::popover', 'add-reminder-popover')
+    },
+    onCloseSequenceEnrollPopover () {
+      this.showEnrollSequenceForm = false
+      this.$root.$emit('bv::hide::popover', 'enroll-sequence-popover')
+    },
     onCloseEditForm () {
       this.showEditForm = false
     },
@@ -104,6 +134,9 @@ export default {
       /* unselect the range */
       phoneNumberClone.setAttribute('type', 'hidden')
       window.getSelection().removeAllRanges()
+    },
+    getPhoneObject () {
+      return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
     }
   }
 }
@@ -121,6 +154,11 @@ export default {
 
   .contact-avatar {
     background-color: #95989E !important;
+  }
+
+  .q-item__section--avatar {
+    padding-right: 0 !important;
+    min-width: 0 !important;
   }
 
   .card:hover {
@@ -161,6 +199,16 @@ export default {
 
   .edit-form-popover{
     left: -251px !important;
+    width: 300px;
+  }
+
+  .enroll-sequence-popover{
+    left: -341px !important;
+    width: 300px;
+  }
+
+  .add-reminder-popover {
+    left: -341px !important;
     width: 300px;
   }
 </style>

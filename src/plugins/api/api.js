@@ -33,6 +33,9 @@ export default {
       updatePhone (id, phoneId, params) {
         return window.axios.post(`${suffixV1}contact/${id}/phone-number/${phoneId}`, params)
       },
+      deletePhone (id, phoneId) {
+        return window.axios.delete(`${suffixV1}contact/${id}/phone-number/${phoneId}`)
+      },
       dispose (id, params) {
         return window.axios.post(`${suffixV1}contact/${id}/dispose`, params)
       },
@@ -41,6 +44,9 @@ export default {
       },
       addEngagement (id, params) {
         return window.axios.post(`${suffixV1}contact/${id}/add-engagement`, params)
+      },
+      updateEngagement (contactId, eventId, params) {
+        return window.axios.post(`${suffixV1}contact/${contactId}/${eventId}/update-engagement`, params)
       },
       getLineIncomingNumber (contactId, lineId) {
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
@@ -69,7 +75,7 @@ export default {
         return window.axios.post(`${suffixV1}campaign/send-fax/${lineId}/${contactId}`, params)
       }
     },
-    ring_groups: {
+    ringGroups: {
       get () {
         return window.axios.get(`${suffixV1}ring-group`)
       }
@@ -80,6 +86,12 @@ export default {
       },
       scheduled (params) {
         return window.axios.post(`${suffixV1}scheduled-messages`, params)
+      },
+      getScheduledByContact (contactId, params) {
+        return window.axios.get(`${suffixV1}scheduled-messages/${contactId}`, { params })
+      },
+      deleteScheduledMessage (messageId) {
+        return window.axios.delete(`${suffixV1}scheduled-messages/${messageId}`)
       }
     },
     sms_template: {
@@ -97,6 +109,13 @@ export default {
         },
         enrollToWorkflow (params) {
           return window.axios.post(`${suffixV1}integration/hubspot/enroll-contact`, params)
+        }
+      }
+    },
+    automations: {
+      workflows: {
+        enroll (workflowId, params) {
+          return window.axios.post(`${suffixV1}automations/workflows/${workflowId}/sequence-contacts`, params)
         }
       }
     }

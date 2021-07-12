@@ -18,6 +18,18 @@
         v-model="phone.number"
       ></b-form-input>
     </b-form-group>
+
+    <b-form-group v-if="this.contactSelectedPhone && this.contactSelectedPhone.phone_number !== contact.phone_number"
+                  id="input-group-2"
+                  class="checkbox-wrapper">
+      <b-form-checkbox
+        v-model="phone.isPrimary"
+        :value="true"
+        :unchecked-value="false">
+        Make Primary
+      </b-form-checkbox>
+    </b-form-group>
+
     <div class="d-flex justify-content-between">
       <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
       <b-button type="submit"
@@ -39,7 +51,7 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'contact-phones-form',
   computed: {
-    ...mapGetters('contacts', ['contact', 'contact_selected_phone'])
+    ...mapGetters('contacts', ['contact', 'contactSelectedPhone'])
   },
   data () {
     return {
@@ -57,12 +69,13 @@ export default {
       this.isBusy = true
       let request = null
 
-      if (this.contact_selected_phone) {
-        request = talk2Api.V1.contact.updatePhone(this.contact.id, this.contact_selected_phone.id, {
+      if (this.contactSelectedPhone) {
+        request = talk2Api.V1.contact.updatePhone(this.contact.id, this.contactSelectedPhone.id, {
           title: this.phone.title,
           phone_number: this.phone.number,
           is_primary: this.phone.isPrimary
         }).then(response => {
+          this.getContact()
           this.updateContactSelectedPhone(response.data)
           this.removeSelectedPhone()
           this.onClose()
@@ -96,18 +109,23 @@ export default {
       this.removeSelectedPhone()
       this.$emit('close')
     },
+    getContact () {
+      talk2Api.V1.contact.get(this.contact.id).then(response => {
+        this.setContact(response.data)
+      })
+    },
     removeSelectedPhone () {
       this.setContactSelectedPhone(null)
     }
   },
   mounted () {
     this.$refs.title.focus()
-    if (this.contact_selected_phone) {
+    if (this.contactSelectedPhone) {
       this.phone = {
-        id: this.contact_selected_phone.id,
-        title: this.contact_selected_phone.title,
-        number: this.contact_selected_phone.phone_number,
-        isPrimary: this.contact_selected_phone ? this.contact_selected_phone.phone_number === this.contact.phone_number : false
+        id: this.contactSelectedPhone.id,
+        title: this.contactSelectedPhone.title,
+        number: this.contactSelectedPhone.phone_number,
+        isPrimary: this.contactSelectedPhone ? this.contactSelectedPhone.phone_number === this.contact.phone_number : false
       }
     }
   }
