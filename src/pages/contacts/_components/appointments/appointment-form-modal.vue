@@ -2,6 +2,7 @@
   <b-modal title="Add Appointment"
            size="md"
            v-model="isAddAppointmentOpen"
+           scrollable
            @hidden="onHidden">
 
     <b-form class="appointment-form"
@@ -9,19 +10,19 @@
             @submit.prevent="onSubmit"
             @reset="onReset">
       <b-form-row>
-        <b-col>
+        <b-col sm="12">
           <b-form-group
             id="input-group-1"
-            label="Select date and time"
+            label="Select date"
             label-for="input-1"
             description=""
           >
-            <vue-ctk-date-time-picker formatted="lll"
+            <vue-ctk-date-time-picker formatted="l"
                                       label="Select date"
-                                      :inline="true"
+                                      :only-date="true"
                                       :no-label="true"
                                       :no-header="true"
-                                      :format="`YYYY-MM-DD HH:mm`"
+                                      :min-date="minDate"
                                       :no-button-now="true"
                                       :auto-close="true"
                                       :minute-interval="5"
@@ -29,10 +30,18 @@
                                       v-model="date" @input="dateSelected">
             </vue-ctk-date-time-picker>
           </b-form-group>
-
+        </b-col>
+        <b-col md="12" lg="6">
+          <b-form-group id="input-group-2" label="Time" label-for="input-2">
+            <predefined-time-selector v-model="appointment.time"></predefined-time-selector>
+          </b-form-group>
+        </b-col>
+        <b-col md="12" lg="6">
           <b-form-group id="input-group-2" label="Duration" label-for="input-2">
             <predefined-time-duration-selector @select="durationSelected"></predefined-time-duration-selector>
           </b-form-group>
+        </b-col>
+        <b-col>
 
           <b-form-group id="input-group-2" label="Timezone" label-for="input-2">
             <timezone-selector @select="timezoneSelected"></timezone-selector>
@@ -40,7 +49,7 @@
 
           <b-form-group id="input-group-2" label="Note" label-for="input-2">
             <b-form-textarea
-              id="textarea-no-auto-shrink"
+              class="textarea-no-auto-shrink"
               placeholder="Write a note for this event.."
               rows="3"
               max-rows="8"
@@ -61,7 +70,7 @@
               v-model="appointment.smsReminder.enabled"
               :value="true"
               :unchecked-value="false">
-              Enable SMS reminder
+              <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
           </b-form-group>
         </b-col>
@@ -88,7 +97,7 @@
             </span>
             </div>
             <b-form-textarea
-              id="textarea-no-auto-shrink"
+              class="textarea-no-auto-shrink"
               placeholder=""
               rows="3"
               max-rows="8"
@@ -135,11 +144,9 @@ import PredefinedTimeSelector from 'pages/contacts/_components/predefined-time-s
 import NumberOfDaysSelector from 'pages/contacts/_components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
 import auth from 'boot/auth'
-import { formValidationMixin } from 'src/plugins/mixins'
-import _ from 'lodash'
+
 export default {
   name: 'appointment-form-modal',
-  mixins: [formValidationMixin],
   components: { NumberOfDaysSelector, PredefinedTimeSelector, VLineSelector, TimezoneSelector, PredefinedTimeDurationSelector, VueCtkDateTimePicker },
   props: {
     id: {
@@ -158,6 +165,9 @@ export default {
     }),
     isValid () {
       return this.appointment.date && this.appointment.time && this.contact
+    },
+    minDate () {
+      return window.moment().format('YYYY-MM-DD')
     }
   },
   data () {
@@ -305,17 +315,7 @@ export default {
     },
     setSmsReminderBody () {
       this.appointment.smsReminder.body = this.currentCompany.sms_reminder_default_text
-    },
-    customPreValidateForm: _.debounce(function (reset = false) {
-      this.preValidateForm('appointmentForm')
-
-      // If campaigns is not empty
-      // AND sms reminder campaign id is not yet set
-      // - Set sms reminder campaign_id to the first of campaigns list.
-      if (this.campaigns.length > 0 && !this.appointment.smsReminder.campaign_id) {
-        this.appointment.smsReminder.campaign_id = this.campaigns[0].id
-      }
-    }, 100)
+    }
 
   },
   watch: {
@@ -350,6 +350,11 @@ export default {
 
   .checkbox-wrapper .custom-control-label {
     padding-top: 3px;
+  }
+
+  span.sms-reminder-label {
+    display: block;
+    margin-top: 4px;
   }
 }
 </style>

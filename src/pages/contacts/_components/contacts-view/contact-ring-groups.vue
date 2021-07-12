@@ -1,57 +1,72 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
     <h6>Contact Ring Groups</h6>
-    <div v-if="!is_edit">
+    <div v-if="!isEdit">
       <b-badge variant="primary"
                class="badge-tag badge-tag-primary ellipsis"
                v-for="ringGroup in appliedRingGroups"
                v-b-tooltip="ringGroup.name"
                :key="ringGroup.id">{{ ringGroup.name }}</b-badge>
     </div>
-    <q-select
-      v-if="is_edit"
-      ref="contactRingGroupsSelect"
-      compact
-      outlined
-      use-chips
-      use-input
-      multiple
-      input-debounce="0"
-      behavior="menu"
-      map-options
-      emit-value
-      option-value="id"
-      option-label="name"
-      style="width: 100%;"
-      class="q-custom-select contact-tags-select"
-      v-model="ringGroupsArray"
-      :options="options"
-      @filter="filterTagFn"
-      @blur="onSelectBlur"
-    >
-      <template v-slot:selected-item="scope">
-        <q-chip
-          v-if="ringGroupsArray"
-          removable
-          dense
-          square
-          color="white"
-          :tabindex="scope.tabindex"
-          @remove="scope.removeAtIndex(scope.index)"
-          v-b-tooltip="scope.opt.name"
-        >
-          <div :style="`color:#256EFF;margin-left:5px;max-width: 11vw;overflow: hidden;text-overflow: ellipsis;`">{{ scope.opt.name }}</div>
-        </q-chip>
-      </template>
-      <template v-slot:no-option>
-        <q-item>
-          <q-item-section class="text-grey pl-3">
-            No results
-          </q-item-section>
-        </q-item>
-      </template>
-    </q-select>
-    <b-link v-if="!is_edit"
+<!--    <q-select-->
+<!--      v-if="isEdit"-->
+<!--      ref="contactRingGroupsSelect"-->
+<!--      compact-->
+<!--      outlined-->
+<!--      use-chips-->
+<!--      use-input-->
+<!--      multiple-->
+<!--      input-debounce="0"-->
+<!--      behavior="menu"-->
+<!--      map-options-->
+<!--      emit-value-->
+<!--      option-value="id"-->
+<!--      option-label="name"-->
+<!--      style="width: 100%;"-->
+<!--      class="q-custom-select contact-tags-select"-->
+<!--      v-model="ringGroupsArray"-->
+<!--      :options="options"-->
+<!--      @filter="filterTagFn"-->
+<!--      @blur="onSelectBlur"-->
+<!--    >-->
+<!--      <template v-slot:selected-item="scope">-->
+<!--        <q-chip-->
+<!--          v-if="ringGroupsArray"-->
+<!--          removable-->
+<!--          dense-->
+<!--          square-->
+<!--          color="white"-->
+<!--          :tabindex="scope.tabindex"-->
+<!--          @remove="scope.removeAtIndex(scope.index)"-->
+<!--          v-b-tooltip="scope.opt.name"-->
+<!--        >-->
+<!--          <div :style="`color:#256EFF;margin-left:5px;max-width: 11vw;overflow: hidden;text-overflow: ellipsis;`">{{ scope.opt.name }}</div>-->
+<!--        </q-chip>-->
+<!--      </template>-->
+<!--      <template v-slot:no-option>-->
+<!--        <q-item>-->
+<!--          <q-item-section class="text-grey pl-3">-->
+<!--            No results-->
+<!--          </q-item-section>-->
+<!--        </q-item>-->
+<!--      </template>-->
+<!--    </q-select>-->
+
+    <vue-multiselect v-show="isEdit"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative"
+                     track-by="id"
+                     label="name"
+                     ref="ringGroupSelect"
+                     placeholder="Select ring group"
+                     openDirection="bottom"
+                     :closeOnSelect="false"
+                     :showLabels="false"
+                     :multiple="true"
+                     :options="options"
+                     v-model="selectedRingGroups"
+                     @close="onSelectBlur">
+    </vue-multiselect>
+    <b-link v-if="!isEdit"
             href="#"
             class="custom-link text-decoration-none"
             v-on:click="onModifyRingGroups">
@@ -64,9 +79,10 @@
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from '../../../../plugins/api/api'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import VueMultiselect from 'vue-multiselect'
 export default {
   name: 'contact-ring-groups',
-  components: { PencilOIcon },
+  components: { PencilOIcon, VueMultiselect },
   computed: {
     ...mapGetters('contacts', ['contact', 'ringGroups', 'contactRingGroups']),
     appliedRingGroups () {
@@ -78,10 +94,11 @@ export default {
   },
   data () {
     return {
-      is_edit: false,
+      isEdit: false,
       ringGroupsArray: [],
       options: [],
-      stringOptions: []
+      stringOptions: [],
+      selectedRingGroups: []
     }
   },
   methods: {
@@ -93,13 +110,13 @@ export default {
       })
     },
     onModifyRingGroups () {
-      this.is_edit = true
+      this.isEdit = true
       this.$nextTick(function () {
-        this.$refs.contactRingGroupsSelect.focus()
+        this.$refs.ringGroupSelect.$el.focus()
       })
     },
     onSelectBlur () {
-      this.is_edit = false
+      this.isEdit = false
       this.submit()
     },
     filterTagFn (val, update) {
@@ -116,9 +133,10 @@ export default {
       })
     },
     submit () {
-      talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: this.ringGroupsArray })
+      let ringGroupIds = this.selectedRingGroups.map(ringGroup => ringGroup.id)
+      talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: ringGroupIds })
         .then(response => {
-          this.setContactRingGroups(this.ringGroupsArray)
+          this.setContactRingGroups(ringGroupIds)
         }).catch(err => {
           console.log(err)
           this.$root.handleErrors(err.response)

@@ -2,7 +2,7 @@
   <div>
     <vue-multiselect track-by="value"
                      label="label"
-                     class="mr-1"
+                     class="mr-1 chip__clear-blue shrink-options"
                      style="width: 100%"
                      placeholder="Select time"
                      :searchable="true"

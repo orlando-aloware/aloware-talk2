@@ -3,7 +3,7 @@
     <vue-multiselect track-by="value"
                      label="label"
                      :multiple="multiple"
-                     class="mr-1"
+                     class="mr-1 chip__clear-blue shrink-options"
                      style="width: 100%"
                      placeholder="Select reminder frequency"
                      :searchable="true"
@@ -12,6 +12,7 @@
                      :options="durations"
                      :show-labels="false"
                      :allow-empty="true"
+                     openDirection="top"
                      v-model="frequencies"
                      @select="onSelect"
                      @remove="onRemove" />

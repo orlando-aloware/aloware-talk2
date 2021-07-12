@@ -9,7 +9,7 @@
     </div>
 
     <vue-multiselect v-show="isEdit"
-                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative b-radius__equal"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative"
                      track-by="id"
                      label="name"
                      ref="linesSelect"

@@ -26,7 +26,7 @@
         v-model="phone.isPrimary"
         :value="true"
         :unchecked-value="false">
-        Make Primary
+        <span class="make-primary-label">Make Primary</span>
       </b-form-checkbox>
     </b-form-group>
 
@@ -132,6 +132,10 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+  .make-primary-label {
+    display: inline-block;
+    margin-top: 1px;
+    cursor: pointer;
+  }
 </style>

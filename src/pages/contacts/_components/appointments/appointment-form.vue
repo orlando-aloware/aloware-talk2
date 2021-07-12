@@ -35,7 +35,7 @@
 
           <b-form-group id="input-group-2" label="Note" label-for="input-2">
           <b-form-textarea
-            id="textarea-no-auto-shrink"
+            class="textarea-no-auto-shrink"
             placeholder="Write a note for this event.."
             rows="3"
             max-rows="8"
@@ -83,7 +83,7 @@
             </span>
             </div>
             <b-form-textarea
-              id="textarea-no-auto-shrink"
+              class="textarea-no-auto-shrink"
               placeholder=""
               rows="3"
               max-rows="8"

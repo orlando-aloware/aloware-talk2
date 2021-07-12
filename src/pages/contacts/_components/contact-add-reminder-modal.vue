@@ -10,32 +10,22 @@
         label-for="input-1"
       >
 
-        <vue-ctk-date-time-picker formatted="lll"
+        <vue-ctk-date-time-picker formatted="l"
                                   label="Select date"
-                                  :inline="true"
+                                  :only-date="true"
                                   :no-label="true"
                                   :no-header="false"
-                                  :format="`YYYY-MM-DD HH:mm`"
                                   :no-button-now="true"
                                   :auto-close="true"
                                   :minute-interval="5"
                                   :disabled-hours="['00','01','02','03','04', '05']"
+                                  :min-date="minDate"
                                   v-model="date" @input="dateSelected">
         </vue-ctk-date-time-picker>
-
-<!--        <vue-ctk-date-time-picker formatted="l"-->
-<!--                                  :inline="true"-->
-<!--                                  label="Select date"-->
-<!--                                  :only-date="false"-->
-<!--                                  :no-label="true"-->
-<!--                                  :format="`MM/DD/YYYY`"-->
-<!--                                  :auto-close="true"-->
-<!--                                  v-model="reminder.date">-->
-<!--        </vue-ctk-date-time-picker>-->
       </b-form-group>
 
       <b-form-group id="input-group-2" label="" label-for="input-2">
-<!--        <predefined-time-selector @select="onTimeSelected"></predefined-time-selector>-->
+        <predefined-time-selector v-model="time" @select="onTimeSelected"></predefined-time-selector>
       </b-form-group>
 
       <b-form-group id="input-group-2" label-for="input-2">
@@ -49,7 +39,6 @@
         ></b-form-textarea>
       </b-form-group>
     </b-form>
-
     <template slot="modal-footer">
       <b-button
         variant="success"
@@ -59,7 +48,11 @@
       >
         Close
       </b-button>
-      <b-button type="submit" size="sm" variant="primary" :disabled="isAdding || !isValid">
+      <b-button type="button"
+                size="sm"
+                variant="primary"
+                :disabled="isAdding || !isValid"
+                @click="onSubmit">
         <q-spinner-bars v-if="isAdding" color="white" />
         {{ isAdding ? 'Adding Reminder...' : 'Add Reminder' }}
       </b-button>
@@ -73,20 +66,25 @@ import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters, mapActions, mapState } from 'vuex'
-// import PredefinedTimeSelector from 'pages/contacts/_components/predefined-time-selector'
+import PredefinedTimeSelector from 'pages/contacts/_components/predefined-time-selector'
+
 export default {
   name: 'contact-add-reminder-modal',
-  components: { VueCtkDateTimePicker },
+  components: { PredefinedTimeSelector, VueCtkDateTimePicker },
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isAddReminderOpen']),
     isValid () {
       return this.reminder.date && this.reminder.time && this.reminder.note
+    },
+    minDate () {
+      return window.moment().format('YYYY-MM-DD')
     }
   },
   data () {
     return {
       date: '',
+      time: '',
       isAdding: false,
       isOpen: false,
       reminder: {
@@ -130,7 +128,7 @@ export default {
       return {
         body: this.reminder.note,
         date: this.reminder.date,
-        time: this.reminder.time.value,
+        time: this.reminder.time,
         timezone: '',
         type: 13
       }
@@ -140,7 +138,8 @@ export default {
     },
     dateSelected (value) {
       this.reminder.date = window.moment(value).format('MM/DD/YYYY')
-      this.reminder.time = window.moment(value).format('hh:mm')
+      // enable this when the vue-date-time-selector is working properly
+      // this.reminder.time = window.moment(value).format('hh:mm')
     }
   },
   watch: {

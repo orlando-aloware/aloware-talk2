@@ -11,7 +11,7 @@
       <b-card no-body
               class="no-border position-relative"
               ref="scrollableArea">
-        <b-list-group class="p-2">
+        <b-list-group class="p-2 pr-3">
           <b-list-group-item v-for="contact in contacts"
                              :key="contact.id"
                              :to="`/contact/${contact.id}`"

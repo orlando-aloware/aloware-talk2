@@ -111,7 +111,7 @@
     <b-popover custom-class="contact-phone-popover"
                id="contact-phone-form-popover"
                target="btn-show-phone-form"
-               triggers="click blur"
+               triggers="click"
                :show.sync="showPhonesForm"
                @hidden="onPopoverHidden">
       <contact-phones-form @close="onClosePhoneForm"></contact-phones-form>

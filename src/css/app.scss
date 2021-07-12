@@ -1161,15 +1161,7 @@ i.option-separator {
   font-size: 13px !important;
 }
 
-.time-picker-column::-webkit-scrollbar {
-  display: block !important;
-}
 
-.time-picker-column[data-v-5bc85983]::-webkit-scrollbar{display:block}
-
-.date-time-picker {
-  font-family: 'Inter', sans-serif !important;
-}
 
 .multiselect.border-blue {
   .multiselect__tags {
@@ -1223,6 +1215,10 @@ margin-top: 2px;
 margin-bottom: 2px;
 }
 }
+.multiselect__content-wrapper{
+  border: 1px solid $blue !important;
+}
+
 }
 
 .multiselect.options__relative {
@@ -1286,6 +1282,12 @@ margin-bottom: 2px;
   border-bottom-right-radius: 5px !important;
 }
 
+.multiselect--active {
+  .multiselect__tags {
+    border: 1px solid $blue !important;
+  }
+}
+
 .contact-audit {
   width: 100%;
 }
@@ -1308,4 +1310,34 @@ margin-bottom: 2px;
 
 .activity-bottom-info {
   height: 30px;
+}
+
+
+//VUECTK DATETIMEPICKER
+
+.date-time-picker {
+  .field-input {
+    font-size: 13px !important;
+    font-family: 'Inter', sans-serif !important;
+  }
+}
+
+.time-picker-column::-webkit-scrollbar {
+  display: block !important;
+}
+
+.time-picker-column[data-v-5bc85983]::-webkit-scrollbar{display:block}
+
+.date-time-picker {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+}
+
+
+.form-control:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: $blue !important;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(25 118 210 / 25%);
 }

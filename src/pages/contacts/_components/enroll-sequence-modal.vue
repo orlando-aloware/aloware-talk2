@@ -88,7 +88,6 @@ export default {
   },
   watch: {
     isEnrollSequenceOpen: function (value) {
-      console.log(value)
       this.open = value
     }
   }

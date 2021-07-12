@@ -44,12 +44,16 @@
 
       <div class="d-block" v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
         <p class="text-muted custom-input-label mb-2">State</p>
-        <location-state-selector></location-state-selector>
+        <location-state-selector v-model="contact.cnam_state"
+                                 :country="contact.cnam_state"
+                                 @select="onUpdateState"></location-state-selector>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Country</p>
-        <location-country-selector></location-country-selector>
+        <location-country-selector v-model="contact.cnam_country"
+                                   :country="contact.cnam_country"
+                                   @select="onUpdateCountry"></location-country-selector>
       </div>
 
       <div class="d-block">
@@ -159,6 +163,12 @@ export default {
           callback()
         }
       })
+    },
+    onUpdateCountry (params) {
+      this.updateContactField({ cnam_country: params.value }, params.callback)
+    },
+    onUpdateState (params) {
+      this.updateContactField({ cnam_state: params.value }, params.callback)
     }
   },
   mounted () {
