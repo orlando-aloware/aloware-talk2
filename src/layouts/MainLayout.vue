@@ -232,6 +232,7 @@ export default {
       loadingCampaigns: false,
       loadingUsers: false,
       loadingTags: false,
+      loadingWorkflows: false,
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
       isWidget: false,
@@ -949,6 +950,26 @@ export default {
         })
     },
 
+    getWorkflows () {
+      if (this.hasPermissionTo('list workflow')) {
+        this.loadingWorkflows = true
+        return this.$axios.get('/api/v1/automations/workflows', {
+          mode: 'no-cors',
+          params: {
+            size: 100
+          }
+        }).then(res => {
+          this.loadingWorkflows = false
+          res.data.data.forEach((workflow) => {
+            this.newWorkflow(workflow)
+          })
+        }).catch(err => {
+          this.loadingWorkflows = false
+          console.log(err)
+        })
+      }
+    },
+
     getDispositionStatuses () {
       if (this.hasPermissionTo('list disposition status')) {
         this.loadingDispositionStatuses = true
@@ -1026,6 +1047,7 @@ export default {
         let getCampaigns = this.getCampaigns()
         let getUsers = this.getUsers()
         let getTags = this.getTags()
+        let getWorkflows = this.getWorkflows()
         let getDispositionStatuses = this.getDispositionStatuses()
         let getCallDispositions = this.getCallDispositions()
         let getMinVersion = this.getMinVersion()
@@ -1034,6 +1056,7 @@ export default {
           getCampaigns,
           getUsers,
           getTags,
+          getWorkflows,
           getDispositionStatuses,
           getCallDispositions,
           getMinVersion
@@ -1460,6 +1483,7 @@ export default {
       'setCampaigns',
       'setUsers',
       'newTag',
+      'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
       'setDialerToken',

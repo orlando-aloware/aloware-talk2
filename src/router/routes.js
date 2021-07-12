@@ -78,6 +78,11 @@ const routes = [
         path: 'user-activity/:id',
         name: 'User Activity',
         component: () => import('pages/Account.vue')
+      },
+      {
+        path: 'communication:id',
+        name: 'Communication',
+        component: () => import('pages/Account.vue')
       }
     ]
   },

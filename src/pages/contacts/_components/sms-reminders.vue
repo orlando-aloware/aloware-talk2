@@ -1,6 +1,6 @@
 <template>
-  <div class="sms-reminders-wrapper mt-4 border-0 p-0">
-    <div class="text-center">
+  <div class="sms-reminders-wrapper border-0 p-0">
+    <div>
       <div v-if="!campaignId">
         <q-select class="p-1"
                   use-input
@@ -14,12 +14,19 @@
                   v-model="selectedCampaign">
         </q-select>
       </div>
-      <el-button v-loading="loading"
-                 v-if="recentshowSendSmsReminderButton"
-                 type="primary"
-                 @click="sendDefaultSmsReminder">
-        Send SMS reminder now
-      </el-button>
+      <div class="pb-2">
+        <q-btn no-caps
+               unelevated
+               size="md"
+               color="primary"
+               :loading="loading"
+               v-if="recentshowSendSmsReminderButton"
+               @click="sendDefaultSmsReminder">
+          <div class="mx-2 px-1">
+            Send SMS Reminder
+          </div>
+        </q-btn>
+      </div>
     </div>
   </div>
 </template>

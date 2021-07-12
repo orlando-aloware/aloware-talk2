@@ -1,4 +1,87 @@
 /**
+ * date time passed
+ * @param {datetime|string|Moment} dt
+ * @returns {string|*}
+ */
+export const dateTimePassed = (dt) => {
+  if (dt) {
+    let difference = 0
+    let dateTimePassed = ''
+    if (window.timezone) {
+      difference = window.moment.utc(dt).tz(window.timezone).diff(window.moment.utc(new Date()), 'days')
+      dateTimePassed = window.moment.utc(dt).tz(window.timezone).fromNow()
+    } else {
+      difference = window.moment.utc(dt).diff(window.moment.utc(new Date()), 'days')
+      dateTimePassed = window.moment.utc(dt).local().fromNow()
+    }
+
+    if (difference < 1 || difference > 60) {
+      return dateTimePassed
+    } else {
+      return difference + ' days ago'
+    }
+  }
+}
+
+/**
+ * Fix schedule date
+ * @param {date|string|Moment} dt
+ * @param format
+ * @returns {string|*}
+ */
+export const fixScheduleDate = (dt, format = 'dddd, D MMMM YYYY') => {
+  if (dt) {
+    if (window.timezone) {
+      return window.moment.utc(dt).tz(window.timezone).format(format)
+    } else {
+      return window.moment.utc(dt).local().format(format)
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
+ * Fix schedule date
+ * @param {datetime|string|Moment} dt
+ * @param duration
+ * @returns {string|*}
+ */
+export const fixScheduleTime = (dt, duration = 0) => {
+  if (dt) {
+    if (window.timezone) {
+      if (window.timezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('h:mm A') + ' MNL'
+      }
+
+      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('h:mm A z')
+    } else {
+      return window.moment.utc(dt).local().add(duration, 'seconds').format('h:mm A z')
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
+ * Fix relative date time format
+ * @param {datetime|string|Moment} dt
+ * @param format
+ * @returns {string|*}
+ */
+export const fixRelativeDatetimeFormat = (dt, format = 'dddd, MMMM D, YYYY h:mm A z') => {
+  if (dt) {
+    if (window.timezone) {
+      return window.moment.utc(dt).tz(window.timezone).format(format)
+    } else {
+      return window.moment.utc(dt).local().format(format)
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
  * Fix date
  * @param {date|string|Moment} dt
  * @param format
@@ -223,6 +306,10 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
 
 export default ({ Vue }) => {
   const filters = {
+    dateTimePassed,
+    fixScheduleDate,
+    fixScheduleTime,
+    fixRelativeDatetimeFormat,
     fixDate,
     fixDateTime,
     fixTime,
