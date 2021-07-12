@@ -126,16 +126,17 @@ export default function () {
     currentListFilters: {},
 
     contact: {},
-    contact_phone_numbers: [],
-    contact_ring_groups: [],
-    contact_attributes: [],
+    contactPhoneNumbers: [],
+    contactRingGroups: [],
+    contactAttributes: [],
     isSidebarCollapsed: false,
     isContactNameEditOpen: false,
     lines: [],
-    ring_groups: [],
-    contact_selected_phone: null,
-    selected_line: null,
-    message_composer: {
+    ringGroups: [],
+    contactSelectedPhone: null,
+    selectedLine: null,
+    messageComposer: {
+      mode: 'sms',
       sms: {
         body: '',
         phone_number: null,
@@ -161,6 +162,12 @@ export default function () {
         timezone: null
       }
     },
-    isScheduleMessageOpen: false
+    isScheduleMessageOpen: false,
+    isScheduledMessageListOpen: false,
+    isAddAppointmentOpen: false,
+    isAppointmentSubmitted: false,
+    isEnrollSequenceOpen: false,
+    isAddReminderOpen: false,
+    changingSelectedContact: false
   }
 }

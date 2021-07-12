@@ -1,13 +1,13 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
     <h6 ref="sample">Notes</h6>
-    <div v-if="!is_edit"
+    <div v-if="!isEdit"
          class="notes" v-on:click="onEditNotes">
       {{ contact.notes }}
     </div>
-    <div v-if="(!contact.notes || contact.notes.length < 1) && !is_edit"
+    <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
          class="notes-empty-placeholder" v-on:click="onEditNotes">Add notes here..</div>
-    <div v-if="is_edit"
+    <div v-if="isEdit"
          style="max-width: 300px" v-on:blur="onBlur">
       <q-input
         ref="notesInput"
@@ -35,19 +35,20 @@ export default {
   },
   data () {
     return {
-      is_edit: false
+      isEdit: false
     }
   },
   methods: {
     ...mapActions('contacts', ['setContact']),
     onEditNotes () {
-      this.is_edit = true
+      this.isEdit = true
       this.$nextTick(function () {
         this.$refs.notesInput.focus()
       })
     },
     onBlur () {
-      this.is_edit = false
+      this.isEdit = false
+      this.onUpdate()
     },
     onUpdate () {
       talk2Api.V1.contact.update(this.contact.id, { notes: this.contact.notes }).then(response => {
@@ -55,13 +56,8 @@ export default {
       })
     }
   },
-  watch: {
-    notes: function () {
-      this.onUpdate()
-    }
-  },
   mounted () {
-    this.is_edit = false
+    this.isEdit = false
   }
 }
 </script>

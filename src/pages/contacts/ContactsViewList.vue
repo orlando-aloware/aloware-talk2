@@ -79,17 +79,19 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.loadList(id)
-      this.setCurrentListFilters({})
+      if (this.$route.name === 'Contacts') {
+        this.loadList(id)
+        this.setCurrentListFilters({})
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.loader-spacer {
-  min-height: calc(100vh - 300px);
-  width: 100%;
-  position: relative;
-}
+  .loader-spacer {
+    min-height: calc(100vh - 300px);
+    width: 100%;
+    position: relative;
+  }
 </style>

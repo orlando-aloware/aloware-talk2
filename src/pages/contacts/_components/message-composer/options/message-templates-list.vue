@@ -58,7 +58,7 @@ export default {
   },
   computed: {
     ...mapState(['smsTemplates']),
-    ...mapGetters('contacts', ['message_composer']),
+    ...mapGetters('contacts', ['messageComposer']),
     agentTemplates () {
       return this.smsTemplates.filter(template => template.is_on_user)
     },

@@ -366,6 +366,20 @@ const nl2br = (value) => {
   }
 }
 
+const strLimit = (string, limit, appendEllipsis = true) => {
+  if (string) {
+    return string.slice(0, limit) + (appendEllipsis && string.length > limit ? '...' : '')
+  }
+  return string
+}
+
+const momentFormat = (datetime, format, toUserTimezone = false) => {
+  if (toUserTimezone) {
+    return window.moment.utc(datetime).tz(window.timezone).format(format)
+  }
+  return window.moment(datetime).format(format)
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -392,7 +406,9 @@ export default ({ Vue }) => {
     agentStatusClass,
     readableArrayValue,
     fixBooleanType,
-    nl2br
+    nl2br,
+    strLimit,
+    momentFormat
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

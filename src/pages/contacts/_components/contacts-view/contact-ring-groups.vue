@@ -24,14 +24,14 @@
       option-label="name"
       style="width: 100%;"
       class="q-custom-select contact-tags-select"
-      v-model="ring_groups_array"
+      v-model="ringGroupsArray"
       :options="options"
       @filter="filterTagFn"
       @blur="onSelectBlur"
     >
       <template v-slot:selected-item="scope">
         <q-chip
-          v-if="ring_groups_array"
+          v-if="ringGroupsArray"
           removable
           dense
           square
@@ -68,10 +68,10 @@ export default {
   name: 'contact-ring-groups',
   components: { PencilOIcon },
   computed: {
-    ...mapGetters('contacts', ['contact', 'ring_groups', 'contact_ring_groups']),
+    ...mapGetters('contacts', ['contact', 'ringGroups', 'contactRingGroups']),
     appliedRingGroups () {
-      if (this.contact_ring_groups.length > 0) {
-        return this.ring_groups.filter(ringGroup => this.contact_ring_groups.includes(ringGroup.id))
+      if (this.contactRingGroups.length > 0) {
+        return this.ringGroups.filter(ringGroup => this.contactRingGroups.includes(ringGroup.id))
       }
       return []
     }
@@ -79,7 +79,7 @@ export default {
   data () {
     return {
       is_edit: false,
-      ring_groups_array: [],
+      ringGroupsArray: [],
       options: [],
       stringOptions: []
     }
@@ -89,7 +89,7 @@ export default {
     getContactRingGroups () {
       return talk2Api.V1.contact.getRingGroups(this.contact.id).then(response => {
         this.setContactRingGroups(response.data)
-        this.ring_groups_array = response.data
+        this.ringGroupsArray = response.data
       })
     },
     onModifyRingGroups () {
@@ -100,6 +100,7 @@ export default {
     },
     onSelectBlur () {
       this.is_edit = false
+      this.submit()
     },
     filterTagFn (val, update) {
       if (val === '') {
@@ -115,9 +116,9 @@ export default {
       })
     },
     submit () {
-      talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: this.ring_groups_array })
+      talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: this.ringGroupsArray })
         .then(response => {
-          this.setContactRingGroups(this.ring_groups_array)
+          this.setContactRingGroups(this.ringGroupsArray)
         }).catch(err => {
           console.log(err)
           this.$root.handleErrors(err.response)
@@ -127,13 +128,10 @@ export default {
   watch: {
     'contact.id': function () {
       this.getContactRingGroups()
-    },
-    ring_groups_array: function () {
-      this.submit()
     }
   },
   mounted () {
-    talk2Api.V1.ring_groups.get()
+    talk2Api.V1.ringGroups.get()
       .then(response => {
         this.setRingGroups(response.data)
         this.stringOptions = response.data

@@ -16,7 +16,7 @@
         use-chips
         multiple
         style="width: 250px;"
-        v-model="ring_groups"
+        v-model="ringGroups"
         :options="options"
       >
         <template v-slot:no-option>
@@ -62,7 +62,7 @@ export default {
         title: null,
         number: null
       },
-      ring_groups: [],
+      ringGroups: [],
       options: ['Google', 'Facebook', 'Twitter', 'Apple', 'Oracle']
     }
   },

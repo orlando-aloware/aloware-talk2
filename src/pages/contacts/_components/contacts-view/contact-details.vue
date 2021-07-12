@@ -7,6 +7,7 @@
       <contact-tags></contact-tags>
       <contact-notes></contact-notes>
       <contact-integrations></contact-integrations>
+      <contact-scheduled-messages></contact-scheduled-messages>
       <contact-activity-counts></contact-activity-counts>
       <contact-lines></contact-lines>
       <contact-ring-groups></contact-ring-groups>
@@ -26,9 +27,11 @@ import ContactRingGroups from 'pages/contacts/_components/contacts-view/contact-
 import ContactBroadcast from 'pages/contacts/_components/contacts-view/contact-broadcast'
 import ContactInformation from 'pages/contacts/_components/contacts-view/contact-information'
 import ContactIntegrations from 'pages/contacts/_components/contacts-view/contact-integrations'
+import ContactScheduledMessages from 'pages/contacts/_components/contacts-view/contact-scheduled-messages'
 export default {
   name: 'contact-details',
   components: {
+    ContactScheduledMessages,
     ContactIntegrations,
     ContactInformation,
     ContactBroadcast,

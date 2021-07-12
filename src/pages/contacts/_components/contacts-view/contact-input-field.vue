@@ -7,10 +7,13 @@
              :placeholder="placeholder"
              :value="field"
              v-model="field">
-      <template v-slot:append>
-        <q-icon v-if="!is_busy"
-                name="edit"
-                class="cursor-pointer input-edit-icon" v-on:click="getFocus" />
+      <template v-slot:append class="q-field-icon__append">
+        <pencil-o-icon v-if="!is_busy"
+                       color="#256EFF"
+                       class="cursor-pointer input-edit-icon"
+                       v-on:click="getFocus">
+
+        </pencil-o-icon>
       </template>
       <template v-slot:error>
         Please use maximum 3 characters.
@@ -20,8 +23,10 @@
 </template>
 
 <script>
+import PencilOIcon from 'components/icons/pencil-o-icon'
 export default {
   name: 'contact-input-field',
+  components: { PencilOIcon },
   props: {
     placeholder: {
       type: String,

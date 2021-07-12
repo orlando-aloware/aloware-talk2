@@ -41,7 +41,7 @@ export default {
   name: 'attachments',
   components: { UploadIcon },
   computed: {
-    ...mapGetters('contacts', ['selected_line'])
+    ...mapGetters('contacts', ['selectedLine'])
   },
   data () {
     return {
@@ -63,7 +63,7 @@ export default {
       let formData = new FormData()
       formData.append('file', file)
       this.is_uploading = true
-      talk2Api.V1.lines.fileUpload(this.selected_line.id, formData, {
+      talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, {
         onUploadProgress: function (progressEvent) {
           this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
         }.bind(this)

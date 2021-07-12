@@ -26,6 +26,9 @@ auth.login('support@alodev.org', 'astro123', true)
     console.log('Failed to login. Error details: ', err)
   })
 
+import CountriesAndTimezones from 'countries-and-timezones'
+window.CountriesAndTimezones = CountriesAndTimezones
+
 import moment from 'moment'
 import 'moment-timezone'
 import momentDurationFormatSetup from 'moment-duration-format'
@@ -49,6 +52,10 @@ import './../src/css/mixins.scss'
 import './../src/css/fonts.scss'
 import './../src/css/variables.scss'
 import './../src/css/svg.scss'
+
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
+Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker)
 
 Vue.use(Quasar)
 Vue.use(BootstrapVue)

@@ -168,19 +168,19 @@ export default {
     state.lines = lines
   },
   SET_RING_GROUPS: (state, ringGroups) => {
-    state.ring_groups = ringGroups
+    state.ringGroups = ringGroups
   },
   SET_CONTACT_RING_GROUPS: (state, ringGroups) => {
-    state.contact_ring_groups = ringGroups
+    state.contactRingGroups = ringGroups
   },
   SET_CONTACT_ATTRIBUTES: (state, attributes) => {
-    state.contact_attributes = attributes
+    state.contactAttributes = attributes
   },
   SET_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {
-    state.contact_phone_numbers = phoneNumbers
+    state.contactPhoneNumbers = phoneNumbers
   },
   ADD_CONTACT_PHONE_NUMBER: (state, phoneNumber) => {
-    state.contact_phone_numbers = [...state.contact_phone_numbers, phoneNumber]
+    state.contactPhoneNumbers = [...state.contactPhoneNumbers, phoneNumber]
   },
   SET_SIDEBAR_COLLAPSED: (state, isCollapsed) => {
     state.isSidebarCollapsed = isCollapsed
@@ -198,61 +198,85 @@ export default {
     state.contact.campaign_ids = [...state.contact.campaign_ids, lineId]
   },
   SET_CONTACT_SELECTED_PHONE: (state, phone) => {
-    state.contact_selected_phone = phone
+    state.contactSelectedPhone = phone
   },
   UPDATE_CONTACT_SELECTED_PHONE: (state, phone) => {
-    state.contact_phone_numbers = state.contact_phone_numbers.map(item => item.id === phone.id ? { ...item, ...{ phone_number: phone.phone_number, title: phone.title } } : item)
+    state.contactPhoneNumbers = state.contactPhoneNumbers.map(item => item.id === phone.id ? { ...item, ...{ phone_number: phone.phone_number, title: phone.title } } : item)
   },
   SET_SELECTED_LINE: (state, line) => {
-    state.selected_line = line
+    state.selectedLine = line
   },
+
+  SET_MESSAGE_COMPOSER_MODE: (state, mode = 'sms') => {
+    state.messageComposer.mode = mode
+  },
+
   SET_MESSAGE_COMPOSER_PHONE_SMS_NUMBER: (state, phoneNumber) => {
-    state.message_composer.sms = { ...state.message_composer.sms, phone_number: phoneNumber }
+    state.messageComposer.sms = { ...state.messageComposer.sms, phone_number: phoneNumber }
   },
   SET_MESSAGE_COMPOSER_SMS_BODY: (state, body) => {
-    state.message_composer.sms = { ...state.message_composer.sms, body: body }
+    state.messageComposer.sms = { ...state.messageComposer.sms, body: body }
   },
   SET_MESSAGE_COMPOSER_SMS_GIF: (state, gif) => {
-    state.message_composer.sms = { ...state.message_composer.sms, gif_url: gif }
+    state.messageComposer.sms = { ...state.messageComposer.sms, gif_url: gif }
   },
   SET_MESSAGE_COMPOSER_ATTACHMENTS: (state, attachments) => {
-    state.message_composer.sms.attachments = attachments
+    state.messageComposer.sms.attachments = attachments
   },
   APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS: (state, attachment) => {
-    state.message_composer.sms.attachments.push(attachment)
+    state.messageComposer.sms.attachments.push(attachment)
   },
 
   REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT: (state, attachment) => {
-    let found = state.message_composer.sms.attachments.find(item => item.id === attachment.id)
+    let found = state.messageComposer.sms.attachments.find(item => item.id === attachment.id)
     if (found) {
-      state.message_composer.sms.attachments.splice(state.message_composer.sms.attachments.indexOf(found), 1)
+      state.messageComposer.sms.attachments.splice(state.messageComposer.sms.attachments.indexOf(found), 1)
     }
   },
   RESET_MESSAGE_COMPOSER_SMS: (state) => {
-    state.message_composer.sms = { ...state.message_composer.sms, body: '', attachments: [], gif_url: '' }
+    state.messageComposer.sms = { ...state.messageComposer.sms, body: '', attachments: [], gif_url: '' }
   },
 
   SET_MESSAGE_COMPOSER_FAX_FILENAME: (state, filename) => {
-    state.message_composer.fax.filename = filename
+    state.messageComposer.fax.filename = filename
   },
   RESET_MESSAGE_COMPOSER_FAX: (state) => {
-    state.message_composer.fax = { ...state.message_composer.fax, filename: '' }
+    state.messageComposer.fax = { ...state.messageComposer.fax, filename: '' }
   },
 
   SET_MESSAGE_COMPOSER_EMAIL_BODY: (state, body) => {
-    state.message_composer.email.body = body
+    state.messageComposer.email.body = body
   },
   RESET_MESSAGE_COMPOSER_EMAIL: (state) => {
-    state.message_composer.email = { ...state.message_composer.email, body: '', subject: '' }
+    state.messageComposer.email = { ...state.messageComposer.email, body: '', subject: '' }
   },
 
   RESET_MESSAGE_COMPOSER_NOTE: (state) => {
-    state.message_composer.note = { ...state.message_composer.note, body: '', date: null, time: null, timezone: null }
+    state.messageComposer.note = { ...state.messageComposer.note, body: '', date: null, time: null, timezone: null }
   },
   SET_MESSAGE_COMPOSER_NOTE_BODY: (state, body) => {
-    state.message_composer.note.body = body
+    state.messageComposer.note.body = body
   },
   SCHEDULE_MESSAGE_OPEN: (state, isOpen) => {
     state.isScheduleMessageOpen = isOpen
+  },
+  SCHEDULE_MESSAGE_LIST_OPEN: (state, isOpen) => {
+    state.isScheduledMessageListOpen = isOpen
+  },
+  ADD_APPOINTMENT_OPEN: (state, isOpen) => {
+    state.isAddAppointmentOpen = isOpen
+  },
+  APPOINTMENT_SUBMITTED: (state, isSubmitted) => {
+    state.isAppointmentSubmitted = isSubmitted
+  },
+
+  ENROLL_SEQUENCE_OPEN: (state, isOpen) => {
+    state.isEnrollSequenceOpen = isOpen
+  },
+  ADD_REMINDER_OPEN: (state, isOpen) => {
+    state.isAddReminderOpen = isOpen
+  },
+  CHANGING_SELECTED_CONTACT: (state, isChanging) => {
+    state.changingSelectedContact = isChanging
   }
 }

@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="pt-2">
-      <div v-if="message_composer.sms.gif_url || message_composer.sms.attachments.length > 0" class="mb-2 d-inline-flex media-preview-wrapper">
-        <div v-if="message_composer.sms.gif_url" class="media-preview">
+      <div v-if="messageComposer.sms.gif_url || messageComposer.sms.attachments.length > 0" class="mb-2 d-inline-flex media-preview-wrapper">
+        <div v-if="messageComposer.sms.gif_url" class="media-preview">
           <img class="img-preview"
-               :src="message_composer.sms.gif_url"/>
+               :src="messageComposer.sms.gif_url"/>
           <b-button pill size="sm" class="btn-remove-attachments" v-on:click="removeMessageGif"> <i class="fa fa-times"></i> </b-button>
         </div>
 
-        <div v-for="attachment of message_composer.sms.attachments" :key="attachment.id" class="media-preview">
+        <div v-for="attachment of messageComposer.sms.attachments" :key="attachment.id" class="media-preview">
           <div v-if="attachment.mimetype.includes('audio')" class="audio-thumbnail-wrapper">
             <div class="text-center media-icon-wrapper mt-2">
               <i class="fa fa-microphone media-icon"></i>
@@ -45,7 +45,7 @@
                input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                type="textarea"
                placeholder="Type your message"
-               v-model="message_composer.sms.body"
+               v-model="messageComposer.sms.body"
                @input="updateMessage"
       />
     </div>
@@ -67,6 +67,7 @@
       <div>
         <b-button-group>
           <b-button variant="primary"
+                    class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="!validSms"
                     v-on:click="onSend">
@@ -139,9 +140,9 @@ export default {
   name: 'message-composer-sms',
   components: { ScheduledMessage, MessageTemplates, Variables, Attachments, SearchGiphy, VariableIcon, CalendarTodayIcon, AttachmentIcon, GifIcon },
   computed: {
-    ...mapGetters('contacts', ['contact', 'message_composer', 'selected_line']),
+    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validSms: function () {
-      return this.message_composer.sms.body && this.message_composer.sms.body.length > 0 && this.selected_line && this.message_composer.sms.phone_number && this.message_composer.sms.phone_number.length > 0
+      return this.messageComposer.sms.body && this.messageComposer.sms.body.length > 0 && this.selectedLine && this.messageComposer.sms.phone_number && this.messageComposer.sms.phone_number.length > 0
     }
   },
   data () {
@@ -163,10 +164,10 @@ export default {
     },
     formatMessage () {
       return {
-        body: this.message_composer.sms.body,
+        body: this.messageComposer.sms.body,
         contact_id: this.contact.id,
-        campaign_id: this.selected_line.id,
-        phone_number: this.message_composer.sms.phone_number
+        campaign_id: this.selectedLine.id,
+        phone_number: this.messageComposer.sms.phone_number
       }
     },
     onSend () {
@@ -214,11 +215,11 @@ export default {
       return process.env.API_URL + '/static/uploaded_file/' + uuid
     },
     templateSelected (template) {
-      this.setMessageComposerSmsBody((this.message_composer.sms.body ?? '') + ' ' + template.body)
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
       this.closeTemplatesPopover()
     },
     variableSelected (variable) {
-      this.setMessageComposerSmsBody((this.message_composer.sms.body ?? '') + ' ' + variable)
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
       this.closeVariablesPopover()
     },
     onAttachmentUploaded (fileData) {

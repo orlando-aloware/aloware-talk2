@@ -9,7 +9,7 @@
                  input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                  type="textarea"
                  placeholder="Type @ to mention someone"
-                 v-model="message_composer.note.body"
+                 v-model="messageComposer.note.body"
                  @input="updateMessage"
         />
       </form>
@@ -21,6 +21,7 @@
       <div>
         <b-button-group>
           <b-button variant="primary"
+                    class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="isAdding || !validNote"
                     v-on:click="onAdd">
@@ -39,9 +40,9 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'message-composer-note',
   computed: {
-    ...mapGetters('contacts', ['contact', 'message_composer', 'selected_line']),
+    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validNote () {
-      return this.message_composer.note.body && this.message_composer.note.body.length > 0
+      return this.messageComposer.note.body && this.messageComposer.note.body.length > 0
     }
   },
   data () {
@@ -56,7 +57,7 @@ export default {
     },
     formatMessage () {
       return {
-        body: this.message_composer.note.body,
+        body: this.messageComposer.note.body,
         type: 10
       }
     },

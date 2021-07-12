@@ -11,6 +11,7 @@
                  class="prev-activities mx-2"
                  color="primary"
                  size="md"
+                 :isLoadingMore="isLoadingMore"
                  :loading="isLoadingPreviousActivities"
                  :disable="isLoadingPreviousActivities"
                  v-if="hasMoreCommunications"
@@ -57,10 +58,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['contactsLoaded', 'setContact']),
+    ...mapActions('contacts', ['contactsLoaded', 'setContact', 'selectedContactChanging']),
     getContact (id) {
+      this.selectedContactChanging(true)
       return this.fetchContactInfo(id).then(response => {
         this.setContact(response.data)
+        this.selectedContactChanging(false)
       })
     }
   },
@@ -70,7 +73,9 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.getContact(id)
+      if (this.$route.name === 'Contact') {
+        this.getContact(id)
+      }
     }
   }
 }

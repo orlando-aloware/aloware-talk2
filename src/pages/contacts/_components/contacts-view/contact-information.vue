@@ -97,7 +97,7 @@ export default {
   name: 'contact-information',
   components: { ContactDisposition, ContactInputField, LocationCountrySelector, LocationStateSelector, ContactUserSelector },
   computed: {
-    ...mapGetters('contacts', ['contact', 'contact_attributes']),
+    ...mapGetters('contacts', ['contact', 'contactAttributes']),
     autoHeightClass () {
       return this.is_expanded ? 'auto-height' : ''
     }
@@ -173,7 +173,7 @@ export default {
     height: 210px;
     overflow: hidden;
     padding: 0 !important;
-    margin-bottom: 25px;
+    margin-bottom: 8px;
 
     .custom-input-label {
       font-size: 80%;

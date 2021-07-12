@@ -6,7 +6,7 @@
           <div class="text-center media-icon-wrapper mt-2">
             <i class="far fa-file-pdf media-icon"></i>
           </div>
-          <p class="ellipsis mt-1 text-center">{{ message_composer.fax.filename }}</p>
+          <p class="ellipsis mt-1 text-center">{{ messageComposer.fax.filename }}</p>
           <b-button pill size="sm" class="btn-remove-attachments" v-on:click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
         </div>
       </div>
@@ -43,6 +43,7 @@
       <div></div>
       <b-button-group>
         <b-button variant="primary"
+                  class="fs-13 pl-3 pr-3"
                   size="sm"
                   :disabled="isSending || !validFax"
                   v-on:click="send">
@@ -65,9 +66,9 @@ export default {
 
   components: { UploadIcon },
   computed: {
-    ...mapGetters('contacts', ['selected_line', 'contact', 'message_composer']),
+    ...mapGetters('contacts', ['selectedLine', 'contact', 'messageComposer']),
     validFax () {
-      return this.message_composer.fax.filename
+      return this.messageComposer.fax.filename
     }
   },
   data () {
@@ -99,7 +100,7 @@ export default {
       let formData = new FormData()
       formData.append('file', file)
       talk2Api.V1.lines.pdfUpload(
-        this.selected_line.id,
+        this.selectedLine.id,
         formData,
         {
           onUploadProgress: function (progressEvent) {
@@ -120,13 +121,13 @@ export default {
     },
     formatMessage () {
       return {
-        file_name: this.message_composer.fax.filename,
-        phone_number: this.message_composer.phone_number
+        file_name: this.messageComposer.fax.filename,
+        phone_number: this.messageComposer.phone_number
       }
     },
     send () {
       this.isSending = true
-      return talk2Api.V1.lines.sendFax(this.selected_line.id, this.contact.id, this.formatMessage())
+      return talk2Api.V1.lines.sendFax(this.selectedLine.id, this.contact.id, this.formatMessage())
         .then(response => {
           if (response.status === 201) {
             this.sendCallback()
