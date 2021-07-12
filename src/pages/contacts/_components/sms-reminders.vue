@@ -73,6 +73,7 @@ export default {
     showSendSmsReminderButton () {
       let appointmentDate = this.$moment(new Date(this.appointmentDatetime)).tz('UTC')
       this.recentshowSendSmsReminderButton = appointmentDate.isAfter()
+      return this.recentshowSendSmsReminderButton
     },
 
     sendDefaultSmsReminder () {

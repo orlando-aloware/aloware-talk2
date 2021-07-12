@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import auth from '../../boot/auth'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
@@ -823,6 +823,7 @@ export default {
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contact_id)
+      this.setContact(selectedContact)
     },
 
     loadingContactsFailed () {
@@ -849,7 +850,8 @@ export default {
       } else {
         this.loadingContact = false
       }
-    }
+    },
+    ...mapActions('contacts', ['setContact'])
   },
 
   watch: {

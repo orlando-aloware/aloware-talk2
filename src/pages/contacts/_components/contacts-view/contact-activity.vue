@@ -182,7 +182,8 @@
         </span>
 
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND">
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              ![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
             &nbsp;to {{ communication.lead_number | fixPhone }}
         </span>
 
@@ -373,8 +374,8 @@ export default {
       return this.communication.direction === CommunicationDirection.OUTBOUND
     },
     avatarName () {
-      return this.communication.direction === CommunicationDirection.OUTBOUND && this.currentCompany
-        ? this.currentCompany.name : this.contact.name
+      return this.communication.direction === CommunicationDirection.OUTBOUND && this.getUser(this.communication.user_id)
+        ? this.getUser(this.communication.user_id).name : this.contact.name
     }
   },
 
@@ -397,7 +398,8 @@ export default {
         communication.direction === CommunicationDirection.INBOUND
       // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
       let callRule = communication.type === CommunicationTypes.CALL &&
-        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2)
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2) &&
+        communication.direction === CommunicationDirection.INBOUND
 
       return smsRule || callRule
     },

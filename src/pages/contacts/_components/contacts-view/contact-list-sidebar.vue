@@ -41,7 +41,7 @@
         </b-list-group>
         <div class="relative py-4" >
           <b-overlay
-            :show="true"
+            :show="isLoaderVisible"
             spinner-variant="success"
             spinner-type="grow"
             rounded="sm"
@@ -91,6 +91,7 @@ export default {
       return `${(this.$route.params.id === String(contact.id) ? 'active' : '')}`
     },
     onBottomScroll () {
+      console.log('test')
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
       scrollTimeout = setTimeout(() => {
