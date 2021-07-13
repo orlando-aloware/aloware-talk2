@@ -2,7 +2,8 @@
   <div class="row mx-0 content-row contact-view-wrapper d-flex">
     <contact-list-sidebar></contact-list-sidebar>
     <div :class="`pr-2 mb-3 contact-activity-wrapper ${widthClass}`">
-      <contact-activities :communications="filteredCommunications"
+      <contact-activities ref="contactActivities"
+                          :communications="filteredCommunications"
                           :campaignId="selectedCampaignId">
         <template v-slot:moreActivities>
           <q-btn outline
@@ -65,6 +66,7 @@ export default {
       return this.fetchContactInfo(id).then(response => {
         this.setContact(response.data)
         this.selectedContactChanging(false)
+        this.$refs.contactActivities.scrollMessages()
       })
     }
   },

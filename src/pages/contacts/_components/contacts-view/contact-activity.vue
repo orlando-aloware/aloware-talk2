@@ -77,9 +77,11 @@
                v-for="(attachment, index) in communication.attachments"
                :key="index">
             <q-img
-              class="border-rounded img-fluid d-block r-2x width-380"
+              class="border-rounded img-fluid d-block r-2x"
               :src="attachment.url"
               :class="index > 0 ? 'mb-1' : ''"
+              width="320px"
+              fit="fill"
             >
               <template v-slot:error>
                 <div class="absolute-full flex flex-center bg-negative text-white">

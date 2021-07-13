@@ -3,7 +3,8 @@
       <contact-activities-header :label="contact.name"/>
       <div class="contact-activities">
         <div class="inner-1">
-          <div class="p-3  inner-2">
+          <div class="p-3  inner-2"
+               ref="activitiesWrap">
             <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center">
               <slot name="moreActivities">
               </slot>
@@ -29,9 +30,11 @@ import ContactActivitiesHeader from 'pages/contacts/_components/contact-activiti
 import { mapGetters } from 'vuex'
 import ContactActivity from 'pages/contacts/_components/contacts-view/contact-activity'
 import MessageComposer from 'pages/contacts/_components/message-composer/message-composer'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'contact-activities',
+  mixins: [contactMixins],
   props: {
     communications: {
       required: true,
@@ -55,6 +58,16 @@ export default {
     MessageComposer,
     ContactActivitiesHeader,
     ContactActivity
+  },
+  methods: {
+    scrollMessages () {
+      setTimeout(() => {
+        let activitiesWrap = this.$refs.activitiesWrap
+        if (activitiesWrap && activitiesWrap.scrollHeight) {
+          activitiesWrap.scrollTop = activitiesWrap.scrollHeight
+        }
+      }, 250)
+    }
   }
 }
 </script>

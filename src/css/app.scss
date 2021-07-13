@@ -1341,3 +1341,21 @@ margin-bottom: 2px;
 .activity-bottom-info {
   height: 30px;
 }
+
+.border-no-top {
+  border: 1px solid $grey-60;
+  border-top: 0 !important;
+}
+
+.bottom-radius {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.collapsed-has-notes {
+  .q-item {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-bottom: 0 !important;
+  }
+}

@@ -222,6 +222,9 @@ export default {
       if (parseInt(data.contact_id) === parseInt(this.contact_id)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
+        if (this.$refs.contactActivities) {
+          this.$refs.contactActivities.scrollMessages()
+        }
       }
     })
   },
@@ -245,6 +248,9 @@ export default {
           // push new data to top of array
           this.communicationsAndAudits.push(data)
           this.scrollMessages()
+          if (this.$refs.contactActivities) {
+            this.$refs.contactActivities.scrollMessages()
+          }
         }
       }
     },
@@ -364,6 +370,9 @@ export default {
       this.selectedPhoneNumber = this.selectedContact ? this.selectedContact.phoneNumber : this.selectedPhoneNumber
 
       this.scrollMessages()
+      if (this.$refs.contactActivities) {
+        this.$refs.contactActivities.scrollMessages()
+      }
 
       if (!this.smsOnly && (localStorage.getItem('PREVIOUS_ROUTE_NAME') !== 'Contacts' || forceClearLoading)) {
         this.loadingContactCommunications = false
@@ -439,6 +448,9 @@ export default {
             this.loadingContactCommunications = false
           } else {
             this.scrollMessages()
+            if (this.$refs.contactActivities) {
+              this.$refs.contactActivities.scrollMessages()
+            }
             this.loadingContactCommunications = false
           }
         })

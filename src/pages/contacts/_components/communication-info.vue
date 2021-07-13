@@ -5,7 +5,7 @@
       <q-expansion-item
         v-model="activeName"
         class="contact-activity"
-        :class="activityExpansionClass"
+        :class="expansionClass"
         @before-show="onBeforeActivityShow"
         @after-show="onAfterActivityShow"
         @after-hide="onActivityHide">
@@ -16,13 +16,15 @@
                          v-if="communication.disposition_status2">
               </component>
             </div>
-            <div class="text-lt p-x">
+            <div class="text-lt p-x"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
                 {{ communication.direction | fixCommDirection }}
               </span>
               {{ communication.type | fixCommType }}
             </div>
-            <q-item-section class="text-lt pl-2 text-left">
+            <q-item-section class="text-lt pl-2 text-left"
+                            v-if="communication.duration">
               <span v-if="communication.type === CommunicationTypes.CALL && activityMode">
                 {{ communication.duration | fixDuration }}
               </span>
@@ -42,6 +44,7 @@
                   v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
                   :class="index > 0 ? 'mb-1' : ''"
                   :key="index"
+                  height="200px"
                   :src="image.url">
                   <template v-slot:error>
                     <div class="absolute-full flex flex-center bg-negative text-white">
@@ -589,15 +592,15 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="p-x-sm p-y-sm b-t width-300"
+    <div class="px-3 pt-2 bottom-radius border-no-top"
          v-if="communication.notes && !activeName">
-      <strong>Note</strong>
-      <p v-html="$options.filters.nl2br(communication.notes)"></p>
+      <label class="form-control-label mb-1">Note</label>
+      <p v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.notes))"></p>
     </div>
-    <div class="p-x-sm p-y-sm b-t width-300"
+    <div class="px-3 pt-2 border-no-top"
          v-if="communication.body && communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirections.INBOUND && !activeName">
       <strong>Note</strong>
-      <p v-html="$options.filters.nl2br(communication.body)"></p>
+      <p v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.body))"></p>
     </div>
   </div>
 </template>
@@ -759,6 +762,17 @@ export default {
         return this.$refs['sms-reminder'].showSendSmsReminderButton()
       }
       return false
+    },
+    expansionClass () {
+      let notesCondition = (this.communication.notes ||
+        (this.communication.body &&
+          this.communication.type === CommunicationTypes.NOTE &&
+          this.communication.direction === CommunicationDirections.INBOUND)) &&
+        !this.activeName
+      if (notesCondition && !this.activityExpansionClass.includes('collapsed-has-notes')) {
+        return this.activityExpansionClass.concat(['collapsed-has-notes'])
+      }
+      return this.activityExpansionClass
     }
   },
 
