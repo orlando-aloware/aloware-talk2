@@ -4,7 +4,12 @@
     <q-list class="rounded-contact-activity">
       <q-expansion-item
         v-model="activeName"
-        class="contact-activity">
+        class="contact-activity"
+        :class="activityExpansionClass"
+        @before-show="onBeforeActivityShow"
+        @after-show="onAfterActivityShow"
+        @before-hide="onBeforeActivityHide"
+        @after-hide="onActivityHide">
         <template slot="header">
           <q-item-section class="communication-header flex-row">
             <div class="ml-3 pr-2">
@@ -12,13 +17,15 @@
                          v-if="communication.disposition_status2">
               </component>
             </div>
-            <div class="text-lt p-x">
+            <div class="text-lt p-x"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
                 {{ communication.direction | fixCommDirection }}
               </span>
               {{ communication.type | fixCommType }}
             </div>
-            <q-item-section class="text-lt pl-2 text-left">
+            <q-item-section class="text-lt pl-2 text-left"
+                            v-if="communication.duration">
               <span v-if="communication.type === CommunicationTypes.CALL && activityMode">
                 {{ communication.duration | fixDuration }}
               </span>
@@ -38,6 +45,7 @@
                   v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
                   :class="index > 0 ? 'mb-1' : ''"
                   :key="index"
+                  height="200px"
                   :src="image.url">
                   <template v-slot:error>
                     <div class="absolute-full flex flex-center bg-negative text-white">
@@ -100,37 +108,6 @@
                     <label class="form-control-label w-100 mb-1">Time</label>
                     {{ communication.engagement_data.reminder_datetime | fixScheduleTime }}
                   </div>
-                </div>
-              </div>
-              <div class="w-100 text-center">
-                <div class="text-center pb-1 b-b">
-                  <q-btn-toggle
-                    class="border w-100"
-                    no-caps
-                    dense
-                    unelevated
-                    toggle-color="primary"
-                    color="white"
-                    text-color="primary"
-                    :options="appointmentOptions"
-                    :disabled="loadingUpdateEngagement"
-                    v-model="communication.disposition_status2"
-                    v-if="communication.type === CommunicationTypes.APPOINTMENT"
-                    @click="changeEngagementStatus"
-                  />
-                  <q-btn-toggle
-                    class="border w-100"
-                    no-caps
-                    dense
-                    unelevated
-                    toggle-color="primary"
-                    color="white"
-                    text-color="primary"
-                    :options="reminderOptions"
-                    :disabled="loadingUpdateEngagement"
-                    v-model="communication.disposition_status2"
-                    v-else
-                    @click="changeEngagementStatus"/>
                 </div>
               </div>
             </div>
@@ -210,7 +187,7 @@
                                    :communication="communication"
                                    :is-form="true"/>
               </div>
-              <div :class="[communication.direction === CommunicationDirections.OUTBOUND ? 'w-100' : 'w-50']">
+              <div :class="[communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id) ? 'w-50' : 'w-100']">
                 <label class="form-control-label w-100">
                   {{ communication.direction === CommunicationDirections.INBOUND ? 'Answered By' : 'Initiated By' }}
                 </label>
@@ -262,11 +239,9 @@
               </div>
             </div>
 
-            <div class="form-horizontal"
-                 :class="[communication.type !== CommunicationTypes.NOTE ? 'b-b': '']"
-                 v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <div class="w-100 mb-0 pt-2 pb-2"
-                   v-if="communication.type !== CommunicationTypes.NOTE">
+            <div class="w-100 mb-2 pb-2 border-bottom"
+                 v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              <div class="w-100 mb-0 pt-2 pb-2">
                 <label class="form-control-label w-100 mb-1">User</label>
                 <div class="d-flex align-items-center w-100">
                   <div class="status-icon d-inline-block"
@@ -323,7 +298,7 @@
                                 v-if="getUser(attemptingUser) && getUser(attemptingUser).id"
                                 class="pb-1">
                                 <router-link
-                                  :to="{ name: 'User Activity', params: {user_id: getUser(attemptingUser).id }}">
+                                  :to="{ name: 'User Activity', params: {userId: getUser(attemptingUser).id }}">
                                     <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                                           :title="getUserName(getUser(attemptingUser))">
                                         {{ getUserName(getUser(attemptingUser)) }}
@@ -338,7 +313,7 @@
             </div>
 
             <div class="pb-2 mb-2 border-bottom"
-                 v-if="![CommunicationTypes.FAX, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                 v-if="![CommunicationTypes.EMAIL, CommunicationTypes.FAX, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="d-flex flex-row w-100"
                    v-if="communication.type === CommunicationTypes.CALL">
                 <div class="w-50">
@@ -415,11 +390,54 @@
               </div>
             </div>
 
-            <div class="form-horizontal pt-1"
+            <div class="form-horizontal pt-1 mb-3 pb-2 border-bottom"
                  v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <label class="form-control-label mb-1">Notes</label>
-              <div class="d-flex flex-column justify-content-center pb-2 w-100">
-                {{ communication.type === CommunicationTypes.APPOINTMENT ? communication.engagement_data.appointment_note : communication.engagement_data.reminder_note }}
+              <div class="d-flex flex-column justify-content-center pb-2 w-100"
+                v-if="communication.type === CommunicationTypes.APPOINTMENT && communication.engagement_data.appointment_note">
+                {{ communication.engagement_data.appointment_note }}
+              </div>
+              <div class="d-flex flex-column justify-content-center pb-2 w-100"
+                   v-else-if="communication.type === CommunicationTypes.REMINDER && communication.engagement_data.reminder_note">
+                {{ communication.engagement_data.reminder_note }}
+              </div>
+              <div class="d-flex flex-column justify-content-center pb-2 w-100"
+                   v-else>
+                -
+              </div>
+            </div>
+
+            <div class="w-100 text-center pb-2"
+                 :class="[hasSMSReminder ? 'mb-2 border-bottom' : '']"
+                 v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              <div class="text-center pb-1 b-b">
+                <q-btn-toggle
+                  class="border w-100"
+                  no-caps
+                  dense
+                  unelevated
+                  toggle-color="primary"
+                  color="white"
+                  text-color="primary"
+                  :options="appointmentOptions"
+                  :disabled="loadingUpdateEngagement"
+                  v-model="communication.disposition_status2"
+                  v-if="communication.type === CommunicationTypes.APPOINTMENT"
+                  @click="changeEngagementStatus"
+                />
+                <q-btn-toggle
+                  class="border w-100"
+                  no-caps
+                  dense
+                  unelevated
+                  toggle-color="primary"
+                  color="white"
+                  text-color="primary"
+                  :options="reminderOptions"
+                  :disabled="loadingUpdateEngagement"
+                  v-model="communication.disposition_status2"
+                  v-else
+                  @click="changeEngagementStatus"/>
               </div>
             </div>
 
@@ -427,22 +445,43 @@
                  v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="form-group row mb-0">
                 <div class="w-100"
-                     v-if="this.communication.has_recording">
+                     v-if="communication.type === CommunicationTypes.CALL">
                   <label class="form-control-label"
-                         v-if="communication.type === CommunicationTypes.CALL">
+                         v-if="communication.has_recording">
                     Call Recording
                   </label>
                   <div class="d-flex align-items-center w-100 mb-2 border-bottom"
-                       v-if="communication.type === CommunicationTypes.CALL">
+                       v-if="communication.has_recording">
                       <communication-audio :communication="communication"
                                            :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                            :uniqueId="communication.id + '1'">
                       </communication-audio>
                   </div>
+                  <div class="form-control-label w-100 mb-2 pb-2 border-bottom"
+                       v-else>
+                    No Call Recording
+                  </div>
                 </div>
-                <div  class="form-control-label w-100"
-                      v-else>
-                  No Call Recording
+
+                <div class="w-100"
+                     v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
+                  <label class="form-control-label w-100"
+                         v-if="this.communication.has_voicemail">
+                    Voicemail
+                  </label>
+                  <div class="d-flex flex-row align-items-center w-100 mb-2 border-bottom"
+                       v-if="this.communication.has_voicemail">
+                    <span class="text-dark-greenish flex-grow-1">
+                      <communication-audio :communication="communication"
+                                           :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
+                                           :uniqueId="communication.id + '2'">
+                      </communication-audio>
+                    </span>
+                  </div>
+                  <div class="form-control-label w-100 mb-2 pb-2 border-bottom"
+                       v-else>
+                    No Voicemail
+                  </div>
                 </div>
 
                 <template v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
@@ -463,23 +502,6 @@
                     </div>
                   </div>
                 </template>
-
-                <label class="form-control-label w-100"
-                       v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && this.communication.has_voicemail">
-                  Voicemail
-                </label>
-                <div class="d-flex align-items-center w-100 mb-2 border-bottom"
-                     v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
-                  <span class="text-dark-greenish">
-                    <communication-audio :communication="communication"
-                                         :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
-                                         :uniqueId="communication.id + '2'">
-                    </communication-audio>
-                  </span>
-                </div>
-                <div v-else>
-                  No Call Recording
-                </div>
 
                 <label class="form-control-label w-100 mb-1">Tags</label>
                 <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom">
@@ -545,7 +567,8 @@
                     </div>
                   </q-btn>
                 </router-link-->
-                <sms-reminders v-if="communication.type === CommunicationTypes.APPOINTMENT"
+                <sms-reminders ref="sms-reminder"
+                               v-if="communication.type === CommunicationTypes.APPOINTMENT"
                                class="d-flex flex-row text-left w-100"
                                :communicationId="communication.id"
                                :campaignId="campaignId"
@@ -570,15 +593,18 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="p-x-sm p-y-sm b-t width-300"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
          v-if="communication.notes && !activeName">
-      <strong>Note</strong>
-      <p v-html="$options.filters.nl2br(communication.notes)"></p>
+      <label class="form-control-label mb-1 text-left">Note</label>
+      <p class="text-left"
+         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.notes))">
+      </p>
     </div>
-    <div class="p-x-sm p-y-sm b-t width-300"
-         v-if="communication.body && communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirections.INBOUND && !activeName">
-      <strong>Note</strong>
-      <p v-html="$options.filters.nl2br(communication.body)"></p>
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
+         v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
+      <p class="text-left"
+         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.body))">
+      </p>
     </div>
   </div>
 </template>
@@ -723,6 +749,7 @@ export default {
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
         }
       ],
+      activityExpansionClass: [],
       AnswerTypes,
       CommunicationDirections,
       CommunicationCurrentStatus,
@@ -733,10 +760,43 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'callDispositions', 'ringGroups', 'currentCompany'])
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'callDispositions', 'ringGroups', 'currentCompany']),
+    hasSMSReminder () {
+      if (this.$refs['sms-reminder']) {
+        return this.$refs['sms-reminder'].showSendSmsReminderButton()
+      }
+      return false
+    },
+    hasNotes () {
+      return (this.communication.notes ||
+        (this.communication.body &&
+          this.communication.type === CommunicationTypes.NOTE))
+    }
+  },
+
+  created () {
+    this.onActivityHide()
   },
 
   methods: {
+    onBeforeActivityShow () {
+      this.activityExpansionClass = ['activity-expanded']
+    },
+    onAfterActivityShow () {
+      this.activityExpansionClass.push('expand-animation-finished')
+    },
+    onBeforeActivityHide () {
+      if (this.hasNotes) {
+        this.activityExpansionClass = ['activity-unexpanded collapsed-has-notes']
+      }
+    },
+    onActivityHide () {
+      let activityClass = 'activity-unexpanded'
+      if (this.hasNotes) {
+        activityClass += ' collapsed-has-notes'
+      }
+      this.activityExpansionClass = [activityClass]
+    },
     getCampaign (id) {
       if (!id) {
         return null

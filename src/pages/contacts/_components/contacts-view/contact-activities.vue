@@ -1,12 +1,21 @@
 <template>
   <div class="contact-activity-container">
-    <contact-activities-header :label="contactName"/>
-    <div class="contact-activities">
-      <div class="inner-1">
-        <div class="p-3  inner-2">
-          <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center">
-            <slot name="moreActivities">
-            </slot>
+      <contact-activities-header :label="contact.name"/>
+      <div class="contact-activities">
+        <div class="inner-1">
+          <div class="p-3 inner-2 scrollbar-white"
+               ref="activitiesWrap">
+            <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center">
+              <slot name="moreActivities">
+              </slot>
+            </div>
+            <contact-activity v-for="(communication, index) in communications"
+                              :key="communication.id + '-comm-' + index"
+                              :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
+                              :communication="communication"
+                              :contact="contact"
+                              :campaignId="campaignId">
+            </contact-activity>
           </div>
           <contact-activity v-for="(communication, index) in communications"
                             :key="communication.id + '-comm-' + index"
@@ -17,7 +26,6 @@
           </contact-activity>
         </div>
       </div>
-    </div>
     <div class="composer-container-wrapper">
       <message-composer></message-composer>
     </div>
@@ -25,15 +33,15 @@
 </template>
 
 <script>
-
-import _ from 'lodash'
 import ContactActivitiesHeader from 'pages/contacts/_components/contact-activities-header'
 import { mapGetters } from 'vuex'
 import ContactActivity from 'pages/contacts/_components/contacts-view/contact-activity'
 import MessageComposer from 'pages/contacts/_components/message-composer/message-composer'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'contact-activities',
+  mixins: [contactMixins],
   props: {
     communications: {
       required: true,
@@ -51,38 +59,21 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', [ 'contact', 'listItems', 'selectedList' ])
-  },
-  created () {
-    this.updateContactName()
-  },
-  methods: {
-    updateContactName () {
-      const listId = _.get(this.selectedList, 'id', null)
-      const contactId = parseInt(_.get(this.$route, 'params.id', null))
-      const contactListItems = _.get(this.listItems, `${listId}.data`, null)
-      if (contactListItems) {
-        const contact = contactListItems.find(contact => contact.id === contactId)
-        this.contactName = _.get(contact, 'name', 'Contact Name')
-        return
-      }
-      this.contactName = 'Contact Name'
-    }
+    ...mapGetters('contacts', ['contact'])
   },
   components: {
     MessageComposer,
     ContactActivitiesHeader,
     ContactActivity
   },
-  watch: {
-    listItems: {
-      deep: true,
-      handler: function () {
-        this.updateContactName()
-      }
-    },
-    '$routes.params.id': function () {
-      this.updateContactName()
+  methods: {
+    scrollMessages () {
+      setTimeout(() => {
+        let activitiesWrap = this.$refs.activitiesWrap
+        if (activitiesWrap && activitiesWrap.scrollHeight) {
+          activitiesWrap.scrollTop = activitiesWrap.scrollHeight
+        }
+      }, 250)
     }
   }
 }
@@ -117,7 +108,7 @@ export default {
           bottom: 0;
           left: 0;
           right: 0;
-          overflow: auto;
+          overflow-y: scroll;
           -webkit-overflow-scrolling: touch;
         }
       }

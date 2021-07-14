@@ -1,5 +1,66 @@
 <template>
-  <q-select
+  <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
+               v-model="tagId"
+               label="name"
+               track-by="id"
+               placeholder="Type to search"
+               selectLabel=""
+               open-direction="bottom"
+               :options="combinedTags"
+               :multiple="multiple"
+               :searchable="true"
+               :loading="loadingTags"
+               :internal-search="false"
+               :clear-on-select="false"
+               :close-on-select="false"
+               :hide-selected="true"
+               :limit="5"
+               :limit-text="limitText"
+               :max-height="150"
+               :show-no-results="true"
+               :class="selectorClass"
+               :group-select="false"
+               group-values="children"
+               group-label="title"
+               @open="onSelectOpen"
+               @close="onSelectClose"
+               @search-change="filterTagFn"
+               @input="selectTag">
+    <template slot="tag" slot-scope="{ option, remove }">
+      <span :style="{ color: option.color }"
+            class="border border-half-rounded px-1 d-inline-flex align-items-center mr-1">
+        <q-badge class="is-dot mx-1"
+                 :style="{ background: option.color }"
+                 rounded>
+        </q-badge>
+        <span class="tag-text">{{ option.name }}</span>
+        <span role="button" class="custom__remove"
+              @click="remove(option)">
+          <remove-tag-icon class="ml-1">
+          </remove-tag-icon>
+        </span>
+      </span>
+    </template>
+    <template slot="option" slot-scope="props">
+      <div class="option__desc">
+        <q-badge class="is-dot mx-1"
+                 :style="{ background: props.option.color }"
+                 rounded
+                 v-if="!props.option.$isLabel">
+        </q-badge>
+        <span class="option__small">{{ props.option.$isLabel ? props.option.$groupLabel : props.option.name }}</span>
+      </div>
+    </template>
+    <template slot="clear" slot-scope="props">
+      <div class="multiselect__clear"
+           v-if="tagId && tagId.length"
+           @mousedown.prevent.stop="clearAll(props.search)"></div>
+    </template>
+    <span slot="noResult">
+      No tags found.
+    </span>
+  </multiselect>
+  <!--q-select
     outlined
     :multiple="multiple"
     v-model="tagId"
@@ -47,19 +108,26 @@
         {{ scope.opt.label }}
       </q-chip>
     </template>
-  </q-select>
+  </q-select-->
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect'
 import _ from 'lodash'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import * as TagTypes from 'src/constants/tag-types'
 import * as TagCategory from 'src/constants/tag-categories'
+import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 export default {
   name: 'tag-selector',
 
   mixins: [aclMixin],
+
+  components: {
+    RemoveTagIcon,
+    Multiselect
+  },
 
   data () {
     return {
@@ -67,6 +135,8 @@ export default {
       loadingTags: false,
       tags: [],
       options: [],
+      filter: '',
+      selectorClass: [],
       TagTypes,
       TagCategory
     }
@@ -181,20 +251,26 @@ export default {
       return []
     },
 
-    combinedFilteredTags () {
-      const companyTags = this.companyTagsAlphabeticalOrder
-      const importTags = this.importTagsAlphabeticalOrder
+    combinedTags () {
+      let companyTags = this.companyTagsAlphabeticalOrder
+      let importTags = this.importTagsAlphabeticalOrder
+
+      if (this.filter) {
+        companyTags = companyTags.filter(v => v.name.toLowerCase().indexOf(this.filter) > -1)
+        importTags = importTags.filter(v => v.name.toLowerCase().indexOf(this.filter) > -1)
+      }
+
       let tags = []
       if (companyTags && companyTags.length) {
         tags.push({
           title: 'Account Tags',
-          children: this.companyTagsAlphabeticalOrder
+          children: companyTags
         })
       }
       if (importTags && importTags.length) {
         tags.push({
           title: 'Import Tags',
-          children: this.importTagsAlphabeticalOrder
+          children: importTags
         })
       }
       return tags
@@ -220,9 +296,47 @@ export default {
   },
 
   methods: {
+    onSelectOpen () {
+      this.selectorClass = ['border-blue']
+    },
+
+    onSelectClose () {
+      this.selectorClass = []
+    },
+
+    limitText (count) {
+      return `and ${count} other tags`
+    },
+
+    initializeTagValues () {
+      let found = null
+      if (this.value instanceof Array) {
+        this.tagId = []
+        for (let item of this.value) {
+          found = this.availableTags.find(tag => tag.id === item)
+          if (found !== null) {
+            this.tagId.push(found)
+          }
+        }
+      } else {
+        found = this.availableTags.find(tag => tag.id === this.value)
+        if (found !== null) {
+          this.tagId = found
+        }
+      }
+    },
+
     selectTag (tag) {
-      this.tagId = tag
-      this.$emit('change', tag)
+      let tagIds = null
+      if (tag instanceof Array) {
+        tagIds = []
+        for (let item of tag) {
+          tagIds.push(item.id)
+        }
+      } else {
+        tagIds = tag.id
+      }
+      this.$emit('change', tagIds)
     },
 
     getTags () {
@@ -234,7 +348,9 @@ export default {
         return this.$axios.get('/api/v1/tag', { params }).then(res => {
           this.tags = res.data
           this.options = res.data
+          this.filteredOptions = this.combinedTags
           this.loadingTags = false
+          this.initializeTagValues()
         }).catch(err => {
           console.log(err)
           this.loadingTags = false
@@ -267,24 +383,18 @@ export default {
       }
     },
 
-    filterTagFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.options = this.tags
-        })
-        return
-      }
+    filterTagFn (query) {
+      this.filter = query
+    },
 
-      update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.tags.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
-      })
+    clearAll () {
+      this.tagId = []
     }
   },
 
   watch: {
     value () {
-      this.tagId = this.value
+      this.initializeTagValues()
     },
 
     'tagOptions.isReset': function () {
@@ -297,3 +407,5 @@ export default {
   }
 }
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

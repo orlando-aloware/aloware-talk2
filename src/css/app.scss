@@ -301,6 +301,13 @@ body,
   line-height: 16px;
 }
 
+.tag-text {
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: -0.0025em;
+  line-height: 16px;
+}
+
 .mb-30 {
   margin-bottom: 30px;
 }
@@ -911,24 +918,43 @@ i.option-separator {
   .q-item {
     min-height: 41px;
   }
-  &.q-expansion-item--expanded {
+  &.activity-expanded {
     &.q-expansion-item {
-      border-radius: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-    }
-    .q-item {
-      border-bottom: 1px solid #EBEBEB;
-      width: 100%;
+      border: 1px solid #EBEBEB;
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
     }
+    &.q-expansion-item,
+    &.q-expansion-item .q-expansion-item__container > .q-item,
+    &.q-expansion-item .q-expansion-item__container > .q-item > .q-focus-helper {
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+    &.q-expansion-item .q-expansion-item__container > .q-item {
+      border-bottom: 1px solid #EBEBEB;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      width: 100%;
+    }
   }
   &.q-expansion-item--collapsed {
-    .q-item {
-      background: linear-gradient(0deg, #FFFFFF, #FFFFFF), rgba(37, 110, 255, 0.1);
-      box-sizing: border-box;
+    .q-expansion-item__container {
+      &> .q-item {
+        background: linear-gradient(0deg, #FFFFFF, #FFFFFF), rgba(37, 110, 255, 0.1);
+        box-sizing: border-box;
+        border-radius: 12px;
+        border-bottom: 1px solid transparent;
+      }
+    }
+  }
+  &.expand-animation-finished {
+    &.q-expansion-item {
       border-radius: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+  }
+  &.activity-unexpanded {
+    & > .q-expansion-item__container > .q-item {
+      border: 1px solid #EBEBEB;
     }
   }
 }
@@ -976,7 +1002,6 @@ i.option-separator {
   i {
     font-size: 10.83px;
     color: #fff;
-    padding-left: 2px;
   }
 }
 
@@ -1010,6 +1035,10 @@ i.option-separator {
 
 .rotating {
   -webkit-animation: rotating 2s linear infinite;
+}
+
+.border-half-rounded {
+  border-radius: 6px;
 }
 
 .border-rounded {
@@ -1275,6 +1304,9 @@ margin-bottom: 2px;
   .multiselect__content-wrapper::-webkit-scrollbar-track {
     display: none !important;
   }
+  .multiselect__tags {
+    padding-bottom: 8px;
+  }
 }
 
 .b-radius__equal.multiselect--active:not(.multiselect--above) .multiselect__current,
@@ -1313,7 +1345,6 @@ margin-bottom: 2px;
 .activity-bottom-info {
   height: 30px;
 }
-
 
 //VUECTK DATETIMEPICKER
 
@@ -1407,4 +1438,31 @@ span.mention {
   padding: 2px 4px;
   border-radius: 8px;
   font-size: 13px !important;
+}
+.border-no-top {
+  border: 1px solid $grey-60;
+  border-top: 0 !important;
+}
+
+.bottom-radius {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.collapsed-has-notes {
+  .q-item {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-bottom: 0 !important;
+  }
+}
+
+.scrollbar-white {
+  &::-webkit-scrollbar-track {
+    background-color: #fff
+  }
+
+  &::-webkit-scrollbar {
+    background-color: #fff;
+  }
 }

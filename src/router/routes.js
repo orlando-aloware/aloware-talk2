@@ -75,12 +75,12 @@ const routes = [
         component: () => import('pages/Account.vue')
       },
       {
-        path: 'user-activity/:id',
+        path: 'user-activity/:userId',
         name: 'User Activity',
         component: () => import('pages/Account.vue')
       },
       {
-        path: 'communication:id',
+        path: 'communication:communicationId',
         name: 'Communication',
         component: () => import('pages/Account.vue')
       }

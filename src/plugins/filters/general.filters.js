@@ -380,6 +380,23 @@ const momentFormat = (datetime, format, toUserTimezone = false) => {
   return window.moment(datetime).format(format)
 }
 
+const twoLinesTextTruncate = (text) => {
+  if (text) {
+    let texts = text.split('<br />').filter(Boolean)
+    if (texts.length >= 2) {
+      texts = texts.slice(0, 2).join('<br />')
+    } else {
+      texts = text
+    }
+    const maxLength = 85
+    texts = texts.substring(0, (texts.length > maxLength ? maxLength : texts.length))
+    const hasEllipse = texts.length < text.length
+    texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
+    return texts + (hasEllipse ? '…' : '')
+  }
+  return text
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -408,7 +425,8 @@ export default ({ Vue }) => {
     fixBooleanType,
     nl2br,
     strLimit,
-    momentFormat
+    momentFormat,
+    twoLinesTextTruncate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

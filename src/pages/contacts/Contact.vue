@@ -81,6 +81,7 @@ export default {
       return this.fetchContactInfo(id).then(response => {
         this.setContact(response.data)
         this.selectedContactChanging(false)
+        this.$refs.contactActivities.scrollMessages()
       })
     }
   },

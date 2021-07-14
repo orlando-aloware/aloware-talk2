@@ -57,11 +57,18 @@
           <span v-else>
             by System
           </span>
-          <span>
+          <q-badge class="is-dot mx-1 grey-light"
+                   rounded>
+          </q-badge>
+
+          <span class="text-muted"
+                v-if="communication.property">
+            {{ datetimePassed }}
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="top middle" self="center middle">
+              {{ relativeDatetime }}
+            </q-tooltip>
           </span>
-          <span v-if="communication.property"
-                class="text-muted"
-                v-html="datetimePassed" />
         </div>
       </div>
     </div>
@@ -77,9 +84,11 @@
                v-for="(attachment, index) in communication.attachments"
                :key="index">
             <q-img
-              class="border-rounded img-fluid d-block r-2x width-380"
+              class="border-rounded img-fluid d-block r-2x"
               :src="attachment.url"
               :class="index > 0 ? 'mb-1' : ''"
+              width="320px"
+              fit="fill"
             >
               <template v-slot:error>
                 <div class="absolute-full flex flex-center bg-negative text-white">
@@ -182,7 +191,8 @@
         </span>
 
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND">
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              ![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
             &nbsp;to {{ communication.lead_number | fixPhone }}
         </span>
 
@@ -373,8 +383,8 @@ export default {
       return this.communication.direction === CommunicationDirection.OUTBOUND
     },
     avatarName () {
-      return this.communication.direction === CommunicationDirection.OUTBOUND && this.currentCompany
-        ? this.currentCompany.name : this.contact.name
+      return this.communication.direction === CommunicationDirection.OUTBOUND && this.getUser(this.communication.user_id)
+        ? this.getUser(this.communication.user_id).name : this.contact.name
     }
   },
 
@@ -397,7 +407,8 @@ export default {
         communication.direction === CommunicationDirection.INBOUND
       // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
       let callRule = communication.type === CommunicationTypes.CALL &&
-        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2)
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2) &&
+        communication.direction === CommunicationDirection.INBOUND
 
       return smsRule || callRule
     },
