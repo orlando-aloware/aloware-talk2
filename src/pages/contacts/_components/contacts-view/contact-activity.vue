@@ -57,11 +57,18 @@
           <span v-else>
             by System
           </span>
-          <span>
+          <q-badge class="is-dot mx-1 grey-light"
+                   rounded>
+          </q-badge>
+
+          <span class="text-muted"
+                v-if="communication.property">
+            {{ datetimePassed }}
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="top middle" self="center middle">
+              {{ relativeDatetime }}
+            </q-tooltip>
           </span>
-          <span v-if="communication.property"
-                class="text-muted"
-                v-html="datetimePassed" />
         </div>
       </div>
     </div>

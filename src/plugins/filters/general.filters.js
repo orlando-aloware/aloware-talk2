@@ -388,9 +388,11 @@ const twoLinesTextTruncate = (text) => {
     } else {
       texts = text
     }
-    const maxLength = 150
+    const maxLength = 85
     texts = texts.substring(0, (texts.length > maxLength ? maxLength : texts.length))
-    return texts + (texts.length < text.length ? '…' : '')
+    const hasEllipse = texts.length < text.length
+    texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
+    return texts + (hasEllipse ? '…' : '')
   }
   return text
 }

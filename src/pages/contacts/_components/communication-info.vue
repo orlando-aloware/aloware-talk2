@@ -5,9 +5,10 @@
       <q-expansion-item
         v-model="activeName"
         class="contact-activity"
-        :class="expansionClass"
+        :class="activityExpansionClass"
         @before-show="onBeforeActivityShow"
         @after-show="onAfterActivityShow"
+        @before-hide="onBeforeActivityHide"
         @after-hide="onActivityHide">
         <template slot="header">
           <q-item-section class="communication-header flex-row">
@@ -186,7 +187,7 @@
                                    :communication="communication"
                                    :is-form="true"/>
               </div>
-              <div :class="[communication.direction === CommunicationDirections.OUTBOUND ? 'w-100' : 'w-50']">
+              <div :class="[communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id) ? 'w-50' : 'w-100']">
                 <label class="form-control-label w-100">
                   {{ communication.direction === CommunicationDirections.INBOUND ? 'Answered By' : 'Initiated By' }}
                 </label>
@@ -297,7 +298,7 @@
                                 v-if="getUser(attemptingUser) && getUser(attemptingUser).id"
                                 class="pb-1">
                                 <router-link
-                                  :to="{ name: 'User Activity', params: {user_id: getUser(attemptingUser).id }}">
+                                  :to="{ name: 'User Activity', params: {userId: getUser(attemptingUser).id }}">
                                     <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                                           :title="getUserName(getUser(attemptingUser))">
                                         {{ getUserName(getUser(attemptingUser)) }}
@@ -592,15 +593,18 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
          v-if="communication.notes && !activeName">
-      <label class="form-control-label mb-1">Note</label>
-      <p v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.notes))"></p>
+      <label class="form-control-label mb-1 text-left">Note</label>
+      <p class="text-left"
+         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.notes))">
+      </p>
     </div>
-    <div class="px-3 pt-2 border-no-top"
-         v-if="communication.body && communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirections.INBOUND && !activeName">
-      <strong>Note</strong>
-      <p v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.body))"></p>
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
+         v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
+      <p class="text-left"
+         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.body))">
+      </p>
     </div>
   </div>
 </template>
@@ -763,16 +767,10 @@ export default {
       }
       return false
     },
-    expansionClass () {
-      let notesCondition = (this.communication.notes ||
+    hasNotes () {
+      return (this.communication.notes ||
         (this.communication.body &&
-          this.communication.type === CommunicationTypes.NOTE &&
-          this.communication.direction === CommunicationDirections.INBOUND)) &&
-        !this.activeName
-      if (notesCondition && !this.activityExpansionClass.includes('collapsed-has-notes')) {
-        return this.activityExpansionClass.concat(['collapsed-has-notes'])
-      }
-      return this.activityExpansionClass
+          this.communication.type === CommunicationTypes.NOTE))
     }
   },
 
@@ -787,8 +785,17 @@ export default {
     onAfterActivityShow () {
       this.activityExpansionClass.push('expand-animation-finished')
     },
+    onBeforeActivityHide () {
+      if (this.hasNotes) {
+        this.activityExpansionClass = ['activity-unexpanded collapsed-has-notes']
+      }
+    },
     onActivityHide () {
-      this.activityExpansionClass = ['activity-unexpanded']
+      let activityClass = 'activity-unexpanded'
+      if (this.hasNotes) {
+        activityClass += ' collapsed-has-notes'
+      }
+      this.activityExpansionClass = [activityClass]
     },
     getCampaign (id) {
       if (!id) {

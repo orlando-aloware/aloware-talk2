@@ -3,7 +3,7 @@
       <contact-activities-header :label="contact.name"/>
       <div class="contact-activities">
         <div class="inner-1">
-          <div class="p-3  inner-2"
+          <div class="p-3 inner-2 scrollbar-white"
                ref="activitiesWrap">
             <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center">
               <slot name="moreActivities">
@@ -101,7 +101,7 @@ export default {
           bottom: 0;
           left: 0;
           right: 0;
-          overflow: auto;
+          overflow-y: scroll;
           -webkit-overflow-scrolling: touch;
         }
       }

@@ -1,61 +1,83 @@
 <template>
   <div class="w-full flex-grow-1"
        v-if="hasPermissionTo('list disposition status')">
-    <q-select v-model="callDispositionId"
-              class="w-full"
-              use-input
-              dense
-              outlined
-              options-dense
-              menu-shrink
-              input-debounce="0"
-              option-value="id"
-              option-label="name"
-              :placeholder="placeholder"
-              :disabled="loadingCallDisposition"
-              :options="callDispositionsAlphabeticalOrder"
-              v-if="communication"
-              @filter="filterFn"
-              @change="selectCallDisposition">
-      <template v-slot:option="scope">
-        <div class="d-flex flex-row w-100">
-          <q-icon name="fa fa-bolt" :style="{ color: scope.opt.color }"/>
-          <q-item
-            :key="scope.opt.id"
-            clickable
-            v-ripple
-            v-close-popup
-            @click="callDispositionId = scope.opt"
-          >
-            <q-item-section>
-              <q-item-label v-html="scope.opt.name" class="q-ml-md" ></q-item-label>
-            </q-item-section>
-          </q-item>
+    <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
+                 v-model="callDispositionId"
+                 label="name"
+                 track-by="id"
+                 placeholder="Select Disposition"
+                 :selectLabel="null"
+                 :deselectLabel="null"
+                 :selectedLabel="null"
+                 open-direction="bottom"
+                 :closeOnSelect="!multiple"
+                 :searchable="multiple"
+                 :options="callDispositionsAlphabeticalOrder"
+                 :multiple="multiple"
+                 :loading="loadingCallDisposition"
+                 :internal-search="false"
+                 :clear-on-select="false"
+                 :close-on-select="false"
+                 :options-limit="300"
+                 :limit="5"
+                 :limit-text="limitText"
+                 :max-height="150"
+                 :show-no-results="true"
+                 :class="selectClass"
+                 v-if="communication"
+                 @open="onSelectOpen"
+                 @close="onSelectClose"
+                 @input="changeCallDisposition">
+      <template slot="option" slot-scope="props">
+        <div class="option__desc">
+          <q-icon name="fa fa-bolt"
+                  :style="{ color: props.option.color }">
+          </q-icon>
+          <span class="option__small">{{ props.option.name }}</span>
         </div>
       </template>
-    </q-select>
-
-    <q-select v-model="callDispositionId"
-              class="w-full"
-              use-input
-              use-chips
-              input-debounce="0"
-              option-value="id"
-              option-label="name"
-              :multiple="multiple"
-              :placeholder="placeholder"
-              :disabled="loadingCallDisposition"
-              :options="callDispositionsAlphabeticalOrder"
-              v-else
-              @filter="filterFn"
-              @change="selectCallDisposition">
-      <template v-slot:prepend
-                v-slot:selected-item="scope">
-        <q-icon name="fa fa-bolt"
-                :style="{ color: scope.color }">
-        </q-icon>
+      <span slot="noResult">
+        No call dispositions found.
+      </span>
+    </multiselect>
+    <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
+                 v-model="callDispositionId"
+                 label="name"
+                 track-by="id"
+                 placeholder="Select Disposition"
+                 :selectLabel="null"
+                 :deselectLabel="null"
+                 :selectedLabel="null"
+                 open-direction="bottom"
+                 :searchable="multiple"
+                 :options="callDispositionsAlphabeticalOrder"
+                 :multiple="multiple"
+                 :loading="loadingCallDisposition"
+                 :internal-search="false"
+                 :clear-on-select="false"
+                 :close-on-select="false"
+                 :options-limit="300"
+                 :limit="5"
+                 :limit-text="limitText"
+                 :max-height="150"
+                 :show-no-results="true"
+                 :class="selectClass"
+                 v-else
+                 @open="onSelectOpen"
+                 @close="onSelectClose"
+                 @input="selectCallDisposition">
+      <template slot="option" slot-scope="props">
+        <div class="option__desc">
+          <q-icon name="fa fa-bolt"
+                  :style="{ color: props.option.color }">
+          </q-icon>
+          <span class="option__small">{{ props.option.name }}</span>
+        </div>
       </template>
-    </q-select>
+      <span slot="noResult">
+        No call dispositions found.
+      </span>
+    </multiselect>
   </div>
 </template>
 
@@ -63,9 +85,14 @@
 import _ from 'lodash'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
+import Multiselect from 'vue-multiselect'
 
 export default {
   mixins: [aclMixin],
+
+  components: {
+    Multiselect
+  },
 
   props: {
     communication: {
@@ -104,7 +131,8 @@ export default {
     return {
       callDispositionId: this.value,
       loadingCallDisposition: false,
-      filteredCallDispositions: []
+      filteredCallDispositions: [],
+      selectClass: []
     }
   },
 
@@ -159,10 +187,41 @@ export default {
   },
 
   methods: {
+    initializeTagValues (overrideValue = undefined) {
+      let found = null
+      const value = overrideValue || this.value
+      if (value instanceof Array) {
+        this.callDispositionId = []
+        for (let item of value) {
+          found = this.availableDispositions.find(disposition => disposition.id === item)
+          if (found !== null) {
+            this.callDispositionId.push(found)
+          }
+        }
+      } else {
+        found = this.availableDispositions.find(disposition => disposition.id === value)
+        if (found !== null) {
+          this.callDispositionId = found
+        }
+      }
+    },
+
+    onSelectOpen () {
+      this.selectClass = ['border-blue']
+    },
+
+    onSelectClose () {
+      this.selectClass = []
+    },
+
+    limitText (count) {
+      return `and ${count} other tags`
+    },
+
     changeCallDisposition () {
       this.loadingCallDisposition = true
       this.$axios.post('/api/v1/communication/' + this.communication.id + '/dispose-call', {
-        callDispositionId: this.callDispositionId
+        call_disposition_id: this.selectCallDisposition(this.callDispositionId, true)
       }).then((res) => {
         this.loadingCallDisposition = false
         this.$q.notify({
@@ -179,9 +238,22 @@ export default {
       })
     },
 
-    selectCallDisposition (callDisposition) {
-      this.callDispositionId = callDisposition
-      this.$emit('change', callDisposition)
+    selectCallDisposition (callDisposition, returnValue = false) {
+      let callDispositionIds = null
+      if (callDisposition instanceof Array) {
+        callDispositionIds = []
+        for (let item of callDisposition) {
+          callDispositionIds.push(item.id)
+        }
+      } else {
+        callDispositionIds = callDisposition.id
+      }
+
+      if (returnValue) {
+        return callDispositionIds
+      }
+
+      this.$emit('change', callDispositionIds)
     },
 
     filterFn (val, update) {
@@ -201,11 +273,11 @@ export default {
 
   watch: {
     value () {
-      this.callDispositionId = this.value
+      this.initializeTagValues()
     },
 
     'computedCommunication.call_disposition_id': function () {
-      this.callDispositionId = this.communication.call_disposition_id
+      this.initializeTagValues(this.communication.call_disposition_id)
       this.$emit('callDisposed')
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <multiselect class="chip__clear-blue border-blue shrink-options options__no-border options__relative b-radius__equal"
+  <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
                v-model="tagId"
                label="name"
                track-by="id"
@@ -14,14 +14,16 @@
                :clear-on-select="false"
                :close-on-select="false"
                :hide-selected="true"
-               :options-limit="300"
                :limit="5"
                :limit-text="limitText"
-               :max-height="600"
+               :max-height="150"
                :show-no-results="true"
+               :class="selectorClass"
+               :group-select="false"
                group-values="children"
                group-label="title"
-               :group-select="false"
+               @open="onSelectOpen"
+               @close="onSelectClose"
                @search-change="filterTagFn"
                @input="selectTag">
     <template slot="tag" slot-scope="{ option, remove }">
@@ -134,6 +136,7 @@ export default {
       tags: [],
       options: [],
       filter: '',
+      selectorClass: [],
       TagTypes,
       TagCategory
     }
@@ -293,6 +296,14 @@ export default {
   },
 
   methods: {
+    onSelectOpen () {
+      this.selectorClass = ['border-blue']
+    },
+
+    onSelectClose () {
+      this.selectorClass = []
+    },
+
     limitText (count) {
       return `and ${count} other tags`
     },
