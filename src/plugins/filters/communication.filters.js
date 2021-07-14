@@ -70,13 +70,13 @@ const fixPhone = (
     }
 
     if (phoneNumber.toString().length <= 9) {
-      return false
+      return force ? '-' : false
     }
 
     let locale = window.guessLocale(phoneNumber)
 
     if (!locale) {
-      return false
+      return force ? '-' : false
     }
 
     let tel = window.phoneUtil.parse(phoneNumber, locale)
