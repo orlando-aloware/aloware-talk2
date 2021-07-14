@@ -9,7 +9,10 @@
       :class="{ 'avatar__inner--active': active }"
       :style="{ 'background-image': `url(${src})` }"
     >
-      {{ getInitials(name || 'No Name') }}
+      <sequence-icon v-if="sequenceIcon" />
+      <span v-else>
+        {{ getInitials(name || 'No Name') }}
+      </span>
     </div>
     <slot></slot>
   </div>
@@ -17,8 +20,10 @@
 
 <script>
 import { avatarMixin } from 'src/plugins/mixins'
+import SequenceIcon from 'src/components/icons/contact-activity/sequence-icon'
 export default {
   name: 'avatar.vue',
+  components: { SequenceIcon },
   mixins: [avatarMixin],
   computed: {
     computedStyle () {
@@ -43,6 +48,10 @@ export default {
     height: {
       type: [String, Number],
       default: 30
+    },
+    sequenceIcon: {
+      type: Boolean,
+      default: false
     }
   }
 }

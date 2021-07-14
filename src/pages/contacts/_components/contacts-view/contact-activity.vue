@@ -9,6 +9,7 @@
       <avatar class="contact-avatar"
               width="34"
               height="34"
+              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id"
               :style="avatarStyle(isSender)"
               :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
               v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
@@ -257,6 +258,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
@@ -383,8 +385,17 @@ export default {
       return this.communication.direction === CommunicationDirection.OUTBOUND
     },
     avatarName () {
-      return this.communication.direction === CommunicationDirection.OUTBOUND && this.getUser(this.communication.user_id)
-        ? this.getUser(this.communication.user_id).name : this.contact.name
+      if (this.communication.direction === CommunicationDirection.OUTBOUND) {
+        if (this.communication.workflow_id) {
+          return this.getWorkflow(this.communication.workflow_id).name
+        }
+        if (this.communication.user_id) {
+          return this.getUser(this.communication.user_id).name
+        }
+        return this.currentCompany.name
+      }
+
+      return this.contact.name
     }
   },
 
@@ -464,13 +475,17 @@ export default {
       let propertyReadableName = data.property.replace('user_id', 'owner').replace('_id', '').replace('_', ' ')
       propertyReadableName = propertyReadableName === 'phone number' ? 'primary ' + propertyReadableName : propertyReadableName
       generalMessage += ' ' + propertyReadableName
+      let workflowToName = this.getWorkflow(data.to).name
+      workflowToName = !workflowToName ? 'Deleted' : workflowToName
+      let workflowFromName = this.getWorkflow(data.from).name
+      workflowFromName = !workflowFromName ? 'Deleted' : workflowFromName
       let workflowMessage = [
-        'Enrolled contact into "' + this.getWorkflow(data.to).name + '" sequence.',
-        'Contact finished all "' + this.getWorkflow(data.from).name + '" sequence steps.'
+        `Enrolled contact into "${workflowToName}" sequence.`,
+        `Contact finished all "${workflowFromName}" sequence steps.`
       ]
 
       if (data.from && !data.to) {
-        workflowMessage[1] = 'Contact was disenrolled from "' + this.getWorkflow(data.from).name + '" sequence.'
+        workflowMessage[1] = `Contact was disenrolled from "${workflowFromName}" sequence.`
       }
 
       if (data.notes && data.notes.length) {
@@ -592,7 +607,7 @@ export default {
       }
       id = parseInt(id)
       let found = this.users.find(user => user.id === id)
-      if (found) {
+      if (!_.isEmpty(found)) {
         return found
       }
       return { name: '' }
