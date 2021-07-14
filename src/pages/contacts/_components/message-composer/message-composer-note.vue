@@ -9,9 +9,8 @@
                     width="30"
                     height="30"
                     :name="props.item.name" />
-            <span :data-text="props.item.full_name" class="at-custom-text">{{ props.item.full_name }} <small>{{ props.item.email }}</small></span>
+            <span :data-text="props.item.full_name" class="at-custom-text">{{ props.item.full_name }} <br><small>{{ props.item.email }}</small></span>
           </template>
-<!--          <template slot="embeddedItem" slot-scope="props">-->
           <template v-slot:embeddedItem="props">
             <span>
                 <span class="mention-tag" :data-id="props.current.id" :data-key="generateKey(32)">@{{ props.current.full_name }}</span>
@@ -166,6 +165,9 @@ export default {
   .at-custom-text {
     margin-left: 36px;
     font-size: 13px;
+    line-height: 1;
+    height: 27px;
+    margin-top: 2px;
   }
 
   .contact-avatar {

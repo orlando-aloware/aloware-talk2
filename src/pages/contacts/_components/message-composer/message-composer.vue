@@ -1,7 +1,7 @@
 <template>
   <div class="composer-container">
     <div class="composer-wrapper p-2">
-      <div class="composer-links d-flex justify-content-between">
+      <div class="composer-links d-inline-flex">
         <b-link href="#" :class="{ active : messageComposer.mode === 'sms' }" v-on:click="setMode('sms')">Text</b-link>
         <b-link href="#" :class="{ active : messageComposer.mode === 'fax' }" v-on:click="setMode('fax')">Fax</b-link>
         <b-link href="#" :class="{ active : messageComposer.mode === 'email' }" v-on:click="setMode('email')">Email</b-link>
@@ -20,9 +20,11 @@
         <phone-number-selector @setSelectedPhone="setSelectedPhone"></phone-number-selector>
       </div>
 
-      <div class="w-35 d-inline-flex">
-        <span class="pr-2 pt-1">From:</span>
-       <line-selector></line-selector>
+      <div class="w-35">
+        <div class="float-right d-inline-flex">
+          <span class="pr-2 pt-1">From:</span>
+          <line-selector></line-selector>
+        </div>
       </div>
     </div>
   </div>
@@ -105,6 +107,10 @@ export default {
 
         a.active {
           border-bottom: 2px solid $blue;
+        }
+
+        a:not(:last-child) {
+          margin-right: 20px;
         }
       }
     }
