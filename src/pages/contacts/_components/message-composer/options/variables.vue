@@ -4,7 +4,7 @@
                  v-model="variable"
                  track-by="value"
                  label="label"
-                 class="custom-multi-select custom-multi-select-single always-open"
+                 :class="`custom-multi-select custom-multi-select-single ${alwaysOpenClass} options__no-border`"
                  placeholder="Select a variable"
                  :options="multiselectOptions"
                  :searchable="true"
@@ -22,6 +22,7 @@
       <template slot="caret">
         <i class="fa fa-search search-icon"></i>
       </template>
+<!--      <template slot="singleLabel" slot-scope="{ option }">{{ option.label }}</template>-->
       <template v-slot:option="props">
         <div v-if=" props.option.hasOwnProperty('$groupLabel')" class="option__group_header">
           <span class="option__title">{{ props.option.$groupLabel }}</span>
@@ -43,6 +44,13 @@ import VueMultiselect from 'vue-multiselect'
 export default {
   name: 'variables',
   components: { VueMultiselect },
+  props: {
+    alwaysOpen: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   computed: {
     ...mapGetters('contacts', ['messageComposer']),
     formattedOptions () {
@@ -136,6 +144,9 @@ export default {
       }
 
       return groups
+    },
+    alwaysOpenClass () {
+      return this.alwaysOpen ? 'always-open' : ''
     }
   },
   data () {

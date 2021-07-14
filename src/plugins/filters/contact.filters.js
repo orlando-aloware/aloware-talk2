@@ -138,15 +138,19 @@ const fixLrnType = (lrnType) => {
       case LrnTypes.LRN_TYPE_WIRELESS:
         return 'Wireless'
       case LrnTypes.LRN_TYPE_VOIP:
-        return 'Voip'
+        return 'VOIP'
       case LrnTypes.LRN_TYPE_OTHER:
         return 'Other'
       default:
-        return 'N/A'
+        return ''
     }
   }
 
-  return 'N/A'
+  return ''
+}
+
+const validLrnType = (type) => {
+  return ![null, undefined].includes(type)
 }
 
 export default ({ Vue }) => {
@@ -161,7 +165,8 @@ export default ({ Vue }) => {
     fixEmail,
     fixTimezone,
     fixLrnType,
-    fixCount
+    fixCount,
+    validLrnType
   }
   Object.keys(filters).map((k) => Vue.filter(k, filters[k]))
 }

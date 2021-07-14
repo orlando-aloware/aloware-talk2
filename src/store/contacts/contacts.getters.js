@@ -65,5 +65,6 @@ export default {
   isAppointmentSubmitted: (state) => state.isAppointmentSubmitted,
   isEnrollSequenceOpen: (state) => state.isEnrollSequenceOpen,
   isAddReminderOpen: (state) => state.isAddReminderOpen,
-  changingSelectedContact: (state) => state.changingSelectedContact
+  changingSelectedContact: (state) => state.changingSelectedContact,
+  smsTemplateModal: (state) => state.smsTemplateModal
 }

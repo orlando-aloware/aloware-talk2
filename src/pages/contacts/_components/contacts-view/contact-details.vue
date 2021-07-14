@@ -1,6 +1,6 @@
 <template>
   <div class="contact-details-wrapper">
-    <div class="details-component-container">
+    <div class="details-component-container" ref="detailsComponentContainer">
       <contact-info></contact-info>
       <contact-phones></contact-phones>
       <contact-information></contact-information>
@@ -28,6 +28,7 @@ import ContactBroadcast from 'pages/contacts/_components/contacts-view/contact-b
 import ContactInformation from 'pages/contacts/_components/contacts-view/contact-information'
 import ContactIntegrations from 'pages/contacts/_components/contacts-view/contact-integrations'
 import ContactScheduledMessages from 'pages/contacts/_components/contacts-view/contact-scheduled-messages'
+import { mapGetters } from 'vuex'
 export default {
   name: 'contact-details',
   components: {
@@ -42,6 +43,16 @@ export default {
     ContactTags,
     ContactInfo,
     ContactPhones
+  },
+  computed: {
+    ...mapGetters('contacts', ['contact'])
+  },
+  watch: {
+    'contact.id': function () {
+      this.$nextTick(() => {
+        this.$refs.detailsComponentContainer.scrollTop = 0
+      })
+    }
   }
 }
 </script>

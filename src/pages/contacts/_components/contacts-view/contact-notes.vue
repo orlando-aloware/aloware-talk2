@@ -2,8 +2,7 @@
   <b-card class="mt-2 mb-2 border-0">
     <h6 ref="sample">Notes</h6>
     <div v-if="!isEdit"
-         class="notes" v-on:click="onEditNotes">
-      {{ contact.notes }}
+         class="notes" v-on:click="onEditNotes" v-html="contact.notes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
          class="notes-empty-placeholder" v-on:click="onEditNotes">Add notes here..</div>
@@ -63,8 +62,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .notes{
-    font-size: 80%;
+  .notes {
+    font-size: 14px;
   }
 
   .contact-notes {
@@ -76,7 +75,7 @@ export default {
   }
 
   .notes-empty-placeholder {
-    font-size: 80%;
+    font-size: 13px;
     opacity: 0.5;
   }
 </style>

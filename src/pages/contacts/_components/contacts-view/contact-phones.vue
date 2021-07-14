@@ -7,9 +7,9 @@
            :key="phoneNumber.id">
         <div>
           <span v-if="phoneNumber.title" class="text-muted phone-number-title mr-2">{{ phoneNumber.title }} </span>
-          <b-badge v-if="phoneNumber.lrn_type && phoneNumber.lrn_type !== undefined"
+          <b-badge v-if="phoneNumber && $options.filters.validLrnType(phoneNumber.lrn_type)"
                    :variant="getBadgeVariant(phoneNumber.lrn_type)"
-                   class="badge-phone-info">
+                   class="badge-phone-info mr-1">
             {{ phoneNumber.lrn_type | fixLrnType }}
           </b-badge>
 
@@ -56,8 +56,8 @@
            v-for="phoneNumber in otherPhones"
            :key="phoneNumber.id">
         <div>
-          <span v-if="phoneNumber.title" class="text-muted phone-number-title mr-2">{{ phoneNumber.title }} </span>
-          <b-badge v-if="phoneNumber.lrn_type && phoneNumber.lrn_type !== undefined"
+          <span v-if="phoneNumber.title" class="text-muted phone-number-title mr-1">{{ phoneNumber.title }} </span>
+          <b-badge v-if="phoneNumber.lrn_type && $options.filters.validLrnType(phoneNumber.lrn_type)"
                    :variant="getBadgeVariant(phoneNumber.lrn_type)"
                    class="badge-phone-info">
             {{ phoneNumber.lrn_type | fixLrnType }}
@@ -226,11 +226,11 @@ export default {
 
 <style lang="scss" scoped>
   .phone-number {
-    font-size: 0.90rem;
+    font-size: 14px;
   }
 
   .phone-number-title {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: normal;
     color: #FFFFFF;
     display: inline-block;

@@ -1,19 +1,18 @@
 <template>
   <div class="calls-header">
     <div class="calls-header__label">
-      {{ label }}
+      {{ contact.name }}
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'calls-header.vue',
-  props: {
-    label: {
-      type: String,
-      required: true
-    }
+  computed: {
+    ...mapGetters('contacts', ['contact'])
   }
 }
 </script>

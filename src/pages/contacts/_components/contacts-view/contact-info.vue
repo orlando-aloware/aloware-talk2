@@ -14,10 +14,10 @@
       <div class="d-flex justify-content-between relative-position">
         <div>
 
-          <h6 class="mt-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
+          <h6 class="mt-1 mb-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
           <p class="contact-phone">
             {{ contact.phone_number | fixPhone }}
-            <b-badge v-if="phone && phone.lrn_type !== 'undefined'" variant="warning" class="badge-phone-info">{{ phone.lrn_type }}</b-badge>
+            <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)" variant="warning" class="badge-phone-info">{{ phone.lrn_type | fixLrnType }}</b-badge>
             <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
             <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
           </p>
@@ -144,7 +144,7 @@ export default {
 
 <style lang="scss" scoped>
   .contact-name{
-    font-size: 0.85em;
+    font-size: 17px;
     display: inline-block;
     width: 160px;
     white-space: nowrap;
@@ -154,6 +154,7 @@ export default {
 
   .contact-avatar {
     background-color: #95989E !important;
+    font-weight: 600;
   }
 
   .q-item__section--avatar {
@@ -168,7 +169,7 @@ export default {
   }
 
   .contact-phone {
-    font-size: 0.80rem;
+    font-size: 12px;
     margin-top: -5px;
     right: 0;
 

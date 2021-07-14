@@ -1,7 +1,7 @@
 <template>
   <b-modal title="Add Reminder"
            size="md"
-           v-model="isAddReminderOpen"
+           v-model="isOpen"
            @hidden="onHidden">
     <b-form @submit.prevent="onSubmit">
       <b-form-group
@@ -79,6 +79,14 @@ export default {
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
+    },
+    isOpen: {
+      get () {
+        return this.isAddReminderOpen
+      },
+      set (isOpen) {
+        return isOpen
+      }
     }
   },
   data () {
@@ -86,7 +94,6 @@ export default {
       date: '',
       time: '',
       isAdding: false,
-      isOpen: false,
       reminder: {
         date: '',
         time: '',

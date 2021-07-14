@@ -2,6 +2,7 @@
   <div>
     <q-select class="inline-select"
               use-input
+              clearable
               v-model="currentState"
               :options="options"
               :loading="isBusy"

@@ -17,28 +17,24 @@
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Email</p>
         <contact-input-field v-model="contact.email"
-                             placeholder="Enter email here..."
                              @updateField="onUpdateEmail" />
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Company</p>
         <contact-input-field v-model="contact.company_name"
-                             placeholder="Enter company here..."
                              @updateField="onUpdateCompany"/>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Website</p>
         <contact-input-field v-model="contact.website"
-                             placeholder="Enter website here..."
                              @updateField="onUpdateWebsite"/>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">City</p>
         <contact-input-field v-model="contact.cnam_city"
-                             placeholder="Enter city here..."
                              @updateField="onUpdateCity"/>
       </div>
 
@@ -59,7 +55,6 @@
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Zip Code</p>
         <contact-input-field v-model="contact.cnam_zipcode"
-                             placeholder="Enter zip code here..."
                              @updateField="onUpdateZipCode">
         </contact-input-field>
       </div>
@@ -183,10 +178,10 @@ export default {
     height: 210px;
     overflow: hidden;
     padding: 0 !important;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 
     .custom-input-label {
-      font-size: 80%;
+      font-size: 12px;
     }
   }
 

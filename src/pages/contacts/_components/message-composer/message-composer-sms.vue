@@ -108,7 +108,7 @@
                target="smsVariables"
                triggers="click blur"
                @show="onPopoverShown">
-        <variables @variableSelected="variableSelected"></variables>
+        <variables @variableSelected="variableSelected" always-open></variables>
     </b-popover>
 
     <b-popover ref="popover"
@@ -121,6 +121,7 @@
     </b-popover>
 
     <scheduled-message></scheduled-message>
+    <sms-template-modal></sms-template-modal>
   </div>
 </template>
 
@@ -136,9 +137,10 @@ import { mapActions, mapGetters } from 'vuex'
 import MessageTemplates from 'pages/contacts/_components/message-composer/options/message-templates'
 import talk2Api from 'src/plugins/api/api'
 import ScheduledMessage from 'pages/contacts/_components/message-composer/scheduled-message'
+import SmsTemplateModal from 'pages/contacts/_components/sms-template-modal'
 export default {
   name: 'message-composer-sms',
-  components: { ScheduledMessage, MessageTemplates, Variables, Attachments, SearchGiphy, VariableIcon, CalendarTodayIcon, AttachmentIcon, GifIcon },
+  components: { SmsTemplateModal, ScheduledMessage, MessageTemplates, Variables, Attachments, SearchGiphy, VariableIcon, CalendarTodayIcon, AttachmentIcon, GifIcon },
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validSms: function () {

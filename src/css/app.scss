@@ -540,14 +540,14 @@ body,
 
 
 .badge-tag {
-  font-size: 0.80em;
+  font-size: 14px;
   max-width: 250px;
   padding-right: 8px;
   text-align: left;
 }
 
 .custom-link{
-  font-size: 0.8em;
+  font-size: 13px;
   color: $blue;
   i {
     margin-top: -1px;
@@ -1076,7 +1076,7 @@ i.option-separator {
   .multiselect__content-wrapper {
     margin-top: 4px;
     position: absolute;
-    border: none !important;
+    //border: none !important;
   }
 
   .multiselect__tags {
@@ -1161,7 +1161,9 @@ i.option-separator {
   font-size: 13px !important;
 }
 
-
+.fs-12 {
+  font-size: 12px !important;
+}
 
 .multiselect.border-blue {
   .multiselect__tags {
@@ -1340,4 +1342,69 @@ margin-bottom: 2px;
   border-color: $blue !important;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgb(25 118 210 / 25%);
+}
+
+
+//AT MENTIONABLE
+.atwho-wrap {
+  .atwho-ul {
+    margin: 0;
+
+    .atwho-li {
+      height: 38px !important;
+      margin: 10px;
+      border-radius: 8px;
+    }
+
+    .atwho-cur {
+      background: #F4F4F6;
+      color: #040404;
+    }
+  }
+
+  .atwho-view {
+    max-width: 100% !important;
+    min-width: 386px !important;
+  }
+}
+
+
+.tippy-content {
+  button.item {
+    height: 38px !important;
+    margin: 10px;
+    border-radius: 8px;
+  }
+}
+
+
+[contenteditable=true] {
+  font-size: 14px;
+}
+
+[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  pointer-events: none;
+  display: block; /* For Firefox */
+  opacity: 0.9;
+}
+
+[contenteditable=true]:focus-visible {
+  outline: none !important;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #ced4da;
+  pointer-events: none;
+  height: 0;
+}
+
+span.mention {
+  color: $black;
+  background: $blue-3;
+  padding: 2px 4px;
+  border-radius: 8px;
+  font-size: 13px !important;
 }

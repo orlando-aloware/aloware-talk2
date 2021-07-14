@@ -2,16 +2,23 @@
   <div>
     <div class="pt-2 form-input-container">
       <form>
-        <q-input borderless
-                 autogrow
-                 ref="noteMessageBody"
-                 class="q-input-composer"
-                 input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
-                 type="textarea"
-                 placeholder="Type @ to mention someone"
-                 v-model="messageComposer.note.body"
-                 @input="updateMessage"
-        />
+        <at v-model="messageComposer.note.body" :members="items" name-key="full_name">
+          <template slot="item" slot-scope="props" >
+
+            <avatar class="contact-avatar mr-2 position-absolute"
+                    width="30"
+                    height="30"
+                    :name="props.item.name" />
+            <span :data-text="props.item.full_name" class="at-custom-text">{{ props.item.full_name }} <small>{{ props.item.email }}</small></span>
+          </template>
+<!--          <template slot="embeddedItem" slot-scope="props">-->
+          <template v-slot:embeddedItem="props">
+            <span>
+                <span class="mention-tag" :data-id="props.current.id" :data-key="generateKey(32)">@{{ props.current.full_name }}</span>
+            </span>
+          </template>
+          <div contenteditable placeholder="Type @ to mention someone"></div>
+        </at>
       </form>
     </div>
     <div class="d-flex justify-content-between">
@@ -37,8 +44,13 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+
+import At from 'vue-at'
+import Avatar from 'src/components/avatar/avatar.vue'
+
 export default {
   name: 'message-composer-note',
+  components: { Avatar, At },
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validNote () {
@@ -47,7 +59,8 @@ export default {
   },
   data () {
     return {
-      isAdding: false
+      isAdding: false,
+      items: []
     }
   },
   methods: {
@@ -82,16 +95,37 @@ export default {
           })
         }).finally(() => {
           this.isAdding = false
-          this.$refs.noteMessageBody.focus()
+          // this.$refs.noteMessageBody.focus()
         })
+    },
+    getMentionableItems () {
+      return talk2Api.V1.users.withAccessToContact(this.contact.id).then(response => {
+        this.items = response.data
+      })
+    },
+    generateKey (length) {
+      let result = ''
+      let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      let charactersLength = characters.length
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+      }
+      return result
     }
   },
   mounted () {
+    this.getMentionableItems()
+  },
+  watch: {
+    'contact.id': function () {
+      this.getMentionableItems()
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/variables.scss';
   .b-textarea, .b-textarea:focus {
     border: none !important;
     box-shadow:none !important;
@@ -117,6 +151,44 @@ export default {
 
   .email-subject-input {
     padding: 0 !important;
+  }
+
+  .atwho-wrap {
+    textarea {
+      border: none !important;
+      box-shadow:none !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      font-size: 14px;
+    }
+  }
+
+  .at-custom-text {
+    margin-left: 36px;
+    font-size: 13px;
+  }
+
+  .contact-avatar {
+    font-weight: 600;
+  }
+
+  [contenteditable=true] {
+    font-size: 14px;
+  }
+
+  [contenteditable=true]:empty:before{
+    content: attr(placeholder);
+    pointer-events: none;
+    display: block; /* For Firefox */
+    opacity: 0.9;
+  }
+
+  [contenteditable=true]:focus-visible {
+    outline: none;
+  }
+
+  .mention-tag {
+    color: $green;
   }
 
 </style>

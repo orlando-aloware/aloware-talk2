@@ -14,6 +14,7 @@
 <!--                     v-model="currentCountry" />-->
     <q-select class="inline-select"
               use-input
+              clearable
               input-debounce="0"
               map-options
               emit-value

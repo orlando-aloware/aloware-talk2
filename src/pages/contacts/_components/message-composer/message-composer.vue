@@ -59,7 +59,7 @@ export default {
     },
 
     getSmsTemplates () {
-      return talk2Api.V1.sms_template.get()
+      return talk2Api.V1.smsTemplate.get()
         .then(response => {
           this.setSmsTemplates(response.data)
         })

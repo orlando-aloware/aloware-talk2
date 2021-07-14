@@ -184,6 +184,7 @@ export default {
       margin-top: -8px !important;
       background-color: #95989E !important;
       color: #ffffff !important;
+      font-weight: 600;
     }
 
   }

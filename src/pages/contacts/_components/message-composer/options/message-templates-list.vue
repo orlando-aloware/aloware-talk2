@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="templateWrapper">
     <ul class="pl-0">
       <li class="d-flex justify-content-between"
           v-for="template in templates"
@@ -18,11 +18,11 @@
             <eye-icon height="16" width="16"></eye-icon>
           </b-link>
           <b-link href="#"
-                  v-b-tooltip="`Edit`">
+                  v-b-tooltip="`Edit`" @click="onEdit(template)">
             <pencil-o-icon color="#62666E"/>
           </b-link>
           <b-link href="#" v-b-tooltip="`Delete`"
-                  v-on:click="deleteTemplate(template)">
+                  v-on:click="onDelete(template)">
             <trash-o-icon/>
           </b-link>
 
@@ -44,7 +44,6 @@ import PencilOIcon from 'components/icons/pencil-o-icon'
 import AddIconSquare from 'components/icons/add-icon-square'
 import EyeIcon from 'components/icons/eye-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'
-import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'sms-templates-list',
   components: { TrashOIcon, EyeIcon, AddIconSquare, PencilOIcon },
@@ -71,26 +70,24 @@ export default {
   },
   data () {
     return {
-      selectedTemplate: {},
-      is_deleting: false
+      selectedTemplate: {}
     }
   },
   methods: {
-    ...mapActions(['deleteSmsTemplate']),
+    ...mapActions('contacts', ['setSmsTemplateModal']),
     templateSelected (template) {
       this.$emit('templateSelected', template)
     },
-    deleteTemplate (template) {
-      this.selectedTemplate = template
-      this.is_deleting = true
-      talk2Api.V1.sms_template.delete(template.id)
-        .then(response => {
-          if (response.status === 204) {
-            this.deleteSmsTemplate(template)
-          }
-        }).finally(() => {
-          this.is_deleting = false
-        })
+
+    onDelete (template) {
+      this.$emit('templateDeleted', template)
+    },
+    onEdit (template) {
+      this.setSmsTemplateModal({
+        isOpen: true,
+        scope: this.template_scope,
+        template: template
+      })
     }
   }
 }

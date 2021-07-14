@@ -94,9 +94,15 @@ export default {
         return window.axios.delete(`${suffixV1}scheduled-messages/${messageId}`)
       }
     },
-    sms_template: {
+    smsTemplate: {
       get () {
         return window.axios.get(`${suffixV1}sms-template`)
+      },
+      create (params) {
+        return window.axios.post(`${suffixV1}sms-template`, params)
+      },
+      update (id, params) {
+        return window.axios.put(`${suffixV1}sms-template/${id}`, params)
       },
       delete (id) {
         return window.axios.delete(`${suffixV1}sms-template/${id}`)
@@ -117,6 +123,11 @@ export default {
         enroll (workflowId, params) {
           return window.axios.post(`${suffixV1}automations/workflows/${workflowId}/sequence-contacts`, params)
         }
+      }
+    },
+    users: {
+      withAccessToContact (contactId) {
+        return window.axios.get(`${suffixV1}user/get-users-with-access-to-contact?contact_id=${contactId}`)
       }
     }
   },

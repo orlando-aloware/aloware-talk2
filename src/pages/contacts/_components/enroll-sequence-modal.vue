@@ -1,7 +1,7 @@
 <template>
   <b-modal title="Enroll To Sequence"
            size="md"
-           v-model="isEnrollSequenceOpen"
+           v-model="isOpen"
            @hidden="onHidden">
     <b-form @submit.prevent="onSubmit">
       <b-form-group
@@ -44,11 +44,18 @@ export default {
   components: { SequenceSelector },
   computed: {
     ...mapGetters('contacts', ['contact']),
-    ...mapState('contacts', ['isEnrollSequenceOpen'])
+    ...mapState('contacts', ['isEnrollSequenceOpen']),
+    isOpen: {
+      get () {
+        return this.isEnrollSequenceOpen
+      },
+      set (isOpen) {
+        return isOpen
+      }
+    }
   },
   data () {
     return {
-      isOpen: false,
       isEnrolling: false,
       sequence: null
     }

@@ -225,6 +225,8 @@ export default {
   },
   selectedContactChanging: ({ commit }, isChanging) => {
     commit('CHANGING_SELECTED_CONTACT', isChanging)
+  },
+  setSmsTemplateModal: ({ commit }, params) => {
+    commit('SMS_TEMPLATE_MODAL', params)
   }
-
 }

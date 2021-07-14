@@ -1,33 +1,49 @@
 <template>
-  <div class="row mx-0 content-row contact-view-wrapper d-flex">
-    <contact-list-sidebar></contact-list-sidebar>
-    <div :class="`pr-2 mb-3 contact-activity-wrapper ${widthClass}`">
-      <contact-activities :communications="filteredCommunications"
-                          :campaignId="selectedCampaignId">
-        <template v-slot:moreActivities>
-          <q-btn outline
-                 dense
-                 rounded
-                 no-caps
-                 class="prev-activities mx-2"
-                 color="primary"
-                 size="md"
-                 :isLoadingMore="isLoadingMore"
-                 :loading="isLoadingPreviousActivities"
-                 :disable="isLoadingPreviousActivities"
-                 v-if="hasMoreCommunications"
-                 @click="loadMorePreviousActivities">
-            <div class="px-2">
-              Previous Activities
-            </div>
-          </q-btn>
-        </template>
-      </contact-activities>
+  <b-overlay
+    :show="changingSelectedContact"
+    variant="white"
+    :opacity="0.85"
+    rounded="sm"
+  >
+    <div class="row mx-0 content-row contact-view-wrapper d-flex">
+        <contact-list-sidebar></contact-list-sidebar>
+        <div :class="`pr-2 mb-3 contact-activity-wrapper ${widthClass}`">
+          <contact-activities :communications="filteredCommunications"
+                              :campaignId="selectedCampaignId">
+            <template v-slot:moreActivities>
+              <q-btn outline
+                     dense
+                     rounded
+                     no-caps
+                     class="prev-activities mx-2"
+                     color="primary"
+                     size="md"
+                     :isLoadingMore="isLoadingMore"
+                     :loading="isLoadingPreviousActivities"
+                     :disable="isLoadingPreviousActivities"
+                     v-if="hasMoreCommunications"
+                     @click="loadMorePreviousActivities">
+                <div class="px-2">
+                  Previous Activities
+                </div>
+              </q-btn>
+            </template>
+          </contact-activities>
+        </div>
+        <div class="px-0 mb-3 width-300">
+          <contact-details></contact-details>
+        </div>
     </div>
-    <div class="px-0 mb-3 width-300">
-      <contact-details></contact-details>
-    </div>
-  </div>
+    <template #overlay>
+      <div class="text-center">
+        <q-spinner-bars
+          color="primary"
+          size="2em"
+        />
+        <p id="cancel-label">Fetching contact...</p>
+      </div>
+    </template>
+  </b-overlay>
 </template>
 
 <script>
@@ -47,7 +63,7 @@ export default {
     ContactListSidebar
   },
   computed: {
-    ...mapGetters('contacts', [ 'contact', 'isSidebarCollapsed' ]),
+    ...mapGetters('contacts', [ 'contact', 'isSidebarCollapsed', 'changingSelectedContact' ]),
     widthClass () {
       return !this.isSidebarCollapsed ? 'w-less-600px' : 'w-less-315px'
     }

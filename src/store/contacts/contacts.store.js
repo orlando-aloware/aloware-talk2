@@ -168,6 +168,11 @@ export default function () {
     isAppointmentSubmitted: false,
     isEnrollSequenceOpen: false,
     isAddReminderOpen: false,
-    changingSelectedContact: false
+    changingSelectedContact: false,
+    smsTemplateModal: {
+      open: false,
+      scope: 'user',
+      template: null
+    }
   }
 }

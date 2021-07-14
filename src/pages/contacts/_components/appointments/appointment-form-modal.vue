@@ -1,7 +1,7 @@
 <template>
   <b-modal title="Add Appointment"
            size="md"
-           v-model="isAddAppointmentOpen"
+           v-model="isOpen"
            scrollable
            @hidden="onHidden">
 
@@ -168,11 +168,18 @@ export default {
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
+    },
+    isOpen: {
+      get () {
+        return this.isAddAppointmentOpen
+      },
+      set (isOpen) {
+        return isOpen
+      }
     }
   },
   data () {
     return {
-      isOpen: false,
       auth,
       isSaving: false,
       date: '',

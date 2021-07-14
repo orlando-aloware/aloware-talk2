@@ -1,6 +1,6 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
-    <h6>Scheduled Messages</h6>
+    <h6 class="mb-2">Scheduled Messages</h6>
     <div>
       <b-button
         class="btn-block"

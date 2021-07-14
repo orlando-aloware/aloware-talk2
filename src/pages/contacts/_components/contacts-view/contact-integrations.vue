@@ -1,8 +1,8 @@
 <template>
   <b-card class="mt-2 mb-2 border-0">
-    <h6 class="mb-3">Integrations</h6>
+    <h6 class="mb-2">Integrations</h6>
     <p v-if="!isHubspotEnabled"
-       class="status-notice text-muted">
+       class="status-notice text-muted mb-0">
       Enable your favorite CRM integration and push contacts from the
       integration settings page to see links to your CRM contacts.
     </p>
