@@ -202,7 +202,7 @@ export default {
   },
   mounted () {
     if (this.$refs.scrollableArea) {
-      this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
+      // this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
     document.addEventListener('mouseup', this.onResizerMouseUp)
