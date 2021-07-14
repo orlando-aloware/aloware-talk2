@@ -17,13 +17,6 @@
                               :campaignId="campaignId">
             </contact-activity>
           </div>
-          <contact-activity v-for="(communication, index) in communications"
-                            :key="communication.id + '-comm-' + index"
-                            :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
-                            :communication="communication"
-                            :contact="contact"
-                            :campaignId="campaignId">
-          </contact-activity>
         </div>
       </div>
     <div class="composer-container-wrapper">

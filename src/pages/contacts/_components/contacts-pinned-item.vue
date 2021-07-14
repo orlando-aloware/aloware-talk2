@@ -21,7 +21,7 @@
           v-if="item.type === contactListType.DYNAMIC || !item.type"
         ></folder-dynamic-icon>
       </div>
-      <div class="pr-3 flex-grow-1">{{ item.name }}</div>
+      <div class="pr-3 flex-grow-1 item-name">{{ item.name }}</div>
       <div class="pr-2">
         <b-badge pill variant="light text-muted">{{
             item.count | fixCount
@@ -56,6 +56,11 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+  .item-name {
+    font-size: 13px;
+    max-width: 175px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
