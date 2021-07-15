@@ -31,10 +31,17 @@
           <span v-if="communication.user_id && getUser(communication.user_id).name.length">
               by {{ getUser(communication.user_id).name }}
           </span>
-          <span>
+          <q-badge class="is-dot mx-1 grey-light"
+                   rounded>
+          </q-badge>
+
+          <span class="text-muted">
+            {{ datetimePassed }}
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="top middle" self="center middle">
+              {{ relativeDatetime }}
+            </q-tooltip>
           </span>
-          <span class="text-muted"
-                v-html="datetimeTimePassed"/>
         </div>
       </div>
     </div>
