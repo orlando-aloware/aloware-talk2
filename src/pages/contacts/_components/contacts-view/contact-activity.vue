@@ -4,7 +4,7 @@
     <div class="d-flex flex-row align-items-center">
       <q-badge class="is-dot mx-1 blue"
                rounded
-               v-if="communication.direction === CommunicationDirection.INBOUND && !communication.is_read">
+               v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read">
       </q-badge>
       <avatar class="contact-avatar"
               width="34"
@@ -31,10 +31,17 @@
           <span v-if="communication.user_id && getUser(communication.user_id).name.length">
               by {{ getUser(communication.user_id).name }}
           </span>
-          <span>
+          <q-badge class="is-dot mx-1 grey-light"
+                   rounded>
+          </q-badge>
+
+          <span class="text-muted">
+            {{ datetimePassed }}
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="top middle" self="center middle">
+              {{ relativeDatetime }}
+            </q-tooltip>
           </span>
-          <span class="text-muted"
-                v-html="datetimeTimePassed"/>
         </div>
       </div>
     </div>
