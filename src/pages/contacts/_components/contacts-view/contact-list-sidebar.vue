@@ -123,6 +123,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "src/css/variables.scss";
   .contact-list-sidebar-wrapper {
     height: 100%;
     border-right: 1px solid #dee2e6;
@@ -163,7 +164,7 @@ export default {
         border-bottom: 1px solid #F4F4F6;
 
         .contact-name{
-          font-size: 0.85em;
+          font-size: $font-size-13;
           display: inline-block;
           width: 190px;
           white-space: nowrap;
