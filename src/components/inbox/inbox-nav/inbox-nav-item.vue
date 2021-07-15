@@ -24,29 +24,30 @@
       >
         <icon :icon="icon" :isActive="isActive"/>
       </div>
-      <div class="inbox-nav-item__label" v-bind:class="{
-          'inbox-nav-item__label--closed': closed,
-          'inbox-nav-item__label--opened': !closed
-        }">{{ label }}
+      <div class="inbox-nav-item__label">
+        {{ label }}
       </div>
-      <badge
+      <span class="count-label">
+        <span class="open-count">{{ openCount }}</span>
+        <span>|</span>
+        <span class="pending-count">{{ pendingCount }}</span>
+      </span>
+      <!--badge
         v-if="badge"
         :color="badgeColor"
         :value="badgeValue"
         :closed="closed"
-      />
+      /-->
     </div>
   </a>
 </template>
 
 <script>
 import Icon from './inbox-nav-icon.vue'
-import Badge from './inbox-nav-badge.vue'
 
 export default {
   components: {
-    Icon,
-    Badge
+    Icon
   },
   props: {
     label: {
@@ -73,7 +74,11 @@ export default {
       type: Boolean,
       default: false
     },
-    badgeValue: {
+    openCount: {
+      type: [Number, String],
+      default: 0
+    },
+    pendingCount: {
       type: [Number, String],
       default: 0
     },
@@ -162,8 +167,8 @@ export default {
 
   &__label {
     font-size: 14px;
-    line-height: 19px;
-    font-weight: bold;
+    line-height: 17px;
+    letter-spacing: -0.0025em;
     flex-grow: 1;
     display: none;
 
@@ -181,6 +186,18 @@ export default {
         display: none;
       }
     }
+  }
+  .count-label {
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 500;
+  }
+  .open-count {
+    color: $grey-20;
+  }
+  .pending-count {
+    font-weight: 500;
+    color: $grey-30;
   }
 }
 </style>

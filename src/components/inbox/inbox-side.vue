@@ -3,13 +3,12 @@
     <div class="inbox-side__left"
          :class="{'inbox-side__left--closed': closed }">
       <div>
-        <inbox-nav-toggle :closed="closed" @toggle="toggle"/>
         <div class="inbox-side__nav">
           <inbox-nav-list :closed="closed"></inbox-nav-list>
         </div>
       </div>
     </div>
-    <div class="inbox-side__right" :class="{'inbox-side__right--closed': closed }">
+    <div class="border-left">
       <calls-header label="Inbound Calls"/>
       <div>
         <calls-list-section count="1" sub-label="Talk Time" label="Active"/>
@@ -40,7 +39,6 @@
 </template>
 
 <script>
-import InboxNavToggle from 'components/inbox/inbox-nav/inbox-nav-toggle'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import CallsListSection from 'components/inbox/calls/calls-list-section'
@@ -68,7 +66,7 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.toggleOnResize)
   },
-  components: { CallsEmptyState, CallsListSection, CallsHeader, InboxNavList, InboxNavToggle, CallListItem }
+  components: { CallsEmptyState, CallsListSection, CallsHeader, InboxNavList, CallListItem }
 }
 </script>
 

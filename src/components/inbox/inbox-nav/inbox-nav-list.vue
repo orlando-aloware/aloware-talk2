@@ -28,22 +28,27 @@ export default {
   },
   data: function () {
     return {
-      active: 'tasks',
+      active: 'inbox',
       items: [
         {
-          label: 'Tasks',
-          value: 'tasks',
-          icon: 'task'
+          label: 'Inbox',
+          value: 'inbox',
+          icon: 'inbox'
         },
         {
           label: 'Calls',
           value: 'calls',
-          icon: 'phone'
+          icon: 'call'
         },
         {
           label: 'Messages',
           value: 'messages',
           icon: 'message'
+        },
+        {
+          label: 'Mentions',
+          value: 'mentions',
+          icon: 'mention'
         },
         {
           label: 'Voicemails',

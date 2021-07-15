@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-lg-5 ml-lg-2 q-px-xs-md">
+  <div class="pl-lg-3 ml-lg-3 q-px-xs-md">
     <div class="call-active">
       <call-active name="May Kerr" time="00:00"/>
     </div>

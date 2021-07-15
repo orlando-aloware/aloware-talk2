@@ -1,22 +1,28 @@
 <script>
 import phone from 'components/icons/phone-icon.vue'
 import hideMinimize from 'components/icons/hide-minimize-icon.vue'
-import message from 'components/icons/message-icon.vue'
-import record from 'components/icons/record-icon.vue'
 import showContent from 'components/icons/show-content-icon.vue'
 import task from 'components/icons/task-icon.vue'
-import voicemail from 'components/icons/voicemail-icon.vue'
+import inbox from 'components/icons/inbox/inbox-icon.vue'
+import call from 'components/icons/inbox/call-icon.vue'
+import message from 'components/icons/inbox/message-icon.vue'
+import mention from 'components/icons/inbox/mention-icon.vue'
+import voicemail from 'components/icons/inbox/voicemail-icon.vue'
+import record from 'components/icons/inbox/record-icon.vue'
 
 export default {
   /* eslint-disable */
   components: {
     phone,
     hideMinimize,
-    message,
-    record,
     showContent,
     task,
-    voicemail
+    voicemail,
+    inbox,
+    call,
+    message,
+    mention,
+    record
     /* eslint-enable */
   },
   props: {
@@ -33,5 +39,5 @@ export default {
 </script>
 
 <template>
-  <component v-bind:is="icon" :iconColor="isActive ? 'green' : 'grey-mid'"></component>
+  <component v-bind:is="icon"></component>
 </template>
