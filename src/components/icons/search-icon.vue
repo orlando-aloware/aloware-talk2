@@ -26,7 +26,7 @@
 
 <script>
 export default {
-  name: 'search-icon.vue',
+  name: 'search-icon',
   props: {
     width: {
       type: [Number, String],

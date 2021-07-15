@@ -336,6 +336,67 @@ const agentStatusClass = (agentStatus) => {
   return 'bg-grey-6'
 }
 
+/**
+ * readableArrayValue
+ * @param {Array} value
+ * @returns {string|*}
+ */
+const readableArrayValue = (value) => {
+  if (value.length === 0) {
+    return ''
+  }
+  if (value.length >= 2) {
+    const last = value.pop()
+    return value.join(', ') + ', or ' + last
+  } else {
+    return value.pop()
+  }
+}
+
+const fixBooleanType = (val) => {
+  return val ? 'Yes' : 'No'
+}
+
+const nl2br = (value) => {
+  if (!value) {
+    return '-'
+  } else {
+    let breakTag = '<br />'
+    return (value + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
+  }
+}
+
+const strLimit = (string, limit, appendEllipsis = true) => {
+  if (string) {
+    return string.slice(0, limit) + (appendEllipsis && string.length > limit ? '...' : '')
+  }
+  return string
+}
+
+const momentFormat = (datetime, format, toUserTimezone = false) => {
+  if (toUserTimezone) {
+    return window.moment.utc(datetime).tz(window.timezone).format(format)
+  }
+  return window.moment(datetime).format(format)
+}
+
+const twoLinesTextTruncate = (text) => {
+  if (text) {
+    let texts = text.split('<br />').filter(Boolean)
+    if (texts.length >= 2) {
+      texts = texts.slice(0, 2).join('<br />')
+    } else {
+      texts = text
+    }
+    const maxLength = 85
+    texts = texts.substring(0, (texts.length > maxLength ? maxLength : texts.length))
+    const hasEllipse = texts.length < text.length
+    texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
+    return texts + (hasEllipse ? '…' : '')
+  }
+  return text
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -359,7 +420,13 @@ export default ({ Vue }) => {
     firstName,
     lastName,
     replaceDash,
-    agentStatusClass
+    agentStatusClass,
+    readableArrayValue,
+    fixBooleanType,
+    nl2br,
+    strLimit,
+    momentFormat,
+    twoLinesTextTruncate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

@@ -1,1 +1,232 @@
-export default {}
+export default {
+  toggleFolder: ({ commit }, id) => {
+    commit('TOGGLE_FOLDER', id)
+  },
+  openFolder: ({ commit }, id) => {
+    commit('OPEN_FOLDER', id)
+  },
+  closeFolder: ({ commit }, id) => {
+    commit('CLOSE_FOLDER', id)
+  },
+  removeListOpen: ({ commit }, list) => {
+    commit('REMOVE_LIST_OPEN', list)
+  },
+  removeFolderOpen: ({ commit }, folder) => {
+    commit('REMOVE_FOLDER_OPEN', folder)
+  },
+  removeContactOpen: ({ commit }, contact) => {
+    commit('REMOVE_CONTACT_OPEN', contact)
+  },
+  removeListClose: ({ commit }) => {
+    commit('REMOVE_LIST_CLOSE')
+  },
+  removeFolderClose: ({ commit }) => {
+    commit('REMOVE_FOLDER_CLOSE')
+  },
+  removeContactClose: ({ commit }) => {
+    commit('REMOVE_CONTACT_CLOSE')
+  },
+  openFilters: ({ commit }) => {
+    commit('FILTERS_OPEN')
+  },
+  closeFilters: ({ commit }) => {
+    commit('FILTERS_CLOSE')
+  },
+  contactsLoaded: ({ commit }, payload) => {
+    commit('CONTACTS_LOADED', payload)
+  },
+  pinnedCountLoaded: ({ commit }, payload) => {
+    commit('PINNED_COUNT_LOADED', payload)
+  },
+  foldersLoaded: ({ commit }, payload) => {
+    commit('FOLDERS_LOADED', payload)
+  },
+  pinnedLoaded: ({ commit }, payload) => {
+    commit('PINNED_LOADED', payload)
+  },
+  listLoaded: ({ commit }, payload) => {
+    commit('LIST_LOADED', payload)
+  },
+  columnsOpen: ({ commit }, payload) => {
+    commit('COLUMNS_OPEN', payload)
+  },
+  columnsClose: ({ commit }) => {
+    commit('COLUMNS_CLOSE')
+  },
+  columnsReordered: ({ commit }, payload) => {
+    commit('COLUMNS_REORDERED', payload)
+  },
+  columnsUpdated: ({ commit }, payload) => {
+    commit('COLUMNS_UPDATED', payload)
+  },
+  listPinToggled: ({ commit }, { id, isPinned }) => {
+    commit(isPinned ? 'LIST_PINNED' : 'LIST_UNPINNED', id)
+  },
+  openMoveDialog: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_OPEN', payload)
+  },
+  closeMoveDialog: ({ commit }) => {
+    commit('MOVE_DIALOG_CLOSE')
+  },
+  setMoveDialogTarget: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_TARGET', payload)
+  },
+  setContactRemoveActionType: ({ commit }, payload) => {
+    commit('SET_CONTACT_REMOVE_ACTION_TYPE', payload)
+  },
+  setRemoveListActionType: ({ commit }, payload) => {
+    commit('SET_REMOVE_LIST_ACTION_TYPE', payload)
+  },
+  setBulkDelete: ({ commit }, payload) => {
+    commit('SET_BULK_DELETE', payload)
+  },
+  setListSelectedContacts: ({ commit }, payload) => {
+    commit('SET_LIST_SELECTED_CONTACTS', payload)
+  },
+  setSelectedList: ({ commit }, payload) => {
+    commit('SET_SELECTED_LIST', payload)
+  },
+  setSelectedStaticList: ({ commit }, payload) => {
+    commit('SET_SELECTED_STATIC_LIST', payload)
+  },
+  createListOpen: ({ commit }, payload) => {
+    commit('CREATE_LIST_OPEN', payload)
+  },
+  createListClose: ({ commit }) => {
+    commit('CREATE_LIST_CLOSE')
+  },
+
+  selectListOpen: ({ commit }, payload) => {
+    commit('SELECT_LIST_OPEN', payload)
+  },
+  selectListClose: ({ commit }) => {
+    commit('SELECT_LIST_CLOSE')
+  },
+
+  setSelectListSearchValue: ({ commit }, value) => {
+    commit('SET_SELECT_LIST_SEARCH_VALUE', value)
+  },
+
+  setFilters: ({ commit }, filters) => {
+    commit('SET_FILTERS', filters)
+  },
+  setCurrentListFilters: ({ commit }, filters) => {
+    commit('SET_CURRENT_LIST_FILTERS', filters)
+  },
+
+  setContact: ({ commit }, contact) => {
+    commit('SET_CONTACT', contact)
+  },
+  setLines: ({ commit }, lines) => {
+    commit('SET_LINES', lines)
+  },
+  setRingGroups: ({ commit }, ringGroups) => {
+    commit('SET_RING_GROUPS', ringGroups)
+  },
+  setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
+    commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
+  },
+  setContactRingGroups: ({ commit }, ringGroups) => {
+    commit('SET_CONTACT_RING_GROUPS', ringGroups)
+  },
+  setContactAttributes: ({ commit }, attributes) => {
+    commit('SET_CONTACT_ATTRIBUTES', attributes)
+  },
+  addContactPhoneNumber: ({ commit }, phoneNumber) => {
+    commit('ADD_CONTACT_PHONE_NUMBER', phoneNumber)
+  },
+  setSidebarCollapsed: ({ commit }, isCollapsed) => {
+    commit('SET_SIDEBAR_COLLAPSED', isCollapsed)
+  },
+  setContactNameEditOpen: ({ commit }, isOpen) => {
+    commit('SET_CONTACT_NAME_EDIT_OPEN', isOpen)
+  },
+  setContactTags: ({ commit }, tags) => {
+    commit('SET_CONTACT_TAGS', tags)
+  },
+  setContactLines: ({ commit }, lines) => {
+    commit('SET_CONTACT_LINES', lines)
+  },
+  setContactSelectedPhone: ({ commit }, phone) => {
+    commit('SET_CONTACT_SELECTED_PHONE', phone)
+  },
+  updateContactSelectedPhone: ({ commit }, phone) => {
+    commit('UPDATE_CONTACT_SELECTED_PHONE', phone)
+  },
+  setSelectedLine: ({ commit }, line) => {
+    commit('SET_SELECTED_LINE', line)
+  },
+  setMessageComposerMode: ({ commit }, mode) => {
+    commit('SET_MESSAGE_COMPOSER_MODE', mode)
+  },
+  setMessageComposerSmsPhoneNumber: ({ commit }, phoneNumber) => {
+    commit('SET_MESSAGE_COMPOSER_PHONE_SMS_NUMBER', phoneNumber)
+  },
+  setMessageComposerSmsBody: ({ commit }, body) => {
+    commit('SET_MESSAGE_COMPOSER_SMS_BODY', body)
+  },
+  setMessageComposerSmsGif: ({ commit }, gif) => {
+    commit('SET_MESSAGE_COMPOSER_SMS_GIF', gif)
+  },
+  setMessageComposerAttachments: ({ commit }, attachments) => {
+    commit('SET_MESSAGE_COMPOSER_ATTACHMENTS', attachments)
+  },
+  setMessageComposerFaxFilename: ({ commit }, filename) => {
+    commit('SET_MESSAGE_COMPOSER_FAX_FILENAME', filename)
+  },
+  appendMessageComposerSmsAttachments: ({ commit }, attachment) => {
+    commit('APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS', attachment)
+  },
+  removeMessageComposerSmsAttachment: ({ commit }, attachment) => {
+    commit('REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT', attachment)
+  },
+  resetMessageComposerSms: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_SMS')
+  },
+  resetMessageComposerFax: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_FAX')
+  },
+
+  resetMessageComposerEmail: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_EMAIL')
+  },
+
+  setMessageComposerEmailBody: ({ commit }, body) => {
+    commit('SET_MESSAGE_COMPOSER_EMAIL_BODY', body)
+  },
+
+  resetMessageComposerNote: ({ commit }) => {
+    commit('RESET_MESSAGE_COMPOSER_NOTE')
+  },
+
+  setMessageComposerNoteBody: ({ commit }, body) => {
+    commit('SET_MESSAGE_COMPOSER_NOTE_BODY', body)
+  },
+
+  scheduleMessageOpen: ({ commit }, isOpen) => {
+    commit('SCHEDULE_MESSAGE_OPEN', isOpen)
+  },
+  scheduledMessageListOpen: ({ commit }, isOpen) => {
+    commit('SCHEDULE_MESSAGE_LIST_OPEN', isOpen)
+  },
+  addAppointmentOpen: ({ commit }, isOpen) => {
+    commit('ADD_APPOINTMENT_OPEN', isOpen)
+  },
+
+  appointmentSubmit: ({ commit }, isOpen) => {
+    commit('ADD_APPOINTMENT_OPEN', isOpen)
+  },
+
+  enrollSequenceOpen: ({ commit }, isOpen) => {
+    commit('ENROLL_SEQUENCE_OPEN', isOpen)
+  },
+  addReminderOpen: ({ commit }, isOpen) => {
+    commit('ADD_REMINDER_OPEN', isOpen)
+  },
+  selectedContactChanging: ({ commit }, isChanging) => {
+    commit('CHANGING_SELECTED_CONTACT', isChanging)
+  },
+  setSmsTemplateModal: ({ commit }, params) => {
+    commit('SMS_TEMPLATE_MODAL', params)
+  }
+}

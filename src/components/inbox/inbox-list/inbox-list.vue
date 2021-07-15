@@ -8,7 +8,6 @@
 
 <script>
 import _ from 'lodash'
-import auth from 'boot/auth'
 import { aclMixin } from '../../../boot/mixins'
 import InboxItem from './inbox-item'
 export default {
@@ -22,7 +21,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loading: false,
       CancelToken: null,
       source: null,

@@ -1,47 +1,63 @@
 <template>
-  <div class="h-100"
-       :class="[authenticated ? 'dashboard' : 'guest',
-       lightMode ? 'light-mode' : 'night-mode']">
-    <q-layout class="page-layout h-100 pb-sm-0"
-              view="lHh Lpr lff"
-              :height="'100%'"
-              v-if="!showUpgradeDialog">
-      <div class="h-100"
-           :class="[sidebarVisibile ? 'sidebar-active' : '',
-           authenticated ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2 pr-sm-2 mr-sm-2' : '']">
-        <q-header class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
-                  v-show="authenticated && !isWidget && !loading">
-          <app-header @toggleSidebar="toggleSidebar"/>
+  <div
+    class="h-100"
+    :class="[
+      authenticated ? 'dashboard' : 'guest',
+      lightMode ? 'light-mode' : 'night-mode'
+    ]"
+  >
+    <q-layout
+      class="page-layout h-100 pb-sm-0"
+      view="lHh Lpr lff"
+      :height="'100%'"
+      v-if="!showUpgradeDialog"
+    >
+      <div
+        class="h-100"
+        :class="[
+          sidebarVisibile ? 'sidebar-active' : '',
+          authenticated
+            ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2'
+            : ''
+        ]"
+      >
+        <q-header
+          class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
+          v-show="authenticated && !isWidget && !loading"
+        >
+          <app-header @toggleSidebar="toggleSidebar" />
         </q-header>
-        <q-page-container class="page-container h-100 pl-lg-5 ml-lg-2 q-px-xs-md">
+        <q-page-container
+          class="page-container h-100 "
+        >
           <section class="main-content section h-100 py-2">
             <template v-if="!loading">
-              <transition :name="transitionName"
-                          mode="out-in"
-                          @beforeLeave="beforeLeave"
-                          @enter="enter"
-                          @afterEnter="afterEnter">
+              <transition
+                :name="transitionName"
+                mode="out-in"
+                @beforeLeave="beforeLeave"
+                @enter="enter"
+                @afterEnter="afterEnter"
+              >
                 <keep-alive>
                   <router-view></router-view>
                 </keep-alive>
               </transition>
             </template>
-            <div v-else
-                 class="d-flex justify-content-center align-items-center text-center text-black h-100">
+            <div
+              v-else
+              class="d-flex justify-content-center align-items-center text-center text-black h-100"
+            >
               <div class="container">
-                <q-spinner-bars color="success"
-                                size="40px"/>
+                <q-spinner-bars color="success" size="40px" />
                 <div>
                   <div v-if="!onlineStatus">
                     <span>Network is <b>offline</b></span>
                   </div>
                   <div v-else-if="!authCheckStatus">
                     <span>Checking authentication</span>
-                    <div class="container"
-                         v-if="showRefreshButton">
-                      <b-button type="is-link"
-                                @click="refreshPage"
-                                expanded>
+                    <div class="container" v-if="showRefreshButton">
+                      <b-button type="is-link" @click="refreshPage" expanded>
                         Refresh
                       </b-button>
                     </div>
@@ -62,115 +78,99 @@
         :breakpoint="0"
         class="h-100 sidebar-wrapper d-none d-sm-block"
         :width="60"
-        content-class="sidebar">
+        content-class="sidebar"
+      >
         <q-list>
-          <app-sidebar class="page-sidebar"
-                       :lightMode="lightMode"
-                       @toggleMode="toggleMode" />
+          <app-sidebar
+            class="page-sidebar"
+            :lightMode="lightMode"
+            @toggleMode="toggleMode"
+          />
         </q-list>
       </q-drawer>
-      <app-footer v-if="authenticated && !isWidget && !loading"
-                  class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
-                  ref="appFooter">
+      <app-footer
+        v-if="authenticated && !isWidget && !loading"
+        class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
+        ref="appFooter"
+      >
       </app-footer>
     </q-layout>
-    <q-dialog v-model="showUpgradeDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-red text-white"
-              style="width: 300px">
+    <q-dialog
+      v-model="showUpgradeDialog"
+      transition-show="scale"
+      transition-hide="scale"
+      persistent
+    >
+      <q-card class="bg-red text-white" style="width: 300px">
         <q-card-section>
           <div class="text-h6">Oops!</div>
         </q-card-section>
 
         <q-card-section>
-          It looks like that you are using an outdated version of the app, please download and install the new version
-          to continue using it.
+          It looks like that you are using an outdated version of the app,
+          please download and install the new version to continue using it.
         </q-card-section>
 
-        <q-card-actions align="right"
-                        class="bg-white text-danger">
-          <q-btn type="a"
-                 label="Visit Website"
-                 @click="openApps"
-                 flat>
-          </q-btn>
+        <q-card-actions align="right" class="bg-white text-danger">
+          <q-btn type="a" label="Visit Website" @click="openApps" flat> </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="showNewVersionDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-blue text-white"
-              style="width: 300px">
+    <q-dialog
+      v-model="showNewVersionDialog"
+      transition-show="scale"
+      transition-hide="scale"
+      persistent
+    >
+      <q-card class="bg-blue text-white" style="width: 300px">
         <q-card-section>
           <div class="text-h6">Update Available</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none"
-                        v-html="updateDialogText">
+        <q-card-section class="q-pt-none" v-html="updateDialogText">
         </q-card-section>
 
-        <q-card-actions align="right"
-                        class="bg-white text-blue">
-          <q-btn label="Close"
-                 v-close-popup
-                 flat>
-          </q-btn>
+        <q-card-actions align="right" class="bg-white text-blue">
+          <q-btn label="Close" v-close-popup flat> </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="showUpdateErrorDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-red text-white"
-              style="width: 300px">
+    <q-dialog
+      v-model="showUpdateErrorDialog"
+      transition-show="scale"
+      transition-hide="scale"
+      persistent
+    >
+      <q-card class="bg-red text-white" style="width: 300px">
         <q-card-section>
           <div class="text-h6">Download Failed</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none"
-                        v-html="updateDialogText">
+        <q-card-section class="q-pt-none" v-html="updateDialogText">
         </q-card-section>
 
-        <q-card-actions align="right"
-                        class="bg-white">
-          <q-btn label="Close"
-                 text-color="red"
-                 v-close-popup
-                 flat>
-          </q-btn>
-          <q-btn label="Quit"
-                 text-color="red"
-                 @click="quitApp"
-                 flat>
-          </q-btn>
+        <q-card-actions align="right" class="bg-white">
+          <q-btn label="Close" text-color="red" v-close-popup flat> </q-btn>
+          <q-btn label="Quit" text-color="red" @click="quitApp" flat> </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="showUpdateDownloadedDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-greenish text-white"
-              style="width: 300px">
+    <q-dialog
+      v-model="showUpdateDownloadedDialog"
+      transition-show="scale"
+      transition-hide="scale"
+      persistent
+    >
+      <q-card class="bg-greenish text-white" style="width: 300px">
         <q-card-section>
           <div class="text-h6">Update Downloaded</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none"
-                        v-html="updateDialogText">
+        <q-card-section class="q-pt-none" v-html="updateDialogText">
         </q-card-section>
 
-        <q-card-actions align="right"
-                        class="bg-white text-greenish">
-          <q-btn label="Restart"
-                 @click="restartApp"
-                 flat>
-          </q-btn>
+        <q-card-actions align="right" class="bg-white text-greenish">
+          <q-btn label="Restart" @click="restartApp" flat> </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -179,7 +179,12 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
+import {
+  aclMixin,
+  communicationMixin,
+  htmlMixin,
+  webrtcMixin
+} from '../boot/mixins'
 import { Platform } from 'quasar'
 import broadcast from '../boot/broadcast'
 import * as AgentStatus from '../constants/agent-status'
@@ -190,16 +195,24 @@ import AppSidebar from '../components/layout/app-sidebar'
 import Dialer from '../components/dialer'
 
 if (Platform.is.cordova) {
-  document.addEventListener('deviceready', () => {
-    console.log('device ready')
-    window.addEventListener('keyboardDidShow', function () {
-      document.activeElement.scrollIntoView()
-    })
-  }, false)
+  document.addEventListener(
+    'deviceready',
+    () => {
+      console.log('device ready')
+      window.addEventListener('keyboardDidShow', function () {
+        document.activeElement.scrollIntoView()
+      })
+    },
+    false
+  )
 
-  document.addEventListener('resume', () => {
-    console.log('app resumed')
-  }, false)
+  document.addEventListener(
+    'resume',
+    () => {
+      console.log('app resumed')
+    },
+    false
+  )
 }
 
 export default {
@@ -219,6 +232,7 @@ export default {
       loadingCampaigns: false,
       loadingUsers: false,
       loadingTags: false,
+      loadingWorkflows: false,
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
       isWidget: false,
@@ -248,7 +262,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['current_company', 'dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -367,14 +381,30 @@ export default {
       })
 
       // new desktop appointment notification
-      window.VueEvent.listen('new_desktop_appointment', ({ engagement, contact, timeDiff, unit }) => {
-        this.handleDesktopAppointmentNotification(engagement, contact, timeDiff, unit)
-      })
+      window.VueEvent.listen(
+        'new_desktop_appointment',
+        ({ engagement, contact, timeDiff, unit }) => {
+          this.handleDesktopAppointmentNotification(
+            engagement,
+            contact,
+            timeDiff,
+            unit
+          )
+        }
+      )
 
       // new desktop reminder notification
-      window.VueEvent.listen('new_desktop_reminder', ({ engagement, contact, timeDiff, unit }) => {
-        this.handleDesktopReminderNotification(engagement, contact, timeDiff, unit)
-      })
+      window.VueEvent.listen(
+        'new_desktop_reminder',
+        ({ engagement, contact, timeDiff, unit }) => {
+          this.handleDesktopReminderNotification(
+            engagement,
+            contact,
+            timeDiff,
+            unit
+          )
+        }
+      )
 
       // new desktop call notification
       window.VueEvent.listen('new_desktop_call', (communication) => {
@@ -440,23 +470,25 @@ export default {
     if (this.authenticated) {
       this.initAuth()
     } else {
-      this.check().then(() => {
-        this.loading = false
-        this.authCheckStatus = true
-        this.showRefreshButton = false
-      }).catch(() => {
-        if (this.$route.name !== 'Login') {
-          // @todo Go to login page
-          this.$router.push({ name: 'Login' }).catch(err => {
-            console.log(err)
-          })
-        }
-        this.loading = false
-        this.authCheckStatus = false
-        setTimeout(() => {
-          this.showRefreshButton = true
-        }, 10000)
-      })
+      this.check()
+        .then(() => {
+          this.loading = false
+          this.authCheckStatus = true
+          this.showRefreshButton = false
+        })
+        .catch(() => {
+          if (this.$route.name !== 'Login') {
+            // @todo Go to login page
+            this.$router.push({ name: 'Login' }).catch((err) => {
+              console.log(err)
+            })
+          }
+          this.loading = false
+          this.authCheckStatus = false
+          setTimeout(() => {
+            this.showRefreshButton = true
+          }, 10000)
+        })
     }
   },
 
@@ -478,7 +510,10 @@ export default {
 
     if (this.$q.platform.is.electron) {
       console.log('Push permission: ' + window.Push.Permission.get())
-      if (!window.Push.Permission.has() && window.Push.Permission.get() !== window.Push.Permission.DENIED) {
+      if (
+        !window.Push.Permission.has() &&
+        window.Push.Permission.get() !== window.Push.Permission.DENIED
+      ) {
         window.Push.Permission.request()
       }
     }
@@ -535,7 +570,12 @@ export default {
         localStorage.setItem('registrationType', data.registrationType)
       })
       this.push.on('notification', (data) => {
-        if (data.additionalData.contact_id && this.$route.name === 'Contact' && parseInt(this.$route.params.contactId) === parseInt(data.additionalData.contact_id)) {
+        if (
+          data.additionalData.contact_id &&
+          this.$route.name === 'Contact' &&
+          parseInt(this.$route.params.contactId) ===
+            parseInt(data.additionalData.contact_id)
+        ) {
           return
         }
         this.increaseAppBadge()
@@ -545,7 +585,13 @@ export default {
             this.decreaseAppBadge()
             const dismiss = this.$q.notify({
               timeout: 5000,
-              message: '<div class="no-select"><small><b>' + data.title + '</b></small>' + '<p class="has-margin-top-5">' + this.nl2br(data.message) + '</p></div>',
+              message:
+                '<div class="no-select"><small><b>' +
+                data.title +
+                '</b></small>' +
+                '<p class="has-margin-top-5">' +
+                this.nl2br(data.message) +
+                '</p></div>',
               html: true,
               actions: [
                 {
@@ -580,12 +626,11 @@ export default {
                   }
                 }
               ],
-              onDismiss: () => {
-
-              }
+              onDismiss: () => {}
             })
           }
-        } else if (data.additionalData.coldstart) { // Will be true if the application is started by clicking on the push notification, false if the app is already started.
+        } else if (data.additionalData.coldstart) {
+          // Will be true if the application is started by clicking on the push notification, false if the app is already started.
           if (this.authenticated) {
             this.decreaseAppBadge()
             if (data.additionalData.contact_id) {
@@ -606,7 +651,8 @@ export default {
               window.open(data.additionalData.custom_link, '_system')
             }
           }
-        } else if (data.additionalData.dismissed) { // Is set to true if the notification was dismissed by the user
+        } else if (data.additionalData.dismissed) {
+          // Is set to true if the notification was dismissed by the user
           // @todo
         } else {
           if (this.authenticated) {
@@ -670,8 +716,12 @@ export default {
       if (typeof str === 'undefined' || str === null) {
         return ''
       }
-      let breakTag = (isXhtml || typeof isXhtml === 'undefined') ? '<br />' : '<br>'
-      return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
+      let breakTag =
+        isXhtml || typeof isXhtml === 'undefined' ? '<br />' : '<br>'
+      return (str + '').replace(
+        /([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,
+        '$1' + breakTag + '$2'
+      )
     },
 
     beforeLeave (element) {
@@ -694,8 +744,14 @@ export default {
 
     removeBehaviorsRestrictions () {
       window.removeEventListener('keydown', this.removeBehaviorsRestrictions())
-      window.removeEventListener('mousedown', this.removeBehaviorsRestrictions())
-      window.removeEventListener('touchstart', this.removeBehaviorsRestrictions())
+      window.removeEventListener(
+        'mousedown',
+        this.removeBehaviorsRestrictions()
+      )
+      window.removeEventListener(
+        'touchstart',
+        this.removeBehaviorsRestrictions()
+      )
       this.enableAudio = true
     },
 
@@ -704,14 +760,16 @@ export default {
       let audio = document.createElement('audio')
       let promise = audio.play()
       if (promise !== undefined) {
-        promise.catch(() => {
-          // Auto-play was prevented
-          // Show a UI element to let the user manually start playback
-          return true
-        }).then(() => {
-          // Auto-play started
-          return audio.paused
-        })
+        promise
+          .catch(() => {
+            // Auto-play was prevented
+            // Show a UI element to let the user manually start playback
+            return true
+          })
+          .then(() => {
+            // Auto-play started
+            return audio.paused
+          })
       }
     },
 
@@ -721,13 +779,24 @@ export default {
         this.loading = false
         if (this.$q.platform.is.cordova) {
           if (this.$q.platform.is.android) {
-            if (this.minVersion && this.version && this.compareVersion(this.version, this.minVersion.androidVersion) < 0) {
+            if (
+              this.minVersion &&
+              this.version &&
+              this.compareVersion(
+                this.version,
+                this.minVersion.androidVersion
+              ) < 0
+            ) {
               this.showUpgradeDialog = true
             }
           }
 
           if (this.$q.platform.is.ios) {
-            if (this.minVersion && this.version && this.compareVersion(this.version, this.minVersion.iosVersion) < 0) {
+            if (
+              this.minVersion &&
+              this.version &&
+              this.compareVersion(this.version, this.minVersion.iosVersion) < 0
+            ) {
               this.showUpgradeDialog = true
             }
           }
@@ -735,12 +804,18 @@ export default {
 
         if (this.profile.live_calls === 0 && this.dialer.call) {
           if (!this.profile.go_to_available_after_login) {
-            this.$VueEvent.fire('change_agent_status', AgentStatus.AGENT_STATUS_OFFLINE)
+            this.$VueEvent.fire(
+              'change_agent_status',
+              AgentStatus.AGENT_STATUS_OFFLINE
+            )
           }
         }
 
         if (this.profile.go_to_available_after_login && !this.dialer.call) {
-          this.$VueEvent.fire('change_agent_status', AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+          this.$VueEvent.fire(
+            'change_agent_status',
+            AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
+          )
         }
 
         broadcast.init()
@@ -749,24 +824,26 @@ export default {
 
     checkAuth (authTry = 1) {
       if (this.profile !== null) {
-        this.check(true).then(() => {
-          this.loading = false
-          this.authCheckStatus = true
-          this.showRefreshButton = false
-        }).catch((err) => {
-          console.log(err)
-          authTry++
-          // check if we are authenticated after 3 retries
-          if (authTry > 3) {
-            this.authCheckStatus = false
-            setTimeout(() => {
-              this.showRefreshButton = true
-            }, 10000)
-            this.loading = true
-          } else {
-            this.checkAuth(authTry)
-          }
-        })
+        this.check(true)
+          .then(() => {
+            this.loading = false
+            this.authCheckStatus = true
+            this.showRefreshButton = false
+          })
+          .catch((err) => {
+            console.log(err)
+            authTry++
+            // check if we are authenticated after 3 retries
+            if (authTry > 3) {
+              this.authCheckStatus = false
+              setTimeout(() => {
+                this.showRefreshButton = true
+              }, 10000)
+              this.loading = true
+            } else {
+              this.checkAuth(authTry)
+            }
+          })
       }
     },
 
@@ -781,7 +858,7 @@ export default {
       if (!id) {
         return null
       }
-      let found = this.campaigns.find(campaign => campaign.id === id)
+      let found = this.campaigns.find((campaign) => campaign.id === id)
       if (found) {
         return found
       }
@@ -789,48 +866,57 @@ export default {
       return null
     },
 
-    // refresh the current_company state
+    // refresh the currentCompany state
     getCurrentCompany () {
-      return this.$axios.get('/api/v1/company/' + this.current_company.id, {
-        mode: 'no-cors'
-      }).then(res => {
-        this.setCurrentCompany(res.data)
-        return Promise.resolve()
-      }).catch(err => {
-        console.log(err)
-        return Promise.reject()
-      })
+      return this.$axios
+        .get('/api/v1/company/' + this.profile.company_id, {
+          mode: 'no-cors'
+        })
+        .then((res) => {
+          this.setCurrentCompany(res.data)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.log(err)
+          return Promise.reject()
+        })
     },
 
     getCampaigns () {
       if (this.hasPermissionTo('list campaign')) {
         this.loadingCampaigns = true
-        return this.$axios.get('/api/v1/campaign', {
-          mode: 'no-cors'
-        }).then(res => {
-          this.setCampaigns(res.data)
-          this.loadingCampaigns = false
-          return Promise.resolve()
-        }).catch(err => {
-          console.log(err)
-          this.loadingCampaigns = false
-          return Promise.reject()
-        })
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setCampaigns(res.data)
+            this.loadingCampaigns = false
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingCampaigns = false
+            return Promise.reject()
+          })
       }
     },
 
     getUsers () {
       if (this.hasPermissionTo('list user')) {
         this.loading_users = true
-        return this.$axios.get('/api/v1/user', {
-          mode: 'no-cors'
-        }).then(res => {
-          this.setUsers(res.data)
-          this.loadingUsers = false
-        }).catch(err => {
-          console.log(err)
-          this.loadingUsers = false
-        })
+        return this.$axios
+          .get('/api/v1/user', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setUsers(res.data)
+            this.loadingUsers = false
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingUsers = false
+          })
       }
     },
 
@@ -841,36 +927,60 @@ export default {
       let params = {
         page: page
       }
-      return this.$axios.get('/api/v1/tag', { params }).then(res => {
-        if (res.data.data && res.data.data.length) {
-          res.data.data.forEach((tag) => {
-            this.newTag(tag)
-          })
-        }
-        if (res.data.to !== res.data.total) {
-          this.getTags(page + 1)
-        } else {
-          window.VueEvent.fire('tags_loaded')
+      return this.$axios
+        .get('/api/v1/tag', { params })
+        .then((res) => {
+          if (res.data.data && res.data.data.length) {
+            res.data.data.forEach((tag) => {
+              this.newTag(tag)
+            })
+          }
+          if (res.data.to !== res.data.total) {
+            this.getTags(page + 1)
+          } else {
+            window.VueEvent.fire('tags_loaded')
+            this.loadingTags = false
+            return Promise.resolve()
+          }
+        })
+        .catch((err) => {
+          console.log(err)
           this.loadingTags = false
-          return Promise.resolve()
-        }
-      }).catch(err => {
-        console.log(err)
-        this.loadingTags = false
-        return Promise.reject()
-      })
+          return Promise.reject()
+        })
+    },
+
+    getWorkflows () {
+      if (this.hasPermissionTo('list workflow')) {
+        this.loadingWorkflows = true
+        return this.$axios.get('/api/v1/automations/workflows', {
+          mode: 'no-cors',
+          params: {
+            size: 100
+          }
+        }).then(res => {
+          this.loadingWorkflows = false
+          res.data.data.forEach((workflow) => {
+            this.newWorkflow(workflow)
+          })
+        }).catch(err => {
+          this.loadingWorkflows = false
+          console.log(err)
+        })
+      }
     },
 
     getDispositionStatuses () {
       if (this.hasPermissionTo('list disposition status')) {
         this.loadingDispositionStatuses = true
-        return this.$axios.get('/api/v1/disposition-status')
-          .then(res => {
+        return this.$axios
+          .get('/api/v1/disposition-status')
+          .then((res) => {
             this.setDispositionStatuses(res.data)
             this.loadingDispositionStatuses = false
             return Promise.resolve()
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err)
             this.loadingDispositionStatuses = false
             return Promise.reject()
@@ -881,12 +991,13 @@ export default {
     getCallDispositions () {
       if (this.hasPermissionTo('list disposition status')) {
         this.loadingCallDispositionStatuses = true
-        return this.$axios.get('/api/v1/call-disposition')
-          .then(res => {
+        return this.$axios
+          .get('/api/v1/call-disposition')
+          .then((res) => {
             this.setCallDispositions(res.data)
             this.loadingCallDispositionStatuses = false
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err)
             this.loadingCallDispositionStatuses = false
           })
@@ -894,11 +1005,14 @@ export default {
     },
 
     getMinVersion () {
-      return this.$axios.get('/get-min-version').then(res => {
-        this.minVersion = res.data.version
-      }).catch(err => {
-        console.log(err)
-      })
+      return this.$axios
+        .get('/get-min-version')
+        .then((res) => {
+          this.minVersion = res.data.version
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
 
     compareVersion (v1, v2) {
@@ -913,7 +1027,7 @@ export default {
         if (v1[i] > v2[i]) return 1
         if (v1[i] < v2[i]) return -1
       }
-      return v1.length === v2.length ? 0 : (v1.length < v2.length ? -1 : 1)
+      return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1
     },
 
     async initAccount () {
@@ -933,18 +1047,34 @@ export default {
         let getCampaigns = this.getCampaigns()
         let getUsers = this.getUsers()
         let getTags = this.getTags()
+        let getWorkflows = this.getWorkflows()
         let getDispositionStatuses = this.getDispositionStatuses()
         let getCallDispositions = this.getCallDispositions()
         let getMinVersion = this.getMinVersion()
-        await Promise.all([getCurrentCompany, getCampaigns, getUsers, getTags, getDispositionStatuses, getCallDispositions, getMinVersion])
+        await Promise.all([
+          getCurrentCompany,
+          getCampaigns,
+          getUsers,
+          getTags,
+          getWorkflows,
+          getDispositionStatuses,
+          getCallDispositions,
+          getMinVersion
+        ])
       }
     },
 
     openApps () {
       if (this.$q.platform.is.android) {
-        window.open('https://play.google.com/store/apps/details?id=com.aloware.talk', '_system')
+        window.open(
+          'https://play.google.com/store/apps/details?id=com.aloware.talk',
+          '_system'
+        )
       } else if (this.$q.platform.is.ios) {
-        window.open('https://apps.apple.com/us/app/aloware-talk-business-phone/id1479253481', '_system')
+        window.open(
+          'https://apps.apple.com/us/app/aloware-talk-business-phone/id1479253481',
+          '_system'
+        )
       } else {
         window.open('https://aloware.com/apps', '_system')
       }
@@ -998,7 +1128,10 @@ export default {
     },
 
     handleDesktopCommunicationNotification (communication) {
-      if (window.Push.Permission.has() && !this.communicationNotifiedDesktop.includes(communication.id)) {
+      if (
+        window.Push.Permission.has() &&
+        !this.communicationNotifiedDesktop.includes(communication.id)
+      ) {
         this.communicationNotifiedDesktop.push(communication.id)
         let self = this
         let title = ''
@@ -1019,7 +1152,10 @@ export default {
         }
 
         // handling answered calls
-        if (communication.type === CommunicationTypes.CALL && communication.user_id) {
+        if (
+          communication.type === CommunicationTypes.CALL &&
+          communication.user_id
+        ) {
           title = 'Answered Incoming Call'
         }
 
@@ -1030,46 +1166,57 @@ export default {
           self.restoreApp()
           if (communication.type === CommunicationTypes.CALL) {
             if (!this.dialer.call) {
-              self.$router.push({
-                name: 'Communication',
-                params: {
-                  communicationObj: communication,
-                  communicationId: communication.id
-                }
-              }).catch(err => {
-                console.log(err)
-              })
+              self.$router
+                .push({
+                  name: 'Communication',
+                  params: {
+                    communicationObj: communication,
+                    communicationId: communication.id
+                  }
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
             }
           }
           if (communication.type === CommunicationTypes.SMS) {
-            self.$router.push({
-              name: 'Contact',
-              params: {
-                contactId: communication.contact_id
-              }
-            }).catch(err => {
-              console.log(err)
-            })
+            self.$router
+              .push({
+                name: 'Contact',
+                params: {
+                  contactId: communication.contact_id
+                }
+              })
+              .catch((err) => {
+                console.log(err)
+              })
           }
           if (communication.type === CommunicationTypes.FAX) {
-            self.$router.push({
-              name: 'Contact',
-              params: {
-                contactId: communication.contact_id
-              }
-            }).catch(err => {
-              console.log(err)
-            })
+            self.$router
+              .push({
+                name: 'Contact',
+                params: {
+                  contactId: communication.contact_id
+                }
+              })
+              .catch((err) => {
+                console.log(err)
+              })
           }
         }
 
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
           icon: 'notification-icons/' + icon + '.png',
-          body: `From: ${this.$options.filters.fixName(this.sanitizeText(communication.contact.name))} ${this.$options.filters.fixPhone(communication.contact.phone_number)} on ${lineName} line.`,
+          body: `From: ${this.$options.filters.fixName(
+            this.sanitizeText(communication.contact.name)
+          )} ${this.$options.filters.fixPhone(
+            communication.contact.phone_number
+          )} on ${lineName} line.`,
           tag: 'communication-notification-' + communication.id,
-          requireInteraction: (communication.type !== CommunicationTypes.CALL),
-          timeout: (communication.type === CommunicationTypes.CALL) ? 60000 : 30000,
+          requireInteraction: communication.type !== CommunicationTypes.CALL,
+          timeout:
+            communication.type === CommunicationTypes.CALL ? 60000 : 30000,
           onClick: onClickFunction,
           onError: function (err) {
             console.log(err)
@@ -1084,7 +1231,10 @@ export default {
     },
 
     handleDesktopVoicemailNotification (communication) {
-      if (window.Push.Permission.has() && !this.voicemailNotifiedDesktop.includes(communication.id)) {
+      if (
+        window.Push.Permission.has() &&
+        !this.voicemailNotifiedDesktop.includes(communication.id)
+      ) {
         this.voicemailNotifiedDesktop.push(communication.id)
         let self = this
         const title = 'New Voicemail'
@@ -1093,20 +1243,26 @@ export default {
           this.close()
           self.decreaseAppBadge()
           self.restoreApp()
-          self.$router.push({
-            name: 'Communication',
-            params: {
-              communicationObj: communication,
-              communicationId: communication.id
-            }
-          }).catch(err => {
-            console.log(err)
-          })
+          self.$router
+            .push({
+              name: 'Communication',
+              params: {
+                communicationObj: communication,
+                communicationId: communication.id
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
         }
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
           icon: 'notification-icons/voicemail.png',
-          body: `From: ${this.$options.filters.fixName(this.sanitizeText(communication.contact.name))} ${this.$options.filters.fixPhone(communication.contact.phone_number)} on ${lineName} line.`,
+          body: `From: ${this.$options.filters.fixName(
+            this.sanitizeText(communication.contact.name)
+          )} ${this.$options.filters.fixPhone(
+            communication.contact.phone_number
+          )} on ${lineName} line.`,
           tag: 'voicemail-notification-' + communication.id,
           requireInteraction: true,
           timeout: 10000,
@@ -1122,7 +1278,10 @@ export default {
     },
 
     handleDesktopContactNotification (contact) {
-      if (window.Push.Permission.has() && !this.contactNotifiedDesktop.includes(contact.id)) {
+      if (
+        window.Push.Permission.has() &&
+        !this.contactNotifiedDesktop.includes(contact.id)
+      ) {
         this.contactNotifiedDesktop.push(contact.id)
         let self = this
         const title = 'You have been assigned to a contact.'
@@ -1131,19 +1290,25 @@ export default {
           this.close()
           self.decreaseAppBadge()
           self.restoreApp()
-          self.$router.push({
-            name: 'Contact',
-            params: {
-              contactObj: contact,
-              contactId: contact.id
-            }
-          }).catch(err => {
-            console.log(err)
-          })
+          self.$router
+            .push({
+              name: 'Contact',
+              params: {
+                contactObj: contact,
+                contactId: contact.id
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
         }
         const options = {
           icon: 'notification-icons/contact.png',
-          body: `Name: ${this.$options.filters.fixName(this.sanitizeText(contact.name))} Phone number: ${this.$options.filters.fixPhone(contact.phone_number)}.`,
+          body: `Name: ${this.$options.filters.fixName(
+            this.sanitizeText(contact.name)
+          )} Phone number: ${this.$options.filters.fixPhone(
+            contact.phone_number
+          )}.`,
           tag: 'contact-notification-' + contact.id,
           requireInteraction: true,
           timeout: 10000,
@@ -1159,7 +1324,10 @@ export default {
     },
 
     handleDesktopAppointmentNotification (engagement, contact, timeDiff, unit) {
-      if (window.Push.Permission.has() && !this.appointmentNotifiedDesktop.includes(engagement.id)) {
+      if (
+        window.Push.Permission.has() &&
+        !this.appointmentNotifiedDesktop.includes(engagement.id)
+      ) {
         this.appointmentNotifiedDesktop.push(engagement.id)
         let self = this
         let title = 'Appointment'
@@ -1171,22 +1339,31 @@ export default {
           this.close()
           self.decreaseAppBadge()
           self.restoreApp()
-          self.$router.push({
-            name: 'Contact',
-            params: {
-              contactObj: contact,
-              contactId: contact.id
-            },
-            query: {
-              activityType: engagement.type
-            }
-          }).catch(err => {
-            console.log(err)
-          })
+          self.$router
+            .push({
+              name: 'Contact',
+              params: {
+                contactObj: contact,
+                contactId: contact.id
+              },
+              query: {
+                activityType: engagement.type
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
         }
         const options = {
           icon: 'notification-icons/appointment.png',
-          body: engagement.body + '\n\r' + `Name: ${this.$options.filters.fixName(this.sanitizeText(contact.name))} Phone number: ${this.$options.filters.fixPhone(contact.phone_number)}.`,
+          body:
+            engagement.body +
+            '\n\r' +
+            `Name: ${this.$options.filters.fixName(
+              this.sanitizeText(contact.name)
+            )} Phone number: ${this.$options.filters.fixPhone(
+              contact.phone_number
+            )}.`,
           tag: 'appointment-notification-' + contact.id,
           requireInteraction: true,
           timeout: 10000,
@@ -1202,7 +1379,10 @@ export default {
     },
 
     handleDesktopReminderNotification (engagement, contact, timeDiff, unit) {
-      if (window.Push.Permission.has() && !this.reminderNotifiedDesktop.includes(engagement.id)) {
+      if (
+        window.Push.Permission.has() &&
+        !this.reminderNotifiedDesktop.includes(engagement.id)
+      ) {
         this.reminderNotifiedDesktop.push(engagement.id)
         let self = this
         let title = 'Reminder'
@@ -1214,22 +1394,31 @@ export default {
           this.close()
           self.decreaseAppBadge()
           self.restoreApp()
-          self.$router.push({
-            name: 'Contact',
-            params: {
-              contactObj: contact,
-              contactId: contact.id
-            },
-            query: {
-              activityType: engagement.type
-            }
-          }).catch(err => {
-            console.log(err)
-          })
+          self.$router
+            .push({
+              name: 'Contact',
+              params: {
+                contactObj: contact,
+                contactId: contact.id
+              },
+              query: {
+                activityType: engagement.type
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
         }
         const options = {
           icon: 'notification-icons/reminder.png',
-          body: engagement.body + '\n\r' + `Name: ${this.$options.filters.fixName(this.sanitizeText(contact.name))} Phone number: ${this.$options.filters.fixPhone(contact.phone_number)}.`,
+          body:
+            engagement.body +
+            '\n\r' +
+            `Name: ${this.$options.filters.fixName(
+              this.sanitizeText(contact.name)
+            )} Phone number: ${this.$options.filters.fixPhone(
+              contact.phone_number
+            )}.`,
           tag: 'reminder-notification-' + contact.id,
           requireInteraction: true,
           timeout: 10000,
@@ -1277,14 +1466,16 @@ export default {
           app_version: localStorage.getItem('version')
         }
       }
-      this.logoutUser(deviceInfo).then(res => {
-        this.response = res.data
-        this.$router.push({ name: 'Login' }).catch(err => {
+      this.logoutUser(deviceInfo)
+        .then((res) => {
+          this.response = res.data
+          this.$router.push({ name: 'Login' }).catch((err) => {
+            console.log(err)
+          })
+        })
+        .catch((err) => {
           console.log(err)
         })
-      }).catch(err => {
-        console.log(err)
-      })
     },
 
     ...mapActions([
@@ -1292,6 +1483,7 @@ export default {
       'setCampaigns',
       'setUsers',
       'newTag',
+      'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
       'setDialerToken',
@@ -1306,13 +1498,13 @@ export default {
   },
 
   watch: {
-    '$route' (to, from) {
+    $route (to, from) {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     },
 
-    'authenticated' (newVal, oldVal) {
+    authenticated (newVal, oldVal) {
       if (newVal && !oldVal) {
         this.initAuth()
       }

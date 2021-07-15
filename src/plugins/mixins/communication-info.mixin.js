@@ -100,77 +100,70 @@ export default {
 
     stateToIcon: function (dispositionStatus, type, direction = null) {
       let icon = ''
+
+      if (![CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
+        if (direction === CommunicationDirections.INBOUND) {
+          icon += 'inbound-'
+        } else {
+          icon += 'outbound-'
+        }
+      }
+
       if (type === CommunicationTypes.CALL) {
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          icon += `<i class="mdi mdi-phone-in-talk"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          icon += `<i class="mdi mdi-phone-hangup"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
-          icon += `<i class="mdi mdi-phone-missed"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-          icon += `<i class="mdi mdi-phone-missed"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          icon += `<i class="mdi mdi-phone-locked"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          icon += `<i class="mdi mdi-phone-locked"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
-          icon += `<i class="mdi mdi-block-helper"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
-          icon += `<i class="mdi mdi-voicemail"></i>`
-        } else {
-          icon += dispositionStatus
-        }
+        icon += 'call-'
       } else if (type === CommunicationTypes.SMS) {
-        // if type is sms
+        icon += 'sms-'
+      } else if (type === CommunicationTypes.EMAIL) {
+        icon += 'email-'
+      } else if (type === CommunicationTypes.RVM) {
+        icon += 'voicemail-'
+      } else if (type === CommunicationTypes.FAX) {
+        icon += 'fax-'
+      } else if (type === CommunicationTypes.NOTE) {
+        icon += 'note-'
+      } else if (type === CommunicationTypes.APPOINTMENT) {
+        icon += 'appointment-'
+      } else if (type === CommunicationTypes.REMINDER) {
+        icon += 'reminder-'
+      }
+
+      if (![CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
         if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          icon += `<i class="mdi mdi-message-text-outline"></i>`
+          icon += `inprogress-`
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          icon += `<i class="mdi mdi-message-text-outline"></i>`
+          icon += type === CommunicationTypes.CALL ? `answered-` : `completed-`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+          icon += `abandoned-`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+          icon += `missed-`
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          icon += `<i class="mdi mdi-message-text-outline"></i>`
+          icon += `failed-`
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          icon += `<i class="mdi mdi-message-text-outline"></i>`
+          icon += `failed-`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
+          icon += `deadend-`
+        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+          icon += `voicemail-`
         } else {
-          icon += dispositionStatus
-        }
-      } else {
-        // if type is voicemail
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          icon += `<i class="mdi mdi-voicemail"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          icon += `<i class="mdi mdi-voicemail"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          icon += `<i class="mdi mdi-voicemail"></i>`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          icon += `<i class="mdi mdi-voicemail"></i>`
-        } else {
-          icon += dispositionStatus
+          icon += `failed-`
         }
       }
 
-      if (direction && direction === CommunicationDirections.INBOUND) {
-        icon += `<i class="mdi mdi-call-received"></i>`
-      }
-
-      if (direction && direction === CommunicationDirections.OUTBOUND) {
-        icon += `<i class="mdi mdi-call-made"></i>`
-      }
-
-      return icon
+      return icon + 'icon'
     },
 
     rejectionToIcon: function (rejectionReason) {
       switch (rejectionReason) {
         case this.REJECTION_REASON_BLOCKED:
-          return '<i class="mdi mdi-phone-locked"></i>'
+          return 'phone_locked'
         case this.REJECTION_REASON_CREDITS:
-          return '<i class="mdi currency-usd-off"></i>'
+          return 'money_off'
         case this.REJECTION_REASON_OTHER:
-          return '<i class="mdi alert"></i>'
+          return 'warning'
         case this.REJECTION_REASON_USER_NOT_FOUND:
-          return '<i class="mdi alert-circle"></i>'
+          return 'error'
         case this.REJECTION_REASON_FAILED:
-          return '<i class="mdi alert-circle"></i>'
+          return 'error'
       }
     },
 

@@ -2,16 +2,20 @@ import randomColor from 'randomcolor'
 
 export default {
   methods: {
-    avatarStyle (name) {
-      if (!name) {
-        return
+    avatarStyle (isSender = false) {
+      let style = {
+        backgroundColor: '#95989E',
+        color: '#fff'
       }
 
-      let bg = this.intToRGB(this.hashCode(name))
-      return {
-        backgroundColor: bg,
-        color: this.overlayColor(bg)
+      if (isSender) {
+        style = {
+          backgroundColor: '#859ED1',
+          color: '#fff'
+        }
       }
+
+      return style
     },
 
     gradientGenerator (name) {
@@ -37,14 +41,6 @@ export default {
       return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
     },
 
-    intToRGB (i) {
-      let c = (i & 0x00FFFFFF)
-        .toString(16)
-        .toUpperCase()
-
-      return '#' + '00000'.substring(0, 6 - c.length) + c
-    },
-
     hashCode (str) {
       let hash = 0
       for (let i = 0; i < str.length; i++) {
@@ -59,6 +55,17 @@ export default {
         color += color.slice(1)
       }
       return (color.replace('#', '0x')) > (0xffffff / 2) ? '#333' : '#fff'
+    },
+
+    daysPassedSinceCreated (contact) {
+      if (!contact.created_at) {
+        return 0
+      }
+
+      let createdAtDate = this.$moment(contact.created_at)
+      let now = this.$moment()
+
+      return now.diff(createdAtDate, 'days')
     }
   }
 }

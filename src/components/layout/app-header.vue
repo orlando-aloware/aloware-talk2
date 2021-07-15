@@ -54,7 +54,7 @@
                     v-slot:label>
             <div class="items-center no-wrap">
               <div class="text-center">
-                <span class="w-40 avatar agent-avatar grey-300"
+                <span class="d-flex justify-content-center align-items-center w-40 avatar agent-avatar grey-300"
                       v-bind:style="avatarStyle(user.profile.name)">
                     <span>{{ user.profile.name | initials }}</span>
                     <i class="b-white bottom"

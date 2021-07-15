@@ -9,6 +9,8 @@ import Bowser from 'bowser'
 import * as Sentry from '@sentry/vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
+import 'vue-popperjs/dist/vue-popper.css'
+import VueWaveSurfer from 'vue-wave-surfer'
 
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
@@ -16,11 +18,10 @@ localStorage.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 localStorage.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 localStorage.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 
-// Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
-// Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
+Vue.use(VueWaveSurfer)
 
 window.Bowser = Bowser
 window.timezone = jstz.determine().name()
@@ -44,7 +45,10 @@ window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
 
   try {
     for (let validCountry of validCountries) {
-      let number = window.phoneUtil.parseAndKeepRawInput(phoneNumber, validCountry)
+      let number = window.phoneUtil.parseAndKeepRawInput(
+        phoneNumber,
+        validCountry
+      )
       let isPossible = window.phoneUtil.isPossibleNumber(number)
       if (isPossible) {
         if (window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
@@ -65,7 +69,9 @@ window.guessLocale = function (phoneNumber) {
 
   try {
     // handle US and CA as an special case
-    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(phoneNumber)
+    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(
+      phoneNumber
+    )
     if (northAmericaLocale) {
       return northAmericaLocale
     }
@@ -104,7 +110,11 @@ window.moment = moment
 
 window.Sentry = Sentry
 
-if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') && process.env.APP_ENV !== 'local') {
+if (
+  (process.env.NODE_ENV === 'production' ||
+    process.env.NODE_ENV === 'development') &&
+  process.env.APP_ENV !== 'local'
+) {
   Sentry.init({
     Vue: Vue,
     tracingOptions: {
@@ -119,15 +129,89 @@ if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'developm
 }
 
 // Branding :D
-console.log(`%c
+console.log(
+  `%c
  █████╗ ██╗      ██████╗ ██╗    ██╗ █████╗ ██████╗ ███████╗
 ██╔══██╗██║     ██╔═══██╗██║    ██║██╔══██╗██╔══██╗██╔════╝
 ███████║██║     ██║   ██║██║ █╗ ██║███████║██████╔╝█████╗
 ██╔══██║██║     ██║   ██║██║███╗██║██╔══██║██╔══██╗██╔══╝
 ██║  ██║███████╗╚██████╔╝╚███╔███╔╝██║  ██║██║  ██║███████╗
 ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
-`, 'color: #00BF50')
+`,
+  'color: #00BF50'
+)
 
 Vue.prototype.$moment = window.moment
 Vue.prototype.$Pusher = window.Pusher
 Vue.prototype.$Sentry = window.Sentry
+
+Vue.prototype.$handleErrors = function (response, title = null) {
+  if (response && response.status) {
+    let message = ''
+    switch (response.status) {
+      case 401:
+        if (response.data.error) {
+          message += '<p class="pt-1 pb-1">- ' + response.data.error + '</p>'
+        }
+        for (let error of response.data.errors) {
+          message += '<p class="pt-1 pb-1">- ' + error + '</p>'
+        }
+        break
+      case 403:
+        message = 'You do not have enough permissions to make this request.'
+        if (response.data && response.data.error) {
+          message = response.data.error
+        }
+        break
+      case 404:
+        message = 'Requested resource not found.'
+        break
+      case 400:
+        message = response.data.error
+        break
+      case 422:
+        message = ''
+        for (let error of response.data.errors) {
+          message += '<p class="pt-1 pb-1">- ' + error + '</p>'
+        }
+        break
+      case 500:
+        message = 'Oops! We are having some problems right now, please try again later.'
+        break
+    }
+    this.$q.notify({
+      offset: 95,
+      title: title || 'Error',
+      dangerouslyUseHTMLString: true,
+      message: message,
+      type: 'error',
+      showClose: true
+    })
+  }
+}
+
+Vue.prototype.$handleUploadErrors = function (error) {
+  if (typeof error === 'string') {
+    error = JSON.parse(error)
+  }
+  let err
+  if (error.message === 'This action is unauthorized.') {
+    err = {
+      status: 403
+    }
+  } else {
+    err = {
+      status: 422,
+      data: {
+        errors: error.errors.file
+      }
+    }
+  }
+
+  this.$handleErrors(err)
+}
+
+// eslint-disable-next-line no-extend-native
+String.prototype.capitalize = function () {
+  return this.charAt(0).toUpperCase() + this.slice(1)
+}

@@ -1,4 +1,3 @@
-
 const routes = [
   {
     path: '/',
@@ -26,8 +25,34 @@ const routes = [
       },
       {
         path: 'contacts',
-        name: 'Contacts',
-        component: () => import('pages/Contacts.vue')
+        component: () => import('src/pages/contacts/Contacts.vue'),
+        children: [
+          {
+            path: '',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactsViewAll.vue')
+          },
+          {
+            path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactsViewAll.vue')
+          },
+          {
+            path: 'list/:id(\\d+)+',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactsViewList.vue')
+          },
+          {
+            path: 'list/:id(\\d+)+/add',
+            name: 'Contacts',
+            component: () => import('src/pages/contacts/ContactsAddView.vue')
+          }
+        ]
+      },
+      {
+        path: 'contact/:id',
+        name: 'Contact',
+        component: () => import('src/pages/contacts/Contact.vue')
       },
       {
         path: 'power-dialer',
@@ -47,6 +72,16 @@ const routes = [
       {
         path: 'account',
         name: 'Account',
+        component: () => import('pages/Account.vue')
+      },
+      {
+        path: 'user-activity/:userId',
+        name: 'User Activity',
+        component: () => import('pages/Account.vue')
+      },
+      {
+        path: 'communication:communicationId',
+        name: 'Communication',
         component: () => import('pages/Account.vue')
       }
     ]

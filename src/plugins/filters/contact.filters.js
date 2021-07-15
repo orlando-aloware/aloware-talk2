@@ -2,6 +2,17 @@ import _ from 'lodash'
 import * as LrnTypes from '../../constants/lrn-types'
 
 /**
+ * Fix count format to have k suffix
+ * @param {string} dateOfBirth
+ * @returns {string|*}
+ */
+const fixCount = (num) => {
+  return Math.abs(num) > 999
+    ? Math.sign(num) * (Math.abs(num) / 1000).toFixed(1) + 'k'
+    : Math.sign(num) * Math.abs(num)
+}
+
+/**
  * Fix date of birth
  * @param {string} dateOfBirth
  * @returns {string|*}
@@ -12,6 +23,14 @@ const fixDateOfBirth = (dateOfBirth) => {
   }
 
   return 'N/A'
+}
+
+const fixContactName = (name) => {
+  if (name) {
+    return name.capitalize()
+  }
+
+  return 'No Name'
 }
 
 /**
@@ -119,20 +138,25 @@ const fixLrnType = (lrnType) => {
       case LrnTypes.LRN_TYPE_WIRELESS:
         return 'Wireless'
       case LrnTypes.LRN_TYPE_VOIP:
-        return 'Voip'
+        return 'VOIP'
       case LrnTypes.LRN_TYPE_OTHER:
         return 'Other'
       default:
-        return 'N/A'
+        return ''
     }
   }
 
-  return 'N/A'
+  return ''
+}
+
+const validLrnType = (type) => {
+  return ![null, undefined].includes(type)
 }
 
 export default ({ Vue }) => {
   const filters = {
     fixDateOfBirth,
+    fixContactName,
     fixName,
     fixCountry,
     fixState,
@@ -140,7 +164,9 @@ export default ({ Vue }) => {
     fixZipcode,
     fixEmail,
     fixTimezone,
-    fixLrnType
+    fixLrnType,
+    fixCount,
+    validLrnType
   }
-  Object.keys(filters).map(k => Vue.filter(k, filters[k]))
+  Object.keys(filters).map((k) => Vue.filter(k, filters[k]))
 }

@@ -70,13 +70,13 @@ const fixPhone = (
     }
 
     if (phoneNumber.toString().length <= 9) {
-      return false
+      return force ? '-' : false
     }
 
     let locale = window.guessLocale(phoneNumber)
 
     if (!locale) {
-      return false
+      return force ? '-' : false
     }
 
     let tel = window.phoneUtil.parse(phoneNumber, locale)
@@ -138,9 +138,17 @@ const fixCommType = (type) => {
     case 3:
       return 'Conference'
     case 4:
-      return 'RVM'
+      return 'Voicemail'
     case 5:
       return 'Email'
+    case 8:
+      return 'Fax'
+    case 10:
+      return 'Note'
+    case 12:
+      return 'Appointment'
+    case 13:
+      return 'Reminder'
     default:
       return 'N/A'
   }

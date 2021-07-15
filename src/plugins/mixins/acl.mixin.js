@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import * as Roles from '../../constants/roles'
 import goBackMixin from './goback.mixin'
+import { mapState } from 'vuex'
 
 export default _.merge({
   methods: {
@@ -113,19 +114,19 @@ export default _.merge({
       }
 
       // if user doesn't have permissions
-      if (!source.user || !source.user.profile || !source.user.profile.user_permissions) {
+      if (!source.profile || !source.profile || !source.profile.user_permissions) {
         return false
       }
 
       if (Array.isArray(permissions)) {
         for (let permission of permissions) {
-          if (!source.user.profile.user_permissions.includes(permission)) {
+          if (!source.profile.user_permissions.includes(permission)) {
             return false
           }
         }
         return true
       } else {
-        return source.user.profile.user_permissions.includes(permissions)
+        return source.profile.user_permissions.includes(permissions)
       }
     },
 
@@ -141,23 +142,24 @@ export default _.merge({
       }
 
       // if user doesn't have roles
-      if (!source.user || !source.user.profile || !source.user.profile.user_roles) {
+      if (!source.profile || !source.profile.user_roles) {
         return false
       }
 
       if (Array.isArray(roles)) {
         for (let role of roles) {
-          if (!source.user.profile.user_roles.includes(role)) {
+          if (!source.profile.user_roles.includes(role)) {
             return false
           }
         }
         return true
       } else {
-        return source.user.profile.user_roles.includes(roles)
+        return source.profile.user_roles.includes(roles)
       }
     }
   },
   computed: {
+    ...mapState(['auth']),
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
     }

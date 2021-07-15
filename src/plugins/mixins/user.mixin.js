@@ -1,0 +1,62 @@
+import { mapState } from 'vuex'
+import * as AnswerTypes from '../../constants/answer-types'
+import _ from 'lodash'
+
+export default {
+  computed: {
+    ...mapState(['users'])
+  },
+
+  methods: {
+    getUser (id) {
+      const users = _.get(this, 'users', null)
+
+      if (!id || !users) {
+        return null
+      }
+
+      let found = users.find(user => user.id === id)
+
+      if (found) {
+        return found
+      }
+
+      return null
+    },
+
+    getUserName (user) {
+      if (!user) {
+        return
+      }
+
+      // sanity check
+      if (!user.id) {
+        return
+      }
+
+      if (user.answer_by !== undefined) {
+        switch (user.answer_by) {
+          case AnswerTypes.BY_BROWSER:
+            return user.name + ' - Browser / Apps'
+          case AnswerTypes.BY_IP_PHONE:
+            return user.name + ' - SIP (IP Phone)'
+          case AnswerTypes.BY_PHONE_NUMBER:
+            return user.name + ' - Phone Number (' + user.phone_number + ')'
+          case AnswerTypes.BY_NONE:
+            return user.name + ' - Will Not Answer'
+        }
+      }
+
+      switch (true) {
+        case user.name !== '' && user.name && !user.sip_uri:
+          return user.name + ' (' + user.phone_number + ')'
+        case user.name !== '' && user.name && user.sip_uri:
+          return user.name + ' - SIP'
+        case !user.name && user.sip_uri:
+          return 'No Name - SIP'
+        default:
+          return 'No Name (' + user.phone_number + ')'
+      }
+    }
+  }
+}

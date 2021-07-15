@@ -1,22 +1,42 @@
 <template>
-  <div class="avatar"
-       :class="{'avatar--src': src, 'avatar--active': active }"
-       :style="{width: `${width}px`, height: `${height}px`}"
+  <div
+    class="avatar"
+    :class="{ 'avatar--src': src, 'avatar--active': active }"
+    :style="computedStyle"
   >
-    <div class="avatar__inner" :class="{'avatar__inner--active': active }"
-         :style="{'background-image': `url(${src})` }">
-      <slot/>
+    <div
+      class="avatar__inner"
+      :class="{ 'avatar__inner--active': active }"
+      :style="{ 'background-image': `url(${src})` }"
+    >
+      <sequence-icon v-if="sequenceIcon" />
+      <span v-else>
+        {{ getInitials(name || 'No Name') }}
+      </span>
     </div>
+    <slot></slot>
   </div>
 </template>
 
 <script>
+import { avatarMixin } from 'src/plugins/mixins'
+import SequenceIcon from 'src/components/icons/contact-activity/sequence-icon'
 export default {
   name: 'avatar.vue',
+  components: { SequenceIcon },
+  mixins: [avatarMixin],
+  computed: {
+    computedStyle () {
+      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
+    }
+  },
   props: {
     active: {
       type: Boolean,
       default: false
+    },
+    name: {
+      type: String
     },
     src: {
       type: String
@@ -28,6 +48,10 @@ export default {
     height: {
       type: [String, Number],
       default: 30
+    },
+    sequenceIcon: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -47,7 +71,6 @@ export default {
   font-size: 13px;
   font-weight: bold;
   line-height: 0;
-  border: solid 1px $grey-light;
   letter-spacing: 0.35px;
 
   &--src {

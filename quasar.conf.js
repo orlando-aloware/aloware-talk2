@@ -18,19 +18,10 @@ module.exports = function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: [
-      'bootstrap',
-      'axios',
-      'VueEvent',
-      'Push',
-      'filters',
-      'directives'
-    ],
+    boot: ['bootstrap', 'axios', 'VueEvent', 'Push', 'filters', 'directives', 'components'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: [
-      'app.scss'
-    ],
+    css: ['app.scss'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -82,10 +73,12 @@ module.exports = function (/* ctx */) {
     devServer: {
       before (app) {
         const cors = require('cors')
-        app.use(cors())
+        if (process.env.USE_CORS) {
+          app.use(cors())
+        }
       },
 
-      https: true,
+      https: process.env.USE_HTTPS,
       host: 'localhost',
       port: 9090,
       disableHostCheck: true,
@@ -111,17 +104,12 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        'Notify'
-      ]
+      plugins: ['Notify']
     },
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: [
-      'slideInLeft',
-      'slideOutLeft'
-    ],
+    animations: ['slideInLeft', 'slideOutLeft'],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
@@ -186,13 +174,11 @@ module.exports = function (/* ctx */) {
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-
         // OS X / Mac App Store
         // appBundleId: '',
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
-
         // Windows only
         // win32metadata: { ... }
       },
@@ -209,7 +195,8 @@ module.exports = function (/* ctx */) {
           hardenedRuntime: true,
           darkModeSupport: false,
           extendInfo: {
-            'NSMicrophoneUsageDescription': 'Please give us access to your microphone'
+            NSMicrophoneUsageDescription:
+              'Please give us access to your microphone'
           }
         },
         win: {
