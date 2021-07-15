@@ -29,12 +29,11 @@
 <script>
 import GiphyClient from 'giphy-js-sdk-core'
 import _ from 'lodash'
-import VueMasonryGallery from 'vue-masonry-gallery'
 import SearchIcon from 'components/icons/search-icon'
 
 export default {
   name: 'search-giphy',
-  components: { SearchIcon, VueMasonryGallery },
+  components: { SearchIcon },
   data () {
     return {
       client: GiphyClient(process.env.GIPHY_API_KEY),

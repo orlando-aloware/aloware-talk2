@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import VueMasonryGallery from 'vue-masonry-gallery/vendor/VueMasonryGallery/VueMasonryGallery'
 
 // contact call disposition icons
 Vue.component('outbound-call-answered-icon', require('src/components/icons/contact-activity/outbound-call-answered-icon').default)
@@ -51,3 +52,6 @@ Vue.component('outbound-voicemail-icon', require('src/components/icons/contact-a
 
 // note
 Vue.component('note-icon', require('src/components/icons/contact-activity/note-icon').default)
+
+// masonry gallery for giphy component
+Vue.component('vue-masonry-gallery', VueMasonryGallery)
