@@ -8,50 +8,6 @@
                v-b-tooltip="ringGroup.name"
                :key="ringGroup.id">{{ ringGroup.name }}</b-badge>
     </div>
-<!--    <q-select-->
-<!--      v-if="isEdit"-->
-<!--      ref="contactRingGroupsSelect"-->
-<!--      compact-->
-<!--      outlined-->
-<!--      use-chips-->
-<!--      use-input-->
-<!--      multiple-->
-<!--      input-debounce="0"-->
-<!--      behavior="menu"-->
-<!--      map-options-->
-<!--      emit-value-->
-<!--      option-value="id"-->
-<!--      option-label="name"-->
-<!--      style="width: 100%;"-->
-<!--      class="q-custom-select contact-tags-select"-->
-<!--      v-model="ringGroupsArray"-->
-<!--      :options="options"-->
-<!--      @filter="filterTagFn"-->
-<!--      @blur="onSelectBlur"-->
-<!--    >-->
-<!--      <template v-slot:selected-item="scope">-->
-<!--        <q-chip-->
-<!--          v-if="ringGroupsArray"-->
-<!--          removable-->
-<!--          dense-->
-<!--          square-->
-<!--          color="white"-->
-<!--          :tabindex="scope.tabindex"-->
-<!--          @remove="scope.removeAtIndex(scope.index)"-->
-<!--          v-b-tooltip="scope.opt.name"-->
-<!--        >-->
-<!--          <div :style="`color:#256EFF;margin-left:5px;max-width: 11vw;overflow: hidden;text-overflow: ellipsis;`">{{ scope.opt.name }}</div>-->
-<!--        </q-chip>-->
-<!--      </template>-->
-<!--      <template v-slot:no-option>-->
-<!--        <q-item>-->
-<!--          <q-item-section class="text-grey pl-3">-->
-<!--            No results-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
-<!--      </template>-->
-<!--    </q-select>-->
-
     <vue-multiselect v-show="isEdit"
                      class="chip__clear-blue border-blue shrink-options options__no-border options__relative"
                      track-by="id"
@@ -66,7 +22,7 @@
                      v-model="selectedRingGroups"
                      @close="onSelectBlur">
     </vue-multiselect>
-    <b-link v-if="!isEdit"
+    <b-link v-if="!isEdit && hasRole('Company Admin') || (hasRole('Company Agent') && hasPermissionTo('modify contact ring groups'))"
             href="#"
             class="custom-link text-decoration-none"
             v-on:click="onModifyRingGroups">
@@ -80,8 +36,10 @@ import { mapActions, mapGetters } from 'vuex'
 import talk2Api from '../../../../plugins/api/api'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import VueMultiselect from 'vue-multiselect'
+import { aclMixin } from 'src/plugins/mixins'
 export default {
   name: 'contact-ring-groups',
+  mixins: [aclMixin],
   components: { PencilOIcon, VueMultiselect },
   computed: {
     ...mapGetters('contacts', ['contact', 'ringGroups', 'contactRingGroups']),

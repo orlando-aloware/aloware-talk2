@@ -6,9 +6,10 @@
              :loading="is_busy"
              :placeholder="placeholder"
              :value="field"
+             :disable="disabled"
              v-model="field">
       <template v-slot:append class="q-field-icon__append">
-        <pencil-o-icon v-if="!is_busy"
+        <pencil-o-icon v-if="!is_busy && !disabled"
                        color="#256EFF"
                        class="cursor-pointer input-edit-icon"
                        v-on:click="getFocus">
@@ -35,6 +36,11 @@ export default {
     },
     value: {
       type: String
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {

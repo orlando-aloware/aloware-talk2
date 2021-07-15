@@ -6,6 +6,7 @@
               v-model="currentState"
               :options="options"
               :loading="isBusy"
+              :disable="disabled"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
@@ -24,6 +25,11 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {

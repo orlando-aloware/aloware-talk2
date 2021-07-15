@@ -16,10 +16,15 @@
 
           <h6 class="mt-1 mb-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
           <p class="contact-phone">
-            {{ contact.phone_number | fixPhone }}
-            <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)" variant="warning" class="badge-phone-info">{{ phone.lrn_type | fixLrnType }}</b-badge>
-            <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
-            <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
+            <span v-if="contact.phone_number !== '0'">
+              {{ contact.phone_number | fixPhone }}
+              <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)" variant="warning" class="badge-phone-info">{{ phone.lrn_type | fixLrnType }}</b-badge>
+              <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
+              <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
+            </span>
+            <span v-else>
+              Phone number unavailable
+            </span>
           </p>
         </div>
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"

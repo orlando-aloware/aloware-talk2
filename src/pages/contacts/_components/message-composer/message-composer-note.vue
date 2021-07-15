@@ -2,13 +2,15 @@
   <div>
     <div class="pt-2 form-input-container">
       <form>
-        <at v-model="messageComposer.note.body" :members="items" name-key="full_name">
+        <at hideOnBlur
+            name-key="full_name"
+            v-model="messageComposer.note.body"
+            :members="items">
           <template slot="item" slot-scope="props" >
-
-            <avatar class="contact-avatar mr-2 position-absolute"
+            <avatar class="contact-avatar mr-2"
                     width="30"
                     height="30"
-                    :name="props.item.name" />
+                    :name="`KL`" />
             <span :data-text="props.item.full_name" class="at-custom-text">{{ props.item.full_name }} <br><small>{{ props.item.email }}</small></span>
           </template>
           <template v-slot:embeddedItem="props">
@@ -21,7 +23,7 @@
       </form>
     </div>
     <div class="d-flex justify-content-between">
-      <div class="message-options">
+      <div class="messagehasRole-options">
 
       </div>
       <div>

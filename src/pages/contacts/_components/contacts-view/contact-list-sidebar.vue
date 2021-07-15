@@ -25,7 +25,8 @@
                 <p class="text-bold contact-name mb-0"
                    v-b-tooltip="contact.name">{{ contact.name }}</p>
                 <p class="text-sm-left contact-phone mb-1">
-                  {{ contact.phone_number | fixPhone }}
+                  <span v-if="contact.phone_number !== '0'">{{ contact.phone_number | fixPhone }}</span>
+                  <span v-else>Phone number unavailable</span>
                 </p>
               </div>
               <p>
@@ -155,16 +156,18 @@ export default {
 
       .list-group-item.active,
       .list-group-item:hover {
-        background: #F4F4F6;
-        color: #040404;
+        background: $grey-50;
+        color: $grey-100;
         border-radius: 10px;
       }
 
       .contact-details {
-        border-bottom: 1px solid #F4F4F6;
+        border-bottom: 1px solid $grey-50;
 
         .contact-name{
-          font-size: $font-size-13;
+          font-size: $f-size-13;
+          color: $grey-100;
+          font-weight: 500;
           display: inline-block;
           width: 190px;
           white-space: nowrap;

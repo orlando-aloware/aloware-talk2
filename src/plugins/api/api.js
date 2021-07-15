@@ -56,8 +56,8 @@ export default {
       }
     },
     tags: {
-      get () {
-        return window.axios.get(`${suffixV1}tag?full_load=true`)
+      get (params) {
+        return window.axios.get(`${suffixV1}tag`, params)
       }
     },
     lines: {

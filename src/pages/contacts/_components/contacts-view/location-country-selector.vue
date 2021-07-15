@@ -1,17 +1,5 @@
 <template>
   <div>
-<!--    <vue-multiselect track-by="code"-->
-<!--                     label="name"-->
-<!--                     class="mr-1 chip__clear-blue shrink-options"-->
-<!--                     style="width: 100%"-->
-<!--                     placeholder="Select country"-->
-<!--                     :searchable="true"-->
-<!--                     :showNoResults="false"-->
-<!--                     :close-on-select="true"-->
-<!--                     :options="options"-->
-<!--                     :show-labels="false"-->
-<!--                     :allow-empty="false"-->
-<!--                     v-model="currentCountry" />-->
     <q-select class="inline-select"
               use-input
               clearable
@@ -24,6 +12,7 @@
               v-model="currentCountry"
               :options="options"
               :loading="isBusy"
+              :disable="disabled"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
@@ -44,6 +33,11 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {

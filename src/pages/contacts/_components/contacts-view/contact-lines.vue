@@ -23,7 +23,7 @@
                      @close="onSelectBlur">
     </vue-multiselect>
 
-    <b-link v-if="!isEdit"
+    <b-link v-if="!isEdit && hasRole('Company Admin')"
             href="#"
             class="custom-link text-decoration-none"
             v-on:click="onModifyLines">
@@ -37,9 +37,11 @@ import { mapActions, mapGetters } from 'vuex'
 import talk2Api from '../../../../plugins/api/api'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import VueMultiselect from 'vue-multiselect'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-lines',
+  mixins: [aclMixin],
   components: { PencilOIcon, VueMultiselect },
   computed: {
     ...mapGetters('contacts', ['contact', 'lines']),

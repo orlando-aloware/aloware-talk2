@@ -1,5 +1,5 @@
 <template>
-  <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
+  <multiselect class="chip__clear-blue shrink-options options__no-border options__relative"
                v-model="tagId"
                label="name"
                track-by="id"
@@ -14,7 +14,7 @@
                :clear-on-select="false"
                :close-on-select="false"
                :hide-selected="true"
-               :limit="5"
+               :limit="displayLimit"
                :limit-text="limitText"
                :max-height="150"
                :show-no-results="true"
@@ -25,7 +25,8 @@
                @open="onSelectOpen"
                @close="onSelectClose"
                @search-change="filterTagFn"
-               @input="selectTag">
+               @input="selectTag"
+               @blur="onSelectBlur">
     <template slot="tag" slot-scope="{ option, remove }">
       <span :style="{ color: option.color }"
             class="border border-half-rounded px-1 d-inline-flex align-items-center mr-1">
@@ -161,6 +162,11 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+    displayLimit: {
+      type: Number,
+      required: false,
+      default: 5
     },
 
     noCollapse: {
@@ -302,6 +308,11 @@ export default {
 
     onSelectClose () {
       this.selectorClass = []
+      this.$emit('close')
+    },
+
+    onSelectBlur () {
+      this.$emit('blur')
     },
 
     limitText (count) {

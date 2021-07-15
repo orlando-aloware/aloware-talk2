@@ -10,6 +10,7 @@
               v-model="field"
               :loading="is_busy"
               :options="options"
+              :disable="disabled"
               @filter="filterFn">
       <template v-slot:option="scope">
         <q-item v-if="!scope.opt.group"
@@ -40,11 +41,13 @@
 </template>
 
 <script>
-import auth from 'boot/auth'
 import * as AnswerTypes from '../../../../constants/answer-types'
 import { mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'contact-user-selector',
+  mixins: [aclMixin],
   props: {
     ignore_focus_mode: {
       default: false,
@@ -54,7 +57,12 @@ export default {
     value: {
       type: Number
     },
-    hideExtensions: Boolean
+    hideExtensions: Boolean,
+    disabled: {
+      required: false,
+      default: false,
+      type: Boolean
+    }
   },
   computed: {
     ...mapState({
@@ -127,7 +135,6 @@ export default {
   data () {
     return {
       is_busy: false,
-      auth: auth,
       filtered_text: null,
       options: this.formattedOptions
     }

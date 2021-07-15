@@ -3,38 +3,46 @@
     <h6>About this contact</h6>
 
     <div :class="`information-container ${autoHeightClass}`">
-      <div class="d-block">
+      <div class="d-block"
+           v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-2">Owner</p>
         <contact-user-selector v-model="contact.user_id"
-                               @updateField="onUpdateOwner" />
+                               @updateField="onUpdateOwner"
+                               :disabled="!hasPermissionTo('change contact ownership')"/>
       </div>
 
-      <div class="d-block">
+      <div class="d-block"
+           v-if="hasPermissionTo('list disposition status')">
         <p class="text-muted custom-input-label mb-2">Contact Disposition</p>
-        <contact-disposition @updateField="onUpdateOwner" />
+        <contact-disposition @updateField="onUpdateOwner"
+                             :disabled="!hasPermissionTo('dispose contact')" />
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Email</p>
         <contact-input-field v-model="contact.email"
+                             :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateEmail" />
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Company</p>
         <contact-input-field v-model="contact.company_name"
+                             :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateCompany"/>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Website</p>
         <contact-input-field v-model="contact.website"
+                             :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateWebsite"/>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">City</p>
         <contact-input-field v-model="contact.cnam_city"
+                             :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateCity"/>
       </div>
 
@@ -42,6 +50,7 @@
         <p class="text-muted custom-input-label mb-2">State</p>
         <location-state-selector v-model="contact.cnam_state"
                                  :country="contact.cnam_state"
+                                 :disabled="!hasPermissionTo('update contact')"
                                  @select="onUpdateState"></location-state-selector>
       </div>
 
@@ -49,12 +58,14 @@
         <p class="text-muted custom-input-label mb-2">Country</p>
         <location-country-selector v-model="contact.cnam_country"
                                    :country="contact.cnam_country"
+                                   :disabled="!hasPermissionTo('update contact')"
                                    @select="onUpdateCountry"></location-country-selector>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-2">Zip Code</p>
         <contact-input-field v-model="contact.cnam_zipcode"
+                             :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateZipCode">
         </contact-input-field>
       </div>
@@ -91,9 +102,11 @@ import LocationStateSelector from 'pages/contacts/_components/contacts-view/loca
 import LocationCountrySelector from 'pages/contacts/_components/contacts-view/location-country-selector'
 import ContactInputField from 'pages/contacts/_components/contacts-view/contact-input-field'
 import ContactDisposition from 'pages/contacts/_components/contacts-view/contact-disposition'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-information',
+  mixins: [aclMixin],
   components: { ContactDisposition, ContactInputField, LocationCountrySelector, LocationStateSelector, ContactUserSelector },
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),

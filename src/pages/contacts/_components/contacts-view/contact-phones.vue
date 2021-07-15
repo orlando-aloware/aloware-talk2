@@ -62,12 +62,6 @@
                    class="badge-phone-info">
             {{ phoneNumber.lrn_type | fixLrnType }}
           </b-badge>
-
-          <b-badge v-if="phoneNumber.phone_number === contact.phone_number"
-                   variant="grey-80"
-                   class="badge-phone-info">
-            Primary
-          </b-badge>
         </div>
         <div class="d-flex justify-content-between">
           <p class="phone-number m-0">
@@ -136,7 +130,7 @@ export default {
       return this.contactPhoneNumbers.filter(phone => phone.phone_number !== this.contact.phone_number)
     },
     primaryPhone () {
-      return this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
+      return this.contact.phone_number === '0' ? [] : this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
     }
   },
   data () {

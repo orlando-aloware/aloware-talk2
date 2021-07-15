@@ -2,15 +2,28 @@
   <div class="composer-container">
     <div class="composer-wrapper p-2">
       <div class="composer-links d-inline-flex">
-        <b-link href="#" :class="{ active : messageComposer.mode === 'sms' }" v-on:click="setMode('sms')">Text</b-link>
-        <b-link href="#" :class="{ active : messageComposer.mode === 'fax' }" v-on:click="setMode('fax')">Fax</b-link>
-        <b-link href="#" :class="{ active : messageComposer.mode === 'email' }" v-on:click="setMode('email')">Email</b-link>
-        <b-link href="#" :class="{ active : messageComposer.mode === 'note' }" v-on:click="setMode('note')">Note</b-link>
+        <b-link href="#"
+                :class="{ active : messageComposer.mode === 'sms' }"
+                v-on:click="setMode('sms')">Text
+        </b-link>
+        <b-link href="#"
+                :class="{ active : messageComposer.mode === 'fax' }"
+                v-on:click="setMode('fax')">Fax
+        </b-link>
+        <b-link href="#"
+                :disabled="!contact.email"
+                :class="{ active : messageComposer.mode === 'email' }"
+                v-on:click="setMode('email')">Email
+        </b-link>
+        <b-link href="#"
+                :class="{ active : messageComposer.mode === 'note' }"
+                v-on:click="setMode('note')">Note
+        </b-link>
       </div>
       <div>
         <message-composer-sms v-if="messageComposer.mode === 'sms'" />
         <message-composer-fax v-if="messageComposer.mode === 'fax'" />
-        <message-composer-email v-if="messageComposer.mode === 'email'" />
+        <message-composer-email v-if="messageComposer.mode === 'email' && contact.email" />
         <message-composer-note v-if="messageComposer.mode === 'note'" />
       </div>
     </div>

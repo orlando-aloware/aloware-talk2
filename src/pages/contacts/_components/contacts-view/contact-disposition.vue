@@ -11,6 +11,7 @@
               v-model="contact.disposition_status_id"
               :options="options"
               :loading="is_busy"
+              :disable="disabled"
               @filter="filterFn"/>
   </div>
 </template>
@@ -20,9 +21,18 @@ import { mapGetters, mapState } from 'vuex'
 import * as Roles from 'src/constants/roles'
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-disposition',
+  mixins: [aclMixin],
+  props: {
+    disabled: {
+      required: false,
+      default: false,
+      type: Boolean
+    }
+  },
   computed: {
     ...mapState(['disposition_statuses', 'currentCompany']),
     ...mapGetters('contacts', ['contact']),

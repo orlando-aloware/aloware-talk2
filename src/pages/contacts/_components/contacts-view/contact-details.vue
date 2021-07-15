@@ -4,7 +4,7 @@
       <contact-info></contact-info>
       <contact-phones></contact-phones>
       <contact-information></contact-information>
-      <contact-tags></contact-tags>
+      <contact-tags v-if="hasPermissionTo('tag contact')"></contact-tags>
       <contact-notes></contact-notes>
       <contact-integrations></contact-integrations>
       <contact-scheduled-messages></contact-scheduled-messages>
@@ -29,8 +29,10 @@ import ContactInformation from 'pages/contacts/_components/contacts-view/contact
 import ContactIntegrations from 'pages/contacts/_components/contacts-view/contact-integrations'
 import ContactScheduledMessages from 'pages/contacts/_components/contacts-view/contact-scheduled-messages'
 import { mapGetters } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 export default {
   name: 'contact-details',
+  mixins: [aclMixin],
   components: {
     ContactScheduledMessages,
     ContactIntegrations,
