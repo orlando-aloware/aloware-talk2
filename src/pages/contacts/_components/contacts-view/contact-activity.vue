@@ -4,7 +4,7 @@
     <div class="d-flex flex-row align-items-center">
       <q-badge class="is-dot mx-1 blue"
                rounded
-               v-if="communication.direction === CommunicationDirection.INBOUND && !communication.is_read">
+               v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read">
       </q-badge>
       <avatar class="contact-avatar"
               width="34"

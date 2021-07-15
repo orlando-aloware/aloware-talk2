@@ -192,29 +192,17 @@
                   {{ communication.direction === CommunicationDirections.INBOUND ? 'Answered By' : 'Initiated By' }}
                 </label>
                 <div class="d-flex align-items-center w-100">
-                  <div class="status-icon d-inline-block"
-                       :state="communication.rejected_by_app"
-                       v-if="communication.rejected_by_app !== 0"
-                       v-html="rejectionToIcon(communication.rejected_by_app)">
-                    <q-tooltip anchor="bottom middle" self="top middle">
+                  <q-icon class="status-icon d-inline-block text-danger"
+                          :state="communication.rejected_by_app"
+                          :name="rejectionToIcon(communication.rejected_by_app)"
+                          v-if="communication.rejected_by_app !== 0">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
                       {{ rejectionTooltipData(communication.rejected_by_app) }}
                     </q-tooltip>
-                  </div>
-
-                  <q-tooltip class="item"
-                             content-class="bg-grey-light11"
-                             anchor="top middle"
-                             self="top middle"
-                             v-if="communication.rejected_by_app !== 0">
-                    {{ rejectionTooltipData(communication.rejected_by_app) }}
-                    <component class="status-icon d-inline-block"
-                               v-bind:is="icon"
-                               :name="rejectionToIcon(communication.rejected_by_app)">
-                    </component>
-                    <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
-                               v-if="communication.disposition_status2">
-                    </component>
-                  </q-tooltip>
+                  </q-icon>
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
                     <router-link
                       :to="{ name: 'User Activity', params: {userId: communication.user_id }}">

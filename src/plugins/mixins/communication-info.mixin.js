@@ -155,15 +155,15 @@ export default {
     rejectionToIcon: function (rejectionReason) {
       switch (rejectionReason) {
         case this.REJECTION_REASON_BLOCKED:
-          return 'mdi-phone-locked'
+          return 'phone_locked'
         case this.REJECTION_REASON_CREDITS:
-          return 'currency-usd-off'
+          return 'money_off'
         case this.REJECTION_REASON_OTHER:
-          return 'alert'
+          return 'warning'
         case this.REJECTION_REASON_USER_NOT_FOUND:
-          return 'alert-circle'
+          return 'error'
         case this.REJECTION_REASON_FAILED:
-          return 'alert-circle'
+          return 'error'
       }
     },
 
