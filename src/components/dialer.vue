@@ -264,9 +264,9 @@ export default {
         }
 
         this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
-          this.$router.push({ name: 'Incoming Call' }).catch(err => {
-            console.log(err)
-          })
+          // this.$router.push({ name: 'Incoming Call' }).catch(err => {
+          //   console.log(err)
+          // })
         }).catch((err) => {
           console.log(err)
         })
