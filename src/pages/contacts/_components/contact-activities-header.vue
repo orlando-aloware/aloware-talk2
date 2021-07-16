@@ -28,8 +28,8 @@ export default {
   border-bottom: solid 1px $grey-light3;
   &__label {
     padding-left: 20px;
-    font-weight: bold;
-    font-size: 12px;
+    font-weight: 600;
+    font-size: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

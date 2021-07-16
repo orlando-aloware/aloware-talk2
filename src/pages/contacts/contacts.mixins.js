@@ -156,7 +156,7 @@ export default {
         })
       }
 
-      if (!_.isEmpty(this.currentListFilters)) {
+      if (!_.isEmpty(this.currentListFilters) && this.id !== 'all') {
         query.filter_groups = query.filter_groups.concat(this.currentListFilters)
       }
 

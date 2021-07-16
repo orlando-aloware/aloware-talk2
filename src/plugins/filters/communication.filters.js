@@ -1,5 +1,6 @@
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
 
 /**
  * Fix phone number
@@ -271,6 +272,20 @@ const translateDispositionStatusText = (status) => {
   }
 }
 
+const fixLrnTypeBadge = (type) => {
+  switch (type) {
+    case LRN_TYPE_LANDLINE:
+      return 'yellow-1'
+    case LRN_TYPE_WIRELESS:
+      return 'blue-3'
+    case LRN_TYPE_VOIP:
+      return 'purple-2'
+    case LRN_TYPE_OTHER:
+    default:
+      return 'green-3'
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -278,7 +293,8 @@ export default ({ Vue }) => {
     fixCommType,
     areaCode: areaCode({ Vue }),
     translateCurrentStatusText,
-    translateDispositionStatusText
+    translateDispositionStatusText,
+    fixLrnTypeBadge
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

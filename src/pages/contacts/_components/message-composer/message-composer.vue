@@ -7,6 +7,7 @@
                 v-on:click="setMode('sms')">Text
         </b-link>
         <b-link href="#"
+                v-if="currentCompany && currentCompany.reseller_id != 357"
                 :class="{ active : messageComposer.mode === 'fax' }"
                 v-on:click="setMode('fax')">Fax
         </b-link>
@@ -45,7 +46,7 @@
 
 <script>
 import MessageComposerSms from 'pages/contacts/_components/message-composer/message-composer-sms'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
 import PhoneNumberSelector from 'pages/contacts/_components/message-composer/phone-number-selector'
 import LineSelector from 'pages/contacts/_components/message-composer/line-selector'
@@ -59,7 +60,8 @@ export default {
   mixins: [contactMixin],
   components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, PhoneNumberSelector, MessageComposerSms },
   computed: {
-    ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer'])
+    ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
+    ...mapState(['currentCompany'])
   },
   methods: {
     ...mapActions(

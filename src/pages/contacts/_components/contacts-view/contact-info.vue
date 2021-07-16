@@ -18,7 +18,12 @@
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
               {{ contact.phone_number | fixPhone }}
-              <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)" variant="warning" class="badge-phone-info">{{ phone.lrn_type | fixLrnType }}</b-badge>
+              <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
+                       :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
+                       class="badge-phone-info">
+                {{ phone.lrn_type | fixLrnType }}
+              </b-badge>
+
               <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
               <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
             </span>
@@ -45,13 +50,25 @@
       <b-button variant="secondary" size="sm" class="custom-action-button">
         <call-icon></call-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button" @click="openAppointmentModal">
+      <b-button variant="secondary"
+                size="sm"
+                class="custom-action-button"
+                :disabled="contact.is_dnc"
+                @click="openAppointmentModal">
         <calendar-icon></calendar-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button" @click="openAddReminderModal">
+      <b-button variant="secondary"
+                size="sm"
+                class="custom-action-button"
+                :disabled="contact.is_dnc"
+                @click="openAddReminderModal">
         <timer-icon></timer-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button"  @click="openEnrollSequenceModal">
+      <b-button v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
+                variant="secondary"
+                size="sm"
+                class="custom-action-button"
+                @click="openEnrollSequenceModal">
         <add-sequence-icon></add-sequence-icon>
       </b-button>
       <b-button variant="secondary" size="sm" class="custom-action-button">
@@ -77,9 +94,11 @@ import PencilOIcon from 'components/icons/pencil-o-icon'
 import AppointmentFormModal from 'pages/contacts/_components/appointments/appointment-form-modal'
 import EnrollSequenceModal from 'pages/contacts/_components/enroll-sequence-modal'
 import ContactAddReminderModal from 'pages/contacts/_components/contact-add-reminder-modal'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-info',
+  mixins: [aclMixin],
   components: { ContactAddReminderModal, EnrollSequenceModal, AppointmentFormModal, PencilOIcon, AddCallIcon, CallIcon, CalendarIcon, TimerIcon, AddSequenceIcon, Avatar, ContactNameForm },
   computed: {
     ...mapGetters('contacts', ['contact', 'isContactNameEditOpen', 'contactPhoneNumbers', 'changingSelectedContact']),

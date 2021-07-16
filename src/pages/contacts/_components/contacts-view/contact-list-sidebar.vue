@@ -137,8 +137,8 @@ export default {
       top: 8px;
       right: -10px;
       z-index: 1;
-      border: 1px solid #EBEBEB;
-      background: #FFFFFF;
+      border: 1px solid $grey-60;
+      background: $white;
       padding: 0.15rem;
       line-height: 0.5;
     }
@@ -175,7 +175,10 @@ export default {
           text-overflow: ellipsis;
         }
         .contact-phone {
-          font-size: 0.70em;
+          font-size: 13px;
+          font-weight: 400;
+          color: $grey-80;
+          margin-top: -10px;
         }
 
         .contact-badge{
@@ -185,9 +188,9 @@ export default {
     }
 
     .contact-avatar {
-      margin-top: -8px !important;
-      background-color: #95989E !important;
-      color: #ffffff !important;
+      margin-top: 0 !important;
+      background-color: $grey-80 !important;
+      color: $white !important;
       font-weight: 600;
     }
 

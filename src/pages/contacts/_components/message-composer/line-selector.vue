@@ -88,12 +88,23 @@ export default {
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
-      this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
+      if (this.selectedLine) {
+        this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
+      }
     },
     onBlur () {
       this.isFocused = false
       this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
-      this.$el.querySelector('.inline-select .selected-option-container').style.display = ''
+      this.showPlaceholder()
+      if (this.selectedLine) {
+        this.$el.querySelector('.inline-select .selected-option-container').style.display = ''
+      }
+    },
+    showPlaceholder () {
+      if (!this.selectedLine) {
+        this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select line'
+        this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
+      }
     },
     onInput () {
       this.$el.querySelector('.inline-select .q-field__input').blur()
@@ -129,15 +140,20 @@ export default {
   },
   mounted () {
     this.lineOptions = this.formattedLineOptions
-    this.selectedLine = this.formattedLineOptions[1]
-    this.getIncomingNumber()
+    this.showPlaceholder()
   },
   watch: {
-    selectedLine: function () {
-      this.setSelectedLine(this.selectedLine)
-      if (this.selectedLine) {
+    selectedLine: function (value) {
+      this.setSelectedLine(value)
+      if (value) {
         this.getIncomingNumber()
       }
+    },
+    'contact': function (value) {
+      let campaign = (value.initial_campaign_id) ? this.lineOptions.find(line => line.id === value.initial_campaign_id) : null
+      this.setSelectedLine(campaign)
+      this.selectedLine = campaign
+      this.showPlaceholder()
     }
   }
 }
