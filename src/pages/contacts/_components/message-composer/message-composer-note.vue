@@ -7,10 +7,10 @@
             v-model="messageComposer.note.body"
             :members="items">
           <template slot="item" slot-scope="props" >
-            <avatar class="contact-avatar mr-2"
+            <avatar class="contact-avatar mr-2 position-absolute"
                     width="30"
                     height="30"
-                    :name="`KL`" />
+                    :name="props.item.full_name" />
             <span :data-text="props.item.full_name" class="at-custom-text">{{ props.item.full_name }} <br><small>{{ props.item.email }}</small></span>
           </template>
           <template v-slot:embeddedItem="props">
@@ -18,7 +18,7 @@
                 <span class="mention-tag" :data-id="props.current.id" :data-key="generateKey(32)">@{{ props.current.full_name }}</span>
             </span>
           </template>
-          <div contenteditable placeholder="Type @ to mention someone"></div>
+          <div contenteditable placeholder="Type @ to span mention someone"></div>
         </at>
       </form>
     </div>
@@ -170,10 +170,6 @@ export default {
     line-height: 1;
     height: 27px;
     margin-top: 2px;
-  }
-
-  .contact-avatar {
-    font-weight: 600;
   }
 
   [contenteditable=true] {

@@ -1,7 +1,6 @@
 <template>
   <div>
     <q-select class="inline-select show-caret__always caret__grey-90"
-              clearable
               input-debounce="0"
               option-value="id"
               option-label="phone_number"

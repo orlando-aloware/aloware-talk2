@@ -623,6 +623,15 @@ body,
       padding: 5px;
       border-radius: 6px;
       max-width: 240px!important;
+      min-height: 32px !important;
+
+      .q-item__label--header {
+        padding: 4px !important;
+      }
+
+      .q-item__section--main {
+        padding-top: 2px;
+      }
     }
 
     .q-item__label {
@@ -1399,6 +1408,15 @@ margin-bottom: 2px;
       height: 38px !important;
       margin: 10px;
       border-radius: 8px;
+
+      .contact-avatar {
+        font-weight: 600;
+
+        span {
+          overflow: inherit !important;
+        }
+      }
+
     }
 
     .atwho-cur {

@@ -16,7 +16,8 @@
                   v-model="selectedTagIds"
                   :displayLimit="100"
                   :multiple="true"
-                  @change="changeTags($event)" @close="onSelectBlur">
+                  @change="changeTags($event)"
+                  @close="onSelectBlur">
     </tag-selector>
 
     <b-link v-if="!isEdit && hasPermissionTo(['list tag', 'view tag'])"
