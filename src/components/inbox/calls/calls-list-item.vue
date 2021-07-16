@@ -34,7 +34,7 @@
 <script>
 import DeclineIcon from 'components/icons/decline-icon'
 import AnswerIcon from 'components/icons/answer-icon'
-import Avatar from 'components/avatar/avatar'
+import Avatar from 'components/avatar'
 import PauseIcon from 'components/icons/pause-icon'
 import DropIcon from 'components/icons/drop-icon'
 

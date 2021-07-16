@@ -31,7 +31,7 @@
 import MessageIcon from '../../icons/message-icon.vue'
 import RoundBgIcon from '../../icons/round-bg-icon'
 import * as CommunicationTypes from '../../../constants/communication-types'
-import RelativeTime from 'components/commons/relative-time'
+import RelativeTime from 'components/relative-time'
 import InboxItemName from 'components/inbox/inbox-list/inbox-item-name'
 export default {
   name: 'inbox-item',

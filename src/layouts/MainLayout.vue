@@ -69,7 +69,7 @@
               </div>
             </div>
           </section>
-          <dialer v-if="authenticated"></dialer>
+          <!--dialer v-if="authenticated"></dialer-->
         </q-page-container>
       </div>
       <q-drawer
@@ -192,7 +192,7 @@ import * as CommunicationTypes from '../constants/communication-types'
 import AppHeader from '../components/layout/app-header'
 import AppFooter from '../components/layout/app-footer'
 import AppSidebar from '../components/layout/app-sidebar'
-import Dialer from '../components/dialer'
+// import Dialer from '../components/dialer'
 
 if (Platform.is.cordova) {
   document.addEventListener(
@@ -221,8 +221,8 @@ export default {
   components: {
     AppHeader,
     AppFooter,
-    AppSidebar,
-    Dialer
+    AppSidebar
+    // Dialer
   },
 
   mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],

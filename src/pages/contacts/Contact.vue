@@ -48,11 +48,11 @@
 </template>
 
 <script>
-import ContactListSidebar from 'pages/contacts/_components/contacts-view/contact-list-sidebar'
-import ContactActivities from 'pages/contacts/_components/contacts-view/contact-activities'
-import ContactDetails from 'pages/contacts/_components/contacts-view/contact-details'
-import contactsMixins from './contacts.mixins'
-import contactMixins from '../../plugins/mixins/contact.mixin'
+import ContactListSidebar from 'src/components/contacts/contact-list-sidebar'
+import ContactActivities from 'src/components/contacts/contact-activities'
+import ContactDetails from 'src/components/contacts/contact-details'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 import { mapActions, mapGetters } from 'vuex'
 

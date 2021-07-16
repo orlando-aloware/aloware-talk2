@@ -40,12 +40,12 @@
 </template>
 
 <script>
-import InboxNavToggle from 'components/inbox/inbox-nav/inbox-nav-toggle'
-import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
-import CallsHeader from 'components/inbox/calls/calls-header'
-import CallsListSection from 'components/inbox/calls/calls-list-section'
-import CallListItem from 'components/inbox/calls/calls-list-item'
-import CallsEmptyState from 'components/inbox/calls/calls-empty-state'
+import InboxNavToggle from 'src/components/inbox/inbox-nav/inbox-nav-toggle'
+import InboxNavList from 'src/components/inbox/inbox-nav/inbox-nav-list'
+import CallsHeader from 'src/components/inbox/calls/calls-header'
+import CallsListSection from 'src/components/inbox/calls/calls-list-section'
+import CallListItem from 'src/components/inbox/calls/calls-list-item'
+import CallsEmptyState from 'src/components/inbox/calls/calls-empty-state'
 
 export default {
   name: 'inbox-side',

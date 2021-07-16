@@ -112,16 +112,16 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import CompactBtn from 'src/components/buttons/compact-btn.vue'
-import ContactsScreen from './_components/contacts-screen.vue'
-import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
-import Datatable from 'src/components/datatable/datatable.vue'
-import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
+import CompactBtn from 'components/compact-btn.vue'
+import ContactsScreen from 'components/contacts/contacts-screen.vue'
+import ContactsTableSearch from 'components/contacts/contacts-table-search.vue'
+import Datatable from 'components/datatable.vue'
+import ImportContactsModal from 'components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
-import TableRow from 'src/pages/contacts/_components/table-row.vue'
+import TableRow from 'components/table-row.vue'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import contactsMixins from './contacts.mixins'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 
 export default {
   mixins: [contactsMixins],
