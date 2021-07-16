@@ -4,54 +4,102 @@ export default {
   V1: {
     contact: {
       get: function (id) {
+        if (!id) {
+          return null
+        }
         return window.axios.get(`${suffixV1}contact/${id}`)
       },
       getAttributes (id) {
+        if (!id) {
+          return null
+        }
         return window.axios.get(`${suffixV1}contact-attributes/${id}`)
       },
       update: function (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.put(`${suffixV1}contact/${id}`, params)
       },
       getPhoneNumbers (id) {
+        if (!id) {
+          return null
+        }
         return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
       },
       getRingGroups (id) {
+        if (!id) {
+          return null
+        }
         return window.axios.get(`${suffixV1}contact/${id}/ring-groups`)
       },
       storeTags (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.post(`${suffixV1}contact/${id}/tag`, params)
       },
       storeLines (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.put(`${suffixV1}contact/${id}/campaigns`, params)
       },
       storeRingGroups (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.put(`${suffixV1}contact/${id}/ring-groups`, params)
       },
       storePhone (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.post(`${suffixV1}contact/${id}/phone-number`, params)
       },
       updatePhone (id, phoneId, params) {
+        if (!id || phoneId) {
+          return null
+        }
         return window.axios.post(`${suffixV1}contact/${id}/phone-number/${phoneId}`, params)
       },
       deletePhone (id, phoneId) {
+        if (!id || phoneId) {
+          return null
+        }
         return window.axios.delete(`${suffixV1}contact/${id}/phone-number/${phoneId}`)
       },
       dispose (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.post(`${suffixV1}contact/${id}/dispose`, params)
       },
       sendEmail (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
       },
       addEngagement (id, params) {
+        if (!id) {
+          return null
+        }
         return window.axios.post(`${suffixV1}contact/${id}/add-engagement`, params)
       },
       updateEngagement (contactId, eventId, params) {
         return window.axios.post(`${suffixV1}contact/${contactId}/${eventId}/update-engagement`, params)
       },
       getLineIncomingNumber (contactId, lineId) {
+        if (!contactId || lineId) {
+          return null
+        }
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
       },
       getIntegrationData (contactId, params) {
+        if (!contactId) {
+          return null
+        }
         return window.axios.get(`${suffixV1}contact/${contactId}/integration-data`, params)
       }
     },

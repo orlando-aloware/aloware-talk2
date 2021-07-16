@@ -231,7 +231,7 @@
         </b-button>
 
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
-          <router-link :to="{ name: 'Communication', params: {communication_id: communication.id }}"
+          <router-link :to="{ name: 'Communication', params: {communicationId: communication.id }}"
                        :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
             <template
               v-if="communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
