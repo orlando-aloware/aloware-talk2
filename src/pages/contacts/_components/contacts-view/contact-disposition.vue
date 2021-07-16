@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as Roles from 'src/constants/roles'
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
@@ -90,7 +90,8 @@ export default {
       }).finally(() => {
         this.is_busy = false
       })
-    }
+    },
+    ...mapActions('contacts', ['setContact'])
   },
   watch: {
     'contact.disposition_status_id': function () {
