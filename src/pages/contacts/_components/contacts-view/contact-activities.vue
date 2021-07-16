@@ -3,7 +3,7 @@
       <contact-activities-header :label="contact.name"/>
       <div class="contact-activities">
         <div class="inner-1">
-          <div class="p-3 inner-2 scrollbar-white"
+          <div class="p-3 mx-1 inner-2 scrollbar-white"
                ref="activitiesWrap">
             <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center">
               <slot name="moreActivities">
