@@ -1,4 +1,3 @@
-import { Platform } from 'quasar'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
 
