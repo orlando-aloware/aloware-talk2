@@ -172,7 +172,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete']),
+    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
     onCheckerClicked () {
       const checked = new Set([...this.checked])
 
@@ -192,7 +192,8 @@ export default {
       })
     },
     onMessage () {
-      this.$router.push(`/contacts/${this.contact.id}`)
+      this.setMessageComposerMode('sms')
+      this.$router.push(`/contact/${this.contact.id}`)
     },
     onCall () {
       // check contact has timezone or not

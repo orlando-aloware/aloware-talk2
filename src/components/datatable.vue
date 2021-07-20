@@ -71,10 +71,11 @@
     <div class="relative py-5" v-b-visible.100="onVisibilityChanged">
       <b-overlay
         :show="isLoadingMore"
-        spinner-variant="success"
-        spinner-type="grow"
         rounded="sm"
       >
+        <template #overlay>
+          <q-spinner-bars color="primary" size="20px" />
+        </template>
       </b-overlay>
     </div>
 

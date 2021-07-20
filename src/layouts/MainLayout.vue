@@ -49,7 +49,7 @@
               class="d-flex justify-content-center align-items-center text-center text-black h-100"
             >
               <div class="container">
-                <q-spinner-bars color="success" size="40px" />
+                <q-spinner-bars color="primary" size="40px" />
                 <div>
                   <div v-if="!onlineStatus">
                     <span>Network is <b>offline</b></span>

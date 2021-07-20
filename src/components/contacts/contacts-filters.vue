@@ -24,10 +24,10 @@
             <b-button variant="outline-primary header-buttons btn-close-filter" size="sm" @click="onCloseFilter"><i class="fa fa-times"></i> </b-button>
           </div>
         </template>
-        <div class="filter-contents">
+        <div class="">
           <div>
             <!-- Using slots -->
-            <div class="step-1 pt-2"
+            <div class="filter-contents step-1 pt-2 pr-1"
                  v-if="step === 1">
               <compact-btn
                 v-if="isEmptyListFilters"
@@ -105,7 +105,7 @@
                 </compact-btn>
               </div>
             </div>
-            <div class="p-2"
+            <div class="filter-contents step-2 p-2"
                  v-else-if="step === 2">
               <div class="mb-3">
                 <h6 class="contact-prop-label">Contact properties</h6>
@@ -146,7 +146,7 @@
 
               </b-list-group>
             </div>
-            <div class="step-3 p-2"
+            <div class="filter-contents step-3 p-2 pr-1"
                  v-else-if="step === 3">
               <span class="filter-label">{{ selectedFilter.label }}</span>
               <contacts-filter-types :filter="selectedFilter"
@@ -462,6 +462,15 @@ export default {
     width: 100%;
     height: calc(100vh - 232px);
     overflow: auto;
+  }
+
+  .filter-contents.step-2{
+    overflow: hidden !important;
+
+    .filter-list {
+      height: calc(100vh - 332px);
+      overflow: auto;
+    }
   }
 
   .contact-prop-label {

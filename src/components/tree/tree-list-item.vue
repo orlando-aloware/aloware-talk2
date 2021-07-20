@@ -400,7 +400,7 @@ export default {
       display: none;
     }
     .folder {
-      padding-right: 4px;
+      padding-right: 0;
     }
   }
 }

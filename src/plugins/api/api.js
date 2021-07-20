@@ -1,4 +1,5 @@
 let suffixV1 = '/api/v1/'
+let suffixV2 = '/api/v2/'
 
 export default {
   V1: {
@@ -184,7 +185,14 @@ export default {
       getRingGroups (id) {
         return window.axios.get(`/api/v2/contact/${id}/ring-groups`)
       }
+    },
+    contactFolders: {
+      list () {
+        return window.axios.get(`${suffixV2}contact-folders`)
+      },
+      delete (id) {
+        return window.axios.delete('/api/v2/contact-folders/' + id)
+      }
     }
   }
-
 }
