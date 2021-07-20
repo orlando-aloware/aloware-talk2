@@ -1,5 +1,3 @@
-import { Platform } from 'quasar'
-
 export default () => ({
   bind: function (el, binding, vNode) {
     el.dataset.longPressTimeoutId = '0'
