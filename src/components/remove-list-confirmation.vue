@@ -27,12 +27,7 @@
         <button class="btn btn-sm btn-danger mr-2"
                 :disabled="(listName !== listToRemove.name) || isBusy"
                 @click="onConfirm">
-          <b-spinner variant="warning"
-                     type="grow"
-                     label="Spinning"
-                     small
-                     v-if="isBusy">
-          </b-spinner>
+          <q-spinner-bars v-if="isBusy" color="white" />
           Delete
         </button>
       </div>

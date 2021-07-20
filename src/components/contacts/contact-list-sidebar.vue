@@ -43,10 +43,11 @@
         <div class="relative py-4" >
           <b-overlay
             :show="isLoadingMore"
-            spinner-variant="success"
-            spinner-type="grow"
             rounded="sm"
           >
+            <template #overlay>
+              <q-spinner-bars color="primary" />
+            </template>
           </b-overlay>
         </div>
       </b-card>

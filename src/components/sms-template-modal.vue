@@ -161,7 +161,6 @@ export default {
       }
 
       request.then(response => {
-        console.log(response)
         this.getSmsTemplates()
         this.onHidden()
         this.$q.notify({

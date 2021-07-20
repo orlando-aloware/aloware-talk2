@@ -37,6 +37,7 @@ import ConfirmDialog from 'components/confirm-dialog.vue'
 
 import { mapActions, mapGetters } from 'vuex'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   components: {
@@ -65,9 +66,9 @@ export default {
       if (this.isRemoving) return
       this.isRemoving = true
       return Promise.all([
-        this.removeFolderRequest(this.folderToRemove.id),
-        this.reloadFoldersRequest()
+        this.removeFolderRequest(this.folderToRemove.id)
       ]).finally(() => {
+        this.reloadFoldersRequest()
         this.removeFolderClose()
         this.isRemoving = false
       }).then(() => {
@@ -79,8 +80,7 @@ export default {
       })
     },
     removeFolderRequest (id) {
-      return window.axios
-        .delete('/api/v2/contact-folders/' + id)
+      return talk2Api.V2.contactFolders.delete(id)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           this.$q.notify({
@@ -92,8 +92,7 @@ export default {
         })
     },
     reloadFoldersRequest () {
-      return window.axios
-        .get('/api/v2/contact-folders')
+      return talk2Api.V2.contactFolders.list()
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

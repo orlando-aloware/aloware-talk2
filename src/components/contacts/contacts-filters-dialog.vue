@@ -8,8 +8,6 @@
   >
     <b-overlay
       :show="show"
-      spinner-variant="success"
-      spinner-type="grow"
       rounded="sm"
       style="max-width: 324px"
     >
@@ -35,6 +33,10 @@
           </b-list-group>
         </div>
       </div>
+
+      <template #overlay>
+        <q-spinner-bars color="primary"/>
+      </template>
     </b-overlay>
   </b-modal>
 </template>

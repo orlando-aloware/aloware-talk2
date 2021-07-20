@@ -19,13 +19,14 @@
         </div>
         <b-overlay
           :show="loading"
-          spinner-variant="success"
-          spinner-type="grow"
           rounded="sm"
         >
           <div class="datatable-wrapper">
             <slot name="table" />
           </div>
+          <template #overlay>
+            <q-spinner-bars color="primary" size="40px" />
+          </template>
         </b-overlay>
         <slot name="footer" />
       </card>
