@@ -1,7 +1,8 @@
 <template>
   <div class="calls-list-item" :class="{'calls-list-item--active': active}" @click="select">
     <div class="calls-list-item__avatar">
-      <avatar :src="avatar" :active="active">
+      <avatar :src="avatar"
+              :active="active">
         {{ initial }}
       </avatar>
     </div>
