@@ -135,32 +135,13 @@ export default {
   methods: {
     resetPassword () {
       this.loading = true
-      const isMobile = this.$q.platform.is.cordova
-      if (isMobile) {
-        this.deviceInfo = {
-          registration_id: localStorage.getItem('registrationId'),
-          registration_type: localStorage.getItem('registrationType'),
-          model: window.device.model,
-          platform: window.device.platform,
-          is_virtual: window.device.isVirtual,
-          uuid: window.device.uuid,
-          version: window.device.version,
-          manufacturer: window.device.manufacturer,
-          serial: window.device.serial,
-          app_version: localStorage.getItem('version')
-        }
-      }
       this.$axios.post('/reset', this.user).then((res) => {
-        if (this.$q.platform.is.cordova) {
-          window.Keyboard.hide()
-          this.setKeyboardScroll(false)
-        }
         this.loading = false
         this.success = true
         this.resetUser()
         setTimeout(() => {
           this.loginUser()
-          this.closeDialog(isMobile)
+          this.closeDialog(false)
         }, 2000)
       }).catch(err => {
         this.loading = false
@@ -220,11 +201,6 @@ export default {
       this.setCurrentCompany(company)
       this.resetVuex()
       this.setUsage(usage)
-
-      if (this.$q.platform.is.cordova) {
-        window.Keyboard.hide()
-        this.setKeyboardScroll(false)
-      }
 
       localStorage.setItem('company_id', company.id)
 

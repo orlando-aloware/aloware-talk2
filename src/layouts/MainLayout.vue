@@ -15,7 +15,7 @@
       <div
         class="h-100"
         :class="[
-          sidebarVisibile ? 'sidebar-active' : '',
+          sidebarVisible ? 'sidebar-active' : '',
           authenticated
             ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2'
             : ''
@@ -73,8 +73,8 @@
         </q-page-container>
       </div>
       <q-drawer
-        v-model="sidebarVisibile"
-        v-show="sidebarVisibile && authenticated && !loading"
+        v-model="sidebarVisible"
+        v-show="sidebarVisible && authenticated && !loading"
         :breakpoint="0"
         class="h-100 sidebar-wrapper d-none d-sm-block"
         :width="60"
@@ -185,7 +185,6 @@ import {
   htmlMixin,
   webrtcMixin
 } from '../boot/mixins'
-import { Platform } from 'quasar'
 import broadcast from '../boot/broadcast'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
@@ -193,27 +192,6 @@ import AppHeader from '../components/layout/app-header'
 import AppFooter from '../components/layout/app-footer'
 import AppSidebar from '../components/layout/app-sidebar'
 // import Dialer from '../components/dialer'
-
-if (Platform.is.cordova) {
-  document.addEventListener(
-    'deviceready',
-    () => {
-      console.log('device ready')
-      window.addEventListener('keyboardDidShow', function () {
-        document.activeElement.scrollIntoView()
-      })
-    },
-    false
-  )
-
-  document.addEventListener(
-    'resume',
-    () => {
-      console.log('app resumed')
-    },
-    false
-  )
-}
 
 export default {
   name: 'MyLayout',
@@ -255,7 +233,7 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      sidebarVisibile: false,
+      sidebarVisible: false,
       lightMode: true,
       CommunicationTypes
     }
@@ -446,7 +424,7 @@ export default {
       })
     }
 
-    if (this.$q.platform.is.cordova || this.$q.platform.is.electron) {
+    if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
         position: 'top',
         color: 'white',
@@ -458,17 +436,6 @@ export default {
         color: 'white',
         textColor: 'black'
       })
-    }
-
-    if (this.$q.platform.is.cordova) {
-      window.cordova.getAppVersion.getVersionNumber().then((version) => {
-        this.version = version
-        localStorage.setItem('version', this.version)
-        window.axios.defaults.headers.common['Version'] = this.version
-        this.$axios = window.axios
-      })
-
-      this.registerPush()
     }
 
     if (this.authenticated) {
@@ -497,7 +464,7 @@ export default {
   },
 
   mounted () {
-    if (!window.sessionIntervalId && !this.$q.platform.is.cordova) {
+    if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         // this is a recursive authentication check with 3 tries
         this.checkAuth()
@@ -536,7 +503,7 @@ export default {
     },
 
     toggleSidebar () {
-      this.sidebarVisibile = !this.sidebarVisibile
+      this.sidebarVisible = !this.sidebarVisible
     },
 
     setHubSpotDeal (phoneNumber) {
@@ -554,136 +521,6 @@ export default {
       } else {
         this.loading = false
       }
-    },
-
-    registerPush () {
-      this.push = window.PushNotification.init({
-        android: {
-          senderId: 663210610327,
-          icon: 'fcm_push_icon',
-          iconColor: '#090A0D'
-        },
-        ios: {
-          sound: true,
-          alert: true,
-          badge: true
-        }
-      })
-      this.push.on('registration', (data) => {
-        localStorage.setItem('registrationId', data.registrationId)
-        localStorage.setItem('registrationType', data.registrationType)
-      })
-      this.push.on('notification', (data) => {
-        if (
-          data.additionalData.contact_id &&
-          this.$route.name === 'Contact' &&
-          parseInt(this.$route.params.contactId) ===
-            parseInt(data.additionalData.contact_id)
-        ) {
-          return
-        }
-        this.increaseAppBadge()
-        // Will be true if the notification was received while the app was in the foreground
-        if (data.additionalData.foreground) {
-          if (this.authenticated) {
-            this.decreaseAppBadge()
-            const dismiss = this.$q.notify({
-              timeout: 5000,
-              message:
-                '<div class="no-select"><small><b>' +
-                data.title +
-                '</b></small>' +
-                '<p class="has-margin-top-5">' +
-                this.nl2br(data.message) +
-                '</p></div>',
-              html: true,
-              actions: [
-                {
-                  label: 'Check',
-                  color: 'link',
-                  handler: () => {
-                    dismiss()
-                    if (data.additionalData.contact_id) {
-                      // @todo Go to contact page
-                      /*
-                      this.$router.push({
-                        name: 'Contact',
-                        params: {
-                          contactId: data.additionalData.contact_id
-                        }
-                      }).catch(err => {
-                        console.log(err)
-                      })
-                       */
-                    }
-
-                    if (data.additionalData.custom_link) {
-                      window.open(data.additionalData.custom_link, '_system')
-                    }
-                  }
-                },
-                {
-                  label: 'Dismiss',
-                  color: 'greyish',
-                  handler: () => {
-                    dismiss()
-                  }
-                }
-              ],
-              onDismiss: () => {}
-            })
-          }
-        } else if (data.additionalData.coldstart) {
-          // Will be true if the application is started by clicking on the push notification, false if the app is already started.
-          if (this.authenticated) {
-            this.decreaseAppBadge()
-            if (data.additionalData.contact_id) {
-              // @todo Go to contact page
-              /*
-              this.$router.push({
-                name: 'Contact',
-                params: {
-                  contactId: data.additionalData.contact_id
-                }
-              }).catch(err => {
-                console.log(err)
-              })
-               */
-            }
-
-            if (data.additionalData.custom_link) {
-              window.open(data.additionalData.custom_link, '_system')
-            }
-          }
-        } else if (data.additionalData.dismissed) {
-          // Is set to true if the notification was dismissed by the user
-          // @todo
-        } else {
-          if (this.authenticated) {
-            this.decreaseAppBadge()
-            if (data.additionalData.contact_id) {
-              // @todo Go to contact page
-              /*
-              this.$router.push({
-                name: 'Contact',
-                params: {
-                  contactId: data.additionalData.contact_id
-                }
-              }).catch(err => {
-                console.log(err)
-              })
-               */
-            }
-
-            if (data.additionalData.custom_link) {
-              window.open(data.additionalData.custom_link, '_system')
-            }
-          }
-        }
-      })
-      this.push.on('error', (err) => {
-        console.log(err)
-      })
     },
 
     call (phoneNumber) {
@@ -781,31 +618,6 @@ export default {
       this.loading = true
       this.initAccount().then(() => {
         this.loading = false
-        if (this.$q.platform.is.cordova) {
-          if (this.$q.platform.is.android) {
-            if (
-              this.minVersion &&
-              this.version &&
-              this.compareVersion(
-                this.version,
-                this.minVersion.androidVersion
-              ) < 0
-            ) {
-              this.showUpgradeDialog = true
-            }
-          }
-
-          if (this.$q.platform.is.ios) {
-            if (
-              this.minVersion &&
-              this.version &&
-              this.compareVersion(this.version, this.minVersion.iosVersion) < 0
-            ) {
-              this.showUpgradeDialog = true
-            }
-          }
-        }
-
         if (this.profile.live_calls === 0 && this.dialer.call) {
           if (!this.profile.go_to_available_after_login) {
             this.$VueEvent.fire(
@@ -1454,23 +1266,7 @@ export default {
     },
 
     logout () {
-      let deviceInfo = null
-      const isMobile = this.$q.platform.is.cordova
-      if (isMobile) {
-        deviceInfo = {
-          registration_id: localStorage.getItem('registrationId'),
-          registration_type: localStorage.getItem('registrationType'),
-          model: window.device.model,
-          platform: window.device.platform,
-          is_virtual: window.device.isVirtual,
-          uuid: window.device.uuid,
-          version: window.device.version,
-          manufacturer: window.device.manufacturer,
-          serial: window.device.serial,
-          app_version: localStorage.getItem('version')
-        }
-      }
-      this.logoutUser(deviceInfo)
+      this.logoutUser()
         .then((res) => {
           this.response = res.data
           this.setCurrentListFilters({})

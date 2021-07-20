@@ -106,31 +106,9 @@ export default {
     isActive (name) {
       return this.$route.name === name
     },
-    getDeviceInfo (isMobile) {
-      let deviceInfo = null
-      if (isMobile) {
-        deviceInfo = {
-          registration_id: localStorage.getItem('registrationId'),
-          registration_type: localStorage.getItem('registrationType'),
-          model: window.device.model,
-          platform: window.device.platform,
-          is_virtual: window.device.isVirtual,
-          uuid: window.device.uuid,
-          version: window.device.version,
-          manufacturer: window.device.manufacturer,
-          serial: window.device.serial,
-          app_version: localStorage.getItem('version')
-        }
-      }
-      return deviceInfo
-    },
     async logoutAction () {
       try {
-        const isMobile = this.$q.platform.is.cordova
-
-        const deviceInfo = this.getDeviceInfo(isMobile)
-
-        const response = await this.logout({ deviceInfo })
+        const response = await this.logout()
 
         this.response = response?.data
 

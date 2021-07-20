@@ -1,5 +1,3 @@
-import { Platform } from 'quasar'
-
 export default () => ({
   bind: function (el, binding, vNode) {
     // Make sure expression provided is a function
@@ -51,17 +49,9 @@ export default () => ({
       isExecuted = false
     }
 
-    if (Platform.is.cordova) {
-      // Add Event listeners
-      el.addEventListener('touchstart', start)
-      // Cancel timeouts if this events happen
-      el.addEventListener('touchend', cancel)
-      el.addEventListener('touchcancel', cancel)
-    } else {
-      // Add Event listeners
-      el.addEventListener('mousedown', start)
-      // Cancel timeouts if this events happen
-      el.addEventListener('click', cancel)
-    }
+    // Add Event listeners
+    el.addEventListener('mousedown', start)
+    // Cancel timeouts if this events happen
+    el.addEventListener('click', cancel)
   }
 })

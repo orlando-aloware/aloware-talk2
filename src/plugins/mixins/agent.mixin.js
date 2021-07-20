@@ -1,4 +1,3 @@
-import { Platform } from 'quasar'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
 
@@ -66,24 +65,8 @@ export default {
       if (!this.authenticated) {
         return
       }
-      let deviceInfo = null
-      const isMobile = Platform.is.cordova
-      if (isMobile) {
-        deviceInfo = {
-          registration_id: localStorage.getItem('registrationId'),
-          registration_type: localStorage.getItem('registrationType'),
-          model: window.device.model,
-          platform: window.device.platform,
-          is_virtual: window.device.isVirtual,
-          uuid: window.device.uuid,
-          version: window.device.version,
-          manufacturer: window.device.manufacturer,
-          serial: window.device.serial,
-          app_version: localStorage.getItem('version')
-        }
-      }
       this.$axios.post('/api/v1/profile/get-agent-status', {
-        device_info: deviceInfo
+        device_info: null
       }).then(res => {
         this.profile.agent_status = res.data.agent_status
         this.agentStatus = res.data.agent_status

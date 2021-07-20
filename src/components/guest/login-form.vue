@@ -41,7 +41,7 @@
           </div>
         </div>
         <div class="field text-left"
-             v-if="!$q.platform.is.cordova && !$q.platform.is.electron">
+             v-if="!$q.platform.is.electron">
           <router-link :to="{ name: 'Forgot Password' }">
             <label class="link mb-3 w-100 pb-2">
               Forgot Password?
@@ -83,7 +83,7 @@ export default {
       user: {
         email: null,
         password: null,
-        remember_me: !!this.$q.platform.is.cordova && !!this.$q.platform.is.electron
+        remember_me: !!this.$q.platform.is.electron
       },
       loading: false,
       sb: null,
@@ -95,22 +95,6 @@ export default {
     ...mapState(['currentCompany'])
   },
   methods: {
-    getDeviceInfo (isMobile) {
-      if (isMobile) {
-        return {
-          registration_id: localStorage.getItem('registrationId'),
-          registration_type: localStorage.getItem('registrationType'),
-          model: window.device.model,
-          platform: window.device.platform,
-          is_virtual: window.device.isVirtual,
-          uuid: window.device.uuid,
-          version: window.device.version,
-          manufacturer: window.device.manufacturer,
-          serial: window.device.serial,
-          app_version: localStorage.getItem('version')
-        }
-      }
-    },
     getLoginParams () {
       return {
         email: this.user.email,
@@ -121,15 +105,8 @@ export default {
     async submit () {
       try {
         this.loading = true
-
-        const isMobile = this.$q.platform.is.cordova
-
-        this.deviceInfo = this.getDeviceInfo(isMobile)
-
         const response = await this.login({
-          ...this.getLoginParams(),
-          deviceInfo: this.deviceInfo,
-          isMobile
+          ...this.getLoginParams()
         })
 
         console.log(response)
@@ -170,11 +147,6 @@ export default {
       this.resetVuex()
       this.setUsage(usage)
 
-      if (this.$q.platform.is.cordova) {
-        window.Keyboard.hide()
-        this.setKeyboardScroll(false)
-      }
-
       localStorage.setItem('company_id', company.id)
 
       const redirectPath = this.$route.query.redirect || '/'
@@ -197,7 +169,7 @@ export default {
       this.user = {
         email: null,
         password: null,
-        remember_me: !!this.$q.platform.is.cordova && !!this.$q.platform.is.electron
+        remember_me: !!this.$q.platform.is.electron
       }
     },
 

@@ -94,26 +94,7 @@ export default {
   methods: {
     forgotPassword () {
       this.loading = true
-      const isMobile = this.$q.platform.is.cordova
-      if (isMobile) {
-        this.deviceInfo = {
-          registration_id: localStorage.getItem('registrationId'),
-          registration_type: localStorage.getItem('registrationType'),
-          model: window.device.model,
-          platform: window.device.platform,
-          is_virtual: window.device.isVirtual,
-          uuid: window.device.uuid,
-          version: window.device.version,
-          manufacturer: window.device.manufacturer,
-          serial: window.device.serial,
-          app_version: localStorage.getItem('version')
-        }
-      }
       this.$axios.post('/forgot', this.user).then((res) => {
-        if (this.$q.platform.is.cordova) {
-          window.Keyboard.hide()
-          this.setKeyboardScroll(false)
-        }
         this.loading = false
         this.success = true
         this.resetUser()

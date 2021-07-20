@@ -139,7 +139,8 @@ export default {
       ],
       initialListFilters: [],
       validated: false,
-      debounceDelay: 0
+      debounceDelay: 0,
+      format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' }
     }
   },
   computed: {
@@ -222,13 +223,14 @@ export default {
       }
 
       const currentFilter = _.get(allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      if (value) {
+      let toDelete = _.get(allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+      if (!value && currentFilter && !this.validated && toDelete) {
+        delete allFilters[this.filterGroupIndex].filters[this.filter.key]
+      } else {
         allFilters[this.filterGroupIndex].filters[this.filter.key] = {
           value: JSON.parse(JSON.stringify(value)),
           operator: this.filterOperator
         }
-      } else if (!value && currentFilter && !this.validated) {
-        delete allFilters[this.filterGroupIndex].filters[this.filter.key]
       }
 
       this.setCurrentListFilters(allFilters)

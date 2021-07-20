@@ -1,5 +1,4 @@
 import store from '../store/index'
-import { Platform } from 'quasar'
 
 export default {
   user: {
@@ -8,22 +7,6 @@ export default {
   },
 
   check (preventLogout = false) {
-    let deviceInfo = null
-    const isMobile = Platform.is.cordova
-    if (isMobile) {
-      deviceInfo = {
-        registration_id: localStorage.getItem('registrationId'),
-        registration_type: localStorage.getItem('registrationType'),
-        model: window.device.model,
-        platform: window.device.platform,
-        is_virtual: window.device.isVirtual,
-        uuid: window.device.uuid,
-        version: window.device.version,
-        manufacturer: window.device.manufacturer,
-        serial: window.device.serial,
-        app_version: localStorage.getItem('version')
-      }
-    }
     if (localStorage.getItem('api_token') === null) {
       this.user.authenticated = false
       this.user.profile = null
@@ -32,7 +15,7 @@ export default {
     } else {
       window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
       return window.axios.post('/get-auth-user', {
-        device_info: deviceInfo
+        device_info: null
       })
         .then((res) => {
           // success
