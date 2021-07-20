@@ -386,6 +386,7 @@ export default {
   },
   watch: {
     '$route.params.id': function () {
+      this.resetFilters()
       this.initialListFilters = this.currentListFilters
       this.filtersCount = this.getFiltersCount(this.currentListFilters)
       this.fetch()

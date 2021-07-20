@@ -210,10 +210,10 @@ export default {
     },
     filterByGroup () {
       // eslint-disable-next-line camelcase
-      return function (group_id) {
+      return function (groupId) {
         let label = ''
         // eslint-disable-next-line camelcase
-        switch (group_id) {
+        switch (groupId) {
           case this.filterGroups.GROUP_PRIMARY_INFO:
             label = 'Primary Information'
             break
@@ -241,8 +241,8 @@ export default {
           return comparison
         }
 
-        // eslint-disable-next-line camelcase
-        let filters = !group_id ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1) : this.filtersFiltered.filter(list => list.group_id === group_id)
+        let filters = !groupId ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
+          : this.filtersFiltered.filter(list => list.group_id === groupId)
 
         return { filters: filters.sort(compare), label: label }
       }

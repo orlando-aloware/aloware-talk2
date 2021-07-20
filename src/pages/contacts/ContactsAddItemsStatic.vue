@@ -238,12 +238,12 @@ export default {
   watch: {
     '$route.params.id': function () {
       this.fetch()
-    }
-  },
-  currentListFilters: {
-    deep: true,
-    handler: function () {
-      this.fetch(this.currentListFilters)
+    },
+    currentListFilters: {
+      deep: true,
+      handler: function () {
+        this.fetch(this.currentListFilters)
+      }
     }
   }
 }

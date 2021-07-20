@@ -267,6 +267,10 @@ export default {
   },
 
   created () {
+    window.onbeforeunload = () => {
+      this.setCurrentListFilters({})
+    }
+
     this.resetCall()
 
     window.handleOpenURL = (url) => {
@@ -1469,6 +1473,7 @@ export default {
       this.logoutUser(deviceInfo)
         .then((res) => {
           this.response = res.data
+          this.setCurrentListFilters({})
           this.$router.push({ name: 'Login' }).catch((err) => {
             console.log(err)
           })
@@ -1494,6 +1499,7 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted'
     ]),
+    ...mapActions('contacts', ['setCurrentListFilters']),
     ...mapActions('auth', { logoutUser: 'logout', check: 'check' })
   },
 

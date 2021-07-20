@@ -86,7 +86,7 @@ export default {
       })
     }
   },
-  mounted () {
+  created () {
     this.contactId = this.$route.params.id
     this.processFetchContactInfo()
   },
