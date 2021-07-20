@@ -156,11 +156,12 @@ export default {
   }
   &__option {
     line-height: 0;
-    height: 34px;
-    width: 34px;
+    height: 20px;
+    width: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    margin-top: 1px !important;
     &:hover,
     &:active,
     &:focus {

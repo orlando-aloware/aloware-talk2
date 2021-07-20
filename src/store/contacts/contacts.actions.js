@@ -174,8 +174,8 @@ export default {
   setMessageComposerFaxFilename: ({ commit }, filename) => {
     commit('SET_MESSAGE_COMPOSER_FAX_FILENAME', filename)
   },
-  appendMessageComposerSmsAttachments: ({ commit }, attachment) => {
-    commit('APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS', attachment)
+  appendMessageComposerSmsAttachments: ({ commit }, attachments) => {
+    commit('APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS', attachments)
   },
   removeMessageComposerSmsAttachment: ({ commit }, attachment) => {
     commit('REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT', attachment)

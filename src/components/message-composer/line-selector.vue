@@ -88,6 +88,7 @@ export default {
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
+      this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
       if (this.selectedLine) {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
       }
@@ -104,6 +105,8 @@ export default {
       if (!this.selectedLine) {
         this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select line'
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
+      } else {
+        this.$el.querySelector('.inline-select .q-field__input').style.display = 'none'
       }
     },
     onInput () {

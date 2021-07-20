@@ -5,7 +5,6 @@
         type="text"
         placeholder="e.g. Wireless"
         ref="title"
-        required
         v-model="phone.title"
       ></b-form-input>
     </b-form-group>

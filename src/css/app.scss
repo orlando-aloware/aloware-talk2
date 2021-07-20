@@ -1326,9 +1326,9 @@ margin-bottom: 2px;
   .multiselect__content-wrapper::-webkit-scrollbar-track {
     display: none !important;
   }
-  .multiselect__tags {
-    padding-bottom: 8px;
-  }
+  //.multiselect__tags {
+  //  padding-bottom: 8px;
+  //}
 }
 
 .b-radius__equal.multiselect--active:not(.multiselect--above) .multiselect__current,

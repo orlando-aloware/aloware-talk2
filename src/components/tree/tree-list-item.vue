@@ -380,7 +380,7 @@ export default {
   }
   &__option {
     margin-top: -5px;
-    margin-left: -5px;
+    margin-left: 5px;
   }
   &__input {
     font-size: 12px;

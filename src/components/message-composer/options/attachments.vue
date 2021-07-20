@@ -20,10 +20,10 @@
       </b-form-group>
     </form>
 
-    <b-progress v-if="is_uploading" :max="100" variant="success">
+    <b-progress v-if="isUploading" :max="100" variant="success">
       <b-progress-bar :value="uploadPercentage" :label="`${uploadPercentage}%`"></b-progress-bar>
     </b-progress>
-    <p v-if="has_error" class="error-notice">Error while uploading attachment...</p>
+    <p v-if="hasError" class="error-notice">Error while uploading attachment...</p>
     <div class="text-center mt-3 notice">
       <p class="mb-0"><a href="https://www.twilio.com/docs/sms/accepted-mime-types#accepted-mime-types" target="_blank">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>
@@ -45,41 +45,56 @@ export default {
   },
   data () {
     return {
-      is_uploading: false,
+      isUploading: false,
       uploadPercentage: 0,
       files: [],
-      selected_files: [],
-      has_error: false
+      selectedFiles: [],
+      uploadedFiles: [],
+      hasError: false
     }
   },
   methods: {
     onDrop (e) {
-      this.selected_files = e.dataTransfer.files
+      this.selectedFiles = e.dataTransfer.files
     },
     onAdded () {
-      this.selected_files = event.target.files
+      this.selectedFiles = event.target.files
     },
     onUpload (file) {
       let formData = new FormData()
       formData.append('file', file)
-      this.is_uploading = true
+      this.isUploading = true
+
+      this.files.push(file)
+
       talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, {
         onUploadProgress: function (progressEvent) {
           this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
         }.bind(this)
       }).then(response => {
-        this.has_error = false
-        this.emitFileUploaded(response.data.uploaded_file)
+        this.hasError = false
+
+        // collect all uploaded file to be used in updating text attachments
+        this.uploadedFiles.push(response.data.uploaded_file)
+
+        // get all files that are yet to be uploaded
+        this.files = this.files.filter(file => file.name !== response.data.uploaded_file.original_file)
+
+        // if all files are uploaded, the update the text attachments
+        if (this.files.length === 0) {
+          this.emitFileUploaded()
+          this.isUploading = false
+        }
       }).catch(error => {
         console.log(error)
-        this.has_error = true
+        this.hasError = true
       }).finally(() => {
-        this.is_uploading = false
+
       })
     },
-    emitFileUploaded (fileData) {
+    emitFileUploaded () {
       this.$nextTick(() => {
-        this.$emit('attachmentUploaded', fileData)
+        this.$emit('attachmentUploaded', this.uploadedFiles)
         this.$root.$emit('bv::hide::popover', 'attachment-popover')
       })
     },
@@ -88,10 +103,10 @@ export default {
     }
   },
   watch: {
-    selected_files: function () {
-      if (this.selected_files) {
-        for (let i = 0; i < this.selected_files.length; i++) {
-          this.onUpload(this.selected_files[i])
+    selectedFiles: function () {
+      if (this.selectedFiles) {
+        for (let i = 0; i < this.selectedFiles.length; i++) {
+          this.onUpload(this.selectedFiles[i])
         }
       }
     }
