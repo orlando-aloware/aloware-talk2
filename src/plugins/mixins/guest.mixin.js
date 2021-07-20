@@ -1,4 +1,3 @@
-import { Platform } from 'quasar'
 import { mapActions } from 'vuex'
 import store from '../../store'
 
@@ -21,22 +20,9 @@ export default {
   },
 
   activated () {
-    if (Platform.is.cordova) {
-      this.setKeyboardResizeMode('native')
-      this.setKeyboardScroll(true)
-    }
-
-    if (!Platform.is.cordova) {
-      this.init()
-      this.getStatics()
-      this.setTitle()
-    }
-  },
-
-  deactivated () {
-    if (Platform.is.cordova) {
-      this.setKeyboardScroll(false)
-    }
+    this.init()
+    this.getStatics()
+    this.setTitle()
   },
 
   methods: {
@@ -99,10 +85,6 @@ export default {
   },
 
   beforeRouteEnter (to, from, next) {
-    if (Platform.is.cordova) {
-      return next()
-    }
-
     store().dispatch('auth/check')
       .then(() => {
         next({ name: 'Inbox' })

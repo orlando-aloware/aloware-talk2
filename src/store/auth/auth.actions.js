@@ -1,30 +1,5 @@
-import { Platform } from 'quasar'
-
-const getDeviceInfo = () => {
-  return {
-    registration_id: localStorage.getItem('registrationId'),
-    registration_type: localStorage.getItem('registrationType'),
-    model: window.device.model,
-    platform: window.device.platform,
-    is_virtual: window.device.isVirtual,
-    uuid: window.device.uuid,
-    version: window.device.version,
-    manufacturer: window.device.manufacturer,
-    serial: window.device.serial,
-    app_version: localStorage.getItem('version')
-  }
-}
-
 const check = async ({ commit }, preventLogout = false) => {
   try {
-    let deviceInfo = null
-
-    const isMobile = Platform.is.cordova
-
-    if (isMobile) {
-      deviceInfo = getDeviceInfo()
-    }
-
     if (localStorage.getItem('api_token') === null) {
       return Promise.reject('unauthorized')
     }
@@ -34,7 +9,7 @@ const check = async ({ commit }, preventLogout = false) => {
     commit('SET_LOADING', true)
 
     const response = await window.axios.post('/get-auth-user', {
-      device_info: deviceInfo
+      device_info: null
     })
 
     const { user } = response.data
