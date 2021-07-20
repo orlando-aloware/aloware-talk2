@@ -169,7 +169,8 @@ export default {
         body: this.messageComposer.sms.body,
         contact_id: this.contact.id,
         campaign_id: this.selectedLine.id,
-        phone_number: this.messageComposer.sms.phone_number
+        phone_number: this.messageComposer.sms.phone_number,
+        attachments: this.messageComposer.sms.attachments.map(attachment => attachment.uuid)
       }
     },
     onSend () {
@@ -224,8 +225,11 @@ export default {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
       this.closeVariablesPopover()
     },
-    onAttachmentUploaded (fileData) {
-      this.appendMessageComposerSmsAttachments(fileData)
+    onAttachmentUploaded (files) {
+      let _this = this
+      files.forEach(function (file) {
+        _this.appendMessageComposerSmsAttachments(file)
+      })
     },
     onPopoverShown () {
       this.$root.$emit('bv::hide::popover')
@@ -233,6 +237,9 @@ export default {
     showScheduleMessage () {
       this.scheduleMessageOpen(true)
     }
+  },
+  mounted () {
+    this.resetMessageComposerSms()
   }
 }
 </script>

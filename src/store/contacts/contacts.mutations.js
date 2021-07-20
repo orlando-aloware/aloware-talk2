@@ -223,8 +223,8 @@ export default {
   SET_MESSAGE_COMPOSER_ATTACHMENTS: (state, attachments) => {
     state.messageComposer.sms.attachments = attachments
   },
-  APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS: (state, attachment) => {
-    state.messageComposer.sms.attachments.push(attachment)
+  APPEND_MESSAGE_COMPOSER_SMS_ATTACHMENTS: (state, attachments) => {
+    state.messageComposer.sms.attachments.push(attachments)
   },
 
   REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT: (state, attachment) => {

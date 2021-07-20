@@ -83,7 +83,7 @@
           <button
             class="btn btn-block btn-primary mt-0"
             @click="onSubmit"
-            :disabled="isLoading"
+            :disabled="!isNameValid || isLoading"
           >
             Create
           </button>
@@ -115,6 +115,9 @@ export default {
       }
 
       return 'New Lists'
+    },
+    isNameValid () {
+      return this.createList.name && this.createList.name.length > 0
     }
   },
   methods: {

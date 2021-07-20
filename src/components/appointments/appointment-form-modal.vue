@@ -164,7 +164,7 @@ export default {
       currentCompany: 'currentCompany'
     }),
     isValid () {
-      return this.appointment.date && this.appointment.time && this.contact
+      return this.appointment.date && this.appointment.time && this.appointment.timezone && this.contact
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
@@ -191,7 +191,7 @@ export default {
         body: '',
         type: 12,
         smsReminder: {
-          enabled: true,
+          enabled: false,
           body: '',
           campaign_id: '',
           frequencies: [],

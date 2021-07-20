@@ -91,7 +91,7 @@ export default {
         return window.axios.post(`${suffixV1}contact/${contactId}/${eventId}/update-engagement`, params)
       },
       getLineIncomingNumber (contactId, lineId) {
-        if (!contactId || lineId) {
+        if (!contactId || !lineId) {
           return null
         }
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
