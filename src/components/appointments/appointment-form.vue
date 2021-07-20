@@ -174,7 +174,6 @@ export default {
       }
 
       request.then(response => {
-        console.log(response)
         this.$q.notify({
           duration: 2500,
           title: 'Event',
