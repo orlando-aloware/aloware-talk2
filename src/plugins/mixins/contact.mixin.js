@@ -100,7 +100,7 @@ export default {
         phone_number: null
       },
       activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups'],
-      contact_id: null
+      contactId: null
     }
   },
 

@@ -19,16 +19,16 @@
 </template>
 
 <script>
-import ContactsSidebar from 'src/pages/contacts/_components/contacts-sidebar.vue'
-import RemoveListModal from 'src/pages/contacts/_components/remove-list.vue'
-import RemoveFolderDialog from 'src/pages/contacts/_components/remove-folder.vue'
-import ColumnHeaders from './_components/column-headers.vue'
-import RemoveContact from './_components/remove-contact.vue'
-import RemoveContactConfirmation from './_components/remove-contact-confirmation.vue'
-import MoveDialog from './_components/move-dialog.vue'
-import CreateListModal from './_components/create-list-modal.vue'
-import SelectListModal from 'pages/contacts/_components/select-list-modal'
-import RemoveListConfirmation from 'pages/contacts/_components/remove-list-confirmation'
+import ContactsSidebar from 'components/contacts/contacts-sidebar.vue'
+import RemoveListModal from 'components/remove-list.vue'
+import RemoveFolderDialog from 'components/remove-folder.vue'
+import ColumnHeaders from 'components/column-headers.vue'
+import RemoveContact from 'components/remove-contact.vue'
+import RemoveContactConfirmation from 'components/remove-contact-confirmation.vue'
+import MoveDialog from 'components/move-dialog.vue'
+import CreateListModal from 'components/create-list-modal.vue'
+import SelectListModal from 'components/select-list-modal'
+import RemoveListConfirmation from 'components/remove-list-confirmation'
 
 export default {
   name: 'Contacts',

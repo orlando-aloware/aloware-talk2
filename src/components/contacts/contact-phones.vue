@@ -1,0 +1,132 @@
+<template>
+  <div>
+    <b-card class="mt-2 mb-2 border-0" id="card-contact-phone">
+      <h6>All Numbers</h6>
+      <contact-phones-list-items :phones="primaryPhone"
+                                 @edit="onEditPhone"
+                                 @delete="onDeletePhone"
+                                 @composerMedia="setComposerVariables" />
+
+      <contact-phones-list-items :phones="otherPhones"
+                                 @edit="onEditPhone"
+                                 @delete="onDeletePhone"
+                                 @composerMedia="setComposerVariables" />
+      <b-link v-if="hasPermissionTo('update contact')"
+              id="btn-show-phone-form"
+              ref="phone_form"
+              href="#" class="custom-link text-decoration-none">
+        <plus-circle-icon></plus-circle-icon> Add Phone Number
+      </b-link>
+    </b-card>
+    <b-popover custom-class="contact-phone-popover"
+               id="contact-phone-form-popover"
+               target="btn-show-phone-form"
+               triggers="click"
+               :show.sync="showPhonesForm"
+               @hidden="onPopoverHidden">
+      <contact-phones-form @close="onClosePhoneForm"></contact-phones-form>
+    </b-popover>
+  </div>
+</template>
+
+<script>
+import { mapActions, mapGetters } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
+import ContactPhonesForm from 'src/components/forms/contact-phones-form'
+import PlusCircleIcon from 'components/icons/plus-circle-icon'
+import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
+import { aclMixin } from 'src/plugins/mixins'
+import ContactPhonesListItems from 'src/components/contacts/contact-phones-list-items'
+
+export default {
+  name: 'contact-phones',
+  mixins: [aclMixin],
+  components: { ContactPhonesListItems, PlusCircleIcon, ContactPhonesForm },
+  computed: {
+    ...mapGetters('contacts', ['contact', 'contactPhoneNumbers']),
+    otherPhones () {
+      return this.contactPhoneNumbers.filter(phone => phone.phone_number !== this.contact.phone_number)
+    },
+    primaryPhone () {
+      return this.contact.phone_number === '0' ? [] : this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
+    }
+  },
+  data () {
+    return {
+      showPhonesForm: false,
+      LRN_TYPE_LANDLINE,
+      LRN_TYPE_WIRELESS,
+      LRN_TYPE_VOIP,
+      LRN_TYPE_OTHER
+    }
+  },
+  methods: {
+    ...mapActions('contacts', ['setContactPhoneNumbers', 'setContactSelectedPhone', 'setMessageComposerMode', 'setMessageComposerSmsPhoneNumber']),
+    getPhoneNumbers () {
+      return talk2Api.V1.contact.getPhoneNumbers(this.contact.id).then(response => {
+        this.setContactPhoneNumbers(response.data)
+      })
+    },
+    onEditPhone (phoneNumber) {
+      this.setContactSelectedPhone(phoneNumber)
+      this.$root.$emit('bv::show::popover', 'contact-phone-form-popover')
+    },
+    onClosePhoneForm () {
+      this.showPhonesForm = false
+    },
+    onPopoverHidden () {
+      this.setContactSelectedPhone(null)
+    },
+    onDeletePhone (phone) {
+      this.$bvModal.msgBoxConfirm('Do you wish to delete this phone number?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes, delete',
+        cancelTitle: 'No, keep'
+      }).then(confirm => {
+        if (confirm) {
+          this.isDeleting = true
+          talk2Api.V1.contact.deletePhone(this.contact.id, phone.id)
+            .then(response => {
+              this.$q.notify({
+                message: 'Phone number has been deleted.',
+                type: 'positive',
+                textColor: 'white',
+                position: 'bottom-right'
+              })
+              this.getPhoneNumbers()
+            }).catch(error => {
+              console.log(error)
+              this.$q.notify({
+                message: 'Error while deleting phone number.',
+                type: 'negative',
+                textColor: 'white',
+                position: 'bottom-right'
+              })
+            }).finally(() => {
+              this.isDeleting = false
+            })
+        }
+      })
+    },
+    setComposerVariables (mode, phone) {
+      this.setMessageComposerMode(mode)
+      this.setMessageComposerSmsPhoneNumber(phone.phone_number)
+    }
+  },
+  watch: {
+    'contact.id': function () {
+      this.getPhoneNumbers()
+    }
+  },
+  mounted () {
+    this.getPhoneNumbers()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  .contact-phone-popover {
+    left: -340px !important;
+    width: 300px;
+  }
+</style>

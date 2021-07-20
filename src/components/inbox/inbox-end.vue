@@ -1,19 +1,15 @@
 <template>
 <div class="inbox-end">
   <div class="inbox-info">
-      <dialer v-if="!showContactInfo" ></dialer>
-     <call-details-card v-if="showContactInfo" />
   </div>
 </div>
 </template>
 
 <script>
-import CallDetailsCard from 'components/inbox/call-details/call-details-card'
-import Dialer from 'components/inbox/dialer/dialer'
 
 export default {
   name: 'inbox-end.vue',
-  components: { Dialer, CallDetailsCard },
+  components: {},
   data () {
     return {
       showContactInfo: false

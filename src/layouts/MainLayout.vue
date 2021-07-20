@@ -69,7 +69,7 @@
               </div>
             </div>
           </section>
-          <dialer v-if="authenticated"></dialer>
+          <!--dialer v-if="authenticated"></dialer-->
         </q-page-container>
       </div>
       <q-drawer
@@ -192,7 +192,7 @@ import * as CommunicationTypes from '../constants/communication-types'
 import AppHeader from '../components/layout/app-header'
 import AppFooter from '../components/layout/app-footer'
 import AppSidebar from '../components/layout/app-sidebar'
-import Dialer from '../components/dialer'
+// import Dialer from '../components/dialer'
 
 if (Platform.is.cordova) {
   document.addEventListener(
@@ -221,8 +221,8 @@ export default {
   components: {
     AppHeader,
     AppFooter,
-    AppSidebar,
-    Dialer
+    AppSidebar
+    // Dialer
   },
 
   mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
@@ -267,6 +267,10 @@ export default {
   },
 
   created () {
+    window.onbeforeunload = () => {
+      this.setCurrentListFilters({})
+    }
+
     this.resetCall()
 
     window.handleOpenURL = (url) => {
@@ -1469,6 +1473,7 @@ export default {
       this.logoutUser(deviceInfo)
         .then((res) => {
           this.response = res.data
+          this.setCurrentListFilters({})
           this.$router.push({ name: 'Login' }).catch((err) => {
             console.log(err)
           })
@@ -1494,6 +1499,7 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted'
     ]),
+    ...mapActions('contacts', ['setCurrentListFilters']),
     ...mapActions('auth', { logoutUser: 'logout', check: 'check' })
   },
 

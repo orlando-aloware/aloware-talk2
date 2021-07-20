@@ -173,16 +173,16 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import contactsMixins from './contacts.mixins'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import _ from 'lodash'
-import BulkActionMenu from 'pages/contacts/_components/bulk-action-menu'
-import CompactBtn from 'src/components/buttons/compact-btn.vue'
-import ContactsScreen from './_components/contacts-screen.vue'
-import ContactsTableSearch from 'src/pages/contacts/_components/contacts-table-search.vue'
-import Datatable from 'src/components/datatable/datatable.vue'
-import ImportContactsModal from 'src/pages/contacts/_components/import-contacts-modal.vue'
-import TableRow from 'src/pages/contacts/_components/table-row.vue'
-import ContactsFilters from 'pages/contacts/_components/contacts-filters'
+import BulkActionMenu from 'src/components/bulk-action-menu'
+import CompactBtn from 'src/components/compact-btn.vue'
+import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
+import ContactsTableSearch from 'src/components/contacts/contacts-table-search.vue'
+import Datatable from 'src/components/datatable.vue'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
+import TableRow from 'src/components/table-row.vue'
+import ContactsFilters from 'src/components/contacts/contacts-filters'
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
 
@@ -386,6 +386,7 @@ export default {
   },
   watch: {
     '$route.params.id': function () {
+      this.resetFilters()
       this.initialListFilters = this.currentListFilters
       this.filtersCount = this.getFiltersCount(this.currentListFilters)
       this.fetch()

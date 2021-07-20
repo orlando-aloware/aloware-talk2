@@ -6,12 +6,11 @@
 </template>
 
 <script>
-import InboxMidCall from './inbox-mid-call'
 import InboxMidMsg from './inbox-mid-msg'
 
 export default {
   name: 'inbox-mid.vue',
-  components: { InboxMidMsg, InboxMidCall },
+  components: { InboxMidMsg },
   methods: {
     toggle () {
       this.showMessage = !this.showMessage

@@ -76,7 +76,6 @@ export default {
 @import 'src/css/breakpoints.scss';
 
 .inbox-side {
-  @include border-radius(10px);
   background-color: $white;
   border: solid 1px $grey-light3;
   display: flex;
