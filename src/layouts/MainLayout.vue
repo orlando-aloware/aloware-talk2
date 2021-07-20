@@ -15,7 +15,7 @@
       <div
         class="h-100"
         :class="[
-          sidebarVisibile ? 'sidebar-active' : '',
+          sidebarVisible ? 'sidebar-active' : '',
           authenticated
             ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2'
             : ''
@@ -73,8 +73,8 @@
         </q-page-container>
       </div>
       <q-drawer
-        v-model="sidebarVisibile"
-        v-show="sidebarVisibile && authenticated && !loading"
+        v-model="sidebarVisible"
+        v-show="sidebarVisible && authenticated && !loading"
         :breakpoint="0"
         class="h-100 sidebar-wrapper d-none d-sm-block"
         :width="60"
@@ -233,7 +233,7 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      sidebarVisibile: false,
+      sidebarVisible: false,
       lightMode: true,
       CommunicationTypes
     }
@@ -503,7 +503,7 @@ export default {
     },
 
     toggleSidebar () {
-      this.sidebarVisibile = !this.sidebarVisibile
+      this.sidebarVisible = !this.sidebarVisible
     },
 
     setHubSpotDeal (phoneNumber) {
