@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="pt-2 form-input-container">
+  <div class="pt-2">
+    <div class="form-input-container">
       <form>
         <at hideOnBlur
             name-key="full_name"
@@ -28,7 +28,7 @@
                 </span>
             </span>
           </template>
-          <div contenteditable placeholder="Type @ to span mention someone"></div>
+          <div placeholder="Type @ to span mention someone" contenteditable></div>
         </at>
       </form>
     </div>

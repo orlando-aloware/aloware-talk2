@@ -97,6 +97,7 @@ $f-size-h5: 14px;
 $f-size-body: 14px;
 $f-size-body-sm: 13px;
 $f-size-body-xs: 12px;
+$f-size-body-xxs: 11px;
 
 // Texts
 h1 {
@@ -128,16 +129,20 @@ body {
   @extend .text-grey-100;
   font-family: $font-family-body;
 }
-.text-regular {
+.text {
   @include font-size($f-size-body, 400);
   @extend .text-grey-100;
 }
-.text-small {
+.text-xs {
   @include font-size($f-size-body-sm, 500);
   @extend .text-grey-100;
 }
-.text-extra-small {
+.text-xs {
   @include font-size($f-size-body-xs, 400);
+  @extend .text-grey-100;
+}
+.text-xxs {
+  @include font-size($f-size-body-xxs, 400);
   @extend .text-grey-100;
 }
 

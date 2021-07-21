@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="pt-2">
+  <div class="pt-2">
+    <div>
       <div v-if="messageComposer.sms.gif_url || messageComposer.sms.attachments.length > 0" class="mb-2 d-inline-flex media-preview-wrapper">
         <div v-if="messageComposer.sms.gif_url" class="media-preview">
           <img class="img-preview"
@@ -38,16 +38,16 @@
         </div>
 
       </div>
-      <q-input borderless
-               autogrow
-               ref="smsMessageBody"
+      <q-input ref="smsMessageBody"
                class="q-input-composer"
                input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                type="textarea"
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
-               @input="updateMessage"
-      />
+               borderless
+               autogrow
+               @input="updateMessage">
+      </q-input>
     </div>
     <div class="d-flex justify-content-between">
       <div class="message-options">
