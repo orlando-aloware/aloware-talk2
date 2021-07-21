@@ -38,7 +38,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
 
@@ -54,7 +53,6 @@ export default {
   max-height: calc(100vh - 215px);
   width: 100%;
   display: flex;
-  gap: 20px;
 
   @include screen('md') {
     min-height: calc(100vh - 130px);

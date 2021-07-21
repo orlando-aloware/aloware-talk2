@@ -1,6 +1,6 @@
 <template>
   <a
-    class="inbox-nav-item"
+    class="inbox-nav-item mx-2"
     v-bind:class="{
       'inbox-nav-item__active': isActive,
       'inbox-nav-item--closed': closed,
@@ -27,11 +27,13 @@
       <div class="inbox-nav-item__label">
         {{ label }}
       </div>
-      <span class="count-label">
-        <span class="open-count">{{ openCount }}</span>
-        <span>|</span>
-        <span class="pending-count">{{ pendingCount }}</span>
+      <span class="count-label"
+        v-if="value === 'inbox'">
+        <span class="open-count border-right">{{ openCount }}</span>
+        <span class="pending-count ml-2">{{ pendingCount }}</span>
       </span>
+      <refresh-icon :isActive="isActive"
+                    v-if="value === 'inbox'"/>
       <!--badge
         v-if="badge"
         :color="badgeColor"
@@ -44,9 +46,11 @@
 
 <script>
 import Icon from './inbox-nav-icon.vue'
+import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
   components: {
+    RefreshIcon,
     Icon
   },
   props: {
@@ -101,6 +105,7 @@ export default {
 @import 'src/css/breakpoints.scss';
 
 .inbox-nav-item {
+  @include border-radius(10px);
   display: flex;
   align-items: center;
   height: 40px;
@@ -114,7 +119,7 @@ export default {
   }
 
   &__active {
-    background-color: $flesh;
+    background-color: $grey-50;
     color: $black;
   }
 
@@ -133,21 +138,8 @@ export default {
     padding-left: 0;
     padding-right: 0;
     justify-content: center;
-
-    &--opened {
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-
-    &--closed {
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    @include screen('lg') {
-      padding-left: 20px;
-      padding-right: 20px;
-    }
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
   &__icon {
@@ -191,13 +183,14 @@ export default {
     font-size: 13px;
     line-height: 16px;
     font-weight: 500;
+    letter-spacing: 8px;
+    color: $grey-30;
   }
   .open-count {
     color: $grey-20;
   }
   .pending-count {
     font-weight: 500;
-    color: $grey-30;
   }
 }
 </style>

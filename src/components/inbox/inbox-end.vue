@@ -38,7 +38,6 @@ export default {
 }
 
 .inbox-end {
-  @include border-radius(10px);
   background-color: $white;
   border: solid 1px $grey-light3;
   position: relative;
@@ -46,7 +45,7 @@ export default {
   width: 100%;
   display: none;
   @include screen('lg') {
-    width: 261px;
+    width: 330px;
     display: flex;
   }
 }

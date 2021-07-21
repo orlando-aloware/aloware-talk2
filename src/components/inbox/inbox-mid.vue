@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-mid" :class="{'inbox-mid--show': showingMid}">
+  <div class="inbox-mid mr-3 border-left-0" :class="{'inbox-mid--show': showingMid}">
     <inbox-mid-call v-if="showMessage" @toggle="toggle"/>
     <inbox-mid-msg v-if="!showMessage" @toggle="toggle"/>
   </div>
@@ -45,7 +45,6 @@ export default {
 @import 'src/css/breakpoints.scss';
 
 .inbox-mid {
-  @include border-radius(10px);
   background-color: $white;
   border: solid 1px $grey-light3;
   display: none;

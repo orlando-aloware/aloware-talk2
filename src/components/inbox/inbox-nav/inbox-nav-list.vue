@@ -6,7 +6,7 @@
       :label="item.label"
       :value="item.value"
       :icon="item.icon"
-      :is-active="active === item.value"
+      :isActive="active === item.value"
       :closed="closed"
       :badge="true"
       badge-value="20"
