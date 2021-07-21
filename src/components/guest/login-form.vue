@@ -109,8 +109,6 @@ export default {
           ...this.getLoginParams()
         })
 
-        console.log(response)
-
         await this.onLoginSuccess(response)
 
         this.loading = false
