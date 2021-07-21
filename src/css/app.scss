@@ -389,6 +389,23 @@ body,
 .page-header {
   width: auto;
   height: 62px;
+
+  & .q-item {
+    padding: 0;
+  }
+
+  & .q-item > .q-btn {
+    &:hover, &:focus {
+      & .q-focus-helper {
+        display: none !important;
+      }
+    }
+  }
+
+  & .q-icon {
+    width: auto;
+    height: auto;
+  }
 }
 
 .page-sidebar {
@@ -399,10 +416,10 @@ body,
     width: 48px;
     height: 52px;
 
-    &:hover {
+    &:hover, &:focus {
       color: transparent;
       & .q-focus-helper {
-        display: none;
+        display: none !important;
       }
     }
 
