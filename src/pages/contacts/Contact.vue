@@ -91,7 +91,6 @@ export default {
       this.contactId = this.$route.params.id
       this.processFetchContactInfo()
     }
-    this.$options.filters.setDocumentTitle(this.title)
   },
   watch: {
     '$route.params.id': function (id) {

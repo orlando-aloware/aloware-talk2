@@ -21,11 +21,17 @@ const routes = [
       {
         path: '',
         name: 'Inbox',
-        component: () => import('pages/Inbox.vue')
+        component: () => import('pages/Inbox.vue'),
+        meta: {
+          title: 'Inbox'
+        }
       },
       {
         path: 'contacts',
         component: () => import('src/pages/contacts/Contacts.vue'),
+        meta: {
+          title: 'Contacts'
+        },
         children: [
           {
             path: '',
@@ -52,7 +58,10 @@ const routes = [
       {
         path: 'contact/:id',
         name: 'Contact',
-        component: () => import('src/pages/contacts/Contact.vue')
+        component: () => import('src/pages/contacts/Contact.vue'),
+        meta: {
+          title: 'Contact'
+        }
       },
       {
         path: 'power-dialer',

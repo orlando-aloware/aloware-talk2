@@ -48,9 +48,6 @@ export default {
   },
   computed: {
     ...mapState(['auth'])
-  },
-  created () {
-    this.$options.filters.setDocumentTitle('Contacts')
   }
 }
 </script>
