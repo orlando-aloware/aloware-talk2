@@ -8,7 +8,7 @@
 }
 
 @mixin font-size($sizeValue, $weightValue) {
-  font-size: $sizeValue + px;
+  font-size: $sizeValue;
   font-weight: $weightValue;
   letter-spacing: -0.0025em;
 }
@@ -59,7 +59,36 @@ $grey-20: #6F6F6F;
 @include text-color('grey-30', $grey-30);
 @include text-color('grey-20', $grey-20);
 
-// Text sizes
+// Font family
+$font-family-body: 'Inter', sans-serif;
+
+// Font weights
+._100{
+  font-weight: 100 !important;
+}
+._200{
+  font-weight: 200 !important;
+}
+._300{
+  font-weight: 300 !important;
+}
+._400{
+  font-weight: 400 !important;
+}
+._500{
+  font-weight: 500 !important;
+}
+._600{
+  font-weight: 600 !important;
+}
+._700{
+  font-weight: 700 !important;
+}
+._800{
+  font-weight: 800 !important;
+}
+
+// Font sizes
 $f-size-h1: 22px;
 $f-size-h2: 17px;
 $f-size-h3: 16px;
@@ -90,9 +119,14 @@ h5 {
   @include font-size($f-size-h5, 500);
   @extend .text-grey-100;
 }
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: $font-family-body;
+  margin-bottom: 0rem;
+}
 body {
   @include font-size($f-size-body, 400);
   @extend .text-grey-100;
+  font-family: $font-family-body;
 }
 .text-regular {
   @include font-size($f-size-body, 400);
@@ -106,6 +140,7 @@ body {
   @include font-size($f-size-body-xs, 400);
   @extend .text-grey-100;
 }
+
 
 /*
  Other styling

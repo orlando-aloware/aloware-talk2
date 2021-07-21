@@ -1,13 +1,21 @@
 <template>
-  <q-toolbar class="page-header">
+  <q-toolbar class="page-header pl-4 pr-4">
     <div class="d-flex h-100 align-items-center">
-      <div class="page-title font-weight-bold">
-        {{ $route.name }}
-      </div>
+      <h1>{{ $route.name }}</h1>
     </div>
     <div class="ml-auto d-none d-lg-block">
       <div class="d-flex h-100 align-items-center">
-
+        <q-item>
+          <q-item-section>
+            <q-item-label class="text-regular _500">{{ user.profile.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section avatar>
+            <avatar :name="user.profile.name"
+                    width="34"
+                    height="34">
+            </avatar>
+          </q-item-section>
+        </q-item>
       </div>
     </div>
     <div class="ml-auto d-block d-sm-none">
@@ -19,26 +27,19 @@
 </template>
 
 <script>
-import * as AgentStatus from '../../constants/agent-status'
-import { avatarMixin } from '../../boot/mixins'
 import { mapGetters, mapState } from 'vuex'
+import Avatar from 'components/avatar.vue'
+import * as AgentStatus from '../../constants/agent-status'
 
 export default {
   name: 'app-header',
-  mixins: [
-    avatarMixin
-  ],
+
+  components: {
+    Avatar
+  },
+
   data () {
     return {
-      pageIcons: {
-        inbox: 'app-icons/menu/inbox_green.svg',
-        contacts: 'app-icons/menu/contacts_green.svg',
-        powerdialer: 'app-icons/menu/powerdialer_green.svg',
-        dashboard: 'app-icons/menu/dashboard_green.svg',
-        account: 'app-icons/menu/account_green.svg',
-        settings: 'app-icons/menu/settings_green.svg'
-      },
-      pageIcon: null,
       AgentStatus
     }
   },
@@ -46,6 +47,7 @@ export default {
   computed: {
     ...mapState(['dialer', 'campaigns']),
     ...mapGetters('auth', ['user']),
+
     statusLabel () {
       switch (this.user.profile.agent_status) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
@@ -75,26 +77,9 @@ export default {
     }
   },
 
-  created () {
-    this.updatePageIcon()
-  },
-
   methods: {
-    updatePageIcon () {
-      if (this.$route.name) {
-        let pageIndex = this.$route.name.toLowerCase().replace(' ', '')
-        this.pageIcon = this.pageIcons[pageIndex]
-      }
-    },
-
     toggleSidebar () {
       this.$emit('toggleSidebar')
-    }
-  },
-
-  watch: {
-    '$route.name': function () {
-      this.updatePageIcon()
     }
   }
 }

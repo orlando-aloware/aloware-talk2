@@ -10,7 +10,7 @@ html {
 
 body {
   overflow-y: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   color: $grey-100;
 }
 
@@ -95,6 +95,13 @@ body,
   .q-item__label {
     padding-right: 15px !important;
     padding-left: 15px !important;
+  }
+  .q-item__section .q-item__label {
+    padding: inherit !important;
+  }
+  .q-item__section--avatar {
+    min-width: 34px !important;
+    padding-left: 10px !important;
   }
   .q-field.q-field--float .q-field__label {
     padding-right: 20px;
@@ -199,7 +206,7 @@ body,
   }
   input {
     color: #202125;
-    font-family: 'Inter', sans-serif;
+    font-family: $font-family-body;
     font-size: 14px;
     font-weight: bold;
     letter-spacing: 0.35px;
@@ -208,7 +215,7 @@ body,
   .q-field__label {
     opacity: 0.9;
     color: #666666;
-    font-family: 'Inter', sans-serif;
+    font-family: $font-family-body;
     font-size: 12px;
     letter-spacing: 0;
     line-height: 16px;
@@ -237,7 +244,7 @@ body,
 
 .title {
   color: #202125;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 26px;
   font-weight: bold;
   letter-spacing: 0.35px;
@@ -246,7 +253,7 @@ body,
 
 .description {
   color: #e4e4e4;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 14px;
   letter-spacing: 0.19px;
   line-height: 22px;
@@ -255,7 +262,7 @@ body,
 
 .description-sm {
   color: #999999;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0;
@@ -267,7 +274,7 @@ body,
 
 .small-text {
   color: #202125;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 12px;
   letter-spacing: 0.3px;
   line-height: 16px;
@@ -277,7 +284,7 @@ body,
 }
 
 .xs-text {
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 10px;
   letter-spacing: 0.25px;
   line-height: 13px;
@@ -287,7 +294,7 @@ body,
   height: 18px;
   width: 107px;
   color: $blue;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 13px;
   letter-spacing: 0;
   line-height: 18px;
@@ -295,7 +302,7 @@ body,
 
 .mark-as {
   color: $blue;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 13px;
   letter-spacing: -0.0025em;
   line-height: 16px;
@@ -323,7 +330,7 @@ body,
 
 .remember-me {
   color: #666666;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 13px;
   letter-spacing: 0;
   line-height: 18px;
@@ -341,7 +348,7 @@ body,
 
 .button {
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family-body;
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 0.5px;
@@ -367,7 +374,7 @@ body,
   box-shadow: 2px 4px 20px 0 rgba(21, 22, 63, 0.2);
   .message {
     color: #666666;
-    font-family: 'Inter', sans-serif;
+    font-family: $font-family-body;
     font-size: 13px;
     letter-spacing: 0;
     line-height: 18px;
@@ -381,7 +388,7 @@ body,
 
 .page-header {
   width: auto;
-  height: 66px;
+  height: 62px;
 }
 
 .page-sidebar {
@@ -402,7 +409,7 @@ body,
       height: 20px;
     }
     .q-tab__label {
-      font-family: 'Inter', sans-serif;
+      font-family: $font-family-body;
       font-size: 10px;
       font-weight: bold;
       letter-spacing: 0;
@@ -438,26 +445,6 @@ body,
 
 .separator-blur {
   opacity: 0.2;
-}
-
-.h1,
-.h2,
-.page-title {
-  font-family: 'Inter', sans-serif;
-  color: #202125;
-  letter-spacing: 0.29px;
-  margin-bottom: 0 !important;
-}
-
-.h1,
-.page-title {
-  font-size: 26px;
-  line-height: 28px;
-}
-
-.h2 {
-  font-size: 22px !important;
-  line-height: 28px !important;
 }
 
 .page-icon,
@@ -549,7 +536,7 @@ body,
 }
 
 .popover {
-  font-family: 'Inter', sans-serif !important;
+  font-family: $font-family-body !important;
 }
 
 .ellipse {
@@ -1376,7 +1363,7 @@ margin-bottom: 2px;
 .date-time-picker {
   .field-input {
     font-size: 13px !important;
-    font-family: 'Inter', sans-serif !important;
+    font-family: $font-family-body !important;
   }
 }
 
@@ -1387,7 +1374,7 @@ margin-bottom: 2px;
 .time-picker-column[data-v-5bc85983]::-webkit-scrollbar{display:block}
 
 .date-time-picker {
-  font-family: 'Inter', sans-serif !important;
+  font-family: $font-family-body !important;
   font-size: 13px !important;
 }
 
@@ -1501,4 +1488,22 @@ span.mention {
   &::-webkit-scrollbar {
     background-color: #fff;
   }
+}
+
+.text-left-align {
+  text-align: left;
+}
+
+.text-center-align {
+  text-align: center;
+}
+
+.text-right-align {
+  text-align: right;
+}
+
+.no-box-shadow {
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
 }
