@@ -397,6 +397,10 @@ const twoLinesTextTruncate = (text) => {
   return text
 }
 
+const setDocumentTitle = (title) => {
+  document.title = (title || '') + ' | Aloware Talk'
+}
+
 export default ({ Vue }) => {
   const filters = {
     toUpperCase,
@@ -426,7 +430,8 @@ export default ({ Vue }) => {
     nl2br,
     strLimit,
     momentFormat,
-    twoLinesTextTruncate
+    twoLinesTextTruncate,
+    setDocumentTitle
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

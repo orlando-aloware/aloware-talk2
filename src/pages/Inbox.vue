@@ -31,8 +31,12 @@ export default {
   },
   data () {
     return {
-      contactInfoOpen: false
+      contactInfoOpen: false,
+      title: 'Inbox'
     }
+  },
+  created () {
+    this.$options.filters.setDocumentTitle(this.title)
   }
 }
 </script>

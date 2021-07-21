@@ -21,6 +21,7 @@ import {
   OPERATORS
 } from 'src/constants/contacts-list-types'
 import ContactsPinnedItem from 'components/contacts/contacts-pinned-item'
+import auth from 'boot/auth'
 
 export default {
   methods: {
@@ -136,13 +137,16 @@ export default {
   },
   data () {
     return {
+      auth: auth,
       loading: false,
       contactListType: { STATIC, DYNAMIC }
     }
   },
   mounted () {
-    this.loadDefaultCounts()
-    this.loadPinned()
+    if (this.auth.user.authenticated) {
+      this.loadDefaultCounts()
+      this.loadPinned()
+    }
   }
 }
 </script>

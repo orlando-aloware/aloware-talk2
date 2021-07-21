@@ -5,7 +5,7 @@
     :opacity="0.85"
     rounded="sm"
   >
-    <div class="row mx-0 content-row contact-view-wrapper d-flex">
+    <div class="row mx-0 content-row contact-view-wrapper d-flex" v-if="userAuth.authenticated">
         <contact-list-sidebar></contact-list-sidebar>
         <div :class="`pr-2 mb-3 contact-activity-wrapper ${widthClass}`">
           <contact-activities ref="contactActivities"
@@ -53,8 +53,7 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
@@ -65,14 +64,15 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', [ 'contact', 'isSidebarCollapsed', 'changingSelectedContact' ]),
+    ...mapState({ userAuth: 'auth' }),
     widthClass () {
       return !this.isSidebarCollapsed ? 'w-less-600px' : 'w-less-315px'
     }
   },
   data () {
     return {
-      title: 'Google Map List',
-      totalContacts: 216
+      title: 'Contact',
+      totalContacts: 0
     }
   },
   methods: {
@@ -87,8 +87,11 @@ export default {
     }
   },
   created () {
-    this.contactId = this.$route.params.id
-    this.processFetchContactInfo()
+    if (this.userAuth.authenticated) {
+      this.contactId = this.$route.params.id
+      this.processFetchContactInfo()
+    }
+    this.$options.filters.setDocumentTitle(this.title)
   },
   watch: {
     '$route.params.id': function (id) {
@@ -108,7 +111,7 @@ export default {
     border-top: 1px solid #dee2e6;
     overflow: hidden;
     position: relative;
-    background: #F4F4F6;
+    background: $grey-50;
     padding-left: 1.90rem !important;
 
     .contact-activity-wrapper.w-less-600px {
