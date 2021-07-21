@@ -26,5 +26,15 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   })
 
+  Router.beforeEach((to, from, next) => {
+    next()
+    let record = to.matched.find(record => record.meta.title)
+    let documentTitle = ''
+    if (record) {
+      documentTitle = (record.meta.title || '')
+    }
+    document.title = documentTitle + ' | Aloware Talk'
+  })
+
   return Router
 }
