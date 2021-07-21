@@ -148,14 +148,14 @@ body,
 @media (min-width: 992px) {
   .dashboard {
     header {
-      left: 60px;
+      left: 64px;
     }
     .sidebar-wrapper,
     .sidebar-wrapper > aside {
       display: block !important;
     }
     .sidebar-wrapper {
-      width: 60px;
+      width: 64px;
     }
     .sidebar-wrapper > aside {
       transform: translateX(0px) !important;
@@ -440,7 +440,7 @@ body,
 
 .sidebar-wrapper,
 .sidebar-wrapper > aside {
-  max-width: 60px;
+  max-width: 64px;
 }
 
 .separator-blur {
@@ -1516,7 +1516,7 @@ span.mention {
  Main layout
  */
 .main-content {
-  padding-left: 1.90rem !important;
+  padding-left: 64px !important;
   background: #F4F4F4;
 }
 
@@ -1637,6 +1637,10 @@ span.mention {
   }
 }
 
+/*
+ Quasar related
+ */
+
 .tab-dropdown {
   & .q-focus-helper {
     display: none;
@@ -1666,6 +1670,10 @@ span.mention {
     border: 2px solid #FFFFFF;
     padding: 0px;
   }
+}
+
+.q-menu {
+  @extend .text-sm;
 }
 
 /*

@@ -2,39 +2,37 @@
   <div class="d-flex align-items-start flex-column h-100 w-100">
     <div class="w-100">
       <q-btn flat
-             icon="img:app-icons/misc/logo_icon_white.svg"
+             icon="img:app-icons/menu/logo_white.svg"
              size="1.1rem"
              align="center"
              to="/"
-             class="w-100 p-2"/>
-      <q-separator class="separator-blur mt-1"
-                   color="white"/>
-      <q-space class="p-2"/>
+             class="w-100 p-2">
+      </q-btn>
     </div>
     <q-btn flat
-           icon="img:app-icons/menu/inbox_white.svg"
-           size="0.9rem"
+           icon="img:app-icons/menu/inbox_gray.svg"
+           size="0.75rem"
            align="center"
            :to="{ name: 'Inbox' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Inbox') ? 'active' : '' ]"/>
     <q-btn flat
-           icon="img:app-icons/menu/contacts_white.svg"
-           size="0.9rem"
+           icon="img:app-icons/menu/contacts_gray.svg"
+           size="0.75rem"
            align="center"
            :to="{ name: 'Contacts' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Contacts') ? 'active' : '' ]"/>
     <q-btn flat
-           icon="img:app-icons/menu/powerdialer_white.svg"
-           size="0.9rem"
+           icon="img:app-icons/menu/power_dialer_gray.svg"
+           size="0.75rem"
            align="center"
            :to="{ name: 'Power Dialer' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Power Dialer') ? 'active' : '' ]"/>
     <q-btn flat
-           icon="img:app-icons/menu/dashboard_white.svg"
-           size="0.9rem"
+           icon="img:app-icons/menu/stats_gray.svg"
+           size="0.75rem"
            align="center"
            :to="{ name: 'Dashboard' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
@@ -44,7 +42,7 @@
                    color="white"/>
       <q-btn flat
              :icon="modeIcon"
-             size="0.9rem"
+             size="0.75rem"
              align="center"
              class="nav-icons w-100 pt-2 pb-2"
              :class="[ isActive('Dashboard') ? 'active' : '' ]"
@@ -52,8 +50,8 @@
       <q-separator class="separator-blur"
                    color="white"/>
       <q-btn flat
-             icon="img:app-icons/menu/settings_white.svg"
-             size="0.9rem"
+             icon="img:app-icons/menu/settings_gray.svg"
+             size="0.75rem"
              align="center"
              class="nav-icons w-100 pt-2 pb-2"
              :class="[ isActive('Dashboard') ? 'active' : '' ]">
@@ -98,7 +96,7 @@ export default {
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/light_mode.svg'
+      modeIcon: 'img:app-icons/menu/mode_gray.svg'
     }
   },
 
@@ -122,7 +120,7 @@ export default {
 
   watch: {
     lightMode () {
-      this.modeIcon = this.lightMode ? 'img:app-icons/menu/light_mode.svg' : 'img:app-icons/menu/night_mode.svg'
+      this.modeIcon = this.lightMode ? 'img:app-icons/menu/mode_gray.svg' : 'img:app-icons/menu/mode_gray.svg'
     }
   }
 }
