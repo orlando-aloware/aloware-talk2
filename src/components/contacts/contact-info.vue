@@ -1,5 +1,5 @@
 <template>
-  <b-card class="mt-2 mb-2 border-0" id="card-contact-info">
+  <b-card class="border-0">
     <b-media>
       <template #aside>
         <q-item-section avatar>

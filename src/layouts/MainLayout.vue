@@ -21,7 +21,7 @@
           <app-header @toggleSidebar="toggleSidebar"/>
         </q-header>
         <q-page-container class="page-container h-100">
-          <section class="main-content section h-100 py-2">
+          <section class="main-content section h-100">
             <template v-if="!loading">
               <transition :name="transitionName"
                           mode="out-in"
@@ -36,7 +36,9 @@
             <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
                  v-else>
               <div class="container">
-                <q-spinner-bars color="primary" size="40px"/>
+                <q-spinner-bars color="primary"
+                                size="40px">
+                </q-spinner-bars>
                 <div>
                   <div v-if="!onlineStatus">
                     <span>Network is <b>offline</b></span>

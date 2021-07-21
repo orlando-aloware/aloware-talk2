@@ -1,10 +1,11 @@
 <template>
   <div class="contact-details-wrapper">
-    <div class="details-component-container" ref="detailsComponentContainer">
+    <div class="details-component-container"
+         ref="detailsComponentContainer">
       <contact-info></contact-info>
       <contact-phones></contact-phones>
       <contact-information></contact-information>
-      <contact-tags v-if="hasPermissionTo('tag contact')"></contact-tags>
+      <contact-tags></contact-tags>
       <contact-notes></contact-notes>
       <contact-integrations></contact-integrations>
       <contact-scheduled-messages></contact-scheduled-messages>
@@ -30,9 +31,12 @@ import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import { mapGetters } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'contact-details',
+
   mixins: [aclMixin],
+
   components: {
     ContactScheduledMessages,
     ContactIntegrations,
@@ -46,9 +50,11 @@ export default {
     ContactInfo,
     ContactPhones
   },
+
   computed: {
     ...mapGetters('contacts', ['contact'])
   },
+
   watch: {
     'contact.id': function () {
       this.$nextTick(() => {
@@ -58,17 +64,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.contact-details-wrapper {
-  height: 100%;
-  display: flex;
-  justify-content: flex-end;
-  overflow: hidden;
-
-  .details-component-container {
-    height: calc(100vh - 80px);
-    overflow: auto;
-  }
-}
-</style>
