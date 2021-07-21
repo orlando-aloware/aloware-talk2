@@ -10,38 +10,77 @@
       </q-btn>
     </div>
     <q-btn flat
+           icon="img:app-icons/menu/inbox_active.svg"
+           align="left"
+           :to="{ name: 'Inbox' }"
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Inbox')"/>
+    <q-btn flat
            icon="img:app-icons/menu/inbox_gray.svg"
-           size="0.75rem"
            align="center"
            :to="{ name: 'Inbox' }"
-           class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
-           :class="[ isActive('Inbox') ? 'active' : '' ]"/>
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Inbox')"/>
+
+    <q-btn flat
+           icon="img:app-icons/menu/contacts_active.svg"
+           align="left"
+           :to="{ name: 'Contacts' }"
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Contacts')"/>
     <q-btn flat
            icon="img:app-icons/menu/contacts_gray.svg"
-           size="0.75rem"
            align="center"
            :to="{ name: 'Contacts' }"
-           class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
-           :class="[ isActive('Contacts') ? 'active' : '' ]"/>
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Contacts')"/>
+
+    <q-btn flat
+           icon="img:app-icons/menu/power_dialer_active.svg"
+           align="left"
+           :to="{ name: 'Power Dialer' }"
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Power Dialer')"/>
     <q-btn flat
            icon="img:app-icons/menu/power_dialer_gray.svg"
-           size="0.75rem"
            align="center"
            :to="{ name: 'Power Dialer' }"
-           class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
-           :class="[ isActive('Power Dialer') ? 'active' : '' ]"/>
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Power Dialer')"/>
+
+    <q-btn flat
+           icon="img:app-icons/menu/stats_active.svg"
+           align="left"
+           :to="{ name: 'Stats' }"
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Stats')"/>
     <q-btn flat
            icon="img:app-icons/menu/stats_gray.svg"
-           size="0.75rem"
            align="center"
-           :to="{ name: 'Dashboard' }"
-           class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
-           :class="[ isActive('Dashboard') ? 'active' : '' ]"/>
+           :to="{ name: 'Stats' }"
+           :ripple="false"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Stats')"/>
+
     <q-btn flat
            icon="img:app-icons/menu/settings_gray.svg"
-           size="0.75rem"
            align="center"
-           class="nav-icons w-100 pt-2 pb-2">
+           class="nav-icons w-100">
       <q-menu fit anchor="top right"
               elf="bottom left"
               :offset="[10, 0]">
@@ -71,9 +110,11 @@
       </div>
       <q-btn flat
              :icon="modeIcon"
+             :ripple="false"
+             padding="none"
              size="0.75rem"
              align="center"
-             class="nav-icons w-100 pt-2 pb-2"
+             class="nav-icons w-100"
              @click="$emit('toggleMode')"/>
     </div>
   </div>

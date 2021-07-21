@@ -394,9 +394,21 @@ body,
 .page-sidebar {
   height: 100%;
   background-color: #15163f;
-  .nav-icons {
-    &.active {
 
+  .nav-icons {
+    width: 48px;
+    height: 48px;
+
+    &:hover {
+      color: transparent;
+      & .q-focus-helper {
+        display: none;
+      }
+    }
+
+    & .q-icon {
+      width: auto;
+      height: auto;
     }
   }
 }
