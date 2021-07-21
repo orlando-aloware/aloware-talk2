@@ -69,9 +69,9 @@ const routes = [
         component: () => import('pages/PowerDialer.vue')
       },
       {
-        path: 'dashboard',
-        name: 'Dashboard',
-        component: () => import('pages/Dashboard.vue')
+        path: 'stats',
+        name: 'Stats',
+        component: () => import('pages/Stats.vue')
       },
       {
         path: 'settings',

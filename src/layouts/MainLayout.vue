@@ -19,10 +19,7 @@
           <section class="main-content section h-100">
             <template v-if="!loading">
               <transition :name="transitionName"
-                          mode="out-in"
-                          @beforeLeave="beforeLeave"
-                          @enter="enter"
-                          @afterEnter="afterEnter">
+                          mode="out-in">
                 <keep-alive>
                   <router-view></router-view>
                 </keep-alive>
@@ -564,24 +561,6 @@ export default {
         /([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,
         '$1' + breakTag + '$2'
       )
-    },
-
-    beforeLeave (element) {
-      this.prevHeight = getComputedStyle(element).height
-    },
-
-    enter (element) {
-      const { height } = getComputedStyle(element)
-
-      element.style.height = this.prevHeight
-
-      setTimeout(() => {
-        element.style.height = height
-      })
-    },
-
-    afterEnter (element) {
-      element.style.height = '100%'
     },
 
     removeBehaviorsRestrictions () {

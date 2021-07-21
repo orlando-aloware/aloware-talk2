@@ -3,11 +3,11 @@
     <div class="d-flex h-100 align-items-center">
       <h1>{{ $route.name }}</h1>
     </div>
-    <div class="ml-auto d-none d-lg-block">
+    <div class="ml-auto d-none d-lg-block h-100">
       <div class="d-flex h-100 align-items-center">
         <q-item>
           <q-item-section>
-            <q-item-label class="text-regular _500">{{ user.profile.name }}</q-item-label>
+            <q-item-label class="text-regular _500">{{ user.profile.first_name }}</q-item-label>
           </q-item-section>
           <q-item-section avatar>
             <q-btn-dropdown class="tab-dropdown"
@@ -58,6 +58,21 @@
             </q-btn-dropdown>
           </q-item-section>
         </q-item>
+
+        <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
+                     vertical>
+        </q-separator>
+
+        <q-item>
+          <q-btn :ripple="false"
+                 :icon="dialerIcon"
+                 size="40px"
+                 padding="none"
+                 align="center"
+                 flat
+                 @click="toggleDialer">
+          </q-btn>
+        </q-item>
       </div>
     </div>
     <div class="ml-auto d-block d-sm-none">
@@ -80,6 +95,8 @@ export default {
 
   data () {
     return {
+      dialerIcon: 'img:app-icons/header/dialer_gray.svg',
+      dialerStatus: false,
       AgentStatus
     }
   },
@@ -120,6 +137,12 @@ export default {
   methods: {
     toggleSidebar () {
       this.$emit('toggleSidebar')
+    },
+
+    toggleDialer () {
+      this.dialerStatus = !this.dialerStatus
+      this.dialerIcon = this.dialerStatus ? 'img:app-icons/header/dialer_active.svg' : 'img:app-icons/header/dialer_gray.svg'
+      this.$emit('toggleDialer')
     },
 
     changeStatus (status) {
