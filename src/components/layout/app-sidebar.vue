@@ -37,46 +37,44 @@
            :to="{ name: 'Dashboard' }"
            class="nav-icons w-100 pt-2 pb-2 mt-1 mb-1"
            :class="[ isActive('Dashboard') ? 'active' : '' ]"/>
+    <q-btn flat
+           icon="img:app-icons/menu/settings_gray.svg"
+           size="0.75rem"
+           align="center"
+           class="nav-icons w-100 pt-2 pb-2">
+      <q-menu fit anchor="top right"
+              elf="bottom left"
+              :offset="[10, 0]">
+        <q-item clickable
+                class="pl-3 pr-3"
+                v-close-popup>
+          <q-item-section>
+            Profile
+          </q-item-section>
+        </q-item>
+        <q-separator class="separator-blur"
+                     color="black"/>
+        <q-item clickable
+                v-close-popup
+                @click="logoutAction"
+                class="pl-3 pr-3">
+          <q-item-section>
+            Log-out
+          </q-item-section>
+        </q-item>
+      </q-menu>
+    </q-btn>
     <div class="mt-auto w-100">
-      <q-separator class="separator-blur mt-1"
-                   color="white"/>
+      <div class="width-40 margin-auto position-relative">
+        <q-separator class="separator-blur mt-1"
+                     color="white"/>
+      </div>
       <q-btn flat
              :icon="modeIcon"
              size="0.75rem"
              align="center"
              class="nav-icons w-100 pt-2 pb-2"
-             :class="[ isActive('Dashboard') ? 'active' : '' ]"
              @click="$emit('toggleMode')"/>
-      <q-separator class="separator-blur"
-                   color="white"/>
-      <q-btn flat
-             icon="img:app-icons/menu/settings_gray.svg"
-             size="0.75rem"
-             align="center"
-             class="nav-icons w-100 pt-2 pb-2"
-             :class="[ isActive('Dashboard') ? 'active' : '' ]">
-        <q-menu fit anchor="top right"
-                elf="bottom left"
-                :offset="[10, 0]">
-          <q-item clickable
-                  class="pl-3 pr-3"
-                  v-close-popup>
-            <q-item-section>
-              Profile
-            </q-item-section>
-          </q-item>
-          <q-separator class="separator-blur"
-                       color="black"/>
-          <q-item clickable
-                  v-close-popup
-                  @click="logoutAction"
-                  class="pl-3 pr-3">
-            <q-item-section>
-              Log-out
-            </q-item-section>
-          </q-item>
-        </q-menu>
-      </q-btn>
     </div>
   </div>
 </template>

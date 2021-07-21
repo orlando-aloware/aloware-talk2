@@ -395,8 +395,8 @@ body,
   height: 100%;
   background-color: #15163f;
   .nav-icons {
-    &:not(.active) {
-      opacity: 0.5;
+    &.active {
+
     }
   }
 }
@@ -519,8 +519,8 @@ body,
   border-color: #dae0e5;
 }
 
-.w-px__250 {
-  width: 250px;
+.width-40 {
+  width: 40px;
 }
 
 .width-300 {
@@ -1679,6 +1679,10 @@ span.mention {
 /*
  Utilities
  */
+
+.margin-auto {
+  margin: auto auto;
+}
 
 .no-select {
   user-drag: none;
