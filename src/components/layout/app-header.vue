@@ -10,10 +10,52 @@
             <q-item-label class="text-regular _500">{{ user.profile.name }}</q-item-label>
           </q-item-section>
           <q-item-section avatar>
-            <avatar :name="user.profile.name"
-                    width="34"
-                    height="34">
-            </avatar>
+            <q-btn-dropdown class="tab-dropdown"
+                            menu-self="top right"
+                            ref="menu"
+                            :ripple="false"
+                            :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
+                            auto-close
+                            flat>
+              <template v-slot:label>
+                <q-avatar size="34px"
+                          v-if="user.profile"
+                          class="has-text-light"
+                          :style="avatarStyle(user.profile.name)">
+                  {{ user.profile.name | fixName | initials }}
+                  <q-badge :color="color"
+                           class="availability-status"
+                           floating>
+                  </q-badge>
+                </q-avatar>
+              </template>
+
+              <q-list class="tab-dropdown-list no-select">
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>Offline</q-item-section>
+                </q-item>
+
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>Available</q-item-section>
+                </q-item>
+
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>Busy</q-item-section>
+                </q-item>
+
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>On-break</q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
           </q-item-section>
         </q-item>
       </div>
@@ -28,15 +70,13 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import Avatar from 'components/avatar.vue'
 import * as AgentStatus from '../../constants/agent-status'
+import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-header',
 
-  components: {
-    Avatar
-  },
+  mixins: [aclMixin, avatarMixin, agentMixin],
 
   data () {
     return {
@@ -80,6 +120,11 @@ export default {
   methods: {
     toggleSidebar () {
       this.$emit('toggleSidebar')
+    },
+
+    changeStatus (status) {
+      this.changeAgentStatus(status)
+      this.$refs.menu.hide()
     }
   }
 }

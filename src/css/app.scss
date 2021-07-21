@@ -1636,3 +1636,74 @@ span.mention {
     }
   }
 }
+
+.tab-dropdown {
+  & .q-focus-helper {
+    display: none;
+  }
+
+  & .q-btn-dropdown__arrow {
+    font-size: 0;
+    border: solid #62666E;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 2px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  & .q-btn-dropdown__arrow.rotate-180 {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+
+  & .availability-status {
+    top: -1px;
+    right: -1px;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    padding: 0px;
+  }
+}
+
+/*
+ Utilities
+ */
+
+.no-select {
+  user-drag: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+
+  & ::selection {
+    background: transparent; /* WebKit/Blink Browsers */
+  }
+
+  & ::-moz-selection {
+    background: transparent; /* Gecko Browsers */
+  }
+}
+
+.allow-select {
+  -webkit-touch-callout: default; /* iOS Safari */
+  -webkit-user-select: text; /* Safari */
+  -khtml-user-select: text; /* Konqueror HTML */
+  -moz-user-select: text; /* Firefox */
+  -ms-user-select: text; /* Internet Explorer/Edge */
+  user-select: text; /* Non-prefixed version, currently supported by Chrome and Opera */
+
+  & ::selection {
+    background: rgba($primary, 0.2) !important; /* WebKit/Blink Browsers */
+  }
+
+  & ::-moz-selection {
+    background: rgba($primary, 0.2) !important; /* Gecko Browsers */
+  }
+}
