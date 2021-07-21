@@ -31,9 +31,9 @@
               </div>
               <p>
                 <b-badge v-if="contact.unread_count > 0"
-                         pill
                          class="contact-badge"
-                         variant="danger">
+                         variant="danger"
+                         pill>
                   {{ contact.unread_count }}
                 </b-badge>
               </p>
@@ -41,10 +41,8 @@
           </b-list-group-item>
         </b-list-group>
         <div class="relative py-4">
-          <b-overlay
-            :show="isLoadingMore"
-            rounded="sm"
-          >
+          <b-overlay :show="isLoadingMore"
+                     rounded="sm">
             <template #overlay>
               <q-spinner-bars color="primary"/>
             </template>
@@ -63,36 +61,46 @@ import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 let scrollTimeout
 export default {
   name: 'sidebar',
+
   mixins: [contactsMixins],
+
   components: {
     Avatar
   },
+
   data () {
     return {
       isExpanded: true,
       isLoaderVisible: false
     }
   },
+
   computed: {
     ...mapGetters('contacts', [
       'selectedList',
       'listItems'
     ]),
-    id: function () {
+
+    id () {
       return this.selectedList.id
     },
-    contacts: function () {
+
+    contacts () {
       return this.listItems[this.selectedList.id].data
     },
+
     widthClass () {
       return this.isExpanded ? 'width-300' : 'width-0'
     }
   },
+
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed']),
+
     getActiveClass (contact) {
       return `${(this.$route.params.id === String(contact.id) ? 'active' : '')}`
     },
+
     onBottomScroll () {
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
@@ -103,11 +111,13 @@ export default {
         }
       }, 66)
     },
+
     onSidebarToggle () {
       this.isExpanded = !this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
     }
   },
+
   mounted () {
     if (this.listItems[this.selectedList.id].data.length < 1) {
       this.fetch()
@@ -118,6 +128,7 @@ export default {
       this.$refs.scrollableArea.addEventListener('scroll', this.onBottomScroll)
     }
   },
+
   beforeDestroy () {
     clearTimeout(scrollTimeout)
     this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
