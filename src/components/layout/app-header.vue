@@ -7,7 +7,7 @@
       <div class="d-flex h-100 align-items-center">
         <q-item>
           <q-item-section>
-            <q-item-label class="text-regular _500">{{ user.profile.name }}</q-item-label>
+            <q-item-label class="text-regular _500">{{ user.profile.first_name }}</q-item-label>
           </q-item-section>
           <q-item-section avatar>
             <q-btn-dropdown class="tab-dropdown"
