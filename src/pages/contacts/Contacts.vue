@@ -1,10 +1,10 @@
 <template>
-  <div class="row mx-0 overflow-auto content-row pl-lg-5 ml-lg-2 q-px-xs-md">
+  <div class="row mx-0 content-row pt-2 d-flex overflow-hidden">
     <div class="col-lg-2 px-0 pl-lg-2 pr-lg-3 mb-3">
-      <contacts-sidebar></contacts-sidebar>
+      <contacts-sidebar v-if="auth.authenticated"></contacts-sidebar>
     </div>
     <div class="col-lg-10 px-0 pr-lg-3 mb-3 main">
-      <router-view></router-view>
+      <router-view v-if="auth.authenticated"></router-view>
     </div>
     <remove-folder-dialog />
     <column-headers />
@@ -29,9 +29,11 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Contacts',
+
   components: {
     RemoveListConfirmation,
     SelectListModal,
@@ -43,12 +45,9 @@ export default {
     ColumnHeaders,
     MoveDialog,
     CreateListModal
+  },
+  computed: {
+    ...mapState(['auth'])
   }
 }
 </script>
-
-<style lang="scss">
-  .content-row {
-    height: auto !important;
-  }
-</style>

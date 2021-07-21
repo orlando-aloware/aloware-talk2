@@ -1,7 +1,6 @@
 <template>
   <div class="pl-lg-3 ml-lg-3 q-px-xs-md">
     <div class="call-active">
-      <call-active name="May Kerr" time="00:00"/>
     </div>
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side></inbox-side>
@@ -15,11 +14,9 @@
 import InboxSide from 'components/inbox/inbox-side'
 import InboxMid from 'components/inbox/inbox-mid'
 import InboxEnd from 'components/inbox/inbox-end'
-import CallActive from 'components/inbox/call-active/call-active'
 
 export default {
   components: {
-    CallActive,
     InboxEnd,
     InboxSide,
     InboxMid
@@ -31,7 +28,8 @@ export default {
   },
   data () {
     return {
-      contactInfoOpen: false
+      contactInfoOpen: false,
+      title: 'Inbox'
     }
   }
 }

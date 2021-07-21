@@ -1,53 +1,92 @@
 <template>
-  <div>
-    <div class="pt-2">
-      <div v-if="messageComposer.sms.gif_url || messageComposer.sms.attachments.length > 0" class="mb-2 d-inline-flex media-preview-wrapper">
-        <div v-if="messageComposer.sms.gif_url" class="media-preview">
+  <div class="pt-2">
+    <div>
+      <div v-if="messageComposer.sms.gif_url || messageComposer.sms.attachments.length > 0"
+           class="mb-2 d-inline-flex media-preview-wrapper">
+        <div v-if="messageComposer.sms.gif_url"
+             class="media-preview">
           <img class="img-preview"
                :src="messageComposer.sms.gif_url"/>
-          <b-button pill size="sm" class="btn-remove-attachments" v-on:click="removeMessageGif"> <i class="fa fa-times"></i> </b-button>
+          <b-button size="sm"
+                    class="btn-remove-attachments"
+                    v-on:click="removeMessageGif"
+                    pill>
+            <i class="fa fa-times"></i>
+          </b-button>
         </div>
 
-        <div v-for="attachment of messageComposer.sms.attachments" :key="attachment.id" class="media-preview">
-          <div v-if="attachment.mimetype.includes('audio')" class="audio-thumbnail-wrapper">
+        <div v-for="attachment of messageComposer.sms.attachments"
+             :key="attachment.id"
+             class="media-preview">
+          <div v-if="attachment.mimetype.includes('audio')"
+               class="audio-thumbnail-wrapper">
             <div class="text-center media-icon-wrapper mt-2">
               <i class="fa fa-microphone media-icon"></i>
             </div>
             <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
-            <b-button pill size="sm" class="btn-remove-attachments" v-on:click="removeAttachment(attachment)"> <i class="fa fa-times"></i> </b-button>
+            <b-button size="sm"
+                      class="btn-remove-attachments"
+                      v-on:click="removeAttachment(attachment)"
+                      pill>
+              <i class="fa fa-times"></i>
+            </b-button>
           </div>
-          <div v-if="attachment.mimetype.includes('pdf')" class="pdf-thumbnail-wrapper">
+          <div v-if="attachment.mimetype.includes('pdf')"
+               class="pdf-thumbnail-wrapper">
             <div class="text-center media-icon-wrapper mt-2">
               <i class="far fa-file-pdf media-icon"></i>
             </div>
             <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
-            <b-button pill size="sm" class="btn-remove-attachments" v-on:click="removeAttachment(attachment)"> <i class="fa fa-times"></i> </b-button>
+            <b-button size="sm"
+                      class="btn-remove-attachments"
+                      v-on:click="removeAttachment(attachment)"
+                      pill>
+              <i class="fa fa-times"></i>
+            </b-button>
           </div>
-          <div v-if="attachment.mimetype.includes('video')" class="video-thumbnail-wrapper">
-            <b-embed type="video" aspect="1by1">
-              <source :src="getPreviewLink(attachment.uuid)" :type="attachment.mimetype">
+          <div v-if="attachment.mimetype.includes('video')"
+               class="video-thumbnail-wrapper">
+            <b-embed type="video"
+                     aspect="1by1">
+              <source :src="getPreviewLink(attachment.uuid)"
+                      :type="attachment.mimetype">
             </b-embed>
-            <b-button pill size="sm" variant="light" class="btn-play"> <i class="fa fa-play"></i> </b-button>
-            <b-button pill size="sm" class="btn-remove-attachments" v-on:click="removeAttachment(attachment)"> <i class="fa fa-times"></i> </b-button>
+            <b-button size="sm"
+                      variant="light"
+                      class="btn-play"
+                      pill>
+              <i class="fa fa-play"></i>
+            </b-button>
+            <b-button size="sm"
+                      class="btn-remove-attachments"
+                      v-on:click="removeAttachment(attachment)"
+                      pill>
+              <i class="fa fa-times"></i>
+            </b-button>
           </div>
           <div v-if="attachment.mimetype.includes('image')">
             <img  class="img-preview"
                   :src="getPreviewLink(attachment.uuid)"/>
-            <b-button pill size="sm" class="btn-remove-attachments" v-on:click="removeAttachment(attachment)"> <i class="fa fa-times"></i> </b-button>
+            <b-button size="sm"
+                      class="btn-remove-attachments"
+                      v-on:click="removeAttachment(attachment)"
+                      pill>
+              <i class="fa fa-times"></i>
+            </b-button>
           </div>
         </div>
 
       </div>
-      <q-input borderless
-               autogrow
-               ref="smsMessageBody"
+      <q-input ref="smsMessageBody"
                class="q-input-composer"
                input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                type="textarea"
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
-               @input="updateMessage"
-      />
+               borderless
+               autogrow
+               @input="updateMessage">
+      </q-input>
     </div>
     <div class="d-flex justify-content-between">
       <div class="message-options">

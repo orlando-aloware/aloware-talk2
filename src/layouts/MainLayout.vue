@@ -1,55 +1,39 @@
 <template>
-  <div
-    class="h-100"
-    :class="[
+  <div class="h-100"
+       :class="[
       authenticated ? 'dashboard' : 'guest',
       lightMode ? 'light-mode' : 'night-mode'
-    ]"
-  >
-    <q-layout
-      class="page-layout h-100 pb-sm-0"
-      view="lHh Lpr lff"
-      :height="'100%'"
-      v-if="!showUpgradeDialog"
-    >
-      <div
-        class="h-100"
-        :class="[
-          sidebarVisible ? 'sidebar-active' : '',
-          authenticated
-            ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2'
-            : ''
-        ]"
-      >
-        <q-header
-          class="page-header bg-transparent p-3 py-sm-0 pl-sm-2 pl-lg-4 pt-lg-1 pr-2 pr-lg-2 mx-0 ml-lg-2 mr-lg-2"
-          v-show="authenticated && !isWidget && !loading"
-        >
-          <app-header @toggleSidebar="toggleSidebar" />
+    ]">
+    <q-layout class="page-layout h-100 pb-sm-0"
+              view="lHh Lpr lff"
+              :height="'100%'"
+              v-if="!showUpgradeDialog">
+      <div class="h-100"
+           :class="[ sidebarVisible ? 'sidebar-active' : '']">
+        <q-header class="page-header bg-white text-black no-box-shadow"
+                  style="border-bottom: 1px solid #EBEBEB;"
+                  v-show="authenticated && !isWidget && !loading">
+          <app-header @toggleSidebar="toggleSidebar"/>
         </q-header>
-        <q-page-container
-          class="page-container h-100 "
-        >
-          <section class="main-content section h-100 py-2">
+        <q-page-container class="page-container h-100">
+          <section class="main-content section h-100">
             <template v-if="!loading">
-              <transition
-                :name="transitionName"
-                mode="out-in"
-                @beforeLeave="beforeLeave"
-                @enter="enter"
-                @afterEnter="afterEnter"
-              >
+              <transition :name="transitionName"
+                          mode="out-in"
+                          @beforeLeave="beforeLeave"
+                          @enter="enter"
+                          @afterEnter="afterEnter">
                 <keep-alive>
                   <router-view></router-view>
                 </keep-alive>
               </transition>
             </template>
-            <div
-              v-else
-              class="d-flex justify-content-center align-items-center text-center text-black h-100"
-            >
+            <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
+                 v-else>
               <div class="container">
-                <q-spinner-bars color="primary" size="40px" />
+                <q-spinner-bars color="primary"
+                                size="40px">
+                </q-spinner-bars>
                 <div>
                   <div v-if="!onlineStatus">
                     <span>Network is <b>offline</b></span>
@@ -72,35 +56,28 @@
           <!--dialer v-if="authenticated"></dialer-->
         </q-page-container>
       </div>
-      <q-drawer
-        v-model="sidebarVisible"
-        v-show="sidebarVisible && authenticated && !loading"
-        :breakpoint="0"
-        class="h-100 sidebar-wrapper d-none d-sm-block"
-        :width="60"
-        content-class="sidebar"
-      >
+      <q-drawer v-model="sidebarVisible"
+                v-show="sidebarVisible && authenticated && !loading"
+                :breakpoint="0"
+                class="h-100 sidebar-wrapper d-none d-sm-block"
+                :width="64"
+                content-class="sidebar">
         <q-list>
-          <app-sidebar
-            class="page-sidebar"
-            :lightMode="lightMode"
-            @toggleMode="toggleMode"
-          />
+          <app-sidebar class="page-sidebar"
+                       :lightMode="lightMode"
+                       @toggleMode="toggleMode">
+          </app-sidebar>
         </q-list>
       </q-drawer>
-      <app-footer
-        v-if="authenticated && !isWidget && !loading"
-        class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
-        ref="appFooter"
-      >
+      <app-footer class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
+                  ref="appFooter"
+                  v-if="authenticated && !isWidget && !loading">
       </app-footer>
     </q-layout>
-    <q-dialog
-      v-model="showUpgradeDialog"
-      transition-show="scale"
-      transition-hide="scale"
-      persistent
-    >
+    <q-dialog v-model="showUpgradeDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
       <q-card class="bg-red text-white" style="width: 300px">
         <q-card-section>
           <div class="text-h6">Oops!</div>
@@ -111,66 +88,85 @@
           please download and install the new version to continue using it.
         </q-card-section>
 
-        <q-card-actions align="right" class="bg-white text-danger">
-          <q-btn type="a" label="Visit Website" @click="openApps" flat> </q-btn>
+        <q-card-actions align="right"
+                        class="bg-white text-danger">
+          <q-btn type="a"
+                 label="Visit Website"
+                 @click="openApps"
+                 flat>
+          </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog
-      v-model="showNewVersionDialog"
-      transition-show="scale"
-      transition-hide="scale"
-      persistent
-    >
-      <q-card class="bg-blue text-white" style="width: 300px">
+    <q-dialog v-model="showNewVersionDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-blue text-white"
+              style="width: 300px">
         <q-card-section>
           <div class="text-h6">Update Available</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none" v-html="updateDialogText">
+        <q-card-section class="q-pt-none"
+                        v-html="updateDialogText">
         </q-card-section>
 
-        <q-card-actions align="right" class="bg-white text-blue">
-          <q-btn label="Close" v-close-popup flat> </q-btn>
+        <q-card-actions align="right"
+                        class="bg-white text-blue">
+          <q-btn label="Close"
+                 v-close-popup flat>
+          </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog
-      v-model="showUpdateErrorDialog"
-      transition-show="scale"
-      transition-hide="scale"
-      persistent
-    >
-      <q-card class="bg-red text-white" style="width: 300px">
+    <q-dialog v-model="showUpdateErrorDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-red text-white width-300">
         <q-card-section>
           <div class="text-h6">Download Failed</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none" v-html="updateDialogText">
+        <q-card-section class="q-pt-none"
+                        v-html="updateDialogText">
         </q-card-section>
 
-        <q-card-actions align="right" class="bg-white">
-          <q-btn label="Close" text-color="red" v-close-popup flat> </q-btn>
-          <q-btn label="Quit" text-color="red" @click="quitApp" flat> </q-btn>
+        <q-card-actions align="right"
+                        class="bg-white">
+          <q-btn label="Close"
+                 text-color="red"
+                 v-close-popup flat>
+          </q-btn>
+          <q-btn label="Quit"
+                 text-color="red"
+                 @click="quitApp"
+                 flat>
+          </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog
-      v-model="showUpdateDownloadedDialog"
-      transition-show="scale"
-      transition-hide="scale"
-      persistent
-    >
-      <q-card class="bg-greenish text-white" style="width: 300px">
+    <q-dialog v-model="showUpdateDownloadedDialog"
+              transition-show="scale"
+              transition-hide="scale"
+              persistent>
+      <q-card class="bg-greenish text-white"
+              style="width: 300px">
         <q-card-section>
           <div class="text-h6">Update Downloaded</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none" v-html="updateDialogText">
+        <q-card-section class="q-pt-none"
+                        v-html="updateDialogText">
         </q-card-section>
 
-        <q-card-actions align="right" class="bg-white text-greenish">
-          <q-btn label="Restart" @click="restartApp" flat> </q-btn>
+        <q-card-actions align="right"
+                        class="bg-white text-greenish">
+          <q-btn label="Restart"
+                 @click="restartApp"
+                 flat>
+          </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -179,12 +175,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import {
-  aclMixin,
-  communicationMixin,
-  htmlMixin,
-  webrtcMixin
-} from '../boot/mixins'
+import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
 import broadcast from '../boot/broadcast'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
@@ -365,7 +356,12 @@ export default {
       // new desktop appointment notification
       window.VueEvent.listen(
         'new_desktop_appointment',
-        ({ engagement, contact, timeDiff, unit }) => {
+        ({
+          engagement,
+          contact,
+          timeDiff,
+          unit
+        }) => {
           this.handleDesktopAppointmentNotification(
             engagement,
             contact,
@@ -378,7 +374,12 @@ export default {
       // new desktop reminder notification
       window.VueEvent.listen(
         'new_desktop_reminder',
-        ({ engagement, contact, timeDiff, unit }) => {
+        ({
+          engagement,
+          contact,
+          timeDiff,
+          unit
+        }) => {
           this.handleDesktopReminderNotification(
             engagement,
             contact,
@@ -1296,7 +1297,10 @@ export default {
       'setDialerIsMuted'
     ]),
     ...mapActions('contacts', ['setCurrentListFilters']),
-    ...mapActions('auth', { logoutUser: 'logout', check: 'check' })
+    ...mapActions('auth', {
+      logoutUser: 'logout',
+      check: 'check'
+    })
   },
 
   watch: {
@@ -1329,6 +1333,7 @@ export default {
     }
   }
 }
+
 .guest {
   & .main-content {
     padding: 0 !important;

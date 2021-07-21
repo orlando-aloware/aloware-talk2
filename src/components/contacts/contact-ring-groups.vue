@@ -1,5 +1,5 @@
 <template>
-  <b-card class="mt-2 mb-2 border-0">
+  <b-card class="border-0">
     <h6>Contact Ring Groups</h6>
     <div v-if="!isEdit">
       <b-badge variant="primary"

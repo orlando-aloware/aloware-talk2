@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="pt-2 form-input-container">
+  <div class="pt-2">
+    <div class="form-input-container">
       <form>
         <at hideOnBlur
             name-key="full_name"
@@ -10,15 +10,25 @@
             <avatar class="contact-avatar mr-2 position-absolute"
                     width="30"
                     height="30"
-                    :name="props.item.full_name" />
-            <span :data-text="props.item.full_name" class="at-custom-text">{{ props.item.full_name }} <br><small>{{ props.item.email }}</small></span>
+                    :name="props.item.full_name">
+            </avatar>
+            <span :data-text="props.item.full_name"
+                  class="at-custom-text">
+              {{ props.item.full_name }}
+              <br>
+              <small>{{ props.item.email }}</small>
+            </span>
           </template>
           <template v-slot:embeddedItem="props">
             <span>
-                <span class="mention-tag" :data-id="props.current.id" :data-key="generateKey(32)">@{{ props.current.full_name }}</span>
+                <span class="mention-tag"
+                      :data-id="props.current.id"
+                      :data-key="generateKey(32)">
+                  @{{ props.current.full_name }}
+                </span>
             </span>
           </template>
-          <div contenteditable placeholder="Type @ to span mention someone"></div>
+          <div placeholder="Type @ to span mention someone" contenteditable></div>
         </at>
       </form>
     </div>

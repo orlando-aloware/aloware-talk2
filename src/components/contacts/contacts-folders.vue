@@ -87,7 +87,6 @@ import ContactMenuItem from './contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-icon.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
-
 export default {
   components: {
     TreeFolder,

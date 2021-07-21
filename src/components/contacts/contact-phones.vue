@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-card class="mt-2 mb-2 border-0" id="card-contact-phone">
+    <b-card class="border-0">
       <h6>All Numbers</h6>
       <contact-phones-list-items :phones="primaryPhone"
                                  @edit="onEditPhone"
@@ -14,8 +14,10 @@
       <b-link v-if="hasPermissionTo('update contact')"
               id="btn-show-phone-form"
               ref="phone_form"
-              href="#" class="custom-link text-decoration-none">
-        <plus-circle-icon></plus-circle-icon> Add Phone Number
+              href="#"
+              class="custom-link text-decoration-none">
+        <plus-circle-icon></plus-circle-icon>
+        Add Phone Number
       </b-link>
     </b-card>
     <b-popover custom-class="contact-phone-popover"

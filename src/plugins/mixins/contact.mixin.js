@@ -87,7 +87,7 @@ export default {
       headers: {
         Accept: 'application/json',
         Authorization: 'Bearer ' + localStorage.getItem('api_token'),
-        'X-Socket-Id': window.Echo.socketId()
+        'X-Socket-Id': window.Echo ? window.Echo.socketId() : ''
       },
       isLoadingPreviousActivities: false,
       activityTypes: [

@@ -1504,6 +1504,228 @@ span.mention {
   }
 }
 
+.text-left-align {
+  text-align: left;
+}
+
+.text-center-align {
+  text-align: center;
+}
+
+.text-right-align {
+  text-align: right;
+}
+
+.no-box-shadow {
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ Main layout
+ */
+.main-content {
+  padding-left: 64px !important;
+  background: #F4F4F4;
+}
+
+/*
+ Contact page
+ */
+.contact-list-sidebar-wrapper {
+  height: 100%;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+
+  .sidebar-toggle {
+    position: absolute;
+    top: 8px;
+    right: -10px;
+    z-index: 1;
+    border: 1px solid $grey-60;
+    background: $white;
+    padding: 0.15rem;
+    line-height: 0.5;
+  }
+
+  .card {
+    height: calc(100vh - 62px) !important;
+    overflow: auto;
+    position: relative;
+    width: 300px;
+
+    .list-group-item {
+      padding: 0.75rem 0.5rem;
+      margin-top: 2px;
+    }
+
+    .list-group-item.active,
+    .list-group-item:hover {
+      background: $grey-50;
+      color: $grey-100;
+      border-radius: 10px;
+    }
+
+    .contact-details {
+      border-bottom: 1px solid $grey-50;
+
+      .contact-name{
+        font-size: $f-size-13;
+        color: $grey-100;
+        font-weight: 500;
+        display: inline-block;
+        width: 190px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .contact-phone {
+        font-size: 13px;
+        font-weight: 400;
+        color: $grey-80;
+        margin-top: -10px;
+      }
+
+      .contact-badge{
+        margin-top: 15px;
+      }
+    }
+  }
+
+  .contact-avatar {
+    margin-top: 0 !important;
+    background-color: $grey-80 !important;
+    color: $white !important;
+    font-weight: 600;
+  }
+
+}
+
+.contact-list-sidebar-container.width-0 {
+  margin-left: 15px;
+}
+
+.contact-details-wrapper {
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+
+  .details-component-container {
+    width: 100%;
+    height: calc(100vh - 62px);
+    overflow: auto;
+
+    .card {
+      width: 300px;
+      margin: 10px auto;
+    }
+  }
+}
+
+.contact-view-wrapper {
+  overflow: hidden;
+  position: relative;
+  background: #F4F4F6;
+
+  .contact-activity-wrapper.w-less-630px {
+    width: calc(100% - 630px)
+  }
+
+  .contact-activity-wrapper.w-less-345px {
+    width: calc(100% - 345px)
+  }
+
+  .prev-activities {
+    .q-btn__wrapper {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+  }
+}
+
+/*
+ Quasar related
+ */
+
+.tab-dropdown {
+  & .q-focus-helper {
+    display: none;
+  }
+
+  & .q-btn-dropdown__arrow {
+    font-size: 0;
+    border: solid #62666E;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 2px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  & .q-btn-dropdown__arrow.rotate-180 {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+
+  & .availability-status {
+    top: -1px;
+    right: -1px;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    padding: 0px;
+  }
+}
+
+.q-menu {
+  @extend .text-sm;
+}
+
+/*
+ Utilities
+ */
+
+.no-select {
+  user-drag: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+
+  & ::selection {
+    background: transparent; /* WebKit/Blink Browsers */
+  }
+
+  & ::-moz-selection {
+    background: transparent; /* Gecko Browsers */
+  }
+}
+
+.allow-select {
+  -webkit-touch-callout: default; /* iOS Safari */
+  -webkit-user-select: text; /* Safari */
+  -khtml-user-select: text; /* Konqueror HTML */
+  -moz-user-select: text; /* Firefox */
+  -ms-user-select: text; /* Internet Explorer/Edge */
+  user-select: text; /* Non-prefixed version, currently supported by Chrome and Opera */
+
+  & ::selection {
+    background: rgba($primary, 0.2) !important; /* WebKit/Blink Browsers */
+  }
+
+  & ::-moz-selection {
+    background: rgba($primary, 0.2) !important; /* Gecko Browsers */
+  }
+}
+
 .inbox-side {
   max-width: 508px;
   width: 100% !important;

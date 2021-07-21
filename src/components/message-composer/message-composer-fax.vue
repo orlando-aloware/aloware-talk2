@@ -1,6 +1,7 @@
 <template>
   <div class="pt-2">
-    <div v-if="validFax" class="d-inline-flex media-preview-wrapper">
+    <div v-if="validFax"
+         class="d-inline-flex media-preview-wrapper">
       <div class="media-preview">
         <div class="pdf-thumbnail-wrapper">
           <div class="text-center media-icon-wrapper mt-2">
@@ -11,31 +12,41 @@
         </div>
       </div>
     </div>
-    <div v-if="!validFax" class="fax-file-wrapper cursor-pointer"
+    <div v-if="!validFax"
+         class="fax-file-wrapper cursor-pointer"
          @click="onBrowse"
          @drop.prevent="onDrop"
          @dragover.prevent>
       <form ref="faxForm">
-        <b-form-group id="fileInput" class="dragdrop">
-          <div class="text-center uploader-label" v-if="!isUploading">
-            <upload-icon height="32" width="32" class="pb-1"></upload-icon>
-            <p class="mb-0">Drop PDF files here, or <span style="color: #256EFF;">Browse</span></p>
-            <p class="file-info">Maximum PDF file size is 8MB</p>
+        <b-form-group id="fileInput"
+                      class="dragdrop">
+          <div class="text-center uploader-label"
+               v-if="!isUploading">
+            <upload-icon height="20"
+                         width="20"
+                         class="pb-1">
+            </upload-icon>
+            <p class="text-xs mb-0">Drop PDF files here, or <span class="text-primary">Browse</span></p>
+            <p class="text-xxs file-info">Maximum PDF file size is 8MB</p>
           </div>
           <div v-if="isUploading" class="text-center uploading-label pl-2 pr-2">
-            <b-progress :max="100" variant="success" class="100">
-              <b-progress-bar :value="uploadPercentage" :label="`${uploadPercentage}%`"></b-progress-bar>
+            <b-progress :max="100"
+                        variant="success"
+                        class="100">
+              <b-progress-bar :value="uploadPercentage"
+                              :label="`${uploadPercentage}%`">
+              </b-progress-bar>
             </b-progress>
             <p class="mb-0">Uploading PDF File...</p>
           </div>
           <input v-if="!isUploading"
-                 v-cloak
-                 multiple
                  type="file"
                  class="w-px h-px opacity-0 overflow-hidden absolute d-none"
                  ref="file"
                  accept="application/pdf"
-                 @change="onSelect" />
+                 @change="onSelect"
+                 v-cloak
+                 multiple/>
         </b-form-group>
       </form>
     </div>
@@ -47,7 +58,9 @@
                   size="sm"
                   :disabled="isSending || !validFax"
                   v-on:click="send">
-          <q-spinner-bars v-if="isSending" color="white" />
+          <q-spinner-bars v-if="isSending"
+                          color="white">
+          </q-spinner-bars>
           {{ isSending ? 'Sending Fax...' : 'Send Fax' }}
         </b-button>
       </b-button-group>
@@ -163,9 +176,7 @@ export default {
 
 <style lang="scss" scoped>
   .file-info {
-    font-size: 12px;
     margin-bottom: 0 !important;
-    font-weight: normal;
   }
 
   .custom-progress-bar {

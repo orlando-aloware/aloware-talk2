@@ -389,7 +389,6 @@ export default {
       this.resetFilters()
       this.initialListFilters = this.currentListFilters
       this.filtersCount = this.getFiltersCount(this.currentListFilters)
-      this.fetch()
     },
     currentListFilters: {
       deep: true,

@@ -10,7 +10,7 @@
               behavior="menu"
               v-model="contact.disposition_status_id"
               :options="options"
-              :loading="is_busy"
+              :loading="isBusy"
               :disable="disabled"
               @filter="filterFn"/>
   </div>
@@ -34,14 +34,14 @@ export default {
     }
   },
   computed: {
-    ...mapState(['disposition_statuses', 'currentCompany']),
+    ...mapState(['dispositionStatuses', 'currentCompany']),
     ...mapGetters('contacts', ['contact']),
     isCompanyAgent () {
       return this.hasRole(Roles.COMPANY_AGENT)
     },
     sortedStatusDispositions () {
-      if (this.disposition_statuses) {
-        let dispositionStatuses = _.clone(this.disposition_statuses)
+      if (this.dispositionStatuses) {
+        let dispositionStatuses = _.clone(this.dispositionStatuses)
           .sort((a, b) => {
             let textA = a.name.toUpperCase()
             let textB = b.name.toUpperCase()
@@ -63,7 +63,7 @@ export default {
   },
   data () {
     return {
-      is_busy: false,
+      isBusy: false,
       options: [],
       Roles
     }
@@ -79,16 +79,15 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        console.log(val)
         this.options = this.sortedStatusDispositions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     onDispose () {
-      this.is_busy = true
+      this.isBusy = true
       talk2Api.V1.contact.dispose(this.contact.id, { 'disposition_status': this.contact.disposition_status_id }).then(response => {
         this.setContact(response.data)
       }).finally(() => {
-        this.is_busy = false
+        this.isBusy = false
       })
     },
     ...mapActions('contacts', ['setContact'])

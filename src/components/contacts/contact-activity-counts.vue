@@ -1,5 +1,5 @@
 <template>
-  <b-card class="mt-2 mb-2 border-0">
+  <b-card class="border-0">
     <h6>Activity Counts</h6>
     <b-row>
       <b-col col lg="6" class="p-0">

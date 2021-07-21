@@ -1,130 +1,85 @@
 <template>
-  <q-toolbar class="page-header">
+  <q-toolbar class="page-header pl-4 pr-4">
     <div class="d-flex h-100 align-items-center">
-      <q-btn flat
-             @click="toggleSidebar"
-             round
-             dense
-             icon="img:app-icons/header/nav_icon-burger.svg"
-             class="mobile-menu d-none d-sm-block d-lg-none mr-2" />
-      <q-img :src="pageIcon"
-             height="20px"
-             width="20px"
-             class="page-icon mr-1 d-none d-sm-block d-lg-none" />
-      <div class="page-title font-weight-bold">
-        {{ $route.name }}
-      </div>
+      <h1>{{ $route.name }}</h1>
     </div>
     <div class="ml-auto d-none d-lg-block">
       <div class="d-flex h-100 align-items-center">
-<!--        <q-btn flat-->
-<!--               @click="toggleSidebar"-->
-<!--               round-->
-<!--               dense-->
-<!--               icon="img:app-icons/header/nav_icon-dialer.svg"-->
-<!--               class="mr-2 ml-auto"-->
-<!--               style="color: #202125;" />-->
-        <call-active name="May Kerr" time="00:00" />
-        <q-btn flat
-               @click="toggleSidebar"
-               round
-               dense
-               icon="img:app-icons/header/nav_icon-notification.svg"
-               class="mr-2 ml-auto"
-               style="color: #202125;" />
-        <div v-if="user.profile"
-             class="d-none d-lg-block mr-2 ml-auto">
-          <span>
-            <div class="small-text">
-              <strong>{{ user.profile.name }}</strong>
-              <template v-if="phoneNumber">
-                | {{ phoneNumber | fixPhone }}
+        <q-item>
+          <q-item-section>
+            <q-item-label class="text-regular _500">{{ user.profile.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section avatar>
+            <q-btn-dropdown class="tab-dropdown"
+                            menu-self="top right"
+                            ref="menu"
+                            :ripple="false"
+                            :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
+                            auto-close
+                            flat>
+              <template v-slot:label>
+                <q-avatar size="34px"
+                          v-if="user.profile"
+                          class="has-text-light"
+                          :style="avatarStyle(user.profile.name)">
+                  {{ user.profile.name | fixName | initials }}
+                  <q-badge :color="color"
+                           class="availability-status"
+                           floating>
+                  </q-badge>
+                </q-avatar>
               </template>
-            </div>
-            <div class="xs-text inactive status-label w-100 text-right">{{ statusLabel }}</div>
-          </span>
-        </div>
-        <q-btn-dropdown avatar
-                        flat
-                        round
-                        dropdown-icon="img:app-icons/header/arrow-down.svg"
-                        class="profile-menu ml-auto d-none d-lg-block"
-                        content-style="{ padding: '0' }">
-          <template v-if="user.profile"
-                    v-slot:label>
-            <div class="items-center no-wrap">
-              <div class="text-center">
-                <span class="d-flex justify-content-center align-items-center w-40 avatar agent-avatar grey-300"
-                      v-bind:style="avatarStyle(user.profile.name)">
-                    <span>{{ user.profile.name | initials }}</span>
-                    <i class="b-white bottom"
-                       :class="[ $options.filters.agentStatusClass(user.profile.agent_status) ]">
-                    </i>
-                </span>
-              </div>
-            </div>
-          </template>
-          <q-list class="list-drp">
-            <q-item class="pl-3 pr-3"
-                    v-close-popup
-                    clickable>
-              <q-item-section>
-                Test 1
-              </q-item-section>
-            </q-item>
-            <q-item class="pl-3 pr-3"
-                    v-close-popup
-                    clickable>
-              Test 2
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+
+              <q-list class="tab-dropdown-list no-select">
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>Offline</q-item-section>
+                </q-item>
+
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>Available</q-item-section>
+                </q-item>
+
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>Busy</q-item-section>
+                </q-item>
+
+                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'has-text-link has-text-weight-medium' : '']"
+                        clickable>
+                  <q-item-section>On-break</q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </q-item-section>
+        </q-item>
       </div>
     </div>
     <div class="ml-auto d-block d-sm-none">
       <div class="d-flex h-100 align-items-center">
-        <q-btn flat
-               round
-               dense
-               icon="img:app-icons/header/search.svg"
-               class="mr-2 ml-auto"
-               style="color: #202125;" />
-        <q-btn flat
-               @click="toggleSidebar"
-               round
-               dense
-               icon="img:app-icons/header/inactive/notification.svg"
-               class="mr-2 ml-auto"
-               style="color: #202125;" />
+
       </div>
     </div>
   </q-toolbar>
 </template>
 
 <script>
-import * as AgentStatus from '../../constants/agent-status'
-import { avatarMixin } from '../../boot/mixins'
 import { mapGetters, mapState } from 'vuex'
-
-import CallActive from 'components/inbox/call-active/call-active'
+import * as AgentStatus from '../../constants/agent-status'
+import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-header',
-  components: { CallActive },
-  mixins: [
-    avatarMixin
-  ],
+
+  mixins: [aclMixin, avatarMixin, agentMixin],
+
   data () {
     return {
-      pageIcons: {
-        inbox: 'app-icons/menu/inbox_green.svg',
-        contacts: 'app-icons/menu/contacts_green.svg',
-        powerdialer: 'app-icons/menu/powerdialer_green.svg',
-        dashboard: 'app-icons/menu/dashboard_green.svg',
-        account: 'app-icons/menu/account_green.svg',
-        settings: 'app-icons/menu/settings_green.svg'
-      },
-      pageIcon: null,
       AgentStatus
     }
   },
@@ -132,6 +87,7 @@ export default {
   computed: {
     ...mapState(['dialer', 'campaigns']),
     ...mapGetters('auth', ['user']),
+
     statusLabel () {
       switch (this.user.profile.agent_status) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
@@ -161,26 +117,14 @@ export default {
     }
   },
 
-  created () {
-    this.updatePageIcon()
-  },
-
   methods: {
-    updatePageIcon () {
-      if (this.$route.name) {
-        let pageIndex = this.$route.name.toLowerCase().replace(' ', '')
-        this.pageIcon = this.pageIcons[pageIndex]
-      }
-    },
-
     toggleSidebar () {
       this.$emit('toggleSidebar')
-    }
-  },
+    },
 
-  watch: {
-    '$route.name': function () {
-      this.updatePageIcon()
+    changeStatus (status) {
+      this.changeAgentStatus(status)
+      this.$refs.menu.hide()
     }
   }
 }

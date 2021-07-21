@@ -70,13 +70,11 @@ const login = async ({ commit }, {
   }
 }
 
-const logout = async ({ commit }, { deviceInfo = null }) => {
+const logout = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
-    const response = await window.axios.post('/logout', {
-      device_info: deviceInfo
-    })
+    const response = await window.axios.post('/logout')
 
     localStorage.removeItem('api_token')
     localStorage.removeItem('impersonate')
