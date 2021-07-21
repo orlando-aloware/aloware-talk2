@@ -1,5 +1,5 @@
 <template>
-  <b-card class="mt-2 mb-2 border-0">
+  <b-card class="border-0">
     <h6>Broadcast</h6>
     <div>
       <b-badge v-for="broadcast in contact.broadcasts"

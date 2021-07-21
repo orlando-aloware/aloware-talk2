@@ -1,5 +1,5 @@
 <template>
-  <b-card class="mt-2 mb-2 border-0 position-relative">
+  <b-card class="border-0 position-relative">
     <h6>About this contact</h6>
 
     <div :class="`information-container ${autoHeightClass}`">

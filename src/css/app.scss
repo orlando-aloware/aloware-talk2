@@ -527,6 +527,10 @@ body,
   width: 300px;
 }
 
+.width-330 {
+  width: 330px;
+}
+
 .width-380 {
   width: 380px;
 }
@@ -1506,4 +1510,128 @@ span.mention {
   -webkit-box-shadow: none !important;
   -moz-box-shadow: none !important;
   box-shadow: none !important;
+}
+
+/*
+ Main layout
+ */
+.main-content {
+  padding-left: 1.90rem !important;
+}
+
+/*
+ Contact page
+ */
+.contact-list-sidebar-wrapper {
+  height: 100%;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+
+  .sidebar-toggle {
+    position: absolute;
+    top: 8px;
+    right: -10px;
+    z-index: 1;
+    border: 1px solid $grey-60;
+    background: $white;
+    padding: 0.15rem;
+    line-height: 0.5;
+  }
+
+  .card {
+    height: calc(100vh - 62px) !important;
+    overflow: auto;
+    position: relative;
+    width: 300px;
+
+    .list-group-item {
+      padding: 0.75rem 0.5rem;
+      margin-top: 2px;
+    }
+
+    .list-group-item.active,
+    .list-group-item:hover {
+      background: $grey-50;
+      color: $grey-100;
+      border-radius: 10px;
+    }
+
+    .contact-details {
+      border-bottom: 1px solid $grey-50;
+
+      .contact-name{
+        font-size: $f-size-13;
+        color: $grey-100;
+        font-weight: 500;
+        display: inline-block;
+        width: 190px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .contact-phone {
+        font-size: 13px;
+        font-weight: 400;
+        color: $grey-80;
+        margin-top: -10px;
+      }
+
+      .contact-badge{
+        margin-top: 15px;
+      }
+    }
+  }
+
+  .contact-avatar {
+    margin-top: 0 !important;
+    background-color: $grey-80 !important;
+    color: $white !important;
+    font-weight: 600;
+  }
+
+}
+
+.contact-list-sidebar-container.width-0 {
+  margin-left: 15px;
+}
+
+.contact-details-wrapper {
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+
+  .details-component-container {
+    width: 100%;
+    height: calc(100vh - 62px);
+    overflow: auto;
+
+    .card {
+      width: 300px;
+      margin: 10px auto;
+    }
+  }
+}
+
+.contact-view-wrapper {
+  overflow: hidden;
+  position: relative;
+  background: #F4F4F6;
+
+  .contact-activity-wrapper.w-less-630px {
+    width: calc(100% - 630px)
+  }
+
+  .contact-activity-wrapper.w-less-345px {
+    width: calc(100% - 345px)
+  }
+
+  .prev-activities {
+    .q-btn__wrapper {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+  }
 }
