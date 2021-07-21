@@ -58,6 +58,10 @@
             </q-btn-dropdown>
           </q-item-section>
         </q-item>
+
+        <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
+                     vertical>
+        </q-separator>
       </div>
     </div>
     <div class="ml-auto d-block d-sm-none">

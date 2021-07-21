@@ -531,26 +531,6 @@ body,
   border-color: #dae0e5;
 }
 
-.width-40 {
-  width: 40px;
-}
-
-.width-300 {
-  width: 300px;
-}
-
-.width-330 {
-  width: 330px;
-}
-
-.width-380 {
-  width: 380px;
-}
-
-.width-0 {
-  width: 0;
-}
-
 .popover {
   font-family: $font-family-body !important;
 }
@@ -1691,6 +1671,30 @@ span.mention {
 /*
  Utilities
  */
+
+.height-28 {
+  height: 28px;
+}
+
+.width-40 {
+  width: 40px;
+}
+
+.width-300 {
+  width: 300px;
+}
+
+.width-330 {
+  width: 330px;
+}
+
+.width-380 {
+  width: 380px;
+}
+
+.width-0 {
+  width: 0;
+}
 
 .margin-auto {
   margin: auto auto;
