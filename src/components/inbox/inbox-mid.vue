@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-mid mr-3 border-left-0" :class="{'inbox-mid--show': showingMid}">
+  <div class="inbox-mid border-left-0 border-top-0" :class="{'inbox-mid--show': showingMid}">
     <inbox-mid-call v-if="showMessage" @toggle="toggle"/>
     <inbox-mid-msg v-if="!showMessage" @toggle="toggle"/>
   </div>

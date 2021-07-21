@@ -1,5 +1,5 @@
 <template>
-<div class="inbox-end">
+<div class="inbox-end mx-3 mt-3 border-top-0 bg-transparent">
   <div class="inbox-info">
   </div>
 </div>
@@ -30,23 +30,4 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
-
-.inbox-info {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.inbox-end {
-  background-color: $white;
-  border: solid 1px $grey-light3;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  display: none;
-  @include screen('lg') {
-    width: 330px;
-    display: flex;
-  }
-}
 </style>

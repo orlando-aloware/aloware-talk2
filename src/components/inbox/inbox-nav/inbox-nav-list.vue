@@ -24,6 +24,7 @@ export default {
   methods: {
     onItemClicked (nextActive) {
       this.active = nextActive
+      this.$emit('active', this.active)
     }
   },
   data: function () {

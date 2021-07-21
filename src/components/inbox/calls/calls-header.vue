@@ -53,21 +53,21 @@ export default {
       ],
       optionsRight: [
         {
-          label: 'Newest',
-          value: 'Newest'
-        },
-        {
           label: 'Oldest',
           value: 'oldest'
+        },
+        {
+          label: 'Newest',
+          value: 'newest'
+        },
+        {
+          label: 'Priority first',
+          value: 'priority'
         }
       ],
       filterLeft: 'everything',
-      filterRight: 'oldest'
+      filterRight: 'newest'
     }
-  },
-  mounted () {
-    console.log('ref: ', this.$refs.select)
-    // this.icon.input.dropdown = 'arrow_downward'
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <a
-    class="inbox-nav-item mx-2"
+    class="inbox-nav-item mx-2 px-1"
     v-bind:class="{
       'inbox-nav-item__active': isActive,
       'inbox-nav-item--closed': closed,

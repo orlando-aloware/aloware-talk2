@@ -1745,7 +1745,7 @@ span.mention {
   }
 
   &__left {
-    max-width: 280px;
+    max-width: 200px;
     width: 100%;
     overflow: hidden;
 
@@ -1789,6 +1789,24 @@ span.mention {
   }
 }
 
+.inbox-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inbox-end {
+  background-color: $white;
+  position: relative;
+  overflow: hidden;
+  max-width: 330px;
+  width: 100%;
+  display: none;
+  @include screen('lg') {
+    display: flex;
+  }
+}
+
 .form-control-search {
   width: 100%;
   height: 32px !important;
@@ -1800,4 +1818,27 @@ span.mention {
 }
 .form-control-search::-webkit-input-placeholder {
   font-size: 12px;
+}
+
+.task-item {
+  .contact-name {
+    @include font-size(14px, 500);
+    line-height: 17px;
+  }
+  .avatar {
+    max-width: 64px;
+    width: 100%;
+  }
+  .comm-label {
+    @include font-size(12px, 'normal');
+    line-height: 15px;
+  }
+  .campaign-name {
+    @include font-size(10px, 'normal');
+    line-height: 12px;
+  }
+  .time-passed {
+    @include font-size(12px, 'normal');
+    line-height: 15px;
+  }
 }

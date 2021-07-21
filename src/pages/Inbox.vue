@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-lg-3 ml-lg-3 q-px-xs-md">
+  <div>
     <div class="call-active">
     </div>
     <div class="inbox animate__animated animate__fadeIn position-relative">
