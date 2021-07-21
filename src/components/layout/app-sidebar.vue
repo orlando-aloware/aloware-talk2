@@ -1,84 +1,91 @@
 <template>
   <div class="d-flex align-items-start flex-column h-100 w-100">
     <div class="w-100">
-      <q-btn flat
-             icon="img:app-icons/menu/logo_white.svg"
+      <q-btn icon="img:app-icons/menu/logo_white.svg"
              size="1.1rem"
              align="center"
              to="/"
-             class="w-100 p-2">
+             class="w-100 p-2"
+             flat>
       </q-btn>
     </div>
-    <q-btn flat
+    <q-btn :to="{ name: 'Inbox' }"
+           :ripple="false"
            icon="img:app-icons/menu/inbox_active.svg"
            align="left"
-           :to="{ name: 'Inbox' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Inbox')"/>
-    <q-btn flat
+           v-show="isActive('Inbox')"
+           flat>
+    </q-btn>
+    <q-btn :to="{ name: 'Inbox' }"
+           :ripple="false"
            icon="img:app-icons/menu/inbox_gray.svg"
            align="center"
-           :to="{ name: 'Inbox' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Inbox')"/>
+           v-show="!isActive('Inbox')"
+           flat>
+    </q-btn>
 
-    <q-btn flat
+    <q-btn :to="{ name: 'Contacts' }"
+           :ripple="false"
            icon="img:app-icons/menu/contacts_active.svg"
            align="left"
-           :to="{ name: 'Contacts' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Contacts')"/>
-    <q-btn flat
-           icon="img:app-icons/menu/contacts_gray.svg"
+           v-show="isActive('Contacts')"
+           flat>
+    </q-btn>
+    <q-btn icon="img:app-icons/menu/contacts_gray.svg"
            align="center"
            :to="{ name: 'Contacts' }"
            :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Contacts')"/>
+           v-show="!isActive('Contacts')"
+           flat>
+    </q-btn>
 
-    <q-btn flat
+    <q-btn :to="{ name: 'Power Dialer' }"
+           :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
-           :to="{ name: 'Power Dialer' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Power Dialer')"/>
-    <q-btn flat
+           v-show="isActive('Power Dialer')"
+           flat>
+    </q-btn>
+    <q-btn :to="{ name: 'Power Dialer' }"
+           :ripple="false"
            icon="img:app-icons/menu/power_dialer_gray.svg"
            align="center"
-           :to="{ name: 'Power Dialer' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Power Dialer')"/>
+           v-show="!isActive('Power Dialer')"
+           flat>
+    </q-btn>
 
-    <q-btn flat
+    <q-btn :to="{ name: 'Stats' }"
+           :ripple="false"
            icon="img:app-icons/menu/stats_active.svg"
            align="left"
-           :to="{ name: 'Stats' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Stats')"/>
-    <q-btn flat
+           v-show="isActive('Stats')"
+           flat>
+    </q-btn>
+    <q-btn :to="{ name: 'Stats' }"
+           :ripple="false"
            icon="img:app-icons/menu/stats_gray.svg"
            align="center"
-           :to="{ name: 'Stats' }"
-           :ripple="false"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Stats')"/>
+           v-show="!isActive('Stats')"
+           flat>
+    </q-btn>
 
-    <q-btn flat
-           icon="img:app-icons/menu/settings_gray.svg"
+    <q-btn icon="img:app-icons/menu/settings_gray.svg"
            align="center"
            class="nav-icons w-100">
       <q-menu fit anchor="top right"
@@ -108,8 +115,7 @@
         <q-separator class="separator-blur mt-1"
                      color="white"/>
       </div>
-      <q-btn flat
-             :icon="modeIcon"
+      <q-btn :icon="modeIcon"
              :ripple="false"
              padding="none"
              size="0.75rem"
