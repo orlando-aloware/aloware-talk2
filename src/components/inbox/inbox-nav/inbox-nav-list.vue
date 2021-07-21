@@ -84,9 +84,5 @@ export default {
 .inbox-nav-list {
   display: flex;
   flex-direction: column;
-  &--closed {
-    max-width: 40px;
-    overflow: hidden;
-  }
 }
 </style>

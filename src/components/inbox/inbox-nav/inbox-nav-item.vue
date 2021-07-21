@@ -143,18 +143,7 @@ export default {
   }
 
   &__icon {
-    padding-right: 0;
-    @include screen('lg') {
-      padding-right: 10px;
-    }
-
-    &--opened {
-      padding-right: 10px;;
-    }
-
-    &--closed {
-      padding-right: 0 !important;
-    }
+    padding-right: 10px;
   }
 
   &__label {
@@ -162,7 +151,6 @@ export default {
     line-height: 17px;
     letter-spacing: -0.0025em;
     flex-grow: 1;
-    display: none;
 
     &--opened {
       display: block;

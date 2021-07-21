@@ -15,14 +15,17 @@
       <div class="d-flex flex-row">
         <div class="pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
-                     v-if="communication.disposition_status2">
+                     height="18px"
+                     width="18px">
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-                <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-                  {{ communication.direction | fixCommDirection }}
-                </span>
-          {{ communication.type | fixCommType }}
+          <span v-if="communication.type !== CommunicationTypes.SMS">
+            {{ communication.direction | fixCommDirection }} {{ communication.type | fixCommType }}
+          </span>
+          <span v-if="communication.body !== null">
+            {{ communication.body | truncate(22) }}
+          </span>
         </div>
       </div>
       <div class="campaign-name text-grey-10">
@@ -30,9 +33,9 @@
       </div>
     </div>
     <div class="actions text-right">
-      <span class="time-passed text-grey-90"
+      <span class="time-passed text-grey-90 mr-2"
             v-if="communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW">
-          {{ communication.created_at | dateTimePassed }}
+          {{ communication.created_at | shortDateTimePassed }}
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
             v-else>

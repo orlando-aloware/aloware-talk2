@@ -20,7 +20,7 @@
           no-caps
           dense
           unelevated
-          toggle-color="primary"
+          toggle-color="grey-9"
           color="white"
           text-color="primary"
           :options="options"
