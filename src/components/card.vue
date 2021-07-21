@@ -19,6 +19,7 @@ export default {
 @import '../css/mixins';
 @import '../css/variables';
 .mycard {
+  background: $white;
   box-sizing: border-box;
   border: solid 1px $grey-light3;
   @include border-radius(10px);
