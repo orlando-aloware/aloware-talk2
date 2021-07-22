@@ -2570,11 +2570,22 @@ span.mention {
   & .availability-status {
     top: -2px;
     right: -2px;
-    height: 12px;
-    width: 12px;
-    border-radius: 50%;
-    border: 2px solid #FFFFFF;
-    padding: 0px;
+
+    @extend .rounded-badge;
+  }
+}
+
+.rounded-badge {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  padding: 0px;
+}
+
+.tab-dropdown-list {
+  .q-item {
+    padding: 0 8px;
   }
 }
 
