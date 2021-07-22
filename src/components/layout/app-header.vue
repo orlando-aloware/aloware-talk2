@@ -10,11 +10,11 @@
             <q-item-label class="text-regular _500">{{ user.profile.first_name }}</q-item-label>
           </q-item-section>
           <q-item-section avatar>
-            <q-btn-dropdown class="tab-dropdown"
-                            menu-self="top right"
-                            ref="menu"
-                            :ripple="false"
+            <q-btn-dropdown :ripple="false"
                             :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
+                            class="tab-dropdown"
+                            ref="menu"
+                            :menu-offset="[4, 12]"
                             auto-close
                             flat>
               <template v-slot:label>
@@ -23,7 +23,7 @@
                           class="has-text-light"
                           :style="avatarStyle(user.profile.name)">
                   {{ user.profile.name | fixName | initials }}
-                  <q-badge :color="color"
+                  <q-badge :color="color(user.profile.agent_status)"
                            class="availability-status"
                            floating>
                   </q-badge>
@@ -32,27 +32,51 @@
 
               <q-list class="tab-dropdown-list no-select">
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'has-text-link has-text-weight-medium' : '']"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary _500' : '']"
                         clickable>
-                  <q-item-section>Offline</q-item-section>
+                  <div class="d-flex align-items-center">
+                    <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
+                             class="q-mr-sm"
+                             rounded>
+                    </q-badge>
+                    Offline
+                  </div>
                 </q-item>
 
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'has-text-link has-text-weight-medium' : '']"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                         clickable>
-                  <q-item-section>Available</q-item-section>
+                  <div class="d-flex align-items-center">
+                    <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
+                             class="q-mr-sm"
+                             rounded>
+                    </q-badge>
+                    Available
+                  </div>
                 </q-item>
 
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'has-text-link has-text-weight-medium' : '']"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                         clickable>
-                  <q-item-section>Busy</q-item-section>
+                  <div class="d-flex align-items-center">
+                    <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
+                             class="q-mr-sm"
+                             rounded>
+                    </q-badge>
+                    Busy
+                  </div>
                 </q-item>
 
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'has-text-link has-text-weight-medium' : '']"
+                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
                         clickable>
-                  <q-item-section>On-break</q-item-section>
+                  <div class="d-flex align-items-center">
+                    <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
+                             class="q-mr-sm"
+                             rounded>
+                    </q-badge>
+                    On-break
+                  </div>
                 </q-item>
               </q-list>
             </q-btn-dropdown>

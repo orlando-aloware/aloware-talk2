@@ -1681,6 +1681,13 @@ span.mention {
   }
 }
 
+.tab-dropdown-list {
+  .q-item {
+    min-height: 40px;
+    padding: 0 10px;
+  }
+}
+
 .q-menu {
   @extend .text-sm;
 }
