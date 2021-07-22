@@ -109,7 +109,7 @@
                  v-else-if="step === 2">
               <div class="mb-3">
                 <h6 class="contact-prop-label">Contact properties</h6>
-                <contacts-table-search placeholder="Search"
+                <search placeholder="Search"
                                        @search="searchFilter"/>
               </div>
               <b-list-group class="filter-list">
@@ -165,8 +165,8 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import ContactsTableSearch from './contacts-table-search.vue'
-import ContactsFilterTypes from './contacts-filter-types.vue'
+import Search from 'src/components/search.vue'
+import ContactsFilterTypes from 'src/components/contacts/contacts-filter-types.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import _ from 'lodash'
 import {
@@ -176,7 +176,7 @@ import {
   GROUP_CONTACT_COMM_METADATA } from 'src/constants/contact-filter-groups'
 
 export default {
-  components: { ContactsTableSearch, CompactBtn, ContactsFilterTypes },
+  components: { Search, CompactBtn, ContactsFilterTypes },
   data () {
     return {
       items: Array.from(new Array(10)),

@@ -50,11 +50,11 @@
     </template>
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
-        <contacts-table-search
+        <search
           placeholder="Search All Contacts"
           @search="onSearch"
           :disabled="isLoadingDisabled"
-        ></contacts-table-search>
+        ></search>
         <div class="px-3">
           <b-form-checkbox
             v-model="myContacts"
@@ -112,13 +112,13 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import CompactBtn from 'components/compact-btn.vue'
-import ContactsScreen from 'components/contacts/contacts-screen.vue'
-import ContactsTableSearch from 'components/contacts/contacts-table-search.vue'
-import Datatable from 'components/datatable.vue'
-import ImportContactsModal from 'components/import-contacts-modal.vue'
+import CompactBtn from 'src/components/compact-btn.vue'
+import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
+import Search from 'src/components/search.vue'
+import Datatable from 'src/components/datatable.vue'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
-import TableRow from 'components/table-row.vue'
+import TableRow from 'src/components/table-row.vue'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
@@ -128,7 +128,7 @@ export default {
   components: {
     CompactBtn,
     ContactsScreen,
-    ContactsTableSearch,
+    Search,
     Datatable,
     ImportContactsModal,
     TableRow,

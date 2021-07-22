@@ -8,10 +8,10 @@
     </template>
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
-        <contacts-table-search
+        <search
           @search="onSearch"
           :disabled="isLoadingDisabled"
-        ></contacts-table-search>
+        ></search>
         <div class="px-3">
           <b-form-checkbox
             v-model="myContacts"
@@ -77,24 +77,22 @@
 </template>
 
 <script>
-import { createContactFilters } from './filters'
 import { mapActions, mapGetters } from 'vuex'
-import * as ContactListTypes from '../../constants/contacts-list-types'
-import columns from 'src/constants/columns'
-import CompactBtn from 'components/compact-btn.vue'
-import ContactsScreen from 'components/contacts/contacts-screen.vue'
-import ContactsTableSearch from 'components/contacts/contacts-table-search.vue'
-import Datatable from 'components/datatable.vue'
-import ImportContactsModal from 'components/import-contacts-modal.vue'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+import CompactBtn from 'src/components/compact-btn.vue'
+import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
+import Search from 'src/components/search.vue'
+import Datatable from 'src/components/datatable.vue'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import moment from 'moment'
 import _ from 'lodash'
-import TableRow from 'components/table-row.vue'
+import TableRow from 'src/components/table-row.vue'
 
 export default {
   components: {
     CompactBtn,
     ContactsScreen,
-    ContactsTableSearch,
+    Search,
     Datatable,
     ImportContactsModal,
     TableRow
@@ -202,7 +200,7 @@ export default {
       if (type === ContactListTypes.DYNAMIC) {
         return window.axios
           .get('api/v2/contact', {
-            params: createContactFilters(params)
+            params: params
           })
           .then((response) => response.data)
       }

@@ -6,9 +6,11 @@
       :label="item.label"
       :value="item.value"
       :icon="item.icon"
-      :is-active="active === item.value"
+      :isActive="active === item.value"
       :closed="closed"
       :badge="true"
+      :openCount="openCount"
+      :pending-count="pendingCount"
       badge-value="20"
       badge-color="danger"
       @click="onItemClicked"
@@ -24,26 +26,32 @@ export default {
   methods: {
     onItemClicked (nextActive) {
       this.active = nextActive
+      this.$emit('active', this.active)
     }
   },
   data: function () {
     return {
-      active: 'tasks',
+      active: 'inbox',
       items: [
         {
-          label: 'Tasks',
-          value: 'tasks',
-          icon: 'task'
+          label: 'Inbox',
+          value: 'inbox',
+          icon: 'inbox'
         },
         {
           label: 'Calls',
           value: 'calls',
-          icon: 'phone'
+          icon: 'call'
         },
         {
           label: 'Messages',
           value: 'messages',
           icon: 'message'
+        },
+        {
+          label: 'Mentions',
+          value: 'mentions',
+          icon: 'mention'
         },
         {
           label: 'Voicemails',
@@ -65,6 +73,14 @@ export default {
     closed: {
       type: Boolean,
       default: false
+    },
+    openCount: {
+      required: false,
+      default: 0
+    },
+    pendingCount: {
+      required: false,
+      default: 0
     }
   }
 }
@@ -78,9 +94,5 @@ export default {
 .inbox-nav-list {
   display: flex;
   flex-direction: column;
-  &--closed {
-    max-width: 40px;
-    overflow: hidden;
-  }
 }
 </style>

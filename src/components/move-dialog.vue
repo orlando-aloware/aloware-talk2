@@ -10,11 +10,11 @@
     </div>
     <div class="move-dialog-input">
       <div>
-        <contacts-table-search
+        <search
           ref="folder-search"
           placeholder="Search..."
           @search="onSearch"
-        ></contacts-table-search>
+        ></search>
       </div>
     </div>
     <div class="move-dialog-lists">
@@ -54,9 +54,9 @@
 <script>
 import { createPopper } from '@popperjs/core'
 import { mapActions, mapGetters } from 'vuex'
-import MoveFolderItem from './move-folder-item.vue'
-import ContactsTableSearch from './contacts/contacts-table-search.vue'
-import CompactBtn from 'components/compact-btn.vue'
+import MoveFolderItem from 'src/components/move-folder-item.vue'
+import Search from 'src/components/search.vue'
+import CompactBtn from 'src/components/compact-btn.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let popperInstance
@@ -64,7 +64,7 @@ let popperInstance
 export default {
   components: {
     MoveFolderItem,
-    ContactsTableSearch,
+    Search,
     CompactBtn
   },
   data () {

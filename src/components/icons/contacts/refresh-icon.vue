@@ -21,11 +21,11 @@ export default {
   props: {
     width: {
       type: [Number, String],
-      default: 24
+      default: 14
     },
     height: {
       type: [Number, String],
-      default: 24
+      default: 14
     },
     iconColor: {
       type: String,

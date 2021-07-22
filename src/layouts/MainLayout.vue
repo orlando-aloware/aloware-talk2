@@ -9,12 +9,7 @@
               :height="'100%'"
               v-if="!showUpgradeDialog">
       <div class="h-100"
-           :class="[
-          sidebarVisible ? 'sidebar-active' : '',
-          authenticated
-            ? 'px-3 px-sm-0 pl-1 pl-sm-2 pl-lg-4 ml-sm-1 pt-sm-0 pr-2'
-            : ''
-        ]">
+           :class="[ sidebarVisible ? 'sidebar-active' : '']">
         <q-header class="page-header bg-white text-black no-box-shadow"
                   style="border-bottom: 1px solid #EBEBEB;"
                   v-show="authenticated && !isWidget && !loading">
@@ -24,10 +19,7 @@
           <section class="main-content section h-100">
             <template v-if="!loading">
               <transition :name="transitionName"
-                          mode="out-in"
-                          @beforeLeave="beforeLeave"
-                          @enter="enter"
-                          @afterEnter="afterEnter">
+                          mode="out-in">
                 <keep-alive>
                   <router-view></router-view>
                 </keep-alive>
@@ -65,14 +57,13 @@
                 v-show="sidebarVisible && authenticated && !loading"
                 :breakpoint="0"
                 class="h-100 sidebar-wrapper d-none d-sm-block"
-                :width="60"
+                :width="64"
                 content-class="sidebar">
         <q-list>
-          <app-sidebar
-            class="page-sidebar"
-            :lightMode="lightMode"
-            @toggleMode="toggleMode"
-          />
+          <app-sidebar class="page-sidebar"
+                       :lightMode="lightMode"
+                       @toggleMode="toggleMode">
+          </app-sidebar>
         </q-list>
       </q-drawer>
       <app-footer class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
@@ -130,8 +121,7 @@
               transition-show="scale"
               transition-hide="scale"
               persistent>
-      <q-card class="bg-red text-white"
-              style="width: 300px">
+      <q-card class="bg-red text-white width-300">
         <q-card-section>
           <div class="text-h6">Download Failed</div>
         </q-card-section>
@@ -206,6 +196,7 @@ export default {
     return {
       loading: true,
       loadingCampaigns: false,
+      loadingRingGroups: false,
       loadingUsers: false,
       loadingTags: false,
       loadingWorkflows: false,
@@ -573,24 +564,6 @@ export default {
       )
     },
 
-    beforeLeave (element) {
-      this.prevHeight = getComputedStyle(element).height
-    },
-
-    enter (element) {
-      const { height } = getComputedStyle(element)
-
-      element.style.height = this.prevHeight
-
-      setTimeout(() => {
-        element.style.height = height
-      })
-    },
-
-    afterEnter (element) {
-      element.style.height = '100%'
-    },
-
     removeBehaviorsRestrictions () {
       window.removeEventListener('keydown', this.removeBehaviorsRestrictions())
       window.removeEventListener(
@@ -721,6 +694,26 @@ export default {
           .catch((err) => {
             console.log(err)
             this.loadingCampaigns = false
+            return Promise.reject()
+          })
+      }
+    },
+
+    getRingGroups () {
+      if (this.hasPermissionTo('list ring group')) {
+        this.loadingRingGroups = true
+        return this.$axios
+          .get('/api/v1/ring-group', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setRingGroups(res.data)
+            this.loadingRingGroups = false
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingRingGroups = false
             return Promise.reject()
           })
       }
@@ -869,6 +862,7 @@ export default {
         }
         let getCurrentCompany = this.getCurrentCompany()
         let getCampaigns = this.getCampaigns()
+        let getRingGroups = this.getRingGroups()
         let getUsers = this.getUsers()
         let getTags = this.getTags()
         let getWorkflows = this.getWorkflows()
@@ -878,6 +872,7 @@ export default {
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
+          getRingGroups,
           getUsers,
           getTags,
           getWorkflows,
@@ -1290,6 +1285,7 @@ export default {
     ...mapActions([
       'setCurrentCompany',
       'setCampaigns',
+      'setRingGroups',
       'setUsers',
       'newTag',
       'newWorkflow',

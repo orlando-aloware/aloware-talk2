@@ -1,57 +1,252 @@
 <template>
-  <div class="inbox-side">
+  <div class="inbox-side border-top-0">
     <div class="inbox-side__left"
          :class="{'inbox-side__left--closed': closed }">
+      <calls-header :isSearch="true"
+                    @search="search"/>
       <div>
-        <inbox-nav-toggle :closed="closed" @toggle="toggle"/>
         <div class="inbox-side__nav">
-          <inbox-nav-list :closed="closed"></inbox-nav-list>
+          <inbox-nav-list :closed="closed"
+                          :openCount="openCount"
+                          :pendingCount="pendingCount"
+                          @active="newActive">
+          </inbox-nav-list>
         </div>
       </div>
     </div>
-    <div class="inbox-side__right" :class="{'inbox-side__right--closed': closed }">
-      <calls-header label="Inbound Calls"/>
-      <div>
-        <calls-list-section count="1" sub-label="Talk Time" label="Active"/>
-        <div>
-          <call-list-item avatar="https://uifaces.co/our-content/donated/3799Ffxy.jpeg" name="May Kerr"
-                          number="(111) 222-3333" active />
-        </div>
+    <div class="inbox-side__right border-left">
+      <calls-header class="w-100"
+                    :openCount="openCount"
+                    :pendingCount="pendingCount"
+                    :commCampaigns="communicationLines"
+                    :commRingGroups="communicationRingGroups"/>
+      <div class="w-100 d-flex"
+        v-if="active === 'inbox'">
+        <q-btn-toggle
+          class="current-tasks border w-100 mx-2 mt-2 mb-1"
+          no-caps
+          dense
+          unelevated
+          toggle-color="grey-9"
+          color="white"
+          text-color="primary"
+          :options="options"
+          v-model="currentTask"
+          @click="checkTask">
+          <template v-slot:one>
+            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
+                 :class="[currentTask !== 'open' ? 'text-grey-20' : 'active']">
+              <span class="text-left">
+                Open
+              </span>
+              <span class="text-right">
+                {{ openCount }}
+              </span>
+            </div>
+          </template>
+
+          <template v-slot:two>
+            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
+                 :class="[currentTask !== 'pending' ? 'text-grey-20' : 'active']">
+              <span class="text-left">
+                Pending
+              </span>
+              <span class="text-right">
+                {{ pendingCount }}
+              </span>
+            </div>
+          </template>
+
+          <template v-slot:three>
+            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
+                 :class="[currentTask !== 'closed' ? 'text-grey-20' : 'active']">
+              <span class="text-left">
+                Closed
+              </span>
+              <span class="text-right">
+                &nbsp;
+              </span>
+            </div>
+          </template>
+        </q-btn-toggle>
       </div>
-      <div>
-        <calls-list-section count="4" label="Queue"/>
-        <div>
-          <call-list-item avatar="https://randomuser.me/api/portraits/men/29.jpg" name="Mark Twain"
-                          number="(205) 666-3290"/>
-          <call-list-item avatar="https://uifaces.co/our-content/donated/1H_7AxP0.jpg" name="James Franco"
-                          number="(205) 666-3291"/>
-          <call-list-item avatar="https://uifaces.co/our-content/donated/6MWH9Xi_.jpg" name="Stephen Knowles"
-                          number="(205) 666-3292"/>
-          <call-list-item avatar="https://images-na.ssl-images-amazon.com/images/M/MV5BMTgxMTc1MTYzM15BMl5BanBnXkFtZTgwNzI5NjMwOTE@._V1_UY256_CR16,0,172,256_AL_.jpg" name="Shaniqua James"
-                          number="(205) 666-3293"/>
-        </div>
+      <div class="w-100">
+        <task-list :communications="communications"/>
       </div>
-      <calls-header label="Outbound Calls"/>
-      <calls-empty-state label="No outbound calls to shown"/>
-      <calls-header label="Unanswered Leads"/>
-      <calls-empty-state label="No unanswered sms to shown"/>
     </div>
   </div>
 </template>
 
 <script>
-import InboxNavToggle from 'src/components/inbox/inbox-nav/inbox-nav-toggle'
-import InboxNavList from 'src/components/inbox/inbox-nav/inbox-nav-list'
-import CallsHeader from 'src/components/inbox/calls/calls-header'
-import CallsListSection from 'src/components/inbox/calls/calls-list-section'
-import CallListItem from 'src/components/inbox/calls/calls-list-item'
-import CallsEmptyState from 'src/components/inbox/calls/calls-empty-state'
+import { mapState } from 'vuex'
+import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
+import CallsHeader from 'components/inbox/calls/calls-header'
+import TaskList from 'components/icons/inbox/task-list'
 
 export default {
   name: 'inbox-side',
   data () {
     return {
-      closed: window.innerWidth < 992
+      openCount: 7,
+      pendingCount: 2,
+      active: 'inbox',
+      closed: window.innerWidth < 992,
+      currentTask: 'open',
+      options: [
+        {
+          value: 'open',
+          slot: 'one'
+        },
+        {
+          value: 'pending',
+          slot: 'two'
+        },
+        {
+          value: 'closed',
+          slot: 'three'
+        }
+      ],
+      communications: [
+        {
+          id: 1,
+          type: 1,
+          direction: 1,
+          campaign_id: 373,
+          ring_group_id: null,
+          current_status2: 3,
+          disposition_status2: 1,
+          body: null,
+          contact: {
+            name: 'John Smith'
+          },
+          created_at: '2021-07-21 11:06:01'
+        },
+        {
+          id: 2,
+          type: 1,
+          direction: 1,
+          campaign_id: 11,
+          ring_group_id: 32,
+          current_status2: 3,
+          disposition_status2: 1,
+          body: null,
+          contact: {
+            name: 'Mark Avery'
+          },
+          created_at: '2021-07-21 11:06:01'
+        },
+        {
+          id: 3,
+          type: 1,
+          direction: 1,
+          campaign_id: 443,
+          ring_group_id: null,
+          current_status2: 9,
+          disposition_status2: 3,
+          body: null,
+          contact: {
+            name: 'Ashley Meyers'
+          },
+          created_at: '2021-07-21 11:06:01'
+        },
+        {
+          id: 4,
+          type: 2,
+          direction: 1,
+          campaign_id: 11,
+          ring_group_id: null,
+          current_status2: 9,
+          disposition_status2: 4,
+          body: 'Hi, where can I find an article in the knowledge base about Sequences+?',
+          contact: {
+            name: 'Cam Johnson'
+          },
+          created_at: '2021-07-21 11:06:01'
+        },
+        {
+          id: 5,
+          type: 2,
+          direction: 1,
+          campaign_id: 11,
+          ring_group_id: null,
+          current_status2: 9,
+          disposition_status2: 4,
+          body: 'Hi, do you know where the settings for the ring group is?',
+          contact: {
+            name: 'Walter Bowman'
+          },
+          created_at: '2021-07-21 11:06:01'
+        },
+        {
+          id: 6,
+          type: 2,
+          direction: 1,
+          campaign_id: 506,
+          ring_group_id: null,
+          current_status2: 9,
+          disposition_status2: 4,
+          body: 'Hi, where can I find a tutorial for sending bulk messages?',
+          contact: {
+            name: 'Sarah Johnson'
+          },
+          created_at: '2021-07-20 08:21:33'
+        },
+        {
+          id: 7,
+          type: 2,
+          direction: 1,
+          campaign_id: 373,
+          ring_group_id: null,
+          current_status2: 9,
+          disposition_status2: 4,
+          body: 'Hi, do you know where to create a new Line?',
+          contact: {
+            name: 'Tyler Smith'
+          },
+          created_at: '2021-07-20 07:21:33'
+        }
+      ]
+    }
+  },
+  computed: {
+    ...mapState(['campaigns', 'ringGroups']),
+    communicationLines () {
+      let campaigns = []
+      let found = null
+      let exists = null
+      for (let communication of this.communications) {
+        if (communication.campaign_id === null) {
+          continue
+        }
+        found = null
+        exists = campaigns.length && campaigns.find(campaign => campaign.id === communication.campaign_id) !== null
+        if (!exists) {
+          found = this.campaigns.find(campaign => campaign.id === communication.campaign_id)
+        }
+        if (found) {
+          campaigns.push(found)
+        }
+      }
+      return campaigns
+    },
+    communicationRingGroups () {
+      let ringGroups = []
+      let found = null
+      let exists = null
+      for (let communication of this.communications) {
+        if (communication.ring_group_id === null) {
+          continue
+        }
+        found = null
+        exists = ringGroups.length && ringGroups.find(ringGroup => ringGroup.id === communication.campaign_id) !== null
+        if (!exists) {
+          found = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+        }
+        if (found) {
+          ringGroups.push(found)
+        }
+      }
+      return ringGroups
     }
   },
   methods: {
@@ -60,6 +255,15 @@ export default {
     },
     toggleOnResize () {
       this.closed = window.innerWidth < 992
+    },
+    checkTask () {
+      // @TODO: work on the task states
+    },
+    search (value) {
+      // @TODO: search value from where?
+    },
+    newActive (active) {
+      this.active = active
     }
   },
   mounted () {
@@ -68,68 +272,6 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.toggleOnResize)
   },
-  components: { CallsEmptyState, CallsListSection, CallsHeader, InboxNavList, InboxNavToggle, CallListItem }
+  components: { TaskList, CallsHeader, InboxNavList }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-@import 'src/css/breakpoints.scss';
-
-.inbox-side {
-  @include border-radius(10px);
-  background-color: $white;
-  border: solid 1px $grey-light3;
-  display: flex;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  overflow-x:auto;
-
-  @include screen('md') {
-    width: auto;
-  }
-
-  &__nav {
-    padding-top: 10px;
-  }
-
-  &__left {
-    min-width: 240px;
-    overflow: hidden;
-
-    &--closed {
-      min-width: 40px;
-    }
-
-    @include screen('lg') {
-      min-width: 240px;
-
-      &--closed {
-        min-width: 40px;
-      }
-    }
-  }
-
-  &__right {
-    flex-grow: 1;
-    border-left: solid 1px $grey-light3;
-    overflow: hidden;
-    height: 100%;
-    overflow-y: auto;
-
-    &--closed {
-      box-shadow: none;
-    }
-
-    @include screen('lg') {
-      max-width: 303px;
-      box-shadow: -5px 0 24px 0 rgba(0, 0, 0, 0.08);
-      &--closed {
-        box-shadow: none;
-      }
-    }
-  }
-}
-</style>

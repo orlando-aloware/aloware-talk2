@@ -88,7 +88,8 @@
     <b-button pill
               variant="light"
               size="sm"
-              class="contact-information-toggle" @click="onExpanded">
+              class="contact-information-toggle"
+              @click="onExpanded">
       <i class="material-icons">{{ is_expanded ? 'expand_less' : 'expand_more' }}</i>
     </b-button>
   </b-card>

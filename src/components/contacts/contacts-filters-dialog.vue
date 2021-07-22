@@ -15,7 +15,7 @@
         <div class="p-3">
           <!-- Using slots -->
           <div class="mb-3">
-            <contacts-table-search />
+            <search />
           </div>
 
           <b-list-group class="filter-list">
@@ -43,9 +43,9 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import contactsTableSearch from './contacts-table-search.vue'
+import Search from 'src/components/search.vue'
 export default {
-  components: { contactsTableSearch },
+  components: { Search },
   data () {
     return {
       items: Array.from(new Array(10)),

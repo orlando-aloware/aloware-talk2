@@ -1,5 +1,6 @@
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'bootstrap-vue/src/index.scss';
+@import 'src/css/breakpoints.scss';
 @import 'fonts.scss';
 @import 'variables.scss';
 @import 'svg.scss';
@@ -148,14 +149,14 @@ body,
 @media (min-width: 992px) {
   .dashboard {
     header {
-      left: 60px;
+      left: 64px;
     }
     .sidebar-wrapper,
     .sidebar-wrapper > aside {
       display: block !important;
     }
     .sidebar-wrapper {
-      width: 60px;
+      width: 64px;
     }
     .sidebar-wrapper > aside {
       transform: translateX(0px) !important;
@@ -389,14 +390,43 @@ body,
 .page-header {
   width: auto;
   height: 62px;
+
+  & .q-item {
+    padding: 0;
+  }
+
+  & .q-item > .q-btn {
+    &:hover, &:focus {
+      & .q-focus-helper {
+        display: none !important;
+      }
+    }
+  }
+
+  & .q-icon {
+    width: auto;
+    height: auto;
+  }
 }
 
 .page-sidebar {
   height: 100%;
   background-color: $dark;
+
   .nav-icons {
-    &:not(.active) {
-      opacity: 0.5;
+    width: 48px;
+    height: 52px;
+
+    &:hover, &:focus {
+      color: transparent;
+      & .q-focus-helper {
+        display: none !important;
+      }
+    }
+
+    & .q-icon {
+      width: auto;
+      height: auto;
     }
   }
 }
@@ -440,7 +470,7 @@ body,
 
 .sidebar-wrapper,
 .sidebar-wrapper > aside {
-  max-width: 60px;
+  max-width: 64px;
 }
 
 .separator-blur {
@@ -622,10 +652,6 @@ body,
 
       .q-item__label--header {
         padding: 4px !important;
-      }
-
-      .q-item__section--main {
-        padding-top: 2px;
       }
     }
 
@@ -1536,7 +1562,7 @@ span.mention {
  Main layout
  */
 .main-content {
-  padding-left: 1.90rem !important;
+  padding-left: 64px !important;
   background: #F4F4F4;
 }
 
@@ -1810,6 +1836,7 @@ span.mention {
   left: -330px !important;
   width: 300px;
 }
+
 //ABOUT THIS CONTACT
 .contact-about-wrapper {
   .information-container {
@@ -2318,7 +2345,6 @@ span.mention {
   }
 }
 
-
 // SCHEDULED MESSAGES MODAL
 .scheduled-messages-modal {
   .preview.file-name {
@@ -2357,7 +2383,7 @@ span.mention {
       .pdf-thumbnail-wrapper {
         padding: 4px;
         width: 50px;
-        height:39px;
+        height: 39px;
         border-radius: 8px;
         border: 1px solid $grey-60;
 
@@ -2410,7 +2436,7 @@ span.mention {
 
     }
 
-    .media-preview:hover{
+    .media-preview:hover {
       .btn-remove-attachments {
         opacity: 1;
       }
@@ -2429,4 +2455,252 @@ span.mention {
       }
     }
   }
+}
+
+/*
+ Quasar related
+ */
+
+.tab-dropdown {
+  & .q-focus-helper {
+    display: none;
+  }
+
+  & .q-btn-dropdown__arrow {
+    font-size: 0;
+    border: solid #62666E;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 2px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  & .q-btn-dropdown__arrow.rotate-180 {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+
+  & .availability-status {
+    top: -2px;
+    right: -2px;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    padding: 0px;
+  }
+}
+
+.q-menu {
+  @extend .text-sm;
+}
+
+/*
+ Utilities
+ */
+
+.height-28 {
+  height: 28px;
+}
+
+.width-40 {
+  width: 40px;
+}
+
+.width-300 {
+  width: 300px;
+}
+
+.width-330 {
+  width: 330px;
+}
+
+.width-380 {
+  width: 380px;
+}
+
+.width-0 {
+  width: 0;
+}
+
+.margin-auto {
+  margin: auto auto;
+}
+
+.no-select {
+  user-drag: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+
+  & ::selection {
+    background: transparent; /* WebKit/Blink Browsers */
+  }
+
+  & ::-moz-selection {
+    background: transparent; /* Gecko Browsers */
+  }
+}
+
+.allow-select {
+  -webkit-touch-callout: default; /* iOS Safari */
+  -webkit-user-select: text; /* Safari */
+  -khtml-user-select: text; /* Konqueror HTML */
+  -moz-user-select: text; /* Firefox */
+  -ms-user-select: text; /* Internet Explorer/Edge */
+  user-select: text; /* Non-prefixed version, currently supported by Chrome and Opera */
+
+  & ::selection {
+    background: rgba($primary, 0.2) !important; /* WebKit/Blink Browsers */
+  }
+
+  & ::-moz-selection {
+    background: rgba($primary, 0.2) !important; /* Gecko Browsers */
+  }
+}
+
+.inbox-side {
+  max-width: 508px;
+  width: 100% !important;
+  background-color: $white;
+  border: solid 1px $grey-light3;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  overflow-x:auto;
+
+  @include screen('md') {
+    width: auto;
+  }
+
+  &__nav {
+    padding-top: 10px;
+  }
+
+  &__left {
+    max-width: 200px;
+    width: 100%;
+    overflow: hidden;
+
+    &--closed {
+      min-width: 40px;
+    }
+
+    @include screen('lg') {
+      &--closed {
+        min-width: 40px;
+      }
+    }
+  }
+
+  &__right {
+    max-width: 308px;
+    width: 100%;
+    flex-grow: 1;
+    border-left: solid 1px $grey-light3;
+    overflow: hidden;
+    height: 100%;
+    overflow-y: auto;
+
+    @include screen('lg') {
+    }
+  }
+  .header {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    border-bottom: solid 1px $grey-light3;
+    &__label {
+      padding-left: 20px;
+      font-weight: bold;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.inbox-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inbox-end {
+  background-color: $white;
+  position: relative;
+  overflow: hidden;
+  max-width: 330px;
+  width: 100%;
+  display: none;
+  @include screen('lg') {
+    display: flex;
+  }
+}
+
+.form-control-search {
+  width: 100%;
+  height: 32px !important;
+  font-size: 12px;
+  &__icon {
+    font-size: 12.5px;
+    color: $grey-mid;
+  }
+}
+.form-control-search::-webkit-input-placeholder {
+  font-size: 12px;
+}
+
+.task-item {
+  .contact-name {
+    @include font-size(14px, 500);
+    line-height: 17px;
+  }
+  .avatar {
+    max-width: 64px;
+    width: 100%;
+  }
+  .comm-label {
+    @include font-size(12px, 'normal');
+    line-height: 15px;
+  }
+  .campaign-name {
+    @include font-size(10px, 'normal');
+    line-height: 12px;
+  }
+  .time-passed {
+    @include font-size(12px, 'normal');
+    line-height: 15px;
+  }
+}
+
+.current-tasks {
+  .options {
+    @include font-size(14px, 500);
+    line-height: 17px;
+  }
+}
+
+.call-active {
+  margin-bottom: 15px;
+  @include screen('lg') {
+    display: none;
+  }
+}
+
+.inbox {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.opacity-1 {
+  opacity: 1 !important;
 }

@@ -42,15 +42,6 @@
                    no-caps
                    exact>
       </q-route-tab>
-      <q-route-tab name="account"
-                   label="Account"
-                   to="/account"
-                   :icon="icons.account"
-                   content-class="tab-icons xs-text"
-                   :ripple="false"
-                   no-caps
-                   exact>
-      </q-route-tab>
     </q-tabs>
     <div class="w-100 d-flex justify-content-center">
       <q-separator class="separator mt-1"
@@ -92,7 +83,7 @@ export default {
         page = this.$route.name.toLowerCase().replace(' ')
       }
 
-      let iconColor = page === icon ? '_green' : '_grey'
+      let iconColor = (page === icon) ? '_active' : '_gray'
       this.icons[icon] = 'img:app-icons/menu/' + icon + iconColor + '.svg'
     }
   },

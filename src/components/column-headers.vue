@@ -12,7 +12,7 @@
       >
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
-            <contacts-table-search
+            <search
               @search="onSearch"
               placeholder="Search available columns..."
             />
@@ -151,7 +151,7 @@ import {
 
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
-import ContactsTableSearch from './contacts/contacts-table-search.vue'
+import Search from 'src/components/search.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 const DEFAULT_CONTACT_LIST_IDS = Object.keys(DEFAULT_CONTACT_LIST).map(
@@ -161,7 +161,7 @@ const DEFAULT_CONTACT_LIST_IDS = Object.keys(DEFAULT_CONTACT_LIST).map(
 export default {
   components: {
     draggable,
-    ContactsTableSearch
+    Search
   },
   data () {
     return {

@@ -24,6 +24,37 @@ export const dateTimePassed = (dt) => {
 }
 
 /**
+ * shortcut date time passed
+ * @param {datetime|string|Moment} dt
+ * @returns {string|*}
+ */
+export const shortDateTimePassed = (dt) => {
+  if (dt) {
+    let dateTimePassed = ''
+    if (window.timezone) {
+      dateTimePassed = window.moment.utc(dt).tz(window.timezone).fromNow()
+    } else {
+      dateTimePassed = window.moment.utc(dt).local().fromNow()
+    }
+    return dateTimePassed.replace(' ago', '')
+      .replace(' seconds', 's')
+      .replace(' second', 's')
+      .replace(' minutes', 'm')
+      .replace(' minute', 'm')
+      .replace(' hours', 'h')
+      .replace(' hour', 'h')
+      .replace(' days', 'd')
+      .replace(' day', 'd')
+      .replace(' weeks', 'w')
+      .replace(' week', 'w')
+      .replace(' months', 'mo')
+      .replace(' month', 'mo')
+      .replace(' years', 'y')
+      .replace(' year', 'y')
+  }
+}
+
+/**
  * Fix schedule date
  * @param {date|string|Moment} dt
  * @param format
@@ -307,6 +338,7 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
 export default ({ Vue }) => {
   const filters = {
     dateTimePassed,
+    shortDateTimePassed,
     fixScheduleDate,
     fixScheduleTime,
     fixRelativeDatetimeFormat,

@@ -20,10 +20,10 @@
 
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
-        <contacts-table-search
+        <search
           @search="onSearch"
           :disabled="isLoadingDisabled"
-        ></contacts-table-search>
+        ></search>
         <div class="px-3" v-if="!isMyContactsView">
           <b-form-checkbox
             v-model="myContacts"
@@ -178,7 +178,7 @@ import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
-import ContactsTableSearch from 'src/components/contacts/contacts-table-search.vue'
+import Search from 'src/components/search.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import TableRow from 'src/components/table-row.vue'
@@ -192,7 +192,7 @@ export default {
     BulkActionMenu,
     CompactBtn,
     ContactsScreen,
-    ContactsTableSearch,
+    Search,
     Datatable,
     ImportContactsModal,
     TableRow
