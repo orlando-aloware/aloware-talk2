@@ -3,7 +3,7 @@
     <h4>About this contact</h4>
 
     <div :class="`information-container ${autoHeightClass}`">
-      <div class="d-block"
+      <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-2">Owner</p>
         <contact-user-selector v-model="contact.user_id"
