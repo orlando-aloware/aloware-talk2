@@ -594,22 +594,6 @@ body,
   width: 250px;
 }
 
-.width-300 {
-  width: 300px;
-}
-
-.width-330 {
-  width: 330px;
-}
-
-.width-380 {
-  width: 380px;
-}
-
-.width-0 {
-  width: 0;
-}
-
 .popover {
   font-family: $font-family-body !important;
 }
@@ -2549,6 +2533,11 @@ span.mention {
   margin-right: inherit;
 }
 
+.q-select .q-field__input {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .tab-dropdown {
   & .q-focus-helper {
     display: none;
@@ -2594,6 +2583,14 @@ span.mention {
 
 .width-40 {
   width: 40px;
+}
+
+.width-290 {
+  width: 290px;
+}
+
+.max-width-266 {
+  max-width: 266px;
 }
 
 .width-300 {

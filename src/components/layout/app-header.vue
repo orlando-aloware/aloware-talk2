@@ -99,9 +99,9 @@
                     self="top right"
                     @before-show="showDialer"
                     @before-hide="hideDialer">
-              <div class="row no-wrap q-pa-md">
-                <div class="col">
-
+              <div class="row no-wrap q-pa-md width-290">
+                <div class="col no-padding max-width-266">
+                  <line-selector></line-selector>
                 </div>
               </div>
             </q-menu>
@@ -121,10 +121,11 @@
 import { mapGetters, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
 import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
+import LineSelector from 'components/dialer/line-selector'
 
 export default {
   name: 'app-header',
-
+  components: { LineSelector },
   mixins: [aclMixin, avatarMixin, agentMixin],
 
   data () {
