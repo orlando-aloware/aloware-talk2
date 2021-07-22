@@ -27,7 +27,7 @@
                 v-if="scope.opt.group"
                 v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
-          <q-item-label class="text font-weight-bold px-0"
+          <q-item-label class="text-grey-100 _600 px-0"
                         header>
             {{ scope.opt.group }}
           </q-item-label>
@@ -36,7 +36,7 @@
                 v-if="scope.opt.first"
                 v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
-          <q-item-label class="px-0"
+          <q-item-label class="_600 px-0"
                         header>
             {{ scope.opt.first }}
           </q-item-label>
