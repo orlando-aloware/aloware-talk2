@@ -1887,6 +1887,13 @@ span.mention {
   }
 }
 
+.current-tasks {
+  .options {
+    @include font-size(14px, 500);
+    line-height: 17px;
+  }
+}
+
 .call-active {
   margin-bottom: 15px;
   @include screen('lg') {
@@ -1898,4 +1905,8 @@ span.mention {
   height: 100%;
   width: 100%;
   display: flex;
+}
+
+.opacity-1 {
+  opacity: 1 !important;
 }

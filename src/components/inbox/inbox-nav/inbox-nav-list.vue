@@ -9,6 +9,8 @@
       :isActive="active === item.value"
       :closed="closed"
       :badge="true"
+      :openCount="openCount"
+      :pending-count="pendingCount"
       badge-value="20"
       badge-color="danger"
       @click="onItemClicked"
@@ -71,6 +73,14 @@ export default {
     closed: {
       type: Boolean,
       default: false
+    },
+    openCount: {
+      required: false,
+      default: 0
+    },
+    pendingCount: {
+      required: false,
+      default: 0
     }
   }
 }

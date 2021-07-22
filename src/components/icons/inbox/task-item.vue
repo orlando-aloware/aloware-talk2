@@ -1,6 +1,7 @@
 <template>
-  <div class="task-item w-100 d-flex flex-row py-2 pr-2 align-items-center">
-    <div class="avatar d-flex justify-content-center">
+  <div class="task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom mb-1">
+    <div class="avatar d-flex justify-content-center pb-1"
+         role="button">
       <avatar width="34"
               height="34"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id"
@@ -8,7 +9,8 @@
               :name="communication.contact.name">
       </avatar>
     </div>
-    <div class="task-details flex-grow-1">
+    <div class="task-details flex-grow-1 pb-1"
+         role="button">
       <div class="contact-name">
         {{ communication.contact.name }}
       </div>
@@ -32,18 +34,19 @@
         {{ campaignName }}
       </div>
     </div>
-    <div class="actions text-right">
+    <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
+            role="button"
             v-if="communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW">
           {{ communication.created_at | shortDateTimePassed }}
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
             v-else>
         <div  class="px-2">
-          <cancel-call-icon/>
+          <cancel-call-icon role="button"/>
         </div>
         <div  class="px-2">
-          <accept-call-icon/>
+          <accept-call-icon role="button"/>
         </div>
       </div>
     </div>

@@ -196,6 +196,7 @@ export default {
     return {
       loading: true,
       loadingCampaigns: false,
+      loadingRingGroups: false,
       loadingUsers: false,
       loadingTags: false,
       loadingWorkflows: false,
@@ -698,6 +699,26 @@ export default {
       }
     },
 
+    getRingGroups () {
+      if (this.hasPermissionTo('list ring group')) {
+        this.loadingRingGroups = true
+        return this.$axios
+          .get('/api/v1/ring-group', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setRingGroups(res.data)
+            this.loadingRingGroups = false
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingRingGroups = false
+            return Promise.reject()
+          })
+      }
+    },
+
     getUsers () {
       if (this.hasPermissionTo('list user')) {
         this.loading_users = true
@@ -841,6 +862,7 @@ export default {
         }
         let getCurrentCompany = this.getCurrentCompany()
         let getCampaigns = this.getCampaigns()
+        let getRingGroups = this.getRingGroups()
         let getUsers = this.getUsers()
         let getTags = this.getTags()
         let getWorkflows = this.getWorkflows()
@@ -850,6 +872,7 @@ export default {
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
+          getRingGroups,
           getUsers,
           getTags,
           getWorkflows,
@@ -1262,6 +1285,7 @@ export default {
     ...mapActions([
       'setCurrentCompany',
       'setCampaigns',
+      'setRingGroups',
       'setUsers',
       'newTag',
       'newWorkflow',
