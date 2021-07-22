@@ -31,7 +31,7 @@
         <div class="pt-3">
           <b-form-row>
             <b-col md="10">
-              <contacts-table-search
+              <search
                 @search="onSearch"
                 placeholder="Search static list..."
                 searchOnKeyup
@@ -81,11 +81,11 @@ import {
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import SelectListTreeFolder from 'src/components/select-list-tree-folder/select-list-tree-folder'
-import ContactsTableSearch from 'src/components/contacts/contacts-table-search'
+import Search from 'src/components/search'
 
 const ContactListTypes = { STATIC, DYNAMIC }
 export default {
-  components: { ContactsTableSearch, SelectListTreeFolder },
+  components: { Search, SelectListTreeFolder },
   computed: {
     ...mapGetters('contacts', ['selectList', 'currentListFilters', 'selectedStaticList', 'selectedList', 'selectedContacts', 'folders']),
     getTitle () {

@@ -1,6 +1,6 @@
 <template>
   <a
-    class="inbox-nav-item"
+    class="inbox-nav-item mx-2 px-1"
     v-bind:class="{
       'inbox-nav-item__active': isActive,
       'inbox-nav-item--closed': closed,
@@ -24,29 +24,34 @@
       >
         <icon :icon="icon" :isActive="isActive"/>
       </div>
-      <div class="inbox-nav-item__label" v-bind:class="{
-          'inbox-nav-item__label--closed': closed,
-          'inbox-nav-item__label--opened': !closed
-        }">{{ label }}
+      <div class="inbox-nav-item__label">
+        {{ label }}
       </div>
-      <badge
+      <span class="count-label"
+        v-if="value === 'inbox'">
+        <span class="open-count border-right">{{ openCount }}</span>
+        <span class="pending-count ml-2">{{ pendingCount }}</span>
+      </span>
+      <refresh-icon :isActive="isActive"
+                    v-if="value === 'inbox'"/>
+      <!--badge
         v-if="badge"
         :color="badgeColor"
         :value="badgeValue"
         :closed="closed"
-      />
+      /-->
     </div>
   </a>
 </template>
 
 <script>
 import Icon from './inbox-nav-icon.vue'
-import Badge from './inbox-nav-badge.vue'
+import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
   components: {
-    Icon,
-    Badge
+    RefreshIcon,
+    Icon
   },
   props: {
     label: {
@@ -73,7 +78,11 @@ export default {
       type: Boolean,
       default: false
     },
-    badgeValue: {
+    openCount: {
+      type: [Number, String],
+      default: 0
+    },
+    pendingCount: {
       type: [Number, String],
       default: 0
     },
@@ -96,6 +105,7 @@ export default {
 @import 'src/css/breakpoints.scss';
 
 .inbox-nav-item {
+  @include border-radius(10px);
   display: flex;
   align-items: center;
   height: 40px;
@@ -109,7 +119,7 @@ export default {
   }
 
   &__active {
-    background-color: $flesh;
+    background-color: $grey-50;
     color: $black;
   }
 
@@ -128,21 +138,8 @@ export default {
     padding-left: 0;
     padding-right: 0;
     justify-content: center;
-
-    &--opened {
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-
-    &--closed {
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    @include screen('lg') {
-      padding-left: 20px;
-      padding-right: 20px;
-    }
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
   &__icon {
@@ -162,8 +159,8 @@ export default {
 
   &__label {
     font-size: 14px;
-    line-height: 19px;
-    font-weight: bold;
+    line-height: 17px;
+    letter-spacing: -0.0025em;
     flex-grow: 1;
     display: none;
 
@@ -181,6 +178,19 @@ export default {
         display: none;
       }
     }
+  }
+  .count-label {
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 8px;
+    color: $grey-30;
+  }
+  .open-count {
+    color: $grey-20;
+  }
+  .pending-count {
+    font-weight: 500;
   }
 }
 </style>

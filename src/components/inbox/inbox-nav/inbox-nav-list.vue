@@ -6,7 +6,7 @@
       :label="item.label"
       :value="item.value"
       :icon="item.icon"
-      :is-active="active === item.value"
+      :isActive="active === item.value"
       :closed="closed"
       :badge="true"
       badge-value="20"
@@ -24,26 +24,32 @@ export default {
   methods: {
     onItemClicked (nextActive) {
       this.active = nextActive
+      this.$emit('active', this.active)
     }
   },
   data: function () {
     return {
-      active: 'tasks',
+      active: 'inbox',
       items: [
         {
-          label: 'Tasks',
-          value: 'tasks',
-          icon: 'task'
+          label: 'Inbox',
+          value: 'inbox',
+          icon: 'inbox'
         },
         {
           label: 'Calls',
           value: 'calls',
-          icon: 'phone'
+          icon: 'call'
         },
         {
           label: 'Messages',
           value: 'messages',
           icon: 'message'
+        },
+        {
+          label: 'Mentions',
+          value: 'mentions',
+          icon: 'mention'
         },
         {
           label: 'Voicemails',

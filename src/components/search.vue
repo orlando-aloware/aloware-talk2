@@ -1,7 +1,8 @@
 <template>
   <div class="position-relative">
     <q-input
-      class="form-control form-control-search mt-2"
+      class=" form-control-search mt-2"
+      :class="[border ? 'form-control' : '']"
       borderless
       dense
       v-model="search"
@@ -10,7 +11,7 @@
       @input="onInput"
     >
       <template v-slot:prepend>
-        <i class="fa fa-search form-control-search__icon"></i>
+        <search-icon />
       </template>
     </q-input>
   </div>
@@ -18,7 +19,9 @@
 
 <script>
 import _ from 'lodash'
+import SearchIcon from 'components/icons/search-icon'
 export default {
+  components: { SearchIcon },
   props: {
     placeholder: {
       type: String,
@@ -27,6 +30,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    border: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -44,20 +51,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../css/mixins';
-@import '../../css/variables';
-.form-control-search {
-  width: 100%;
-  height: 32px !important;
-  font-size: 12px;
-  &__icon {
-    font-size: 12.5px;
-    color: $grey-mid;
-  }
-}
-.form-control-search::-webkit-input-placeholder {
-  font-size: 12px;
-}
-</style>

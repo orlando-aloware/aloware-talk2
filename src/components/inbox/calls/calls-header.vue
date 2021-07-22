@@ -1,18 +1,72 @@
 <template>
-<div class="calls-header">
-  <div class="calls-header__label">
-    {{ label }}
+<div class="header flex- w-100">
+  <search placeholder=""
+          :border="false"
+          v-if="isSearch">
+  </search>
+  <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2"
+       v-else>
+    <q-select class="m-0"
+              ref="select"
+              borderless
+              emit-value
+              map-options
+              v-model="filterLeft"
+              :options="optionsLeft"
+              :append="[{icon: 'ion-ios-arrow-down'}]">
+    </q-select>
+    <q-select class="m-0"
+              borderless
+              emit-value
+              map-options
+              v-model="filterRight"
+              :options="optionsRight"
+              :append="[{icon: 'ion-ios-arrow-down'}]">
+    </q-select>
   </div>
 </div>
 </template>
 
 <script>
+import Search from 'components/search'
+
 export default {
   name: 'calls-header.vue',
+  components: { Search },
   props: {
-    label: {
-      type: String,
-      required: true
+    isSearch: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data () {
+    return {
+      optionsLeft: [
+        {
+          label: 'Everything',
+          value: 'everything'
+        },
+        {
+          label: 'Test',
+          value: 'test'
+        }
+      ],
+      optionsRight: [
+        {
+          label: 'Oldest',
+          value: 'oldest'
+        },
+        {
+          label: 'Newest',
+          value: 'newest'
+        },
+        {
+          label: 'Priority first',
+          value: 'priority'
+        }
+      ],
+      filterLeft: 'everything',
+      filterRight: 'newest'
     }
   }
 }
@@ -21,20 +75,4 @@ export default {
 <style lang="scss" scoped>
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
-.calls-header {
-  height: 45px;
-  display: flex;
-  align-items: center;
-  border-bottom: solid 1px $grey-light3;
-  &__label {
-    padding-left: 20px;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 12px;
-    letter-spacing: 0.3px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
 </style>

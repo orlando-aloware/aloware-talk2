@@ -8,7 +8,7 @@
                @input="findGif">
         <template v-slot:append>
           <q-avatar>
-            <search-icon></search-icon>
+            <search-icon/>
           </q-avatar>
         </template>
       </q-input>
