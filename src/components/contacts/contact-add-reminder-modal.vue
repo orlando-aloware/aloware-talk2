@@ -9,26 +9,21 @@
         label=""
         label-for="input-1"
       >
-
-        <vue-ctk-date-time-picker formatted="l"
-                                  label="Select date"
-                                  :only-date="true"
-                                  :no-label="true"
-                                  :no-header="false"
-                                  :no-button-now="true"
-                                  :auto-close="true"
-                                  :minute-interval="5"
-                                  :disabled-hours="['00','01','02','03','04', '05']"
-                                  :min-date="minDate"
-                                  v-model="date" @input="dateSelected">
-        </vue-ctk-date-time-picker>
+        <date-selector :min-date="minDate"
+                       @dateSelected="dateSelected">
+        </date-selector>
       </b-form-group>
 
-      <b-form-group id="input-group-2" label="" label-for="input-2">
-        <predefined-time-selector v-model="time" @select="onTimeSelected"></predefined-time-selector>
+      <b-form-group id="input-group-2"
+                    label=""
+                    label-for="input-2">
+        <predefined-time-selector v-model="time"
+                                  @select="onTimeSelected">
+        </predefined-time-selector>
       </b-form-group>
 
-      <b-form-group id="input-group-2" label-for="input-2">
+      <b-form-group id="input-group-2"
+                    label-for="input-2">
         <b-form-textarea
           id="textarea-no-auto-shrink"
           placeholder="Reminder notes"
@@ -61,16 +56,14 @@
 </template>
 
 <script>
-
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
-import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters, mapActions, mapState } from 'vuex'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
+import DateSelector from 'components/date-selector'
 
 export default {
   name: 'contact-add-reminder-modal',
-  components: { PredefinedTimeSelector, VueCtkDateTimePicker },
+  components: { DateSelector, PredefinedTimeSelector },
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isAddReminderOpen']),
@@ -109,7 +102,7 @@ export default {
       this.isAdding = true
       talk2Api.V1.contact.addEngagement(this.contact.id, this.formatParameters())
         .then(response => {
-          this.$emit('close')
+          this.onHidden()
           this.$q.notify({
             message: 'Reminder has been added.',
             type: 'positive',
@@ -156,9 +149,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.time-picker-column::-webkit-scrollbar {
-  display: block !important;
-}
-</style>

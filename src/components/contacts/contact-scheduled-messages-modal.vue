@@ -32,92 +32,94 @@
     <b-row>
       <b-col cols="12">
         <b-table hover
-                   :busy="isBusy"
-                   :items="messages"
-                   :fields="fields">
-            <template #table-busy>
-              <div class="text-center text-danger my-2">
-                <div>
-                  <q-spinner-bars
-                    color="primary"
-                    size="2em"
-                  />
+                 show-empty
+                 :busy="isBusy"
+                 :items="messages"
+                 :fields="fields">
+          <template #empty>
+            <h5 class="text-center mt-2">No scheduled messages found..</h5>
+          </template>
+          <template #table-busy>
+            <div class="text-center text-danger my-2">
+              <div>
+                <q-spinner-bars
+                  color="primary"
+                  size="2em"
+                />
+              </div>
+            </div>
+          </template>
+          <template #cell(message)="data">
+            <span v-if="data.item.message.length < 100">{{ data.item.message }}</span>
+            <span v-else v-b-tooltip="data.item.message">{{ data.item.message | strLimit(100)  }}</span>
+          </template>
+
+          <template #cell(upload_files)="data">
+            <span v-if="!data.item.gif_url && data.item.uploaded_files.length < 1">----</span>
+            <div class="mb-2 d-inline-flex media-preview-wrapper">
+                <div v-if="data.item.gif_url" class="media-preview">
+                  <img class="img-preview" height="20px" width="20px"
+                       :src="data.item.gif_url"/>
+                </div>
+
+                <div v-for="attachment in data.item.uploaded_files" :key="attachment.id" class="media-preview">
+                <div v-if="attachment.mimetype.includes('audio')" class="audio-thumbnail-wrapper">
+                  <div class="text-center media-icon-wrapper">
+                    <i class="fa fa-microphone media-icon"></i>
+                  </div>
+                  <p class="ellipsis text-center">{{ attachment.original_file }}</p>
+                </div>
+                <div v-if="attachment.mimetype.includes('pdf')" class="pdf-thumbnail-wrapper">
+                  <div class="text-center media-icon-wrapper">
+                    <i class="far fa-file-pdf media-icon"></i>
+                  </div>
+                  <p class="ellipsis text-center">{{ attachment.original_file }}</p>
+                </div>
+                <div v-if="attachment.mimetype.includes('video')" class="video-thumbnail-wrapper">
+                  <b-embed type="video" aspect="1by1">
+                    <source :src="getPreviewLink(attachment.uuid)" :type="attachment.mimetype">
+                  </b-embed>
+                  <b-button pill size="sm" variant="light" class="btn-play"> <i class="fa fa-play"></i> </b-button>
+                </div>
+                <div v-if="attachment.mimetype.includes('image')">
+                  <img  class="img-preview"
+                        :src="getPreviewLink(attachment.uuid)"/>
                 </div>
               </div>
-            </template>
-            <template #cell(message)="data">
-              <span v-if="data.item.message.length < 100">{{ data.item.message }}</span>
-              <span v-else v-b-tooltip="data.item.message">{{ data.item.message | strLimit(100)  }}</span>
-            </template>
+              </div>
+          </template>
 
-            <template #cell(upload_files)="data">
-              <span v-if="!data.item.gif_url && data.item.uploaded_files.length < 1">----</span>
-              <div class="mb-2 d-inline-flex media-preview-wrapper">
-                  <div v-if="data.item.gif_url" class="media-preview">
-                    <img class="img-preview" height="20px" width="20px"
-                         :src="data.item.gif_url"/>
-                  </div>
+          <template #cell(scheduled_at)="data">
+            {{ data.item.scheduled_at | momentFormat('MMM D, yyyy hh:mm a', true)  }}
+          </template>
 
-                  <div v-for="attachment in data.item.uploaded_files" :key="attachment.id" class="media-preview">
-                  <div v-if="attachment.mimetype.includes('audio')" class="audio-thumbnail-wrapper">
-                    <div class="text-center media-icon-wrapper">
-                      <i class="fa fa-microphone media-icon"></i>
-                    </div>
-                    <p class="ellipsis text-center">{{ attachment.original_file }}</p>
-                  </div>
-                  <div v-if="attachment.mimetype.includes('pdf')" class="pdf-thumbnail-wrapper">
-                    <div class="text-center media-icon-wrapper">
-                      <i class="far fa-file-pdf media-icon"></i>
-                    </div>
-                    <p class="ellipsis text-center">{{ attachment.original_file }}</p>
-                  </div>
-                  <div v-if="attachment.mimetype.includes('video')" class="video-thumbnail-wrapper">
-                    <b-embed type="video" aspect="1by1">
-                      <source :src="getPreviewLink(attachment.uuid)" :type="attachment.mimetype">
-                    </b-embed>
-                    <b-button pill size="sm" variant="light" class="btn-play"> <i class="fa fa-play"></i> </b-button>
-                  </div>
-                  <div v-if="attachment.mimetype.includes('image')">
-                    <img  class="img-preview"
-                          :src="getPreviewLink(attachment.uuid)"/>
-                  </div>
-                </div>
-                </div>
-            </template>
-
-            <template #cell(scheduled_at)="data">
-              {{ data.item.scheduled_at | momentFormat('MMM D, yyyy hh:mm a', true)  }}
-            </template>
-
-            <template #cell(user)="data">
-              {{ data.item.user.full_name  }}
-            </template>
-            <template #cell(action)="data">
-              <b-button size="sm"
-                        variant="outline-danger" @click="onDelete(data.item)">
-                <trash-o-icon></trash-o-icon>
-              </b-button>
-            </template>
-          </b-table>
+          <template #cell(user)="data">
+            {{ data.item.user.full_name  }}
+          </template>
+          <template #cell(action)="data">
+            <b-button size="sm"
+                      variant="outline-danger" @click="onDelete(data.item)">
+              <trash-o-icon></trash-o-icon>
+            </b-button>
+          </template>
+        </b-table>
         <hr/>
         <div class="d-flex justify-content-center">
-          <b-pagination
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="filter.size"
-            aria-controls="my-table" @change="onPagination">
+          <b-pagination aria-controls="my-table"
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="filter.size"
+                        @change="onPagination">
           </b-pagination>
         </div>
       </b-col>
     </b-row>
     <template slot="modal-footer">
-      <b-button
-        variant="success"
-        class="custom-btn"
-        size="sm"
-        @click="onHidden"
-      >
-      Close
+      <b-button variant="success"
+                class="custom-btn"
+                size="sm"
+                @click="onHidden">
+        Close
       </b-button>
     </template>
   </b-modal>
@@ -284,115 +286,3 @@ export default {
 </script>
 
 <style src="../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style lang="scss" scoped>
-  .preview.file-name {
-  max-width: 45px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-  span.row-summary {
-    display: block;
-    margin-top: 8px;
-  }
-
-  .media-preview-wrapper div:not(:first-child) {
-    margin-left: 10px;
-  }
-
-  .media-preview-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 5px;
-    padding-right: 1px;
-
-    .media-preview {
-      position: relative;
-
-      .img-preview {
-        height: 40px;
-        width: 40px;
-        border: 1px solid #EBEBEB;;
-        border-radius: 6px;
-        padding: 2px;
-      }
-
-      .pdf-thumbnail-wrapper {
-        padding: 4px;
-        width: 50px;
-        height:39px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-
-        i.media-icon {
-          color: #FE2216;
-        }
-
-        p {
-          font-size: 10px;
-          max-width: 90px;
-        }
-
-        .pdf-preview {
-          overflow: hidden !important;
-        }
-      }
-
-      .audio-thumbnail-wrapper {
-        padding: 4px;
-        width: 100px;
-        height: 76px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-
-        p {
-          font-size: 10px;
-          max-width: 90px;
-        }
-      }
-
-      .video-thumbnail-wrapper {
-        height: 76px;
-        width: 76px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-        padding: 4px;
-
-        .embed-responsive {
-          height: 100%;
-        }
-
-        .btn-play {
-          position: absolute;
-          top: 29%;
-          left: 31%;
-          color: #62666E;
-          cursor: inherit;
-        }
-      }
-
-    }
-
-    .media-preview:hover{
-      .btn-remove-attachments {
-        opacity: 1;
-      }
-    }
-
-    .media-icon-wrapper {
-      height: 18px;
-      width: 42px;
-      //background: #EBEBEB;
-      border-radius: 6px;
-      text-align: center;
-      margin: auto;
-
-      i.media-icon {
-        //margin-top: 10px;
-        font-size: 12px;
-        color: #B5B7BB;;
-      }
-    }
-  }
-</style>

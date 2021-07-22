@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-card class="border-0">
-      <h6>All Numbers</h6>
+      <h4>All Numbers</h4>
       <contact-phones-list-items :phones="primaryPhone"
                                  @edit="onEditPhone"
                                  @delete="onDeletePhone"
@@ -20,10 +20,10 @@
         Add Phone Number
       </b-link>
     </b-card>
-    <b-popover custom-class="contact-phone-popover"
+    <b-popover custom-class="contact-phone-popover z-index-1"
                id="contact-phone-form-popover"
                target="btn-show-phone-form"
-               triggers="click"
+               triggers="focus"
                :show.sync="showPhonesForm"
                @hidden="onPopoverHidden">
       <contact-phones-form @close="onClosePhoneForm"></contact-phones-form>
@@ -125,10 +125,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .contact-phone-popover {
-    left: -340px !important;
-    width: 300px;
-  }
-</style>

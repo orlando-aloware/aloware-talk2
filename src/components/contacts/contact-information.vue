@@ -1,6 +1,6 @@
 <template>
-  <b-card class="border-0 position-relative">
-    <h6>About this contact</h6>
+  <b-card class="border-0 position-relative contact-about-wrapper">
+    <h4>About this contact</h4>
 
     <div :class="`information-container ${autoHeightClass}`">
       <div class="d-block"
@@ -184,49 +184,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .information-container{
-    font-size: 90%;
-    height: 210px;
-    overflow: hidden;
-    padding: 0 !important;
-    margin-bottom: 12px;
-
-    .custom-input-label {
-      font-size: 12px;
-    }
-  }
-
-  .information-container.auto-height {
-    height: 100%;
-  }
-
-  .contact-information-toggle {
-    background: transparent;
-    border: 1px solid #dee2e6;
-    position: absolute;
-    margin: 0;
-    left: 50%;
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    padding: 0.10rem 0.35rem;;
-  }
-
-  div.label {
-    font-size: 1em;
-    display: inline-block;
-    width: 90px;
-    color: #6c757d !important;
-    padding-right: 8px;
-  }
-
-  div.value {
-    font-size: 1em;
-    display: inline-block;
-    width: 180px;
-    color: #6c757d !important;
-    padding-right: 8px;
-  }
-
-</style>

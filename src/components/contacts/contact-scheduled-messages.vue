@@ -1,6 +1,6 @@
 <template>
   <b-card class="border-0">
-    <h6 class="mb-2">Scheduled Messages</h6>
+    <h4 class="mb-2">Scheduled Messages</h4>
     <div>
       <b-button
         class="btn-block"
@@ -9,7 +9,7 @@
         View Scheduled Messages
       </b-button>
     </div>
-    <contact-scheduled-messages-modal></contact-scheduled-messages-modal>
+    <contact-scheduled-messages-modal/>
   </b-card>
 </template>
 
@@ -31,7 +31,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

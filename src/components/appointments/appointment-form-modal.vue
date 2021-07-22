@@ -1,5 +1,6 @@
 <template>
   <b-modal title="Add Appointment"
+           id="appointment-modal"
            size="md"
            v-model="isOpen"
            scrollable
@@ -15,47 +16,49 @@
             id="input-group-1"
             label="Select date"
             label-for="input-1"
-            description=""
-          >
-            <vue-ctk-date-time-picker formatted="l"
-                                      label="Select date"
-                                      :only-date="true"
-                                      :no-label="true"
-                                      :no-header="true"
-                                      :min-date="minDate"
-                                      :no-button-now="true"
-                                      :auto-close="true"
-                                      :minute-interval="5"
-                                      :disabled-hours="['00','01','02','03','04', '05']"
-                                      v-model="date" @input="dateSelected">
-            </vue-ctk-date-time-picker>
+            description="">
+            <date-selector v-model="appointment.date"
+                           :min-date="minDate"
+                           @dateSelected="dateSelected">
+            </date-selector>
           </b-form-group>
         </b-col>
         <b-col md="12" lg="6">
-          <b-form-group id="input-group-2" label="Time" label-for="input-2">
-            <predefined-time-selector v-model="appointment.time"></predefined-time-selector>
+          <b-form-group id="input-group-2"
+                        label="Time"
+                        label-for="input-2">
+            <predefined-time-selector v-model="appointment.time"
+                                      @select="timeSelected">
+            </predefined-time-selector>
           </b-form-group>
         </b-col>
         <b-col md="12" lg="6">
-          <b-form-group id="input-group-2" label="Duration" label-for="input-2">
-            <predefined-time-duration-selector @select="durationSelected"></predefined-time-duration-selector>
+          <b-form-group id="input-group-2"
+                        label="Duration"
+                        label-for="input-2">
+            <predefined-time-duration-selector @select="durationSelected">
+            </predefined-time-duration-selector>
           </b-form-group>
         </b-col>
         <b-col>
 
-          <b-form-group id="input-group-2" label="Timezone" label-for="input-2">
+          <b-form-group id="input-group-2"
+                        label="Timezone"
+                        label-for="input-2">
             <timezone-selector @select="timezoneSelected"></timezone-selector>
           </b-form-group>
 
-          <b-form-group id="input-group-2" label="Note" label-for="input-2">
+          <b-form-group id="input-group-2"
+                        label="Note"
+                        label-for="input-2">
             <b-form-textarea
               class="textarea-no-auto-shrink"
               placeholder="Write a note for this event.."
               rows="3"
               max-rows="8"
               no-auto-shrink
-              v-model="appointment.note"
-            ></b-form-textarea>
+              v-model="appointment.note">
+            </b-form-textarea>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -65,7 +68,9 @@
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
         <b-col cols="12">
-          <b-form-group id="input-group-2" label="" class="checkbox-wrapper">
+          <b-form-group id="input-group-2"
+                        label=""
+                        class="checkbox-wrapper">
             <b-form-checkbox
               v-model="appointment.smsReminder.enabled"
               :value="true"
@@ -75,19 +80,27 @@
           </b-form-group>
         </b-col>
         <b-col v-show="appointment.smsReminder.enabled" cols="12">
-          <b-form-group id="input-group-2" label="Send From" label-for="input-2">
+          <b-form-group id="input-group-2"
+                        label="Send From"
+                        label-for="input-2">
             <v-line-selector  @select="lineSelected"></v-line-selector>
           </b-form-group>
 
-          <b-form-group id="input-group-2" label="Time" label-for="input-2">
+          <b-form-group id="input-group-2"
+                        label="Time"
+                        label-for="input-2">
             <predefined-time-selector @select="smsReminderTimeSelected"></predefined-time-selector>
           </b-form-group>
 
-          <b-form-group id="input-group-2" label="Send (n) days before" label-for="input-2">
+          <b-form-group id="input-group-2"
+                        label="Send (n) days before"
+                        label-for="input-2">
             <number-of-days-selector @select="smsReminderFrequencySelected"></number-of-days-selector>
           </b-form-group>
 
-          <b-form-group id="input-group-2" label="Template Variables" label-for="input-2">
+          <b-form-group id="input-group-2"
+                        label="Template Variables"
+                        label-for="input-2">
             <div class="mb-1">
               <span class="text-danger sms-reminder-template-variables"
                     v-for="item in appointment.smsReminder.template_variables"
@@ -102,8 +115,8 @@
               rows="3"
               max-rows="8"
               no-auto-shrink
-              v-model="appointment.smsReminder.body"
-            ></b-form-textarea>
+              v-model="appointment.smsReminder.body">
+            </b-form-textarea>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -135,8 +148,6 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
-import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import TimezoneSelector from 'components/timezone-selector'
 import VLineSelector from 'components/line-selector'
@@ -144,10 +155,11 @@ import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
 import auth from 'boot/auth'
+import DateSelector from 'components/date-selector'
 
 export default {
   name: 'appointment-form-modal',
-  components: { NumberOfDaysSelector, PredefinedTimeSelector, VLineSelector, TimezoneSelector, PredefinedTimeDurationSelector, VueCtkDateTimePicker },
+  components: { DateSelector, NumberOfDaysSelector, PredefinedTimeSelector, VLineSelector, TimezoneSelector, PredefinedTimeDurationSelector },
   props: {
     id: {
       type: Number,
@@ -182,9 +194,8 @@ export default {
     return {
       auth,
       isSaving: false,
-      date: '',
       appointment: {
-        date: '',
+        date: window.moment().format('MM/DD/YYYY'),
         time: '',
         duration: '',
         timezone: '',
@@ -235,8 +246,9 @@ export default {
     ...mapActions('contacts', ['addAppointmentOpen']),
     onHidden () {
       this.addAppointmentOpen(false)
+      this.appointment.smsReminder.enabled = false
+      this.setSmsReminderBody()
     },
-
     onSubmit () {
       this.isSaving = true
       let pastActionText = 'Added'
@@ -254,8 +266,10 @@ export default {
           title: 'Event',
           message: `Event has been ${pastActionText.toLowerCase()}.`,
           type: 'positive',
-          position: 'bottom-right'
+          position: 'bottom-right',
+          textColor: 'white'
         })
+        this.onHidden()
       }).catch(error => {
         console.log(error)
         this.$q.notify({
@@ -263,7 +277,8 @@ export default {
           title: 'Event',
           message: `Error while ${presentActionText.toLowerCase()} event.`,
           type: 'negative',
-          position: 'bottom-right'
+          position: 'bottom-right',
+          textColor: 'white'
         })
       }).finally(() => {
         this.isSaving = false
@@ -304,9 +319,13 @@ export default {
     lineSelected (line) {
       this.appointment.smsReminder.campaign_id = line.id
     },
+    timeSelected (time) {
+      this.appointment.time = time.value
+    },
     dateSelected (value) {
       this.appointment.date = window.moment(value).format('MM/DD/YYYY')
-      this.appointment.time = window.moment(value).format('hh:mm')
+      // Enable this once the datetimepicker bug is resolved
+      // this.appointment.time = window.moment(value).format('hh:mm')
     },
     smsReminderTimeSelected (time) {
       this.appointment.smsReminder.time = time.value
@@ -334,33 +353,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.time-picker-column::-webkit-scrollbar {
-  display: block;
-}
-
-.appointment-form {
-  font-size: 12px;
-
-  .form-title {
-    font-size: 11px;
-  }
-  .sms-reminder-template-variables {
-    cursor: pointer;
-  }
-
-  .sms-reminder-template-variables:hover {
-    color: #C4183C !important;
-  }
-
-  .checkbox-wrapper .custom-control-label {
-    padding-top: 3px;
-  }
-
-  span.sms-reminder-label {
-    display: block;
-    margin-top: 4px;
-  }
-}
-</style>

@@ -9,11 +9,13 @@
               :options="contactPhoneNumbers"
               @input="onPhoneChange">
       <template v-slot:selected>
-        <div class="selected-option-container" v-html="getSelectedPhoneLabel()"></div>
+        <div class="selected-option-container"
+             v-html="getSelectedPhoneLabel()"></div>
       </template>
 
       <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
           <q-item-section>
             <q-item-label v-html="$options.filters.fixPhone(scope.opt.phone_number)" />
             <q-item-label caption v-html="getPhoneVariableLabels(scope.opt)"></q-item-label>
@@ -93,10 +95,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
- .inline-select{
-  padding-top: 10px;
-  //width: 300px;
- }
-</style>

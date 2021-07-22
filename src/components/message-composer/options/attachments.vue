@@ -1,10 +1,12 @@
 <template>
-  <div class="attachment-wrapper" v-cloak
+  <div class="attachment-wrapper"
+       v-cloak
        @drop.prevent="onDrop"
        @dragover.prevent>
 
     <form class="mt-1" @click="onBrowse">
-      <b-form-group id="fileInput" class="dragdrop">
+      <b-form-group id="fileInput"
+                    class="dragdrop">
         <div class="text-center uploader-label">
           <upload-icon class="pb-2"></upload-icon>
           <p>Drop files to attach, or <span style="color: #256EFF;cursor: pointer" @click="onBrowse">Browse</span></p>
@@ -20,10 +22,16 @@
       </b-form-group>
     </form>
 
-    <b-progress v-if="isUploading" :max="100" variant="success">
-      <b-progress-bar :value="uploadPercentage" :label="`${uploadPercentage}%`"></b-progress-bar>
+    <b-progress v-if="isUploading"
+                variant="success"
+                :max="100">
+      <b-progress-bar :value="uploadPercentage"
+                      :label="`${uploadPercentage}%`"/>
     </b-progress>
-    <p v-if="hasError" class="error-notice">Error while uploading attachment...</p>
+    <p v-if="hasError"
+       class="error-notice">
+      Error while uploading attachment...
+    </p>
     <div class="text-center mt-3 notice">
       <p class="mb-0"><a href="https://www.twilio.com/docs/sms/accepted-mime-types#accepted-mime-types" target="_blank">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>

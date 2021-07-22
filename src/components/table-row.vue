@@ -85,8 +85,10 @@
               v-for="tag in contact.tags"
               :key="tag.id"
             >
-              <span class="text-primary mr-1">●</span>
-              {{ tag.name }}
+              <span :style="`color: ${tag.color};`">
+                <i class="fa fa-circle" :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`"></i>
+                {{ tag.name }}
+              </span>
             </span>
           </b-popover>
 
@@ -94,8 +96,10 @@
             :id="'popover-tags-' + contact.id"
             class="d-flex align-items-center contact-tags-item"
           >
-            <span class="text-primary mr-1">●</span>
-            {{ contact.tags[0].name }}
+            <span :style="`color: ${contact.tags[0].color};`">
+                <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`"></i>
+                {{ contact.tags[0].name }}
+              </span>
           </span>
         </template>
       </td>

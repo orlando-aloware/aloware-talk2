@@ -4,7 +4,7 @@
       class="folders__header d-flex align-items-center border-bottom border-top"
     >
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
-        My List
+        My Lists
       </div>
 
       <b-popover

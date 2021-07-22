@@ -161,20 +161,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .inline-select.q-select--without-input {
-    padding-top: 9px;
-    width: 300px;
-  }
-
-  .inline-select.q-select--with-input {
-    padding-top: 10px;
-    //width: 300px;
-    min-width: 245px;
-
-    .q-field__input {
-      display: none;
-    }
-  }
-</style>

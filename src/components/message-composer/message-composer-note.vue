@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-2">
+  <div class="pt-2 message-composer-note-wrapper">
     <div class="form-input-container">
       <form>
         <at hideOnBlur
@@ -134,71 +134,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../css/variables';
-  .b-textarea, .b-textarea:focus {
-    border: none !important;
-    box-shadow:none !important;
-    padding: 0 !important;
-    overflow: hidden;
-  }
-
-  .message-options {
-    padding-top: 6px;
-  }
-  .message-options a:focus,
-  .message-options a:focus-visible {
-    outline: none !important;
-    outline-offset: 0;
-  }
-
-  .message-options a:not(:first-child){
-    margin-left: 10px;
-  }
-  .popover {
-    max-width: 100%;
-  }
-
-  .email-subject-input {
-    padding: 0 !important;
-  }
-
-  .atwho-wrap {
-    textarea {
-      border: none !important;
-      box-shadow:none !important;
-      padding: 0 !important;
-      overflow: hidden !important;
-      font-size: 14px;
-    }
-  }
-
-  .at-custom-text {
-    margin-left: 36px;
-    font-size: 13px;
-    line-height: 1;
-    height: 27px;
-    margin-top: 2px;
-  }
-
-  [contenteditable=true] {
-    font-size: 14px;
-  }
-
-  [contenteditable=true]:empty:before{
-    content: attr(placeholder);
-    pointer-events: none;
-    display: block; /* For Firefox */
-    opacity: 0.9;
-  }
-
-  [contenteditable=true]:focus-visible {
-    outline: none;
-  }
-
-  .mention-tag {
-    color: $green;
-  }
-
-</style>

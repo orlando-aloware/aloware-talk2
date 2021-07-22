@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0">
+  <b-card class="border-0 contact-info-wrapper">
     <b-media>
       <template #aside>
         <q-item-section avatar>
@@ -8,13 +8,17 @@
                   height="40"
                   :name="contact.name" />
         </q-item-section>
-
       </template>
 
       <div class="d-flex justify-content-between relative-position">
         <div>
-
-          <h6 class="mt-1 mb-0 contact-name" v-b-tooltip="contact.name">{{ contact.name }}</h6>
+          <h2 class="mt-1 mb-0 contact-name">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ contact.name }}
+            </q-tooltip>
+            {{ contact.name }}
+          </h2>
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
               {{ contact.phone_number | fixPhone }}
@@ -24,8 +28,14 @@
                 {{ phone.lrn_type | fixLrnType }}
               </b-badge>
 
-              <b-link href="#" class="copy-phone-number ml-1" @click.prevent="copyPhoneNumber"><i class="material-icons">content_copy</i></b-link>
-              <input type="hidden" id="phone-number-clone" :value="contact.phone_number">
+              <b-link href="#"
+                      class="copy-phone-number ml-1"
+                      @click.prevent="copyPhoneNumber">
+                <i class="material-icons">content_copy</i>
+              </b-link>
+              <input type="hidden"
+                     id="phone-number-clone"
+                     :value="contact.phone_number">
             </span>
             <span v-else>
               Phone number unavailable
@@ -38,7 +48,7 @@
                   id="btn-edit-contact-info">
           <pencil-o-icon></pencil-o-icon>
         </b-button>
-        <b-popover custom-class="edit-form-popover"
+        <b-popover custom-class="edit-form-popover z-index-1"
                    target="btn-edit-contact-info"
                    triggers="focus"
                    :show.sync="showEditForm">
@@ -47,7 +57,9 @@
       </div>
     </b-media>
     <div class="d-inline-flex flex-wrap contact-action-button">
-      <b-button variant="secondary" size="sm" class="custom-action-button">
+      <b-button variant="secondary"
+                size="sm"
+                class="custom-action-button">
         <call-icon></call-icon>
       </b-button>
       <b-button variant="secondary"
@@ -71,13 +83,15 @@
                 @click="openEnrollSequenceModal">
         <add-sequence-icon></add-sequence-icon>
       </b-button>
-      <b-button variant="secondary" size="sm" class="custom-action-button">
+      <b-button variant="secondary"
+                size="sm"
+                class="custom-action-button">
         <add-call-icon></add-call-icon>
       </b-button>
     </div>
     <appointment-form-modal :contact="contact"></appointment-form-modal>
-    <enroll-sequence-modal></enroll-sequence-modal>
     <contact-add-reminder-modal></contact-add-reminder-modal>
+    <enroll-sequence-modal></enroll-sequence-modal>
   </b-card>
 </template>
 
@@ -123,13 +137,6 @@ export default {
     openAppointmentModal () {
       this.addAppointmentOpen(true)
     },
-    onCloseAddReminderPopover () {
-      this.$root.$emit('bv::hide::popover', 'add-reminder-popover')
-    },
-    onCloseSequenceEnrollPopover () {
-      this.showEnrollSequenceForm = false
-      this.$root.$emit('bv::hide::popover', 'enroll-sequence-popover')
-    },
     onCloseEditForm () {
       this.showEditForm = false
     },
@@ -165,75 +172,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .contact-name{
-    font-size: 17px;
-    display: inline-block;
-    width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .contact-avatar {
-    background-color: #95989E !important;
-    font-weight: 600;
-  }
-
-  .q-item__section--avatar {
-    padding-right: 0 !important;
-    min-width: 0 !important;
-  }
-
-  .card:hover {
-    .btn-edit-contact-info {
-      opacity: 1;
-    }
-  }
-
-  .contact-phone {
-    font-size: 12px;
-    margin-top: -5px;
-    right: 0;
-
-    .copy-phone-number {
-      text-decoration: none;
-      color: #62666E;
-    }
-  }
-
-  .btn-edit-contact-info {
-    position: absolute;
-    right: -7px;
-    top: -9px;
-    opacity: 0;
-  }
-
-  .contact-action-button {
-    button {
-      margin-right: 10px;
-    }
-
-    .custom-action-button {
-      background: #F4F4F6;
-      color: #62666E;
-      border: none;
-    }
-  }
-
-  .edit-form-popover{
-    left: -251px !important;
-    width: 300px;
-  }
-
-  .enroll-sequence-popover{
-    left: -341px !important;
-    width: 300px;
-  }
-
-  .add-reminder-popover {
-    left: -341px !important;
-    width: 300px;
-  }
-</style>
