@@ -34,7 +34,7 @@
     <b-link v-if="!isEdit && hasRole('Company Admin')"
             href="#"
             class="custom-link text-decoration-none"
-            v-on:click="onModifyLines">
+            @click="onModifyLines">
       <pencil-o-icon></pencil-o-icon> Modify Lines
     </b-link>
   </b-card>

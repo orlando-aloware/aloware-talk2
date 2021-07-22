@@ -2054,35 +2054,34 @@ span.mention {
     position: relative;
     border: 1px solid $grey-70;
     border-radius: 8px;
-
-    .composer-links {
-      color: $blue;
-      font-weight: 600;
-      font-size: 13px;
-      width: 20%;
-
-      a {
-        text-decoration: none;
-      }
-
-      a:hover {
-        border-bottom: 2px solid $blue;
-        color: $blue;
-      }
-
-      a.active {
-        border-bottom: 2px solid $blue;
-      }
-
-      a:not(:last-child) {
-        margin-right: 20px;
-      }
-    }
   }
 
   .composer-variables {
     font-size: 13px;
     height: 26px;
+  }
+}
+
+.tab-links {
+  color: $primary;
+  font-weight: 600;
+  font-size: 13px;
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    border-bottom: 2px solid $primary;
+    color: $primary;
+  }
+
+  a.active {
+    border-bottom: 2px solid $primary;
+  }
+
+  a:not(:last-child) {
+    margin-right: 20px;
   }
 }
 

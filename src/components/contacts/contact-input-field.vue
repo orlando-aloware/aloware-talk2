@@ -12,7 +12,7 @@
         <pencil-o-icon v-if="!is_busy && !disabled"
                        color="#256EFF"
                        class="cursor-pointer input-edit-icon"
-                       v-on:click="getFocus">
+                       @click="getFocus">
 
         </pencil-o-icon>
       </template>

@@ -11,16 +11,16 @@
         Power Dialer
       </a>
       <a href=""
-         v-on:click="onAddToStaticList">
+         @click="onAddToStaticList">
         <i class="fa fa-user-plus"></i>
         Add to Static List
       </a>
       <a href=""
-         v-on:click="onCreateStaticList">
+         @click="onCreateStaticList">
         <i class="fa fa-plus"></i>
         Create Static List
       </a>
-      <a href="" v-on:click="onDelete">
+      <a href="" @click="onDelete">
         <i class="fa fa-trash"></i>
         Delete
       </a>

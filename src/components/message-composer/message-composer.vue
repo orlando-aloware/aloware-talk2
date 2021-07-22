@@ -1,24 +1,24 @@
 <template>
   <div class="composer-container">
     <div class="composer-wrapper p-2">
-      <div class="composer-links d-inline-flex">
+      <div class="tab-links d-inline-flex">
         <b-link href="#"
                 :class="{ active : messageComposer.mode === 'sms' }"
-                v-on:click="setMode('sms')">Text
+                @click="setMode('sms')">Text
         </b-link>
         <b-link href="#"
                 v-if="currentCompany && currentCompany.reseller_id != 357"
                 :class="{ active : messageComposer.mode === 'fax' }"
-                v-on:click="setMode('fax')">Fax
+                @click="setMode('fax')">Fax
         </b-link>
         <b-link href="#"
                 :disabled="!contact.email"
                 :class="{ active : messageComposer.mode === 'email' }"
-                v-on:click="setMode('email')">Email
+                @click="setMode('email')">Email
         </b-link>
         <b-link href="#"
                 :class="{ active : messageComposer.mode === 'note' }"
-                v-on:click="setMode('note')">Note
+                @click="setMode('note')">Note
         </b-link>
       </div>
       <div>

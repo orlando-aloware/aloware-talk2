@@ -35,7 +35,7 @@
                     class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="isSending || !validEmail"
-                    v-on:click="onSend">
+                    @click="onSend">
             <q-spinner-bars v-if="isSending" color="white" />
             {{ isSending ? 'Sending Email...' : 'Send Email' }}
           </b-button>

@@ -8,7 +8,7 @@
             <i class="far fa-file-pdf media-icon"></i>
           </div>
           <p class="ellipsis mt-1 text-center">{{ messageComposer.fax.filename }}</p>
-          <b-button pill size="sm" class="btn-remove-attachments" v-on:click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
+          <b-button pill size="sm" class="btn-remove-attachments" @click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@
                   class="fs-13 pl-3 pr-3"
                   size="sm"
                   :disabled="isSending || !validFax"
-                  v-on:click="send">
+                  @click="send">
           <q-spinner-bars v-if="isSending"
                           color="white">
           </q-spinner-bars>

@@ -42,7 +42,7 @@
                     class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="isAdding || !validNote"
-                    v-on:click="onAdd">
+                    @click="onAdd">
             <q-spinner-bars v-if="isAdding" color="white" />
             {{ isAdding ? 'Adding Note...' : 'Add Note' }}
           </b-button>

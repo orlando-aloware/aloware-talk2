@@ -2,10 +2,10 @@
   <b-card class="border-0 contact-notes-wrapper">
     <h4>Notes</h4>
     <div v-if="!isEdit"
-         class="notes" v-on:click="onEditNotes" v-html="contact.notes">
+         class="notes" @click="onEditNotes" v-html="contact.notes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
-         class="notes-empty-placeholder" v-on:click="onEditNotes">Add notes here..</div>
+         class="notes-empty-placeholder" @click="onEditNotes">Add notes here..</div>
     <div v-if="isEdit"
          style="max-width: 300px" v-on:blur="onBlur">
       <q-input

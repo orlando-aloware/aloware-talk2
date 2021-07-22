@@ -32,7 +32,7 @@
     <b-link v-if="!isEdit && hasRole('Company Admin') || (hasRole('Company Agent') && hasPermissionTo('modify contact ring groups'))"
             href="#"
             class="custom-link text-decoration-none"
-            v-on:click="onModifyRingGroups">
+            @click="onModifyRingGroups">
       <pencil-o-icon></pencil-o-icon> Modify Ring Groups
     </b-link>
   </b-card>

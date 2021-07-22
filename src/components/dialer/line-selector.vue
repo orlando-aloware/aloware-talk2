@@ -1,8 +1,8 @@
 <template>
   <q-select :options="campaignOptions"
             :multiple="multiple"
+            :placeholder="placeholder"
             v-model="campaignId"
-            label="Select a line"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"

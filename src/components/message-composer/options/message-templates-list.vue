@@ -9,7 +9,7 @@
           <b-link href="#"
                   class="active"
                   v-b-tooltip="`Use`"
-                  v-on:click="templateSelected(template)">
+                  @click="templateSelected(template)">
             <add-icon-square></add-icon-square>
           </b-link>
           <b-link href="#"
@@ -22,7 +22,7 @@
             <pencil-o-icon color="#62666E"/>
           </b-link>
           <b-link href="#" v-b-tooltip="`Delete`"
-                  v-on:click="onDelete(template)">
+                  @click="onDelete(template)">
             <trash-o-icon/>
           </b-link>
 

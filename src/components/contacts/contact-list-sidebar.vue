@@ -5,7 +5,7 @@
         variant="light"
         size="sm"
         class="sidebar-toggle"
-        v-on:click="onSidebarToggle">
+        @click="onSidebarToggle">
         <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
       <b-card no-body

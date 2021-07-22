@@ -9,7 +9,7 @@
                :src="messageComposer.sms.gif_url"/>
           <b-button size="sm"
                     class="btn-remove-attachments"
-                    v-on:click="removeMessageGif"
+                    @click="removeMessageGif"
                     pill>
             <i class="fa fa-times"></i>
           </b-button>
@@ -26,7 +26,7 @@
             <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -39,7 +39,7 @@
             <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -59,7 +59,7 @@
             </b-button>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -69,7 +69,7 @@
                   :src="getPreviewLink(attachment.uuid)"/>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -109,7 +109,7 @@
                     class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="!validSms"
-                    v-on:click="onSend">
+                    @click="onSend">
             <q-spinner-bars v-if="isSending" color="white" />
             {{ isSending ? 'Sending Text...' : 'Send Text' }}
           </b-button>
