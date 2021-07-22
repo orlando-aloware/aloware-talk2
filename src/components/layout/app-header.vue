@@ -9,7 +9,8 @@
           <q-item-section>
             <q-item-label class="text-regular _500">{{ user.profile.first_name }}</q-item-label>
           </q-item-section>
-          <q-item-section avatar>
+          <q-item-section class="profile-menu"
+                          avatar>
             <q-btn-dropdown :ripple="false"
                             :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
                             :menu-offset="[4, 16]"
@@ -20,7 +21,6 @@
               <template v-slot:label>
                 <q-avatar size="34px"
                           v-if="user.profile"
-                          class="has-text-light"
                           :style="avatarStyle(user.profile.name)">
                   {{ user.profile.name | fixName | initials }}
                   <q-badge :color="color(user.profile.agent_status)"

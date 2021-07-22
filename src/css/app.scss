@@ -111,11 +111,6 @@ body,
     padding: inherit !important;
   }
 
-  .q-item__section--avatar {
-    min-width: 34px !important;
-    padding-left: 10px !important;
-  }
-
   .q-field.q-field--float .q-field__label {
     padding-right: 20px;
     padding-left: 20px;
@@ -522,9 +517,7 @@ body,
 }
 
 .profile-menu {
-  .q-btn-dropdown__arrow {
-    font-size: 0.8em;
-  }
+  padding-left: 6px !important;
 }
 
 .avatar {
