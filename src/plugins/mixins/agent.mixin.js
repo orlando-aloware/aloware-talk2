@@ -12,31 +12,7 @@ export default {
 
   computed: {
     ...mapState(['oldAgentStatus']),
-    ...mapState('auth', ['profile', 'authenticated']),
-    color () {
-      switch (this.profile.agent_status) {
-        case AgentStatus.AGENT_STATUS_OFFLINE:
-          return 'blue-grey-6'
-        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
-          return 'green-6'
-        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
-          return 'red-6'
-        case AgentStatus.AGENT_STATUS_ON_BREAK:
-          return 'orange-6'
-        case AgentStatus.AGENT_STATUS_ON_CALL:
-          return 'light-blue-6'
-        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
-          return 'yellow-6'
-        case AgentStatus.AGENT_STATUS_RINGING:
-          return 'lime-13'
-        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
-          return 'white'
-        case AgentStatus.AGENT_STATUS_SENTRY:
-          return 'dark'
-        default:
-          return 'grey-6'
-      }
-    }
+    ...mapState('auth', ['profile', 'authenticated'])
   },
 
   created () {
@@ -61,6 +37,31 @@ export default {
   },
 
   methods: {
+    color (agentStatus) {
+      switch (agentStatus) {
+        case AgentStatus.AGENT_STATUS_OFFLINE:
+          return 'blue-grey-6'
+        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
+          return 'green-6'
+        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
+          return 'red-6'
+        case AgentStatus.AGENT_STATUS_ON_BREAK:
+          return 'orange-6'
+        case AgentStatus.AGENT_STATUS_ON_CALL:
+          return 'light-blue-6'
+        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
+          return 'yellow-6'
+        case AgentStatus.AGENT_STATUS_RINGING:
+          return 'lime-13'
+        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
+          return 'white'
+        case AgentStatus.AGENT_STATUS_SENTRY:
+          return 'dark'
+        default:
+          return 'grey-6'
+      }
+    },
+
     getAgentStatus (getTry = 1) {
       if (!this.authenticated) {
         return
