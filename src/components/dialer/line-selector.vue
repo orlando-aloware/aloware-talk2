@@ -66,10 +66,10 @@ export default {
 
     placeholder () {
       if (this.multiple) {
-        return 'Select Lines'
+        return 'Select lines'
       }
 
-      return 'Select Line'
+      return 'Select a line'
     },
 
     campaignsAlphabeticalOrder () {
