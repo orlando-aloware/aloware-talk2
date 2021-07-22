@@ -102,6 +102,40 @@
               <div class="row no-wrap q-pa-md width-290">
                 <div class="col no-padding max-width-266">
                   <line-selector></line-selector>
+
+                  <div class="tab-links d-inline-flex w-100">
+                    <b-link href="#"
+                            :class="{ active : mode === 'call' }"
+                            @click="setMode('call')">
+                      Call
+                    </b-link>
+                    <b-link href="#"
+                            :class="{ active : mode === 'text' }"
+                            @click="setMode('text')">
+                      Text
+                    </b-link>
+                  </div>
+                  <div>
+                    <b-form inline>
+                      <b-form-group :label="label"
+                                    class="mt-2 mb-0">
+                        <b-form-input v-model="phoneNumber"
+                                      type="text"
+                                      placeholder="Enter a phone number"
+                                      required>
+                        </b-form-input>
+                      </b-form-group>
+
+                      <q-btn :ripple="true"
+                             icon="img:app-icons/dialer/call_btn_small.svg"
+                             size="36px"
+                             class="font-size-0 ml-3"
+                             align="center"
+                             padding="none"
+                             flat>
+                      </q-btn>
+                    </b-form>
+                  </div>
                 </div>
               </div>
             </q-menu>
@@ -132,6 +166,9 @@ export default {
     return {
       dialerIcon: 'img:app-icons/header/dialer_gray.svg',
       dialerStatus: false,
+      label: 'Call a number',
+      mode: 'call',
+      phoneNumber: '',
       AgentStatus
     }
   },
@@ -160,7 +197,7 @@ export default {
       }
     },
 
-    phoneNumber () {
+    personalPhoneNumber () {
       let found = this.campaigns.find(campaign => campaign.id === this.user.profile.campaign_id)
       if (found && found.incoming_numbers.length) {
         return found.incoming_numbers[0].phone_number
@@ -189,6 +226,18 @@ export default {
     changeStatus (status) {
       this.changeAgentStatus(status)
       this.$refs.menu.hide()
+    },
+
+    setMode (mode) {
+      this.mode = mode
+      switch (mode) {
+        case 'call':
+          this.label = 'Call a number'
+          break
+        case 'text':
+          this.label = 'Text a number'
+          break
+      }
     }
   }
 }
