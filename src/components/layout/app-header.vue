@@ -12,9 +12,9 @@
           <q-item-section avatar>
             <q-btn-dropdown :ripple="false"
                             :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
+                            :menu-offset="[4, 16]"
                             class="tab-dropdown"
                             ref="menu"
-                            :menu-offset="[4, 12]"
                             auto-close
                             flat>
               <template v-slot:label>
@@ -33,11 +33,11 @@
               <q-list class="tab-dropdown-list no-select">
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
                         :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary _500' : '']"
+                        dense
                         clickable>
                   <div class="d-flex align-items-center">
                     <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
-                             class="q-mr-sm"
-                             rounded>
+                             class="rounded-badge q-mr-sm">
                     </q-badge>
                     Offline
                   </div>
@@ -45,11 +45,11 @@
 
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
                         :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
+                        dense
                         clickable>
                   <div class="d-flex align-items-center">
                     <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                             class="q-mr-sm"
-                             rounded>
+                             class="rounded-badge q-mr-sm">
                     </q-badge>
                     Available
                   </div>
@@ -57,11 +57,11 @@
 
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
                         :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
+                        dense
                         clickable>
                   <div class="d-flex align-items-center">
                     <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                             class="q-mr-sm"
-                             rounded>
+                             class="rounded-badge q-mr-sm">
                     </q-badge>
                     Busy
                   </div>
@@ -69,11 +69,11 @@
 
                 <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
                         :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
+                        dense
                         clickable>
                   <div class="d-flex align-items-center">
                     <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                             class="q-mr-sm"
-                             rounded>
+                             class="rounded-badge q-mr-sm">
                     </q-badge>
                     On-break
                   </div>
