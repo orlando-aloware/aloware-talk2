@@ -115,26 +115,24 @@
                       Text
                     </b-link>
                   </div>
-                  <div>
-                    <b-form inline>
-                      <b-form-group :label="label"
-                                    class="mt-2 mb-0">
-                        <b-form-input v-model="phoneNumber"
-                                      type="text"
-                                      placeholder="Enter a phone number"
-                                      required>
-                        </b-form-input>
-                      </b-form-group>
-
-                      <q-btn :ripple="true"
-                             icon="img:app-icons/dialer/call_btn_small.svg"
-                             size="36px"
-                             class="font-size-0 ml-3"
-                             align="center"
-                             padding="none"
-                             flat>
-                      </q-btn>
-                    </b-form>
+                  <div class="d-inline-flex align-items-center justify-content-between w-100">
+                    <b-form-group :label="label"
+                                  class="mt-2 mb-0">
+                      <b-form-input v-model="phoneNumber"
+                                    type="text"
+                                    class="width-214 important"
+                                    placeholder="Enter a phone number"
+                                    required>
+                      </b-form-input>
+                    </b-form-group>
+                    <q-btn :ripple="true"
+                           icon="img:app-icons/dialer/call_btn_small.svg"
+                           size="36px"
+                           class="icon-btn auto-size"
+                           align="right"
+                           padding="none"
+                           flat>
+                    </q-btn>
                   </div>
                 </div>
               </div>

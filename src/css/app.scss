@@ -2527,6 +2527,16 @@ span.mention {
  Quasar related
  */
 
+.q-pa-md {
+  padding: 12px 12px;
+}
+
+.q-btn.icon-btn {
+  & .q-icon {
+    font-size: inherit;
+  }
+}
+
 .row {
   margin-left: inherit;
   margin-right: inherit;
@@ -2576,12 +2586,25 @@ span.mention {
  Utilities
  */
 
+.auto-size {
+  width: auto;
+  height: auto;
+}
+
 .height-28 {
   height: 28px;
 }
 
 .width-40 {
   width: 40px;
+}
+
+.width-214 {
+  width: 214px;
+
+  &.important {
+    width: 214px !important;
+  }
 }
 
 .width-290 {
