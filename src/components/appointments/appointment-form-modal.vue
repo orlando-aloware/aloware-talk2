@@ -83,7 +83,7 @@
           <b-form-group id="input-group-2"
                         label="Send From"
                         label-for="input-2">
-            <v-line-selector  @select="lineSelected"></v-line-selector>
+            <contact-line-selector @select="lineSelected"></contact-line-selector>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -106,7 +106,7 @@
                     v-for="item in appointment.smsReminder.template_variables"
                     :key="item"
                     @click="appendSmsReminderTemplateVariable(item)">
-                {{item}}
+                {{ item }}
             </span>
             </div>
             <b-form-textarea
@@ -138,7 +138,7 @@
         :disabled="isSaving || !isValid"
         @click="onSubmit"
       >
-        <q-spinner-bars v-if="isSaving" color="white" />
+        <q-spinner-bars v-if="isSaving" color="white"/>
         {{ isSaving ? 'Adding Event...' : 'Add Event' }}
       </b-button>
     </template>
@@ -150,7 +150,7 @@
 import { mapActions, mapState } from 'vuex'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import TimezoneSelector from 'components/timezone-selector'
-import VLineSelector from 'components/line-selector'
+import ContactLineSelector from 'components/contact-line-selector'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
@@ -159,7 +159,14 @@ import DateSelector from 'components/date-selector'
 
 export default {
   name: 'appointment-form-modal',
-  components: { DateSelector, NumberOfDaysSelector, PredefinedTimeSelector, VLineSelector, TimezoneSelector, PredefinedTimeDurationSelector },
+  components: {
+    DateSelector,
+    NumberOfDaysSelector,
+    PredefinedTimeSelector,
+    ContactLineSelector,
+    TimezoneSelector,
+    PredefinedTimeDurationSelector
+  },
   props: {
     id: {
       type: Number,
@@ -309,7 +316,8 @@ export default {
 
       return params
     },
-    onReset () {},
+    onReset () {
+    },
     durationSelected (duration) {
       this.appointment.duration = duration.value
     },
