@@ -1,5 +1,5 @@
 <template>
-  <div class="task-list w-100">
+  <div class="task-list scrollable w-100">
     <task-item v-for="communication in communications"
                :key="communication.id"
                :communication="communication">

@@ -70,7 +70,7 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="w-100">
+      <div class="h-100 w-100">
         <task-list :communications="communications"/>
       </div>
     </div>
