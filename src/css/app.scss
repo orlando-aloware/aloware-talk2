@@ -2461,6 +2461,11 @@ span.mention {
  Quasar related
  */
 
+.row {
+  margin-left: inherit;
+  margin-right: inherit;
+}
+
 .tab-dropdown {
   & .q-focus-helper {
     display: none;
