@@ -1,5 +1,5 @@
 <template>
-<div class="inbox-end mx-3 mt-3 border-top-0 bg-transparent">
+<div class="inbox-end mt-1 border-top-0 bg-transparent">
   <div class="inbox-info">
     <contact-details v-if="hasContact">
     </contact-details>
