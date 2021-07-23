@@ -1,7 +1,7 @@
 <template>
   <vue-bootstrap-typeahead :serializer="serializer"
                            :data="phoneNumbers"
-                           v-model="phoneNumber"
+                           v-model="query"
                            class="width-214 important"
                            placeholder="Enter a name or phone number"
                            :minMatchingChars="3"
@@ -30,7 +30,7 @@ export default {
 
   data () {
     return {
-      phoneNumber: this.value,
+      query: this.value,
       phoneNumbers: [],
       selectedPhoneNumber: null
     }
@@ -70,12 +70,13 @@ export default {
 
   watch: {
     value () {
-      this.phoneNumber = this.value
+      this.query = this.value
     },
 
-    phoneNumber: _.debounce(function () {
-      if (this.phoneNumber.length >= 3) {
-        this.getPhoneNumbers(this.phoneNumber)
+    query: _.debounce(function () {
+      this.$emit('change', this.query)
+      if (this.query.length >= 3) {
+        this.getPhoneNumbers(this.query)
       }
     }, 500)
   }
