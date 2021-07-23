@@ -1,10 +1,11 @@
 <template>
   <vue-bootstrap-typeahead :serializer="serializer"
                            :data="phoneNumbers"
+                           :minMatchingChars="3"
+                           ref="searchField"
                            v-model="query"
                            class="width-214 important"
                            placeholder="Enter a name or phone number"
-                           :minMatchingChars="3"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
@@ -64,6 +65,7 @@ export default {
 
     changePhoneNumber ($event) {
       this.selectedPhoneNumber = $event.phone_number
+      this.$refs.searchField.inputValue = this.selectedPhoneNumber
       this.$emit('change', this.selectedPhoneNumber)
     }
   },

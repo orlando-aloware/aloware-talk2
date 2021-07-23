@@ -126,7 +126,19 @@
                     </b-form-group>
                     <q-btn :ripple="true"
                            :disable="!validPhoneNumber"
+                           v-show="mode == 'call'"
                            icon="img:app-icons/dialer/call_btn_small.svg"
+                           size="36px"
+                           class="icon-btn auto-size height-36"
+                           align="right"
+                           padding="none"
+                           rounded
+                           flat>
+                    </q-btn>
+                    <q-btn :ripple="true"
+                           :disable="!validPhoneNumber"
+                           v-show="mode == 'text'"
+                           icon="img:app-icons/dialer/text_btn_small.svg"
                            size="36px"
                            class="icon-btn auto-size height-36"
                            align="right"
@@ -201,7 +213,7 @@ export default {
     },
 
     validPhoneNumber () {
-      return this.$options.filters.fixPhone(this.phoneNumber)
+      return this.$options.filters.fixPhone(this.phoneNumber) !== false
     },
 
     invalidPhoneNumber () {
