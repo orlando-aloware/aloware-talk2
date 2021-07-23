@@ -2846,4 +2846,11 @@ span.mention {
 .vbt-autcomplete-list {
   z-index: 6001 !important;
   position: fixed !important;
+
+  & .list-group-item {
+    &.active {
+      background: #E5EEFF;
+      border: 1px solid #D3E2FF;
+    }
+  }
 }

@@ -10,9 +10,13 @@
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
     <template slot="suggestion" slot-scope="{ data }">
-      <strong>{{ (data.first_name + ' ' + data.last_name).trim() }}</strong>
+      <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
       <br>
-      <span>{{ data.phone_number | fixPhone }}</span>
+      <span class="text-xs">{{ getContactName(data) }}</span>
+      <template v-if="data.company_name">
+        <br>
+        <span class="text-xs">{{ data.company_name }}</span>
+      </template>
     </template>
   </vue-bootstrap-typeahead>
 </template>
@@ -67,6 +71,15 @@ export default {
       this.selectedPhoneNumber = $event.phone_number
       this.$refs.searchField.inputValue = this.selectedPhoneNumber
       this.$emit('change', this.selectedPhoneNumber)
+    },
+
+    getContactName (item) {
+      let name = (item.first_name + ' ' + item.last_name).trim()
+      if (!name.length) {
+        name = 'No Name'
+      }
+
+      return name
     }
   },
 
