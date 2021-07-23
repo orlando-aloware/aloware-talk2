@@ -1,7 +1,7 @@
 /*
  Mixins
  */
-@function if-important($important){
+@function if-important($important) {
   @return #{if($important, '!important', '')};
 }
 
@@ -41,7 +41,11 @@ $spaces: (
 $primary: #256eff;
 $success: #00bf4a;
 $danger: #fa003f;
+$warning: #F2994A;
 $white: #FFFFFF;
+$info: #17a2b8;
+$light: #f8f9fa;
+$dark: #343a40;
 
 // Greys
 $grey-100: #040404;
@@ -79,28 +83,35 @@ $grey-9: #767C89;
 $font-family-body: 'Inter', sans-serif;
 
 // Font weights
-._100{
+._100 {
   font-weight: 100 !important;
 }
-._200{
+
+._200 {
   font-weight: 200 !important;
 }
-._300{
+
+._300 {
   font-weight: 300 !important;
 }
-._400{
+
+._400 {
   font-weight: 400 !important;
 }
-._500{
+
+._500 {
   font-weight: 500 !important;
 }
-._600{
+
+._600 {
   font-weight: 600 !important;
 }
-._700{
+
+._700 {
   font-weight: 700 !important;
 }
-._800{
+
+._800 {
   font-weight: 800 !important;
 }
 
@@ -120,43 +131,53 @@ h1 {
   @include font-size($f-size-h1, 600);
   @extend .text-grey-100;
 }
+
 h2 {
   @include font-size($f-size-h2, 600);
   @extend .text-grey-100;
 }
+
 h3 {
   @include font-size($f-size-h3, 600);
   @extend .text-grey-100;
 }
+
 h4 {
   @include font-size($f-size-h4, 600);
   @extend .text-grey-100;
 }
+
 h5 {
   @include font-size($f-size-h5, 500);
   @extend .text-grey-100;
 }
+
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: $font-family-body;
   margin-bottom: 0rem;
 }
+
 body {
   @include font-size($f-size-body, 400);
   @extend .text-grey-100;
   font-family: $font-family-body;
 }
+
 .text {
   @include font-size($f-size-body, 400, true);
   @extend .text-grey-100;
 }
+
 .text-sm {
   @include font-size($f-size-body-sm, 500, true);
   @extend .text-grey-100;
 }
+
 .text-xs {
   @include font-size($f-size-body-xs, 400, true);
   @extend .text-grey-100;
 }
+
 .text-xxs {
   @include font-size($f-size-body-xxs, 400, true);
   @extend .text-grey-100;
@@ -169,7 +190,7 @@ body {
 // Colors
 $green: $success;
 $dark: #15163f;
-$black: #040404;
+$black: $grey-100;
 $grey-dark: #666666;
 $grey-2: #989899;
 $grey-light: #d8d8d8;
@@ -202,6 +223,8 @@ $green-3: #6FCF97;
 $yellow-1: #F2C94C;
 $blue-3: #56CCF2;
 $purple-2: #BB6BD9;
+
+$red-100: #C4183C;
 
 $f-size-12: 12px;
 $f-size-13: 13px;

@@ -95,17 +95,17 @@
         <b-dropdown text="More"
                     variant="outline-primary"
                     class="m-2 b-compact-dropdown-button">
-          <b-dropdown-item href="" v-on:click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
+          <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
-                           v-on:click="onAddContactsToList">
+                           @click="onAddContactsToList">
             <i class="fa fa-list-ul"></i> Add Contacts to this List
           </b-dropdown-item>
           <b-dropdown-item href="#"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
           <b-dropdown-item href="#"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
-                           v-on:click="onRemoveList">
+                           @click="onRemoveList">
             <i class="fa fa-trash-alt"></i> Delete
           </b-dropdown-item>
         </b-dropdown>

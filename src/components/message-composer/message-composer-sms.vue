@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-2">
+  <div class="pt-2 message-composer-text-wrapper">
     <div>
       <div v-if="messageComposer.sms.gif_url || messageComposer.sms.attachments.length > 0"
            class="mb-2 d-inline-flex media-preview-wrapper">
@@ -9,7 +9,7 @@
                :src="messageComposer.sms.gif_url"/>
           <b-button size="sm"
                     class="btn-remove-attachments"
-                    v-on:click="removeMessageGif"
+                    @click="removeMessageGif"
                     pill>
             <i class="fa fa-times"></i>
           </b-button>
@@ -26,7 +26,7 @@
             <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -39,7 +39,7 @@
             <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -59,7 +59,7 @@
             </b-button>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -69,7 +69,7 @@
                   :src="getPreviewLink(attachment.uuid)"/>
             <b-button size="sm"
                       class="btn-remove-attachments"
-                      v-on:click="removeAttachment(attachment)"
+                      @click="removeAttachment(attachment)"
                       pill>
               <i class="fa fa-times"></i>
             </b-button>
@@ -109,7 +109,7 @@
                     class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="!validSms"
-                    v-on:click="onSend">
+                    @click="onSend">
             <q-spinner-bars v-if="isSending" color="white" />
             {{ isSending ? 'Sending Text...' : 'Send Text' }}
           </b-button>
@@ -126,6 +126,7 @@
       </div>
     </div>
     <b-popover ref="popover"
+               custom-class="mx-w-100"
                id="attachment-popover"
                placement="topright"
                target="smsAttachments"
@@ -134,6 +135,7 @@
       <attachments @attachmentUploaded="onAttachmentUploaded"></attachments>
     </b-popover>
     <b-popover ref="popover"
+               custom-class="mx-w-100"
                id="gif-popover"
                placement="topright"
                target="smsGif"
@@ -172,11 +174,12 @@ import VariableIcon from 'components/icons/variable-icon'
 import SearchGiphy from 'components/message-composer/options/search-giphy'
 import Attachments from 'components/message-composer/options/attachments'
 import Variables from 'components/message-composer/options/variables'
-import { mapActions, mapGetters } from 'vuex'
-import MessageTemplates from 'components/message-composer/options/message-templates'
-import talk2Api from 'src/plugins/api/api'
 import ScheduledMessage from 'components/message-composer/scheduled-message'
 import SmsTemplateModal from 'components/sms-template-modal'
+import MessageTemplates from 'components/message-composer/options/message-templates'
+import { mapActions, mapGetters } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
+
 export default {
   name: 'message-composer-sms',
   components: { SmsTemplateModal, ScheduledMessage, MessageTemplates, Variables, Attachments, SearchGiphy, VariableIcon, CalendarTodayIcon, AttachmentIcon, GifIcon },
@@ -282,141 +285,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .b-textarea, .b-textarea:focus {
-    border: none !important;
-    box-shadow:none !important;
-    padding: 0 !important;
-    overflow: hidden;
-  }
-
-  .message-options {
-    padding-top: 6px;
-  }
-  .message-options a:focus,
-  .message-options a:focus-visible {
-    outline: none !important;
-    outline-offset: 0;
-  }
-
-  .message-options a:not(:first-child){
-    margin-left: 10px;
-  }
-  .popover {
-    max-width: 100%;
-  }
-  .b-dropdown a.dropdown-item.disabled,
-  .b-dropdown a.dropdown-item:disabled,
-  .b-dropdown a.dropdown-item {
-    font-size: 80%;
-  }
-
-  .media-preview-wrapper div:not(:first-child) {
-    margin-left: 10px;
-  }
-
-  .media-preview-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 5px;
-    padding-right: 1px;
-
-    .media-preview {
-      position: relative;
-
-      .img-preview {
-        height: 76px;
-        width: 76px;
-        border: 1px solid #EBEBEB;;
-        border-radius: 6px;
-        padding: 2px;
-      }
-
-      .btn-remove-attachments {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-        padding: 0.015rem 0.2rem;
-        font-size: 50%;
-        opacity: 0;
-      }
-
-      .pdf-thumbnail-wrapper {
-        padding: 4px;
-        width: 100px;
-        height: 76px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-
-        i.media-icon {
-          color: #FE2216;
-        }
-
-        p {
-          font-size: 10px;
-          max-width: 90px;
-        }
-
-        .pdf-preview {
-          overflow: hidden !important;
-        }
-      }
-
-      .audio-thumbnail-wrapper {
-        padding: 4px;
-        width: 100px;
-        height: 76px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-
-        p {
-          font-size: 10px;
-          max-width: 90px;
-        }
-      }
-
-      .video-thumbnail-wrapper {
-        height: 76px;
-        width: 76px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-        padding: 4px;
-
-        .embed-responsive {
-          height: 100%;
-        }
-
-        .btn-play {
-          position: absolute;
-          top: 29%;
-          left: 31%;
-          color: #62666E;
-          cursor: inherit;
-        }
-      }
-
-    }
-
-    .media-preview:hover{
-      .btn-remove-attachments {
-        opacity: 1;
-      }
-    }
-
-    .media-icon-wrapper {
-      height: 42px;
-      width: 42px;
-      background: #EBEBEB;
-      border-radius: 6px;
-      text-align: center;
-      margin: auto;
-
-      i.media-icon {
-        margin-top: 10px;
-        font-size: 20px;
-        color: #B5B7BB;;
-      }
-    }
-  }
-</style>

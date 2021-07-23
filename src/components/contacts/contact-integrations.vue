@@ -1,8 +1,8 @@
 <template>
   <b-card class="border-0">
-    <h6 class="mb-2">Integrations</h6>
+    <h4 class="mb-2">Integrations</h4>
     <p v-if="!isHubspotEnabled"
-       class="status-notice text-muted mb-0">
+       class="status-notice fs-12 text-muted mb-0">
       Enable your favorite CRM integration and push contacts from the
       integration settings page to see links to your CRM contacts.
     </p>
@@ -26,9 +26,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .status-notice {
-    font-size: 12px;
-  }
-</style>

@@ -36,6 +36,11 @@ export const shortDateTimePassed = (dt) => {
     } else {
       dateTimePassed = window.moment.utc(dt).local().fromNow()
     }
+    dateTimePassed = dateTimePassed.split(' ')
+    if (dateTimePassed.length > 0 && ['a', 'an'].includes(dateTimePassed[0])) {
+      dateTimePassed[0] = '1'
+    }
+    dateTimePassed = dateTimePassed.join(' ')
     return dateTimePassed.replace(' ago', '')
       .replace(' seconds', 's')
       .replace(' second', 's')

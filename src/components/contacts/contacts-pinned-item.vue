@@ -59,7 +59,6 @@ export default {
 <style lang="scss" scoped>
   .item-name {
     font-size: 13px;
-    max-width: 175px;
     overflow: hidden;
     text-overflow: ellipsis;
   }

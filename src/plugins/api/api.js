@@ -59,13 +59,13 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/phone-number`, params)
       },
       updatePhone (id, phoneId, params) {
-        if (!id || phoneId) {
+        if (!id || !phoneId) {
           return null
         }
         return window.axios.post(`${suffixV1}contact/${id}/phone-number/${phoneId}`, params)
       },
       deletePhone (id, phoneId) {
-        if (!id || phoneId) {
+        if (!id || !phoneId) {
           return null
         }
         return window.axios.delete(`${suffixV1}contact/${id}/phone-number/${phoneId}`)

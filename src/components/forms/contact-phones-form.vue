@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="onSubmit">
+  <b-form @submit.prevent="onSubmit">
     <b-form-group label="Title">
       <b-form-input
         type="text"
@@ -30,7 +30,7 @@
     </b-form-group>
 
     <div class="d-flex justify-content-between">
-      <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
+      <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
       <b-button type="submit"
                 size="sm"
                 variant="primary"
@@ -66,42 +66,11 @@ export default {
     ...mapActions('contacts', ['setContact', 'addContactPhoneNumber', 'setContactSelectedPhone', 'updateContactSelectedPhone']),
     onSubmit (e) {
       this.isBusy = true
-      let request = null
-
       if (this.contactSelectedPhone) {
-        request = talk2Api.V1.contact.updatePhone(this.contact.id, this.contactSelectedPhone.id, {
-          title: this.phone.title,
-          phone_number: this.phone.number,
-          is_primary: this.phone.isPrimary
-        }).then(response => {
-          this.getContact()
-          this.updateContactSelectedPhone(response.data)
-          this.removeSelectedPhone()
-          this.onClose()
-        })
+        this.handleUpdate()
       } else {
-        request = talk2Api.V1.contact.storePhone(this.contact.id, {
-          title: this.phone.title,
-          phone_number: this.phone.number
-        }).then(response => {
-          this.addContactPhoneNumber(response.data)
-          this.removeSelectedPhone()
-          this.onClose()
-        })
+        this.handleCreate()
       }
-
-      request.catch(err => {
-        console.log(err)
-        this.$q.notify({
-          message: 'Error while updating phone number.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
-      }).finally(() => {
-        this.isBusy = false
-      })
-
       e.preventDefault()
     },
     onClose () {
@@ -115,6 +84,48 @@ export default {
     },
     removeSelectedPhone () {
       this.setContactSelectedPhone(null)
+    },
+    handleUpdate () {
+      return talk2Api.V1.contact.updatePhone(this.contact.id, this.contactSelectedPhone.id, {
+        title: this.phone.title,
+        phone_number: this.phone.number,
+        is_primary: this.phone.isPrimary
+      }).then(response => {
+        this.getContact()
+        this.updateContactSelectedPhone(response.data)
+        this.removeSelectedPhone()
+        this.onClose()
+      }).catch(err => {
+        console.log(err)
+        this.$q.notify({
+          message: 'Error while updating phone number.',
+          type: 'negative',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
+      }).finally(() => {
+        this.isBusy = false
+      })
+    },
+    handleCreate () {
+      return talk2Api.V1.contact.storePhone(this.contact.id, {
+        title: this.phone.title,
+        phone_number: this.phone.number
+      }).then(response => {
+        this.addContactPhoneNumber(response.data)
+        this.removeSelectedPhone()
+        this.onClose()
+      }).catch(err => {
+        console.log(err)
+        this.$q.notify({
+          message: 'Error while creating phone number.',
+          type: 'negative',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
+      }).finally(() => {
+        this.isBusy = false
+      })
     }
   },
   mounted () {

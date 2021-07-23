@@ -1,15 +1,23 @@
 <template>
-  <b-card class="border-0">
-    <h6>Lines</h6>
-    <div v-if="!isEdit">
+  <b-card class="border-0 contact-lines-wrapper">
+    <h4>Lines</h4>
+    <div v-if="!isEdit"
+         class="mt-1">
       <b-badge variant="primary"
                class="badge-tag badge-tag-primary ellipsis"
-               v-b-tooltip="line.name"
-               v-for="line in appliedLines" :key="line.id">{{ line.name }}</b-badge>
+               v-for="line in appliedLines"
+               :key="line.id">
+        <q-tooltip anchor="top middle"
+                   self="center middle"
+                   :offset="[20, 20]">
+          {{ line.name }}
+        </q-tooltip>
+        {{ line.name }}
+      </b-badge>
     </div>
 
     <vue-multiselect v-show="isEdit"
-                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2"
                      track-by="id"
                      label="name"
                      ref="linesSelect"
@@ -26,7 +34,7 @@
     <b-link v-if="!isEdit && hasRole('Company Admin')"
             href="#"
             class="custom-link text-decoration-none"
-            v-on:click="onModifyLines">
+            @click="onModifyLines">
       <pencil-o-icon></pencil-o-icon> Modify Lines
     </b-link>
   </b-card>
@@ -103,6 +111,8 @@ export default {
         this.options = this.stringOptions
       }).finally(() => {
         this.linesArray = this.contact.campaign_ids
+
+        this.selectedLines = this.options.filter(line => this.linesArray.includes(line.id))
       })
     }
   },
@@ -118,17 +128,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.card:hover {
-  .btn-edit-action{
-    opacity: 1;
-  }
-}
-
-.btn-edit-action {
-  right: 10px;
-  top: 10px;
-  opacity: 0;
-}
-</style>

@@ -22,7 +22,7 @@
       <b-button type="button"
                 size="sm"
                 variant="light"
-                v-on:click="onCancel">Cancel</b-button>
+                @click="onCancel">Cancel</b-button>
       <b-button type="submit"
                 size="sm"
                 variant="primary"

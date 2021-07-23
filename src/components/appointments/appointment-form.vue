@@ -34,15 +34,15 @@
           </b-form-group>
 
           <b-form-group id="input-group-2" label="Note" label-for="input-2">
-          <b-form-textarea
-            class="textarea-no-auto-shrink"
-            placeholder="Write a note for this event.."
-            rows="3"
-            max-rows="8"
-            no-auto-shrink
-            v-model="appointment.note"
-          ></b-form-textarea>
-        </b-form-group>
+            <b-form-textarea
+              class="textarea-no-auto-shrink"
+              placeholder="Write a note for this event.."
+              rows="3"
+              max-rows="8"
+              no-auto-shrink
+              v-model="appointment.note"
+            ></b-form-textarea>
+          </b-form-group>
         </b-col>
       </b-form-row>
 
@@ -62,7 +62,7 @@
         </b-col>
         <b-col v-show="appointment.smsReminder.enabled" cols="12">
           <b-form-group id="input-group-2" label="Send From" label-for="input-2">
-            <v-line-selector  @select="lineSelected"></v-line-selector>
+            <contact-line-selector @select="lineSelected"></contact-line-selector>
           </b-form-group>
 
           <b-form-group id="input-group-2" label="Time" label-for="input-2">
@@ -79,7 +79,7 @@
                     v-for="item in appointment.smsReminder.template_variables"
                     :key="item"
                     @click="appendSmsReminderTemplateVariable(item)">
-                {{item}}
+                {{ item }}
             </span>
             </div>
             <b-form-textarea
@@ -119,11 +119,12 @@ import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import TimezoneSelector from 'components/timezone-selector'
-import VLineSelector from 'components/line-selector'
+import ContactLineSelector from 'components/contact-line-selector'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
 import auth from 'boot/auth'
+
 export default {
   name: 'appointment-form',
   props: {
@@ -136,7 +137,14 @@ export default {
       required: true
     }
   },
-  components: { NumberOfDaysSelector, PredefinedTimeSelector, VLineSelector, TimezoneSelector, PredefinedTimeDurationSelector, VueCtkDateTimePicker },
+  components: {
+    NumberOfDaysSelector,
+    PredefinedTimeSelector,
+    ContactLineSelector,
+    TimezoneSelector,
+    PredefinedTimeDurationSelector,
+    VueCtkDateTimePicker
+  },
   data () {
     return {
       auth,
@@ -219,7 +227,8 @@ export default {
 
       return params
     },
-    onReset () {},
+    onReset () {
+    },
     durationSelected (duration) {
       this.appointment.duration = duration.value
     },
@@ -245,26 +254,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .time-picker-column::-webkit-scrollbar {
-    display: block;
+.time-picker-column::-webkit-scrollbar {
+  display: block;
+}
+
+.appointment-form {
+  font-size: 12px;
+
+  .form-title {
+    font-size: 11px;
   }
 
-  .appointment-form {
-    font-size: 12px;
-
-    .form-title {
-      font-size: 11px;
-    }
-    .sms-reminder-template-variables {
-      cursor: pointer;
-    }
-
-    .sms-reminder-template-variables:hover {
-      color: #C4183C !important;
-    }
-
-    .checkbox-wrapper .custom-control-label {
-      padding-top: 3px;
-    }
+  .sms-reminder-template-variables {
+    cursor: pointer;
   }
+
+  .sms-reminder-template-variables:hover {
+    color: #C4183C !important;
+  }
+
+  .checkbox-wrapper .custom-control-label {
+    padding-top: 3px;
+  }
+}
 </style>

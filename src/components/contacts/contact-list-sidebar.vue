@@ -5,7 +5,7 @@
         variant="light"
         size="sm"
         class="sidebar-toggle"
-        v-on:click="onSidebarToggle">
+        @click="onSidebarToggle">
         <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
       <b-card no-body
@@ -22,8 +22,13 @@
                     :name="contact.name"/>
             <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
               <div class="mr-auto">
-                <p class="text-bold contact-name mb-0"
-                   v-b-tooltip="contact.name">{{ contact.name }}</p>
+                <p class="text-bold contact-name mb-0">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ contact.name }}
+                  </q-tooltip>
+                  {{ contact.name }}
+                </p>
                 <p class="text-sm-left contact-phone mb-1">
                   <span v-if="contact.phone_number !== '0'">{{ contact.phone_number | fixPhone }}</span>
                   <span v-else>Phone number unavailable</span>

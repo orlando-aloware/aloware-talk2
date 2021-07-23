@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-2">
+  <div class="pt-2 message-composer-fax-wrapper">
     <div v-if="validFax"
          class="d-inline-flex media-preview-wrapper">
       <div class="media-preview">
@@ -8,7 +8,7 @@
             <i class="far fa-file-pdf media-icon"></i>
           </div>
           <p class="ellipsis mt-1 text-center">{{ messageComposer.fax.filename }}</p>
-          <b-button pill size="sm" class="btn-remove-attachments" v-on:click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
+          <b-button pill size="sm" class="btn-remove-attachments" @click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@
                   class="fs-13 pl-3 pr-3"
                   size="sm"
                   :disabled="isSending || !validFax"
-                  v-on:click="send">
+                  @click="send">
           <q-spinner-bars v-if="isSending"
                           color="white">
           </q-spinner-bars>
@@ -173,87 +173,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .file-info {
-    margin-bottom: 0 !important;
-  }
-
-  .custom-progress-bar {
-    width: 97% !important;
-    height: 4px !important;
-    margin-top: 10px;
-
-    div.progress-bar{
-      background-color: #D8D8D8 !important;
-    }
-  }
-
-  .btn-remove-file {
-    color: #62666E;
-  }
-
-  .media-preview-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0;
-    padding-right: 1px;
-
-    .media-preview {
-      position: relative;
-
-      .btn-remove-attachments {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-        padding: 0.015rem 0.2rem;
-        font-size: 50%;
-        opacity: 0;
-      }
-
-      .pdf-thumbnail-wrapper {
-        padding: 4px;
-        width: 100px;
-        height: 76px;
-        border-radius: 8px;
-        border: 1px solid #EBEBEB;
-
-        i.media-icon {
-          color: #FE2216;
-        }
-
-        p {
-          font-size: 10px;
-          max-width: 90px;
-        }
-
-        .pdf-preview {
-          overflow: hidden !important;
-        }
-      }
-    }
-
-    .media-preview:hover{
-      .btn-remove-attachments {
-        opacity: 1;
-      }
-    }
-
-    .media-icon-wrapper {
-      height: 42px;
-      width: 42px;
-      background: #EBEBEB;
-      border-radius: 6px;
-      text-align: center;
-      margin: auto;
-
-      i.media-icon {
-        margin-top: 10px;
-        font-size: 20px;
-        color: #B5B7BB;;
-      }
-    }
-
-  }
-
-</style>

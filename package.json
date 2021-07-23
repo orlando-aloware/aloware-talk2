@@ -51,6 +51,7 @@
     "uuid": "^8.3.2",
     "vue": "^2.6.12",
     "vue-at": "^2.5.0-beta",
+    "vue-bootstrap-typeahead": "^0.2.6",
     "vue-ctk-date-time-picker": "^2.5.0",
     "vue-custom-scrollbar": "^1.4.0",
     "vue-filter-number-format": "^3.0.1",

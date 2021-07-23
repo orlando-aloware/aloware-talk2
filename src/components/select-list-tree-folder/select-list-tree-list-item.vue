@@ -1,7 +1,7 @@
 <template>
     <div :class="{ 'list--active' : id === selectedStaticList.id }"
         :data-layer="layer"
-         v-on:click="onSelect">
+         @click="onSelect">
       <div
         :title="name"
         class="folder d-flex align-items-center"

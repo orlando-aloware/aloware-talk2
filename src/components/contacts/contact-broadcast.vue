@@ -1,16 +1,20 @@
 <template>
   <b-card class="border-0">
-    <h6>Broadcast</h6>
-    <div>
+    <h4>Broadcast</h4>
+    <div class="mt-1">
       <b-badge v-for="broadcast in contact.broadcasts"
                variant="primary"
                class="badge-tag badge-tag-primary ellipsis"
-               v-b-tooltip="broadcast.name"
                :key="broadcast.id">
+        <q-tooltip anchor="top middle"
+                   self="center middle"
+                   :offset="[20, 20]">
+          {{ broadcast.name }}
+        </q-tooltip>
         {{ broadcast.name }}
       </b-badge>
-      <p v-if="!contact.broadcasts"
-         class="status-notice text-muted">
+      <p v-if="!contact.broadcasts || contact.broadcasts.length < 1"
+         class="status-notice text-muted mb-0 fs-12">
         No broadcast data available.
       </p>
     </div>
@@ -27,9 +31,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.status-notice {
-  font-size: 12px;
-}
-</style>

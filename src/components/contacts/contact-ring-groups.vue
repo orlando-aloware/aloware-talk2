@@ -1,15 +1,22 @@
 <template>
-  <b-card class="border-0">
-    <h6>Contact Ring Groups</h6>
-    <div v-if="!isEdit">
+  <b-card class="border-0 contact-ring-groups-wrapper">
+    <h4>Contact Ring Groups</h4>
+    <div v-if="!isEdit"
+         class="mt-1">
       <b-badge variant="primary"
                class="badge-tag badge-tag-primary ellipsis"
                v-for="ringGroup in appliedRingGroups"
-               v-b-tooltip="ringGroup.name"
-               :key="ringGroup.id">{{ ringGroup.name }}</b-badge>
+               :key="ringGroup.id">
+        <q-tooltip anchor="top middle"
+                   self="center middle"
+                   :offset="[20, 20]">
+          {{ ringGroup.name }}
+        </q-tooltip>
+        {{ ringGroup.name }}
+      </b-badge>
     </div>
     <vue-multiselect v-show="isEdit"
-                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2"
                      track-by="id"
                      label="name"
                      ref="ringGroupSelect"
@@ -25,7 +32,7 @@
     <b-link v-if="!isEdit && hasRole('Company Admin') || (hasRole('Company Agent') && hasPermissionTo('modify contact ring groups'))"
             href="#"
             class="custom-link text-decoration-none"
-            v-on:click="onModifyRingGroups">
+            @click="onModifyRingGroups">
       <pencil-o-icon></pencil-o-icon> Modify Ring Groups
     </b-link>
   </b-card>
@@ -57,7 +64,6 @@ export default {
       isEdit: false,
       ringGroupsArray: [],
       options: [],
-      stringOptions: [],
       selectedRingGroups: []
     }
   },
@@ -67,7 +73,16 @@ export default {
       return talk2Api.V1.contact.getRingGroups(this.contact.id).then(response => {
         this.setContactRingGroups(response.data)
         this.ringGroupsArray = response.data
+        this.selectedRingGroups = this.options.filter(ringGroup => this.ringGroupsArray.includes(ringGroup.id))
       })
+    },
+    getRingGroups () {
+      return talk2Api.V1.ringGroups.get()
+        .then(response => {
+          this.setRingGroups(response.data)
+          this.options = response.data
+          this.getContactRingGroups()
+        })
     },
     onModifyRingGroups () {
       this.isEdit = true
@@ -78,19 +93,6 @@ export default {
     onSelectBlur () {
       this.isEdit = false
       this.submit()
-    },
-    filterTagFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.options = this.stringOptions
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.stringOptions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
-      })
     },
     submit () {
       let ringGroupIds = this.selectedRingGroups.map(ringGroup => ringGroup.id)
@@ -112,29 +114,8 @@ export default {
   },
   mounted () {
     if (!_.isEmpty(this.contact)) {
-      talk2Api.V1.ringGroups.get()
-        .then(response => {
-          this.setRingGroups(response.data)
-          this.stringOptions = response.data
-          this.options = this.stringOptions
-        })
-
-      this.getContactRingGroups()
+      this.getRingGroups()
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .card:hover {
-    .btn-edit-action{
-      opacity: 1;
-    }
-  }
-
-  .btn-edit-action {
-    right: 10px;
-    top: 10px;
-    opacity: 0;
-  }
-</style>

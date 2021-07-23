@@ -24,7 +24,7 @@
         <b-button v-if="hasPermissionTo('update contact')"
                   class="btn-bg-transparent btn-b-0"
                   size="sm"
-                  variant="light" v-on:click="onEdit(phone)">
+                  variant="light" @click="onEdit(phone)">
           <pencil-o-icon color="#256EFF"></pencil-o-icon>
         </b-button>
 
@@ -40,20 +40,20 @@
                            class="phone-actions"
                            :disabled="contact.is_dnc"
                            @click="onComposerMedia('sms', phone)">
-            <i class="material-icons">description</i> Text
+            <text-icon color="#62666E"></text-icon> Text
           </b-dropdown-item>
           <b-dropdown-item  v-if="hasPermissionTo('update contact')"
                             class="phone-actions"
                             :disabled="contact.is_dnc">
-            <i class="material-icons">phone</i> Call
+            <call-icon></call-icon> Call
           </b-dropdown-item>
           <b-dropdown-item class="phone-actions" @click="onComposerMedia('fax', phone)">
-            <i class="material-icons">print</i> Fax
+            <fax-icon></fax-icon> Fax
           </b-dropdown-item>
           <b-dropdown-item v-if="hasPermissionTo('archive contact') && phone.phone_number !== contact.phone_number"
                            class="phone-actions"
                            @click="onDelete(phone)">
-            <i class="material-icons">delete</i> Delete
+            <trash-icon color="#62666E" width="13" height="13"></trash-icon> Delete
           </b-dropdown-item>
         </b-dropdown>
       </div>
@@ -66,10 +66,14 @@
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import { aclMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
+import TextIcon from 'components/icons/text-icon'
+import CallIcon from 'components/icons/call-icon'
+import FaxIcon from 'components/icons/fax-icon'
+import TrashIcon from 'components/icons/trash-icon'
 export default {
   name: 'contact-phones-list-items',
   mixins: [aclMixin],
-  components: { PencilOIcon },
+  components: { TrashIcon, FaxIcon, CallIcon, TextIcon, PencilOIcon },
   props: {
     phones: {
       type: Array,
@@ -92,38 +96,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import "src/css/variables.scss";
-.phone-number {
-  font-size: $f-size-14;
-}
-
-.phone-number-title {
-  font-size: $f-size-12;
-  font-weight: normal;
-  color: $white;
-  display: inline-block;
-  top: 0;
-  position: relative;
-}
-
-.phone-number-wrapper:hover {
-  div.options {
-    opacity: 1;
-  }
-}
-
-div.options {
-  margin-top: -14px;
-  opacity: 0;
-}
-
-.phone-actions{
-  font-size: 80%;
-
-  i {
-    margin-top: -3px;
-  }
-}
-</style>

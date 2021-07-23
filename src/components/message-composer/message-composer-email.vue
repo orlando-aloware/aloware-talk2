@@ -1,7 +1,6 @@
 <template>
-  <div>
+  <div class="message-composer-email">
     <div class="pt-2 form-input-container">
-
       <form>
         <q-input placeholder="Subject"
                  input-class="q-input-pl-0 q-input-pr-0"
@@ -36,7 +35,7 @@
                     class="fs-13 pl-3 pr-3"
                     size="sm"
                     :disabled="isSending || !validEmail"
-                    v-on:click="onSend">
+                    @click="onSend">
             <q-spinner-bars v-if="isSending" color="white" />
             {{ isSending ? 'Sending Email...' : 'Send Email' }}
           </b-button>
@@ -47,9 +46,9 @@
                id="email-variables-popover"
                placement="topright"
                target="smsVariables"
-               triggers="click"
+               triggers="click blur"
                @show="onPopoverShown">
-      <variables @variableSelected="variableSelected"></variables>
+      <variables @variableSelected="variableSelected" always-open></variables>
     </b-popover>
 
     <b-popover ref="popover"
@@ -145,33 +144,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .b-textarea, .b-textarea:focus {
-    border: none !important;
-    box-shadow:none !important;
-    padding: 0 !important;
-    overflow: hidden;
-  }
-
-  .message-options {
-    padding-top: 6px;
-  }
-  .message-options a:focus,
-  .message-options a:focus-visible {
-    outline: none !important;
-    outline-offset: 0;
-  }
-
-  .message-options a:not(:first-child){
-    margin-left: 10px;
-  }
-  .popover {
-    max-width: 100%;
-  }
-
-  .email-subject-input {
-    padding: 0 !important;
-  }
-
-</style>

@@ -12,7 +12,7 @@
                      :show-labels="false"
                      :allow-empty="false"
                      v-model="line"
-                     @select="onSelect" />
+                     @select="onSelect"/>
   </div>
 </template>
 
@@ -20,12 +20,13 @@
 import VueMultiselect from 'vue-multiselect'
 import { mapGetters, mapState } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
+
 export default {
-  name: 'v-line-selector',
+  name: 'contact-line-selector',
   mixins: [contactMixin],
   components: { VueMultiselect },
   computed: {
-    ...mapGetters({ }),
+    ...mapGetters({}),
     ...mapState({ currentCompany: 'currentCompany' }),
     formattedLineOptions () {
       let contactLines = []

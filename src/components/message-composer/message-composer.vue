@@ -1,24 +1,24 @@
 <template>
   <div class="composer-container">
     <div class="composer-wrapper p-2">
-      <div class="composer-links d-inline-flex">
+      <div class="tab-links d-inline-flex">
         <b-link href="#"
                 :class="{ active : messageComposer.mode === 'sms' }"
-                v-on:click="setMode('sms')">Text
+                @click="setMode('sms')">Text
         </b-link>
         <b-link href="#"
                 v-if="currentCompany && currentCompany.reseller_id != 357"
                 :class="{ active : messageComposer.mode === 'fax' }"
-                v-on:click="setMode('fax')">Fax
+                @click="setMode('fax')">Fax
         </b-link>
         <b-link href="#"
                 :disabled="!contact.email"
                 :class="{ active : messageComposer.mode === 'email' }"
-                v-on:click="setMode('email')">Email
+                @click="setMode('email')">Email
         </b-link>
         <b-link href="#"
                 :class="{ active : messageComposer.mode === 'note' }"
-                v-on:click="setMode('note')">Note
+                @click="setMode('note')">Note
         </b-link>
       </div>
       <div>
@@ -93,57 +93,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  @import '../../css/variables';
-  .composer-container {
-    padding: 10px;
-    background: $white;
-
-    .composer-wrapper {
-      position: relative;
-      border: 1px solid $grey-70;
-      border-radius: 8px;
-
-      .composer-links {
-        color: $blue;
-        font-weight: 600;
-        font-size: 13px;
-        width: 20%;
-
-        a {
-          text-decoration: none;
-        }
-
-        a:hover {
-          border-bottom: 2px solid $blue;
-          color: $blue;
-        }
-
-        a.active {
-          border-bottom: 2px solid $blue;
-        }
-
-        a:not(:last-child) {
-          margin-right: 20px;
-        }
-      }
-    }
-
-    .composer-variables {
-      font-size: 13px;
-      height: 26px;
-    }
-
-    .w-30 {
-      width: 30%;
-    }
-    .w-35 {
-      width: 35%;
-    }
-    .w-40 {
-      width: 40%;
-    }
-
-  }
-</style>

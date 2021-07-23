@@ -1,11 +1,11 @@
 <template>
-  <b-card class="border-0">
-    <h6 ref="sample">Notes</h6>
+  <b-card class="border-0 contact-notes-wrapper">
+    <h4>Notes</h4>
     <div v-if="!isEdit"
-         class="notes" v-on:click="onEditNotes" v-html="contact.notes">
+         class="notes" @click="onEditNotes" v-html="contact.notes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
-         class="notes-empty-placeholder" v-on:click="onEditNotes">Add notes here..</div>
+         class="notes-empty-placeholder" @click="onEditNotes">Add notes here..</div>
     <div v-if="isEdit"
          style="max-width: 300px" v-on:blur="onBlur">
       <q-input
@@ -50,7 +50,7 @@ export default {
       this.onUpdate()
     },
     onUpdate () {
-      talk2Api.V1.contact.update(this.contact.id, { notes: this.contact.notes }).then(response => {
+      talk2Api.V1.contact.update(this.contact.id, { notes: this.contact.notes.trim() }).then(response => {
         this.setContact(response.data)
       })
     }
@@ -60,22 +60,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .notes {
-    font-size: 14px;
-  }
-
-  .contact-notes {
-    border: none;
-    opacity: 0.5;
-  }
-  .contact-notes:hover {
-    border: 1px solid #256EFF;
-  }
-
-  .notes-empty-placeholder {
-    font-size: 13px;
-    opacity: 0.5;
-  }
-</style>
