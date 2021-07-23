@@ -234,10 +234,6 @@ export default {
   },
 
   created () {
-    window.onbeforeunload = () => {
-      this.setCurrentListFilters({})
-    }
-
     this.resetCall()
 
     window.handleOpenURL = (url) => {
@@ -489,7 +485,8 @@ export default {
     }
 
     // event for listening before tab/browser close
-    window.addEventListener('beforeunload', this.unsubscribeFromPusher)
+
+    window.addEventListener('beforeunload', this.beforeUnload)
 
     // online / offline
     window.addEventListener('online', this.updateOnlineStatus)
@@ -1272,7 +1269,6 @@ export default {
       this.logoutUser()
         .then((res) => {
           this.response = res.data
-          this.setCurrentListFilters({})
           this.$router.push({ name: 'Login' }).catch((err) => {
             console.log(err)
           })
@@ -1280,6 +1276,12 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    },
+
+    beforeUnload () {
+      this.unsubscribeFromPusher()
+      this.resetContactsVuex()
+      this.resetInboxVuex()
     },
 
     ...mapActions([
@@ -1299,7 +1301,8 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted'
     ]),
-    ...mapActions('contacts', ['setCurrentListFilters']),
+    ...mapActions('contacts', ['resetContactsVuex']),
+    ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
@@ -1311,6 +1314,8 @@ export default {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+      this.resetContactsVuex()
+      this.resetInboxVuex()
     },
 
     authenticated (newVal, oldVal) {

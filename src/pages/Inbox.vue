@@ -29,7 +29,8 @@ export default {
   data () {
     return {
       contactInfoOpen: false,
-      title: 'Inbox'
+      title: 'Inbox',
+      contactId: null
     }
   }
 }

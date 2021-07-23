@@ -9,7 +9,7 @@
       <avatar class="contact-avatar"
               width="34"
               height="34"
-              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id"
+              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
               :style="avatarStyle(isSender)"
               :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
               v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"

@@ -44,6 +44,7 @@ import talk2Api from 'src/plugins/api/api'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import VueMultiselect from 'vue-multiselect'
 import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'contact-ring-groups',
   mixins: [aclMixin],
