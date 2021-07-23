@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="page-header pl-4 pr-4">
+  <q-toolbar class="page-header pl-3 pr-3">
     <div class="d-flex h-100 align-items-center">
       <h1>{{ $route.name }}</h1>
     </div>
