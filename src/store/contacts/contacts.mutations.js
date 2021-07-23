@@ -281,5 +281,9 @@ export default {
   },
   CHANGING_SELECTED_CONTACT: (state, isChanging) => {
     state.changingSelectedContact = isChanging
+  },
+  RESET_CONTACTS_VUEX: (state) => {
+    state.currentListFilters = {}
+    state.contact = {}
   }
 }

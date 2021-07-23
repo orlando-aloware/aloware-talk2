@@ -1,15 +1,17 @@
 export const DEFAULT_STATE = {
   filter: {},
+  tags: [],
   campaigns: [],
   users: [],
-  ring_groups: [],
+  ringGroups: [],
   workflows: [],
   changelogs: [],
-  disposition_statuses: [],
-  call_dispositions: [],
+  dispositionStatuses: [],
+  callDispositions: [],
+  broadcasts: [],
   filters: [],
-  first_login: false,
-  user_status: false,
+  firstLogin: false,
+  userStatus: false,
   oldAgentStatus: false,
   dialer: {
     token: null,
@@ -34,5 +36,12 @@ export const DEFAULT_STATE = {
   keyboard: {
     scroll: null,
     resizeMode: null
+  },
+  // cached states
+  sidebarFolded: false,
+  currentCompany: null,
+  smsTemplates: [],
+  tagOptions: {
+    isReset: false
   }
 }

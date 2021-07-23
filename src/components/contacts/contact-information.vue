@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ContactUserSelector from 'src/components/contacts/contact-user-selector'
@@ -151,6 +152,10 @@ export default {
       this.updateContactField({ cnam_city: params.val }, params.callback)
     },
     updateContactField (params, callback) {
+      if (_.isEmpty(this.contact)) {
+        return
+      }
+
       return talk2Api.V1.contact.update(this.contact.id, params).then(response => {
         this.setContact(response.data)
       }).catch((err) => {
@@ -181,7 +186,9 @@ export default {
     }
   },
   mounted () {
-    this.getAttributes()
+    if (!_.isEmpty(this.contact)) {
+      this.getAttributes()
+    }
   }
 }
 </script>

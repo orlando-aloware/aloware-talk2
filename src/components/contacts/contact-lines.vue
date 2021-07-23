@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
@@ -46,7 +47,10 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'lines']),
     appliedLines () {
-      return this.lines.filter(line => this.linesArray.includes(line.id))
+      if (!_.isEmpty(this.lines) && !_.isEmpty(this.linesArray)) {
+        return this.lines.filter(line => this.linesArray.includes(line.id))
+      }
+      return []
     }
   },
   data () {
@@ -103,7 +107,9 @@ export default {
     }
   },
   mounted () {
-    this.getLines()
+    if (!_.isEmpty(this.lines) && !_.isEmpty(this.contact)) {
+      this.getLines()
+    }
   },
   watch: {
     selectedLines: function () {

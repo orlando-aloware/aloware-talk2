@@ -1,10 +1,11 @@
 <template>
-  <div class="task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom mb-1">
+  <div class="task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom mb-1"
+       @click="setContact(communication.contact.id)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
       <avatar width="34"
               height="34"
-              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id"
+              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
               :style="avatarStyle(false)"
               :name="communication.contact.name">
       </avatar>
@@ -64,7 +65,7 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import Avatar from 'src/components/avatar'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 export default {
@@ -100,6 +101,12 @@ export default {
       }
       return '-'
     }
+  },
+  methods: {
+    setContact (id) {
+      this.setContactId(id)
+    },
+    ...mapActions('inbox', ['setContactId'])
   }
 }
 </script>
