@@ -7,6 +7,7 @@
             color="primary"
             option-value="id"
             option-label="name"
+            input-debounce="0"
             use-input
             emit-value
             map-options
@@ -15,7 +16,7 @@
             @filter="filterFn">
     <template v-slot:no-option>
       <q-item>
-        <q-item-section class="text-grey">
+        <q-item-section class="no-results text-grey">
           No results
         </q-item-section>
       </q-item>
@@ -65,6 +66,10 @@ export default {
     ...mapState(['currentCompany', 'campaigns']),
 
     placeholder () {
+      if (this.campaignId) {
+        return ''
+      }
+
       if (this.multiple) {
         return 'Select lines'
       }
@@ -104,8 +109,19 @@ export default {
     }
   },
 
+  created () {
+    this.campaignOptions = this.campaignsAlphabeticalOrder
+  },
+
   methods: {
     filterFn (val, update) {
+      if (this.campaignId && val === this.campaignId) {
+        update(() => {
+          this.campaignOptions = this.campaignsAlphabeticalOrder.filter(campaign => campaign.id === this.campaignId)
+        })
+        return
+      }
+
       if (val === '') {
         update(() => {
           this.campaignOptions = this.campaignsAlphabeticalOrder

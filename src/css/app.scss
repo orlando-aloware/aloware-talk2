@@ -520,6 +520,10 @@ body,
   padding-left: 6px !important;
 }
 
+.no-results {
+  padding: 0 10px;
+}
+
 .avatar {
   border-radius: 17px;
   width: 34px;
@@ -2599,6 +2603,10 @@ span.mention {
   height: 28px;
 }
 
+.height-36 {
+  height: 36px;
+}
+
 .width-40 {
   width: 40px;
 }
@@ -2826,4 +2834,10 @@ span.mention {
 
 .opacity-1 {
   opacity: 1 !important;
+}
+
+.dialer {
+  & .invalid-feedback {
+    position: absolute;
+  }
 }

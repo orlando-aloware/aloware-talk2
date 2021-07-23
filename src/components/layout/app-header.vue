@@ -101,7 +101,7 @@
                     @before-hide="hideDialer">
               <div class="row no-wrap q-pa-md width-290">
                 <div class="col no-padding max-width-266">
-                  <line-selector></line-selector>
+                  <line-selector v-model="campaignId"></line-selector>
 
                   <div class="tab-links d-inline-flex w-100">
                     <b-link href="#"
@@ -115,8 +115,10 @@
                       Text
                     </b-link>
                   </div>
-                  <div class="d-inline-flex align-items-center justify-content-between w-100">
+                  <div class="d-inline-flex align-items-end justify-content-between dialer w-100 pb-2">
                     <b-form-group :label="label"
+                                  :invalid-feedback="invalidPhoneNumber"
+                                  :state="validPhoneNumber"
                                   class="mt-2 mb-0">
                       <b-form-input v-model="phoneNumber"
                                     type="text"
@@ -126,11 +128,13 @@
                       </b-form-input>
                     </b-form-group>
                     <q-btn :ripple="true"
+                           :disable="phoneNumber.trim() == ''"
                            icon="img:app-icons/dialer/call_btn_small.svg"
                            size="36px"
-                           class="icon-btn auto-size"
+                           class="icon-btn auto-size height-36"
                            align="right"
                            padding="none"
+                           rounded
                            flat>
                     </q-btn>
                   </div>
@@ -154,6 +158,7 @@ import { mapGetters, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
 import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/dialer/line-selector'
+import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 
 export default {
   name: 'app-header',
@@ -166,13 +171,15 @@ export default {
       dialerStatus: false,
       label: 'Call a number',
       mode: 'call',
+      defaultOutboundCampaignId: null,
+      campaignId: null,
       phoneNumber: '',
       AgentStatus
     }
   },
 
   computed: {
-    ...mapState(['dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns']),
     ...mapGetters('auth', ['user']),
 
     statusLabel () {
@@ -195,6 +202,14 @@ export default {
       }
     },
 
+    validPhoneNumber () {
+      return this.$options.filters.fixPhone(this.phoneNumber)
+    },
+
+    invalidPhoneNumber () {
+      return 'Please enter a valid phone number'
+    },
+
     personalPhoneNumber () {
       let found = this.campaigns.find(campaign => campaign.id === this.user.profile.campaign_id)
       if (found && found.incoming_numbers.length) {
@@ -210,12 +225,17 @@ export default {
     },
 
     showDialer () {
+      // find default outbound campaign
+      this.findDefaultOutboundCampaign()
+
       this.dialerStatus = true
       this.dialerIcon = 'img:app-icons/header/dialer_active.svg'
       this.$emit('showDialer')
     },
 
     hideDialer () {
+      this.phoneNumber = ''
+
       this.dialerStatus = false
       this.dialerIcon = 'img:app-icons/header/dialer_gray.svg'
       this.$emit('hideDialer')
@@ -224,6 +244,38 @@ export default {
     changeStatus (status) {
       this.changeAgentStatus(status)
       this.$refs.menu.hide()
+    },
+
+    findDefaultOutboundCampaign () {
+      this.campaignId = null
+      this.defaultOutboundCampaignId = null
+
+      // force outbound line on all users
+      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.currentCompany.force_outbound_line) {
+        this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
+        this.campaignId = this.defaultOutboundCampaignId
+        return
+      }
+
+      // outbound line is set to use account default and account has a default
+      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.user.profile && this.user.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.user.profile.default_outbound_campaign_id) {
+        this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
+        this.campaignId = this.defaultOutboundCampaignId
+        return
+      }
+
+      // user has a default outbound line
+      if (this.user.profile && this.user.profile.default_outbound_campaign_id && this.user.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        this.defaultOutboundCampaignId = this.user.profile.default_outbound_campaign_id
+        this.campaignId = this.defaultOutboundCampaignId
+        return
+      }
+
+      // user has to choose outbound line every time
+      if (this.user.profile && this.user.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+        this.defaultOutboundCampaignId = null
+        this.campaignId = null
+      }
     },
 
     setMode (mode) {
