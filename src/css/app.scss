@@ -2060,12 +2060,12 @@ span.mention {
 }
 
 .tab-links {
-  color: $primary;
   font-weight: 600;
   font-size: 13px;
 
   a {
     text-decoration: none;
+    color: $grey-90;
   }
 
   a:hover {
@@ -2075,6 +2075,7 @@ span.mention {
 
   a.active {
     border-bottom: 2px solid $primary;
+    color: $primary;
   }
 
   a:not(:last-child) {
