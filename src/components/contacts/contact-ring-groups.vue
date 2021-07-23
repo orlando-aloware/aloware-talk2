@@ -44,7 +44,6 @@ import talk2Api from 'src/plugins/api/api'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import VueMultiselect from 'vue-multiselect'
 import { aclMixin } from 'src/plugins/mixins'
-import _ from 'lodash'
 
 export default {
   name: 'contact-ring-groups',
@@ -107,15 +106,11 @@ export default {
   },
   watch: {
     'contact.id': function () {
-      if (!_.isEmpty(this.contact)) {
-        this.getContactRingGroups()
-      }
+      this.getContactRingGroups()
     }
   },
   mounted () {
-    if (!_.isEmpty(this.contact)) {
-      this.getRingGroups()
-    }
+    this.getRingGroups()
   }
 }
 </script>

@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ContactPhonesForm from 'src/components/forms/contact-phones-form'
@@ -118,15 +117,11 @@ export default {
   },
   watch: {
     'contact.id': function () {
-      if (!_.isEmpty(this.contact)) {
-        this.getPhoneNumbers()
-      }
+      this.getPhoneNumbers()
     }
   },
   mounted () {
-    if (!_.isEmpty(this.contact)) {
-      this.getPhoneNumbers()
-    }
+    this.getPhoneNumbers()
   }
 }
 </script>

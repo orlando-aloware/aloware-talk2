@@ -94,9 +94,7 @@ export default {
   },
   watch: {
     'contact.disposition_status_id': function () {
-      if (!_.isEmpty(this.contact)) {
-        this.onDispose()
-      }
+      this.onDispose()
     }
   },
   mounted () {
