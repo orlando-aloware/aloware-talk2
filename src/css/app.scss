@@ -2854,3 +2854,42 @@ span.mention {
     }
   }
 }
+
+.search-form {
+  .form-control {
+    font-size: 12px;
+
+    &::-webkit-input-placeholder {
+      font-size: 12px;
+    }
+  }
+}
+
+.line-selector {
+  height: 32px !important;
+  font-size: 13px !important;
+
+  .q-field__control {
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+
+  .q-field__control-container {
+    height: 32px !important;
+  }
+
+  .q-field__native {
+    min-height: 32px !important;
+    height: 32px !important;
+    line-height: 16px !important;
+  }
+
+  .q-field__input {
+    min-height: 16px;
+    line-height: 16px;
+  }
+
+  .q-field__append {
+    height: 32px !important;
+  }
+}

@@ -4,7 +4,7 @@
                            :minMatchingChars="3"
                            ref="searchField"
                            v-model="query"
-                           class="width-214 important"
+                           class="width-214 important search-form"
                            placeholder="Enter a name or phone number"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->

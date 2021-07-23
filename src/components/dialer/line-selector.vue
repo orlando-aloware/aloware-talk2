@@ -8,6 +8,7 @@
             option-value="id"
             option-label="name"
             input-debounce="0"
+            class="line-selector"
             use-input
             emit-value
             map-options
