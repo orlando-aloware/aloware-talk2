@@ -397,8 +397,118 @@ const twoLinesTextTruncate = (text) => {
   return text
 }
 
+/**
+ * Fix phone number
+ * @param phoneNumber
+ * @param format
+ * @param force
+ * @param includeSuffix
+ * @returns {string|boolean|*}
+ */
+const fixPhone = (
+  phoneNumber,
+  format = null,
+  force = false,
+  includeSuffix = false
+) => {
+  if (phoneNumber) {
+    phoneNumber = phoneNumber.replace('#', '')
+    phoneNumber = phoneNumber.replace(/\s+/g, '')
+
+    if (phoneNumber.toLowerCase() === 'restricted') {
+      return phoneNumber
+    }
+
+    if (phoneNumber.toLowerCase() === 'anonymous') {
+      return phoneNumber
+    }
+
+    if (phoneNumber.toLowerCase() === 'unknown') {
+      return phoneNumber
+    }
+
+    if (phoneNumber === '+266696687') {
+      return phoneNumber
+    }
+
+    if (phoneNumber === '8656696') {
+      return phoneNumber
+    }
+
+    if (phoneNumber.includes('unhold:')) {
+      return phoneNumber
+    }
+
+    if (phoneNumber.includes('auto_dial_task:')) {
+      return phoneNumber
+    }
+
+    if (phoneNumber.includes('call:')) {
+      return phoneNumber
+    }
+
+    if (phoneNumber.includes('hs:')) {
+      return phoneNumber
+    }
+
+    // sip uri used instead of phone number
+    if (phoneNumber.indexOf('@') > -1) {
+      return phoneNumber
+    }
+
+    // Use substring() and indexOf() functions to remove
+    // portion of string after certain character (w => wait)
+    let pos = phoneNumber.indexOf('w')
+    let suffix = ''
+    if (pos !== -1) {
+      suffix = phoneNumber.substring(pos, phoneNumber.length - 1).trim()
+      phoneNumber = phoneNumber.substring(0, pos).trim()
+    }
+
+    if (phoneNumber.toString().length <= 9) {
+      return force ? '-' : false
+    }
+
+    let locale = window.guessLocale(phoneNumber)
+
+    if (!locale) {
+      return force ? '-' : false
+    }
+
+    let tel = window.phoneUtil.parse(phoneNumber, locale)
+
+    if (['US', 'CA'].includes(locale) && !format) {
+      format = 'NATIONAL'
+    }
+
+    if (!format) {
+      format = 'E164'
+    }
+
+    let formattedPhoneNumber
+
+    if (format === 'INTERNATIONAL') {
+      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.INTERNATIONAL).toString()
+    } else if (format === 'E164') {
+      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.E164).toString()
+    } else {
+      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.NATIONAL).toString()
+    }
+
+    // if we have to include suffix
+    if (includeSuffix) {
+      formattedPhoneNumber = formattedPhoneNumber + suffix
+    }
+
+    return formattedPhoneNumber
+  } else {
+    return ''
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
+    fixPhone,
     toUpperCase,
     capitalize,
     initials,

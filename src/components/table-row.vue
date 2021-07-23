@@ -50,7 +50,7 @@
         class="datatable-row__phone"
       >
         <span>
-          {{ contact.phone_number | fixPhone(null, true) }}
+          {{ contact.phone_number | fixPhone('NATIONAL', true) }}
         </span>
       </td>
 
