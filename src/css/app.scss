@@ -700,9 +700,8 @@ i.option-separator {
   padding-top: 10px;
 }
 
-
 .inline-select.q-select--without-input {
-  padding-top: 9px;
+  padding-top: 0;
 }
 
 .inline-select.q-select--with-input {
@@ -735,7 +734,7 @@ i.option-separator {
 }
 
 .inline-select {
-  margin-top: -10px;
+  margin-top: -2px;
   width: 100%;
 
   .q-field__control,
@@ -851,7 +850,7 @@ i.option-separator {
 }
 
 .inline-input {
-  margin-top: -10px;
+  margin-top: -2px;
   width: 100%;
 
   .q-field__native {

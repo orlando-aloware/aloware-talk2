@@ -5,7 +5,7 @@
     <div :class="`information-container ${autoHeightClass}`">
       <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
-        <p class="text-muted custom-input-label mb-2">Owner</p>
+        <p class="text-muted custom-input-label mb-0">Owner</p>
         <contact-user-selector v-model="contact.user_id"
                                @updateField="onUpdateOwner"
                                :disabled="!hasPermissionTo('change contact ownership')"/>
@@ -13,41 +13,41 @@
 
       <div class="d-block"
            v-if="hasPermissionTo('list disposition status')">
-        <p class="text-muted custom-input-label mb-2">Contact Disposition</p>
+        <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
         <contact-disposition @updateField="onUpdateOwner"
                              :disabled="!hasPermissionTo('dispose contact')" />
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Email</p>
+        <p class="text-muted custom-input-label mb-0">Email</p>
         <contact-input-field v-model="contact.email"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateEmail" />
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Company</p>
+        <p class="text-muted custom-input-label mb-0">Company</p>
         <contact-input-field v-model="contact.company_name"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateCompany"/>
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Website</p>
+        <p class="text-muted custom-input-label mb-0">Website</p>
         <contact-input-field v-model="contact.website"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateWebsite"/>
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">City</p>
+        <p class="text-muted custom-input-label mb-0">City</p>
         <contact-input-field v-model="contact.cnam_city"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateCity"/>
       </div>
 
       <div class="d-block" v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
-        <p class="text-muted custom-input-label mb-2">State</p>
+        <p class="text-muted custom-input-label mb-0">State</p>
         <location-state-selector v-model="contact.cnam_state"
                                  :country="contact.cnam_state"
                                  :disabled="!hasPermissionTo('update contact')"
@@ -55,7 +55,7 @@
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Country</p>
+        <p class="text-muted custom-input-label mb-0">Country</p>
         <location-country-selector v-model="contact.cnam_country"
                                    :country="contact.cnam_country"
                                    :disabled="!hasPermissionTo('update contact')"
@@ -63,7 +63,7 @@
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Zip Code</p>
+        <p class="text-muted custom-input-label mb-0">Zip Code</p>
         <contact-input-field v-model="contact.cnam_zipcode"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="onUpdateZipCode">
@@ -71,17 +71,17 @@
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">TCPA Approved</p>
+        <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Created At</p>
+        <p class="text-muted custom-input-label mb-0">Created At</p>
         <p>{{ contact.created_at | fixFullDateUTCRelative }}</p>
       </div>
 
       <div class="d-block">
-        <p class="text-muted custom-input-label mb-2">Intake Source</p>
+        <p class="text-muted custom-input-label mb-0">Intake Source</p>
         <p>{{ contact.intake_source | toUpperCase }}</p>
       </div>
     </div>
