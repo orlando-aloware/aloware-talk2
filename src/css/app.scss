@@ -2841,3 +2841,8 @@ span.mention {
     position: absolute;
   }
 }
+
+.vbt-autcomplete-list {
+  z-index: 6001 !important;
+  position: fixed !important;
+}

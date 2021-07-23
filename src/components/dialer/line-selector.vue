@@ -35,13 +35,10 @@
 
 <script>
 import { mapState } from 'vuex'
-import { aclMixin } from '../../boot/mixins'
 import _ from 'lodash'
 
 export default {
   name: 'line-selector',
-
-  mixins: [aclMixin],
 
   props: {
     value: {

@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import VueMasonryGallery from 'vue-masonry-gallery/vendor/VueMasonryGallery/VueMasonryGallery'
+import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
+
+// Global registration
+Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead)
 
 // contact call disposition icons
 Vue.component('outbound-call-answered-icon', require('src/components/icons/contact-activity/outbound-call-answered-icon').default)

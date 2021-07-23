@@ -120,15 +120,12 @@
                                   :invalid-feedback="invalidPhoneNumber"
                                   :state="validPhoneNumber"
                                   class="mt-2 mb-0">
-                      <b-form-input v-model="phoneNumber"
-                                    type="text"
-                                    class="width-214 important"
-                                    placeholder="Enter a phone number"
-                                    required>
-                      </b-form-input>
+                      <contact-phone-number-search v-model="phoneNumber"
+                                                   @change="changePhoneNumber">
+                      </contact-phone-number-search>
                     </b-form-group>
                     <q-btn :ripple="true"
-                           :disable="phoneNumber.trim() == ''"
+                           :disable="!validPhoneNumber"
                            icon="img:app-icons/dialer/call_btn_small.svg"
                            size="36px"
                            class="icon-btn auto-size height-36"
@@ -159,10 +156,11 @@ import * as AgentStatus from '../../constants/agent-status'
 import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/dialer/line-selector'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 
 export default {
   name: 'app-header',
-  components: { LineSelector },
+  components: { ContactPhoneNumberSearch, LineSelector },
   mixins: [aclMixin, avatarMixin, agentMixin],
 
   data () {
@@ -244,6 +242,10 @@ export default {
     changeStatus (status) {
       this.changeAgentStatus(status)
       this.$refs.menu.hide()
+    },
+
+    changePhoneNumber (phoneNumber) {
+      this.phoneNumber = phoneNumber
     },
 
     findDefaultOutboundCampaign () {
