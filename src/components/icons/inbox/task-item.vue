@@ -68,18 +68,23 @@ import Avatar from 'src/components/avatar'
 import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
+
 export default {
   name: 'task-item',
+
   mixins: [
     avatarMixin,
     communicationInfoMixin
   ],
+
   components: { AcceptCallIcon, CancelCallIcon, Avatar },
+
   props: {
     communication: {
       required: true
     }
   },
+
   data () {
     return {
       CommunicationDirection,
@@ -88,8 +93,10 @@ export default {
       CommunicationTypes
     }
   },
+
   computed: {
     ...mapState(['campaigns']),
+
     campaignName () {
       if (_.isEmpty(this.campaigns) || !this.communication.campaign_id) {
         return '-'
@@ -102,6 +109,7 @@ export default {
       return '-'
     }
   },
+
   methods: {
     setContact (id) {
       this.setContactId(id)

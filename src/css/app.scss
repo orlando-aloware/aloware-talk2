@@ -2893,3 +2893,15 @@ span.mention {
     height: 32px !important;
   }
 }
+
+.active-call {
+  background: $dark;
+  @extend .text-white;
+  border-radius: 7px;
+  width: 180px;
+
+  .call-status {
+    font-size: 11px !important;
+    @extend .text-light-grey;
+  }
+}

@@ -87,6 +87,19 @@
                      vertical>
         </q-separator>
 
+        <q-item class="mr-3 pl-2 pr-2 active-call">
+          <q-item-section>
+            <q-item-label class="_600">Bently Ericson</q-item-label>
+            <q-item-label class="call-status">
+              (774) 905-2255 · 3:16
+            </q-item-label>
+          </q-item-section>
+
+          <q-item-section side>
+            <cancel-call-icon role="button"/>
+          </q-item-section>
+        </q-item>
+
         <q-item>
           <q-btn :ripple="false"
                  :icon="dialerIcon"
@@ -117,12 +130,13 @@
 import { mapGetters, mapState } from 'vuex'
 import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 import Dialer from 'components/dialer/dialer'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
 import * as AgentStatus from '../../constants/agent-status'
 
 export default {
   name: 'app-header',
 
-  components: { Dialer },
+  components: { Dialer, CancelCallIcon },
 
   mixins: [aclMixin, avatarMixin, agentMixin],
 
