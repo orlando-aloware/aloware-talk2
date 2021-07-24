@@ -1,7 +1,9 @@
 <template>
   <div class="row no-wrap q-pa-md width-290">
     <div class="col no-padding max-width-266">
-      <line-selector v-model="campaignId"></line-selector>
+      <line-selector v-model="campaignId"
+                     @change="changeCampaignId">
+      </line-selector>
 
       <div class="tab-links d-inline-flex w-100">
         <b-link href="#"
@@ -25,7 +27,7 @@
           </contact-phone-number-search>
         </b-form-group>
         <q-btn :ripple="true"
-               :disable="!validPhoneNumber || !phoneNumber.length"
+               :disable="sendDisabled"
                v-show="mode == 'call'"
                icon="img:app-icons/dialer/call_btn_small.svg"
                size="36px"
@@ -36,7 +38,7 @@
                flat>
         </q-btn>
         <q-btn :ripple="true"
-               :disable="!validPhoneNumber || !phoneNumber.length"
+               :disable="sendDisabled"
                v-show="mode == 'text'"
                icon="img:app-icons/dialer/text_btn_small.svg"
                size="36px"
@@ -89,6 +91,10 @@ export default {
 
     invalidPhoneNumber () {
       return 'Please enter a valid phone number'
+    },
+
+    sendDisabled () {
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId
     }
   },
 
@@ -122,6 +128,10 @@ export default {
 
     changePhoneNumber (phoneNumber) {
       this.phoneNumber = phoneNumber
+    },
+
+    changeCampaignId (campaignId) {
+      this.campaignId = campaignId
     },
 
     findDefaultOutboundCampaign () {
