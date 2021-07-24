@@ -1,7 +1,8 @@
 <template>
   <div class="row no-wrap q-pa-md width-290">
     <div class="col no-padding max-width-266">
-      <line-selector v-model="campaignId"
+      <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+                     v-model="campaignId"
                      @change="changeCampaignId">
       </line-selector>
 
@@ -27,7 +28,7 @@
           </contact-phone-number-search>
         </b-form-group>
         <q-btn :ripple="true"
-               :disable="sendDisabled"
+               :disable="callDisabled"
                v-show="mode == 'call'"
                icon="img:app-icons/dialer/call_btn_small.svg"
                size="36px"
@@ -91,6 +92,10 @@ export default {
 
     invalidPhoneNumber () {
       return 'Please enter a valid phone number'
+    },
+
+    callDisabled () {
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId
     },
 
     sendDisabled () {

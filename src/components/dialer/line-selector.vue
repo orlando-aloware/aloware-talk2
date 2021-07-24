@@ -2,6 +2,7 @@
   <q-select :options="campaignOptions"
             :multiple="multiple"
             :placeholder="placeholder"
+            :disable="disable"
             v-model="campaignId"
             options-selected-class="text-primary"
             color="primary"
@@ -47,6 +48,12 @@ export default {
     },
 
     multiple: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
+    disable: {
       type: Boolean,
       default: false,
       required: false
