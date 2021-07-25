@@ -166,15 +166,17 @@ export default {
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
       console.log('Successfully connected call', call)
       this.setDialerCall(call)
-      this.startCallTimer()
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber).finally(() => {
         // this.$router.push({ name: 'Call' }).catch(err => {
         //   console.log(err)
         // })
+        setTimeout(() => {
+          this.startCallTimer()
+          this.setDialerCurrentStatus('CALL_CONNECTED')
+        }, 3000)
       }).catch((err) => {
         console.log(err)
       })
-      this.setDialerCurrentStatus('CALL_CONNECTED')
       if (this.callNotification) {
         this.callNotification()
       }
@@ -193,7 +195,7 @@ export default {
 
     this.getDesktopToken()
 
-    // ping getMobileToken every 24 hours
+    // ping getDesktopToken every 24 hours
     this.$options.webrtcTokenRegenerateInterval = setInterval(() => {
       if (this.authenticated) {
         this.getDesktopToken()
@@ -328,30 +330,6 @@ export default {
           codecPreferences: ['opus', 'pcmu'],
           enableIceRestart: true
         })
-
-        return Promise.resolve(res)
-      }).catch(err => {
-        this.loading = false
-        console.log(err)
-        return Promise.reject(err)
-      })
-    },
-
-    getMobileToken () {
-      console.log('Generating mobile token')
-
-      this.setDialerCurrentStatus('GENERATING_TOKEN')
-
-      return this.$axios.post('/api/v1/dialer/new-mobile-token', {
-        is_android: this.$q.platform.is.android,
-        is_ios: this.$q.platform.is.ios
-      }).then(res => {
-        this.loading = false
-        this.setDialerToken(res.data)
-        this.setDialerCurrentStatus('TOKEN_GENERATED')
-        console.log('Twilio token', this.dialer.token)
-        // initialize twilio voice client
-        window.Twilio.TwilioVoiceClient.initialize(this.dialer.token)
 
         return Promise.resolve(res)
       }).catch(err => {
@@ -548,6 +526,9 @@ export default {
     },
 
     startCallTimer () {
+      let timer = this.secondsToHms(0)
+      this.setDialerDuration(0)
+      this.setDialerTimer(timer)
       this.$options.callDurationInterval = setInterval(this.countCallDuration, 1000)
     },
 
