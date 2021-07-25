@@ -235,7 +235,7 @@ export default {
     })
 
     this.$VueEvent.listen('makeCall', (data) => {
-      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName)
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
     })
 
     this.$VueEvent.listen('hangupCall', () => {
@@ -358,14 +358,14 @@ export default {
       })
     },
 
-    makeCall (currentNumber, outboundCampaignId, contactName = '') {
-      console.log(currentNumber, outboundCampaignId, this.dialer.isReady, this.dialer.call)
+    makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
+      console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready, rescheduling', currentNumber, outboundCampaignId)
         // dialer is not ready, rescheduling
         setTimeout(() => {
-          this.makeCall(currentNumber, outboundCampaignId, contactName)
+          this.makeCall(currentNumber, outboundCampaignId, contactName, companyName, contactId)
         }, 1000)
       }
 
@@ -377,7 +377,9 @@ export default {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
         'CampaignId': outboundCampaignId.toString(),
         'UserId': this.profile.id.toString(),
-        'ContactName': contactName.toString()
+        'ContactName': contactName.toString(),
+        'CompanyName': companyName.toString(),
+        'ContactId': contactId.toString()
       }
 
       console.log('Making call', params)

@@ -76,7 +76,9 @@ export default {
 
       this.$emit('change', {
         currentNumber: this.selectedPhoneNumber,
-        contactName: name
+        contactName: name,
+        companyName: $event.company_name,
+        contactId: $event.contact_id
       })
     },
 
@@ -100,7 +102,9 @@ export default {
       if (!this.query.includes(' - +')) {
         this.$emit('change', {
           currentNumber: this.query,
-          contactName: 'No Name'
+          contactName: '',
+          companyName: '',
+          contactId: null
         })
       }
 

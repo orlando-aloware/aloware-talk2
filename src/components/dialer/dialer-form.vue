@@ -59,10 +59,13 @@
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/dialer/line-selector'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 
 export default {
   name: 'dialer-form',
+
+  mixins: [contactMixins],
 
   components: { ContactPhoneNumberSearch, LineSelector },
 
@@ -80,7 +83,9 @@ export default {
       defaultOutboundCampaignId: null,
       campaignId: null,
       phoneNumber: '',
-      contactName: ''
+      contactName: '',
+      companyName: '',
+      contactId: null
     }
   },
 
@@ -107,8 +112,9 @@ export default {
 
   created () {
     this.$VueEvent.listen('changePhoneNumber', (data) => {
-      this.changePhoneNumber(data)
-      this.makeCall()
+      this.changePhoneNumber(data).then(() => {
+        this.makeCall()
+      })
     })
   },
 
@@ -135,15 +141,27 @@ export default {
     resetForm () {
       this.phoneNumber = ''
       this.contactName = ''
+      this.companyName = ''
+      this.contactId = null
       this.defaultOutboundCampaignId = null
       this.campaignId = null
       this.label = 'Call a number'
       this.mode = 'call'
     },
 
-    changePhoneNumber (data) {
+    async changePhoneNumber (data) {
       this.phoneNumber = data.currentNumber
       this.contactName = data.contactName
+      this.companyName = data.companyName
+      this.contactId = data.contactId
+
+      if (!this.contactId) {
+        await this.getContactByPhoneNumber(this.phoneNumber).then((data) => {
+          this.contactName = data.name
+          this.companyName = data.company_name
+          this.contactId = data.id
+        })
+      }
     },
 
     changeCampaignId (campaignId) {
@@ -202,7 +220,9 @@ export default {
       let data = {
         currentNumber: this.phoneNumber,
         outboundCampaignId: this.campaignId,
-        contactName: this.contactName
+        contactName: this.contactName,
+        companyName: this.companyName,
+        contactId: this.contactId
       }
       this.$VueEvent.fire('makeCall', data)
       this.hideDialer()

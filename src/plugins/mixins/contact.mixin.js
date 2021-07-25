@@ -863,6 +863,35 @@ export default {
         this.loadingContact = false
       }
     },
+
+    getContactByPhoneNumber (phoneNumber, getContactTry = 1) {
+      if (!this.$options.filters.fixPhone(phoneNumber)) {
+        return Promise.reject('Phone number is not valid')
+      }
+
+      this.loadingContact = true
+      return this.$axios.get('/api/v1/contact/phone-number', {
+        params: {
+          phone_number: phoneNumber,
+          load_info: 0
+        }
+      }).then(res => {
+        this.loadingContact = false
+        return Promise.resolve(res.data)
+      }).catch(err => {
+        getContactTry++
+        // check if we have found the contact after 3 retries
+        if (getContactTry > 3) {
+          // error
+          console.log('An error occurred while getting the contact', err)
+          this.loadingContact = false
+          return Promise.reject(err)
+        } else {
+          this.getContact(phoneNumber, getContactTry)
+        }
+      })
+    },
+
     ...mapActions('contacts', ['setContact'])
   },
 

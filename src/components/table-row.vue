@@ -267,7 +267,9 @@ export default {
 
       let data = {
         currentNumber: this.contact.phone_number,
-        contactName: this.contact.name
+        contactName: this.contact.name,
+        companyName: this.contact.company_name,
+        contactId: this.contact.id
       }
       this.$VueEvent.fire('callContact', data)
     },
