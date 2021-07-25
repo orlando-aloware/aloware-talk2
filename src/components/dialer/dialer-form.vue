@@ -48,7 +48,8 @@
                align="right"
                padding="none"
                rounded
-               flat>
+               flat
+               @click="sendText">
         </q-btn>
       </div>
     </div>
@@ -218,7 +219,7 @@ export default {
       }
 
       let data = {
-        currentNumber: this.phoneNumber,
+        currentNumber: this.$options.filters.fixPhone(this.phoneNumber),
         outboundCampaignId: this.campaignId,
         contactName: this.contactName,
         companyName: this.companyName,
@@ -226,6 +227,24 @@ export default {
       }
       this.$VueEvent.fire('makeCall', data)
       this.hideDialer()
+    },
+
+    sendText () {
+      if (!this.validPhoneNumber) {
+        return
+      }
+
+      if (this.contactId) {
+        this.$router.push({
+          name: 'Contact',
+          params: {
+            id: this.contactId,
+            campaignId: this.outboundCampaignId
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      }
     }
   },
 

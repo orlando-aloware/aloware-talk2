@@ -20,7 +20,7 @@
                 v-on="scope.itemEvents"
         >
           <q-item-section>
-            <q-item-label v-html="scope.opt.name" ></q-item-label>
+            <q-item-label v-html="scope.opt.name"></q-item-label>
             <q-item-label caption>{{ scope.opt.email }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -44,11 +44,15 @@
 import { mapActions, mapGetters } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
 import talk2Api from 'src/plugins/api/api'
+
 export default {
   name: 'line-selector',
+
   mixins: [contactMixin],
+
   computed: {
     ...mapGetters('contacts', ['contact']),
+
     formattedLineOptions () {
       let contactLines = []
       if (this.contactCampaignsFromCommunications.length > 0) {
@@ -74,6 +78,7 @@ export default {
       return linesArray
     }
   },
+
   data () {
     return {
       isBusy: false,
@@ -83,8 +88,13 @@ export default {
       isFocused: false
     }
   },
+
+  mounted () {
+    this.lineOptions = this.formattedLineOptions
+    this.showPlaceholder()
+  },
+
   methods: {
-    ...mapActions('contacts', ['setSelectedLine']),
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
@@ -93,6 +103,7 @@ export default {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
       }
     },
+
     onBlur () {
       this.isFocused = false
       this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
@@ -101,6 +112,7 @@ export default {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = ''
       }
     },
+
     showPlaceholder () {
       if (!this.selectedLine) {
         this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select line'
@@ -109,9 +121,11 @@ export default {
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'none'
       }
     },
+
     onInput () {
       this.$el.querySelector('.inline-select .q-field__input').blur()
     },
+
     filterLineFn (val, update) {
       if (val === '') {
         update(() => {
@@ -124,6 +138,7 @@ export default {
         this.lineOptions = this.formattedLineOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     getSelectedLineLabel () {
       if (!this.selectedLine && Object.keys(this.selectedLine).length < 1) {
         return 'Select line...'
@@ -132,6 +147,7 @@ export default {
       let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.selectedLine.name}</span> ${titleText}`
     },
+
     getIncomingNumber () {
       this.isBusy = true
       return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id).then(response => {
@@ -139,12 +155,11 @@ export default {
       }).finally(() => {
         this.isBusy = false
       })
-    }
+    },
+
+    ...mapActions('contacts', ['setSelectedLine'])
   },
-  mounted () {
-    this.lineOptions = this.formattedLineOptions
-    this.showPlaceholder()
-  },
+
   watch: {
     selectedLine: function (value) {
       this.setSelectedLine(value)
@@ -152,6 +167,7 @@ export default {
         this.getIncomingNumber()
       }
     },
+
     'contact': function (value) {
       let campaign = (value.initial_campaign_id) ? this.lineOptions.find(line => line.id === value.initial_campaign_id) : null
       this.setSelectedLine(campaign)
