@@ -1792,6 +1792,9 @@ span.mention {
       background: $grey-50;
       color: $grey-90;
       border: none;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
     }
   }
 }
