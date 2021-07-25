@@ -97,6 +97,13 @@ export default {
     },
 
     query: _.debounce(function () {
+      if (!this.query.includes(' - +')) {
+        this.$emit('change', {
+          currentNumber: this.query,
+          contactName: 'No Name'
+        })
+      }
+
       if (this.query.length >= 3) {
         this.getPhoneNumbers(this.query)
       }
