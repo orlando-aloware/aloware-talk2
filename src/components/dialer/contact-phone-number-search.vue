@@ -41,6 +41,11 @@ export default {
     }
   },
 
+  mounted () {
+    this.query = this.value
+    this.$refs.searchField.inputValue = this.query
+  },
+
   computed: {
     serializer (item) {
       return item => {
@@ -86,6 +91,7 @@ export default {
   watch: {
     value () {
       this.query = this.value
+      this.$refs.searchField.inputValue = this.query
     },
 
     query: _.debounce(function () {

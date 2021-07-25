@@ -234,7 +234,7 @@ export default {
       }
 
       this.setCurrentListFilters(allFilters)
-      this.$VueEvent.unlisten('filters-back')
+      this.$VueEvent.stop('filters-back')
       this.$VueEvent.listen('filters-back', () => {
         this.setCurrentListFilters(this.initialListFilters)
       })

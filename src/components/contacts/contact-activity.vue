@@ -169,7 +169,7 @@
         </div>
       </div>
 
-      <div class="activity-bottom-info text-xxs mt-2 width-500 m-b d-flex align-items-center"
+      <div class="activity-bottom-info text-xxs width-500 m-b d-flex align-items-center"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id)">
@@ -413,7 +413,7 @@ export default {
     setInterval(this.getDateTimePassed, 10000)
   },
 
-  destroyed () {
+  beforeDestroy () {
     clearInterval(this.getRelativeDateTime)
     clearInterval(this.getDateTimePassed)
   },

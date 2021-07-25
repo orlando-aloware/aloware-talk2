@@ -105,8 +105,9 @@ export default {
   },
 
   created () {
-    this.$VueEvent.listen('callContact', (data) => {
-      this.showDialer()
+    this.$VueEvent.listen('changePhoneNumber', (data) => {
+      this.changePhoneNumber(data.currentNumber)
+      this.makeCall()
     })
   },
 
@@ -191,6 +192,10 @@ export default {
     },
 
     makeCall () {
+      if (!this.validPhoneNumber) {
+        return
+      }
+
       let data = {
         currentNumber: this.phoneNumber,
         outboundCampaignId: this.campaignId
@@ -198,6 +203,10 @@ export default {
       this.$VueEvent.fire('makeCall', data)
       this.hideDialer()
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('changePhoneNumber')
   },
 
   watch: {

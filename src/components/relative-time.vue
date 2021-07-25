@@ -44,7 +44,7 @@ export default {
     setInterval(this.getRelativeTime, this.updateInterval)
   },
 
-  destroyed () {
+  beforeDestroy () {
     clearInterval(this.getRelativeTime)
   },
 

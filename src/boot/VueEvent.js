@@ -13,7 +13,7 @@ window.VueEvent = new class {
     this.vue.$on(event, callback)
   }
 
-  unlisten (event, callback) {
+  stop (event, callback) {
     this.vue.$off(event, callback)
   }
 }()

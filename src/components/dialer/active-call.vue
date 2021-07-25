@@ -29,7 +29,8 @@
     </q-item-section>
 
     <q-item-section side>
-      <q-btn icon="img:app-icons/dialer/hangup_btn.svg"
+      <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
+             icon="img:app-icons/dialer/hangup_btn.svg"
              size="22px"
              class="icon-btn auto-size height-22"
              padding="none"

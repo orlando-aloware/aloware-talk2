@@ -721,6 +721,20 @@ export default {
   },
 
   beforeDestroy () {
+    this.$VueEvent.stop('update_communication')
+    this.$VueEvent.stop('endWrapUp')
+    this.$VueEvent.stop('resetCall')
+    this.$VueEvent.stop('makeCall')
+    this.$VueEvent.stop('hangupCall')
+    this.$VueEvent.stop('answerCall')
+    this.$VueEvent.stop('rejectCall')
+    this.$VueEvent.stop('sendDigit')
+    this.$VueEvent.stop('toggleMute')
+    this.$VueEvent.stop('forceRefreshCommunication')
+    this.$VueEvent.stop('setInputDevice')
+    this.$VueEvent.stop('setOutputDevice')
+    this.$VueEvent.stop('testOutputDevice')
+    this.$VueEvent.stop('initializeSettings')
     clearInterval(this.$options.callDurationInterval)
   }
 }

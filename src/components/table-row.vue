@@ -22,7 +22,7 @@
       >
         <div class="d-flex align-items-center">
           <div class="pr-2">
-            <avatar :name="contact.name" />
+            <avatar :name="contact.name"/>
           </div>
           <div class="flex-grow-1">
             <router-link
@@ -37,7 +37,7 @@
                 <template v-if="contact.name">
                   {{ contact.name | ucwords }}
                 </template>
-                <template v-if="!contact.name"> No Name </template>
+                <template v-if="!contact.name"> No Name</template>
               </a>
             </router-link>
           </div>
@@ -150,10 +150,8 @@
 
 <script>
 import moment from 'moment'
-
-import Avatar from 'components/avatar.vue'
-
 import { mapActions, mapGetters } from 'vuex'
+import Avatar from 'components/avatar.vue'
 
 export default {
   components: {
@@ -175,6 +173,17 @@ export default {
       type: [Number, String]
     }
   },
+
+  data () {
+    return {
+      moment
+    }
+  },
+
+  computed: {
+    ...mapGetters('auth', ['profile'])
+  },
+
   methods: {
     ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
     onCheckerClicked () {
@@ -188,6 +197,7 @@ export default {
 
       this.$emit('checked', [...checked])
     },
+
     onRemove () {
       this.setBulkDelete(false)
       this.removeContactOpen({
@@ -195,10 +205,12 @@ export default {
         contactListId: this.contactListId
       })
     },
+
     onMessage () {
       this.setMessageComposerMode('sms')
       this.$router.push(`/contact/${this.contact.id}`)
     },
+
     onCall () {
       // check contact has timezone or not
       if (this.contact.timezone) {
@@ -226,13 +238,13 @@ export default {
               customClass: 'width-500 fixed',
               type: 'warning'
             }
-          )
-            .then(() => {
-              this.makeCall()
-            })
-            .catch(() => {})
+          ).then(() => {
+            this.makeCall()
+          }).catch(() => {
+          })
         }
       }
+
       this.makeCall()
     },
 
@@ -247,16 +259,18 @@ export default {
           cancelButtonText: 'Cancel',
           customClass: 'width-500 fixed',
           type: 'warning'
+        }).then(() => {
+          this.makeTwoLeggedCall()
+        }).catch(() => {
         })
-          .then(() => {
-            this.makeTwoLeggedCall()
-          })
-          .catch(() => {})
       }
-      window.VueEvent.fire('make_new_call', {
-        phone_number: this.contact.phone_number
-      })
+
+      let data = {
+        currentNumber: this.contact.phone_number
+      }
+      this.$VueEvent.fire('callContact', data)
     },
+
     makeTwoLeggedCall () {
       window.axios
         .post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
@@ -275,14 +289,6 @@ export default {
           // this.$root.handleErrors(err.response)
         })
     }
-  },
-  data () {
-    return {
-      moment
-    }
-  },
-  computed: {
-    ...mapGetters('auth', ['profile'])
   }
 }
 </script>
@@ -291,34 +297,44 @@ export default {
 @import '../css/mixins';
 @import '../css/variables';
 @import '../css/breakpoints';
+
 .datatable-row {
   font-size: 12px;
+
   &__checkbox {
     max-width: 40px;
+
     input {
       margin-top: 5px;
     }
   }
+
   &__phone {
     min-width: 50px;
   }
+
   &__name {
     min-width: 150px;
   }
+
   &__actions {
     min-width: 40px;
     max-width: 40px;
+
     &__action {
       &--call:hover {
         color: $green;
       }
+
       &--chat:hover {
         color: $blue;
       }
+
       &--trash:hover {
         color: $red;
       }
     }
+
     button {
       color: $grey-mid;
     }

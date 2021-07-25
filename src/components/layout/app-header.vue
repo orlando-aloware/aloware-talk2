@@ -103,7 +103,6 @@
                     @before-show="showDialer"
                     @before-hide="hideDialer">
               <dialer-form v-model="dialerStatus"
-                           @show="showDialer"
                            @hide="hideDialer">
               </dialer-form>
             </q-menu>
@@ -172,6 +171,15 @@ export default {
       }
       return ''
     }
+  },
+
+  created () {
+    this.$VueEvent.listen('callContact', (data) => {
+      this.showDialer()
+      setTimeout(() => {
+        this.$VueEvent.fire('changePhoneNumber', data)
+      }, 100)
+    })
   },
 
   methods: {

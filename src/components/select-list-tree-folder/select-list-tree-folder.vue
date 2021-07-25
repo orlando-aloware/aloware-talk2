@@ -49,11 +49,9 @@ import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'components/icons/folder-icon.vue'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon.vue'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
-import SelectListTreeFolderContents
-  from 'src/components/select-list-tree-folder/select-list-tree-folder-contents'
-import SelectListTreeListContents
-  from 'components/select-list-tree-folder/select-list-tree-list-contents'
-import { STATIC, DYNAMIC } from 'src/constants/contacts-list-types'
+import SelectListTreeFolderContents from 'src/components/select-list-tree-folder/select-list-tree-folder-contents'
+import SelectListTreeListContents from 'components/select-list-tree-folder/select-list-tree-list-contents'
+import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
 
 let inputTimeout
 
@@ -62,32 +60,40 @@ export default {
     id: {
       type: Number
     },
+
     name: {
       type: String
     },
+
     hasEdit: {
       type: Number
     },
+
     hasDelete: {
       type: Number
     },
+
     folders: {
       type: Array,
       required: false
     },
+
     lists: {
       type: Array,
       required: false
     },
+
     layer: {
       type: Number,
       required: false,
       default: 1
     },
+
     order: {
       type: Number
     }
   },
+
   components: {
     SelectListTreeListContents,
     SelectListTreeFolderContents,
@@ -95,19 +101,33 @@ export default {
     FolderArrowOpenIcon,
     FolderArrowCloseIcon
   },
+
+  data () {
+    return {
+      isOpen: false,
+      ContactListTypes: {
+        STATIC,
+        DYNAMIC
+      }
+    }
+  },
+
   computed: {
     ...mapGetters('contacts', ['opened', 'moveDialog', 'createList', 'selectList']),
+
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
       }
     },
+
     isSelected () {
       return (
         (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
         (this.createList.open && this.createList.folderId === this.id)
       )
     },
+
     filterStaticList () {
       if (this.selectList.search_value.length > 0) {
         return this.lists.filter(list => list.name.toLowerCase().includes(this.selectList.search_value.toLowerCase()))
@@ -115,12 +135,7 @@ export default {
       return this.lists
     }
   },
-  data () {
-    return {
-      isOpen: false,
-      ContactListTypes: { STATIC, DYNAMIC }
-    }
-  },
+
   methods: {
     ...mapActions('contacts', [
       'toggleFolder',
@@ -131,6 +146,7 @@ export default {
       'openMoveDialog',
       'createListOpen'
     ]),
+
     onMove () {
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
@@ -138,6 +154,7 @@ export default {
         type: 'folder'
       })
     },
+
     onCreateList () {
       this.$root.$emit('bv::hide::popover')
 
@@ -147,6 +164,7 @@ export default {
 
       this.onToggleFolder()
     },
+
     onKeyDown (evt) {
       if (evt.keyCode === 13) {
         this.updateFolderName(evt.target.value)
@@ -155,6 +173,7 @@ export default {
         evt.target.value = this.name
       }
     },
+
     reloadFolders () {
       return window.axios
         .get('/api/v2/contact-folders')
@@ -173,14 +192,17 @@ export default {
           })
         })
     },
+
     onToggleFolder () {
       this.isOpen = !this.isOpen
     },
+
     onCloseFolder () {
       this.isCreatingFolder = false
     }
   },
-  destroyed () {
+
+  beforeDestroy () {
     clearTimeout(inputTimeout)
   }
 }
@@ -189,6 +211,7 @@ export default {
 <style lang="scss">
 @import '../../css/mixins';
 @import '../../css/variables';
+
 .folder {
   padding-left: 10px;
   padding-right: 10px;
@@ -197,23 +220,29 @@ export default {
   user-select: none;
   transition: background-color 100ms ease-in-out;
   max-height: 40vh;
+
   &__arrow {
     margin-top: -5px;
     margin-right: 5px;
   }
+
   &__icon {
     margin-top: -5px;
     margin-right: 5px;
   }
+
   &--selected {
     background-color: $light-green2;
   }
+
   &:hover {
     background-color: $light-green2;
+
     .folder__option {
       display: block;
     }
   }
+
   &__name {
     font-size: 13px;
     overflow: hidden;
@@ -221,25 +250,31 @@ export default {
     white-space: nowrap;
     max-width: calc(100% - 30px);
   }
+
   &__sub {
     padding-left: 10px;
   }
+
   &__indent {
     width: 10px;
   }
+
   &__option {
     margin-top: -5px;
+
     &--hide {
       width: 0;
       overflow: hidden;
     }
   }
+
   &__input {
     font-size: 12px;
     height: 100%;
     width: 100%;
     border: none;
     border-radius: 0;
+
     &:focus {
       outline-color: $green;
       -moz-outline-radius: 0;

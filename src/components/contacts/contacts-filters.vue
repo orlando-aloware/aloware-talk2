@@ -277,7 +277,7 @@ export default {
         this.filterGroupIndex = index
       }
       this.filterConjunction = conjunction
-      this.$VueEvent.unlisten('filters-back')
+      this.$VueEvent.stop('filters-back')
       if (!skipStep) {
         this.step = 2
       }

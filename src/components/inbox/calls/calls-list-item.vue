@@ -50,7 +50,7 @@ export default {
       this.$emit('answer')
     },
     select () {
-      window.VueEvent.fire('make_call')
+      this.$VueEvent.fire('make_call')
     }
   },
   props: {

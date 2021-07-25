@@ -318,12 +318,12 @@ export default {
       })
 
       // bounce dock
-      window.VueEvent.listen('bounce_dock', () => {
+      this.$VueEvent.listen('bounce_dock', () => {
         this.bounceDock()
       })
 
       // set dock badge
-      window.VueEvent.listen('set_badge', (badgeText) => {
+      this.$VueEvent.listen('set_badge', (badgeText) => {
         if (badgeText === undefined) {
           return
         }
@@ -331,24 +331,24 @@ export default {
       })
 
       // increase dock badge
-      window.VueEvent.listen('increase_badge', (count) => {
+      this.$VueEvent.listen('increase_badge', (count) => {
         this.increaseAppBadge(count)
       })
 
       // decrease dock badge
-      window.VueEvent.listen('decrease_badge', (count) => {
+      this.$VueEvent.listen('decrease_badge', (count) => {
         this.decreaseAppBadge(count)
       })
 
       // new desktop contact assigned notification
-      window.VueEvent.listen('new_desktop_contact_assigned', (contact) => {
+      this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
         if (this.checkContactMatchesUserAccessibility(contact)) {
           this.handleDesktopContactNotification(contact)
         }
       })
 
       // new desktop appointment notification
-      window.VueEvent.listen(
+      this.$VueEvent.listen(
         'new_desktop_appointment',
         ({
           engagement,
@@ -366,7 +366,7 @@ export default {
       )
 
       // new desktop reminder notification
-      window.VueEvent.listen(
+      this.$VueEvent.listen(
         'new_desktop_reminder',
         ({
           engagement,
@@ -384,35 +384,35 @@ export default {
       )
 
       // new desktop call notification
-      window.VueEvent.listen('new_desktop_call', (communication) => {
+      this.$VueEvent.listen('new_desktop_call', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // answered desktop call notification
-      window.VueEvent.listen('answered_desktop_call', (communication) => {
+      this.$VueEvent.listen('answered_desktop_call', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // new desktop sms notification
-      window.VueEvent.listen('new_desktop_sms', (communication) => {
+      this.$VueEvent.listen('new_desktop_sms', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // new desktop fax notification
-      window.VueEvent.listen('new_desktop_fax', (communication) => {
+      this.$VueEvent.listen('new_desktop_fax', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // new desktop voicemail notification
-      window.VueEvent.listen('new_desktop_voicemail', (communication) => {
+      this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopVoicemailNotification(communication)
         }
@@ -752,7 +752,7 @@ export default {
           if (res.data.to !== res.data.total) {
             this.getTags(page + 1)
           } else {
-            window.VueEvent.fire('tags_loaded')
+            this.$VueEvent.fire('tags_loaded')
             this.loadingTags = false
             return Promise.resolve()
           }
