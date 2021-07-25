@@ -5,14 +5,16 @@
       <contact-phones-list-items :phones="primaryPhone"
                                  @edit="onEditPhone"
                                  @delete="onDeletePhone"
-                                 @composerMedia="setComposerVariables" />
+                                 @composerMedia="setComposerVariables">
+      </contact-phones-list-items>
 
       <contact-phones-list-items :phones="otherPhones"
                                  @edit="onEditPhone"
                                  @delete="onDeletePhone"
-                                 @composerMedia="setComposerVariables" />
-      <b-link v-if="hasPermissionTo('update contact')"
-              id="btn-show-phone-form"
+                                 @composerMedia="setComposerVariables">
+      </contact-phones-list-items>
+
+      <b-link id="btn-show-phone-form"
               ref="phone_form"
               href="#"
               class="custom-link text-decoration-none">
@@ -33,17 +35,24 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import ContactPhonesForm from 'src/components/forms/contact-phones-form'
 import PlusCircleIcon from 'components/icons/plus-circle-icon'
-import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
-import { aclMixin } from 'src/plugins/mixins'
 import ContactPhonesListItems from 'src/components/contacts/contact-phones-list-items'
+import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
 
 export default {
   name: 'contact-phones',
+
   mixins: [aclMixin],
-  components: { ContactPhonesListItems, PlusCircleIcon, ContactPhonesForm },
+
+  components: {
+    ContactPhonesListItems,
+    PlusCircleIcon,
+    ContactPhonesForm
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'contactPhoneNumbers']),
     otherPhones () {
@@ -53,6 +62,7 @@ export default {
       return this.contact.phone_number === '0' ? [] : this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
     }
   },
+
   data () {
     return {
       showPhonesForm: false,
@@ -62,6 +72,13 @@ export default {
       LRN_TYPE_OTHER
     }
   },
+
+  mounted () {
+    if (this.contact && this.contact.id) {
+      this.getPhoneNumbers()
+    }
+  },
+
   methods: {
     ...mapActions('contacts', ['setContactPhoneNumbers', 'setContactSelectedPhone', 'setMessageComposerMode', 'setMessageComposerSmsPhoneNumber']),
     getPhoneNumbers () {
@@ -69,16 +86,20 @@ export default {
         this.setContactPhoneNumbers(response.data)
       })
     },
+
     onEditPhone (phoneNumber) {
       this.setContactSelectedPhone(phoneNumber)
       this.$root.$emit('bv::show::popover', 'contact-phone-form-popover')
     },
+
     onClosePhoneForm () {
       this.showPhonesForm = false
     },
+
     onPopoverHidden () {
       this.setContactSelectedPhone(null)
     },
+
     onDeletePhone (phone) {
       this.$bvModal.msgBoxConfirm('Do you wish to delete this phone number?', {
         buttonSize: 'sm',
@@ -110,18 +131,19 @@ export default {
         }
       })
     },
+
     setComposerVariables (mode, phone) {
       this.setMessageComposerMode(mode)
       this.setMessageComposerSmsPhoneNumber(phone.phone_number)
     }
   },
+
   watch: {
     'contact.id': function () {
-      this.getPhoneNumbers()
+      if (this.contact && this.contact.id) {
+        this.getPhoneNumbers()
+      }
     }
-  },
-  mounted () {
-    this.getPhoneNumbers()
   }
 }
 </script>

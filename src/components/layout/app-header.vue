@@ -103,6 +103,7 @@
                     @before-show="showDialer"
                     @before-hide="hideDialer">
               <dialer-form v-model="dialerStatus"
+                           @show="showDialer"
                            @hide="hideDialer">
               </dialer-form>
             </q-menu>

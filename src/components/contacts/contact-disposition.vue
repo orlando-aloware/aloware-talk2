@@ -25,7 +25,9 @@ import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-disposition',
+
   mixins: [aclMixin],
+
   props: {
     disabled: {
       required: false,
@@ -33,12 +35,15 @@ export default {
       type: Boolean
     }
   },
+
   computed: {
     ...mapState(['dispositionStatuses', 'currentCompany']),
     ...mapGetters('contacts', ['contact']),
+
     isCompanyAgent () {
       return this.hasRole(Roles.COMPANY_AGENT)
     },
+
     sortedStatusDispositions () {
       if (this.dispositionStatuses) {
         let dispositionStatuses = _.clone(this.dispositionStatuses)
@@ -61,6 +66,7 @@ export default {
       return []
     }
   },
+
   data () {
     return {
       isBusy: false,
@@ -68,6 +74,11 @@ export default {
       Roles
     }
   },
+
+  mounted () {
+    this.options = this.sortedStatusDispositions
+  },
+
   methods: {
     filterFn (val, update) {
       if (val === '') {
@@ -82,6 +93,7 @@ export default {
         this.options = this.sortedStatusDispositions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     onDispose () {
       this.isBusy = true
       talk2Api.V1.contact.dispose(this.contact.id, { 'disposition_status': this.contact.disposition_status_id }).then(response => {
@@ -90,15 +102,16 @@ export default {
         this.isBusy = false
       })
     },
+
     ...mapActions('contacts', ['setContact'])
   },
+
   watch: {
     'contact.disposition_status_id': function () {
-      this.onDispose()
+      if (this.contact && this.contact.id) {
+        this.onDispose()
+      }
     }
-  },
-  mounted () {
-    this.options = this.sortedStatusDispositions
   }
 }
 </script>

@@ -15,14 +15,14 @@
            v-if="hasPermissionTo('list disposition status')">
         <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
         <contact-disposition @updateField="onUpdateOwner"
-                             :disabled="!hasPermissionTo('dispose contact')" />
+                             :disabled="!hasPermissionTo('dispose contact')"/>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Email</p>
         <contact-input-field v-model="contact.email"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateEmail" />
+                             @updateField="onUpdateEmail"/>
       </div>
 
       <div class="d-block">
@@ -97,60 +97,99 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import ContactUserSelector from 'src/components/contacts/contact-user-selector'
 import LocationStateSelector from 'src/components/contacts/location-state-selector'
 import LocationCountrySelector from 'src/components/contacts/location-country-selector'
 import ContactInputField from 'src/components/contacts/contact-input-field'
 import ContactDisposition from 'src/components/contacts/contact-disposition'
-import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-information',
+
   mixins: [aclMixin],
-  components: { ContactDisposition, ContactInputField, LocationCountrySelector, LocationStateSelector, ContactUserSelector },
+
+  components: {
+    ContactDisposition,
+    ContactInputField,
+    LocationCountrySelector,
+    LocationStateSelector,
+    ContactUserSelector
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),
+
     autoHeightClass () {
       return this.is_expanded ? 'auto-height' : ''
     }
   },
+
   data () {
     return {
       is_expanded: false,
       attributes: []
     }
   },
+
+  mounted () {
+    if (this.contact && this.contact.id) {
+      this.getAttributes()
+    }
+  },
+
   methods: {
     ...mapActions('contacts', ['setContactAttributes', 'setContact']),
+
     onExpanded () {
       this.is_expanded = !this.is_expanded
     },
+
     getAttributes () {
       talk2Api.V1.contact.getAttributes(this.contact.id)
         .then(response => {
           this.setContactAttributes(response.data)
         })
     },
+
     onUpdateOwner (params) {
       this.updateContactField({ user_id: params.val }, params.callback)
     },
+
     onUpdateZipCode (params) {
       this.updateContactField({ cnam_zipcode: params.val }, params.callback)
     },
+
     onUpdateEmail (params) {
       this.updateContactField({ email: params.val }, params.callback)
     },
+
     onUpdateWebsite (params) {
       this.updateContactField({ website: params.val }, params.callback)
     },
+
     onUpdateCompany (params) {
       this.updateContactField({ company_name: params.val }, params.callback)
     },
+
     onUpdateCity (params) {
       this.updateContactField({ cnam_city: params.val }, params.callback)
     },
+
+    onUpdateCountry (params) {
+      this.updateContactField({ cnam_country: params.value }, params.callback)
+    },
+
+    onUpdateState (params) {
+      this.updateContactField({ cnam_state: params.value }, params.callback)
+    },
+
     updateContactField (params, callback) {
+      if (!this.contact || !this.contact.id) {
+        return false
+      }
+
       return talk2Api.V1.contact.update(this.contact.id, params).then(response => {
         this.setContact(response.data)
       }).catch((err) => {
@@ -172,16 +211,15 @@ export default {
           callback()
         }
       })
-    },
-    onUpdateCountry (params) {
-      this.updateContactField({ cnam_country: params.value }, params.callback)
-    },
-    onUpdateState (params) {
-      this.updateContactField({ cnam_state: params.value }, params.callback)
     }
   },
-  mounted () {
-    this.getAttributes()
+
+  watch: {
+    'contact.id': function () {
+      if (this.contact && this.contact.id) {
+        this.getAttributes()
+      }
+    }
   }
 }
 </script>

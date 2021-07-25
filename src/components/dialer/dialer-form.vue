@@ -104,6 +104,12 @@ export default {
     }
   },
 
+  created () {
+    this.$VueEvent.listen('callContact', (data) => {
+      this.showDialer()
+    })
+  },
+
   mounted () {
     if (this.value) {
       this.showDialer()

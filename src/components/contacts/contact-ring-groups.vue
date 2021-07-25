@@ -33,7 +33,8 @@
             href="#"
             class="custom-link text-decoration-none"
             @click="onModifyRingGroups">
-      <pencil-o-icon></pencil-o-icon> Modify Ring Groups
+      <pencil-o-icon></pencil-o-icon>
+      Modify Ring Groups
     </b-link>
   </b-card>
 </template>
@@ -47,10 +48,17 @@ import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-ring-groups',
+
   mixins: [aclMixin],
-  components: { PencilOIcon, VueMultiselect },
+
+  components: {
+    PencilOIcon,
+    VueMultiselect
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'ringGroups', 'contactRingGroups']),
+
     appliedRingGroups () {
       if (this.contactRingGroups.length > 0) {
         return this.ringGroups.filter(ringGroup => this.contactRingGroups.includes(ringGroup.id))
@@ -58,6 +66,7 @@ export default {
       return []
     }
   },
+
   data () {
     return {
       isEdit: false,
@@ -66,6 +75,13 @@ export default {
       selectedRingGroups: []
     }
   },
+
+  mounted () {
+    if (this.contact && this.contact.id) {
+      this.getRingGroups()
+    }
+  },
+
   methods: {
     ...mapActions('contacts', ['setRingGroups', 'setContactRingGroups']),
     getContactRingGroups () {
@@ -75,6 +91,7 @@ export default {
         this.selectedRingGroups = this.options.filter(ringGroup => this.ringGroupsArray.includes(ringGroup.id))
       })
     },
+
     getRingGroups () {
       return talk2Api.V1.ringGroups.get()
         .then(response => {
@@ -83,16 +100,19 @@ export default {
           this.getContactRingGroups()
         })
     },
+
     onModifyRingGroups () {
       this.isEdit = true
       this.$nextTick(function () {
         this.$refs.ringGroupSelect.$el.focus()
       })
     },
+
     onSelectBlur () {
       this.isEdit = false
       this.submit()
     },
+
     submit () {
       let ringGroupIds = this.selectedRingGroups.map(ringGroup => ringGroup.id)
       talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: ringGroupIds })
@@ -104,13 +124,13 @@ export default {
         })
     }
   },
+
   watch: {
     'contact.id': function () {
-      this.getContactRingGroups()
+      if (this.contact && this.contact.id) {
+        this.getContactRingGroups()
+      }
     }
-  },
-  mounted () {
-    this.getRingGroups()
   }
 }
 </script>
