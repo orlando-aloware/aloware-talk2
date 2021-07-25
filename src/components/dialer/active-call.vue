@@ -11,28 +11,31 @@
         <span v-else-if="dialer.currentNumber">{{ dialer.currentNumber | fixPhone }}</span>
         <span v-else-if="dialer.onHoldCall">{{ dialer.onHoldCall.lead_number | fixPhone }}</span>
         <span v-else>{{ dialer.call.from | fixPhone }}</span>
-        <span>·</span>
+        <span class="ml-1 mr-1">·</span>
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
-        <span v-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
+        <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
       </q-item-label>
     </q-item-section>
 
     <q-item-section side>
-      <cancel-call-icon role="button"
-                        @click="hangupCall">
-      </cancel-call-icon>
+      <q-btn icon="img:app-icons/dialer/hangup_btn.svg"
+             size="22px"
+             class="icon-btn auto-size height-22"
+             padding="none"
+             ripple
+             rounded
+             flat
+             @click="hangupCall">
+      </q-btn>
     </q-item-section>
   </q-item>
 </template>
 
 <script>
-import CancelCallIcon from 'components/icons/cancel-call-icon'
 import { mapState } from 'vuex'
 
 export default {
   name: 'active-call',
-
-  components: { CancelCallIcon },
 
   computed: {
     ...mapState(['dialer'])

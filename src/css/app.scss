@@ -2597,6 +2597,10 @@ span.mention {
   height: auto;
 }
 
+.height-22 {
+  height: 22px;
+}
+
 .height-28 {
   height: 28px;
 }
@@ -2898,7 +2902,7 @@ span.mention {
   background: $dark;
   @extend .text-white;
   border-radius: 7px;
-  width: 180px;
+  width: 190px;
 
   .call-status {
     font-size: 11px !important;

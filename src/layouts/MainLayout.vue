@@ -50,7 +50,7 @@
               </div>
             </div>
           </section>
-          <!--dialer v-if="authenticated"></dialer-->
+          <dialer v-if="authenticated"></dialer>
         </q-page-container>
       </div>
       <q-drawer v-model="sidebarVisible"
@@ -174,12 +174,12 @@
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
 import broadcast from '../boot/broadcast'
-import * as AgentStatus from '../constants/agent-status'
-import * as CommunicationTypes from '../constants/communication-types'
 import AppHeader from '../components/layout/app-header'
 import AppFooter from '../components/layout/app-footer'
 import AppSidebar from '../components/layout/app-sidebar'
-// import Dialer from '../components/dialer'
+import Dialer from '../components/dialer/dialer'
+import * as AgentStatus from '../constants/agent-status'
+import * as CommunicationTypes from '../constants/communication-types'
 
 export default {
   name: 'MyLayout',
@@ -187,8 +187,8 @@ export default {
   components: {
     AppHeader,
     AppFooter,
-    AppSidebar
-    // Dialer
+    AppSidebar,
+    Dialer
   },
 
   mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
