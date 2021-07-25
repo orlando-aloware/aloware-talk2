@@ -44,7 +44,7 @@ export default {
         })
       }
 
-      window.axios
+      this.$axios
         .get('/api/v2/contacts-list/' + stringId)
         .then((response) => response.data)
         .then((response) => {

@@ -123,12 +123,18 @@ export default {
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       console.log('Received call invite', call)
+      let map = call._connection.customParameters
+      let customParameters = {}
+      map.forEach((value, key) => {
+        customParameters[key] = value
+      })
       this.setDialerCall({
         from: call.from,
         to: call.to,
         callSid: call.callSid,
         state: call.state,
-        isMuted: call.isMuted
+        isMuted: call.isMuted,
+        customParameters: customParameters
       })
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
@@ -165,7 +171,20 @@ export default {
 
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
       console.log('Successfully connected call', call)
-      this.setDialerCall(call)
+      let map = call._connection.customParameters
+      let customParameters = {}
+      map.forEach((value, key) => {
+        customParameters[key] = value
+      })
+      this.setDialerCall({
+        from: call.from,
+        to: call.to,
+        callSid: call.callSid,
+        state: call.state,
+        isMuted: call.isMuted,
+        customParameters: customParameters
+      })
+      console.log(this.dialer.call)
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber).finally(() => {
         // this.$router.push({ name: 'Call' }).catch(err => {
         //   console.log(err)
@@ -216,7 +235,7 @@ export default {
     })
 
     this.$VueEvent.listen('makeCall', (data) => {
-      this.makeCall(data.currentNumber, data.outboundCampaignId)
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName)
     })
 
     this.$VueEvent.listen('hangupCall', () => {
@@ -339,14 +358,14 @@ export default {
       })
     },
 
-    makeCall (currentNumber, outboundCampaignId) {
+    makeCall (currentNumber, outboundCampaignId, contactName = '') {
       console.log(currentNumber, outboundCampaignId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready, rescheduling', currentNumber, outboundCampaignId)
         // dialer is not ready, rescheduling
         setTimeout(() => {
-          this.makeCall(currentNumber, outboundCampaignId)
+          this.makeCall(currentNumber, outboundCampaignId, contactName)
         }, 1000)
       }
 
@@ -357,7 +376,8 @@ export default {
       let params = {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
         'CampaignId': outboundCampaignId.toString(),
-        'UserId': this.profile.id.toString()
+        'UserId': this.profile.id.toString(),
+        'ContactName': contactName.toString()
       }
 
       console.log('Making call', params)

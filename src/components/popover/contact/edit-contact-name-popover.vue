@@ -93,7 +93,7 @@ export default {
     },
     onSubmit (e) {
       this.is_busy = true
-      window.axios.patch('/api/v1/contact/' + this.contact.id, {
+      this.$axios.patch('/api/v1/contact/' + this.contact.id, {
         first_name: this.selected_contact.first_name,
         last_name: this.selected_contact.last_name
       }).then(response => {

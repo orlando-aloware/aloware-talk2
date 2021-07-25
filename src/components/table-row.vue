@@ -266,13 +266,14 @@ export default {
       }
 
       let data = {
-        currentNumber: this.contact.phone_number
+        currentNumber: this.contact.phone_number,
+        contactName: this.contact.name
       }
       this.$VueEvent.fire('callContact', data)
     },
 
     makeTwoLeggedCall () {
-      window.axios
+      this.$axios
         .post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
           phone_number: this.contact.phone_number
         })

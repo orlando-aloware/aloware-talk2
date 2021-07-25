@@ -177,7 +177,7 @@ export default {
     ]),
     addSelectedContacts () {
       this.isLoading = true
-      return window.axios
+      return this.$axios
         .post('api/v2/contact-list-items', {
           contact_list_id: this.contactList.id,
           contacts: this.getSelectedContacts()

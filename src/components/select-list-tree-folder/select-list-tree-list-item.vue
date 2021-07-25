@@ -88,7 +88,7 @@ export default {
       this.setSelectedStaticList({ id: this.id, name: this.name, type: this.type, hasEdit: this.hasEdit, hasDelete: this.hasDelete })
     },
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)

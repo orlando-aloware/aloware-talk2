@@ -4,6 +4,7 @@
     <q-item-section>
       <q-item-label class="_600">
         <span v-if="dialer.contact">{{ dialer.contact.name | truncate(15) }}</span>
+        <span v-else-if="dialer.call && dialer.call.customParameters && dialer.call.customParameters.ContactName">{{ dialer.call.customParameters.ContactName | truncate(15) }}</span>
         <span v-else-if="dialer.onHoldCall && dialer.onHoldCall.contact">{{ dialer.onHoldCall.contact.name | truncate(15) }}</span>
         <q-skeleton type="text"
                     v-else>

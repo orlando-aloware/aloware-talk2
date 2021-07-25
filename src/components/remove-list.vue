@@ -60,7 +60,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeListClose', 'removeListOpen', 'foldersLoaded', 'setRemoveListActionType']),
     onRemoveList () {
-      return window.axios
+      return this.$axios
         .delete('/api/v2/contacts-list/' + this.listToRemove.id)
         .then(() => {
           this.reloadFolders()
@@ -80,7 +80,7 @@ export default {
         .finally(() => this.removeListClose())
     },
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then((response) => {

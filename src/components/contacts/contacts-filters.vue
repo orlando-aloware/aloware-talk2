@@ -251,7 +251,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
     getFilters: function () {
-      window.axios
+      this.$axios
         .get('/api/v2/contacts/filters')
         .then((response) => response.data.filters)
         .then(this.setFilters)

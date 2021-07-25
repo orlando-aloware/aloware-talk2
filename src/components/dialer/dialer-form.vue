@@ -79,7 +79,8 @@ export default {
       mode: 'call',
       defaultOutboundCampaignId: null,
       campaignId: null,
-      phoneNumber: ''
+      phoneNumber: '',
+      contactName: ''
     }
   },
 
@@ -106,7 +107,7 @@ export default {
 
   created () {
     this.$VueEvent.listen('changePhoneNumber', (data) => {
-      this.changePhoneNumber(data.currentNumber)
+      this.changePhoneNumber(data)
       this.makeCall()
     })
   },
@@ -133,14 +134,16 @@ export default {
 
     resetForm () {
       this.phoneNumber = ''
+      this.contactName = ''
       this.defaultOutboundCampaignId = null
       this.campaignId = null
       this.label = 'Call a number'
       this.mode = 'call'
     },
 
-    changePhoneNumber (phoneNumber) {
-      this.phoneNumber = phoneNumber
+    changePhoneNumber (data) {
+      this.phoneNumber = data.currentNumber
+      this.contactName = data.contactName
     },
 
     changeCampaignId (campaignId) {
@@ -198,7 +201,8 @@ export default {
 
       let data = {
         currentNumber: this.phoneNumber,
-        outboundCampaignId: this.campaignId
+        outboundCampaignId: this.campaignId,
+        contactName: this.contactName
       }
       this.$VueEvent.fire('makeCall', data)
       this.hideDialer()

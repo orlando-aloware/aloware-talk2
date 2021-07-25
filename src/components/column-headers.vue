@@ -224,7 +224,7 @@ export default {
         return
       }
       this.loading = true
-      window.axios
+      this.$axios
         .patch(`/api/v2/contacts-list/${this.columns.id}`, {
           ...this.columns,
           headers: this.currentColumns,
@@ -259,7 +259,7 @@ export default {
       }
 
       this.loading = true
-      window.axios
+      this.$axios
         .patch(`/api/v2/contacts-list/${this.columns.id}`, {
           ...this.columns,
           headers: DEFAULT_COLUMNS,

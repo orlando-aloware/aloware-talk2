@@ -84,7 +84,7 @@ export default {
     },
     onSubmit (e) {
       this.is_busy = true
-      window.axios.post(`/api/v1/contact/${this.contact.id}/phone-number`, {
+      this.$axios.post(`/api/v1/contact/${this.contact.id}/phone-number`, {
         title: this.phone.title,
         phone_number: this.phone.number
       }).then(response => {

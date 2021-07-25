@@ -276,7 +276,7 @@ export default {
       if (this.selectedList.type === this.ContactListType.STATIC || this.defaultIds.includes(this.id)) {
         return
       }
-      return window.axios
+      return this.$axios
         .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
         .then(() => {
           this.initialListFilters = this.currentListFilters

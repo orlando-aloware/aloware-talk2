@@ -49,10 +49,7 @@ export default {
   computed: {
     serializer (item) {
       return item => {
-        let name = (item.first_name + ' ' + item.last_name).trim()
-        if (!name.length) {
-          name = 'No Name'
-        }
+        let name = this.getContactName(item)
 
         let searchTerm = name + ' - ' + item.phone_number
         return searchTerm
@@ -63,7 +60,7 @@ export default {
   methods: {
     getPhoneNumbers (search) {
       this.phoneNumbers = []
-      window.axios.get('api/v2/contacts/quick-search', {
+      this.$axios.get('api/v2/contacts/quick-search', {
         params: {
           search: search
         }
@@ -75,7 +72,12 @@ export default {
     changePhoneNumber ($event) {
       this.selectedPhoneNumber = $event.phone_number
       this.$refs.searchField.inputValue = this.selectedPhoneNumber
-      this.$emit('change', this.selectedPhoneNumber)
+      let name = this.getContactName($event)
+
+      this.$emit('change', {
+        currentNumber: this.selectedPhoneNumber,
+        contactName: name
+      })
     },
 
     getContactName (item) {
@@ -95,7 +97,6 @@ export default {
     },
 
     query: _.debounce(function () {
-      this.$emit('change', this.query)
       if (this.query.length >= 3) {
         this.getPhoneNumbers(this.query)
       }

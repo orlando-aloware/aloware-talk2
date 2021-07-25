@@ -42,7 +42,7 @@ export default {
       if (this.hasMore) {
         this.isLoadingMore = true
         const nextPage = this.listItems[this.id].current_page + 1
-        return window.axios
+        return this.$axios
           .get('api/v2/contacts', {
             params: this.buildQueryString({
               page: nextPage,
@@ -81,7 +81,7 @@ export default {
     },
     fetch (params = {}) {
       this.isLoading = true
-      return window.axios
+      return this.$axios
         .get('api/v2/contacts', {
           params: this.buildQueryString(params),
           paramsSerializer: qs.stringify

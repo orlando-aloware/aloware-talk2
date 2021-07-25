@@ -102,7 +102,7 @@ export default {
           break
       }
       this.isBusy = true
-      return window.axios
+      return this.$axios
         .delete(
           url
         )
@@ -136,7 +136,7 @@ export default {
           break
       }
       this.isBusy = true
-      return window.axios
+      return this.$axios
         .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id] } })
         .then(() => {
           this.$q.notify({

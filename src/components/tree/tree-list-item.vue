@@ -161,7 +161,7 @@ export default {
       })
     },
     createList (params) {
-      window.axios
+      this.$axios
         .post('/api/v2/contacts-list/' + this.id + '/duplicate', params)
         .then((response) => {
           const data = response.data.data
@@ -204,7 +204,7 @@ export default {
       })
 
       if (isPinned) {
-        window.axios
+        this.$axios
           .get(`api/v2/contacts-list/${this.id}/items?per_page=1`)
           .then((response) => {
             this.pinnedCountLoaded({
@@ -233,9 +233,9 @@ export default {
     },
     pinRequest (id, isPinned) {
       if (isPinned) {
-        return window.axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
+        return this.$axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
       } else {
-        return window.axios.delete('/api/v2/contact-list-bookmark/' + id)
+        return this.$axios.delete('/api/v2/contact-list-bookmark/' + id)
       }
     },
     onRenameList () {
@@ -280,7 +280,7 @@ export default {
         })
     },
     updateListRequest (id, params) {
-      return window.axios
+      return this.$axios
         .patch('/api/v2/contacts-list/' + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -293,7 +293,7 @@ export default {
         })
     },
     getContactList (id) {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contacts-list/' + id)
         .then((response) => response.data)
         .catch((error) => {
@@ -307,11 +307,11 @@ export default {
         })
     },
     getItems (id) {
-      return window.axios
+      return this.$axios
         .get(`api/v2/contacts-list/${id}/items?per_page=1`)
     },
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)

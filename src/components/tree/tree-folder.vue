@@ -264,7 +264,7 @@ export default {
     },
 
     updateFolderRequest (id, params) {
-      return window.axios
+      return this.$axios
         .patch('/api/v2/contact-folders/' + id, params)
         .catch((error) => {
           const {
@@ -281,7 +281,7 @@ export default {
     },
 
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
