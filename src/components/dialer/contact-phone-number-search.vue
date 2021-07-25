@@ -44,6 +44,7 @@ export default {
   mounted () {
     this.query = this.value
     this.$refs.searchField.inputValue = this.query
+    this.focusInput()
   },
 
   computed: {
@@ -58,6 +59,12 @@ export default {
   },
 
   methods: {
+    focusInput () {
+      setTimeout(() => {
+        this.$refs.searchField.$refs.input.focus()
+      }, 100)
+    },
+
     getPhoneNumbers (search) {
       this.phoneNumbers = []
       this.$axios.get('api/v2/contacts/quick-search', {
@@ -96,6 +103,7 @@ export default {
     value () {
       this.query = this.value
       this.$refs.searchField.inputValue = this.query
+      this.focusInput()
     },
 
     query: _.debounce(function () {

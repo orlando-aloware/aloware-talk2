@@ -24,6 +24,7 @@
                       :state="validPhoneNumber"
                       class="mt-2 mb-0">
           <contact-phone-number-search v-model="phoneNumber"
+                                       ref="contactPhoneNumberSearch"
                                        @change="changePhoneNumber">
           </contact-phone-number-search>
         </b-form-group>
@@ -203,6 +204,7 @@ export default {
 
     setMode (mode) {
       this.mode = mode
+      this.$refs.contactPhoneNumberSearch.focusInput()
       switch (mode) {
         case 'call':
           this.label = 'Call a number'
