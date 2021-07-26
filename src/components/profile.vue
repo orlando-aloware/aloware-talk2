@@ -1,5 +1,5 @@
 <template>
-  <q-item>
+  <q-item v-if="profile">
     <q-item-section>
       <q-item-label class="text-regular _500">{{ profile.first_name }}</q-item-label>
     </q-item-section>
