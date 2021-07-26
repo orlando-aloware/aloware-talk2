@@ -34,8 +34,9 @@
     <b-link v-if="!isEdit && hasRole('Company Admin')"
             href="#"
             class="custom-link text-decoration-none"
-            v-on:click="onModifyLines">
-      <pencil-o-icon></pencil-o-icon> Modify Lines
+            @click="onModifyLines">
+      <pencil-o-icon></pencil-o-icon>
+      Modify Lines
     </b-link>
   </b-card>
 </template>
@@ -49,14 +50,22 @@ import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-lines',
+
   mixins: [aclMixin],
-  components: { PencilOIcon, VueMultiselect },
+
+  components: {
+    PencilOIcon,
+    VueMultiselect
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'lines']),
+
     appliedLines () {
       return this.lines.filter(line => this.linesArray.includes(line.id))
     }
   },
+
   data () {
     return {
       isEdit: false,
@@ -66,6 +75,13 @@ export default {
       selectedLines: []
     }
   },
+
+  mounted () {
+    if (this.contact && this.contact.id) {
+      this.getLines()
+    }
+  },
+
   methods: {
     ...mapActions('contacts', ['setLines', 'setContactLines']),
     onModifyLines () {
@@ -74,10 +90,12 @@ export default {
         this.$refs.linesSelect.$el.focus()
       })
     },
+
     onSelectBlur () {
       this.isEdit = false
       this.submitLines()
     },
+
     filterTagFn (val, update) {
       if (val === '') {
         update(() => {
@@ -91,6 +109,7 @@ export default {
         this.options = this.stringOptions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     submitLines () {
       talk2Api.V1.contact.storeLines(this.contact.id, { campaign_ids: this.linesArray })
         .then(response => {
@@ -100,6 +119,7 @@ export default {
           this.$root.handleErrors(err.response)
         })
     },
+
     getLines () {
       talk2Api.V1.lines.get().then(response => {
         this.setLines(response.data)
@@ -112,11 +132,15 @@ export default {
       })
     }
   },
-  mounted () {
-    this.getLines()
-  },
+
   watch: {
-    selectedLines: function () {
+    'contact.id': function () {
+      if (this.contact && this.contact.id) {
+        this.getLines()
+      }
+    },
+
+    selectedLines () {
       this.linesArray = this.selectedLines.map(line => line.id)
     }
   }

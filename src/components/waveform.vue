@@ -22,6 +22,7 @@
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'waveform',
 

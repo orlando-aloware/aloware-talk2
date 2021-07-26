@@ -11,7 +11,8 @@
              v-if="remoteUrl">
           <waveform :remoteUrl="remoteUrl"
                     :uniqueId="uniqueId"
-                    @ready="loading = false"></waveform>
+                    @ready="loading = false">
+          </waveform>
           <a class="btn btn-inline p-0"
              title="Download"
              target="_blank"

@@ -228,5 +228,8 @@ export default {
   },
   setSmsTemplateModal: ({ commit }, params) => {
     commit('SMS_TEMPLATE_MODAL', params)
+  },
+  resetContactsVuex: ({ commit }) => {
+    commit('RESET_CONTACTS_VUEX')
   }
 }

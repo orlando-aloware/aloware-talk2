@@ -24,7 +24,7 @@
         <b-button v-if="hasPermissionTo('update contact')"
                   class="btn-bg-transparent btn-b-0"
                   size="sm"
-                  variant="light" v-on:click="onEdit(phone)">
+                  variant="light" @click="onEdit(phone)">
           <pencil-o-icon color="#256EFF"></pencil-o-icon>
         </b-button>
 

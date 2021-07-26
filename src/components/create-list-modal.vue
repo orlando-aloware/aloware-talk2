@@ -163,7 +163,7 @@ export default {
     },
     onSubmit () {
       this.isLoading = true
-      window.axios
+      this.$axios
         .post('/api/v2/contacts-list', this.getParams())
         .then((response) => {
           const data = response.data.data
@@ -195,7 +195,7 @@ export default {
         })
     },
     loadFolders () {
-      window.axios
+      this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)

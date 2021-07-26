@@ -98,7 +98,7 @@ const routes = [
         component: () => import('pages/Account.vue')
       },
       {
-        path: 'communication:communicationId',
+        path: 'communication/:communicationId',
         name: 'Communication',
         component: () => import('pages/Account.vue')
       }

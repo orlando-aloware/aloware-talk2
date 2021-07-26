@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="page-header pl-4 pr-4">
+  <q-toolbar class="page-header pl-3 pr-3">
     <div class="d-flex h-100 align-items-center">
       <b-link v-if="['Contact'].includes($route.name) && canGoBack" class="btn-header-nav-back mr-3"
               href="#"
@@ -11,87 +11,13 @@
     </div>
     <div class="ml-auto d-none d-lg-block h-100">
       <div class="d-flex h-100 align-items-center">
-        <q-item>
-          <q-item-section>
-            <q-item-label class="text-regular _500">{{ user.profile.first_name }}</q-item-label>
-          </q-item-section>
-          <q-item-section avatar>
-            <q-btn-dropdown :ripple="false"
-                            :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
-                            class="tab-dropdown"
-                            ref="menu"
-                            :menu-offset="[4, 12]"
-                            auto-close
-                            flat>
-              <template v-slot:label>
-                <q-avatar size="34px"
-                          v-if="user.profile"
-                          class="has-text-light"
-                          :style="avatarStyle(user.profile.name)">
-                  {{ user.profile.name | fixName | initials }}
-                  <q-badge :color="color(user.profile.agent_status)"
-                           class="availability-status"
-                           floating>
-                  </q-badge>
-                </q-avatar>
-              </template>
-
-              <q-list class="tab-dropdown-list no-select">
-                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary _500' : '']"
-                        clickable>
-                  <div class="d-flex align-items-center">
-                    <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
-                             class="q-mr-sm"
-                             rounded>
-                    </q-badge>
-                    Offline
-                  </div>
-                </q-item>
-
-                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
-                        clickable>
-                  <div class="d-flex align-items-center">
-                    <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                             class="q-mr-sm"
-                             rounded>
-                    </q-badge>
-                    Available
-                  </div>
-                </q-item>
-
-                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
-                        clickable>
-                  <div class="d-flex align-items-center">
-                    <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                             class="q-mr-sm"
-                             rounded>
-                    </q-badge>
-                    Busy
-                  </div>
-                </q-item>
-
-                <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                        :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
-                        clickable>
-                  <div class="d-flex align-items-center">
-                    <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                             class="q-mr-sm"
-                             rounded>
-                    </q-badge>
-                    On-break
-                  </div>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
-          </q-item-section>
-        </q-item>
+        <profile></profile>
 
         <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
                      vertical>
         </q-separator>
+
+        <active-call></active-call>
 
         <q-item>
           <q-btn :ripple="false"
@@ -103,13 +29,12 @@
             <q-menu :offset="[0, 10]"
                     anchor="bottom end"
                     self="top right"
+                    v-model="dialerStatus"
                     @before-show="showDialer"
                     @before-hide="hideDialer">
-              <div class="row no-wrap q-pa-md">
-                <div class="col">
-
-                </div>
-              </div>
+              <dialer-form v-model="dialerStatus"
+                           @hide="hideDialer">
+              </dialer-form>
             </q-menu>
           </q-btn>
         </q-item>
@@ -124,54 +49,33 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import * as AgentStatus from '../../constants/agent-status'
 import { aclMixin, agentMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
+
+import DialerForm from 'components/dialer/dialer-form'
+import ActiveCall from 'components/dialer/active-call'
+import Profile from 'components/profile'
 
 export default {
   name: 'app-header',
 
   mixins: [aclMixin, avatarMixin, agentMixin, goBackMixin],
 
+  components: { ActiveCall, DialerForm, Profile },
+
   data () {
     return {
       dialerIcon: 'img:app-icons/header/dialer_gray.svg',
-      dialerStatus: false,
-      AgentStatus
+      dialerStatus: false
     }
   },
 
-  computed: {
-    ...mapState(['dialer', 'campaigns']),
-    ...mapGetters('auth', ['user']),
-
-    statusLabel () {
-      switch (this.user.profile.agent_status) {
-        case AgentStatus.AGENT_STATUS_OFFLINE:
-          return 'Offline'
-        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
-          return 'Available'
-        case AgentStatus.AGENT_STATUS_ON_BREAK:
-          return 'On-break'
-        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
-        case AgentStatus.AGENT_STATUS_ON_CALL:
-        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
-        case AgentStatus.AGENT_STATUS_RINGING:
-        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
-        case AgentStatus.AGENT_STATUS_SENTRY:
-          return 'Busy'
-        default:
-          return 'Offline'
-      }
-    },
-
-    phoneNumber () {
-      let found = this.campaigns.find(campaign => campaign.id === this.user.profile.campaign_id)
-      if (found && found.incoming_numbers.length) {
-        return found.incoming_numbers[0].phone_number
-      }
-      return ''
-    }
+  created () {
+    this.$VueEvent.listen('callContact', (data) => {
+      this.showDialer()
+      setTimeout(() => {
+        this.$VueEvent.fire('changePhoneNumber', data)
+      }, 100)
+    })
   },
 
   methods: {
@@ -180,21 +84,15 @@ export default {
     },
 
     showDialer () {
-      this.dialerStatus = true
       this.dialerIcon = 'img:app-icons/header/dialer_active.svg'
-      this.$emit('showDialer')
+      this.dialerStatus = true
     },
 
     hideDialer () {
-      this.dialerStatus = false
       this.dialerIcon = 'img:app-icons/header/dialer_gray.svg'
-      this.$emit('hideDialer')
+      this.dialerStatus = false
     },
 
-    changeStatus (status) {
-      this.changeAgentStatus(status)
-      this.$refs.menu.hide()
-    },
     navigateBackward (e) {
       this.goBack()
       e.preventDefault()

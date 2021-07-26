@@ -2,9 +2,12 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import _ from 'lodash'
 import * as Default from '../constants/default'
+import * as ContactsDefault from '../constants/contacts-default'
+import * as InboxDefault from '../constants/inbox-default'
 import createPersistedState from 'vuex-persistedstate'
 import auth from './auth'
 import contacts from './contacts'
+import inbox from './inbox'
 
 Vue.use(Vuex)
 
@@ -21,7 +24,8 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       auth,
-      contacts
+      contacts,
+      inbox
     },
     state: {
       filter: {},
@@ -344,6 +348,7 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CURRENT_STATUS (state, status) {
         state.dialer.currentStatus = status
+        console.log('Dialer current status: ' + this.state.dialer.currentStatus)
       },
 
       SET_DIALER_COMMUNICATION (state, communication) {
@@ -645,6 +650,8 @@ export default function (/* { ssrContext } */) {
 
       RESET_VUEX (state) {
         state = Object.assign(state, Default.DEFAULT_STATE)
+        contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
+        inbox.state = Object.assign(inbox.state, InboxDefault.DEFAULT_STATE)
       },
 
       RESET_FILTERS (state) {

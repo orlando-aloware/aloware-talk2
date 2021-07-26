@@ -63,12 +63,12 @@ export default {
         })
     },
     loadAllCount () {
-      return window.axios
+      return this.$axios
         .get('api/v2/contacts/count')
         .then((response) => response.data.count)
     },
     loadMyContactsCount () {
-      return window.axios
+      return this.$axios
         .get('api/v2/contacts/count', {
           params: {
             filters: {
@@ -83,12 +83,12 @@ export default {
         .then((response) => response.data.count)
     },
     loadStatusCounts () {
-      return window.axios
+      return this.$axios
         .get('api/v2/contacts/status-counts')
         .then((response) => response.data)
     },
     loadPinnedCount (id) {
-      return window.axios
+      return this.$axios
         .get(`api/v2/contacts-list/${id}/items?per_page=1`)
         .then((response) => {
           this.pinnedCountLoaded({
@@ -99,7 +99,7 @@ export default {
     },
     loadPinned () {
       this.loading = true
-      return window.axios
+      return this.$axios
         .get('api/v2/contact-list-bookmark')
         .then((response) => response.data)
         .then(async (data) => {

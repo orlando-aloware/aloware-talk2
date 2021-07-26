@@ -3,10 +3,11 @@
     <b-media>
       <template #aside>
         <q-item-section avatar>
-          <avatar class="contact-avatar"
+          <avatar :name="contact.name"
+                  class="contact-avatar"
                   width="40"
-                  height="40"
-                  :name="contact.name" />
+                  height="40">
+          </avatar>
         </q-item-section>
       </template>
 
@@ -33,9 +34,9 @@
                       @click.prevent="copyPhoneNumber">
                 <i class="material-icons">content_copy</i>
               </b-link>
-              <input type="hidden"
-                     id="phone-number-clone"
-                     :value="contact.phone_number">
+              <input :value="contact.phone_number"
+                     type="hidden"
+                     id="phone-number-clone"/>
             </span>
             <span v-else>
               Phone number unavailable
@@ -52,38 +53,39 @@
                    target="btn-edit-contact-info"
                    triggers="focus"
                    :show.sync="showEditForm">
-            <contact-name-form @close="onCloseEditForm"></contact-name-form>
+          <contact-name-form @close="onCloseEditForm"></contact-name-form>
         </b-popover>
       </div>
     </b-media>
     <div class="d-inline-flex flex-wrap contact-action-button">
-      <b-button variant="secondary"
+      <b-button variant="light"
                 size="sm"
-                class="custom-action-button">
+                class="custom-action-button"
+                @click="callContact">
         <call-icon></call-icon>
       </b-button>
-      <b-button variant="secondary"
+      <b-button variant="light"
                 size="sm"
                 class="custom-action-button"
                 :disabled="contact.is_dnc"
                 @click="openAppointmentModal">
         <calendar-icon></calendar-icon>
       </b-button>
-      <b-button variant="secondary"
+      <b-button variant="light"
                 size="sm"
                 class="custom-action-button"
                 :disabled="contact.is_dnc"
                 @click="openAddReminderModal">
         <timer-icon></timer-icon>
       </b-button>
-      <b-button v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                variant="secondary"
+      <b-button v-if="!contact.is_dnc"
+                variant="light"
                 size="sm"
                 class="custom-action-button"
                 @click="openEnrollSequenceModal">
         <add-sequence-icon></add-sequence-icon>
       </b-button>
-      <b-button variant="secondary"
+      <b-button variant="light"
                 size="sm"
                 class="custom-action-button">
         <add-call-icon></add-call-icon>
@@ -112,34 +114,57 @@ import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-info',
+
   mixins: [aclMixin],
-  components: { ContactAddReminderModal, EnrollSequenceModal, AppointmentFormModal, PencilOIcon, AddCallIcon, CallIcon, CalendarIcon, TimerIcon, AddSequenceIcon, Avatar, ContactNameForm },
+
+  components: {
+    ContactAddReminderModal,
+    EnrollSequenceModal,
+    AppointmentFormModal,
+    PencilOIcon,
+    AddCallIcon,
+    CallIcon,
+    CalendarIcon,
+    TimerIcon,
+    AddSequenceIcon,
+    Avatar,
+    ContactNameForm
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'isContactNameEditOpen', 'contactPhoneNumbers', 'changingSelectedContact']),
+
     phone () {
       return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
     }
   },
+
   data () {
     return {
       showEditForm: false,
       showEnrollSequenceForm: false
     }
   },
+
   methods: {
     ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'enrollSequenceOpen', 'addReminderOpen']),
+
     openAddReminderModal () {
       this.addReminderOpen(true)
     },
+
     openEnrollSequenceModal () {
       this.enrollSequenceOpen(true)
     },
+
     openAppointmentModal () {
       this.addAppointmentOpen(true)
     },
+
     onCloseEditForm () {
       this.showEditForm = false
     },
+
     copyPhoneNumber () {
       let phoneNumberClone = document.querySelector('#phone-number-clone')
       phoneNumberClone.setAttribute('type', 'text')
@@ -166,8 +191,19 @@ export default {
       phoneNumberClone.setAttribute('type', 'hidden')
       window.getSelection().removeAllRanges()
     },
+
     getPhoneObject () {
       return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
+    },
+
+    callContact () {
+      let data = {
+        currentNumber: this.contact.phone_number,
+        contactName: this.contact.name,
+        companyName: this.contact.company_name,
+        contactId: this.contact.id
+      }
+      this.$VueEvent.fire('callContact', data)
     }
   }
 }

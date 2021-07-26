@@ -1,6 +1,6 @@
 <template>
-  <div class="contact-activity-container">
-      <contact-activities-header :label="contact.name"/>
+  <div class="contact-activity-container w-100">
+      <contact-activities-header :label="contactName"/>
       <div class="contact-activities">
         <div class="inner-1">
           <div class="p-3 mx-1 inner-2 scrollbar-white"
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import { mapGetters } from 'vuex'
 import ContactActivity from 'src/components/contacts/contact-activity'
@@ -47,12 +48,14 @@ export default {
   },
   data () {
     return {
-      contactName: 'Contact Name',
       isLoadingPreviousActivities: false
     }
   },
   computed: {
-    ...mapGetters('contacts', ['contact'])
+    ...mapGetters('contacts', ['contact']),
+    contactName () {
+      return _.get(this.contact, 'name', '')
+    }
   },
   components: {
     MessageComposer,

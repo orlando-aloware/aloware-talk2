@@ -234,7 +234,7 @@ export default {
       }
 
       this.setCurrentListFilters(allFilters)
-      this.$VueEvent.unlisten('filters-back')
+      this.$VueEvent.stop('filters-back')
       this.$VueEvent.listen('filters-back', () => {
         this.setCurrentListFilters(this.initialListFilters)
       })
@@ -293,10 +293,14 @@ export default {
     },
     getRelationTypesValue () {
       let newValue = []
-      for (let item of this.filterOperatorValue) {
-        newValue.push(item.value)
+      if (this.filterOperatorValue instanceof Array) {
+        for (let item of this.filterOperatorValue) {
+          newValue.push(item.value)
+        }
+        return newValue
+      } else {
+        return JSON.parse(JSON.stringify(this.filterOperatorValue))
       }
-      return newValue
     },
     validateValue () {
       switch (this.filter.type) {

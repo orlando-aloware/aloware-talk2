@@ -50,7 +50,7 @@
               </div>
             </div>
           </section>
-          <!--dialer v-if="authenticated"></dialer-->
+          <dialer v-if="authenticated"></dialer>
         </q-page-container>
       </div>
       <q-drawer v-model="sidebarVisible"
@@ -174,12 +174,12 @@
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
 import broadcast from '../boot/broadcast'
-import * as AgentStatus from '../constants/agent-status'
-import * as CommunicationTypes from '../constants/communication-types'
 import AppHeader from '../components/layout/app-header'
 import AppFooter from '../components/layout/app-footer'
 import AppSidebar from '../components/layout/app-sidebar'
-// import Dialer from '../components/dialer'
+import Dialer from '../components/dialer/dialer'
+import * as AgentStatus from '../constants/agent-status'
+import * as CommunicationTypes from '../constants/communication-types'
 
 export default {
   name: 'MyLayout',
@@ -187,8 +187,8 @@ export default {
   components: {
     AppHeader,
     AppFooter,
-    AppSidebar
-    // Dialer
+    AppSidebar,
+    Dialer
   },
 
   mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
@@ -234,10 +234,6 @@ export default {
   },
 
   created () {
-    window.onbeforeunload = () => {
-      this.setCurrentListFilters({})
-    }
-
     this.resetCall()
 
     window.handleOpenURL = (url) => {
@@ -322,12 +318,12 @@ export default {
       })
 
       // bounce dock
-      window.VueEvent.listen('bounce_dock', () => {
+      this.$VueEvent.listen('bounce_dock', () => {
         this.bounceDock()
       })
 
       // set dock badge
-      window.VueEvent.listen('set_badge', (badgeText) => {
+      this.$VueEvent.listen('set_badge', (badgeText) => {
         if (badgeText === undefined) {
           return
         }
@@ -335,24 +331,24 @@ export default {
       })
 
       // increase dock badge
-      window.VueEvent.listen('increase_badge', (count) => {
+      this.$VueEvent.listen('increase_badge', (count) => {
         this.increaseAppBadge(count)
       })
 
       // decrease dock badge
-      window.VueEvent.listen('decrease_badge', (count) => {
+      this.$VueEvent.listen('decrease_badge', (count) => {
         this.decreaseAppBadge(count)
       })
 
       // new desktop contact assigned notification
-      window.VueEvent.listen('new_desktop_contact_assigned', (contact) => {
+      this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
         if (this.checkContactMatchesUserAccessibility(contact)) {
           this.handleDesktopContactNotification(contact)
         }
       })
 
       // new desktop appointment notification
-      window.VueEvent.listen(
+      this.$VueEvent.listen(
         'new_desktop_appointment',
         ({
           engagement,
@@ -370,7 +366,7 @@ export default {
       )
 
       // new desktop reminder notification
-      window.VueEvent.listen(
+      this.$VueEvent.listen(
         'new_desktop_reminder',
         ({
           engagement,
@@ -388,35 +384,35 @@ export default {
       )
 
       // new desktop call notification
-      window.VueEvent.listen('new_desktop_call', (communication) => {
+      this.$VueEvent.listen('new_desktop_call', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // answered desktop call notification
-      window.VueEvent.listen('answered_desktop_call', (communication) => {
+      this.$VueEvent.listen('answered_desktop_call', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // new desktop sms notification
-      window.VueEvent.listen('new_desktop_sms', (communication) => {
+      this.$VueEvent.listen('new_desktop_sms', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // new desktop fax notification
-      window.VueEvent.listen('new_desktop_fax', (communication) => {
+      this.$VueEvent.listen('new_desktop_fax', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopCommunicationNotification(communication)
         }
       })
 
       // new desktop voicemail notification
-      window.VueEvent.listen('new_desktop_voicemail', (communication) => {
+      this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
         if (this.checkCommunicationMatchesUserAccessibility(communication)) {
           this.handleDesktopVoicemailNotification(communication)
         }
@@ -489,7 +485,8 @@ export default {
     }
 
     // event for listening before tab/browser close
-    window.addEventListener('beforeunload', this.unsubscribeFromPusher)
+
+    window.addEventListener('beforeunload', this.beforeUnload)
 
     // online / offline
     window.addEventListener('online', this.updateOnlineStatus)
@@ -755,7 +752,7 @@ export default {
           if (res.data.to !== res.data.total) {
             this.getTags(page + 1)
           } else {
-            window.VueEvent.fire('tags_loaded')
+            this.$VueEvent.fire('tags_loaded')
             this.loadingTags = false
             return Promise.resolve()
           }
@@ -1272,7 +1269,6 @@ export default {
       this.logoutUser()
         .then((res) => {
           this.response = res.data
-          this.setCurrentListFilters({})
           this.$router.push({ name: 'Login' }).catch((err) => {
             console.log(err)
           })
@@ -1280,6 +1276,12 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    },
+
+    beforeUnload () {
+      this.unsubscribeFromPusher()
+      this.resetContactsVuex()
+      this.resetInboxVuex()
     },
 
     ...mapActions([
@@ -1299,7 +1301,8 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted'
     ]),
-    ...mapActions('contacts', ['setCurrentListFilters']),
+    ...mapActions('contacts', ['resetContactsVuex']),
+    ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
@@ -1311,6 +1314,8 @@ export default {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+      this.resetContactsVuex()
+      this.resetInboxVuex()
     },
 
     authenticated (newVal, oldVal) {

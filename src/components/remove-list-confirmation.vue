@@ -75,7 +75,7 @@ export default {
     },
     handleDeletion (params) {
       this.isBusy = true
-      return window.axios
+      return this.$axios
         .delete(`/api/v2/contacts-list/${this.listToRemove.id}`, { params })
         .then(() => {
           this.$q.notify({
@@ -128,7 +128,7 @@ export default {
       }
     },
     refreshFoldersList () {
-      window.axios
+      this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)

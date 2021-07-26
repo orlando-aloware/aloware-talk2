@@ -99,7 +99,7 @@ export default {
       return this.moveFolderRequest()
     },
     moveFolderRequest () {
-      return window.axios
+      return this.$axios
         .patch('/api/v2/contact-folders/move/' + this.moveDialog.id, {
           parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
@@ -108,7 +108,7 @@ export default {
         .finally(this.closeMoveDialog)
     },
     moveListRequest () {
-      return window.axios
+      return this.$axios
         .patch('/api/v2/contacts-list/' + this.moveDialog.id, {
           contact_folder_id: this.moveDialog.target
         })
@@ -126,7 +126,7 @@ export default {
       })
     },
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)

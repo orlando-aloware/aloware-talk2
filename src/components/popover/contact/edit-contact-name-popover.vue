@@ -27,7 +27,7 @@
         ></b-form-input>
       </b-form-group>
       <div class="d-flex justify-content-between">
-        <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
+        <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
         <b-button type="submit" size="sm" variant="success">Submit</b-button>
       </div>
     </b-form>
@@ -93,7 +93,7 @@ export default {
     },
     onSubmit (e) {
       this.is_busy = true
-      window.axios.patch('/api/v1/contact/' + this.contact.id, {
+      this.$axios.patch('/api/v1/contact/' + this.contact.id, {
         first_name: this.selected_contact.first_name,
         last_name: this.selected_contact.last_name
       }).then(response => {

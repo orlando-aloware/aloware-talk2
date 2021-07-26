@@ -30,7 +30,7 @@
     </b-form-group>
 
     <div class="d-flex justify-content-between">
-      <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
+      <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
       <b-button type="submit"
                 size="sm"
                 variant="primary"

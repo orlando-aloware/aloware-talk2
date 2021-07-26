@@ -118,37 +118,46 @@ export default {
     id: {
       type: Number
     },
+
     name: {
       type: String
     },
+
     hasEdit: {
       type: Number
     },
+
     hasDelete: {
       type: Number
     },
+
     isRootList: {
       type: Boolean,
       required: false,
       default: false
     },
+
     folders: {
       type: Array,
       required: false
     },
+
     lists: {
       type: Array,
       required: false
     },
+
     layer: {
       type: Number,
       required: false,
       default: 1
     },
+
     order: {
       type: Number
     }
   },
+
   components: {
     FolderIcon,
     FolderArrowOpenIcon,
@@ -159,23 +168,7 @@ export default {
     FolderActions,
     TreeFolderCreate
   },
-  computed: {
-    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList']),
-    indentStyle () {
-      return {
-        width: `${this.layer * 10}px`
-      }
-    },
-    isOpen () {
-      return this.opened.has(this.id)
-    },
-    isSelected () {
-      return (
-        (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
-        (this.createList.open && this.createList.folderId === this.id)
-      )
-    }
-  },
+
   data () {
     return {
       isCreatingFolder: false,
@@ -183,6 +176,28 @@ export default {
       isRenaming: false
     }
   },
+
+  computed: {
+    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList']),
+
+    indentStyle () {
+      return {
+        width: `${this.layer * 10}px`
+      }
+    },
+
+    isOpen () {
+      return this.opened.has(this.id)
+    },
+
+    isSelected () {
+      return (
+        (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
+        (this.createList.open && this.createList.folderId === this.id)
+      )
+    }
+  },
+
   methods: {
     ...mapActions('contacts', [
       'toggleFolder',
@@ -193,6 +208,7 @@ export default {
       'openMoveDialog',
       'createListOpen'
     ]),
+
     onMove () {
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
@@ -200,6 +216,7 @@ export default {
         type: 'folder'
       })
     },
+
     onCreateList () {
       this.$root.$emit('bv::hide::popover')
 
@@ -209,6 +226,7 @@ export default {
 
       this.onToggleFolder()
     },
+
     onKeyDown (evt) {
       if (evt.keyCode === 13) {
         this.updateFolderName(evt.target.value)
@@ -217,6 +235,7 @@ export default {
         evt.target.value = this.name
       }
     },
+
     onInputBlur (evt) {
       if (evt.target.value !== this.name && evt.target.value !== '') {
         this.updateFolderName(evt.target.value)
@@ -227,10 +246,12 @@ export default {
         })
       }
     },
+
     updateFolderName (name) {
       if (this.isRenaming) return
       this.isRenaming = true
-      this.updateFolderRequest(this.id, { name, order: this.order }).then(response => {
+
+      return this.updateFolderRequest(this.id, { name, order: this.order }).then(response => {
         this.reloadFolders()
       }).finally(() => {
         this.$nextTick(() => {
@@ -239,11 +260,15 @@ export default {
         })
       })
     },
+
     updateFolderRequest (id, params) {
-      return window.axios
+      return this.$axios
         .patch('/api/v2/contact-folders/' + id, params)
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
           this.$q.notify({
             message,
             type: 'negative',
@@ -252,8 +277,9 @@ export default {
           })
         })
     },
+
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
@@ -270,29 +296,38 @@ export default {
           })
         })
     },
+
     onCreateFolder () {
       this.isCreatingFolder = true
       this.openFolder(this.id)
     },
+
     onEditFolder () {
       this.isEditing = true
       inputTimeout = setTimeout(() => {
         document.getElementById('folder-input-' + this.id).focus()
       })
     },
+
     onRemoveFolder () {
       this.$nextTick(() => {
-        this.removeFolderOpen({ id: this.id, name: this.name })
+        this.removeFolderOpen({
+          id: this.id,
+          name: this.name
+        })
       })
     },
+
     onToggleFolder () {
       this.toggleFolder(this.id)
     },
+
     onCloseFolder () {
       this.isCreatingFolder = false
     }
   },
-  destroyed () {
+
+  beforeDestroy () {
     clearTimeout(inputTimeout)
   }
 }
@@ -301,6 +336,7 @@ export default {
 <style lang="scss">
 @import '../../css/mixins';
 @import '../../css/variables';
+
 .folder {
   padding-left: 10px;
   padding-right: 10px;
@@ -308,23 +344,29 @@ export default {
   cursor: pointer;
   user-select: none;
   transition: background-color 100ms ease-in-out;
+
   &__arrow {
     margin-top: -5px;
     margin-right: 5px;
   }
+
   &__icon {
     margin-top: -5px;
     margin-right: 5px;
   }
+
   &--selected {
     background-color: $light-green2;
   }
+
   &:hover {
     background-color: $light-green2;
+
     .folder__option {
       display: block;
     }
   }
+
   &__name {
     font-size: 13px;
     overflow: hidden;
@@ -332,25 +374,31 @@ export default {
     white-space: nowrap;
     max-width: calc(100% - 30px);
   }
+
   &__sub {
     padding-left: 10px;
   }
+
   &__indent {
     width: 10px;
   }
+
   &__option {
     margin-top: -5px;
+
     &--hide {
       width: 0;
       overflow: hidden;
     }
   }
+
   &__input {
     font-size: 12px;
     height: 100%;
     width: 100%;
     border: none;
     border-radius: 0;
+
     &:focus {
       outline-color: $green;
       -moz-outline-radius: 0;

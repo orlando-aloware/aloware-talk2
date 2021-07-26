@@ -20,7 +20,7 @@
                 v-on="scope.itemEvents"
         >
           <q-item-section>
-            <q-item-label v-html="scope.opt.name" ></q-item-label>
+            <q-item-label v-html="scope.opt.name"></q-item-label>
             <q-item-label caption>{{ scope.opt.email }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -44,11 +44,15 @@
 import { mapActions, mapGetters } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
 import talk2Api from 'src/plugins/api/api'
+
 export default {
   name: 'line-selector',
+
   mixins: [contactMixin],
+
   computed: {
     ...mapGetters('contacts', ['contact']),
+
     formattedLineOptions () {
       let contactLines = []
       if (this.contactCampaignsFromCommunications.length > 0) {
@@ -74,6 +78,7 @@ export default {
       return linesArray
     }
   },
+
   data () {
     return {
       isBusy: false,
@@ -83,8 +88,8 @@ export default {
       isFocused: false
     }
   },
+
   methods: {
-    ...mapActions('contacts', ['setSelectedLine']),
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
@@ -143,7 +148,8 @@ export default {
     setDefaultLine (contactId) {
       this.showContactInfo(contactId)
       this.selectedLine = this.selectedCampaign
-    }
+    },
+    ...mapActions('contacts', ['setSelectedLine'])
   },
   mounted () {
     this.lineOptions = this.formattedLineOptions
@@ -157,6 +163,7 @@ export default {
         this.getIncomingNumber()
       }
     },
+
     'contact': function (value) {
       this.setDefaultLine(value.id)
       this.showPlaceholder()

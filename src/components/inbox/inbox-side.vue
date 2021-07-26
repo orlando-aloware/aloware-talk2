@@ -70,7 +70,7 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="w-100">
+      <div class="h-100 w-100">
         <task-list :communications="communications"/>
       </div>
     </div>
@@ -117,6 +117,7 @@ export default {
           disposition_status2: 1,
           body: null,
           contact: {
+            id: 180215,
             name: 'John Smith'
           },
           created_at: '2021-07-21 11:06:01'
@@ -131,7 +132,8 @@ export default {
           disposition_status2: 1,
           body: null,
           contact: {
-            name: 'Mark Avery'
+            id: 182913,
+            name: 'Kevin Aguilar'
           },
           created_at: '2021-07-21 11:06:01'
         },
@@ -145,7 +147,8 @@ export default {
           disposition_status2: 3,
           body: null,
           contact: {
-            name: 'Ashley Meyers'
+            id: 182912,
+            name: 'Fernando Altamirano'
           },
           created_at: '2021-07-21 11:06:01'
         },
@@ -159,7 +162,8 @@ export default {
           disposition_status2: 4,
           body: 'Hi, where can I find an article in the knowledge base about Sequences+?',
           contact: {
-            name: 'Cam Johnson'
+            id: 182910,
+            name: 'Caroline Yoo'
           },
           created_at: '2021-07-21 11:06:01'
         },
@@ -173,7 +177,8 @@ export default {
           disposition_status2: 4,
           body: 'Hi, do you know where the settings for the ring group is?',
           contact: {
-            name: 'Walter Bowman'
+            id: 182898,
+            name: 'Alexis Nghiem'
           },
           created_at: '2021-07-21 11:06:01'
         },
@@ -187,7 +192,8 @@ export default {
           disposition_status2: 4,
           body: 'Hi, where can I find a tutorial for sending bulk messages?',
           contact: {
-            name: 'Sarah Johnson'
+            id: 182569,
+            name: 'Tremaine Schroeder'
           },
           created_at: '2021-07-20 08:21:33'
         },
@@ -201,7 +207,8 @@ export default {
           disposition_status2: 4,
           body: 'Hi, do you know where to create a new Line?',
           contact: {
-            name: 'Tyler Smith'
+            id: 182537,
+            name: 'Eliane Schiller'
           },
           created_at: '2021-07-20 07:21:33'
         }

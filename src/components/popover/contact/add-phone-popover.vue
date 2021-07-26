@@ -28,7 +28,7 @@
         ></b-form-input>
       </b-form-group>
       <div class="d-flex justify-content-between">
-        <b-button type="button" size="sm" variant="light" v-on:click="onClose">Cancel</b-button>
+        <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
         <b-button type="submit" size="sm" variant="primary">Save</b-button>
       </div>
     </b-form>
@@ -84,7 +84,7 @@ export default {
     },
     onSubmit (e) {
       this.is_busy = true
-      window.axios.post(`/api/v1/contact/${this.contact.id}/phone-number`, {
+      this.$axios.post(`/api/v1/contact/${this.contact.id}/phone-number`, {
         title: this.phone.title,
         phone_number: this.phone.number
       }).then(response => {

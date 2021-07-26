@@ -18,7 +18,7 @@
                 v-on="scope.itemEvents"
         >
           <q-item-section>
-            <q-item-label v-html="scope.opt.name" ></q-item-label>
+            <q-item-label v-html="scope.opt.name"></q-item-label>
             <q-item-label caption>{{ scope.opt.email }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -47,7 +47,9 @@ import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-user-selector',
+
   mixins: [aclMixin],
+
   props: {
     ignore_focus_mode: {
       default: false,
@@ -64,10 +66,10 @@ export default {
       type: Boolean
     }
   },
+
   computed: {
-    ...mapState({
-      users: state => state.users
-    }),
+    ...mapState(['users']),
+
     availableUsers () {
       if (this.users.length > 0 && (this.auth.profile && this.auth.profile.focus_mode) && !this.ignore_focus_mode) {
         return this.users.filter(user => user.id === this.auth.profile.id)
@@ -75,6 +77,7 @@ export default {
         return this.users
       }
     },
+
     filteredUsers () {
       if (this.availableUsers) {
         let filteredUsers = this.availableUsers.filter((user) =>
@@ -95,9 +98,11 @@ export default {
 
       return []
     },
+
     normalUsers () {
       return this.filteredUsers.filter((user) => !user.is_destination)
     },
+
     extensionUsers () {
       return this.filteredUsers.filter((user) => user.is_destination)
     },
@@ -123,6 +128,7 @@ export default {
 
       return usersArray
     },
+
     field: {
       get () {
         return this.value
@@ -132,6 +138,7 @@ export default {
       }
     }
   },
+
   data () {
     return {
       is_busy: false,
@@ -139,6 +146,11 @@ export default {
       options: this.formattedOptions
     }
   },
+
+  mounted () {
+    this.options = this.formattedOptions
+  },
+
   methods: {
     filterFn (val, update) {
       if (val === '') {
@@ -153,27 +165,28 @@ export default {
         this.options = this.formattedOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     getLabel () {
 
     }
   },
+
   watch: {
-    field: function (val) {
+    field (val) {
       this.is_busy = true
-      this.$emit('updateField', { val,
+      this.$emit('updateField', {
+        val,
         callback: () => {
           this.is_busy = false
-        } })
+        }
+      })
     }
-  },
-  mounted () {
-    this.options = this.formattedOptions
   }
 }
 </script>
 
 <style scoped>
-  .group-label {
-    font-size: 90%;
-  }
+.group-label {
+  font-size: 90%;
+}
 </style>

@@ -111,11 +111,6 @@ body,
     padding: inherit !important;
   }
 
-  .q-item__section--avatar {
-    min-width: 34px !important;
-    padding-left: 10px !important;
-  }
-
   .q-field.q-field--float .q-field__label {
     padding-right: 20px;
     padding-left: 20px;
@@ -522,9 +517,11 @@ body,
 }
 
 .profile-menu {
-  .q-btn-dropdown__arrow {
-    font-size: 0.8em;
-  }
+  padding-left: 6px !important;
+}
+
+.no-results {
+  padding: 0 10px;
 }
 
 .avatar {
@@ -592,22 +589,6 @@ body,
 
 .w-px__250 {
   width: 250px;
-}
-
-.width-300 {
-  width: 300px;
-}
-
-.width-330 {
-  width: 330px;
-}
-
-.width-380 {
-  width: 380px;
-}
-
-.width-0 {
-  width: 0;
 }
 
 .popover {
@@ -719,13 +700,12 @@ i.option-separator {
   padding-top: 10px;
 }
 
-
 .inline-select.q-select--without-input {
-  padding-top: 9px;
+  padding-top: 0;
 }
 
 .inline-select.q-select--with-input {
-  padding-top: 10px;
+  padding-top: 0;
   min-width: 245px;
 
   .q-field__input {
@@ -754,7 +734,7 @@ i.option-separator {
 }
 
 .inline-select {
-  margin-top: -10px;
+  margin-top: -2px;
   width: 100%;
 
   .q-field__control,
@@ -870,7 +850,7 @@ i.option-separator {
 }
 
 .inline-input {
-  margin-top: -10px;
+  margin-top: -2px;
   width: 100%;
 
   .q-field__native {
@@ -1058,7 +1038,6 @@ i.option-separator {
       }
     }
   }
-
   &.expand-animation-finished {
     &.q-expansion-item {
       border-radius: 12px;
@@ -1813,6 +1792,9 @@ span.mention {
       background: $grey-50;
       color: $grey-90;
       border: none;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
     }
   }
 }
@@ -1978,7 +1960,7 @@ span.mention {
   }
 
   .custom-badge-light {
-    color: $light;
+    color: $light-grey;
   }
 
   .custom-badge-dark {
@@ -2029,7 +2011,6 @@ span.mention {
   border-spacing: 0;
   width: 100%;
   height: 100%;
-  margin-right: 10px;
   background-color: $white;
   position: relative;
 
@@ -2070,35 +2051,35 @@ span.mention {
     position: relative;
     border: 1px solid $grey-70;
     border-radius: 8px;
-
-    .composer-links {
-      color: $blue;
-      font-weight: 600;
-      font-size: 13px;
-      width: 20%;
-
-      a {
-        text-decoration: none;
-      }
-
-      a:hover {
-        border-bottom: 2px solid $blue;
-        color: $blue;
-      }
-
-      a.active {
-        border-bottom: 2px solid $blue;
-      }
-
-      a:not(:last-child) {
-        margin-right: 20px;
-      }
-    }
   }
 
   .composer-variables {
     font-size: 13px;
     height: 26px;
+  }
+}
+
+.tab-links {
+  font-weight: 600;
+  font-size: 13px;
+
+  a {
+    text-decoration: none;
+    color: $grey-90;
+  }
+
+  a:hover {
+    border-bottom: 2px solid $primary;
+    color: $primary;
+  }
+
+  a.active {
+    border-bottom: 2px solid $primary;
+    color: $primary;
+  }
+
+  a:not(:last-child) {
+    margin-right: 20px;
   }
 }
 
@@ -2544,9 +2525,24 @@ span.mention {
  Quasar related
  */
 
+.q-pa-md {
+  padding: 12px 12px;
+}
+
+.q-btn.icon-btn {
+  & .q-icon {
+    font-size: inherit;
+  }
+}
+
 .row {
   margin-left: inherit;
   margin-right: inherit;
+}
+
+.q-select .q-field__input {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .tab-dropdown {
@@ -2572,11 +2568,22 @@ span.mention {
   & .availability-status {
     top: -2px;
     right: -2px;
-    height: 12px;
-    width: 12px;
-    border-radius: 50%;
-    border: 2px solid #FFFFFF;
-    padding: 0px;
+
+    @extend .rounded-badge;
+  }
+}
+
+.rounded-badge {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  padding: 0px;
+}
+
+.tab-dropdown-list {
+  .q-item {
+    padding: 0 8px;
   }
 }
 
@@ -2588,12 +2595,45 @@ span.mention {
  Utilities
  */
 
+.auto-size {
+  width: auto;
+  height: auto;
+}
+
+.height-22 {
+  height: 22px;
+}
+
 .height-28 {
   height: 28px;
 }
 
+.height-36 {
+  height: 36px;
+}
+
 .width-40 {
   width: 40px;
+}
+
+.width-214 {
+  width: 214px;
+
+  &.important {
+    width: 214px !important;
+  }
+}
+
+.max-width-266 {
+  max-width: 266px;
+}
+
+.width-250 {
+  width: 250px;
+}
+
+.width-290 {
+  width: 290px;
 }
 
 .width-300 {
@@ -2610,6 +2650,10 @@ span.mention {
 
 .width-0 {
   width: 0;
+}
+
+.font-size-0 {
+  font-size: 0;
 }
 
 .margin-auto {
@@ -2736,7 +2780,6 @@ span.mention {
 }
 
 .form-control-search {
-  width: 100%;
   height: 32px !important;
   font-size: 12px;
 
@@ -2801,7 +2844,6 @@ span.mention {
   opacity: 1 !important;
 }
 
-
 .btn-header-nav-back {
   color: $grey-90;
 }
@@ -2813,4 +2855,73 @@ span.mention {
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
   background: white !important;
+}
+
+.dialer {
+  & .invalid-feedback {
+    position: absolute;
+  }
+}
+
+.vbt-autcomplete-list {
+  z-index: 6001 !important;
+  position: fixed !important;
+
+  & .list-group-item {
+    &.active {
+      background: #E5EEFF;
+      border: 1px solid #D3E2FF;
+    }
+  }
+}
+
+.search-form {
+  .form-control {
+    font-size: 12px;
+
+    &::-webkit-input-placeholder {
+      font-size: 12px;
+    }
+  }
+}
+
+.line-selector {
+  height: 32px !important;
+  font-size: 13px !important;
+
+  .q-field__control {
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+
+  .q-field__control-container {
+    height: 32px !important;
+  }
+
+  .q-field__native {
+    min-height: 32px !important;
+    height: 32px !important;
+    line-height: 16px !important;
+  }
+
+  .q-field__input {
+    min-height: 16px;
+    line-height: 16px;
+  }
+
+  .q-field__append {
+    height: 32px !important;
+  }
+}
+
+.active-call {
+  background: $dark;
+  @extend .text-white;
+  border-radius: 7px;
+  width: 190px;
+
+  .call-status {
+    font-size: 11px !important;
+    @extend .text-light-grey;
+  }
 }

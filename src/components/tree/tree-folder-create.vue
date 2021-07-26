@@ -78,7 +78,7 @@ export default {
       }
     },
     createFolderRequest (params) {
-      return window.axios
+      return this.$axios
         .post('/api/v2/contact-folders', params)
         .then(() => this.reloadFolders())
         .catch((error) => {
@@ -106,7 +106,7 @@ export default {
       })
     },
     reloadFolders () {
-      return window.axios
+      return this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
