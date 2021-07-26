@@ -61,7 +61,9 @@ export default {
   methods: {
     focusInput () {
       setTimeout(() => {
-        this.$refs.searchField.$refs.input.focus()
+        if (this.$refs.searchField) {
+          this.$refs.searchField.$refs.input.focus()
+        }
       }, 100)
     },
 

@@ -89,6 +89,14 @@ export default {
     }
   },
 
+  mounted () {
+    if (this.contact && this.contact.id) {
+      this.lineOptions = this.formattedLineOptions
+      this.setDefaultLine(this.contact.id)
+      this.showPlaceholder()
+    }
+  },
+
   methods: {
     onFocus () {
       this.isFocused = true
@@ -98,6 +106,7 @@ export default {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
       }
     },
+
     onBlur () {
       this.isFocused = false
       this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
@@ -106,6 +115,7 @@ export default {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = ''
       }
     },
+
     showPlaceholder () {
       if (!this.selectedLine) {
         this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select line'
@@ -114,9 +124,11 @@ export default {
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'none'
       }
     },
+
     onInput () {
       this.$el.querySelector('.inline-select .q-field__input').blur()
     },
+
     filterLineFn (val, update) {
       if (val === '') {
         update(() => {
@@ -129,6 +141,7 @@ export default {
         this.lineOptions = this.formattedLineOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     getSelectedLineLabel () {
       if (!this.selectedLine && Object.keys(this.selectedLine).length < 1) {
         return 'Select line...'
@@ -137,6 +150,7 @@ export default {
       let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.selectedLine.name}</span> ${titleText}`
     },
+
     getIncomingNumber () {
       this.isBusy = true
       return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id).then(response => {
@@ -145,6 +159,7 @@ export default {
         this.isBusy = false
       })
     },
+
     setDefaultLine (contactId) {
       this.showContactInfo(contactId)
       this.selectedLine = this.selectedCampaign
@@ -152,24 +167,23 @@ export default {
         this.getIncomingNumber()
       }
     },
+
     ...mapActions('contacts', ['setSelectedLine'])
   },
-  mounted () {
-    this.lineOptions = this.formattedLineOptions
-    this.setDefaultLine(this.contact.id)
-    this.showPlaceholder()
-  },
+
   watch: {
-    selectedLine: function (value) {
+    selectedLine (value) {
       this.setSelectedLine(value)
-      if (value && this.contact.id) {
+      if (value && this.contact && this.contact.id) {
         this.getIncomingNumber()
       }
     },
 
-    'contact': function (value) {
-      this.setDefaultLine(value.id)
-      this.showPlaceholder()
+    'contact.id': function (value) {
+      if (this.contact && this.contact.id) {
+        this.setDefaultLine(value)
+        this.showPlaceholder()
+      }
     }
   }
 }
