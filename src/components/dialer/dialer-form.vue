@@ -1,58 +1,80 @@
 <template>
-  <div class="row no-wrap q-pa-md width-290">
-    <div class="col no-padding max-width-266">
-      <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
-                     v-model="campaignId"
-                     @change="changeCampaignId">
-      </line-selector>
+  <div class="row no-wrap q-pa-md width-380">
+    <div class="col no-padding">
+      <b-tabs class="dialer-tabs"
+              pills
+              vertical>
+        <b-tab :active="mode === 'call'"
+               title="Call"
+               @click="setMode('call')">
+          <div class="d-inline-flex align-items-end justify-content-between dialer w-100 pb-4">
+            <b-form-group :invalid-feedback="invalidPhoneNumber"
+                          :state="validPhoneNumber"
+                          label="Call a number"
+                          class="mb-0">
+              <contact-phone-number-search v-model="phoneNumber"
+                                           ref="callContactPhoneNumberSearch"
+                                           @change="changePhoneNumber">
+              </contact-phone-number-search>
+            </b-form-group>
+            <q-btn :ripple="true"
+                   :disable="callDisabled"
+                   icon="img:app-icons/dialer/call_btn.svg"
+                   size="36px"
+                   class="icon-btn auto-size height-36"
+                   align="right"
+                   padding="none"
+                   rounded
+                   flat
+                   @click="makeCall">
+            </q-btn>
+          </div>
 
-      <div class="tab-links d-inline-flex w-100">
-        <b-link :class="{ active : mode === 'call' }"
-                href="#"
-                @click="setMode('call')">
-          Call
-        </b-link>
-        <b-link :class="{ active : mode === 'text' }"
-                href="#"
-                @click="setMode('text')">
-          Text
-        </b-link>
-      </div>
-      <div class="d-inline-flex align-items-end justify-content-between dialer w-100 pb-2">
-        <b-form-group :label="label"
-                      :invalid-feedback="invalidPhoneNumber"
-                      :state="validPhoneNumber"
-                      class="mt-2 mb-0">
-          <contact-phone-number-search v-model="phoneNumber"
-                                       ref="contactPhoneNumberSearch"
-                                       @change="changePhoneNumber">
-          </contact-phone-number-search>
-        </b-form-group>
-        <q-btn :ripple="true"
-               :disable="callDisabled"
-               v-show="mode == 'call'"
-               icon="img:app-icons/dialer/call_btn.svg"
-               size="36px"
-               class="icon-btn auto-size height-36"
-               align="right"
-               padding="none"
-               rounded
-               flat
-               @click="makeCall">
-        </q-btn>
-        <q-btn :ripple="true"
-               :disable="sendDisabled"
-               v-show="mode == 'text'"
-               icon="img:app-icons/dialer/text_btn.svg"
-               size="36px"
-               class="icon-btn auto-size height-36"
-               align="right"
-               padding="none"
-               rounded
-               flat
-               @click="sendText">
-        </q-btn>
-      </div>
+          <b-form-group :invalid-feedback="invalidCampaign"
+                        :state="validCampaign"
+                        class="mb-1">
+            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+                           v-model="campaignId"
+                           @change="changeCampaignId">
+            </line-selector>
+          </b-form-group>
+        </b-tab>
+        <b-tab :active="mode === 'text'"
+               title="Text"
+               @click="setMode('text')">
+          <div class="d-inline-flex align-items-end justify-content-between dialer w-100 pb-4">
+            <b-form-group :invalid-feedback="invalidPhoneNumber"
+                          :state="validPhoneNumber"
+                          label="Text a number"
+                          class="mb-0">
+              <contact-phone-number-search v-model="phoneNumber"
+                                           ref="textContactPhoneNumberSearch"
+                                           @change="changePhoneNumber">
+              </contact-phone-number-search>
+            </b-form-group>
+            <q-btn :ripple="true"
+                   :disable="sendDisabled"
+                   icon="img:app-icons/dialer/text_btn.svg"
+                   size="36px"
+                   class="icon-btn auto-size height-36"
+                   align="right"
+                   padding="none"
+                   rounded
+                   flat
+                   @click="sendText">
+            </q-btn>
+          </div>
+
+          <b-form-group :invalid-feedback="invalidCampaign"
+                        :state="validCampaign"
+                        class="mb-1">
+            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+                           v-model="campaignId"
+                           @change="changeCampaignId">
+            </line-selector>
+          </b-form-group>
+        </b-tab>
+      </b-tabs>
     </div>
   </div>
 </template>
@@ -80,7 +102,6 @@ export default {
 
   data () {
     return {
-      label: 'Call a number',
       mode: 'call',
       defaultOutboundCampaignId: null,
       campaignId: null,
@@ -101,6 +122,14 @@ export default {
 
     invalidPhoneNumber () {
       return 'Please enter a valid phone number'
+    },
+
+    validCampaign () {
+      return this.campaignId !== null
+    },
+
+    invalidCampaign () {
+      return 'Please select a line'
     },
 
     callDisabled () {
@@ -162,6 +191,8 @@ export default {
           this.contactName = data.name
           this.companyName = data.company_name
           this.contactId = data.id
+        }).catch((err) => {
+          console.log(err)
         })
       }
     },
@@ -204,19 +235,18 @@ export default {
 
     setMode (mode) {
       this.mode = mode
-      this.$refs.contactPhoneNumberSearch.focusInput()
       switch (mode) {
         case 'call':
-          this.label = 'Call a number'
+          this.$refs.callContactPhoneNumberSearch.focusInput()
           break
         case 'text':
-          this.label = 'Text a number'
+          this.$refs.textContactPhoneNumberSearch.focusInput()
           break
       }
     },
 
     makeCall () {
-      if (!this.validPhoneNumber) {
+      if (!this.validPhoneNumber || !this.campaignId) {
         return
       }
 
