@@ -4,7 +4,6 @@
       class=" form-control-search mt-2"
       :class="[border ? 'form-control' : '']"
       borderless
-      dense
       v-model="search"
       :placeholder="placeholder"
       :disabled="disabled"

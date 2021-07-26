@@ -85,7 +85,7 @@
                v-model="messageComposer.sms.body"
                borderless
                autogrow
-               @input="updateMessage">
+               @keydown="onKeyDown">
       </q-input>
     </div>
     <div class="d-flex justify-content-between">
@@ -186,7 +186,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validSms: function () {
-      return this.messageComposer.sms.body && this.messageComposer.sms.body.length > 0 && this.selectedLine && this.messageComposer.sms.phone_number && this.messageComposer.sms.phone_number.length > 0
+      return this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0 && this.selectedLine && this.messageComposer.sms.phone_number && this.messageComposer.sms.phone_number.length > 0
     }
   },
   data () {
@@ -203,8 +203,13 @@ export default {
       'appendMessageComposerSmsAttachments',
       'scheduleMessageOpen'
     ]),
-    updateMessage (value) {
-      this.setMessageComposerSmsBody(value)
+    onKeyDown (evt) {
+      if (evt.keyCode === 13 && !evt.shiftKey) {
+        if (this.validSms) {
+          this.onSend()
+        }
+        evt.preventDefault()
+      }
     },
     formatMessage () {
       return {
@@ -282,6 +287,11 @@ export default {
   },
   mounted () {
     this.resetMessageComposerSms()
+  },
+  watch: {
+    'messageComposer.sms.body': function (value) {
+      this.setMessageComposerSmsBody(value)
+    }
   }
 }
 </script>

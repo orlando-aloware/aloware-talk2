@@ -34,7 +34,7 @@ export default {
     },
     isRootList: {
       type: Boolean,
-      requried: false,
+      required: false,
       default: false
     }
   }

@@ -34,7 +34,8 @@ export default {
   },
   data () {
     return {
-      isEdit: false
+      isEdit: false,
+      prevValue: ''
     }
   },
   methods: {
@@ -47,16 +48,20 @@ export default {
     },
     onBlur () {
       this.isEdit = false
-      this.onUpdate()
+      if (this.prevValue !== this.contact.notes) {
+        this.onUpdate()
+      }
     },
     onUpdate () {
-      talk2Api.V1.contact.update(this.contact.id, { notes: this.contact.notes.trim() }).then(response => {
+      talk2Api.V1.contact.update(this.contact.id, { notes: (this.contact.notes ? this.contact.notes.trim() : this.contact.notes) }).then(response => {
         this.setContact(response.data)
+        this.prevValue = this.contact.notes
       })
     }
   },
   mounted () {
     this.isEdit = false
+    this.prevValue = this.contact.notes
   }
 }
 </script>

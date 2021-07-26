@@ -22,8 +22,8 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <search
           @search="onSearch"
-          :disabled="isLoadingDisabled"
-        ></search>
+          :disabled="isLoadingDisabled">
+        </search>
         <div class="px-3" v-if="!isMyContactsView">
           <b-form-checkbox
             v-model="myContacts"
@@ -230,12 +230,18 @@ export default {
       })
     },
     onCheckAllItems (checked) {
-      const items = []
-      if (checked) {
-        document
-          .querySelectorAll('.checker')
-          .forEach((checkbox) => items.push(Number(checkbox.value)))
-      }
+      let items = []
+      let _this = this
+      document
+        .querySelectorAll('.checker')
+        .forEach(function (checkbox) {
+          if (checked) {
+            items.push(_this.listItems[_this.id].data.find(item => item.id === Number(checkbox.value)))
+          } else {
+            items = items.filter(item => item.id !== Number(checkbox.value))
+          }
+        })
+
       this.setListSelectedContacts({ id: this.id, contacts: items })
     },
     onCheckedRows (checked) {
@@ -359,7 +365,7 @@ export default {
       return this.isFiltersOpen ? 'light' : 'primary'
     },
     resetButtonVariant () {
-      return this.hasFilterChanges() ? 'primary' : 'outlined-light'
+      return this.filterHasChanges ? 'primary' : 'outlined-light'
     },
     saveFilterButtonVariant () {
       return this.filterHasChanges ? 'primary' : 'secondary'
@@ -368,7 +374,7 @@ export default {
       return !this.filterHasChanges ? 'button-disabled' : ''
     },
     isResetDisabled () {
-      return !this.hasFilterChanges()
+      return !this.filterHasChanges
     },
     isListDeletable () {
       // eslint-disable-next-line no-unused-vars
@@ -383,6 +389,8 @@ export default {
   },
   mounted () {
     this.fetch()
+    // force close filter
+    // this.closeFilters()
   },
   watch: {
     '$route.params.id': function () {

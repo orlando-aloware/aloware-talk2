@@ -49,7 +49,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['listLoaded', 'contactsLoaded']),
+    ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'openFilters']),
     loadList (id) {
       const stringId = String(id)
 
@@ -80,6 +80,9 @@ export default {
   },
   mounted () {
     this.loadList(this.$route.params.id)
+    if (this.contactList.type === this.ContactListType.DYNAMIC) {
+      this.openFilters()
+    }
   },
   watch: {
     '$route.params.id': function (id) {

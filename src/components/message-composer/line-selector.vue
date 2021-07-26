@@ -139,10 +139,15 @@ export default {
       }).finally(() => {
         this.isBusy = false
       })
+    },
+    setDefaultLine (contactId) {
+      this.showContactInfo(contactId)
+      this.selectedLine = this.selectedCampaign
     }
   },
   mounted () {
     this.lineOptions = this.formattedLineOptions
+    this.setDefaultLine(this.contact.id)
     this.showPlaceholder()
   },
   watch: {
@@ -153,9 +158,7 @@ export default {
       }
     },
     'contact': function (value) {
-      let campaign = (value.initial_campaign_id) ? this.lineOptions.find(line => line.id === value.initial_campaign_id) : null
-      this.setSelectedLine(campaign)
-      this.selectedLine = campaign
+      this.setDefaultLine(value.id)
       this.showPlaceholder()
     }
   }

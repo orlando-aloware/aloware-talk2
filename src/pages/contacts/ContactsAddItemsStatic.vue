@@ -180,7 +180,7 @@ export default {
       return window.axios
         .post('api/v2/contact-list-items', {
           contact_list_id: this.contactList.id,
-          contacts: this.getSelectedContacts()
+          contacts: this.checked
         })
         .then(() => {
           this.$router.push('/contacts/list/' + this.contactList.id)
@@ -218,15 +218,16 @@ export default {
       })
     },
     onCheckAllItems (checked) {
-      const items = []
-
-      if (checked) {
-        document
-          .querySelectorAll('.checker')
-          .forEach((checkbox) => items.push(Number(checkbox.value)))
-      }
-
-      this.checked = items
+      let _this = this
+      document
+        .querySelectorAll('.checker')
+        .forEach(function (checkbox) {
+          if (checked) {
+            _this.checked.push(_this.listItems['all'].data.find(item => item.id === Number(checkbox.value)))
+          } else {
+            _this.checked = _this.checked.filter(item => item.id !== Number(checkbox.value))
+          }
+        })
     },
     onCheckedRows (checked) {
       this.checked = checked

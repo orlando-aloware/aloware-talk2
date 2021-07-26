@@ -13,8 +13,8 @@
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
             <search
-              @search="onSearch"
               placeholder="Search available columns..."
+              @search="onSearch"
             />
           </div>
           <div class="column-headers-modal__checkboxes">
@@ -57,7 +57,7 @@
         </div>
         <div class="w-50">
           <div
-            class="font-weight-bold body text-uppercase column-headers-modal__selecteds"
+            class="font-weight-bold body text-uppercase column-headers-modal__selected"
           >
             Selected Columns ({{ currentColumns.length - 2 }})
           </div>
@@ -297,7 +297,7 @@ export default {
       let results = 0
 
       const matches = sortBy(ALL_COLUMNS, ['name']).filter((item) => {
-        if (this.searchText && this.searchText.length > 1) {
+        if (this.searchText && this.searchText.trim().length > 1) {
           return (
             (item.name + item.label)
               .toLowerCase()
@@ -368,7 +368,7 @@ export default {
     align-items: center;
     line-height: 10px;
   }
-  &__selecteds {
+  &__selected {
     font-size: 14px;
   }
   .handle:hover {

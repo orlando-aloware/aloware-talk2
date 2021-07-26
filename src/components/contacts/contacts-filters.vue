@@ -110,7 +110,7 @@
               <div class="mb-3">
                 <h6 class="contact-prop-label">Contact properties</h6>
                 <search placeholder="Search"
-                                       @search="searchFilter"/>
+                        @search="searchFilter"/>
               </div>
               <b-list-group class="filter-list">
                 <b-list-group-item class="filter-divider">
@@ -379,6 +379,9 @@ export default {
   mounted () {
     this.step = 1
     this.getFilters()
+    if (this.isFiltersOpen) {
+      this.show = true
+    }
   },
   watch: {
     isFiltersOpen (isFiltersOpen) {

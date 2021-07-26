@@ -1,6 +1,12 @@
 <template>
   <q-toolbar class="page-header pl-4 pr-4">
     <div class="d-flex h-100 align-items-center">
+      <b-link v-if="['Contact'].includes($route.name) && canGoBack" class="btn-header-nav-back mr-3"
+              href="#"
+              @click="navigateBackward">
+        <i class="fa fa-chevron-left"></i>
+      </b-link>
+
       <h1>{{ $route.name }}</h1>
     </div>
     <div class="ml-auto d-none d-lg-block h-100">
@@ -120,12 +126,12 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
-import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-header',
 
-  mixins: [aclMixin, avatarMixin, agentMixin],
+  mixins: [aclMixin, avatarMixin, agentMixin, goBackMixin],
 
   data () {
     return {
@@ -188,6 +194,10 @@ export default {
     changeStatus (status) {
       this.changeAgentStatus(status)
       this.$refs.menu.hide()
+    },
+    navigateBackward (e) {
+      this.goBack()
+      e.preventDefault()
     }
   }
 }

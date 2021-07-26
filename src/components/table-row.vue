@@ -10,7 +10,7 @@
           type="checkbox"
           class="checker"
           :value="contact.id"
-          :checked="checked.includes(contact.id)"
+          :checked="checked.find(item => item.id === contact.id)"
           @click="onCheckerClicked"
         />
       </td>
@@ -180,10 +180,10 @@ export default {
     onCheckerClicked () {
       const checked = new Set([...this.checked])
 
-      if (this.checked.includes(this.contact.id)) {
-        checked.delete(this.contact.id)
+      if (this.checked.includes(this.contact)) {
+        checked.delete(this.contact)
       } else {
-        checked.add(this.contact.id)
+        checked.add(this.contact)
       }
 
       this.$emit('checked', [...checked])

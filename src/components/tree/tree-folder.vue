@@ -230,12 +230,12 @@ export default {
     updateFolderName (name) {
       if (this.isRenaming) return
       this.isRenaming = true
-      return Promise.all([
-        this.updateFolderRequest(this.id, { name, order: this.order }),
+      this.updateFolderRequest(this.id, { name, order: this.order }).then(response => {
         this.reloadFolders()
-      ]).finally(() => {
+      }).finally(() => {
         this.$nextTick(() => {
           this.isEditing = false
+          this.isRenaming = false
         })
       })
     },

@@ -26,7 +26,8 @@
                @close="onSelectClose"
                @search-change="filterTagFn"
                @input="selectTag"
-               @blur="onSelectBlur">
+               @blur="onSelectBlur"
+               @remove="onRemoveTag">
     <template slot="tag" slot-scope="{ option, remove }">
       <span :style="{ color: option.color }"
             class="border border-half-rounded px-1 d-inline-flex align-items-center mr-1">
@@ -36,8 +37,8 @@
         </q-badge>
         <span class="tag-text">{{ option.name }}</span>
         <span role="button" class="custom__remove"
-              @click="remove(option)">
-          <remove-tag-icon class="ml-1">
+              @click="remove(option, false)">
+          <remove-tag-icon class="ml-1 remove-tag-icon">
           </remove-tag-icon>
         </span>
       </span>
@@ -61,55 +62,6 @@
       No tags found.
     </span>
   </multiselect>
-  <!--q-select
-    outlined
-    :multiple="multiple"
-    v-model="tagId"
-    :options="combinedFilteredTags"
-    :use-input="multiple"
-    :clearable="clearable"
-    stack-label
-    color="secondary"
-    :loading="loadingTags"
-    @change="selectTag"
-    @filter="filterTagFn">
-    <template v-slot:option="scope">
-      <q-item class="text-muted"
-              :label="scope.opt.title">
-        <q-item-section>{{ scope.opt.title }}</q-item-section>
-      </q-item>
-      <template v-for="child in scope.opt.children">
-        <q-item
-          :key="child.id"
-          clickable
-          v-ripple
-          v-close-popup
-          @click="tagId = child.id"
-          :class="{ 'bg-light-blue-1': tagId === child.id }"
-        >
-          <q-item-section>
-            <q-item-label v-html="child.name" class="q-ml-md" ></q-item-label>
-          </q-item-section>
-          <q-item-section side>
-          </q-item-section>
-        </q-item>
-      </template>
-    </template>
-    <template v-slot:selected-item="scope">
-      <q-chip
-        removable
-        dense
-        @remove="scope.removeAtIndex(scope.index)"
-        :tabindex="scope.tabindex"
-        color="white"
-        text-color="secondary"
-        class="q-ma-none"
-      >
-        <q-avatar color="secondary" text-color="white" :icon="scope.opt.icon" />
-        {{ scope.opt.label }}
-      </q-chip>
-    </template>
-  </q-select-->
 </template>
 
 <script>
@@ -295,24 +247,22 @@ export default {
     })
   },
 
-  mounted () {
-    if (!this.loaded) {
-      this.getTags()
-    }
-  },
-
   methods: {
     onSelectOpen () {
       this.selectorClass = ['border-blue']
     },
 
-    onSelectClose () {
+    onSelectClose (e) {
       this.selectorClass = []
       this.$emit('close')
     },
 
     onSelectBlur () {
       this.$emit('blur')
+    },
+
+    onRemoveTag () {
+      this.$emit('removeTag')
     },
 
     limitText (count) {
@@ -400,6 +350,17 @@ export default {
 
     clearAll () {
       this.tagId = []
+    }
+  },
+
+  mounted () {
+    if (!this.loaded) {
+      this.getTags()
+    } else if (this.loaded && this.customTags.length > 0) {
+      this.tags = this.customTags
+      this.options = this.tags
+      this.filteredOptions = this.combinedTags
+      this.initializeTagValues()
     }
   },
 

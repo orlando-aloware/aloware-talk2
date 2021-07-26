@@ -8,7 +8,7 @@
       <b-form-group id="fileInput"
                     class="dragdrop">
         <div class="text-center uploader-label">
-          <upload-icon class="pb-2"></upload-icon>
+          <upload-icon height="40" width="40" class="pb-2"></upload-icon>
           <p>Drop files to attach, or <span style="color: #256EFF;cursor: pointer" @click="onBrowse">Browse</span></p>
         </div>
 

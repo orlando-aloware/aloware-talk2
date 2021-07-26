@@ -66,17 +66,26 @@ const routes = [
       {
         path: 'power-dialer',
         name: 'Power Dialer',
-        component: () => import('pages/PowerDialer.vue')
+        component: () => import('pages/PowerDialer.vue'),
+        meta: {
+          title: 'Power Dialer'
+        }
       },
       {
         path: 'stats',
         name: 'Stats',
-        component: () => import('pages/Stats.vue')
+        component: () => import('pages/Stats.vue'),
+        meta: {
+          title: 'Stats'
+        }
       },
       {
         path: 'settings',
         name: 'Settings',
-        component: () => import('pages/Settings.vue')
+        component: () => import('pages/Settings.vue'),
+        meta: {
+          title: 'Settings'
+        }
       },
       {
         path: 'account',

@@ -114,7 +114,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'date_of_birth',
-    label: 'DOB',
+    label: 'Date of Birth',
     category: 0,
     sortable: true,
     draggable: true,
@@ -221,6 +221,61 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
+    name: 'broadcasts',
+    label: 'Broadcast',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'contact_lists',
+    label: 'Contact List',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'contact_owner',
+    label: 'Contact Owner',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'contact_disposition',
+    label: 'Disposition Status',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'lines',
+    label: 'Line',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'ring_groups',
+    label: 'Ring Group',
+    category: 2,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+
+  {
     name: 'tags',
     label: 'Tags',
     category: 2,
@@ -296,6 +351,42 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
+    name: 'communication_count',
+    label: 'Communications',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'inbound_sms_count',
+    label: 'Inbound SMS',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'last_inbound_engagement_at',
+    label: 'Last Inbound Engagement',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'last_outbound_engagement_at',
+    label: 'Last Outbound Engagement',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
     name: 'csf1',
     label: 'Custom Field 1',
     category: 4,
@@ -307,6 +398,33 @@ export const ALL_COLUMNS = [
   {
     name: 'csf2',
     label: 'Custom Field 2',
+    category: 4,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'is_new_contact',
+    label: 'New',
+    category: 4,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'is_unanswered_contact',
+    label: 'Unanswered',
+    category: 4,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'is_unassigned',
+    label: 'Unassigned',
     category: 4,
     sortable: false,
     draggable: true,

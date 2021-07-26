@@ -265,17 +265,14 @@ export default {
     updateListName (name) {
       if (this.isRenaming) return
       this.isRenaming = true
-      return Promise.all([
-        this.updateListRequest(this.id, { name, order: this.order }),
-        this.reloadFolders()
-      ])
-        .then(([listResponse]) => {
-          const list = listResponse.data.data
-          this.listLoaded(list)
-        })
-        .finally(() => {
+      this.updateListRequest(this.id, { name, order: this.order })
+        .then(response => {
+          this.listLoaded(response.data.data)
+          this.reloadFolders()
+        }).finally(() => {
           this.$nextTick(() => {
             this.isEditing = false
+            this.isRenaming = false
           })
         })
     },

@@ -75,7 +75,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validEmail () {
-      return (this.messageComposer.email.body && this.messageComposer.email.body.length > 0) && (this.messageComposer.email.subject && this.messageComposer.email.subject.length > 0)
+      return (this.messageComposer.email.body && this.messageComposer.email.body.trim().length > 0) && (this.messageComposer.email.subject && this.messageComposer.email.subject.trim().length > 0)
     },
     isSubjectValid () {
       return this.messageComposer.email.subject.length > 2

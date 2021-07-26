@@ -3,7 +3,7 @@
     <h4>Tags</h4>
     <div v-if="!isEdit"
          class="mt-1">
-      <b-badge v-for="tag in tags"
+      <b-badge v-for="tag in contactTags"
                variant="primary"
                class="badge-tag custom-badge-primary ellipsis"
                :key="tag.id" >
@@ -15,19 +15,21 @@
          <span :style="`color: ${tag.color};`"><i class="fa fa-circle" :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`"></i> {{ tag.name }}</span>
       </b-badge>
     </div>
-    <tag-selector v-if="isEdit"
-                  class="details-contact-tags"
+    <tag-selector v-if="isEdit && tags.length > 0"
+                  class="details-contact-tags mt-2"
                   ref="contactTagSelector"
                   v-model="selectedTagIds"
                   :displayLimit="100"
                   :multiple="true"
+                  :loaded="true"
+                  :custom-tags="tags"
                   @change="changeTags($event)"
-                  @close="onSelectBlur">
+                  @blur="onSelectBlur">
     </tag-selector>
 
     <b-link v-if="!isEdit && hasPermissionTo(['list tag', 'view tag'])"
             href="#"
-            class="custom-link text-decoration-none"
+            class="custom-link text-decoration-none btn-tag-edit"
             v-on:click="onModifyTags">
       <pencil-o-icon></pencil-o-icon> Modify Tags
     </b-link>
@@ -47,7 +49,7 @@ export default {
   components: { TagSelector, PencilOIcon },
   computed: {
     ...mapGetters('contacts', ['contact']),
-    tags () {
+    contactTags () {
       return this.contact.tags
     },
     getLabel () {
@@ -56,13 +58,14 @@ export default {
       }
     },
     selectedTagIds () {
-      return this.tags.map(tag => tag.id)
+      return this.contactTags.map(tag => tag.id)
     }
   },
   data () {
     return {
       isEdit: false,
-      tagsArray: []
+      tagsArray: [],
+      tags: []
     }
   },
   methods: {
@@ -76,8 +79,24 @@ export default {
         this.$refs.contactTagSelector.$el.focus()
       })
     },
-    onSelectBlur () {
+    onSelectClose () {
       this.isEdit = false
+    },
+    onSelectBlur () {
+    },
+
+    onRemoveTag () {
+      this.isEdit = true
+    },
+
+    getTags () {
+      return talk2Api.V1.tags.get({
+        params: { full_load: true }
+      }).then(res => {
+        this.tags = res.data
+      }).catch(err => {
+        console.log(err)
+      })
     },
 
     submitTags () {
@@ -94,6 +113,16 @@ export default {
     'tagsArray': function () {
       this.submitTags()
     }
+  },
+  mounted () {
+    this.getTags()
+    let _this = this
+    document.addEventListener('click', function (evt) {
+      let targetElement = evt.target
+      _this.isEdit = targetElement.classList.contains('details-contact-tags') || targetElement.classList.contains('btn-tag-edit') || targetElement.classList.contains('remove-tag-icon')
+      evt.stopImmediatePropagation()
+      evt.preventDefault()
+    })
   }
 }
 </script>

@@ -37,8 +37,7 @@
 
       <button
         class="btn btn-link btn-sm tooltip-target mr-1"
-        id="bs-folder-options"
-      >
+        id="bs-folder-options">
         <i class="fa fa-plus text-success"></i>
       </button>
     </div>
