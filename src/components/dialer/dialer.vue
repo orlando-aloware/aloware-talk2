@@ -374,10 +374,10 @@ export default {
 
       let params = {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
-        'CampaignId': outboundCampaignId.toString(),
-        'UserId': this.profile.id.toString(),
-        'ContactName': contactName.toString(),
-        'CompanyName': companyName.toString(),
+        'CampaignId': outboundCampaignId ? outboundCampaignId.toString() : '',
+        'UserId': this.profile ? this.profile.id.toString() : '',
+        'ContactName': contactName ? contactName.toString() : 'No Name',
+        'CompanyName': companyName ? companyName.toString() : '',
         'ContactId': contactId ? contactId.toString() : ''
       }
 
