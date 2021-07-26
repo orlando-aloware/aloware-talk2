@@ -5,6 +5,7 @@
     :title="title"
     modal-class="column-headers-modal"
     scrollable
+    @show="onModalShow"
   >
     <b-overlay :show="loading" rounded="sm" variant="white">
       <div
@@ -13,6 +14,7 @@
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
             <search
+              class="w-100"
               placeholder="Search available columns..."
               @search="onSearch"
             />
@@ -36,20 +38,20 @@
                   'column-headers-modal__item--hidden': isHidden(column)
                 }"
               >
-                <div class="pl-2 checkbox">
+                <div class="pl-2 checkbox d-flex justify-content-between cursor-pointer"
+                     @click="onClickedColumn(column, selected.has(column.name))">
                   <input
+                    class="cursor-pointer mt-1"
                     type="checkbox"
                     :checked="selected.has(column.name)"
                     :disabled="column.required"
                     :value="column.name"
-                    @click="onClickedColumn(column, selected.has(column.name))"
                   />
-                </div>
-                <div
-                  class="flex-grow-1 pl-2 column-headers-modal__label"
-                  @click="onClickedColumn(column, selected.has(column.name))"
-                >
-                  {{ column.label }}
+                  <div
+                    class="flex-grow-1 pl-2 column-headers-modal__label"
+                  >
+                    {{ column.label }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -285,6 +287,9 @@ export default {
         .finally(() => {
           this.loading = false
         })
+    },
+    onModalShow () {
+      this.searchText = ''
     }
   },
   computed: {

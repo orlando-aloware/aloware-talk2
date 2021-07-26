@@ -21,6 +21,7 @@
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <search
+          class="width-250"
           @search="onSearch"
           :disabled="isLoadingDisabled">
         </search>
@@ -122,6 +123,7 @@
         :hasMore="hasMore"
         :isEmpty="isEmpty || isStartState"
         :isLoadingMore="isLoadingMore"
+        :contact-list-id="id"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"

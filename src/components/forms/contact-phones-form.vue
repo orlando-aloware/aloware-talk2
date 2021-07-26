@@ -13,9 +13,13 @@
       <b-form-input
         type="text"
         placeholder="Phone Number"
-        required
+        :state="validPhoneNumber"
         v-model="phone.number"
-      ></b-form-input>
+        required>
+      </b-form-input>
+      <b-form-invalid-feedback :state="validPhoneNumber">
+        {{ invalidPhoneNumber }}
+      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group v-if="this.contactSelectedPhone && this.contactSelectedPhone.phone_number !== contact.phone_number"
@@ -50,7 +54,13 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'contact-phones-form',
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactSelectedPhone'])
+    ...mapGetters('contacts', ['contact', 'contactSelectedPhone']),
+    validPhoneNumber () {
+      return this.$options.filters.fixPhone(this.phone.number) !== false
+    },
+    invalidPhoneNumber () {
+      return 'Please enter a valid phone number'
+    }
   },
   data () {
     return {

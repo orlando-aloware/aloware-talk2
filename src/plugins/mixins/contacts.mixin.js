@@ -57,6 +57,7 @@ export default {
               append: true,
               ...data
             })
+            this.markCheckedAll()
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -93,6 +94,7 @@ export default {
             append: false,
             ...data
           })
+          this.markCheckedAll()
         })
         .finally(() => {
           this.isLoading = false
@@ -171,6 +173,9 @@ export default {
         }
       }
       return filtersCount
+    },
+    markCheckedAll () {
+      document.querySelector('.data-table-check-all').checked = this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
     }
   },
 

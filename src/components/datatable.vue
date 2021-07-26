@@ -28,6 +28,8 @@
             }"
           >
             <input
+              class="data-table-check-all"
+              ref="dataTableCheckAll"
               type="checkbox"
               v-if="column.name === 'checkbox'"
               @click="onCheckboxClicked"

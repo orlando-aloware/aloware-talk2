@@ -1,7 +1,7 @@
 <template>
   <div class="position-relative">
     <q-input
-      class="form-control-search mt-2 width-250"
+      class="form-control-search mt-2"
       :class="[border ? 'form-control' : '']"
       borderless
       v-model="search"

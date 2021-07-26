@@ -734,7 +734,7 @@ i.option-separator {
 }
 
 .inline-select {
-  margin-top: -2px;
+  margin-top: 0;
   width: 100%;
 
   .q-field__control,
@@ -1987,6 +1987,80 @@ span.mention {
     font-size: 13px;
     opacity: 0.5;
   }
+}
+
+//CONTACT INTEGRATIONS
+.hubspot-integration-wrapper {
+
+  a {
+    text-decoration: none;
+  }
+
+  .name-wrapper {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  p {
+
+    font-size: 14px;
+
+    .data-icon-label {
+
+    }
+
+    .data-value {
+      font-weight: 400;
+    }
+  }
+
+  .deals {
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 5px;
+
+    .data-value {
+      max-width: 156px !important;
+    }
+
+    .deals-title {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #303133;
+    }
+  }
+
+  .integration-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #303133;
+  }
+
+  .hubspot-icon {
+    color: #FF7A59;
+    margin-right: 10px;
+    font-size: 20px;
+  }
+
+  .data-value {
+    max-width: 177px;
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    top: 5px;
+  }
+
+  .data-icon-label {
+    font-weight: 500;
+    color: $grey-100 !important;
+  }
+}
+
+.workflow-enroll-popover {
+  left: -340px !important;
+  width: 300px;
 }
 
 .w-30 {
