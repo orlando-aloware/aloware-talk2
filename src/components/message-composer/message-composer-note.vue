@@ -3,6 +3,7 @@
     <div class="form-input-container">
       <form>
         <at hideOnBlur
+            ref="noteMessageBody"
             name-key="full_name"
             v-model="messageComposer.note.body"
             :members="items">
@@ -28,12 +29,12 @@
                 </span>
             </span>
           </template>
-          <div placeholder="Type @ to span mention someone" contenteditable></div>
+          <div id="noteContentEditable" placeholder="Type @ to span mention someone" contenteditable></div>
         </at>
       </form>
     </div>
     <div class="d-flex justify-content-between">
-      <div class="messagehasRole-options">
+      <div class="message-options">
 
       </div>
       <div>
@@ -122,10 +123,19 @@ export default {
         result += characters.charAt(Math.floor(Math.random() * charactersLength))
       }
       return result
+    },
+    focusInput () {
+      let el = document.getElementById('noteContentEditable')
+      setTimeout(function () {
+        el.focus()
+      }, 10)
     }
   },
   mounted () {
     this.getMentionableItems()
+    if (this.messageComposer.mode === 'note') {
+      this.focusInput()
+    }
   },
   watch: {
     'contact.id': function () {

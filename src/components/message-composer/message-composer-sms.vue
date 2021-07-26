@@ -245,11 +245,11 @@ export default {
     },
     closeVariablesPopover () {
       this.$root.$emit('bv::hide::popover', 'sms-variables-popover')
-      this.$refs.smsMessageBody.focus()
+      this.focusInput()
     },
     closeTemplatesPopover () {
       this.$root.$emit('bv::hide::popover', 'sms-templates-popover')
-      this.$refs.smsMessageBody.focus()
+      this.focusInput()
     },
     setMessageGif (gif) {
       this.setMessageComposerSmsGif(gif)
@@ -283,10 +283,19 @@ export default {
     },
     showScheduleMessage () {
       this.scheduleMessageOpen(true)
+    },
+    focusInput () {
+      let _this = this
+      setTimeout(function () {
+        _this.$refs.smsMessageBody.focus()
+      }, 100)
     }
   },
   mounted () {
     this.resetMessageComposerSms()
+    if (this.messageComposer.mode === 'sms') {
+      this.focusInput()
+    }
   },
   watch: {
     'messageComposer.sms.body': function (value) {

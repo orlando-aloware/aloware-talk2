@@ -7,7 +7,7 @@
         <i class="fa fa-chevron-left"></i>
       </b-link>
 
-      <h1>{{ $route.name }}</h1>
+      <h1>{{ ['Contact'].includes($route.name) ? 'Search Result' : $route.name }}</h1>
     </div>
     <div class="ml-auto d-none d-lg-block h-100">
       <div class="d-flex h-100 align-items-center">

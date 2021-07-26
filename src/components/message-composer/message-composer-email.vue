@@ -128,7 +128,7 @@ export default {
     },
     closeTemplatesPopover () {
       this.$root.$emit('bv::hide::popover', 'email-templates-popover')
-      this.$refs.emailMessageBody.focus()
+      this.focusEmailBody()
     },
     variableSelected (variable) {
       this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + variable)
@@ -136,10 +136,18 @@ export default {
     },
     closeVariablesPopover () {
       this.$root.$emit('bv::hide::popover', 'email-variables-popover')
-      this.$refs.emailMessageBody.focus()
+      this.focusEmailBody()
     },
     onPopoverShown () {
       this.$root.$emit('bv::hide::popover')
+    },
+    focusEmailBody () {
+      this.$refs.emailMessageBody.focus()
+    }
+  },
+  mounted () {
+    if (this.messageComposer.mode === 'email') {
+      this.focusEmailBody()
     }
   }
 }

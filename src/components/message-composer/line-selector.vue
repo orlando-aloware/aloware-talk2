@@ -148,6 +148,9 @@ export default {
     setDefaultLine (contactId) {
       this.showContactInfo(contactId)
       this.selectedLine = this.selectedCampaign
+      if (this.selectedLine && this.contact.id) {
+        this.getIncomingNumber()
+      }
     },
     ...mapActions('contacts', ['setSelectedLine'])
   },
@@ -159,7 +162,7 @@ export default {
   watch: {
     selectedLine: function (value) {
       this.setSelectedLine(value)
-      if (value) {
+      if (value && this.contact.id) {
         this.getIncomingNumber()
       }
     },
