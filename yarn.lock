@@ -8794,11 +8794,6 @@
   "resolved" "https://registry.npmjs.org/reselect/-/reselect-4.0.0.tgz"
   "version" "4.0.0"
 
-"resize-observer-polyfill@^1.5.0":
-  "integrity" "sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg=="
-  "resolved" "https://registry.npmjs.org/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz"
-  "version" "1.5.1"
-
 "resolve-cwd@^2.0.0":
   "integrity" "sha1-AKn3OHVW4nA46uIyyqNypqWbZlo="
   "resolved" "https://registry.npmjs.org/resolve-cwd/-/resolve-cwd-2.0.0.tgz"
@@ -10485,14 +10480,6 @@
   "resolved" "https://registry.npmjs.org/vue-at/-/vue-at-2.5.0-beta.2.tgz"
   "version" "2.5.0-beta.2"
 
-"vue-bootstrap-typeahead@^0.2.6":
-  "integrity" "sha512-BcUAnvfN+PS0StL6E3endd37P7HUt9otk+8m7tsa2gkt2I2KY8O2Dma49oR8ie8iletvJAlAqpN+klF6ktPULQ=="
-  "resolved" "https://registry.npmjs.org/vue-bootstrap-typeahead/-/vue-bootstrap-typeahead-0.2.6.tgz"
-  "version" "0.2.6"
-  dependencies:
-    "resize-observer-polyfill" "^1.5.0"
-    "vue" "^2.5.17"
-
 "vue-ctk-date-time-picker@^2.5.0":
   "integrity" "sha512-s4AO+5xnPlX+LD5UPQcjLBnv8MwcEJKlKUnkTLQeXRV0xqpH9pWRe6aJ8N2+506mEN6b7iwhlFox6uKKdtK+gw=="
   "resolved" "https://registry.npmjs.org/vue-ctk-date-time-picker/-/vue-ctk-date-time-picker-2.5.0.tgz"
@@ -10623,7 +10610,7 @@
   dependencies:
     "wavesurfer.js" "^3.2.0"
 
-"vue@^2.1.6", "vue@^2.5.17", "vue@^2.6.11", "vue@^2.6.12", "vue@^2.6.9", "vue@2.6.14", "vue@2.x":
+"vue@^2.1.6", "vue@^2.6.11", "vue@^2.6.12", "vue@^2.6.9", "vue@2.6.14", "vue@2.x":
   "integrity" "sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-2.6.14.tgz"
   "version" "2.6.14"
