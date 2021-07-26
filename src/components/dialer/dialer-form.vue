@@ -246,6 +246,18 @@ export default {
         }).catch(err => {
           console.log(err)
         })
+      } else {
+        this.addContactByPhoneNumber(this.phoneNumber).then((data) => {
+          this.$router.push({
+            name: 'Contact',
+            params: {
+              id: data.id,
+              campaignId: this.outboundCampaignId
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        })
       }
     }
   },

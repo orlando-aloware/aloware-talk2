@@ -872,7 +872,7 @@ export default {
       this.loadingContact = true
       return this.$axios.get('/api/v1/contact/phone-number', {
         params: {
-          phone_number: phoneNumber,
+          phone_number: this.$options.filters.fixPhone(phoneNumber),
           load_info: 0
         }
       }).then(res => {
@@ -887,8 +887,20 @@ export default {
           this.loadingContact = false
           return Promise.reject(err)
         } else {
-          this.getContact(phoneNumber, getContactTry)
+          this.getContactByPhoneNumber(phoneNumber, getContactTry)
         }
+      })
+    },
+
+    addContactByPhoneNumber (phoneNumber) {
+      if (!this.$options.filters.fixPhone(phoneNumber)) {
+        return Promise.reject('Phone number is not valid')
+      }
+
+      return this.$axios.post('/api/v1/contact', {
+        add_phone_number: this.$options.filters.fixPhone(phoneNumber)
+      }).then(res => {
+        return Promise.resolve(res.data)
       })
     },
 
