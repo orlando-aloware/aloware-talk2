@@ -184,7 +184,6 @@ export default {
         isMuted: call.isMuted,
         customParameters: customParameters
       })
-      console.log(this.dialer.call)
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber).finally(() => {
         // this.$router.push({ name: 'Call' }).catch(err => {
         //   console.log(err)
@@ -379,7 +378,7 @@ export default {
         'UserId': this.profile.id.toString(),
         'ContactName': contactName.toString(),
         'CompanyName': companyName.toString(),
-        'ContactId': contactId.toString()
+        'ContactId': contactId ? contactId.toString() : ''
       }
 
       console.log('Making call', params)
