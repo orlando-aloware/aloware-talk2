@@ -30,7 +30,7 @@
     <b-link v-if="!isEdit && hasPermissionTo(['list tag', 'view tag'])"
             href="#"
             class="custom-link text-decoration-none btn-tag-edit"
-            v-on:click="onModifyTags">
+            @click="onModifyTags">
       <pencil-o-icon></pencil-o-icon> Modify Tags
     </b-link>
   </b-card>

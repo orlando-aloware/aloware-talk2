@@ -7,14 +7,14 @@
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
          class="notes-empty-placeholder" @click="onEditNotes">Add notes here..</div>
     <div v-if="isEdit"
-         style="max-width: 300px" v-on:blur="onBlur">
+         style="max-width: 300px" @blur="onBlur">
       <q-input
         ref="notesInput"
         outlined
         autogrow
         debounce="500"
         v-model="contact.notes"
-        v-on:blur="onBlur"
+        @blur="onBlur"
       />
     </div>
   </b-card>
