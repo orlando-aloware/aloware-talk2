@@ -143,6 +143,7 @@ export default {
 
   created () {
     this.$VueEvent.listen('changePhoneNumber', (data) => {
+      this.setMode('call')
       this.changePhoneNumber(data).then(() => {
         this.makeCall()
       })
