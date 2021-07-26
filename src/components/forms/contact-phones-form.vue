@@ -35,13 +35,15 @@
 
     <div class="d-flex justify-content-between">
       <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
-      <b-button type="submit"
+      <b-button type="button"
                 size="sm"
                 variant="primary"
-                :disabled="isBusy">
+                :disabled="isBusy"
+                @click="onSubmit">
         <b-spinner v-if="isBusy"
                    small label="Small Spinner"
-                   type="grow"></b-spinner>
+                   type="grow">
+        </b-spinner>
         Save
       </b-button>
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="onSubmit">
+  <b-form @submit.prevent="onSubmit">
     <b-form-group label="First Name">
       <b-form-input
         type="text"
@@ -23,13 +23,15 @@
                 size="sm"
                 variant="light"
                 @click="onCancel">Cancel</b-button>
-      <b-button type="submit"
+      <b-button type="button"
                 size="sm"
                 variant="primary"
-                :disabled="is_busy">
+                :disabled="is_busy"
+                @click="onSubmit">
         <b-spinner v-if="is_busy"
                    small label="Small Spinner"
-                   type="grow"></b-spinner>
+                   type="grow">
+        </b-spinner>
         Submit
       </b-button>
     </div>
