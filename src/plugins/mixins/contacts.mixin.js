@@ -175,7 +175,9 @@ export default {
       return filtersCount
     },
     markCheckedAll () {
-      document.querySelector('.data-table-check-all').checked = this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
+      if (this.selectedContacts[this.id] && this.listItems[this.id]) {
+        document.querySelector('.data-table-check-all').checked = this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
+      }
     }
   },
 
