@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 
@@ -114,6 +114,10 @@ export default {
   components: { WorkflowSelector },
 
   props: {
+    contact: {
+      type: Object,
+      required: true
+    },
     dialer_mode: {
       type: Boolean,
       required: false,
@@ -122,7 +126,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact']),
     ...mapState(['currentCompany']),
     isWorkflowValid () {
       return this.workflow.id
@@ -174,6 +177,8 @@ export default {
       return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow)
         .then(response => {
           this.resetWorkflowEnrollment()
+          // emit on parent if there's a need to do after workflow enrollment
+          this.$emit('enrolledToWorkflow', this.workflow)
           this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
           this.$q.notify({
             message: 'Contact has been successfully enrolled to the workflow.',

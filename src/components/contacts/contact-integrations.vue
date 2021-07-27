@@ -6,19 +6,25 @@
       Enable your favorite CRM integration and push contacts from the
       integration settings page to see links to your CRM contacts.
     </p>
-    <integration-hubspot v-if="isHubspotEnabled"></integration-hubspot>
+    <integration-hubspot v-if="isHubspotEnabled"
+                         :contact="contact"/>
   </b-card>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
 
 export default {
   name: 'contact-integrations',
+  props: {
+    contact: {
+      type: Object,
+      required: true
+    }
+  },
   components: { IntegrationHubspot },
   computed: {
-    ...mapGetters('contacts', ['contact']),
     ...mapState(['currentCompany']),
     isHubspotEnabled () {
       return this.currentCompany && this.currentCompany.hubspot_integration_enabled
