@@ -168,9 +168,13 @@ body {
   font-family: $font-family-body;
 }
 
-.text {
+.text-rg {
   @include font-size($f-size-body, 400, true);
   @extend .text-grey-100;
+}
+
+.text-size-rg {
+  @include font-size($f-size-body, 400);
 }
 
 .text-sm {
@@ -178,14 +182,26 @@ body {
   @extend .text-grey-100;
 }
 
+.text-size-sm {
+  @include font-size($f-size-body-sm, 500);
+}
+
 .text-xs {
   @include font-size($f-size-body-xs, 400, true);
   @extend .text-grey-100;
 }
 
+.text-size-xs {
+  @include font-size($f-size-body-xs, 400);
+}
+
 .text-xxs {
   @include font-size($f-size-body-xxs, 400, true);
   @extend .text-grey-100;
+}
+
+.text-size-xxs {
+  @include font-size($f-size-body-xxs, 400);
 }
 
 /*

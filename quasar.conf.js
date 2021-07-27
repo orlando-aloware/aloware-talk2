@@ -78,9 +78,8 @@ module.exports = function (/* ctx */) {
         }
       },
 
-      https: process.env.USE_HTTPS,
-      host: 'localhost',
-      port: 9090,
+      https: true,
+      host: 'talk2.test',
       disableHostCheck: true,
       open: true // opens browser window automatically
     },
