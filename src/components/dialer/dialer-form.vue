@@ -21,7 +21,7 @@
             <q-btn :ripple="true"
                    :disable="callDisabled"
                    icon="img:app-icons/dialer/call_btn.svg"
-                   size="36px"
+                   size="32px"
                    class="icon-btn auto-size height-36"
                    align="right"
                    padding="none"
@@ -44,7 +44,7 @@
                   v-if="contactId && companyName">
               {{ companyName }}
             </p>
-            <div v-if="!contactId && validPhoneNumber && phoneNumber">
+            <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
               <span class="text-size-sm text-grey-80 _400">New number</span>
             </div>
           </div>
@@ -75,7 +75,7 @@
             <q-btn :ripple="true"
                    :disable="sendDisabled"
                    icon="img:app-icons/dialer/text_btn.svg"
-                   size="36px"
+                   size="32px"
                    class="icon-btn auto-size height-36"
                    align="right"
                    padding="none"
@@ -130,7 +130,8 @@ export default {
       companyName: '',
       contactId: null,
       contactTimezone: null,
-      currentLocalTime: null
+      currentLocalTime: null,
+      loadingContact: false
     }
   },
 
@@ -211,13 +212,16 @@ export default {
       this.contactTimezone = data.contactTimezone
 
       if (!this.contactId) {
+        this.loadingContact = true
         await this.getContactByPhoneNumber(this.phoneNumber).then((data) => {
           this.contactName = data.name
           this.companyName = data.company_name
           this.contactId = data.id
           this.contactTimezone = data.timezone
+          this.loadingContact = false
         }).catch((err) => {
           console.log(err)
+          this.loadingContact = false
         })
       }
 
