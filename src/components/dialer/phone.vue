@@ -71,7 +71,7 @@
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
       <div class="phone-notice d-flex flex-column align-items-center"
-           v-if="dialer.contact">
+           v-if="dialer.contact && showLocalTime">
         <q-banner class="bg-primary text-white pt-1 pb-1"
                   inline-actions
                   rounded
@@ -82,14 +82,15 @@
                     class="text-size-rg">
             </q-icon>
           </template>
-          <span class="text-size-xs">It's {{ contact_local_time }} in the timezone of the person you are calling</span>
+          <span class="text-size-xs">It's {{ currentLocalTime }} in the timezone of the person you are calling</span>
           <template v-slot:action>
             <q-btn color="white"
                    icon="o_cancel"
                    class="text-size-rg"
                    padding="none"
                    flat
-                   round>
+                   round
+                   @click="hideLocalTime">
             </q-btn>
           </template>
         </q-banner>
@@ -98,13 +99,25 @@
         <person-icon></person-icon>
 
         <div class="text-white text-center">
-          <q-item-label class="text-size-xxl _600 mt-2"
+          <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center"
                         v-if="dialer.contact">
-            {{ dialer.contact.name | truncate(15) }}
+            <span class="d-inline-flex">{{ dialer.contact.name | truncate(15) }}</span>
+            <q-btn color="white"
+                   icon="o_info"
+                   class="text-size-rg d-inline-flex ml-1"
+                   flat
+                   round
+                   @click="goToContact">
+            </q-btn>
           </q-item-label>
           <q-item-label class="text-size-sm _400 mt-1"
                         v-if="dialer.communication">
-            {{ dialer.communication.lead_number | fixPhone }}
+            <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+            <b-link href="#"
+                    class="copy-phone-number text-white d-inline-flex ml-1"
+                    @click.prevent="copyPhoneNumber">
+              <i class="material-icons">content_copy</i>
+            </b-link>
           </q-item-label>
           <q-item-label class="text-size-sm _400 mt-1"
                         v-if="dialer.contact && dialer.contact.company_name">
@@ -223,7 +236,8 @@ export default {
         top: 0
       },
       isVisible: true,
-      contact_local_time: null
+      currentLocalTime: null,
+      showLocalTime: true
     }
   },
 
@@ -266,10 +280,54 @@ export default {
       }
     },
 
+    hideLocalTime () {
+      this.showLocalTime = false
+    },
+
     getContactLocalTime () {
       if (this.dialer.contact && this.dialer.contact.timezone) {
-        this.contact_local_time = this.$moment.utc().tz(this.dialer.contact.timezone).format('h:mm a')
+        this.currentLocalTime = this.$moment.utc().tz(this.dialer.contact.timezone).format('h:mm a')
       }
+    },
+
+    goToContact () {
+      if (this.dialer.contact) {
+        this.$router.push({
+          name: 'Contact',
+          params: {
+            id: this.dialer.contact.id
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      }
+    },
+
+    copyPhoneNumber () {
+      let phoneNumberClone = document.querySelector('#phone-number-clone')
+      phoneNumberClone.setAttribute('type', 'text')
+      phoneNumberClone.select()
+
+      try {
+        document.execCommand('copy')
+        this.$q.notify({
+          message: 'Phone number copied to clipboard.',
+          type: 'positive',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
+      } catch (err) {
+        this.$q.notify({
+          message: 'Error copying phone number to clipboard.',
+          type: 'negative',
+          textColor: 'white',
+          position: 'bottom-right'
+        })
+      }
+
+      /* unselect the range */
+      phoneNumberClone.setAttribute('type', 'hidden')
+      window.getSelection().removeAllRanges()
     },
 
     hangupCall ($event) {

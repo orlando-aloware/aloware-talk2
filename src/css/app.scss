@@ -3127,10 +3127,8 @@ span.mention {
       line-height: 16px;
     }
 
-    .q-btn {
-      & > .q-icon {
-        font-size: inherit;
-      }
+    .q-btn .q-icon {
+      font-size: inherit;
     }
 
     .q-banner__actions {
@@ -3149,6 +3147,22 @@ span.mention {
   .phone-info {
     width: 200px;
     height: 150px;
+
+    .q-btn {
+      & .q-btn__wrapper {
+        min-width: 14px;
+        min-height: 14px;
+      }
+
+      & .q-btn__content {
+        padding: 0;
+        height: auto;
+      }
+
+      & .q-icon {
+        font-size: inherit;
+      }
+    }
   }
 
   .phone-status {
