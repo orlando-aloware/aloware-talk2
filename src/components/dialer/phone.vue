@@ -1,9 +1,9 @@
 <template>
   <div :class="[ isVisible ? '' : 'invisible' ]"
-       class="phone"
+       class="phone d-flex flex-column"
        ref="phone"
        v-if="shouldShow">
-    <div class="phone-header grabbable d-flex justify-content-between align-items-center"
+    <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-55">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
@@ -69,7 +69,24 @@
         </q-btn>
       </div>
     </div>
+    <div class="phone-body d-flex flex-grow-1">
 
+    </div>
+    <div class="phone-integrations d-flex">
+      <q-expansion-item class="shadow-1 overflow-hidden w-100"
+                        style="border-radius: 12px"
+                        label="Integrations"
+                        header-class="text-sm bg-white text-center"
+                        expand-icon-class="text-grey-100 ml-3"
+                        switch-toggle-side
+                        dense>
+        <q-card>
+          <q-card-section>
+            <span>test</span>
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+    </div>
   </div>
 </template>
 

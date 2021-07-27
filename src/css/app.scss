@@ -3103,4 +3103,18 @@ span.mention {
       background: $success;
     }
   }
+
+  .phone-integrations {
+    .q-item__label {
+      margin-left: -28px;
+    }
+
+    .q-expansion-item__toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .q-expansion-item__toggle-icon--rotated {
+      transform: rotate(0deg);
+    }
+  }
 }

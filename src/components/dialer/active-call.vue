@@ -27,7 +27,7 @@
           <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
         </template>
         <template v-else>
-          <span>Dialing...</span>
+          <span>Calling...</span>
         </template>
       </q-item-label>
     </q-item-section>
