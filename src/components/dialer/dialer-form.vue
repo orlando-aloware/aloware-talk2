@@ -14,7 +14,8 @@
                           class="mb-0">
               <contact-phone-number-search v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
-                                           @change="changePhoneNumber">
+                                           @change="changePhoneNumber"
+                                           @keyup.enter.native="makeCall">
               </contact-phone-number-search>
             </b-form-group>
             <q-btn :ripple="true"
@@ -49,7 +50,8 @@
                           class="mb-0">
               <contact-phone-number-search v-model="phoneNumber"
                                            ref="textContactPhoneNumberSearch"
-                                           @change="changePhoneNumber">
+                                           @change="changePhoneNumber"
+                                           @keyup.enter.native="sendText">
               </contact-phone-number-search>
             </b-form-group>
             <q-btn :ripple="true"

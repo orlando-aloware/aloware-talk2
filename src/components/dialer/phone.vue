@@ -134,6 +134,7 @@ export default {
     })
 
     this.setupDraggable()
+    this.isVisible = true
   },
 
   methods: {

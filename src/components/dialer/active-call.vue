@@ -58,7 +58,9 @@ export default {
   },
 
   methods: {
-    hangupCall () {
+    hangupCall ($event) {
+      $event.stopPropagation()
+      $event.preventDefault()
       this.$VueEvent.fire('hangupCall')
     },
 
