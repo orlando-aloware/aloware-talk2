@@ -201,7 +201,8 @@ export default {
         currentNumber: this.contact.phone_number,
         contactName: this.contact.name,
         companyName: this.contact.company_name,
-        contactId: this.contact.id
+        contactId: this.contact.id,
+        contactTimezone: this.contact.timezone
       }
       this.$VueEvent.fire('callContact', data)
     }

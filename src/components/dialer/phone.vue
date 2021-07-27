@@ -279,7 +279,7 @@ export default {
     setupContactLocalTime () {
       if (this.dialer.contact) {
         this.getContactLocalTime()
-        this.$options.local_time_interval = setInterval(this.getContactLocalTime, 60 * 1000)
+        this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
       }
     },
 
@@ -445,7 +445,7 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('togglePhone')
-    clearInterval(this.$options.local_time_interval)
+    clearInterval(this.$options.localTimeInterval)
   }
 }
 </script>

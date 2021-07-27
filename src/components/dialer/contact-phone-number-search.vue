@@ -5,11 +5,12 @@
                            ref="searchField"
                            v-model="query"
                            class="width-214 important search-form"
-                           placeholder="Enter name or phone number"
+                           placeholder="Name or phone number"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
-    <template slot="suggestion" slot-scope="{ data }">
+    <template slot="suggestion"
+              slot-scope="{ data }">
       <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
       <br>
       <span class="text-xs">{{ getContactName(data) }}</span>
@@ -42,13 +43,11 @@ export default {
   },
 
   mounted () {
-    this.query = this.value
-    this.$refs.searchField.inputValue = this.query
-    this.focusInput()
+    this.setupForm()
   },
 
   computed: {
-    serializer (item) {
+    serializer () {
       return item => {
         let name = this.getContactName(item)
 
@@ -59,10 +58,26 @@ export default {
   },
 
   methods: {
+    setupForm (noFocus = false) {
+      this.query = this.value
+      this.$refs.searchField.inputValue = this.query
+      if (!noFocus) {
+        this.focusInput()
+      }
+    },
+
     focusInput () {
       setTimeout(() => {
         if (this.$refs.searchField) {
           this.$refs.searchField.$refs.input.focus()
+        }
+      }, 100)
+    },
+
+    blurInput () {
+      setTimeout(() => {
+        if (this.$refs.searchField) {
+          this.$refs.searchField.$refs.input.blur()
         }
       }, 100)
     },
@@ -87,8 +102,10 @@ export default {
         currentNumber: this.selectedPhoneNumber,
         contactName: name,
         companyName: $event.company_name,
-        contactId: $event.contact_id
+        contactId: $event.contact_id,
+        contactTimezone: $event.timezone
       })
+      this.blurInput()
     },
 
     getContactName (item) {
@@ -103,25 +120,28 @@ export default {
 
   watch: {
     value () {
-      this.query = this.value
-      this.$refs.searchField.inputValue = this.query
-      this.focusInput()
+      this.setupForm(true)
     },
 
     query: _.debounce(function () {
+      if (this.value && this.value === this.query) {
+        return
+      }
+
       if (!this.query.includes(' - +')) {
         this.$emit('change', {
           currentNumber: this.query,
           contactName: '',
           companyName: '',
-          contactId: null
+          contactId: null,
+          contactTimezone: null
         })
       }
 
       if (this.query.length >= 3) {
         this.getPhoneNumbers(this.query)
       }
-    }, 500)
+    }, 1000)
   }
 }
 </script>

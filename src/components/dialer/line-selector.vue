@@ -16,6 +16,10 @@
             outlined
             dense
             @filter="filterFn">
+    <template v-slot:prepend>
+      <span class="text-size-sm text-grey-80 ml-2">From:</span>
+    </template>
+
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="no-results text-grey">

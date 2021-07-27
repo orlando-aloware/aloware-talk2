@@ -1,5 +1,5 @@
 <template>
-  <div class="row no-wrap q-pa-md width-380">
+  <div class="row no-wrap pt-3 pb-3 width-380">
     <div class="col no-padding">
       <b-tabs class="dialer-tabs"
               pills
@@ -7,10 +7,10 @@
         <b-tab :active="mode === 'call'"
                title="Call"
                @click="setMode('call')">
-          <div class="d-inline-flex align-items-end justify-content-between dialer w-100 pb-4">
+          <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
+               v-if="mode === 'call'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumber"
-                          label="Call a number"
                           class="mb-0">
               <contact-phone-number-search v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
@@ -31,6 +31,24 @@
             </q-btn>
           </div>
 
+          <div class="dialer-contact-info">
+            <div class="text-size-sm text-grey-80 mb-0 d-flex justify-content-between"
+                  v-if="contactId">
+              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
+              <div class="d-inline-flex text-right"
+                   v-if="currentLocalTime">
+                ~{{ currentLocalTime }}
+              </div>
+            </div>
+            <p class="text-size-sm text-grey-80 mb-1"
+                  v-if="contactId && companyName">
+              {{ companyName }}
+            </p>
+            <div v-if="!contactId && validPhoneNumber && phoneNumber">
+              <span class="text-size-sm text-grey-80">New number</span>
+            </div>
+          </div>
+
           <b-form-group :invalid-feedback="invalidCampaign"
                         :state="validCampaign"
                         class="mb-1">
@@ -43,10 +61,10 @@
         <b-tab :active="mode === 'text'"
                title="Text"
                @click="setMode('text')">
-          <div class="d-inline-flex align-items-end justify-content-between dialer w-100 pb-4">
+          <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
+               v-if="mode === 'text'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumber"
-                          label="Text a number"
                           class="mb-0">
               <contact-phone-number-search v-model="phoneNumber"
                                            ref="textContactPhoneNumberSearch"
@@ -110,7 +128,9 @@ export default {
       phoneNumber: '',
       contactName: '',
       companyName: '',
-      contactId: null
+      contactId: null,
+      contactTimezone: null,
+      currentLocalTime: null
     }
   },
 
@@ -177,9 +197,9 @@ export default {
       this.contactName = ''
       this.companyName = ''
       this.contactId = null
+      this.contactTimezone = null
       this.defaultOutboundCampaignId = null
       this.campaignId = null
-      this.label = 'Call a number'
       this.mode = 'call'
     },
 
@@ -188,15 +208,36 @@ export default {
       this.contactName = data.contactName
       this.companyName = data.companyName
       this.contactId = data.contactId
+      this.contactTimezone = data.contactTimezone
 
       if (!this.contactId) {
         await this.getContactByPhoneNumber(this.phoneNumber).then((data) => {
           this.contactName = data.name
           this.companyName = data.company_name
           this.contactId = data.id
+          this.contactTimezone = data.timezone
         }).catch((err) => {
           console.log(err)
         })
+      }
+
+      this.setupContactLocalTime()
+    },
+
+    setupContactLocalTime () {
+      if (this.contactTimezone) {
+        this.getContactLocalTime()
+        this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
+      }
+    },
+
+    hideLocalTime () {
+      this.showLocalTime = false
+    },
+
+    getContactLocalTime () {
+      if (this.contactTimezone) {
+        this.currentLocalTime = this.$moment.utc().tz(this.contactTimezone).format('h:mm a')
       }
     },
 
@@ -238,14 +279,6 @@ export default {
 
     setMode (mode) {
       this.mode = mode
-      switch (mode) {
-        case 'call':
-          this.$refs.callContactPhoneNumberSearch.focusInput()
-          break
-        case 'text':
-          this.$refs.textContactPhoneNumberSearch.focusInput()
-          break
-      }
     },
 
     makeCall () {
@@ -295,10 +328,6 @@ export default {
     }
   },
 
-  beforeDestroy () {
-    this.$VueEvent.stop('changePhoneNumber')
-  },
-
   watch: {
     value () {
       if (this.value) {
@@ -307,6 +336,11 @@ export default {
         this.hideDialer()
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('changePhoneNumber')
+    clearInterval(this.$options.localTimeInterval)
   }
 }
 </script>

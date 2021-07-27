@@ -2973,6 +2973,13 @@ span.mention {
   }
 }
 
+.dialer-contact-info {
+  width: 214px;
+  padding-left: 13px;
+  padding-right: 13px;
+  margin-bottom: 9px;
+}
+
 .search-form {
   .form-control {
     font-size: 12px;
@@ -2985,8 +2992,9 @@ span.mention {
 
 .dialer-tabs {
   .col-auto {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    border-right: 0.5px solid $grey-70;
   }
 }
 
@@ -2998,6 +3006,14 @@ span.mention {
   .q-field__control {
     min-height: 32px !important;
     height: 32px !important;
+  }
+
+  .q-field__prepend {
+    height: 32px !important;
+  }
+
+  .q-field__native {
+    padding-left: 0 !important;
   }
 
   .q-field__control-container {
@@ -3190,7 +3206,7 @@ span.mention {
   .phone-integrations {
     .q-item__label {
       margin-left: -36px;
-      
+
       @extend .no-select;
     }
 
