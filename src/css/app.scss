@@ -3189,7 +3189,9 @@ span.mention {
 
   .phone-integrations {
     .q-item__label {
-      margin-left: -28px;
+      margin-left: -36px;
+      
+      @extend .no-select;
     }
 
     .q-expansion-item__toggle-icon {
