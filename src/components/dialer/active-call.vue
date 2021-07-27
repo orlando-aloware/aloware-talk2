@@ -1,6 +1,9 @@
 <template>
-  <q-item class="mr-3 pl-2 pr-2 active-call"
-          v-if="dialer && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(dialer.currentStatus)">
+  <q-item class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
+          v-if="dialer && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(dialer.currentStatus)"
+          clickable
+          v-ripple
+          @click="togglePhone">
     <q-item-section>
       <q-item-label class="_600">
         <span v-if="dialer.contact">{{ dialer.contact.name | truncate(15) }}</span>
@@ -57,6 +60,10 @@ export default {
   methods: {
     hangupCall () {
       this.$VueEvent.fire('hangupCall')
+    },
+
+    togglePhone () {
+      this.$VueEvent.fire('togglePhone')
     }
   }
 }

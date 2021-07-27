@@ -13,6 +13,8 @@
       <div class="d-flex h-100 align-items-center">
         <profile></profile>
 
+        <phone></phone>
+
         <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
                      vertical>
         </q-separator>
@@ -54,13 +56,14 @@ import { aclMixin, agentMixin, avatarMixin, goBackMixin } from 'src/plugins/mixi
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
 import Profile from 'components/profile'
+import Phone from 'components/dialer/phone'
 
 export default {
   name: 'app-header',
 
   mixins: [aclMixin, avatarMixin, agentMixin, goBackMixin],
 
-  components: { ActiveCall, DialerForm, Profile },
+  components: { Phone, ActiveCall, DialerForm, Profile },
 
   data () {
     return {

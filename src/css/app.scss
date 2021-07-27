@@ -2674,6 +2674,10 @@ span.mention {
   height: auto;
 }
 
+.height-12 {
+  height: 12px;
+}
+
 .height-22 {
   height: 22px;
 }
@@ -2688,6 +2692,10 @@ span.mention {
 
 .width-40 {
   width: 40px;
+}
+
+.width-55 {
+  width: 55px;
 }
 
 .width-214 {
@@ -2768,6 +2776,16 @@ span.mention {
   & ::-moz-selection {
     background: rgba($primary, 0.2) !important; /* Gecko Browsers */
   }
+}
+
+.grabbable {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+}
+
+/* (Optional) Apply a "closed-hand" cursor during drag operation. */
+.grabbable:active {
+  cursor: grabbing;
 }
 
 .inbox-side {
@@ -3010,9 +3028,9 @@ span.mention {
 }
 
 .phone {
-  position: absolute;
-  top: 65px;
-  right: 320px;
+  position: fixed;
+  top: 67px;
+  right: 5px;
   width: 280px;
   height: 522px;
   border-radius: 12px;
@@ -3024,11 +3042,29 @@ span.mention {
     height: 36px;
     padding-left: 12px;
     padding-right: 12px;
+
+    @extend .no-select;
   }
 
+  .tab-dropdown {
+    &.q-btn {
+      line-height: 1;
+    }
+
+    .q-btn__wrapper {
+      min-height: 12px;
+    }
+  }
+
+  .no-arrow {
+    .q-btn-dropdown__arrow {
+      display: none;
+    }
+  }
 
   #signal-strength {
-    height: 11px;
+    display: inline-flex;
+    height: 12px;
     list-style: none;
     overflow: hidden;
     padding: 0;
