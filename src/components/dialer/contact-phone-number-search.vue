@@ -6,6 +6,7 @@
                            v-model="query"
                            class="width-214 important search-form"
                            placeholder="Name or phone number"
+                           prepend="To:"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->

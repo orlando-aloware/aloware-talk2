@@ -32,7 +32,7 @@
           </div>
 
           <div class="dialer-contact-info">
-            <div class="text-size-sm text-grey-80 mb-0 d-flex justify-content-between"
+            <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                   v-if="contactId">
               <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
               <div class="d-inline-flex text-right"
@@ -40,12 +40,12 @@
                 ~{{ currentLocalTime }}
               </div>
             </div>
-            <p class="text-size-sm text-grey-80 mb-1"
+            <p class="text-size-sm text-grey-80 _400 mb-1"
                   v-if="contactId && companyName">
               {{ companyName }}
             </p>
             <div v-if="!contactId && validPhoneNumber && phoneNumber">
-              <span class="text-size-sm text-grey-80">New number</span>
+              <span class="text-size-sm text-grey-80 _400">New number</span>
             </div>
           </div>
 

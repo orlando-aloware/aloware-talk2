@@ -2983,10 +2983,39 @@ span.mention {
 .search-form {
   .form-control {
     font-size: 12px;
+    border-width: 1px 1px 1px 0 !important;
 
     &::-webkit-input-placeholder {
       font-size: 12px;
     }
+
+    &:focus {
+      border-color: $grey-70 !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .input-group-prepend {
+    width: 39px;
+
+    .input-group-text {
+      width: 100%;
+      text-align: right;
+
+      @extend .justify-content-end;
+    }
+  }
+
+  .input-group-text {
+    background: $white;
+    border-color: $grey-70;
+    border-style: solid;
+    border-width: 1px 0 1px 1px !important;
+    padding-left: 8px;
+    padding-right: 0;
+
+    @extend .text-size-xs;
+    @extend .text-grey-80;
   }
 }
 

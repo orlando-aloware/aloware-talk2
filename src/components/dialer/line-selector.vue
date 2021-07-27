@@ -17,7 +17,7 @@
             dense
             @filter="filterFn">
     <template v-slot:prepend>
-      <span class="text-size-sm text-grey-80 ml-2">From:</span>
+      <span class="text-size-xs text-grey-80 ml-2">From:</span>
     </template>
 
     <template v-slot:no-option>
