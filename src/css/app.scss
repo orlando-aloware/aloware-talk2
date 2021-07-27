@@ -234,7 +234,7 @@ body,
     opacity: 0.9;
     color: $grey-dark;
     font-family: $font-family-body;
-    font-size: 12px;
+    font-size: $f-size-body-xs;
     letter-spacing: 0;
     line-height: 16px;
   }
@@ -285,7 +285,7 @@ body,
 .description-sm {
   color: $grey-mid;
   font-family: $font-family-body;
-  font-size: 12px;
+  font-size: $f-size-body-xs;
   font-weight: 500;
   letter-spacing: 0;
   line-height: 16px;
@@ -298,7 +298,7 @@ body,
 .small-text {
   color: #202125;
   font-family: $font-family-body;
-  font-size: 12px;
+  font-size: $f-size-body-xs;
   letter-spacing: 0.3px;
   line-height: 16px;
 
@@ -319,7 +319,7 @@ body,
   width: 107px;
   color: $blue;
   font-family: $font-family-body;
-  font-size: 13px;
+  font-size: $f-size-body-sm;
   letter-spacing: 0;
   line-height: 18px;
 }
@@ -327,14 +327,14 @@ body,
 .mark-as {
   color: $blue;
   font-family: $font-family-body;
-  font-size: 13px;
+  font-size: $f-size-body-sm;
   letter-spacing: -0.0025em;
   line-height: 16px;
 }
 
 .tag-text {
   font-weight: 500;
-  font-size: 13px;
+  font-size: $f-size-body-sm;
   letter-spacing: -0.0025em;
   line-height: 16px;
 }
@@ -355,7 +355,7 @@ body,
 .remember-me {
   color: $grey-dark;
   font-family: $font-family-body;
-  font-size: 13px;
+  font-size: $f-size-body-sm;
   letter-spacing: 0;
   line-height: 18px;
 }
@@ -403,7 +403,7 @@ body,
   .message {
     color: $grey-dark;
     font-family: $font-family-body;
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     letter-spacing: 0;
     line-height: 18px;
   }
@@ -529,7 +529,7 @@ body,
   width: 34px;
   height: 34px;
   display: inline-block;
-  font-size: 13px;
+  font-size: $f-size-body-sm;
 
   & > span {
     vertical-align: middle;
@@ -607,14 +607,14 @@ body,
 
 
 .badge-tag {
-  font-size: 13px;
+  font-size: $f-size-body-sm;
   max-width: 250px;
   padding-right: 8px;
   text-align: left;
 }
 
 .custom-link {
-  font-size: 13px;
+  font-size: $f-size-body-sm;
   color: $blue;
 
   i {
@@ -632,7 +632,7 @@ body,
   justify-content: flex-start;
 
   .text-xxs {
-    font-size: 12px;
+    font-size: $f-size-body-xs;
     color: $grey-90 !important;
   }
 
@@ -782,7 +782,7 @@ i.option-separator {
 
   .selected-option-title {
     color: $grey-70;
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     font-weight: 500;
     margin-left: 10px;
     position: relative;
@@ -791,7 +791,7 @@ i.option-separator {
 
   .selected-option {
     color: $grey-100;
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     font-weight: 500;
 
     max-width: 105px;
@@ -803,7 +803,7 @@ i.option-separator {
   }
 
   .q-field__input {
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     font-weight: 500;
     margin-top: -4px;
   }
@@ -933,7 +933,7 @@ i.option-separator {
     width: 100%;
 
     p {
-      font-size: 12px;
+      font-size: $f-size-body-xs;
     }
   }
 
@@ -1064,7 +1064,7 @@ i.option-separator {
 
   .form-control-label {
     color: $grey-90;
-    font-size: 12px;
+    font-size: $f-size-body-xs;
     line-height: 15px;
     padding-left: 0px;
     vertical-align: top;
@@ -1109,7 +1109,7 @@ i.option-separator {
 }
 
 .waveform-timeline {
-  font-size: 11px;
+  font-size: $f-size-body-xxs;
   line-height: 13px;
   letter-spacing: 0.004em;
   color: $grey-90;
@@ -1160,7 +1160,7 @@ i.option-separator {
 
 .message-composer-dropdown {
   .dropdown-menu {
-    font-size: 13px;
+    font-size: $f-size-body-sm;
   }
 }
 
@@ -1173,7 +1173,7 @@ i.option-separator {
   }
 
   button {
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     flex: 1;
     padding-left: 5px;
     padding-right: 5px;
@@ -1237,7 +1237,7 @@ i.option-separator {
   .multiselect__placeholder {
     margin-bottom: 8px !important;
     padding-top: 0 !important;
-    font-size: 13px;
+    font-size: $f-size-body-sm;
   }
 
   .multiselect__element {
@@ -1260,7 +1260,7 @@ i.option-separator {
   .modal-body {
     //padding: 0 !important;
     overflow-x: hidden !important;
-    font-size: 13px;
+    font-size: $f-size-body-sm;
   }
 }
 
@@ -1672,7 +1672,7 @@ span.mention {
       }
 
       .contact-phone {
-        font-size: 13px;
+        font-size: $f-size-body-sm;
         font-weight: 400;
         color: $grey-80;
         margin-top: -6px;
@@ -1767,7 +1767,7 @@ span.mention {
   }
 
   .contact-phone {
-    font-size: 12px;
+    font-size: $f-size-body-xs;
     margin-top: -5px;
     right: 0;
 
@@ -1901,7 +1901,7 @@ span.mention {
     margin-bottom: 12px;
 
     .custom-input-label {
-      font-size: 12px;
+      font-size: $f-size-body-xs;
     }
   }
 
@@ -1985,7 +1985,7 @@ span.mention {
   }
 
   .notes-empty-placeholder {
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     opacity: 0.5;
   }
 }
@@ -2129,14 +2129,14 @@ span.mention {
   }
 
   .composer-variables {
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     height: 26px;
   }
 }
 
 .tab-links {
   font-weight: 600;
-  font-size: 13px;
+  font-size: $f-size-body-sm;
 
   a {
     text-decoration: none;
@@ -2458,7 +2458,7 @@ span.mention {
 
   .at-custom-text {
     margin-left: 36px;
-    font-size: 13px;
+    font-size: $f-size-body-sm;
     line-height: 1;
     height: 27px;
     margin-top: 2px;
@@ -2589,7 +2589,7 @@ span.mention {
       margin: auto;
 
       i.media-icon {
-        font-size: 12px;
+        font-size: $f-size-body-xs;
         color: #B5B7BB;;
       }
     }
@@ -2864,7 +2864,7 @@ span.mention {
     &__label {
       padding-left: 20px;
       font-weight: bold;
-      font-size: 12px;
+      font-size: $f-size-body-xs;
       letter-spacing: 0.3px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2893,7 +2893,7 @@ span.mention {
 
 .form-control-search {
   height: 32px !important;
-  font-size: 12px;
+  font-size: $f-size-body-xs;
 
   &__icon {
     font-size: 12.5px;
@@ -2902,7 +2902,7 @@ span.mention {
 }
 
 .form-control-search::-webkit-input-placeholder {
-  font-size: 12px;
+  font-size: $f-size-body-xs;
 }
 
 .task-item {
@@ -2997,11 +2997,12 @@ span.mention {
 
 .search-form {
   .form-control {
-    font-size: 12px;
+    font-size: $f-size-body-xs;
+    padding-left: 6px;
     border-width: 1px 1px 1px 0 !important;
 
     &::-webkit-input-placeholder {
-      font-size: 12px;
+      font-size: $f-size-body-xs;
     }
 
     &:focus {
@@ -3045,7 +3046,7 @@ span.mention {
 .line-selector {
   margin-bottom: 0;
   height: 32px !important;
-  font-size: 13px !important;
+  font-size: $f-size-body-xs !important;
 
   .q-field__control {
     min-height: 32px !important;
