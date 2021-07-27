@@ -22,7 +22,7 @@
                    :disable="callDisabled"
                    icon="img:app-icons/dialer/call_btn.svg"
                    size="32px"
-                   class="icon-btn auto-size height-36"
+                   class="icon-btn auto-size height-32"
                    align="right"
                    padding="none"
                    rounded
@@ -76,7 +76,7 @@
                    :disable="sendDisabled"
                    icon="img:app-icons/dialer/text_btn.svg"
                    size="32px"
-                   class="icon-btn auto-size height-36"
+                   class="icon-btn auto-size height-32"
                    align="right"
                    padding="none"
                    rounded
