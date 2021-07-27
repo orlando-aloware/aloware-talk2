@@ -236,6 +236,9 @@ export default {
   created () {
     this.resetCall()
 
+    // Quasar global config
+    this.$q.iconSet.arrow.dropdown = 'o_expand_more'
+
     window.handleOpenURL = (url) => {
       let action = url.replace(/(^\w+:|^)\/\//, '')
 
