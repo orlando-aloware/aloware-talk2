@@ -23,6 +23,40 @@
   letter-spacing: -0.0025em if-important($important);
 }
 
+@mixin rings($duration, $delay) {
+  opacity: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  content: '';
+  height: 100%;
+  width: 100%;
+  border: 8px solid rgba(107, 107, 132, 0.3);
+  border-radius: 100%;
+  animation-name: ripple;
+  animation-duration: $duration;
+  animation-delay: $delay;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(.65, 0, .34, 1);
+  z-index: -1;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 1;
+    transform: scale3d(0.75, 0.75, 1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale3d(2.5, 2.5, 1);
+  }
+}
+
 // Spaces
 $spaces: (
   "spacing-xxs": 4px,
@@ -84,6 +118,22 @@ $grey-9: #767C89;
 // Background Colors
 @include bg-color('grey-9', $grey-9, true);
 
+.bg-primary {
+  background: $primary !important;
+}
+
+.bg-success {
+  background: $success !important;
+}
+
+.bg-danger {
+  background: $danger !important;
+}
+
+.bg-warning {
+  background: $warning !important;
+}
+
 // Font family
 $font-family-body: 'Inter', sans-serif;
 
@@ -127,6 +177,7 @@ $f-size-h3: 16px;
 $f-size-h4: 15px;
 $f-size-h5: 14px;
 $f-size-body: 14px;
+$f-size-body-xxl: 17px;
 $f-size-body-sm: 13px;
 $f-size-body-xs: 12px;
 $f-size-body-xxs: 11px;
@@ -167,6 +218,16 @@ body {
   @extend .text-grey-100;
   font-family: $font-family-body;
 }
+
+.text-xxl {
+  @include font-size($f-size-body-xxl, 400, true);
+  @extend .text-grey-100;
+}
+
+.text-size-xxl {
+  @include font-size($f-size-body-xxl, 400);
+}
+
 
 .text-rg {
   @include font-size($f-size-body, 400, true);

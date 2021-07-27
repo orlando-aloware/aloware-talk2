@@ -134,7 +134,8 @@ export default {
         callSid: call.callSid,
         state: call.state,
         isMuted: call.isMuted,
-        customParameters: customParameters
+        customParameters: customParameters,
+        direction: call._connection._direction
       })
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
@@ -182,7 +183,8 @@ export default {
         callSid: call.callSid,
         state: call.state,
         isMuted: call.isMuted,
-        customParameters: customParameters
+        customParameters: customParameters,
+        direction: call._connection._direction
       })
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber).finally(() => {
         // this.$router.push({ name: 'Call' }).catch(err => {
@@ -191,7 +193,7 @@ export default {
         setTimeout(() => {
           this.startCallTimer()
           this.setDialerCurrentStatus('CALL_CONNECTED')
-        }, 3000)
+        }, 5000)
       }).catch((err) => {
         console.log(err)
       })

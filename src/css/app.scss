@@ -1038,6 +1038,7 @@ i.option-separator {
       }
     }
   }
+
   &.expand-animation-finished {
     &.q-expansion-item {
       border-radius: 12px;
@@ -2690,6 +2691,10 @@ span.mention {
   height: 36px;
 }
 
+.height-52 {
+  height: 52px;
+}
+
 .width-40 {
   width: 40px;
 }
@@ -2940,7 +2945,7 @@ span.mention {
   color: $grey-90;
 }
 
-.custom-switch .custom-control-input ~ .custom-control-label::after,{
+.custom-switch .custom-control-input ~ .custom-control-label::after, {
   background: $grey-90 !important;
   border: none !important;
 }
@@ -3101,6 +3106,70 @@ span.mention {
 
     & li div.active {
       background: $success;
+    }
+  }
+
+  .phone-notice {
+    width: 264px;
+    height: 46px;
+
+    .q-banner__avatar {
+      padding-left: 0;
+      padding-right: 0;
+      margin: auto;
+
+      & > .q-icon {
+        font-size: inherit;
+      }
+    }
+
+    .q-banner__content {
+      line-height: 16px;
+    }
+
+    .q-btn {
+      & > .q-icon {
+        font-size: inherit;
+      }
+    }
+
+    .q-banner__actions {
+      padding-left: 0;
+      padding-right: 0;
+      width: 14px;
+      height: 14px;
+      margin: auto;
+
+      .q-btn__content {
+        margin-top: -6px;
+      }
+    }
+  }
+
+  .phone-info {
+    width: 200px;
+    height: 150px;
+  }
+
+  .phone-status {
+    width: 180px;
+    height: 17px;
+    color: $white;
+  }
+
+  .phone-cta {
+    width: 180px;
+    height: 80px;
+    color: $white;
+  }
+
+  .ripple {
+    &::after {
+      @include rings(3s, 0s);
+    }
+
+    &::before {
+      @include rings(3s, 0.5s);
     }
   }
 

@@ -69,8 +69,96 @@
         </q-btn>
       </div>
     </div>
-    <div class="phone-body d-flex flex-grow-1">
+    <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
+      <div class="phone-notice d-flex flex-column align-items-center"
+           v-if="dialer.contact">
+        <q-banner class="bg-primary text-white pt-1 pb-1"
+                  inline-actions
+                  rounded
+                  dense>
+          <template v-slot:avatar>
+            <q-icon name="o_info"
+                    color="white"
+                    class="text-size-rg">
+            </q-icon>
+          </template>
+          <span class="text-size-xs">It's {{ contact_local_time }} in the timezone of the person you are calling</span>
+          <template v-slot:action>
+            <q-btn color="white"
+                   icon="o_cancel"
+                   class="text-size-rg"
+                   padding="none"
+                   flat
+                   round>
+            </q-btn>
+          </template>
+        </q-banner>
+      </div>
+      <div class="phone-info d-flex flex-column align-items-center">
+        <person-icon></person-icon>
 
+        <div class="text-white text-center">
+          <q-item-label class="text-size-xxl _600 mt-2"
+                        v-if="dialer.contact">
+            {{ dialer.contact.name | truncate(15) }}
+          </q-item-label>
+          <q-item-label class="text-size-sm _400 mt-1"
+                        v-if="dialer.communication">
+            {{ dialer.communication.lead_number | fixPhone }}
+          </q-item-label>
+          <q-item-label class="text-size-sm _400 mt-1"
+                        v-if="dialer.contact && dialer.contact.company_name">
+            {{ dialer.contact.company_name }}
+          </q-item-label>
+        </div>
+      </div>
+      <div class="phone-status d-flex justify-content-center">
+        <span v-if="dialer.currentStatus === 'MAKING_CALL'">Calling...</span>
+      </div>
+      <div class="phone-cta">
+        <div class="d-flex flex-row justify-content-between"
+             v-if="dialer.call.direction === 'INCOMING'">
+          <div class="d-flex flex-column align-items-center">
+            <q-btn class="height-52"
+                   ripple
+                   round
+                   no-caps>
+              <cancel-call-icon width="52"
+                                height="52">
+              </cancel-call-icon>
+            </q-btn>
+            <span class="text-size-xs mt-1">Decline</span>
+          </div>
+
+          <div class="d-flex flex-column align-items-center">
+            <q-btn class="height-52"
+                   ripple
+                   round
+                   no-caps>
+              <accept-call-icon width="52"
+                                height="52">
+              </accept-call-icon>
+            </q-btn>
+            <span class="text-size-xs mt-1">Accept</span>
+          </div>
+        </div>
+
+        <div class="d-flex flex-column justify-content-center align-items-center"
+             v-if="dialer.call.direction === 'OUTGOING'">
+          <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
+                 :class="[ dialer.currentStatus === 'MAKING_CALL' ? 'ripple' : '']"
+                 class="height-52"
+                 ripple
+                 round
+                 no-caps
+                 @click="hangupCall">
+            <cancel-call-icon width="52"
+                              height="52">
+            </cancel-call-icon>
+          </q-btn>
+          <span class="text-size-xs mt-1">Hang Up</span>
+        </div>
+      </div>
     </div>
     <div class="phone-integrations d-flex">
       <q-expansion-item class="shadow-1 overflow-hidden w-100"
@@ -92,9 +180,14 @@
 
 <script>
 import { mapState } from 'vuex'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
+import AcceptCallIcon from 'components/icons/accept-call-icon'
+import PersonIcon from 'components/icons/person-icon'
 
 export default {
   name: 'phone',
+
+  components: { PersonIcon, AcceptCallIcon, CancelCallIcon },
 
   props: {
     is_widget: {
@@ -129,7 +222,8 @@ export default {
         right: 0,
         top: 0
       },
-      isVisible: true
+      isVisible: true,
+      contact_local_time: null
     }
   },
 
@@ -151,6 +245,7 @@ export default {
     })
 
     this.setupDraggable()
+    this.setupContactLocalTime()
     this.isVisible = true
   },
 
@@ -162,6 +257,25 @@ export default {
           this.dragElement()
         }, 100)
       }
+    },
+
+    setupContactLocalTime () {
+      if (this.dialer.contact) {
+        this.getContactLocalTime()
+        this.$options.local_time_interval = setInterval(this.getContactLocalTime, 60 * 1000)
+      }
+    },
+
+    getContactLocalTime () {
+      if (this.dialer.contact && this.dialer.contact.timezone) {
+        this.contact_local_time = this.$moment.utc().tz(this.dialer.contact.timezone).format('h:mm a')
+      }
+    },
+
+    hangupCall ($event) {
+      $event.stopPropagation()
+      $event.preventDefault()
+      this.$VueEvent.fire('hangupCall')
     },
 
     getCampaign (id) {
@@ -256,15 +370,21 @@ export default {
     }
   },
 
-  beforeDestroy () {
-    window.removeEventListener('resize', this.resizeHandler)
-    this.$VueEvent.stop('togglePhone')
-  },
-
   watch: {
     shouldShow () {
       this.setupDraggable()
+      this.setupContactLocalTime()
+    },
+
+    'dialer.contact': function () {
+      this.setupContactLocalTime()
     }
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.resizeHandler)
+    this.$VueEvent.stop('togglePhone')
+    clearInterval(this.$options.local_time_interval)
   }
 }
 </script>

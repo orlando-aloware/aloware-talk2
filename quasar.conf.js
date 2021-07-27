@@ -35,6 +35,7 @@ module.exports = function (/* ctx */) {
 
       'roboto-font',
       'material-icons',
+      'material-icons-outlined',
       'fontawesome-v5'
     ],
 
