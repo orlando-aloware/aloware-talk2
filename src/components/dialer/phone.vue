@@ -99,7 +99,7 @@
         <person-icon></person-icon>
 
         <div class="text-white text-center">
-          <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center"
+          <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                         v-if="dialer.contact">
             <span class="d-inline-flex">{{ dialer.contact.name | truncate(15) }}</span>
             <q-btn color="white"
@@ -110,7 +110,7 @@
                    @click="goToContact">
             </q-btn>
           </q-item-label>
-          <q-item-label class="text-size-sm _400 mt-1"
+          <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center"
                         v-if="dialer.communication">
             <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
             <b-link href="#"
@@ -118,6 +118,9 @@
                     @click.prevent="copyPhoneNumber">
               <i class="material-icons">content_copy</i>
             </b-link>
+            <input :value="dialer.communication.lead_number"
+                   type="hidden"
+                   id="phone-number-clone"/>
           </q-item-label>
           <q-item-label class="text-size-sm _400 mt-1"
                         v-if="dialer.contact && dialer.contact.company_name">
