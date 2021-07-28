@@ -3008,8 +3008,8 @@ span.mention {
 
 .dialer-contact-info {
   width: 214px;
-  padding-left: 13px;
-  padding-right: 13px;
+  padding-left: 10px;
+  padding-right: 10px;
   margin-bottom: 9px;
 }
 
@@ -3036,13 +3036,11 @@ span.mention {
   }
 
   .input-group-prepend {
-    width: 39px;
-
     .input-group-text {
       width: 100%;
-      text-align: right;
+      text-align: left;
 
-      @extend .justify-content-end;
+      @extend .justify-content-start;
     }
   }
 
@@ -3075,6 +3073,10 @@ span.mention {
   .q-field__control {
     min-height: 32px !important;
     height: 32px !important;
+
+    &:before {
+      border: 1px solid $grey-70 !important;
+    }
   }
 
   .q-field__prepend {
