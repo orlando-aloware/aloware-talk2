@@ -178,7 +178,8 @@
         </div>
       </div>
     </div>
-    <div class="phone-integrations d-flex">
+    <div class="phone-integrations d-flex"
+         v-if="dialer.contact">
       <q-expansion-item class="shadow-1 overflow-hidden w-100"
                         style="border-radius: 12px"
                         label="Integrations"
@@ -188,7 +189,7 @@
                         dense>
         <q-card>
           <q-card-section>
-            <span>test</span>
+            <contact-integrations :contact="dialer.contact"></contact-integrations>
           </q-card-section>
         </q-card>
       </q-expansion-item>
