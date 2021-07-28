@@ -32,6 +32,7 @@
                     anchor="bottom end"
                     self="top right"
                     v-model="dialerStatus"
+                    persistent
                     @before-show="showDialer"
                     @before-hide="hideDialer">
               <dialer-form v-model="dialerStatus"

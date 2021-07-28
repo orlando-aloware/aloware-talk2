@@ -3014,9 +3014,15 @@ span.mention {
 }
 
 .search-form {
+  &.no-prepend {
+    .form-control {
+      border-width: 1px !important;
+    }
+  }
+
   .form-control {
     font-size: $f-size-body-xs;
-    padding-left: 6px;
+    padding-left: 8px;
     border-width: 1px 1px 1px 0 !important;
 
     &::-webkit-input-placeholder {

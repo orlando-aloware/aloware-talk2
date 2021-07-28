@@ -306,6 +306,7 @@ export default {
   methods: {
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
+        this.openPhone()
         setTimeout(() => {
           window.addEventListener('resize', this.resizeHandler)
           this.dragElement()
@@ -397,6 +398,10 @@ export default {
 
     togglePhone () {
       this.isVisible = !this.isVisible
+    },
+
+    openPhone () {
+      this.isVisible = true
     },
 
     closePhone () {

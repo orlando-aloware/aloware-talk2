@@ -12,7 +12,8 @@
             <b-form-group :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumber"
                           class="mb-0">
-              <contact-phone-number-search v-model="phoneNumber"
+              <contact-phone-number-search :no_prepend="true"
+                                           v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
                                            @keyup.enter.native="makeCall">
