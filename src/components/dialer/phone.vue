@@ -188,8 +188,10 @@
                         switch-toggle-side
                         dense>
         <q-card>
-          <q-card-section>
-            <contact-integrations :contact="dialer.contact"></contact-integrations>
+          <q-card-section class="height-200">
+            <contact-integrations :contact="dialer.contact"
+                                  :no_title="true">
+            </contact-integrations>
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -202,11 +204,12 @@ import { mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
+import ContactIntegrations from 'components/contacts/contact-integrations'
 
 export default {
   name: 'phone',
 
-  components: { PersonIcon, AcceptCallIcon, CancelCallIcon },
+  components: { PersonIcon, AcceptCallIcon, CancelCallIcon, ContactIntegrations },
 
   props: {
     is_widget: {

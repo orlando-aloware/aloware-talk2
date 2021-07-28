@@ -1992,7 +1992,6 @@ span.mention {
 
 //CONTACT INTEGRATIONS
 .hubspot-integration-wrapper {
-
   a {
     text-decoration: none;
   }
@@ -2003,7 +2002,6 @@ span.mention {
   }
 
   p {
-
     font-size: 14px;
 
     .data-icon-label {
@@ -2710,6 +2708,10 @@ span.mention {
   height: 52px;
 }
 
+.height-200 {
+  height: 200px;
+}
+
 .width-40 {
   width: 40px;
 }
@@ -3261,6 +3263,11 @@ span.mention {
 
     .q-expansion-item__toggle-icon--rotated {
       transform: rotate(0deg);
+    }
+
+    .q-expansion-item__content > .q-card > .q-card__section {
+      padding: 0;
+      overflow-y: auto;
     }
   }
 }

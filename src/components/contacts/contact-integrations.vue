@@ -1,6 +1,9 @@
 <template>
   <b-card class="border-0">
-    <h4 class="mb-2">Integrations</h4>
+    <h4 class="mb-2"
+        v-if="!no_title">
+      Integrations
+    </h4>
     <p v-if="isIntegrationsDisabled"
        class="status-notice fs-12 text-muted mb-0">
       Enable your favorite CRM integration to see more details directly from the CRM.
@@ -22,6 +25,12 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+
+    no_title: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
