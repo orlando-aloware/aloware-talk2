@@ -193,7 +193,7 @@ export default {
         setTimeout(() => {
           this.startCallTimer()
           this.setDialerCurrentStatus('CALL_CONNECTED')
-        }, 5000)
+        }, 3000)
       }).catch((err) => {
         console.log(err)
       })

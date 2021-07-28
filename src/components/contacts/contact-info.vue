@@ -16,9 +16,9 @@
           <h2 class="mt-1 mb-0 contact-name">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              {{ contact.name }}
+              {{ contactName }}
             </q-tooltip>
-            {{ contact.name }}
+            {{ contactName | truncate(15) }}
           </h2>
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
@@ -134,6 +134,14 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'isContactNameEditOpen', 'contactPhoneNumbers', 'changingSelectedContact']),
 
+    contactName () {
+      if (this.contact) {
+        return this.contact.name || 'No Name'
+      }
+
+      return 'No Name'
+    },
+
     phone () {
       return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
     }
@@ -201,7 +209,8 @@ export default {
         currentNumber: this.contact.phone_number,
         contactName: this.contact.name,
         companyName: this.contact.company_name,
-        contactId: this.contact.id
+        contactId: this.contact.id,
+        contactTimezone: this.contact.timezone
       }
       this.$VueEvent.fire('callContact', data)
     }

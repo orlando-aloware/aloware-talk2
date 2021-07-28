@@ -1,6 +1,7 @@
 <template>
-  <q-item class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
-          v-if="dialer && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(dialer.currentStatus)"
+  <q-item :class="[ profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? 'wrap-up' : '' ]"
+          class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
+          v-if="dialer && profile && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(dialer.currentStatus)"
           clickable
           v-ripple
           @click="togglePhone">
@@ -14,7 +15,10 @@
         </q-skeleton>
       </q-item-label>
       <q-item-label class="call-status">
-        <template v-if="dialer.currentStatus !== 'MAKING_CALL'">
+        <template v-if="phoneStatus">
+          <span>{{ phoneStatus }}</span>
+        </template>
+        <template v-else>
           <span v-if="dialer.communication">{{ dialer.communication.lead_number | fixPhone }}</span>
           <span v-else-if="dialer.currentNumber">{{ dialer.currentNumber | fixPhone }}</span>
           <span v-else-if="dialer.onHoldCall">{{ dialer.onHoldCall.lead_number | fixPhone }}</span>
@@ -26,14 +30,12 @@
           <span v-if="dialer.timer">{{ dialer.timer }}</span>
           <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
         </template>
-        <template v-else>
-          <span>Calling...</span>
-        </template>
       </q-item-label>
     </q-item-section>
 
     <q-item-section side>
       <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
+             v-if="profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP"
              icon="img:app-icons/dialer/hangup_btn.svg"
              size="22px"
              class="icon-btn auto-size height-22"
@@ -43,18 +45,55 @@
              flat
              @click="hangupCall">
       </q-btn>
+      <q-btn :disable="dialer.currentStatus !== 'CALL_DISCONNECTED'"
+             v-else
+             icon="img:app-icons/dialer/end_wrap_up.svg"
+             size="22px"
+             class="icon-btn auto-size height-22"
+             padding="none"
+             ripple
+             rounded
+             flat
+             @click="endWrapUp">
+      </q-btn>
     </q-item-section>
   </q-item>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as AgentStatus from 'src/constants/agent-status'
 
 export default {
   name: 'active-call',
 
+  data () {
+    return {
+      AgentStatus
+    }
+  },
+
   computed: {
-    ...mapState(['dialer'])
+    ...mapState('auth', ['profile']),
+    ...mapState(['dialer']),
+
+    phoneStatus () {
+      if (!this.dialer.communication) {
+        return ''
+      }
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        return 'Wrapping Up'
+      }
+
+      switch (this.dialer.communication.current_status2) {
+        case CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW:
+          return 'Calling...'
+        default:
+          return ''
+      }
+    }
   },
 
   methods: {
@@ -62,6 +101,12 @@ export default {
       $event.stopPropagation()
       $event.preventDefault()
       this.$VueEvent.fire('hangupCall')
+    },
+
+    endWrapUp ($event) {
+      $event.stopPropagation()
+      $event.preventDefault()
+      this.$VueEvent.fire('endWrapUp')
     },
 
     togglePhone () {

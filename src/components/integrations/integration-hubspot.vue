@@ -1,8 +1,9 @@
 <template>
   <div v-if="integration_data"
        class="hubspot-integration-wrapper">
-
-    <q-card class="my-card" flat bordered>
+    <q-card class="my-card"
+            flat
+            bordered>
       <q-item>
         <q-item-section>
           <b-link class="ml-2" :href="hubspotLink">
@@ -14,58 +15,82 @@
       <q-separator/>
 
       <q-card-section>
-        <p class="mb-0" v-if="integration_data.properties.firstname && integration_data.properties.lastname">
+        <p class="mb-0"
+           v-if="integration_data.properties.firstname && integration_data.properties.lastname">
              <span class="data-icon-label">
               Name:
             </span>
-          <span class="data-value" v-b-tooltip="integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value">
+          <span class="data-value"
+                v-b-tooltip="integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value">
               {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
             </span>
         </p>
-        <p class="mb-0" v-if="integration_data.properties.email">
+        <p class="mb-0"
+           v-if="integration_data.properties.email">
             <span class="data-icon-label">
               Email:
             </span>
-          <span class="data-value" v-b-tooltip="integration_data.properties.email.value">
+          <span class="data-value"
+                v-b-tooltip="integration_data.properties.email.value">
               {{ integration_data.properties.email.value }}
             </span>
         </p>
-        <p class="mb-0" v-if="integration_data.properties.company">
+        <p class="mb-0"
+           v-if="integration_data.properties.company">
              <span class="data-icon-label">
               Company:
             </span>
-          <span class="data-value" v-b-tooltip="integration_data.properties.company.value">
+          <span class="data-value"
+                v-b-tooltip="integration_data.properties.company.value">
               {{ integration_data.properties.company.value }}
             </span>
         </p>
-        <p class="mb-0" v-if="integration_data.properties.hubspot_owner">
+        <p class="mb-0"
+           v-if="integration_data.properties.hubspot_owner">
              <span class="data-icon-label">
               Owner:
             </span>
-          <span class="data-value" v-b-tooltip="integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName">
+          <span class="data-value"
+                v-b-tooltip="integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName">
               {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
             </span>
         </p>
       </q-card-section>
 
       <q-card-section horizontal>
-        <q-card class="my-card mr-3 ml-3 deals" flat bordered v-for="(deal, index) in integration_data.properties.deals" :key="index">
+        <q-card class="my-card mr-3 ml-3 deals"
+                v-for="(deal, index) in integration_data.properties.deals"
+                :key="index"
+                flat bordered>
           <q-card-section horizontal>
             <q-card-section class="pl-2 pr-2">
               <h6>
-                <b-link class="deals-title" :href="hubspotContactBaseLink() + 'deal/' + deal.dealId" target="_blank">{{ deal.properties.dealname.value }}</b-link>
+                <b-link class="deals-title"
+                        :href="hubspotContactBaseLink() + 'deal/' + deal.dealId"
+                        target="_blank">
+                  {{ deal.properties.dealname.value }}
+                </b-link>
               </h6>
               <p class="mb-0">
                 <span class="data-icon-label">Amount: </span>
-                <span class="data-value" v-b-tooltip="$options.filters.toCurrency(deal.properties.amount.value)">{{ deal.properties.amount.value | toCurrency }}</span>
+                <span class="data-value"
+                      v-b-tooltip="$options.filters.toCurrency(deal.properties.amount.value)">
+                  {{ deal.properties.amount.value | toCurrency }}
+                </span>
               </p>
               <p class="mb-0">
                 <span class="data-icon-label">Pipeline: </span>
-                <span class="data-value" v-b-tooltip="deal.properties.pipeline.label">{{ deal.properties.pipeline.label }}</span>
+                <span class="data-value"
+                      v-b-tooltip="deal.properties.pipeline.label">
+                  {{ deal.properties.pipeline.label }}
+                </span>
               </p>
               <p class="mb-0">
                 <span class="data-icon-label">Stage: </span>
-                <span class="data-value" v-b-tooltip="deal.properties.dealstage.label">{{ deal.properties.dealstage.label }}</span>
+                <span class="data-value"
+                      v-b-tooltip="deal.properties.dealstage.label">
+                  {{ deal.properties.dealstage.label }}
+                </span>
               </p>
             </q-card-section>
           </q-card-section>
@@ -93,9 +118,10 @@
                 size="sm"
                 variant="primary"
                 :disabled="isEnrolling || !isWorkflowValid"
-                @click.prevent="enrollToWorkflow"
-      >
-        <q-spinner-bars v-if="isEnrolling" color="white"/>
+                @click.prevent="enrollToWorkflow">
+        <q-spinner-bars v-if="isEnrolling"
+                        color="white">
+        </q-spinner-bars>
         {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
       </b-button>
     </b-popover>

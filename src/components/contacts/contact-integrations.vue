@@ -1,14 +1,16 @@
 <template>
   <b-card class="border-0">
-    <h4 class="mb-2">Integrations</h4>
+    <h4 class="mb-2"
+        v-if="!no_title">
+      Integrations
+    </h4>
     <p v-if="isIntegrationsDisabled"
        class="status-notice fs-12 text-muted mb-0">
-      Enable your favorite CRM integration and push contacts from the
-      integration settings page to see links to your CRM contacts.
+      Enable your favorite CRM integration to see more details directly from the CRM.
     </p>
     <integration-hubspot v-if="isHubspotEnabled"
                          :contact="contact"/>
-    <contact-crm-links :contact="contact"></contact-crm-links>
+    <contact-crm-links :contact="contact"/>
   </b-card>
 </template>
 
@@ -24,6 +26,12 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+
+    no_title: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -31,6 +39,7 @@ export default {
 
   computed: {
     ...mapState(['currentCompany']),
+
     isIntegrationsDisabled () {
       if (!this.currentCompany) {
         return true
@@ -47,21 +56,26 @@ export default {
         !this.currentCompany.helpscout_integration_enabled &&
         !this.currentCompany.guesty_integration_enabled
     },
+
     isHubspotEnabled () {
       return this.currentCompany && this.currentCompany.hubspot_integration_enabled
     },
+
     isPipedriveEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.pipedrive_integration_enabled)
     },
+
     isZohoEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.zoho_integration_enabled)
     },
+
     isHelpScoutEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.helpscout_integration_enabled)
     },
+
     isGuestyEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.guesty_integration_enabled)

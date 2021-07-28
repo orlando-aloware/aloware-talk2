@@ -71,7 +71,7 @@
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
       <div class="phone-notice d-flex flex-column align-items-center"
-           v-if="dialer.contact && showLocalTime">
+           v-if="dialer.contact && dialer.call.direction === 'OUTGOING' && showLocalTime">
         <q-banner class="bg-primary text-white pt-1 pb-1"
                   inline-actions
                   rounded
@@ -101,7 +101,7 @@
         <div class="text-white text-center">
           <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                         v-if="dialer.contact">
-            <span class="d-inline-flex">{{ dialer.contact.name | truncate(15) }}</span>
+            <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
             <q-btn color="white"
                    icon="o_info"
                    class="text-size-rg d-inline-flex ml-1"
@@ -128,8 +128,9 @@
           </q-item-label>
         </div>
       </div>
-      <div class="phone-status d-flex justify-content-center">
-        <span v-if="dialer.currentStatus === 'MAKING_CALL'">Calling...</span>
+      <div class="phone-status d-flex justify-content-center"
+           v-if="phoneStatus">
+        <span>{{ phoneStatus }}</span>
       </div>
       <div class="phone-cta">
         <div class="d-flex flex-row justify-content-between"
@@ -138,7 +139,8 @@
             <q-btn class="height-52"
                    ripple
                    round
-                   no-caps>
+                   no-caps
+                   @click="rejectCall">
               <cancel-call-icon width="52"
                                 height="52">
               </cancel-call-icon>
@@ -150,7 +152,8 @@
             <q-btn class="height-52"
                    ripple
                    round
-                   no-caps>
+                   no-caps
+                   @click="answerCall">
               <accept-call-icon width="52"
                                 height="52">
               </accept-call-icon>
@@ -176,7 +179,8 @@
         </div>
       </div>
     </div>
-    <div class="phone-integrations d-flex">
+    <div class="phone-integrations d-flex"
+         v-if="dialer.contact">
       <q-expansion-item class="shadow-1 overflow-hidden w-100"
                         style="border-radius: 12px"
                         label="Integrations"
@@ -185,8 +189,10 @@
                         switch-toggle-side
                         dense>
         <q-card>
-          <q-card-section>
-            <span>test</span>
+          <q-card-section class="height-200">
+            <contact-integrations :contact="dialer.contact"
+                                  :no_title="true">
+            </contact-integrations>
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -199,11 +205,16 @@ import { mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
+import ContactIntegrations from 'components/contacts/contact-integrations'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'phone',
 
-  components: { PersonIcon, AcceptCallIcon, CancelCallIcon },
+  components: { PersonIcon, AcceptCallIcon, CancelCallIcon, ContactIntegrations },
 
   props: {
     is_widget: {
@@ -240,15 +251,40 @@ export default {
       },
       isVisible: true,
       currentLocalTime: null,
-      showLocalTime: true
+      showLocalTime: true,
+      CommunicationDirection,
+      CommunicationDispositionStatus,
+      CommunicationCurrentStatus,
+      CommunicationTypes
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings']),
 
+    phoneStatus () {
+      if (!this.dialer.communication) {
+        return ''
+      }
+
+      switch (this.dialer.communication.current_status2) {
+        case CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW:
+          return 'Calling...'
+        default:
+          return ''
+      }
+    },
+
     signalStrength () {
       return 100 - (this.warnings.length * 25)
+    },
+
+    contactName () {
+      if (this.dialer.contact) {
+        return this.dialer.contact.name || 'No Name'
+      }
+
+      return 'No Name'
     },
 
     shouldShow () {
@@ -264,6 +300,7 @@ export default {
     this.setupDraggable()
     this.setupContactLocalTime()
     this.isVisible = true
+    this.showLocalTime = true
   },
 
   methods: {
@@ -279,7 +316,7 @@ export default {
     setupContactLocalTime () {
       if (this.dialer.contact) {
         this.getContactLocalTime()
-        this.$options.local_time_interval = setInterval(this.getContactLocalTime, 60 * 1000)
+        this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
       }
     },
 
@@ -333,10 +370,17 @@ export default {
       window.getSelection().removeAllRanges()
     },
 
-    hangupCall ($event) {
-      $event.stopPropagation()
-      $event.preventDefault()
+    hangupCall () {
       this.$VueEvent.fire('hangupCall')
+    },
+
+    answerCall () {
+      this.$VueEvent.fire('answerCall')
+    },
+
+    rejectCall () {
+      this.$VueEvent.fire('rejectCall')
+      this.closePhone()
     },
 
     getCampaign (id) {
@@ -445,7 +489,7 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('togglePhone')
-    clearInterval(this.$options.local_time_interval)
+    clearInterval(this.$options.localTimeInterval)
   }
 }
 </script>
