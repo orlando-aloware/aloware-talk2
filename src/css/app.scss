@@ -3029,6 +3029,7 @@ span.mention {
 
     &::-webkit-input-placeholder {
       font-size: $f-size-body-xs;
+      color: $grey-80;
     }
 
     &:focus {
