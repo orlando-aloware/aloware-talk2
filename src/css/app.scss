@@ -2064,6 +2064,21 @@ span.mention {
   width: 300px;
 }
 
+.contact-crm-integrations-wrapper {
+  .integrations-link{
+    display: block;
+    text-decoration: none;
+    color: $grey-100;
+
+    .integrations-logo {
+      background-size: cover !important;
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+    }
+  }
+}
+
 .w-30 {
   width: 30%;
 }
@@ -3190,7 +3205,7 @@ span.mention {
   .phone-integrations {
     .q-item__label {
       margin-left: -36px;
-      
+
       @extend .no-select;
     }
 
