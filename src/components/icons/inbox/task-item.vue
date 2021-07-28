@@ -60,14 +60,14 @@ import {
   avatarMixin,
   communicationInfoMixin
 } from 'src/plugins/mixins'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import * as CommunicationTypes from 'src/constants/communication-types'
 import Avatar from 'src/components/avatar'
 import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'task-item',

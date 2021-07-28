@@ -128,8 +128,9 @@
           </q-item-label>
         </div>
       </div>
-      <div class="phone-status d-flex justify-content-center">
-        <span v-if="dialer.currentStatus === 'MAKING_CALL'">Calling...</span>
+      <div class="phone-status d-flex justify-content-center"
+           v-if="phoneStatus">
+        <span>{{ phoneStatus }}</span>
       </div>
       <div class="phone-cta">
         <div class="d-flex flex-row justify-content-between"
@@ -205,6 +206,10 @@ import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'phone',
@@ -246,12 +251,29 @@ export default {
       },
       isVisible: true,
       currentLocalTime: null,
-      showLocalTime: true
+      showLocalTime: true,
+      CommunicationDirection,
+      CommunicationDispositionStatus,
+      CommunicationCurrentStatus,
+      CommunicationTypes
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings']),
+
+    phoneStatus () {
+      if (!this.dialer.communication) {
+        return ''
+      }
+
+      switch (this.dialer.communication.current_status2) {
+        case CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW:
+          return 'Calling...'
+        default:
+          return ''
+      }
+    },
 
     signalStrength () {
       return 100 - (this.warnings.length * 25)
@@ -278,6 +300,7 @@ export default {
     this.setupDraggable()
     this.setupContactLocalTime()
     this.isVisible = true
+    this.showLocalTime = true
   },
 
   methods: {

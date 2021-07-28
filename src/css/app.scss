@@ -3085,9 +3085,13 @@ span.mention {
 
 .active-call {
   background: $dark;
-  @extend .text-white;
   border-radius: 7px;
   width: 190px;
+  @extend .text-white;
+
+  &.wrap-up {
+    background: $grey-80;
+  }
 
   .call-status {
     font-size: 11px !important;
