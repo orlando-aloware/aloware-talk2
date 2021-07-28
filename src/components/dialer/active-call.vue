@@ -83,11 +83,13 @@ export default {
         return ''
       }
 
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        return 'Wrapping Up'
+      }
+
       switch (this.dialer.communication.current_status2) {
         case CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW:
           return 'Calling...'
-        case CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW:
-          return 'Wrapping Up'
         default:
           return ''
       }
