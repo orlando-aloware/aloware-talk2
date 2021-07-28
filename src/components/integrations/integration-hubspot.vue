@@ -248,7 +248,7 @@ export default {
 
     hubspotLink () {
       if (this.hubspotContactBaseLink()) {
-        return `${this.hubspotContactBaseLink()}contact/${this.contact.id}`
+        return `${this.hubspotContactBaseLink()}contact/${this.contact.integration_data.hubspot.contact_id}`
       }
 
       return false
