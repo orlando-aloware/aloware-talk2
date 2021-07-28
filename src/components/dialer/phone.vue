@@ -138,7 +138,8 @@
             <q-btn class="height-52"
                    ripple
                    round
-                   no-caps>
+                   no-caps
+                   @click="rejectCall">
               <cancel-call-icon width="52"
                                 height="52">
               </cancel-call-icon>
@@ -150,7 +151,8 @@
             <q-btn class="height-52"
                    ripple
                    round
-                   no-caps>
+                   no-caps
+                   @click="answerCall">
               <accept-call-icon width="52"
                                 height="52">
               </accept-call-icon>
@@ -341,10 +343,17 @@ export default {
       window.getSelection().removeAllRanges()
     },
 
-    hangupCall ($event) {
-      $event.stopPropagation()
-      $event.preventDefault()
+    hangupCall () {
       this.$VueEvent.fire('hangupCall')
+    },
+
+    answerCall () {
+      this.$VueEvent.fire('answerCall')
+    },
+
+    rejectCall () {
+      this.$VueEvent.fire('rejectCall')
+      this.closePhone()
     },
 
     getCampaign (id) {
