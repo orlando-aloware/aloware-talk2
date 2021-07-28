@@ -71,7 +71,7 @@
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
       <div class="phone-notice d-flex flex-column align-items-center"
-           v-if="dialer.contact && showLocalTime">
+           v-if="dialer.contact && dialer.call.direction === 'OUTGOING' && showLocalTime">
         <q-banner class="bg-primary text-white pt-1 pb-1"
                   inline-actions
                   rounded
@@ -101,7 +101,7 @@
         <div class="text-white text-center">
           <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                         v-if="dialer.contact">
-            <span class="d-inline-flex">{{ dialer.contact.name | truncate(15) }}</span>
+            <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
             <q-btn color="white"
                    icon="o_info"
                    class="text-size-rg d-inline-flex ml-1"
@@ -249,6 +249,14 @@ export default {
 
     signalStrength () {
       return 100 - (this.warnings.length * 25)
+    },
+
+    contactName () {
+      if (this.dialer.contact) {
+        return this.dialer.contact.name || 'No Name'
+      }
+
+      return 'No Name'
     },
 
     shouldShow () {
