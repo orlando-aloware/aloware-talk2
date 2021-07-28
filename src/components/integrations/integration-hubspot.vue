@@ -6,7 +6,7 @@
             bordered>
       <q-item>
         <q-item-section>
-          <b-link class="ml-2" :href="hubspotLink">
+          <b-link class="ml-2" :href="hubspotLink()">
             <i class="fab fa-hubspot hubspot-icon mr-3"></i> <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
