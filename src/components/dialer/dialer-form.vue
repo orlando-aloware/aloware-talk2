@@ -305,7 +305,7 @@ export default {
     },
 
     makeCall () {
-      if (!this.validPhoneNumber || !this.campaignId) {
+      if (!this.validPhoneNumber || !this.campaignId || !this.currentNumber) {
         return
       }
 

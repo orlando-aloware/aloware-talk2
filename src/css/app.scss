@@ -3008,8 +3008,9 @@ span.mention {
 
 .dialer-contact-info {
   width: 214px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 11px;
+  padding-right: 11px;
+  margin-top: 2px;
   margin-bottom: 9px;
 }
 
@@ -3024,6 +3025,7 @@ span.mention {
     font-size: $f-size-body-xs;
     padding-left: 8px;
     border-width: 1px 1px 1px 0 !important;
+    color: $grey-100;
 
     &::-webkit-input-placeholder {
       font-size: $f-size-body-xs;
@@ -3080,6 +3082,7 @@ span.mention {
   }
 
   .q-field__prepend {
+    padding-left: 10px;
     height: 32px !important;
   }
 
