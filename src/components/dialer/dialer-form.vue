@@ -13,6 +13,7 @@
                           :state="validPhoneNumber"
                           class="mb-0">
               <contact-phone-number-search :no_prepend="true"
+                                           class="width-214"
                                            v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
@@ -32,61 +33,7 @@
             </q-btn>
           </div>
 
-          <div class="dialer-contact-info">
-            <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
-                  v-if="contactId">
-              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
-              <div class="d-inline-flex text-right"
-                   v-if="currentLocalTime">
-                ~{{ currentLocalTime }}
-              </div>
-            </div>
-            <p class="text-size-sm text-grey-80 _400 mb-1"
-                  v-if="contactId && companyName">
-              {{ companyName }}
-            </p>
-            <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
-              <span class="text-size-sm text-grey-80 _400">New number</span>
-            </div>
-          </div>
-
-          <b-form-group :invalid-feedback="invalidCampaign"
-                        :state="validCampaign"
-                        class="mb-1">
-            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
-                           v-model="campaignId"
-                           @change="changeCampaignId">
-            </line-selector>
-          </b-form-group>
-        </b-tab>
-        <b-tab :active="mode === 'text'"
-               title="Text"
-               @click="setMode('text')">
-          <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
-               v-if="mode === 'text'">
-            <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumber"
-                          class="mb-0">
-              <contact-phone-number-search v-model="phoneNumber"
-                                           ref="textContactPhoneNumberSearch"
-                                           @change="changePhoneNumber"
-                                           @keyup.enter.native="sendText">
-              </contact-phone-number-search>
-            </b-form-group>
-            <q-btn :ripple="true"
-                   :disable="sendDisabled"
-                   icon="img:app-icons/dialer/text_btn.svg"
-                   size="32px"
-                   class="icon-btn auto-size height-32"
-                   align="right"
-                   padding="none"
-                   rounded
-                   flat
-                   @click="sendText">
-            </q-btn>
-          </div>
-
-          <div class="dialer-contact-info">
+          <div class="dialer-contact-info width-214">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
               <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
@@ -113,6 +60,74 @@
             </line-selector>
           </b-form-group>
         </b-tab>
+        <b-tab :active="mode === 'text'"
+               title="Text"
+               @click="setMode('text')">
+          <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
+               v-if="mode === 'text'">
+            <b-form-group :invalid-feedback="invalidPhoneNumber"
+                          :state="validPhoneNumber"
+                          class="mb-0 w-100">
+              <contact-phone-number-search v-model="phoneNumber"
+                                           ref="textContactPhoneNumberSearch"
+                                           @change="changePhoneNumber"
+                                           @keyup.enter.native="sendText">
+              </contact-phone-number-search>
+            </b-form-group>
+          </div>
+
+          <div class="dialer-contact-info w-100">
+            <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
+                 v-if="contactId">
+              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
+              <div class="d-inline-flex text-right"
+                   v-if="currentLocalTime">
+                ~{{ currentLocalTime }}
+              </div>
+            </div>
+            <p class="text-size-sm text-grey-80 _400 mb-1"
+               v-if="contactId && companyName">
+              {{ companyName }}
+            </p>
+            <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
+              <span class="text-size-sm text-grey-80 _400">New number</span>
+            </div>
+          </div>
+
+          <b-input-group class="mb-2">
+            <template #append>
+              <b-input-group-text class="bg-white border-left-0 align-items-end">
+                <q-btn :disable="sendDisabled"
+                       class="height-16 no-q-btn-focus"
+                       padding="none"
+                       flat
+                       @click="sendText">
+                  <send-text-icon width="16"
+                                  height="16"
+                                  :color="sendTextColor">
+                  </send-text-icon>
+                </q-btn>
+              </b-input-group-text>
+            </template>
+            <b-form-textarea class="textarea-no-auto-shrink text-size-sm _400 border-right-0 overflow-hidden"
+                             placeholder="Text Message..."
+                             rows="2"
+                             max-rows="3"
+                             no-auto-shrink
+                             no-resize
+                             v-model="textMessage">
+            </b-form-textarea>
+          </b-input-group>
+
+          <b-form-group :invalid-feedback="invalidCampaign"
+                        :state="validCampaign"
+                        class="mb-1">
+            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+                           v-model="campaignId"
+                           @change="changeCampaignId">
+            </line-selector>
+          </b-form-group>
+        </b-tab>
       </b-tabs>
     </div>
   </div>
@@ -123,6 +138,7 @@ import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/dialer/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
+import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 
 export default {
@@ -130,7 +146,11 @@ export default {
 
   mixins: [contactMixins],
 
-  components: { ContactPhoneNumberSearch, LineSelector },
+  components: {
+    ContactPhoneNumberSearch,
+    LineSelector,
+    SendTextIcon
+  },
 
   props: {
     value: {
@@ -150,13 +170,18 @@ export default {
       contactId: null,
       contactTimezone: null,
       currentLocalTime: null,
-      loadingContact: false
+      loadingContact: false,
+      textMessage: ''
     }
   },
 
   computed: {
     ...mapState(['currentCompany']),
     ...mapGetters('auth', ['profile']),
+
+    sendTextColor () {
+      return this.sendDisabled ? '#D8D8D8' : '#256EFF'
+    },
 
     validPhoneNumber () {
       return this.$options.filters.fixPhone(this.phoneNumber) !== false
@@ -179,7 +204,7 @@ export default {
     },
 
     sendDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage
     }
   },
 
@@ -221,6 +246,7 @@ export default {
       this.defaultOutboundCampaignId = null
       this.campaignId = null
       this.mode = 'call'
+      this.textMessage = ''
     },
 
     async changePhoneNumber (data) {

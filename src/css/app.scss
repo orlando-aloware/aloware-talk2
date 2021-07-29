@@ -423,11 +423,7 @@ body,
   }
 
   & .q-item > .q-btn {
-    &:hover, &:focus {
-      & .q-focus-helper {
-        display: none !important;
-      }
-    }
+    @extend .no-q-btn-focus;
   }
 
   & .q-icon {
@@ -2620,6 +2616,15 @@ span.mention {
 /*
  Quasar related
  */
+
+.no-q-btn-focus {
+  &:hover, &:focus {
+    & .q-focus-helper {
+      display: none !important;
+    }
+  }
+}
+
 .q-select__dropdown-icon {
   font-size: 16px;
 }
@@ -2701,6 +2706,10 @@ span.mention {
 
 .height-12 {
   height: 12px;
+}
+
+.height-16 {
+  height: 16px;
 }
 
 .height-22 {
@@ -3007,7 +3016,6 @@ span.mention {
 }
 
 .dialer-contact-info {
-  width: 214px;
   padding-left: 11px;
   padding-right: 11px;
   margin-top: 2px;
@@ -3065,6 +3073,22 @@ span.mention {
     padding-left: 16px !important;
     padding-right: 16px !important;
     border-right: 0.5px solid $grey-70;
+  }
+
+  textarea {
+    color: $grey-100 !important;
+
+    &::-webkit-input-placeholder {
+      color: $grey-80;
+    }
+  }
+
+  textarea:focus {
+    border-color: $grey-70 !important;
+    border-style: solid;
+    border-width: 1px 0 1px 1px !important;
+    box-shadow: none !important;
+    overflow: hidden;
   }
 }
 
