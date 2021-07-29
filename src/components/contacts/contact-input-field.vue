@@ -11,9 +11,8 @@
       <template v-slot:append class="q-field-icon__append">
         <pencil-o-icon v-if="!is_busy && !disabled"
                        color="#256EFF"
-                       class="cursor-pointer input-edit-icon"
+                       class="cursor-pointer text-size-rg"
                        @click="getFocus">
-
         </pencil-o-icon>
       </template>
       <template v-slot:error>
@@ -25,9 +24,12 @@
 
 <script>
 import PencilOIcon from 'components/icons/pencil-o-icon'
+
 export default {
   name: 'contact-input-field',
+
   components: { PencilOIcon },
+
   props: {
     placeholder: {
       type: String,
@@ -43,6 +45,7 @@ export default {
       default: false
     }
   },
+
   computed: {
     field: {
       get () {
@@ -53,30 +56,29 @@ export default {
       }
     }
   },
+
   data () {
     return {
       is_busy: false
     }
   },
+
   methods: {
     getFocus () {
       this.$refs.inline_input.focus()
     }
   },
+
   watch: {
     field: function (val) {
       this.is_busy = true
-      this.$emit('updateField', { val,
+      this.$emit('updateField', {
+        val,
         callback: () => {
           this.is_busy = false
-        } })
+        }
+      })
     }
   }
 }
 </script>
-
-<style scoped>
-  .input-edit-icon {
-    font-size: 60%;
-  }
-</style>

@@ -60,10 +60,7 @@ export default {
     ...mapGetters('contacts', ['contact', 'ringGroups', 'contactRingGroups']),
 
     appliedRingGroups () {
-      if (this.contactRingGroups.length > 0) {
-        return this.ringGroups.filter(ringGroup => this.contactRingGroups.includes(ringGroup.id))
-      }
-      return []
+      return this.ringGroups.filter(ringGroup => this.contactRingGroups.includes(ringGroup.id))
     }
   },
 
@@ -84,6 +81,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setRingGroups', 'setContactRingGroups']),
+
     getContactRingGroups () {
       return talk2Api.V1.contact.getRingGroups(this.contact.id).then(response => {
         this.setContactRingGroups(response.data)
@@ -115,6 +113,7 @@ export default {
 
     submit () {
       let ringGroupIds = this.selectedRingGroups.map(ringGroup => ringGroup.id)
+      ringGroupIds = ringGroupIds || []
       talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: ringGroupIds })
         .then(response => {
           this.setContactRingGroups(ringGroupIds)

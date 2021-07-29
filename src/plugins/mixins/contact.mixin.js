@@ -285,16 +285,15 @@ export default {
       }
     },
 
-    async fetchContactInfo (contactId = null) {
-      const id = contactId || this.contactId
+    async fetchContactInfo () {
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
       console.log('fetching comms')
-      return this.$axios.get(`/api/v1/contact/${id}`).then(res => {
-        this.fetchContactCommunications(id, false)
+      return this.$axios.get(`/api/v1/contact/${this.contactId}`).then(res => {
+        this.fetchContactCommunications(this.contactId, false)
           .then(() => {
             this.loadingContact = false
             console.log('fetched comms')
@@ -790,9 +789,11 @@ export default {
     },
 
     processFetchContactInfo () {
+      this.selectedContactChanging(true)
       this.loadingContactInProgress()
       this.fetchContactInfo().then(res => {
         this.processFetchedContactInfo(res.data)
+        this.selectedContactChanging(false)
       }).catch(() => {
         this.loadingContactsFailed()
       })
@@ -817,7 +818,6 @@ export default {
 
     processFetchedContactInfo (selectedContact) {
       this.messageObject.contact = selectedContact
-      this.fetchedContactInfo(selectedContact)
       this.contact.first_name = selectedContact.first_name
       this.contact.last_name = selectedContact.last_name
       // TODO: update contact name in title?

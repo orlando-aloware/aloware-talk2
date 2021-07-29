@@ -13,9 +13,10 @@
     <div class="waveform-timeline mr-2">
       <span class="text-xxs">{{ currentTime | fixDuration(true) }}/{{ duration | fixDuration(true) }}</span>
     </div>
-    <vue-wave-surfer ref="surf"
-                     :src="remoteUrl"
-                     :options="options">
+    <vue-wave-surfer :src="remoteUrl"
+                     :options="options"
+                     ref="surf"
+                     v-if="remoteUrl">
     </vue-wave-surfer>
   </div>
 </template>
@@ -62,30 +63,38 @@ export default {
 
   computed: {
     player () {
-      return this.$refs.surf.waveSurfer
+      if (this.$refs.surf) {
+        return this.$refs.surf.waveSurfer
+      }
+
+      return null
     }
   },
 
   mounted () {
-    this.player.on('ready', () => {
-      this.ready = true
-      this.$emit('ready')
-      this.duration = this.player.getDuration()
-    })
+    if (this.player) {
+      this.player.on('ready', () => {
+        this.ready = true
+        this.$emit('ready')
+        this.duration = this.player.getDuration()
+      })
 
-    this.player.on('finish', () => {
-      this.playing = false
-    })
+      this.player.on('finish', () => {
+        this.playing = false
+      })
 
-    this.player.on('audioprocess', () => {
-      this.currentTime = this.player.getCurrentTime()
-    })
+      this.player.on('audioprocess', () => {
+        this.currentTime = this.player.getCurrentTime()
+      })
+    }
   },
 
   methods: {
     handlePlay () {
       this.playing = !this.playing
-      this.player.playPause()
+      if (this.player) {
+        this.player.playPause()
+      }
     }
   }
 }

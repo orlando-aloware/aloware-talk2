@@ -36,7 +36,7 @@ export default {
   },
   created () {
     this.contactId = this.selectedContactId
-    if (this.selectedContactId) {
+    if (this.contactId) {
       this.processFetchContactInfo()
     }
   },

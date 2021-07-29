@@ -2,48 +2,55 @@
   <b-card class="border-0 position-relative contact-about-wrapper">
     <h4>About this contact</h4>
 
-    <div :class="`information-container ${autoHeightClass}`">
+    <div :class="`information-container ${autoHeightClass}`"
+         v-if="!changingSelectedContact">
       <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-0">Owner</p>
         <contact-user-selector v-model="contact.user_id"
                                @updateField="onUpdateOwner"
-                               :disabled="!hasPermissionTo('change contact ownership')"/>
+                               :disabled="!hasPermissionTo('change contact ownership')">
+        </contact-user-selector>
       </div>
 
       <div class="d-block"
            v-if="hasPermissionTo('list disposition status')">
         <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
         <contact-disposition @updateField="onUpdateOwner"
-                             :disabled="!hasPermissionTo('dispose contact')"/>
+                             :disabled="!hasPermissionTo('dispose contact')">
+        </contact-disposition>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Email</p>
         <contact-input-field v-model="contact.email"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateEmail"/>
+                             @updateField="onUpdateEmail">
+        </contact-input-field>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Company</p>
         <contact-input-field v-model="contact.company_name"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateCompany"/>
+                             @updateField="onUpdateCompany">
+        </contact-input-field>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Website</p>
         <contact-input-field v-model="contact.website"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateWebsite"/>
+                             @updateField="onUpdateWebsite">
+        </contact-input-field>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">City</p>
         <contact-input-field v-model="contact.cnam_city"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateCity"/>
+                             @updateField="onUpdateCity">
+        </contact-input-field>
       </div>
 
       <div class="d-block" v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
@@ -119,7 +126,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactAttributes']),
+    ...mapGetters('contacts', ['contact', 'contactAttributes', 'changingSelectedContact']),
 
     autoHeightClass () {
       return this.is_expanded ? 'auto-height' : ''

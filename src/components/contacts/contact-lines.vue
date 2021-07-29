@@ -62,11 +62,7 @@ export default {
     ...mapGetters('contacts', ['contact', 'lines']),
 
     appliedLines () {
-      if (this.linesArray.length > 0) {
-        return this.lines.filter(line => this.linesArray.includes(line.id))
-      }
-
-      return []
+      return this.lines.filter(line => this.linesArray.includes(line.id))
     }
   },
 
@@ -131,8 +127,7 @@ export default {
         this.stringOptions = response.data
         this.options = this.stringOptions
       }).finally(() => {
-        this.linesArray = this.contact.campaign_ids
-
+        this.linesArray = this.contact.campaign_ids || []
         this.selectedLines = this.options.filter(line => this.linesArray.includes(line.id))
       })
     }
