@@ -1,19 +1,13 @@
 <template>
-<div>
-  <q-card class="my-card contact-crm-integrations-wrapper contact-integration-wrapper mt-1"
-          flat
-          bordered
-          :key="integration.name"
-          v-for="integration in activeCrmIntegrations">
-    <q-card-section>
-      <b-link class="md-btn md-raised white integrations-link d-flex"
-              target="_blank"
-              :href="integration.link">
-        <div class="integrations-logo mr-3" :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></div>
-        <span class="integration-title">{{ integration.label }}</span>
-      </b-link>
-    </q-card-section>
-  </q-card>
+<div class="contact-crm-integrations-wrapper contact-integration-wrapper">
+    <b-link class="md-btn md-raised white integrations-link d-flex"
+            target="_blank"
+            :href="integration.link"
+            :key="integration.name"
+            v-for="integration in activeCrmIntegrations">
+      <div class="integrations-logo mr-3" :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></div>
+      <span class="integration-title">{{ integration.label }}</span>
+    </b-link>
 </div>
 </template>
 

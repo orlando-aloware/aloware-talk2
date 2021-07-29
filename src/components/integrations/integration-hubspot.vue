@@ -1,15 +1,13 @@
 <template>
   <div v-if="integration_data && hubspotLink"
        class="hubspot-integration-wrapper">
-    <q-card class="my-card"
-            flat
-            bordered>
+    <q-card class="hubspot-card"
+            flat>
       <q-item>
         <q-item-section>
-          <b-link class="ml-2"
-                  target="_blank"
+          <b-link target="_blank"
                   :href="hubspotLink">
-            <i class="fab fa-hubspot hubspot-icon mr-3"></i>
+            <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
@@ -72,23 +70,23 @@
         </p>
       </q-card-section>
 
-      <q-card-section horizontal>
-        <q-card class="my-card mr-3 ml-3 deals"
+      <q-card-section class="pt-0 pb-0">
+        <q-card class="deals"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
                 flat bordered>
-          <q-card-section horizontal>
-            <q-card-section class="pl-2 pr-2">
-              <h6>
+          <q-card-section>
+            <q-card-section class="p-0">
+              <h6 class="mb-2">
                 <b-link class="deals-title"
                         :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
                         target="_blank">
                   {{ deal.properties.dealname.value }}
                 </b-link>
               </h6>
-              <p class="mb-0">
+              <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Amount: </span>
-                <span class="data-value">
+                <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
                              self="center middle">
                     {{ deal.properties.amount.value | toCurrency }}
@@ -96,9 +94,9 @@
                   {{ deal.properties.amount.value | toCurrency }}
                 </span>
               </p>
-              <p class="mb-0">
+              <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Pipeline: </span>
-                <span class="data-value">
+                <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
                              self="center middle">
                     {{ deal.properties.pipeline.label }}
@@ -106,9 +104,9 @@
                   {{ deal.properties.pipeline.label }}
                 </span>
               </p>
-              <p class="mb-0">
+              <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Stage: </span>
-                <span class="data-value">
+                <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
                              self="center middle">
                     {{ deal.properties.dealstage.label }}
@@ -122,9 +120,9 @@
       </q-card-section>
       <q-card-section>
         <b-row>
-          <b-button class="text-white text-uppercase btn-block"
+          <b-button class="text-white btn-block"
                     size="sm"
-                    variant="warning"
+                    variant="primary"
                     tabindex="0"
                     id="btn-workflow-enroll">
             <i class="fa fa-user-plus"></i>
