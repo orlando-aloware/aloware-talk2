@@ -7,6 +7,7 @@
           v-for="integration in activeCrmIntegrations">
     <q-card-section>
       <b-link class="md-btn md-raised white integrations-link d-flex"
+              target="_blank"
               :href="integration.link">
         <div class="integrations-logo mr-3" :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></div>
         <span class="integration-title">{{ integration.label }}</span>
