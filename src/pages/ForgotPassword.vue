@@ -126,9 +126,7 @@ export default {
 
     closeDialog () {
       this.success = false
-    },
-
-    ...mapActions(['setKeyboardScroll'])
+    }
   }
 }
 </script>
