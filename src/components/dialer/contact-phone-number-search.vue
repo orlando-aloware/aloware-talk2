@@ -62,7 +62,7 @@ export default {
 
     prependText () {
       if (this.no_prepend) {
-        return false
+        return ''
       }
 
       return 'To:'
