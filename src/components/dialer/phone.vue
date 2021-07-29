@@ -221,7 +221,9 @@
         </div>
       </template>
       <template v-else>
-
+        <div class="phone-main d-flex flex-column align-items-center">
+          <div class="dummy bg-dark w-100 height-36"></div>
+        </div>
       </template>
     </div>
     <div class="phone-integrations d-flex"
