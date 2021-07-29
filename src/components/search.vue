@@ -4,7 +4,8 @@
       class="form-control-search mt-2"
       :class="[border ? 'form-control' : '']"
       borderless
-      v-model="search"
+      clearable
+      v-model="searchValue"
       :placeholder="placeholder"
       :disabled="disabled"
       @input="onInput"
@@ -33,19 +34,31 @@ export default {
     border: {
       type: Boolean,
       default: true
+    },
+    search: {
+      type: String,
+      default: ''
     }
   },
   data () {
     return {
-      search: ''
+      searchValue: ''
     }
+  },
+  created () {
+    this.searchValue = this.search
   },
   methods: {
     onInput: _.debounce(function () {
-      this.$emit('search', this.search)
+      this.$emit('search', this.searchValue)
     }, 500),
     clearSearch () {
-      this.search = ''
+      this.searchValue = ''
+    }
+  },
+  watch: {
+    search () {
+      this.searchValue = this.search
     }
   }
 }

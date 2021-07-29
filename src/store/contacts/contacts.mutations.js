@@ -285,5 +285,11 @@ export default {
   RESET_CONTACTS_VUEX: (state) => {
     state.currentListFilters = {}
     state.contact = {}
+  },
+  SET_SEARCH: (state, value) => {
+    state.search = value
+  },
+  RESET_SEARCH: (state) => {
+    state.search = ''
   }
 }

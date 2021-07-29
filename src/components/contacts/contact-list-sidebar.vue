@@ -14,7 +14,7 @@
         <b-list-group class="p-2 pr-3">
           <b-list-group-item v-for="contact in contacts"
                              :key="contact.id"
-                             :to="`/contact/${contact.id}`"
+                             :to="`/contacts/${contact.id}`"
                              :class="`d-flex align-items-center border-0 ${getActiveClass(contact)}`">
             <avatar class="contact-avatar"
                     width="34"

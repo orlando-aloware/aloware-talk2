@@ -26,7 +26,7 @@
           </div>
           <div class="flex-grow-1">
             <router-link
-              :to="`/contact/${contact.id}`"
+              :to="`/contacts/${contact.id}`"
               v-slot="{ href, route, navigate }"
             >
               <a
@@ -208,7 +208,7 @@ export default {
 
     onMessage () {
       this.setMessageComposerMode('sms')
-      this.$router.push(`/contact/${this.contact.id}`)
+      this.$router.push(`/contacts/${this.contact.id}`)
     },
 
     onCall () {

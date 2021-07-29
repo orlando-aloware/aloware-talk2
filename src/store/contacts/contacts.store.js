@@ -173,6 +173,7 @@ export default function () {
       open: false,
       scope: 'user',
       template: null
-    }
+    },
+    search: ''
   }
 }

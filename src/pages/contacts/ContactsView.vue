@@ -22,6 +22,7 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <search
           class="width-250"
+          :search="search"
           @search="onSearch"
           :disabled="isLoadingDisabled">
         </search>

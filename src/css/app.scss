@@ -121,6 +121,9 @@ body,
     margin-right: 0;
     padding-left: 0;
     padding-right: 8px;
+    &.q-field__marginal {
+      height: auto !important;
+    }
   }
 
   .q-field__bottom {

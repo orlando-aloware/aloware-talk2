@@ -1,9 +1,11 @@
 <template>
   <div class="row mx-0 content-row pt-2 d-flex overflow-hidden">
-    <div class="col-lg-2 px-0 pl-lg-2 pr-lg-3 mb-3">
+    <div class="col-lg-2 px-0 pl-lg-2 pr-lg-3 mb-3"
+         v-if="$route.name === 'Contacts'">
       <contacts-sidebar v-if="auth.authenticated"></contacts-sidebar>
     </div>
-    <div class="col-lg-10 px-0 pr-lg-3 mb-3 main">
+    <div class="col-lg-10 px-0 pr-lg-3 mb-3 main"
+         :class="[ $route.name === 'Contacts' ? 'col-lg-10' : 'col-lg-12' ]">
       <router-view v-if="auth.authenticated"></router-view>
     </div>
     <remove-folder-dialog />
