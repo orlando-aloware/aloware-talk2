@@ -1,5 +1,6 @@
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'bootstrap-vue/src/index.scss';
+@import 'mixins.scss';
 @import 'src/css/breakpoints.scss';
 @import 'fonts.scss';
 @import 'variables.scss';
@@ -3302,4 +3303,8 @@ span.mention {
       overflow-y: auto;
     }
   }
+}
+
+.basic-selector {
+  @include border-radius('8px')
 }
