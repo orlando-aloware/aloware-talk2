@@ -13,7 +13,7 @@
                           :state="validPhoneNumber"
                           class="mb-0">
               <contact-phone-number-search :no_prepend="true"
-                                           class="width-214"
+                                           class="width-190"
                                            v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
@@ -33,7 +33,7 @@
             </q-btn>
           </div>
 
-          <div class="dialer-contact-info width-214">
+          <div class="dialer-contact-info width-190">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
               <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
@@ -61,7 +61,7 @@
           </b-form-group>
         </b-tab>
         <b-tab :active="mode === 'text'"
-               title="Text"
+               title="Message"
                @click="setMode('text')">
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
@@ -110,7 +110,7 @@
                 </q-btn>
               </b-input-group-text>
             </template>
-            <b-form-textarea class="textarea-no-auto-shrink text-size-sm _400 border-right-0 overflow-hidden"
+            <b-form-textarea class="textarea-no-auto-shrink text-size-sm _400 border-right-0 overflow-hidden pl-2 pr-2 border-half-rounded"
                              placeholder="Text Message..."
                              rows="2"
                              max-rows="3"

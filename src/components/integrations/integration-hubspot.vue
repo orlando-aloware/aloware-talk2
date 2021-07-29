@@ -1,14 +1,13 @@
 <template>
   <div v-if="integration_data && hubspotLink"
        class="hubspot-integration-wrapper">
-    <q-card class="my-card"
-            flat
-            bordered>
+    <q-card class="hubspot-card"
+            flat>
       <q-item>
         <q-item-section>
-          <b-link class="ml-2"
+          <b-link target="_blank"
                   :href="hubspotLink">
-            <i class="fab fa-hubspot hubspot-icon mr-3"></i>
+            <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
@@ -22,8 +21,11 @@
              <span class="data-icon-label">
               Name:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            </q-tooltip>
               {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
             </span>
         </p>
@@ -32,8 +34,11 @@
             <span class="data-icon-label">
               Email:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.email.value">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.email.value }}
+            </q-tooltip>
               {{ integration_data.properties.email.value }}
             </span>
         </p>
@@ -42,8 +47,11 @@
              <span class="data-icon-label">
               Company:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.company.value">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.email.value }}
+            </q-tooltip>
               {{ integration_data.properties.company.value }}
             </span>
         </p>
@@ -52,45 +60,57 @@
              <span class="data-icon-label">
               Owner:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
+            </q-tooltip>
               {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
             </span>
         </p>
       </q-card-section>
 
-      <q-card-section horizontal>
-        <q-card class="my-card mr-3 ml-3 deals"
+      <q-card-section class="pt-0 pb-0">
+        <q-card class="deals"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
                 flat bordered>
-          <q-card-section horizontal>
-            <q-card-section class="pl-2 pr-2">
-              <h6>
-                <b-link class="deals-title"
+          <q-card-section>
+            <q-card-section class="p-0">
+              <h6 class="mb-2">
+                <b-link class="deals-title ml-0"
                         :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
                         target="_blank">
                   {{ deal.properties.dealname.value }}
                 </b-link>
               </h6>
-              <p class="mb-0">
+              <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Amount: </span>
-                <span class="data-value"
-                      v-b-tooltip="$options.filters.toCurrency(deal.properties.amount.value)">
+                <span class="data-value ml-1">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ deal.properties.amount.value | toCurrency }}
+                  </q-tooltip>
                   {{ deal.properties.amount.value | toCurrency }}
                 </span>
               </p>
-              <p class="mb-0">
+              <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Pipeline: </span>
-                <span class="data-value"
-                      v-b-tooltip="deal.properties.pipeline.label">
+                <span class="data-value ml-1">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ deal.properties.pipeline.label }}
+                  </q-tooltip>
                   {{ deal.properties.pipeline.label }}
                 </span>
               </p>
-              <p class="mb-0">
+              <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Stage: </span>
-                <span class="data-value"
-                      v-b-tooltip="deal.properties.dealstage.label">
+                <span class="data-value ml-1">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ deal.properties.dealstage.label }}
+                  </q-tooltip>
                   {{ deal.properties.dealstage.label }}
                 </span>
               </p>
@@ -100,9 +120,9 @@
       </q-card-section>
       <q-card-section>
         <b-row>
-          <b-button class="text-white text-uppercase btn-block"
+          <b-button class="text-white btn-block"
                     size="sm"
-                    variant="warning"
+                    variant="primary"
                     tabindex="0"
                     id="btn-workflow-enroll">
             <i class="fa fa-user-plus"></i>

@@ -80,7 +80,6 @@ export default {
   },
 
   created () {
-    console.log('created')
     if (this.userAuth.authenticated) {
       this.contactId = this.$route.params.id
       this.processFetchContactInfo()
@@ -89,7 +88,6 @@ export default {
 
   watch: {
     '$route.params.id': function () {
-      console.log('watch')
       if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
         this.contactId = this.$route.params.id
         this.processFetchContactInfo()

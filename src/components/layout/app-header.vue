@@ -8,6 +8,7 @@
       </b-link>
 
       <h1>{{ ['Contact'].includes($route.name) ? 'Search Result' : $route.name }}</h1>
+      <contact-list-navigation v-if="['Contact'].includes($route.name)" />
     </div>
     <div class="ml-auto d-none d-lg-block h-100">
       <div class="d-flex h-100 align-items-center">
@@ -58,13 +59,14 @@ import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
 import Profile from 'components/profile'
 import Phone from 'components/dialer/phone'
+import ContactListNavigation from 'components/contacts/contact-list-navigation'
 
 export default {
   name: 'app-header',
 
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
-  components: { Phone, ActiveCall, DialerForm, Profile },
+  components: { ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
 
   data () {
     return {

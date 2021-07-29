@@ -121,7 +121,6 @@ export default {
       let targetElement = evt.target
       _this.isEdit = targetElement.classList.contains('details-contact-tags') || targetElement.classList.contains('btn-tag-edit') || targetElement.classList.contains('remove-tag-icon')
       evt.stopImmediatePropagation()
-      evt.preventDefault()
     })
   }
 }

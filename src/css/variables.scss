@@ -97,6 +97,9 @@ $dark: #15163f;
 $light-grey: #f8f9fa;
 $dark-grey: #343a40;
 
+//Hover Colors
+$primary-hover: #054CDB;
+
 // Text Colors
 @include text-color('primary', $primary);
 @include text-color('success', $success);
@@ -134,6 +137,10 @@ $dark-grey: #343a40;
 
 .bg-warning {
   background: $warning !important;
+}
+
+.bg-dark {
+  background: $dark !important;
 }
 
 // Font family
@@ -179,6 +186,7 @@ $f-size-h3: 16px;
 $f-size-h4: 15px;
 $f-size-h5: 14px;
 $f-size-body: 14px;
+$f-size-body-xxxl: 18px;
 $f-size-body-xxl: 17px;
 $f-size-body-sm: 13px;
 $f-size-body-xs: 12px;
@@ -219,6 +227,15 @@ body {
   @include font-size($f-size-body, 400);
   @extend .text-grey-100;
   font-family: $font-family-body;
+}
+
+.text-xxxl {
+  @include font-size($f-size-body-xxxl, 400, true);
+  @extend .text-grey-100;
+}
+
+.text-size-xxxl {
+  @include font-size($f-size-body-xxxl, 400);
 }
 
 .text-xxl {
