@@ -223,9 +223,6 @@ export default {
       if (parseInt(data.contact_id) === parseInt(this.contact_id)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
-        if (this.$refs.contactActivities) {
-          this.$refs.contactActivities.scrollMessages()
-        }
       }
     })
   },
@@ -249,9 +246,6 @@ export default {
           // push new data to top of array
           this.communicationsAndAudits.push(data)
           this.scrollMessages()
-          if (this.$refs.contactActivities) {
-            this.$refs.contactActivities.scrollMessages()
-          }
         }
       }
     },
@@ -291,17 +285,18 @@ export default {
       }
     },
 
-    async fetchContactInfo (contactId = null) {
-      const id = contactId || this.contactId
+    async fetchContactInfo () {
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
-      return this.$axios.get(`/api/v1/contact/${id}`).then(res => {
-        this.fetchContactCommunications(id, false)
+      console.log('fetching comms')
+      return this.$axios.get(`/api/v1/contact/${this.contactId}`).then(res => {
+        this.fetchContactCommunications(this.contactId, false)
           .then(() => {
             this.loadingContact = false
+            console.log('fetched comms')
 
             // if route hash contains activity info, retrieve communications
             // until id is found
@@ -311,6 +306,7 @@ export default {
             } else {
               this.loadingContactCommunications = false
             }
+            this.scrollMessages()
           })
         return res
       }).catch(err => {
@@ -371,9 +367,6 @@ export default {
       this.selectedPhoneNumber = this.selectedContact ? this.selectedContact.phoneNumber : this.selectedPhoneNumber
 
       this.scrollMessages()
-      if (this.$refs.contactActivities) {
-        this.$refs.contactActivities.scrollMessages()
-      }
 
       if (!this.smsOnly && (localStorage.getItem('PREVIOUS_ROUTE_NAME') !== 'Contacts' || forceClearLoading)) {
         this.loadingContactCommunications = false
@@ -449,9 +442,6 @@ export default {
             this.loadingContactCommunications = false
           } else {
             this.scrollMessages()
-            if (this.$refs.contactActivities) {
-              this.$refs.contactActivities.scrollMessages()
-            }
             this.loadingContactCommunications = false
           }
         })
@@ -680,12 +670,9 @@ export default {
     },
 
     scrollMessages () {
-      setTimeout(() => {
-        let activitiesWrap = this.$refs.activitiesWrap
-        if (activitiesWrap && activitiesWrap.scrollHeight) {
-          activitiesWrap.scrollTop = activitiesWrap.scrollHeight
-        }
-      }, 250)
+      if (this.$refs.contactActivities) {
+        this.$refs.contactActivities.scrollMessages()
+      }
     },
 
     isHashActivityType () {
@@ -802,9 +789,11 @@ export default {
     },
 
     processFetchContactInfo () {
+      this.selectedContactChanging(true)
       this.loadingContactInProgress()
       this.fetchContactInfo().then(res => {
         this.processFetchedContactInfo(res.data)
+        this.selectedContactChanging(false)
       }).catch(() => {
         this.loadingContactsFailed()
       })
@@ -829,7 +818,6 @@ export default {
 
     processFetchedContactInfo (selectedContact) {
       this.messageObject.contact = selectedContact
-      this.fetchedContactInfo(selectedContact)
       this.contact.first_name = selectedContact.first_name
       this.contact.last_name = selectedContact.last_name
       // TODO: update contact name in title?

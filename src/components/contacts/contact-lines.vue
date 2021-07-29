@@ -111,13 +111,14 @@ export default {
     },
 
     submitLines () {
-      talk2Api.V1.contact.storeLines(this.contact.id, { campaign_ids: this.linesArray })
-        .then(response => {
-          this.setContactLines(this.linesArray)
-        }).catch(err => {
-          console.log(err)
-          this.$root.handleErrors(err.response)
-        })
+      talk2Api.V1.contact.storeLines(this.contact.id, {
+        campaign_ids: this.linesArray
+      }).then(response => {
+        this.setContactLines(this.linesArray)
+      }).catch(err => {
+        console.log(err)
+        this.$root.handleErrors(err.response)
+      })
     },
 
     getLines () {
@@ -126,8 +127,7 @@ export default {
         this.stringOptions = response.data
         this.options = this.stringOptions
       }).finally(() => {
-        this.linesArray = this.contact.campaign_ids
-
+        this.linesArray = this.contact.campaign_ids || []
         this.selectedLines = this.options.filter(line => this.linesArray.includes(line.id))
       })
     }

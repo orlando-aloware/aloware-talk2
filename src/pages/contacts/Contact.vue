@@ -52,7 +52,7 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
@@ -79,19 +79,6 @@ export default {
     }
   },
 
-  methods: {
-    ...mapActions('contacts', ['contactsLoaded', 'setContact', 'selectedContactChanging']),
-
-    getContact (id) {
-      this.selectedContactChanging(true)
-      return this.fetchContactInfo(id).then(response => {
-        this.setContact(response.data)
-        this.selectedContactChanging(false)
-        this.$refs.contactActivities.scrollMessages()
-      })
-    }
-  },
-
   created () {
     if (this.userAuth.authenticated) {
       this.contactId = this.$route.params.id
@@ -100,9 +87,10 @@ export default {
   },
 
   watch: {
-    '$route.params.id': function (id) {
-      if (this.$route.name === 'Contact') {
-        this.getContact(id)
+    '$route.params.id': function () {
+      if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
+        this.contactId = this.$route.params.id
+        this.processFetchContactInfo()
       }
     }
   }

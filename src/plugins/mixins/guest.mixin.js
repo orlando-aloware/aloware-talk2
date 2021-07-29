@@ -80,7 +80,7 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setKeyboardScroll', 'setKeyboardResizeMode']),
+    ...mapActions(['setCurrentCompany', 'resetVuex']),
     ...mapActions('auth', ['check'])
   },
 

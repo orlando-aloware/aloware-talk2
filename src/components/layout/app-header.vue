@@ -33,6 +33,7 @@
                     anchor="bottom end"
                     self="top right"
                     v-model="dialerStatus"
+                    persistent
                     @before-show="showDialer"
                     @before-hide="hideDialer">
               <dialer-form v-model="dialerStatus"
@@ -52,7 +53,7 @@
 </template>
 
 <script>
-import { aclMixin, agentMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -63,7 +64,7 @@ import ContactListNavigation from 'components/contacts/contact-list-navigation'
 export default {
   name: 'app-header',
 
-  mixins: [aclMixin, avatarMixin, agentMixin, goBackMixin],
+  mixins: [aclMixin, avatarMixin, goBackMixin],
 
   components: { ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
 

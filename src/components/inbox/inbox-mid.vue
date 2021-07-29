@@ -36,7 +36,7 @@ export default {
   },
   created () {
     this.contactId = this.selectedContactId
-    if (this.selectedContactId) {
+    if (this.contactId) {
       this.processFetchContactInfo()
     }
   },
@@ -57,7 +57,6 @@ export default {
       return this.fetchContactInfo(id).then(response => {
         this.setContact(response.data)
         this.selectedContactChanging(false)
-        this.$refs.contactActivities.scrollMessages()
       })
     }
   },

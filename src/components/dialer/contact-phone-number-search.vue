@@ -2,11 +2,12 @@
   <vue-bootstrap-typeahead :serializer="serializer"
                            :data="phoneNumbers"
                            :minMatchingChars="3"
+                           :prepend="prependText"
+                           :class="[no_prepend ? 'no-prepend' : '']"
                            ref="searchField"
                            v-model="query"
-                           class="width-214 important search-form"
+                           class="important search-form"
                            placeholder="Name or phone number"
-                           prepend="To:"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
@@ -32,6 +33,12 @@ export default {
   props: {
     value: {
       required: false
+    },
+
+    no_prepend: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -43,10 +50,6 @@ export default {
     }
   },
 
-  mounted () {
-    this.setupForm()
-  },
-
   computed: {
     serializer () {
       return item => {
@@ -55,7 +58,19 @@ export default {
         let searchTerm = name + ' - ' + item.phone_number
         return searchTerm
       }
+    },
+
+    prependText () {
+      if (this.no_prepend) {
+        return ''
+      }
+
+      return 'To:'
     }
+  },
+
+  mounted () {
+    this.setupForm()
   },
 
   methods: {

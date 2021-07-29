@@ -62,10 +62,10 @@ export default function (/* { ssrContext } */) {
       warnings: [],
       shouldIntroduce: false,
       addedParty: null,
-      keyboard: {
-        scroll: null,
-        resizeMode: null
-      },
+      currentInputDevice: 'default',
+      inputDevices: [],
+      currentOutputDevice: 'default',
+      outputDevices: [],
       // cached states
       sidebarFolded: false,
       currentCompany: null,
@@ -138,14 +138,6 @@ export default function (/* { ssrContext } */) {
 
       setOldAgentStatus ({ commit }, status) {
         commit('SET_OLD_AGENT_STATUS', status)
-      },
-
-      setKeyboardScroll ({ commit }, status) {
-        commit('SET_KEYBOARD_SCROLL', status)
-      },
-
-      setKeyboardResizeMode ({ commit }, mode) {
-        commit('SET_KEYBOARD_RESIZE_MODE', mode)
       },
 
       setUserStatus ({ commit }, status) {
@@ -324,6 +316,22 @@ export default function (/* { ssrContext } */) {
         commit('SET_ADDED_PARTY', addedParty)
       },
 
+      setCurrentInputDevice ({ commit }, inputDevice) {
+        commit('SET_CURRENT_INPUT_DEVICE', inputDevice)
+      },
+
+      setInputDevices ({ commit }, inputDevices) {
+        commit('SET_INPUT_DEVICES', inputDevices)
+      },
+
+      setCurrentOutputDevice ({ commit }, outputDevice) {
+        commit('SET_CURRENT_OUTPUT_DEVICE', outputDevice)
+      },
+
+      setOutputDevices ({ commit }, outputDevices) {
+        commit('SET_OUTPUT_DEVICES', outputDevices)
+      },
+
       setSmsTemplates ({ commit }, smsTemplates) {
         commit('SET_SMS_TEMPLATES', smsTemplates)
       },
@@ -413,26 +421,6 @@ export default function (/* { ssrContext } */) {
 
       SET_OLD_AGENT_STATUS (state, status) {
         state.oldAgentStatus = status
-      },
-
-      SET_KEYBOARD_SCROLL (state, status) {
-        if (
-          state.keyboard.scroll !== null ||
-          state.keyboard.scroll !== status
-        ) {
-          state.keyboard.scroll = status
-          window.Keyboard.disableScroll(!status)
-        }
-      },
-
-      SET_KEYBOARD_RESIZE_MODE (state, mode) {
-        if (
-          state.keyboard.resizeMode !== null ||
-          state.keyboard.resizeMode !== mode
-        ) {
-          state.keyboard.resizeMode = mode
-          window.Keyboard.setResizeMode(mode)
-        }
       },
 
       SET_USER_STATUS (state, status) {
@@ -742,6 +730,22 @@ export default function (/* { ssrContext } */) {
 
       SET_ADDED_PARTY (state, addedParty) {
         state.addedParty = addedParty
+      },
+
+      SET_CURRENT_INPUT_DEVICE (state, inputDevice) {
+        state.currentInputDevice = inputDevice
+      },
+
+      SET_INPUT_DEVICES (state, inputDevices) {
+        state.inputDevices = inputDevices
+      },
+
+      SET_CURRENT_OUTPUT_DEVICE (state, outputDevice) {
+        state.currentOutputDevice = outputDevice
+      },
+
+      SET_OUTPUT_DEVICES (state, outputDevices) {
+        state.outputDevices = outputDevices
       },
 
       SET_SMS_TEMPLATES (state, smsTemplates) {
