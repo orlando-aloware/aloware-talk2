@@ -922,7 +922,6 @@ i.option-separator {
 }
 
 .q-input-borderless {
-
   textarea {
     min-height: 500px;
   }
@@ -2727,6 +2726,9 @@ span.mention {
 /*
  Quasar related
  */
+.q-menu {
+  @extend .border-rounded;
+}
 
 .no-q-btn-focus {
   &:hover, &:focus {
@@ -2859,11 +2861,11 @@ span.mention {
   width: 55px;
 }
 
-.width-214 {
-  width: 214px;
+.width-190 {
+  width: 190px;
 
   &.important {
-    width: 214px !important;
+    width: 190px !important;
   }
 }
 
@@ -3141,6 +3143,7 @@ span.mention {
   &.no-prepend {
     .form-control {
       border-width: 1px !important;
+      border-radius: 6px;
     }
   }
 
@@ -3149,6 +3152,7 @@ span.mention {
     padding-left: 8px;
     border-width: 1px 1px 1px 0 !important;
     color: $grey-100;
+    border-radius: 6px;
 
     &::-webkit-input-placeholder {
       font-size: $f-size-body-xs;
@@ -3162,6 +3166,8 @@ span.mention {
   }
 
   .input-group-prepend {
+    margin-right: 0;
+
     .input-group-text {
       width: 100%;
       text-align: left;
@@ -3177,6 +3183,7 @@ span.mention {
     border-width: 1px 0 1px 1px !important;
     padding-left: 8px;
     padding-right: 0;
+    border-radius: 6px;
 
     @extend .text-size-xs;
     @extend .text-grey-80;
@@ -3187,7 +3194,11 @@ span.mention {
   .col-auto {
     padding-left: 16px !important;
     padding-right: 16px !important;
-    border-right: 0.5px solid $grey-70;
+    border-right: 0.5px solid $grey-60;
+  }
+
+  .nav-pills .nav-link {
+    text-align: right;
   }
 
   textarea {
@@ -3215,9 +3226,11 @@ span.mention {
   .q-field__control {
     min-height: 32px !important;
     height: 32px !important;
+    border-radius: 6px;
 
     &:before {
       border: 1px solid $grey-70 !important;
+      border-radius: 6px;
     }
   }
 
