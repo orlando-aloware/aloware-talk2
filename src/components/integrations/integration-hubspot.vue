@@ -1,13 +1,15 @@
 <template>
-  <div v-if="integration_data"
+  <div v-if="integration_data && hubspotLink"
        class="hubspot-integration-wrapper">
     <q-card class="my-card"
             flat
             bordered>
       <q-item>
         <q-item-section>
-          <b-link class="ml-2" :href="hubspotLink()">
-            <i class="fab fa-hubspot hubspot-icon mr-3"></i> <span class="integration-title">Hubspot</span>
+          <b-link class="ml-2"
+                  :href="hubspotLink">
+            <i class="fab fa-hubspot hubspot-icon mr-3"></i>
+            <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
       </q-item>
@@ -66,7 +68,7 @@
             <q-card-section class="pl-2 pr-2">
               <h6>
                 <b-link class="deals-title"
-                        :href="hubspotContactBaseLink() + 'deal/' + deal.dealId"
+                        :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
                         target="_blank">
                   {{ deal.properties.dealname.value }}
                 </b-link>
@@ -152,8 +154,29 @@ export default {
 
   computed: {
     ...mapState(['currentCompany']),
+
     isWorkflowValid () {
       return this.workflow.id
+    },
+
+    hubspotContactBaseLink () {
+      if (this.currentCompany &&
+        this.currentCompany.hubspot_integration_enabled &&
+        this.contact &&
+        this.contact.integration_data &&
+        this.currentCompany.hubspot_marketing_portal_id) {
+        return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
+      }
+
+      return false
+    },
+
+    hubspotLink () {
+      if (this.hubspotContactBaseLink) {
+        return `${this.hubspotContactBaseLink}contact/${this.contact.integration_data.hubspot.contact_id}`
+      }
+
+      return false
     }
   },
 
@@ -232,26 +255,6 @@ export default {
         .finally(() => {
           this.isEnrolling = false
         })
-    },
-
-    hubspotContactBaseLink () {
-      if (this.currentCompany &&
-        this.currentCompany.hubspot_integration_enabled &&
-        this.contact &&
-        this.contact.integration_data &&
-        this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
-      }
-
-      return false
-    },
-
-    hubspotLink () {
-      if (this.hubspotContactBaseLink()) {
-        return `${this.hubspotContactBaseLink()}contact/${this.contact.integration_data.hubspot.contact_id}`
-      }
-
-      return false
     }
   },
 

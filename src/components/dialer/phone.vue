@@ -111,7 +111,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW">
+      <template v-if="![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2)">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="dialer.contact && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"

@@ -62,7 +62,11 @@ export default {
     ...mapGetters('contacts', ['contact', 'lines']),
 
     appliedLines () {
-      return this.lines.filter(line => this.linesArray.includes(line.id))
+      if (this.linesArray.length > 0) {
+        return this.lines.filter(line => this.linesArray.includes(line.id))
+      }
+
+      return []
     }
   },
 
@@ -111,13 +115,14 @@ export default {
     },
 
     submitLines () {
-      talk2Api.V1.contact.storeLines(this.contact.id, { campaign_ids: this.linesArray })
-        .then(response => {
-          this.setContactLines(this.linesArray)
-        }).catch(err => {
-          console.log(err)
-          this.$root.handleErrors(err.response)
-        })
+      talk2Api.V1.contact.storeLines(this.contact.id, {
+        campaign_ids: this.linesArray
+      }).then(response => {
+        this.setContactLines(this.linesArray)
+      }).catch(err => {
+        console.log(err)
+        this.$root.handleErrors(err.response)
+      })
     },
 
     getLines () {

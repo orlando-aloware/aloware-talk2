@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from '../../constants/agent-status'
 
@@ -109,7 +110,7 @@ export default {
       }
     },
 
-    changeAgentStatus (val, changeAgentStatusTry = 1) {
+    changeAgentStatus: _.debounce(function (val, changeAgentStatusTry = 1) {
       if (!this.authenticated) {
         return
       }
@@ -145,7 +146,12 @@ export default {
           }
         })
       }
-    },
+    }, 500),
+
     ...mapActions(['setOldAgentStatus'])
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('change_agent_status')
   }
 }
