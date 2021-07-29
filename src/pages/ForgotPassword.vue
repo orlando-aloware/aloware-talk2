@@ -1,10 +1,14 @@
 <template>
   <section :class="[success ? 'default-bg' : '']"
            class="row w-100 h-100 mx-0">
-    <login-large-screens-info v-show="!success" class="col-5 px-0" />
-    <div v-if="!success" class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
+    <login-large-screens-info v-show="!success"
+                              class="col-5 px-0">
+    </login-large-screens-info>
+    <div v-if="!success"
+         class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-        <img src="app-icons/misc/logo.svg" class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0" />
+        <img src="app-icons/misc/logo.svg"
+             class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0"/>
         <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-2 mb-1">
           Reset Password
         </div>
@@ -17,13 +21,14 @@
               @submit.prevent="forgotPassword">
           <div class="field pb-2 pb-sm-2">
             <div class="control has-icons-left">
-              <q-input outlined
+              <q-input v-model="user.email"
                        class="input rectangle"
                        type="email"
                        label="Email"
                        autocomplete="username"
-                       v-model="user.email"
-                       required />
+                       outlined
+                       required>
+              </q-input>
             </div>
           </div>
           <div class="field mt-4 pt-1 text-left">
@@ -33,7 +38,7 @@
               color="positive"
               type="submit"
               style="width: 190px; height: 50px;"
-              :loading="loading" />
+              :loading="loading"/>
           </div>
           <div class="description-sm field text-left pt-3 mt-1">
             Just Remembered?
@@ -49,17 +54,22 @@
               class="h-100 w-100 d-flex justify-content-center align-items-center text-center">
       <q-card
         class="thank-you-container">
-          <q-card-section class="row items-center q-pb-none mx-1">
-            <q-space />
-            <q-btn icon="close" flat round dense v-close-popup />
-          </q-card-section>
+        <q-card-section class="row items-center q-pb-none mx-1">
+          <q-space/>
+          <q-btn icon="close"
+                 flat
+                 round
+                 dense
+                 v-close-popup>
+          </q-btn>
+        </q-card-section>
 
         <q-card-section class="text-center">
           <q-icon
             name="fas fa-check"
             color="positive"
             class="cursor-pointer rounded-icon-opaque p-2 mx-4 mb-4"
-            style="font-size: 1.3em" />
+            style="font-size: 1.3em"/>
           <div class="title w-100 pb-2">Thank You!</div>
           <div class="message pb-4 mb-1">Please check your email.</div>
         </q-card-section>
@@ -71,10 +81,12 @@
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import { guestMixin } from '../boot/mixins'
-import { mapActions } from 'vuex'
+
 export default {
   name: 'forgot-password',
+
   mixins: [guestMixin],
+
   components: { LoginLargeScreensInfo },
 
   data () {
@@ -87,6 +99,7 @@ export default {
       success: false
     }
   },
+
   created () {
     this.title = 'Forgot Password'
   },
