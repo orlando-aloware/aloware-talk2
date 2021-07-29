@@ -78,7 +78,7 @@
           <q-card-section>
             <q-card-section class="p-0">
               <h6 class="mb-2">
-                <b-link class="deals-title"
+                <b-link class="deals-title ml-0"
                         :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
                         target="_blank">
                   {{ deal.properties.dealname.value }}
