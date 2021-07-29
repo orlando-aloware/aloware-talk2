@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { aclMixin, agentMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -62,7 +62,7 @@ import Phone from 'components/dialer/phone'
 export default {
   name: 'app-header',
 
-  mixins: [aclMixin, avatarMixin, agentMixin, goBackMixin],
+  mixins: [aclMixin, avatarMixin, goBackMixin],
 
   components: { Phone, ActiveCall, DialerForm, Profile },
 

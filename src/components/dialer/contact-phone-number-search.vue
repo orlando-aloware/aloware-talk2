@@ -6,7 +6,7 @@
                            :class="[no_prepend ? 'no-prepend' : '']"
                            ref="searchField"
                            v-model="query"
-                           class="width-214 important search-form"
+                           class="important search-form"
                            placeholder="Name or phone number"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
@@ -62,7 +62,7 @@ export default {
 
     prependText () {
       if (this.no_prepend) {
-        return false
+        return ''
       }
 
       return 'To:'

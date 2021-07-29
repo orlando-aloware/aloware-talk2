@@ -243,7 +243,7 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage', 'setKeyboardScroll']),
+    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
     ...mapActions('auth', ['login', 'resetPass'])
   }
 }

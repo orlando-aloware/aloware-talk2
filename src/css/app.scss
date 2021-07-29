@@ -1,6 +1,5 @@
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'bootstrap-vue/src/index.scss';
-@import 'mixins.scss';
 @import 'src/css/breakpoints.scss';
 @import 'fonts.scss';
 @import 'variables.scss';
@@ -424,11 +423,7 @@ body,
   }
 
   & .q-item > .q-btn {
-    &:hover, &:focus {
-      & .q-focus-helper {
-        display: none !important;
-      }
-    }
+    @extend .no-q-btn-focus;
   }
 
   & .q-icon {
@@ -445,13 +440,7 @@ body,
     width: 48px;
     height: 52px;
 
-    &:hover, &:focus {
-      color: transparent;
-
-      & .q-focus-helper {
-        display: none !important;
-      }
-    }
+    @extend .no-q-btn-focus;
 
     & .q-icon {
       width: auto;
@@ -1895,8 +1884,7 @@ span.mention {
 //ABOUT THIS CONTACT
 .contact-about-wrapper {
   .information-container {
-    font-size: 90%;
-    height: 210px;
+    height: 225px;
     overflow: hidden;
     padding: 0 !important;
     margin-bottom: 12px;
@@ -2064,7 +2052,7 @@ span.mention {
 }
 
 .contact-crm-integrations-wrapper {
-  .integrations-link{
+  .integrations-link {
     display: block;
     text-decoration: none;
     color: $grey-100;
@@ -2621,6 +2609,15 @@ span.mention {
 /*
  Quasar related
  */
+
+.no-q-btn-focus {
+  &:hover, &:focus {
+    & .q-focus-helper {
+      display: none !important;
+    }
+  }
+}
+
 .q-select__dropdown-icon {
   font-size: 16px;
 }
@@ -2702,6 +2699,10 @@ span.mention {
 
 .height-12 {
   height: 12px;
+}
+
+.height-16 {
+  height: 16px;
 }
 
 .height-22 {
@@ -3008,7 +3009,6 @@ span.mention {
 }
 
 .dialer-contact-info {
-  width: 214px;
   padding-left: 11px;
   padding-right: 11px;
   margin-top: 2px;
@@ -3066,6 +3066,22 @@ span.mention {
     padding-left: 16px !important;
     padding-right: 16px !important;
     border-right: 0.5px solid $grey-70;
+  }
+
+  textarea {
+    color: $grey-100 !important;
+
+    &::-webkit-input-placeholder {
+      color: $grey-80;
+    }
+  }
+
+  textarea:focus {
+    border-color: $grey-70 !important;
+    border-style: solid;
+    border-width: 1px 0 1px 1px !important;
+    box-shadow: none !important;
+    overflow: hidden;
   }
 }
 
@@ -3302,6 +3318,32 @@ span.mention {
       padding: 0;
       overflow-y: auto;
     }
+  }
+}
+
+.phone-settings {
+  width: 210px;
+  @extend .q-pa-md;
+
+  .q-field__native {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 2px 0;
+    font-size: $f-size-body;
+  }
+
+  .q-field__control {
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+
+  .q-field__marginal {
+    height: 32px !important;
+  }
+
+  .btn:focus, .btn.focus {
+    box-shadow: none;
+    text-decoration: none;
   }
 }
 
