@@ -32,7 +32,7 @@
               ref="dataTableCheckAll"
               type="checkbox"
               v-if="column.name === 'checkbox'"
-              @click="onCheckboxClicked"
+              @change="onCheckboxClicked"
             />
             <template v-if="column.name && column.name !== 'checkbox'">
               <span :class="{ handle: column.draggable }"

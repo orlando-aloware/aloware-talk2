@@ -2,11 +2,11 @@
   <div class="bulk-action-menu">
     <div class="menu-actions d-flex justify-content-around">
       <span>{{ getSelectedCount }} selected</span>
-      <a href="#">
+      <a href="#" :disabled="true">
         <i class="fa fa-layer-group"></i>
         Enroll in Sequence
       </a>
-      <a href="#">
+      <a href="#" :disabled="true">
         <i class="fa fa-crosshairs"></i>
         Power Dialer
       </a>

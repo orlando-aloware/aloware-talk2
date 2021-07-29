@@ -6,7 +6,7 @@
             bordered>
       <q-item>
         <q-item-section>
-          <b-link class="ml-2" :href="hubspotLink()">
+          <b-link class="ml-2" :href="hubspotLink()" target="_blank">
             <i class="fab fa-hubspot hubspot-icon mr-3"></i> <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
@@ -20,8 +20,11 @@
              <span class="data-icon-label">
               Name:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            </q-tooltip>
               {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
             </span>
         </p>
@@ -30,8 +33,11 @@
             <span class="data-icon-label">
               Email:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.email.value">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.email.value }}
+            </q-tooltip>
               {{ integration_data.properties.email.value }}
             </span>
         </p>
@@ -40,8 +46,11 @@
              <span class="data-icon-label">
               Company:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.company.value">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.email.value }}
+            </q-tooltip>
               {{ integration_data.properties.company.value }}
             </span>
         </p>
@@ -50,8 +59,11 @@
              <span class="data-icon-label">
               Owner:
             </span>
-          <span class="data-value"
-                v-b-tooltip="integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName">
+          <span class="data-value">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
+            </q-tooltip>
               {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
             </span>
         </p>
@@ -73,22 +85,31 @@
               </h6>
               <p class="mb-0">
                 <span class="data-icon-label">Amount: </span>
-                <span class="data-value"
-                      v-b-tooltip="$options.filters.toCurrency(deal.properties.amount.value)">
+                <span class="data-value">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ deal.properties.amount.value | toCurrency }}
+                  </q-tooltip>
                   {{ deal.properties.amount.value | toCurrency }}
                 </span>
               </p>
               <p class="mb-0">
                 <span class="data-icon-label">Pipeline: </span>
-                <span class="data-value"
-                      v-b-tooltip="deal.properties.pipeline.label">
+                <span class="data-value">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ deal.properties.pipeline.label }}
+                  </q-tooltip>
                   {{ deal.properties.pipeline.label }}
                 </span>
               </p>
               <p class="mb-0">
                 <span class="data-icon-label">Stage: </span>
-                <span class="data-value"
-                      v-b-tooltip="deal.properties.dealstage.label">
+                <span class="data-value">
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ deal.properties.dealstage.label }}
+                  </q-tooltip>
                   {{ deal.properties.dealstage.label }}
                 </span>
               </p>
@@ -247,11 +268,11 @@ export default {
     },
 
     hubspotLink () {
-      if (this.hubspotContactBaseLink()) {
+      if (this.hubspotContactBaseLink() && this.contact.integration_data.hubspot) {
         return `${this.hubspotContactBaseLink()}contact/${this.contact.integration_data.hubspot.contact_id}`
       }
 
-      return false
+      return '#'
     }
   },
 

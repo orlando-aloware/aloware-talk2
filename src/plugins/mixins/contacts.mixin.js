@@ -35,7 +35,7 @@ export default {
       this.fetch({
         search: this.searchText,
         page: this.listItems[this.id].current_page,
-        comm_sort_by: `${sorts.orderBy}:${sorts.order}`
+        order_by: `${sorts.orderBy}:${sorts.order}`
       })
     },
     onLoadMore () {
@@ -160,6 +160,10 @@ export default {
 
       if (!_.isEmpty(this.currentListFilters)) {
         query.filter_groups = query.filter_groups.concat(this.currentListFilters)
+      }
+
+      if (params.order_by) {
+        query.order_by = params.order_by
       }
 
       return query

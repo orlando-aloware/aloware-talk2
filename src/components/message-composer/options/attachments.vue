@@ -20,19 +20,19 @@
                accept=".pdf,.jpg,.jpeg,.png,.pdf,.mp4,.amr"
                @change="onAdded" />
       </b-form-group>
+      <b-progress v-if="!isUploading"
+                  class="attachment-upload-progress"
+                  variant="success"
+                  :max="100">
+        <b-progress-bar :value="uploadPercentage"
+                        :label="`${uploadPercentage}%`"/>
+      </b-progress>
     </form>
-
-    <b-progress v-if="isUploading"
-                variant="success"
-                :max="100">
-      <b-progress-bar :value="uploadPercentage"
-                      :label="`${uploadPercentage}%`"/>
-    </b-progress>
     <p v-if="hasError"
        class="error-notice">
       Error while uploading attachment...
     </p>
-    <div class="text-center mt-3 notice">
+    <div class="text-center mt-5 notice">
       <p class="mb-0"><a href="https://www.twilio.com/docs/sms/accepted-mime-types#accepted-mime-types" target="_blank">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>
       <p class="mb-0">Other file types should be below 600KB</p>
@@ -121,66 +121,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.attachment-wrapper {
-  height: 215px;
-  width: 362px;
-  border: 1px dashed #D8D8D8;
-  border-radius: 4px;
-  padding: 10px;
-
-  #fileInput {
-    position: relative;
-  }
-
-  .uploader-label {
-    position: absolute;
-    width: 100%;
-    top: 15px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  form {
-    height: 14vh;
-    cursor: pointer;
-  }
-
-  #fileInput.dragdrop .custom-file,
-  #fileInput.dragdrop .custom-file-input {
-    height: 100px;
-  }
-
-  #fileInput.dragdrop .custom-file-label {
-    height: 100px;
-    line-height: 90px;
-    text-align: center;
-    padding: 0;
-    border: none !important;
-    background: transparent;
-  }
-
-  #fileInput.dragdrop .custom-file-label span {
-    visibility: hidden;
-  }
-
-  #fileInput.dragdrop .custom-file-label::after {
-    display: none;
-  }
-
-  .notice {
-    font-size: 12px;
-  }
-
-  [v-cloak] {
-    display: none;
-  }
-
-  .error-notice {
-    text-align: center;
-    color: #721c24;
-    font-size: 80%;
-  }
-}
-</style>

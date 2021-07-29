@@ -116,6 +116,7 @@
           <b-dropdown class="message-composer-dropdown"
                       variant="primary"
                       size="sm"
+                      :disabled="!validSms"
                       right>
             <b-dropdown-item :disabled="!validSms"
                              @click="showScheduleMessage">
@@ -186,7 +187,10 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validSms: function () {
-      return this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0 && this.selectedLine && this.messageComposer.sms.phone_number && this.messageComposer.sms.phone_number.length > 0
+      return ((this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0) &&
+        this.selectedLine &&
+        this.messageComposer.sms.phone_number &&
+        this.messageComposer.sms.phone_number.length > 0
     }
   },
   data () {

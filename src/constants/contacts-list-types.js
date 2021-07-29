@@ -98,7 +98,7 @@ export const ALL_COLUMNS = [
     name: 'email',
     label: 'Email',
     category: 0,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -116,7 +116,7 @@ export const ALL_COLUMNS = [
     name: 'date_of_birth',
     label: 'Date of Birth',
     category: 0,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -125,7 +125,7 @@ export const ALL_COLUMNS = [
     name: 'text_authorized_at',
     label: 'TCPA Approved',
     category: 0,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -134,7 +134,7 @@ export const ALL_COLUMNS = [
     name: 'address',
     label: 'Address',
     category: 1,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -143,7 +143,7 @@ export const ALL_COLUMNS = [
     name: 'cnam_state',
     label: 'State',
     category: 1,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -152,7 +152,7 @@ export const ALL_COLUMNS = [
     name: 'cnam_city',
     label: 'City',
     category: 1,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -161,7 +161,7 @@ export const ALL_COLUMNS = [
     name: 'cnam_zipcode',
     label: 'Zip Code',
     category: 1,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -170,7 +170,7 @@ export const ALL_COLUMNS = [
     name: 'cnam_country',
     label: 'Country',
     category: 1,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -179,7 +179,7 @@ export const ALL_COLUMNS = [
     name: 'timezone',
     label: 'Timezone',
     category: 1,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -188,7 +188,7 @@ export const ALL_COLUMNS = [
     name: 'website',
     label: 'Website',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -197,7 +197,7 @@ export const ALL_COLUMNS = [
     name: 'company_name',
     label: 'Company Name',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -206,7 +206,7 @@ export const ALL_COLUMNS = [
     name: 'lead_source',
     label: 'Lead Source',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -215,7 +215,7 @@ export const ALL_COLUMNS = [
     name: 'intake_source',
     label: 'Intake Source',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -224,7 +224,7 @@ export const ALL_COLUMNS = [
     name: 'broadcasts',
     label: 'Broadcast',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -233,7 +233,7 @@ export const ALL_COLUMNS = [
     name: 'contact_lists',
     label: 'Contact List',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -242,7 +242,7 @@ export const ALL_COLUMNS = [
     name: 'contact_owner',
     label: 'Contact Owner',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -251,7 +251,7 @@ export const ALL_COLUMNS = [
     name: 'contact_disposition',
     label: 'Disposition Status',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -260,7 +260,7 @@ export const ALL_COLUMNS = [
     name: 'lines',
     label: 'Line',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -269,7 +269,7 @@ export const ALL_COLUMNS = [
     name: 'ring_groups',
     label: 'Ring Group',
     category: 2,
-    sortable: true,
+    sortable: false,
     draggable: true,
     resizable: true,
     default: false
@@ -309,7 +309,7 @@ export const ALL_COLUMNS = [
     name: 'inbound_call_count',
     label: 'Inbound Calls',
     category: 3,
-    sortable: false,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false
@@ -318,7 +318,7 @@ export const ALL_COLUMNS = [
     name: 'outbound_call_count',
     label: 'Outbound Calls',
     category: 3,
-    sortable: false,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false
@@ -363,7 +363,7 @@ export const ALL_COLUMNS = [
     name: 'inbound_sms_count',
     label: 'Inbound SMS',
     category: 3,
-    sortable: false,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false

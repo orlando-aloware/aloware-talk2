@@ -11,7 +11,7 @@
           class="checker"
           :value="contact.id"
           :checked="checked.find(item => item.id === contact.id)"
-          @click="onCheckerClicked"
+          @change="onCheckerClicked"
         />
       </td>
 
@@ -187,15 +187,16 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
     onCheckerClicked () {
-      const checked = new Set([...this.checked])
-
-      if (this.checked.includes(this.contact)) {
-        checked.delete(this.contact)
+      let items = []
+      let found = this.checked.find(item => item.id === this.contact.id)
+      if (found) {
+        items = this.checked.filter(item => item.id !== this.contact.id)
       } else {
-        checked.add(this.contact)
+        items = [...this.checked]
+        items.push(this.contact)
       }
 
-      this.$emit('checked', [...checked])
+      this.$emit('checked', items)
     },
 
     onRemove () {
