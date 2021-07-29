@@ -230,6 +230,41 @@
                     height="50">
             </avatar>
           </div>
+          <div class="phone-info d-flex flex-column align-items-center">
+            <div class="text-grey-100 text-center">
+              <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
+                            v-if="dialer.contact">
+                <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                <q-btn color="text-grey-100"
+                       icon="o_info"
+                       class="text-size-rg d-inline-flex ml-1"
+                       flat
+                       round
+                       @click="goToContact">
+                </q-btn>
+              </q-item-label>
+              <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
+                <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                <b-link href="#"
+                        class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                        @click.prevent="copyPhoneNumber">
+                  <i class="material-icons">content_copy</i>
+                </b-link>
+                <input :value="dialer.communication.lead_number"
+                       type="hidden"
+                       id="phone-number-clone"/>
+              </q-item-label>
+              <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
+                            v-if="dialer.contact && dialer.contact.company_name">
+                <span>{{ dialer.contact.company_name }}</span>
+                <span class="ml-1 mr-1"
+                      v-if="currentLocalTime">
+                  ·
+                </span>
+                <span v-if="currentLocalTime">{{ currentLocalTime }}</span>
+              </q-item-label>
+            </div>
+          </div>
         </div>
       </template>
     </div>
