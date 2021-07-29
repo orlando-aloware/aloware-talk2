@@ -98,6 +98,7 @@
             <template #append>
               <b-input-group-text class="bg-white border-left-0 align-items-end">
                 <q-btn :disable="sendDisabled"
+                       :ripple="false"
                        class="height-16 no-q-btn-focus"
                        padding="none"
                        flat
@@ -122,8 +123,7 @@
           <b-form-group :invalid-feedback="invalidCampaign"
                         :state="validCampaign"
                         class="mb-1">
-            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
-                           v-model="campaignId"
+            <line-selector v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>
@@ -331,7 +331,7 @@ export default {
     },
 
     makeCall () {
-      if (!this.validPhoneNumber || !this.campaignId || !this.currentNumber) {
+      if (this.callDisabled) {
         return
       }
 
@@ -347,32 +347,36 @@ export default {
     },
 
     sendText () {
-      if (!this.validPhoneNumber) {
+      if (this.sendDisabled) {
         return
       }
 
-      if (this.contactId) {
+      this.loading_btn = true
+      this.$axios.post('/api/v1/campaign/send-message-to-phone-number/' + this.campaignId, {
+        phone_number: this.$options.filters.fixPhone(this.phoneNumber),
+        message: this.textMessage
+      }).then(res => {
+        this.loading_btn = false
+        this.hideDialer()
         this.$router.push({
           name: 'Contact',
           params: {
-            id: this.contactId,
-            campaignId: this.outboundCampaignId
+            id: res.data.id
           }
         }).catch(err => {
           console.log(err)
         })
-      } else {
-        this.addContactByPhoneNumber(this.phoneNumber).then((data) => {
-          this.$router.push({
-            name: 'Contact',
-            params: {
-              id: data.id,
-              campaignId: this.outboundCampaignId
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        })
+      }).catch(err => {
+        this.loading_btn = false
+        this.$handleErrors(err.response)
+      })
+    },
+
+    resetSMS () {
+      this.sms = {
+        campaign_id: null,
+        phone_number: null,
+        message: null
       }
     }
   },

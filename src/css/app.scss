@@ -440,13 +440,7 @@ body,
     width: 48px;
     height: 52px;
 
-    &:hover, &:focus {
-      color: transparent;
-
-      & .q-focus-helper {
-        display: none !important;
-      }
-    }
+    @extend .no-q-btn-focus;
 
     & .q-icon {
       width: auto;
