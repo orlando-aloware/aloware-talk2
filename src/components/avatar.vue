@@ -68,7 +68,6 @@ export default {
   align-items: center;
   justify-content: center;
   color: $white;
-  font-size: 13px;
   font-weight: bold;
   line-height: 0;
   letter-spacing: 0.35px;

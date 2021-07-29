@@ -19,7 +19,8 @@
             <avatar class="contact-avatar"
                     width="34"
                     height="34"
-                    :name="contact.name"/>
+                    :name="contact.name">
+            </avatar>
             <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
               <div class="mr-auto">
                 <p class="text-bold contact-name mb-0">
@@ -60,7 +61,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import Avatar from 'components/avatar.vue'
+import Avatar from 'components/avatar'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 
 let scrollTimeout

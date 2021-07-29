@@ -223,12 +223,21 @@
       <template v-else>
         <div class="phone-main d-flex flex-column align-items-center">
           <div class="dummy bg-dark w-100 height-36"></div>
+          <div class="phone-avatar">
+            <avatar :name="contactName"
+                    class="contact-avatar text-size-xxxl"
+                    width="50"
+                    height="50">
+            </avatar>
+          </div>
         </div>
       </template>
     </div>
-    <div class="phone-integrations d-flex"
+    <div :class="[ ![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2) ? 'bg-dark' : 'bg-white']"
+         class="phone-integrations d-flex"
          v-if="dialer.contact">
-      <q-expansion-item class="shadow-1 overflow-hidden w-100"
+      <q-expansion-item v-model="expanded"
+                        class="shadow-1 overflow-hidden w-100"
                         style="border-radius: 12px"
                         label="Integrations"
                         header-class="text-sm bg-white text-center"
@@ -238,7 +247,8 @@
         <q-card>
           <q-card-section class="height-200">
             <contact-integrations :contact="dialer.contact"
-                                  :no_title="true">
+                                  :no_title="true"
+                                  v-show="expanded">
             </contact-integrations>
           </q-card-section>
         </q-card>
@@ -252,6 +262,7 @@ import { mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
+import Avatar from 'components/avatar'
 import ContactIntegrations from 'components/contacts/contact-integrations'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -261,7 +272,13 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 export default {
   name: 'phone',
 
-  components: { PersonIcon, AcceptCallIcon, CancelCallIcon, ContactIntegrations },
+  components: {
+    Avatar,
+    PersonIcon,
+    AcceptCallIcon,
+    CancelCallIcon,
+    ContactIntegrations
+  },
 
   props: {
     is_widget: {
@@ -302,6 +319,7 @@ export default {
       inputDevice: 'default',
       outputDevice: 'default',
       loadingCommunication: false,
+      expanded: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,

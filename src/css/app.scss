@@ -2740,8 +2740,12 @@ span.mention {
   font-size: 16px;
 }
 
+.q-pa-sm {
+  padding: 10px;
+}
+
 .q-pa-md {
-  padding: 12px 12px;
+  padding: 12px;
 }
 
 .q-btn.icon-btn {
@@ -3416,6 +3420,10 @@ span.mention {
     width: 100%;
     height: 100%;
     background: $white;
+
+    .phone-avatar {
+      margin-top: -29px;
+    }
   }
 
   .phone-integrations {
@@ -3440,6 +3448,12 @@ span.mention {
     .q-expansion-item__content > .q-card > .q-card__section {
       padding: 0;
       overflow-y: auto;
+    }
+
+    .integrations-card {
+      .card-body {
+        @extend .q-pa-sm;
+      }
     }
   }
 
