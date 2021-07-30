@@ -15,7 +15,7 @@
           <b-list-group-item v-for="contact in contacts"
                              :key="contact.id"
                              :to="`/contacts/${contact.id}`"
-                             :class="`d-flex align-items-center border-0 ${getActiveClass(contact)}`">
+                             class="d-flex align-items-center border-0">
             <avatar class="contact-avatar"
                     width="34"
                     height="34"
@@ -102,10 +102,6 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed']),
-
-    getActiveClass (contact) {
-      return `${(this.$route.params.id === String(contact.id) ? 'active' : '')}`
-    },
 
     onBottomScroll () {
       clearTimeout(scrollTimeout)

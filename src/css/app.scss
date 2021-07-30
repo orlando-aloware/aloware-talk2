@@ -1677,6 +1677,11 @@ span.mention {
   justify-content: flex-end;
   position: relative;
 
+  .router-link-exact-active {
+    margin-top: 0 !important;
+    @extend .active;
+  }
+
   .sidebar-toggle {
     position: absolute;
     top: 8px;
@@ -1697,8 +1702,8 @@ span.mention {
 
     .list-group-item {
       padding: 0.75rem 0.5rem;
-      margin-top: 2px;
       height: 65px;
+      margin-bottom: 13px;
     }
 
     .list-group-item.active,
