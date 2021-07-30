@@ -90,16 +90,45 @@
     </div>
     <div class="d-flex justify-content-between">
       <div class="message-options">
-        <b-link href="#" id="smsGif">
+        <b-link href="#">
+          <q-menu content-class="mx-height-500"
+                  ref="giphyMenu"
+                  :offset="[0,5]" >
+            <div class="row no-wrap q-pa-md">
+              <search-giphy @selected="setMessageGif"></search-giphy>
+            </div>
+          </q-menu>
+
           <gif-icon></gif-icon>
         </b-link>
-        <b-link href="#" id="smsAttachments">
+
+        <b-link href="#">
+          <q-menu ref="attachmentMenu"
+                  :offset="[0,5]">
+            <div class="row no-wrap q-pa-md">
+              <attachments @attachmentUploaded="onAttachmentUploaded"></attachments>
+            </div>
+          </q-menu>
           <attachment-icon></attachment-icon>
         </b-link>
-        <b-link href="#" id="smsTemplate">
+        <b-link href="#">
+          <q-menu content-class="mx-height-300"
+                  ref="templatesMenu"
+                  :offset="[0,5]">
+            <div class="row no-wrap q-pa-md">
+              <message-templates @templateSelected="templateSelected"></message-templates>
+            </div>
+          </q-menu>
           <calendar-today-icon></calendar-today-icon>
         </b-link>
-        <b-link href="#" id="smsVariables">
+        <b-link href="#">
+          <q-menu content-class="mx-height-300"
+                  ref="variablesMenu"
+                  :offset="[0,5]">
+            <div class="row no-wrap q-pa-md">
+              <variables @variableSelected="variableSelected" always-open></variables>
+            </div>
+          </q-menu>
           <variable-icon></variable-icon>
         </b-link>
       </div>
@@ -126,42 +155,6 @@
         </b-button-group>
       </div>
     </div>
-    <b-popover ref="popover"
-               custom-class="mx-w-100"
-               id="attachment-popover"
-               placement="topright"
-               target="smsAttachments"
-               triggers="click"
-               @show="onPopoverShown">
-      <attachments @attachmentUploaded="onAttachmentUploaded"></attachments>
-    </b-popover>
-    <b-popover ref="popover"
-               custom-class="mx-w-100"
-               id="gif-popover"
-               placement="topright"
-               target="smsGif"
-               triggers="click blur"
-               @show="onPopoverShown">
-      <search-giphy @selected="setMessageGif"></search-giphy>
-    </b-popover>
-    <b-popover ref="popover"
-               id="sms-variables-popover"
-               placement="topright"
-               target="smsVariables"
-               triggers="click blur"
-               @show="onPopoverShown">
-        <variables @variableSelected="variableSelected" always-open></variables>
-    </b-popover>
-
-    <b-popover ref="popover"
-               id="sms-templates-popover"
-               placement="topright"
-               target="smsTemplate"
-               triggers="click blur"
-               @show="onPopoverShown">
-      <message-templates @templateSelected="templateSelected"></message-templates>
-    </b-popover>
-
     <scheduled-message></scheduled-message>
     <sms-template-modal></sms-template-modal>
   </div>
@@ -247,14 +240,6 @@ export default {
           this.isSending = false
         })
     },
-    closeVariablesPopover () {
-      this.$root.$emit('bv::hide::popover', 'sms-variables-popover')
-      this.focusInput()
-    },
-    closeTemplatesPopover () {
-      this.$root.$emit('bv::hide::popover', 'sms-templates-popover')
-      this.focusInput()
-    },
     setMessageGif (gif) {
       this.setMessageComposerSmsGif(gif)
       this.$root.$emit('bv::hide::popover', 'gif-popover')
@@ -270,20 +255,19 @@ export default {
     },
     templateSelected (template) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
-      this.closeTemplatesPopover()
+      this.$refs.templatesMenu.hide()
     },
     variableSelected (variable) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
-      this.closeVariablesPopover()
+      this.$refs.variablesMenu.hide()
     },
     onAttachmentUploaded (files) {
       let _this = this
       files.forEach(function (file) {
         _this.appendMessageComposerSmsAttachments(file)
       })
-    },
-    onPopoverShown () {
-      this.$root.$emit('bv::hide::popover')
+
+      this.$refs.attachmentMenu.hide()
     },
     showScheduleMessage () {
       this.scheduleMessageOpen(true)

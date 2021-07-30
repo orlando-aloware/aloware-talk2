@@ -2,49 +2,58 @@
   <b-card class="border-0 contact-notes-wrapper">
     <h4>Notes</h4>
     <div v-if="!isEdit"
-         class="notes" @click="onEditNotes" v-html="contact.notes">
+         class="notes mt-1" @click="onEditNotes" v-html="contact.notes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
          class="notes-empty-placeholder" @click="onEditNotes">Add notes here..</div>
     <div v-if="isEdit"
-         style="max-width: 300px" @blur="onBlur">
-      <q-input
-        ref="notesInput"
-        outlined
-        autogrow
-        debounce="500"
-        v-model="contact.notes"
-        @blur="onBlur"
-      />
+         class="mt-1"
+         style="max-width: 300px">
+      <contact-notes-input ref="notesInput"
+                           v-model="contact.notes"
+                           @blur="onBlur">
+      </contact-notes-input>
     </div>
   </b-card>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+
 import talk2Api from 'src/plugins/api/api'
+import ContactNotesInput from 'components/contacts/contact-notes-input'
 
 export default {
   name: 'contact-notes',
+  components: { ContactNotesInput },
+  props: {
+    contact: {
+      required: true
+    },
+    title: {
+      required: false,
+      default: 'Notes'
+    }
+  },
+
   computed: {
-    ...mapGetters('contacts', ['contact']),
     notes () {
       return this.contact.notes
     }
   },
+
   data () {
     return {
       isEdit: false,
       prevValue: ''
     }
   },
+
   methods: {
-    ...mapActions('contacts', ['setContact']),
     onEditNotes () {
       this.isEdit = true
-      this.$nextTick(function () {
-        this.$refs.notesInput.focus()
-      })
+    },
+    onInput (value) {
+      this.$emit('input', value)
     },
     onBlur () {
       this.isEdit = false
@@ -54,11 +63,12 @@ export default {
     },
     onUpdate () {
       talk2Api.V1.contact.update(this.contact.id, { notes: (this.contact.notes ? this.contact.notes.trim() : this.contact.notes) }).then(response => {
-        this.setContact(response.data)
+        this.$emit('update', response.data)
         this.prevValue = this.contact.notes
       })
     }
   },
+
   mounted () {
     this.isEdit = false
     this.prevValue = this.contact.notes

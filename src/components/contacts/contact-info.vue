@@ -32,6 +32,10 @@
               <b-link href="#"
                       class="copy-phone-number ml-1"
                       @click.prevent="copyPhoneNumber">
+                <q-tooltip anchor="top middle"
+                            self="center middle">
+                  Copy
+                </q-tooltip>
                 <i class="material-icons">content_copy</i>
               </b-link>
               <input :value="contact.phone_number"
@@ -62,6 +66,10 @@
                 size="sm"
                 class="custom-action-button"
                 @click="callContact">
+        <q-tooltip anchor="top middle"
+                   self="center middle">
+          Call
+        </q-tooltip>
         <call-icon></call-icon>
       </b-button>
       <b-button variant="light"
@@ -69,6 +77,10 @@
                 class="custom-action-button"
                 :disabled="contact.is_dnc"
                 @click="openAppointmentModal">
+        <q-tooltip anchor="top middle"
+                   self="center middle">
+          Add appointment
+        </q-tooltip>
         <calendar-icon></calendar-icon>
       </b-button>
       <b-button variant="light"
@@ -76,6 +88,10 @@
                 class="custom-action-button"
                 :disabled="contact.is_dnc"
                 @click="openAddReminderModal">
+        <q-tooltip anchor="top middle"
+                   self="center middle">
+          Add reminder
+        </q-tooltip>
         <timer-icon></timer-icon>
       </b-button>
       <b-button v-if="!contact.is_dnc"
@@ -83,11 +99,20 @@
                 size="sm"
                 class="custom-action-button"
                 @click="openEnrollSequenceModal">
+        <q-tooltip anchor="top middle"
+                   self="center middle">
+          Enroll to sequence
+        </q-tooltip>
         <add-sequence-icon></add-sequence-icon>
       </b-button>
       <b-button variant="light"
                 size="sm"
-                class="custom-action-button">
+                class="custom-action-button"
+                :disabled="true">
+        <q-tooltip anchor="top middle"
+                   self="center middle">
+          Add to power dialer
+        </q-tooltip>
         <add-call-icon></add-call-icon>
       </b-button>
     </div>

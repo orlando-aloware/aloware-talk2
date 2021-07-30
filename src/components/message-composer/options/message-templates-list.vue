@@ -8,21 +8,35 @@
         <div class="d-flex justify-content-between template-actions">
           <b-link href="#"
                   class="active"
-                  v-b-tooltip="`Use`"
                   @click="templateSelected(template)">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Use
+            </q-tooltip>
             <add-icon-square></add-icon-square>
           </b-link>
           <b-link href="#"
-                  :id="`template-view-${template.id}`"
-                  v-b-tooltip="`View`">
+                  :id="`template-view-${template.id}`">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              View
+            </q-tooltip>
             <eye-icon height="16" width="16"></eye-icon>
           </b-link>
           <b-link href="#"
-                  v-b-tooltip="`Edit`" @click="onEdit(template)">
+                  @click="onEdit(template)">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Edit
+            </q-tooltip>
             <pencil-o-icon color="#62666E"/>
           </b-link>
-          <b-link href="#" v-b-tooltip="`Delete`"
+          <b-link href="#"
                   @click="onDelete(template)">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Delete
+            </q-tooltip>
             <trash-o-icon/>
           </b-link>
 

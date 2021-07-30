@@ -13,7 +13,7 @@
                  :show-labels="false"
                  tagPosition="bottom"
                  ref="multiselect"
-                 :maxHeight="130"
+                 :maxHeight="220"
                  group-label="type"
                  group-values="variables"
                  :group-select="false"

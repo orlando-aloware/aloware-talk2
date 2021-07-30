@@ -115,7 +115,7 @@ export default {
 @import '../../../css/variables';
 
 .templates-list-wrapper{
-  max-height: 400px;
+  max-height: 250px;
   overflow: auto;
   padding-right: 5px;
 

@@ -5,8 +5,12 @@
       <contact-info></contact-info>
       <contact-phones></contact-phones>
       <contact-information></contact-information>
-      <contact-tags></contact-tags>
-      <contact-notes></contact-notes>
+      <contact-tags :contact="contact"
+                    @update="onTagsUpdate">
+      </contact-tags>
+      <contact-notes :contact="contact"
+                     @update="onNotesUpdate">
+      </contact-notes>
       <contact-integrations :contact="contact"></contact-integrations>
       <contact-scheduled-messages></contact-scheduled-messages>
       <contact-activity-counts></contact-activity-counts>
@@ -29,7 +33,7 @@ import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactInformation from 'src/components/contacts/contact-information'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -53,6 +57,15 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact'])
+  },
+  methods: {
+    ...mapActions('contacts', ['setContact', 'setContactTags']),
+    onNotesUpdate (contact) {
+      this.setContact(contact)
+    },
+    onTagsUpdate (tags) {
+      this.setContactTags(tags)
+    }
   },
 
   watch: {

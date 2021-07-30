@@ -382,6 +382,32 @@ body,
   }
 }
 
+.tag-items {
+  padding: 1px 5px;
+  border-radius: 5px !important;
+}
+
+.show-raw-value {
+  .multiselect__select {
+    display: none !important;
+  }
+  .multiselect__tags {
+    border: none;
+    padding: 0;
+
+    .custom__remove {
+      display: none;
+    }
+
+    .tag-text {
+      max-width: 230px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+}
+
 .mb-30 {
   margin-bottom: 30px;
 }
@@ -1386,26 +1412,26 @@ i.option-separator {
 }
 
 .multiselect__option--selected {
-  background: $grey-40 !important;
+  background: $grey-50 !important;
   color: $grey-90 !important;
   font-weight: 500 !important;
 }
 
 .multiselect__option--highlight {
-  background: $grey-50 !important;
+  background: $grey-60 !important;
   outline: none !important;
-  color: $grey-90 !important;
+  color: $grey-100 !important;
 }
 
 .multiselect__option--highlight.multiselect__option--selected {
-  background: $grey-40 !important;
+  background: $grey-50 !important;
   color: $grey-90 !important;
 }
 
 .multiselect__option {
-  padding: 5px !important;
+  padding: 9px !important;
   border-radius: 8px;
-  min-height: 28px !important;
+  min-height: 32px !important;
   margin-top: 2px;
   margin-bottom: 2px;
 }
@@ -2359,7 +2385,7 @@ span.mention {
 }
 
 .attachment-wrapper {
-  height: 215px;
+  height: 209px;
   width: 362px;
   padding: 10px;
   #fileInput {
@@ -2369,18 +2395,24 @@ span.mention {
   .uploader-label {
     position: absolute;
     width: 100%;
-    height: 140px;
+    height: 128px;
     font-size: 14px;
     font-weight: 500;
     border: 1px dashed #D8D8D8;
     border-radius: 4px;
-    padding-top: 35px;
+    padding-top: 30px;
   }
 
   form {
     height: 14vh;
     cursor: pointer;
-    margin-bottom: 45px;
+    margin-bottom: 30px;
+    position: relative;
+  }
+
+  .attachment-upload-progress {
+    margin: 100px auto 0 auto;
+    width: 90%;
   }
 
   #fileInput.dragdrop .custom-file,
@@ -2417,6 +2449,7 @@ span.mention {
     text-align: center;
     color: #721c24;
     font-size: 80%;
+    margin-top: -17px;
   }
 }
 
@@ -3463,4 +3496,23 @@ span.mention {
     box-shadow: none;
     text-decoration: none;
   }
+}
+
+.giphy-wrapper {
+  div.img-box.default-card-animation {
+    cursor: pointer;
+  }
+}
+
+.mx-height-500 {
+  max-height: 500px !important;
+}
+
+.mx-height-300 {
+  max-height: 300px !important;
+}
+
+.option__group_title {
+  color: $grey-100;
+  font-weight: 600;
 }

@@ -1,30 +1,19 @@
 <template>
   <b-card class="border-0 contact-tags-wrapper">
     <h4>Tags</h4>
-    <div v-if="!isEdit"
-         class="mt-1">
-      <b-badge v-for="tag in contactTags"
-               variant="primary"
-               class="badge-tag custom-badge-primary ellipsis"
-               :key="tag.id" >
-        <q-tooltip anchor="top middle"
-                   self="center middle"
-                   :offset="[20, 20]">
-          {{ tag.name }}
-        </q-tooltip>
-         <span :style="`color: ${tag.color};`"><i class="fa fa-circle" :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`"></i> {{ tag.name }}</span>
-      </b-badge>
-    </div>
-    <tag-selector v-if="isEdit && tags.length > 0"
-                  class="details-contact-tags mt-2"
+    <tag-selector v-if="tags.length > 0"
                   ref="contactTagSelector"
                   v-model="selectedTagIds"
+                  :class="`details-contact-tags mt-2 ${displayClass}`"
+                  :max-height="500"
                   :displayLimit="100"
                   :multiple="true"
                   :loaded="true"
                   :custom-tags="tags"
                   @change="changeTags($event)"
-                  @blur="onSelectBlur">
+                  @open="onSelectOpen"
+                  @close="onSelectClose"
+    >
     </tag-selector>
 
     <b-link v-if="!isEdit && hasPermissionTo(['list tag', 'view tag'])"
@@ -37,7 +26,6 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import { aclMixin } from 'src/plugins/mixins'
@@ -46,9 +34,13 @@ import TagSelector from 'components/tag-selector'
 export default {
   name: 'contact-tags',
   mixins: [aclMixin],
+  props: {
+    contact: {
+      required: true
+    }
+  },
   components: { TagSelector, PencilOIcon },
   computed: {
-    ...mapGetters('contacts', ['contact']),
     contactTags () {
       return this.contact.tags
     },
@@ -58,7 +50,10 @@ export default {
       }
     },
     selectedTagIds () {
-      return this.contactTags.map(tag => tag.id)
+      return this.contactTags ? this.contactTags.map(tag => tag.id) : []
+    },
+    displayClass () {
+      return !this.isEdit ? 'show-raw-value' : ''
     }
   },
   data () {
@@ -69,7 +64,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContactTags']),
     changeTags (event) {
       this.tagsArray = event
     },
@@ -82,13 +76,12 @@ export default {
     onSelectClose () {
       this.isEdit = false
     },
-    onSelectBlur () {
+    onSelectOpen () {
+      this.isEdit = true
     },
-
     onRemoveTag () {
       this.isEdit = true
     },
-
     getTags () {
       return talk2Api.V1.tags.get({
         params: { full_load: true }
@@ -98,11 +91,10 @@ export default {
         console.log(err)
       })
     },
-
     submitTags () {
       talk2Api.V1.contact.storeTags(this.contact.id, { tags: this.tagsArray })
         .then(response => {
-          this.setContactTags(response.data)
+          this.$emit('update', response.data)
         }).catch(err => {
           console.log(err)
           this.$root.handleErrors(err.response)
@@ -116,12 +108,6 @@ export default {
   },
   mounted () {
     this.getTags()
-    let _this = this
-    document.addEventListener('click', function (evt) {
-      let targetElement = evt.target
-      _this.isEdit = targetElement.classList.contains('details-contact-tags') || targetElement.classList.contains('btn-tag-edit') || targetElement.classList.contains('remove-tag-icon')
-      evt.stopImmediatePropagation()
-    })
   }
 }
 </script>

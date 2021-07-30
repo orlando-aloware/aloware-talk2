@@ -13,10 +13,10 @@
                :internal-search="false"
                :clear-on-select="false"
                :close-on-select="false"
-               :hide-selected="true"
+               :hide-selected="hideSelected"
                :limit="displayLimit"
                :limit-text="limitText"
-               :max-height="150"
+               :max-height="maxHeight"
                :show-no-results="true"
                :class="selectorClass"
                :group-select="false"
@@ -30,7 +30,7 @@
                @remove="onRemoveTag">
     <template slot="tag" slot-scope="{ option, remove }">
       <span :style="{ color: option.color }"
-            class="border border-half-rounded px-1 d-inline-flex align-items-center mr-1">
+            class="border border-half-rounded d-inline-flex align-items-center mr-1 mb-1 tag-items">
         <q-badge class="is-dot mx-1"
                  :style="{ background: option.color }"
                  rounded>
@@ -44,13 +44,16 @@
       </span>
     </template>
     <template slot="option" slot-scope="props">
-      <div class="option__desc">
+      <div class="option__group_title"
+           v-if="props.option.$isLabel">
+        <span class="option__small">{{ props.option.$groupLabel }}</span>
+      </div>
+      <div class="option__desc" v-else>
         <q-badge class="is-dot mx-1"
                  :style="{ background: props.option.color }"
-                 rounded
-                 v-if="!props.option.$isLabel">
+                 rounded>
         </q-badge>
-        <span class="option__small">{{ props.option.$isLabel ? props.option.$groupLabel : props.option.name }}</span>
+        <span class="option__small">{{ props.option.name }}</span>
       </div>
     </template>
     <template slot="clear" slot-scope="props">
@@ -149,6 +152,16 @@ export default {
       required: false,
       type: Number,
       default: null
+    },
+    maxHeight: {
+      required: false,
+      type: Number,
+      default: 150
+    },
+    hideSelected: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
 
@@ -250,6 +263,7 @@ export default {
   methods: {
     onSelectOpen () {
       this.selectorClass = ['border-blue']
+      this.$emit('open')
     },
 
     onSelectClose (e) {

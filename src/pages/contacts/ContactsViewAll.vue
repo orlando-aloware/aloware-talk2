@@ -39,7 +39,12 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.setData(id)
+      if (!id && this.$route.name === 'Contacts') {
+        id = 'all'
+      }
+      if (id && this.$route.name === 'Contacts') {
+        this.setData(id)
+      }
     }
   },
   mounted () {
