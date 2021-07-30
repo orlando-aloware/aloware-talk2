@@ -3489,6 +3489,13 @@ span.mention {
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      width: 70px;
+      height: 70px;
+      padding: 0;
+
+      &:focus, &.focus {
+        box-shadow: none;
+      }
 
       span {
         margin-top: 10px;
