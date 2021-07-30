@@ -22,6 +22,8 @@ export default {
       loadingDropThirdParty: false,
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
+      loadingHold: false,
+      loadingPark: false,
       callNotification: null,
       desktopNotification: null,
       device: new TwilioDevice(),
@@ -50,12 +52,12 @@ export default {
       }
 
       // check data matches dialer on hold call
-      if (this.dialer.onHoldCall && this.dialer.onHoldCall.id === data.id) {
+      if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          data = _.merge(this.dialer.onHoldCall, data)
-          this.setDialerOnHoldCall(data)
+          data = _.merge(this.dialer.parkedCall, data)
+          this.setDialerParkedCall(data)
         } else {
-          this.setDialerOnHoldCall()
+          this.setDialerParkedCall()
         }
       }
     })
@@ -193,7 +195,7 @@ export default {
       console.log('Call ended')
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      if (!this.dialer.onHoldCall) {
+      if (!this.dialer.parkedCall) {
         this.startWrapUpTimer()
       } else {
         this.backToDial()
@@ -776,7 +778,7 @@ export default {
     ...mapActions([
       'setDialerToken',
       'setDialerCall',
-      'setDialerOnHoldCall',
+      'setDialerParkedCall',
       'setDialerIsReady',
       'setDialerCurrentStatus',
       'setDialerCommunication',

@@ -278,7 +278,8 @@
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
             </button>
-            <button class="phone-buttons btn"
+            <button :disabled="isHoldDisabled || loadingHold"
+                    class="phone-buttons btn"
                     @click="toggleHold">
               <hold-icon width="16"
                          height="16"
@@ -400,6 +401,7 @@ import ScriptsIcon from 'components/icons/scripts-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import AddIcon from 'components/icons/add-icon'
@@ -475,10 +477,13 @@ export default {
       loadingDropThirdParty: false,
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
+      loadingHold: false,
+      loadingPark: false,
       expanded: false,
       screen: 'call',
       CommunicationDirection,
       CommunicationDispositionStatus,
+      CommunicationStatus,
       CommunicationCurrentStatus,
       CommunicationTypes
     }
@@ -486,6 +491,26 @@ export default {
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
+
+    isTransferDisabled () {
+      return (!this.dialer.communication || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isAddDisabled () {
+      return (!this.dialer.communication || this.dialer.communication.in_cold_transfer || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isCallAdded () {
+      return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
+    },
+
+    isHoldDisabled () {
+      return (!this.dialer.communication || this.loadingHold || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isParkDisabled () {
+      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
 
     phoneStatus () {
       if (!this.dialer.communication) {
