@@ -1190,7 +1190,7 @@ i.option-separator {
 }
 
 .border-rounded {
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .sms-activity {
@@ -3238,7 +3238,8 @@ span.mention {
   }
 
   .nav-pills .nav-link {
-    text-align: right;
+    text-align: center;
+    @extend .no-select;
   }
 
   textarea {
