@@ -670,9 +670,11 @@ export default {
     },
 
     scrollMessages () {
-      if (this.$refs.contactActivities) {
-        this.$refs.contactActivities.scrollMessages()
-      }
+      setTimeout(() => {
+        if (this.$refs.contactActivities) {
+          this.$refs.contactActivities.scrollMessages()
+        }
+      }, 50)
     },
 
     isHashActivityType () {

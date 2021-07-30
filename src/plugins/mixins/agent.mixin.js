@@ -154,7 +154,7 @@ export default {
 
   watch: {
     agentStatus (toVal, fromVal) {
-      if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP && toVal !== fromVal) {
+      if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
         this.$VueEvent.fire('endWrapUp')
       }
     }
