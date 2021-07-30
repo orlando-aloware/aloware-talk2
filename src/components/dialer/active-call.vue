@@ -1,7 +1,7 @@
 <template>
   <q-item :class="[ profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? 'wrap-up' : '' ]"
           class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
-          v-if="dialer && profile && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(dialer.currentStatus)"
+          v-if="dialer && profile && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(dialer.currentStatus)"
           clickable
           v-ripple
           @click="togglePhone">
@@ -45,7 +45,7 @@
              flat
              @click="hangupCall">
       </q-btn>
-      <q-btn :disable="dialer.currentStatus !== 'CALL_DISCONNECTED'"
+      <q-btn :disable="dialer.currentStatus !== 'WRAP_UP'"
              v-else
              icon="img:app-icons/dialer/end_wrap_up.svg"
              size="22px"

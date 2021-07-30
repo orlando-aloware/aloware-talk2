@@ -223,7 +223,7 @@ export default {
     }, 24 * 60 * 60 * 1000)
 
     this.$VueEvent.listen('endWrapUp', () => {
-      if (this.dialer.currentStatus !== 'CALL_DISCONNECTED') {
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
       console.log('Ending wrap up')
@@ -562,6 +562,7 @@ export default {
     },
 
     startWrapUpTimer () {
+      this.setDialerCurrentStatus('WRAP_UP')
       let wrapUpTimer = this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
       if (wrapUpTimer < 0) {
@@ -587,13 +588,6 @@ export default {
     backToDial () {
       this.resetAgentStatus()
       this.resetCall()
-      // setTimeout(() => {
-      //   if (this.$route.name === 'Call') {
-      //     this.$router.push({ name: 'Dial' }).catch(err => {
-      //       console.log(err)
-      //     })
-      //   }
-      // }, 200)
     },
 
     playDispositionNotification () {

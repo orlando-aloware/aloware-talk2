@@ -6,6 +6,7 @@
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-55">
+<!--        <span v-if="dialer.currentStatus">{{ dialer.currentStatus }}</span>-->
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
         <span v-else>
@@ -111,7 +112,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2)">
+      <template v-if="screen === 'call'">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="dialer.contact && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
@@ -339,10 +340,9 @@
         </div>
       </template>
     </div>
-    <div
-      :class="[ ![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2) ? 'bg-dark' : 'bg-white']"
-      class="phone-integrations d-flex overlay"
-      v-if="dialer.contact">
+    <div :class="[ screen === 'call' ? 'bg-dark' : 'bg-white']"
+         class="phone-integrations d-flex overlay"
+         v-if="dialer.contact">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         style="border-radius: 12px"
@@ -447,6 +447,7 @@ export default {
       outputDevice: 'default',
       loadingCommunication: false,
       expanded: false,
+      screen: 'call',
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
@@ -568,10 +569,12 @@ export default {
 
     hangupCall () {
       this.$VueEvent.fire('hangupCall')
+      this.screen = 'menu'
     },
 
     answerCall () {
       this.$VueEvent.fire('answerCall')
+      this.screen = 'menu'
     },
 
     rejectCall () {
@@ -700,6 +703,78 @@ export default {
     shouldShow () {
       this.setupDraggable()
       this.setupContactLocalTime()
+    },
+
+    screen () {
+      console.log('Current screen: ' + this.screen)
+    },
+
+    dialer: {
+      handler () {
+        if (!this.dialer.communication) {
+          return
+        }
+
+        console.log(this.dialer.communication.current_status2)
+        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
+          this.screen = 'menu'
+        }
+      },
+      deep: true
+    },
+
+    'dialer.currentStatus': function () {
+      switch (this.dialer.currentStatus) {
+        case 'READY':
+          this.screen = 'call'
+          break
+        case 'OFFLINE':
+          this.screen = 'call'
+          break
+        case 'RECEIVED_CALL_INVITE':
+          this.screen = 'call'
+          break
+        case 'INVITE_CANCELLED':
+          this.screen = 'call'
+          break
+        case 'WRAP_UP':
+          this.screen = 'wrap-up'
+          break
+        case 'GENERATING_TOKEN':
+          this.screen = 'call'
+          this.closePhone()
+          break
+        case 'TOKEN_GENERATED':
+          this.screen = 'call'
+          this.closePhone()
+          break
+        case 'MAKING_CALL':
+          this.screen = 'call'
+          break
+        case 'ANSWERING_CALL':
+          this.screen = 'call'
+          break
+        case 'REJECTING_CALL':
+          this.screen = 'call'
+          break
+        case 'CALL_CONNECTED':
+          if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
+            this.screen = 'menu'
+          }
+          break
+        case 'GOT_ERROR':
+          // ?
+          break
+        case 'RESTARTING':
+          // ?
+          break
+        case 'HANGING_UP_CALL':
+          // ?
+          break
+        case 'CALL_DISCONNECTED':
+          // ?
+          break
+      }
     },
 
     'dialer.contact': function () {
