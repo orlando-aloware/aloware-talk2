@@ -3399,6 +3399,10 @@ span.mention {
     width: 200px;
     height: 150px;
 
+    &.small {
+      height: 66px;
+    }
+
     .q-btn {
       & .q-btn__wrapper {
         min-width: 14px;
@@ -3439,6 +3443,18 @@ span.mention {
 
     .phone-avatar {
       margin-top: -29px;
+    }
+
+    .phone-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      span {
+        margin-top: 11px;
+        font-size: $f-size-body-xxs;
+      }
     }
   }
 

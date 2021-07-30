@@ -230,7 +230,7 @@
                     height="50">
             </avatar>
           </div>
-          <div class="phone-info d-flex flex-column align-items-center">
+          <div class="phone-info small d-flex flex-column align-items-center">
             <div class="text-grey-100 text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                             v-if="dialer.contact">
@@ -265,12 +265,39 @@
               </q-item-label>
             </div>
           </div>
+          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
+            <button class="phone-buttons btn">
+              <mute-icon width="16"
+                         height="16">
+              </mute-icon>
+              <span>Mute</span>
+            </button>
+            <button class="phone-buttons btn">
+              <hold-icon width="16"
+                         height="16">
+              </hold-icon>
+              <span>Hold</span>
+            </button>
+            <button class="phone-buttons btn">
+              <dialpad-icon width="16"
+                            height="16">
+              </dialpad-icon>
+              <span>Dial pad</span>
+            </button>
+            <button class="phone-buttons btn">
+              <record-icon width="16"
+                           height="16">
+              </record-icon>
+              <span>Record</span>
+            </button>
+          </div>
         </div>
       </template>
     </div>
-    <div :class="[ ![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2) ? 'bg-dark' : 'bg-white']"
-         class="phone-integrations d-flex"
-         v-if="dialer.contact">
+    <div
+      :class="[ ![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2) ? 'bg-dark' : 'bg-white']"
+      class="phone-integrations d-flex"
+      v-if="dialer.contact">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         style="border-radius: 12px"
@@ -298,6 +325,10 @@ import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
 import Avatar from 'components/avatar'
+import RecordIcon from 'components/icons/record-icon'
+import DialpadIcon from 'components/icons/dialpad-icon'
+import HoldIcon from 'components/icons/hold-icon'
+import MuteIcon from 'components/icons/mute-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -308,6 +339,10 @@ export default {
   name: 'phone',
 
   components: {
+    MuteIcon,
+    HoldIcon,
+    DialpadIcon,
+    RecordIcon,
     Avatar,
     PersonIcon,
     AcceptCallIcon,

@@ -1,47 +1,25 @@
 <template>
-  <svg
-    :width="width"
-    :height="height"
-    viewBox="0 0 24 24"
-    version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-  >
-    <title>record</title>
-    <defs>
-      <rect id="path-1" x="0" y="0" width="24" height="24"></rect>
-    </defs>
-    <g id="record" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-      <g>
-        <mask id="mask-2" fill="white">
-          <use xlink:href="#path-1"></use>
-        </mask>
-        <g id="basic-/-radio_filled-(Background/Mask)"></g>
-        <path
-          d="M12,15.4285714 C10.1064524,15.4285714 8.57142857,13.8935481 8.57142857,12 C8.57142857,10.1064524 10.1064524,8.57142857 12,8.57142857 C13.8935481,8.57142857 15.4285714,10.1064524 15.4285714,12 C15.4285714,13.8935481 13.8935481,15.4285714 12,15.4285714 Z M12,20 C16.4182783,20 20,16.4182783 20,12 C20,7.58172199 16.4182783,4 12,4 C7.58172199,4 4,7.58172199 4,12 C4,16.4182783 7.58172199,20 12,20 C14.9455189,20 14.9455189,20 12,20 Z M12,17.7142857 C15.1559132,17.7142857 17.7142857,15.1559132 17.7142857,12 C17.7142857,8.84408733 15.1559132,6.28571429 12,6.28571429 C8.84408733,6.28571429 6.28571429,8.84408733 6.28571429,12 C6.28571429,15.1559132 8.84408733,17.7142857 12,17.7142857 C14.1039421,17.7142857 14.1039421,17.7142857 12,17.7142857 Z"
-          id="basic-/-radio_filled"
-          :class="`svg-fill-${iconColor}`"
-          mask="url(#mask-2)"
-        ></path>
-      </g>
-    </g>
+  <svg :width="width" :height="height" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M8 1.2C4.24446 1.2 1.2 4.24446 1.2 8C1.2 11.7555 4.24446 14.8 8 14.8C11.7555 14.8 14.8 11.7555 14.8 8C14.8 4.24446 11.7555 1.2 8 1.2ZM0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8Z" :fill="color"/>
+    <path d="M9.85 4.75H6.15C5.3768 4.75 4.75 5.3768 4.75 6.15V9.85C4.75 10.6232 5.3768 11.25 6.15 11.25H9.85C10.6232 11.25 11.25 10.6232 11.25 9.85V6.15C11.25 5.3768 10.6232 4.75 9.85 4.75Z" :fill="color"/>
   </svg>
 </template>
 
 <script>
 export default {
+  name: 'record-icon',
   props: {
     width: {
       type: [Number, String],
-      default: 24
+      default: 16
     },
     height: {
       type: [Number, String],
-      default: 24
+      default: 16
     },
-    iconColor: {
+    color: {
       type: String,
-      default: 'grey-mid'
+      default: '#62666E'
     }
   }
 }
