@@ -231,5 +231,11 @@ export default {
   },
   resetContactsVuex: ({ commit }) => {
     commit('RESET_CONTACTS_VUEX')
+  },
+  setSearch: ({ commit }, value) => {
+    commit('SET_SEARCH', value)
+  },
+  resetSearch: ({ commit }, value) => {
+    commit('RESET_SEARCH', value)
   }
 }

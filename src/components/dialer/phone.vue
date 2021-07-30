@@ -221,12 +221,85 @@
         </div>
       </template>
       <template v-else>
-
+        <div class="phone-main d-flex flex-column align-items-center">
+          <div class="dummy bg-dark w-100 height-36"></div>
+          <div class="phone-avatar">
+            <avatar :name="contactName"
+                    class="contact-avatar text-size-xxxl"
+                    width="50"
+                    height="50">
+            </avatar>
+          </div>
+          <div class="phone-info small d-flex flex-column align-items-center">
+            <div class="text-grey-100 text-center">
+              <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
+                            v-if="dialer.contact">
+                <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                <q-btn color="text-grey-100"
+                       icon="o_info"
+                       class="text-size-rg d-inline-flex ml-1"
+                       flat
+                       round
+                       @click="goToContact">
+                </q-btn>
+              </q-item-label>
+              <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
+                <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                <b-link href="#"
+                        class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                        @click.prevent="copyPhoneNumber">
+                  <i class="material-icons">content_copy</i>
+                </b-link>
+                <input :value="dialer.communication.lead_number"
+                       type="hidden"
+                       id="phone-number-clone"/>
+              </q-item-label>
+              <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
+                            v-if="dialer.contact && dialer.contact.company_name">
+                <span>{{ dialer.contact.company_name }}</span>
+                <span class="ml-1 mr-1"
+                      v-if="currentLocalTime">
+                  ·
+                </span>
+                <span v-if="currentLocalTime">{{ currentLocalTime }}</span>
+              </q-item-label>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
+            <button class="phone-buttons btn">
+              <mute-icon width="16"
+                         height="16">
+              </mute-icon>
+              <span>Mute</span>
+            </button>
+            <button class="phone-buttons btn">
+              <hold-icon width="16"
+                         height="16">
+              </hold-icon>
+              <span>Hold</span>
+            </button>
+            <button class="phone-buttons btn">
+              <dialpad-icon width="16"
+                            height="16">
+              </dialpad-icon>
+              <span>Dial pad</span>
+            </button>
+            <button class="phone-buttons btn">
+              <record-icon width="16"
+                           height="16">
+              </record-icon>
+              <span>Record</span>
+            </button>
+          </div>
+        </div>
       </template>
     </div>
-    <div class="phone-integrations d-flex"
-         v-if="dialer.contact">
-      <q-expansion-item class="shadow-1 overflow-hidden w-100"
+    <div
+      :class="[ ![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2) ? 'bg-dark' : 'bg-white']"
+      class="phone-integrations d-flex"
+      v-if="dialer.contact">
+      <q-expansion-item v-model="expanded"
+                        class="shadow-1 overflow-hidden w-100"
                         style="border-radius: 12px"
                         label="Integrations"
                         header-class="text-sm bg-white text-center"
@@ -236,7 +309,8 @@
         <q-card>
           <q-card-section class="height-200">
             <contact-integrations :contact="dialer.contact"
-                                  :no_title="true">
+                                  :no_title="true"
+                                  v-show="expanded">
             </contact-integrations>
           </q-card-section>
         </q-card>
@@ -250,6 +324,11 @@ import { mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
+import Avatar from 'components/avatar'
+import RecordIcon from 'components/icons/record-icon'
+import DialpadIcon from 'components/icons/dialpad-icon'
+import HoldIcon from 'components/icons/hold-icon'
+import MuteIcon from 'components/icons/mute-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -259,7 +338,17 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 export default {
   name: 'phone',
 
-  components: { PersonIcon, AcceptCallIcon, CancelCallIcon, ContactIntegrations },
+  components: {
+    MuteIcon,
+    HoldIcon,
+    DialpadIcon,
+    RecordIcon,
+    Avatar,
+    PersonIcon,
+    AcceptCallIcon,
+    CancelCallIcon,
+    ContactIntegrations
+  },
 
   props: {
     is_widget: {
@@ -300,6 +389,7 @@ export default {
       inputDevice: 'default',
       outputDevice: 'default',
       loadingCommunication: false,
+      expanded: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,

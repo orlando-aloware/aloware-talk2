@@ -1304,7 +1304,7 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex']),
+    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
@@ -1317,7 +1317,12 @@ export default {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
-      this.resetContactsVuex()
+      if (!['Contacts', 'Contact'].includes(this.$route.name)) {
+        this.resetSearch()
+      }
+      if (this.$route.name !== 'Contact') {
+        this.resetContactsVuex()
+      }
       this.resetInboxVuex()
     },
 

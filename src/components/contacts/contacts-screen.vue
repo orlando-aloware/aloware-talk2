@@ -9,7 +9,7 @@
       <slot name="options" />
     </div>
     <div class="d-flex flex-grow-1">
-      <card class="flex-grow-1" style="width: auto">
+      <card class="flex-grow-1 w-100">
         <div class="table-header d-flex align-items-center border-bottom">
           <div class="px-3 py-3 py-lg-0 w-100">
             <div class="row mx-0 relative-position">

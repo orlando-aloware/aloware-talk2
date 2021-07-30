@@ -155,6 +155,9 @@ body,
     margin-right: 0;
     padding-left: 0;
     padding-right: 8px;
+    &.q-field__marginal {
+      height: auto !important;
+    }
   }
 
   .q-field__bottom {
@@ -948,7 +951,6 @@ i.option-separator {
 }
 
 .q-input-borderless {
-
   textarea {
     min-height: 500px;
   }
@@ -1188,7 +1190,7 @@ i.option-separator {
 }
 
 .border-rounded {
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .sms-activity {
@@ -2760,6 +2762,9 @@ span.mention {
 /*
  Quasar related
  */
+.q-menu {
+  @extend .border-rounded;
+}
 
 .no-q-btn-focus {
   &:hover, &:focus {
@@ -2773,8 +2778,12 @@ span.mention {
   font-size: 16px;
 }
 
+.q-pa-sm {
+  padding: 10px;
+}
+
 .q-pa-md {
-  padding: 12px 12px;
+  padding: 12px;
 }
 
 .q-btn.icon-btn {
@@ -2888,11 +2897,11 @@ span.mention {
   width: 55px;
 }
 
-.width-214 {
-  width: 214px;
+.width-190 {
+  width: 190px;
 
   &.important {
-    width: 214px !important;
+    width: 190px !important;
   }
 }
 
@@ -3170,6 +3179,7 @@ span.mention {
   &.no-prepend {
     .form-control {
       border-width: 1px !important;
+      border-radius: 6px;
     }
   }
 
@@ -3178,6 +3188,7 @@ span.mention {
     padding-left: 8px;
     border-width: 1px 1px 1px 0 !important;
     color: $grey-100;
+    border-radius: 6px;
 
     &::-webkit-input-placeholder {
       font-size: $f-size-body-xs;
@@ -3191,6 +3202,8 @@ span.mention {
   }
 
   .input-group-prepend {
+    margin-right: 0;
+
     .input-group-text {
       width: 100%;
       text-align: left;
@@ -3206,6 +3219,7 @@ span.mention {
     border-width: 1px 0 1px 1px !important;
     padding-left: 8px;
     padding-right: 0;
+    border-radius: 6px;
 
     @extend .text-size-xs;
     @extend .text-grey-80;
@@ -3216,7 +3230,11 @@ span.mention {
   .col-auto {
     padding-left: 16px !important;
     padding-right: 16px !important;
-    border-right: 0.5px solid $grey-70;
+    border-right: 0.5px solid $grey-60;
+  }
+
+  .nav-pills .nav-link {
+    text-align: right;
   }
 
   textarea {
@@ -3244,9 +3262,11 @@ span.mention {
   .q-field__control {
     min-height: 32px !important;
     height: 32px !important;
+    border-radius: 6px;
 
     &:before {
       border: 1px solid $grey-70 !important;
+      border-radius: 6px;
     }
   }
 
@@ -3302,12 +3322,13 @@ span.mention {
   width: 280px;
   height: 522px;
   border-radius: 12px;
-  background: $dark;
   box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.08), 0px 10px 20px -4px rgba(4, 4, 4, 0.2);
+  overflow: hidden;
 
   .phone-header {
     width: 100%;
     height: 36px;
+    background: $dark;
     padding-left: 12px;
     padding-right: 12px;
 
@@ -3411,6 +3432,10 @@ span.mention {
     width: 200px;
     height: 150px;
 
+    &.small {
+      height: 66px;
+    }
+
     .q-btn {
       & .q-btn__wrapper {
         min-width: 14px;
@@ -3440,13 +3465,29 @@ span.mention {
     color: $white;
   }
 
-  .ripple {
-    &::after {
-      @include rings(3s, 0s);
+  .phone-body {
+    background: $dark;
+  }
+
+  .phone-main {
+    width: 100%;
+    height: 100%;
+    background: $white;
+
+    .phone-avatar {
+      margin-top: -29px;
     }
 
-    &::before {
-      @include rings(3s, 0.5s);
+    .phone-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      span {
+        margin-top: 11px;
+        font-size: $f-size-body-xxs;
+      }
     }
   }
 
@@ -3455,6 +3496,10 @@ span.mention {
       margin-left: -36px;
 
       @extend .no-select;
+    }
+
+    .q-expansion-item {
+      box-shadow: 0px 0px 8px rgba(4, 4, 4, 0.12);
     }
 
     .q-expansion-item__toggle-icon {
@@ -3468,6 +3513,22 @@ span.mention {
     .q-expansion-item__content > .q-card > .q-card__section {
       padding: 0;
       overflow-y: auto;
+    }
+
+    .integrations-card {
+      .card-body {
+        @extend .q-pa-sm;
+      }
+    }
+  }
+
+  .ripple {
+    &::after {
+      @include rings(3s, 0s);
+    }
+
+    &::before {
+      @include rings(3s, 0.5s);
     }
   }
 }
@@ -3515,4 +3576,8 @@ span.mention {
 .option__group_title {
   color: $grey-100;
   font-weight: 600;
+}
+
+.basic-selector {
+  @include border-radius('8px')
 }

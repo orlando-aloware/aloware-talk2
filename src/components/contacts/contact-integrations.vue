@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0">
+  <b-card class="integrations-card border-0">
     <h4 class="mb-2"
         v-if="!no_title">
       Integrations

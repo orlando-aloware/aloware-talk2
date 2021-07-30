@@ -1,4 +1,4 @@
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import qs from 'qs'
 import _ from 'lodash'
 
@@ -16,7 +16,6 @@ export default {
       isLoaded: false,
       isLoadingMore: false,
       myContacts: false,
-      searchText: '',
       ContactListType: { STATIC, DYNAMIC },
       initialListFilters: null,
       filtersCount: 0
@@ -29,11 +28,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['selectedContactChanging']),
+    ...mapActions('contacts', ['selectedContactChanging', 'setSearch']),
     onSortByField (sorts) {
       this.isLoaded = false
       this.fetch({
-        search: this.searchText,
+        search: this.search,
         page: this.listItems[this.id].current_page,
         order_by: `${sorts.orderBy}:${sorts.order}`
       })
@@ -46,7 +45,7 @@ export default {
           .get('api/v2/contacts', {
             params: this.buildQueryString({
               page: nextPage,
-              search: this.searchText
+              search: this.search
             }),
             paramsSerializer: qs.stringify
           })
@@ -71,17 +70,18 @@ export default {
       this.isLoading = true
       this.fetch({
         contact_owner: checked ? this.profile.id : undefined,
-        search: this.searchText,
+        search: this.search,
         page: this.listItems[this.id].page
       })
     },
     onSearch (searchText) {
       this.isLoaded = false
-      this.searchText = searchText
-      this.fetch({ search: this.searchText })
+      this.setSearch(searchText)
+      this.fetch({ search: this.search })
     },
     fetch (params = {}) {
       this.isLoading = true
+      params.search = this.search
       return this.$axios
         .get('api/v2/contacts', {
           params: this.buildQueryString(params),
@@ -188,6 +188,7 @@ export default {
   },
 
   computed: {
+    ...mapState('contacts', ['search']),
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact']),
     hasMore () {

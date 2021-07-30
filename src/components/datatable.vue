@@ -1,7 +1,7 @@
 <template>
   <div
     ref="scrollableArea"
-    class="scrollableArea position-relative"
+    class="scrollableArea position-relative d-flex flex-column h-100"
     :class="{ 'overflow-hidden': isEmpty }"
   >
     <table :class="computedClass" ref="table">
@@ -70,7 +70,7 @@
         <slot name="tbody" />
       </tbody>
     </table>
-    <div class="relative py-5" v-b-visible.100="onVisibilityChanged">
+    <div class="relative py-5 flex-1" v-b-visible.100="onVisibilityChanged">
       <b-overlay
         :show="isLoadingMore"
         rounded="sm"
