@@ -266,7 +266,8 @@
             </div>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
-            <button class="phone-buttons btn"
+            <button :disabled="isMuteDisabled"
+                    class="phone-buttons btn"
                     @click="toggleMute">
               <mute-icon width="16"
                          height="16"
@@ -298,7 +299,7 @@
               </dialpad-icon>
               <span>Dial pad</span>
             </button>
-            <button :disabled="loadingToggleRecordingStatus || dialer.communication.should_record === false"
+            <button :disabled="isRecordingDisabled || loadingToggleRecordingStatus || dialer.communication.should_record === false"
                     class="phone-buttons btn"
                     @click="toggleRecordingStatus">
               <record-icon width="16"
@@ -333,7 +334,8 @@
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
-            <button class="phone-buttons btn"
+            <button :disabled="isHangupDisabled"
+                    class="phone-buttons btn"
                     @click="hangupCall">
               <cancel-call-icon width="40"
                                 height="40">
@@ -492,24 +494,44 @@ export default {
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
 
-    isTransferDisabled () {
-      return (!this.dialer.communication || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    isCallCompleted () {
+      return ((this.dialer.communication && this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) || this.dialer.currentStatus === 'CALL_DISCONNECTED')
+    },
+
+    isHangupDisabled () {
+      return !this.isCallCompleted
     },
 
     isAddDisabled () {
-      return (!this.dialer.communication || this.dialer.communication.in_cold_transfer || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (!this.dialer.communication || !this.isCallCompleted || this.dialer.communication.in_cold_transfer || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isTransferDisabled () {
+      return (!this.dialer.communication || !this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isMoreDisabled () {
+      return !this.isCallCompleted
+    },
+
+    isHoldDisabled () {
+      return (!this.dialer.communication || this.loadingHold || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isParkDisabled () {
+      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isMuteDisabled () {
+      return !this.isCallCompleted
+    },
+
+    isRecordingDisabled () {
+      return !this.isCallCompleted
     },
 
     isCallAdded () {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
-    },
-
-    isHoldDisabled () {
-      return (!this.dialer.communication || this.loadingHold || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
-    },
-
-    isParkDisabled () {
-      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     phoneStatus () {
