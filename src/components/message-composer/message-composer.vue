@@ -28,7 +28,7 @@
         <message-composer-note v-if="messageComposer.mode === 'note'" />
       </div>
     </div>
-    <div class="composer-variables d-flex justify-content-between pt-1">
+    <div class="composer-footer d-flex justify-content-between pt-1">
       <div class="w-40 d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
         <phone-number-selector @setSelectedPhone="setSelectedPhone"></phone-number-selector>
