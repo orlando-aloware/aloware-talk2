@@ -31,7 +31,8 @@
               </span>
             </q-item-section>
           </q-item-section>
-          <q-tooltip anchor="top middle" self="center middle">
+          <q-tooltip anchor="top middle"
+                     self="center middle">
             {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash | capitalize }}
           </q-tooltip>
         </template>
@@ -57,9 +58,9 @@
 
               <div v-if="communication.body">
                 <div class="text-muted mb-2"
-                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
-                      v-html="$options.filters.nl2br(communication.body)"
-                      v-linkify:options="{ target: '_blank' }">
+                     v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
+                     v-html="$options.filters.nl2br(communication.body)"
+                     v-linkify:options="{ target: '_blank' }">
                 </div>
                 <div class="font-weight-light-bold my-2"
                      v-else-if="communication.type === CommunicationTypes.APPOINTMENT">
@@ -78,7 +79,7 @@
             </template>
 
             <div class="font-weight-light-bold my-2"
-                  v-if="communication.type === CommunicationTypes.CALL">
+                 v-if="communication.type === CommunicationTypes.CALL">
               This call
               {{ communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ? 'is' : 'was' }}
               {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash }}.
@@ -236,7 +237,8 @@
                        :state="communication.rejected_by_app"
                        v-if="communication.rejected_by_app !== 0"
                        v-html="rejectionToIcon(communication.rejected_by_app)">
-                    <q-tooltip anchor="bottom middle" self="top middle">
+                    <q-tooltip anchor="bottom middle"
+                               self="top middle">
                       {{ rejectionTooltipData(communication.rejected_by_app) }}
                     </q-tooltip>
                   </div>
@@ -339,9 +341,9 @@
                 <div class="d-flex align-items-center w-100">
                   {{
                     communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW ?
-                    $options.filters.translateCurrentStatusText(communication.current_status2) :
-                    $options.filters.translateDispositionStatusText(communication.disposition_status2) | replaceDash |
-                    capitalize
+                      $options.filters.translateCurrentStatusText(communication.current_status2) :
+                      $options.filters.translateDispositionStatusText(communication.disposition_status2) | replaceDash |
+                      capitalize
                   }}
                 </div>
               </div>
@@ -382,7 +384,7 @@
                  v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <label class="form-control-label mb-1">Notes</label>
               <div class="d-flex flex-column justify-content-center pb-2 w-100"
-                v-if="communication.type === CommunicationTypes.APPOINTMENT && communication.engagement_data.appointment_note">
+                   v-if="communication.type === CommunicationTypes.APPOINTMENT && communication.engagement_data.appointment_note">
                 {{ communication.engagement_data.appointment_note }}
               </div>
               <div class="d-flex flex-column justify-content-center pb-2 w-100"
@@ -440,10 +442,10 @@
                   </label>
                   <div class="d-flex align-items-center w-100 mb-2 border-bottom"
                        v-if="communication.has_recording">
-                      <communication-audio :communication="communication"
-                                           :type="UploadedFileTypes.TYPE_CALL_RECORDING"
-                                           :uniqueId="communication.id + '1'">
-                      </communication-audio>
+                    <communication-audio :communication="communication"
+                                         :type="UploadedFileTypes.TYPE_CALL_RECORDING"
+                                         :uniqueId="communication.id + '1'">
+                    </communication-audio>
                   </div>
                   <div class="form-control-label w-100 mb-2 pb-2 border-bottom"
                        v-else>
@@ -493,7 +495,7 @@
 
                 <label class="form-control-label w-100 mb-1">Tags</label>
                 <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom">
-                  <communication-tags :communication="communication" />
+                  <communication-tags :communication="communication"/>
                 </div>
 
                 <label class="form-control-label mb-1">Notes</label>
@@ -508,7 +510,7 @@
                   <div class="d-flex align-items-center co-12">
                     <label class="form-control-label mb-1">Call Disposition:</label>
                     <label class="ml-1 d-flex align-items-center"
-                         v-if="currentCompany.force_call_disposition">
+                           v-if="currentCompany.force_call_disposition">
                       <b-button id="audio-btn"
                                 size="sm"
                                 variant="link"
@@ -573,7 +575,9 @@
                 :to="{ name: 'Communication', params: {communicationId: communication.id}}">
                 <button class="more-details font-weight-light-bold btn btn-sm">
                   More Details
-                  <chevron-right width="5" height="8" />
+                  <chevron-right width="5"
+                                 height="8">
+                  </chevron-right>
                 </button>
               </router-link>
             </div>
@@ -599,20 +603,8 @@
 
 <script>
 import _ from 'lodash'
-import {
-  aclMixin,
-  avatarMixin,
-  communicationInfoMixin,
-  dateMixin,
-  userMixin
-} from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import * as AnswerTypes from '../constants/answer-types'
-import * as CommunicationCurrentStatus from '../constants/communication-current-status'
-import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
-import * as CommunicationTypes from '../constants/communication-types'
-import * as CommunicationDirections from '../constants/communication-direction'
-import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import ContactDispositionSelector from './contacts/contact-disposition-selector'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
@@ -622,9 +614,16 @@ import CommunicationNote from 'components/communication-note'
 import CommunicationTags from 'components/communication-tags'
 import CallDispositionSelector from 'components/call-disposition-selector'
 import CalendarIcon from 'components/icons/calendar-icon'
+import * as AnswerTypes from '../constants/answer-types'
+import * as CommunicationCurrentStatus from '../constants/communication-current-status'
+import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
+import * as CommunicationTypes from '../constants/communication-types'
+import * as CommunicationDirections from '../constants/communication-direction'
+import * as UploadedFileTypes from '../constants/uploaded-file-types'
 
 export default {
   name: 'communication-info',
+
   mixins: [
     aclMixin,
     avatarMixin,
@@ -908,6 +907,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../css/variables';
+
 .communication-info {
   .more-details {
     color: $blue;
