@@ -311,6 +311,32 @@
               <span>Scripts</span>
             </button>
           </div>
+          <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
+            <button class="phone-buttons btn"
+                    @click="hangupCall">
+              <cancel-call-icon width="40"
+                                height="40">
+              </cancel-call-icon>
+            </button>
+            <button class="phone-buttons btn">
+              <add-icon width="16"
+                        height="16">
+              </add-icon>
+              <span>Add</span>
+            </button>
+            <button class="phone-buttons btn">
+              <transfer-icon width="16"
+                             height="16">
+              </transfer-icon>
+              <span>Transfer</span>
+            </button>
+            <button class="phone-buttons btn">
+              <more-icon width="16"
+                         height="16">
+              </more-icon>
+              <span>More</span>
+            </button>
+          </div>
         </div>
       </template>
     </div>
@@ -357,11 +383,17 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import AddIcon from 'components/icons/add-icon'
+import MoreIcon from 'components/icons/more-icon'
+import TransferIcon from 'components/icons/transfer-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    TransferIcon,
+    MoreIcon,
+    AddIcon,
     ScriptsIcon,
     TagsIcon,
     NotesIcon,

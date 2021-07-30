@@ -1,40 +1,27 @@
 <template>
-  <svg class="svg" :width="width" :height="height" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
-       xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>calls / add</title>
-    <g id="calls-/-add" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-      <g id="add">
-        <circle id="Oval" cx="12" cy="12" r="12"></circle>
-        <path
-          d="M12.7142857,12.7142857 L12.7142857,17 L11.2857143,17 L11.2857143,12.7142857 L7,12.7142857 L7,11.2857143 L11.2857143,11.2857143 L11.2857143,7 L12.7142857,7 L12.7142857,11.2857143 L17,11.2857143 L17,12.7142857 L12.7142857,12.7142857 Z"
-          id="edit-/-plus" fill="#FFFFFF" fill-rule="nonzero"></path>
-      </g>
-    </g>ad
+  <svg :width="width" :height="height" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.59893 7.56031C8.58723 7.56031 10.1991 5.86788 10.1991 3.78015C10.1991 1.69243 8.58723 0 6.59893 0C4.61062 0 2.99878 1.69243 2.99878 3.78015C2.99878 5.86788 4.61062 7.56031 6.59893 7.56031Z" :fill="color"/>
+    <path d="M6.60048 8.82031C0.522504 8.82031 0 13.0146 0 14.0813C0 15.1465 0.83408 15.7506 1.61312 15.7506H6.60048H11.5876C12.3663 15.7506 13.2005 15.147 13.2005 14.0813C13.2005 13.0146 12.6784 8.82031 6.60048 8.82031Z" :fill="color"/>
+    <path d="M17.403 6.30343H15.5953V4.4055C15.5953 4.05919 15.3287 3.7793 14.9993 3.7793C14.6696 3.7793 14.4029 4.05919 14.4029 4.4055V6.30343H12.5953C12.2659 6.30343 11.9991 6.58332 11.9991 6.92943C11.9991 7.27531 12.2659 7.55563 12.5953 7.55563H14.4029V9.45335C14.4029 9.79902 14.6696 10.0796 14.9993 10.0796C15.3287 10.0796 15.5953 9.79902 15.5953 9.45335V7.55563H17.403C17.7326 7.55563 17.9994 7.27531 17.9994 6.92943C17.9994 6.58332 17.7326 6.30343 17.403 6.30343Z" :fill="color"/>
   </svg>
 </template>
 
 <script>
 export default {
+  name: 'add-icon',
   props: {
     width: {
       type: [Number, String],
-      default: 24
+      default: 16
     },
     height: {
       type: [Number, String],
-      default: 24
+      default: 16
+    },
+    color: {
+      type: String,
+      default: '#62666E'
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-.svg circle {
-  fill: $grey-mid;
-}
-.svg:hover circle {
-  fill: darken($grey-mid, 7%);
-}
-</style>
