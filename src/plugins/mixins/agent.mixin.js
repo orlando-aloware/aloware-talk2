@@ -21,7 +21,7 @@ export default {
       if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
         this.profile.agent_status = user.agent_status
         this.agentStatus = user.agent_status
-        console.log('Changed agent status: ' + user.agent_status)
+        console.log('Changed agent status 1: ' + user.agent_status)
       }
     })
 
@@ -72,6 +72,7 @@ export default {
       }).then(res => {
         this.profile.agent_status = res.data.agent_status
         this.agentStatus = res.data.agent_status
+        console.log('Changed agent status 3: ' + res.data.agent_status)
       }).catch((err) => {
         console.log(err)
         getTry++
@@ -129,8 +130,8 @@ export default {
           this.loadingAgentStatus = false
           this.profile.agent_status = res.data.agent_status
           this.agentStatus = res.data.agent_status
-          console.log('Changed agent status: ' + res.data.agent_status)
           this.$VueEvent.fire('user_updated', res.data)
+          console.log('Changed agent status 2: ' + res.data.agent_status)
           if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
             this.$VueEvent.fire('endWrapUp')
           }
@@ -149,6 +150,14 @@ export default {
     }, 500),
 
     ...mapActions(['setOldAgentStatus'])
+  },
+
+  watch: {
+    agentStatus (toVal, fromVal) {
+      if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP && toVal !== fromVal) {
+        this.$VueEvent.fire('endWrapUp')
+      }
+    }
   },
 
   beforeDestroy () {

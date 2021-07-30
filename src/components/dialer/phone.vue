@@ -208,7 +208,6 @@
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
-                   ripple
                    round
                    no-caps
                    @click="hangupCall">

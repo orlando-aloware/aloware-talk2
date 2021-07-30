@@ -3467,8 +3467,20 @@ span.mention {
 
   .phone-cta {
     width: 180px;
-    height: 80px;
+    height: 150px;
     color: $white;
+  }
+
+  .ripple {
+    .q-btn__content {
+      &::after {
+        @include rings(3s, 0s);
+      }
+
+      &::before {
+        @include rings(3s, 0.5s);
+      }
+    }
   }
 
   .phone-body {
@@ -3555,16 +3567,6 @@ span.mention {
       .card-body {
         @extend .q-pa-sm;
       }
-    }
-  }
-
-  .ripple {
-    &::after {
-      @include rings(3s, 0s);
-    }
-
-    &::before {
-      @include rings(3s, 0.5s);
     }
   }
 }
