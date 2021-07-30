@@ -5,7 +5,7 @@
 <script>
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
-import { mapState, mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { aclMixin, agentMixin } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -19,6 +19,9 @@ export default {
   data () {
     return {
       loadingCommunication: false,
+      loadingDropThirdParty: false,
+      loadingToggleRecordingStatus: false,
+      loadingMerge: false,
       callNotification: null,
       desktopNotification: null,
       device: new TwilioDevice(),
@@ -101,24 +104,8 @@ export default {
     })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
-      // if this error is a token error re-establish it
-      if (error.tokenError() || error.code === 'Canceled') {
-        this.handleError(error)
-        if ([31205, 31204].includes(error.code)) {
-          this.rebootPhone(true)
-        } else {
-          this.rebootPhone()
-        }
-      } else {
-        // non token related errors (non trivial errors)
-        // this.changePhoneStatus('Error (' + error.code + ')')
-        this.handleError(error)
-        if ([31201].includes(error.code)) {
-          setTimeout(() => {
-            this.rebootPhone()
-          }, 5000)
-        }
-      }
+      this.handleError(error)
+      this.backToDial()
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
@@ -257,6 +244,14 @@ export default {
 
     this.$VueEvent.listen('toggleMute', () => {
       this.toggleMute()
+    })
+
+    this.$VueEvent.listen('toggleHold', () => {
+      this.toggleHold()
+    })
+
+    this.$VueEvent.listen('toggleRecordingStatus', () => {
+      this.toggleRecordingStatus()
     })
 
     this.$VueEvent.listen('forceRefreshCommunication', () => {
@@ -489,7 +484,7 @@ export default {
         return
       }
 
-      if (!this.dialer.call.isMuted) {
+      if (!this.dialer.isMuted) {
         console.log('Muting call')
         if (this.device.activeConnection()) {
           this.device.activeConnection().mute(true)
@@ -504,6 +499,72 @@ export default {
       }
     },
 
+    toggleHold () {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      if (!this.dialer.isHeld) {
+        console.log('Holding call')
+        this.setDialerIsHeld(true)
+      } else {
+        console.log('Unholding call')
+        this.setDialerIsHeld(false)
+      }
+    },
+
+    toggleRecordingStatus () {
+      if (!this.dialer.call || !this.dialer.communication || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      const newStatus = (this.dialer.recordingStatus === 'in-progress') ? 'paused' : 'in-progress'
+
+      if (newStatus === 'paused') {
+        console.log('Pausing recording')
+      }
+
+      if (newStatus === 'in-progress') {
+        console.log('Starting recording')
+      }
+
+      this.loadingToggleRecordingStatus = true
+      this.$axios.post('/api/v1/communication/' + this.dialer.communication.id + '/toggle-recording-status', {
+        status: newStatus
+      }).then((res) => {
+        this.loadingToggleRecordingStatus = false
+        if (res.data.result) {
+          this.setDialerRecordingStatus(newStatus)
+          if (newStatus === 'paused') {
+            console.log('Recording paused')
+          }
+
+          if (newStatus === 'in-progress') {
+            console.log('Recording started')
+          }
+        } else {
+          // alert didn't change
+          if (newStatus === 'paused') {
+            console.log('Failed to pause recording')
+          }
+
+          if (newStatus === 'in-progress') {
+            console.log('Failed to start recording')
+          }
+        }
+      }).catch(err => {
+        if (newStatus === 'paused') {
+          console.log('Failed to pause recording')
+        }
+
+        if (newStatus === 'in-progress') {
+          console.log('Failed to start recording')
+        }
+        this.loadingToggleRecordingStatus = false
+        console.log(err)
+      })
+    },
+
     resetCall () {
       this.stopCallTimer()
       this.stopWrapUpTimer()
@@ -516,6 +577,8 @@ export default {
       this.setDialerContact()
       this.setDialerCurrentNumber('')
       this.setDialerIsMuted(false)
+      this.setDialerIsHeld(false)
+      this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       if (this.callNotification) {
         this.callNotification()
@@ -720,8 +783,9 @@ export default {
       'setDialerDeal',
       'setDialerContact',
       'setDialerCurrentNumber',
-      'setDialerOnSpeaker',
       'setDialerIsMuted',
+      'setDialerIsHeld',
+      'setDialerRecordingStatus',
       'setDialerDuration',
       'setDialerTimer',
       'setDialerWrapUpDuration',
@@ -747,6 +811,8 @@ export default {
     this.$VueEvent.stop('rejectCall')
     this.$VueEvent.stop('sendDigit')
     this.$VueEvent.stop('toggleMute')
+    this.$VueEvent.stop('toggleHold')
+    this.$VueEvent.stop('toggleRecordingStatus')
     this.$VueEvent.stop('forceRefreshCommunication')
     this.$VueEvent.stop('setInputDevice')
     this.$VueEvent.stop('setOutputDevice')

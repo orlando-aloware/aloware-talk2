@@ -23,6 +23,8 @@ export const DEFAULT_STATE = {
     contact: null,
     onSpeaker: false,
     isMuted: false,
+    isHeld: false,
+    recordingStatus: 'in-progress',
     timer: '',
     wrapUpTimer: '',
     duration: 0,

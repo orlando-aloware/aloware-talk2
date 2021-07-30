@@ -266,29 +266,49 @@
             </div>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
-            <button class="phone-buttons btn">
+            <button class="phone-buttons btn"
+                    @click="toggleMute">
               <mute-icon width="16"
-                         height="16">
+                         height="16"
+                         v-show="!dialer.isMuted">
               </mute-icon>
-              <span>Mute</span>
+              <unmute-icon width="16"
+                           height="16"
+                           v-show="dialer.isMuted">
+              </unmute-icon>
+              <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
             </button>
-            <button class="phone-buttons btn">
+            <button class="phone-buttons btn"
+                    @click="toggleHold">
               <hold-icon width="16"
-                         height="16">
+                         height="16"
+                         v-show="!dialer.isHeld">
               </hold-icon>
-              <span>Hold</span>
+              <unhold-icon width="16"
+                           height="16"
+                           v-show="dialer.isHeld">
+              </unhold-icon>
+              <span>{{ dialer.isHeld ? 'Unhold' : 'Hold' }}</span>
             </button>
-            <button class="phone-buttons btn">
+            <button class="phone-buttons btn"
+                    @click="openDialpad">
               <dialpad-icon width="16"
                             height="16">
               </dialpad-icon>
               <span>Dial pad</span>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="loadingToggleRecordingStatus || dialer.communication.should_record === false"
+                    class="phone-buttons btn"
+                    @click="toggleRecordingStatus">
               <record-icon width="16"
-                           height="16">
+                           height="16"
+                           v-show="dialer.recordingStatus === 'paused' && dialer.communication.should_record === true">
               </record-icon>
-              <span>Record</span>
+              <pause-record-icon width="16"
+                                 height="16"
+                                 v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
+              </pause-record-icon>
+              <span>{{ recordingText }}</span>
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
@@ -385,11 +405,17 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import AddIcon from 'components/icons/add-icon'
 import MoreIcon from 'components/icons/more-icon'
 import TransferIcon from 'components/icons/transfer-icon'
+import UnholdIcon from 'components/icons/unhold-icon'
+import UnmuteIcon from 'components/icons/unmute-icon'
+import PauseRecordIcon from 'components/icons/pause-record-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    PauseRecordIcon,
+    UnmuteIcon,
+    UnholdIcon,
     TransferIcon,
     MoreIcon,
     AddIcon,
@@ -446,6 +472,9 @@ export default {
       inputDevice: 'default',
       outputDevice: 'default',
       loadingCommunication: false,
+      loadingDropThirdParty: false,
+      loadingToggleRecordingStatus: false,
+      loadingMerge: false,
       expanded: false,
       screen: 'call',
       CommunicationDirection,
@@ -469,6 +498,18 @@ export default {
         default:
           return ''
       }
+    },
+
+    recordingText () {
+      if (this.dialer.recordingStatus === 'in-progress' && this.dialer.communication && this.dialer.communication.should_record === true) {
+        return 'Pause Rec'
+      }
+
+      if (this.dialer.recordingStatus === 'paused' && this.dialer.communication && this.dialer.communication.should_record === true) {
+        return 'Start Rec'
+      }
+
+      return 'Start Rec'
     },
 
     signalStrength () {
@@ -580,6 +621,30 @@ export default {
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
       this.closePhone()
+    },
+
+    toggleMute () {
+      this.$VueEvent.fire('toggleMute')
+    },
+
+    toggleHold () {
+      this.$VueEvent.fire('toggleHold')
+    },
+
+    openDialpad () {
+      this.screen = 'dialpad'
+    },
+
+    closeDialpad () {
+      this.screen = 'menu'
+    },
+
+    toggleRecordingStatus () {
+      this.loadingToggleRecordingStatus = true
+      this.$VueEvent.fire('toggleRecordingStatus')
+      setTimeout(() => {
+        this.loadingToggleRecordingStatus = false
+      }, 1000)
     },
 
     getCampaign (id) {
@@ -715,7 +780,6 @@ export default {
           return
         }
 
-        console.log(this.dialer.communication.current_status2)
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
           this.screen = 'menu'
         }

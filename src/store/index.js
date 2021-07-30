@@ -52,6 +52,8 @@ export default function (/* { ssrContext } */) {
         contact: null,
         onSpeaker: false,
         isMuted: false,
+        isHeld: false,
+        recordingStatus: 'in-progress',
         timer: '',
         wrapUpTimer: '',
         duration: 0,
@@ -108,12 +110,16 @@ export default function (/* { ssrContext } */) {
         commit('SET_DIALER_CURRENT_NUMBER', currentNumber)
       },
 
-      setDialerOnSpeaker ({ commit }, status) {
-        commit('SET_DIALER_ON_SPEAKER', status)
-      },
-
       setDialerIsMuted ({ commit }, status) {
         commit('SET_DIALER_IS_MUTED', status)
+      },
+
+      setDialerIsHeld ({ commit }, status) {
+        commit('SET_DIALER_IS_HELD', status)
+      },
+
+      setDialerRecordingStatus ({ commit }, status) {
+        commit('SET_DIALER_RECORDING_STATUS', status)
       },
 
       setDialerDuration ({ commit }, duration) {
@@ -385,14 +391,24 @@ export default function (/* { ssrContext } */) {
         state.dialer.currentNumber = currentNumber
       },
 
-      SET_DIALER_ON_SPEAKER (state, status) {
-        state.dialer.onSpeaker = status
-      },
-
       SET_DIALER_IS_MUTED (state, status) {
         state.dialer.isMuted = status
         if (state.dialer.call && state.dialer.call.isMuted !== undefined) {
           state.dialer.call.isMuted = status
+        }
+      },
+
+      SET_DIALER_IS_HELD (state, status) {
+        state.dialer.isHeld = status
+        if (state.dialer.call && state.dialer.call.isHeld !== undefined) {
+          state.dialer.call.isHeld = status
+        }
+      },
+
+      SET_DIALER_RECORDING_STATUS (state, status) {
+        state.dialer.recordingStatus = status
+        if (state.dialer.call && state.dialer.call.recordingStatus !== undefined) {
+          state.dialer.call.recordingStatus = status
         }
       },
 
