@@ -291,12 +291,32 @@
               <span>Record</span>
             </button>
           </div>
+          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
+            <button class="phone-buttons elevated btn">
+              <notes-icon width="16"
+                          height="16">
+              </notes-icon>
+              <span>Notes</span>
+            </button>
+            <button class="phone-buttons elevated btn">
+              <tags-icon width="16"
+                         height="16">
+              </tags-icon>
+              <span>Tags</span>
+            </button>
+            <button class="phone-buttons elevated btn">
+              <scripts-icon width="16"
+                            height="16">
+              </scripts-icon>
+              <span>Scripts</span>
+            </button>
+          </div>
         </div>
       </template>
     </div>
     <div
       :class="[ ![CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(dialer.communication.current_status2) ? 'bg-dark' : 'bg-white']"
-      class="phone-integrations d-flex"
+      class="phone-integrations d-flex overlay"
       v-if="dialer.contact">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
@@ -329,6 +349,9 @@ import RecordIcon from 'components/icons/record-icon'
 import DialpadIcon from 'components/icons/dialpad-icon'
 import HoldIcon from 'components/icons/hold-icon'
 import MuteIcon from 'components/icons/mute-icon'
+import NotesIcon from 'components/icons/notes-icon'
+import TagsIcon from 'components/icons/tags-icon'
+import ScriptsIcon from 'components/icons/scripts-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -339,6 +362,9 @@ export default {
   name: 'phone',
 
   components: {
+    ScriptsIcon,
+    TagsIcon,
+    NotesIcon,
     MuteIcon,
     HoldIcon,
     DialpadIcon,

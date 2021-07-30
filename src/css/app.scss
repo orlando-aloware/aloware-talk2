@@ -3331,6 +3331,7 @@ span.mention {
     background: $dark;
     padding-left: 12px;
     padding-right: 12px;
+    flex-shrink: 0;
 
     @extend .no-select;
   }
@@ -3485,10 +3486,33 @@ span.mention {
       justify-content: center;
 
       span {
-        margin-top: 11px;
+        margin-top: 10px;
+        color: $grey-90;
         font-size: $f-size-body-xxs;
       }
+
+      &.elevated {
+        background: $white;
+        box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.04), 0px 3px 10px rgba(4, 4, 4, 0.12);
+        border-radius: 10px;
+        width: 74px;
+        height: 74px;
+        padding: 0;
+
+        span {
+          color: $grey-90;
+          font-size: $f-size-body;
+          font-weight: 600;
+        }
+      }
     }
+  }
+
+  .overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   .phone-integrations {
