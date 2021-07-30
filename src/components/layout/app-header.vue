@@ -62,6 +62,7 @@ import Profile from 'components/profile'
 import Phone from 'components/dialer/phone'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'app-header',
@@ -75,6 +76,10 @@ export default {
       dialerIcon: 'img:app-icons/header/dialer_gray.svg',
       dialerStatus: false
     }
+  },
+
+  computed: {
+    ...mapGetters('auth', ['authenticated'])
   },
 
   created () {
@@ -104,6 +109,14 @@ export default {
     navigateBackward (e) {
       this.goBack()
       e.preventDefault()
+    }
+  },
+
+  watch: {
+    authenticated () {
+      if (!this.authenticated) {
+        this.hideDialer()
+      }
     }
   }
 }
