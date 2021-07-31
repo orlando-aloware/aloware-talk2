@@ -22,7 +22,7 @@
 import { avatarMixin } from 'src/plugins/mixins'
 import SequenceIcon from 'components/icons/contact-activity/sequence-icon'
 export default {
-  name: 'avatar.vue',
+  name: 'avatar',
   components: { SequenceIcon },
   mixins: [avatarMixin],
   computed: {

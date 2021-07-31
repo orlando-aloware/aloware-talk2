@@ -151,7 +151,7 @@
 <script>
 import moment from 'moment'
 import { mapActions, mapGetters } from 'vuex'
-import Avatar from 'components/avatar.vue'
+import Avatar from 'components/avatar'
 
 export default {
   components: {

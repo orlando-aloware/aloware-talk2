@@ -106,6 +106,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_DIALER_CONTACT', contact)
       },
 
+      setDialerContactTags ({ commit }, tags) {
+        commit('SET_DIALER_CONTACT_TAGS', tags)
+      },
+
       setDialerCurrentNumber ({ commit }, currentNumber) {
         commit('SET_DIALER_CURRENT_NUMBER', currentNumber)
       },
@@ -385,6 +389,11 @@ export default function (/* { ssrContext } */) {
           contact.tag_ids = []
         }
         state.dialer.contact = contact
+      },
+
+      SET_DIALER_CONTACT_TAGS: (state, tags) => {
+        state.dialer.contact.tags = tags
+        state.dialer.contact.tag_ids = tags.map((a) => a.id)
       },
 
       SET_DIALER_CURRENT_NUMBER (state, currentNumber) {

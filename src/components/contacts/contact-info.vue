@@ -125,7 +125,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import ContactNameForm from 'src/components/forms/contact-name-form'
-import Avatar from 'src/components/avatar.vue'
+import Avatar from 'src/components/avatar'
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon'
 import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'

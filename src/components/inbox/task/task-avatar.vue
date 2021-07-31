@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: 'task-avatar.vue',
+  name: 'task-avatar',
   props: {
     src: {
       type: String,

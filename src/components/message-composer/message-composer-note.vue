@@ -58,7 +58,7 @@ import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 import At from 'vue-at'
-import Avatar from 'components/avatar.vue'
+import Avatar from 'components/avatar'
 
 export default {
   name: 'message-composer-note',

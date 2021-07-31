@@ -314,19 +314,22 @@
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
-            <button class="phone-buttons elevated btn">
+            <button class="phone-buttons elevated btn"
+                    @click="openNotes">
               <notes-icon width="16"
                           height="16">
               </notes-icon>
               <span>Notes</span>
             </button>
-            <button class="phone-buttons elevated btn">
+            <button class="phone-buttons elevated btn"
+                    @click="openTags">
               <tags-icon width="16"
                          height="16">
               </tags-icon>
               <span>Tags</span>
             </button>
-            <button class="phone-buttons elevated btn">
+            <button class="phone-buttons elevated btn"
+                    @click="openScripts">
               <scripts-icon width="16"
                             height="16">
               </scripts-icon>
@@ -363,24 +366,63 @@
         </div>
       </template>
     </div>
-    <div :class="[ screen === 'call' ? 'bg-dark' : 'bg-white']"
-         class="phone-integrations d-flex overlay"
+    <div class="phone-expansion d-flex overlay"
          v-if="dialer.contact">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
-                        style="border-radius: 12px"
-                        label="Integrations"
                         header-class="text-sm bg-white text-center"
-                        expand-icon-class="text-grey-100 ml-3"
+                        expand-icon-class="text-grey-100"
                         switch-toggle-side
                         dense>
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label>{{ bottomExpansionLabel }}</q-item-label>
+          </q-item-section>
+
+          <q-item-section side>
+            <q-btn :ripple="false"
+                   :class="[ (bottomExpansion === 'integrations' || !expanded) ? 'invisible' : '']"
+                   color="primary"
+                   label="Done"
+                   class="no-q-btn-focus"
+                   no-caps
+                   unelevated
+                   dense
+                   flat
+                   @click="saveAndResetExpansion">
+            </q-btn>
+          </q-item-section>
+        </template>
+
         <q-card>
-          <q-card-section class="height-200">
-            <contact-integrations :contact="dialer.contact"
-                                  :no_title="true"
-                                  v-show="expanded">
-            </contact-integrations>
-          </q-card-section>
+          <template v-if="bottomExpansion === 'integrations'">
+            <q-card-section class="height-240">
+              <contact-integrations :contact="dialer.contact"
+                                    :no_title="true"
+                                    v-show="expanded">
+              </contact-integrations>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'notes'">
+            <q-card-section class="height-445">
+              <contact-notes :contact="dialer.contact"
+                             :no_title="true"
+                             @update="onNotesUpdate">
+              </contact-notes>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'tags'">
+            <q-card-section class="height-240">
+              <contact-tags :contact="dialer.contact"
+                            :no_title="true"
+                            @update="onTagsUpdate">
+              </contact-tags>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'scripts'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
         </q-card>
       </q-expansion-item>
     </div>
@@ -388,7 +430,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
@@ -401,22 +443,26 @@ import NotesIcon from 'components/icons/notes-icon'
 import TagsIcon from 'components/icons/tags-icon'
 import ScriptsIcon from 'components/icons/scripts-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as CommunicationStatus from 'src/constants/communication-status'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import * as CommunicationTypes from 'src/constants/communication-types'
 import AddIcon from 'components/icons/add-icon'
 import MoreIcon from 'components/icons/more-icon'
 import TransferIcon from 'components/icons/transfer-icon'
 import UnholdIcon from 'components/icons/unhold-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import PauseRecordIcon from 'components/icons/pause-record-icon'
+import ContactNotes from 'components/contacts/contact-notes'
+import ContactTags from 'components/contacts/contact-tags'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationStatus from 'src/constants/communication-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'phone',
 
   components: {
+    ContactTags,
+    ContactNotes,
     PauseRecordIcon,
     UnmuteIcon,
     UnholdIcon,
@@ -483,6 +529,7 @@ export default {
       loadingPark: false,
       expanded: false,
       screen: 'call',
+      bottomExpansion: 'integrations',
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -532,6 +579,21 @@ export default {
 
     isCallAdded () {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
+    },
+
+    bottomExpansionLabel () {
+      switch (this.bottomExpansion) {
+        case 'integrations':
+          return 'Integrations'
+        case 'notes':
+          return 'Add Notes'
+        case 'tags':
+          return 'Add Tags'
+        case 'scripts':
+          return 'Scripts'
+        default:
+          return ''
+      }
     },
 
     phoneStatus () {
@@ -686,6 +748,36 @@ export default {
       this.screen = 'menu'
     },
 
+    openNotes () {
+      this.bottomExpansion = 'notes'
+      this.expanded = true
+    },
+
+    openTags () {
+      this.bottomExpansion = 'tags'
+      this.expanded = true
+    },
+
+    openScripts () {
+      this.bottomExpansion = 'scripts'
+      this.expanded = true
+    },
+
+    saveAndResetExpansion ($event) {
+      $event.stopPropagation()
+      $event.preventDefault()
+      this.bottomExpansion = 'integrations'
+      this.expanded = false
+    },
+
+    onNotesUpdate (contact) {
+      this.setDialerContact(contact)
+    },
+
+    onTagsUpdate (tags) {
+      this.setDialerContactTags(tags)
+    },
+
     toggleRecordingStatus () {
       this.loadingToggleRecordingStatus = true
       this.$VueEvent.fire('toggleRecordingStatus')
@@ -808,13 +900,20 @@ export default {
       setTimeout(() => {
         this.loadingCommunication = false
       }, 1000)
-    }
+    },
+
+    ...mapActions([
+      'setDialerContact',
+      'setDialerContactTags'
+    ])
   },
 
   watch: {
     shouldShow () {
       this.setupDraggable()
       this.setupContactLocalTime()
+      this.bottomExpansion = 'integrations'
+      this.screen = 'call'
     },
 
     screen () {

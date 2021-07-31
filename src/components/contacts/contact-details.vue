@@ -58,11 +58,14 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact'])
   },
+
   methods: {
     ...mapActions('contacts', ['setContact', 'setContactTags']),
+
     onNotesUpdate (contact) {
       this.setContact(contact)
     },
+
     onTagsUpdate (tags) {
       this.setContactTags(tags)
     }
