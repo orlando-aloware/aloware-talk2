@@ -36,6 +36,7 @@
 
 <script>
 export default {
+  name: 'task-icon',
   props: {
     width: {
       type: [Number, String],

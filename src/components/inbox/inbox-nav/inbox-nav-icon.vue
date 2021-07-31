@@ -1,14 +1,14 @@
 <script>
-import phone from 'components/icons/phone-icon.vue'
-import hideMinimize from 'components/icons/hide-minimize-icon.vue'
-import showContent from 'components/icons/show-content-icon.vue'
-import task from 'components/icons/task-icon.vue'
-import inbox from 'components/icons/inbox/inbox-icon.vue'
-import call from 'components/icons/inbox/call-icon.vue'
-import message from 'components/icons/inbox/message-icon.vue'
-import mention from 'components/icons/inbox/mention-icon.vue'
-import voicemail from 'components/icons/inbox/voicemail-icon.vue'
-import record from 'components/icons/inbox/record-icon.vue'
+import phone from 'components/icons/phone-icon'
+import hideMinimize from 'components/icons/hide-minimize-icon'
+import showContent from 'components/icons/show-content-icon'
+import task from 'components/icons/task-icon'
+import inbox from 'components/icons/inbox/inbox-icon'
+import call from 'components/icons/inbox/call-icon'
+import message from 'components/icons/inbox/message-icon'
+import mention from 'components/icons/inbox/mention-icon'
+import voicemail from 'components/icons/inbox/voicemail-icon'
+import record from 'components/icons/inbox/record-icon'
 
 export default {
   /* eslint-disable */

@@ -30,6 +30,7 @@
 
 <script>
 export default {
+  name: 'phone-icon',
   props: {
     width: {
       type: [Number, String],
