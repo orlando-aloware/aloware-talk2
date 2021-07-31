@@ -9,7 +9,7 @@ Vue.use(VueRouter)
 // before vue-router is registered with Vue.use(VueRouter)
 
 window.addEventListener('popstate', () => {
-  window.VueEvent.fire('browser-back')
+  window.VueEvent.fire('browser-pop')
 })
 
 /*
