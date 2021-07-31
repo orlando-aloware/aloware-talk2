@@ -102,9 +102,9 @@ export default {
           agentStatus = AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
           break
       }
-      console.log('old agent status: ' + this.oldAgentStatus)
-      console.log('current agent status: ' + this.agentStatus)
-      console.log('new agent status: ' + agentStatus)
+      console.log('old agent status [reset]: ' + this.oldAgentStatus)
+      console.log('current agent status [reset]: ' + this.agentStatus)
+      console.log('new agent status [reset]: ' + agentStatus)
       // check status
       if (this.agentStatus !== agentStatus) {
         this.changeAgentStatus(agentStatus)
@@ -116,10 +116,10 @@ export default {
         return
       }
       if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
-        console.log('Setting old agent status: ' + val)
+        console.log('Setting old agent status [api]: ' + val)
         this.setOldAgentStatus(val)
       }
-      console.log('Changing agent status: ' + val)
+      console.log('Changing agent status [api]: ' + val)
 
       // make sure that the session is valid
       if (this.profile) {
@@ -138,7 +138,7 @@ export default {
         }).catch(err => {
           changeAgentStatusTry++
           // error
-          console.log('An error occurred while changing agent status', err)
+          console.log('An error occurred while changing agent status [api]', err)
           // check if we have found the communication after 3 retries
           if (changeAgentStatusTry > 3) {
             this.loadingAgentStatus = false
