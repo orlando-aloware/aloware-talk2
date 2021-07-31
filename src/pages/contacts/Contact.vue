@@ -80,7 +80,6 @@ export default {
   },
 
   mounted () {
-    console.log('mounted')
     if (this.authenticated) {
       this.contactId = this.$route.params.id
       this.processFetchContactInfo()
