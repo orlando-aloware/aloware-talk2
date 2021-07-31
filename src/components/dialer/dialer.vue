@@ -241,7 +241,7 @@ export default {
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {
-      this.sendDigit(data.digit)
+      this.sendDigit(data)
     })
 
     this.$VueEvent.listen('toggleMute', () => {

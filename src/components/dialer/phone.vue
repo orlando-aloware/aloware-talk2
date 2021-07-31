@@ -411,6 +411,104 @@
           </template>
           <template v-if="bottomExpansion === 'dialpad'">
             <q-card-section class="height-445">
+              <div class="d-flex flex-column justify-content-around h-100 pt-3 pb-3">
+                <div class="d-flex flex-column">
+                  <b-form-input v-model="digits"
+                                class="phone-digits"
+                                type="text">
+                  </b-form-input>
+                </div>
+                <div class="d-flex flex-column dialpad">
+                  <div class="d-flex flex-row align-items-center justify-content-between mb-2">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('1')">
+                      <span class="number-text">1</span>
+                      <span class="number-text-sub invisible">$</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('2')">
+                      <span class="number-text">2</span>
+                      <span class="number-text-sub">A B C</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('3')">
+                      <span class="number-text">3</span>
+                      <span class="number-text-sub">D E F</span>
+                    </button>
+                  </div>
+                  <div class="d-flex flex-row align-items-center justify-content-between mb-2">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('4')">
+                      <span class="number-text">4</span>
+                      <span class="number-text-sub">G H I</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('5')">
+                      <span class="number-text">5</span>
+                      <span class="number-text-sub">J K L</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('6')">
+                      <span class="number-text">6</span>
+                      <span class="number-text-sub">M N O</span>
+                    </button>
+                  </div>
+                  <div class="d-flex flex-row align-items-center justify-content-between mb-2">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('7')">
+                      <span class="number-text">7</span>
+                      <span class="number-text-sub">P Q R S</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('8')">
+                      <span class="number-text">8</span>
+                      <span class="number-text-sub">T U V</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('9')">
+                      <span class="number-text">9</span>
+                      <span class="number-text-sub">W X Y Z</span>
+                    </button>
+                  </div>
+                  <div class="d-flex flex-row align-items-center justify-content-between">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('*')">
+                      <span class="number-text">*</span>
+                      <span class="number-text-sub invisible">$</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            v-longpress="handleLongPress">
+                      <span class="number-text">0</span>
+                      <span class="number-text-sub">+</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('#')">
+                      <span class="number-text">#</span>
+                      <span class="number-text-sub invisible">$</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                  <q-btn class="height-56"
+                         ripple
+                         round
+                         no-caps
+                         unelevated
+                         @click="hangupCall">
+                    <cancel-call-icon width="56"
+                                      height="56">
+                    </cancel-call-icon>
+                  </q-btn>
+                </div>
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'notes'">
@@ -577,6 +675,7 @@ export default {
       expanded: false,
       screen: 'call',
       bottomExpansion: 'integrations',
+      digits: '',
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -869,6 +968,19 @@ export default {
       }, 1000)
     },
 
+    handleLongPress (isLong = false) {
+      if (isLong) {
+        this.sendDigit('+')
+      } else {
+        this.sendDigit('0')
+      }
+    },
+
+    sendDigit (digit) {
+      this.digits += digit.toString()
+      this.$VueEvent.fire('sendDigit', digit)
+    },
+
     getCampaign (id) {
       if (!id) {
         return null
@@ -1002,6 +1114,7 @@ export default {
       this.setupContactLocalTime()
       this.resetBottomExpansion()
       this.screen = 'call'
+      this.digits = ''
     },
 
     screen () {

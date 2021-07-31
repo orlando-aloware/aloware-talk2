@@ -2890,6 +2890,10 @@ span.mention {
   height: 52px;
 }
 
+.height-56 {
+  height: 56px;
+}
+
 .height-140 {
   height: 140px;
 }
@@ -3542,6 +3546,51 @@ span.mention {
         color: $grey-90;
         font-size: $f-size-body;
         font-weight: 600;
+      }
+    }
+  }
+
+  .phone-digits {
+    border: 0;
+    padding: 0;
+    font-size: 24px;
+    line-height: 29px;
+    text-align: center;
+    color: $grey-100;
+  }
+
+  .dialpad {
+    padding-left: 34px;
+    padding-right: 34px;
+
+    .number-btn-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      padding: 0;
+      border: 1px solid #EBEBEB;
+      border-radius: 50px;
+      overflow: hidden;
+
+      &:focus, &.focus {
+        box-shadow: none;
+      }
+
+      .number-text {
+        font-size: 24px;
+        line-height: 29px;
+        font-weight: 400;
+      }
+
+      .number-text-sub {
+        font-size: 8px;
+        line-height: 10px;
+        text-align: center;
+        font-weight: 400;
+        color: $grey-90;
       }
     }
   }
