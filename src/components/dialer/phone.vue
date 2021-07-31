@@ -406,7 +406,7 @@
           <template v-if="bottomExpansion === 'notes'">
             <q-card-section class="height-445">
               <contact-notes :contact="dialer.contact"
-                             :no_title="trued"
+                             :no_title="true"
                              @update="onNotesUpdate">
               </contact-notes>
             </q-card-section>
