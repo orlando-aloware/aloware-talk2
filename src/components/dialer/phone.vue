@@ -406,7 +406,7 @@
           <template v-if="bottomExpansion === 'notes'">
             <q-card-section class="height-445">
               <contact-notes :contact="dialer.contact"
-                             :no_title="true"
+                             :no_title="trued"
                              @update="onNotesUpdate">
               </contact-notes>
             </q-card-section>
@@ -902,6 +902,11 @@ export default {
       }, 1000)
     },
 
+    resetBottomExpansion () {
+      this.bottomExpansion = 'integrations'
+      this.expanded = false
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -912,7 +917,7 @@ export default {
     shouldShow () {
       this.setupDraggable()
       this.setupContactLocalTime()
-      this.bottomExpansion = 'integrations'
+      this.resetBottomExpansion()
       this.screen = 'call'
     },
 
@@ -949,6 +954,7 @@ export default {
           break
         case 'WRAP_UP':
           this.screen = 'wrap-up'
+          this.resetBottomExpansion()
           break
         case 'GENERATING_TOKEN':
           this.screen = 'call'
@@ -989,6 +995,10 @@ export default {
 
     'dialer.contact': function () {
       this.setupContactLocalTime()
+    },
+
+    isCallCompleted () {
+      this.resetBottomExpansion()
     }
   },
 

@@ -12,8 +12,7 @@
                   :custom-tags="tags"
                   @change="changeTags($event)"
                   @open="onSelectOpen"
-                  @close="onSelectClose"
-    >
+                  @close="onSelectClose">
     </tag-selector>
 
     <b-link v-if="!isEdit && hasPermissionTo(['list tag', 'view tag'])"
