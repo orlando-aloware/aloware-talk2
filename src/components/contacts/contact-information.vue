@@ -2,8 +2,7 @@
   <b-card class="border-0 position-relative contact-about-wrapper">
     <h4>About this contact</h4>
 
-    <div :class="`information-container ${autoHeightClass}`"
-         v-if="!changingSelectedContact">
+    <div :class="`information-container ${autoHeightClass}`">
       <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-0">Owner</p>
@@ -126,7 +125,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactAttributes', 'changingSelectedContact']),
+    ...mapGetters('contacts', ['contact', 'contactAttributes']),
 
     autoHeightClass () {
       return this.is_expanded ? 'auto-height' : ''

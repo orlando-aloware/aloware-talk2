@@ -2,14 +2,13 @@
   <div class="communication-info"
        v-if="communication">
     <q-list class="rounded-contact-activity">
-      <q-expansion-item
-        v-model="activeName"
-        class="contact-activity"
-        :class="activityExpansionClass"
-        @before-show="onBeforeActivityShow"
-        @after-show="onAfterActivityShow"
-        @before-hide="onBeforeActivityHide"
-        @after-hide="onActivityHide">
+      <q-expansion-item :class="activityExpansionClass"
+                        class="contact-activity"
+                        v-model="activeName"
+                        @before-show="onBeforeActivityShow"
+                        @after-show="onAfterActivityShow"
+                        @before-hide="onBeforeActivityHide"
+                        @after-hide="onActivityHide">
         <template slot="header">
           <q-item-section class="communication-header flex-row">
             <div class="ml-3 pr-2">
@@ -444,7 +443,8 @@
                        v-if="communication.has_recording">
                     <communication-audio :communication="communication"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
-                                         :uniqueId="communication.id + '1'">
+                                         :uniqueId="communication.id + '1'"
+                                         v-if="activeName">
                     </communication-audio>
                   </div>
                   <div class="form-control-label w-100 mb-2 pb-2 border-bottom"
@@ -464,7 +464,8 @@
                     <span class="text-dark-greenish flex-grow-1">
                       <communication-audio :communication="communication"
                                            :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
-                                           :uniqueId="communication.id + '2'">
+                                           :uniqueId="communication.id + '2'"
+                                           v-if="activeName">
                       </communication-audio>
                     </span>
                   </div>

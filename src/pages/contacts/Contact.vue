@@ -52,7 +52,7 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
@@ -65,7 +65,7 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
-    ...mapState({ userAuth: 'auth' }),
+    ...mapGetters('auth', ['authenticated']),
 
     widthClass () {
       return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
@@ -79,8 +79,9 @@ export default {
     }
   },
 
-  created () {
-    if (this.userAuth.authenticated) {
+  mounted () {
+    console.log('mounted')
+    if (this.authenticated) {
       this.contactId = this.$route.params.id
       this.processFetchContactInfo()
     }
@@ -89,8 +90,11 @@ export default {
   watch: {
     '$route.params.id': function () {
       if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
+        this.resetSelectedContact()
         this.contactId = this.$route.params.id
         this.processFetchContactInfo()
+      } else {
+        this.resetSelectedContact()
       }
     }
   }

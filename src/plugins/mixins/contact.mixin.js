@@ -493,6 +493,7 @@ export default {
     },
 
     resetSelectedContact () {
+      this.contactId = null
       this.selectedContact = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null
@@ -814,8 +815,6 @@ export default {
       } else {
         this.activeNames = this.activeNames.filter(name => name !== 'push-to-crm')
       }
-
-      this.resetSelectedContact()
     },
 
     processFetchedContactInfo (selectedContact) {
