@@ -6,7 +6,7 @@
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-55">
-<!--        <span v-if="dialer.currentStatus">{{ dialer.currentStatus }}</span>-->
+        <!--        <span v-if="dialer.currentStatus">{{ dialer.currentStatus }}</span>-->
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
         <span v-else>
@@ -344,19 +344,25 @@
                                 height="40">
               </cancel-call-icon>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="isAddDisabled"
+                    class="phone-buttons btn"
+                    @click="openAdd">
               <add-icon width="16"
                         height="16">
               </add-icon>
               <span>Add</span>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="isTransferDisabled"
+                    class="phone-buttons btn"
+                    @click="openTransfer">
               <transfer-icon width="16"
                              height="16">
               </transfer-icon>
               <span>Transfer</span>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="isMoreDisabled"
+                    class="phone-buttons btn"
+                    @click="openMore">
               <more-icon width="16"
                          height="16">
               </more-icon>
@@ -381,7 +387,7 @@
 
           <q-item-section side>
             <q-btn :ripple="false"
-                   :class="[ (bottomExpansion === 'integrations' || !expanded) ? 'invisible' : '']"
+                   :class="[ (['integrations', 'more', 'dialpad', 'add', 'vm-drop'].includes(bottomExpansion) || !expanded) ? 'invisible' : '']"
                    color="primary"
                    label="Done"
                    class="no-q-btn-focus"
@@ -403,6 +409,10 @@
               </contact-integrations>
             </q-card-section>
           </template>
+          <template v-if="bottomExpansion === 'dialpad'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
           <template v-if="bottomExpansion === 'notes'">
             <q-card-section class="height-445">
               <contact-notes :contact="dialer.contact"
@@ -421,6 +431,39 @@
           </template>
           <template v-if="bottomExpansion === 'scripts'">
             <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'add'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'transfer'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'vm-drop'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'more'">
+            <q-card-section class="height-140">
+              <div class="d-flex justify-content-start w-100 mt-3 pl-3 pr-3">
+                <button :disabled="isVmDropDisabled"
+                        class="phone-buttons btn"
+                        @click="openVmDrop">
+                  <vm-drop-icon width="18"
+                                height="18">
+                  </vm-drop-icon>
+                  <span>VM Drop</span>
+                </button>
+                <button class="phone-buttons btn"
+                        @click="openIntegrations">
+                  <integrations-icon width="18"
+                                     height="18">
+                  </integrations-icon>
+                  <span>Integrations</span>
+                </button>
+              </div>
             </q-card-section>
           </template>
         </q-card>
@@ -456,11 +499,15 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import IntegrationsIcon from 'components/icons/integrations-icon'
+import VmDropIcon from 'components/icons/vm-drop-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    VmDropIcon,
+    IntegrationsIcon,
     ContactTags,
     ContactNotes,
     PauseRecordIcon,
@@ -542,7 +589,7 @@ export default {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
 
     isCallCompleted () {
-      return ((this.dialer.communication && this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) || this.dialer.currentStatus === 'CALL_DISCONNECTED')
+      return ((this.dialer.communication && this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(this.dialer.currentStatus))
     },
 
     isHangupDisabled () {
@@ -550,15 +597,19 @@ export default {
     },
 
     isAddDisabled () {
-      return (!this.dialer.communication || !this.isCallCompleted || this.dialer.communication.in_cold_transfer || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return false && (!this.dialer.communication || !this.isCallCompleted || this.dialer.communication.in_cold_transfer || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isTransferDisabled () {
-      return (!this.dialer.communication || !this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return false && (!this.dialer.communication || !this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isMoreDisabled () {
-      return !this.isCallCompleted
+      return false && !this.isCallCompleted
+    },
+
+    isVmDropDisabled () {
+      return false && !this.isCallCompleted
     },
 
     isHoldDisabled () {
@@ -585,12 +636,22 @@ export default {
       switch (this.bottomExpansion) {
         case 'integrations':
           return 'Integrations'
+        case 'dialpad':
+          return 'Dial Pad'
         case 'notes':
           return 'Add Notes'
         case 'tags':
           return 'Add Tags'
         case 'scripts':
           return 'Scripts'
+        case 'add':
+          return 'Add User'
+        case 'transfer':
+          return 'Transfer'
+        case 'vm-drop':
+          return 'VM Drop'
+        case 'more':
+          return 'More'
         default:
           return ''
       }
@@ -741,11 +802,8 @@ export default {
     },
 
     openDialpad () {
-      this.screen = 'dialpad'
-    },
-
-    closeDialpad () {
-      this.screen = 'menu'
+      this.bottomExpansion = 'dialpad'
+      this.expanded = true
     },
 
     openNotes () {
@@ -760,6 +818,31 @@ export default {
 
     openScripts () {
       this.bottomExpansion = 'scripts'
+      this.expanded = true
+    },
+
+    openAdd () {
+      this.bottomExpansion = 'add'
+      this.expanded = true
+    },
+
+    openTransfer () {
+      this.bottomExpansion = 'transfer'
+      this.expanded = true
+    },
+
+    openMore () {
+      this.bottomExpansion = 'more'
+      this.expanded = true
+    },
+
+    openVmDrop () {
+      this.bottomExpansion = 'vm-drop'
+      this.expanded = true
+    },
+
+    openIntegrations () {
+      this.bottomExpansion = 'integrations'
       this.expanded = true
     },
 
