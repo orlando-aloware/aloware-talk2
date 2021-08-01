@@ -8,18 +8,19 @@
       <div class="d-flex flex-row text-size-rg _500 text-white width-55">
         <!--        <span v-if="dialer.currentStatus">{{ dialer.currentStatus }}</span>-->
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
-        <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
+        <span v-else-if="isCallCompleted"></span>
         <span v-else>
           0:00
         </span>
       </div>
-      <div class="d-flex flex-row text-xs text-white"
-           v-if="getCampaign(dialer.communication.campaign_id)">
-        {{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}
+      <div class="d-flex flex-row text-xs text-white">
+        <span v-if="isCallCompleted">Call Ended</span>
+        <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row width-55">
+      <div class="d-flex flex-row justify-content-end width-55">
         <ul id="signal-strength"
-            class="mr-2">
+            class="mr-2"
+            v-if="!isCallCompleted">
           <li class="very-weak">
             <div id="very-weak"
                  class="active">
@@ -220,7 +221,7 @@
           </div>
         </div>
       </template>
-      <template v-else>
+      <template v-else-if="screen === 'menu'">
         <div class="phone-main d-flex flex-column align-items-center">
           <div class="dummy bg-dark w-100 height-36"></div>
           <div class="phone-avatar">
@@ -339,7 +340,7 @@
           <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
             <button :disabled="isHangupDisabled"
                     class="phone-buttons btn"
-                    @click="hangupCall">
+                    @click="endCall">
               <cancel-call-icon width="40"
                                 height="40">
               </cancel-call-icon>
@@ -371,9 +372,54 @@
           </div>
         </div>
       </template>
+      <template v-else-if="screen === 'wrap-up'">
+        <div class="phone-main d-flex flex-column pl-2 pr-2 flex-grow-1 overflow-auto">
+          <b-list-group class="w-100 border-bottom">
+            <b-list-group-item class="d-flex align-items-center border-0 pl-0 pr-0">
+              <avatar class="contact-avatar"
+                      width="40"
+                      height="40"
+                      :name="dialer.contact.name">
+              </avatar>
+              <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
+                <div class="mr-auto">
+                  <p class="contact-name mb-1">
+                    {{ contactName }}
+                  </p>
+                  <p class="text-sm-left contact-phone mb-1">
+                    <span>{{ dialer.contact.phone_number | fixPhone }}</span>
+                    <b-link href="#"
+                            class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                            @click.prevent="copyPhoneNumber">
+                      <i class="material-icons">content_copy</i>
+                    </b-link>
+                    <input :value="dialer.contact.phone_number"
+                           type="hidden"
+                           id="phone-number-clone"/>
+                  </p>
+                </div>
+              </div>
+            </b-list-group-item>
+          </b-list-group>
+        </div>
+      </template>
+    </div>
+    <div class="phone-footer-buttons p-2"
+         v-if="!expansionEnabled">
+      <b-button variant="outline-dark"
+                @click="endWrapUp">
+        <span>Back</span>
+        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }})</span>
+      </b-button>
+
+      <b-button variant="primary"
+                @click="makeCall">
+        <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
+        <span class="ml-1">Call Back</span>
+      </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
-         v-if="dialer.contact">
+         v-if="dialer.contact && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         header-class="text-sm bg-white text-center"
@@ -502,7 +548,7 @@
                          round
                          no-caps
                          unelevated
-                         @click="hangupCall">
+                         @click="endCall">
                     <cancel-call-icon width="56"
                                       height="56">
                     </cancel-call-icon>
@@ -675,6 +721,7 @@ export default {
       expanded: false,
       screen: 'call',
       bottomExpansion: 'integrations',
+      expansionEnabled: true,
       digits: '',
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -688,43 +735,43 @@ export default {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
 
     isCallCompleted () {
-      return ((this.dialer.communication && this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(this.dialer.currentStatus))
+      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(this.dialer.currentStatus))
     },
 
     isHangupDisabled () {
-      return !this.isCallCompleted
+      return this.isCallCompleted
     },
 
     isAddDisabled () {
-      return false && (!this.dialer.communication || !this.isCallCompleted || this.dialer.communication.in_cold_transfer || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return false && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isTransferDisabled () {
-      return false && (!this.dialer.communication || !this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return false && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isMoreDisabled () {
-      return false && !this.isCallCompleted
+      return false && this.isCallCompleted
     },
 
     isVmDropDisabled () {
-      return false && !this.isCallCompleted
+      return false && this.isCallCompleted
     },
 
     isHoldDisabled () {
-      return (!this.dialer.communication || this.loadingHold || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (!this.dialer.communication || this.loadingHold || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isParkDisabled () {
-      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || !this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isMuteDisabled () {
-      return !this.isCallCompleted
+      return this.isCallCompleted
     },
 
     isRecordingDisabled () {
-      return !this.isCallCompleted
+      return this.isCallCompleted
     },
 
     isCallAdded () {
@@ -877,6 +924,10 @@ export default {
       window.getSelection().removeAllRanges()
     },
 
+    endCall () {
+      this.$VueEvent.fire('hangupCall')
+    },
+
     hangupCall () {
       this.$VueEvent.fire('hangupCall')
       this.screen = 'menu'
@@ -1005,6 +1056,28 @@ export default {
       this.isVisible = false
     },
 
+    endWrapUp () {
+      this.$VueEvent.fire('endWrapUp')
+    },
+
+    makeCall () {
+      if (!this.dialer.communication) {
+        return
+      }
+
+      let data = {
+        currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
+        outboundCampaignId: this.dialer.communication.campaign_id,
+        contactName: this.contactName,
+        companyName: (this.dialer.contact) ? this.dialer.contact.company_name : '',
+        contactId: this.dialer.communication.contact_id
+      }
+
+      this.endWrapUp()
+
+      this.$VueEvent.fire('makeCall', data)
+    },
+
     resizeHandler (e) {
       e = e || window.event
       if (this.$refs.phone) {
@@ -1115,6 +1188,7 @@ export default {
       this.resetBottomExpansion()
       this.screen = 'call'
       this.digits = ''
+      this.expansionEnabled = true
     },
 
     screen () {
@@ -1195,6 +1269,7 @@ export default {
 
     isCallCompleted () {
       this.resetBottomExpansion()
+      this.expansionEnabled = false
     }
   },
 

@@ -3512,6 +3512,11 @@ span.mention {
     .phone-avatar {
       margin-top: -29px;
     }
+
+    .border-bottom {
+      border-bottom: 1px solid $grey-60 !important;
+      border-radius: 0;
+    }
   }
 
   .phone-buttons {
@@ -3591,6 +3596,59 @@ span.mention {
         text-align: center;
         font-weight: 400;
         color: $grey-90;
+      }
+    }
+  }
+
+  .contact-name {
+    font-weight: 600;
+    font-size: $f-size-body-xl;
+    line-height: 19px;
+  }
+
+  .contact-phone {
+    font-size: $f-size-body-sm;
+    line-height: 16px;
+  }
+
+  .phone-footer-buttons {
+    height: 52px;
+    box-shadow: 0px 0px 8px rgba(4, 4, 4, 0.12);
+    background: $white;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+
+    .btn {
+      font-weight: 500;
+      font-size: $f-size-body;
+      line-height: 16px;
+      border-radius: 6px;
+
+      .b-icon {
+        font-size: $f-size-body-sm;
+        vertical-align: -0.15em;
+      }
+    }
+
+    .btn-outline-dark {
+      border: 1px solid $grey-70;
+
+      &:active, &:hover, &:focus {
+        background-color: $white;
+        border-color: $grey-70;
+        color: $grey-100;
+        box-shadow: none !important;
+      }
+    }
+
+    .btn-primary {
+      &:active, &:hover, &:focus {
+        background-color: $primary;
+        border-color: $primary;
+        color: $white;
+        box-shadow: none !important;
       }
     }
   }
