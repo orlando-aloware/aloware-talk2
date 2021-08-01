@@ -1,12 +1,12 @@
 <template>
-  <div class="row mx-0 content-row d-flex overflow-hidden">
-    <div class="col-lg-2 px-0 pl-lg-2 pr-1 mb-3"
+  <div class="row mx-0 content-row d-flex overflow-hidden h-100 pb-2">
+    <div class="col-lg-2 pt-2 pl-2 pr-1 mb-0 h-100"
          v-if="$route.name === 'Contacts'">
-      <contacts-sidebar v-if="auth.authenticated"></contacts-sidebar>
+      <contacts-sidebar></contacts-sidebar>
     </div>
-    <div class="col-lg-10 px-0 pr-1 mb-3 main"
+    <div class="col-lg-10 px-0 pr-1 mb-0 main"
          :class="[ $route.name === 'Contacts' ? 'col-lg-10' : 'col-lg-12' ]">
-      <router-view v-if="auth.authenticated"></router-view>
+      <router-view></router-view>
     </div>
     <remove-folder-dialog />
     <column-headers />
@@ -31,7 +31,6 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import { mapState } from 'vuex'
 
 export default {
   name: 'Contacts',
@@ -47,9 +46,6 @@ export default {
     ColumnHeaders,
     MoveDialog,
     CreateListModal
-  },
-  computed: {
-    ...mapState(['auth'])
   }
 }
 </script>
