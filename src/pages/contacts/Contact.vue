@@ -30,7 +30,7 @@
           </template>
         </contact-activities>
       </div>
-      <div class="px-0 width-330">
+      <div class="px-0 width-330 pt-2">
         <contact-details></contact-details>
       </div>
     </div>
