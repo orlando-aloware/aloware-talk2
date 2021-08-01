@@ -3604,6 +3604,22 @@ span.mention {
     font-weight: 600;
     font-size: $f-size-body-xl;
     line-height: 19px;
+
+    .q-btn {
+      & .q-btn__wrapper {
+        min-width: 14px;
+        min-height: 14px;
+      }
+
+      & .q-btn__content {
+        padding: 0;
+        height: auto;
+      }
+
+      & .q-icon {
+        font-size: inherit;
+      }
+    }
   }
 
   .contact-phone {
@@ -3611,7 +3627,15 @@ span.mention {
     line-height: 16px;
   }
 
+  .phone-wrap-up {
+    max-height: 435px;
+    font-size: $f-size-body-sm;
+
+    @extend .phone-main;
+  }
+
   .phone-footer-buttons {
+    z-index: 1;
     height: 52px;
     box-shadow: 0px 0px 8px rgba(4, 4, 4, 0.12);
     background: $white;

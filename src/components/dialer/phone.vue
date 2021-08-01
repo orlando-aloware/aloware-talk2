@@ -373,7 +373,7 @@
         </div>
       </template>
       <template v-else-if="screen === 'wrap-up'">
-        <div class="phone-main d-flex flex-column pl-2 pr-2 flex-grow-1 overflow-auto">
+        <div class="phone-wrap-up d-flex flex-column pl-2 pr-2 flex-grow-1 overflow-auto">
           <b-list-group class="w-100 border-bottom">
             <b-list-group-item class="d-flex align-items-center border-0 pl-0 pr-0">
               <avatar class="contact-avatar"
@@ -384,7 +384,14 @@
               <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
                 <div class="mr-auto">
                   <p class="contact-name mb-1">
-                    {{ contactName }}
+                    <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                    <q-btn color="black"
+                           icon="o_info"
+                           class="text-size-rg d-inline-flex ml-1"
+                           flat
+                           round
+                           @click="goToContact">
+                    </q-btn>
                   </p>
                   <p class="text-sm-left contact-phone mb-1">
                     <span>{{ dialer.contact.phone_number | fixPhone }}</span>
@@ -401,6 +408,108 @@
               </div>
             </b-list-group-item>
           </b-list-group>
+
+          <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2">
+            <div class="pr-2">
+              <component :is="stateToIcon(dialer.communication.disposition_status2, dialer.communication.type, dialer.communication.direction)"
+                         v-if="dialer.communication.disposition_status2">
+              </component>
+            </div>
+            <div class="text-lt p-x"
+                 :class="[!dialer.communication.duration ? 'flex-grow-1 text-left' : '']">
+              <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(dialer.communication.type)">
+                {{ dialer.communication.direction | fixCommDirection }}
+              </span>
+              {{ dialer.communication.type | fixCommType }}
+            </div>
+          </q-item-section>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Call Disposition
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <call-disposition-selector :communication="dialer.communication"></call-disposition-selector>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-row align-items-center w-100 mb-2">
+              <label class="form-control-label mb-0 text-grey-90">Started at:</label>
+              <span class="ml-2">{{ dialer.communication.created_at | fixCommunicationDateTime }}</span>
+            </div>
+            <div class="d-flex flex-row align-items-center w-100">
+              <label class="form-control-label mb-0 text-grey-90">Duration:</label>
+              <span class="ml-2">{{ dialer.communication.duration | fixDuration }}</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label mb-0 text-grey-90">Line:</label>
+            <span class="ml-2"
+                  v-if="getCampaign(dialer.communication.campaign_id)">
+              {{ getCampaign(dialer.communication.campaign_id).name }}
+            </span>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90"
+                   v-if="dialer.communication.has_recording">
+              Call Recording
+            </label>
+            <div class="d-flex align-items-center w-100"
+                 v-if="dialer.communication.has_recording">
+              <communication-audio :communication="dialer.communication"
+                                   :type="UploadedFileTypes.TYPE_CALL_RECORDING"
+                                   :uniqueId="dialer.communication.id + '1'">
+              </communication-audio>
+            </div>
+            <div class="form-control-label text-grey-90 w-100"
+                 v-else>
+              No Call Recording
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90"
+                   v-if="dialer.communication.has_voicemail">
+              Voicemail
+            </label>
+            <div class="d-flex flex-row align-items-center w-100"
+                 v-if="dialer.communication.has_voicemail">
+              <communication-audio :communication="dialer.communication"
+                                   :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
+                                   :uniqueId="dialer.communication.id + '2'">
+              </communication-audio>
+            </div>
+            <div class="form-control-label text-grey-90 w-100"
+                 v-else>
+              No Voicemail
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">Tags</label>
+            <div class="d-flex align-items-center w-100">
+              <communication-tags :communication="dialer.communication"/>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">Notes</label>
+            <div class="d-flex align-items-center w-100">
+              <communication-note ref="communication_notes"
+                                  :communication="dialer.communication">
+              </communication-note>
+            </div>
+          </div>
+
         </div>
       </template>
     </div>
@@ -618,6 +727,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { communicationInfoMixin } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
@@ -638,18 +748,27 @@ import UnmuteIcon from 'components/icons/unmute-icon'
 import PauseRecordIcon from 'components/icons/pause-record-icon'
 import ContactNotes from 'components/contacts/contact-notes'
 import ContactTags from 'components/contacts/contact-tags'
+import IntegrationsIcon from 'components/icons/integrations-icon'
+import VmDropIcon from 'components/icons/vm-drop-icon'
+import CommunicationAudio from 'components/communication-audio'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import IntegrationsIcon from 'components/icons/integrations-icon'
-import VmDropIcon from 'components/icons/vm-drop-icon'
+import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import CommunicationNote from 'components/communication-note'
+import CommunicationTags from 'components/communication-tags'
+import CallDispositionSelector from 'components/call-disposition-selector'
 
 export default {
   name: 'phone',
 
   components: {
+    CallDispositionSelector,
+    CommunicationTags,
+    CommunicationNote,
+    CommunicationAudio,
     VmDropIcon,
     IntegrationsIcon,
     ContactTags,
@@ -673,6 +792,10 @@ export default {
     CancelCallIcon,
     ContactIntegrations
   },
+
+  mixins: [
+    communicationInfoMixin
+  ],
 
   props: {
     is_widget: {
@@ -727,7 +850,8 @@ export default {
       CommunicationDispositionStatus,
       CommunicationStatus,
       CommunicationCurrentStatus,
-      CommunicationTypes
+      CommunicationTypes,
+      UploadedFileTypes
     }
   },
 

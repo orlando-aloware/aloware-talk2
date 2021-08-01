@@ -33,7 +33,7 @@
           <q-icon name="fa fa-bolt"
                   :style="{ color: props.option.color }">
           </q-icon>
-          <span class="option__small">{{ props.option.name }}</span>
+          <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
       <span slot="noResult">
@@ -71,7 +71,7 @@
           <q-icon name="fa fa-bolt"
                   :style="{ color: props.option.color }">
           </q-icon>
-          <span class="option__small">{{ props.option.name }}</span>
+          <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
       <span slot="noResult">
