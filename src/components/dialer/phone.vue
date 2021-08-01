@@ -6,7 +6,6 @@
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-55">
-        <!--        <span v-if="dialer.currentStatus">{{ dialer.currentStatus }}</span>-->
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="isCallCompleted"></span>
         <span v-else>
