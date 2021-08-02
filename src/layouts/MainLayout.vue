@@ -201,6 +201,7 @@ export default {
       loadingWorkflows: false,
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
+      loadingScripts: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -820,30 +821,19 @@ export default {
       }
     },
 
-    getMinVersion () {
-      return this.$axios
-        .get('/get-min-version')
-        .then((res) => {
-          this.minVersion = res.data.version
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
-
-    compareVersion (v1, v2) {
-      if (typeof v1 !== 'string') return false
-      if (typeof v2 !== 'string') return false
-      v1 = v1.split('.')
-      v2 = v2.split('.')
-      const k = Math.min(v1.length, v2.length)
-      for (let i = 0; i < k; ++i) {
-        v1[i] = parseInt(v1[i], 10)
-        v2[i] = parseInt(v2[i], 10)
-        if (v1[i] > v2[i]) return 1
-        if (v1[i] < v2[i]) return -1
+    getScripts () {
+      if (this.hasPermissionTo('list script')) {
+        this.loadingScripts = true
+        return this.$axios.get('/api/v1/script')
+          .then((res) => {
+            this.setScripts(res.data)
+            this.loadingScripts = false
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingScripts = false
+          })
       }
-      return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1
     },
 
     async initAccount () {
@@ -867,7 +857,7 @@ export default {
         let getWorkflows = this.getWorkflows()
         let getDispositionStatuses = this.getDispositionStatuses()
         let getCallDispositions = this.getCallDispositions()
-        let getMinVersion = this.getMinVersion()
+        let getScripts = this.getScripts()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -877,7 +867,7 @@ export default {
           getWorkflows,
           getDispositionStatuses,
           getCallDispositions,
-          getMinVersion
+          getScripts
         ])
       }
     },
@@ -1295,6 +1285,7 @@ export default {
       'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
+      'setScripts',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',
