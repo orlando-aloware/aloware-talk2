@@ -278,7 +278,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-types'
 import CommunicationInfo from 'components/communication-info'
-import Avatar from 'components/avatar.vue'
+import Avatar from 'components/avatar'
 import FileIcon from 'components/icons/contact-activity/file-icon'
 
 export default {

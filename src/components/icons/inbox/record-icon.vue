@@ -3,7 +3,6 @@
     <circle cx="8.00003" cy="7.99978" r="6.51111" stroke="#4F4F4F" stroke-width="1.2"/>
     <circle cx="8" cy="8" r="3" fill="#4F4F4F"/>
   </svg>
-
 </template>
 
 <script>

@@ -9,7 +9,7 @@
       <q-item-label class="_600">
         <span v-if="dialer.contact">{{ dialer.contact.name | truncate(15) }}</span>
         <span v-else-if="dialer.call && dialer.call.customParameters && dialer.call.customParameters.ContactName">{{ dialer.call.customParameters.ContactName | truncate(15) }}</span>
-        <span v-else-if="dialer.onHoldCall && dialer.onHoldCall.contact">{{ dialer.onHoldCall.contact.name | truncate(15) }}</span>
+        <span v-else-if="dialer.parkedCall && dialer.parkedCall.contact">{{ dialer.parkedCall.contact.name | truncate(15) }}</span>
         <q-skeleton type="text"
                     v-else>
         </q-skeleton>
@@ -21,7 +21,7 @@
         <template v-else>
           <span v-if="dialer.communication">{{ dialer.communication.lead_number | fixPhone }}</span>
           <span v-else-if="dialer.currentNumber">{{ dialer.currentNumber | fixPhone }}</span>
-          <span v-else-if="dialer.onHoldCall">{{ dialer.onHoldCall.lead_number | fixPhone }}</span>
+          <span v-else-if="dialer.parkedCall">{{ dialer.parkedCall.lead_number | fixPhone }}</span>
           <span v-else-if="dialer.call">{{ dialer.call.from | fixPhone }}</span>
           <span class="ml-1 mr-1"
                 v-if="dialer.timer || dialer.wrapUpTimer">

@@ -1,6 +1,5 @@
 <template>
-  <div class="pb-2 w-100"
-       :class="[ hasAudio ? 'mb-1' : '' ]">
+  <div class="w-100">
     <div v-if="hasAudio">
       <div class="audio-player p-2 d-flex justify-center position-relative">
         <q-spinner-bars color="success"

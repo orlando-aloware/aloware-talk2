@@ -30,7 +30,7 @@
           </template>
         </contact-activities>
       </div>
-      <div class="px-0 width-330">
+      <div class="px-0 width-330 pt-2">
         <contact-details></contact-details>
       </div>
       <contact-save-bar></contact-save-bar>
@@ -53,7 +53,8 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-import { mapActions, mapGetters, mapState } from 'vuex'
+
+import { mapActions, mapGetters } from 'vuex'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 
 export default {
@@ -68,7 +69,7 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
-    ...mapState({ userAuth: 'auth' }),
+    ...mapGetters('auth', ['authenticated']),
 
     widthClass () {
       return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
@@ -85,8 +86,8 @@ export default {
     ...mapActions('contacts', ['resetChangedContactProperties'])
   },
 
-  created () {
-    if (this.userAuth.authenticated) {
+  mounted () {
+    if (this.authenticated) {
       this.contactId = this.$route.params.id
       this.processFetchContactInfo()
     }
@@ -95,9 +96,12 @@ export default {
   watch: {
     '$route.params.id': function () {
       if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
+        this.resetSelectedContact()
         this.contactId = this.$route.params.id
         this.resetChangedContactProperties()
         this.processFetchContactInfo()
+      } else {
+        this.resetSelectedContact()
       }
     }
   }

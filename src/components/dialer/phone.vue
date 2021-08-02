@@ -6,20 +6,20 @@
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-55">
-<!--        <span v-if="dialer.currentStatus">{{ dialer.currentStatus }}</span>-->
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
-        <span v-else-if="dialer.wrapUpTimer">{{ dialer.wrapUpTimer }}</span>
+        <span v-else-if="isCallCompleted"></span>
         <span v-else>
           0:00
         </span>
       </div>
-      <div class="d-flex flex-row text-xs text-white"
-           v-if="getCampaign(dialer.communication.campaign_id)">
-        {{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}
+      <div class="d-flex flex-row text-xs text-white">
+        <span v-if="isCallCompleted">Call Ended</span>
+        <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row width-55">
+      <div class="d-flex flex-row justify-content-end width-55">
         <ul id="signal-strength"
-            class="mr-2">
+            class="mr-2"
+            v-if="!isCallCompleted">
           <li class="very-weak">
             <div id="very-weak"
                  class="active">
@@ -220,7 +220,7 @@
           </div>
         </div>
       </template>
-      <template v-else>
+      <template v-else-if="screen === 'menu'">
         <div class="phone-main d-flex flex-column align-items-center">
           <div class="dummy bg-dark w-100 height-36"></div>
           <div class="phone-avatar">
@@ -266,7 +266,8 @@
             </div>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
-            <button class="phone-buttons btn"
+            <button :disabled="isMuteDisabled"
+                    class="phone-buttons btn"
                     @click="toggleMute">
               <mute-icon width="16"
                          height="16"
@@ -278,7 +279,8 @@
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
             </button>
-            <button class="phone-buttons btn"
+            <button :disabled="isHoldDisabled || loadingHold"
+                    class="phone-buttons btn"
                     @click="toggleHold">
               <hold-icon width="16"
                          height="16"
@@ -297,7 +299,7 @@
               </dialpad-icon>
               <span>Dial pad</span>
             </button>
-            <button :disabled="loadingToggleRecordingStatus || dialer.communication.should_record === false"
+            <button :disabled="isRecordingDisabled || loadingToggleRecordingStatus || dialer.communication.should_record === false"
                     class="phone-buttons btn"
                     @click="toggleRecordingStatus">
               <record-icon width="16"
@@ -312,19 +314,22 @@
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
-            <button class="phone-buttons elevated btn">
+            <button class="phone-buttons elevated btn"
+                    @click="openNotes">
               <notes-icon width="16"
                           height="16">
               </notes-icon>
               <span>Notes</span>
             </button>
-            <button class="phone-buttons elevated btn">
+            <button class="phone-buttons elevated btn"
+                    @click="openTags">
               <tags-icon width="16"
                          height="16">
               </tags-icon>
               <span>Tags</span>
             </button>
-            <button class="phone-buttons elevated btn">
+            <button class="phone-buttons elevated btn"
+                    @click="openScripts">
               <scripts-icon width="16"
                             height="16">
               </scripts-icon>
@@ -332,25 +337,32 @@
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
-            <button class="phone-buttons btn"
-                    @click="hangupCall">
+            <button :disabled="isHangupDisabled"
+                    class="phone-buttons btn"
+                    @click="endCall">
               <cancel-call-icon width="40"
                                 height="40">
               </cancel-call-icon>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="isAddDisabled"
+                    class="phone-buttons btn"
+                    @click="openAdd">
               <add-icon width="16"
                         height="16">
               </add-icon>
               <span>Add</span>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="isTransferDisabled"
+                    class="phone-buttons btn"
+                    @click="openTransfer">
               <transfer-icon width="16"
                              height="16">
               </transfer-icon>
               <span>Transfer</span>
             </button>
-            <button class="phone-buttons btn">
+            <button :disabled="isMoreDisabled"
+                    class="phone-buttons btn"
+                    @click="openMore">
               <more-icon width="16"
                          height="16">
               </more-icon>
@@ -359,25 +371,353 @@
           </div>
         </div>
       </template>
+      <template v-else-if="screen === 'wrap-up'">
+        <div class="phone-wrap-up d-flex flex-column pl-2 pr-2 flex-grow-1 overflow-auto">
+          <b-list-group class="w-100 border-bottom">
+            <b-list-group-item class="d-flex align-items-center border-0 pl-0 pr-0">
+              <avatar class="contact-avatar"
+                      width="40"
+                      height="40"
+                      :name="dialer.contact.name">
+              </avatar>
+              <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
+                <div class="mr-auto">
+                  <p class="contact-name mb-1">
+                    <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                    <q-btn color="black"
+                           icon="o_info"
+                           class="text-size-rg d-inline-flex ml-1"
+                           flat
+                           round
+                           @click="goToContact">
+                    </q-btn>
+                  </p>
+                  <p class="text-sm-left contact-phone mb-1">
+                    <span>{{ dialer.contact.phone_number | fixPhone }}</span>
+                    <b-link href="#"
+                            class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                            @click.prevent="copyPhoneNumber">
+                      <i class="material-icons">content_copy</i>
+                    </b-link>
+                    <input :value="dialer.contact.phone_number"
+                           type="hidden"
+                           id="phone-number-clone"/>
+                  </p>
+                </div>
+              </div>
+            </b-list-group-item>
+          </b-list-group>
+
+          <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2">
+            <div class="pr-2">
+              <component :is="stateToIcon(dialer.communication.disposition_status2, dialer.communication.type, dialer.communication.direction)"
+                         v-if="dialer.communication.disposition_status2">
+              </component>
+            </div>
+            <div class="text-lt p-x"
+                 :class="[!dialer.communication.duration ? 'flex-grow-1 text-left' : '']">
+              <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(dialer.communication.type)">
+                {{ dialer.communication.direction | fixCommDirection }}
+              </span>
+              {{ dialer.communication.type | fixCommType }}
+            </div>
+          </q-item-section>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Call Disposition
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <call-disposition-selector :communication="dialer.communication"></call-disposition-selector>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-row align-items-center w-100 mb-2">
+              <label class="form-control-label mb-0 text-grey-90">Started at:</label>
+              <span class="ml-2">{{ dialer.communication.created_at | fixCommunicationDateTime }}</span>
+            </div>
+            <div class="d-flex flex-row align-items-center w-100">
+              <label class="form-control-label mb-0 text-grey-90">Duration:</label>
+              <span class="ml-2">{{ dialer.communication.duration | fixDuration }}</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label mb-0 text-grey-90">Line:</label>
+            <span class="ml-2"
+                  v-if="getCampaign(dialer.communication.campaign_id)">
+              {{ getCampaign(dialer.communication.campaign_id).name }}
+            </span>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90"
+                   v-if="dialer.communication.has_recording">
+              Call Recording
+            </label>
+            <div class="d-flex align-items-center w-100"
+                 v-if="dialer.communication.has_recording">
+              <communication-audio :communication="dialer.communication"
+                                   :type="UploadedFileTypes.TYPE_CALL_RECORDING"
+                                   :uniqueId="dialer.communication.id + '1'">
+              </communication-audio>
+            </div>
+            <div class="form-control-label text-grey-90 w-100"
+                 v-else>
+              No Call Recording
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90"
+                   v-if="dialer.communication.has_voicemail">
+              Voicemail
+            </label>
+            <div class="d-flex flex-row align-items-center w-100"
+                 v-if="dialer.communication.has_voicemail">
+              <communication-audio :communication="dialer.communication"
+                                   :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
+                                   :uniqueId="dialer.communication.id + '2'">
+              </communication-audio>
+            </div>
+            <div class="form-control-label text-grey-90 w-100"
+                 v-else>
+              No Voicemail
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">Tags</label>
+            <div class="d-flex align-items-center w-100">
+              <communication-tags :communication="dialer.communication"/>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">Notes</label>
+            <div class="d-flex align-items-center w-100">
+              <communication-note ref="communication_notes"
+                                  :communication="dialer.communication">
+              </communication-note>
+            </div>
+          </div>
+
+        </div>
+      </template>
     </div>
-    <div :class="[ screen === 'call' ? 'bg-dark' : 'bg-white']"
-         class="phone-integrations d-flex overlay"
-         v-if="dialer.contact">
+    <div class="phone-footer-buttons p-2"
+         v-if="!expansionEnabled">
+      <b-button variant="outline-dark"
+                @click="endWrapUp">
+        <span>Back</span>
+        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }})</span>
+      </b-button>
+
+      <b-button variant="primary"
+                @click="makeCall">
+        <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
+        <span class="ml-1">Call Back</span>
+      </b-button>
+    </div>
+    <div class="phone-expansion d-flex overlay"
+         v-if="dialer.contact && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
-                        style="border-radius: 12px"
-                        label="Integrations"
                         header-class="text-sm bg-white text-center"
-                        expand-icon-class="text-grey-100 ml-3"
+                        expand-icon-class="text-grey-100"
                         switch-toggle-side
                         dense>
+        <template v-slot:header>
+          <q-item-section>
+            <q-item-label>{{ bottomExpansionLabel }}</q-item-label>
+          </q-item-section>
+
+          <q-item-section side>
+            <q-btn :ripple="false"
+                   :class="[ (['integrations', 'more', 'dialpad', 'add', 'vm-drop'].includes(bottomExpansion) || !expanded) ? 'invisible' : '']"
+                   color="primary"
+                   label="Done"
+                   class="no-q-btn-focus"
+                   no-caps
+                   unelevated
+                   dense
+                   flat
+                   @click="saveAndResetExpansion">
+            </q-btn>
+          </q-item-section>
+        </template>
+
         <q-card>
-          <q-card-section class="height-200">
-            <contact-integrations :contact="dialer.contact"
-                                  :no_title="true"
-                                  v-show="expanded">
-            </contact-integrations>
-          </q-card-section>
+          <template v-if="bottomExpansion === 'integrations'">
+            <q-card-section class="height-240">
+              <contact-integrations :contact="dialer.contact"
+                                    :no_title="true"
+                                    v-show="expanded">
+              </contact-integrations>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'dialpad'">
+            <q-card-section class="height-445">
+              <div class="d-flex flex-column justify-content-around h-100 pt-3 pb-3">
+                <div class="d-flex flex-column">
+                  <b-form-input v-model="digits"
+                                class="phone-digits"
+                                type="text">
+                  </b-form-input>
+                </div>
+                <div class="d-flex flex-column dialpad">
+                  <div class="d-flex flex-row align-items-center justify-content-between mb-2">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('1')">
+                      <span class="number-text">1</span>
+                      <span class="number-text-sub invisible">$</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('2')">
+                      <span class="number-text">2</span>
+                      <span class="number-text-sub">A B C</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('3')">
+                      <span class="number-text">3</span>
+                      <span class="number-text-sub">D E F</span>
+                    </button>
+                  </div>
+                  <div class="d-flex flex-row align-items-center justify-content-between mb-2">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('4')">
+                      <span class="number-text">4</span>
+                      <span class="number-text-sub">G H I</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('5')">
+                      <span class="number-text">5</span>
+                      <span class="number-text-sub">J K L</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('6')">
+                      <span class="number-text">6</span>
+                      <span class="number-text-sub">M N O</span>
+                    </button>
+                  </div>
+                  <div class="d-flex flex-row align-items-center justify-content-between mb-2">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('7')">
+                      <span class="number-text">7</span>
+                      <span class="number-text-sub">P Q R S</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('8')">
+                      <span class="number-text">8</span>
+                      <span class="number-text-sub">T U V</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('9')">
+                      <span class="number-text">9</span>
+                      <span class="number-text-sub">W X Y Z</span>
+                    </button>
+                  </div>
+                  <div class="d-flex flex-row align-items-center justify-content-between">
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('*')">
+                      <span class="number-text">*</span>
+                      <span class="number-text-sub invisible">$</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            v-longpress="handleLongPress">
+                      <span class="number-text">0</span>
+                      <span class="number-text-sub">+</span>
+                    </button>
+
+                    <button class="number-btn-wrapper btn"
+                            @click="sendDigit('#')">
+                      <span class="number-text">#</span>
+                      <span class="number-text-sub invisible">$</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                  <q-btn class="height-56"
+                         ripple
+                         round
+                         no-caps
+                         unelevated
+                         @click="endCall">
+                    <cancel-call-icon width="56"
+                                      height="56">
+                    </cancel-call-icon>
+                  </q-btn>
+                </div>
+              </div>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'notes'">
+            <q-card-section class="height-445">
+              <contact-notes :contact="dialer.contact"
+                             :no_title="true"
+                             @update="onNotesUpdate">
+              </contact-notes>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'tags'">
+            <q-card-section class="height-240">
+              <contact-tags :contact="dialer.contact"
+                            :no_title="true"
+                            @update="onTagsUpdate">
+              </contact-tags>
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'scripts'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'add'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'transfer'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'vm-drop'">
+            <q-card-section class="height-445">
+            </q-card-section>
+          </template>
+          <template v-if="bottomExpansion === 'more'">
+            <q-card-section class="height-140">
+              <div class="d-flex justify-content-start w-100 mt-3 pl-3 pr-3">
+                <button :disabled="isVmDropDisabled"
+                        class="phone-buttons btn"
+                        @click="openVmDrop">
+                  <vm-drop-icon width="18"
+                                height="18">
+                  </vm-drop-icon>
+                  <span>VM Drop</span>
+                </button>
+                <button class="phone-buttons btn"
+                        @click="openIntegrations">
+                  <integrations-icon width="18"
+                                     height="18">
+                  </integrations-icon>
+                  <span>Integrations</span>
+                </button>
+              </div>
+            </q-card-section>
+          </template>
         </q-card>
       </q-expansion-item>
     </div>
@@ -385,7 +725,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import { communicationInfoMixin } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
@@ -398,21 +739,39 @@ import NotesIcon from 'components/icons/notes-icon'
 import TagsIcon from 'components/icons/tags-icon'
 import ScriptsIcon from 'components/icons/scripts-icon'
 import ContactIntegrations from 'components/contacts/contact-integrations'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import * as CommunicationTypes from 'src/constants/communication-types'
 import AddIcon from 'components/icons/add-icon'
 import MoreIcon from 'components/icons/more-icon'
 import TransferIcon from 'components/icons/transfer-icon'
 import UnholdIcon from 'components/icons/unhold-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import PauseRecordIcon from 'components/icons/pause-record-icon'
+import ContactNotes from 'components/contacts/contact-notes'
+import ContactTags from 'components/contacts/contact-tags'
+import IntegrationsIcon from 'components/icons/integrations-icon'
+import VmDropIcon from 'components/icons/vm-drop-icon'
+import CommunicationAudio from 'components/communication-audio'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationStatus from 'src/constants/communication-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import CommunicationNote from 'components/communication-note'
+import CommunicationTags from 'components/communication-tags'
+import CallDispositionSelector from 'components/call-disposition-selector'
 
 export default {
   name: 'phone',
 
   components: {
+    CallDispositionSelector,
+    CommunicationTags,
+    CommunicationNote,
+    CommunicationAudio,
+    VmDropIcon,
+    IntegrationsIcon,
+    ContactTags,
+    ContactNotes,
     PauseRecordIcon,
     UnmuteIcon,
     UnholdIcon,
@@ -432,6 +791,10 @@ export default {
     CancelCallIcon,
     ContactIntegrations
   },
+
+  mixins: [
+    communicationInfoMixin
+  ],
 
   props: {
     is_widget: {
@@ -475,17 +838,93 @@ export default {
       loadingDropThirdParty: false,
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
+      loadingHold: false,
+      loadingPark: false,
       expanded: false,
       screen: 'call',
+      bottomExpansion: 'integrations',
+      expansionEnabled: true,
+      digits: '',
       CommunicationDirection,
       CommunicationDispositionStatus,
+      CommunicationStatus,
       CommunicationCurrentStatus,
-      CommunicationTypes
+      CommunicationTypes,
+      UploadedFileTypes
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
+
+    isCallCompleted () {
+      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(this.dialer.currentStatus))
+    },
+
+    isHangupDisabled () {
+      return this.isCallCompleted
+    },
+
+    isAddDisabled () {
+      return false && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isTransferDisabled () {
+      return false && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isMoreDisabled () {
+      return false && this.isCallCompleted
+    },
+
+    isVmDropDisabled () {
+      return false && this.isCallCompleted
+    },
+
+    isHoldDisabled () {
+      return (!this.dialer.communication || this.loadingHold || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isParkDisabled () {
+      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+    },
+
+    isMuteDisabled () {
+      return this.isCallCompleted
+    },
+
+    isRecordingDisabled () {
+      return this.isCallCompleted
+    },
+
+    isCallAdded () {
+      return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
+    },
+
+    bottomExpansionLabel () {
+      switch (this.bottomExpansion) {
+        case 'integrations':
+          return 'Integrations'
+        case 'dialpad':
+          return 'Dial Pad'
+        case 'notes':
+          return 'Add Notes'
+        case 'tags':
+          return 'Add Tags'
+        case 'scripts':
+          return 'Scripts'
+        case 'add':
+          return 'Add User'
+        case 'transfer':
+          return 'Transfer'
+        case 'vm-drop':
+          return 'VM Drop'
+        case 'more':
+          return 'More'
+        default:
+          return ''
+      }
+    },
 
     phoneStatus () {
       if (!this.dialer.communication) {
@@ -608,6 +1047,10 @@ export default {
       window.getSelection().removeAllRanges()
     },
 
+    endCall () {
+      this.$VueEvent.fire('hangupCall')
+    },
+
     hangupCall () {
       this.$VueEvent.fire('hangupCall')
       this.screen = 'menu'
@@ -632,11 +1075,63 @@ export default {
     },
 
     openDialpad () {
-      this.screen = 'dialpad'
+      this.bottomExpansion = 'dialpad'
+      this.expanded = true
     },
 
-    closeDialpad () {
-      this.screen = 'menu'
+    openNotes () {
+      this.bottomExpansion = 'notes'
+      this.expanded = true
+    },
+
+    openTags () {
+      this.bottomExpansion = 'tags'
+      this.expanded = true
+    },
+
+    openScripts () {
+      this.bottomExpansion = 'scripts'
+      this.expanded = true
+    },
+
+    openAdd () {
+      this.bottomExpansion = 'add'
+      this.expanded = true
+    },
+
+    openTransfer () {
+      this.bottomExpansion = 'transfer'
+      this.expanded = true
+    },
+
+    openMore () {
+      this.bottomExpansion = 'more'
+      this.expanded = true
+    },
+
+    openVmDrop () {
+      this.bottomExpansion = 'vm-drop'
+      this.expanded = true
+    },
+
+    openIntegrations () {
+      this.bottomExpansion = 'integrations'
+      this.expanded = true
+    },
+
+    saveAndResetExpansion ($event) {
+      $event.stopPropagation()
+      $event.preventDefault()
+      this.bottomExpansion = 'integrations'
+      this.expanded = false
+    },
+
+    onNotesUpdate (contact) {
+      this.setDialerContact(contact)
+    },
+
+    onTagsUpdate (tags) {
+      this.setDialerContactTags(tags)
     },
 
     toggleRecordingStatus () {
@@ -645,6 +1140,19 @@ export default {
       setTimeout(() => {
         this.loadingToggleRecordingStatus = false
       }, 1000)
+    },
+
+    handleLongPress (isLong = false) {
+      if (isLong) {
+        this.sendDigit('+')
+      } else {
+        this.sendDigit('0')
+      }
+    },
+
+    sendDigit (digit) {
+      this.digits += digit.toString()
+      this.$VueEvent.fire('sendDigit', digit)
     },
 
     getCampaign (id) {
@@ -669,6 +1177,28 @@ export default {
 
     closePhone () {
       this.isVisible = false
+    },
+
+    endWrapUp () {
+      this.$VueEvent.fire('endWrapUp')
+    },
+
+    makeCall () {
+      if (!this.dialer.communication) {
+        return
+      }
+
+      let data = {
+        currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
+        outboundCampaignId: this.dialer.communication.campaign_id,
+        contactName: this.contactName,
+        companyName: (this.dialer.contact) ? this.dialer.contact.company_name : '',
+        contactId: this.dialer.communication.contact_id
+      }
+
+      this.endWrapUp()
+
+      this.$VueEvent.fire('makeCall', data)
     },
 
     resizeHandler (e) {
@@ -761,13 +1291,27 @@ export default {
       setTimeout(() => {
         this.loadingCommunication = false
       }, 1000)
-    }
+    },
+
+    resetBottomExpansion () {
+      this.bottomExpansion = 'integrations'
+      this.expanded = false
+    },
+
+    ...mapActions([
+      'setDialerContact',
+      'setDialerContactTags'
+    ])
   },
 
   watch: {
     shouldShow () {
       this.setupDraggable()
       this.setupContactLocalTime()
+      this.resetBottomExpansion()
+      this.screen = 'call'
+      this.digits = ''
+      this.expansionEnabled = true
     },
 
     screen () {
@@ -803,6 +1347,7 @@ export default {
           break
         case 'WRAP_UP':
           this.screen = 'wrap-up'
+          this.resetBottomExpansion()
           break
         case 'GENERATING_TOKEN':
           this.screen = 'call'
@@ -843,6 +1388,11 @@ export default {
 
     'dialer.contact': function () {
       this.setupContactLocalTime()
+    },
+
+    isCallCompleted () {
+      this.resetBottomExpansion()
+      this.expansionEnabled = false
     }
   },
 

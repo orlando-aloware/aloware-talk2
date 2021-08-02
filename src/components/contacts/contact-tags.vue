@@ -1,6 +1,6 @@
 <template>
   <b-card class="border-0 contact-tags-wrapper">
-    <h4>Tags</h4>
+    <h4 v-if="!no_title">Tags</h4>
     <tag-selector v-if="tags.length > 0"
                   ref="contactTagSelector"
                   v-model="selectedTagIds"
@@ -12,8 +12,7 @@
                   :custom-tags="tags"
                   @change="changeTags($event)"
                   @open="onSelectOpen"
-                  @close="onSelectClose"
-    >
+                  @close="onSelectClose">
     </tag-selector>
 
     <b-link v-if="!isEdit && hasPermissionTo(['list tag', 'view tag'])"
@@ -33,29 +32,23 @@ import TagSelector from 'components/tag-selector'
 
 export default {
   name: 'contact-tags',
+
   mixins: [aclMixin],
+
+  components: { TagSelector, PencilOIcon },
+
   props: {
     contact: {
       required: true
+    },
+
+    no_title: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
-  components: { TagSelector, PencilOIcon },
-  computed: {
-    contactTags () {
-      return this.contact.tags
-    },
-    getLabel () {
-      return tag => {
-        return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
-      }
-    },
-    selectedTagIds () {
-      return this.contactTags ? this.contactTags.map(tag => tag.id) : []
-    },
-    displayClass () {
-      return !this.isEdit ? 'show-raw-value' : ''
-    }
-  },
+
   data () {
     return {
       isEdit: false,
@@ -63,25 +56,55 @@ export default {
       tags: []
     }
   },
+
+  computed: {
+    contactTags () {
+      return this.contact.tags
+    },
+
+    getLabel () {
+      return tag => {
+        return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
+      }
+    },
+
+    selectedTagIds () {
+      return this.contactTags ? this.contactTags.map(tag => tag.id) : []
+    },
+
+    displayClass () {
+      return !this.isEdit ? 'show-raw-value' : ''
+    }
+  },
+
+  mounted () {
+    this.getTags()
+  },
+
   methods: {
     changeTags (event) {
       this.tagsArray = event
     },
+
     onModifyTags () {
       this.isEdit = true
       this.$nextTick(function () {
         this.$refs.contactTagSelector.$el.focus()
       })
     },
+
     onSelectClose () {
       this.isEdit = false
     },
+
     onSelectOpen () {
       this.isEdit = true
     },
+
     onRemoveTag () {
       this.isEdit = true
     },
+
     getTags () {
       return talk2Api.V1.tags.get({
         params: { full_load: true }
@@ -91,6 +114,7 @@ export default {
         console.log(err)
       })
     },
+
     submitTags () {
       talk2Api.V1.contact.storeTags(this.contact.id, { tags: this.tagsArray })
         .then(response => {
@@ -101,13 +125,11 @@ export default {
         })
     }
   },
+
   watch: {
     'tagsArray': function () {
       this.submitTags()
     }
-  },
-  mounted () {
-    this.getTags()
   }
 }
 </script>

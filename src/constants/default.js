@@ -29,7 +29,7 @@ export const DEFAULT_STATE = {
     wrapUpTimer: '',
     duration: 0,
     wrapUpDuration: '',
-    onHoldCall: null,
+    parkedCall: null,
     dealId: null
   },
   warnings: [],

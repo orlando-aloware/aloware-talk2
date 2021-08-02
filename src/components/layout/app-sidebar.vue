@@ -28,7 +28,7 @@
            flat>
     </q-btn>
 
-    <q-btn :to="{ name: 'Contacts' }"
+    <q-btn :to="{ name: 'Contacts', path: '' }"
            :ripple="false"
            icon="img:app-icons/menu/contacts_active.svg"
            align="left"

@@ -21,7 +21,7 @@ export default {
       if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
         this.profile.agent_status = user.agent_status
         this.agentStatus = user.agent_status
-        console.log('Changed agent status 1: ' + user.agent_status)
+        console.log('Changed agent status [event]: ' + user.agent_status)
       }
     })
 
@@ -72,7 +72,7 @@ export default {
       }).then(res => {
         this.profile.agent_status = res.data.agent_status
         this.agentStatus = res.data.agent_status
-        console.log('Changed agent status 3: ' + res.data.agent_status)
+        console.log('Changed agent status [pull]: ' + res.data.agent_status)
       }).catch((err) => {
         console.log(err)
         getTry++
@@ -102,9 +102,9 @@ export default {
           agentStatus = AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
           break
       }
-      console.log('old agent status: ' + this.oldAgentStatus)
-      console.log('current agent status: ' + this.agentStatus)
-      console.log('new agent status: ' + agentStatus)
+      console.log('old agent status [reset]: ' + this.oldAgentStatus)
+      console.log('current agent status [reset]: ' + this.agentStatus)
+      console.log('new agent status [reset]: ' + agentStatus)
       // check status
       if (this.agentStatus !== agentStatus) {
         this.changeAgentStatus(agentStatus)
@@ -116,10 +116,10 @@ export default {
         return
       }
       if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
-        console.log('Setting old agent status: ' + val)
+        console.log('Setting old agent status [api]: ' + val)
         this.setOldAgentStatus(val)
       }
-      console.log('Changing agent status: ' + val)
+      console.log('Changing agent status [api]: ' + val)
 
       // make sure that the session is valid
       if (this.profile) {
@@ -131,14 +131,14 @@ export default {
           this.profile.agent_status = res.data.agent_status
           this.agentStatus = res.data.agent_status
           this.$VueEvent.fire('user_updated', res.data)
-          console.log('Changed agent status 2: ' + res.data.agent_status)
+          console.log('Changed agent status [api]: ' + res.data.agent_status)
           if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
             this.$VueEvent.fire('endWrapUp')
           }
         }).catch(err => {
           changeAgentStatusTry++
           // error
-          console.log('An error occurred while changing agent status', err)
+          console.log('An error occurred while changing agent status [api]', err)
           // check if we have found the communication after 3 retries
           if (changeAgentStatusTry > 3) {
             this.loadingAgentStatus = false

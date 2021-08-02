@@ -67,9 +67,6 @@ export default {
         value: value
       })
     },
-    onNotesUpdate (contact) {
-      this.setContact(contact)
-    },
     onTagsUpdate (tags) {
       this.setContactTags(tags)
     }

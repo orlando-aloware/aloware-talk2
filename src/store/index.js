@@ -58,7 +58,7 @@ export default function (/* { ssrContext } */) {
         wrapUpTimer: '',
         duration: 0,
         wrapUpDuration: '',
-        onHoldCall: null,
+        parkedCall: null,
         dealId: null
       },
       warnings: [],
@@ -106,6 +106,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_DIALER_CONTACT', contact)
       },
 
+      setDialerContactTags ({ commit }, tags) {
+        commit('SET_DIALER_CONTACT_TAGS', tags)
+      },
+
       setDialerCurrentNumber ({ commit }, currentNumber) {
         commit('SET_DIALER_CURRENT_NUMBER', currentNumber)
       },
@@ -138,8 +142,8 @@ export default function (/* { ssrContext } */) {
         commit('SET_DIALER_WRAP_UP_TIMER', timer)
       },
 
-      setDialerOnHoldCall ({ commit }, communication) {
-        commit('SET_DIALER_ON_HOLD_CALL', communication)
+      setDialerParkedCall ({ commit }, communication) {
+        commit('SET_DIALER_PARKED_CALL', communication)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -387,6 +391,11 @@ export default function (/* { ssrContext } */) {
         state.dialer.contact = contact
       },
 
+      SET_DIALER_CONTACT_TAGS: (state, tags) => {
+        state.dialer.contact.tags = tags
+        state.dialer.contact.tag_ids = tags.map((a) => a.id)
+      },
+
       SET_DIALER_CURRENT_NUMBER (state, currentNumber) {
         state.dialer.currentNumber = currentNumber
       },
@@ -428,8 +437,8 @@ export default function (/* { ssrContext } */) {
         state.dialer.wrapUpTimer = timer
       },
 
-      SET_DIALER_ON_HOLD_CALL (state, communication) {
-        state.dialer.onHoldCall = communication
+      SET_DIALER_PARKED_CALL (state, communication) {
+        state.dialer.parkedCall = communication
         if (communication) {
           state.dialer.call = null
         }

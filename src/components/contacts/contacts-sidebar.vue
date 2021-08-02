@@ -1,5 +1,5 @@
 <template>
-  <card>
+  <card class="h-100">
     <contacts-pinned></contacts-pinned>
     <contacts-folders></contacts-folders>
   </card>

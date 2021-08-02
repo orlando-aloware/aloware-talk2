@@ -11,7 +11,6 @@
       <div class="h-100"
            :class="[ sidebarVisible ? 'sidebar-active' : '']">
         <q-header class="page-header bg-white text-black no-box-shadow"
-                  style="border-bottom: 1px solid #EBEBEB;"
                   v-show="authenticated && !isWidget && !loading">
           <app-header @toggleSidebar="toggleSidebar"/>
         </q-header>
@@ -54,7 +53,7 @@
         </q-page-container>
       </div>
       <q-drawer v-model="sidebarVisible"
-                v-show="sidebarVisible && authenticated && !loading"
+                v-show="authenticated && sidebarVisible && !loading"
                 :breakpoint="0"
                 class="h-100 sidebar-wrapper d-none d-sm-block"
                 :width="64"

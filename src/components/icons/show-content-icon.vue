@@ -40,6 +40,7 @@
 
 <script>
 export default {
+  name: 'show-content-icon',
   props: {
     width: {
       type: [Number, String],

@@ -38,6 +38,7 @@
 
 <script>
 export default {
+  name: 'hide-minimize-icon',
   props: {
     width: {
       type: [Number, String],

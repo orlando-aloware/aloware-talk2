@@ -64,7 +64,10 @@ body,
 }
 
 .btn-contact-prev-next {
-  padding: 1px 4px !important;
+  width: 28px;
+  height: 28px;
+  padding: 0 4px !important;
+  line-height: 1;
   border-radius: 6px;
 
   i {
@@ -74,7 +77,7 @@ body,
 
 .btn-contact-list-navigation {
   position: absolute;
-  left: 20%;
+  left: 300px;
 }
 
 .row {
@@ -478,6 +481,7 @@ body,
 }
 
 .page-header {
+  border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
 
@@ -1190,7 +1194,7 @@ i.option-separator {
 }
 
 .border-rounded {
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .sms-activity {
@@ -2896,8 +2900,24 @@ span.mention {
   height: 52px;
 }
 
+.height-56 {
+  height: 56px;
+}
+
+.height-140 {
+  height: 140px;
+}
+
 .height-200 {
   height: 200px;
+}
+
+.height-240 {
+  height: 240px;
+}
+
+.height-445 {
+  height: 445px;
 }
 
 .width-40 {
@@ -3245,7 +3265,8 @@ span.mention {
   }
 
   .nav-pills .nav-link {
-    text-align: right;
+    text-align: center;
+    @extend .no-select;
   }
 
   textarea {
@@ -3502,38 +3523,166 @@ span.mention {
       margin-top: -29px;
     }
 
-    .phone-buttons {
+    .border-bottom {
+      border-bottom: 1px solid $grey-60 !important;
+      border-radius: 0;
+    }
+  }
+
+  .phone-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    padding: 0;
+
+    &:focus, &.focus {
+      box-shadow: none;
+    }
+
+    span {
+      margin-top: 10px;
+      color: $grey-90;
+      font-size: $f-size-body-xxs;
+      font-weight: 500;
+    }
+
+    &.elevated {
+      background: $white;
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.04), 0px 3px 10px rgba(4, 4, 4, 0.12);
+      border-radius: 10px;
+      width: 74px;
+      height: 74px;
+      padding: 0;
+
+      span {
+        color: $grey-90;
+        font-size: $f-size-body;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .phone-digits {
+    border: 0;
+    padding: 0;
+    font-size: 24px;
+    line-height: 29px;
+    text-align: center;
+    color: $grey-100;
+  }
+
+  .dialpad {
+    padding-left: 34px;
+    padding-right: 34px;
+
+    .number-btn-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       padding: 0;
+      border: 1px solid #EBEBEB;
+      border-radius: 50px;
+      overflow: hidden;
 
       &:focus, &.focus {
         box-shadow: none;
       }
 
-      span {
-        margin-top: 10px;
-        color: $grey-90;
-        font-size: $f-size-body-xxs;
+      .number-text {
+        font-size: 24px;
+        line-height: 29px;
+        font-weight: 400;
       }
 
-      &.elevated {
-        background: $white;
-        box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.04), 0px 3px 10px rgba(4, 4, 4, 0.12);
-        border-radius: 10px;
-        width: 74px;
-        height: 74px;
-        padding: 0;
+      .number-text-sub {
+        font-size: 8px;
+        line-height: 10px;
+        text-align: center;
+        font-weight: 400;
+        color: $grey-90;
+      }
+    }
+  }
 
-        span {
-          color: $grey-90;
-          font-size: $f-size-body;
-          font-weight: 600;
-        }
+  .contact-name {
+    font-weight: 600;
+    font-size: $f-size-body-xl;
+    line-height: 19px;
+
+    .q-btn {
+      & .q-btn__wrapper {
+        min-width: 14px;
+        min-height: 14px;
+      }
+
+      & .q-btn__content {
+        padding: 0;
+        height: auto;
+      }
+
+      & .q-icon {
+        font-size: inherit;
+      }
+    }
+  }
+
+  .contact-phone {
+    font-size: $f-size-body-sm;
+    line-height: 16px;
+  }
+
+  .phone-wrap-up {
+    max-height: 435px;
+    font-size: $f-size-body-sm;
+
+    @extend .phone-main;
+  }
+
+  .phone-footer-buttons {
+    z-index: 1;
+    height: 52px;
+    box-shadow: 0px 0px 8px rgba(4, 4, 4, 0.12);
+    background: $white;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+
+    .btn {
+      font-weight: 500;
+      font-size: $f-size-body;
+      line-height: 16px;
+      border-radius: 6px;
+
+      .b-icon {
+        font-size: $f-size-body-sm;
+        vertical-align: -0.15em;
+      }
+    }
+
+    .btn-outline-dark {
+      border: 1px solid $grey-70;
+
+      &:active, &:hover, &:focus {
+        background-color: $white;
+        border-color: $grey-70;
+        color: $grey-100;
+        box-shadow: none !important;
+      }
+    }
+
+    .btn-primary {
+      &:active, &:hover, &:focus {
+        background-color: $primary;
+        border-color: $primary;
+        color: $white;
+        box-shadow: none !important;
       }
     }
   }
@@ -3545,28 +3694,47 @@ span.mention {
     bottom: 0;
   }
 
-  .phone-integrations {
-    .q-item__label {
-      margin-left: -36px;
+  .phone-expansion {
+    background: transparent;
 
+    .q-item__label {
       @extend .no-select;
     }
 
     .q-expansion-item {
       box-shadow: 0px 0px 8px rgba(4, 4, 4, 0.12);
-    }
+      border-radius: 12px;
 
-    .q-expansion-item__toggle-icon {
-      transform: rotate(180deg);
-    }
+      .q-item {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
 
-    .q-expansion-item__toggle-icon--rotated {
-      transform: rotate(0deg);
-    }
+      .q-focus-helper {
+        display: none !important;
+      }
 
-    .q-expansion-item__content > .q-card > .q-card__section {
-      padding: 0;
-      overflow-y: auto;
+      &:hover, &:focus {
+        & .q-focus-helper {
+          display: none !important;
+        }
+      }
+
+      .q-expansion-item__toggle-icon {
+        transform: rotate(180deg);
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+      }
+
+      .q-expansion-item__toggle-icon--rotated {
+        transform: rotate(0deg);
+      }
+
+      .q-expansion-item__content > .q-card > .q-card__section {
+        padding: 0;
+        overflow-y: auto;
+      }
     }
 
     .integrations-card {
