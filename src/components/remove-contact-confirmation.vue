@@ -137,7 +137,7 @@ export default {
       }
       this.isBusy = true
       return this.$axios
-        .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id] } })
+        .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id].map(contact => contact.id) } })
         .then(() => {
           this.$q.notify({
             message: 'Contacts was successfully removed.',

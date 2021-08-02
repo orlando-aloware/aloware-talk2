@@ -71,13 +71,7 @@ export default {
 
   watch: {
     field: function (val) {
-      this.is_busy = true
-      this.$emit('updateField', {
-        val,
-        callback: () => {
-          this.is_busy = false
-        }
-      })
+      this.$emit('updateField', { val })
     }
   }
 }

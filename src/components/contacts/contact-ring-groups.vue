@@ -16,7 +16,7 @@
       </b-badge>
     </div>
     <vue-multiselect v-show="isEdit"
-                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2 options-list__tall"
                      track-by="id"
                      label="name"
                      ref="ringGroupSelect"
@@ -25,7 +25,7 @@
                      :closeOnSelect="false"
                      :showLabels="false"
                      :multiple="true"
-                     :options="options"
+                     :options="ringGroups"
                      v-model="selectedRingGroups"
                      @close="onSelectBlur">
     </vue-multiselect>
@@ -68,7 +68,6 @@ export default {
     return {
       isEdit: false,
       ringGroupsArray: [],
-      options: [],
       selectedRingGroups: []
     }
   },
@@ -86,7 +85,7 @@ export default {
       return talk2Api.V1.contact.getRingGroups(this.contact.id).then(response => {
         this.setContactRingGroups(response.data)
         this.ringGroupsArray = response.data
-        this.selectedRingGroups = this.options.filter(ringGroup => this.ringGroupsArray.includes(ringGroup.id))
+        this.selectedRingGroups = this.ringGroups.filter(ringGroup => this.ringGroupsArray.includes(ringGroup.id))
       })
     },
 
@@ -94,7 +93,6 @@ export default {
       return talk2Api.V1.ringGroups.get()
         .then(response => {
           this.setRingGroups(response.data)
-          this.options = response.data
           this.getContactRingGroups()
         })
     },

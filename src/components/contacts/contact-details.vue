@@ -9,7 +9,7 @@
                     @update="onTagsUpdate">
       </contact-tags>
       <contact-notes :contact="contact"
-                     @update="onNotesUpdate">
+                     @input="onNotesInput">
       </contact-notes>
       <contact-integrations :contact="contact"></contact-integrations>
       <contact-scheduled-messages></contact-scheduled-messages>
@@ -56,10 +56,17 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact'])
+    ...mapGetters('contacts', ['contact', 'contactClone'])
   },
+
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactTags']),
+    ...mapActions('contacts', ['setContact', 'setContactTags', 'updateChangedContactProperties']),
+    onNotesInput (value) {
+      this.updateChangedContactProperties({
+        name: 'notes',
+        value: value
+      })
+    },
     onNotesUpdate (contact) {
       this.setContact(contact)
     },

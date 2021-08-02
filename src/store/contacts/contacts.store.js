@@ -126,6 +126,8 @@ export default function () {
     currentListFilters: {},
 
     contact: {},
+    contactClone: {},
+    changedContactProperties: [],
     contactPhoneNumbers: [],
     contactRingGroups: [],
     contactAttributes: [],

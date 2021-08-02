@@ -33,6 +33,7 @@
       <div class="px-0 width-330">
         <contact-details></contact-details>
       </div>
+      <contact-save-bar></contact-save-bar>
     </div>
     <template #overlay>
       <div class="text-center">
@@ -52,12 +53,14 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import ContactSaveBar from 'components/contacts/contact-save-bar'
 
 export default {
   mixins: [contactsMixins, contactMixins],
 
   components: {
+    ContactSaveBar,
     ContactDetails,
     ContactActivities,
     ContactListSidebar
@@ -78,6 +81,9 @@ export default {
       totalContacts: 0
     }
   },
+  methods: {
+    ...mapActions('contacts', ['resetChangedContactProperties'])
+  },
 
   created () {
     if (this.userAuth.authenticated) {
@@ -90,6 +96,7 @@ export default {
     '$route.params.id': function () {
       if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
         this.contactId = this.$route.params.id
+        this.resetChangedContactProperties()
         this.processFetchContactInfo()
       }
     }

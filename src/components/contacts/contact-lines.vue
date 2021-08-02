@@ -17,7 +17,7 @@
     </div>
 
     <vue-multiselect v-show="isEdit"
-                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2"
+                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2 options-list__tall"
                      track-by="id"
                      label="name"
                      ref="linesSelect"

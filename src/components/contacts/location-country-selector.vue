@@ -9,9 +9,8 @@
               option-value="code"
               option-label="name"
               behavior="menu"
-              v-model="currentCountry"
+              v-model="contact.cnam_country"
               :options="options"
-              :loading="isBusy"
               :disable="disabled"
               @focus="onFocus"
               @blur="onBlur"
@@ -22,17 +21,15 @@
 
 <script>
 import * as Countries from 'src/constants/countries'
-import talk2Api from 'src/plugins/api/api'
-import { mapActions, mapGetters } from 'vuex'
-// import VueMultiselect from 'vue-multiselect'
 export default {
   name: 'location-country-selector',
-  // components: { VueMultiselect },
   props: {
-    country: {
-      type: String,
+    contact: {
+      type: Object,
       required: false,
-      default: ''
+      default: () => {
+        return {}
+      }
     },
     disabled: {
       type: Boolean,
@@ -42,28 +39,16 @@ export default {
   },
   data () {
     return {
-      isBusy: false,
       countries: Countries.COUNTRIES,
-      options: Countries.COUNTRIES,
-      currentCountry: this.country
+      options: Countries.COUNTRIES
     }
   },
   computed: {
-    ...mapGetters('contacts', ['contact']),
-    selectedCountry: {
-      get () {
-        return this.currentCountry
-      },
-      set (country) {
-        return country
-      }
-    },
     selectedCountryObject () {
-      return this.countries.find(country => country.code === this.selectedCountry)
+      return this.countries.find(country => country.code === this.contact.cnam_country)
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact']),
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedCountryObject ? this.selectedCountryObject.name : 'Select country'
@@ -89,23 +74,11 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.countries.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
-    },
-    onUpdate () {
-      this.isBusy = true
-      talk2Api.V1.contact.update(this.contact.id, { 'cnam_country': this.contact.cnam_country }).then(response => {
-        this.setContact(response.data)
-      }).finally(() => {
-        this.isBusy = false
-      })
     }
   },
   watch: {
-    'selectedCountry': function (value) {
-      this.isBusy = true
-      this.$emit('select', { value,
-        callback: () => {
-          this.isBusy = false
-        } })
+    'contact.cnam_country': function (val) {
+      this.$emit('select', { val })
     }
   }
 }

@@ -49,6 +49,7 @@ export default {
   },
   currentListFilters: (state) => state.currentListFilters,
   contact: (state) => state.contact,
+  contactClone: (state) => state.contactClone,
   lines: (state) => state.lines,
   ringGroups: (state) => state.ringGroups,
   contactAttributes: (state) => state.contactAttributes,

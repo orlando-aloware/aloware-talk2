@@ -16,7 +16,7 @@
       <div class="d-block"
            v-if="hasPermissionTo('list disposition status')">
         <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
-        <contact-disposition @updateField="onUpdateOwner"
+        <contact-disposition @select="onUpdateDisposition"
                              :disabled="!hasPermissionTo('dispose contact')">
         </contact-disposition>
       </div>
@@ -56,17 +56,19 @@
       <div class="d-block" v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
         <p class="text-muted custom-input-label mb-0">State</p>
         <location-state-selector v-model="contact.cnam_state"
-                                 :country="contact.cnam_state"
+                                 :contact="contact"
                                  :disabled="!hasPermissionTo('update contact')"
-                                 @select="onUpdateState"></location-state-selector>
+                                 @select="onUpdateState">
+        </location-state-selector>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Country</p>
         <location-country-selector v-model="contact.cnam_country"
-                                   :country="contact.cnam_country"
+                                   :contact="contact"
                                    :disabled="!hasPermissionTo('update contact')"
-                                   @select="onUpdateCountry"></location-country-selector>
+                                   @select="onUpdateCountry">
+        </location-country-selector>
       </div>
 
       <div class="d-block">
@@ -147,7 +149,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContactAttributes', 'setContact']),
+    ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties']),
 
     onExpanded () {
       this.is_expanded = !this.is_expanded
@@ -161,35 +163,65 @@ export default {
     },
 
     onUpdateOwner (params) {
-      this.updateContactField({ user_id: params.val }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'user_id',
+        value: params.val
+      })
+    },
+    onUpdateDisposition (dispositionStatusId) {
+      this.updateChangedContactProperties({
+        name: 'disposition_status_id',
+        value: dispositionStatusId
+      })
     },
 
     onUpdateZipCode (params) {
-      this.updateContactField({ cnam_zipcode: params.val }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'cnam_zipcode',
+        value: params.val
+      })
     },
 
     onUpdateEmail (params) {
-      this.updateContactField({ email: params.val }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'email',
+        value: params.val
+      })
     },
 
     onUpdateWebsite (params) {
-      this.updateContactField({ website: params.val }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'website',
+        value: params.val
+      })
     },
 
     onUpdateCompany (params) {
-      this.updateContactField({ company_name: params.val }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'company_name',
+        value: params.val
+      })
     },
 
     onUpdateCity (params) {
-      this.updateContactField({ cnam_city: params.val }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'cnam_city',
+        value: params.val
+      })
     },
 
     onUpdateCountry (params) {
-      this.updateContactField({ cnam_country: params.value }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'cnam_country',
+        value: params.val
+      })
     },
 
     onUpdateState (params) {
-      this.updateContactField({ cnam_state: params.value }, params.callback)
+      this.updateChangedContactProperties({
+        name: 'cnam_state',
+        value: params.val
+      })
     },
 
     updateContactField (params, callback) {

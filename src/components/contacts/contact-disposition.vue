@@ -109,7 +109,8 @@ export default {
   watch: {
     'contact.disposition_status_id': function () {
       if (this.contact && this.contact.id) {
-        this.onDispose()
+        this.$emit('select', this.contact.disposition_status_id)
+        // this.onDispose()
       }
     }
   }

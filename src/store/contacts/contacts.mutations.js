@@ -164,6 +164,9 @@ export default {
   SET_CONTACT: (state, contact) => {
     state.contact = contact
   },
+  SET_CONTACT_CLONE: (state, contact) => {
+    state.contactClone = { ...contact }
+  },
   SET_LINES: (state, lines) => {
     state.lines = lines
   },
@@ -291,5 +294,21 @@ export default {
   },
   RESET_SEARCH: (state) => {
     state.search = ''
+  },
+  UPDATE_CHANGED_CONTACT_PROPERTIES: (state, { name, value }) => {
+    if (state.contactClone[name] !== value) {
+      let prop = state.changedContactProperties.find(item => item.property === name)
+      if (prop) {
+        prop.value = value
+      } else {
+        state.changedContactProperties.push({ property: name, value: value })
+      }
+    } else {
+      let changedProp = [...state.changedContactProperties]
+      state.changedContactProperties = changedProp.filter(item => item.property !== name)
+    }
+  },
+  RESET_CHANGED_CONTACT_PROPERTIES: (state) => {
+    state.changedContactProperties = []
   }
 }
