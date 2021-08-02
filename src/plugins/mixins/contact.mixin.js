@@ -826,6 +826,8 @@ export default {
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contact_id)
       this.setContact(selectedContact)
+      this.setContactClone(selectedContact)
+      this.resetChangedContactProperties()
     },
 
     loadingContactsFailed () {
@@ -894,7 +896,7 @@ export default {
       })
     },
 
-    ...mapActions('contacts', ['setContact'])
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties'])
   },
 
   watch: {

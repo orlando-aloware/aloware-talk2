@@ -66,7 +66,7 @@
                 size="sm"
                 class="custom-action-button"
                 @click="callContact">
-        <q-tooltip anchor="top middle"
+        <q-tooltip anchor="bottom middle"
                    self="center middle">
           Call
         </q-tooltip>
@@ -77,7 +77,7 @@
                 class="custom-action-button"
                 :disabled="contact.is_dnc"
                 @click="openAppointmentModal">
-        <q-tooltip anchor="top middle"
+        <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add appointment
         </q-tooltip>
@@ -88,7 +88,7 @@
                 class="custom-action-button"
                 :disabled="contact.is_dnc"
                 @click="openAddReminderModal">
-        <q-tooltip anchor="top middle"
+        <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add reminder
         </q-tooltip>
@@ -99,7 +99,7 @@
                 size="sm"
                 class="custom-action-button"
                 @click="openEnrollSequenceModal">
-        <q-tooltip anchor="top middle"
+        <q-tooltip anchor="bottom middle"
                    self="center middle">
           Enroll to sequence
         </q-tooltip>
@@ -109,7 +109,7 @@
                 size="sm"
                 class="custom-action-button"
                 :disabled="true">
-        <q-tooltip anchor="top middle"
+        <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add to power dialer
         </q-tooltip>

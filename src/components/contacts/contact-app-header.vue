@@ -3,15 +3,16 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'contact-app-header',
 
   computed: {
     ...mapGetters('contacts', ['selectedList']),
+    ...mapState('contacts', ['search']),
     title () {
-      return this.selectedList.name
+      return this.search && this.search.length > 0 ? 'Search results' : this.selectedList.name
     }
   }
 }

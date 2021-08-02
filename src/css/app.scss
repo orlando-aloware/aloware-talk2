@@ -1411,6 +1411,12 @@ i.option-separator {
 
 }
 
+.multiselect.options-list__tall {
+  .multiselect__content-wrapper {
+    max-height: 300px !important;
+  }
+}
+
 .multiselect.options__relative {
   .multiselect__content-wrapper {
     position: relative !important;
@@ -1418,15 +1424,16 @@ i.option-separator {
 }
 
 .multiselect__option--selected {
-  background: $grey-50 !important;
-  color: $grey-90 !important;
+  background: $grey-60 !important;
+  color: $grey-100 !important;
   font-weight: 500 !important;
 }
 
 .multiselect__option--highlight {
-  background: $grey-60 !important;
+  background: $grey-50 !important;
+  color: $grey-90 !important;
   outline: none !important;
-  color: $grey-100 !important;
+
 }
 
 .multiselect__option--highlight.multiselect__option--selected {
@@ -3785,4 +3792,36 @@ span.mention {
 
 .basic-selector {
   @include border-radius('8px')
+}
+.q-tooltip{
+  background-color: $grey-light11;
+  color: $grey-100;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+}
+
+.contact-save-bar-wrapper{
+  position: absolute;
+  width: 100%;
+  background: $grey-40;
+  height: 73px;
+  padding: 17px 18px;
+  bottom: 0;
+  border-top: 1px solid $grey-70;
+  z-index: 9;
+
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: $grey-90;
+  }
+}
+
+.q-item--active{
+  background: $grey-60 !important;
+  color: $grey-100 !important;
+}
+
+.q-manual-focusable--focused{
+  background: $grey-50 !important;
+  color: $grey-90 !important;
 }

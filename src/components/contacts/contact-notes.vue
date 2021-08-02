@@ -11,6 +11,7 @@
          style="max-width: 300px">
       <contact-notes-input ref="notesInput"
                            v-model="contact.notes"
+                           @input="onInput"
                            @blur="onBlur">
       </contact-notes-input>
     </div>
@@ -67,13 +68,17 @@ export default {
     },
 
     onInput (value) {
-      this.$emit('input', value)
+      if (this.prevValue !== value) {
+        this.$emit('input', value)
+      }
     },
 
     onBlur () {
       this.isEdit = false
       if (this.prevValue !== this.contact.notes) {
-        this.onUpdate()
+        if (this.prevValue !== this.contact.notes) {
+          this.$emit('blue', this.contact.notes)
+        }
       }
     },
 

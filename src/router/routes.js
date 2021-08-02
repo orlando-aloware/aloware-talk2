@@ -34,34 +34,34 @@ const routes = [
         },
         children: [
           {
+            name: 'Contacts',
             path: '',
-            name: 'Contacts',
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
-            path: ':id',
-            name: 'Contact',
-            component: () => import('src/pages/contacts/Contact.vue'),
-            meta: {
-              title: 'Contact'
-            }
-          },
-          {
+            name: 'Contacts',
             path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
-            name: 'Contacts',
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
-            path: 'list/:id(\\d+)+',
             name: 'Contacts',
+            path: 'list/:id(\\d+)+',
             component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
-            path: 'list/:id(\\d+)+/add',
             name: 'Contacts',
+            path: 'list/:id(\\d+)+/add',
             component: () => import('src/pages/contacts/ContactsAddView.vue')
           }
         ]
+      },
+      {
+        path: 'contacts/:id',
+        name: 'Contact',
+        component: () => import('src/pages/contacts/Contact.vue'),
+        meta: {
+          title: 'Contact'
+        }
       },
       {
         path: 'power-dialer',

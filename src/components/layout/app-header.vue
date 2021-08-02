@@ -107,7 +107,13 @@ export default {
     },
 
     navigateBackward (e) {
-      this.goBack()
+      if (this.$router.history._startLocation === this.$route.path) {
+        this.$router.push({
+          name: 'Contacts'
+        })
+      } else {
+        this.goBack()
+      }
       e.preventDefault()
     }
   },

@@ -1,11 +1,9 @@
 <template>
   <div class="row mx-0 content-row d-flex overflow-hidden h-100 pb-2">
-    <div class="col-lg-2 pt-2 pl-2 pr-1 mb-0 h-100"
-         v-if="$route.name === 'Contacts'">
+    <div class="col-2 pt-2 pl-2 pr-1 mb-0 h-100">
       <contacts-sidebar></contacts-sidebar>
     </div>
-    <div class="col-lg-10 px-0 pr-1 mb-0 main"
-         :class="[ $route.name === 'Contacts' ? 'col-lg-10' : 'col-lg-12' ]">
+    <div class="col-10 px-0 pr-1 mb-0 main">
       <router-view></router-view>
     </div>
     <remove-folder-dialog />

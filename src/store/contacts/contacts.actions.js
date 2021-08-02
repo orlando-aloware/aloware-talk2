@@ -117,6 +117,9 @@ export default {
   setContact: ({ commit }, contact) => {
     commit('SET_CONTACT', contact)
   },
+  setContactClone: ({ commit }, contact) => {
+    commit('SET_CONTACT_CLONE', contact)
+  },
   setLines: ({ commit }, lines) => {
     commit('SET_LINES', lines)
   },
@@ -237,5 +240,11 @@ export default {
   },
   resetSearch: ({ commit }, value) => {
     commit('RESET_SEARCH', value)
+  },
+  updateChangedContactProperties: ({ commit }, params) => {
+    commit('UPDATE_CHANGED_CONTACT_PROPERTIES', params)
+  },
+  resetChangedContactProperties: ({ commit }) => {
+    commit('RESET_CHANGED_CONTACT_PROPERTIES')
   }
 }

@@ -68,6 +68,13 @@
             Book a demo now!
           </a>
         </div>
+        <div class=" field text-left pt-3 mt-1">
+          <b-link href="https://support.aloware.com/en/articles/5456128-aloware-authentication-issues"
+                  class="cursor-pointer field text-left text-decoration-none"
+                  target="_blank">
+            Trouble authenticating?
+          </b-link>
+        </div>
       </form>
     </div>
   </div>
