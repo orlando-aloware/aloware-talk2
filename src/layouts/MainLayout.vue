@@ -1316,10 +1316,8 @@ export default {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
-      if (!['Contacts', 'Contact'].includes(this.$route.name)) {
-        this.resetSearch()
-      }
-      if (this.$route.name !== 'Contact') {
+      if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
+        !(from.name === 'Contact' && this.$route.name === 'Contacts')) {
         this.resetContactsVuex()
       }
       this.resetInboxVuex()

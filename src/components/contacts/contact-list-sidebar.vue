@@ -21,7 +21,7 @@
                     height="34"
                     :name="contact.name">
             </avatar>
-            <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
+            <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between align-items-center contact-details pt-0">
               <div class="mr-auto">
                 <p class="text-bold contact-name mb-0">
                   <q-tooltip anchor="top middle"
@@ -30,19 +30,19 @@
                   </q-tooltip>
                   {{ contact.name }}
                 </p>
-                <p class="text-sm-left contact-phone mb-1">
+                <div class="text-sm-left contact-phone mb-1">
                   <span v-if="contact.phone_number !== '0'">{{ contact.phone_number | fixPhone }}</span>
                   <span v-else>Phone number unavailable</span>
-                </p>
+                </div>
               </div>
-              <p>
-                <b-badge v-if="contact.unread_count > 0"
-                         class="contact-badge"
+              <div class="d-flex justify-center align-items-center">
+                <b-badge v-if="(contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count) > 0"
+                         class="contact-badge m-0 p-0 d-flex justify-center align-items-center"
                          variant="danger"
                          pill>
-                  {{ contact.unread_count }}
+                  {{ contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count }}
                 </b-badge>
-              </p>
+              </div>
             </div>
           </b-list-group-item>
         </b-list-group>
@@ -66,7 +66,7 @@ import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 
 let scrollTimeout
 export default {
-  name: 'sidebar',
+  name: 'contact-list-sidebar',
 
   mixins: [contactsMixins],
 

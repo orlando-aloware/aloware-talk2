@@ -283,6 +283,7 @@ export default {
     state.changingSelectedContact = isChanging
   },
   RESET_CONTACTS_VUEX: (state) => {
+    state.search = ''
     state.currentListFilters = {}
     state.contact = {}
   },
