@@ -79,11 +79,11 @@
           class="filter-operation border"
           borderless
           dense
-          use-input
           use-chips
           multiple
+          map-options
+          emit-value
           input-debounce="0"
-          new-value-mode="add-unique"
           v-if="operator.value === filterOperator && hasValue"
           v-model="filterOperatorValue"
           :options="filter.options"
@@ -172,7 +172,7 @@ export default {
       return false
     }
   },
-  created () {
+  mounted () {
     this.debounceDelay = this.filter.type === 'string' ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
@@ -191,9 +191,9 @@ export default {
         this.$refs.filterOperation[0].updateInputValue('')
       }
       let allFilters = []
-      if (!_.isEmpty(this.initialListFilters)) {
-        allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
-      }
+      // if (!_.isEmpty(this.initialListFilters)) {
+      //   allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
+      // }
       allFilters[this.filterGroupIndex] = {
         filters: {},
         is_conjunction: this.filterConjunction
@@ -292,12 +292,8 @@ export default {
       }
     },
     getRelationTypesValue () {
-      let newValue = []
       if (this.filterOperatorValue instanceof Array) {
-        for (let item of this.filterOperatorValue) {
-          newValue.push(item.value)
-        }
-        return newValue
+        return this.filterOperatorValue
       } else {
         return JSON.parse(JSON.stringify(this.filterOperatorValue))
       }

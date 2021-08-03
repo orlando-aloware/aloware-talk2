@@ -58,12 +58,12 @@
                     <template v-for="(filter, key, index) in group.filters">
                       <b-card class="mb-2 filter-item"
                               role="button"
-                              :key="filter.key"
+                              :key="key"
                               @click="selectFilterByKey(filter.key, groupIndex, group.is_conjunction)">
                         <span class="filter-name">{{ filter.label }}</span>
                         <span class="text-lowercase"> {{ filter.operator }}</span>
                         <span class="font-weight-bold">
-                          {{ getFormattedFilterSummary(filter) }}
+                          {{ getFormattedFilterSummary(filter, key) }}
                         </span>
                         <compact-btn class="py-0 delete-filter"
                                      @clicked="onDeleteFilter(groupIndex, filter.key)">
@@ -177,6 +177,11 @@ import {
 
 export default {
   components: { Search, CompactBtn, ContactsFilterTypes },
+  props: {
+    listFilters: {
+      required: false
+    }
+  },
   data () {
     return {
       items: Array.from(new Array(10)),
@@ -329,22 +334,32 @@ export default {
       }
       return filterGroups
     },
-    getFormattedFilterSummary (filter) {
+    getFormattedFilterSummary (filter, key) {
       if (!filter.trueValue) {
         return ''
       }
       if (typeof filter.trueValue === 'object') {
+        const filterFound = this.filters.find(filter => filter.key === key)
+        const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
+        let values = []
         switch (true) {
-          case filter.trueValue.length === 1:
-            return filter.trueValue[0]
+          case filter.trueValue.length === 1 || (isRelationType):
+            values = filter.trueValue
+            break
           case filter.trueValue.length === 2 && filter.operator !== 'Is between':
             return filter.trueValue.join(' or ')
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
-          case filter.trueValue.length >= 3:
-            let joinedValues = filter.trueValue.join(', ')
-            return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
         }
+        let labels = []
+        if (filterFound && isRelationType) {
+          for (let item of values) {
+            const optionFound = filterFound.options.find(option => option.value === item)
+            labels.push(optionFound ? optionFound.label : '')
+          }
+        }
+        const joinedValues = labels.join(', ')
+        return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
       } else {
         return filter.trueValue
       }
