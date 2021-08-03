@@ -77,7 +77,9 @@
                    class="h-100"
                    rounded="sm"
                    variant="white">
-          <task-list :communications="communications"/>
+          <task-list :communications="communications"
+                     v-if="!isGettingTasksList">
+          </task-list>
           <template #overlay>
             <div class="text-center">
               <q-spinner-bars

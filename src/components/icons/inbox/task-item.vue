@@ -13,7 +13,7 @@
     <div class="task-details flex-grow-1 pb-1"
          role="button">
       <div class="contact-name">
-        {{ communication.contact.name }}
+        {{ contactName | truncate(20) }}
       </div>
       <div class="d-flex flex-row">
         <div class="pr-2">
@@ -38,15 +38,15 @@
     <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW">
+            v-if="(communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || communication.type !== CommunicationTypes.CALL">
           {{ communication.created_at | shortDateTimePassed }}
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-            v-else>
-        <div  class="px-2">
+           v-else-if="communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
+        <div class="px-2">
           <cancel-call-icon role="button"/>
         </div>
-        <div  class="px-2">
+        <div class="px-2">
           <accept-call-icon role="button"/>
         </div>
       </div>
@@ -56,10 +56,7 @@
 
 <script>
 import _ from 'lodash'
-import {
-  avatarMixin,
-  communicationInfoMixin
-} from 'src/plugins/mixins'
+import { avatarMixin, communicationInfoMixin } from 'src/plugins/mixins'
 import Avatar from 'src/components/avatar'
 import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
@@ -77,7 +74,11 @@ export default {
     communicationInfoMixin
   ],
 
-  components: { AcceptCallIcon, CancelCallIcon, Avatar },
+  components: {
+    AcceptCallIcon,
+    CancelCallIcon,
+    Avatar
+  },
 
   props: {
     communication: {
@@ -97,6 +98,18 @@ export default {
   computed: {
     ...mapState(['campaigns']),
 
+    contactName () {
+      if (this.communication && this.communication.contact) {
+        return this.communication.contact.name || this.$options.filters.fixPhone(this.communication.lead_number)
+      }
+
+      if (this.communication) {
+        return this.$options.filters.fixPhone(this.communication.lead_number)
+      }
+
+      return 'No Name'
+    },
+
     campaignName () {
       if (_.isEmpty(this.campaigns) || !this.communication.campaign_id) {
         return '-'
@@ -114,6 +127,7 @@ export default {
     setContact (id) {
       this.setContactId(id)
     },
+
     ...mapActions('inbox', ['setContactId'])
   }
 }
