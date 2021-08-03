@@ -8,6 +8,7 @@ export const DEFAULT_STATE = {
   changelogs: [],
   dispositionStatuses: [],
   callDispositions: [],
+  scripts: [],
   broadcasts: [],
   filters: [],
   firstLogin: false,

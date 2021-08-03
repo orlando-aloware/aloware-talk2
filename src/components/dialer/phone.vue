@@ -513,7 +513,7 @@
       </template>
     </div>
     <div class="phone-footer-buttons p-2"
-         v-if="!expansionEnabled">
+         v-if="isCallCompleted">
       <b-button variant="outline-dark"
                 @click="endWrapUp">
         <span>Back</span>
@@ -527,7 +527,7 @@
       </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
-         v-if="dialer.contact && expansionEnabled">
+         v-if="!isCallCompleted && dialer.contact && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         header-class="text-sm bg-white text-center"
@@ -858,7 +858,7 @@ export default {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
 
     isCallCompleted () {
-      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED'].includes(this.dialer.currentStatus))
+      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
 
     isHangupDisabled () {
@@ -1075,46 +1075,55 @@ export default {
     },
 
     openDialpad () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'dialpad'
       this.expanded = true
     },
 
     openNotes () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'notes'
       this.expanded = true
     },
 
     openTags () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'tags'
       this.expanded = true
     },
 
     openScripts () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'scripts'
       this.expanded = true
     },
 
     openAdd () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'add'
       this.expanded = true
     },
 
     openTransfer () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'transfer'
       this.expanded = true
     },
 
     openMore () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'more'
       this.expanded = true
     },
 
     openVmDrop () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'vm-drop'
       this.expanded = true
     },
 
     openIntegrations () {
+      this.expansionEnabled = true
       this.bottomExpansion = 'integrations'
       this.expanded = true
     },
@@ -1122,6 +1131,7 @@ export default {
     saveAndResetExpansion ($event) {
       $event.stopPropagation()
       $event.preventDefault()
+      this.expansionEnabled = false
       this.bottomExpansion = 'integrations'
       this.expanded = false
     },
@@ -1296,6 +1306,7 @@ export default {
     resetBottomExpansion () {
       this.bottomExpansion = 'integrations'
       this.expanded = false
+      this.expansionEnabled = true
     },
 
     ...mapActions([
@@ -1311,7 +1322,6 @@ export default {
       this.resetBottomExpansion()
       this.screen = 'call'
       this.digits = ''
-      this.expansionEnabled = true
     },
 
     screen () {

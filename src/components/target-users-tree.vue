@@ -10,7 +10,7 @@
           :nodes="generateTargetUsersTree"
           node-key="label"
           selected-color="primary"
-          :expanded="[communication.attempt]">
+          :expanded.sync="attemptPath">
         </q-tree>
       </template>
       <template v-else-if="isTargetUsersWithNoAttempts">
@@ -34,7 +34,7 @@
             :nodes="generateTargetUsersTree"
             node-key="label"
             selected-color="primary"
-            :expanded="[communication.attempt]">
+            :expanded.sync="attemptPath">
           </q-tree>
         </template>
         <template v-else-if="isTargetUsersWithNoAttempts">
@@ -89,7 +89,7 @@ export default {
         layerNumber++
         let entry = {
           id: layerNumber,
-          label: 'Layer ' + layerNumber,
+          label: `Layer ${layerNumber}`,
           children: []
         }
         entry.children = this.generateAttemptingUsersTree(userIds)
@@ -116,6 +116,18 @@ export default {
         this.communication.target_users.length &&
         (this.communication.attempt == null ||
           this.communication.attempt > this.communication.target_users.length)
+    }
+  },
+
+  data () {
+    return {
+      attemptPath: []
+    }
+  },
+
+  mounted () {
+    if (this.communication.attempt !== null) {
+      this.attemptPath = [`Layer ${this.communication.attempt}`]
     }
   },
 
