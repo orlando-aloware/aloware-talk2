@@ -54,15 +54,14 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
-
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
 import Profile from 'components/profile'
 import Phone from 'components/dialer/phone'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'app-header',

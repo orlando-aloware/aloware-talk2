@@ -428,11 +428,21 @@
               Call Disposition
             </label>
             <div class="d-flex flex-row align-items-center w-100">
-              <call-disposition-selector :communication="dialer.communication"></call-disposition-selector>
+              <call-disposition-wrapper :communication="dialer.communication"
+                                        class="w-100">
+              </call-disposition-wrapper>
             </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Contact Disposition
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <contact-disposition-wrapper :contact="dialer.contact"
+                                           class="w-100">
+              </contact-disposition-wrapper>
+            </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
@@ -515,15 +525,15 @@
     <div class="phone-footer-buttons p-2"
          v-if="isCallCompleted">
       <b-button variant="outline-dark"
-                @click="endWrapUp">
-        <span>Back</span>
-        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }})</span>
-      </b-button>
-
-      <b-button variant="primary"
                 @click="makeCall">
         <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
         <span class="ml-1">Call Back</span>
+      </b-button>
+
+      <b-button variant="primary"
+                @click="endWrapUp">
+        <span>Finish</span>
+        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
       </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
@@ -750,21 +760,23 @@ import ContactTags from 'components/contacts/contact-tags'
 import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
 import CommunicationAudio from 'components/communication-audio'
+import CommunicationNote from 'components/communication-note'
+import CommunicationTags from 'components/communication-tags'
+import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
+import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/communication-tags'
-import CallDispositionSelector from 'components/call-disposition-selector'
 
 export default {
   name: 'phone',
 
   components: {
-    CallDispositionSelector,
+    ContactDispositionWrapper,
+    CallDispositionWrapper,
     CommunicationTags,
     CommunicationNote,
     CommunicationAudio,
