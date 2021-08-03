@@ -21,16 +21,18 @@ export default {
     InboxSide,
     InboxMid
   },
-  methods: {
-    toggleContactInfo () {
-      this.contactInfoOpen = !this.contactInfoOpen
-    }
-  },
+
   data () {
     return {
       contactInfoOpen: false,
       title: 'Inbox',
       contactId: null
+    }
+  },
+
+  methods: {
+    toggleContactInfo () {
+      this.contactInfoOpen = !this.contactInfoOpen
     }
   }
 }

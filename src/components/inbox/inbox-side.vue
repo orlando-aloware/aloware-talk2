@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-side border-top-0">
+  <div class="inbox-side border-top-0 flex-shrink-0">
     <div class="inbox-side__left"
          :class="{'inbox-side__left--closed': closed }">
       <calls-header :isSearch="true"
