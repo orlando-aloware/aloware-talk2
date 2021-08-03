@@ -14,18 +14,19 @@
         </div>
       </div>
     </div>
-    <div class="inbox-side__right border-left">
+    <div class="inbox-side__right border-left d-flex align-items-start flex-column">
       <calls-header class="w-100"
                     :openCount="openCount"
                     :pendingCount="pendingCount"
                     :commCampaigns="communicationLines"
                     :commRingGroups="communicationRingGroups"/>
-      <div class="w-100 d-flex"
-        v-if="active === 'inbox'">
+      <div v-if="active === 'inbox'"
+           class="w-100">
         <q-btn-toggle
-          class="current-tasks border w-100 mx-2 mt-2 mb-1"
+          class="current-tasks border mx-2 mt-2 mb-1"
           no-caps
           dense
+          spread
           unelevated
           toggle-color="grey-9"
           color="white"
@@ -70,25 +71,37 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-100 w-100">
+      <div class="h-100 w-100 flex-grow-1 scroll-y">
+        <b-overlay :show="isGettingTasksList"
+                   rounded="sm">
         <task-list :communications="communications"/>
+          <template #overlay>
+            <div class="text-center">
+              <q-spinner-bars
+                color="primary"
+                size="2em"
+              />
+            </div>
+          </template>
+        </b-overlay>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import TaskList from 'components/icons/inbox/task-list'
 
+import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'inbox-side',
   data () {
     return {
-      openCount: 7,
-      pendingCount: 2,
+      openCount: 0,
+      pendingCount: 0,
       active: 'inbox',
       closed: window.innerWidth < 992,
       currentTask: 'open',
@@ -106,117 +119,16 @@ export default {
           slot: 'three'
         }
       ],
-      communications: [
-        {
-          id: 1,
-          type: 1,
-          direction: 1,
-          campaign_id: 373,
-          ring_group_id: null,
-          current_status2: 3,
-          disposition_status2: 1,
-          body: null,
-          contact: {
-            id: 180215,
-            name: 'John Smith'
-          },
-          created_at: '2021-07-21 11:06:01'
-        },
-        {
-          id: 2,
-          type: 1,
-          direction: 1,
-          campaign_id: 11,
-          ring_group_id: 32,
-          current_status2: 3,
-          disposition_status2: 1,
-          body: null,
-          contact: {
-            id: 182913,
-            name: 'Kevin Aguilar'
-          },
-          created_at: '2021-07-21 11:06:01'
-        },
-        {
-          id: 3,
-          type: 1,
-          direction: 1,
-          campaign_id: 443,
-          ring_group_id: null,
-          current_status2: 9,
-          disposition_status2: 3,
-          body: null,
-          contact: {
-            id: 182912,
-            name: 'Fernando Altamirano'
-          },
-          created_at: '2021-07-21 11:06:01'
-        },
-        {
-          id: 4,
-          type: 2,
-          direction: 1,
-          campaign_id: 11,
-          ring_group_id: null,
-          current_status2: 9,
-          disposition_status2: 4,
-          body: 'Hi, where can I find an article in the knowledge base about Sequences+?',
-          contact: {
-            id: 182910,
-            name: 'Caroline Yoo'
-          },
-          created_at: '2021-07-21 11:06:01'
-        },
-        {
-          id: 5,
-          type: 2,
-          direction: 1,
-          campaign_id: 11,
-          ring_group_id: null,
-          current_status2: 9,
-          disposition_status2: 4,
-          body: 'Hi, do you know where the settings for the ring group is?',
-          contact: {
-            id: 182898,
-            name: 'Alexis Nghiem'
-          },
-          created_at: '2021-07-21 11:06:01'
-        },
-        {
-          id: 6,
-          type: 2,
-          direction: 1,
-          campaign_id: 506,
-          ring_group_id: null,
-          current_status2: 9,
-          disposition_status2: 4,
-          body: 'Hi, where can I find a tutorial for sending bulk messages?',
-          contact: {
-            id: 182569,
-            name: 'Tremaine Schroeder'
-          },
-          created_at: '2021-07-20 08:21:33'
-        },
-        {
-          id: 7,
-          type: 2,
-          direction: 1,
-          campaign_id: 373,
-          ring_group_id: null,
-          current_status2: 9,
-          disposition_status2: 4,
-          body: 'Hi, do you know where to create a new Line?',
-          contact: {
-            id: 182537,
-            name: 'Eliane Schiller'
-          },
-          created_at: '2021-07-20 07:21:33'
-        }
-      ]
+      filters: {
+        type: 'all',
+        answer_status: 'all'
+      },
+      communications: []
     }
   },
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
+    ...mapState('inbox', ['isGettingTasksList']),
     communicationLines () {
       let campaigns = []
       let found = null
@@ -257,6 +169,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('inbox', ['gettingTasksList']),
     toggle () {
       this.closed = !this.closed
     },
@@ -269,12 +182,48 @@ export default {
     search (value) {
       // @TODO: search value from where?
     },
+    getCommunications (params) {
+      this.gettingTasksList(true)
+      talk2Api.V1.reports.communications
+        .get({ params: params })
+        .then(response => {
+          this.communications = response.data.data
+          this.gettingTasksList(false)
+        })
+    },
     newActive (active) {
       this.active = active
+      switch (this.active) {
+        case 'calls':
+          this.filters = { type: 'call', direction: 'all' }
+          break
+        case 'messages':
+          this.filters = { type: 'sms', direction: 'all' }
+          break
+        case 'mentions':
+          break
+        case 'voicemails':
+          this.filters = { type: 'call', direction: 'all', 'answer_status': 'voicemail' }
+          break
+        case 'recordings':
+          this.filters = { type: 'call', direction: 'all', 'answer_status': 'recorded' }
+          break
+        case 'inbox':
+        default:
+          this.filters = { type: 'all', direction: 'all', 'answer_status': 'all' }
+          this.communications = []
+          break
+      }
+
+      // Disable inbox as of the moment
+      if (this.active !== 'inbox') {
+        this.getCommunications(this.filters)
+      }
     }
   },
   mounted () {
     window.addEventListener('resize', this.toggleOnResize)
+    // this.getCommunications(this.filters)
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.toggleOnResize)

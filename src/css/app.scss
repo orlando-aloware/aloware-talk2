@@ -3059,7 +3059,6 @@ span.mention {
     border-left: solid 1px $grey-light3;
     overflow: hidden;
     height: 100%;
-    overflow-y: auto;
 
     @include screen('lg') {
     }

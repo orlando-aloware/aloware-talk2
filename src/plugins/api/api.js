@@ -178,6 +178,13 @@ export default {
       withAccessToContact (contactId) {
         return window.axios.get(`${suffixV1}user/get-users-with-access-to-contact?contact_id=${contactId}`)
       }
+    },
+    reports: {
+      communications: {
+        get (params) {
+          return window.axios.get(`${suffixV1}reports/communications`, params)
+        }
+      }
     }
   },
   V2: {

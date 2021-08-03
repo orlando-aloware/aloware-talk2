@@ -54,7 +54,8 @@ export default {
     },
     getContact (id) {
       this.selectedContactChanging(true)
-      return this.fetchContactInfo(id).then(response => {
+      this.contactId = id
+      return this.fetchContactInfo().then(response => {
         this.setContact(response.data)
         this.selectedContactChanging(false)
       })

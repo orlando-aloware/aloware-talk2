@@ -1,5 +1,6 @@
 export default function () {
   return {
-    selectedContactId: null
+    selectedContactId: null,
+    isGettingTasksList: false
   }
 }
