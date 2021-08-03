@@ -55,6 +55,7 @@
                         :state="validCampaign"
                         class="mb-1">
             <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+                           prepend="From:"
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
@@ -136,7 +137,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
-import LineSelector from 'components/dialer/line-selector'
+import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
