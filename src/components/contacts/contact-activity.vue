@@ -144,7 +144,7 @@
              :class="getCommunicationClass"
              v-if="communication.body">
           <span class="arrow pull-top"
-                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
+                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'left' : 'right' ]">
           </span>
           <div class="p-a p-y-sm handle-whitespace">
             <span v-linkify:options="{ target: '_blank' }">{{ communication.body }}</span>
@@ -157,7 +157,7 @@
         <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
           <span class="arrow pull-top"
-                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'arrow-dker left' : 'arrow-dker right' ]">
+                :class="[ communication.direction === CommunicationDirection.INBOUND ? 'left' : 'right' ]">
           </span>
 
           <div class="p-y-sm"
@@ -377,15 +377,15 @@ export default {
 
     getCommunicationClass () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
-        return 'inbound dker bg-grey-50'
+        return 'inbound bg-grey-50'
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && ![CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound bg-blue text-grey-50 text-left'
+        return 'outbound bg-primary text-grey-50 text-left'
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound bg-red-100 text-left'
+        return 'outbound bg-danger text-white text-left'
       }
 
       return ''

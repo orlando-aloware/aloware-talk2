@@ -21,17 +21,31 @@
 </template>
 
 <script>
-import NavItem from './inbox-nav-item.vue'
+import NavItem from './inbox-nav-item'
 
 export default {
-  name: 'inbox-nav-list.vue',
-  methods: {
-    onItemClicked (nextActive) {
-      this.active = nextActive
-      this.$emit('active', this.active)
+  name: 'inbox-nav-list',
+
+  components: {
+    NavItem
+  },
+
+  props: {
+    closed: {
+      type: Boolean,
+      default: false
+    },
+    openCount: {
+      required: false,
+      default: 0
+    },
+    pendingCount: {
+      required: false,
+      default: 0
     }
   },
-  data: function () {
+
+  data () {
     return {
       active: 'inbox',
       items: [
@@ -82,21 +96,11 @@ export default {
       ]
     }
   },
-  components: {
-    NavItem
-  },
-  props: {
-    closed: {
-      type: Boolean,
-      default: false
-    },
-    openCount: {
-      required: false,
-      default: 0
-    },
-    pendingCount: {
-      required: false,
-      default: 0
+
+  methods: {
+    onItemClicked (nextActive) {
+      this.active = nextActive
+      this.$emit('active', this.active)
     }
   }
 }

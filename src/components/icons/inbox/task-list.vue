@@ -9,9 +9,12 @@
 
 <script>
 import TaskItem from 'components/icons/inbox/task-item'
+
 export default {
   name: 'task-list',
+
   components: { TaskItem },
+
   props: {
     communications: {
       required: true

@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-side border-top-0">
+  <div class="inbox-side border-top-0 flex-shrink-0">
     <div class="inbox-side__left"
          :class="{'inbox-side__left--closed': closed }">
       <calls-header :isSearch="true"
@@ -19,7 +19,8 @@
                     :openCount="openCount"
                     :pendingCount="pendingCount"
                     :commCampaigns="communicationLines"
-                    :commRingGroups="communicationRingGroups"/>
+                    :commRingGroups="communicationRingGroups">
+      </calls-header>
       <div v-if="active === 'inbox'"
            class="w-100">
         <q-btn-toggle
@@ -73,8 +74,12 @@
       </div>
       <div class="h-100 w-100 flex-grow-1 scroll-y">
         <b-overlay :show="isGettingTasksList"
-                   rounded="sm">
-        <task-list :communications="communications"/>
+                   class="h-100"
+                   rounded="sm"
+                   variant="white">
+          <task-list :communications="communications"
+                     v-if="!isGettingTasksList">
+          </task-list>
           <template #overlay>
             <div class="text-center">
               <q-spinner-bars
@@ -90,14 +95,21 @@
 </template>
 
 <script>
+import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import TaskList from 'components/icons/inbox/task-list'
 
-import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'inbox-side',
+
+  components: {
+    TaskList,
+    CallsHeader,
+    InboxNavList
+  },
+
   data () {
     return {
       openCount: 0,
@@ -126,9 +138,11 @@ export default {
       communications: []
     }
   },
+
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
     ...mapState('inbox', ['isGettingTasksList']),
+
     communicationLines () {
       let campaigns = []
       let found = null
@@ -148,6 +162,7 @@ export default {
       }
       return campaigns
     },
+
     communicationRingGroups () {
       let ringGroups = []
       let found = null
@@ -168,20 +183,29 @@ export default {
       return ringGroups
     }
   },
+
+  mounted () {
+    window.addEventListener('resize', this.toggleOnResize)
+    // this.getCommunications(this.filters)
+  },
+
   methods: {
-    ...mapActions('inbox', ['gettingTasksList']),
     toggle () {
       this.closed = !this.closed
     },
+
     toggleOnResize () {
       this.closed = window.innerWidth < 992
     },
+
     checkTask () {
       // @TODO: work on the task states
     },
+
     search (value) {
       // @TODO: search value from where?
     },
+
     getCommunications (params) {
       this.gettingTasksList(true)
       talk2Api.V1.reports.communications
@@ -191,26 +215,45 @@ export default {
           this.gettingTasksList(false)
         })
     },
+
     newActive (active) {
       this.active = active
       switch (this.active) {
         case 'calls':
-          this.filters = { type: 'call', direction: 'all' }
+          this.filters = {
+            type: 'call',
+            direction: 'all'
+          }
           break
         case 'messages':
-          this.filters = { type: 'sms', direction: 'all' }
+          this.filters = {
+            type: 'sms',
+            direction: 'all'
+          }
           break
         case 'mentions':
           break
         case 'voicemails':
-          this.filters = { type: 'call', direction: 'all', 'answer_status': 'voicemail' }
+          this.filters = {
+            type: 'call',
+            direction: 'all',
+            'answer_status': 'voicemail'
+          }
           break
         case 'recordings':
-          this.filters = { type: 'call', direction: 'all', 'answer_status': 'recorded' }
+          this.filters = {
+            type: 'call',
+            direction: 'all',
+            'answer_status': 'recorded'
+          }
           break
         case 'inbox':
         default:
-          this.filters = { type: 'all', direction: 'all', 'answer_status': 'all' }
+          this.filters = {
+            type: 'all',
+            direction: 'all',
+            'answer_status': 'all'
+          }
           this.communications = []
           break
       }
@@ -219,15 +262,13 @@ export default {
       if (this.active !== 'inbox') {
         this.getCommunications(this.filters)
       }
-    }
+    },
+
+    ...mapActions('inbox', ['gettingTasksList'])
   },
-  mounted () {
-    window.addEventListener('resize', this.toggleOnResize)
-    // this.getCommunications(this.filters)
-  },
+
   beforeDestroy () {
     window.removeEventListener('resize', this.toggleOnResize)
-  },
-  components: { TaskList, CallsHeader, InboxNavList }
+  }
 }
 </script>
