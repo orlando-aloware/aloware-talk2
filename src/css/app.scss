@@ -291,6 +291,10 @@ body,
 }
 
 .checkbox {
+  input {
+    cursor: pointer;
+    height: 35px;
+  }
   .q-checkbox__inner .q-checkbox__bg {
     border-radius: 4px;
   }
