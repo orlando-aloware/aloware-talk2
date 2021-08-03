@@ -518,6 +518,10 @@ body,
       width: auto;
       height: auto;
     }
+
+    .q-btn__wrapper:before {
+      box-shadow: none;
+    }
   }
 }
 
