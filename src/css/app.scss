@@ -510,6 +510,7 @@ body,
   .nav-icons {
     width: 48px;
     height: 52px;
+    -webkit-appearance: none;
 
     @extend .no-q-btn-focus;
 
