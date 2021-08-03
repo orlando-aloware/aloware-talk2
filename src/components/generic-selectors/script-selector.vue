@@ -1,6 +1,5 @@
 <template>
   <q-select :options="scriptsOptions"
-            :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '' ]"
@@ -53,12 +52,6 @@ export default {
       required: false
     },
 
-    multiple: {
-      type: Boolean,
-      default: false,
-      required: false
-    },
-
     disable: {
       type: Boolean,
       default: false,
@@ -84,10 +77,6 @@ export default {
     placeholder () {
       if (this.scriptId) {
         return ''
-      }
-
-      if (this.multiple) {
-        return 'Select scripts'
       }
 
       return 'Select a script'
