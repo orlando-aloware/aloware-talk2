@@ -1,10 +1,10 @@
 <template>
-  <div class="task-list scrollable w-100">
-    <task-item v-for="communication in communications"
-               :key="communication.id"
-               :communication="communication">
-    </task-item>
-  </div>
+    <div class="task-list scrollable w-100">
+      <task-item v-for="communication in communications"
+                 :key="communication.id"
+                 :communication="communication">
+      </task-item>
+    </div>
 </template>
 
 <script>

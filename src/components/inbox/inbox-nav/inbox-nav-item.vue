@@ -1,47 +1,55 @@
 <template>
-  <a
-    class="inbox-nav-item mx-2 px-1"
-    v-bind:class="{
+  <div>
+    <a
+      class="inbox-nav-item mx-2 px-1"
+      v-bind:class="{
       'inbox-nav-item__active': isActive,
       'inbox-nav-item--closed': closed,
     }"
-    href="/"
-    @click.prevent="onClick"
-  >
-    <div
-      class="inbox-nav-item__inner"
-      v-bind:class="{
+      href="/"
+      :disabled="disabled"
+      @click.prevent="onClick"
+      v-if="!group"
+    >
+      <div
+        class="inbox-nav-item__inner"
+        v-bind:class="{
         'inbox-nav-item__inner--closed': closed,
          'inbox-nav-item__inner--opened': !closed
       }"
-    >
-      <div
-        class="inbox-nav-item__icon"
-        v-bind:class="{
+      >
+        <div
+          class="inbox-nav-item__icon"
+          v-bind:class="{
           'inbox-nav-item__icon--closed': closed,
           'inbox-nav-item__icon--opened': !closed
         }"
-      >
-        <icon :icon="icon" :isActive="isActive"/>
-      </div>
-      <div class="inbox-nav-item__label">
-        {{ label }}
-      </div>
-      <span class="count-label"
-        v-if="value === 'inbox'">
+        >
+          <icon :icon="icon" :isActive="isActive"/>
+        </div>
+        <div class="inbox-nav-item__label">
+          {{ label }}
+        </div>
+        <span class="count-label"
+              v-if="value === 'inbox'">
         <span class="open-count border-right">{{ openCount }}</span>
         <span class="pending-count ml-2">{{ pendingCount }}</span>
       </span>
-      <refresh-icon :isActive="isActive"
-                    v-if="value === 'inbox'"/>
-      <!--badge
-        v-if="badge"
-        :color="badgeColor"
-        :value="badgeValue"
-        :closed="closed"
-      /-->
+        <refresh-icon :isActive="isActive"
+                      v-if="value === 'inbox'"/>
+        <!--badge
+          v-if="badge"
+          :color="badgeColor"
+          :value="badgeValue"
+          :closed="closed"
+        /-->
+      </div>
+    </a>
+    <div v-else
+         class="inbox-nav-item-group-header mx-2 px-1 text-uppercase">
+      {{ label }}
     </div>
-  </a>
+  </div>
 </template>
 
 <script>
@@ -89,10 +97,19 @@ export default {
     badgeColor: {
       type: String,
       default: 'default'
+    },
+    group: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
     onClick () {
+      if (this.disabled) { return }
       this.$emit('click', this.value)
     }
   }
@@ -103,6 +120,12 @@ export default {
 @import 'src/css/mixins.scss';
 @import 'src/css/variables.scss';
 @import 'src/css/breakpoints.scss';
+
+.inbox-nav-item-group-header {
+  padding: 10px 5px 10px 10px !important;
+  color: #666666;
+  letter-spacing: 1px;
+}
 
 .inbox-nav-item {
   @include border-radius(10px);
@@ -135,8 +158,6 @@ export default {
     display: flex;
     align-items: center;
     width: 100%;
-    padding-left: 0;
-    padding-right: 0;
     justify-content: center;
     padding-left: 5px;
     padding-right: 5px;

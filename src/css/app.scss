@@ -2814,18 +2814,7 @@ span.mention {
   }
 
   & .q-btn-dropdown__arrow {
-    font-size: 0;
-    border: solid #62666E;
-    border-width: 0 2px 2px 0;
-    display: inline-block;
-    padding: 2px;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-  }
-
-  & .q-btn-dropdown__arrow.rotate-180 {
-    transform: rotate(-135deg);
-    -webkit-transform: rotate(-135deg);
+    font-size: 16px;
   }
 
   & .availability-status {
@@ -3050,7 +3039,6 @@ span.mention {
     border-left: solid 1px $grey-light3;
     overflow: hidden;
     height: 100%;
-    overflow-y: auto;
 
     @include screen('lg') {
     }
@@ -4003,6 +3991,7 @@ span.mention {
   box-sizing: border-box;
   border: solid 1px $grey-light3;
   @include border-radius(10px);
+  overflow: hidden;
 }
 
 .mycard--shadow {
@@ -4591,7 +4580,7 @@ span.mention {
   min-height: 58px;
 }
 .datatable-wrapper {
-  height: calc(100vh - 198px);
+  height: calc(100vh - 180px);
 }
 
 .empty-state {
@@ -4611,7 +4600,7 @@ span.mention {
   position: relative;
   margin: auto;
   overflow: auto;
-  max-height: calc(100vh - 210px);
+  max-height: calc(100vh - 180px);
 }
 
 div.tableResizer {

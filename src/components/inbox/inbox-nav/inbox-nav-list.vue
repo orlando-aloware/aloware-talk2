@@ -6,6 +6,8 @@
       :label="item.label"
       :value="item.value"
       :icon="item.icon"
+      :group="item.group"
+      :disabled="item.disabled"
       :isActive="active === item.value"
       :closed="closed"
       :badge="true"
@@ -36,32 +38,46 @@ export default {
         {
           label: 'Inbox',
           value: 'inbox',
-          icon: 'inbox'
+          icon: 'inbox',
+          disabled: false
+        },
+        {
+          label: 'Channels',
+          group: true,
+          value: '',
+          class: 'nav-list-group-title',
+          icon: '',
+          disabled: false
         },
         {
           label: 'Calls',
           value: 'calls',
-          icon: 'call'
+          icon: 'call',
+          disabled: false
         },
         {
           label: 'Messages',
           value: 'messages',
-          icon: 'message'
+          icon: 'message',
+          disabled: false
         },
         {
           label: 'Mentions',
           value: 'mentions',
-          icon: 'mention'
+          icon: 'mention',
+          disabled: true
         },
         {
           label: 'Voicemails',
           value: 'voicemails',
-          icon: 'voicemail'
+          icon: 'voicemail',
+          disabled: false
         },
         {
           label: 'Recordings',
           value: 'recordings',
-          icon: 'record'
+          icon: 'record',
+          disabled: false
         }
       ]
     }
