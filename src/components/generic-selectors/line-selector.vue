@@ -3,21 +3,23 @@
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
+            :class="[ prepend ? 'with-prepend' : '' ]"
+            class="generic-selector"
             v-model="campaignId"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
             option-label="name"
             input-debounce="0"
-            class="line-selector"
             use-input
             emit-value
             map-options
             outlined
             dense
             @filter="filterFn">
-    <template v-slot:prepend>
-      <span class="text-size-xs text-grey-80">From:</span>
+    <template v-slot:prepend
+              v-if="prepend">
+      <span class="text-size-xs text-grey-80">{{ prepend }}</span>
     </template>
 
     <template v-slot:no-option>
@@ -60,6 +62,11 @@ export default {
     disable: {
       type: Boolean,
       default: false,
+      required: false
+    },
+
+    prepend: {
+      type: String,
       required: false
     }
   },

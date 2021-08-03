@@ -6,8 +6,7 @@
     ]">
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
-              :height="'100%'"
-              v-if="!showUpgradeDialog">
+              :height="'100%'">
       <div class="h-100"
            :class="[ sidebarVisible ? 'sidebar-active' : '']">
         <q-header class="page-header bg-white text-black no-box-shadow"
@@ -70,30 +69,6 @@
                   v-if="authenticated && !isWidget && !loading">
       </app-footer>
     </q-layout>
-    <q-dialog v-model="showUpgradeDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-red text-white" style="width: 300px">
-        <q-card-section>
-          <div class="text-h6">Oops!</div>
-        </q-card-section>
-
-        <q-card-section>
-          It looks like that you are using an outdated version of the app,
-          please download and install the new version to continue using it.
-        </q-card-section>
-
-        <q-card-actions align="right"
-                        class="bg-white text-danger">
-          <q-btn type="a"
-                 label="Visit Website"
-                 @click="openApps"
-                 flat>
-          </q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
     <q-dialog v-model="showNewVersionDialog"
               transition-show="scale"
               transition-hide="scale"
@@ -202,6 +177,7 @@ export default {
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
       loadingScripts: false,
+      loadingTemplates: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -209,7 +185,6 @@ export default {
       push: null,
       minVersion: null,
       version: null,
-      showUpgradeDialog: false,
       showNewVersionDialog: false,
       showUpdateDownloadedDialog: false,
       showUpdateErrorDialog: false,
@@ -729,10 +704,12 @@ export default {
           .then((res) => {
             this.setUsers(res.data)
             this.loadingUsers = false
+            return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingUsers = false
+            return Promise.reject()
           })
       }
     },
@@ -780,9 +757,11 @@ export default {
           res.data.data.forEach((workflow) => {
             this.newWorkflow(workflow)
           })
+          return Promise.resolve()
         }).catch(err => {
           this.loadingWorkflows = false
           console.log(err)
+          return Promise.reject()
         })
       }
     },
@@ -813,10 +792,12 @@ export default {
           .then((res) => {
             this.setCallDispositions(res.data)
             this.loadingCallDispositionStatuses = false
+            return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingCallDispositionStatuses = false
+            return Promise.reject()
           })
       }
     },
@@ -828,11 +809,30 @@ export default {
           .then((res) => {
             this.setScripts(res.data)
             this.loadingScripts = false
+            return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingScripts = false
+            return Promise.reject()
           })
+      }
+    },
+
+    getTemplates () {
+      if (this.hasPermissionTo('list sms template')) {
+        this.loadingTemplates = true
+        return this.$axios.get('/api/v1/sms-template', {
+          mode: 'no-cors'
+        }).then(res => {
+          this.loadingTemplates = false
+          this.setTemplates(res.data)
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingTemplates = false
+          return Promise.reject()
+        })
       }
     },
 
@@ -858,6 +858,7 @@ export default {
         let getDispositionStatuses = this.getDispositionStatuses()
         let getCallDispositions = this.getCallDispositions()
         let getScripts = this.getScripts()
+        let getTemplates = this.getTemplates()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -867,26 +868,10 @@ export default {
           getWorkflows,
           getDispositionStatuses,
           getCallDispositions,
-          getScripts
+          getScripts,
+          getTemplates
         ])
       }
-    },
-
-    openApps () {
-      if (this.$q.platform.is.android) {
-        window.open(
-          'https://play.google.com/store/apps/details?id=com.aloware.talk',
-          '_system'
-        )
-      } else if (this.$q.platform.is.ios) {
-        window.open(
-          'https://apps.apple.com/us/app/aloware-talk-business-phone/id1479253481',
-          '_system'
-        )
-      } else {
-        window.open('https://aloware.com/apps', '_system')
-      }
-      return false
     },
 
     sendCall (phoneNumber) {
@@ -1286,6 +1271,7 @@ export default {
       'setDispositionStatuses',
       'setCallDispositions',
       'setScripts',
+      'setTemplates',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',

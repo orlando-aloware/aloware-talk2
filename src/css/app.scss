@@ -3287,7 +3287,7 @@ span.mention {
   }
 }
 
-.line-selector {
+.generic-selector {
   margin-bottom: 0;
   height: 32px !important;
   font-size: $f-size-body-xs !important;
@@ -3309,7 +3309,14 @@ span.mention {
   }
 
   .q-field__native {
-    padding-left: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  &.with-prepend {
+    .q-field__native {
+      padding-left: 0 !important;
+    }
   }
 
   .q-field__control-container {
