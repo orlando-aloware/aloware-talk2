@@ -747,6 +747,7 @@ body,
       border-radius: 6px;
       max-width: 240px !important;
       min-height: 32px !important;
+      margin: 2px 0;
 
       .q-item__label--header {
         padding: 4px !important;
@@ -3110,6 +3111,10 @@ span.mention {
   font-size: $f-size-body-xs;
 }
 
+.task-item.active {
+  background: $grey-50;
+}
+
 .task-item {
   .contact-name {
     @include font-size(14px, 500);
@@ -3281,7 +3286,7 @@ span.mention {
   }
 }
 
-.line-selector {
+.generic-selector {
   margin-bottom: 0;
   height: 32px !important;
   font-size: $f-size-body-xs !important;
@@ -3303,7 +3308,14 @@ span.mention {
   }
 
   .q-field__native {
-    padding-left: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  &.with-prepend {
+    .q-field__native {
+      padding-left: 0 !important;
+    }
   }
 
   .q-field__control-container {

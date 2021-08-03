@@ -1,6 +1,6 @@
 <template>
-  <div class="task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom mb-1"
-       @click="setContact(communication.contact.id)">
+  <div :class="`task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
+       @click="onItemClick(communication)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
       <avatar width="34"
@@ -97,7 +97,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
-
+    ...mapState('inbox', ['selectedCommunication']),
     contactName () {
       if (this.communication && this.communication.contact) {
         return this.communication.contact.name || this.$options.filters.fixPhone(this.communication.lead_number)
@@ -120,12 +120,20 @@ export default {
         return this.campaigns[index].name
       }
       return '-'
+    },
+    activeClass () {
+      return this.communication.id === this.selectedCommunication.id ? 'active' : ''
     }
   },
 
   methods: {
+    ...mapActions('inbox', ['setCommunication']),
     setContact (id) {
       this.setContactId(id)
+    },
+    onItemClick (communication) {
+      this.setContact(communication.contact.id)
+      this.setCommunication(communication)
     },
 
     ...mapActions('inbox', ['setContactId'])

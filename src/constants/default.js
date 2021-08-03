@@ -9,6 +9,7 @@ export const DEFAULT_STATE = {
   dispositionStatuses: [],
   callDispositions: [],
   scripts: [],
+  templates: [],
   broadcasts: [],
   filters: [],
   firstLogin: false,

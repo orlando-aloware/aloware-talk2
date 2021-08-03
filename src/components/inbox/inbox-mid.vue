@@ -5,6 +5,24 @@
                         :communications="filteredCommunications"
                         :campaignId="selectedCampaignId"
                         v-if="selectedContactId !== null">
+      <template v-slot:moreActivities>
+        <q-btn outline
+               dense
+               rounded
+               no-caps
+               class="prev-activities mx-2"
+               color="primary"
+               size="md"
+               :isLoadingMore="isLoadingMore"
+               :loading="isLoadingPreviousActivities"
+               :disable="isLoadingPreviousActivities"
+               v-if="hasMoreCommunications"
+               @click="loadMorePreviousActivities">
+          <div class="px-2">
+            Previous Activities
+          </div>
+        </q-btn>
+      </template>
     </contact-activities>
   </div>
 </template>

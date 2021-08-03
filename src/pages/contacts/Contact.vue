@@ -33,7 +33,7 @@
       <div class="px-0 width-330 pt-2">
         <contact-details></contact-details>
       </div>
-      <contact-save-bar></contact-save-bar>
+      <contact-save-bar v-if="!changingSelectedContact"></contact-save-bar>
     </div>
     <template #overlay>
       <div class="text-center">

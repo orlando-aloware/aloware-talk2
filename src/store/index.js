@@ -38,6 +38,7 @@ export default function (/* { ssrContext } */) {
       dispositionStatuses: [],
       callDispositions: [],
       scripts: [],
+      templates: [],
       broadcasts: [],
       filters: [],
       firstLogin: false,
@@ -229,6 +230,10 @@ export default function (/* { ssrContext } */) {
 
       setScripts ({ commit }, scripts) {
         commit('SET_SCRIPTS', scripts)
+      },
+
+      setTemplates ({ commit }, templates) {
+        commit('SET_TEMPLATES', templates)
       },
 
       newTag ({ commit }, tag) {
@@ -573,6 +578,10 @@ export default function (/* { ssrContext } */) {
 
       SET_SCRIPTS (state, scripts) {
         state.scripts = scripts
+      },
+
+      SET_TEMPLATES (state, templates) {
+        state.templates = templates
       },
 
       NEW_FILTER (state, filter) {
