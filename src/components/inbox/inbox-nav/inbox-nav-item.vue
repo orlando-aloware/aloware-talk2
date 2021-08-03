@@ -57,10 +57,13 @@ import Icon from './inbox-nav-icon.vue'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
+  name: 'inbox-nav-item',
+
   components: {
     RefreshIcon,
     Icon
   },
+
   props: {
     label: {
       type: String,
@@ -107,9 +110,12 @@ export default {
       default: false
     }
   },
+
   methods: {
     onClick () {
-      if (this.disabled) { return }
+      if (this.disabled) {
+        return
+      }
       this.$emit('click', this.value)
     }
   }
@@ -188,6 +194,7 @@ export default {
       }
     }
   }
+
   .count-label {
     font-size: 13px;
     line-height: 16px;
@@ -195,9 +202,11 @@ export default {
     letter-spacing: 8px;
     color: $grey-30;
   }
+
   .open-count {
     color: $grey-20;
   }
+
   .pending-count {
     font-weight: 500;
   }

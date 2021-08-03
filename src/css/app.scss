@@ -507,6 +507,14 @@ body,
   height: 100%;
   background-color: $dark;
 
+  .app-logo {
+    -webkit-appearance: none;
+
+    .q-btn__wrapper:before {
+      box-shadow: none;
+    }
+  }
+
   .nav-icons {
     width: 48px;
     height: 52px;
@@ -514,7 +522,7 @@ body,
 
     @extend .no-q-btn-focus;
 
-    & .q-icon {
+    .q-icon {
       width: auto;
       height: auto;
     }

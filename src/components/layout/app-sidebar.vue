@@ -5,7 +5,7 @@
              size="1.1rem"
              align="center"
              to="/"
-             class="w-100 p-2"
+             class="app-logo w-100 p-2"
              flat>
       </q-btn>
     </div>
