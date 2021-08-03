@@ -1,5 +1,6 @@
 <template>
   <router-link
+    class="tree-list-item"
     :to="'/contacts/list/' + id"
     v-slot="{ navigate, isExactActive }"
   >
@@ -334,71 +335,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../css/mixins';
-@import '../../css/variables';
-.folder {
-  line-height: 34px;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 100ms ease-in-out;
-  &__arrow {
-    margin-top: -5px;
-    margin-right: 5px;
-  }
-  &__icon {
-    margin-top: -5px;
-    margin-right: 5px;
-  }
-  &:hover,
-  &--moving,
-  &--active {
-    background-color: $light-green2;
-  }
-  &__name {
-    width: calc(100% - 54px);
-    display: flex;
-    align-items: center;
-    span {
-      display: inline-block;
-      font-size: 13px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 100%;
-    }
-  }
-  &__sub {
-    padding-left: 10px;
-  }
-  &__indent {
-    width: 10px;
-  }
-  &__option {
-    margin-top: -5px;
-    margin-left: 5px;
-  }
-  &__input {
-    font-size: 12px;
-    height: 100%;
-    width: 100%;
-    border: none;
-    border-radius: 0;
-    &:focus {
-      outline-color: $green;
-      -moz-outline-radius: 0;
-    }
-  }
-}
-.sublists {
-  &.is-root {
-    .folder__indent {
-      display: none;
-    }
-    .folder {
-      padding-right: 0;
-    }
-  }
-}
-</style>

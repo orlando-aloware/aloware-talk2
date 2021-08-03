@@ -20,12 +20,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-@import 'src/css/breakpoints.scss';
-.table-header {
-  min-height: 58px;
-}
-</style>

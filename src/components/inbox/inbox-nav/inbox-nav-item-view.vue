@@ -62,11 +62,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-.compressed {
-  max-width: 40px;
-}
-</style>

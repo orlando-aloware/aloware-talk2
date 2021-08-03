@@ -110,28 +110,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../css/variables';
-
-.templates-list-wrapper{
-  max-height: 250px;
-  overflow: auto;
-  padding-right: 5px;
-
-  .list-group-title{
-    color: $grey-90;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .action-links {
-    color: $green;
-    text-decoration: none;
-
-    svg {
-      margin-top: -2px;
-    }
-  }
-}
-</style>

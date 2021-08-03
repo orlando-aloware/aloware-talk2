@@ -34,25 +34,3 @@ export default {
   name: 'task-accept-btn.vue'
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-
-.task-accept-btn {
-  width: 60px;
-  height: 60px;
-  background-color: $green;
-  border: none;
-  @include border-radius(50%);
-  transition: background-color 100ms ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background-color: darken($green, 7%);
-    box-shadow: 0 3px 10px 0 rgba(0, 191, 74, 0.3);
-  }
-}
-</style>

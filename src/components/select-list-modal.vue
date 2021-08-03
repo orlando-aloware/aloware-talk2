@@ -55,6 +55,7 @@
         </div>
         <div class="tree-container">
           <select-list-tree-folder
+            class="select-list-tree-folder"
             v-for="folder in folders"
             :name="folder.name"
             :key="folder.id"
@@ -181,52 +182,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../css/mixins';
-@import '../css/variables';
-@import '../css/breakpoints';
-.select-list-modal {
-  .modal-lg {
-    @media (min-width: 992px) {
-      max-width: 550px;
-    }
-  }
-  .modal-body {
-    padding: 0;
-    min-height: 90vh;
-    max-height: 90vh;
-    overflow: hidden !important;
-  }
-  &__body {
-    padding: 40px;
-  }
-  &__title {
-    font-size: 18px;
-    font-weight: 400;
-    color: $black;
-  }
-  &__close {
-    margin-right: -15px;
-    margin-top: -30px;
-  }
-  &__list-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: $black;
-  }
-  &__list-desc {
-    font-size: 13px;
-    color: $grey-light5;
-  }
-
-  .tree-container {
-    max-height: 65vh;
-    overflow: auto;
-  }
-
-  .row.q-input .q-field__prepend + .q-field__control-container .q-field__native {
-    padding-left: 15px !important;
-  }
-}
-</style>

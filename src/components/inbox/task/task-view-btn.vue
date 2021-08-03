@@ -30,22 +30,3 @@ export default {
   name: 'task-view-btn.vue'
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-.task-view-btn {
-  border: 0;
-  background-color: transparent;
-  display: inline-flex;
-  align-items: center;
-  &__text {
-    padding-left: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.35px;
-    line-height: 19px;
-    color: $black;
-  }
-}
-</style>

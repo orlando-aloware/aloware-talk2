@@ -69,30 +69,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../css/mixins';
-@import '../css/variables';
-.compact-button {
-  height: 24px;
-  padding: 0;
-  line-height: 24px;
-  padding-left: 10px;
-  padding-right: 10px;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-}
-.btn-outlined-light {
-  border-color: $grey-light11;
-  color: $black;
-  &.with-border {
-    background-color: #EFF6FE;
-  }
-}
-.button-disabled {
-  background-color: #E0E0E0 !important;
-  border-color: #E0E0E0 !important;
-  color: #828282;
-}
-</style>

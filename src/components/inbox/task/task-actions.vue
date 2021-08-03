@@ -77,32 +77,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/breakpoints.scss';
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-
-.task-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &__container {
-    margin: auto;
-    display: grid;
-    grid-template-rows: 65px 65px 65px;
-    grid-template-columns: 65px 65px 65px 65px;
-
-    @include screen('md') {
-      grid-template-columns: 80px 80px 80px;
-      grid-template-rows: 80px 80px 80px 80px;
-    }
-
-    @include screen('lg') {
-      grid-template-rows: 80px 80px;
-      grid-template-columns: 80px 80px 80px 80px 80px 80px;
-    }
-  }
-}
-</style>

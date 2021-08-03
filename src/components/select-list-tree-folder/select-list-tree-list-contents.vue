@@ -1,6 +1,7 @@
 <template>
   <div class="sublists">
     <select-list-tree-list-item
+      class="select-list-tree-list-item"
       v-for="list in lists"
       :name="list.name"
       :key="list.id"

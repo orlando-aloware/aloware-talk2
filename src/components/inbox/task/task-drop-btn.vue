@@ -15,19 +15,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-.task-drop-btn {
-  width: 60px;
-  height: 60px;
-  border: none;
-  @include border-radius(50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  &:hover {
-    box-shadow: 0 3px 10px 0 rgba(250,0,63,0.3);
-  }
-}
 </style>

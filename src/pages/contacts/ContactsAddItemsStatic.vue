@@ -249,27 +249,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-@import 'src/css/breakpoints.scss';
-
-.title-icon {
-  padding-left: 5px;
-  padding-right: 5px;
-  svg {
-    path {
-      stroke: $dark;
-    }
-  }
-}
-
-.selected-contacts {
-  font-size: 11px;
-}
-
-.action-desc {
-  padding-left: 20px;
-}
-</style>

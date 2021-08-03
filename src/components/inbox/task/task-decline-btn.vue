@@ -30,23 +30,3 @@ export default {
   name: 'task-decline-btn.vue'
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-.task-decline-btn {
-  width: 60px;
-  height: 60px;
-  background-color: $red;
-  border: none;
-  @include border-radius(50%);
-  transition: background-color 100ms ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  &:hover {
-    background-color: darken($red, 7%);
-    box-shadow: 0 3px 10px 0 rgba(250,0,63,0.3);
-  }
-}
-</style>

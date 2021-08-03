@@ -59,10 +59,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../css/variables';
-.relative-time {
-  color: $grey-mid
-}
-</style>

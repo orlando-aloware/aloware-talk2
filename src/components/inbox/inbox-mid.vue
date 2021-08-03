@@ -69,32 +69,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-@import 'src/css/breakpoints.scss';
-
-.inbox-mid {
-  background-color: $white;
-  border: solid 1px $grey-light3;
-  display: none;
-  position: relative;
-  overflow: hidden;
-  flex-grow: 1;
-
-  &--show {
-    @include screen-max('sm') {
-      position: absolute;
-      display: flex;
-      z-index: 1000;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  @include screen('md') {
-    display: flex;
-  }
-}
-</style>

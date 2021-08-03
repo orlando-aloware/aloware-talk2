@@ -50,15 +50,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../css/mixins';
-@import '../../css/variables';
-@import '../../css/breakpoints';
-.table-header {
-  min-height: 58px;
-}
-.datatable-wrapper {
-  height: calc(100vh - 198px);
-}
-</style>

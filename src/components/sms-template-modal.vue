@@ -210,33 +210,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.time-picker-column::-webkit-scrollbar {
-  display: block;
-}
-
-.appointment-form {
-  font-size: 12px;
-
-  .form-title {
-    font-size: 11px;
-  }
-  .sms-reminder-template-variables {
-    cursor: pointer;
-  }
-
-  .sms-reminder-template-variables:hover {
-    color: #C4183C !important;
-  }
-
-  .checkbox-wrapper .custom-control-label {
-    padding-top: 3px;
-  }
-
-  span.sms-reminder-label {
-    display: block;
-    margin-top: 4px;
-  }
-}
-</style>

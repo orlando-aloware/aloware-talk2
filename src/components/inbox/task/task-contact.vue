@@ -25,36 +25,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-.task-contact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  &__name {
-    color: $black;
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    line-height: 26px;
-    margin-bottom: 5px;
-  }
-  &__number {
-    color: $grey-dark;
-    font-size: 16px;
-    letter-spacing: 0;
-    line-height: 21px;
-  }
-
-  &__time {
-    color: $black;
-    font-size: 16px;
-    letter-spacing: 0;
-    line-height: 21px;
-    padding-top: 20px;
-  }
-}
-</style>

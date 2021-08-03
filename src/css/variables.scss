@@ -85,6 +85,9 @@ $grey-20: #6F6F6F;
 $grey-10: #828282;
 $grey-9: #767C89;
 
+// Red
+$red-100: #EB5757;
+
 // Primary colors
 $primary: #256eff;
 $secondary: $grey-60;
@@ -119,9 +122,13 @@ $primary-hover: #054CDB;
 @include text-color('grey-30', $grey-30);
 @include text-color('grey-20', $grey-20);
 @include text-color('grey-10', $grey-20);
+@include text-color('red-100', $red-100, true);
 
 // Background Colors
+@include bg-color('grey-50', $grey-50, true);
 @include bg-color('grey-9', $grey-9, true);
+@include bg-color('red-100', $red-100, true);
+@include bg-color('blue', $primary, true);
 
 .bg-primary {
   background: $primary !important;
@@ -348,3 +355,5 @@ $red-100: #C4183C;
 $f-size-12: 12px;
 $f-size-13: 13px;
 $f-size-14: 14px;
+
+@include bg-color('grey-light11', $grey-light11, true);

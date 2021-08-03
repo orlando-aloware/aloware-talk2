@@ -23,22 +23,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../../css/mixins';
-@import '../../css/variables';
-.contact-menu {
-  width: 200px;
-  padding-top: 5px;
-  &__title {
-    padding-left: 2px;
-    padding-right: 2px;
-    &__inner {
-      height: 34px;
-      font-weight: bold;
-      line-height: 14px;
-      font-size: 12px;
-    }
-  }
-}
-</style>

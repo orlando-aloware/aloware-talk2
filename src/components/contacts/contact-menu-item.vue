@@ -32,24 +32,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../../css/mixins';
-@import '../../css/variables';
-.contact-menu-item {
-  height: 31px;
-  cursor: pointer;
-  transition: background-color 100ms ease-in-out;
-  &__title {
-    line-height: 14px;
-    font-size: 12px;
-    font-weight: 400;
-  }
-  &__icon {
-    margin-top: -2px;
-  }
-  &:hover {
-    background-color: $light-green2;
-  }
-}
-</style>

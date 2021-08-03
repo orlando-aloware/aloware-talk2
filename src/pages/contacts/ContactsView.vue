@@ -400,6 +400,7 @@ export default {
       this.resetFilters()
       this.initialListFilters = this.currentListFilters
       this.filtersCount = this.getFiltersCount(this.currentListFilters)
+      this.myContacts = false
     },
     currentListFilters: {
       deep: true,
@@ -410,30 +411,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import 'src/css/mixins.scss';
-@import 'src/css/variables.scss';
-@import 'src/css/breakpoints.scss';
-.start-state {
-  align-items: center;
-  background: $white;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  justify-content: flex-start;
-  left: 0;
-  padding-top: 36px;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 0;
-}
-.disabledButton {
-  & .btn:not(.dropdown-toggle-split) {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-}
-</style>

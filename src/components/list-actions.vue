@@ -1,5 +1,5 @@
 <template>
-  <contact-menu>
+  <contact-menu class="list-actions">
     <contact-menu-item @click="$emit('rename')" v-if="hasEdit">
       <template slot="icon">
         <pencil-icon></pencil-icon>
@@ -106,42 +106,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../css/mixins';
-@import '../css/variables';
-.folder {
-  padding-left: 10px;
-  padding-right: 10px;
-  line-height: 34px;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 100ms ease-in-out;
-  &__arrow {
-    margin-top: -5px;
-    margin-right: 5px;
-  }
-  &__icon {
-    margin-top: -5px;
-    margin-right: 5px;
-  }
-  &:hover {
-    background-color: $light-green2;
-  }
-  &__name {
-    font-size: 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  &__sub {
-    padding-left: 10px;
-  }
-  &__indent {
-    width: 10px;
-  }
-  &__option {
-    margin-top: -5px;
-  }
-}
-</style>

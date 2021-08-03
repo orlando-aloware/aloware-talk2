@@ -140,32 +140,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../css/mixins';
-@import '../css/variables';
-.submenu {
-  &-icon {
-    svg {
-      path {
-        fill: $black;
-      }
-    }
-  }
-  &-items {
-    background: white;
-    width: 130px;
-  }
-}
-.folder-submenu-items {
-  background: white;
-  border-radius: 5px;
-  border: solid 1px $grey-light;
-  display: none;
-  flex-direction: column;
-  padding-bottom: 2px;
-  padding-top: 2px;
-  position: absolute;
-  width: 200px;
-}
-</style>

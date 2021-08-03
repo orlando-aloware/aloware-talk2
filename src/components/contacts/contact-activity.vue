@@ -1,7 +1,9 @@
 <template>
   <div class="message mb-3 pb-1 d-flex flex-row align-items-start"
+       v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) || (communication.property === undefined)"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
-    <div class="d-flex flex-row align-items-center position-relative">
+    <div class="d-flex flex-row align-items-center position-relative"
+         v-if="communication.property === undefined">
       <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
                rounded
                v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read">
@@ -82,7 +84,7 @@
     </div>
     <div class="clear d-flex flex-column"
          :class="[ communication.direction === CommunicationDirection.INBOUND ? 'align-items-start pl-1' : 'align-items-end text-right pr-1' ]"
-         v-else>
+         v-else-if="communication.property === undefined">
       <div class="item d-flex flex-column"
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
@@ -254,9 +256,9 @@
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
             </template>
 
-            <i class="material-icons help text-red-500"
+            <i class="material-icons help text-red-100"
                :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
-               v-else>error</i>
+               v-else>errors</i>
           </router-link>
         </template>
       </div>
@@ -375,15 +377,15 @@ export default {
 
     getCommunicationClass () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
-        return 'inbound dker'
+        return 'inbound dker bg-grey-50'
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && ![CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound blue-800 text-left'
+        return 'outbound bg-blue text-grey-50 text-left'
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound red-500 text-left'
+        return 'outbound bg-red-100 text-left'
       }
 
       return ''
@@ -683,10 +685,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import 'src/css/variables.scss';
-.bg-grey-light11 {
-  background: $grey-light11;
-}
-</style>

@@ -905,13 +905,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../css/variables';
-
-.communication-info {
-  .more-details {
-    color: $blue;
-  }
-}
-</style>

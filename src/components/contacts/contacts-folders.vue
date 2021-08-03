@@ -149,37 +149,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../css/mixins';
-@import '../../css/variables';
-.folders {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: calc(100vh - 410px);
-  padding-bottom: 5px;
-  &__header {
-    min-height: 40px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  &__content {
-    height: calc(100% - 40px);
-    overflow: auto;
-  }
-}
-.item {
-  cursor: pointer;
-  font-size: 13px;
-  line-height: 34px;
-  transition: background-color 100ms ease-in-out;
-}
-.item:hover {
-  background: $light-green2;
-}
-.contact-popover .popover-body {
-  padding: 0;
-}
-</style>

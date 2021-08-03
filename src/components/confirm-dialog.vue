@@ -37,34 +37,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../css/mixins';
-@import '../css/variables';
-@import '../css/breakpoints';
-.confirm-dialog {
-  .modal-title {
-    color: $dark;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  .modal-header {
-    background-color: $white;
-    border-radius: 0;
-    padding: 15px;
-    .close {
-      color: $dark;
-    }
-  }
-  .modal-content {
-    border-radius: 0;
-    border: none;
-    font-size: 14px;
-  }
-  .modal-footer {
-    .action-btn {
-      min-width: 120px;
-    }
-  }
-}
-</style>
