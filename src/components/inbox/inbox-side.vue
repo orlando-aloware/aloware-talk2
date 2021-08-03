@@ -255,7 +255,6 @@ export default {
             'answer_status': 'all'
           }
           this.communications = []
-          break
       }
 
       // Disable inbox as of the moment

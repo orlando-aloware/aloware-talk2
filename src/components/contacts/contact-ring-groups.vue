@@ -93,7 +93,9 @@ export default {
       return talk2Api.V1.ringGroups.get()
         .then(response => {
           this.setRingGroups(response.data)
-          this.getContactRingGroups()
+          if (this.contact && this.contact.id) {
+            this.getContactRingGroups()
+          }
         })
     },
 

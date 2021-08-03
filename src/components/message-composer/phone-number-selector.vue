@@ -32,11 +32,15 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'phone-number-selector',
   computed: {
-    ...mapGetters('contacts', ['contactPhoneNumbers', 'contact', 'messageComposer'])
+    ...mapGetters('contacts', ['contactPhoneNumbers', 'contact', 'messageComposer']),
+    contactAndPhoneNumbers () {
+      return this.contact && this.contactPhoneNumbers
+    }
   },
   data () {
     return {
-      selectedPhone: {}
+      selectedPhone: {},
+      isFocused: false
     }
   },
   methods: {
@@ -45,7 +49,6 @@ export default {
       let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.$options.filters.fixPhone(this.selectedPhone.phone_number)}</span> ${titleText}`
     },
-
     getOptionLabel (phone) {
       let title = (phone.phone_number === this.contact.phone_number) ? 'Primary' : phone.title
       let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
@@ -81,7 +84,7 @@ export default {
     this.setPhone(this.contact.phone_number)
   },
   watch: {
-    'contact': function () {
+    'contactAndPhoneNumbers': function () {
       let phone = this.getPhoneObject(this.contact.phone_number)
       if (phone) {
         this.selectedPhone = phone

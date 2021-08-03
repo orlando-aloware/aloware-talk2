@@ -748,6 +748,7 @@ body,
       border-radius: 6px;
       max-width: 240px !important;
       min-height: 32px !important;
+      margin: 2px 0;
 
       .q-item__label--header {
         padding: 4px !important;
@@ -3109,6 +3110,10 @@ span.mention {
 
 .form-control-search::-webkit-input-placeholder {
   font-size: $f-size-body-xs;
+}
+
+.task-item.active {
+  background: $grey-50;
 }
 
 .task-item {
