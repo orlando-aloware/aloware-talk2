@@ -1,11 +1,11 @@
 <template>
-  <q-select :options="campaignOptions"
+  <q-select :options="scriptsOptions"
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '' ]"
             class="generic-selector"
-            v-model="campaignId"
+            v-model="scriptId"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -34,7 +34,7 @@
       <q-item v-bind="scope.itemProps"
               v-on="scope.itemEvents">
         <q-item-section>
-          <q-item-label v-html="scope.opt.name"/>
+          <q-item-label v-html="scope.opt.title"/>
         </q-item-section>
       </q-item>
     </template>
@@ -46,7 +46,7 @@ import { mapState } from 'vuex'
 import _ from 'lodash'
 
 export default {
-  name: 'line-selector',
+  name: 'script-selector',
 
   props: {
     value: {
@@ -73,52 +73,34 @@ export default {
 
   data () {
     return {
-      campaignId: this.value,
-      campaignOptions: []
+      scriptId: this.value,
+      scriptsOptions: []
     }
   },
 
   computed: {
-    ...mapState(['currentCompany', 'campaigns']),
+    ...mapState(['currentCompany', 'scripts']),
 
     placeholder () {
-      if (this.campaignId) {
+      if (this.scriptId) {
         return ''
       }
 
       if (this.multiple) {
-        return 'Select lines'
+        return 'Select scripts'
       }
 
-      return 'Select a line'
+      return 'Select a script'
     },
 
-    campaignsAlphabeticalOrder () {
-      if (this.campaigns) {
-        let campaigns = _.clone(this.campaigns)
-        return campaigns.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+    scriptsAlphabeticalOrder () {
+      if (this.scripts) {
+        let scripts = _.clone(this.scripts)
+        return scripts.sort((a, b) => {
+          let textA = a.title.toUpperCase()
+          let textB = b.title.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
-      }
-
-      return []
-    },
-
-    activeCampaignsAlphabeticalOrder () {
-      if (this.campaignsAlphabeticalOrder.length) {
-        let campaigns = _.clone(this.campaignsAlphabeticalOrder)
-        return campaigns.filter(campaign => campaign.active === true)
-      }
-
-      return []
-    },
-
-    pausedCampaignsAlphabeticalOrder () {
-      if (this.campaignsAlphabeticalOrder.length) {
-        let campaigns = _.clone(this.campaignsAlphabeticalOrder)
-        return campaigns.filter(campaign => campaign.active === false)
       }
 
       return []
@@ -126,39 +108,39 @@ export default {
   },
 
   created () {
-    this.campaignOptions = this.campaignsAlphabeticalOrder
+    this.scriptsOptions = this.scriptsAlphabeticalOrder
   },
 
   methods: {
     filterFn (val, update) {
-      if (this.campaignId && val === this.campaignId) {
+      if (this.scriptId && val === this.scriptId) {
         update(() => {
-          this.campaignOptions = this.campaignsAlphabeticalOrder.filter(campaign => campaign.id === this.campaignId)
+          this.scriptsOptions = this.scriptsAlphabeticalOrder.filter(script => script.id === this.scriptId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.campaignOptions = this.campaignsAlphabeticalOrder
+          this.scriptsOptions = this.scriptsAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.campaignOptions = this.campaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
+        this.scriptsOptions = this.scriptsAlphabeticalOrder.filter(script => script.title.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
 
   watch: {
     value () {
-      this.campaignId = this.value
+      this.scriptId = this.value
     },
 
-    campaignId (val) {
-      if (this.value !== undefined && this.campaignId !== this.value) {
+    scriptId (val) {
+      if (this.value !== undefined && this.scriptId !== this.value) {
         this.$emit('change', val)
       }
     }

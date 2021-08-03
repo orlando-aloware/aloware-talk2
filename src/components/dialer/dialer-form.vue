@@ -125,6 +125,7 @@
                         :state="validCampaign"
                         class="mb-1">
             <line-selector v-model="campaignId"
+                           prepend="From:"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>
