@@ -23,6 +23,7 @@ export default {
   box-sizing: border-box;
   border: solid 1px $grey-light3;
   @include border-radius(10px);
+  overflow: hidden;
 }
 .mycard--shadow {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1);

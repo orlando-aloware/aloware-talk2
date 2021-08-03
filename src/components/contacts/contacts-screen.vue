@@ -59,6 +59,6 @@ export default {
   min-height: 58px;
 }
 .datatable-wrapper {
-  height: calc(100vh - 198px);
+  height: calc(100vh - 180px);
 }
 </style>
