@@ -2823,18 +2823,7 @@ span.mention {
   }
 
   & .q-btn-dropdown__arrow {
-    font-size: 0;
-    border: solid #62666E;
-    border-width: 0 2px 2px 0;
-    display: inline-block;
-    padding: 2px;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-  }
-
-  & .q-btn-dropdown__arrow.rotate-180 {
-    transform: rotate(-135deg);
-    -webkit-transform: rotate(-135deg);
+    font-size: 16px;
   }
 
   & .availability-status {
