@@ -86,13 +86,14 @@
           </q-card-section>
         </q-card>
       </q-card-section>
-      <q-card-section>
+      <q-card-section
+        v-if="integration_data.properties.email">
         <b-row>
-          <b-button class="text-white btn-block"
+          <b-button id="btn-workflow-enroll"
+                    class="text-white btn-block"
                     size="sm"
                     variant="primary"
-                    tabindex="0"
-                    id="btn-workflow-enroll">
+                    tabindex="0">
             <i class="fa fa-user-plus"></i>
             Enroll to Workflow
           </b-button>
@@ -108,7 +109,6 @@
                 size="sm"
                 variant="primary"
                 :disabled="isEnrolling || !isWorkflowValid"
-                v-if="integration_data.properties.email"
                 @click.prevent="enrollToWorkflow">
         <q-spinner-bars v-if="isEnrolling"
                         color="white">
