@@ -328,12 +328,13 @@
               </tags-icon>
               <span>Tags</span>
             </button>
-            <button class="phone-buttons elevated btn"
-                    @click="openScripts">
-              <scripts-icon width="16"
-                            height="16">
-              </scripts-icon>
-              <span>Scripts</span>
+            <button :disabled="isVmDropDisabled"
+                    class="phone-buttons elevated btn"
+                    @click="openVmDrop">
+              <vm-drop-icon width="18"
+                            height="18">
+              </vm-drop-icon>
+              <span>VM Drop</span>
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
@@ -428,14 +429,44 @@
               Call Disposition
             </label>
             <div class="d-flex flex-row align-items-center w-100">
-              <call-disposition-selector :communication="dialer.communication"></call-disposition-selector>
+              <call-disposition-wrapper :communication="dialer.communication"
+                                        class="w-100">
+              </call-disposition-wrapper>
             </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Contact Disposition
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <contact-disposition-wrapper :contact="dialer.contact"
+                                           class="w-100">
+              </contact-disposition-wrapper>
+            </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Send Message
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <div class="d-flex flex-grow-1">
+                <template-selector class="w-100"
+                                   v-model="templateId"
+                                   @change="changeTemplate">
+                </template-selector>
+              </div>
+              <div class="d-flex flex-shrink-0 ml-2">
+                <b-button :loading="loadingSendMessage"
+                          :disabled="loadingSendMessage || !template"
+                          variant="primary"
+                          size="sm"
+                          @click="sendMessage">
+                  <span>Send</span>
+                </b-button>
+              </div>
+            </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
@@ -513,21 +544,21 @@
       </template>
     </div>
     <div class="phone-footer-buttons p-2"
-         v-if="isCallCompleted">
+         v-if="isCallCompleted && !devMode">
       <b-button variant="outline-dark"
-                @click="endWrapUp">
-        <span>Back</span>
-        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }})</span>
-      </b-button>
-
-      <b-button variant="primary"
                 @click="makeCall">
         <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
         <span class="ml-1">Call Back</span>
       </b-button>
+
+      <b-button variant="primary"
+                @click="endWrapUp">
+        <span>Finish</span>
+        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
+      </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
-         v-if="!isCallCompleted && dialer.contact && expansionEnabled">
+         v-if="(devMode || !isCallCompleted) && dialer.contact && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         header-class="text-sm bg-white text-center"
@@ -682,7 +713,18 @@
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'scripts'">
-            <q-card-section class="height-445">
+            <q-card-section class="height-445 overflow-hidden-y">
+              <div class="d-flex flex-column justify-content-start w-100 mt-3 pl-3 pr-3">
+                <script-selector :communication="dialer.communication"
+                                 v-model="scriptId"
+                                 class="w-100"
+                                 @change="changeScript">
+                </script-selector>
+              </div>
+              <div class="d-flex flex-column justify-content-start w-100 mt-2 pl-3 pr-3 height-410 overflow-auto"
+                   v-if="script"
+                   v-html="script.text">
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'add'">
@@ -700,13 +742,25 @@
           <template v-if="bottomExpansion === 'more'">
             <q-card-section class="height-140">
               <div class="d-flex justify-content-start w-100 mt-3 pl-3 pr-3">
-                <button :disabled="isVmDropDisabled"
-                        class="phone-buttons btn"
-                        @click="openVmDrop">
-                  <vm-drop-icon width="18"
+                <button class="phone-buttons btn"
+                        @click="openScripts">
+                  <scripts-icon width="18"
                                 height="18">
-                  </vm-drop-icon>
-                  <span>VM Drop</span>
+                  </scripts-icon>
+                  <span>Scripts</span>
+                </button>
+                <button class="phone-buttons btn">
+                  <park-call-icon width="18"
+                                  height="18">
+                  </park-call-icon>
+                  <span>Park Call</span>
+                </button>
+                <button class="phone-buttons btn"
+                        @click="openContact">
+                  <contact-icon width="18"
+                                height="18">
+                  </contact-icon>
+                  <span>Contact</span>
                 </button>
                 <button class="phone-buttons btn"
                         @click="openIntegrations">
@@ -750,21 +804,31 @@ import ContactTags from 'components/contacts/contact-tags'
 import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
 import CommunicationAudio from 'components/communication-audio'
+import CommunicationNote from 'components/communication-note'
+import CommunicationTags from 'components/communication-tags'
+import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
+import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
+import TemplateSelector from 'components/generic-selectors/template-selector'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ContactIcon from 'components/icons/contact-icon'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/communication-tags'
-import CallDispositionSelector from 'components/call-disposition-selector'
+import ScriptSelector from 'components/generic-selectors/script-selector'
 
 export default {
   name: 'phone',
 
   components: {
-    CallDispositionSelector,
+    ScriptSelector,
+    ContactIcon,
+    ParkCallIcon,
+    TemplateSelector,
+    ContactDispositionWrapper,
+    CallDispositionWrapper,
     CommunicationTags,
     CommunicationNote,
     CommunicationAudio,
@@ -845,6 +909,12 @@ export default {
       bottomExpansion: 'integrations',
       expansionEnabled: true,
       digits: '',
+      templateId: null,
+      template: null,
+      scriptId: null,
+      script: null,
+      loadingSendMessage: false,
+      devMode: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1053,7 +1123,6 @@ export default {
 
     hangupCall () {
       this.$VueEvent.fire('hangupCall')
-      this.screen = 'menu'
     },
 
     answerCall () {
@@ -1077,62 +1146,84 @@ export default {
     openDialpad () {
       this.expansionEnabled = true
       this.bottomExpansion = 'dialpad'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openNotes () {
       this.expansionEnabled = true
       this.bottomExpansion = 'notes'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openTags () {
       this.expansionEnabled = true
       this.bottomExpansion = 'tags'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openScripts () {
       this.expansionEnabled = true
       this.bottomExpansion = 'scripts'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openAdd () {
       this.expansionEnabled = true
       this.bottomExpansion = 'add'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openTransfer () {
       this.expansionEnabled = true
       this.bottomExpansion = 'transfer'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openMore () {
       this.expansionEnabled = true
       this.bottomExpansion = 'more'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openVmDrop () {
       this.expansionEnabled = true
       this.bottomExpansion = 'vm-drop'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openIntegrations () {
       this.expansionEnabled = true
       this.bottomExpansion = 'integrations'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
+    },
+
+    openContact ($event) {
+      this.saveAndResetExpansion($event)
+      this.goToContact()
     },
 
     saveAndResetExpansion ($event) {
       $event.stopPropagation()
       $event.preventDefault()
       this.expansionEnabled = false
-      this.bottomExpansion = 'integrations'
       this.expanded = false
     },
 
@@ -1309,6 +1400,46 @@ export default {
       this.expansionEnabled = true
     },
 
+    changeTemplate (template) {
+      if (template) {
+        this.templateId = template.id
+      }
+      this.template = template
+    },
+
+    changeScript (script) {
+      if (script) {
+        this.scriptId = script.id
+      }
+      this.script = script
+    },
+
+    sendMessage () {
+      if (!this.dialer.communication) {
+        return
+      }
+
+      this.loadingSendMessage = true
+      this.$axios.post('/api/v1/campaign/send-message/' + this.dialer.communication.campaign_id + '/' + this.dialer.communication.contact_id, {
+        message: this.template.body,
+        phone_number: this.dialer.communication.lead_number
+      }).then(res => {
+        this.template = null
+        this.templateId = null
+        this.loadingSendMessage = false
+        this.$q.notify({
+          offset: 95,
+          title: 'Phone',
+          message: 'Message sent',
+          type: 'success',
+          showClose: true
+        })
+      }).catch(err => {
+        this.loadingSendMessage = false
+        console.log(err)
+      })
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -1334,7 +1465,7 @@ export default {
           return
         }
 
-        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
+        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
           this.screen = 'menu'
         }
       },

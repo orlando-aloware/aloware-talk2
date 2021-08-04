@@ -87,7 +87,7 @@
         </b-dropdown-->
         <compact-btn
           variant="primary"
-          :disabled="!filterHasChanges"
+          :disabled="!filterHasChanges || this.defaultIds.includes(this.id)"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList"
         >
@@ -164,8 +164,7 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters :listFilters="list.filters"
-                        @filtersUpdated="updateFilterHasChanges"
+      <contacts-filters @filtersUpdated="updateFilterHasChanges"
                         @filtersCount="updateFiltersCount"/>
     </template>
     <template slot="footer">
@@ -224,7 +223,8 @@ export default {
       'setSelectedList',
       'createListOpen',
       'setCurrentListFilters',
-      'removeListOpen'
+      'removeListOpen',
+      'resetSearch'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -327,14 +327,12 @@ export default {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
     updateFilterHasChanges () {
-      if (!this.defaultIds.includes(this.id)) {
-        this.filterHasChanges = this.hasFilterChanges()
-      } else {
-        this.filterHasChanges = false
-      }
+      this.filterHasChanges = this.hasFilterChanges()
     },
     resetFilters () {
-      this.setCurrentListFilters(this.initialListFilters)
+      const defaultFilters = this.fixDefaultFilters()
+      this.setCurrentListFilters(defaultFilters)
+      this.resetSearch()
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     }
@@ -399,13 +397,13 @@ export default {
     '$route.params.id': function () {
       this.resetFilters()
       this.initialListFilters = this.currentListFilters
-      this.filtersCount = this.getFiltersCount(this.currentListFilters)
       this.myContacts = false
     },
     currentListFilters: {
       deep: true,
       handler: function () {
         this.fetch(this.currentListFilters)
+        this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }
     }
   }

@@ -178,6 +178,7 @@ export default {
       loadingCallDispositionStatuses: false,
       loadingScripts: false,
       loadingTemplates: false,
+      loadingBroadcasts: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -802,23 +803,6 @@ export default {
       }
     },
 
-    getScripts () {
-      if (this.hasPermissionTo('list script')) {
-        this.loadingScripts = true
-        return this.$axios.get('/api/v1/script')
-          .then((res) => {
-            this.setScripts(res.data)
-            this.loadingScripts = false
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingScripts = false
-            return Promise.reject()
-          })
-      }
-    },
-
     getTemplates () {
       if (this.hasPermissionTo('list sms template')) {
         this.loadingTemplates = true
@@ -831,6 +815,23 @@ export default {
         }).catch(err => {
           console.log(err)
           this.loadingTemplates = false
+          return Promise.reject()
+        })
+      }
+    },
+
+    getBroadcasts () {
+      if (this.hasPermissionTo('list broadcast')) {
+        this.loadingBroadcasts = true
+        return this.$axios.get('/api/v1/broadcasts', {
+          mode: 'no-cors'
+        }).then(res => {
+          this.loadingBroadcasts = false
+          this.setBroadcasts(res.data)
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingBroadcasts = false
           return Promise.reject()
         })
       }
@@ -857,8 +858,8 @@ export default {
         let getWorkflows = this.getWorkflows()
         let getDispositionStatuses = this.getDispositionStatuses()
         let getCallDispositions = this.getCallDispositions()
-        let getScripts = this.getScripts()
         let getTemplates = this.getTemplates()
+        let getBroadcasts = this.getBroadcasts()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -868,8 +869,8 @@ export default {
           getWorkflows,
           getDispositionStatuses,
           getCallDispositions,
-          getScripts,
-          getTemplates
+          getTemplates,
+          getBroadcasts
         ])
       }
     },
@@ -1270,8 +1271,8 @@ export default {
       'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
-      'setScripts',
       'setTemplates',
+      'setBroadcasts',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',

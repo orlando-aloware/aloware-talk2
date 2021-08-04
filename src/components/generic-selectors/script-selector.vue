@@ -1,14 +1,15 @@
 <template>
   <q-select :options="scriptsOptions"
             :placeholder="placeholder"
-            :disable="disable"
+            :loading="loadingScripts"
+            :disable="disable || loadingScripts"
             :class="[ prepend ? 'with-prepend' : '' ]"
             class="generic-selector"
             v-model="scriptId"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
-            option-label="name"
+            option-label="title"
             input-debounce="0"
             use-input
             emit-value
@@ -48,6 +49,10 @@ export default {
   name: 'script-selector',
 
   props: {
+    communication: {
+      required: true
+    },
+
     value: {
       required: false
     },
@@ -67,12 +72,14 @@ export default {
   data () {
     return {
       scriptId: this.value,
-      scriptsOptions: []
+      scripts: [],
+      scriptsOptions: [],
+      loadingScripts: false
     }
   },
 
   computed: {
-    ...mapState(['currentCompany', 'scripts']),
+    ...mapState(['currentCompany']),
 
     placeholder () {
       if (this.scriptId) {
@@ -97,10 +104,25 @@ export default {
   },
 
   created () {
-    this.scriptsOptions = this.scriptsAlphabeticalOrder
+    this.fetchScripts().then(() => {
+      this.scriptsOptions = this.scriptsAlphabeticalOrder
+    })
   },
 
   methods: {
+    fetchScripts () {
+      this.loadingScripts = true
+      return this.$axios.get('/api/v1/communication/' + this.communication.id + '/scripts').then(res => {
+        this.loadingScripts = false
+        this.scripts = res.data
+        return Promise.resolve()
+      }).catch(err => {
+        this.loadingScripts = false
+        console.log(err)
+        return Promise.reject()
+      })
+    },
+
     filterFn (val, update) {
       if (this.scriptId && val === this.scriptId) {
         update(() => {
@@ -129,8 +151,8 @@ export default {
     },
 
     scriptId (val) {
-      if (this.value !== undefined && this.scriptId !== this.value) {
-        this.$emit('change', val)
+      if (this.scriptId !== this.value) {
+        this.$emit('change', this.scripts.find(script => script.id === val))
       }
     }
   }

@@ -101,7 +101,7 @@ export default {
     stateToIcon: function (dispositionStatus, type, direction = null, answerStatus = null) {
       let icon = ''
 
-      if (![CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
+      if (![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
         if (direction === CommunicationDirections.INBOUND) {
           icon += 'inbound-'
         } else {

@@ -94,9 +94,8 @@
                v-for="(attachment, index) in communication.attachments"
                :key="index">
             <q-img
-              class="border-rounded img-fluid d-block r-2x"
+              class="border-rounded img-fluid d-block r-2x mb-1"
               :src="attachment.url"
-              :class="index > 0 ? 'mb-1' : ''"
               width="320px"
               fit="fill"
             >
@@ -185,6 +184,10 @@
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length">
             {{ getUser(communication.user_id).name }}
         </span>
+        <span class="text-muted"
+              v-else>
+            {{ currentCompany.name }}
+        </span>
 
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND">
@@ -233,7 +236,7 @@
         </b-button>
 
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
-          <router-link :to="{ name: 'Communication', params: {communicationId: communication.id }}"
+          <router-link class="activity-status text-decoration-none" :to="{ name: 'Communication', params: {communicationId: communication.id }}"
                        :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
             <template
               v-if="communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
@@ -256,7 +259,7 @@
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
             </template>
 
-            <i class="material-icons help text-red-100"
+            <i class="material-icons help text-danger"
                :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
                v-else>errors</i>
           </router-link>
