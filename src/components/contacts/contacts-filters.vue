@@ -58,12 +58,12 @@
                     <template v-for="(filter, key, index) in group.filters">
                       <b-card class="mb-2 filter-item"
                               role="button"
-                              :key="filter.key"
+                              :key="key"
                               @click="selectFilterByKey(filter.key, groupIndex, group.is_conjunction)">
                         <span class="filter-name">{{ filter.label }}</span>
                         <span class="text-lowercase"> {{ filter.operator }}</span>
                         <span class="font-weight-bold">
-                          {{ getFormattedFilterSummary(filter) }}
+                          {{ getFormattedFilterSummary(filter, key) }}
                         </span>
                         <compact-btn class="py-0 delete-filter"
                                      @clicked="onDeleteFilter(groupIndex, filter.key)">
@@ -248,6 +248,9 @@ export default {
       }
     }
   },
+  created () {
+    this.visibleListFilters = this.generateListFilters()
+  },
   methods: {
     ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
     getFilters: function () {
@@ -313,9 +316,17 @@ export default {
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       for (let groupIndex in filterGroups) {
+        if (groupIndex === 'search') {
+          delete filterGroups[groupIndex]
+          continue
+        }
         for (let filterIndex in filterGroups[groupIndex].filters) {
+          if (filterIndex === 'search') {
+            continue
+          }
           const found = this.filters.find(filter => filter.key === filterIndex)
-          if (found) {
+          const operators = found ? _.get(found, 'operators', null) : null
+          if (operators) {
             const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
@@ -324,29 +335,53 @@ export default {
               trueValue: filterGroups[groupIndex].filters[filterIndex].value,
               value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
             }
+          } else {
+            filterGroups[groupIndex].filters[filterIndex] = {
+              key: filterIndex,
+              label: found.label,
+              operator: 'is',
+              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
+              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+            }
           }
         }
       }
       return filterGroups
     },
-    getFormattedFilterSummary (filter) {
+    getFormattedFilterSummary (filter, key) {
       if (!filter.trueValue) {
         return ''
       }
+      const filterFound = this.filters.find(filter => filter.key === key)
+      const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
+      const isSimpleType = filterFound && _.get(filterFound, 'type', null)
       if (typeof filter.trueValue === 'object') {
+        let values = []
         switch (true) {
-          case filter.trueValue.length === 1:
-            return filter.trueValue[0]
+          case filter.trueValue.length === 1 || (isRelationType):
+            values = filter.trueValue
+            break
           case filter.trueValue.length === 2 && filter.operator !== 'Is between':
             return filter.trueValue.join(' or ')
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
-          case filter.trueValue.length >= 3:
-            let joinedValues = filter.trueValue.join(', ')
-            return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
         }
+        let labels = []
+        if (filterFound && isRelationType) {
+          for (let item of values) {
+            const optionFound = filterFound.options.find(option => option.value === item)
+            labels.push(optionFound ? optionFound.label : '')
+          }
+        } else {
+          labels = filter.trueValue
+        }
+        const joinedValues = labels.join(', ')
+        if (labels > 1) {
+          return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+        }
+        return joinedValues
       } else {
-        return filter.trueValue
+        return !isSimpleType ? filter.trueValue : (filter.trueValue ? 'true' : 'false')
       }
     },
     getFilterLength (filter) {

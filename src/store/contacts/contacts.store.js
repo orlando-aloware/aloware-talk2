@@ -25,45 +25,65 @@ export default function () {
       'my-contacts': {
         all: 'my-contacts',
         headers: DEFAULT_COLUMNS,
-        filters: {
-          contact_owner: {
-            value: null,
-            operator: OPERATORS.IS_ANY_OF
+        filters: [
+          {
+            filters: {
+              contact_owner: {
+                value: null,
+                operator: OPERATORS.IS_ANY_OF
+              }
+            },
+            is_conjunction: true
           }
-        },
+        ],
         type: 2,
         name: 'My Contacts'
       },
       unassigned: {
         id: 'unassigned',
         headers: DEFAULT_COLUMNS,
-        filters: {
-          is_unassigned: {
-            value: 1
+        filters: [
+          {
+            filters: {
+              is_unassigned: {
+                value: 1
+              }
+            },
+            is_conjunction: true
           }
-        },
+        ],
         type: 2,
         name: 'Unassigned'
       },
       unanswered: {
         id: 'unanswered',
         headers: DEFAULT_COLUMNS,
-        filters: {
-          is_unanswered_contact: {
-            value: 1
+        filters: [
+          {
+            filters: {
+              is_unanswered_contact: {
+                value: 1
+              }
+            },
+            is_conjunction: true
           }
-        },
+        ],
         type: 2,
         name: 'Unanswered'
       },
       'new-leads': {
         id: 'new-leads',
         headers: DEFAULT_COLUMNS,
-        filters: {
-          is_new_contact: {
-            value: 1
+        filters: [
+          {
+            filters: {
+              is_new_contact: {
+                value: 1
+              }
+            },
+            is_conjunction: true
           }
-        },
+        ],
         type: 2,
         name: 'New Leads'
       },

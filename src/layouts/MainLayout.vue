@@ -178,6 +178,7 @@ export default {
       loadingCallDispositionStatuses: false,
       loadingScripts: false,
       loadingTemplates: false,
+      loadingBroadcasts: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -836,6 +837,23 @@ export default {
       }
     },
 
+    getBroadcasts () {
+      if (this.hasPermissionTo('list broadcast')) {
+        this.loadingBroadcasts = true
+        return this.$axios.get('/api/v1/broadcasts', {
+          mode: 'no-cors'
+        }).then(res => {
+          this.loadingBroadcasts = false
+          this.setBroadcasts(res.data)
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingBroadcasts = false
+          return Promise.reject()
+        })
+      }
+    },
+
     async initAccount () {
       if (this.profile) {
         this.$Sentry.configureScope((scope) => {
@@ -859,6 +877,7 @@ export default {
         let getCallDispositions = this.getCallDispositions()
         let getScripts = this.getScripts()
         let getTemplates = this.getTemplates()
+        let getBroadcasts = this.getBroadcasts()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -869,7 +888,8 @@ export default {
           getDispositionStatuses,
           getCallDispositions,
           getScripts,
-          getTemplates
+          getTemplates,
+          getBroadcasts
         ])
       }
     },
@@ -1272,6 +1292,7 @@ export default {
       'setCallDispositions',
       'setScripts',
       'setTemplates',
+      'setBroadcasts',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',

@@ -23,12 +23,17 @@ export default {
   },
 
   created () {
-    this.initialListFilters = this.currentListFilters
-    this.filtersCount = this.getFiltersCount(this.currentListFilters)
+    this.init()
   },
 
   methods: {
-    ...mapActions('contacts', ['selectedContactChanging', 'setSearch']),
+    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters']),
+    init () {
+      const defaultFilters = this.fixDefaultFilters()
+      this.setCurrentListFilters(defaultFilters)
+      this.initialListFilters = defaultFilters
+      this.filtersCount = this.getFiltersCount(defaultFilters)
+    },
     onSortByField (sorts) {
       this.isLoaded = false
       this.fetch({
@@ -186,6 +191,20 @@ export default {
           document.querySelector('.data-table-check-all').checked = this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
         }
       }
+    },
+    fixDefaultFilters () {
+      if (!this.list) {
+        return []
+      }
+      let defaultFilters = JSON.parse(JSON.stringify(this.list.filters))
+      if (this.$route.params.id === 'my-contacts') {
+        const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
+        const profileId = _.get(this.profile, 'id', null)
+        if (filter && profileId) {
+          defaultFilters[0].filters.contact_owner.value = [profileId]
+        }
+      }
+      return defaultFilters
     }
   },
 
@@ -258,6 +277,14 @@ export default {
         return this.lists['all']
       }
       return this.lists[this.$route.params.id]
+    }
+  },
+  watch: {
+    list: {
+      deep: true,
+      handler: function () {
+        this.init()
+      }
     }
   }
 }

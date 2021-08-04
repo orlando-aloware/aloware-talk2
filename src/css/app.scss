@@ -293,7 +293,6 @@ body,
 .checkbox {
   input {
     cursor: pointer;
-    height: 35px;
   }
   .q-checkbox__inner .q-checkbox__bg {
     border-radius: 4px;
@@ -3993,20 +3992,12 @@ span.mention {
   }
   .filter-item {
     position: relative;
-    &:not(:hover) {
-      .delete-filter {
-        display: none;
-        z-index: 0;
-      }
-    }
-    &:hover {
-      .delete-filter {
-        margin-top: 1rem;
-        position: absolute;
-        right: 0;
-        top: 0;
-        z-index: 2;
-      }
+    .delete-filter {
+      margin-top: 1rem;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 2;
     }
   }
   .delete-group-filter {
@@ -5767,4 +5758,139 @@ table.datatable {
   .pending-count {
     font-weight: 500;
   }
+}
+
+//
+.pinned {
+  display: flex;
+  flex-direction: column;
+  height: 20rem;
+
+  &__header {
+    min-height: 40px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  &__content {
+    height: calc(100% - 40px);
+    overflow: auto;
+  }
+  .icon {
+    margin-top: -5px;
+  }
+
+  .item {
+    color: $dark;
+    cursor: pointer;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    transition: background-color 100ms ease-in-out;
+    white-space: nowrap;
+  }
+
+  .item:hover {
+    background: $light-green2;
+    color: $dark;
+    text-decoration: none;
+  }
+
+  .item.router-link-exact-active {
+    background: $light-green2;
+  }
+}
+
+.inbox-nav-item-group-header {
+  padding: 10px 5px 10px 10px !important;
+  color: #666666;
+  letter-spacing: 1px;
+}
+
+.inbox-nav-item {
+  @include border-radius(10px);
+  display: flex;
+  align-items: center;
+  height: 40px;
+  color: $grey-dark;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 100ms ease-in;
+
+  &--closed {
+    overflow: hidden;
+  }
+
+  &__active {
+    background-color: $grey-50;
+    color: $black;
+  }
+
+  @include screen('lg') {
+    overflow: auto;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  &__icon {
+    padding-right: 10px;
+  }
+
+  &__label {
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: -0.0025em;
+    flex-grow: 1;
+
+    &--opened {
+      display: block;
+    }
+
+    &--closed {
+      display: none;
+    }
+
+    @include screen('lg') {
+      display: block;
+      &--closed {
+        display: none;
+      }
+    }
+  }
+
+  .count-label {
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 8px;
+    color: $grey-30;
+  }
+
+  .open-count {
+    color: $grey-20;
+  }
+
+  .pending-count {
+    font-weight: 500;
+  }
+}
+
+.activity-status {
+  width: 10px;
 }
