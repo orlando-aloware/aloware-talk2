@@ -150,7 +150,7 @@ export default {
     },
 
     contactDispositionId (val) {
-      if (this.value !== undefined && this.contactDispositionId !== this.value) {
+      if (this.contactDispositionId !== this.value) {
         this.$emit('change', val)
       }
     }

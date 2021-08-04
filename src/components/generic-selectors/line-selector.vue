@@ -158,7 +158,7 @@ export default {
     },
 
     campaignId (val) {
-      if (this.value !== undefined && this.campaignId !== this.value) {
+      if (this.campaignId !== this.value) {
         this.$emit('change', val)
       }
     }

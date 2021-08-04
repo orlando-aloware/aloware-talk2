@@ -129,7 +129,7 @@ export default {
     },
 
     templateId (val) {
-      if (this.value !== undefined && this.templateId !== this.value) {
+      if (this.templateId !== this.value) {
         this.$emit('change', this.templates.find(template => template.id === val))
       }
     }

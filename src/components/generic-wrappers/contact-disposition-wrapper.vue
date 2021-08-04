@@ -1,0 +1,55 @@
+<template>
+  <contact-disposition-selector v-model="dispositionStatusId"
+                                @change="changeContactDisposition">
+  </contact-disposition-selector>
+</template>
+
+<script>
+import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
+
+export default {
+  name: 'contact-disposition-wrapper',
+
+  components: { ContactDispositionSelector },
+
+  props: {
+    contact: {
+      required: false
+    }
+  },
+
+  data () {
+    return {
+      loadingContactDisposition: false,
+      dispositionStatusId: null
+    }
+  },
+
+  mounted () {
+    this.dispositionStatusId = this.contact.disposition_status_id
+  },
+
+  methods: {
+    changeContactDisposition (dispositionStatusId) {
+      this.loadingContactDisposition = true
+      this.$axios.post('/api/v1/contact/' + this.contact.id + '/dispose', {
+        disposition_status: dispositionStatusId
+      }).then((res) => {
+        this.loadingContactDisposition = false
+        this.dispositionStatusId = dispositionStatusId
+        this.$emit('change', dispositionStatusId)
+        this.$q.notify({
+          offset: 95,
+          title: 'Contact',
+          message: 'Contact disposed',
+          type: 'success',
+          showClose: true
+        })
+      }).catch((err) => {
+        this.loadingContactDisposition = false
+        console.log(err)
+      })
+    }
+  }
+}
+</script>

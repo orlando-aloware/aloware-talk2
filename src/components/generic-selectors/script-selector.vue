@@ -129,7 +129,7 @@ export default {
     },
 
     scriptId (val) {
-      if (this.value !== undefined && this.scriptId !== this.value) {
+      if (this.scriptId !== this.value) {
         this.$emit('change', val)
       }
     }

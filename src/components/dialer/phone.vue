@@ -428,14 +428,43 @@
               Call Disposition
             </label>
             <div class="d-flex flex-row align-items-center w-100">
-              <call-disposition-selector :communication="dialer.communication"></call-disposition-selector>
+              <call-disposition-wrapper :communication="dialer.communication"
+                                        class="w-100">
+              </call-disposition-wrapper>
             </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Contact Disposition
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <contact-disposition-wrapper :contact="dialer.contact"
+                                           class="w-100">
+              </contact-disposition-wrapper>
+            </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <label class="form-control-label text-grey-90">
+              Send Message
+            </label>
+            <div class="d-flex flex-row align-items-center w-100">
+              <div class="d-flex flex-grow-1">
+                <template-selector class="w-100"
+                                   @change="changeTemplate">
+                </template-selector>
+              </div>
+              <div class="d-flex flex-shrink-0 ml-2">
+                <b-button :loading="loadingSendMessage"
+                          :disabled="loadingSendMessage || !template"
+                          variant="primary"
+                          size="sm"
+                          @click="sendMessage">
+                  <span>Send</span>
+                </b-button>
+              </div>
+            </div>
           </div>
 
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
@@ -515,15 +544,15 @@
     <div class="phone-footer-buttons p-2"
          v-if="isCallCompleted">
       <b-button variant="outline-dark"
-                @click="endWrapUp">
-        <span>Back</span>
-        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }})</span>
-      </b-button>
-
-      <b-button variant="primary"
                 @click="makeCall">
         <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
         <span class="ml-1">Call Back</span>
+      </b-button>
+
+      <b-button variant="primary"
+                @click="endWrapUp">
+        <span>Finish</span>
+        <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
       </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
@@ -750,21 +779,25 @@ import ContactTags from 'components/contacts/contact-tags'
 import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
 import CommunicationAudio from 'components/communication-audio'
+import CommunicationNote from 'components/communication-note'
+import CommunicationTags from 'components/communication-tags'
+import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
+import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
+import TemplateSelector from 'components/generic-selectors/template-selector'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/communication-tags'
-import CallDispositionSelector from 'components/call-disposition-selector'
 
 export default {
   name: 'phone',
 
   components: {
-    CallDispositionSelector,
+    TemplateSelector,
+    ContactDispositionWrapper,
+    CallDispositionWrapper,
     CommunicationTags,
     CommunicationNote,
     CommunicationAudio,
@@ -845,6 +878,8 @@ export default {
       bottomExpansion: 'integrations',
       expansionEnabled: true,
       digits: '',
+      template: null,
+      loadingSendMessage: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1053,7 +1088,6 @@ export default {
 
     hangupCall () {
       this.$VueEvent.fire('hangupCall')
-      this.screen = 'menu'
     },
 
     answerCall () {
@@ -1307,6 +1341,28 @@ export default {
       this.bottomExpansion = 'integrations'
       this.expanded = false
       this.expansionEnabled = true
+    },
+
+    changeTemplate (template) {
+      this.template = template
+    },
+
+    sendMessage () {
+      if (!this.dialer.communication) {
+        return
+      }
+
+      this.loadingSendMessage = true
+      this.$axios.post('/api/v1/campaign/send-message/' + this.dialer.communication.campaign_id + '/' + this.dialer.communication.contact_id, {
+        message: this.template.body,
+        phone_number: this.dialer.communication.lead_number
+      }).then(res => {
+        this.template = null
+        this.loadingSendMessage = false
+      }).catch(err => {
+        this.loadingSendMessage = false
+        console.log(err)
+      })
     },
 
     ...mapActions([
