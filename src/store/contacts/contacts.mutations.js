@@ -1,3 +1,5 @@
+import * as ContactsListDefaultList from 'src/constants/default-lists'
+
 export default {
   TOGGLE_FOLDER: (state, id) => {
     const opened = new Set(state.opened)
@@ -289,6 +291,7 @@ export default {
     state.search = ''
     state.currentListFilters = {}
     state.contact = {}
+    state.lists = Object.assign({}, ContactsListDefaultList.DEFAULT_STATE.lists)
   },
   SET_SEARCH: (state, value) => {
     state.search = value

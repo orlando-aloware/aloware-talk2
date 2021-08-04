@@ -236,6 +236,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_TEMPLATES', templates)
       },
 
+      setBroadcasts ({ commit }, broadcasts) {
+        commit('SET_BROADCASTS', broadcasts)
+      },
+
       newTag ({ commit }, tag) {
         commit('NEW_TAG', tag)
       },
@@ -582,6 +586,10 @@ export default function (/* { ssrContext } */) {
 
       SET_TEMPLATES (state, templates) {
         state.templates = templates
+      },
+
+      SET_BROADCASTS (state, broadcasts) {
+        state.broadcasts = broadcasts
       },
 
       NEW_FILTER (state, filter) {

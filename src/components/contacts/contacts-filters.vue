@@ -177,11 +177,6 @@ import {
 
 export default {
   components: { Search, CompactBtn, ContactsFilterTypes },
-  props: {
-    listFilters: {
-      required: false
-    }
-  },
   data () {
     return {
       items: Array.from(new Array(10)),
@@ -253,6 +248,9 @@ export default {
       }
     }
   },
+  created () {
+    this.visibleListFilters = this.generateListFilters()
+  },
   methods: {
     ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
     getFilters: function () {
@@ -318,14 +316,30 @@ export default {
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       for (let groupIndex in filterGroups) {
+        if (groupIndex === 'search') {
+          delete filterGroups[groupIndex]
+          continue
+        }
         for (let filterIndex in filterGroups[groupIndex].filters) {
+          if (filterIndex === 'search') {
+            continue
+          }
           const found = this.filters.find(filter => filter.key === filterIndex)
-          if (found) {
+          const operators = found ? _.get(found, 'operators', null) : null
+          if (operators) {
             const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
               label: found.label,
               operator: operator.label,
+              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
+              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+            }
+          } else {
+            filterGroups[groupIndex].filters[filterIndex] = {
+              key: filterIndex,
+              label: found.label,
+              operator: 'is',
               trueValue: filterGroups[groupIndex].filters[filterIndex].value,
               value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
             }
@@ -338,9 +352,10 @@ export default {
       if (!filter.trueValue) {
         return ''
       }
+      const filterFound = this.filters.find(filter => filter.key === key)
+      const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
+      const isSimpleType = filterFound && _.get(filterFound, 'type', null)
       if (typeof filter.trueValue === 'object') {
-        const filterFound = this.filters.find(filter => filter.key === key)
-        const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
         let values = []
         switch (true) {
           case filter.trueValue.length === 1 || (isRelationType):
@@ -357,11 +372,16 @@ export default {
             const optionFound = filterFound.options.find(option => option.value === item)
             labels.push(optionFound ? optionFound.label : '')
           }
+        } else {
+          labels = filter.trueValue
         }
         const joinedValues = labels.join(', ')
-        return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+        if (labels > 1) {
+          return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+        }
+        return joinedValues
       } else {
-        return filter.trueValue
+        return !isSimpleType ? filter.trueValue : (filter.trueValue ? 'true' : 'false')
       }
     },
     getFilterLength (filter) {
