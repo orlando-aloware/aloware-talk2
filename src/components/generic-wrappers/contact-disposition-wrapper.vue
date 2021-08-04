@@ -14,7 +14,7 @@ export default {
 
   props: {
     contact: {
-      required: false
+      required: true
     }
   },
 

@@ -37,7 +37,6 @@ export default function (/* { ssrContext } */) {
       changelogs: [],
       dispositionStatuses: [],
       callDispositions: [],
-      scripts: [],
       templates: [],
       broadcasts: [],
       filters: [],
@@ -226,10 +225,6 @@ export default function (/* { ssrContext } */) {
 
       setCallDispositions ({ commit }, callDispositions) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
-      },
-
-      setScripts ({ commit }, scripts) {
-        commit('SET_SCRIPTS', scripts)
       },
 
       setTemplates ({ commit }, templates) {
@@ -578,10 +573,6 @@ export default function (/* { ssrContext } */) {
 
       SET_CALL_DISPOSITIONS (state, callDispositions) {
         state.callDispositions = callDispositions
-      },
-
-      SET_SCRIPTS (state, scripts) {
-        state.scripts = scripts
       },
 
       SET_TEMPLATES (state, templates) {

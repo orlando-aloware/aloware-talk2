@@ -803,23 +803,6 @@ export default {
       }
     },
 
-    getScripts () {
-      if (this.hasPermissionTo('list script')) {
-        this.loadingScripts = true
-        return this.$axios.get('/api/v1/script')
-          .then((res) => {
-            this.setScripts(res.data)
-            this.loadingScripts = false
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingScripts = false
-            return Promise.reject()
-          })
-      }
-    },
-
     getTemplates () {
       if (this.hasPermissionTo('list sms template')) {
         this.loadingTemplates = true
@@ -875,7 +858,6 @@ export default {
         let getWorkflows = this.getWorkflows()
         let getDispositionStatuses = this.getDispositionStatuses()
         let getCallDispositions = this.getCallDispositions()
-        let getScripts = this.getScripts()
         let getTemplates = this.getTemplates()
         let getBroadcasts = this.getBroadcasts()
         await Promise.all([
@@ -887,7 +869,6 @@ export default {
           getWorkflows,
           getDispositionStatuses,
           getCallDispositions,
-          getScripts,
           getTemplates,
           getBroadcasts
         ])
@@ -1290,7 +1271,6 @@ export default {
       'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
-      'setScripts',
       'setTemplates',
       'setBroadcasts',
       'setDialerToken',

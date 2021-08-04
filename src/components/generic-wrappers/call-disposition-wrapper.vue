@@ -14,7 +14,7 @@ export default {
 
   props: {
     communication: {
-      required: false
+      required: true
     }
   },
 
