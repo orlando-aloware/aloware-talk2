@@ -60,8 +60,14 @@
                               role="button"
                               :key="key"
                               @click="selectFilterByKey(filter.key, groupIndex, group.is_conjunction)">
+                        <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
+                          Not
+                        </span>
                         <span class="filter-name">{{ filter.label }}</span>
-                        <span class="text-lowercase"> {{ filter.operator }}</span>
+                        <span class="text-lowercase"
+                              v-if="filter.operator">
+                          &nbsp;{{ filter.operator }}
+                        </span>
                         <span class="font-weight-bold">
                           {{ getFormattedFilterSummary(filter, key) }}
                         </span>
@@ -339,7 +345,6 @@ export default {
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
               label: found.label,
-              operator: 'is',
               trueValue: filterGroups[groupIndex].filters[filterIndex].value,
               value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
             }
@@ -381,7 +386,7 @@ export default {
         }
         return joinedValues
       } else {
-        return !isSimpleType ? filter.trueValue : (filter.trueValue ? 'true' : 'false')
+        return !isSimpleType ? filter.trueValue : ''
       }
     },
     getFilterLength (filter) {

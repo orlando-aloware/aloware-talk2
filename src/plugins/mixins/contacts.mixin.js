@@ -4,7 +4,6 @@ import _ from 'lodash'
 
 import {
   DEFAULT_CONTACT_LIST,
-  OPERATORS,
   DYNAMIC,
   STATIC
 } from 'src/constants/contacts-list-types'
@@ -111,40 +110,11 @@ export default {
         })
     },
     buildQueryString (params) {
-      const invalidIds = this.defaultIds
-
       const query = {
         page: 1
       }
 
       let filters = {}
-
-      if (this.id === DEFAULT_CONTACT_LIST.UNANSWERED.id) {
-        filters.is_unanswered_contact = {}
-        filters.is_unanswered_contact.value = 1
-      }
-
-      if (this.id === DEFAULT_CONTACT_LIST.UNASSIGNED.id) {
-        filters.is_unassigned = {}
-        filters.is_unassigned.value = 1
-      }
-
-      if (this.id === DEFAULT_CONTACT_LIST.NEWLEADS.id) {
-        filters.is_new_contact = {}
-        filters.is_new_contact.value = 1
-      }
-
-      if (this.id === DEFAULT_CONTACT_LIST.MY_CONTACTS.id || this.myContacts) {
-        filters.contact_owner = {}
-        filters.contact_owner.value = [this.profile.id]
-        filters.contact_owner.operator = OPERATORS.IS_ANY_OF
-      }
-
-      if (this.id && !invalidIds.includes(this.id) && this.list && this.list.type !== DYNAMIC) {
-        filters.contact_lists = {}
-        filters.contact_lists.value = [this.id]
-        filters.contact_lists.operator = OPERATORS.IS_ANY_OF
-      }
 
       if (params.search) {
         filters.search = {}
@@ -165,7 +135,7 @@ export default {
       }
 
       if (!_.isEmpty(this.currentListFilters)) {
-        query.filter_groups = query.filter_groups.concat(this.currentListFilters)
+        query.filter_groups = query.filter_groups.concat(this.currentListFilters[0])
       }
 
       if (params.sort) {
