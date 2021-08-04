@@ -1128,60 +1128,78 @@ export default {
     openDialpad () {
       this.expansionEnabled = true
       this.bottomExpansion = 'dialpad'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openNotes () {
       this.expansionEnabled = true
       this.bottomExpansion = 'notes'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openTags () {
       this.expansionEnabled = true
       this.bottomExpansion = 'tags'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openScripts () {
       this.expansionEnabled = true
       this.bottomExpansion = 'scripts'
-      this.expanded = true
-    },
-
-    openContact ($event) {
-      this.saveAndResetExpansion($event)
-      this.goToContact()
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openAdd () {
       this.expansionEnabled = true
       this.bottomExpansion = 'add'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openTransfer () {
       this.expansionEnabled = true
       this.bottomExpansion = 'transfer'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openMore () {
       this.expansionEnabled = true
       this.bottomExpansion = 'more'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openVmDrop () {
       this.expansionEnabled = true
       this.bottomExpansion = 'vm-drop'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
     },
 
     openIntegrations () {
       this.expansionEnabled = true
       this.bottomExpansion = 'integrations'
-      this.expanded = true
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
+    },
+
+    openContact ($event) {
+      this.saveAndResetExpansion($event)
+      this.goToContact()
     },
 
     saveAndResetExpansion ($event) {
@@ -1412,7 +1430,7 @@ export default {
           return
         }
 
-        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
+        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
           this.screen = 'menu'
         }
       },
