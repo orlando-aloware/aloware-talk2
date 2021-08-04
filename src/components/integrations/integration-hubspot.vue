@@ -108,6 +108,7 @@
                 size="sm"
                 variant="primary"
                 :disabled="isEnrolling || !isWorkflowValid"
+                v-if="integration_data.properties.email"
                 @click.prevent="enrollToWorkflow">
         <q-spinner-bars v-if="isEnrolling"
                         color="white">
@@ -209,40 +210,37 @@ export default {
 
     enrollToWorkflow () {
       this.isEnrolling = true
-      this.workflow.email = this.integration_data.properties.email.value
-      return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow)
-        .then(response => {
-          this.resetWorkflowEnrollment()
-          // emit on parent if there's a need to do after workflow enrollment
-          this.$emit('enrolledToWorkflow', this.workflow)
-          this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
-          this.$q.notify({
-            message: 'Contact has been successfully enrolled to the workflow.',
-            type: 'positive',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+      this.workflow.email = this.integration_data.properties.email ? this.integration_data.properties.email.value : ''
+      return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
+        this.resetWorkflowEnrollment()
+        // emit on parent if there's a need to do after workflow enrollment
+        this.$emit('enrolledToWorkflow', this.workflow)
+        this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
+        this.$q.notify({
+          message: 'Contact has been successfully enrolled to the workflow.',
+          type: 'positive',
+          textColor: 'white',
+          actions: [
+            {
+              icon: 'close'
+            }
+          ]
         })
-        .catch(err => {
-          console.log(err)
-          this.$q.notify({
-            message: 'Error while enrolling contact to the workflow.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+      }).catch(err => {
+        console.log(err)
+        this.$q.notify({
+          message: 'Error while enrolling contact to the workflow.',
+          type: 'negative',
+          textColor: 'white',
+          actions: [
+            {
+              icon: 'close'
+            }
+          ]
         })
-        .finally(() => {
-          this.isEnrolling = false
-        })
+      }).finally(() => {
+        this.isEnrolling = false
+      })
     }
   },
 
