@@ -1244,8 +1244,10 @@ export default {
     },
 
     saveAndResetExpansion ($event) {
-      $event.stopPropagation()
-      $event.preventDefault()
+      if ($event) {
+        $event.stopPropagation()
+        $event.preventDefault()
+      }
       this.expansionEnabled = false
       this.expanded = false
     },
@@ -1444,7 +1446,7 @@ export default {
       this.vmDrop = vmDrop
     },
 
-    sendVmDrop () {
+    sendVmDrop ($event) {
       if (!this.dialer.communication || this.isCallCompleted || !this.vmDrop) {
         return
       }
@@ -1458,6 +1460,7 @@ export default {
         this.vmDrop = null
         this.vmDropId = null
         this.loadingSendVmDrop = false
+        this.saveAndResetExpansion($event)
         this.$q.notify({
           offset: 95,
           title: 'Phone',
