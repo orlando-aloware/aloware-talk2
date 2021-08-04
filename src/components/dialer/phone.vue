@@ -544,7 +544,7 @@
       </template>
     </div>
     <div class="phone-footer-buttons p-2"
-         v-if="isCallCompleted">
+         v-if="isCallCompleted && !devMode">
       <b-button variant="outline-dark"
                 @click="makeCall">
         <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
@@ -558,7 +558,7 @@
       </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
-         v-if="!isCallCompleted && dialer.contact && expansionEnabled">
+         v-if="(devMode || !isCallCompleted) && dialer.contact && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         header-class="text-sm bg-white text-center"
@@ -713,7 +713,18 @@
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'scripts'">
-            <q-card-section class="height-445">
+            <q-card-section class="height-445 overflow-hidden-y">
+              <div class="d-flex flex-column justify-content-start w-100 mt-3 pl-3 pr-3">
+                <script-selector :communication="dialer.communication"
+                                 v-model="scriptId"
+                                 class="w-100"
+                                 @change="changeScript">
+                </script-selector>
+              </div>
+              <div class="d-flex flex-column justify-content-start w-100 mt-2 pl-3 pr-3 height-410 overflow-auto"
+                   v-if="script"
+                   v-html="script.text">
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'add'">
@@ -806,11 +817,13 @@ import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import ScriptSelector from 'components/generic-selectors/script-selector'
 
 export default {
   name: 'phone',
 
   components: {
+    ScriptSelector,
     ContactIcon,
     ParkCallIcon,
     TemplateSelector,
@@ -898,7 +911,10 @@ export default {
       digits: '',
       templateId: null,
       template: null,
+      scriptId: null,
+      script: null,
       loadingSendMessage: false,
+      devMode: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1390,6 +1406,13 @@ export default {
         this.templateId = template.id
       }
       this.template = template
+    },
+
+    changeScript (script) {
+      if (script) {
+        this.scriptId = script.id
+      }
+      this.script = script
     },
 
     sendMessage () {
