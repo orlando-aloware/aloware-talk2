@@ -838,7 +838,7 @@ export default {
     },
 
     getBroadcasts () {
-      if (this.hasPermissionTo('list broadcasts')) {
+      if (this.hasPermissionTo('list broadcast')) {
         this.loadingBroadcasts = true
         return this.$axios.get('/api/v1/broadcasts', {
           mode: 'no-cors'
