@@ -1445,7 +1445,7 @@ export default {
     },
 
     sendVmDrop () {
-      if (!this.dialer.communication || !this.isCallCompleted || !this.vmDrop) {
+      if (!this.dialer.communication || this.isCallCompleted || !this.vmDrop) {
         return
       }
 
