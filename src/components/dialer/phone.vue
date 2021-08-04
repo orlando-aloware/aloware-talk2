@@ -328,12 +328,13 @@
               </tags-icon>
               <span>Tags</span>
             </button>
-            <button class="phone-buttons elevated btn"
-                    @click="openScripts">
-              <scripts-icon width="16"
-                            height="16">
-              </scripts-icon>
-              <span>Scripts</span>
+            <button :disabled="isVmDropDisabled"
+                    class="phone-buttons elevated btn"
+                    @click="openVmDrop">
+              <vm-drop-icon width="18"
+                            height="18">
+              </vm-drop-icon>
+              <span>VM Drop</span>
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
@@ -729,13 +730,25 @@
           <template v-if="bottomExpansion === 'more'">
             <q-card-section class="height-140">
               <div class="d-flex justify-content-start w-100 mt-3 pl-3 pr-3">
-                <button :disabled="isVmDropDisabled"
-                        class="phone-buttons btn"
-                        @click="openVmDrop">
-                  <vm-drop-icon width="18"
+                <button class="phone-buttons btn"
+                        @click="openScripts">
+                  <scripts-icon width="18"
                                 height="18">
-                  </vm-drop-icon>
-                  <span>VM Drop</span>
+                  </scripts-icon>
+                  <span>Scripts</span>
+                </button>
+                <button class="phone-buttons btn">
+                  <park-call-icon width="18"
+                                  height="18">
+                  </park-call-icon>
+                  <span>Park Call</span>
+                </button>
+                <button class="phone-buttons btn"
+                        @click="openContact">
+                  <contact-icon width="18"
+                                height="18">
+                  </contact-icon>
+                  <span>Contact</span>
                 </button>
                 <button class="phone-buttons btn"
                         @click="openIntegrations">
@@ -784,6 +797,8 @@ import CommunicationTags from 'components/communication-tags'
 import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
 import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
 import TemplateSelector from 'components/generic-selectors/template-selector'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ContactIcon from 'components/icons/contact-icon'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
@@ -795,6 +810,8 @@ export default {
   name: 'phone',
 
   components: {
+    ContactIcon,
+    ParkCallIcon,
     TemplateSelector,
     ContactDispositionWrapper,
     CallDispositionWrapper,
@@ -1130,6 +1147,11 @@ export default {
       this.expansionEnabled = true
       this.bottomExpansion = 'scripts'
       this.expanded = true
+    },
+
+    openContact ($event) {
+      this.saveAndResetExpansion($event)
+      this.goToContact()
     },
 
     openAdd () {
