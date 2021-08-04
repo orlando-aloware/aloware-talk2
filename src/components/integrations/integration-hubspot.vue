@@ -3,7 +3,7 @@
        class="hubspot-integration-wrapper">
     <q-card class="hubspot-card"
             flat>
-      <q-item>
+      <q-item class="p-0">
         <q-item-section>
           <b-link target="_blank"
                   :href="hubspotLink">
@@ -17,56 +17,24 @@
 
       <q-card-section>
         <p class="mb-0"
-           v-if="integration_data.properties.firstname && integration_data.properties.lastname">
-             <span class="data-icon-label">
-              Name:
-            </span>
-          <span class="data-value">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
-            </q-tooltip>
-              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
-            </span>
+           v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
+          <span class="data-icon-label">Name: </span>
+          <span class="data-value">{{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}</span>
         </p>
         <p class="mb-0"
            v-if="integration_data.properties.email">
-            <span class="data-icon-label">
-              Email:
-            </span>
-          <span class="data-value">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ integration_data.properties.email.value }}
-            </q-tooltip>
-              {{ integration_data.properties.email.value }}
-            </span>
+          <span class="data-icon-label">Email: </span>
+          <span class="data-value">{{ integration_data.properties.email.value }}</span>
         </p>
         <p class="mb-0"
            v-if="integration_data.properties.company">
-             <span class="data-icon-label">
-              Company:
-            </span>
-          <span class="data-value">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ integration_data.properties.email.value }}
-            </q-tooltip>
-              {{ integration_data.properties.company.value }}
-            </span>
+          <span class="data-icon-label">Company: </span>
+          <span class="data-value">{{ integration_data.properties.company.value }}</span>
         </p>
         <p class="mb-0"
            v-if="integration_data.properties.hubspot_owner">
-             <span class="data-icon-label">
-              Owner:
-            </span>
-          <span class="data-value">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
-            </q-tooltip>
-              {{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}
-            </span>
+          <span class="data-icon-label">Owner: </span>
+          <span class="data-value">{{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}</span>
         </p>
       </q-card-section>
 
