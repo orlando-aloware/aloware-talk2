@@ -453,6 +453,7 @@
             <div class="d-flex flex-row align-items-center w-100">
               <div class="d-flex flex-grow-1">
                 <template-selector class="w-100"
+                                   v-model="templateId"
                                    @change="changeTemplate">
                 </template-selector>
               </div>
@@ -895,6 +896,7 @@ export default {
       bottomExpansion: 'integrations',
       expansionEnabled: true,
       digits: '',
+      templateId: null,
       template: null,
       loadingSendMessage: false,
       CommunicationDirection,
@@ -1384,6 +1386,9 @@ export default {
     },
 
     changeTemplate (template) {
+      if (template) {
+        this.templateId = template.id
+      }
       this.template = template
     },
 
@@ -1398,7 +1403,15 @@ export default {
         phone_number: this.dialer.communication.lead_number
       }).then(res => {
         this.template = null
+        this.templateId = null
         this.loadingSendMessage = false
+        this.$q.notify({
+          offset: 95,
+          title: 'Phone',
+          message: 'Message sent',
+          type: 'success',
+          showClose: true
+        })
       }).catch(err => {
         this.loadingSendMessage = false
         console.log(err)
