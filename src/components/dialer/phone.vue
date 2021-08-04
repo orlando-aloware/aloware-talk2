@@ -714,7 +714,7 @@
           </template>
           <template v-if="bottomExpansion === 'scripts'">
             <q-card-section class="height-445 overflow-hidden-y">
-              <div class="d-flex flex-column justify-content-start w-100 mt-3 pl-3 pr-3">
+              <div class="d-flex flex-column justify-content-start w-100 pt-3 pl-3 pr-3">
                 <script-selector :communication="dialer.communication"
                                  v-model="scriptId"
                                  class="w-100"
@@ -737,11 +737,29 @@
           </template>
           <template v-if="bottomExpansion === 'vm-drop'">
             <q-card-section class="height-445">
+              <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
+                <div class="d-flex">
+                  <vm-drop-selector v-model="vmDropId"
+                                    class="w-100"
+                                    @change="changeVmDrop">
+                  </vm-drop-selector>
+                </div>
+                <div class="d-flex">
+                  <b-button :loading="loadingSendVmDrop"
+                            :disabled="loadingSendVmDrop || !vmDropId"
+                            variant="primary"
+                            size="sm"
+                            block
+                            @click="sendVmDrop">
+                    <span>Leave Voicemail</span>
+                  </b-button>
+                </div>
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'more'">
             <q-card-section class="height-140">
-              <div class="d-flex justify-content-start w-100 mt-3 pl-3 pr-3">
+              <div class="d-flex justify-content-start w-100 pt-3 pl-3 pr-3">
                 <button class="phone-buttons btn"
                         @click="openScripts">
                   <scripts-icon width="18"
@@ -811,18 +829,20 @@ import ContactDispositionWrapper from 'components/generic-wrappers/contact-dispo
 import TemplateSelector from 'components/generic-selectors/template-selector'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ContactIcon from 'components/icons/contact-icon'
+import ScriptSelector from 'components/generic-selectors/script-selector'
+import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import ScriptSelector from 'components/generic-selectors/script-selector'
 
 export default {
   name: 'phone',
 
   components: {
+    VmDropSelector,
     ScriptSelector,
     ContactIcon,
     ParkCallIcon,
@@ -913,6 +933,9 @@ export default {
       template: null,
       scriptId: null,
       script: null,
+      vmDropId: null,
+      vmDrop: null,
+      loadingSendVmDrop: false,
       loadingSendMessage: false,
       devMode: false,
       CommunicationDirection,
@@ -936,19 +959,19 @@ export default {
     },
 
     isAddDisabled () {
-      return false && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return !this.devMode && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isTransferDisabled () {
-      return false && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return !this.devMode && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isMoreDisabled () {
-      return false && this.isCallCompleted
+      return !this.devMode && this.isCallCompleted
     },
 
     isVmDropDisabled () {
-      return false && this.isCallCompleted
+      return !this.devMode && this.isCallCompleted
     },
 
     isHoldDisabled () {
@@ -1414,8 +1437,43 @@ export default {
       this.script = script
     },
 
+    changeVmDrop (vmDrop) {
+      if (vmDrop) {
+        this.vmDropId = vmDrop.id
+      }
+      this.vmDrop = vmDrop
+    },
+
+    sendVmDrop () {
+      if (!this.dialer.communication || !this.isCallCompleted || !this.vmDrop) {
+        return
+      }
+
+      this.loadingSendVmDrop = true
+      this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
+        communication_id: this.dialer.communication.id,
+        file_name: this.vmDrop.uploaded_file.uuid,
+        name: this.vmDrop.name
+      }).then(res => {
+        this.vmDrop = null
+        this.vmDropId = null
+        this.loadingSendVmDrop = false
+        this.$q.notify({
+          offset: 95,
+          title: 'Phone',
+          message: 'Voicemail left',
+          type: 'success',
+          showClose: true
+        })
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingSendVmDrop = false
+      })
+    },
+
     sendMessage () {
-      if (!this.dialer.communication) {
+      if (!this.dialer.communication || !this.template) {
         return
       }
 
@@ -1435,8 +1493,9 @@ export default {
           showClose: true
         })
       }).catch(err => {
-        this.loadingSendMessage = false
         console.log(err)
+      }).finally(_ => {
+        this.loadingSendMessage = false
       })
     },
 
