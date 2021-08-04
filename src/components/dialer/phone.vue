@@ -1224,7 +1224,6 @@ export default {
       $event.stopPropagation()
       $event.preventDefault()
       this.expansionEnabled = false
-      this.bottomExpansion = 'integrations'
       this.expanded = false
     },
 
