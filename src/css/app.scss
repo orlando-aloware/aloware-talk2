@@ -819,7 +819,6 @@ i.option-separator {
   }
 
   .q-field__native, .q-field__label, .q-field__input {
-
     padding-left: 0 !important;
   }
 
@@ -3311,6 +3310,10 @@ span.mention {
   .q-field__native {
     padding-left: 10px !important;
     padding-right: 10px !important;
+
+    span {
+      position: absolute;
+    }
   }
 
   &.with-prepend {
@@ -3700,6 +3703,10 @@ span.mention {
     left: 0;
     right: 0;
     bottom: 0;
+  }
+
+  .btn-sm, .btn-group-sm > .btn {
+    @extend .border-half-rounded;
   }
 
   .phone-expansion {
