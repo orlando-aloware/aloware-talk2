@@ -150,9 +150,6 @@ export default {
           icon += `failed-`
         }
       }
-
-      console.log(icon + 'icon')
-
       return icon + 'icon'
     },
 
