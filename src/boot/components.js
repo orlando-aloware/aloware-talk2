@@ -19,6 +19,10 @@ Vue.component('inbound-call-deadend-icon', require('src/components/icons/contact
 Vue.component('inbound-call-abandoned-icon', require('src/components/icons/contact-activity/inbound-call-abandoned-icon').default)
 Vue.component('inbound-call-missed-icon', require('src/components/icons/contact-activity/inbound-call-missed-icon').default)
 Vue.component('inbound-call-voicemail-icon', require('src/components/icons/contact-activity/inbound-call-voicemail-icon').default)
+Vue.component('outbound-recorded-answered-icon', require('src/components/icons/contact-activity/outbound-recorded-answered-icon').default)
+Vue.component('inbound-recorded-answered-icon', require('src/components/icons/contact-activity/inbound-recorded-answered-icon').default)
+Vue.component('inbound-recorded-missed-icon', require('src/components/icons/contact-activity/inbound-recorded-missed-icon').default)
+Vue.component('outbound-recorded-missed-icon', require('src/components/icons/contact-activity/outbound-recorded-missed-icon').default)
 
 // contact sms disposition icons
 Vue.component('inbound-sms-completed-icon', require('src/components/icons/contact-activity/inbound-sms-completed-icon').default)

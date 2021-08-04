@@ -98,7 +98,7 @@ export default {
       return color
     },
 
-    stateToIcon: function (dispositionStatus, type, direction = null) {
+    stateToIcon: function (dispositionStatus, type, direction = null, answerStatus = null) {
       let icon = ''
 
       if (![CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
@@ -109,8 +109,10 @@ export default {
         }
       }
 
-      if (type === CommunicationTypes.CALL) {
+      if (type === CommunicationTypes.CALL && (!answerStatus || answerStatus === 'all')) {
         icon += 'call-'
+      } else if (type === CommunicationTypes.CALL && answerStatus === 'recorded') {
+        icon += 'recorded-'
       } else if (type === CommunicationTypes.SMS) {
         icon += 'sms-'
       } else if (type === CommunicationTypes.EMAIL) {
@@ -148,6 +150,8 @@ export default {
           icon += `failed-`
         }
       }
+
+      console.log(icon + 'icon')
 
       return icon + 'icon'
     },

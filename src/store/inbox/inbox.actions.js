@@ -10,5 +10,8 @@ export default {
   },
   gettingTasksList: ({ commit }, isGetting) => {
     commit('GETTING_TASKS_LIST', isGetting)
+  },
+  setActiveChannel: ({ commit }, channel) => {
+    commit('SET_ACTIVE_CHANNEL', channel)
   }
 }

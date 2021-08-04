@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="hasPermissionTo('list user')">
     <q-select class="inline-select"
               clearable
               use-input
@@ -8,7 +8,7 @@
               option-value="id"
               option-label="name"
               v-model="field"
-              :loading="is_busy"
+              :loading="isBusy"
               :options="options"
               :disable="disabled"
               @filter="filterFn">
@@ -42,7 +42,7 @@
 
 <script>
 import * as AnswerTypes from 'src/constants/answer-types'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -69,10 +69,10 @@ export default {
 
   computed: {
     ...mapState(['users']),
-
+    ...mapGetters('auth', ['profile']),
     availableUsers () {
-      if (this.users.length > 0 && (this.auth.profile && this.auth.profile.focus_mode) && !this.ignore_focus_mode) {
-        return this.users.filter(user => user.id === this.auth.profile.id)
+      if (this.users.length > 0 && (this.profile && this.profile.focus_mode) && !this.ignore_focus_mode) {
+        return this.users.filter(user => user.id === this.profile.id)
       } else {
         return this.users
       }
@@ -85,11 +85,11 @@ export default {
           user.answer_by !== AnswerTypes.BY_NONE
         )
 
-        if (this.filtered_text) {
+        if (this.filteredText) {
           return filteredUsers.filter((user) =>
-            (user.name && user.name.toLowerCase().includes(this.filtered_text.toLowerCase())) ||
-            (user.phone_number && user.phone_number.includes(this.filtered_text)) ||
-            (user.email && user.email.toLowerCase().includes(this.filtered_text.toLowerCase()))
+            (user.name && user.name.toLowerCase().includes(this.filteredText.toLowerCase())) ||
+            (user.phone_number && user.phone_number.includes(this.filteredText)) ||
+            (user.email && user.email.toLowerCase().includes(this.filteredText.toLowerCase()))
           )
         }
 
@@ -141,8 +141,8 @@ export default {
 
   data () {
     return {
-      is_busy: false,
-      filtered_text: null,
+      isBusy: false,
+      filteredText: null,
       options: this.formattedOptions
     }
   },
@@ -173,13 +173,7 @@ export default {
 
   watch: {
     field (val) {
-      this.is_busy = true
-      this.$emit('updateField', {
-        val,
-        callback: () => {
-          this.is_busy = false
-        }
-      })
+      this.$emit('updateField', { val })
     }
   }
 }

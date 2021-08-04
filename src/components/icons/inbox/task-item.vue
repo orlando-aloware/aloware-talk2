@@ -7,7 +7,7 @@
               height="34"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
               :style="avatarStyle(false)"
-              :name="communication.contact.name">
+              :name="contactName">
       </avatar>
     </div>
     <div class="task-details flex-grow-1 pb-1"
@@ -17,7 +17,7 @@
       </div>
       <div class="d-flex flex-row">
         <div class="pr-2">
-          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, channelAnswerStatus)"
                      height="18px"
                      width="18px">
           </component>
@@ -97,7 +97,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
-    ...mapState('inbox', ['selectedCommunication']),
+    ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
     contactName () {
       if (this.communication && this.communication.contact) {
         return this.communication.contact.name || this.$options.filters.fixPhone(this.communication.lead_number)
@@ -114,15 +114,17 @@ export default {
       if (_.isEmpty(this.campaigns) || !this.communication.campaign_id) {
         return '-'
       }
-      const found = this.campaigns.find(campaign => campaign.id === this.communication.campaign_id)
-      const index = found ? this.campaigns.indexOf(found) : null
-      if (index) {
-        return this.campaigns[index].name
+      const campaign = this.campaigns.find(campaign => campaign.id === this.communication.campaign_id)
+      if (campaign) {
+        return campaign.name
       }
       return '-'
     },
     activeClass () {
       return this.communication.id === this.selectedCommunication.id ? 'active' : ''
+    },
+    channelAnswerStatus () {
+      return this.activeChannel.answerStatus || ''
     }
   },
 
@@ -132,7 +134,10 @@ export default {
       this.setContactId(id)
     },
     onItemClick (communication) {
-      this.setContact(communication.contact.id)
+      if (communication.contact) {
+        this.setContact(communication.contact.id)
+      }
+
       this.setCommunication(communication)
     },
 

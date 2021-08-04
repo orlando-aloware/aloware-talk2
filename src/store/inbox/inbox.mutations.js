@@ -10,5 +10,8 @@ export default {
   },
   GETTING_TASKS_LIST: (state, isGetting) => {
     state.isGettingTasksList = isGetting
+  },
+  SET_ACTIVE_CHANNEL: (state, channel) => {
+    state.activeChannel = channel
   }
 }

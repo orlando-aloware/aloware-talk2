@@ -153,7 +153,7 @@ export default {
           if (this.selectedContacts[this.selectedList.id]) {
             contacts = this.selectedContacts[this.selectedList.id]
           }
-          params = { ...params, contacts: contacts }
+          params = { ...params, contacts: contacts.map(contact => contact.id) }
           break
         case this.createList.mode === FROM_FOLDERS:
         default:

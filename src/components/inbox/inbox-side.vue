@@ -21,7 +21,7 @@
                     :commCampaigns="communicationLines"
                     :commRingGroups="communicationRingGroups">
       </calls-header>
-      <div v-if="active === 'inbox'"
+      <div v-if="!activeChannel || activeChannel.value === 'inbox'"
            class="w-100">
         <q-btn-toggle
           class="current-tasks border mx-2 mt-2 mb-1"
@@ -72,40 +72,45 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-100 w-100 flex-grow-1 scroll-y">
-        <b-overlay :show="isGettingTasksList"
-                   class="h-100"
-                   rounded="sm"
-                   variant="white">
-          <task-list :communications="communications"
-                     v-if="!isGettingTasksList">
-          </task-list>
-          <template #overlay>
-            <div class="text-center">
-              <q-spinner-bars
-                color="primary"
-                size="2em"
-              />
-            </div>
-          </template>
-        </b-overlay>
-      </div>
+      <inbox-channels v-if="activeChannel && !['inbox', 'messages', 'mentions'].includes(activeChannel.value)"
+                      class="h-100 w-100 flex-grow-1 scroll-y"
+                      :filter-type="activeChannel.type"
+                      :answer-status="activeChannel.answerStatus">
+      </inbox-channels>
     </div>
   </div>
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import TaskList from 'components/icons/inbox/task-list'
+import InboxChannels from 'components/inbox/inbox-channels'
 
+let scrollTimeout
 export default {
   name: 'inbox-side',
+  props: {
+    campaignId: {
+      required: false
+    },
+
+    ringGroupId: {
+      required: false
+    },
+
+    userId: {
+      required: false
+    },
+
+    workflowId: {
+      required: false
+    }
+  },
 
   components: {
-    TaskList,
+    InboxChannels,
     CallsHeader,
     InboxNavList
   },
@@ -131,18 +136,20 @@ export default {
           slot: 'three'
         }
       ],
-      filters: {
-        type: 'all',
-        answer_status: 'all'
-      },
-      communications: []
+      filters: null,
+      communications: [],
+      searchText: '',
+      searchFields: ['name', 'phone_number', 'email'],
+      currentPage: 0,
+      hasMore: false,
+      isLoadingMore: false,
+      isLoaded: true
     }
   },
 
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
-    ...mapState('inbox', ['isGettingTasksList']),
-
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel']),
     communicationLines () {
       let campaigns = []
       let found = null
@@ -162,7 +169,6 @@ export default {
       }
       return campaigns
     },
-
     communicationRingGroups () {
       let ringGroups = []
       let found = null
@@ -181,12 +187,10 @@ export default {
         }
       }
       return ringGroups
+    },
+    nextPage () {
+      return this.currentPage + 1
     }
-  },
-
-  mounted () {
-    window.addEventListener('resize', this.toggleOnResize)
-    // this.getCommunications(this.filters)
   },
 
   methods: {
@@ -212,61 +216,43 @@ export default {
         .get({ params: params })
         .then(response => {
           this.communications = response.data.data
+          this.currentPage = response.data.current_page
+          this.hasMore = response.data.next_page_url
           this.gettingTasksList(false)
+        })
+    },
+
+    loadMoreCommunications (params) {
+      this.isLoadingMore = true
+      this.isLoaded = false
+      talk2Api.V1.reports.communications
+        .get({ params: params })
+        .then(response => {
+          this.communications = [...this.communications, ...response.data.data]
+          this.currentPage = response.data.current_page
+          this.hasMore = response.data.next_page_url
+          this.isLoadingMore = false
+          this.isLoaded = true
         })
     },
 
     newActive (active) {
       this.active = active
-      switch (this.active) {
-        case 'calls':
-          this.filters = {
-            type: 'call',
-            direction: 'all'
-          }
-          break
-        case 'messages':
-          this.filters = {
-            type: 'sms',
-            direction: 'all'
-          }
-          break
-        case 'mentions':
-          break
-        case 'voicemails':
-          this.filters = {
-            type: 'call',
-            direction: 'all',
-            'answer_status': 'voicemail'
-          }
-          break
-        case 'recordings':
-          this.filters = {
-            type: 'call',
-            direction: 'all',
-            'answer_status': 'recorded'
-          }
-          break
-        case 'inbox':
-        default:
-          this.filters = {
-            type: 'all',
-            direction: 'all',
-            'answer_status': 'all'
-          }
-          this.communications = []
-      }
-
-      // Disable inbox as of the moment
-      if (this.active !== 'inbox') {
-        this.getCommunications(this.filters)
-      }
+      this.setActiveChannel(active)
     },
 
-    ...mapActions('inbox', ['gettingTasksList'])
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel'])
+  },
+
+  mounted () {
+    window.addEventListener('resize', this.toggleOnResize)
+  },
+  created () {
+    this.setActiveChannel(null)
   },
 
   beforeDestroy () {
+    clearTimeout(scrollTimeout)
     window.removeEventListener('resize', this.toggleOnResize)
   }
 }

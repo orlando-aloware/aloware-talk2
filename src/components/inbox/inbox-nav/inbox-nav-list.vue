@@ -67,7 +67,9 @@ export default {
           label: 'Calls',
           value: 'calls',
           icon: 'call',
-          disabled: false
+          disabled: false,
+          type: 'call',
+          answerStatus: 'all'
         },
         {
           label: 'Messages',
@@ -85,13 +87,17 @@ export default {
           label: 'Voicemails',
           value: 'voicemails',
           icon: 'voicemail',
-          disabled: false
+          disabled: false,
+          type: 'call',
+          answerStatus: 'voicemail'
         },
         {
           label: 'Recordings',
           value: 'recordings',
           icon: 'record',
-          disabled: false
+          disabled: false,
+          type: 'call',
+          answerStatus: 'recorded'
         }
       ]
     }
@@ -100,7 +106,7 @@ export default {
   methods: {
     onItemClicked (nextActive) {
       this.active = nextActive
-      this.$emit('active', this.active)
+      this.$emit('active', this.items.find(item => item.value === this.active))
     }
   }
 }
