@@ -1579,6 +1579,10 @@ export default {
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
             this.screen = 'menu'
           }
+
+          if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
+            this.screen = 'menu'
+          }
           break
         case 'GOT_ERROR':
           // ?

@@ -1,7 +1,8 @@
 <template>
-  <q-item class="mr-3 pl-2 pr-2 parked-call cursor-pointer no-select"
+  <q-item :clickable="dialer && dialer.parkedCall && !dialer.call"
+          :disabled="dialer.call"
           v-if="dialer && dialer.parkedCall"
-          clickable
+          class="mr-3 pl-2 pr-2 parked-call cursor-pointer no-select"
           v-ripple
           @click="unparkCall">
     <q-item-section>
@@ -55,6 +56,10 @@ export default {
 
   methods: {
     unparkCall () {
+      if (this.dialer.call) {
+        return false
+      }
+
       this.$VueEvent.fire('unparkCall')
     }
   }
