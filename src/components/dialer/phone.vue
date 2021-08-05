@@ -279,7 +279,7 @@
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
             </button>
-            <button :disabled="isHoldDisabled || loadingHold"
+            <button :disabled="isHoldDisabled || loadingHold || loadingUnhold"
                     class="phone-buttons btn"
                     @click="toggleHold">
               <hold-icon width="16"
@@ -925,6 +925,7 @@ export default {
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
       loadingHold: false,
+      loadingUnhold: false,
       loadingPark: false,
       expanded: false,
       screen: 'call',
@@ -1165,7 +1166,21 @@ export default {
     },
 
     toggleHold () {
+      if (this.dialer.isHeld) {
+        this.loadingUnhold = true
+      } else {
+        this.loadingHold = true
+      }
+
       this.$VueEvent.fire('toggleHold')
+
+      setTimeout(() => {
+        if (this.dialer.isHeld) {
+          this.loadingHold = false
+        } else {
+          this.loadingUnhold = false
+        }
+      }, 1000)
     },
 
     openDialpad () {
@@ -1246,8 +1261,12 @@ export default {
     },
 
     parkCall ($event) {
+      this.loadingPark = true
       this.$VueEvent.fire('parkCall')
       this.saveAndResetExpansion($event)
+      setTimeout(() => {
+        this.loadingPark = false
+      }, 1000)
     },
 
     saveAndResetExpansion ($event) {

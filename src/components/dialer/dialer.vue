@@ -522,20 +522,6 @@ export default {
       }
     },
 
-    toggleHold () {
-      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
-        return
-      }
-
-      if (!this.dialer.isHeld) {
-        console.log('Holding call')
-        this.setDialerIsHeld(true)
-      } else {
-        console.log('Unholding call')
-        this.setDialerIsHeld(false)
-      }
-    },
-
     toggleRecordingStatus () {
       if (!this.dialer.call || !this.dialer.communication || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
@@ -588,11 +574,44 @@ export default {
       })
     },
 
-    parkCall () {
-      if (!this.dialer.communication) {
+    toggleHold () {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
-      if (this.dialer.parkedCall) {
+
+      if (!this.dialer.isHeld) {
+        console.log('Holding call')
+        this.loadingHold = true
+        let params = {
+          communication_id: this.dialer.communication.id
+        }
+        this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
+          this.setDialerIsHeld(true)
+          console.log('Call held')
+        }).catch(err => {
+          console.log(err)
+        }).finally(_ => {
+          this.loadingHold = false
+        })
+      } else {
+        console.log('Unholding call')
+        this.loadingHold = true
+        let params = {
+          communication_id: this.dialer.communication.id
+        }
+        this.$axios.post('/api/v1/dialer/new-unhold', params).then(() => {
+          this.setDialerIsHeld(false)
+          console.log('Call unheld')
+        }).catch(err => {
+          console.log(err)
+        }).finally(_ => {
+          this.loadingHold = false
+        })
+      }
+    },
+
+    parkCall () {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
         return
       }
       this.loadingPark = true
