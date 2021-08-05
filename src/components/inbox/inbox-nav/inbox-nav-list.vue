@@ -75,7 +75,9 @@ export default {
           label: 'Messages',
           value: 'messages',
           icon: 'message',
-          disabled: false
+          disabled: false,
+          type: 'sms',
+          answerStatus: 'all'
         },
         {
           label: 'Mentions',

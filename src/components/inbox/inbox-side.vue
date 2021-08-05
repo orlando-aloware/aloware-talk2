@@ -88,9 +88,9 @@ import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import InboxChannels from 'components/inbox/inbox-channels'
 
-let scrollTimeout
 export default {
   name: 'inbox-side',
+
   props: {
     campaignId: {
       required: false
@@ -150,6 +150,7 @@ export default {
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
     ...mapState('inbox', ['isGettingTasksList', 'activeChannel']),
+
     communicationLines () {
       let campaigns = []
       let found = null
@@ -169,6 +170,7 @@ export default {
       }
       return campaigns
     },
+
     communicationRingGroups () {
       let ringGroups = []
       let found = null
@@ -191,6 +193,14 @@ export default {
     nextPage () {
       return this.currentPage + 1
     }
+  },
+
+  created () {
+    this.setActiveChannel(null)
+  },
+
+  mounted () {
+    window.addEventListener('resize', this.toggleOnResize)
   },
 
   methods: {
@@ -244,15 +254,7 @@ export default {
     ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel'])
   },
 
-  mounted () {
-    window.addEventListener('resize', this.toggleOnResize)
-  },
-  created () {
-    this.setActiveChannel(null)
-  },
-
   beforeDestroy () {
-    clearTimeout(scrollTimeout)
     window.removeEventListener('resize', this.toggleOnResize)
   }
 }
