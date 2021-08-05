@@ -5,7 +5,7 @@
        v-if="shouldShow">
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
-      <div class="d-flex flex-row text-size-rg _500 text-white width-55">
+      <div class="d-flex flex-row text-size-rg _500 text-white width-65">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="isCallCompleted"></span>
         <span v-else>
@@ -16,7 +16,13 @@
         <span v-if="isCallCompleted">Call Ended</span>
         <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row justify-content-end width-55">
+      <div class="d-flex flex-row justify-content-end align-items-center width-65">
+        <pause-record-icon width="14"
+                           height="14"
+                           class="mr-2"
+                           v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
+        </pause-record-icon>
+
         <ul id="signal-strength"
             class="mr-2"
             v-if="!isCallCompleted">
