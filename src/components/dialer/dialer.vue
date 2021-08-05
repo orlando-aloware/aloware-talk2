@@ -260,6 +260,18 @@ export default {
       this.forceRefreshCommunication()
     })
 
+    this.$VueEvent.listen('parkCall', () => {
+      this.parkCall()
+    })
+
+    this.$VueEvent.listen('mergeCalls', () => {
+      this.mergeCalls()
+    })
+
+    this.$VueEvent.listen('dropThirdParty', () => {
+      this.dropThirdParty()
+    })
+
     this.$VueEvent.listen('setInputDevice', (inputDevice) => {
       this.setInputDevice(inputDevice)
     })
@@ -564,6 +576,64 @@ export default {
         }
         this.loadingToggleRecordingStatus = false
         console.log(err)
+      })
+    },
+
+    parkCall () {
+      if (!this.dialer.communication) {
+        return
+      }
+      if (this.dialer.parkedCall) {
+        return
+      }
+      this.loadingHold = true
+      this.setDialerParkedCall(this.dialer.communication)
+      let params = {
+        communication_id: this.dialer.communication.id
+      }
+      this.$axios.post('/api/v1/dialer/hold', params).then(() => {
+        console.log('Call parked')
+      }).catch(err => {
+        this.setDialerParkedCall()
+        console.log(err)
+      }).finally(_ => {
+        this.loadingHold = false
+      })
+    },
+
+    mergeCalls () {
+      if (!this.dialer.communication) {
+        return
+      }
+      this.loadingMerge = true
+      let params = {
+        communication_id: this.dialer.communication.id
+      }
+      this.$axios.post('/api/v1/dialer/merge-calls', params).then(res => {
+        this.setShouldIntroduce(false)
+        console.log('Merge successful.')
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingMerge = false
+      })
+    },
+
+    dropThirdParty () {
+      if (!this.dialer.communication) {
+        return
+      }
+      this.loadingDropThirdParty = true
+      this.$axios.post('/api/v1/dialer/drop-third-party', {
+        communication_id: this.dialer.communication.id
+      }).then(res => {
+        this.setShouldIntroduce(false)
+        this.setAddedParty()
+        console.log('Third party has been dropped out of this call.')
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingDropThirdParty = false
       })
     },
 
