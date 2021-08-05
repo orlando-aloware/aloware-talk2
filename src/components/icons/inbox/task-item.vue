@@ -98,6 +98,7 @@ export default {
   computed: {
     ...mapState(['campaigns']),
     ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
+
     contactName () {
       if (this.communication && this.communication.contact) {
         return this.communication.contact.name || this.$options.filters.fixPhone(this.communication.lead_number)
@@ -120,19 +121,21 @@ export default {
       }
       return '-'
     },
+
     activeClass () {
       return this.communication.id === this.selectedCommunication.id ? 'active' : ''
     },
+
     channelAnswerStatus () {
       return this.activeChannel.answerStatus || ''
     }
   },
 
   methods: {
-    ...mapActions('inbox', ['setCommunication']),
     setContact (id) {
       this.setContactId(id)
     },
+
     onItemClick (communication) {
       if (communication.contact) {
         this.setContact(communication.contact.id)
@@ -141,7 +144,7 @@ export default {
       this.setCommunication(communication)
     },
 
-    ...mapActions('inbox', ['setContactId'])
+    ...mapActions('inbox', ['setContactId', 'setCommunication'])
   }
 }
 </script>
