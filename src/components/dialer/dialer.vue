@@ -193,10 +193,12 @@ export default {
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('Call ended')
+      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      if (!this.dialer.parkedCall) {
+      if (!this.dialer.parkedCall && !this.dialer.call) {
+        this.startWrapUpTimer()
+      } else if (this.dialer.parkedCall && this.dialer.call) {
         this.startWrapUpTimer()
       } else {
         this.backToDial()
