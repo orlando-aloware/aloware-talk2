@@ -4,7 +4,7 @@ import * as CommunicationTypes from '../../constants/communication-types'
 
 export default {
   methods: {
-    stateToTextColor: function (dispositionStatus, type) {
+    stateToTextColor (dispositionStatus, type) {
       let color = ''
       if (type === CommunicationTypes.CALL) {
         if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
@@ -51,7 +51,7 @@ export default {
       return color
     },
 
-    stateToColor: function (dispositionStatus, type) {
+    stateToColor (dispositionStatus, type) {
       let color = ''
       if (type === CommunicationTypes.CALL) {
         if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
@@ -98,7 +98,7 @@ export default {
       return color
     },
 
-    stateToIcon: function (dispositionStatus, type, direction = null, answerStatus = null) {
+    stateToIcon (dispositionStatus, type, direction = null, answerStatus = null) {
       let icon = ''
 
       if (![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
@@ -153,7 +153,7 @@ export default {
       return icon + 'icon'
     },
 
-    rejectionToIcon: function (rejectionReason) {
+    rejectionToIcon (rejectionReason) {
       switch (rejectionReason) {
         case this.REJECTION_REASON_BLOCKED:
           return 'phone_locked'
