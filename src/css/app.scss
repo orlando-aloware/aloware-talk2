@@ -3361,6 +3361,19 @@ span.mention {
   }
 }
 
+.parked-call {
+  background: rgba(155, 81, 224, 0.04);
+  border: 1px solid #9B51E0;
+  border-radius: 7px;
+  width: 190px;
+  @extend .text-grey-100;
+
+  .call-status {
+    font-size: 11px !important;
+    @extend .text-grey-100;
+  }
+}
+
 .phone {
   position: fixed;
   top: 67px;

@@ -149,8 +149,7 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.resetAgentStatus()
-      this.resetCall()
+      this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
       //     console.log(err)
@@ -613,21 +612,18 @@ export default {
       }
 
       this.loadingUnpark = true
+      const parkedCall = this.dialer.parkedCall
+      this.setDialerParkedCall()
       let data = {
-        currentNumber: 'unhold:' + this.dialer.parkedCall.id,
-        outboundCampaignId: this.dialer.parkedCall.campaign_id,
-        contactName: (this.dialer.parkedCall.contact) ? this.dialer.parkedCall.contact.name : 'No Name',
-        companyName: (this.dialer.parkedCall.contact) ? this.dialer.contact.company_name : '',
-        contactId: this.dialer.parkedCall.contact_id
+        currentNumber: 'unhold:' + parkedCall.id,
+        outboundCampaignId: parkedCall.campaign_id,
+        contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
+        companyName: (parkedCall.contact) ? parkedCall.contact.company_name : '',
+        contactId: parkedCall.contact_id
       }
-      this.$VueEvent.fire('makeCall', data)
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
       console.log('Unhold is in progress.')
-      this.setDialerCommunication(this.dialer.parkedCall)
-      if (this.dialer.parkedCall && this.dialer.parkedCall.contact) {
-        this.setDialerContact(this.dialer.parkedCall.contact)
-      }
-      this.setDialerParkedCall()
     },
 
     mergeCalls () {
@@ -863,8 +859,7 @@ export default {
     },
 
     rebootPhone (login = false) {
-      this.resetAgentStatus()
-      this.resetCall()
+      this.backToDial()
       if (login) {
         this.setDialerCurrentStatus('RESTARTING')
         this.getDesktopToken()

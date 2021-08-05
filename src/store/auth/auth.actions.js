@@ -185,6 +185,10 @@ const impersonate = async ({ commit }, payload) => {
   }
 }
 
+const setAgentStatus = async ({ commit }, agentStatus) => {
+  commit('SET_AGENT_STATUS', agentStatus)
+}
+
 export default {
-  check, login, logout, register, forgotPass, resetPass, impersonate
+  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus
 }

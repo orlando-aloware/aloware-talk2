@@ -114,7 +114,7 @@
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
       <template v-if="screen === 'call'">
         <div class="phone-notice d-flex flex-column align-items-center"
-             v-if="dialer.contact && dialer.call.direction === 'OUTGOING' && showLocalTime">
+             v-if="dialer.contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
                     inline-actions
                     rounded
@@ -176,7 +176,7 @@
         </div>
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
-               v-if="dialer.call.direction === 'INCOMING'">
+               v-if="dialer.call && dialer.call.direction === 'INCOMING'">
             <div class="d-flex flex-column align-items-center">
               <q-btn class="height-52"
                      ripple
@@ -205,7 +205,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call.direction === 'OUTGOING'">
+               v-if="dialer.call && dialer.call.direction === 'OUTGOING'">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
