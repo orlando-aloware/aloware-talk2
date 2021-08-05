@@ -200,6 +200,8 @@ export default {
         this.startWrapUpTimer()
       } else if (this.dialer.parkedCall && this.dialer.call) {
         this.startWrapUpTimer()
+      } else if (!this.dialer.parkedCall && this.dialer.call) {
+        this.startWrapUpTimer()
       } else {
         this.backToDial()
       }
