@@ -23,7 +23,9 @@ export default {
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
       loadingHold: false,
+      loadingUnhold: false,
       loadingPark: false,
+      loadingUnpark: false,
       callNotification: null,
       desktopNotification: null,
       device: new TwilioDevice(),
@@ -262,6 +264,10 @@ export default {
 
     this.$VueEvent.listen('parkCall', () => {
       this.parkCall()
+    })
+
+    this.$VueEvent.listen('unparkCall', () => {
+      this.unparkCall()
     })
 
     this.$VueEvent.listen('mergeCalls', () => {
@@ -586,7 +592,7 @@ export default {
       if (this.dialer.parkedCall) {
         return
       }
-      this.loadingHold = true
+      this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
       let params = {
         communication_id: this.dialer.communication.id
@@ -597,8 +603,31 @@ export default {
         this.setDialerParkedCall()
         console.log(err)
       }).finally(_ => {
-        this.loadingHold = false
+        this.loadingPark = false
       })
+    },
+
+    unparkCall () {
+      if (!this.dialer.parkedCall) {
+        return
+      }
+
+      this.loadingUnpark = true
+      let data = {
+        currentNumber: 'unhold:' + this.dialer.parkedCall.id,
+        outboundCampaignId: this.dialer.parkedCall.campaign_id,
+        contactName: (this.dialer.parkedCall.contact) ? this.dialer.parkedCall.contact.name : 'No Name',
+        companyName: (this.dialer.parkedCall.contact) ? this.dialer.contact.company_name : '',
+        contactId: this.dialer.parkedCall.contact_id
+      }
+      this.$VueEvent.fire('makeCall', data)
+      this.loadingUnpark = false
+      console.log('Unhold is in progress.')
+      this.setDialerCommunication(this.dialer.parkedCall)
+      if (this.dialer.parkedCall && this.dialer.parkedCall.contact) {
+        this.setDialerContact(this.dialer.parkedCall.contact)
+      }
+      this.setDialerParkedCall()
     },
 
     mergeCalls () {
