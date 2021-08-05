@@ -72,7 +72,7 @@
           </template>
         </q-btn-toggle>
       </div>
-      <inbox-channels v-if="activeChannel && !['inbox', 'messages', 'mentions'].includes(activeChannel.value)"
+      <inbox-channels v-if="activeChannel && !['inbox', 'mentions'].includes(activeChannel.value)"
                       class="h-100 w-100 flex-grow-1 scroll-y"
                       :filter-type="activeChannel.type"
                       :answer-status="activeChannel.answerStatus">
