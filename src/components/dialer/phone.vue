@@ -767,7 +767,8 @@
                   </scripts-icon>
                   <span>Scripts</span>
                 </button>
-                <button class="phone-buttons btn"
+                <button :disabled="isParkDisabled"
+                        class="phone-buttons btn"
                         @click="parkCall">
                   <park-call-icon width="18"
                                   height="18">
