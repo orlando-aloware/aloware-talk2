@@ -130,80 +130,6 @@
             </line-selector>
           </b-form-group>
         </b-tab>
-        <b-tab :active="mode === 'transfer'"
-               v-if="false"
-               title="Transfer"
-               @click="setMode('transfer')">
-          <q-list class="phone-radio-select">
-            <q-item tag="label"
-                    dense>
-              <q-item-section avatar>
-                <q-radio v-model="selected"
-                         val="user"
-                         color="primary"
-                         size="xs"
-                         dense>
-                </q-radio>
-              </q-item-section>
-              <q-item-section>
-                <template v-if="selected === 'user'">
-                  <user-selector v-model="selectorId"
-                                 @change="changeSelector">
-                  </user-selector>
-                </template>
-                <template v-else>
-                  <span class="text-rg text-grey-100">Transfer to User</span>
-                </template>
-              </q-item-section>
-            </q-item>
-            <q-item tag="label"
-                    dense>
-              <q-item-section avatar>
-                <q-radio v-model="selected"
-                         val="ring-group"
-                         color="primary"
-                         size="xs"
-                         dense>
-                </q-radio>
-              </q-item-section>
-              <q-item-section>
-                <template v-if="selected === 'ring-group'">
-                  <ring-group-selector v-model="selectorId"
-                                       @change="changeSelector">
-                  </ring-group-selector>
-                </template>
-                <template v-else>
-                  <span class="text-rg text-grey-100">Transfer to Ring Group</span>
-                </template>
-              </q-item-section>
-            </q-item>
-            <q-item tag="label"
-                    dense>
-              <q-item-section avatar>
-                <q-radio v-model="selected"
-                         val="phone-number"
-                         color="primary"
-                         size="xs"
-                         dense>
-                </q-radio>
-              </q-item-section>
-              <q-item-section>
-                <template v-if="selected === 'phone-number'">
-                  <q-input v-model="selectorPhoneNumber"
-                           class="form-control-search form-control"
-                           placeholder="Enter phone number"
-                           borderless
-                           clearable
-                           dense>
-                  </q-input>
-                </template>
-                <template v-else>
-                  <span class="text-rg text-grey-100">Transfer to Phone Number</span>
-                </template>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </b-tab>
       </b-tabs>
     </div>
   </div>
@@ -216,8 +142,6 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
-import UserSelector from 'components/generic-selectors/user-selector'
 
 export default {
   name: 'dialer-form',
@@ -225,8 +149,6 @@ export default {
   mixins: [contactMixins],
 
   components: {
-    UserSelector,
-    RingGroupSelector,
     ContactPhoneNumberSearch,
     LineSelector,
     SendTextIcon
@@ -251,10 +173,7 @@ export default {
       contactTimezone: null,
       currentLocalTime: null,
       loadingContact: false,
-      textMessage: '',
-      selectorId: null,
-      selectorPhoneNumber: null,
-      selected: 'user'
+      textMessage: ''
     }
   },
 
@@ -375,15 +294,6 @@ export default {
 
     changeCampaignId (campaignId) {
       this.campaignId = campaignId
-    },
-
-    resetSelectorId () {
-      this.selectorId = null
-      this.selectorPhoneNumber = null
-    },
-
-    changeSelector (selectorId) {
-      this.selectorId = selectorId
     },
 
     findDefaultOutboundCampaign () {

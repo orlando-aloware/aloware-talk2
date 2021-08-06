@@ -5,18 +5,32 @@
            scrollable
            v-model="isOpen"
            :title="title"
-            @hidden="onHidden">
+           @hidden="onHidden">
     <div>
       <b-row>
         <b-col cols="12">
-          <b-calendar hide-header v-model="date" @context="onContext" :min="minDate" locale="en-US"></b-calendar>
+          <b-calendar :min="minDate"
+                      v-model="date"
+                      locale="en-US"
+                      hide-header
+                      @context="onContext">
+          </b-calendar>
         </b-col>
         <b-col cols="12">
-          <b-time class="mt-2 w-100" hide-header v-model="time" locale="en" @context="onContext"></b-time>
+          <b-time v-model="time"
+                  class="mt-2 w-100"
+                  locale="en"
+                  hide-header
+                  @context="onContext">
+          </b-time>
         </b-col>
 
         <b-col cols="12">
-          <b-alert class="schedule-notice p-1 mt-2 mb-0" :show="!isScheduleDeliverable" variant="warning">Schedule must be in future date</b-alert>
+          <b-alert class="schedule-notice p-1 mt-2 mb-0"
+                   :show="!isScheduleDeliverable"
+                   variant="warning">
+            Schedule must be in future date
+          </b-alert>
         </b-col>
       </b-row>
     </div>
@@ -24,25 +38,23 @@
     <template slot="modal-footer">
       <div class="w-100 d-flex align-items-center">
         <div class="d-flex align-items-center">
-          <b-button
-            variant="outline-success"
-            class="custom-btn"
-            size="sm"
-            :disabled="isSending"
-            @click="onReset"
-          >
+          <b-button variant="outline-success"
+                    class="custom-btn"
+                    size="sm"
+                    :disabled="isSending"
+                    @click="onReset">
             Reset
           </b-button>
         </div>
         <div class="flex-grow-1"></div>
-        <b-button
-          variant="primary"
-          class="custom-btn"
-          size="sm"
-          :disabled="isSending || !isScheduleDeliverable"
-          @click="onSend"
-        >
-          <q-spinner-bars v-if="isSending" color="white" />
+        <b-button variant="primary"
+                  class="custom-btn"
+                  size="sm"
+                  :disabled="isSending || !isScheduleDeliverable"
+                  @click="onSend">
+          <q-spinner-bars v-if="isSending"
+                          color="white">
+          </q-spinner-bars>
           {{ isSending ? 'Scheduling Message...' : 'Schedule Send' }}
         </b-button>
       </div>
@@ -53,15 +65,23 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+
 export default {
   name: 'scheduled-message',
+
   computed: {
     ...mapGetters('contacts', ['isScheduleMessageOpen']),
     ...mapState('contacts', ['contact', 'messageComposer', 'selectedLine']),
+
     minDate () {
       return new Date()
     }
   },
+
+  mounted () {
+    this.setNow()
+  },
+
   data () {
     return {
       isSending: false,
@@ -74,17 +94,20 @@ export default {
       isScheduleDeliverable: false
     }
   },
+
   methods: {
-    ...mapActions('contacts', ['scheduleMessageOpen', 'resetMessageComposerSms']),
     onHidden () {
       this.scheduleMessageOpen(false)
     },
+
     onContext (ctx) {
       this.context = ctx
     },
+
     onReset () {
       this.setNow()
     },
+
     onSend () {
       this.isSending = true
       return talk2Api.V1.message.scheduled(this.formatMessage())
@@ -95,6 +118,7 @@ export default {
           this.isSending = false
         })
     },
+
     formatMessage () {
       return {
         body: this.messageComposer.sms.body,
@@ -106,16 +130,21 @@ export default {
         attachments: this.messageComposer.sms.attachments
       }
     },
+
     setNow () {
       this.scheduleDate = window.moment()
 
       this.time = this.scheduleDate.format('HH:mm')
       this.date = this.scheduleDate.toDate()
     },
+
     validateScheduleDate () {
       this.isScheduleDeliverable = this.scheduleDate.isAfter(window.moment())
-    }
+    },
+
+    ...mapActions('contacts', ['scheduleMessageOpen', 'resetMessageComposerSms'])
   },
+
   watch: {
     date: function (date) {
       if (typeof date === 'object') {
@@ -142,22 +171,19 @@ export default {
     'isScheduleMessageOpen': function (value) {
       this.isOpen = value
     }
-  },
-  mounted () {
-    this.setNow()
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .schedule-message-modal {
-    .modal-body {
-      overflow-x: hidden !important;
-    }
-
+.schedule-message-modal {
+  .modal-body {
+    overflow-x: hidden !important;
   }
 
-  .schedule-notice {
-    font-size: 0.75rem;
-  }
+}
+
+.schedule-notice {
+  font-size: 0.75rem;
+}
 </style>

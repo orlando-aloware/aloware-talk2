@@ -1745,11 +1745,10 @@ span.mention {
       }
 
       .contact-badge {
-        margin-top: 8px;
         height: 20px;
         width: 20px;
         padding: 5px 0 !important;
-        text-align: -webkit-center;
+        text-align: center;
       }
     }
   }
@@ -2775,6 +2774,27 @@ span.mention {
   background-color: $primary;
 }
 
+.btn-outline-dark {
+  border: 1px solid $grey-70;
+
+  &:active, &:hover, &:focus {
+    background-color: $white;
+    border-color: $grey-70;
+    color: $grey-100;
+    box-shadow: none !important;
+  }
+
+  i {
+    font-size: $f-size-body-xl;
+    margin-top: -2px;
+  }
+}
+
+.btn-outline-dark-primary {
+  color: $primary;
+  @extend .btn-outline-dark;
+}
+
 /*
  Quasar related
  */
@@ -2865,6 +2885,10 @@ span.mention {
 /*
  Utilities
  */
+.flex-even {
+  flex: 1;
+}
+
 .break-all {
   word-break: break-all;
 }
@@ -3710,17 +3734,6 @@ span.mention {
       .b-icon {
         font-size: $f-size-body-sm;
         vertical-align: -0.15em;
-      }
-    }
-
-    .btn-outline-dark {
-      border: 1px solid $grey-70;
-
-      &:active, &:hover, &:focus {
-        background-color: $white;
-        border-color: $grey-70;
-        color: $grey-100;
-        box-shadow: none !important;
       }
     }
 

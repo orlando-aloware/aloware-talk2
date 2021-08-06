@@ -6,7 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, agentMixin } from '../../boot/mixins'
+import { aclMixin, agentMixin, userMixin } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
@@ -14,7 +14,7 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 export default {
   name: 'dialer',
 
-  mixins: [aclMixin, agentMixin],
+  mixins: [aclMixin, agentMixin, userMixin],
 
   data () {
     return {
@@ -233,6 +233,14 @@ export default {
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
     })
 
+    this.$VueEvent.listen('transferCall', (data) => {
+      this.transferCall(data)
+    })
+
+    this.$VueEvent.listen('addParticipant', (data) => {
+      this.addParticipant(data)
+    })
+
     this.$VueEvent.listen('hangupCall', () => {
       this.hangupCall()
     })
@@ -381,14 +389,12 @@ export default {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
-        console.log('Dialer is not ready, rescheduling', currentNumber, outboundCampaignId)
-        // dialer is not ready, rescheduling
-        setTimeout(() => {
-          this.makeCall(currentNumber, outboundCampaignId, contactName, companyName, contactId)
-        }, 1000)
+        console.log('Dialer is not ready', currentNumber, outboundCampaignId)
+        return
       }
 
       if (this.dialer.call || !currentNumber || !outboundCampaignId) {
+        console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
       }
 
@@ -650,7 +656,7 @@ export default {
     },
 
     mergeCalls () {
-      if (!this.dialer.communication) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
       this.loadingMerge = true
@@ -668,7 +674,7 @@ export default {
     },
 
     dropThirdParty () {
-      if (!this.dialer.communication) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
       this.loadingDropThirdParty = true
@@ -682,6 +688,79 @@ export default {
         console.log(err)
       }).finally(_ => {
         this.loadingDropThirdParty = false
+      })
+    },
+
+    transferCall (transfer) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      this.loadingTransfer = true
+      let params = {
+        communication_id: this.dialer.communication.id,
+        user_id: null,
+        ring_group_id: null,
+        phone_number: null,
+        type: 'cold'
+      }
+
+      if (transfer.mode === 'user') {
+        params.user_id = transfer.userId
+      }
+
+      if (transfer.mode === 'ring-group') {
+        params.ring_group_id = transfer.ringGroupId
+      }
+
+      if (transfer.mode === 'phone-number') {
+        params.phone_number = this.$options.filters.fixPhone(transfer.phoneNumber, 'E164', true, true)
+      }
+
+      this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
+        console.log('Transfer is in progress')
+      }).catch(err => {
+        console.log(err)
+      }).finally(() => {
+        this.loadingTransfer = false
+      })
+    },
+
+    addParticipant (add) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      this.loadingAdd = true
+      let params = {
+        communication_id: this.dialer.communication.id,
+        introduce: add.introduce,
+        user_id: null,
+        phone_number: null,
+        type: 'warm'
+      }
+
+      if (add.mode === 'user') {
+        params.user_id = add.userId
+        let user = this.getUser(add.userId)
+        if (user) {
+          this.setAddedParty(user.name)
+        }
+      }
+
+      if (add.mode === 'phone-number') {
+        params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
+        this.setAddedParty(this.$options.filters.fixPhone(add.phone_number, 'NATIONAL', true, true))
+      }
+
+      this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
+        this.setShouldIntroduce(add.introduce)
+        console.log((add.introduce) ? 'Introduce is in progress.' : 'Add is in progress.')
+      }).catch(err => {
+        this.setAddedParty()
+        console.log(err)
+      }).finally(() => {
+        this.loadingAdd = false
       })
     },
 
@@ -925,6 +1004,8 @@ export default {
     this.$VueEvent.stop('endWrapUp')
     this.$VueEvent.stop('resetCall')
     this.$VueEvent.stop('makeCall')
+    this.$VueEvent.stop('transferCall')
+    this.$VueEvent.stop('addParticipant')
     this.$VueEvent.stop('hangupCall')
     this.$VueEvent.stop('answerCall')
     this.$VueEvent.stop('rejectCall')
@@ -933,6 +1014,10 @@ export default {
     this.$VueEvent.stop('toggleHold')
     this.$VueEvent.stop('toggleRecordingStatus')
     this.$VueEvent.stop('forceRefreshCommunication')
+    this.$VueEvent.stop('parkCall')
+    this.$VueEvent.stop('unparkCall')
+    this.$VueEvent.stop('mergeCalls')
+    this.$VueEvent.stop('dropThirdParty')
     this.$VueEvent.stop('setInputDevice')
     this.$VueEvent.stop('setOutputDevice')
     this.$VueEvent.stop('testOutputDevice')

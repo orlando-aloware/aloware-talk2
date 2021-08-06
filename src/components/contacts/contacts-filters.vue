@@ -1,10 +1,10 @@
 <template>
-  <div class="contacts-filter-sidebar" v-if="show">
+  <div class="contacts-filter-sidebar"
+       v-if="show">
     <b-overlay class="full-width"
                spinner-variant="success"
                spinner-type="grow"
-               rounded="sm"
-    >
+               rounded="sm">
       <b-card header="Primary"
               header-bg-variant="primary"
               header-text-variant="white">
@@ -14,14 +14,17 @@
               <b-button variant="outline-primary header-buttons"
                         size="sm"
                         @click="backToStep"
-                        v-if="step !== 1"
-              >
+                        v-if="step !== 1">
                 <i class="fa fa-arrow-left"></i>
               </b-button>
               <h6 class="mb-0">Filters</h6>
             </div>
 
-            <b-button variant="outline-primary header-buttons btn-close-filter" size="sm" @click="onCloseFilter"><i class="fa fa-times"></i> </b-button>
+            <b-button variant="outline-primary header-buttons btn-close-filter"
+                      size="sm"
+                      @click="onCloseFilter">
+              <i class="fa fa-times"></i>
+            </b-button>
           </div>
         </template>
         <div class="">
@@ -29,12 +32,10 @@
             <!-- Using slots -->
             <div class="filter-contents step-1 pt-2 pr-1"
                  v-if="step === 1">
-              <compact-btn
-                v-if="isEmptyListFilters"
-                variant="primary"
-                customClass="px-4 add-filters m-2"
-                @clicked="toAddFiltersStep"
-              >
+              <compact-btn v-if="isEmptyListFilters"
+                           variant="primary"
+                           customClass="px-4 add-filters m-2"
+                           @clicked="toAddFiltersStep">
                 <i class="material-icons mr-1 add-icon">add</i> Add a Filter
               </compact-btn>
               <div class="textual-filters"
@@ -43,13 +44,11 @@
                   <div class="d-flex full-width mb-2"
                        :key="`group-remove-${groupIndex}`">
                     <div v-if="visibleListFilters.length >= 2 && groupIndex >= 1"
-                         class="font-weight-bold group-conjunction"
-                    >
-                      {{ group.is_conjunction ? 'AND' : 'OR'}}
+                         class="font-weight-bold group-conjunction">
+                      {{ group.is_conjunction ? 'AND' : 'OR' }}
                     </div>
                     <compact-btn class="py-0 delete-group-filter ml-auto"
-                                 @clicked="onDeleteGroupFilter(groupIndex)"
-                    >
+                                 @clicked="onDeleteGroupFilter(groupIndex)">
                       Remove
                     </compact-btn>
                   </div>
@@ -80,17 +79,14 @@
                         </compact-btn>
                       </b-card>
                       <div v-if="getFilterLength(group.filters) >= 2 && index < (getFilterLength(group.filters) - 1)"
-                            class="mb-2 font-weight-bold"
-                            :key="`filter-${filter.key}`"
-                      >
+                           class="mb-2 font-weight-bold"
+                           :key="`filter-${filter.key}`">
                         AND
                       </div>
                     </template>
-                    <compact-btn
-                      variant="outlined-light"
-                      customClass="add-filters with-border conjunction-button"
-                      @clicked="toAddFiltersStep(groupIndex)"
-                    >
+                    <compact-btn variant="outlined-light"
+                                 customClass="add-filters with-border conjunction-button"
+                                 @clicked="toAddFiltersStep(groupIndex)">
                       AND
                     </compact-btn>
                   </b-card>
@@ -102,11 +98,9 @@
                 >
                   AND
                 </compact-btn-->
-                <compact-btn
-                  variant="outlined-light"
-                  customClass="mb-2 add-filters with-border conjunction-button"
-                  @clicked="toAddFiltersStep(visibleListFilters.length, false)"
-                >
+                <compact-btn variant="outlined-light"
+                             customClass="mb-2 add-filters with-border conjunction-button"
+                             @clicked="toAddFiltersStep(visibleListFilters.length, false)">
                   OR
                 </compact-btn>
               </div>
@@ -124,15 +118,14 @@
                 </b-list-group-item>
                 <div v-for="filter in filterGroups"
                      :key="filter">
-                  <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup(filter).filters.length > 0">
+                  <b-list-group-item class="filter-divider pt-3"
+                                     v-if="filterByGroup(filter).filters.length > 0">
                     {{ filterByGroup(filter).label }}
                   </b-list-group-item>
-                  <b-list-group-item
-                    class="filter-list-item"
-                    v-for="filter in filterByGroup(filter).filters"
-                    :key="filter.key"
-                    @click="selectFilter(filter)"
-                    >
+                  <b-list-group-item class="filter-list-item"
+                                     v-for="filter in filterByGroup(filter).filters"
+                                     :key="filter.key"
+                                     @click="selectFilter(filter)">
                     {{ filter.label }}
                   </b-list-group-item>
                 </div>
@@ -140,12 +133,10 @@
                   <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup().filters.length > 0">
                     Custom
                   </b-list-group-item>
-                  <b-list-group-item
-                    class="filter-list-item"
-                    v-for="filter in filterByGroup().filters"
-                    :key="filter.key"
-                    @click="selectFilter(filter)"
-                  >
+                  <b-list-group-item class="filter-list-item"
+                                     v-for="filter in filterByGroup().filters"
+                                     :key="filter.key"
+                                     @click="selectFilter(filter)">
                     {{ filter.label }}
                   </b-list-group-item>
                 </div>
@@ -158,8 +149,7 @@
               <contacts-filter-types :filter="selectedFilter"
                                      :filterGroupIndex="filterGroupIndex"
                                      :filterConjunction="filterConjunction"
-                                     @filtersApplied="filtersApplied"
-              >
+                                     @filtersApplied="filtersApplied">
               </contacts-filter-types>
             </div>
           </div>
@@ -170,19 +160,20 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Search from 'src/components/search.vue'
 import ContactsFilterTypes from 'src/components/contacts/contacts-filter-types.vue'
 import CompactBtn from 'components/compact-btn.vue'
-import _ from 'lodash'
-import {
-  GROUP_PRIMARY_INFO,
-  GROUP_CONTACT_LOCATION,
-  GROUP_CONTACT_RELEVANCE,
-  GROUP_CONTACT_COMM_METADATA } from 'src/constants/contact-filter-groups'
+import { GROUP_CONTACT_COMM_METADATA, GROUP_CONTACT_LOCATION, GROUP_CONTACT_RELEVANCE, GROUP_PRIMARY_INFO } from 'src/constants/contact-filter-groups'
 
 export default {
-  components: { Search, CompactBtn, ContactsFilterTypes },
+  components: {
+    Search,
+    CompactBtn,
+    ContactsFilterTypes
+  },
+
   data () {
     return {
       items: Array.from(new Array(10)),
@@ -201,9 +192,11 @@ export default {
       }
     }
   },
+
   computed: {
     ...mapState('contacts', ['isFiltersOpen', 'filters']),
     ...mapGetters('contacts', ['currentListFilters']),
+
     filtersFiltered () {
       if (_.isEmpty(this.visibleListFilters) &&
         (!this.filterSearch || !this.filterSearch.length)) {
@@ -211,9 +204,11 @@ export default {
       }
       return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
     },
+
     isEmptyListFilters () {
       return _.isEmpty(this.visibleListFilters)
     },
+
     filterByGroup () {
       // eslint-disable-next-line camelcase
       return function (groupId) {
@@ -250,15 +245,27 @@ export default {
         let filters = !groupId ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
           : this.filtersFiltered.filter(list => list.group_id === groupId)
 
-        return { filters: filters.sort(compare), label: label }
+        return {
+          filters: filters.sort(compare),
+          label: label
+        }
       }
     }
   },
+
   created () {
     this.visibleListFilters = this.generateListFilters()
   },
+
+  mounted () {
+    this.step = 1
+    this.getFilters()
+    if (this.isFiltersOpen) {
+      this.show = true
+    }
+  },
+
   methods: {
-    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
     getFilters: function () {
       this.$axios
         .get('/api/v2/contacts/filters')
@@ -278,9 +285,11 @@ export default {
           })
         })
     },
+
     searchFilter (filterName) {
       this.filterSearch = filterName
     },
+
     toAddFiltersStep (index, conjunction = true, skipStep = false) {
       if (typeof index === 'number') {
         this.filterGroupIndex = index
@@ -291,10 +300,12 @@ export default {
         this.step = 2
       }
     },
+
     selectFilter (filter) {
       this.selectedFilter = filter
       this.step = 3
     },
+
     selectFilterByKey (key, index, conjunction) {
       const found = this.filters.find(filter => filter.key === key)
       if (found) {
@@ -303,22 +314,28 @@ export default {
         this.step = 3
       }
     },
+
     onCloseFilter () {
       this.show = false
       this.closeFilters()
     },
+
     backToStep () {
       this.$VueEvent.fire('filters-back')
       if (this.step > 1) {
         this.step -= 1
         // make all filters visible
-        if (this.step === 2) { this.filterSearch = '' }
+        if (this.step === 2) {
+          this.filterSearch = ''
+        }
       }
     },
+
     filtersApplied () {
       this.step = 1
       this.$emit('filtersUpdated')
     },
+
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       for (let groupIndex in filterGroups) {
@@ -353,6 +370,7 @@ export default {
       }
       return filterGroups
     },
+
     getFormattedFilterSummary (filter, key) {
       if (!filter.trueValue) {
         return ''
@@ -389,9 +407,11 @@ export default {
         return !isSimpleType ? filter.trueValue : ''
       }
     },
+
     getFilterLength (filter) {
       return Object.keys(filter).length
     },
+
     onDeleteFilter (index, key) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
@@ -400,11 +420,13 @@ export default {
       }
       this.setCurrentListFilters(updatedFilter)
     },
+
     onDeleteGroupFilter (index) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       updatedFilter.splice(index, 1)
       this.setCurrentListFilters(updatedFilter)
     },
+
     emitFiltersCount () {
       let filtersCount = 0
       if (this.currentListFilters.length) {
@@ -414,15 +436,11 @@ export default {
         }
       }
       this.$emit('filtersCount', filtersCount)
-    }
+    },
+
+    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters'])
   },
-  mounted () {
-    this.step = 1
-    this.getFilters()
-    if (this.isFiltersOpen) {
-      this.show = true
-    }
-  },
+
   watch: {
     isFiltersOpen (isFiltersOpen) {
       this.show = isFiltersOpen
