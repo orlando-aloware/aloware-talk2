@@ -1,7 +1,7 @@
-import store from ‘store/index’
+// import store from ‘src/store/index’
 
 function guardMyRoute (to, from, next) {
-  console.log(store.state)
+  // console.log(store.state)
   next()
 }
 
