@@ -447,7 +447,7 @@ export default {
         this.fetchContactCommunications(this.contactId).then(res => {
           if (res.data.has_more_pages) {
             this.fetchContactCommunicationsUntilFound()
-          } else if (this.isCommunicationFound) {
+          } else if (this.isCommunicationFound()) {
             this.scrollIntoActivity()
             this.loadingContactCommunications = false
           } else {
@@ -694,7 +694,7 @@ export default {
 
     isCommunicationFound () {
       let found = null
-      found = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId)
+      found = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
       return !!found
     },
 

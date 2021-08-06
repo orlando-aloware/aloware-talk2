@@ -18,7 +18,7 @@ body {
 html,
 body,
 #q-app {
-  height: 100%;
+  height: calc(100vh);
 }
 
 ::-webkit-scrollbar-track {
@@ -1685,7 +1685,6 @@ span.mention {
  Main layout
  */
 .main-content {
-  padding-left: 64px !important;
   background: #F4F4F4;
 }
 

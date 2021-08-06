@@ -198,7 +198,7 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      sidebarVisible: false,
+      sidebarVisible: true,
       lightMode: true,
       CommunicationTypes
     }
