@@ -37,7 +37,7 @@
               </div>
               <div class="d-flex justify-center align-items-center">
                 <b-badge v-if="contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count > 0"
-                         class="contact-badge m-0 p-0 d-flex justify-center align-items-center"
+                         class="contact-badge d-flex justify-center align-items-center"
                          variant="danger"
                          pill>
                   {{ contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count }}
