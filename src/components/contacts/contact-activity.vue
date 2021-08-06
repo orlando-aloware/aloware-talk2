@@ -186,7 +186,7 @@
             {{ getUser(communication.user_id).name }}
         </span>
         <span class="text-muted"
-              v-else>
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND">
             {{ currentCompany.name }}
         </span>
 

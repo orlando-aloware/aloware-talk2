@@ -5921,7 +5921,21 @@ table.datatable {
   width: 10px;
 }
 
-
 .shine {
-  background: #fff7df;
+  background-color: #fff7df;
+}
+
+.message {
+  &.shine {
+    animation: shine-fade 0.5s linear;
+  }
+
+  @keyframes shine-fade {
+    0% {
+      background-color: rgba(255, 247, 223, 0);
+    }
+    100% {
+      background-color: rgba(255, 247, 223, 1);
+    }
+  }
 }
