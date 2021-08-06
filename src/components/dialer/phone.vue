@@ -735,6 +735,98 @@
           </template>
           <template v-if="bottomExpansion === 'add'">
             <q-card-section class="height-445">
+              <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
+                <div class="d-flex w-100">
+                  <q-list class="phone-radio-select w-100">
+                    <q-item tag="label"
+                            class="pl-0 pr-0"
+                            dense>
+                      <q-item-section avatar>
+                        <q-radio v-model="add.mode"
+                                 val="user"
+                                 color="primary"
+                                 size="xs"
+                                 dense>
+                        </q-radio>
+                      </q-item-section>
+                      <q-item-section>
+                        <template v-if="add.mode === 'user'">
+                          <div class="d-inline-flex w-100">
+                            <available-user-selector :communication="dialer.communication"
+                                                     v-model="add.userId"
+                                                     ref="availableUserSelector"
+                                                     class="flex-grow-1"
+                                                     @change="changeAddUser">
+                            </available-user-selector>
+
+                            <q-btn color="black"
+                                   icon="refresh"
+                                   class="text-size-xxs ml-1"
+                                   flat
+                                   round
+                                   @click="getUsers">
+                            </q-btn>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <span class="text-rg text-grey-100">Add User</span>
+                        </template>
+                      </q-item-section>
+                    </q-item>
+                    <q-item tag="label"
+                            class="pl-0 pr-0"
+                            dense>
+                      <q-item-section avatar>
+                        <q-radio v-model="add.mode"
+                                 val="phone-number"
+                                 color="primary"
+                                 size="xs"
+                                 dense>
+                        </q-radio>
+                      </q-item-section>
+                      <q-item-section>
+                        <template v-if="add.mode === 'phone-number'">
+                          <q-input v-model="add.phoneNumber"
+                                   class="form-control-search form-control"
+                                   placeholder="Enter phone number"
+                                   borderless
+                                   clearable
+                                   dense
+                                   @input="changeAddPhoneNumber">
+                          </q-input>
+                        </template>
+                        <template v-else>
+                          <span class="text-rg text-grey-100">Add Phone Number</span>
+                        </template>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </div>
+                <div class="d-flex flex-inline">
+                  <div class="d-flex flex-even pl-1 pr-1">
+                    <b-button :loading="loadingAdd"
+                              :disabled="loadingAdd || !addValidated"
+                              variant="outline-dark-primary"
+                              size="sm"
+                              block
+                              @click="addParticipant">
+                      <i class="material-icons-outlined">person_add_alt</i>
+                      <span class="ml-2">Add</span>
+                    </b-button>
+                  </div>
+                  <div class="d-flex flex-even pl-1 pr-1">
+                    <b-button :loading="loadingIntroduce"
+                              :disabled="loadingIntroduce || !introduceValidated"
+                              variant="outline-dark-primary"
+                              size="sm"
+                              block
+                              @click="introduceParticipant">
+                      <i class="material-icons-outlined">people</i>
+                      <span class="ml-2">Introduce</span>
+                    </b-button>
+                  </div>
+                </div>
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'transfer'">
@@ -1039,6 +1131,7 @@ export default {
       loadingPark: false,
       loadingTransfer: false,
       loadingAdd: false,
+      loadingIntroduce: false,
       expanded: false,
       screen: 'call',
       bottomExpansion: 'integrations',
@@ -1057,6 +1150,12 @@ export default {
         mode: 'user',
         userId: null,
         ringGroupId: null,
+        phoneNumber: ''
+      },
+      add: {
+        introduce: false,
+        mode: 'user',
+        userId: null,
         phoneNumber: ''
       },
       CommunicationDirection,
@@ -1125,6 +1224,30 @@ export default {
       }
 
       if (this.transfer.mode === 'phone-number' && this.transfer.phoneNumber && this.$options.filters.fixPhone(this.transfer.phoneNumber)) {
+        return true
+      }
+
+      return false
+    },
+
+    addValidated () {
+      if (this.add.mode === 'user' && this.add.userId) {
+        return true
+      }
+
+      if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
+        return true
+      }
+
+      return false
+    },
+
+    introduceValidated () {
+      if (this.add.mode === 'user' && this.add.userId) {
+        return true
+      }
+
+      if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
         return true
       }
 
@@ -1689,18 +1812,58 @@ export default {
       this.transfer.ringGroupId = null
     },
 
+    resetAdd () {
+      this.add.introduce = false
+      this.add.userId = null
+      this.add.phoneNumber = ''
+      this.add.mode = 'user'
+    },
+
+    changeAddUser (userId) {
+      this.add.phoneNumber = ''
+      this.add.userId = userId
+    },
+
+    changeAddPhoneNumber () {
+      this.add.userId = null
+    },
+
     getUsers () {
+      this.add.userId = null
       this.transfer.userId = null
       if (this.$refs.availableUserSelector) {
         this.$refs.availableUserSelector.getUsers()
       }
     },
 
-    transferCall () {
+    transferCall ($event) {
       this.loadingTransfer = true
       this.$VueEvent.fire('transferCall', this.transfer)
+      this.resetTransfer()
+      this.saveAndResetExpansion($event)
       setTimeout(() => {
         this.loadingTransfer = false
+      }, 1000)
+    },
+
+    addParticipant ($event) {
+      this.loadingAdd = true
+      this.$VueEvent.fire('addParticipant', this.add)
+      this.resetAdd()
+      this.saveAndResetExpansion($event)
+      setTimeout(() => {
+        this.loadingAdd = false
+      }, 1000)
+    },
+
+    introduceParticipant ($event) {
+      this.loadingAdd = true
+      this.add.introduce = true
+      this.$VueEvent.fire('introduceParticipant', this.add)
+      this.resetAdd()
+      this.saveAndResetExpansion($event)
+      setTimeout(() => {
+        this.loadingAdd = false
       }, 1000)
     },
 
