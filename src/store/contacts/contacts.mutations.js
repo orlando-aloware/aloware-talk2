@@ -1,4 +1,6 @@
 import * as ContactsListDefaultList from 'src/constants/default-lists'
+import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-types'
+import Vue from 'vue'
 
 export default {
   TOGGLE_FOLDER: (state, id) => {
@@ -47,12 +49,20 @@ export default {
   },
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
+      let newData = data
+      for (let item of state.listItems[String(id)].data) {
+        let found = newData.find(contact => contact.id === item.id)
+        let index = found ? newData.indexOf(found) : null
+        if (index !== -1 && index !== null) {
+          newData.splice(index, 1)
+        }
+      }
       state.listItems = {
         ...state.listItems,
         [String(id)]: {
           ...state.listItems[String(id)],
           ...rest,
-          data: state.listItems[String(id)].data.concat(data)
+          data: state.listItems[String(id)].data.concat(newData)
         }
       }
     } else {
@@ -291,6 +301,9 @@ export default {
     state.currentListFilters = {}
     state.contact = {}
     state.lists = Object.assign({}, ContactsListDefaultList.DEFAULT_STATE.lists)
+    for (let index in state.listItems) {
+      state.listItems[index] = DEFAULT_CONTACT_LIST_ITEMS
+    }
   },
   SET_SEARCH: (state, value) => {
     state.search = value
@@ -315,10 +328,10 @@ export default {
     state.changedContactProperties = []
   },
   UPDATE_CONTACTS: (state, payload) => {
-    const found = state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id)
-    const index = found ? state.listItems[state.selectedList.id].data.indexOf(found) : null
+    let found = state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id)
+    let index = found ? state.listItems[state.selectedList.id].data.indexOf(found) : null
     if (index !== -1 && index !== null) {
-      state.listItems[state.selectedList.id].data[index] = payload
+      Vue.set(state.listItems[state.selectedList.id].data, index, payload)
     }
   },
   SET_CONTACTS: (state, payload) => {

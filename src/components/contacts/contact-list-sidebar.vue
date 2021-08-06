@@ -36,11 +36,11 @@
                 </div>
               </div>
               <div class="d-flex justify-center align-items-center">
-                <b-badge v-if="contactTotalUnreads > 0"
+                <b-badge v-if="contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count > 0"
                          class="contact-badge m-0 p-0 d-flex justify-center align-items-center"
                          variant="danger"
                          pill>
-                  {{ contactTotalUnreads }}
+                  {{ contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count }}
                 </b-badge>
               </div>
             </div>
@@ -94,13 +94,6 @@ export default {
 
     widthClass () {
       return this.isExpanded ? 'width-300' : 'width-0'
-    },
-
-    contactTotalUnreads () {
-      if (!this.contact) {
-        return 0
-      }
-      return this.contact.unread_count + this.contact.unread_missed_call_count + this.contact.unread_voicemail_count
     }
   },
 
@@ -137,7 +130,9 @@ export default {
 
   beforeDestroy () {
     clearTimeout(scrollTimeout)
-    this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
+    if (this.$refs.scrollableArea) {
+      this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
+    }
   }
 }
 </script>
