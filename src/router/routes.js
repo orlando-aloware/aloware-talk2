@@ -24,7 +24,17 @@ const routes = [
         component: () => import('pages/Inbox.vue'),
         meta: {
           title: 'Inbox'
-        }
+        },
+        children: [
+          {
+            path: ':type/contacts/:id/communications/:communicationId',
+            name: 'Inbox Contact',
+            component: () => import('src/pages/contacts/Contact.vue'),
+            meta: {
+              title: 'Inbox Contact'
+            }
+          }
+        ]
       },
       {
         path: 'contacts',

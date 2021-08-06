@@ -5,6 +5,8 @@
                rounded="sm"
                variant="white">
       <task-list :communications="communications"
+                 :filter-type="filterType"
+                 :answer-status="answerStatus"
                  v-if="!isGettingTasksList">
       </task-list>
       <div class="relative py-4">

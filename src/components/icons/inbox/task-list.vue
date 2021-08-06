@@ -2,7 +2,9 @@
     <div class="task-list scrollable w-100">
       <task-item v-for="communication in communications"
                  :key="communication.id"
-                 :communication="communication">
+                 :communication="communication"
+                 :filter-type="filterType"
+                 :answer-status="answerStatus">
       </task-item>
     </div>
 </template>
@@ -18,6 +20,18 @@ export default {
   props: {
     communications: {
       required: true
+    },
+
+    filterType: {
+      type: String,
+      required: false,
+      default: 'call'
+    },
+
+    answerStatus: {
+      type: String,
+      required: false,
+      default: 'all'
     }
   }
 }
