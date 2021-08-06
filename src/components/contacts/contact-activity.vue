@@ -82,9 +82,10 @@
         </div>
       </div>
     </div>
+
     <div class="clear d-flex flex-column"
          :class="[ communication.direction === CommunicationDirection.INBOUND ? 'align-items-start pl-1' : 'align-items-end text-right pr-1' ]"
-         v-else-if="communication.property === undefined">
+         v-if="communication.property === undefined">
       <div class="item d-flex flex-column"
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
@@ -321,6 +322,7 @@ export default {
       datetimePassed: null,
       relativeDatetime: null,
       excluded_audits: [
+        'phone_number',
         'thread_status',
         'email',
         'first_name',

@@ -770,6 +770,10 @@ export default {
     },
 
     highlightActivity (element) {
+      if (!element) {
+        return
+      }
+
       let highlighted = document.querySelector('.shine')
       if (highlighted) {
         highlighted.classList.remove('shine')
@@ -844,6 +848,7 @@ export default {
     },
 
     processFetchedContactInfo (selectedContact) {
+      this.selectedContact = selectedContact
       this.messageObject.contact = selectedContact
       this.contact.first_name = selectedContact.first_name
       this.contact.last_name = selectedContact.last_name

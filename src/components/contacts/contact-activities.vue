@@ -27,11 +27,11 @@
 
 <script>
 import _ from 'lodash'
-import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import { mapGetters } from 'vuex'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
+import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'contact-activities',
@@ -50,6 +50,7 @@ export default {
       type: Array,
       default: () => []
     },
+
     campaignId: {
       required: false
     }

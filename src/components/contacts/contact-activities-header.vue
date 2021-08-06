@@ -8,7 +8,8 @@
 
 <script>
 export default {
-  name: 'calls-header.vue',
+  name: 'contact-activities-header',
+
   props: {
     label: {
       type: String,
