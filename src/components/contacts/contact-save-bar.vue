@@ -1,5 +1,5 @@
 <template>
-  <div v-if="changedContactProperties.length > 0"
+  <div v-if="changedContactProperties.length > 0 && !changingSelectedContact"
        class="contact-save-bar-wrapper text-right">
     <span class="label">
       You've changed {{ changedContactProperties.length }} property
@@ -27,7 +27,7 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'contact-save-bar',
   computed: {
-    ...mapState('contacts', ['changedContactProperties', 'contact', 'contactClone']),
+    ...mapState('contacts', ['changedContactProperties', 'contact', 'contactClone', 'changingSelectedContact']),
     saveButtonLabel () {
       if (this.isBusy || this.isDisposing) {
         return 'Saving changes..'
@@ -90,6 +90,16 @@ export default {
         params[item.property] = item.value
       })
       return params
+    }
+  },
+
+  mounted () {
+    this.resetChangedContactProperties()
+  },
+
+  watch: {
+    contact: function () {
+      this.resetChangedContactProperties()
     }
   }
 }

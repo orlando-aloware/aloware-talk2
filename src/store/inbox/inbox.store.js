@@ -1,7 +1,7 @@
 export default function () {
   return {
     selectedContactId: null,
-    selectedCommunication: {},
+    selectedCommunication: null,
     isGettingTasksList: false,
     activeChannel: 'inbox'
   }

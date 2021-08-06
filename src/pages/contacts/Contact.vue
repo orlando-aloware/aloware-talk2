@@ -5,7 +5,9 @@
              variant="white"
              rounded="sm">
     <div class="row mx-0 content-row contact-view-wrapper d-flex">
-      <contact-list-sidebar></contact-list-sidebar>
+      <template v-if="$route.name != 'Inbox Contact'">
+        <contact-list-sidebar></contact-list-sidebar>
+      </template>
       <div :class="`contact-activity-wrapper ${widthClass}`">
         <contact-activities ref="contactActivities"
                             :communications="filteredCommunications"
@@ -33,7 +35,6 @@
       <div class="px-0 width-330 pt-2">
         <contact-details></contact-details>
       </div>
-      <contact-save-bar v-if="!changingSelectedContact"></contact-save-bar>
     </div>
     <template #overlay>
       <div class="text-center">
@@ -53,15 +54,12 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-
-import { mapActions, mapGetters } from 'vuex'
-import ContactSaveBar from 'components/contacts/contact-save-bar'
+import { mapGetters } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
 
   components: {
-    ContactSaveBar,
     ContactDetails,
     ContactActivities,
     ContactListSidebar
@@ -72,6 +70,10 @@ export default {
     ...mapGetters('auth', ['authenticated']),
 
     widthClass () {
+      if (this.$route.name === 'Inbox Contact') {
+        return 'w-less-330px'
+      }
+
       return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
     }
   },
@@ -82,9 +84,6 @@ export default {
       totalContacts: 0
     }
   },
-  methods: {
-    ...mapActions('contacts', ['resetChangedContactProperties'])
-  },
 
   mounted () {
     if (this.authenticated) {
@@ -94,14 +93,19 @@ export default {
   },
 
   watch: {
-    '$route.params.id': function () {
-      if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
+    '$route.params.id': function (value) {
+      if (['Contact', 'Inbox Contact'].includes(this.$route.name) && this.contactId !== this.$route.params.id) {
         this.resetSelectedContact()
         this.contactId = this.$route.params.id
-        this.resetChangedContactProperties()
         this.processFetchContactInfo()
       } else {
         this.resetSelectedContact()
+      }
+    },
+
+    '$route.params.communicationId': function (value) {
+      if (['Inbox Contact'].includes(this.$route.name)) {
+        this.fetchContactCommunicationsUntilFound()
       }
     }
   }

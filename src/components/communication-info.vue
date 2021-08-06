@@ -35,7 +35,8 @@
             {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash | capitalize }}
           </q-tooltip>
         </template>
-        <div class="px-3 pt-2 pb-2 text-left">
+        <div class="px-3 pt-2 pb-2 text-left"
+             v-if="activeName">
           <div class="p-a b-t b-light">
             <template
               v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
@@ -586,7 +587,7 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white"
          v-if="communication.notes && !activeName">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"

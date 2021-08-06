@@ -6,9 +6,9 @@
       @markAllAsRead="markAllAsRead"/>
     <div class="contact-activities">
       <div class="inner-1">
-        <div class="p-3 mx-1 inner-2 scrollbar-white"
+        <div class="inner-2 scrollbar-white"
              ref="activitiesWrap">
-          <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center">
+          <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center pt-2">
             <slot name="moreActivities">
             </slot>
           </div>
@@ -30,11 +30,11 @@
 
 <script>
 import _ from 'lodash'
-import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import { mapGetters } from 'vuex'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
+import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'contact-activities',
@@ -53,6 +53,7 @@ export default {
       type: Array,
       default: () => []
     },
+
     campaignId: {
       required: false
     }
@@ -84,6 +85,9 @@ export default {
       if (activitiesWrap && activitiesWrap.scrollHeight) {
         activitiesWrap.scrollTop = activitiesWrap.scrollHeight
       }
+    },
+    scrollIntoActivity () {
+      console.log('scroll now')
     }
   }
 }

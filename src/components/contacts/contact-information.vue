@@ -89,6 +89,16 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Time of First Outbound Call</p>
+        <p>{{ timeOfFirstOutboundCall }}</p>
+      </div>
+
+      <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Time to First Outbound Call</p>
+        <p>{{ timeToFirstOutboundCall }}</p>
+      </div>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Intake Source</p>
         <p>{{ contact.intake_source | toUpperCase }}</p>
       </div>
@@ -118,6 +128,10 @@ export default {
 
   mixins: [aclMixin],
 
+  props: {
+    firstOutboundCall: {}
+  },
+
   components: {
     ContactDisposition,
     ContactInputField,
@@ -131,6 +145,27 @@ export default {
 
     autoHeightClass () {
       return this.is_expanded ? 'auto-height' : ''
+    },
+
+    timeOfFirstOutboundCall () {
+      if (this.firstOutboundCall) {
+        return this.$options.filters.fixFullDateUTCRelative(this.firstOutboundCall.created_at)
+      }
+
+      return '--:--'
+    },
+
+    timeToFirstOutboundCall () {
+      if (this.contact && this.firstOutboundCall) {
+        let contactCreated = window.moment(this.contact.created_at)
+        let callCreated = window.moment(this.firstOutboundCall.created_at)
+
+        let formatted = this.formatHumanized(callCreated.diff(contactCreated))
+
+        return !formatted ? '--:--' : `After ${formatted}`
+      }
+
+      return '--:--'
     }
   },
 
@@ -223,32 +258,76 @@ export default {
       })
     },
 
-    updateContactField (params, callback) {
-      if (!this.contact || !this.contact.id) {
-        return false
+    /**
+     * Formats provided period(moment.diff) into human readable format
+     *
+     * @param period
+     *
+     * @return string
+     */
+    formatHumanized (period) {
+      if (period === 0) {
+        return '0 second'
       }
 
-      return talk2Api.V1.contact.update(this.contact.id, params).then(response => {
-        this.setContact(response.data)
-      }).catch((err) => {
-        // TODO enable this when all mixins has been ported
-        // this.$root.handleErrors(err.response)
-        console.log(err)
-        this.$q.notify({
-          message: 'Error while saving data...',
-          type: 'negative',
-          textColor: 'white',
-          actions: [
-            {
-              icon: 'close'
-            }
-          ]
-        })
-      }).finally(() => {
-        if (typeof callback === 'function') {
-          callback()
-        }
-      })
+      let segments = []
+      const duration = window.moment.duration(period)
+
+      // return nothing when the duration is falsy or not correctly parsed (P0D)
+      if (duration.toISOString() === 'P0D' || !duration.isValid()) return ''
+
+      // for duration's year value
+      if (duration.years() >= 1) {
+        segments.push(this.computeAndHumanize(duration, 'years', 'year'))
+      }
+
+      // for duration's month value
+      if (duration.months() >= 1) {
+        segments.push(this.computeAndHumanize(duration, 'months', 'month'))
+      }
+
+      // for duration's days value
+      if (duration.days() >= 1) {
+        segments.push(this.computeAndHumanize(duration, 'days', 'day'))
+      }
+
+      // for duration's hours value
+      if (duration.hours() >= 1) {
+        segments.push(this.computeAndHumanize(duration, 'hours', 'hour'))
+      }
+
+      // for duration's minutes value
+      if (duration.minutes() >= 1) {
+        segments.push(this.computeAndHumanize(duration, 'minutes', 'minute'))
+      }
+
+      // for duration's seconds value, this will only pass if segments is empty
+      if (duration.seconds() >= 1 && !segments.length) {
+        segments.push(this.computeAndHumanize(duration, 'seconds', 'second'))
+      }
+
+      // sanity test, if there are items added to the segment
+      if (!segments.length) {
+        return ''
+      }
+
+      // do formatting
+      // eslint-disable-next-line no-return-assign
+      return segments.reduce((acc, cur, index) => acc += acc ? `${index === segments.length - 1 ? ' and' : ','} ${cur}` : cur, '')
+    },
+
+    /**
+     * Converts the duration value and humanize result
+     *
+     * @param duration
+     * @param field
+     * @param singular
+     *
+     * @return string
+     */
+    computeAndHumanize (duration, field, singular) {
+      const temp = Math.floor(duration[field]())
+      return `${temp} ${temp > 1 ? field : singular}`
     }
   },
 

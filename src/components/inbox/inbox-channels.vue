@@ -5,6 +5,8 @@
                rounded="sm"
                variant="white">
       <task-list :communications="communications"
+                 :filter-type="filterType"
+                 :answer-status="answerStatus"
                  v-if="!isGettingTasksList">
       </task-list>
       <div class="relative py-4">
@@ -424,6 +426,8 @@ export default {
           this.pagination = _.clone(response.data)
           delete this.pagination.data
           this.gettingTasksList(false)
+
+          this.$emit('communicationsLoaded', this.communications)
         })
     },
 
@@ -441,6 +445,8 @@ export default {
 
           this.pagination = _.clone(response.data)
           delete this.pagination.data
+
+          this.$emit('communicationsLoaded', this.communications)
         })
     },
 

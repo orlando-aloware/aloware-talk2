@@ -1,5 +1,5 @@
 <template>
-  <div class="calls-header d-flex justify-content-between">
+  <div class="calls-header">
     <div class="calls-header__label">
       {{ label }}
     </div>
@@ -24,6 +24,7 @@
 <script>
 export default {
   name: 'contact-activities-header',
+
   props: {
     label: {
       type: String,

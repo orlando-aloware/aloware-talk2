@@ -2,8 +2,8 @@ export default {
   setContactId: ({ commit }, id) => {
     commit('SET_CONTACT_ID', id)
   },
-  setCommunication: ({ commit }, communication) => {
-    commit('SET_COMMUNICATION', communication)
+  setSelectedCommunication: ({ commit }, communication) => {
+    commit('SET_SELECTED_COMMUNICATION', communication)
   },
   resetInboxVuex: ({ commit }) => {
     commit('RESET_INBOX_VUEX')

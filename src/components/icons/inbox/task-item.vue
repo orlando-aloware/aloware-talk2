@@ -1,5 +1,6 @@
 <template>
   <div :class="`task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
+       v-if="communication.contact_id"
        @click="onItemClick(communication)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
@@ -83,6 +84,18 @@ export default {
   props: {
     communication: {
       required: true
+    },
+
+    filterType: {
+      type: String,
+      required: false,
+      default: 'call'
+    },
+
+    answerStatus: {
+      type: String,
+      required: false,
+      default: 'all'
     }
   },
 
@@ -123,7 +136,7 @@ export default {
     },
 
     activeClass () {
-      return this.communication.id === this.selectedCommunication.id ? 'active' : ''
+      return this.selectedCommunication && this.communication.id === this.selectedCommunication.id ? 'active' : ''
     },
 
     channelAnswerStatus () {
@@ -137,14 +150,20 @@ export default {
     },
 
     onItemClick (communication) {
-      if (communication.contact) {
-        this.setContact(communication.contact.id)
-      }
-
-      this.setCommunication(communication)
+      this.$router.push({
+        name: 'Inbox Contact',
+        params: {
+          id: communication.contact_id.toString(),
+          communicationId: communication.id,
+          type: this.filterType
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+      this.setSelectedCommunication(communication)
     },
 
-    ...mapActions('inbox', ['setContactId', 'setCommunication'])
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication'])
   }
 }
 </script>

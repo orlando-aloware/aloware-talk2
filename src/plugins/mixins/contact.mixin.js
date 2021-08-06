@@ -48,6 +48,16 @@ export default {
       },
       selectedContactCampaigns: [],
       contactPhoneNumbers: [],
+      communicationsSummary: {
+        first_outbound_call: null,
+        summaries: {
+          inbound_calls_count: 0,
+          outbound_calls_count: 0,
+          inbound_texts_count: 0,
+          outbound_texts_count: 0,
+          total_count: 0
+        }
+      },
       communicationsPage: 1,
       communicationsPerPage: 10,
       contactIncomingNumber: null,
@@ -306,9 +316,9 @@ export default {
             this.loadingContact = false
             console.log('fetched comms')
 
-            // if route hash contains activity info, retrieve communications
+            // if route has communication id
             // until id is found
-            if (this.isHashActivityType()) {
+            if (this.hasCommunication()) {
               this.loadingContactCommunications = true
               this.fetchContactCommunicationsUntilFound()
             } else {
@@ -430,11 +440,11 @@ export default {
       this.loadingContactCommunications = true
 
       // fetch communications until we found the activity id
-      if (!this.isHashActivityFound()) {
+      if (!this.isCommunicationFound()) {
         this.fetchContactCommunications(this.contactId).then(res => {
           if (res.data.has_more_pages) {
             this.fetchContactCommunicationsUntilFound()
-          } else if (this.isHashActivityFound) {
+          } else if (this.isCommunicationFound()) {
             this.scrollIntoActivity()
             this.loadingContactCommunications = false
           } else {
@@ -675,6 +685,16 @@ export default {
       }, 50)
     },
 
+    hasCommunication () {
+      return this.$route.params.communicationId
+    },
+
+    isCommunicationFound () {
+      let found = null
+      found = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      return !!found
+    },
+
     isHashActivityType () {
       if (!this.$route.hash) {
         return false
@@ -718,16 +738,17 @@ export default {
     },
 
     scrollIntoActivity () {
-      let hash = this.$route.hash.replace('#', '')
+      let communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      let ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0
 
       // scroll to activity
       let scrollInterval = setInterval(() => {
-        const communicationActivity = _.get(this.$refs, `${hash}.0`, null)
+        const communicationActivity = _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null)
         if (communicationActivity) {
           communicationActivity.$el.scrollIntoView({
             behavior: 'smooth',
-            block: 'start',
+            block: 'nearest',
             inline: 'start'
           })
           // highlight the activity
@@ -746,10 +767,19 @@ export default {
     },
 
     highlightActivity (element) {
+      if (!element) {
+        return
+      }
+
+      let highlighted = document.querySelector('.shine')
+      if (highlighted) {
+        highlighted.classList.remove('shine')
+      }
       element.classList.add('shine')
+
       setTimeout(() => {
         element.classList.remove('shine')
-      }, 3000)
+      }, 2000)
     },
 
     fetchIncomingNumber () {
@@ -892,6 +922,22 @@ export default {
       }).then(res => {
         return Promise.resolve(res.data)
       })
+    },
+
+    getCommunicationsSummary (contactId) {
+      if (contactId) {
+        this.$axios.get(`/api/v1/contact/${contactId}/communications-summary`)
+          .then(res => {
+            // sanitize summaries data before merging
+            // eslint-disable-next-line no-return-assign
+            Object.keys(res.data.summaries).forEach(key => res.data.summaries[key] = res.data.summaries[key] || 0)
+
+            this.communicationsSummary = { ...this.communicationsSummary, ...res.data }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
     },
 
     ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts'])

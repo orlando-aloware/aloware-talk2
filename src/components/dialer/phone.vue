@@ -5,7 +5,7 @@
        v-if="shouldShow">
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
-      <div class="d-flex flex-row text-size-rg _500 text-white width-55">
+      <div class="d-flex flex-row text-size-rg _500 text-white width-65">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="isCallCompleted"></span>
         <span v-else>
@@ -16,7 +16,13 @@
         <span v-if="isCallCompleted">Call Ended</span>
         <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row justify-content-end width-55">
+      <div class="d-flex flex-row justify-content-end align-items-center width-65">
+        <pause-record-icon width="14"
+                           height="14"
+                           class="mr-2"
+                           v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
+        </pause-record-icon>
+
         <ul id="signal-strength"
             class="mr-2"
             v-if="!isCallCompleted">
@@ -279,7 +285,7 @@
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
             </button>
-            <button :disabled="isHoldDisabled || loadingHold"
+            <button :disabled="isHoldDisabled || loadingHold || loadingUnhold"
                     class="phone-buttons btn"
                     @click="toggleHold">
               <hold-icon width="16"
@@ -925,6 +931,7 @@ export default {
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
       loadingHold: false,
+      loadingUnhold: false,
       loadingPark: false,
       expanded: false,
       screen: 'call',
@@ -1165,7 +1172,21 @@ export default {
     },
 
     toggleHold () {
+      if (this.dialer.isHeld) {
+        this.loadingUnhold = true
+      } else {
+        this.loadingHold = true
+      }
+
       this.$VueEvent.fire('toggleHold')
+
+      setTimeout(() => {
+        if (this.dialer.isHeld) {
+          this.loadingHold = false
+        } else {
+          this.loadingUnhold = false
+        }
+      }, 1000)
     },
 
     openDialpad () {
@@ -1246,8 +1267,12 @@ export default {
     },
 
     parkCall ($event) {
+      this.loadingPark = true
       this.$VueEvent.fire('parkCall')
       this.saveAndResetExpansion($event)
+      setTimeout(() => {
+        this.loadingPark = false
+      }, 1000)
     },
 
     saveAndResetExpansion ($event) {

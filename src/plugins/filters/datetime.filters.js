@@ -314,9 +314,12 @@ export const fixFullDateUTCRelative = (dt) => {
       }
     } else {
       if (window.timezone) {
-        return datetime.tz(window.timezone).format('MMM D h:mma')
+        if (window.timezone === 'Asia/Manila') {
+          return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY H:mma') + ' MNL'
+        }
+        return datetime.tz(window.timezone).format('MMM D h:mma z')
       } else {
-        return datetime.local().format('MMM D h:mma')
+        return datetime.local().format('MMM D h:mma z')
       }
     }
   } else {
