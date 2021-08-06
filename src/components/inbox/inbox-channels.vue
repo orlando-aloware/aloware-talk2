@@ -105,7 +105,7 @@ export default {
   data () {
     return {
       filter: null,
-      searchFields: ['name', 'phone_number', 'email'],
+      searchFields: ['contact.name', 'contact.phone_number'],
       currentPage: 0,
       hasMore: false,
       isLoadingMore: false,
