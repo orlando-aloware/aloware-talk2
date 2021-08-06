@@ -282,7 +282,8 @@
               </q-item-label>
             </div>
 
-            <div class="d-flex justify-content-between mt-3 w-100 pr-2">
+            <div class="d-flex justify-content-between mt-3 w-100 pr-2"
+                 v-if="addedParty">
               <q-item-label>
                 <div class="d-flex align-items-center">
                   <ready-icon></ready-icon>
@@ -290,11 +291,11 @@
                 </div>
                 <div class="mt-1">
                   <span class="add-status"
-                        v-if="addedParty && dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_RINGING_NEW">
+                        v-if="dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_RINGING_NEW">
                     Adding
                   </span>
                   <span class="add-status"
-                        v-if="addedParty && dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_INPROGRESS_NEW">
+                        v-if="dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_INPROGRESS_NEW">
                     Added
                   </span>
                 </div>
@@ -1930,7 +1931,7 @@ export default {
     introduceParticipant ($event) {
       this.loadingAdd = true
       this.add.introduce = true
-      this.$VueEvent.fire('introduceParticipant', this.add)
+      this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
       setTimeout(() => {
