@@ -32,6 +32,7 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { aclMixin, communicationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/icons/inbox/task-list'
 import * as Filters from 'src/constants/filters'
@@ -42,6 +43,8 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 let scrollTimeout
 export default {
   name: 'inbox-channels',
+
+  mixins: [ aclMixin, communicationMixin ],
 
   components: { TaskList },
 
