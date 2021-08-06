@@ -100,9 +100,9 @@
                    @click="testOutputDevice">
             </q-btn>
 
-            <button class="btn btn-link text-size-sm _400 text-grey-100 p-0 mt-2"
+            <button class="btn text-size-sm _400 text-grey-100 p-0 mt-2 d-flex align-items-center"
                     @click="forceRefreshCommunication">
-              <i class="fas fa-redo"></i>
+              <i class="material-icons">refresh</i>
               <span class="ml-2">Refresh</span>
             </button>
           </div>
@@ -578,9 +578,9 @@
 
           <q-item-section side>
             <q-btn :ripple="false"
-                   :class="[ (['integrations', 'more', 'dialpad', 'add', 'vm-drop'].includes(bottomExpansion) || !expanded) ? 'invisible' : '']"
+                   :class="[ !expanded ? 'invisible' : '']"
                    color="primary"
-                   label="Done"
+                   label="Cancel"
                    class="no-q-btn-focus"
                    no-caps
                    unelevated
@@ -739,6 +739,106 @@
           </template>
           <template v-if="bottomExpansion === 'transfer'">
             <q-card-section class="height-445">
+              <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
+                <div class="d-flex w-100">
+                  <q-list class="phone-radio-select w-100">
+                    <q-item tag="label"
+                            class="pl-0 pr-0"
+                            dense>
+                      <q-item-section avatar>
+                        <q-radio v-model="transfer.mode"
+                                 val="user"
+                                 color="primary"
+                                 size="xs"
+                                 dense>
+                        </q-radio>
+                      </q-item-section>
+                      <q-item-section>
+                        <template v-if="transfer.mode === 'user'">
+                          <div class="d-inline-flex w-100">
+                            <available-user-selector :communication="dialer.communication"
+                                                     v-model="transfer.userId"
+                                                     ref="availableUserSelector"
+                                                     class="flex-grow-1"
+                                                     @change="changeTransferUser">
+                            </available-user-selector>
+
+                            <q-btn color="black"
+                                   icon="refresh"
+                                   class="text-size-xxs ml-1"
+                                   flat
+                                   round
+                                   @click="getUsers">
+                            </q-btn>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <span class="text-rg text-grey-100">Transfer to User</span>
+                        </template>
+                      </q-item-section>
+                    </q-item>
+                    <q-item tag="label"
+                            class="pl-0 pr-0"
+                            dense>
+                      <q-item-section avatar>
+                        <q-radio v-model="transfer.mode"
+                                 val="ring-group"
+                                 color="primary"
+                                 size="xs"
+                                 dense>
+                        </q-radio>
+                      </q-item-section>
+                      <q-item-section>
+                        <template v-if="transfer.mode === 'ring-group'">
+                          <ring-group-selector v-model="transfer.ringGroupId"
+                                               @change="changeTransferRingGroup">
+                          </ring-group-selector>
+                        </template>
+                        <template v-else>
+                          <span class="text-rg text-grey-100">Transfer to Ring Group</span>
+                        </template>
+                      </q-item-section>
+                    </q-item>
+                    <q-item tag="label"
+                            class="pl-0 pr-0"
+                            dense>
+                      <q-item-section avatar>
+                        <q-radio v-model="transfer.mode"
+                                 val="phone-number"
+                                 color="primary"
+                                 size="xs"
+                                 dense>
+                        </q-radio>
+                      </q-item-section>
+                      <q-item-section>
+                        <template v-if="transfer.mode === 'phone-number'">
+                          <q-input v-model="transfer.phoneNumber"
+                                   class="form-control-search form-control"
+                                   placeholder="Enter phone number"
+                                   borderless
+                                   clearable
+                                   dense
+                                   @input="changeTransferPhoneNumber">
+                          </q-input>
+                        </template>
+                        <template v-else>
+                          <span class="text-rg text-grey-100">Transfer to Phone Number</span>
+                        </template>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </div>
+                <div class="d-flex">
+                  <b-button :loading="loadingTransfer"
+                            :disabled="loadingTransfer || !transferValidated"
+                            variant="primary"
+                            size="sm"
+                            block
+                            @click="transferCall">
+                    <span>Transfer</span>
+                  </b-button>
+                </div>
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'vm-drop'">
@@ -839,6 +939,8 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import ContactIcon from 'components/icons/contact-icon'
 import ScriptSelector from 'components/generic-selectors/script-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
+import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
+import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
@@ -850,6 +952,8 @@ export default {
   name: 'phone',
 
   components: {
+    AvailableUserSelector,
+    RingGroupSelector,
     VmDropSelector,
     ScriptSelector,
     ContactIcon,
@@ -933,6 +1037,8 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       loadingPark: false,
+      loadingTransfer: false,
+      loadingAdd: false,
       expanded: false,
       screen: 'call',
       bottomExpansion: 'integrations',
@@ -947,6 +1053,12 @@ export default {
       loadingSendVmDrop: false,
       loadingSendMessage: false,
       devMode: false,
+      transfer: {
+        mode: 'user',
+        userId: null,
+        ringGroupId: null,
+        phoneNumber: ''
+      },
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1001,6 +1113,22 @@ export default {
 
     isCallAdded () {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
+    },
+
+    transferValidated () {
+      if (this.transfer.mode === 'user' && this.transfer.userId) {
+        return true
+      }
+
+      if (this.transfer.mode === 'ring-group' && this.transfer.ringGroupId) {
+        return true
+      }
+
+      if (this.transfer.mode === 'phone-number' && this.transfer.phoneNumber && this.$options.filters.fixPhone(this.transfer.phoneNumber)) {
+        return true
+      }
+
+      return false
     },
 
     bottomExpansionLabel () {
@@ -1149,11 +1277,13 @@ export default {
       window.getSelection().removeAllRanges()
     },
 
-    endCall () {
+    endCall ($event) {
+      this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
 
-    hangupCall () {
+    hangupCall ($event) {
+      this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
 
@@ -1230,6 +1360,7 @@ export default {
     },
 
     openTransfer () {
+      this.resetTransfer()
       this.expansionEnabled = true
       this.bottomExpansion = 'transfer'
       setTimeout(() => {
@@ -1532,6 +1663,45 @@ export default {
       }).finally(_ => {
         this.loadingSendMessage = false
       })
+    },
+
+    resetTransfer () {
+      this.transfer.userId = null
+      this.transfer.ringGroupId = null
+      this.transfer.phoneNumber = ''
+      this.transfer.mode = 'user'
+    },
+
+    changeTransferUser (userId) {
+      this.transfer.ringGroupId = null
+      this.transfer.phoneNumber = ''
+      this.transfer.userId = userId
+    },
+
+    changeTransferRingGroup (ringGroupId) {
+      this.transfer.userId = null
+      this.transfer.phoneNumber = ''
+      this.transfer.ringGroupId = ringGroupId
+    },
+
+    changeTransferPhoneNumber () {
+      this.transfer.userId = null
+      this.transfer.ringGroupId = null
+    },
+
+    getUsers () {
+      this.transfer.userId = null
+      if (this.$refs.availableUserSelector) {
+        this.$refs.availableUserSelector.getUsers()
+      }
+    },
+
+    transferCall () {
+      this.loadingTransfer = true
+      this.$VueEvent.fire('transferCall', this.transfer)
+      setTimeout(() => {
+        this.loadingTransfer = false
+      }, 1000)
     },
 
     ...mapActions([

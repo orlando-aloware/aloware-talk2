@@ -233,6 +233,10 @@ export default {
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
     })
 
+    this.$VueEvent.listen('transferCall', (data) => {
+      this.transferCall(data)
+    })
+
     this.$VueEvent.listen('hangupCall', () => {
       this.hangupCall()
     })
@@ -680,6 +684,41 @@ export default {
         console.log(err)
       }).finally(_ => {
         this.loadingDropThirdParty = false
+      })
+    },
+
+    transferCall (transfer) {
+      if (!this.dialer.communication) {
+        return
+      }
+
+      this.loadingTransfer = true
+      let params = {
+        communication_id: this.dialer.communication.id,
+        user_id: null,
+        ring_group_id: null,
+        phone_number: null,
+        type: 'cold'
+      }
+
+      if (transfer.mode === 'user') {
+        params.user_id = transfer.userId
+      }
+
+      if (transfer.mode === 'ring-group') {
+        params.ring_group_id = transfer.ringGroupId
+      }
+
+      if (transfer.mode === 'phone') {
+        params.phone_number = this.$options.filters.fixPhone(transfer.phoneNumber, 'E164', true, true)
+      }
+
+      this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
+        console.log('Transfer is in progress')
+      }).catch(err => {
+        console.log(err)
+      }).finally(() => {
+        this.loadingTransfer = false
       })
     },
 
