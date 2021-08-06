@@ -2845,6 +2845,7 @@ span.mention {
     right: -2px;
 
     @extend .rounded-badge;
+    @extend .bordered;
   }
 }
 
@@ -2852,8 +2853,16 @@ span.mention {
   height: 12px;
   width: 12px;
   border-radius: 50%;
-  border: 2px solid #FFFFFF;
   padding: 0px;
+
+  &.small {
+    height: 6px;
+    width: 6px;
+  }
+
+  &.bordered {
+    border: 2px solid #FFFFFF;
+  }
 }
 
 .tab-dropdown-list {
@@ -2869,6 +2878,9 @@ span.mention {
 /*
  Utilities
  */
+.break-all {
+  word-break: break-all;
+}
 
 .auto-size {
   width: auto;

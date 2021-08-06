@@ -31,7 +31,7 @@
                   clickable>
             <div class="d-flex align-items-center">
               <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
-                       class="rounded-badge q-mr-sm">
+                       class="rounded-badge bordered q-mr-sm">
               </q-badge>
               Offline
             </div>
@@ -43,7 +43,7 @@
                   clickable>
             <div class="d-flex align-items-center">
               <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                       class="rounded-badge q-mr-sm">
+                       class="rounded-badge bordered q-mr-sm">
               </q-badge>
               Available
             </div>
@@ -55,7 +55,7 @@
                   clickable>
             <div class="d-flex align-items-center">
               <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                       class="rounded-badge q-mr-sm">
+                       class="rounded-badge bordered q-mr-sm">
               </q-badge>
               Busy
             </div>
@@ -67,7 +67,7 @@
                   clickable>
             <div class="d-flex align-items-center">
               <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                       class="rounded-badge q-mr-sm">
+                       class="rounded-badge bordered q-mr-sm">
               </q-badge>
               On-break
             </div>

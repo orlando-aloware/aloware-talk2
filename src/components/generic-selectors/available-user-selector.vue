@@ -2,7 +2,8 @@
   <q-select :options="userOptions"
             :multiple="multiple"
             :placeholder="placeholder"
-            :disable="disable"
+            :loading="loadingUsers"
+            :disable="disable || loadingUsers"
             :class="[ prepend ? 'with-prepend' : '' ]"
             class="generic-selector"
             v-model="userId"
@@ -36,15 +37,19 @@
               v-on="scope.itemEvents">
         <q-item-section>
           <q-item-label>
-            <div class="break-all">{{ scope.opt.name }}</div>
+            <q-badge :color="color(scope.opt)"
+                     :style="{ top: '9px', left: '9px' }"
+                     class="rounded-badge small position-absolute">
+            </q-badge>
+            <div class="pl-3 break-all">{{ scope.opt.name }}</div>
           </q-item-label>
           <q-item-label v-if="!scope.opt.is_destination"
                         caption>
-            <div class="break-all">{{ scope.opt.email }} - {{ getLabel(scope.opt) }}</div>
+            <div class="pl-3 break-all">{{ scope.opt.email }} - {{ getLabel(scope.opt) }}</div>
           </q-item-label>
           <q-item-label v-else
                         caption>
-            <div>{{ getLabel(scope.opt) }}</div>
+            <div class="pl-3">{{ getLabel(scope.opt) }}</div>
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -62,9 +67,13 @@ import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 
 export default {
-  name: 'user-selector',
+  name: 'available-user-selector',
 
   props: {
+    communication: {
+      required: true
+    },
+
     value: {
       required: false
     },
@@ -73,12 +82,6 @@ export default {
       type: Boolean,
       default: false,
       required: false
-    },
-
-    hideExtensions: {
-      required: false,
-      default: false,
-      type: Boolean
     },
 
     disable: {
@@ -95,13 +98,17 @@ export default {
 
   data () {
     return {
+      loadingUsers: false,
       userId: this.value,
+      availableUsers: [],
+      unavailableUsers: [],
       userOptions: []
     }
   },
 
   computed: {
-    ...mapState(['currentCompany', 'users']),
+    ...mapState('auth', ['profile']),
+    ...mapState(['currentCompany']),
 
     placeholder () {
       if (this.userId) {
@@ -115,13 +122,13 @@ export default {
       return 'Select a user'
     },
 
-    availableUsers () {
-      return this.users
+    allUsers () {
+      return this.availableUsers.concat(this.unavailableUsers)
     },
 
     filteredUsers () {
-      if (this.availableUsers) {
-        let filteredUsers = this.availableUsers.filter((user) =>
+      if (this.allUsers) {
+        let filteredUsers = this.allUsers.filter((user) =>
           !(user.role_names.length === 1 && user.read_only_access) &&
           user.answer_by !== AnswerTypes.BY_NONE
         )
@@ -132,42 +139,64 @@ export default {
       return []
     },
 
-    normalUsers () {
-      return this.filteredUsers.filter((user) => !user.is_destination)
-    },
-
-    extensionUsers () {
-      return this.filteredUsers.filter((user) => user.is_destination)
-    },
-
     formattedOptions () {
-      let normalUsers = [...this.normalUsers]
+      let availableUsers = [...this.availableUsers]
 
-      normalUsers.unshift({
-        group: 'Users',
+      availableUsers.unshift({
+        group: 'Available Users',
         disable: true
       })
 
-      let usersArray = normalUsers
+      let usersArray = availableUsers
 
-      if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
-        let extensionUsers = [...this.extensionUsers]
-        extensionUsers.unshift({
-          group: 'Extensions',
-          disable: true
-        })
-        usersArray = [...normalUsers, ...extensionUsers]
-      }
+      let unavailableUsers = [...this.unavailableUsers]
+      unavailableUsers.unshift({
+        group: 'Unavailable Users',
+        disable: true
+      })
+      usersArray = [...availableUsers, ...unavailableUsers]
 
       return usersArray
     }
   },
 
   created () {
-    this.userOptions = this.formattedOptions
+    this.getUsers().then(() => {
+      this.userOptions = this.formattedOptions
+    })
   },
 
   methods: {
+    getUsers () {
+      this.loadingUsers = true
+      return this.$axios.get('/api/v1/dialer/available-users', {
+        params: {
+          communication_id: this.communication.id
+        }
+      }).then((res) => {
+        this.availableUsers = res.data.eligible_users.filter((user) => user.id !== this.profile.id).map((user) => {
+          user.available = true
+          return user
+        })
+        this.unavailableUsers = res.data.ineligible_users.filter((user) => user.id !== this.profile.id).map((user) => {
+          user.available = false
+          return user
+        })
+      }).catch(err => {
+        console.log(err)
+      }).finally(() => {
+        this.loadingUsers = false
+      })
+    },
+
+    color (user) {
+      if (user.available) {
+        return 'green-6'
+      }
+
+      return 'red-6'
+    },
+
     filterFn (val, update) {
       if (this.userId && val === this.userId) {
         update(() => {
