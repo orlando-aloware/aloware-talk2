@@ -16,15 +16,13 @@
         <span v-if="isCallCompleted">Call Ended</span>
         <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row justify-content-end align-items-center width-65">
+      <div class="d-flex flex-row justify-content-between align-items-center width-65">
         <pause-record-icon width="14"
                            height="14"
-                           class="mr-2"
                            v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
         </pause-record-icon>
 
         <ul id="signal-strength"
-            class="mr-2"
             v-if="!isCallCompleted">
           <li class="very-weak">
             <div id="very-weak"
@@ -50,7 +48,7 @@
 
         <q-btn-dropdown :ripple="false"
                         :menu-offset="[29, 8]"
-                        class="tab-dropdown no-arrow mr-2"
+                        class="tab-dropdown no-arrow"
                         ref="menu"
                         flat>
           <template v-slot:label>
@@ -231,12 +229,15 @@
           <div class="dummy bg-dark w-100 height-36"></div>
           <div class="phone-avatar">
             <avatar :name="contactName"
-                    class="contact-avatar text-size-xxxl"
+                    v-if="!isCallAdded && !isAddDisabled"
+                    class="contact-avatar"
                     width="50"
                     height="50">
             </avatar>
+            <participants-icon v-else></participants-icon>
           </div>
-          <div class="phone-info small d-flex flex-column align-items-center">
+          <div class="phone-info small d-flex flex-column align-items-center"
+               v-if="!isCallAdded && !isAddDisabled">
             <div class="text-grey-100 text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                             v-if="dialer.contact">
@@ -271,6 +272,46 @@
               </q-item-label>
             </div>
           </div>
+          <div class="phone-info w-100 pl-2 pr-2 small d-flex flex-column align-items-start"
+               v-else>
+            <div>
+              <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center text-grey-100"
+                            v-if="dialer.contact">
+                <ready-icon></ready-icon>
+                <span class="d-inline-flex ml-2">{{ contactName | truncate(15) }}</span>
+              </q-item-label>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3 w-100 pr-2">
+              <q-item-label>
+                <div class="d-flex align-items-center">
+                  <ready-icon></ready-icon>
+                  <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty | truncate(15) }}</span>
+                </div>
+                <div class="mt-1">
+                  <span class="add-status"
+                        v-if="addedParty && dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_RINGING_NEW">
+                    Adding
+                  </span>
+                  <span class="add-status"
+                        v-if="addedParty && dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_INPROGRESS_NEW">
+                    Added
+                  </span>
+                </div>
+              </q-item-label>
+              <q-btn :loading="loadingDropThirdParty"
+                     :disabled="loadingDropThirdParty"
+                     class="height-24"
+                     ripple
+                     round
+                     no-caps
+                     unelevated
+                     @click="dropThirdParty">
+                <drop-participant-icon></drop-participant-icon>
+              </q-btn>
+            </div>
+          </div>
+
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
             <button :disabled="isMuteDisabled"
                     class="phone-buttons btn"
@@ -1061,11 +1102,17 @@ import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import ParticipantsIcon from 'components/icons/participants-icon'
+import ReadyIcon from 'components/icons/ready-icon'
+import DropParticipantIcon from 'components/icons/drop-participant-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    DropParticipantIcon,
+    ReadyIcon,
+    ParticipantsIcon,
     AvailableUserSelector,
     RingGroupSelector,
     VmDropSelector,
@@ -1190,7 +1237,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -1888,6 +1935,14 @@ export default {
       this.saveAndResetExpansion($event)
       setTimeout(() => {
         this.loadingAdd = false
+      }, 1000)
+    },
+
+    dropThirdParty () {
+      this.loadingDropThirdParty = true
+      this.$VueEvent.fire('dropThirdParty')
+      setTimeout(() => {
+        this.loadingDropThirdParty = false
       }, 1000)
     },
 

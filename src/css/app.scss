@@ -2910,6 +2910,10 @@ span.mention {
   height: 22px;
 }
 
+.height-24 {
+  height: 24px;
+}
+
 .height-28 {
   height: 28px;
 }
@@ -3537,6 +3541,12 @@ span.mention {
 
     .w-100 {
       width: 100%;
+    }
+
+    .add-status {
+      margin-left: 23px;
+      font-size: $f-size-body-xs;
+      color: $grey-90;
     }
 
     &.small {
