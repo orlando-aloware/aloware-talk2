@@ -381,14 +381,12 @@ export default {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
-        console.log('Dialer is not ready, rescheduling', currentNumber, outboundCampaignId)
-        // dialer is not ready, rescheduling
-        setTimeout(() => {
-          this.makeCall(currentNumber, outboundCampaignId, contactName, companyName, contactId)
-        }, 1000)
+        console.log('Dialer is not ready', currentNumber, outboundCampaignId)
+        return
       }
 
       if (this.dialer.call || !currentNumber || !outboundCampaignId) {
+        console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
       }
 
