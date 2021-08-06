@@ -751,8 +751,8 @@ export default {
         if (communicationActivity) {
           communicationActivity.$el.scrollIntoView({
             behavior: 'smooth',
-            block: 'center',
-            inline: 'center'
+            block: 'nearest',
+            inline: 'start'
           })
           // highlight the activity
           this.highlightActivity(communicationActivity.$el)
@@ -775,6 +775,10 @@ export default {
         highlighted.classList.remove('shine')
       }
       element.classList.add('shine')
+
+      setTimeout(() => {
+        element.classList.remove('shine')
+      }, 2000)
     },
 
     fetchIncomingNumber () {
