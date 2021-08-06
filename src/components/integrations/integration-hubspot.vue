@@ -153,6 +153,7 @@ export default {
         this.currentCompany.hubspot_integration_enabled &&
         this.contact &&
         this.contact.integration_data &&
+        this.contact.integration_data.hubspot &&
         this.currentCompany.hubspot_marketing_portal_id) {
         return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
