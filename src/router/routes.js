@@ -1,10 +1,3 @@
-// import store from ‘src/store/index’
-
-function guardMyRoute (to, from, next) {
-  // console.log(store.state)
-  next()
-}
-
 const routes = [
   {
     path: '/',
@@ -29,7 +22,6 @@ const routes = [
         path: '',
         name: 'Inbox',
         component: () => import('pages/Inbox.vue'),
-        beforeEnter: guardMyRoute,
         meta: {
           title: 'Inbox'
         },
@@ -55,7 +47,6 @@ const routes = [
       {
         path: 'contacts',
         component: () => import('src/pages/contacts/Contacts.vue'),
-        beforeEnter: guardMyRoute,
         meta: {
           title: 'Contacts'
         },
@@ -86,7 +77,6 @@ const routes = [
         path: 'contacts/:id',
         name: 'Contact',
         component: () => import('src/pages/contacts/Contact.vue'),
-        beforeEnter: guardMyRoute,
         meta: {
           title: 'Contact'
         }
@@ -95,7 +85,6 @@ const routes = [
         path: 'power-dialer',
         name: 'Power Dialer',
         component: () => import('pages/PowerDialer.vue'),
-        beforeEnter: guardMyRoute,
         meta: {
           title: 'Power Dialer'
         }
@@ -104,7 +93,6 @@ const routes = [
         path: 'stats',
         name: 'Stats',
         component: () => import('pages/Stats.vue'),
-        beforeEnter: guardMyRoute,
         meta: {
           title: 'Stats'
         }
@@ -113,7 +101,6 @@ const routes = [
         path: 'settings',
         name: 'Settings',
         component: () => import('pages/Settings.vue'),
-        beforeEnter: guardMyRoute,
         meta: {
           title: 'Settings'
         }
@@ -126,14 +113,12 @@ const routes = [
       {
         path: 'user-activity/:userId',
         name: 'User Activity',
-        component: () => import('pages/Account.vue'),
-        beforeEnter: guardMyRoute
+        component: () => import('pages/Account.vue')
       },
       {
         path: 'communication/:communicationId',
         name: 'Communication',
-        component: () => import('pages/Account.vue'),
-        beforeEnter: guardMyRoute
+        component: () => import('pages/Account.vue')
       }
     ]
   },
