@@ -31,14 +31,20 @@ export default {
   },
 
   props: {
+    value: {
+      required: false
+    },
+
     closed: {
       type: Boolean,
       default: false
     },
+
     openCount: {
       required: false,
       default: 0
     },
+
     pendingCount: {
       required: false,
       default: 0
@@ -47,7 +53,7 @@ export default {
 
   data () {
     return {
-      active: 'inbox',
+      active: this.value,
       items: [
         {
           label: 'Inbox',
@@ -108,7 +114,19 @@ export default {
   methods: {
     onItemClicked (nextActive) {
       this.active = nextActive
-      this.$emit('active', this.items.find(item => item.value === this.active))
+    }
+  },
+
+  watch: {
+    value () {
+      this.active = this.value
+    },
+
+    active (val) {
+      if (this.value !== undefined && this.active !== this.value) {
+        this.$emit('active', this.items.find(item => item.value === val))
+        this.$emit('update:value', val)
+      }
     }
   }
 }
