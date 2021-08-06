@@ -439,14 +439,27 @@ export default {
       })
     },
 
-    fetchContactCommunicationsUntilFound () {
+    fetchContactCommunicationsUntilFound (tryCount = 1) {
+      if (tryCount > 10) {
+        this.loadingContactCommunications = false
+        this.$q.notify({
+          offset: 95,
+          title: 'Contact',
+          message: 'Communication is too old for automatic scrolling',
+          type: 'error',
+          showClose: true
+        })
+        return
+      }
+
       this.loadingContactCommunications = true
 
       // fetch communications until we found the activity id
       if (!this.isCommunicationFound()) {
         this.fetchContactCommunications(this.contactId).then(res => {
           if (res.data.has_more_pages) {
-            this.fetchContactCommunicationsUntilFound()
+            tryCount++
+            this.fetchContactCommunicationsUntilFound(tryCount)
           } else if (this.isCommunicationFound()) {
             this.scrollIntoActivity()
             this.loadingContactCommunications = false

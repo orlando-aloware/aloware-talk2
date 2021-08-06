@@ -77,6 +77,7 @@ export default {
         activitiesWrap.scrollTop = activitiesWrap.scrollHeight
       }
     },
+
     scrollIntoActivity () {
       console.log('scroll now')
     }
