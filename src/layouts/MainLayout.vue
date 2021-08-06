@@ -52,7 +52,7 @@
         </q-page-container>
       </div>
       <q-drawer v-model="sidebarVisible"
-                v-show="authenticated && sidebarVisible && !loading"
+                v-if="authenticated"
                 :breakpoint="0"
                 class="h-100 sidebar-wrapper d-none d-sm-block"
                 :width="64"
@@ -198,7 +198,7 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      sidebarVisible: true,
+      sidebarVisible: false,
       lightMode: true,
       CommunicationTypes
     }
@@ -438,6 +438,10 @@ export default {
   },
 
   mounted () {
+    if (this.authenticated) {
+      this.sidebarVisible = true
+    }
+
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         // this is a recursive authentication check with 3 tries
@@ -1319,6 +1323,10 @@ export default {
 
       if (!this.authenticated) {
         this.resetCall()
+      }
+
+      if (this.authenticated) {
+        this.sidebarVisible = true
       }
     }
   }

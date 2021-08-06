@@ -286,7 +286,8 @@
                  v-if="addedParty">
               <q-item-label>
                 <div class="d-flex align-items-center">
-                  <ready-icon></ready-icon>
+                  <ready-icon v-if="!shouldIntroduce"></ready-icon>
+                  <waiting-icon v-else></waiting-icon>
                   <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty | truncate(15) }}</span>
                 </div>
                 <div class="mt-1">
@@ -1106,11 +1107,13 @@ import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import ParticipantsIcon from 'components/icons/participants-icon'
 import ReadyIcon from 'components/icons/ready-icon'
 import DropParticipantIcon from 'components/icons/drop-participant-icon'
+import WaitingIcon from 'components/icons/waiting-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    WaitingIcon,
     DropParticipantIcon,
     ReadyIcon,
     ParticipantsIcon,

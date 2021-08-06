@@ -754,8 +754,8 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
-        this.setShouldIntroduce(add.introduce)
-        console.log((add.introduce) ? 'Introduce is in progress.' : 'Add is in progress.')
+        this.setShouldIntroduce(params.introduce)
+        console.log((params.introduce) ? 'Introduce is in progress.' : 'Add is in progress.')
       }).catch(err => {
         this.setAddedParty()
         console.log(err)
