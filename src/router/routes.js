@@ -31,7 +31,7 @@ const routes = [
             name: 'Inbox Contact',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox Contact'
+              title: 'Inbox'
             }
           }
         ]

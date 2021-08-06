@@ -11,13 +11,10 @@ export default {
   computed: {
     ...mapGetters('contacts', ['selectedList']),
     ...mapState('contacts', ['search']),
+
     title () {
       return this.search && this.search.length > 0 ? 'Search results' : this.selectedList.name
     }
   }
 }
 </script>
-
-<style scoped>
-
-</style>

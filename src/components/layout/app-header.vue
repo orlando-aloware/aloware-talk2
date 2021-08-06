@@ -7,7 +7,7 @@
         <i class="fa fa-chevron-left"></i>
       </b-link>
 
-      <h1 v-if="!['Contact'].includes($route.name)">{{ $route.name }}</h1>
+      <h1 v-if="!['Contact'].includes($route.name)">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name)"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name)" />
     </div>
