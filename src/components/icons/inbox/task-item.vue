@@ -40,7 +40,7 @@
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="(communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || communication.type !== CommunicationTypes.CALL">
-          {{ communication.created_at | shortDateTimePassed }}
+        <task-item-time :from-time="communication.created_at" update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
            v-else-if="communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
@@ -66,6 +66,7 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import TaskItemTime from 'components/icons/inbox/task-item-time'
 
 export default {
   name: 'task-item',
@@ -76,6 +77,7 @@ export default {
   ],
 
   components: {
+    TaskItemTime,
     AcceptCallIcon,
     CancelCallIcon,
     Avatar
