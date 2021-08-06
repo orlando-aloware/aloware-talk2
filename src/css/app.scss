@@ -2910,6 +2910,10 @@ span.mention {
   height: 22px;
 }
 
+.height-24 {
+  height: 24px;
+}
+
 .height-28 {
   height: 28px;
 }
@@ -3192,7 +3196,6 @@ span.mention {
 .current-tasks {
   .options {
     @include font-size(14px, 500);
-    line-height: 17px;
   }
 }
 
@@ -3536,6 +3539,16 @@ span.mention {
     width: 200px;
     height: 150px;
 
+    .w-100 {
+      width: 100%;
+    }
+
+    .add-status {
+      margin-left: 23px;
+      font-size: $f-size-body-xs;
+      color: $grey-90;
+    }
+
     &.small {
       height: 66px;
     }
@@ -3591,7 +3604,12 @@ span.mention {
     background: $white;
 
     .phone-avatar {
-      margin-top: -29px;
+      margin-top: -25px;
+
+      .contact-avatar {
+        font-size: $f-size-body-xxxl;
+        margin: 0;
+      }
     }
 
     .border-bottom {
