@@ -5,7 +5,8 @@
       <b-button
         class="btn-block"
         variant="outline-primary"
-        size="sm" @click="showDialog">
+        size="sm"
+        @click="showDialog">
         View Scheduled Messages
       </b-button>
     </div>

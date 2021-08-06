@@ -98,7 +98,8 @@
           </template>
           <template #cell(action)="data">
             <b-button size="sm"
-                      variant="outline-danger" @click="onDelete(data.item)">
+                      variant="outline-danger"
+                      @click="onDelete(data.item)">
               <trash-o-icon></trash-o-icon>
             </b-button>
           </template>

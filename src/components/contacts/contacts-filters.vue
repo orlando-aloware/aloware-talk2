@@ -14,8 +14,7 @@
               <b-button variant="outline-primary header-buttons"
                         size="sm"
                         @click="backToStep"
-                        v-if="step !== 1"
-              >
+                        v-if="step !== 1">
                 <i class="fa fa-arrow-left"></i>
               </b-button>
               <h6 class="mb-0">Filters</h6>

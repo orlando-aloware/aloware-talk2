@@ -7,7 +7,8 @@
     <b-button size="sm"
               class="ml-2"
               variant="outline-primary"
-              :disabled="isBusy" @click="onCancel">
+              :disabled="isBusy"
+              @click="onCancel">
       Cancel
     </b-button>
     <b-button size="sm"
