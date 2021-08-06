@@ -10,7 +10,7 @@
       </b-button>
       <b-card no-body
               class="no-border position-relative"
-              ref="scrollableArea">
+              @scroll="handScroll">
         <b-list-group class="p-2 pr-3">
           <b-list-group-item v-for="contact in contacts"
                              :key="contact.id"
@@ -117,6 +117,12 @@ export default {
     onSidebarToggle () {
       this.isExpanded = !this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
+    },
+
+    handScroll (el) {
+      if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
+        this.onBottomScroll()
+      }
     }
   },
 
@@ -124,16 +130,10 @@ export default {
     if (this.listItems[this.selectedList.id].data.length < 1) {
       this.fetch()
     }
-
-    if (this.$refs.scrollableArea) {
-      this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
-      this.$refs.scrollableArea.addEventListener('scroll', this.onBottomScroll)
-    }
   },
 
   beforeDestroy () {
     clearTimeout(scrollTimeout)
-    this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
   }
 }
 </script>

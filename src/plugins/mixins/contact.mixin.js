@@ -807,7 +807,7 @@ export default {
     fetchIncomingNumber () {
       this.contactIncomingNumber = null
       this.$axios.get(`/api/v1/contact/${this.selectedContact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
-        this.contact_incoming_number = res.data
+        this.contactIncomingNumber = res.data
       }).catch(err => {
         this.$handleErrors(err.response)
         console.log(err)
