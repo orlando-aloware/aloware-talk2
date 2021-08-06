@@ -1,5 +1,6 @@
 <template>
-  <div class="h-100">
+  <div class="h-100"
+       v-if="authenticated">
     <div class="call-active">
     </div>
     <div class="inbox animate__animated animate__fadeIn position-relative">
@@ -14,7 +15,7 @@
 
 <script>
 import InboxSide from 'components/inbox/inbox-side'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   components: {
@@ -34,6 +35,7 @@ export default {
   },
 
   methods: {
+    ...mapGetters('auth', ['authenticated']),
     ...mapActions('inbox', ['setActiveChannel']),
 
     setChannel () {
