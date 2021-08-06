@@ -15,18 +15,23 @@
       <template v-slot:option="scope">
         <q-item v-if="!scope.opt.group"
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-        >
+                v-on="scope.itemEvents">
           <q-item-section>
             <q-item-label v-html="scope.opt.name"></q-item-label>
-            <q-item-label caption>{{ scope.opt.email }}</q-item-label>
+            <q-item-label v-if="!scope.opt.is_destination"
+                          caption>
+              {{ scope.opt.email }} - {{ getLabel(scope.opt) }}
+            </q-item-label>
+            <q-item-label v-else
+                          caption>
+              {{ getLabel(scope.opt) }}
+            </q-item-label>
           </q-item-section>
         </q-item>
         <q-item v-if="scope.opt.group"
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-        >
-          <q-item-label header class="group-label">{{ scope.opt.group }}</q-item-label>
+                v-on="scope.itemEvents">
+          <q-item-label header class="text-size-xs">{{ scope.opt.group }}</q-item-label>
         </q-item>
       </template>
       <template v-slot:no-option>
@@ -42,7 +47,7 @@
 
 <script>
 import * as AnswerTypes from 'src/constants/answer-types'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -51,15 +56,16 @@ export default {
   mixins: [aclMixin],
 
   props: {
-    ignore_focus_mode: {
-      default: false,
-      type: Boolean,
-      required: false
-    },
     value: {
       type: Number
     },
-    hideExtensions: Boolean,
+
+    hideExtensions: {
+      required: false,
+      default: false,
+      type: Boolean
+    },
+
     disabled: {
       required: false,
       default: false,
@@ -69,13 +75,9 @@ export default {
 
   computed: {
     ...mapState(['users']),
-    ...mapGetters('auth', ['profile']),
+
     availableUsers () {
-      if (this.users.length > 0 && (this.profile && this.profile.focus_mode) && !this.ignore_focus_mode) {
-        return this.users.filter(user => user.id === this.profile.id)
-      } else {
-        return this.users
-      }
+      return this.users
     },
 
     filteredUsers () {
@@ -84,14 +86,6 @@ export default {
           !(user.role_names.length === 1 && user.read_only_access) &&
           user.answer_by !== AnswerTypes.BY_NONE
         )
-
-        if (this.filteredText) {
-          return filteredUsers.filter((user) =>
-            (user.name && user.name.toLowerCase().includes(this.filteredText.toLowerCase())) ||
-            (user.phone_number && user.phone_number.includes(this.filteredText)) ||
-            (user.email && user.email.toLowerCase().includes(this.filteredText.toLowerCase()))
-          )
-        }
 
         return filteredUsers
       }
@@ -142,7 +136,6 @@ export default {
   data () {
     return {
       isBusy: false,
-      filteredText: null,
       options: this.formattedOptions
     }
   },
@@ -161,13 +154,29 @@ export default {
       }
 
       update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.formattedOptions.filter(v => v.name && v.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.formattedOptions.filter((user) =>
+          (user.name && user.name.toLowerCase().includes(val.toLowerCase())) ||
+          (user.phone_number && user.phone_number.includes(val)) ||
+          (user.email && user.email.toLowerCase().includes(val.toLowerCase()))
+        )
       })
     },
 
-    getLabel () {
+    getLabel (user) {
+      if (!user) {
+        return
+      }
 
+      switch (user.answer_by) {
+        case AnswerTypes.BY_PHONE_NUMBER:
+          return 'Phone Number (' + user.phone_number + ')'
+        case AnswerTypes.BY_BROWSER:
+          return 'Apps'
+        case AnswerTypes.BY_IP_PHONE:
+          return 'SIP (IP Phone)'
+        case AnswerTypes.BY_NONE:
+          return 'Will Not Answer'
+      }
     }
   },
 
@@ -178,9 +187,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.group-label {
-  font-size: 90%;
-}
-</style>

@@ -31,11 +31,25 @@
     </template>
 
     <template v-slot:option="scope">
-      <q-item v-bind="scope.itemProps"
+      <q-item v-if="!scope.opt.group"
+              v-bind="scope.itemProps"
               v-on="scope.itemEvents">
         <q-item-section>
-          <q-item-label v-html="scope.opt.name"/>
+          <q-item-label v-html="scope.opt.name"></q-item-label>
+          <q-item-label v-if="!scope.opt.is_destination"
+                        caption>
+            {{ scope.opt.email }} - {{ getLabel(scope.opt) }}
+          </q-item-label>
+          <q-item-label v-else
+                        caption>
+            {{ getLabel(scope.opt) }}
+          </q-item-label>
         </q-item-section>
+      </q-item>
+      <q-item v-if="scope.opt.group"
+              v-bind="scope.itemProps"
+              v-on="scope.itemEvents">
+        <q-item-label header class="text-size-xs">{{ scope.opt.group }}</q-item-label>
       </q-item>
     </template>
   </q-select>
@@ -43,7 +57,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import _ from 'lodash'
+import * as AnswerTypes from 'src/constants/answer-types'
 
 export default {
   name: 'user-selector',
@@ -57,6 +71,12 @@ export default {
       type: Boolean,
       default: false,
       required: false
+    },
+
+    hideExtensions: {
+      required: false,
+      default: false,
+      type: Boolean
     },
 
     disable: {
@@ -93,62 +113,98 @@ export default {
       return 'Select a user'
     },
 
-    usersAlphabeticalOrder () {
-      if (this.users) {
-        let users = _.clone(this.users)
-        return users.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+    availableUsers () {
+      return this.users
+    },
+
+    filteredUsers () {
+      if (this.availableUsers) {
+        let filteredUsers = this.availableUsers.filter((user) =>
+          !(user.role_names.length === 1 && user.read_only_access) &&
+          user.answer_by !== AnswerTypes.BY_NONE
+        )
+
+        return filteredUsers
+      }
+
+      return []
+    },
+
+    normalUsers () {
+      return this.filteredUsers.filter((user) => !user.is_destination)
+    },
+
+    extensionUsers () {
+      return this.filteredUsers.filter((user) => user.is_destination)
+    },
+
+    formattedOptions () {
+      let normalUsers = [...this.normalUsers]
+
+      normalUsers.unshift({
+        group: 'Users',
+        disable: true
+      })
+
+      let usersArray = normalUsers
+
+      if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
+        let extensionUsers = [...this.extensionUsers]
+        extensionUsers.unshift({
+          group: 'Extensions',
+          disable: true
         })
+        usersArray = [...normalUsers, ...extensionUsers]
       }
 
-      return []
-    },
-
-    activeCampaignsAlphabeticalOrder () {
-      if (this.usersAlphabeticalOrder.length) {
-        let users = _.clone(this.usersAlphabeticalOrder)
-        return users
-      }
-
-      return []
-    },
-
-    pausedCampaignsAlphabeticalOrder () {
-      if (this.usersAlphabeticalOrder.length) {
-        let users = _.clone(this.usersAlphabeticalOrder)
-        return users.filter(user => user.active === false)
-      }
-
-      return []
+      return usersArray
     }
   },
 
   created () {
-    this.userOptions = this.usersAlphabeticalOrder
+    this.userOptions = this.formattedOptions
   },
 
   methods: {
     filterFn (val, update) {
       if (this.userId && val === this.userId) {
         update(() => {
-          this.userOptions = this.usersAlphabeticalOrder.filter(user => user.id === this.userId)
+          this.userOptions = this.formattedOptions.filter(user => user.id === this.userId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.userOptions = this.usersAlphabeticalOrder
+          this.userOptions = this.formattedOptions
         })
         return
       }
 
       update(() => {
-        const needle = val.toLowerCase()
-        this.userOptions = this.usersAlphabeticalOrder.filter(user => user.name.toLowerCase().indexOf(needle) > -1)
+        this.userOptions = this.formattedOptions.filter((user) =>
+          (user.name && user.name.toLowerCase().includes(val.toLowerCase())) ||
+          (user.phone_number && user.phone_number.includes(val)) ||
+          (user.email && user.email.toLowerCase().includes(val.toLowerCase()))
+        )
       })
+    },
+
+    getLabel (user) {
+      if (!user) {
+        return
+      }
+
+      switch (user.answer_by) {
+        case AnswerTypes.BY_PHONE_NUMBER:
+          return 'Phone Number (' + user.phone_number + ')'
+        case AnswerTypes.BY_BROWSER:
+          return 'Apps'
+        case AnswerTypes.BY_IP_PHONE:
+          return 'SIP (IP Phone)'
+        case AnswerTypes.BY_NONE:
+          return 'Will Not Answer'
+      }
     }
   },
 
