@@ -42,6 +42,7 @@ export const shortDateTimePassed = (dt) => {
     }
     dateTimePassed = dateTimePassed.join(' ')
     return dateTimePassed.replace(' ago', '')
+      .replace(' few', '')
       .replace(' seconds', 's')
       .replace(' second', 's')
       .replace(' minutes', 'm')
