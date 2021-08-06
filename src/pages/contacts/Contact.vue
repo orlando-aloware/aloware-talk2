@@ -93,13 +93,19 @@ export default {
   },
 
   watch: {
-    '$route.params.id': function () {
+    '$route.params.id': function (value) {
+      console.log(this.$route.params.id)
       if (['Contact', 'Inbox Contact'].includes(this.$route.name) && this.contactId !== this.$route.params.id) {
         this.resetSelectedContact()
         this.contactId = this.$route.params.id
         this.processFetchContactInfo()
       } else {
         this.resetSelectedContact()
+      }
+    },
+    '$route.params.communicationId': function (value) {
+      if (['Inbox Contact'].includes(this.$route.name)) {
+        this.fetchContactCommunicationsUntilFound()
       }
     }
   }

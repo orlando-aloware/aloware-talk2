@@ -308,9 +308,9 @@ export default {
             this.loadingContact = false
             console.log('fetched comms')
 
-            // if route hash contains activity info, retrieve communications
+            // if route has communication id
             // until id is found
-            if (this.isHashActivityType()) {
+            if (this.hasCommunication()) {
               this.loadingContactCommunications = true
               this.fetchContactCommunicationsUntilFound()
             } else {
@@ -443,11 +443,11 @@ export default {
       this.loadingContactCommunications = true
 
       // fetch communications until we found the activity id
-      if (!this.isHashActivityFound()) {
+      if (!this.isCommunicationFound()) {
         this.fetchContactCommunications(this.contactId).then(res => {
           if (res.data.has_more_pages) {
             this.fetchContactCommunicationsUntilFound()
-          } else if (this.isHashActivityFound) {
+          } else if (this.isCommunicationFound) {
             this.scrollIntoActivity()
             this.loadingContactCommunications = false
           } else {
@@ -688,6 +688,16 @@ export default {
       }, 50)
     },
 
+    hasCommunication () {
+      return this.$route.params.communicationId
+    },
+
+    isCommunicationFound () {
+      let found = null
+      found = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId)
+      return !!found
+    },
+
     isHashActivityType () {
       if (!this.$route.hash) {
         return false
@@ -731,17 +741,18 @@ export default {
     },
 
     scrollIntoActivity () {
-      let hash = this.$route.hash.replace('#', '')
+      let communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      let ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0
 
       // scroll to activity
       let scrollInterval = setInterval(() => {
-        const communicationActivity = _.get(this.$refs, `${hash}.0`, null)
+        const communicationActivity = _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null)
         if (communicationActivity) {
           communicationActivity.$el.scrollIntoView({
             behavior: 'smooth',
-            block: 'start',
-            inline: 'start'
+            block: 'center',
+            inline: 'center'
           })
           // highlight the activity
           this.highlightActivity(communicationActivity.$el)
@@ -759,6 +770,10 @@ export default {
     },
 
     highlightActivity (element) {
+      let highlighted = document.querySelector('.shine')
+      if (highlighted) {
+        highlighted.classList.remove('shine')
+      }
       element.classList.add('shine')
     },
 
