@@ -5,6 +5,9 @@ export default {
   setSelectedCommunication: ({ commit }, communication) => {
     commit('SET_SELECTED_COMMUNICATION', communication)
   },
+  setCommunications: ({ commit }, communications) => {
+    commit('SET_COMMUNICATIONS', communications)
+  },
   resetInboxVuex: ({ commit }) => {
     commit('RESET_INBOX_VUEX')
   },

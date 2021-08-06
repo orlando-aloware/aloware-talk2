@@ -15,6 +15,11 @@
          role="button">
       <div class="contact-name">
         {{ contactName | truncate(20) }}
+        <q-tooltip content-class="bg-grey-light11"
+                   anchor="top middle"
+                   self="center middle">
+          {{ contactName }}
+        </q-tooltip>
       </div>
       <div class="d-flex flex-row">
         <div class="pr-2">
@@ -40,7 +45,7 @@
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="(communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || communication.type !== CommunicationTypes.CALL">
-        <task-item-time :from-time="communication.created_at" update-interval="6000"></task-item-time>
+        <task-item-time :from-time="communication.created_at" :update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
            v-else-if="communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
@@ -88,10 +93,10 @@ export default {
       required: true
     },
 
-    filterType: {
+    channel: {
       type: String,
       required: false,
-      default: 'call'
+      default: 'calls'
     },
 
     answerStatus: {
@@ -152,20 +157,20 @@ export default {
     },
 
     onItemClick (communication) {
+      this.setSelectedCommunication(communication)
       this.$router.push({
         name: 'Inbox Contact',
         params: {
           id: communication.contact_id.toString(),
           communicationId: communication.id,
-          type: this.filterType
+          channel: this.channel
         }
       }).catch(err => {
         console.log(err)
       })
-      this.setSelectedCommunication(communication)
     },
 
-    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication'])
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel'])
   }
 }
 </script>

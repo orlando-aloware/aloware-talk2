@@ -5,6 +5,9 @@ export default {
   SET_SELECTED_COMMUNICATION: (state, communication) => {
     state.selectedCommunication = communication
   },
+  SET_COMMUNICATIONS: (state, communications) => {
+    state.communications = communications
+  },
   RESET_INBOX_VUEX: (state) => {
     state.activeChannel = null
     state.selectedContactId = null

@@ -8,7 +8,7 @@
       :icon="item.icon"
       :group="item.group"
       :disabled="item.disabled"
-      :isActive="active === item.value"
+      :isActive="activeChannel && activeChannel.value === item.value"
       :closed="closed"
       :badge="true"
       :openCount="openCount"
@@ -22,6 +22,7 @@
 
 <script>
 import NavItem from './inbox-nav-item'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'inbox-nav-list',
@@ -51,69 +52,30 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('inbox', ['items', 'activeChannel'])
+  },
+
   data () {
     return {
-      active: this.value,
-      items: [
-        {
-          label: 'Inbox',
-          value: 'inbox',
-          icon: 'inbox',
-          disabled: false
-        },
-        {
-          label: 'Channels',
-          group: true,
-          value: '',
-          class: 'nav-list-group-title',
-          icon: '',
-          disabled: false
-        },
-        {
-          label: 'Calls',
-          value: 'calls',
-          icon: 'call',
-          disabled: false,
-          type: 'call',
-          answerStatus: 'all'
-        },
-        {
-          label: 'Messages',
-          value: 'messages',
-          icon: 'message',
-          disabled: false,
-          type: 'sms',
-          answerStatus: 'all'
-        },
-        {
-          label: 'Mentions',
-          value: 'mentions',
-          icon: 'mention',
-          disabled: true
-        },
-        {
-          label: 'Voicemails',
-          value: 'voicemails',
-          icon: 'voicemail',
-          disabled: false,
-          type: 'call',
-          answerStatus: 'voicemail'
-        },
-        {
-          label: 'Recordings',
-          value: 'recordings',
-          icon: 'record',
-          disabled: false,
-          type: 'call',
-          answerStatus: 'recorded'
-        }
-      ]
+      active: this.value
     }
   },
 
   methods: {
+    ...mapActions('inbox', ['setActiveChannel']),
     onItemClicked (nextActive) {
       this.active = nextActive
+      let channel = this.items.find(item => item.value === nextActive)
+      this.setActiveChannel(channel)
+      this.$router.push({
+        name: 'Inbox Channel',
+        params: {
+          channel: this.active
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
 

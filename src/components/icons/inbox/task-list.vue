@@ -3,7 +3,7 @@
       <task-item v-for="communication in communications"
                  :key="communication.id"
                  :communication="communication"
-                 :filter-type="filterType"
+                 :channel="channel"
                  :answer-status="answerStatus">
       </task-item>
     </div>
@@ -22,10 +22,10 @@ export default {
       required: true
     },
 
-    filterType: {
+    channel: {
       type: String,
       required: false,
-      default: 'call'
+      default: 'calls'
     },
 
     answerStatus: {

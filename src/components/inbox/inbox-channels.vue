@@ -5,8 +5,8 @@
                rounded="sm"
                variant="white">
       <task-list :communications="communications"
-                 :filter-type="filterType"
                  :answer-status="answerStatus"
+                 :channel="channel"
                  v-if="!isGettingTasksList">
       </task-list>
       <div class="relative py-4">
@@ -55,10 +55,26 @@ export default {
       default: 'call'
     },
 
+    channel: {
+      type: String,
+      required: false,
+      default: 'calls'
+    },
+
     answerStatus: {
       type: String,
       required: false,
       default: 'all'
+    },
+
+    searchText: {
+      type: String,
+      default: ''
+    },
+
+    sort: {
+      type: String,
+      default: 'newest'
     },
 
     campaignId: {
@@ -79,7 +95,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications']),
 
     nextPage () {
       return this.currentPage + 1
@@ -88,9 +104,7 @@ export default {
 
   data () {
     return {
-      communications: [],
       filter: null,
-      searchText: '',
       searchFields: ['name', 'phone_number', 'email'],
       currentPage: 0,
       hasMore: false,
@@ -202,8 +216,17 @@ export default {
         }
       }
     })
-
-    this.getCommunications(this.filter)
+    let _this = this
+    if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
+      this.getCommunications(this.filter).then(function () {
+        if (_this.$route.name === 'Inbox Contact') {
+          let communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
+          if (communication) {
+            _this.setSelectedCommunication(communication)
+          }
+        }
+      })
+    }
   },
 
   methods: {
@@ -229,8 +252,7 @@ export default {
 
       this.filter.type = this.filterType
       this.filter.answer_status = this.answerStatus
-
-      this.communications = []
+      this.setCommunications([])
     },
 
     checkCommunicationMatchesFilters (communication) {
@@ -416,18 +438,16 @@ export default {
 
     getCommunications (params) {
       this.gettingTasksList(true)
-      talk2Api.V1.reports.communications
+      return talk2Api.V1.reports.communications
         .get({ params: params })
         .then(response => {
-          this.communications = response.data.data
+          this.setCommunications(response.data.data)
           this.currentPage = response.data.current_page
           this.hasMore = response.data.next_page_url
 
           this.pagination = _.clone(response.data)
           delete this.pagination.data
           this.gettingTasksList(false)
-
-          this.$emit('communicationsLoaded', this.communications)
         })
     },
 
@@ -437,7 +457,7 @@ export default {
       talk2Api.V1.reports.communications
         .get({ params: params })
         .then(response => {
-          this.communications = [...this.communications, ...response.data.data]
+          this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
           this.hasMore = response.data.next_page_url
           this.isLoadingMore = false
@@ -445,8 +465,6 @@ export default {
 
           this.pagination = _.clone(response.data)
           delete this.pagination.data
-
-          this.$emit('communicationsLoaded', this.communications)
         })
     },
 
@@ -468,13 +486,29 @@ export default {
       }, 66)
     },
 
-    ...mapActions('inbox', ['gettingTasksList'])
+    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication'])
   },
 
   watch: {
-    'activeChannel': function () {
-      this.resetFilters()
+    'activeChannel': function (value) {
+      if (this.$route.name === 'Inbox Channel') {
+        this.resetFilters()
+        this.getCommunications(this.filter)
+      }
+    },
+    'searchText': function (value) {
+      this.filter.search_text = value
       this.getCommunications(this.filter)
+    },
+    'sort': function (value) {
+      this.filter.sort = value
+      this.getCommunications(this.filter)
+    },
+    '$route.name': function (value) {
+      if (value === 'Inbox Contact') {
+        let communication = this.communications.find(item => item.id === this.$route.params.communicationId)
+        this.setSelectedCommunication(communication)
+      }
     }
   }
 }

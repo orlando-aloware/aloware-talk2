@@ -14,10 +14,15 @@
 
 <script>
 import InboxSide from 'components/inbox/inbox-side'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   components: {
     InboxSide
+  },
+
+  computed: {
+    ...mapState('inbox', ['items', 'activeChannel'])
   },
 
   data () {
@@ -29,10 +34,29 @@ export default {
   },
 
   methods: {
-    toggleContactInfo () {
-      this.contactInfoOpen = !this.contactInfoOpen
+    ...mapActions('inbox', ['setActiveChannel']),
+
+    setChannel () {
+      if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
+        let channel = this.items.find(item => item.value === this.$route.params.channel)
+        this.setActiveChannel(channel)
+      }
+
+      if (['Inbox'].includes(this.$route.name) && !this.activeChannel) {
+        let channel = this.items.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
+      }
+    }
+  },
+
+  mounted () {
+    this.setChannel()
+  },
+
+  watch: {
+    '$route.name': function () {
+      this.setChannel()
     }
   }
-
 }
 </script>

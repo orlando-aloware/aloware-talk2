@@ -1,9 +1,9 @@
 <template>
   <q-toolbar class="page-header pl-3 pr-3">
     <div class="d-flex h-100 align-items-center">
-      <b-link v-if="['Contact'].includes($route.name) && canGoBack" class="btn-header-nav-back mr-3"
+      <b-link v-if="['Contact'].includes($route.name)" class="btn-header-nav-back mr-3"
               href="#"
-              @click="navigateBackward">
+              @click="navigateToContacts">
         <i class="fa fa-chevron-left"></i>
       </b-link>
 
@@ -108,14 +108,10 @@ export default {
       this.dialerStatus = false
     },
 
-    navigateBackward (e) {
-      if (this.$router.history._startLocation === this.$route.path) {
-        this.$router.push({
-          name: 'Contacts'
-        })
-      } else {
-        this.goBack()
-      }
+    navigateToContacts (e) {
+      this.$router.push({
+        name: 'Contacts'
+      })
       e.preventDefault()
     }
   },

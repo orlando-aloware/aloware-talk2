@@ -21,7 +21,8 @@
                     :openCount="openCount"
                     :pendingCount="pendingCount"
                     :commCampaigns="communicationLines"
-                    :commRingGroups="communicationRingGroups">
+                    :commRingGroups="communicationRingGroups"
+                    @sort="sortCommunications">
       </calls-header>
       <div v-if="!activeChannel || activeChannel.value === 'inbox'"
            class="w-100">
@@ -78,7 +79,9 @@
                       class="h-100 w-100 flex-grow-1 scroll-y"
                       :filter-type="activeChannel.type"
                       :answer-status="activeChannel.answerStatus"
-                      @communicationsLoaded="communicationsLoaded">
+                      :channel="activeChannel.value"
+                      :search-text="searchText"
+                      :sort="sort">
       </inbox-channels>
     </div>
   </div>
@@ -120,9 +123,8 @@ export default {
           slot: 'three'
         }
       ],
-      filters: null,
-      communications: [],
       searchText: '',
+      sort: '',
       searchFields: ['name', 'phone_number', 'email'],
       currentPage: 0,
       hasMore: false,
@@ -133,7 +135,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications']),
 
     communicationLines () {
       let campaigns = []
@@ -174,6 +176,7 @@ export default {
       }
       return ringGroups
     },
+
     nextPage () {
       return this.currentPage + 1
     }
@@ -209,18 +212,18 @@ export default {
     },
 
     search (value) {
-      // @TODO: search value from where?
+      this.searchText = value
     },
 
-    communicationsLoaded (communications) {
-      this.communications = communications
+    sortCommunications (value) {
+      this.sort = value
     },
 
     newActive (active) {
       this.setActiveChannel(active)
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex'])
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
   },
 
   beforeDestroy () {
