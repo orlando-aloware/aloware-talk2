@@ -1,5 +1,5 @@
 <template>
-  <div class="message p-3 mb-3 pb-1 d-flex flex-row align-items-start"
+  <div class="message p-3 pb-1 d-flex flex-row align-items-start"
        v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) || (communication.property === undefined)"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
@@ -186,7 +186,7 @@
             {{ getUser(communication.user_id).name }}
         </span>
         <span class="text-muted"
-              v-else>
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND">
             {{ currentCompany.name }}
         </span>
 

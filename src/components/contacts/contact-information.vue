@@ -6,9 +6,10 @@
       <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-0">Owner</p>
-        <contact-user-selector v-model="contact.user_id"
-                               @updateField="onUpdateOwner"
-                               :disabled="!hasPermissionTo('change contact ownership')">
+        <contact-user-selector :disabled="!hasPermissionTo('change contact ownership')"
+                               :hide-extensions="true"
+                               v-model="contact.user_id"
+                               @updateField="onUpdateOwner">
         </contact-user-selector>
       </div>
 

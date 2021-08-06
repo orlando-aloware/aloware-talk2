@@ -147,8 +147,17 @@ export default {
 
   methods: {
     isActive (name) {
+      if (this.$route.name === 'Contact' && name === 'Contacts') {
+        return true
+      }
+
+      if (this.$route.name === 'Inbox Contact' && name === 'Inbox') {
+        return true
+      }
+
       return this.$route.name === name
     },
+
     async logoutAction () {
       try {
         const response = await this.logout()
@@ -160,6 +169,7 @@ export default {
         console.error(err)
       }
     },
+
     ...mapActions('auth', ['logout'])
   },
 

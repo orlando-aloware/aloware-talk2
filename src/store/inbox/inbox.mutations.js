@@ -6,7 +6,9 @@ export default {
     state.selectedCommunication = communication
   },
   RESET_INBOX_VUEX: (state) => {
+    state.activeChannel = null
     state.selectedContactId = null
+    state.selectedCommunication = null
   },
   GETTING_TASKS_LIST: (state, isGetting) => {
     state.isGettingTasksList = isGetting

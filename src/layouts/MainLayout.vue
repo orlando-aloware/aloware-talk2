@@ -1300,7 +1300,12 @@ export default {
         (to.name !== from.name)) {
         this.resetContactsVuex()
       }
-      this.resetInboxVuex()
+
+      if (!(from.name === 'Inbox' && this.$route.name === 'Inbox Contact') &&
+        !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
+        (to.name !== from.name)) {
+        this.resetInboxVuex()
+      }
     },
 
     authenticated (newVal, oldVal) {

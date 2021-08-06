@@ -110,7 +110,9 @@ export default {
         phone_number: null
       },
       activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups'],
-      contactId: null
+      contactId: null,
+      CancelToken: null,
+      source: null
     }
   },
 
@@ -243,6 +245,9 @@ export default {
         this.scrollMessages()
       }
     })
+
+    this.CancelToken = this.$axios.CancelToken
+    this.source = this.CancelToken.source()
   },
 
   methods: {
@@ -311,21 +316,20 @@ export default {
       this.loadingContactCommunications = true
       console.log('fetching comms')
       return this.$axios.get(`/api/v1/contact/${this.contactId}`).then(res => {
-        this.fetchContactCommunications(this.contactId, false)
-          .then(() => {
-            this.loadingContact = false
-            console.log('fetched comms')
+        this.fetchContactCommunications(this.contactId, false).then(() => {
+          this.loadingContact = false
+          console.log('fetched comms')
 
-            // if route has communication id
-            // until id is found
-            if (this.hasCommunication()) {
-              this.loadingContactCommunications = true
-              this.fetchContactCommunicationsUntilFound()
-            } else {
-              this.loadingContactCommunications = false
-            }
-            this.scrollMessages()
-          })
+          // if route has communication id
+          // until id is found
+          if (this.hasCommunication()) {
+            this.loadingContactCommunications = true
+            this.fetchContactCommunicationsUntilFound()
+          } else {
+            this.loadingContactCommunications = false
+          }
+          this.scrollMessages()
+        })
         return res
       }).catch(err => {
         this.loadingContact = false
@@ -403,6 +407,8 @@ export default {
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
+      this.source.cancel('fetchContactCommunications operation canceled by the user.')
+      this.source = this.CancelToken.source()
       let lastAuditCreatedAt = null
       for (let index in this.communicationsAndAudits) {
         lastAuditCreatedAt = _.get(this.communicationsAndAudits, `[${index}].created_at`, null)
@@ -415,7 +421,8 @@ export default {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
           last_audit_created_at: lastAuditCreatedAt
-        }
+        },
+        cancelToken: this.source.token
       }).then(res => {
         if (res.data.data && res.data.data.length) {
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)
@@ -454,6 +461,12 @@ export default {
       // fetch communications until we found the activity id
       if (!this.isCommunicationFound()) {
         this.fetchContactCommunications(this.contactId).then(res => {
+          if (!res) {
+            this.scrollMessages()
+            this.loadingContactCommunications = false
+            return
+          }
+
           if (res.data.has_more_pages) {
             tryCount++
             this.fetchContactCommunicationsUntilFound(tryCount)
@@ -491,13 +504,11 @@ export default {
 
     loadMorePreviousActivities () {
       this.isLoadingPreviousActivities = true
-      this.fetchContactCommunications(this.contact_id)
-        .then(() => {
-          this.isLoadingPreviousActivities = false
-        })
-        .catch(() => {
-          this.isLoadingPreviousActivities = false
-        })
+      this.fetchContactCommunications(this.contact_id).then(() => {
+        this.isLoadingPreviousActivities = false
+      }).catch(() => {
+        this.isLoadingPreviousActivities = false
+      })
     },
 
     changeSelectedPhoneNumber (phoneNumber) {
@@ -513,6 +524,7 @@ export default {
     },
 
     resetSelectedContact () {
+      this.source = this.CancelToken.source()
       this.setContact(this.selectedContact)
       this.contactId = null
       this.selectedCampaignId = null
@@ -792,13 +804,13 @@ export default {
 
       setTimeout(() => {
         element.classList.remove('shine')
-      }, 2000)
+      }, 5000)
     },
 
     fetchIncomingNumber () {
       this.contactIncomingNumber = null
       this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
-        this.contact_incoming_number = res.data
+        this.contactIncomingNumber = res.data
       }).catch(err => {
         this.$handleErrors(err.response)
         console.log(err)

@@ -105,7 +105,6 @@ body,
 
     .q-field__prepend {
       height: auto;
-      margin-left: 7px !important;
 
       & + .q-field__control-container {
         .q-field__native {
@@ -116,7 +115,6 @@ body,
 
     .q-field__control {
       height: 100%;
-      margin-top: 2px;
 
       .q-field__native {
         padding-top: 0;
@@ -140,8 +138,8 @@ body,
   .q-field__native,
   .q-field:not(.q-field--float) .q-field__label,
   .q-item__label {
-    padding-right: 15px !important;
-    padding-left: 15px !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
   }
 
   .q-item__section .q-item__label {
@@ -2845,6 +2843,7 @@ span.mention {
     right: -2px;
 
     @extend .rounded-badge;
+    @extend .bordered;
   }
 }
 
@@ -2852,8 +2851,16 @@ span.mention {
   height: 12px;
   width: 12px;
   border-radius: 50%;
-  border: 2px solid #FFFFFF;
   padding: 0px;
+
+  &.small {
+    height: 6px;
+    width: 6px;
+  }
+
+  &.bordered {
+    border: 2px solid #FFFFFF;
+  }
 }
 
 .tab-dropdown-list {
@@ -2869,6 +2876,9 @@ span.mention {
 /*
  Utilities
  */
+.break-all {
+  word-break: break-all;
+}
 
 .auto-size {
   width: auto;
@@ -3110,10 +3120,23 @@ span.mention {
 .form-control-search {
   height: 32px !important;
   font-size: $f-size-body-xs;
+  margin-bottom: 0;
+
+  input {
+    line-height: 30px;
+  }
 
   &__icon {
     font-size: 12.5px;
     color: $grey-mid;
+  }
+
+  .q-field__prepend {
+    padding-left: 10px !important;
+  }
+
+  .q-field__focusable-action {
+    @extend .text-size-rg;
   }
 }
 
@@ -3806,6 +3829,17 @@ span.mention {
   .btn:focus, .btn.focus {
     box-shadow: none;
     text-decoration: none;
+  }
+}
+
+.phone-radio-select {
+  .q-item__section--avatar {
+    min-width: 16px;
+    padding-right: 8px;
+  }
+
+  .q-field__control {
+    margin-top: 0;
   }
 }
 
@@ -5921,7 +5955,21 @@ table.datatable {
   width: 10px;
 }
 
-
 .shine {
-  background: #fff7df;
+  background-color: #fff7df;
+}
+
+.message {
+  &.shine {
+    animation: shine-fade 0.5s linear;
+  }
+
+  @keyframes shine-fade {
+    0% {
+      background-color: rgba(255, 247, 223, 0);
+    }
+    100% {
+      background-color: rgba(255, 247, 223, 1);
+    }
+  }
 }

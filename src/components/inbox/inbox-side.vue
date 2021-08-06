@@ -9,6 +9,8 @@
           <inbox-nav-list :closed="closed"
                           :openCount="openCount"
                           :pendingCount="pendingCount"
+                          :value.sync="active"
+                          v-model="active"
                           @active="newActive">
           </inbox-nav-list>
         </div>
@@ -178,12 +180,19 @@ export default {
   },
 
   created () {
-    this.setActiveChannel(null)
-    this.setSelectedCommunication(null)
+    this.resetInboxVuex()
   },
 
   mounted () {
     window.addEventListener('resize', this.toggleOnResize)
+  },
+
+  activated () {
+    this.active = 'inbox'
+  },
+
+  deactivated () {
+    this.active = 'inbox'
   },
 
   methods: {
@@ -208,11 +217,10 @@ export default {
     },
 
     newActive (active) {
-      this.active = active
       this.setActiveChannel(active)
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'setSelectedCommunication'])
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex'])
   },
 
   beforeDestroy () {

@@ -5,7 +5,7 @@
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side></inbox-side>
       <div class="d-flex flex-grow-1"
-           v-show="$route.name === 'Inbox Contact'">
+           v-if="$route.name === 'Inbox Contact'">
         <router-view></router-view>
       </div>
     </div>
@@ -18,7 +18,6 @@ import InboxSide from 'components/inbox/inbox-side'
 export default {
   components: {
     InboxSide
-
   },
 
   data () {
@@ -34,5 +33,6 @@ export default {
       this.contactInfoOpen = !this.contactInfoOpen
     }
   }
+
 }
 </script>
