@@ -329,10 +329,12 @@ export default {
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
-    resetFilters () {
+    resetFilters (resetSearch = false) {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
-      this.resetSearch()
+      if (resetSearch) {
+        this.resetSearch()
+      }
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     }

@@ -136,7 +136,7 @@ export default {
     },
 
     contactCampaignsFromCommunications () {
-      if (this.selectedContact && this.campaigns.length) {
+      if (this.contact && this.campaigns.length) {
         let contactCampaigns = this.campaignsAlphabeticalOrder.filter((cmp) => {
           if (this.selectedContactCampaigns.includes(cmp.id)) {
             return true
@@ -213,9 +213,17 @@ export default {
 
     this.$VueEvent.listen('contact_updated', (data) => {
       // check data loaded
-      if (this.selectedContact && this.selectedContact.id === data.id) {
-        this.updateSelectedContact(data)
+      let updatedContact = _.get(this, 'contact', {})
+      for (let index in data) {
+        if (index === 'communications_and_audits') {
+          continue
+        }
+        updatedContact[index] = data[index]
       }
+      if (this.contact && this.contact.id === data.id) {
+        this.updateSelectedContact(updatedContact)
+      }
+      this.updateContacts(updatedContact)
     })
 
     this.$VueEvent.listen('contact_audit_created', (data) => {
@@ -234,7 +242,7 @@ export default {
       }
 
       // checks if contact is the same in communication
-      if (this.selectedContact && data.contact && this.selectedContact.id !== data.contact.id) {
+      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
         return false
       }
 
@@ -252,7 +260,7 @@ export default {
 
     updateCommunication (data) {
       // checks if contact is the same in communication
-      if (this.selectedContact && data.contact && this.selectedContact.id !== data.contact.id) {
+      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
         return false
       }
 
@@ -270,7 +278,7 @@ export default {
 
     deleteCommunication (data) {
       // checks if contact is the same in communication
-      if (this.selectedContact && data.contact && this.selectedContact.id !== data.contact.id) {
+      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
         return false
       }
 
@@ -317,18 +325,12 @@ export default {
       })
     },
 
-    fetchedContactInfo (selectedContact) {
-      this.communicationsAndAudits = []
-      this.selectedContact = selectedContact
-      this.selectedContact.tag_ids = this.selectedContact.tags.map((a) => a.id)
-    },
-
     showContactInfo (contactId, forceClearLoading = false) {
       this.mapCommunicationsData()
 
       // 1. if contact has initial campaign and there were no communications select initial campaign
-      if (!this.communicationsAndAudits.length && this.selectedContact && this.selectedContact.initial_campaign_id) {
-        this.selectedCampaignId = this.selectedContact.initial_campaign_id
+      if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
+        this.selectedCampaignId = this.contact.initial_campaign_id
       }
 
       // 2. if contact has communications select last communication campaign
@@ -364,7 +366,7 @@ export default {
         this.selectedCampaignId = firstCampaignId
       }
 
-      this.selectedPhoneNumber = this.selectedContact ? this.selectedContact.phoneNumber : this.selectedPhoneNumber
+      this.selectedPhoneNumber = this.contact ? this.contact.phoneNumber : this.selectedPhoneNumber
 
       this.scrollMessages()
 
@@ -374,21 +376,16 @@ export default {
     },
 
     updateSelectedContact (contact) {
-      if (_.isEmpty(contact) || _.isEmpty(this.selectedContact)) {
+      if (_.isEmpty(contact) || _.isEmpty(this.contact) || (contact.id !== this.contact.id)) {
         return
       }
 
-      for (let index in contact) {
-        if (index === 'communications_and_audits') {
-          continue
-        }
-
-        this.$set(this.selectedContact, index, contact[index])
-      }
+      contact.communications_and_audits = _.get(this.contact, 'communications_and_audits', [])
+      this.setContact(contact)
     },
 
     updateSelectedContactAudit (audit) {
-      if (_.isEmpty(audit) || _.isEmpty(this.selectedContact)) {
+      if (_.isEmpty(audit) || _.isEmpty(this.contact)) {
         return
       }
 
@@ -454,7 +451,7 @@ export default {
     mapCommunicationsData () {
       this.selectedContactCampaigns = []
 
-      if (!this.selectedContact) {
+      if (!this.contact) {
         return
       }
 
@@ -493,17 +490,17 @@ export default {
     },
 
     resetSelectedContact () {
+      this.setContact(this.selectedContact)
       this.contactId = null
-      this.selectedContact = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null
       this.contactPhoneNumbers = []
     },
 
     markAllAsRead () {
-      if (this.selectedCampaignId) {
+      if (this.contact) {
         this.loadingMarkAsRead = true
-        this.$axios.post(`/api/v1/contact/${this.selectedContact.id}/mark-as-read`).then(res => {
+        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
           this.loadingMarkAsRead = false
           for (let communication of this.filteredCommunications) {
             this.$set(communication, 'is_read', true)
@@ -523,7 +520,7 @@ export default {
 
       this.markAllAsRead()
       this.loadingSendMessage = true
-      this.$axios.post('/api/v1/campaign/send-message/' + this.selectedCampaignId + '/' + this.selectedContact.id, {
+      this.$axios.post('/api/v1/campaign/send-message/' + this.selectedCampaignId + '/' + this.contact.id, {
         message: this.reply_text,
         phone_number: this.selectedPhoneNumber
       }).then(res => {
@@ -539,7 +536,7 @@ export default {
       this.closeGiphyMediaModal()
       this.markAllAsRead()
       this.loadingSendMessage = true
-      this.$axios.post(`/api/v1/campaign/send-gif/${this.selectedCampaignId}/${this.selectedContact.id}`, {
+      this.$axios.post(`/api/v1/campaign/send-gif/${this.selectedCampaignId}/${this.contact.id}`, {
         url: url,
         phone_number: this.selectedPhoneNumber
       }).then(res => {
@@ -630,7 +627,7 @@ export default {
       this.loadingSendMediaBtn = true
       this.media.phone_number = this.selectedPhoneNumber
       this.media.files = this.uploadFileList.upload.map(item => item.response.file_name)
-      this.$axios.post(`/api/v1/campaign/send-mms/${this.selectedCampaignId}/${this.selectedContact.id}`, this.media)
+      this.$axios.post(`/api/v1/campaign/send-mms/${this.selectedCampaignId}/${this.contact.id}`, this.media)
         .then(res => {
           this.loadingSendMediaBtn = false
           this.resetSendMediaContactsForm('media')
@@ -757,7 +754,7 @@ export default {
 
     fetchIncomingNumber () {
       this.contactIncomingNumber = null
-      this.$axios.get(`/api/v1/contact/${this.selectedContact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
+      this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
         this.contact_incoming_number = res.data
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -785,7 +782,7 @@ export default {
     },
 
     updateMessageComposer () {
-      if (this.selectedCampaign && this.selectedCampaign.id && this.selectedContact && this.selectedContact.id) {
+      if (this.selectedCampaign && this.selectedCampaign.id && this.contact && this.contact.id) {
         this.fetchIncomingNumber()
         this.checkEmailCapability()
       }
@@ -818,6 +815,7 @@ export default {
     },
 
     processFetchedContactInfo (selectedContact) {
+      selectedContact.tag_ids = selectedContact.tags.map((tag) => tag.id)
       this.messageObject.contact = selectedContact
       this.contact.first_name = selectedContact.first_name
       this.contact.last_name = selectedContact.last_name
@@ -896,7 +894,7 @@ export default {
       })
     },
 
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties'])
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts'])
   },
 
   watch: {

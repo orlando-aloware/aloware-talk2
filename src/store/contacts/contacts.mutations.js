@@ -47,7 +47,6 @@ export default {
   },
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
-      state.listItems =
       state.listItems = {
         ...state.listItems,
         [String(id)]: {
@@ -314,5 +313,15 @@ export default {
   },
   RESET_CHANGED_CONTACT_PROPERTIES: (state) => {
     state.changedContactProperties = []
+  },
+  UPDATE_CONTACTS: (state, payload) => {
+    const found = state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id)
+    const index = found ? state.listItems[state.selectedList.id].data.indexOf(found) : null
+    if (index !== -1 && index !== null) {
+      state.listItems[state.selectedList.id].data[index] = payload
+    }
+  },
+  SET_CONTACTS: (state, payload) => {
+    state.listItems[state.selectedList.id].data = payload
   }
 }

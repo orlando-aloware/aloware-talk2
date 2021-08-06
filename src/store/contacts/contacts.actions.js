@@ -246,5 +246,11 @@ export default {
   },
   resetChangedContactProperties: ({ commit }) => {
     commit('RESET_CHANGED_CONTACT_PROPERTIES')
+  },
+  updateContacts: ({ commit }, payload) => {
+    commit('UPDATE_CONTACTS', payload)
+  },
+  setContacts: ({ commit }, payload) => {
+    commit('SET_CONTACTS', payload)
   }
 }

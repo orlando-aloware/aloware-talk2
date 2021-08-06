@@ -1,6 +1,9 @@
 <template>
   <div class="contact-activity-container w-100">
-    <contact-activities-header :label="contactName"/>
+    <contact-activities-header
+      :label="contactName"
+      :hasUnreads="hasUnreads"
+      @markAllAsRead="markAllAsRead"/>
     <div class="contact-activities">
       <div class="inner-1">
         <div class="p-3 mx-1 inner-2 scrollbar-white"
@@ -66,6 +69,12 @@ export default {
 
     contactName () {
       return _.get(this.contact, 'name', '')
+    },
+
+    hasUnreads () {
+      return this.contact.unread_count > 0 ||
+        this.contact.unread_missed_call_count > 0 ||
+        this.contact.unread_voicemail_count > 0
     }
   },
 

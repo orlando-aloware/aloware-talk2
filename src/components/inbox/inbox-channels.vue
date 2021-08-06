@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { aclMixin } from 'src/plugins/mixins'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
@@ -42,6 +43,8 @@ export default {
   name: 'inbox-channels',
 
   components: { TaskList },
+
+  mixins: [aclMixin],
 
   props: {
     filterType: {

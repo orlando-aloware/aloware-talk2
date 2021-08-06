@@ -109,8 +109,34 @@
         :key="column.name"
         v-else-if="column.name === 'unread_count'"
       >
-        <span class="badge badge-danger">
+        <span
+          class="badge badge-danger"
+          v-if="contact.unread_voicemail_count > 0">
           {{ contact.unread_count }}
+        </span>
+      </td>
+
+      <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'unread_missed_call_count'"
+      >
+        <span
+          class="badge badge-danger"
+          v-if="contact.unread_voicemail_count > 0">
+          {{ contact.unread_missed_call_count }}
+        </span>
+      </td>
+
+      <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'unread_voicemail_count'"
+      >
+        <span
+          class="badge badge-danger"
+          v-if="contact.unread_voicemail_count > 0">
+          {{ contact.unread_voicemail_count }}
         </span>
       </td>
 
@@ -142,7 +168,59 @@
       </td>
 
       <td :key="column.name" v-else>
-        <div>{{ contact[column.name] }}</div>
+        <div class="text-center"
+             v-if="!contact[column.name] || contact[column.name] === 'NULL' || ( contact[column.name] instanceof Array && !contact[column.name].length)">
+          -
+        </div>
+        <div class="text-center"
+             v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
+          <b-popover
+            :target="column.name"
+            triggers="hover"
+            placement="left"
+            boundary="window"
+          >
+            <template #title>
+              <div class="contact-tags-title">{{ column.name }}</div>
+            </template>
+            <span v-for="(item) in contact[column.name]"
+                  :key="item.id">
+            {{ item.name }}
+          </span>
+          </b-popover>
+          <span v-for="(item, index) in contact[column.name]"
+                :key="item.id">
+            {{ item.name }}
+            <br v-if="index !== (contact[column.name].length - 1)" />
+          </span>
+        </div>
+        <div class="text-center"
+             v-else-if="contact[column.name] && contact[column.name] instanceof Object">
+          <b-popover
+            :target="column.name"
+            triggers="hover"
+            placement="left"
+            boundary="window"
+          >
+            <template #title>
+              <div class="contact-tags-title">{{ column.name }}</div>
+            </template>
+            <span>
+              {{ contact[column.name].name }}
+            </span>
+          </b-popover>
+          <span :id="column.name">
+            {{ contact[column.name].name }}
+          </span>
+        </div>
+        <div class="text-center"
+             v-else-if="column.name.includes('_at') || column.name.includes('date')">
+          {{ contact[column.name] | fixDateTime }}
+        </div>
+        <div class="text-center"
+             v-else>
+          {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') : contact[column.name] }}
+        </div>
       </td>
     </template>
   </tr>

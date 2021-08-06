@@ -43,8 +43,7 @@ export const COLUMN_CATEGORIES = [
   'Default Information',
   'Contact Location',
   'Contact Relevance',
-  'Contact Communication Metadata',
-  'Custom Fields'
+  'Contact Communication Metadata'
 ]
 
 export const ALL_COLUMNS = [
@@ -110,7 +109,9 @@ export const ALL_COLUMNS = [
     sortable: true,
     draggable: true,
     resizable: true,
-    default: false
+    default: false,
+    maxWidth: 140,
+    minWidth: 140
   },
   {
     name: 'date_of_birth',
@@ -119,7 +120,9 @@ export const ALL_COLUMNS = [
     sortable: false,
     draggable: true,
     resizable: true,
-    default: false
+    default: false,
+    maxWidth: 140,
+    minWidth: 140
   },
   {
     name: 'text_authorized_at',
@@ -306,6 +309,28 @@ export const ALL_COLUMNS = [
     minWidth: 120
   },
   {
+    name: 'unread_missed_call_count',
+    label: 'Unread Missed Calls',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
+    maxWidth: 190,
+    minWidth: 190
+  },
+  {
+    name: 'unread_voicemail_count',
+    label: 'Unread Voicemails',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
+    maxWidth: 175,
+    minWidth: 175
+  },
+  {
     name: 'inbound_call_count',
     label: 'Inbound Calls',
     category: 3,
@@ -381,51 +406,6 @@ export const ALL_COLUMNS = [
     name: 'last_outbound_engagement_at',
     label: 'Last Outbound Engagement',
     category: 3,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'csf1',
-    label: 'Custom Field 1',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'csf2',
-    label: 'Custom Field 2',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'is_new_contact',
-    label: 'New',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'is_unanswered_contact',
-    label: 'Unanswered',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'is_unassigned',
-    label: 'Unassigned',
-    category: 4,
     sortable: false,
     draggable: true,
     resizable: true,
