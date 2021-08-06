@@ -1,11 +1,8 @@
-import store from 'src/store/auth/auth.store'
+import store from ‘store/index’
 
 function guardMyRoute (to, from, next) {
-  if (store.authenticated) {
-    next()
-  } else {
-    next('/login')
-  }
+  console.log(store.state)
+  next()
 }
 
 const routes = [
