@@ -3192,7 +3192,6 @@ span.mention {
 .current-tasks {
   .options {
     @include font-size(14px, 500);
-    line-height: 17px;
   }
 }
 
@@ -3536,6 +3535,10 @@ span.mention {
     width: 200px;
     height: 150px;
 
+    .w-100 {
+      width: 100%;
+    }
+
     &.small {
       height: 66px;
     }
@@ -3591,7 +3594,12 @@ span.mention {
     background: $white;
 
     .phone-avatar {
-      margin-top: -29px;
+      margin-top: -25px;
+
+      .contact-avatar {
+        font-size: $f-size-body-xxxl;
+        margin: 0;
+      }
     }
 
     .border-bottom {
