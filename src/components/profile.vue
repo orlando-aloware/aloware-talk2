@@ -26,7 +26,7 @@
 
         <q-list class="tab-dropdown-list no-select">
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
-                  :class="[profile.agent_status === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary _500' : '']"
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary _500' : '']"
                   dense
                   clickable>
             <div class="d-flex align-items-center">
@@ -38,7 +38,7 @@
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                  :class="[profile.agent_status === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                   dense
                   clickable>
             <div class="d-flex align-items-center">
@@ -50,7 +50,7 @@
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                  :class="[profile.agent_status === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                   dense
                   clickable>
             <div class="d-flex align-items-center">
@@ -62,7 +62,7 @@
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                  :class="[profile.agent_status === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
                   dense
                   clickable>
             <div class="d-flex align-items-center">
@@ -99,7 +99,7 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     statusLabel () {
-      switch (this.profile.agent_status) {
+      switch (this.agentStatus) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
           return 'Offline'
         case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:

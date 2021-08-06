@@ -19,7 +19,8 @@ export default {
   created () {
     this.$VueEvent.listen('user_updated', (user) => {
       if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
-        this.profile.agent_status = user.agent_status
+        console.log('user_updated', user)
+        this.setAgentStatus(user.agent_status)
         this.agentStatus = user.agent_status
         console.log('Changed agent status [event]: ' + user.agent_status)
       }
@@ -70,7 +71,7 @@ export default {
       this.$axios.post('/api/v1/profile/get-agent-status', {
         device_info: null
       }).then(res => {
-        this.profile.agent_status = res.data.agent_status
+        this.setAgentStatus(res.data.agent_status)
         this.agentStatus = res.data.agent_status
         console.log('Changed agent status [pull]: ' + res.data.agent_status)
       }).catch((err) => {
@@ -103,10 +104,10 @@ export default {
           break
       }
       console.log('old agent status [reset]: ' + this.oldAgentStatus)
-      console.log('current agent status [reset]: ' + this.agentStatus)
+      console.log('current agent status [reset]: ' + this.profile.agent_status)
       console.log('new agent status [reset]: ' + agentStatus)
       // check status
-      if (this.agentStatus !== agentStatus) {
+      if (this.profile.agent_status !== agentStatus) {
         this.changeAgentStatus(agentStatus)
       }
     },
@@ -128,7 +129,7 @@ export default {
           agent_status: val
         }).then(res => {
           this.loadingAgentStatus = false
-          this.profile.agent_status = res.data.agent_status
+          this.setAgentStatus(res.data.agent_status)
           this.agentStatus = res.data.agent_status
           this.$VueEvent.fire('user_updated', res.data)
           console.log('Changed agent status [api]: ' + res.data.agent_status)
@@ -149,7 +150,8 @@ export default {
       }
     }, 500),
 
-    ...mapActions(['setOldAgentStatus'])
+    ...mapActions(['setOldAgentStatus']),
+    ...mapActions('auth', ['setAgentStatus'])
   },
 
   watch: {

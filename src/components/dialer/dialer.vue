@@ -23,7 +23,9 @@ export default {
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
       loadingHold: false,
+      loadingUnhold: false,
       loadingPark: false,
+      loadingUnpark: false,
       callNotification: null,
       desktopNotification: null,
       device: new TwilioDevice(),
@@ -147,8 +149,7 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.resetAgentStatus()
-      this.resetCall()
+      this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
       //     console.log(err)
@@ -192,10 +193,14 @@ export default {
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('Call ended')
+      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      if (!this.dialer.parkedCall) {
+      if (!this.dialer.parkedCall && !this.dialer.call) {
+        this.startWrapUpTimer()
+      } else if (this.dialer.parkedCall && this.dialer.call) {
+        this.startWrapUpTimer()
+      } else if (!this.dialer.parkedCall && this.dialer.call) {
         this.startWrapUpTimer()
       } else {
         this.backToDial()
@@ -258,6 +263,22 @@ export default {
 
     this.$VueEvent.listen('forceRefreshCommunication', () => {
       this.forceRefreshCommunication()
+    })
+
+    this.$VueEvent.listen('parkCall', () => {
+      this.parkCall()
+    })
+
+    this.$VueEvent.listen('unparkCall', () => {
+      this.unparkCall()
+    })
+
+    this.$VueEvent.listen('mergeCalls', () => {
+      this.mergeCalls()
+    })
+
+    this.$VueEvent.listen('dropThirdParty', () => {
+      this.dropThirdParty()
     })
 
     this.$VueEvent.listen('setInputDevice', (inputDevice) => {
@@ -501,20 +522,6 @@ export default {
       }
     },
 
-    toggleHold () {
-      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
-        return
-      }
-
-      if (!this.dialer.isHeld) {
-        console.log('Holding call')
-        this.setDialerIsHeld(true)
-      } else {
-        console.log('Unholding call')
-        this.setDialerIsHeld(false)
-      }
-    },
-
     toggleRecordingStatus () {
       if (!this.dialer.call || !this.dialer.communication || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
@@ -564,6 +571,117 @@ export default {
         }
         this.loadingToggleRecordingStatus = false
         console.log(err)
+      })
+    },
+
+    toggleHold () {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      if (!this.dialer.isHeld) {
+        console.log('Holding call')
+        this.loadingHold = true
+        let params = {
+          communication_id: this.dialer.communication.id
+        }
+        this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
+          this.setDialerIsHeld(true)
+          console.log('Call held')
+        }).catch(err => {
+          console.log(err)
+        }).finally(_ => {
+          this.loadingHold = false
+        })
+      } else {
+        console.log('Unholding call')
+        this.loadingHold = true
+        let params = {
+          communication_id: this.dialer.communication.id
+        }
+        this.$axios.post('/api/v1/dialer/new-unhold', params).then(() => {
+          this.setDialerIsHeld(false)
+          console.log('Call unheld')
+        }).catch(err => {
+          console.log(err)
+        }).finally(_ => {
+          this.loadingHold = false
+        })
+      }
+    },
+
+    parkCall () {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
+        return
+      }
+      this.loadingPark = true
+      this.setDialerParkedCall(this.dialer.communication)
+      let params = {
+        communication_id: this.dialer.communication.id
+      }
+      this.$axios.post('/api/v1/dialer/hold', params).then(() => {
+        console.log('Call parked')
+      }).catch(err => {
+        this.setDialerParkedCall()
+        console.log(err)
+      }).finally(_ => {
+        this.loadingPark = false
+      })
+    },
+
+    unparkCall () {
+      if (!this.dialer.parkedCall) {
+        return
+      }
+
+      this.loadingUnpark = true
+      const parkedCall = this.dialer.parkedCall
+      this.setDialerParkedCall()
+      let data = {
+        currentNumber: 'unhold:' + parkedCall.id,
+        outboundCampaignId: parkedCall.campaign_id,
+        contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
+        companyName: (parkedCall.contact) ? parkedCall.contact.company_name : '',
+        contactId: parkedCall.contact_id
+      }
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+      this.loadingUnpark = false
+      console.log('Unhold is in progress.')
+    },
+
+    mergeCalls () {
+      if (!this.dialer.communication) {
+        return
+      }
+      this.loadingMerge = true
+      let params = {
+        communication_id: this.dialer.communication.id
+      }
+      this.$axios.post('/api/v1/dialer/merge-calls', params).then(res => {
+        this.setShouldIntroduce(false)
+        console.log('Merge successful.')
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingMerge = false
+      })
+    },
+
+    dropThirdParty () {
+      if (!this.dialer.communication) {
+        return
+      }
+      this.loadingDropThirdParty = true
+      this.$axios.post('/api/v1/dialer/drop-third-party', {
+        communication_id: this.dialer.communication.id
+      }).then(res => {
+        this.setShouldIntroduce(false)
+        this.setAddedParty()
+        console.log('Third party has been dropped out of this call.')
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingDropThirdParty = false
       })
     },
 
@@ -764,8 +882,7 @@ export default {
     },
 
     rebootPhone (login = false) {
-      this.resetAgentStatus()
-      this.resetCall()
+      this.backToDial()
       if (login) {
         this.setDialerCurrentStatus('RESTARTING')
         this.getDesktopToken()

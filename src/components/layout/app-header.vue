@@ -21,6 +21,8 @@
                      vertical>
         </q-separator>
 
+        <parked-call></parked-call>
+
         <active-call></active-call>
 
         <q-item>
@@ -62,13 +64,14 @@ import Profile from 'components/profile'
 import Phone from 'components/dialer/phone'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
+import ParkedCall from 'components/dialer/parked-call'
 
 export default {
   name: 'app-header',
 
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
-  components: { ContactAppHeader, ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
+  components: { ParkedCall, ContactAppHeader, ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
 
   data () {
     return {

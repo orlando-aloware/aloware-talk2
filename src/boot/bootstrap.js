@@ -110,6 +110,9 @@ window.moment = moment
 
 window.Sentry = Sentry
 
+// set env to browser's local storage
+localStorage.setItem('env', process.env.NODE_ENV)
+
 if (
   (process.env.NODE_ENV === 'production' ||
     process.env.NODE_ENV === 'development') &&

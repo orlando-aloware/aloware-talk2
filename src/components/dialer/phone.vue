@@ -5,7 +5,7 @@
        v-if="shouldShow">
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          ref="phoneHeader">
-      <div class="d-flex flex-row text-size-rg _500 text-white width-55">
+      <div class="d-flex flex-row text-size-rg _500 text-white width-65">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="isCallCompleted"></span>
         <span v-else>
@@ -16,7 +16,13 @@
         <span v-if="isCallCompleted">Call Ended</span>
         <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row justify-content-end width-55">
+      <div class="d-flex flex-row justify-content-end align-items-center width-65">
+        <pause-record-icon width="14"
+                           height="14"
+                           class="mr-2"
+                           v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
+        </pause-record-icon>
+
         <ul id="signal-strength"
             class="mr-2"
             v-if="!isCallCompleted">
@@ -114,7 +120,7 @@
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
       <template v-if="screen === 'call'">
         <div class="phone-notice d-flex flex-column align-items-center"
-             v-if="dialer.contact && dialer.call.direction === 'OUTGOING' && showLocalTime">
+             v-if="dialer.contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
                     inline-actions
                     rounded
@@ -176,7 +182,7 @@
         </div>
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
-               v-if="dialer.call.direction === 'INCOMING'">
+               v-if="dialer.call && dialer.call.direction === 'INCOMING'">
             <div class="d-flex flex-column align-items-center">
               <q-btn class="height-52"
                      ripple
@@ -205,7 +211,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call.direction === 'OUTGOING'">
+               v-if="dialer.call && dialer.call.direction === 'OUTGOING'">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
@@ -279,7 +285,7 @@
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
             </button>
-            <button :disabled="isHoldDisabled || loadingHold"
+            <button :disabled="isHoldDisabled || loadingHold || loadingUnhold"
                     class="phone-buttons btn"
                     @click="toggleHold">
               <hold-icon width="16"
@@ -714,7 +720,7 @@
           </template>
           <template v-if="bottomExpansion === 'scripts'">
             <q-card-section class="height-445 overflow-hidden-y">
-              <div class="d-flex flex-column justify-content-start w-100 mt-3 pl-3 pr-3">
+              <div class="d-flex flex-column justify-content-start w-100 pt-3 pl-3 pr-3">
                 <script-selector :communication="dialer.communication"
                                  v-model="scriptId"
                                  class="w-100"
@@ -737,11 +743,29 @@
           </template>
           <template v-if="bottomExpansion === 'vm-drop'">
             <q-card-section class="height-445">
+              <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
+                <div class="d-flex">
+                  <vm-drop-selector v-model="vmDropId"
+                                    class="w-100"
+                                    @change="changeVmDrop">
+                  </vm-drop-selector>
+                </div>
+                <div class="d-flex">
+                  <b-button :loading="loadingSendVmDrop"
+                            :disabled="loadingSendVmDrop || !vmDropId"
+                            variant="primary"
+                            size="sm"
+                            block
+                            @click="sendVmDrop">
+                    <span>Leave Voicemail</span>
+                  </b-button>
+                </div>
+              </div>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'more'">
             <q-card-section class="height-140">
-              <div class="d-flex justify-content-start w-100 mt-3 pl-3 pr-3">
+              <div class="d-flex justify-content-start w-100 pt-3 pl-3 pr-3">
                 <button class="phone-buttons btn"
                         @click="openScripts">
                   <scripts-icon width="18"
@@ -749,7 +773,9 @@
                   </scripts-icon>
                   <span>Scripts</span>
                 </button>
-                <button class="phone-buttons btn">
+                <button :disabled="isParkDisabled"
+                        class="phone-buttons btn"
+                        @click="parkCall">
                   <park-call-icon width="18"
                                   height="18">
                   </park-call-icon>
@@ -811,18 +837,20 @@ import ContactDispositionWrapper from 'components/generic-wrappers/contact-dispo
 import TemplateSelector from 'components/generic-selectors/template-selector'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ContactIcon from 'components/icons/contact-icon'
+import ScriptSelector from 'components/generic-selectors/script-selector'
+import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import ScriptSelector from 'components/generic-selectors/script-selector'
 
 export default {
   name: 'phone',
 
   components: {
+    VmDropSelector,
     ScriptSelector,
     ContactIcon,
     ParkCallIcon,
@@ -903,6 +931,7 @@ export default {
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
       loadingHold: false,
+      loadingUnhold: false,
       loadingPark: false,
       expanded: false,
       screen: 'call',
@@ -913,6 +942,9 @@ export default {
       template: null,
       scriptId: null,
       script: null,
+      vmDropId: null,
+      vmDrop: null,
+      loadingSendVmDrop: false,
       loadingSendMessage: false,
       devMode: false,
       CommunicationDirection,
@@ -936,19 +968,19 @@ export default {
     },
 
     isAddDisabled () {
-      return false && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return !this.devMode && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isTransferDisabled () {
-      return false && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return !this.devMode && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isMoreDisabled () {
-      return false && this.isCallCompleted
+      return !this.devMode && this.isCallCompleted
     },
 
     isVmDropDisabled () {
-      return false && this.isCallCompleted
+      return !this.devMode && this.isCallCompleted
     },
 
     isHoldDisabled () {
@@ -1140,7 +1172,21 @@ export default {
     },
 
     toggleHold () {
+      if (this.dialer.isHeld) {
+        this.loadingUnhold = true
+      } else {
+        this.loadingHold = true
+      }
+
       this.$VueEvent.fire('toggleHold')
+
+      setTimeout(() => {
+        if (this.dialer.isHeld) {
+          this.loadingHold = false
+        } else {
+          this.loadingUnhold = false
+        }
+      }, 1000)
     },
 
     openDialpad () {
@@ -1220,9 +1266,20 @@ export default {
       this.goToContact()
     },
 
+    parkCall ($event) {
+      this.loadingPark = true
+      this.$VueEvent.fire('parkCall')
+      this.saveAndResetExpansion($event)
+      setTimeout(() => {
+        this.loadingPark = false
+      }, 1000)
+    },
+
     saveAndResetExpansion ($event) {
-      $event.stopPropagation()
-      $event.preventDefault()
+      if ($event) {
+        $event.stopPropagation()
+        $event.preventDefault()
+      }
       this.expansionEnabled = false
       this.expanded = false
     },
@@ -1414,8 +1471,44 @@ export default {
       this.script = script
     },
 
+    changeVmDrop (vmDrop) {
+      if (vmDrop) {
+        this.vmDropId = vmDrop.id
+      }
+      this.vmDrop = vmDrop
+    },
+
+    sendVmDrop ($event) {
+      if (!this.dialer.communication || this.isCallCompleted || !this.vmDrop) {
+        return
+      }
+
+      this.loadingSendVmDrop = true
+      this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
+        communication_id: this.dialer.communication.id,
+        file_name: this.vmDrop.uploaded_file.uuid,
+        name: this.vmDrop.name
+      }).then(res => {
+        this.vmDrop = null
+        this.vmDropId = null
+        this.loadingSendVmDrop = false
+        this.saveAndResetExpansion($event)
+        this.$q.notify({
+          offset: 95,
+          title: 'Phone',
+          message: 'Voicemail left',
+          type: 'success',
+          showClose: true
+        })
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingSendVmDrop = false
+      })
+    },
+
     sendMessage () {
-      if (!this.dialer.communication) {
+      if (!this.dialer.communication || !this.template) {
         return
       }
 
@@ -1435,8 +1528,9 @@ export default {
           showClose: true
         })
       }).catch(err => {
-        this.loadingSendMessage = false
         console.log(err)
+      }).finally(_ => {
+        this.loadingSendMessage = false
       })
     },
 
@@ -1509,6 +1603,10 @@ export default {
           break
         case 'CALL_CONNECTED':
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
+            this.screen = 'menu'
+          }
+
+          if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             this.screen = 'menu'
           }
           break

@@ -5,6 +5,8 @@
                rounded="sm"
                variant="white">
       <task-list :communications="communications"
+                 :filter-type="filterType"
+                 :answer-status="answerStatus"
                  v-if="!isGettingTasksList">
       </task-list>
       <div class="relative py-4">
@@ -28,18 +30,20 @@
 </template>
 
 <script>
-import TaskList from 'components/icons/inbox/task-list'
-import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
+import { mapActions, mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
+import TaskList from 'components/icons/inbox/task-list'
 import * as Filters from 'src/constants/filters'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
-import talk2Api from 'src/plugins/api/api'
-let scrollTimeout
 
+let scrollTimeout
 export default {
   name: 'inbox-channels',
+
+  components: { TaskList },
 
   props: {
     filterType: {
@@ -71,10 +75,9 @@ export default {
     }
   },
 
-  components: { TaskList },
-
   computed: {
     ...mapState('inbox', ['isGettingTasksList', 'activeChannel']),
+
     nextPage () {
       return this.currentPage + 1
     }
@@ -97,8 +100,110 @@ export default {
     }
   },
 
+  created () {
+    this.resetFilters()
+
+    this.$VueEvent.listen('new_communication', (data) => {
+      // disable live dashboard for end clients
+      if (this.hasRole('Company Reporter Access')) {
+        return
+      }
+      // check data loaded
+      if (this.pagination.current_page && this.pagination.current_page === 1) {
+        // check new communication exists in the old list
+        let found = this.communications.filter(communication => {
+          return communication.id === data.id
+        })
+        if (!found.length) {
+          if (this.checkCommunicationMatchesSearch(data) &&
+            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesUserAccessibility(data) &&
+            this.checkCommunicationMatchesCampaign(data) &&
+            this.checkCommunicationMatchesWorkflow(data) &&
+            this.checkCommunicationMatchesUser(data) &&
+            this.checkCommunicationMatchesRingGroup(data)) {
+            this.pagination.total += 1
+            // push new data to top of array
+            this.communications.unshift(data)
+
+            if (this.communications.length > this.filter.per_page) {
+              // push out last data from bottom of array
+              this.communications.pop()
+            }
+          }
+        }
+      }
+    })
+
+    this.$VueEvent.listen('update_communication', (data) => {
+      // disable live dashboard for end clients
+      if (this.hasRole('Company Reporter Access')) {
+        return
+      }
+      // check data loaded
+      if (this.pagination.current_page) {
+        // check new communication exists in the old list
+        let found = this.communications.filter(communication => {
+          return communication.id === data.id
+        })
+        if (found.length) {
+          // update communication
+          data = _.extend({}, found[0], data)
+          if (this.checkCommunicationMatchesSearch(data) &&
+            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesUserAccessibility(data) &&
+            this.checkCommunicationMatchesCampaign(data) &&
+            this.checkCommunicationMatchesWorkflow(data) &&
+            this.checkCommunicationMatchesUser(data) &&
+            this.checkCommunicationMatchesRingGroup(data)) {
+            this.$set(this.communications, this.communications.indexOf(found[0]), data)
+          } else {
+            this.communications = this.communications.filter(communication => {
+              return communication.id !== data.id
+            })
+            this.pagination.total -= 1
+          }
+        } else {
+          // add the communication if it's not already there and if it matches the criteria
+          if (this.checkCommunicationMatchesSearch(data) &&
+            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesUserAccessibility(data) &&
+            this.checkCommunicationMatchesCampaign(data) &&
+            this.checkCommunicationMatchesWorkflow(data) &&
+            this.checkCommunicationMatchesUser(data) &&
+            this.pagination.current_page === 1 &&
+            this.communications.length > 0 &&
+            data.id > this.communications[0].id) {
+            this.pagination.total += 1
+            // push new data to top of array
+            this.communications.unshift(data)
+
+            if (this.communications.length > this.filter.per_page) {
+              // push out last data from bottom of array
+              this.communications.pop()
+            }
+          }
+        }
+      }
+    })
+
+    this.$VueEvent.listen('delete_communication', (data) => {
+      // check data loaded
+      if (this.pagination.current_page) {
+        // try to find the communication
+        let found = this.communications.find(communication => communication.id === data.id)
+        if (found) {
+          // remove it from the list
+          this.communications.splice(this.communications.indexOf(found), 1)
+          this.pagination.total -= 1
+        }
+      }
+    })
+
+    this.getCommunications(this.filter)
+  },
+
   methods: {
-    ...mapActions('inbox', ['gettingTasksList']),
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
       this.filter.search_text = this.searchText
@@ -347,6 +452,7 @@ export default {
         this.onTaskListBottomScroll()
       }
     },
+
     onTaskListBottomScroll () {
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
@@ -357,110 +463,11 @@ export default {
           this.loadMoreCommunications(this.filter)
         }
       }, 66)
-    }
+    },
+
+    ...mapActions('inbox', ['gettingTasksList'])
   },
-  created () {
-    this.resetFilters()
 
-    this.$VueEvent.listen('new_communication', (data) => {
-      // disable live dashboard for end clients
-      if (this.hasRole('Company Reporter Access')) {
-        return
-      }
-      // check data loaded
-      if (this.pagination.current_page && this.pagination.current_page === 1) {
-        // check new communication exists in the old list
-        let found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (!found.length) {
-          if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.checkCommunicationMatchesRingGroup(data)) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
-
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
-          }
-        }
-      }
-    })
-
-    this.$VueEvent.listen('update_communication', (data) => {
-      // disable live dashboard for end clients
-      if (this.hasRole('Company Reporter Access')) {
-        return
-      }
-      // check data loaded
-      if (this.pagination.current_page) {
-        // check new communication exists in the old list
-        let found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (found.length) {
-          // update communication
-          data = _.extend({}, found[0], data)
-          if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.checkCommunicationMatchesRingGroup(data)) {
-            this.$set(this.communications, this.communications.indexOf(found[0]), data)
-          } else {
-            this.communications = this.communications.filter(communication => {
-              return communication.id !== data.id
-            })
-            this.pagination.total -= 1
-          }
-        } else {
-          // add the communication if it's not already there and if it matches the criteria
-          if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.pagination.current_page === 1 &&
-            this.communications.length > 0 &&
-            data.id > this.communications[0].id) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
-
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
-          }
-        }
-      }
-    })
-
-    this.$VueEvent.listen('delete_communication', (data) => {
-      // check data loaded
-      if (this.pagination.current_page) {
-        // try to find the communication
-        let found = this.communications.find(communication => communication.id === data.id)
-        if (found) {
-          // remove it from the list
-          this.communications.splice(this.communications.indexOf(found), 1)
-          this.pagination.total -= 1
-        }
-      }
-    })
-
-    this.getCommunications(this.filter)
-  },
   watch: {
     'activeChannel': function () {
       this.resetFilters()
