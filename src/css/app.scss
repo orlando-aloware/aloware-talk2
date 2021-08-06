@@ -2783,16 +2783,16 @@ span.mention {
     color: $grey-100;
     box-shadow: none !important;
   }
-}
-
-.btn-outline-dark-primary {
-  color: $primary;
-  @extend .btn-outline-dark;
 
   i {
     font-size: $f-size-body-xl;
     margin-top: -2px;
   }
+}
+
+.btn-outline-dark-primary {
+  color: $primary;
+  @extend .btn-outline-dark;
 }
 
 /*

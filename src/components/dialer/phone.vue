@@ -803,28 +803,50 @@
                   </q-list>
                 </div>
                 <div class="d-flex flex-inline">
-                  <div class="d-flex flex-even pl-1 pr-1">
-                    <b-button :loading="loadingAdd"
-                              :disabled="loadingAdd || !addValidated"
-                              variant="outline-dark-primary"
-                              size="sm"
-                              block
-                              @click="addParticipant">
-                      <i class="material-icons-outlined">person_add_alt</i>
-                      <span class="ml-2">Add</span>
-                    </b-button>
+                  <div class="d-flex flex-grow-1">
+                    <div class="d-flex flex-even pl-1 pr-1">
+                      <b-button :loading="loadingAdd"
+                                :disabled="loadingAdd || !addValidated"
+                                variant="outline-dark-primary"
+                                size="sm"
+                                block
+                                @click="addParticipant">
+                        <i class="material-icons-outlined">person_add_alt</i>
+                        <span class="ml-2">Add</span>
+                      </b-button>
+                    </div>
+                    <div class="d-flex flex-even pl-1 pr-1">
+                      <b-button :loading="loadingIntroduce"
+                                :disabled="loadingIntroduce || !introduceValidated"
+                                variant="outline-dark-primary"
+                                size="sm"
+                                block
+                                @click="introduceParticipant">
+                        <i class="material-icons-outlined">people</i>
+                        <span class="ml-2">Introduce</span>
+                      </b-button>
+                    </div>
                   </div>
-                  <div class="d-flex flex-even pl-1 pr-1">
-                    <b-button :loading="loadingIntroduce"
-                              :disabled="loadingIntroduce || !introduceValidated"
-                              variant="outline-dark-primary"
-                              size="sm"
-                              block
-                              @click="introduceParticipant">
-                      <i class="material-icons-outlined">people</i>
-                      <span class="ml-2">Introduce</span>
-                    </b-button>
-                  </div>
+                  <b-button id="add-help"
+                            variant="outline-dark"
+                            class="ml-2 no-border p-0 flex-shrink-1"
+                            size="sm">
+                    <i class="material-icons-outlined">info</i>
+                  </b-button>
+                  <b-popover target="add-help"
+                             placement="topleft"
+                             triggers="hover focus">
+                    <p>
+                      <strong>Add:</strong> Adding a user
+                      <br>
+                      User immediately joins the conversation when he/she answers.
+                    </p>
+                    <p>
+                      <strong>Introduce:</strong> Introducing contact to a user
+                      <br>
+                      Puts the contact on hold and dials the user. Once connected you speak with the user (privately) and then merge both parties using the merge button.
+                    </p>
+                  </b-popover>
                 </div>
               </div>
             </q-card-section>
@@ -1536,6 +1558,8 @@ export default {
       }
       this.expansionEnabled = false
       this.expanded = false
+      this.resetAdd()
+      this.resetTransfer()
     },
 
     onNotesUpdate (contact) {
