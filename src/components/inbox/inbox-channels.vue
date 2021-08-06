@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { aclMixin } from 'src/plugins/mixins'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, communicationMixin } from 'src/plugins/mixins'
@@ -47,6 +48,8 @@ export default {
   mixins: [ aclMixin, communicationMixin ],
 
   components: { TaskList },
+
+  mixins: [aclMixin],
 
   props: {
     filterType: {

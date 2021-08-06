@@ -165,7 +165,7 @@ export default {
     Dialer
   },
 
-  mixins: [webrtcMixin, communicationMixin, htmlMixin, aclMixin],
+  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
   data () {
     return {
       loading: true,

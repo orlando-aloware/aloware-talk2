@@ -43,8 +43,7 @@ export const COLUMN_CATEGORIES = [
   'Default Information',
   'Contact Location',
   'Contact Relevance',
-  'Contact Communication Metadata',
-  'Custom Fields'
+  'Contact Communication Metadata'
 ]
 
 export const ALL_COLUMNS = [
@@ -110,7 +109,9 @@ export const ALL_COLUMNS = [
     sortable: true,
     draggable: true,
     resizable: true,
-    default: false
+    default: false,
+    maxWidth: 140,
+    minWidth: 140
   },
   {
     name: 'date_of_birth',
@@ -119,7 +120,9 @@ export const ALL_COLUMNS = [
     sortable: false,
     draggable: true,
     resizable: true,
-    default: false
+    default: false,
+    maxWidth: 140,
+    minWidth: 140
   },
   {
     name: 'text_authorized_at',
@@ -248,24 +251,6 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'contact_disposition',
-    label: 'Disposition Status',
-    category: 2,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'lines',
-    label: 'Line',
-    category: 2,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
     name: 'ring_groups',
     label: 'Ring Group',
     category: 2,
@@ -306,7 +291,29 @@ export const ALL_COLUMNS = [
     minWidth: 120
   },
   {
-    name: 'inbound_call_count',
+    name: 'unread_missed_call_count',
+    label: 'Unread Missed Calls',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
+    maxWidth: 190,
+    minWidth: 190
+  },
+  {
+    name: 'unread_voicemail_count',
+    label: 'Unread Voicemails',
+    category: 3,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
+    maxWidth: 175,
+    minWidth: 175
+  },
+  {
+    name: 'inbound_calls_count',
     label: 'Inbound Calls',
     category: 3,
     sortable: true,
@@ -315,7 +322,25 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'outbound_call_count',
+    name: 'inbound_texts_count',
+    label: 'Inbound SMS',
+    category: 3,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'inbound_communications_count',
+    label: 'Inbound Communications',
+    category: 3,
+    sortable: true,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'outbound_calls_count',
     label: 'Outbound Calls',
     category: 3,
     sortable: true,
@@ -324,10 +349,19 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'outbound_sms_count',
+    name: 'outbound_texts_count',
     label: 'Outbound Texts',
     category: 3,
     sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
+    name: 'outbound_communications_count',
+    label: 'Outbound Communications',
+    category: 3,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false
@@ -342,8 +376,8 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'disposition_status_id',
-    label: 'Call Disposition',
+    name: 'disposition_status',
+    label: 'Contact Disposition',
     category: 3,
     sortable: false,
     draggable: true,
@@ -351,19 +385,10 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'communication_count',
+    name: 'communications_count',
     label: 'Communications',
     category: 3,
     sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'inbound_sms_count',
-    label: 'Inbound SMS',
-    category: 3,
-    sortable: true,
     draggable: true,
     resizable: true,
     default: false
@@ -381,51 +406,6 @@ export const ALL_COLUMNS = [
     name: 'last_outbound_engagement_at',
     label: 'Last Outbound Engagement',
     category: 3,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'csf1',
-    label: 'Custom Field 1',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'csf2',
-    label: 'Custom Field 2',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'is_new_contact',
-    label: 'New',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'is_unanswered_contact',
-    label: 'Unanswered',
-    category: 4,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'is_unassigned',
-    label: 'Unassigned',
-    category: 4,
     sortable: false,
     draggable: true,
     resizable: true,

@@ -36,7 +36,7 @@
                 </div>
               </div>
               <div class="d-flex justify-center align-items-center">
-                <b-badge v-if="(contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count) > 0"
+                <b-badge v-if="contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count > 0"
                          class="contact-badge m-0 p-0 d-flex justify-center align-items-center"
                          variant="danger"
                          pill>
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Avatar from 'components/avatar'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 
@@ -82,10 +82,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', [
-      'selectedList',
-      'listItems'
-    ]),
+    ...mapState('contacts', ['selectedList', 'listItems']),
 
     id () {
       return this.selectedList.id

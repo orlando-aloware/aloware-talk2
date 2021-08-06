@@ -97,9 +97,18 @@
             class="d-flex align-items-center contact-tags-item"
           >
             <span :style="`color: ${contact.tags[0].color};`">
-                <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`"></i>
-                {{ contact.tags[0].name }}
+              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`"></i>
+              <span v-if="contact.tags.length > 1">
+                {{ contact.tags[0].name | truncate(13) }}
               </span>
+              <span v-else>
+                {{ contact.tags[0].name | truncate(27) }}
+              </span>
+            </span>
+            <span class="ml-1 text-grey-7"
+                  v-if="contact.tags.length > 1">
+              +{{ (contact.tags.length - 1) }} other tag{{ contact.tags.length > 2 ? 's' : ''}}
+            </span>
           </span>
         </template>
       </td>
@@ -109,8 +118,54 @@
         :key="column.name"
         v-else-if="column.name === 'unread_count'"
       >
-        <span class="badge badge-danger">
+        <span
+          class="badge badge-danger"
+          v-if="contact.unread_voicemail_count > 0">
           {{ contact.unread_count }}
+        </span>
+      </td>
+
+      <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'unread_missed_call_count'"
+      >
+        <span
+          class="badge badge-danger"
+          v-if="contact.unread_voicemail_count > 0">
+          {{ contact.unread_missed_call_count }}
+        </span>
+      </td>
+
+      <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'unread_voicemail_count'"
+      >
+        <span
+          class="badge badge-danger"
+          v-if="contact.unread_voicemail_count > 0">
+          {{ contact.unread_voicemail_count }}
+        </span>
+      </td>
+
+      <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'text_authorized_at'"
+      >
+        <span>
+          {{ contact.text_authorized_at ? 'Yes' : 'No' }}
+        </span>
+      </td>
+
+      <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'initial_campaign_id'"
+      >
+        <span>
+          {{ getLineName(contact.initial_campaign_id) }}
         </span>
       </td>
 
@@ -142,7 +197,55 @@
       </td>
 
       <td :key="column.name" v-else>
-        <div>{{ contact[column.name] }}</div>
+        <div class="text-center"
+             v-if="contact[column.name] === null || contact[column.name] === 'NULL' || ( contact[column.name] instanceof Array && !contact[column.name].length)">
+          -
+        </div>
+        <div class="text-center"
+             v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
+          <b-popover
+            :target="`${column.name}-${contact.id}`"
+            triggers="hover"
+            placement="left"
+            boundary="window"
+            v-if="contact[column.name].length > 0"
+          >
+            <template #title>
+              <div class="contact-tags-title">{{ column.label }}</div>
+            </template>
+            <span
+              class="ml-1"
+              v-for="(item, index) in contact[column.name]"
+              :id="`${column.name}-${contact.id}`"
+              :key="`${column.name}-${index}`"
+            >
+              {{ item.name }}
+            </span>
+          </b-popover>
+          <span :id="`${column.name}-${contact.id}`"
+                v-if="contact[column.name].length > 0">
+            {{ contact[column.name][0].name }}
+          </span>
+          <span v-if="contact[column.name].length === 0">
+            -
+          </span>
+        </div>
+        <div class="text-center"
+             v-else-if="contact[column.name] && contact[column.name] instanceof Object">
+          <span>
+            {{ contact[column.name].name }}
+          </span>
+        </div>
+        <div class="text-center"
+             v-else-if="column.name.includes('_at') || column.name.includes('date')">
+          {{ contact[column.name] | fixDateTime }}
+        </div>
+        <div class="text-center"
+             v-else>
+          {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
+            (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() :
+              (contact[column.name] === 0 ? '' : contact[column.name]) ) }}
+        </div>
       </td>
     </template>
   </tr>
@@ -150,7 +253,7 @@
 
 <script>
 import moment from 'moment'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
 
 export default {
@@ -181,11 +284,16 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile'])
+    ...mapGetters('auth', ['profile']),
+    ...mapState(['campaigns'])
   },
 
   methods: {
     ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
+    getLineName (id) {
+      const found = this.campaigns.find(campaign => campaign.id === id)
+      return found ? found.name : '-'
+    },
     onCheckerClicked () {
       let items = []
       let found = this.checked.find(item => item.id === this.contact.id)
