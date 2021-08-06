@@ -10,7 +10,7 @@
       <div class="h-100"
            :class="[ sidebarVisible ? 'sidebar-active' : '']">
         <q-header class="page-header bg-white text-black no-box-shadow"
-                  v-show="authenticated && !isWidget && !loading">
+                  v-if="authenticated && !isWidget && !loading">
           <app-header @toggleSidebar="toggleSidebar"/>
         </q-header>
         <q-page-container class="page-container h-100">
@@ -24,7 +24,7 @@
               </transition>
             </template>
             <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
-                 v-else>
+                 v-else-if="loading">
               <div class="container">
                 <q-spinner-bars color="primary"
                                 size="40px">
