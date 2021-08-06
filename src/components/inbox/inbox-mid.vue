@@ -73,7 +73,6 @@ export default {
   methods: {
     toggle () {
       this.showMessage = !this.showMessage
-      console.log(this.showMessage)
     },
 
     showMid () {

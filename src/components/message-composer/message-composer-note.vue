@@ -29,7 +29,7 @@
                 </span>
             </span>
           </template>
-          <div id="noteContentEditable" placeholder="Type @ to span mention someone" contenteditable></div>
+          <div id="noteContentEditable" placeholder="Type @ to mention someone" contenteditable></div>
         </at>
       </form>
     </div>

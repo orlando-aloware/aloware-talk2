@@ -98,7 +98,7 @@ export default {
       return color
     },
 
-    stateToIcon: function (dispositionStatus, type, direction = null, answerStatus = null) {
+    stateToIcon: function (dispositionStatus, type, direction = null) {
       let icon = ''
 
       if (![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
@@ -109,10 +109,8 @@ export default {
         }
       }
 
-      if (type === CommunicationTypes.CALL && (!answerStatus || answerStatus === 'all')) {
+      if (type === CommunicationTypes.CALL) {
         icon += 'call-'
-      } else if (type === CommunicationTypes.CALL && answerStatus === 'recorded') {
-        icon += 'recorded-'
       } else if (type === CommunicationTypes.SMS) {
         icon += 'sms-'
       } else if (type === CommunicationTypes.EMAIL) {

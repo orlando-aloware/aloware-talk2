@@ -13,6 +13,7 @@
                 emit-value
                 map-options
                 v-model="filterLeft"
+                :disable="true"
                 :options="filterOptions"
                 :append="[{icon: 'ion-ios-arrow-down'}]">
         <template v-slot:option="scope">

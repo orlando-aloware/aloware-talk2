@@ -75,7 +75,8 @@
       <inbox-channels v-if="activeChannel && !['inbox', 'messages', 'mentions'].includes(activeChannel.value)"
                       class="h-100 w-100 flex-grow-1 scroll-y"
                       :filter-type="activeChannel.type"
-                      :answer-status="activeChannel.answerStatus">
+                      :answer-status="activeChannel.answerStatus"
+                      @communicationsLoaded="communicationsLoaded">
       </inbox-channels>
     </div>
   </div>
@@ -83,7 +84,6 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import InboxChannels from 'components/inbox/inbox-channels'
@@ -91,23 +91,6 @@ import InboxChannels from 'components/inbox/inbox-channels'
 let scrollTimeout
 export default {
   name: 'inbox-side',
-  props: {
-    campaignId: {
-      required: false
-    },
-
-    ringGroupId: {
-      required: false
-    },
-
-    userId: {
-      required: false
-    },
-
-    workflowId: {
-      required: false
-    }
-  },
 
   components: {
     InboxChannels,
@@ -210,30 +193,8 @@ export default {
       // @TODO: search value from where?
     },
 
-    getCommunications (params) {
-      this.gettingTasksList(true)
-      talk2Api.V1.reports.communications
-        .get({ params: params })
-        .then(response => {
-          this.communications = response.data.data
-          this.currentPage = response.data.current_page
-          this.hasMore = response.data.next_page_url
-          this.gettingTasksList(false)
-        })
-    },
-
-    loadMoreCommunications (params) {
-      this.isLoadingMore = true
-      this.isLoaded = false
-      talk2Api.V1.reports.communications
-        .get({ params: params })
-        .then(response => {
-          this.communications = [...this.communications, ...response.data.data]
-          this.currentPage = response.data.current_page
-          this.hasMore = response.data.next_page_url
-          this.isLoadingMore = false
-          this.isLoaded = true
-        })
+    communicationsLoaded (communications) {
+      this.communications = communications
     },
 
     newActive (active) {
@@ -241,7 +202,7 @@ export default {
       this.setActiveChannel(active)
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel'])
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'setSelectedCommunication'])
   },
 
   mounted () {
@@ -249,6 +210,7 @@ export default {
   },
   created () {
     this.setActiveChannel(null)
+    this.setSelectedCommunication(null)
   },
 
   beforeDestroy () {

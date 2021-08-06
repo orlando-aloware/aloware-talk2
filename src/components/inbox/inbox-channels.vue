@@ -318,6 +318,8 @@ export default {
           this.pagination = _.clone(response.data)
           delete this.pagination.data
           this.gettingTasksList(false)
+
+          this.$emit('communicationsLoaded', this.communications)
         })
     },
 
@@ -335,6 +337,8 @@ export default {
 
           this.pagination = _.clone(response.data)
           delete this.pagination.data
+
+          this.$emit('communicationsLoaded', this.communications)
         })
     },
 

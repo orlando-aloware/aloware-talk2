@@ -33,7 +33,6 @@
       <div class="px-0 width-330 pt-2">
         <contact-details></contact-details>
       </div>
-      <contact-save-bar v-if="!changingSelectedContact"></contact-save-bar>
     </div>
     <template #overlay>
       <div class="text-center">
@@ -53,15 +52,12 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-
-import { mapActions, mapGetters } from 'vuex'
-import ContactSaveBar from 'components/contacts/contact-save-bar'
+import { mapGetters } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
 
   components: {
-    ContactSaveBar,
     ContactDetails,
     ContactActivities,
     ContactListSidebar
@@ -82,9 +78,6 @@ export default {
       totalContacts: 0
     }
   },
-  methods: {
-    ...mapActions('contacts', ['resetChangedContactProperties'])
-  },
 
   mounted () {
     if (this.authenticated) {
@@ -98,7 +91,6 @@ export default {
       if (this.$route.name === 'Contact' && this.contactId !== this.$route.params.id) {
         this.resetSelectedContact()
         this.contactId = this.$route.params.id
-        this.resetChangedContactProperties()
         this.processFetchContactInfo()
       } else {
         this.resetSelectedContact()

@@ -586,7 +586,7 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white"
          v-if="communication.notes && !activeName">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"

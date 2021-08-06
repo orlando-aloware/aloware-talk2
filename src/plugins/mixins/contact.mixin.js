@@ -48,6 +48,16 @@ export default {
       },
       selectedContactCampaigns: [],
       contactPhoneNumbers: [],
+      communicationsSummary: {
+        first_outbound_call: null,
+        summaries: {
+          inbound_calls_count: 0,
+          outbound_calls_count: 0,
+          inbound_texts_count: 0,
+          outbound_texts_count: 0,
+          total_count: 0
+        }
+      },
       communicationsPage: 1,
       communicationsPerPage: 10,
       contactIncomingNumber: null,
@@ -750,9 +760,6 @@ export default {
 
     highlightActivity (element) {
       element.classList.add('shine')
-      setTimeout(() => {
-        element.classList.remove('shine')
-      }, 3000)
     },
 
     fetchIncomingNumber () {
@@ -894,6 +901,22 @@ export default {
       }).then(res => {
         return Promise.resolve(res.data)
       })
+    },
+
+    getCommunicationsSummary (contactId) {
+      if (contactId) {
+        this.$axios.get(`/api/v1/contact/${contactId}/communications-summary`)
+          .then(res => {
+            // sanitize summaries data before merging
+            // eslint-disable-next-line no-return-assign
+            Object.keys(res.data.summaries).forEach(key => res.data.summaries[key] = res.data.summaries[key] || 0)
+
+            this.communicationsSummary = { ...this.communicationsSummary, ...res.data }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
     },
 
     ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties'])

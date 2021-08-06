@@ -121,7 +121,7 @@ export default {
       return '-'
     },
     activeClass () {
-      return this.communication.id === this.selectedCommunication.id ? 'active' : ''
+      return this.selectedCommunication && this.communication.id === this.selectedCommunication.id ? 'active' : ''
     },
     channelAnswerStatus () {
       return this.activeChannel.answerStatus || ''
@@ -129,7 +129,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setCommunication']),
     setContact (id) {
       this.setContactId(id)
     },
@@ -138,10 +137,10 @@ export default {
         this.setContact(communication.contact.id)
       }
 
-      this.setCommunication(communication)
+      this.setSelectedCommunication(communication)
     },
 
-    ...mapActions('inbox', ['setContactId'])
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication'])
   }
 }
 </script>
