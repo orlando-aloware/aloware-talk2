@@ -3553,7 +3553,7 @@ span.mention {
       height: 66px;
     }
 
-    .q-btn {
+    .q-btn:not(.merge-btn) {
       & .q-btn__wrapper {
         min-width: 14px;
         min-height: 14px;
@@ -3566,6 +3566,14 @@ span.mention {
 
       & .q-icon {
         font-size: inherit;
+      }
+    }
+
+    .merge-btn {
+      & .q-btn__content {
+        padding: 0 9px;
+        font-size: $f-size-body;
+        line-height: 1;
       }
     }
   }

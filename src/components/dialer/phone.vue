@@ -272,22 +272,38 @@
               </q-item-label>
             </div>
           </div>
-          <div class="phone-info w-100 pl-2 pr-2 small d-flex flex-column align-items-start"
+          <div class="phone-info w-100 mt-2 pl-2 pr-2 small d-flex flex-column align-items-start"
                v-else>
-            <div>
-              <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center text-grey-100"
-                            v-if="dialer.contact">
-                <ready-icon></ready-icon>
-                <span class="d-inline-flex ml-2">{{ contactName | truncate(15) }}</span>
-              </q-item-label>
-            </div>
-
-            <div class="d-flex justify-content-between mt-3 w-100 pr-2"
-                 v-if="addedParty">
-              <q-item-label>
+            <div class="d-flex justify-content-between align-items-center w-100 pr-2">
+              <q-item-label v-if="dialer.contact">
                 <div class="d-flex align-items-center">
                   <ready-icon v-if="!shouldIntroduce"></ready-icon>
                   <waiting-icon v-else></waiting-icon>
+                  <span class="ml-2 text-size-xxl _600 text-grey-100">{{ contactName | truncate(15) }}</span>
+                </div>
+              </q-item-label>
+              <q-btn :loading="loadingMerge"
+                     :disabled="loadingMerge || !dialer.communication.legc_status || dialer.communication.legc_status !== CommunicationStatus.STATUS_INPROGRESS_NEW"
+                     v-if="shouldIntroduce"
+                     color="success"
+                     class="d-flex align-items-center justify-content-between merge-btn"
+                     label="Merge"
+                     ripple
+                     outline
+                     rounded
+                     no-caps
+                     unelevated
+                     dense
+                     @click="mergeCalls">
+                <merge-icon class="ml-2"></merge-icon>
+              </q-btn>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 w-100 pr-2"
+                 v-if="addedParty">
+              <q-item-label>
+                <div class="d-flex align-items-center">
+                  <ready-icon></ready-icon>
                   <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty | truncate(15) }}</span>
                 </div>
                 <div class="mt-1">
@@ -296,7 +312,7 @@
                     Adding
                   </span>
                   <span class="add-status"
-                        v-if="dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_INPROGRESS_NEW">
+                        v-if="devMode && dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_INPROGRESS_NEW">
                     Added
                   </span>
                 </div>
@@ -1098,21 +1114,23 @@ import ScriptSelector from 'components/generic-selectors/script-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
 import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
+import ParticipantsIcon from 'components/icons/participants-icon'
+import ReadyIcon from 'components/icons/ready-icon'
+import DropParticipantIcon from 'components/icons/drop-participant-icon'
+import WaitingIcon from 'components/icons/waiting-icon'
+import MergeIcon from 'components/icons/merge-icon'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import ParticipantsIcon from 'components/icons/participants-icon'
-import ReadyIcon from 'components/icons/ready-icon'
-import DropParticipantIcon from 'components/icons/drop-participant-icon'
-import WaitingIcon from 'components/icons/waiting-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    MergeIcon,
     WaitingIcon,
     DropParticipantIcon,
     ReadyIcon,
@@ -1947,6 +1965,14 @@ export default {
       this.$VueEvent.fire('dropThirdParty')
       setTimeout(() => {
         this.loadingDropThirdParty = false
+      }, 1000)
+    },
+
+    mergeCalls () {
+      this.loadingMerge = true
+      this.$VueEvent.fire('mergeCalls')
+      setTimeout(() => {
+        this.loadingMerge = false
       }, 1000)
     },
 

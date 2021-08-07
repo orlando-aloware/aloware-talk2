@@ -104,24 +104,24 @@ $dark-grey: #343a40;
 $primary-hover: #054CDB;
 
 // Text Colors
-@include text-color('primary', $primary);
-@include text-color('success', $success);
-@include text-color('danger', $danger);
-@include text-color('white', $white);
-@include text-color('info', $info);
-@include text-color('dark', $dark);
-@include text-color('light-grey', $light-grey);
-@include text-color('dark-grey', $dark-grey);
-@include text-color('grey-100', $grey-100);
-@include text-color('grey-90', $grey-90);
-@include text-color('grey-80', $grey-80);
-@include text-color('grey-70', $grey-70);
-@include text-color('grey-60', $grey-60);
-@include text-color('grey-50', $grey-50);
-@include text-color('grey-40', $grey-40);
-@include text-color('grey-30', $grey-30);
-@include text-color('grey-20', $grey-20);
-@include text-color('grey-10', $grey-20);
+@include text-color('primary', $primary, true);
+@include text-color('success', $success, true);
+@include text-color('danger', $danger, true);
+@include text-color('white', $white, true);
+@include text-color('info', $info, true);
+@include text-color('dark', $dark, true);
+@include text-color('light-grey', $light-grey, true);
+@include text-color('dark-grey', $dark-grey, true);
+@include text-color('grey-100', $grey-100, true);
+@include text-color('grey-90', $grey-90, true);
+@include text-color('grey-80', $grey-80, true);
+@include text-color('grey-70', $grey-70, true);
+@include text-color('grey-60', $grey-60, true);
+@include text-color('grey-50', $grey-50, true);
+@include text-color('grey-40', $grey-40, true);
+@include text-color('grey-30', $grey-30, true);
+@include text-color('grey-20', $grey-20, true);
+@include text-color('grey-10', $grey-20, true);
 @include text-color('red-100', $red-100, true);
 
 // Background Colors
