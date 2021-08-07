@@ -3784,6 +3784,12 @@ span.mention {
     @extend .border-half-rounded;
   }
 
+  .phone-notes {
+    .q-field__inner {
+      justify-content: start !important;
+    }
+  }
+
   .phone-expansion {
     background: transparent;
 

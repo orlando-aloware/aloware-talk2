@@ -22,8 +22,7 @@
                            v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
         </pause-record-icon>
 
-        <ul id="signal-strength"
-            v-if="!isCallCompleted">
+        <ul id="signal-strength">
           <li class="very-weak">
             <div id="very-weak"
                  class="active">
@@ -229,7 +228,7 @@
           <div class="dummy bg-dark w-100 height-36"></div>
           <div class="phone-avatar">
             <avatar :name="contactName"
-                    v-if="!isCallAdded && !isAddDisabled"
+                    v-if="!isCallAdded"
                     class="contact-avatar"
                     width="50"
                     height="50">
@@ -237,7 +236,7 @@
             <participants-icon v-else></participants-icon>
           </div>
           <div class="phone-info small d-flex flex-column align-items-center"
-               v-if="!isCallAdded && !isAddDisabled">
+               v-if="!isCallAdded">
             <div class="text-grey-100 text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                             v-if="dialer.contact">
@@ -599,7 +598,7 @@
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
             <label class="form-control-label text-grey-90">Notes</label>
             <div class="d-flex align-items-center w-100">
-              <communication-note ref="communication_notes"
+              <communication-note ref="communicationNotes"
                                   :communication="dialer.communication">
               </communication-note>
             </div>
@@ -763,18 +762,31 @@
           </template>
           <template v-if="bottomExpansion === 'notes'">
             <q-card-section class="height-445">
-              <contact-notes :contact="dialer.contact"
-                             :no_title="true"
-                             @update="onNotesUpdate">
-              </contact-notes>
+              <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
+                <div class="d-flex">
+                  <communication-note :communication="dialer.communication"
+                                      :no-auto-save="true"
+                                      class="flex-grow-1 h-100 phone-notes"
+                                      ref="communicationNotes">
+                  </communication-note>
+                </div>
+                <div class="d-flex">
+                  <b-button variant="primary"
+                            size="sm"
+                            block
+                            @click="saveNotes">
+                    <span>Save Notes</span>
+                  </b-button>
+                </div>
+              </div>
+
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'tags'">
             <q-card-section class="height-240">
-              <contact-tags :contact="dialer.contact"
-                            :no_title="true"
-                            @update="onTagsUpdate">
-              </contact-tags>
+              <communication-tags :communication="dialer.communication"
+                                  ref="communicationTags">
+              </communication-tags>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'scripts'">
@@ -1098,8 +1110,6 @@ import TransferIcon from 'components/icons/transfer-icon'
 import UnholdIcon from 'components/icons/unhold-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import PauseRecordIcon from 'components/icons/pause-record-icon'
-import ContactNotes from 'components/contacts/contact-notes'
-import ContactTags from 'components/contacts/contact-tags'
 import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
 import CommunicationAudio from 'components/communication-audio'
@@ -1149,8 +1159,6 @@ export default {
     CommunicationAudio,
     VmDropIcon,
     IntegrationsIcon,
-    ContactTags,
-    ContactNotes,
     PauseRecordIcon,
     UnmuteIcon,
     UnholdIcon,
@@ -1631,14 +1639,6 @@ export default {
       this.resetTransfer()
     },
 
-    onNotesUpdate (contact) {
-      this.setDialerContact(contact)
-    },
-
-    onTagsUpdate (tags) {
-      this.setDialerContactTags(tags)
-    },
-
     toggleRecordingStatus () {
       this.loadingToggleRecordingStatus = true
       this.$VueEvent.fire('toggleRecordingStatus')
@@ -1974,6 +1974,12 @@ export default {
       setTimeout(() => {
         this.loadingMerge = false
       }, 1000)
+    },
+
+    saveNotes () {
+      if (this.$refs.communicationNotes) {
+        this.$refs.communicationNotes.saveNote()
+      }
     },
 
     ...mapActions([
