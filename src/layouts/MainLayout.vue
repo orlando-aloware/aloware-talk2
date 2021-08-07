@@ -35,8 +35,11 @@
                   </div>
                   <div v-else-if="!authCheckStatus">
                     <span>Checking authentication</span>
-                    <div class="container" v-if="showRefreshButton">
-                      <b-button type="is-link" @click="refreshPage" expanded>
+                    <div class="container"
+                         v-if="showRefreshButton">
+                      <b-button type="is-link"
+                                expanded
+                                @click="refreshPage">
                         Refresh
                       </b-button>
                     </div>
@@ -423,13 +426,11 @@ export default {
         if (this.$route.name !== 'Login') {
           this.$router.push({ name: 'Login' }).catch((err) => {
             console.log(err)
+            this.showRefreshButton = true
           })
         }
         this.loading = false
         this.authCheckStatus = false
-        setTimeout(() => {
-          this.showRefreshButton = true
-        }, 10000)
       })
     }
   },
