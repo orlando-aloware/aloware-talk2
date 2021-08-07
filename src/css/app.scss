@@ -80,6 +80,11 @@ body,
   left: 300px;
 }
 
+.q-separator--horizontal-inset {
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
 .row {
   &.q-field,
   &.q-field__control-container,

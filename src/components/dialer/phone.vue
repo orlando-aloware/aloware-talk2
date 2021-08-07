@@ -228,7 +228,7 @@
           <div class="dummy bg-dark w-100 height-36"></div>
           <div class="phone-avatar">
             <avatar :name="contactName"
-                    v-if="!isCallAdded"
+                    v-if="!isCallAdding && !isCallAdded"
                     class="contact-avatar"
                     width="50"
                     height="50">
@@ -236,7 +236,7 @@
             <participants-icon v-else></participants-icon>
           </div>
           <div class="phone-info small d-flex flex-column align-items-center"
-               v-if="!isCallAdded">
+               v-if="!isCallAdding && !isCallAdded">
             <div class="text-grey-100 text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                             v-if="dialer.contact">
@@ -274,7 +274,9 @@
           <div class="phone-info w-100 mt-2 pl-2 pr-2 small d-flex flex-column align-items-start"
                v-else>
             <div class="d-flex justify-content-between align-items-center w-100 pr-2">
-              <q-item-label v-if="dialer.contact">
+              <q-item-label v-if="dialer.contact"
+                            class="cursor-pointer"
+                            @click="openMembers">
                 <div class="d-flex align-items-center">
                   <ready-icon v-if="!shouldIntroduce"></ready-icon>
                   <waiting-icon v-else></waiting-icon>
@@ -300,18 +302,19 @@
 
             <div class="d-flex justify-content-between align-items-center mt-3 w-100 pr-2"
                  v-if="addedParty">
-              <q-item-label>
+              <q-item-label class="cursor-pointer"
+                            @click="openMembers">
                 <div class="d-flex align-items-center">
                   <ready-icon></ready-icon>
-                  <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty | truncate(15) }}</span>
+                  <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty.name | truncate(15) }}</span>
                 </div>
                 <div class="mt-1">
                   <span class="add-status"
-                        v-if="dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_RINGING_NEW">
+                        v-if="isCallAdding">
                     Adding
                   </span>
                   <span class="add-status"
-                        v-if="devMode && dialer.communication.legc_uuid && dialer.communication.legc_status == CommunicationStatus.STATUS_INPROGRESS_NEW">
+                        v-if="devMode && isCallAdded">
                     Added
                   </span>
                 </div>
@@ -650,6 +653,63 @@
         </template>
 
         <q-card>
+          <template v-if="bottomExpansion === 'members'">
+            <q-card-section class="height-240">
+              <div class="text-grey-100">
+                <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-start"
+                              v-if="dialer.contact">
+                  <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                </q-item-label>
+                <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start">
+                  <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                  <b-link href="#"
+                          class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                          @click.prevent="copyPhoneNumber">
+                    <i class="material-icons">content_copy</i>
+                  </b-link>
+                  <input :value="dialer.communication.lead_number"
+                         type="hidden"
+                         id="phone-number-clone"/>
+                </q-item-label>
+                <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
+                              v-if="dialer.contact && dialer.contact.company_name">
+                  <span>{{ dialer.contact.company_name }}</span>
+                  <span class="ml-1 mr-1"
+                        v-if="currentLocalTime">
+                    ·
+                  </span>
+                  <span v-if="currentLocalTime">{{ currentLocalTime }}</span>
+                </q-item-label>
+              </div>
+              <q-separator class="mt-3 mb-3"
+                           inset>
+              </q-separator>
+              <div class="text-grey-100"
+                   v-if="addedParty">
+                <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-start">
+                  <span class="d-inline-flex"
+                        v-if="addedParty.name">
+                    {{ addedParty.name | truncate(15) }}
+                  </span>
+                  <span class="d-inline-flex"
+                        v-else>
+                    {{ addedParty }}
+                  </span>
+                </q-item-label>
+                <div class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
+                     v-if="addedParty.id">
+                  <q-item-label v-if="!addedParty.is_destination"
+                                class="text-size-sm text-grey-90 _400 mt-1">
+                    {{ addedParty.email }} - {{ getLabel(addedParty) }}
+                  </q-item-label>
+                  <q-item-label v-else
+                                class="text-size-sm text-grey-90 _400 mt-1">
+                    {{ getLabel(addedParty) }}
+                  </q-item-label>
+                </div>
+              </div>
+            </q-card-section>
+          </template>
           <template v-if="bottomExpansion === 'integrations'">
             <q-card-section class="height-240">
               <contact-integrations :contact="dialer.contact"
@@ -1135,6 +1195,7 @@ import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import * as AnswerTypes from 'src/constants/answer-types'
 
 export default {
   name: 'phone',
@@ -1313,6 +1374,10 @@ export default {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
     },
 
+    isCallAdding () {
+      return this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_RINGING_NEW
+    },
+
     transferValidated () {
       if (this.transfer.mode === 'user' && this.transfer.userId) {
         return true
@@ -1373,6 +1438,8 @@ export default {
           return 'VM Drop'
         case 'more':
           return 'More'
+        case 'members':
+          return 'Members'
         default:
           return ''
       }
@@ -1609,6 +1676,14 @@ export default {
     openIntegrations () {
       this.expansionEnabled = true
       this.bottomExpansion = 'integrations'
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
+    },
+
+    openMembers () {
+      this.expansionEnabled = true
+      this.bottomExpansion = 'members'
       setTimeout(() => {
         this.expanded = true
       }, 50)
@@ -1982,6 +2057,23 @@ export default {
       }
     },
 
+    getLabel (user) {
+      if (!user) {
+        return
+      }
+
+      switch (user.answer_by) {
+        case AnswerTypes.BY_PHONE_NUMBER:
+          return 'Phone Number (' + user.phone_number + ')'
+        case AnswerTypes.BY_BROWSER:
+          return 'Apps'
+        case AnswerTypes.BY_IP_PHONE:
+          return 'SIP (IP Phone)'
+        case AnswerTypes.BY_NONE:
+          return 'Will Not Answer'
+      }
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -2055,7 +2147,9 @@ export default {
           }
 
           if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
-            this.screen = 'menu'
+            setTimeout(() => {
+              this.screen = 'menu'
+            }, 5000)
           }
           break
         case 'GOT_ERROR':

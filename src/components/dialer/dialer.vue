@@ -744,7 +744,7 @@ export default {
         params.user_id = add.userId
         let user = this.getUser(add.userId)
         if (user) {
-          this.setAddedParty(user.name)
+          this.setAddedParty(user)
         }
       }
 
