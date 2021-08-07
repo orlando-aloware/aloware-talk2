@@ -87,7 +87,7 @@ export default {
           this.removeListFromPinned(this.listToRemove.id)
           // if current route is equals to list page being deleted then redirect to all contacts
           if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {
-            this.$router.push('/contacts')
+            this.$router.push('/contacts/')
           }
         })
         .catch((_err) => {

@@ -14,13 +14,13 @@ export const OPERATORS = {
 export const DEFAULT_CONTACT_LIST = {
   ALL_CONTACTS: {
     id: 'all',
-    link: '/contacts',
-    name: 'All Contacts'
+    name: 'All Contacts',
+    link: '/contacts/'
   },
   MY_CONTACTS: {
     id: 'my-contacts',
-    link: '/contacts/my-contacts',
-    name: 'My Contacts'
+    name: 'My Contacts',
+    link: '/contacts/my-contacts'
   },
   UNASSIGNED: {
     id: 'unassigned',
