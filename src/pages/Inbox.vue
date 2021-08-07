@@ -23,6 +23,7 @@ export default {
   },
 
   computed: {
+    ...mapGetters('auth', ['authenticated']),
     ...mapState('inbox', ['items', 'activeChannel'])
   },
 
@@ -35,7 +36,6 @@ export default {
   },
 
   methods: {
-    ...mapGetters('auth', ['authenticated']),
     ...mapActions('inbox', ['setActiveChannel']),
 
     setChannel () {

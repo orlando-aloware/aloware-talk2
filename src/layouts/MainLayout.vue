@@ -415,25 +415,22 @@ export default {
     if (this.authenticated) {
       this.initAuth()
     } else {
-      this.check()
-        .then(() => {
-          this.loading = false
-          this.authCheckStatus = true
-          this.showRefreshButton = false
-        })
-        .catch(() => {
-          if (this.$route.name !== 'Login') {
-            // @todo Go to login page
-            this.$router.push({ name: 'Login' }).catch((err) => {
-              console.log(err)
-            })
-          }
-          this.loading = false
-          this.authCheckStatus = false
-          setTimeout(() => {
-            this.showRefreshButton = true
-          }, 10000)
-        })
+      this.check().then(() => {
+        this.loading = false
+        this.authCheckStatus = true
+        this.showRefreshButton = false
+      }).catch(() => {
+        if (this.$route.name !== 'Login') {
+          this.$router.push({ name: 'Login' }).catch((err) => {
+            console.log(err)
+          })
+        }
+        this.loading = false
+        this.authCheckStatus = false
+        setTimeout(() => {
+          this.showRefreshButton = true
+        }, 10000)
+      })
     }
   },
 
@@ -601,26 +598,24 @@ export default {
 
     checkAuth (authTry = 1) {
       if (this.profile !== null) {
-        this.check(true)
-          .then(() => {
-            this.loading = false
-            this.authCheckStatus = true
-            this.showRefreshButton = false
-          })
-          .catch((err) => {
-            console.log(err)
-            authTry++
-            // check if we are authenticated after 3 retries
-            if (authTry > 3) {
-              this.authCheckStatus = false
-              setTimeout(() => {
-                this.showRefreshButton = true
-              }, 10000)
-              this.loading = true
-            } else {
-              this.checkAuth(authTry)
-            }
-          })
+        this.check(true).then(() => {
+          this.loading = false
+          this.authCheckStatus = true
+          this.showRefreshButton = false
+        }).catch((err) => {
+          console.log(err)
+          authTry++
+          // check if we are authenticated after 3 retries
+          if (authTry > 3) {
+            this.authCheckStatus = false
+            setTimeout(() => {
+              this.showRefreshButton = true
+            }, 10000)
+            this.loading = true
+          } else {
+            this.checkAuth(authTry)
+          }
+        })
       }
     },
 
@@ -1248,16 +1243,14 @@ export default {
     },
 
     logout () {
-      this.logoutUser()
-        .then((res) => {
-          this.response = res.data
-          this.$router.push({ name: 'Login' }).catch((err) => {
-            console.log(err)
-          })
-        })
-        .catch((err) => {
+      this.logoutUser().then((res) => {
+        this.response = res.data
+        this.$router.push({ name: 'Login' }).catch((err) => {
           console.log(err)
         })
+      }).catch((err) => {
+        console.log(err)
+      })
     },
 
     beforeUnload () {
