@@ -707,6 +707,10 @@
                     {{ getLabel(addedParty) }}
                   </q-item-label>
                 </div>
+                <div class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
+                     v-else>
+                  <q-item-label class="text-size-sm text-grey-90 _400 mt-1">No other data found for this user.</q-item-label>
+                </div>
               </div>
             </q-card-section>
           </template>
