@@ -173,6 +173,8 @@ export default {
     state.currentListFilters = filters
   },
   SET_CONTACT: (state, contact) => {
+    console.log('contact set')
+    console.trace()
     state.contact = contact
   },
   SET_CONTACT_CLONE: (state, contact) => {
@@ -188,6 +190,8 @@ export default {
     state.contactRingGroups = ringGroups
   },
   SET_CONTACT_ATTRIBUTES: (state, attributes) => {
+    console.log('contact attributes set')
+    console.trace()
     state.contactAttributes = attributes
   },
   SET_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {

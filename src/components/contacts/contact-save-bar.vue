@@ -1,5 +1,5 @@
 <template>
-  <div v-if="changedContactProperties.length > 0 && !changingSelectedContact"
+  <div v-if="isVisible"
        class="contact-save-bar-wrapper text-right">
     <span class="label">
       You've changed {{ changedContactProperties.length }} property
@@ -35,6 +35,9 @@ export default {
       }
 
       return 'Save'
+    },
+    isVisible () {
+      return this.contact.id === this.contactClone.id && this.changedContactProperties.length > 0 && !this.changingSelectedContact
     }
   },
   data () {

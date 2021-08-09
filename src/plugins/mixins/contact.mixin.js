@@ -393,9 +393,7 @@ export default {
       if (_.isEmpty(contact) || _.isEmpty(this.contact) || (contact.id !== this.contact.id)) {
         return
       }
-
       contact.communications_and_audits = _.get(this.contact, 'communications_and_audits', [])
-      this.setContact(contact)
     },
 
     updateSelectedContactAudit (audit) {
