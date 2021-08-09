@@ -1,7 +1,7 @@
 <template>
   <q-toolbar class="page-header pl-3 pr-3">
     <div class="d-flex h-100 align-items-center">
-      <b-link v-if="['Contact'].includes($route.name) && canGoBack" class="btn-header-nav-back mr-3"
+      <b-link v-if="['Contact'].includes($route.name)" class="btn-header-nav-back mr-3"
               href="#"
               @click="navigateBackward">
         <i class="fa fa-chevron-left"></i>
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -81,7 +81,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated'])
+    ...mapGetters('auth', ['authenticated']),
+    ...mapState('contacts', ['selectedList'])
   },
 
   created () {
@@ -109,9 +110,9 @@ export default {
     },
 
     navigateBackward (e) {
-      if (this.$router.history._startLocation === this.$route.path) {
+      if (this.$route.name === 'Contact') {
         this.$router.push({
-          name: 'Contacts'
+          path: `list/${this.selectedList.id}`
         })
       } else {
         this.goBack()

@@ -70,17 +70,36 @@
           <span class="text-muted">no tags available</span>
         </template>
         <template v-if="Array.isArray(contact.tags) && contact.tags.length">
+          <span
+            :id="`popover-tags-${contact.id}`"
+            class="d-flex align-items-center contact-tags-item"
+            v-if="contact.id"
+          >
+            <span :style="`color: ${contact.tags[0].color};`">
+              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`"></i>
+              <span v-if="contact.tags.length > 1">
+                {{ contact.tags[0].name | truncate(17) }}
+              </span>
+              <span v-else>
+                {{ contact.tags[0].name | truncate(27) }}
+              </span>
+            </span>
+            <span class="ml-1 text-grey-7"
+                  v-if="contact.tags.length > 1">
+              +{{ (contact.tags.length - 1) }} more
+            </span>
+          </span>
           <b-popover
-            :target="'popover-tags-' + contact.id"
             triggers="hover"
             placement="left"
             boundary="window"
+            :target="`popover-tags-${contact.id}`"
+            v-if="contact.id && hasTargetTags"
           >
             <template #title>
               <div class="contact-tags-title">Tags</div>
             </template>
             <span
-              :id="'popover-tags-' + contact.id"
               class="d-flex align-items-center contact-tags-item"
               v-for="tag in contact.tags"
               :key="tag.id"
@@ -91,25 +110,6 @@
               </span>
             </span>
           </b-popover>
-
-          <span
-            :id="'popover-tags-' + contact.id"
-            class="d-flex align-items-center contact-tags-item"
-          >
-            <span :style="`color: ${contact.tags[0].color};`">
-              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`"></i>
-              <span v-if="contact.tags.length > 1">
-                {{ contact.tags[0].name | truncate(13) }}
-              </span>
-              <span v-else>
-                {{ contact.tags[0].name | truncate(27) }}
-              </span>
-            </span>
-            <span class="ml-1 text-grey-7"
-                  v-if="contact.tags.length > 1">
-              +{{ (contact.tags.length - 1) }} other tag{{ contact.tags.length > 2 ? 's' : ''}}
-            </span>
-          </span>
         </template>
       </td>
 
@@ -203,12 +203,16 @@
         </div>
         <div class="text-center"
              v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
+          <span :id="`${column.name}-${contact.id}`"
+                v-if="contact[column.name].length > 0">
+            {{ contact[column.name][0].name }}
+          </span>
           <b-popover
             :target="`${column.name}-${contact.id}`"
             triggers="hover"
             placement="left"
             boundary="window"
-            v-if="contact[column.name].length > 0"
+            v-if="contact[column.name].length > 0 && hasTargetArrays(column.name)"
           >
             <template #title>
               <div class="contact-tags-title">{{ column.label }}</div>
@@ -222,9 +226,9 @@
               {{ item.name }}
             </span>
           </b-popover>
-          <span :id="`${column.name}-${contact.id}`"
-                v-if="contact[column.name].length > 0">
-            {{ contact[column.name][0].name }}
+          <span class="ml-1 text-grey-7"
+                v-if="contact[column.name].length > 1">
+            +{{ (contact[column.name].length - 1) }} more
           </span>
           <span v-if="contact[column.name].length === 0">
             -
@@ -285,11 +289,17 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState(['campaigns'])
+    ...mapState(['campaigns']),
+    hasTargetTags () {
+      return document.getElementById(`popover-tags-${this.contact.id}`)
+    }
   },
 
   methods: {
     ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
+    hasTargetArrays (name) {
+      return document.getElementById(`${name}-${this.contact.id}`)
+    },
     getLineName (id) {
       const found = this.campaigns.find(campaign => campaign.id === id)
       return found ? found.name : '-'

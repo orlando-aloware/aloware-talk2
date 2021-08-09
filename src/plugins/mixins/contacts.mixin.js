@@ -146,6 +146,7 @@ export default {
       return query
     },
     getFiltersCount (filters) {
+      console.log('filters: ', filters)
       let filtersCount = 0
       if (filters.length) {
         for (let group of filters) {

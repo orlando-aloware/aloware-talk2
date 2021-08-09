@@ -4266,7 +4266,7 @@ span.mention {
 .column-headers-modal {
   max-height: 100%;
   @include screen('lg') {
-    max-height: 80%;
+    max-height: 100%;
   }
   .ghost {
     border: dashed 1px $green !important;
@@ -4280,7 +4280,6 @@ span.mention {
     font-weight: bold;
   }
   &__checkboxes {
-    max-height: 500px;
     overflow: auto;
   }
   &__remove {
@@ -4314,9 +4313,6 @@ span.mention {
   &__label {
     font-size: 14px;
   }
-  &__inner {
-    min-height: 300px;
-  }
   .modal-title {
     color: $white;
   }
@@ -4336,6 +4332,9 @@ span.mention {
     .custom-btn {
       min-width: 120px;
     }
+  }
+  .draggable-columns {
+    height: calc(100% - 24px) !important;
   }
 }
 
@@ -5975,4 +5974,8 @@ table.datatable {
       background-color: rgba(255, 247, 223, 1);
     }
   }
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
 }
