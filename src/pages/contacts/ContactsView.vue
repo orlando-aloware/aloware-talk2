@@ -95,6 +95,7 @@
         </compact-btn>
 
         <b-dropdown text="More"
+                    right
                     variant="outline-primary"
                     class="m-2 b-compact-dropdown-button">
           <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>

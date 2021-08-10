@@ -340,7 +340,7 @@ export default {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       for (let groupIndex in filterGroups) {
         if (groupIndex === 'search') {
-          delete filterGroups[groupIndex]
+          filterGroups.splice(groupIndex, 1)
           continue
         }
         for (let filterIndex in filterGroups[groupIndex].filters) {

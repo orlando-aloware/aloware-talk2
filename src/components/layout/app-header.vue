@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -81,7 +81,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated'])
+    ...mapGetters('auth', ['authenticated']),
+    ...mapState('contacts', ['selectedList'])
   },
 
   created () {
@@ -110,7 +111,7 @@ export default {
 
     navigateToContacts (e) {
       this.$router.push({
-        name: 'Contacts'
+        path: `list/${this.selectedList.id}`
       })
       e.preventDefault()
     }

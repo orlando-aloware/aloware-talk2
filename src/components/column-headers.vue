@@ -5,10 +5,11 @@
            modal-class="column-headers-modal"
            scrollable
            @show="onModalShow">
-    <b-overlay :show="loading"
+    <b-overlay class="h-100"
+               :show="loading"
                rounded="sm"
                variant="white">
-      <div class="w-100 column-headers-modal__inner d-flex position-relative px-2">
+      <div class="w-100 column-headers-modal__inner d-flex position-relative px-2 h-100">
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
             <search class="w-100"
@@ -51,8 +52,9 @@
           <div class="font-weight-bold body text-uppercase column-headers-modal__selected">
             Selected Columns ({{ currentColumns.length - 2 }})
           </div>
-          <div class="d-flex flex-column">
-            <draggable v-model="currentColumns"
+          <div class="d-flex flex-column draggable-columns">
+            <draggable class="h-100 overflow-y-scroll"
+                       v-model="currentColumns"
                        ghost-class="ghost"
                        handle=".handle"
                        :move="onCheckMove"

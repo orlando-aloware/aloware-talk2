@@ -84,8 +84,7 @@ export default {
       this.setSearch(searchText)
       this.fetch({ search: this.search })
     },
-    fetch (params = {}) {
-      this.isLoading = true
+    processFetch: _.debounce(function (params = {}) {
       params.search = this.search
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
@@ -110,6 +109,10 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    }, 1000),
+    fetch (params = {}) {
+      this.isLoading = true
+      this.processFetch(params)
     },
     buildQueryString (params) {
       const query = {
@@ -148,6 +151,7 @@ export default {
       return query
     },
     getFiltersCount (filters) {
+      console.log('filters: ', filters)
       let filtersCount = 0
       if (filters.length) {
         for (let group of filters) {
