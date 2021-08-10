@@ -55,7 +55,7 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   mixins: [contactsMixins, contactMixins],
@@ -86,20 +86,35 @@ export default {
     }
   },
 
+  methods: {
+    ...mapActions('contacts', ['resetChangedContactProperties', 'selectedContactChanging', 'setContact', 'setContactClone']),
+    fetchContact () {
+      this.selectedContactChanging(true)
+      let _this = this
+      this.processFetchContactInfo(function (selectedContact) {
+        _this.setContact(selectedContact)
+        _this.setContactClone(selectedContact)
+        _this.resetChangedContactProperties([])
+        _this.selectedContactChanging(false)
+      })
+    }
+  },
+
   mounted () {
     if (this.authenticated) {
       this.contactId = this.$route.params.id
-      this.processFetchContactInfo()
+      this.fetchContact()
     }
   },
 
   watch: {
     '$route.params.id': function (value) {
-      if (['Contact', 'Inbox Contact'].includes(this.$route.name) && this.contactId !== this.$route.params.id) {
+      if (['Contact', 'Inbox Contact'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
-        this.contactId = this.$route.params.id
-        this.processFetchContactInfo()
+        this.contactId = value
+        this.fetchContact()
       } else {
+        this.setContact(this.selectedContact)
         this.resetSelectedContact()
       }
     },

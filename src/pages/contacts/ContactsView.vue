@@ -407,6 +407,11 @@ export default {
         this.fetch(this.currentListFilters)
         this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }
+    },
+    selectedList: function (value) {
+      if (this.selectedContacts[value.id]) {
+        this.setListSelectedContacts({ id: value.id, contacts: [] })
+      }
     }
   }
 }

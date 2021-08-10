@@ -26,7 +26,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters']),
+    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts']),
     init () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
@@ -87,6 +87,8 @@ export default {
     fetch (params = {}) {
       this.isLoading = true
       params.search = this.search
+      // clear out selections every contact fetch request
+      this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
       return this.$axios
         .get('api/v2/contacts', {
           params: this.buildQueryString(params),
@@ -181,7 +183,7 @@ export default {
   computed: {
     ...mapState('contacts', ['search']),
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&
