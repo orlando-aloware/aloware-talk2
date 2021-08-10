@@ -151,7 +151,7 @@ export default {
         return true
       }
 
-      if (this.$route.name === 'Inbox Contact' && name === 'Inbox') {
+      if (['Inbox Contact', 'Inbox Channel'].includes(this.$route.name) && name === 'Inbox') {
         return true
       }
 

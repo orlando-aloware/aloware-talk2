@@ -10,7 +10,7 @@
       <div class="h-100"
            :class="[ sidebarVisible ? 'sidebar-active' : '']">
         <q-header class="page-header bg-white text-black no-box-shadow"
-                  v-show="authenticated && !isWidget && !loading">
+                  v-if="authenticated && !isWidget && !loading">
           <app-header @toggleSidebar="toggleSidebar"/>
         </q-header>
         <q-page-container class="page-container h-100">
@@ -24,7 +24,7 @@
               </transition>
             </template>
             <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
-                 v-else>
+                 v-else-if="loading">
               <div class="container">
                 <q-spinner-bars color="primary"
                                 size="40px">
@@ -35,8 +35,11 @@
                   </div>
                   <div v-else-if="!authCheckStatus">
                     <span>Checking authentication</span>
-                    <div class="container" v-if="showRefreshButton">
-                      <b-button type="is-link" @click="refreshPage" expanded>
+                    <div class="container"
+                         v-if="showRefreshButton">
+                      <b-button type="is-link"
+                                expanded
+                                @click="refreshPage">
                         Refresh
                       </b-button>
                     </div>
@@ -52,7 +55,7 @@
         </q-page-container>
       </div>
       <q-drawer v-model="sidebarVisible"
-                v-show="authenticated && sidebarVisible && !loading"
+                v-if="authenticated"
                 :breakpoint="0"
                 class="h-100 sidebar-wrapper d-none d-sm-block"
                 :width="64"
@@ -198,7 +201,7 @@ export default {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      sidebarVisible: true,
+      sidebarVisible: false,
       lightMode: true,
       CommunicationTypes
     }
@@ -415,29 +418,28 @@ export default {
     if (this.authenticated) {
       this.initAuth()
     } else {
-      this.check()
-        .then(() => {
-          this.loading = false
-          this.authCheckStatus = true
-          this.showRefreshButton = false
-        })
-        .catch(() => {
-          if (this.$route.name !== 'Login') {
-            // @todo Go to login page
-            this.$router.push({ name: 'Login' }).catch((err) => {
-              console.log(err)
-            })
-          }
-          this.loading = false
-          this.authCheckStatus = false
-          setTimeout(() => {
+      this.check().then(() => {
+        this.loading = false
+        this.authCheckStatus = true
+        this.showRefreshButton = false
+      }).catch(() => {
+        if (this.$route.name !== 'Login') {
+          this.$router.push({ name: 'Login' }).catch((err) => {
+            console.log(err)
             this.showRefreshButton = true
-          }, 10000)
-        })
+          })
+        }
+        this.loading = false
+        this.authCheckStatus = false
+      })
     }
   },
 
   mounted () {
+    if (this.authenticated) {
+      this.sidebarVisible = true
+    }
+
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         // this is a recursive authentication check with 3 tries
@@ -597,26 +599,24 @@ export default {
 
     checkAuth (authTry = 1) {
       if (this.profile !== null) {
-        this.check(true)
-          .then(() => {
-            this.loading = false
-            this.authCheckStatus = true
-            this.showRefreshButton = false
-          })
-          .catch((err) => {
-            console.log(err)
-            authTry++
-            // check if we are authenticated after 3 retries
-            if (authTry > 3) {
-              this.authCheckStatus = false
-              setTimeout(() => {
-                this.showRefreshButton = true
-              }, 10000)
-              this.loading = true
-            } else {
-              this.checkAuth(authTry)
-            }
-          })
+        this.check(true).then(() => {
+          this.loading = false
+          this.authCheckStatus = true
+          this.showRefreshButton = false
+        }).catch((err) => {
+          console.log(err)
+          authTry++
+          // check if we are authenticated after 3 retries
+          if (authTry > 3) {
+            this.authCheckStatus = false
+            setTimeout(() => {
+              this.showRefreshButton = true
+            }, 10000)
+            this.loading = true
+          } else {
+            this.checkAuth(authTry)
+          }
+        })
       }
     },
 
@@ -1244,16 +1244,14 @@ export default {
     },
 
     logout () {
-      this.logoutUser()
-        .then((res) => {
-          this.response = res.data
-          this.$router.push({ name: 'Login' }).catch((err) => {
-            console.log(err)
-          })
-        })
-        .catch((err) => {
+      this.logoutUser().then((res) => {
+        this.response = res.data
+        this.$router.push({ name: 'Login' }).catch((err) => {
           console.log(err)
         })
+      }).catch((err) => {
+        console.log(err)
+      })
     },
 
     beforeUnload () {
@@ -1319,6 +1317,10 @@ export default {
 
       if (!this.authenticated) {
         this.resetCall()
+      }
+
+      if (this.authenticated) {
+        this.sidebarVisible = true
       }
     }
   }

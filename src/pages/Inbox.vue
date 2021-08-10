@@ -1,5 +1,6 @@
 <template>
-  <div class="h-100">
+  <div class="h-100"
+       v-if="authenticated">
     <div class="call-active">
     </div>
     <div class="inbox animate__animated animate__fadeIn position-relative">
@@ -14,10 +15,16 @@
 
 <script>
 import InboxSide from 'components/inbox/inbox-side'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   components: {
     InboxSide
+  },
+
+  computed: {
+    ...mapGetters('auth', ['authenticated']),
+    ...mapState('inbox', ['items', 'activeChannel'])
   },
 
   data () {
@@ -29,10 +36,29 @@ export default {
   },
 
   methods: {
-    toggleContactInfo () {
-      this.contactInfoOpen = !this.contactInfoOpen
+    ...mapActions('inbox', ['setActiveChannel']),
+
+    setChannel () {
+      if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
+        let channel = this.items.find(item => item.value === this.$route.params.channel)
+        this.setActiveChannel(channel)
+      }
+
+      if (['Inbox'].includes(this.$route.name) && !this.activeChannel) {
+        let channel = this.items.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
+      }
+    }
+  },
+
+  mounted () {
+    this.setChannel()
+  },
+
+  watch: {
+    '$route.name': function () {
+      this.setChannel()
     }
   }
-
 }
 </script>

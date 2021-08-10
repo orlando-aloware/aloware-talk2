@@ -3,7 +3,7 @@
     <div class="d-flex h-100 align-items-center">
       <b-link v-if="['Contact'].includes($route.name)" class="btn-header-nav-back mr-3"
               href="#"
-              @click="navigateBackward">
+              @click="navigateToContacts">
         <i class="fa fa-chevron-left"></i>
       </b-link>
 
@@ -109,14 +109,10 @@ export default {
       this.dialerStatus = false
     },
 
-    navigateBackward (e) {
-      if (this.$route.name === 'Contact') {
-        this.$router.push({
-          path: `list/${this.selectedList.id}`
-        })
-      } else {
-        this.goBack()
-      }
+    navigateToContacts (e) {
+      this.$router.push({
+        path: `list/${this.selectedList.id}`
+      })
       e.preventDefault()
     }
   },

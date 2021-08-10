@@ -502,7 +502,7 @@
 
                 <label class="form-control-label mb-1">Notes</label>
                 <div class="d-flex flex-column justify-content-center pb-2 w-100">
-                  <communication-note ref="communication_notes"
+                  <communication-note ref="communicationNotes"
                                       :communication="communication">
                   </communication-note>
                 </div>
@@ -750,12 +750,14 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'callDispositions', 'ringGroups', 'currentCompany']),
+
     hasSMSReminder () {
       if (this.$refs['sms-reminder']) {
         return this.$refs['sms-reminder'].showSendSmsReminderButton()
       }
       return false
     },
+
     hasNotes () {
       return (this.communication.notes ||
         (this.communication.body &&
@@ -771,14 +773,17 @@ export default {
     onBeforeActivityShow () {
       this.activityExpansionClass = ['activity-expanded']
     },
+
     onAfterActivityShow () {
       this.activityExpansionClass.push('expand-animation-finished')
     },
+
     onBeforeActivityHide () {
       if (this.hasNotes) {
         this.activityExpansionClass = ['activity-unexpanded collapsed-has-notes']
       }
     },
+
     onActivityHide () {
       let activityClass = 'activity-unexpanded'
       if (this.hasNotes) {
@@ -786,6 +791,7 @@ export default {
       }
       this.activityExpansionClass = [activityClass]
     },
+
     getCampaign (id) {
       if (!id) {
         return null
@@ -901,6 +907,14 @@ export default {
         this.$emit('contactDisposed')
       } else {
         this.$emit('contactNotDisposed')
+      }
+    }
+  },
+
+  watch: {
+    hasNotes () {
+      if (this.hasNotes && !this.activeName) {
+        this.onActivityHide()
       }
     }
   }

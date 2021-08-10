@@ -6,7 +6,10 @@
       </div>
     </div>
     <div class="d-flex pinned__content flex-column">
-      <contacts-pinned-item v-for="item in pinnedLists" :item="item" :key="item.id"></contacts-pinned-item>
+      <contacts-pinned-item v-for="item in pinnedLists"
+                            :item="item"
+                            :key="item.id">
+      </contacts-pinned-item>
     </div>
   </div>
 </template>

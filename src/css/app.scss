@@ -80,6 +80,11 @@ body,
   left: 300px;
 }
 
+.q-separator--horizontal-inset {
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
 .row {
   &.q-field,
   &.q-field__control-container,
@@ -2783,16 +2788,16 @@ span.mention {
     color: $grey-100;
     box-shadow: none !important;
   }
-}
-
-.btn-outline-dark-primary {
-  color: $primary;
-  @extend .btn-outline-dark;
 
   i {
     font-size: $f-size-body-xl;
     margin-top: -2px;
   }
+}
+
+.btn-outline-dark-primary {
+  color: $primary;
+  @extend .btn-outline-dark;
 }
 
 /*
@@ -2908,6 +2913,10 @@ span.mention {
 
 .height-22 {
   height: 22px;
+}
+
+.height-24 {
+  height: 24px;
 }
 
 .height-28 {
@@ -3192,7 +3201,6 @@ span.mention {
 .current-tasks {
   .options {
     @include font-size(14px, 500);
-    line-height: 17px;
   }
 }
 
@@ -3536,11 +3544,21 @@ span.mention {
     width: 200px;
     height: 150px;
 
+    .w-100 {
+      width: 100%;
+    }
+
+    .add-status {
+      margin-left: 23px;
+      font-size: $f-size-body-xs;
+      color: $grey-90;
+    }
+
     &.small {
       height: 66px;
     }
 
-    .q-btn {
+    .q-btn:not(.merge-btn) {
       & .q-btn__wrapper {
         min-width: 14px;
         min-height: 14px;
@@ -3553,6 +3571,14 @@ span.mention {
 
       & .q-icon {
         font-size: inherit;
+      }
+    }
+
+    .merge-btn {
+      & .q-btn__content {
+        padding: 0 9px;
+        font-size: $f-size-body;
+        line-height: 1;
       }
     }
   }
@@ -3591,7 +3617,12 @@ span.mention {
     background: $white;
 
     .phone-avatar {
-      margin-top: -29px;
+      margin-top: -25px;
+
+      .contact-avatar {
+        font-size: $f-size-body-xxxl;
+        margin: 0;
+      }
     }
 
     .border-bottom {
@@ -3756,6 +3787,12 @@ span.mention {
 
   .btn-sm, .btn-group-sm > .btn {
     @extend .border-half-rounded;
+  }
+
+  .phone-notes {
+    .q-field__inner {
+      justify-content: start !important;
+    }
   }
 
   .phone-expansion {
@@ -4805,12 +4842,12 @@ table.datatable {
         }
 
         a.sorter:before {
-          border-bottom-color: $grey-dark;
+          border-bottom-color: $grey-light10;
           margin-top: -10px;
         }
 
         a.sorter:after {
-          border-top-color: $grey-dark;
+          border-top-color: $grey-light10;
           margin-top: 10px;
           margin-left: -8px;
         }

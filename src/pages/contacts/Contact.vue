@@ -3,7 +3,8 @@
              :opacity="0.85"
              class="h-100"
              variant="white"
-             rounded="sm">
+             rounded="sm"
+             v-if="authenticated">
     <div class="row mx-0 content-row contact-view-wrapper d-flex">
       <template v-if="$route.name != 'Inbox Contact'">
         <contact-list-sidebar></contact-list-sidebar>

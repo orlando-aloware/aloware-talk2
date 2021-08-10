@@ -84,8 +84,7 @@ export default {
       this.setSearch(searchText)
       this.fetch({ search: this.search })
     },
-    fetch (params = {}) {
-      this.isLoading = true
+    processFetch: _.debounce(function (params = {}) {
       params.search = this.search
       return this.$axios
         .get('api/v2/contacts', {
@@ -108,6 +107,10 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    }, 1000),
+    fetch (params = {}) {
+      this.isLoading = true
+      this.processFetch(params)
     },
     buildQueryString (params) {
       const query = {

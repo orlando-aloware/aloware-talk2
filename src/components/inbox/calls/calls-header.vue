@@ -49,8 +49,10 @@
                 emit-value
                 map-options
                 v-model="filterRight"
+                :disable="true"
                 :options="optionsRight"
-                :append="[{icon: 'ion-ios-arrow-down'}]">
+                :append="[{icon: 'ion-ios-arrow-down'}]"
+                @input="sort">
       </q-select>
     </div>
   </div>
@@ -100,15 +102,13 @@ export default {
       optionsRight: [
         {
           label: 'Oldest',
-          value: 'oldest'
+          value: 'oldest',
+          disable: true
         },
         {
           label: 'Newest',
-          value: 'newest'
-        },
-        {
-          label: 'Priority first',
-          value: 'priority'
+          value: 'newest',
+          disable: true
         }
       ],
       filterLeft: 'everything',
@@ -150,6 +150,9 @@ export default {
   methods: {
     search (value) {
       this.$emit('search', value)
+    },
+    sort (value) {
+      this.$emit('sort', value)
     }
   }
 }

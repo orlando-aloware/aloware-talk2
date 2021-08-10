@@ -1,14 +1,16 @@
 <template>
   <div class="d-flex position-relative w-100 flex-column">
-    <q-input outlined
-             dense
+    <q-input :disabled="!hasPermissionTo('note communication') || loadingBtn"
+             :borderless="borderless"
+             :outlined="!borderless"
+             v-model="note"
              type="textarea"
              rows="3"
-             input-class="p-0 pt-1"
+             input-class="p-0 pt-1 flex-grow-1"
+             class="flex-grow-1"
              placeholder="Write notes"
-             ref="communication_notes"
-             v-model="note"
-             :disabled="!hasPermissionTo('note communication') || loadingBtn"
+             ref="communicationNotes"
+             dense
              @input="changeNote">
     </q-input>
     <div class="comm-notes-state d-flex w-100 justify-end">
@@ -19,7 +21,7 @@
       </span>
       <span class="text-muted"
             v-show="!loadingBtn && loading">
-          autosaved
+          saved
       </span>
     </div>
   </div>
@@ -37,6 +39,18 @@ export default {
   props: {
     communication: {
       required: true
+    },
+
+    borderless: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    noAutoSave: {
+      required: false,
+      type: Boolean,
+      default: false
     }
   },
 
@@ -66,7 +80,7 @@ export default {
     },
 
     changeNote: _.debounce(function () {
-      if (this.hasPermissionTo('note communication')) {
+      if (this.hasPermissionTo('note communication') && !this.noAutoSave) {
         this.saveNote()
       }
     }, 2000),
@@ -87,8 +101,8 @@ export default {
         this.$handleErrors(err.response)
         this.loadingBtn = false
       }).then(() => {
-        if (this.$refs.communication_notes) {
-          this.$refs.communication_notes.focus()
+        if (this.$refs.communicationNotes) {
+          this.$refs.communicationNotes.focus()
         }
       })
     }

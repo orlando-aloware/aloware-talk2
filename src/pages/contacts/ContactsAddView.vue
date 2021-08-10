@@ -74,7 +74,7 @@ export default {
             textColor: 'white',
             html
           })
-          this.$router.replace('/contacts')
+          this.$router.replace('/contacts/')
         })
     }
   },

@@ -1,5 +1,6 @@
 <template>
-  <div class="row mx-0 content-row d-flex overflow-hidden h-100 pb-2">
+  <div class="row mx-0 content-row d-flex overflow-hidden h-100 pb-2"
+       v-if="authenticated">
     <div class="col-2 pt-2 pl-2 pr-1 mb-0 h-100">
       <contacts-sidebar></contacts-sidebar>
     </div>
@@ -29,6 +30,7 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Contacts',
@@ -44,6 +46,10 @@ export default {
     ColumnHeaders,
     MoveDialog,
     CreateListModal
+  },
+
+  computed: {
+    ...mapGetters('auth', ['authenticated'])
   }
 }
 </script>

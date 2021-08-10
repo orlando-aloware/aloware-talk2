@@ -16,16 +16,13 @@
         <span v-if="isCallCompleted">Call Ended</span>
         <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
-      <div class="d-flex flex-row justify-content-end align-items-center width-65">
+      <div class="d-flex flex-row justify-content-between align-items-center width-65">
         <pause-record-icon width="14"
                            height="14"
-                           class="mr-2"
                            v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
         </pause-record-icon>
 
-        <ul id="signal-strength"
-            class="mr-2"
-            v-if="!isCallCompleted">
+        <ul id="signal-strength">
           <li class="very-weak">
             <div id="very-weak"
                  class="active">
@@ -50,7 +47,7 @@
 
         <q-btn-dropdown :ripple="false"
                         :menu-offset="[29, 8]"
-                        class="tab-dropdown no-arrow mr-2"
+                        class="tab-dropdown no-arrow"
                         ref="menu"
                         flat>
           <template v-slot:label>
@@ -231,12 +228,15 @@
           <div class="dummy bg-dark w-100 height-36"></div>
           <div class="phone-avatar">
             <avatar :name="contactName"
-                    class="contact-avatar text-size-xxxl"
+                    v-if="!isCallAdding && !isCallAdded"
+                    class="contact-avatar"
                     width="50"
                     height="50">
             </avatar>
+            <participants-icon v-else></participants-icon>
           </div>
-          <div class="phone-info small d-flex flex-column align-items-center">
+          <div class="phone-info small d-flex flex-column align-items-center"
+               v-if="!isCallAdding && !isCallAdded">
             <div class="text-grey-100 text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                             v-if="dialer.contact">
@@ -271,6 +271,67 @@
               </q-item-label>
             </div>
           </div>
+          <div class="phone-info w-100 mt-2 pl-2 pr-2 small d-flex flex-column align-items-start"
+               v-else>
+            <div class="d-flex justify-content-between align-items-center w-100 pr-2">
+              <q-item-label v-if="dialer.contact"
+                            class="cursor-pointer"
+                            @click="openMembers">
+                <div class="d-flex align-items-center">
+                  <ready-icon v-if="!shouldIntroduce"></ready-icon>
+                  <waiting-icon v-else></waiting-icon>
+                  <span class="ml-2 text-size-xxl _600 text-grey-100">{{ contactName | truncate(15) }}</span>
+                </div>
+              </q-item-label>
+              <q-btn :loading="loadingMerge"
+                     :disabled="loadingMerge || !dialer.communication.legc_status || dialer.communication.legc_status !== CommunicationStatus.STATUS_INPROGRESS_NEW"
+                     v-if="shouldIntroduce"
+                     color="success"
+                     class="d-flex align-items-center justify-content-between merge-btn"
+                     label="Merge"
+                     ripple
+                     outline
+                     rounded
+                     no-caps
+                     unelevated
+                     dense
+                     @click="mergeCalls">
+                <merge-icon class="ml-2"></merge-icon>
+              </q-btn>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 w-100 pr-2"
+                 v-if="addedParty">
+              <q-item-label class="cursor-pointer"
+                            @click="openMembers">
+                <div class="d-flex align-items-center">
+                  <ready-icon></ready-icon>
+                  <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty.name | truncate(15) }}</span>
+                </div>
+                <div class="mt-1">
+                  <span class="add-status"
+                        v-if="isCallAdding">
+                    Adding
+                  </span>
+                  <span class="add-status"
+                        v-if="devMode && isCallAdded">
+                    Added
+                  </span>
+                </div>
+              </q-item-label>
+              <q-btn :loading="loadingDropThirdParty"
+                     :disabled="loadingDropThirdParty"
+                     class="height-24"
+                     ripple
+                     round
+                     no-caps
+                     unelevated
+                     @click="dropThirdParty">
+                <drop-participant-icon></drop-participant-icon>
+              </q-btn>
+            </div>
+          </div>
+
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
             <button :disabled="isMuteDisabled"
                     class="phone-buttons btn"
@@ -540,7 +601,7 @@
           <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
             <label class="form-control-label text-grey-90">Notes</label>
             <div class="d-flex align-items-center w-100">
-              <communication-note ref="communication_notes"
+              <communication-note ref="communicationNotes"
                                   :communication="dialer.communication">
               </communication-note>
             </div>
@@ -592,6 +653,67 @@
         </template>
 
         <q-card>
+          <template v-if="bottomExpansion === 'members'">
+            <q-card-section class="height-240">
+              <div class="text-grey-100">
+                <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-start"
+                              v-if="dialer.contact">
+                  <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                </q-item-label>
+                <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start">
+                  <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+                  <b-link href="#"
+                          class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                          @click.prevent="copyPhoneNumber">
+                    <i class="material-icons">content_copy</i>
+                  </b-link>
+                  <input :value="dialer.communication.lead_number"
+                         type="hidden"
+                         id="phone-number-clone"/>
+                </q-item-label>
+                <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
+                              v-if="dialer.contact && dialer.contact.company_name">
+                  <span>{{ dialer.contact.company_name }}</span>
+                  <span class="ml-1 mr-1"
+                        v-if="currentLocalTime">
+                    ·
+                  </span>
+                  <span v-if="currentLocalTime">{{ currentLocalTime }}</span>
+                </q-item-label>
+              </div>
+              <q-separator class="mt-3 mb-3"
+                           inset>
+              </q-separator>
+              <div class="text-grey-100"
+                   v-if="addedParty">
+                <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-start">
+                  <span class="d-inline-flex"
+                        v-if="addedParty.name">
+                    {{ addedParty.name | truncate(15) }}
+                  </span>
+                  <span class="d-inline-flex"
+                        v-else>
+                    {{ addedParty }}
+                  </span>
+                </q-item-label>
+                <div class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
+                     v-if="addedParty.id">
+                  <q-item-label v-if="!addedParty.is_destination"
+                                class="text-size-sm text-grey-90 _400 mt-1">
+                    {{ addedParty.email }} - {{ getLabel(addedParty) }}
+                  </q-item-label>
+                  <q-item-label v-else
+                                class="text-size-sm text-grey-90 _400 mt-1">
+                    {{ getLabel(addedParty) }}
+                  </q-item-label>
+                </div>
+                <div class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
+                     v-else>
+                  <q-item-label class="text-size-sm text-grey-90 _400 mt-1">No other data found for this user.</q-item-label>
+                </div>
+              </div>
+            </q-card-section>
+          </template>
           <template v-if="bottomExpansion === 'integrations'">
             <q-card-section class="height-240">
               <contact-integrations :contact="dialer.contact"
@@ -704,18 +826,31 @@
           </template>
           <template v-if="bottomExpansion === 'notes'">
             <q-card-section class="height-445">
-              <contact-notes :contact="dialer.contact"
-                             :no_title="true"
-                             @update="onNotesUpdate">
-              </contact-notes>
+              <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
+                <div class="d-flex">
+                  <communication-note :communication="dialer.communication"
+                                      :no-auto-save="true"
+                                      class="flex-grow-1 h-100 phone-notes"
+                                      ref="communicationNotes">
+                  </communication-note>
+                </div>
+                <div class="d-flex">
+                  <b-button variant="primary"
+                            size="sm"
+                            block
+                            @click="saveNotes">
+                    <span>Save Notes</span>
+                  </b-button>
+                </div>
+              </div>
+
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'tags'">
             <q-card-section class="height-240">
-              <contact-tags :contact="dialer.contact"
-                            :no_title="true"
-                            @update="onTagsUpdate">
-              </contact-tags>
+              <communication-tags :communication="dialer.communication"
+                                  ref="communicationTags">
+              </communication-tags>
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'scripts'">
@@ -803,28 +938,50 @@
                   </q-list>
                 </div>
                 <div class="d-flex flex-inline">
-                  <div class="d-flex flex-even pl-1 pr-1">
-                    <b-button :loading="loadingAdd"
-                              :disabled="loadingAdd || !addValidated"
-                              variant="outline-dark-primary"
-                              size="sm"
-                              block
-                              @click="addParticipant">
-                      <i class="material-icons-outlined">person_add_alt</i>
-                      <span class="ml-2">Add</span>
-                    </b-button>
+                  <div class="d-flex flex-grow-1">
+                    <div class="d-flex flex-even pl-1 pr-1">
+                      <b-button :loading="loadingAdd"
+                                :disabled="loadingAdd || !addValidated"
+                                variant="outline-dark-primary"
+                                size="sm"
+                                block
+                                @click="addParticipant">
+                        <i class="material-icons-outlined">person_add_alt</i>
+                        <span class="ml-2">Add</span>
+                      </b-button>
+                    </div>
+                    <div class="d-flex flex-even pl-1 pr-1">
+                      <b-button :loading="loadingIntroduce"
+                                :disabled="loadingIntroduce || !introduceValidated"
+                                variant="outline-dark-primary"
+                                size="sm"
+                                block
+                                @click="introduceParticipant">
+                        <i class="material-icons-outlined">people</i>
+                        <span class="ml-2">Introduce</span>
+                      </b-button>
+                    </div>
                   </div>
-                  <div class="d-flex flex-even pl-1 pr-1">
-                    <b-button :loading="loadingIntroduce"
-                              :disabled="loadingIntroduce || !introduceValidated"
-                              variant="outline-dark-primary"
-                              size="sm"
-                              block
-                              @click="introduceParticipant">
-                      <i class="material-icons-outlined">people</i>
-                      <span class="ml-2">Introduce</span>
-                    </b-button>
-                  </div>
+                  <b-button id="add-help"
+                            variant="outline-dark"
+                            class="ml-2 no-border p-0 flex-shrink-1"
+                            size="sm">
+                    <i class="material-icons-outlined">info</i>
+                  </b-button>
+                  <b-popover target="add-help"
+                             placement="topleft"
+                             triggers="hover focus">
+                    <p>
+                      <strong>Add:</strong> Adding a user
+                      <br>
+                      User immediately joins the conversation when he/she answers.
+                    </p>
+                    <p>
+                      <strong>Introduce:</strong> Introducing contact to a user
+                      <br>
+                      Puts the contact on hold and dials the user. Once connected you speak with the user (privately) and then merge both parties using the merge button.
+                    </p>
+                  </b-popover>
                 </div>
               </div>
             </q-card-section>
@@ -1017,8 +1174,6 @@ import TransferIcon from 'components/icons/transfer-icon'
 import UnholdIcon from 'components/icons/unhold-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import PauseRecordIcon from 'components/icons/pause-record-icon'
-import ContactNotes from 'components/contacts/contact-notes'
-import ContactTags from 'components/contacts/contact-tags'
 import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
 import CommunicationAudio from 'components/communication-audio'
@@ -1033,17 +1188,28 @@ import ScriptSelector from 'components/generic-selectors/script-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
 import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
+import ParticipantsIcon from 'components/icons/participants-icon'
+import ReadyIcon from 'components/icons/ready-icon'
+import DropParticipantIcon from 'components/icons/drop-participant-icon'
+import WaitingIcon from 'components/icons/waiting-icon'
+import MergeIcon from 'components/icons/merge-icon'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import * as AnswerTypes from 'src/constants/answer-types'
 
 export default {
   name: 'phone',
 
   components: {
+    MergeIcon,
+    WaitingIcon,
+    DropParticipantIcon,
+    ReadyIcon,
+    ParticipantsIcon,
     AvailableUserSelector,
     RingGroupSelector,
     VmDropSelector,
@@ -1058,8 +1224,6 @@ export default {
     CommunicationAudio,
     VmDropIcon,
     IntegrationsIcon,
-    ContactTags,
-    ContactNotes,
     PauseRecordIcon,
     UnmuteIcon,
     UnholdIcon,
@@ -1168,7 +1332,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -1212,6 +1376,10 @@ export default {
 
     isCallAdded () {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
+    },
+
+    isCallAdding () {
+      return this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_RINGING_NEW
     },
 
     transferValidated () {
@@ -1274,6 +1442,8 @@ export default {
           return 'VM Drop'
         case 'more':
           return 'More'
+        case 'members':
+          return 'Members'
         default:
           return ''
       }
@@ -1515,6 +1685,14 @@ export default {
       }, 50)
     },
 
+    openMembers () {
+      this.expansionEnabled = true
+      this.bottomExpansion = 'members'
+      setTimeout(() => {
+        this.expanded = true
+      }, 50)
+    },
+
     openContact ($event) {
       this.saveAndResetExpansion($event)
       this.goToContact()
@@ -1536,14 +1714,8 @@ export default {
       }
       this.expansionEnabled = false
       this.expanded = false
-    },
-
-    onNotesUpdate (contact) {
-      this.setDialerContact(contact)
-    },
-
-    onTagsUpdate (tags) {
-      this.setDialerContactTags(tags)
+      this.resetAdd()
+      this.resetTransfer()
     },
 
     toggleRecordingStatus () {
@@ -1859,12 +2031,51 @@ export default {
     introduceParticipant ($event) {
       this.loadingAdd = true
       this.add.introduce = true
-      this.$VueEvent.fire('introduceParticipant', this.add)
+      this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
       setTimeout(() => {
         this.loadingAdd = false
       }, 1000)
+    },
+
+    dropThirdParty () {
+      this.loadingDropThirdParty = true
+      this.$VueEvent.fire('dropThirdParty')
+      setTimeout(() => {
+        this.loadingDropThirdParty = false
+      }, 1000)
+    },
+
+    mergeCalls () {
+      this.loadingMerge = true
+      this.$VueEvent.fire('mergeCalls')
+      setTimeout(() => {
+        this.loadingMerge = false
+      }, 1000)
+    },
+
+    saveNotes () {
+      if (this.$refs.communicationNotes) {
+        this.$refs.communicationNotes.saveNote()
+      }
+    },
+
+    getLabel (user) {
+      if (!user) {
+        return
+      }
+
+      switch (user.answer_by) {
+        case AnswerTypes.BY_PHONE_NUMBER:
+          return 'Phone Number (' + user.phone_number + ')'
+        case AnswerTypes.BY_BROWSER:
+          return 'Apps'
+        case AnswerTypes.BY_IP_PHONE:
+          return 'SIP (IP Phone)'
+        case AnswerTypes.BY_NONE:
+          return 'Will Not Answer'
+      }
     },
 
     ...mapActions([
@@ -1940,7 +2151,9 @@ export default {
           }
 
           if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
-            this.screen = 'menu'
+            setTimeout(() => {
+              this.screen = 'menu'
+            }, 5000)
           }
           break
         case 'GOT_ERROR':

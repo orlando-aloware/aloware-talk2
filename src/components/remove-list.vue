@@ -86,7 +86,7 @@ export default {
         .then((response) => {
           this.foldersLoaded(response)
           if (String(this.$route.params.id) === String(this.listToRemove.id)) {
-            this.$router.history.replace('/contacts')
+            this.$router.history.replace('/contacts/')
           }
         })
         .catch((_err) => {
