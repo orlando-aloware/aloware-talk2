@@ -20,7 +20,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as Roles from 'src/constants/roles'
 import _ from 'lodash'
-import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -94,15 +93,6 @@ export default {
       })
     },
 
-    onDispose () {
-      this.isBusy = true
-      talk2Api.V1.contact.dispose(this.contact.id, { 'disposition_status': this.contact.disposition_status_id }).then(response => {
-        this.setContact(response.data)
-      }).finally(() => {
-        this.isBusy = false
-      })
-    },
-
     ...mapActions('contacts', ['setContact'])
   },
 
@@ -110,7 +100,6 @@ export default {
     'contact.disposition_status_id': function () {
       if (this.contact && this.contact.id) {
         this.$emit('select', this.contact.disposition_status_id)
-        // this.onDispose()
       }
     }
   }

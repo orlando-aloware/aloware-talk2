@@ -225,17 +225,18 @@ export default {
 
     this.$VueEvent.listen('contact_updated', (data) => {
       // check data loaded
-      let updatedContact = _.get(this, 'contact', {})
-      for (let index in data) {
-        if (index === 'communications_and_audits') {
-          continue
+      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
+        let updatedContact = _.get(this, 'contact', {})
+        for (let index in data) {
+          if (index === 'communications_and_audits') {
+            continue
+          }
+          updatedContact[index] = data[index]
         }
-        updatedContact[index] = data[index]
-      }
-      if (this.contact && this.contact.id === data.id) {
+
         this.updateSelectedContact(updatedContact)
+        this.updateContacts(updatedContact)
       }
-      this.updateContacts(updatedContact)
     })
 
     this.$VueEvent.listen('contact_audit_created', (data) => {
@@ -523,7 +524,6 @@ export default {
 
     resetSelectedContact () {
       this.source = this.CancelToken.source()
-      this.setContact(this.selectedContact)
       this.contactId = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null
@@ -841,12 +841,10 @@ export default {
       }
     },
 
-    processFetchContactInfo () {
-      this.selectedContactChanging(true)
+    processFetchContactInfo (callback) {
       this.loadingContactInProgress()
-      this.fetchContactInfo().then(res => {
-        this.processFetchedContactInfo(res.data)
-        this.selectedContactChanging(false)
+      return this.fetchContactInfo().then(res => {
+        this.processFetchedContactInfo(res.data, callback)
       }).catch(() => {
         this.loadingContactsFailed()
       })
@@ -867,7 +865,7 @@ export default {
       }
     },
 
-    processFetchedContactInfo (selectedContact) {
+    processFetchedContactInfo (selectedContact, callback) {
       selectedContact.tag_ids = selectedContact.tags.map((tag) => tag.id)
       this.messageObject.contact = selectedContact
       this.contact.first_name = selectedContact.first_name
@@ -876,9 +874,9 @@ export default {
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contact_id)
-      this.setContact(selectedContact)
-      this.setContactClone(selectedContact)
-      this.resetChangedContactProperties()
+      if (typeof callback !== 'undefined') {
+        callback(selectedContact)
+      }
     },
 
     loadingContactsFailed () {

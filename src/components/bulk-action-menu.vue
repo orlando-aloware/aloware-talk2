@@ -76,12 +76,12 @@ export default {
 <style scoped lang="scss">
   .bulk-action-menu{
     margin-left: 34px;
-    margin-top: 55px;
+    margin-top: 49px;
     position: absolute;
     z-index: 9;
     background: white;
-    height: 33px !important;
-    padding: 7px 10px;
+    height: 35px !important;
+    padding: 8px 10px;
     width: 95% !important;
   }
   .menu-actions a{
