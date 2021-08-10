@@ -170,6 +170,16 @@
       </td>
 
       <td
+        class="text-center"
+        :key="column.name"
+        v-else-if="column.name === 'created_at'"
+      >
+        <span>
+          {{ contact.created_at | fixDate }}
+        </span>
+      </td>
+
+      <td
         class="text-center datatable-row__actions"
         :key="column.name"
         v-else-if="column.name === 'actions'"
@@ -242,7 +252,7 @@
         </div>
         <div class="text-center"
              v-else-if="column.name.includes('_at') || column.name.includes('date')">
-          {{ contact[column.name] | fixDateTime }}
+          {{ contact[column.name] | fixFullDateTime }}
         </div>
         <div class="text-center"
              v-else>

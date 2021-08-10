@@ -7,7 +7,7 @@
     <table :class="computedClass" ref="table">
       <thead>
         <draggable
-          :list="columns"
+          :list="fixedColumns"
           tag="tr"
           ghost-class="ghost"
           handle=".handle"
@@ -15,7 +15,7 @@
           :move="onCheckMove"
         >
           <th
-            v-for="column in columns"
+            v-for="column in fixedColumns"
             :key="column.name"
             :data-column-id="column.name"
             :class="{
@@ -91,7 +91,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import draggable from 'vuedraggable'
+import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
+import { DEFAULT_COLUMNS } from 'src/constants/contacts-list-types'
 
 let column
 let scrollTimeout
@@ -127,10 +130,10 @@ export default {
       this.$emit('checked', evt.target.checked)
     },
     onOrderChanged ({ oldIndex, newIndex }) {
-      const columns = [...this.columns]
+      const columns = [...this.fixedColumns]
 
-      columns[oldIndex] = this.columns[newIndex]
-      columns[newIndex] = this.columns[oldIndex]
+      columns[oldIndex] = this.fixedColumns[newIndex]
+      columns[newIndex] = this.fixedColumns[oldIndex]
 
       this.$emit('reordered', [...columns])
     },
@@ -172,6 +175,13 @@ export default {
     }
   },
   computed: {
+    ...mapState(['currentCompany']),
+    defaultContactDateFilter () {
+      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+        return 'created_at'
+      }
+      return 'last_engagement_at'
+    },
     computedClass () {
       return {
         datatable: true,
@@ -181,6 +191,18 @@ export default {
     },
     hasEmptySlot () {
       return !!this.$slots.empty
+    },
+    fixedColumns () {
+      let newItems = JSON.parse(JSON.stringify(this.columns))
+      // now, check if columns have order property, or
+      // check if column is required then update sortable.
+      for (let index in newItems) {
+        let found = DEFAULT_COLUMNS.find(col => col.name === newItems[index].name)
+        if (found && found.required) {
+          newItems[index].sortable = found.sortable
+        }
+      }
+      return newItems
     }
   },
   props: {
@@ -208,6 +230,8 @@ export default {
       // this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
+    this.sorts.orderBy = this.defaultContactDateFilter
+    this.sorts.order = 'desc'
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },
