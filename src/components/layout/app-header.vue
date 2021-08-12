@@ -110,9 +110,15 @@ export default {
     },
 
     navigateToContacts (e) {
-      this.$router.push({
-        path: `list/${this.selectedList.id}`
-      })
+      if (this.selectedList.id.toString() === 'all') {
+        this.$router.push({
+          name: 'Contacts'
+        })
+      } else {
+        this.$router.push({
+          path: `list/${this.selectedList.id}`
+        })
+      }
       e.preventDefault()
     }
   },

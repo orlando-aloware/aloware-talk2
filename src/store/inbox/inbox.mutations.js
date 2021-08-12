@@ -18,5 +18,11 @@ export default {
   },
   SET_ACTIVE_CHANNEL: (state, channel) => {
     state.activeChannel = channel
+  },
+  SET_OPEN_TASK_COUNT: (state, count) => {
+    state.openTaskCount = count
+  },
+  SET_PENDING_TASK_COUNT: (state, count) => {
+    state.pendingTaskCount = count
   }
 }

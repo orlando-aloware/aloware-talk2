@@ -60,6 +60,7 @@ export default {
           if (response.type === DYNAMIC) {
             filters = response.filters
           }
+          console.log(filters)
           this.setCurrentListFilters(filters)
         })
         .catch((error) => {

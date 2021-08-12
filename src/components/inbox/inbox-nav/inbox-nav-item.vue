@@ -32,8 +32,8 @@
         </div>
         <span class="count-label"
               v-if="value === 'inbox'">
-        <span class="open-count border-right">{{ openCount }}</span>
-        <span class="pending-count ml-2">{{ pendingCount }}</span>
+        <span class="open-count border-right pr-2">{{ openCount | numberPlusFormatter(99) }}</span>
+        <span class="pending-count ml-2">{{ pendingCount | numberPlusFormatter(99) }}</span>
       </span>
         <refresh-icon :isActive="isActive"
                       v-if="value === 'inbox'"/>

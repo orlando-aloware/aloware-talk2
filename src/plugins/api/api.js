@@ -1,5 +1,6 @@
 let suffixV1 = '/api/v1/'
 let suffixV2 = '/api/v2/'
+import qs from 'qs'
 
 export default {
   V1: {
@@ -188,9 +189,12 @@ export default {
     }
   },
   V2: {
-    contact: {
-      getRingGroups (id) {
-        return window.axios.get(`/api/v2/contact/${id}/ring-groups`)
+    contacts: {
+      get (id) {
+        return window.axios.get(`/api/v2/contacts/${id}`)
+      },
+      list (params) {
+        return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify })
       }
     },
     contactFolders: {
