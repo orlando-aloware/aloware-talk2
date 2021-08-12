@@ -22,5 +22,11 @@ export default {
   },
   setPendingTaskCount: ({ commit }, count = 0) => {
     commit('SET_PENDING_TASK_COUNT', count)
+  },
+  setContacts: ({ commit }, contacts) => {
+    commit('SET_CONTACTS', contacts)
+  },
+  setSelectedContact: ({ commit }, contact) => {
+    commit('SET_SELECTED_CONTACT', contact)
   }
 }
