@@ -143,7 +143,7 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: DEFAULT_COLUMNS
+      currentColumns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
     }
   },
   methods: {
@@ -158,22 +158,42 @@ export default {
       return name === 'checkbox' || name === 'actions'
     },
     onClickedColumn (column, selected) {
-      if (column.required) return
+      if (column.required) {
+        return
+      }
       if (selected) {
         this.currentColumns = this.currentColumns.filter(
           (c) => c.name !== column.name
         )
       } else {
-        const lastIndex = this.currentColumns.length - 1
-        const lastItem = this.currentColumns[lastIndex]
-        const newItems = []
-        for (let i = 0; i < this.currentColumns.length; i++) {
-          if (i === lastIndex) {
-            newItems[lastIndex] = column
-            newItems[lastIndex + 1] = lastItem
-          } else {
-            newItems[i] = this.currentColumns[i]
+        let newItems = JSON.parse(JSON.stringify(this.currentColumns))
+
+        // now, check if columns have order property, or
+        // check if column is required then update the sortable property.
+        for (let index in newItems) {
+          let found = DEFAULT_COLUMNS.find(col => col.name === newItems[index].name)
+          if (newItems[index].name !== 'checkbox' && typeof newItems[index].order === 'undefined' && found) {
+            newItems[index].order = found.order
           }
+        }
+
+        // insert the column to the nearest existing neighboring column.
+        let lesserOrder = newItems.find(col => col.order < column.order)
+        let lesserOrderIndex = lesserOrder ? newItems.indexOf(lesserOrder) : null
+        let greaterOrder = newItems.find(col => col.order > column.order)
+        let greaterOrderIndex = greaterOrder ? newItems.indexOf(greaterOrder) : null
+        if (greaterOrderIndex !== -1 && greaterOrderIndex !== null) {
+          newItems.splice(greaterOrderIndex, 0, column)
+        } else {
+          newItems.splice((lesserOrderIndex + 1), 0, column)
+        }
+
+        // correct the actions order, should always be at the last.
+        let actions = newItems.find(column => column.label === 'Actions')
+        let actionsIndex = actions ? newItems.indexOf(actions) : null
+        if (actionsIndex !== -1 && actionsIndex !== null && actionsIndex < (newItems.length - 1)) {
+          newItems.splice(actionsIndex, 1)
+          newItems.splice(actions.order, 0, actions)
         }
         this.currentColumns = newItems
       }

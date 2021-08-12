@@ -6,7 +6,7 @@
              rounded="sm"
              v-if="authenticated">
     <div class="row mx-0 content-row contact-view-wrapper d-flex">
-      <template v-if="$route.name != 'Inbox Contact'">
+      <template v-if="!isInbox">
         <contact-list-sidebar></contact-list-sidebar>
       </template>
       <div :class="`contact-activity-wrapper ${widthClass}`">
@@ -71,11 +71,14 @@ export default {
     ...mapGetters('auth', ['authenticated']),
 
     widthClass () {
-      if (this.$route.name === 'Inbox Contact') {
+      if (this.isInbox) {
         return 'w-less-330px'
       }
 
       return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
+    },
+    isInbox () {
+      return ['Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name)
     }
   },
 
@@ -109,7 +112,7 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
-      if (['Contact', 'Inbox Contact'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()

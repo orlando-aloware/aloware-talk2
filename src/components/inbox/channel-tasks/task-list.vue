@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import TaskItem from 'components/icons/inbox/task-item'
+import TaskItem from 'components/inbox/channel-tasks/task-item'
 
 export default {
   name: 'task-list',

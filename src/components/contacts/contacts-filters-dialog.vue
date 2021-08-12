@@ -56,37 +56,11 @@ export default {
     ...mapState('contacts', ['isFiltersOpen', 'filters'])
   },
   methods: {
-    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters']),
-    getFilters: function () {
-      this.$axios
-        .get('/api/v2/contacts/filters')
-        .then((response) => response.data.filters)
-        .then(this.setFilters)
-        .finally(() => {
-          this.show = false
-        })
-        .catch((err) => {
-          console.error(err)
-          this.$q.notify({
-            message: 'Unable to load filters please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
-        })
-    }
+    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters'])
   },
   mounted () {
     this.$refs.modal.$on('hide', () => {
       this.closeFilters()
-    })
-    this.$refs.modal.$on('show', () => {
-      // load filters here...
-      this.getFilters()
     })
   },
   watch: {

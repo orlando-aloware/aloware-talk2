@@ -182,6 +182,7 @@ export default {
       loadingScripts: false,
       loadingTemplates: false,
       loadingBroadcasts: false,
+      loadingFilters: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -837,6 +838,24 @@ export default {
       }
     },
 
+    getFilters: function () {
+      if (this.hasPermissionTo('list filter')) {
+        this.loadingFilters = true
+        this.$axios
+          .get('/api/v2/contacts/filters')
+          .then(response => {
+            this.loadingFilters = false
+            this.setFilters(response.data.filters)
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.error(err)
+            this.loadingFilters = false
+            return Promise.reject()
+          })
+      }
+    },
+
     async initAccount () {
       if (this.profile) {
         this.$Sentry.configureScope((scope) => {
@@ -860,6 +879,7 @@ export default {
         let getCallDispositions = this.getCallDispositions()
         let getTemplates = this.getTemplates()
         let getBroadcasts = this.getBroadcasts()
+        let getFilters = this.getFilters()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -870,7 +890,8 @@ export default {
           getDispositionStatuses,
           getCallDispositions,
           getTemplates,
-          getBroadcasts
+          getBroadcasts,
+          getFilters
         ])
       }
     },
@@ -1277,7 +1298,8 @@ export default {
       'setDialerDeal',
       'setDialerContact',
       'setDialerCurrentNumber',
-      'setDialerIsMuted'
+      'setDialerIsMuted',
+      'setFilters'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
     ...mapActions('inbox', ['resetInboxVuex']),

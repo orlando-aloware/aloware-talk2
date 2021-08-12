@@ -4,81 +4,85 @@
     class="scrollableArea position-relative d-flex flex-column h-100"
     :class="{ 'overflow-hidden': isEmpty }"
   >
-    <table :class="computedClass" ref="table">
-      <thead>
-        <draggable
-          :list="columns"
-          tag="tr"
-          ghost-class="ghost"
-          handle=".handle"
-          @change="onOrderChanged"
-          :move="onCheckMove"
-        >
-          <th
-            v-for="column in columns"
-            :key="column.name"
-            :data-column-id="column.name"
-            :class="{
-              checkbox: column.name === 'checkbox',
-              sticky: column.sticky
-            }"
-            :style="{
-              maxWidth: column.maxWidth ? `${column.maxWidth}px` : '',
-              minWidth: column.minWidth ? `${column.minWidth}px` : ''
-            }"
+    <b-overlay
+      class="table-more-rows-spinner"
+      :class="[!isLoadingMore ? 'z-index-0' : '']"
+      :show="isLoadingMore"
+      rounded="sm"
+    >
+      <template #overlay>
+        <q-spinner-bars color="primary" size="20px" />
+      </template>
+    </b-overlay>
+    <div class="w-100">
+      <table :class="computedClass" ref="table">
+        <thead>
+          <draggable
+            :list="fixedColumns"
+            tag="tr"
+            ghost-class="ghost"
+            handle=".handle"
+            @change="onOrderChanged"
+            :move="onCheckMove"
           >
-            <input
-              class="data-table-check-all"
-              ref="dataTableCheckAll"
-              type="checkbox"
-              v-if="column.name === 'checkbox'"
-              @change="onCheckboxClicked"
-            />
-            <template v-if="column.name && column.name !== 'checkbox'">
-              <span :class="{ handle: column.draggable }"
-                ><i
-                  class="fa fa-bars mr-2 text-muted"
-                  v-if="column.draggable"
-                ></i>
-                {{ column.label }}</span
-              >
-              <a
-                href="#"
-                class="sorter"
-                :class="{
-                  'sorter-asc':
-                    sorts.order === 'asc' && sorts.orderBy === column.name,
-                  'sorter-desc':
-                    sorts.order === 'desc' && sorts.orderBy === column.name
-                }"
-                v-if="column.sortable"
-                @click.prevent="onColumnSort(column)"
-              ></a>
-              <div
-                class="tableResizer"
-                :data-resizer-id="column.name"
-                v-if="column.resizable"
-                @mousedown="onResizerMouseDown"
-              >
-                {{ column.label }}
-              </div>
-            </template>
-          </th>
-        </draggable>
-      </thead>
-      <tbody>
-        <slot name="tbody" />
-      </tbody>
-    </table>
-    <div class="relative py-5 flex-1" v-b-visible.100="onVisibilityChanged">
-      <b-overlay
-        :show="isLoadingMore"
-        rounded="sm"
-      >
-        <template #overlay>
-          <q-spinner-bars color="primary" size="20px" />
-        </template>
-      </b-overlay>
+            <th
+              v-for="column in fixedColumns"
+              :key="column.name"
+              :data-column-id="column.name"
+              :class="{
+                checkbox: column.name === 'checkbox',
+                sticky: column.sticky
+              }"
+              :style="{
+                maxWidth: column.maxWidth ? `${column.maxWidth}px` : '',
+                minWidth: column.minWidth ? `${column.minWidth}px` : ''
+              }"
+            >
+              <input
+                class="data-table-check-all"
+                ref="dataTableCheckAll"
+                type="checkbox"
+                v-if="column.name === 'checkbox'"
+                @change="onCheckboxClicked"
+              />
+              <template v-if="column.name && column.name !== 'checkbox'">
+                <span :class="{ handle: column.draggable }"
+                  ><i
+                    class="fa fa-bars mr-2 text-muted"
+                    v-if="column.draggable"
+                  ></i>
+                  {{ column.label }}</span
+                >
+                <a
+                  href="#"
+                  class="sorter"
+                  :class="{
+                    'sorter-asc':
+                      sorts.order === 'asc' && sorts.orderBy === column.name,
+                    'sorter-desc':
+                      sorts.order === 'desc' && sorts.orderBy === column.name
+                  }"
+                  v-if="column.sortable"
+                  @click.prevent="onColumnSort(column)"
+                ></a>
+                <div
+                  class="tableResizer"
+                  :data-resizer-id="column.name"
+                  v-if="column.resizable"
+                  @mousedown="onResizerMouseDown"
+                >
+                  {{ column.label }}
+                </div>
+              </template>
+            </th>
+          </draggable>
+        </thead>
+        <tbody>
+          <slot name="tbody" />
+        </tbody>
+      </table>
+      <div class="relative py-5 flex-1 w-100" v-b-visible.100="onVisibilityChanged">
+      </div>
     </div>
 
     <template v-if="hasEmptySlot && isEmpty">
@@ -91,7 +95,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import draggable from 'vuedraggable'
+import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
+import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
 
 let column
 let scrollTimeout
@@ -127,10 +134,10 @@ export default {
       this.$emit('checked', evt.target.checked)
     },
     onOrderChanged ({ oldIndex, newIndex }) {
-      const columns = [...this.columns]
+      const columns = [...this.fixedColumns]
 
-      columns[oldIndex] = this.columns[newIndex]
-      columns[newIndex] = this.columns[oldIndex]
+      columns[oldIndex] = this.fixedColumns[newIndex]
+      columns[newIndex] = this.fixedColumns[oldIndex]
 
       this.$emit('reordered', [...columns])
     },
@@ -172,6 +179,13 @@ export default {
     }
   },
   computed: {
+    ...mapState(['currentCompany']),
+    defaultContactDateFilter () {
+      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+        return 'created_at'
+      }
+      return 'last_engagement_at'
+    },
     computedClass () {
       return {
         datatable: true,
@@ -181,6 +195,25 @@ export default {
     },
     hasEmptySlot () {
       return !!this.$slots.empty
+    },
+    fixedColumns () {
+      let newItems = JSON.parse(JSON.stringify(this.columns))
+      // now, check if columns have order, label, maxWidth or minWidth property, or
+      // check if column is required then update sortable.
+      for (let index in newItems) {
+        let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+        if (found && found.required) {
+          newItems[index].sortable = found.sortable
+        }
+        if (found) {
+          newItems[index].label = found.label
+          newItems[index].default = found.default
+          newItems[index].sortable = found.sortable
+          newItems[index].maxWidth = found.maxWidth
+          newItems[index].minWidth = found.minWidth
+        }
+      }
+      return newItems
     }
   },
   props: {
@@ -208,6 +241,8 @@ export default {
       // this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
+    this.sorts.orderBy = this.defaultContactDateFilter
+    this.sorts.order = 'desc'
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },

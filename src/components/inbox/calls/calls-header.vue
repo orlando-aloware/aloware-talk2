@@ -49,7 +49,6 @@
                 emit-value
                 map-options
                 v-model="filterRight"
-                :disable="true"
                 :options="optionsRight"
                 :append="[{icon: 'ion-ios-arrow-down'}]"
                 @input="sort">
@@ -103,12 +102,12 @@ export default {
         {
           label: 'Oldest',
           value: 'oldest',
-          disable: true
+          disable: false
         },
         {
           label: 'Newest',
           value: 'newest',
-          disable: true
+          disable: false
         }
       ],
       filterLeft: 'everything',

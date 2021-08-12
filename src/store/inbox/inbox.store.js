@@ -63,6 +63,8 @@ export default function () {
         answerStatus: 'recorded'
       }
     ],
-    communications: []
+    communications: [],
+    openTaskCount: 0,
+    pendingTaskCount: 0
   }
 }

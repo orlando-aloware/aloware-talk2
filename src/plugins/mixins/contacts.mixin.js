@@ -1,4 +1,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
+import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import qs from 'qs'
 import _ from 'lodash'
 
@@ -17,7 +19,9 @@ export default {
       myContacts: false,
       ContactListType: { STATIC, DYNAMIC },
       initialListFilters: null,
-      filtersCount: 0
+      filtersCount: 0,
+      DefaultContactDateFilter,
+      ContactListTypes
     }
   },
 
@@ -111,6 +115,10 @@ export default {
         })
     }, 1000),
     fetch (params = {}) {
+      const sort = _.get(params, 'sort', this.defaultContactDateFilter)
+      const order = _.get(params, 'order', 'desc')
+      params.sort = sort
+      params.order = order
       this.isLoading = true
       this.processFetch(params)
     },
@@ -132,6 +140,20 @@ export default {
 
       query.filter_groups = []
 
+      if (this.lists[this.id].type === ContactListTypes.STATIC) {
+        query.filter_groups = [
+          {
+            filters: {
+              contact_lists: {
+                value: [this.id],
+                operator: 1
+              }
+            },
+            is_conjunction: true
+          }
+        ]
+      }
+
       if (!_.isEmpty(filters)) {
         query.filter_groups.push({
           is_conjunction: true,
@@ -151,7 +173,6 @@ export default {
       return query
     },
     getFiltersCount (filters) {
-      console.log('filters: ', filters)
       let filtersCount = 0
       if (filters.length) {
         for (let group of filters) {
@@ -188,6 +209,13 @@ export default {
     ...mapState('contacts', ['search']),
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
+    ...mapState(['currentCompany']),
+    defaultContactDateFilter () {
+      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+        return 'created_at'
+      }
+      return 'last_engagement_at'
+    },
     hasMore () {
       return (
         this.listItems[this.id].next_page_url &&
