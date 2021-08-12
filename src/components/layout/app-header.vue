@@ -28,7 +28,7 @@
         <q-item>
           <q-btn :ripple="false"
                  :icon="dialerIcon"
-                 :disable="!dialer.isReady"
+                 :disable="!isDialerReady"
                  size="40px"
                  padding="none"
                  align="center"
@@ -84,7 +84,11 @@ export default {
   computed: {
     ...mapGetters('auth', ['authenticated']),
     ...mapState('contacts', ['selectedList']),
-    ...mapState(['dialer'])
+    ...mapState(['dialer']),
+
+    isDialerReady () {
+      return !this.dialer.call && this.dialer.isReady
+    }
   },
 
   created () {
