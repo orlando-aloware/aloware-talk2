@@ -1,6 +1,6 @@
 <template>
   <tr class="datatable-row">
-    <template v-for="column in columns">
+    <template v-for="column in fixedColumns">
       <td
         :key="column.name"
         class="text-center align-middle datatable-row__checkbox"
@@ -49,8 +49,12 @@
         v-else-if="column.name === 'phone_number'"
         class="datatable-row__phone"
       >
-        <span>
+        <span v-if="contact.phone_number">
           {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+        </span>
+        <span class="ml-1 text-grey-7 text-center"
+              v-else>
+          -
         </span>
       </td>
 
@@ -70,7 +74,7 @@
           <span class="text-muted">no tags available</span>
         </template>
         <template v-if="Array.isArray(contact.tags) && contact.tags.length">
-          <span
+          <div
             :id="`popover-tags-${contact.id}`"
             class="d-flex align-items-center contact-tags-item"
             v-if="contact.id"
@@ -88,10 +92,10 @@
                   v-if="contact.tags.length > 1">
               +{{ (contact.tags.length - 1) }} more
             </span>
-          </span>
+          </div>
           <b-popover
             triggers="hover"
-            placement="left"
+            placement="topright"
             boundary="window"
             :target="`popover-tags-${contact.id}`"
             v-if="contact.id && hasTargetTags"
@@ -123,6 +127,9 @@
           v-if="contact.unread_voicemail_count > 0">
           {{ contact.unread_count }}
         </span>
+        <span v-else>
+          {{ contact.unread_voicemail_count }}
+        </span>
       </td>
 
       <td
@@ -133,6 +140,9 @@
         <span
           class="badge badge-danger"
           v-if="contact.unread_voicemail_count > 0">
+          {{ contact.unread_missed_call_count }}
+        </span>
+        <span v-else>
           {{ contact.unread_missed_call_count }}
         </span>
       </td>
@@ -147,10 +157,13 @@
           v-if="contact.unread_voicemail_count > 0">
           {{ contact.unread_voicemail_count }}
         </span>
+        <span v-else>
+          {{ contact.unread_voicemail_count }}
+        </span>
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'text_authorized_at'"
       >
@@ -170,7 +183,7 @@
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'created_at'"
       >
@@ -211,16 +224,25 @@
              v-if="contact[column.name] === null || contact[column.name] === 'NULL' || ( contact[column.name] instanceof Array && !contact[column.name].length)">
           -
         </div>
-        <div class="text-center"
+        <div class="text-left"
              v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
           <span :id="`${column.name}-${contact.id}`"
                 v-if="contact[column.name].length > 0">
-            {{ contact[column.name][0].name }}
+            <span v-if="typeof contact[column.name][0].phone_number !== 'undefined'">
+              {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
+            </span>
+            <span v-else>
+              {{ contact[column.name][0].name }}
+            </span>
+            <span class="ml-1 text-grey-7"
+                  v-if="contact[column.name].length > 1">
+              +{{ (contact[column.name].length - 1) }} more
+            </span>
           </span>
           <b-popover
             :target="`${column.name}-${contact.id}`"
             triggers="hover"
-            placement="left"
+            placement="topright"
             boundary="window"
             v-if="contact[column.name].length > 0 && hasTargetArrays(column.name)"
           >
@@ -233,32 +255,32 @@
               :id="`${column.name}-${contact.id}`"
               :key="`${column.name}-${index}`"
             >
-              {{ item.name }}
+              <span v-if="typeof item.phone_number !== 'undefined'">
+                {{ item.phone_number | fixPhone('NATIONAL', true) }}
+              </span>
+              <span v-else>
+                {{ item.name }}
+              </span>
             </span>
           </b-popover>
-          <span class="ml-1 text-grey-7"
-                v-if="contact[column.name].length > 1">
-            +{{ (contact[column.name].length - 1) }} more
-          </span>
           <span v-if="contact[column.name].length === 0">
             -
           </span>
         </div>
-        <div class="text-center"
+        <div class="text-left"
              v-else-if="contact[column.name] && contact[column.name] instanceof Object">
           <span>
             {{ contact[column.name].name }}
           </span>
         </div>
-        <div class="text-center"
+        <div class="text-left"
              v-else-if="column.name.includes('_at') || column.name.includes('date')">
           {{ contact[column.name] | fixFullDateTime }}
         </div>
-        <div class="text-center"
+        <div :class="[isCountField(column.name) ? 'text-center' : 'text-left']"
              v-else>
           {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
-            (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() :
-              (contact[column.name] === 0 ? '' : contact[column.name]) ) }}
+            (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : contact[column.name]) }}
         </div>
       </td>
     </template>
@@ -269,6 +291,7 @@
 import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
+import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -293,7 +316,19 @@ export default {
 
   data () {
     return {
-      moment
+      moment,
+      countFields: [
+        'unread_count',
+        'unread_missed_call_count',
+        'unread_voicemail_count',
+        'inbound_calls_count',
+        'inbound_texts_count',
+        'inbound_communications_count',
+        'outbound_calls_count',
+        'outbound_texts_count',
+        'outbound_communications_count',
+        'communications_count'
+      ]
     }
   },
 
@@ -302,11 +337,31 @@ export default {
     ...mapState(['campaigns']),
     hasTargetTags () {
       return document.getElementById(`popover-tags-${this.contact.id}`)
+    },
+    fixedColumns () {
+      let newItems = JSON.parse(JSON.stringify(this.columns))
+      // now, check if columns have order, label, maxWidth or minWidth property, or
+      // check if column is required then update sortable.
+      for (let index in newItems) {
+        let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+        if (found && found.required) {
+          newItems[index].sortable = found.sortable
+        }
+        if (found) {
+          newItems[index].label = found.label
+          newItems[index].maxWidth = found.maxWidth
+          newItems[index].minWidth = found.minWidth
+        }
+      }
+      return newItems
     }
   },
 
   methods: {
     ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
+    isCountField (columnName) {
+      return this.countFields.includes(columnName)
+    },
     hasTargetArrays (name) {
       return document.getElementById(`${name}-${this.contact.id}`)
     },

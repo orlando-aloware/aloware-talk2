@@ -259,33 +259,12 @@ export default {
 
   mounted () {
     this.step = 1
-    this.getFilters()
     if (this.isFiltersOpen) {
       this.show = true
     }
   },
 
   methods: {
-    getFilters: function () {
-      this.$axios
-        .get('/api/v2/contacts/filters')
-        .then((response) => response.data.filters)
-        .then(this.setFilters)
-        .catch((err) => {
-          console.error(err)
-          this.$q.notify({
-            message: 'Unable to load filters please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
-        })
-    },
-
     searchFilter (filterName) {
       this.filterSearch = filterName
     },
