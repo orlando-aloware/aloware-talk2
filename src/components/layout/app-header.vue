@@ -28,6 +28,7 @@
         <q-item>
           <q-btn :ripple="false"
                  :icon="dialerIcon"
+                 :disable="!isCallCompleted"
                  size="40px"
                  padding="none"
                  align="center"
@@ -65,6 +66,7 @@ import Phone from 'components/dialer/phone'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
 import ParkedCall from 'components/dialer/parked-call'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'app-header',
@@ -82,7 +84,12 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['authenticated']),
-    ...mapState('contacts', ['selectedList'])
+    ...mapState('contacts', ['selectedList']),
+    ...mapState(['dialer']),
+
+    isCallCompleted () {
+      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+    }
   },
 
   created () {
