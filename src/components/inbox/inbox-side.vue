@@ -17,7 +17,8 @@
       </div>
     </div>
     <div class="inbox-side__right border-left d-flex align-items-start flex-column">
-      <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"></inbox-tab>
+      <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"
+                 :search-text="searchText"></inbox-tab>
       <inbox-channels v-if="activeChannel && !['inbox', 'mentions'].includes(activeChannel.value)"
                       class="h-100 w-100 flex-grow-1 scroll-y"
                       :filter-type="activeChannel.type"

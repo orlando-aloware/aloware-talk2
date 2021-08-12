@@ -85,6 +85,12 @@ let scrollTimeout
 export default {
   name: 'inbox-tab',
   components: { InboxTaskList, CallsHeader },
+  props: {
+    searchText: {
+      type: String,
+      default: ''
+    }
+  },
   computed: {
     ...mapState('inbox', ['openTaskCount', 'pendingTaskCount']),
     nextPage () {
@@ -117,6 +123,8 @@ export default {
         contact_task_status: {
           value: [ContactTaskStatus.STATUS_OPEN],
           operator: 1
+        },
+        search: {
         }
       },
       sorting: {
@@ -165,6 +173,12 @@ export default {
     },
     getParameters () {
       const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
+
+      this.resetFilters()
+      if (this.searchText && this.searchText.trim()) {
+        this.filters.search.value = this.searchText
+      }
+
       this.filters.contact_task_status.value = [this.currentTask]
       query.filters = this.filters
       return query
@@ -184,6 +198,16 @@ export default {
           this.loadMoreContactTasks()
         }
       }, 66)
+    },
+    resetFilters () {
+      this.filters = {
+        contact_task_status: {
+          value: [ContactTaskStatus.STATUS_OPEN],
+          operator: 1
+        },
+        search: {
+        }
+      }
     }
   },
   created () {
@@ -194,6 +218,9 @@ export default {
       this.loadContactTasks()
     },
     'sorting.order': function () {
+      this.loadContactTasks()
+    },
+    'searchText': function (value) {
       this.loadContactTasks()
     }
   }
