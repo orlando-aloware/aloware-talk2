@@ -49,7 +49,7 @@
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="(2 === CommunicationTypes.CALL && 13 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || 2 !== CommunicationTypes.CALL">
-        <task-item-time :from-time="contact.created_at" :update-interval="6000"></task-item-time>
+        <task-item-time :from-time="contact.last_engagement_at" :update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
            v-else-if="2 === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(13)">
