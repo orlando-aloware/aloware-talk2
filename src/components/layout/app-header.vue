@@ -28,7 +28,7 @@
         <q-item>
           <q-btn :ripple="false"
                  :icon="dialerIcon"
-                 :disable="!isCallCompleted"
+                 :disable="!dialer.isReady"
                  size="40px"
                  padding="none"
                  align="center"
@@ -85,11 +85,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['authenticated']),
     ...mapState('contacts', ['selectedList']),
-    ...mapState(['dialer']),
-
-    isCallCompleted () {
-      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
-    }
+    ...mapState(['dialer'])
   },
 
   created () {
