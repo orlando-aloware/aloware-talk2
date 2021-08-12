@@ -114,10 +114,11 @@ export default {
   },
 
   watch: {
-    'contact.id': function () {
+    'contact.id': function (value) {
       this.$nextTick(() => {
         this.$refs.detailsComponentContainer.scrollTop = 0
       })
+      this.getCommunicationsSummary(value)
     }
   }
 }

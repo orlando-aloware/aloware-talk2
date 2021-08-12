@@ -110,6 +110,7 @@ export default {
     },
 
     loadPinnedCount (id) {
+      console.log(id)
       return this.$axios.get(`api/v2/contacts-list/${id}/items?per_page=1`).then((response) => {
         this.pinnedCountLoaded({
           id: id,

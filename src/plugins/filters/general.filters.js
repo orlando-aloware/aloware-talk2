@@ -506,6 +506,13 @@ const fixPhone = (
   }
 }
 
+const numberPlusFormatter = (value, limit = 99) => {
+  if (value >= limit) {
+    return limit + '+'
+  }
+  return value
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -536,7 +543,8 @@ export default ({ Vue }) => {
     nl2br,
     strLimit,
     momentFormat,
-    twoLinesTextTruncate
+    twoLinesTextTruncate,
+    numberPlusFormatter
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

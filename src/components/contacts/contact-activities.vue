@@ -3,6 +3,7 @@
     <contact-activities-header
       :label="contactName"
       :hasUnreads="hasUnreads"
+      :unreadCount="unreadCount"
       @markAllAsRead="markAllAsRead"/>
     <div class="contact-activities">
       <div class="inner-1">
@@ -69,13 +70,24 @@ export default {
     ...mapGetters('contacts', ['contact']),
 
     contactName () {
-      return _.get(this.contact, 'name', '')
+      if (this.contact && this.contact.name) {
+        return _.get(this.contact, 'name', '')
+      }
+
+      if (this.contact && this.contact.first_name && this.contact.last_name) {
+        return `${this.contact.first_name} ${this.contact.last_name}`
+      }
+
+      return 'No Name'
     },
 
     hasUnreads () {
       return this.contact.unread_count > 0 ||
         this.contact.unread_missed_call_count > 0 ||
         this.contact.unread_voicemail_count > 0
+    },
+    unreadCount () {
+      return this.contact.unread_count + this.contact.unread_missed_call_count + this.contact.unread_voicemail_count
     }
   },
 
