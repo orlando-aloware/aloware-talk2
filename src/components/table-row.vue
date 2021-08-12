@@ -124,11 +124,11 @@
       >
         <span
           class="badge badge-danger"
-          v-if="contact.unread_voicemail_count > 0">
+          v-if="contact.unread_count > 0">
           {{ contact.unread_count }}
         </span>
         <span v-else>
-          {{ contact.unread_voicemail_count }}
+          {{ contact.unread_count }}
         </span>
       </td>
 
@@ -139,7 +139,7 @@
       >
         <span
           class="badge badge-danger"
-          v-if="contact.unread_voicemail_count > 0">
+          v-if="contact.unread_missed_call_count > 0">
           {{ contact.unread_missed_call_count }}
         </span>
         <span v-else>
