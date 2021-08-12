@@ -29,13 +29,14 @@
               :to="`/contacts/${contact.id}`"
               v-slot="{ href, route, navigate }"
             >
-              <a
-                :href="href"
-                @click="navigate"
-                class="d-flex align-items-center item"
+              <a :href="href"
+                 @click="navigate"
+                 class="d-flex align-items-center item"
               >
                 <template v-if="contact.name">
-                  {{ contact.name | ucwords }}
+                  <div class="ellipse">
+                    {{ contact.name | ucwords }}
+                  </div>
                 </template>
                 <template v-if="!contact.name"> No Name</template>
               </a>
@@ -49,9 +50,10 @@
         v-else-if="column.name === 'phone_number'"
         class="datatable-row__phone"
       >
-        <span v-if="contact.phone_number">
+        <div class="ellipse"
+             v-if="contact.phone_number">
           {{ contact.phone_number | fixPhone('NATIONAL', true) }}
-        </span>
+        </div>
         <span class="ml-1 text-grey-7 text-center"
               v-else>
           -
@@ -59,9 +61,11 @@
       </td>
 
       <td :key="column.name" v-else-if="column.name === 'last_engagement_text'">
-        <div>{{ contact.last_engagement_text }}</div>
-        <div class="small text-muted">
-          {{ moment(contact.last_engagement_at).format('LLL') }}
+        <div class="ellipse">
+          <div>{{ contact.last_engagement_text }}</div>
+          <div class="small text-muted">
+            {{ moment(contact.last_engagement_at).format('LLL') }}
+          </div>
         </div>
       </td>
 
@@ -70,8 +74,8 @@
         :key="column.name"
         v-else-if="column.name === 'tags'"
       >
-        <template v-if="!contact.tags">
-          <span class="text-muted">no tags available</span>
+        <template v-if="!contact.tags || (contact.tags && !contact.tags.length)">
+          <span>-</span>
         </template>
         <template v-if="Array.isArray(contact.tags) && contact.tags.length">
           <div
@@ -167,19 +171,19 @@
         :key="column.name"
         v-else-if="column.name === 'text_authorized_at'"
       >
-        <span>
+        <div class="ellipse">
           {{ contact.text_authorized_at ? 'Yes' : 'No' }}
-        </span>
+        </div>
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'initial_campaign_id'"
       >
-        <span>
+        <div class="ellipse">
           {{ getLineName(contact.initial_campaign_id) }}
-        </span>
+        </div>
       </td>
 
       <td
@@ -187,9 +191,9 @@
         :key="column.name"
         v-else-if="column.name === 'created_at'"
       >
-        <span>
+        <div class="ellipse">
           {{ contact.created_at | fixDate }}
-        </span>
+        </div>
       </td>
 
       <td
@@ -220,25 +224,27 @@
       </td>
 
       <td :key="column.name" v-else>
-        <div class="text-center"
-             v-if="contact[column.name] === null || contact[column.name] === 'NULL' || ( contact[column.name] instanceof Array && !contact[column.name].length)">
+        <div class="text-left"
+             v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)">
           -
         </div>
         <div class="text-left"
              v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
-          <span :id="`${column.name}-${contact.id}`"
+          <div :id="`${column.name}-${contact.id}`"
                 v-if="contact[column.name].length > 0">
-            <span v-if="typeof contact[column.name][0].phone_number !== 'undefined'">
+            <div class="ellipse"
+                  v-if="typeof contact[column.name][0].phone_number !== 'undefined'">
               {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
-            </span>
-            <span v-else>
+            </div>
+            <div  class="ellipse"
+                   v-else>
               {{ contact[column.name][0].name }}
-            </span>
+            </div>
             <span class="ml-1 text-grey-7"
                   v-if="contact[column.name].length > 1">
               +{{ (contact[column.name].length - 1) }} more
             </span>
-          </span>
+          </div>
           <b-popover
             :target="`${column.name}-${contact.id}`"
             triggers="hover"
@@ -269,15 +275,16 @@
         </div>
         <div class="text-left"
              v-else-if="contact[column.name] && contact[column.name] instanceof Object">
-          <span>
+          <div class="ellipse">
             {{ contact[column.name].name }}
-          </span>
+          </div>
         </div>
-        <div class="text-left"
+        <div class="text-left ellipse"
              v-else-if="column.name.includes('_at') || column.name.includes('date')">
           {{ contact[column.name] | fixFullDateTime }}
         </div>
-        <div :class="[isCountField(column.name) ? 'text-center' : 'text-left']"
+        <div class="ellipse"
+             :class="[isCountField(column.name) ? 'text-center' : 'text-left']"
              v-else>
           {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
             (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : contact[column.name]) }}
