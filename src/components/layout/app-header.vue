@@ -66,7 +66,6 @@ import Phone from 'components/dialer/phone'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
 import ParkedCall from 'components/dialer/parked-call'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'app-header',
