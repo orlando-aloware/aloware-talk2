@@ -831,7 +831,6 @@ export default {
         this.backToDial()
         return
       }
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_WRAP_UP)
       if (wrapUpTimer === 0) {
         this.stopWrapUpTimer()
         return
