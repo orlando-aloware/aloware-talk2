@@ -65,6 +65,8 @@ export default function () {
     ],
     communications: [],
     openTaskCount: 0,
-    pendingTaskCount: 0
+    pendingTaskCount: 0,
+    contacts: [],
+    selectedContact: null
   }
 }

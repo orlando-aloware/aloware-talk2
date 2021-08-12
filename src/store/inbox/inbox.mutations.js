@@ -24,5 +24,11 @@ export default {
   },
   SET_PENDING_TASK_COUNT: (state, count) => {
     state.pendingTaskCount = count
+  },
+  SET_CONTACTS: (state, contacts) => {
+    state.contacts = contacts
+  },
+  SET_SELECTED_CONTACT: (state, contact) => {
+    state.selectedContact = contact
   }
 }
