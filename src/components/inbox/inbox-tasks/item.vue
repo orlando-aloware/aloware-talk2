@@ -1,5 +1,5 @@
 <template>
-  <div :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom`"
+  <div :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
        @click="onItemClick(contact)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
@@ -73,6 +73,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
+import { mapActions, mapState } from 'vuex'
 export default {
   name: 'inbox-task-item',
   mixins: [avatarMixin, communicationInfoMixin],
@@ -83,12 +84,16 @@ export default {
     }
   },
   computed: {
+    ...mapState('inbox', ['selectedContact']),
     contactName () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
 
       return 'No Name'
+    },
+    activeClass () {
+      return this.selectedContact && this.contact.id === this.selectedContact.id ? 'active' : ''
     }
   },
   data () {
@@ -99,11 +104,14 @@ export default {
     }
   },
   methods: {
+    ...mapActions('inbox', ['setSelectedContact']),
     onItemClick (contact) {
+      this.setSelectedContact(contact)
       this.$router.push({
         name: 'Inbox Contact Task',
         params: {
-          id: contact.id.toString()
+          id: contact.id.toString(),
+          channel: 'inbox'
         }
       }).catch(err => {
         console.log(err)

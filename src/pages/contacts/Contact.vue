@@ -78,7 +78,7 @@ export default {
       return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
     },
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox'].includes(this.$route.name)
     }
   },
 

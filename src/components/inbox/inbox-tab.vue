@@ -78,7 +78,7 @@
 <script>
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 let scrollTimeout
@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('inbox', ['openTaskCount', 'pendingTaskCount']),
+    ...mapState('inbox', ['openTaskCount', 'pendingTaskCount', 'contacts']),
     nextPage () {
       return this.currentPage + 1
     }
@@ -118,7 +118,6 @@ export default {
       ContactTaskStatusOpen: ContactTaskStatus.STATUS_OPEN,
       ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
       ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
-      contacts: [],
       filters: {
         contact_task_status: {
           value: [ContactTaskStatus.STATUS_OPEN],
@@ -141,10 +140,11 @@ export default {
   },
 
   methods: {
+    ...mapActions('inbox', ['setContacts', 'setSelectedContact']),
     loadContactTasks () {
       this.isFetchingContacts = true
       this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.contacts = response.data.data
+        this.setContacts(response.data.data)
         this.isFetchingContacts = false
 
         this.currentPage = response.data.current_page
@@ -156,7 +156,7 @@ export default {
     loadMoreContactTasks () {
       this.isFetchingContacts = true
       this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.contacts = [...this.contacts, ...response.data.data]
+        this.setContacts([...this.contacts, ...response.data.data])
         this.isFetchingContacts = false
 
         this.currentPage = response.data.current_page
@@ -172,7 +172,7 @@ export default {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
     getParameters () {
-      const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
+      const query = { page: this.nextPage, sort: this.sorting.sort, order: this.sorting.order }
 
       this.resetFilters()
       if (this.searchText && this.searchText.trim()) {
@@ -212,6 +212,11 @@ export default {
   },
   created () {
     this.loadContactTasks()
+  },
+  mounted () {
+    if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
+      this.setSelectedContact(null)
+    }
   },
   watch: {
     currentTask () {
