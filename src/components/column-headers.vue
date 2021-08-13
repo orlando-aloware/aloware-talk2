@@ -171,17 +171,21 @@ export default {
         // now, check if columns have order property, or
         // check if column is required then update the sortable property.
         for (let index in newItems) {
-          let found = DEFAULT_COLUMNS.find(col => col.name === newItems[index].name)
+          let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
           if (newItems[index].name !== 'checkbox' && typeof newItems[index].order === 'undefined' && found) {
             newItems[index].order = found.order
           }
         }
+        console.log('column.order: ', column.order)
+        console.log('newItems: ', newItems)
 
         // insert the column to the nearest existing neighboring column.
         let lesserOrder = newItems.find(col => col.order < column.order)
         let lesserOrderIndex = lesserOrder ? newItems.indexOf(lesserOrder) : null
-        let greaterOrder = newItems.find(col => col.order > column.order)
+        let greaterOrder = newItems.find(col => parseInt(col.order) > column.order)
         let greaterOrderIndex = greaterOrder ? newItems.indexOf(greaterOrder) : null
+        console.log('greaterOrderIndex: ', greaterOrderIndex)
+        console.log('lesserOrderIndex: ', lesserOrderIndex)
         if (greaterOrderIndex !== -1 && greaterOrderIndex !== null) {
           newItems.splice(greaterOrderIndex, 0, column)
         } else {
@@ -249,9 +253,8 @@ export default {
         })
     },
     onResetAllColumns () {
-      this.closeAndReset()
-
       if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+        this.closeAndReset()
         return
       }
 
@@ -285,6 +288,8 @@ export default {
         .finally(() => {
           this.loading = false
         })
+
+      this.closeAndReset()
     },
     onModalShow () {
       this.searchText = ''

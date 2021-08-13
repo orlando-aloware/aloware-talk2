@@ -337,7 +337,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'inbound_texts_count',
-    label: 'Inbound SMS',
+    label: 'Inbound Texts',
     category: 3,
     order: 27,
     sortable: true,
@@ -422,15 +422,14 @@ export const ALL_COLUMNS = [
     minWidth: 170
   },
   {
-    name: 'contact_lists',
-    label: 'Contact Lists',
+    name: 'campaigns',
+    label: 'Lines',
     category: 2,
     order: 35,
     sortable: false,
     draggable: true,
     resizable: true,
     default: false,
-    maxWidth: 170,
     minWidth: 170
   },
   {
@@ -444,20 +443,10 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'initial_campaign_id',
-    label: 'Initial Line',
-    category: 2,
-    order: 37,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
     name: 'broadcasts',
     label: 'Broadcasts',
     category: 2,
-    order: 38,
+    order: 37,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -465,10 +454,32 @@ export const ALL_COLUMNS = [
     minWidth: 170
   },
   {
+    name: 'contact_lists',
+    label: 'Contact Lists',
+    category: 2,
+    order: 38,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false,
+    maxWidth: 170,
+    minWidth: 170
+  },
+  {
+    name: 'initial_campaign_id',
+    label: 'Initial Line',
+    category: 2,
+    order: 39,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false
+  },
+  {
     id: '426108ce-7d6e-43e1-b13e-e406a9362db0',
     label: 'Actions',
     name: 'actions',
-    order: 39,
+    order: 40,
     sortable: false,
     draggable: false,
     resizable: false,
