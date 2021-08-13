@@ -12,7 +12,8 @@
       <div :class="`contact-activity-wrapper ${widthClass}`">
         <contact-activities ref="contactActivities"
                             :communications="filteredCommunications"
-                            :campaignId="selectedCampaignId">
+                            :campaignId="selectedCampaignId"
+                            @markAllAsRead="markAllAsRead">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense

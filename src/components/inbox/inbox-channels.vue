@@ -216,6 +216,21 @@ export default {
         }
       }
     })
+
+    this.$VueEvent.listen('mark_contact_communications_as_read', (data) => {
+      // get current contact's communications
+      let contactCommunications = this.communications.filter(communication => communication.contact.id === data.id)
+
+      // iterate through and update is_read value
+      contactCommunications.forEach((communication) => {
+        let index = this.communications.findIndex(item => item.id === communication.id)
+        this.communications[index].is_read = true
+      })
+
+      // set updated communications
+      this.setCommunications(this.communications)
+    })
+
     let _this = this
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
       this.getCommunications(this.filter).then(function () {

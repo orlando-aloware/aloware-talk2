@@ -3,11 +3,11 @@
        @click="onItemClick(contact)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
-      <b-badge v-if="contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count > 0"
+      <b-badge v-if="totalUnreads > 0"
                class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
                variant="danger"
                pill>
-        {{ contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count }}
+        {{ totalUnreads }}
       </b-badge>
       <avatar width="34"
               height="34"
@@ -93,7 +93,10 @@ export default {
       return 'No Name'
     },
     activeClass () {
-      return this.selectedContact && this.contact.id === this.selectedContact.id ? 'active' : ''
+      return this.selectedContact && this.selectedContact.id === this.contact.id ? 'active' : ''
+    },
+    totalUnreads () {
+      return this.contact.unread_count + this.contact.unread_missed_call_count + this.contact.unread_voicemail_count
     }
   },
   data () {
@@ -106,6 +109,9 @@ export default {
   methods: {
     ...mapActions('inbox', ['setSelectedContact']),
     onItemClick (contact) {
+      if (this.selectedContact && this.selectedContact.id === contact.id) {
+        return
+      }
       this.setSelectedContact(contact)
       this.$router.push({
         name: 'Inbox Contact Task',

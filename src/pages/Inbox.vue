@@ -18,11 +18,12 @@ import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import talk2Api from 'src/plugins/api/api'
+import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 export default {
-  components: {
-    InboxSide
-  },
+  mixins: [contactMixins],
+
+  components: { InboxSide },
 
   computed: {
     ...mapGetters('auth', ['authenticated']),

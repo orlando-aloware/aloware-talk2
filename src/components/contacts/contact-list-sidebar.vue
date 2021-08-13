@@ -19,16 +19,16 @@
             <avatar class="contact-avatar"
                     width="34"
                     height="34"
-                    :name="contact.name">
+                    :name="getContactName(contact)">
             </avatar>
             <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between align-items-center contact-details pt-0">
               <div class="mr-auto">
                 <p class="text-bold contact-name mb-0">
                   <q-tooltip anchor="top middle"
                              self="center middle">
-                    {{ contact.name }}
+                    {{ getContactName(contact) }}
                   </q-tooltip>
-                  {{ contact.name }}
+                  {{ getContactName(contact) }}
                 </p>
                 <div class="text-sm-left contact-phone mb-1">
                   <span v-if="contact.phone_number !== '0'">{{ contact.phone_number | fixPhone }}</span>
@@ -99,7 +99,9 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed']),
-
+    getContactName (contact) {
+      return contact.name || 'No Name'
+    },
     onBottomScroll () {
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends

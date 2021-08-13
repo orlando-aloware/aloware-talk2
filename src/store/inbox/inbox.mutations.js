@@ -30,5 +30,8 @@ export default {
   },
   SET_SELECTED_CONTACT: (state, contact) => {
     state.selectedContact = contact
+  },
+  UPDATE_CONTACT: (state, contact) => {
+    state.selectedContact = contact
   }
 }

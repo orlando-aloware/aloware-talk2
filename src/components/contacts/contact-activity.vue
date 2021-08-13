@@ -409,7 +409,7 @@ export default {
         return this.currentCompany.name
       }
 
-      return this.contact.name
+      return this.contact.name || 'No Name'
     }
   },
 

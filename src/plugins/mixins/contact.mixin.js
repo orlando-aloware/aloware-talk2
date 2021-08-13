@@ -316,7 +316,7 @@ export default {
       this.loadingContact = true
       this.loadingContactCommunications = true
       console.log('fetching comms')
-      return this.$axios.get(`/api/v1/contact/${this.contactId}`).then(res => {
+      return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
         this.fetchContactCommunications(this.contactId, false).then(() => {
           this.loadingContact = false
           console.log('fetched comms')
@@ -538,6 +538,7 @@ export default {
           for (let communication of this.filteredCommunications) {
             this.$set(communication, 'is_read', true)
           }
+          this.$VueEvent.fire('mark_contact_communications_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
         }).catch(err => {
           this.$handleErrors(err.response)
@@ -767,7 +768,7 @@ export default {
 
       // scroll to activity
       let scrollInterval = setInterval(() => {
-        const communicationActivity = _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null)
+        const communicationActivity = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
         if (communicationActivity) {
           communicationActivity.$el.scrollIntoView({
             behavior: 'smooth',

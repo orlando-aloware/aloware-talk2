@@ -1,7 +1,7 @@
 <template>
   <div class="calls-header d-flex justify-content-between">
     <div class="calls-header__label">
-      {{ label }}
+      {{ label }} <b-badge :variant="resolveVariant">{{ contact.task_status_name }}</b-badge>
     </div>
    <div class="mr-1">
      <q-btn
@@ -18,6 +18,7 @@
       </span>
      </q-btn>
      <q-btn
+       v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
        borderless
        flat
        no-caps
@@ -33,6 +34,7 @@
       </span>
      </q-btn>
      <q-btn
+       v-if="contact.task_status === ContactTaskStatus.STATUS_PENDING"
        borderless
        flat
        no-caps
@@ -47,6 +49,22 @@
         <check-o-icon></check-o-icon>
       </span>
      </q-btn>
+     <q-btn
+       v-if="contact.task_status === ContactTaskStatus.STATUS_CLOSED"
+       borderless
+       flat
+       no-caps
+       type="a"
+       color="primary"
+       class="text-decoration-none">
+       <q-tooltip anchor="top middle"
+                  self="center middle">
+         Reopen
+       </q-tooltip>
+       <span class="mx-2">
+        <check-o-icon></check-o-icon>
+      </span>
+     </q-btn>
    </div>
   </div>
 </template>
@@ -54,10 +72,16 @@
 <script>
 import TimerOIcon from 'components/icons/timer-o-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
+import * as ContactTaskStatus from 'src/constants/contact-task-status.js'
+
 export default {
   name: 'contact-activities-header',
   components: { CheckOIcon, TimerOIcon },
   props: {
+    contact: {
+      type: Object,
+      required: true
+    },
     label: {
       type: String,
       required: true
@@ -72,6 +96,24 @@ export default {
       required: false,
       default: 0
     }
+  },
+  computed: {
+    resolveVariant () {
+      switch (this.contact.task_status) {
+        case ContactTaskStatus.STATUS_OPEN:
+          return 'primary'
+        case ContactTaskStatus.STATUS_PENDING:
+          return 'warning'
+        default:
+          return ''
+      }
+    }
+  },
+  data () {
+    return {
+      ContactTaskStatus
+    }
   }
+
 }
 </script>

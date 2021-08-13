@@ -4,6 +4,7 @@
       :label="contactName"
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
+      :contact="contact"
       @markAllAsRead="markAllAsRead"/>
     <div class="contact-activities">
       <div class="inner-1">
@@ -32,15 +33,12 @@
 <script>
 import _ from 'lodash'
 import { mapGetters } from 'vuex'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
 
 export default {
   name: 'contact-activities',
-
-  mixins: [contactMixins],
 
   components: {
     MessageComposer,
@@ -97,6 +95,9 @@ export default {
       if (activitiesWrap && activitiesWrap.scrollHeight) {
         activitiesWrap.scrollTop = activitiesWrap.scrollHeight
       }
+    },
+    markAllAsRead () {
+      this.$emit('markAllAsRead')
     }
   }
 }

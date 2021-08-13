@@ -81,6 +81,8 @@ import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
+import Vue from 'vue'
+
 let scrollTimeout
 export default {
   name: 'inbox-tab',
@@ -92,7 +94,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('inbox', ['openTaskCount', 'pendingTaskCount', 'contacts']),
+    ...mapState('inbox', ['openTaskCount', 'pendingTaskCount', 'contacts', 'selectedContact']),
     nextPage () {
       return this.currentPage + 1
     }
@@ -208,14 +210,29 @@ export default {
         search: {
         }
       }
+    },
+    updateContacts (updatedContact) {
+      let index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
+      if (index >= 0) {
+        Vue.set(this.contacts, index, updatedContact)
+        this.setContacts(this.contacts)
+      }
     }
   },
   created () {
     this.loadContactTasks()
+
+    this.$VueEvent.listen('contact_updated', (data) => {
+      // check data loaded
+      if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
+        this.setSelectedContact(data)
+        this.updateContacts(data)
+      }
+    })
   },
   mounted () {
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
-      this.setSelectedContact(null)
+      this.setSelectedContact({})
     }
   },
   watch: {
