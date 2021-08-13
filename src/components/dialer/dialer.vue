@@ -54,7 +54,7 @@ export default {
         }
       }
 
-      // check data matches dialer on hold call
+      // check data matches dialer parked call
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         data = _.merge(this.dialer.parkedCall, data)
         this.setDialerParkedCall(data)
@@ -626,7 +626,7 @@ export default {
       let params = {
         communication_id: this.dialer.communication.id
       }
-      this.$axios.post('/api/v1/dialer/hold', params).then(() => {
+      this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
       }).catch(err => {
         this.setDialerParkedCall()
