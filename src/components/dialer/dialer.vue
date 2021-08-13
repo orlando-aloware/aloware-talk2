@@ -10,6 +10,7 @@ import { aclMixin, agentMixin, userMixin } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 
 export default {
   name: 'dialer',
@@ -55,10 +56,10 @@ export default {
 
       // check data matches dialer on hold call
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
-        if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          data = _.merge(this.dialer.parkedCall, data)
-          this.setDialerParkedCall(data)
-        } else {
+        data = _.merge(this.dialer.parkedCall, data)
+        this.setDialerParkedCall(data)
+
+        if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW || data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
           this.setDialerParkedCall()
         }
       }
@@ -601,7 +602,7 @@ export default {
         })
       } else {
         console.log('Unholding call')
-        this.loadingHold = true
+        this.loadingUnhold = true
         let params = {
           communication_id: this.dialer.communication.id
         }
@@ -611,7 +612,7 @@ export default {
         }).catch(err => {
           console.log(err)
         }).finally(_ => {
-          this.loadingHold = false
+          this.loadingUnhold = false
         })
       }
     },
@@ -831,7 +832,6 @@ export default {
         this.backToDial()
         return
       }
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_WRAP_UP)
       if (wrapUpTimer === 0) {
         this.stopWrapUpTimer()
         return

@@ -1359,7 +1359,7 @@ export default {
     },
 
     isHoldDisabled () {
-      return (!this.dialer.communication || this.loadingHold || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (!this.dialer.communication || this.loadingHold || this.loadingUnhold || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isParkDisabled () {

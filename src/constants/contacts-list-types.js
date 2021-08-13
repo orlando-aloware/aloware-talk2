@@ -429,7 +429,9 @@ export const ALL_COLUMNS = [
     sortable: false,
     draggable: true,
     resizable: true,
-    default: false
+    default: false,
+    maxWidth: 170,
+    minWidth: 170
   },
   {
     name: 'ring_groups',
