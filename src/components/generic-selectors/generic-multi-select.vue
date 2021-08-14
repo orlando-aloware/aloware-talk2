@@ -75,6 +75,8 @@
                 <span class="tag-text">{{ item.name }}</span>
               </span>
               <check-o-icon color="#256EFF"
+                            width="12"
+                            height="8"
                             v-if="isSelected(item.id)"/>
             </div>
           </div>
@@ -108,6 +110,8 @@
                 <span class="tag-text">{{ child.name }}</span>
               </span>
               <check-o-icon color="#256EFF"
+                            width="12"
+                            height="8"
                             v-if="isSelected(child.id)"/>
             </div>
           </div>
