@@ -119,7 +119,7 @@
       </div>
     </q-field>
     <div v-else>
-      <div v-for="item in formattedValues"
+      <span v-for="item in formattedValues"
            :key="item.id">
         <span :style="{ color: item.color }"
               class="border border-half-rounded d-inline-flex align-items-center mr-1 mb-1 tag-items"
@@ -140,7 +140,7 @@
                 @click="remove(item)">
           </span>
         </span>
-      </div>
+      </span>
       <div class="w-100 mt-1"
            v-if="canEdit">
         <b-link href="#"
