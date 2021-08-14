@@ -27,7 +27,6 @@
 <script>
 import ContactPhones from 'src/components/contacts/contact-phones'
 import ContactInfo from 'src/components/contacts/contact-info'
-import ContactTags from 'src/components/contacts/contact-tags'
 import ContactNotes from 'src/components/contacts/contact-notes'
 import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
 import ContactLines from 'src/components/contacts/contact-lines'
@@ -36,6 +35,7 @@ import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactInformation from 'src/components/contacts/contact-information'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
+import ContactTags from 'src/components/generic-selectors/contact-tags'
 import { mapGetters, mapActions } from 'vuex'
 import { contact as contactMixins } from 'src/plugins/mixins'
 
@@ -58,9 +58,9 @@ export default {
     ContactLines,
     ContactActivityCounts,
     ContactNotes,
-    ContactTags,
     ContactInfo,
-    ContactPhones
+    ContactPhones,
+    ContactTags
   },
 
   computed: {

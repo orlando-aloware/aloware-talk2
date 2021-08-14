@@ -726,6 +726,7 @@ export default {
       return this.$axios
         .get('/api/v1/tag', { params })
         .then((res) => {
+          this.setTagsFullyLoaded(false)
           if (res.data.data && res.data.data.length) {
             res.data.data.forEach((tag) => {
               this.newTag(tag)
@@ -740,6 +741,7 @@ export default {
           }
         })
         .catch((err) => {
+          this.setTagsFullyLoaded(false)
           console.log(err)
           this.loadingTags = false
           return Promise.reject()
@@ -1299,7 +1301,8 @@ export default {
       'setDialerContact',
       'setDialerCurrentNumber',
       'setDialerIsMuted',
-      'setFilters'
+      'setFilters',
+      'setTagsFullyLoaded'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
     ...mapActions('inbox', ['resetInboxVuex']),

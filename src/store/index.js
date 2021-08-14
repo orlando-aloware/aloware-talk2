@@ -73,9 +73,7 @@ export default function (/* { ssrContext } */) {
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
-      tagOptions: {
-        isReset: false
-      }
+      tagsFullyLoaded: false
     },
 
     actions: {
@@ -357,6 +355,10 @@ export default function (/* { ssrContext } */) {
 
       deleteSmsTemplate ({ commit }, smsTemplate) {
         commit('DELETE_SMS_TEMPLATE', smsTemplate)
+      },
+
+      setTagsFullyLoaded ({ commit }, tagsFullyLoaded) {
+        commit('SET_TAGS_FULLY_LOADED', tagsFullyLoaded)
       }
     },
 
@@ -793,11 +795,16 @@ export default function (/* { ssrContext } */) {
       SET_SMS_TEMPLATES (state, smsTemplates) {
         state.smsTemplates = smsTemplates
       },
+
       DELETE_SMS_TEMPLATE (state, smsTemplate) {
         let found = state.smsTemplates.find(template => template.id === smsTemplate.id)
         if (found) {
           state.smsTemplates.splice(state.smsTemplates.indexOf(found), 1)
         }
+      },
+
+      SET_TAGS_FULLY_LOADED (state, tagsFullyLoaded) {
+        state.tagsFullyLoaded = tagsFullyLoaded
       }
     },
     plugins: [

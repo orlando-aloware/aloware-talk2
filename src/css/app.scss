@@ -388,23 +388,53 @@ body,
   border-radius: 5px !important;
 }
 
-.show-raw-value {
-  .multiselect__select {
-    display: none !important;
-  }
-  .multiselect__tags {
-    border: none;
-    padding: 0;
+.generic-multi-select {
+  .edittable-wrapper {
+    & > .q-field__inner > .q-field__control {
+      &:before {
+        border: 0;
+      }
 
-    .custom__remove {
-      display: none;
+      &:after {
+        display: none;
+      }
+    }
+    .is-dot {
+      margin-top: 5px;
+    }
+  }
+  .q-field > .q-field {
+    .tag-items {
+      max-width: 230px;
     }
 
     .tag-text {
-      max-width: 230px;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
+    }
+  }
+  .dropdown-select {
+    max-height: 160px;
+    height: 100%;
+    .tag-items {
+      max-width: 200px;
+    }
+    .select-option {
+      &:hover {
+        background-color: $grey-50;
+        border-radius: 6px;
+      }
+    }
+    .select-group {
+      .tag-text {
+        @include font-size($f-size-h5, 600, true);
+      }
+    }
+    .tag-items {
+      .is-dot {
+        margin-top: 5px;
+      }
     }
   }
 }
@@ -2000,8 +2030,7 @@ span.mention {
   }
 }
 
-// CONTACT TAGS
-.contact-tags-wrapper {
+.tags-wrapper {
   .badge-tag {
     background: transparent;
     font-weight: 500;
@@ -6039,4 +6068,21 @@ table.datatable {
 
 .z-index-0 {
   z-index: -1 !important;
+}
+
+.input-text-sm,
+.input-text-sm .q-field__control {
+  max-height: 30px !important;
+  min-height: 30px !important;
+}
+
+.input-text-sm {
+  &.no-after-border {
+    :before {
+      border: 0;
+    }
+    :after {
+      display: none;
+    }
+  }
 }
