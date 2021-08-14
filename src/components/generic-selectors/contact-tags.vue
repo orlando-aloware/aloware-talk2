@@ -1,7 +1,7 @@
 <template>
   <b-card class="border-0 tags-wrapper"
           v-if="hasPermissionTo('tag contact')">
-    <generic-multi-select :="Tags"
+    <generic-multi-select label="Tags"
                           :values="contact.tag_ids"
                           :options="combinedTags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
