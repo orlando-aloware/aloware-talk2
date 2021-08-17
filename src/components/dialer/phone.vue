@@ -1450,6 +1450,10 @@ export default {
       }
     },
 
+    phoneExpansionLabel () {
+      return this.bottomExpansion === 'tags' ? 'Done' : 'Cancel'
+    },
+
     phoneStatus () {
       if (!this.dialer.communication) {
         return ''
@@ -1504,9 +1508,6 @@ export default {
   },
 
   methods: {
-    phoneExpansionLabel () {
-      return this.bottomExpansion === 'tags' ? 'Done' : 'Cancel'
-    },
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
         this.openPhone()
