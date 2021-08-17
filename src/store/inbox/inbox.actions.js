@@ -17,6 +17,9 @@ export default {
   setActiveChannel: ({ commit }, channel) => {
     commit('SET_ACTIVE_CHANNEL', channel)
   },
+  setTaskCount: ({ commit }, payload) => {
+    commit('SET_TASK_COUNT', payload)
+  },
   setOpenTaskCount: ({ commit }, count = 0) => {
     commit('SET_OPEN_TASK_COUNT', count)
   },

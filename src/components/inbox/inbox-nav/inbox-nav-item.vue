@@ -35,8 +35,6 @@
         <span class="open-count border-right pr-1">{{ openCount | numberPlusFormatter(99) }}</span>
         <span class="pending-count ml-1">{{ pendingCount | numberPlusFormatter(99) }}</span>
       </span>
-        <refresh-icon :isActive="isActive"
-                      v-if="value === 'inbox'"/>
         <!--badge
           v-if="badge"
           :color="badgeColor"
@@ -54,13 +52,11 @@
 
 <script>
 import Icon from './inbox-nav-icon.vue'
-import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
   name: 'inbox-nav-item',
 
   components: {
-    RefreshIcon,
     Icon
   },
 

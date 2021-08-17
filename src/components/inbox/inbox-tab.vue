@@ -4,8 +4,8 @@
                rounded="sm"
                variant="white">
       <div class="w-100 h-100 d-flex flex-column">
-        <calls-header :openCount="openTaskCount"
-                      :pendingCount="pendingTaskCount"
+        <calls-header :openCount="taskCounts.open"
+                      :pendingCount="taskCounts.pending"
                       :commCampaigns="[]"
                       :commRingGroups="[]"
                       @sort="sortContactTasks">
@@ -29,7 +29,7 @@
                     Open
                   </span>
                 <span class="text-right">
-                    {{ openTaskCount | numberPlusFormatter(99) }}
+                    {{ taskCounts.open | numberPlusFormatter(99) }}
                   </span>
               </div>
             </template>
@@ -41,7 +41,7 @@
                     Pending
                   </span>
                 <span class="text-right">
-                    {{ pendingTaskCount | numberPlusFormatter(99) }}
+                    {{ taskCounts.pending | numberPlusFormatter(99) }}
                   </span>
               </div>
             </template>
@@ -94,7 +94,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('inbox', ['openTaskCount', 'pendingTaskCount', 'contacts', 'selectedContact']),
+    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact']),
     nextPage () {
       return this.currentPage + 1
     }
@@ -137,7 +137,8 @@ export default {
       isLoadingMore: false,
       isLoaded: true,
       currentPage: 0,
-      page: 1
+      page: 1,
+      perPage: 20
     }
   },
 
@@ -148,7 +149,6 @@ export default {
       this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts(response.data.data)
         this.isFetchingContacts = false
-
         this.currentPage = response.data.current_page
         this.hasMore = response.data.next_page_url
         this.isLoadingMore = false
@@ -174,7 +174,7 @@ export default {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
     getParameters () {
-      const query = { page: this.nextPage, sort: this.sorting.sort, order: this.sorting.order }
+      const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
 
       this.resetFilters()
       if (this.searchText && this.searchText.trim()) {
@@ -217,6 +217,10 @@ export default {
         Vue.set(this.contacts, index, updatedContact)
         this.setContacts(this.contacts)
       }
+    },
+    resetList () {
+      this.page = 1
+      this.loadContactTasks()
     }
   },
   created () {
@@ -228,6 +232,37 @@ export default {
         this.setSelectedContact(data)
         this.updateContacts(data)
       }
+
+      // TODO check for sort when ordering contact tasks
+      // comm type == call, dispo-stat = missed
+      // inbox/[status]/contacts/[id]
+      // only modify order if new contact task === current task
+      if (this.currentTask === data.task_status) {
+        let contact = this.contacts.find(contact => contact.id === data.id)
+        // if contact is not in the list, then automatically add it to the top
+        if (!contact) {
+          let contacts = [...this.contacts]
+          contacts.unshift(contact)
+
+          if (this.contacts.length > this.perPage) {
+            contacts.pop()
+          }
+          this.setContacts(contacts)
+        } else {
+          // get all contacts except the current one
+          let contacts = [...this.contacts.filter(contact => contact.id !== data.id)]
+
+          // TODO compare unreads total
+
+          // add to the top
+          contacts.unshift(data)
+          this.setContacts(contacts)
+        }
+      }
+    })
+
+    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+      this.loadContactTasks()
     })
   },
   mounted () {
@@ -237,12 +272,12 @@ export default {
   },
   watch: {
     currentTask () {
-      this.loadContactTasks()
+      this.resetList()
     },
     'sorting.order': function () {
       this.loadContactTasks()
     },
-    'searchText': function (value) {
+    'searchText': function () {
       this.loadContactTasks()
     }
   }

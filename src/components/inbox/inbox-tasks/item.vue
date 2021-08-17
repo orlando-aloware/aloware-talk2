@@ -1,5 +1,6 @@
 <template>
-  <div :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
+  <div v-if="contact.last_communication"
+       :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
        @click="onItemClick(contact)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
@@ -27,32 +28,30 @@
       </div>
       <div class="d-flex flex-row">
         <div class="pr-2">
-          <component :is="stateToIcon(4, 2, 2)"
+          <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction)"
                      height="18px"
                      width="18px">
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span v-if="2 !== CommunicationTypes.SMS">
-            {{ 2 | fixCommDirection }} {{ 2 | fixCommType }}
-          </span>
           <span>
-            Last Communication
+            {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </span>
+
         </div>
       </div>
       <div class="campaign-name text-grey-10">
-        ---
+        {{ campaignName }}
       </div>
     </div>
     <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="(2 === CommunicationTypes.CALL && 13 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || 2 !== CommunicationTypes.CALL">
+            v-if="(contact.last_communication.type === CommunicationTypes.CALL && contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || contact.last_communication.type !== CommunicationTypes.CALL">
         <task-item-time :from-time="contact.last_engagement_at" :update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-           v-else-if="2 === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(13)">
+           v-else-if="contact.last_communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(contact.last_communication.current_status2)">
         <div class="px-2">
           <cancel-call-icon role="button"/>
         </div>
@@ -74,6 +73,7 @@ import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import { mapActions, mapState } from 'vuex'
+import _ from 'lodash'
 export default {
   name: 'inbox-task-item',
   mixins: [avatarMixin, communicationInfoMixin],
@@ -84,6 +84,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['campaigns']),
     ...mapState('inbox', ['selectedContact']),
     contactName () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
@@ -97,6 +98,16 @@ export default {
     },
     totalUnreads () {
       return this.contact.unread_count + this.contact.unread_missed_call_count + this.contact.unread_voicemail_count
+    },
+    campaignName () {
+      if (_.isEmpty(this.campaigns) || !this.contact.last_communication.campaign_id) {
+        return '-'
+      }
+      const campaign = this.campaigns.find(campaign => campaign.id === this.contact.last_communication.campaign_id)
+      if (campaign) {
+        return campaign.name
+      }
+      return '-'
     }
   },
   data () {

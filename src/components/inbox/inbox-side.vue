@@ -7,8 +7,8 @@
       <div>
         <div class="inbox-side__nav">
           <inbox-nav-list :closed="closed"
-                          :openCount="openTaskCount"
-                          :pendingCount="pendingTaskCount"
+                          :openCount="taskCounts.open"
+                          :pendingCount="taskCounts.pending"
                           :value.sync="active"
                           v-model="active"
                           @active="newActive">
@@ -64,7 +64,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'openTaskCount', 'pendingTaskCount']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'taskCounts']),
 
     nextPage () {
       return this.currentPage + 1

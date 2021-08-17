@@ -19,11 +19,20 @@ export default {
   SET_ACTIVE_CHANNEL: (state, channel) => {
     state.activeChannel = channel
   },
+  SET_TASK_COUNT: (state, payload) => {
+    state.taskCounts = { ...state.taskCounts, ...payload }
+  },
   SET_OPEN_TASK_COUNT: (state, count) => {
-    state.openTaskCount = count
+    state.taskCounts = { ...state.taskCounts, open: count }
   },
   SET_PENDING_TASK_COUNT: (state, count) => {
-    state.pendingTaskCount = count
+    state.taskCounts = { ...state.taskCounts, pending: count }
+  },
+  SET_NEW_TASK_COUNT: (state, count) => {
+    state.taskCounts = { ...state.taskCounts, new: count }
+  },
+  SET_CLOSED_TASK_COUNT: (state, count) => {
+    state.taskCounts = { ...state.taskCounts, closed: count }
   },
   SET_CONTACTS: (state, contacts) => {
     state.contacts = contacts

@@ -889,7 +889,7 @@ i.option-separator {
     font-size: $f-size-body-sm;
     font-weight: 500;
 
-    max-width: 97px;
+    max-width: 105px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -1355,6 +1355,18 @@ i.option-separator {
 
 .t2-badge {
   color: $white;
+}
+
+.badge-primary {
+  background: $primary;
+}
+
+.badge-warning {
+  background: $warning;
+}
+
+.badge-danger {
+  background: $danger;
 }
 
 .badge-grey-80 {

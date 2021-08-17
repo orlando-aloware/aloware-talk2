@@ -16,7 +16,6 @@
 <script>
 import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import talk2Api from 'src/plugins/api/api'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 
@@ -39,7 +38,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setActiveChannel', 'setOpenTaskCount', 'setPendingTaskCount']),
+    ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
 
     setChannel () {
       if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
@@ -52,33 +51,27 @@ export default {
         this.setActiveChannel(channel)
       }
     },
-    fetchTaskData (taskStatusId) {
-      const query = {
-        filters: {
-          contact_task_status: {
-            value: [taskStatusId],
-            operator: 1
-          }
-        }
-      }
-      return talk2Api.V2.contacts.list(query)
-    },
-    getPendingTaskCount () {
-      this.fetchTaskData(ContactTaskStatus.STATUS_PENDING).then(response => {
-        this.setPendingTaskCount(response.data.total)
-      })
-    },
-    getOpenTaskCount () {
-      this.fetchTaskData(ContactTaskStatus.STATUS_OPEN).then(response => {
-        this.setOpenTaskCount(response.data.total)
+    fetchTaskCounts () {
+      return talk2Api.V2.contacts.inboxCounts().then(res => {
+        this.setTaskCount({
+          new: res.data.open,
+          open: res.data.open,
+          pending: res.data.pending,
+          closed: res.data.closed
+        })
       })
     }
   },
 
+  created () {
+    this.$VueEvent.listen('contact_task_status_updated', () => {
+      this.fetchTaskCounts()
+    })
+  },
+
   mounted () {
     this.setChannel()
-    this.getOpenTaskCount()
-    this.getPendingTaskCount()
+    this.fetchTaskCounts()
   },
 
   watch: {

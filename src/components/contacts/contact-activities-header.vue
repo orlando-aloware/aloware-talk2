@@ -1,7 +1,7 @@
 <template>
   <div class="calls-header d-flex justify-content-between">
     <div class="calls-header__label">
-      {{ label }} <b-badge :variant="resolveVariant">{{ contact.task_status_name }}</b-badge>
+      {{ label }} <b-badge :variant="resolveVariant" class="font-weight-light">{{ contact.task_status_name }}</b-badge>
     </div>
    <div class="mr-1">
      <q-btn
@@ -24,14 +24,22 @@
        no-caps
        type="a"
        color="primary"
-       class="text-decoration-none">
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus">
        <q-tooltip anchor="top middle"
                   self="center middle">
          Move to Pending
        </q-tooltip>
-      <span class="mx-2">
+      <span v-if="!isUpdatingStatus"
+            class="mx-2">
         <timer-o-icon></timer-o-icon>
       </span>
+       <q-spinner-bars v-if="isUpdatingStatus"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
      </q-btn>
      <q-btn
        v-if="contact.task_status === ContactTaskStatus.STATUS_PENDING"
@@ -40,14 +48,22 @@
        no-caps
        type="a"
        color="primary"
-       class="text-decoration-none">
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus">
        <q-tooltip anchor="top middle"
                   self="center middle">
          Close
        </q-tooltip>
-      <span class="mx-2">
+      <span v-if="!isUpdatingStatus"
+            class="mx-2">
         <check-o-icon></check-o-icon>
       </span>
+       <q-spinner-bars v-if="isUpdatingStatus"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
      </q-btn>
      <q-btn
        v-if="contact.task_status === ContactTaskStatus.STATUS_CLOSED"
@@ -56,14 +72,22 @@
        no-caps
        type="a"
        color="primary"
-       class="text-decoration-none">
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus">
        <q-tooltip anchor="top middle"
                   self="center middle">
          Reopen
        </q-tooltip>
-       <span class="mx-2">
-        <check-o-icon></check-o-icon>
+       <span v-if="!isUpdatingStatus"
+             class="mx-2">
+        <inbox-o-icon></inbox-o-icon>
       </span>
+       <q-spinner-bars v-if="isUpdatingStatus"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
      </q-btn>
    </div>
   </div>
@@ -73,10 +97,14 @@
 import TimerOIcon from 'components/icons/timer-o-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
 import * as ContactTaskStatus from 'src/constants/contact-task-status.js'
+import InboxOIcon from 'components/icons/inbox-o-icon'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'contact-activities-header',
-  components: { CheckOIcon, TimerOIcon },
+
+  components: { InboxOIcon, CheckOIcon, TimerOIcon },
+
   props: {
     contact: {
       type: Object,
@@ -97,23 +125,48 @@ export default {
       default: 0
     }
   },
+
   computed: {
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:
           return 'primary'
         case ContactTaskStatus.STATUS_PENDING:
-          return 'warning'
+          return 'danger'
         default:
           return ''
       }
+    },
+    nextStat () {
+      switch (this.contact.task_status) {
+        case ContactTaskStatus.STATUS_OPEN:
+          return ContactTaskStatus.STATUS_PENDING
+        case ContactTaskStatus.STATUS_PENDING:
+          return ContactTaskStatus.STATUS_CLOSED
+        case ContactTaskStatus.STATUS_CLOSED:
+          return ContactTaskStatus.STATUS_OPEN
+      }
+      return null
     }
   },
+
   data () {
     return {
-      ContactTaskStatus
+      ContactTaskStatus,
+      isUpdatingStatus: false
+    }
+  },
+
+  methods: {
+    onUpdateTaskStatus () {
+      this.isUpdatingStatus = true
+      talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: this.nextStat }).then(res => {
+        let contact = { ...this.contact }
+        contact.task_status = this.nextStat
+        this.$VueEvent.fire('contact_task_status_updated', contact)
+        this.isUpdatingStatus = false
+      })
     }
   }
-
 }
 </script>

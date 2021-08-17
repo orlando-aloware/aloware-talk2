@@ -195,6 +195,12 @@ export default {
       },
       list (params) {
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify })
+      },
+      inboxCounts () {
+        return window.axios.get(`/api/v2/contacts/inbox-counts`)
+      },
+      taskStatusUpdate (id, params) {
+        return window.axios.put(`/api/v2/contacts/${id}/task-status`, params)
       }
     },
     contactFolders: {
