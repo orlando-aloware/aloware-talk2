@@ -153,8 +153,6 @@ export default function () {
     contactAttributes: [],
     isSidebarCollapsed: false,
     isContactNameEditOpen: false,
-    lines: [],
-    ringGroups: [],
     contactSelectedPhone: null,
     selectedLine: null,
     messageComposer: {

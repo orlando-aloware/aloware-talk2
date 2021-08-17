@@ -1,6 +1,7 @@
 <template>
   <b-card class="border-0 tags-wrapper">
     <generic-multi-select label="Tags"
+                          buttonText="Tags"
                           :values="selectedTagIds"
                           :options="tags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"

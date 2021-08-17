@@ -641,7 +641,7 @@
             <q-btn :ripple="false"
                    :class="[ !expanded ? 'invisible' : '']"
                    color="primary"
-                   label="Cancel"
+                   :label="phoneExpansionLabel"
                    class="no-q-btn-focus"
                    no-caps
                    unelevated
@@ -847,7 +847,7 @@
             </q-card-section>
           </template>
           <template v-if="bottomExpansion === 'tags'">
-            <q-card-section class="height-240">
+            <q-card-section class="height-240 mx-2 px-3">
               <communication-tags :communication="dialer.communication"
                                   ref="communicationTags">
               </communication-tags>
@@ -1503,6 +1503,9 @@ export default {
   },
 
   methods: {
+    phoneExpansionLabel () {
+      return this.bottomExpansion === 'tags' ? 'Done' : 'Cancel'
+    },
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
         this.openPhone()

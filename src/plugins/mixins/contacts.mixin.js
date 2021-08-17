@@ -140,7 +140,7 @@ export default {
 
       query.filter_groups = []
 
-      if (this.lists[this.id].type === ContactListTypes.STATIC) {
+      if (typeof this.lists[this.id] !== 'undefined' && this.lists[this.id].type === ContactListTypes.STATIC) {
         query.filter_groups = [
           {
             filters: {

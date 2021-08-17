@@ -6,8 +6,7 @@
       <contact-phones></contact-phones>
       <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
       </contact-information>
-      <contact-tags :contact="contact"
-                    @update="onTagsUpdate">
+      <contact-tags :contact="contact">
       </contact-tags>
       <contact-notes :contact="contact"
                      @input="onNotesInput">
@@ -68,15 +67,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactTags', 'updateChangedContactProperties']),
+    ...mapActions('contacts', ['setContact', 'updateChangedContactProperties']),
     onNotesInput (value) {
       this.updateChangedContactProperties({
         name: 'notes',
         value: value
       })
-    },
-    onTagsUpdate (tags) {
-      this.setContactTags(tags)
     }
   },
 

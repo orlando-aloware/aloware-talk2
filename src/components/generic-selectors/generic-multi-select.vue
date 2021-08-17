@@ -14,34 +14,22 @@
         <template v-slot:control>
           <div v-for="item in formattedValues"
                :key="item.id">
-            <span :style="{ color: item.color }"
-                  class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items"
-                  v-if="typeof item.color !== 'undefined'">
-              <q-badge class="is-dot mx-1"
-                       :style="{ background: item.color }"
-                       rounded>
-              </q-badge>
-              <span class="tag-text">{{ item.name }}</span>
-              <span role="button" class="custom__remove"
+            <div :style="[ typeof item.color !== 'undefined' ? 'color: item.color;' : '' ]"
+                  class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
+              <div>
+                <q-badge class="is-dot mx-1"
+                         rounded
+                         :style="{ background: item.color }"
+                         v-if="typeof item.color !== 'undefined'">
+                </q-badge>
+              </div>
+              <div class="tag-text">{{ item.name }}</div>
+              <div role="button" class="custom__remove d-flex align-items-center"
                     @click="remove(item.id)">
                 <remove-tag-icon class="ml-1 remove-tag-icon">
                 </remove-tag-icon>
-              </span>
-            </span>
-            <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items"
-                  :key="item.id"
-                  v-else>
-              <q-badge class="is-dot mx-1"
-                       :style="{ background: item.color }"
-                       rounded>
-              </q-badge>
-              <span class="tag-text">{{ item.name }}</span>
-              <span role="button" class="custom__remove"
-                    @click="remove(item.id)">
-                <remove-tag-icon class="ml-1 remove-tag-icon">
-                </remove-tag-icon>
-              </span>
-            </span>
+              </div>
+            </div>
           </div>
           <q-input class="input-text-sm no-after-border w-100 mb-0 mt-1"
                    ref="search"
@@ -133,16 +121,10 @@
                    rounded>
           </q-badge>
           <span class="tag-text">{{ item.name }}</span>
-          <span role="button" class="custom__remove"
-                @click="remove(item)">
-          </span>
         </span>
         <span class="border border-half-rounded d-inline-flex align-items-center mr-1 mb-1 tag-items"
               v-else>
           <span class="tag-text">{{ item.name }}</span>
-          <span role="button" class="custom__remove"
-                @click="remove(item)">
-          </span>
         </span>
       </span>
       <div class="w-100 mt-1"
@@ -153,7 +135,7 @@
           <slot name="button">
             <pencil-o-icon/>
             <span class="ml-1">
-              Modify {{ label | ucwords }}
+              Modify {{ buttonText | ucwords }}
             </span>
           </slot>
         </b-link>
@@ -171,6 +153,11 @@ export default {
   components: { CheckOIcon, PencilOIcon, RemoveTagIcon },
   props: {
     label: {
+      required: false,
+      type: String,
+      default: ''
+    },
+    buttonText: {
       required: false,
       type: String,
       default: ''

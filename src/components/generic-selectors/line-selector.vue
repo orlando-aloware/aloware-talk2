@@ -1,52 +1,71 @@
 <template>
-  <q-select :options="campaignOptions"
-            :multiple="multiple"
-            :placeholder="placeholder"
-            :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
-            v-model="campaignId"
-            options-selected-class="text-primary"
-            color="primary"
-            option-value="id"
-            option-label="name"
-            input-debounce="0"
-            use-input
-            emit-value
-            map-options
-            outlined
-            dense
-            @filter="filterFn">
-    <template v-slot:prepend
-              v-if="prepend">
-      <span class="text-size-xs text-grey-80">{{ prepend }}</span>
-    </template>
+  <div>
+    <generic-multi-select label="Lines"
+                          buttonText="Lines"
+                          :values="campaignId"
+                          :options="campaignOptions"
+                          :disable="disable"
+                          :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
+                          v-if="multiple"
+                          @valuesUpdated="updateLines">
+    </generic-multi-select>
+    <q-select :options="campaignOptions"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '' ]"
+              class="generic-selector"
+              v-model="campaignId"
+              v-else
+              options-selected-class="text-primary"
+              color="primary"
+              option-value="id"
+              option-label="name"
+              input-debounce="0"
+              use-input
+              emit-value
+              map-options
+              outlined
+              dense
+              @filter="filterFn">
+      <template v-slot:prepend
+                v-if="prepend">
+        <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      </template>
 
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="no-results text-grey">
-          No results
-        </q-item-section>
-      </q-item>
-    </template>
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="no-results text-grey">
+            No results
+          </q-item-section>
+        </q-item>
+      </template>
 
-    <template v-slot:option="scope">
-      <q-item v-bind="scope.itemProps"
-              v-on="scope.itemEvents">
-        <q-item-section>
-          <q-item-label v-html="scope.opt.name"/>
-        </q-item-section>
-      </q-item>
-    </template>
-  </q-select>
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-section>
+            <q-item-label v-html="scope.opt.name"/>
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
+  </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'line-selector',
+
+  mixins: [aclMixin],
+
+  components: {
+    GenericMultiSelect
+  },
 
   props: {
     value: {
@@ -149,6 +168,9 @@ export default {
         const needle = val.toLowerCase()
         this.campaignOptions = this.campaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
+    },
+    updateLines (val) {
+      this.$emit('change', val)
     }
   },
 

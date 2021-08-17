@@ -1,134 +1,41 @@
 <template>
   <b-card class="border-0 contact-ring-groups-wrapper">
-    <h4>Contact Ring Groups</h4>
-    <div v-if="!isEdit"
-         class="mt-1">
-      <b-badge variant="primary"
-               class="badge-tag badge-tag-primary ellipsis"
-               v-for="ringGroup in appliedRingGroups"
-               :key="ringGroup.id">
-        <q-tooltip anchor="top middle"
-                   self="center middle"
-                   :offset="[20, 20]">
-          {{ ringGroup.name }}
-        </q-tooltip>
-        {{ ringGroup.name }}
-      </b-badge>
-    </div>
-    <vue-multiselect v-show="isEdit"
-                     class="chip__clear-blue border-blue shrink-options options__no-border options__relative mt-2 options-list__tall"
-                     track-by="id"
-                     label="name"
-                     ref="ringGroupSelect"
-                     placeholder="Select ring group"
-                     openDirection="bottom"
-                     :closeOnSelect="false"
-                     :showLabels="false"
-                     :multiple="true"
-                     :options="ringGroups"
-                     v-model="selectedRingGroups"
-                     @close="onSelectBlur">
-    </vue-multiselect>
-    <b-link v-if="!isEdit && hasRole('Company Admin') || (hasRole('Company Agent') && hasPermissionTo('modify contact ring groups'))"
-            href="#"
-            class="custom-link text-decoration-none"
-            @click="onModifyRingGroups">
-      <pencil-o-icon></pencil-o-icon>
-      Modify Ring Groups
-    </b-link>
+    <ring-group-selector :value="ringGroupValues"
+                         :multiple="true"
+                         @change="submit"/>
   </b-card>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import PencilOIcon from 'src/components/icons/pencil-o-icon'
-import VueMultiselect from 'vue-multiselect'
-import { aclMixin } from 'src/plugins/mixins'
+import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-ring-groups',
 
-  mixins: [aclMixin],
-
   components: {
-    PencilOIcon,
-    VueMultiselect
+    RingGroupSelector
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'ringGroups', 'contactRingGroups']),
-
-    appliedRingGroups () {
-      return this.ringGroups.filter(ringGroup => this.contactRingGroups.includes(ringGroup.id))
-    }
-  },
-
-  data () {
-    return {
-      isEdit: false,
-      ringGroupsArray: [],
-      selectedRingGroups: []
-    }
-  },
-
-  mounted () {
-    if (this.contact && this.contact.id) {
-      this.getRingGroups()
+    ...mapGetters('contacts', ['contact']),
+    ringGroupValues () {
+      if (this.contact && typeof this.contact.ring_groups !== 'undefined') {
+        return this.contact.ring_groups.map(ringGroup => ringGroup.id)
+      }
+      return []
     }
   },
 
   methods: {
-    ...mapActions('contacts', ['setRingGroups', 'setContactRingGroups']),
-
-    getContactRingGroups () {
-      return talk2Api.V1.contact.getRingGroups(this.contact.id).then(response => {
-        this.setContactRingGroups(response.data)
-        this.ringGroupsArray = response.data
-        this.selectedRingGroups = this.ringGroups.filter(ringGroup => this.ringGroupsArray.includes(ringGroup.id))
-      })
-    },
-
-    getRingGroups () {
-      return talk2Api.V1.ringGroups.get()
-        .then(response => {
-          this.setRingGroups(response.data)
-          if (this.contact && this.contact.id) {
-            this.getContactRingGroups()
-          }
-        })
-    },
-
-    onModifyRingGroups () {
-      this.isEdit = true
-      this.$nextTick(function () {
-        this.$refs.ringGroupSelect.$el.focus()
-      })
-    },
-
-    onSelectBlur () {
-      this.isEdit = false
-      this.submit()
-    },
-
-    submit () {
-      let ringGroupIds = this.selectedRingGroups.map(ringGroup => ringGroup.id)
-      ringGroupIds = ringGroupIds || []
+    submit (ringGroupIds) {
+      console.log(ringGroupIds)
       talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: ringGroupIds })
-        .then(response => {
-          this.setContactRingGroups(ringGroupIds)
-        }).catch(err => {
+        .catch(err => {
           console.log(err)
           this.$root.handleErrors(err.response)
         })
-    }
-  },
-
-  watch: {
-    'contact.id': function () {
-      if (this.contact && this.contact.id) {
-        this.getContactRingGroups()
-      }
     }
   }
 }
