@@ -389,7 +389,15 @@ body,
 }
 
 .generic-multi-select {
-  .edittable-wrapper {
+  .list-wrapper {
+    .is-dot {
+      margin-top: 5px;
+    }
+  }
+  .edit-wrapper {
+    .dot-wrapper {
+      height: 16px;
+    }
     & > .q-field__inner > .q-field__control {
       &:before {
         border: 0;
@@ -398,9 +406,6 @@ body,
       &:after {
         display: none;
       }
-    }
-    .is-dot {
-      margin-top: 5px;
     }
   }
   .q-field > .q-field {
