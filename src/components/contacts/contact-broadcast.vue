@@ -4,7 +4,7 @@
     <div class="mt-1">
       <b-badge v-for="broadcast in contact.broadcasts"
                variant="primary"
-               class="badge-tag badge-tag-primary ellipsis"
+               class="badge-tag badge-tag-primary ellipsis bg-transparent"
                :key="broadcast.id">
         <q-tooltip anchor="top middle"
                    self="center middle"
