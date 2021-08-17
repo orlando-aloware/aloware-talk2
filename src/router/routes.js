@@ -27,8 +27,16 @@ const routes = [
         },
         children: [
           {
-            path: 'channels/:channel/contacts/:id',
+            path: 'channels/:channel/:status/contacts/:id',
             name: 'Inbox Contact Task',
+            component: () => import('src/pages/contacts/Contact.vue'),
+            meta: {
+              title: 'Inbox'
+            }
+          },
+          {
+            path: 'channels/:channel/:status',
+            name: 'Inbox Channel Task Status',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
               title: 'Inbox'

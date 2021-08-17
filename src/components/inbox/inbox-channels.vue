@@ -217,7 +217,7 @@ export default {
       }
     })
 
-    this.$VueEvent.listen('mark_contact_communications_as_read', (data) => {
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', (data) => {
       // get current contact's communications
       let contactCommunications = this.communications.filter(communication => communication.contact.id === data.id)
 

@@ -21,7 +21,7 @@
             color="white"
             text-color="primary"
             :options="options"
-            v-model="currentTask">
+            v-model="currentTask" @click="onToggleStatus">
             <template v-slot:one>
               <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
                    :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-20' : 'active']">
@@ -97,6 +97,17 @@ export default {
     ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact']),
     nextPage () {
       return this.currentPage + 1
+    },
+    statusText () {
+      switch (this.currentTask) {
+        case ContactTaskStatus.STATUS_PENDING:
+          return 'pending'
+        case ContactTaskStatus.STATUS_CLOSED:
+          return 'closed'
+        case ContactTaskStatus.STATUS_OPEN:
+        default:
+          return 'open'
+      }
     }
   },
   data () {
@@ -221,44 +232,75 @@ export default {
     resetList () {
       this.page = 1
       this.loadContactTasks()
+      this.setSelectedContact({})
+    },
+    setStatus () {
+      switch (this.$route.params.status) {
+        case 'pending':
+          this.currentTask = ContactTaskStatus.STATUS_PENDING
+          break
+        case 'closed':
+          this.currentTask = ContactTaskStatus.STATUS_CLOSED
+          break
+        case 'open':
+        default:
+          this.currentTask = ContactTaskStatus.STATUS_OPEN
+      }
+    },
+    onToggleStatus (value) {
+      this.$router.push({
+        name: 'Inbox Channel Task Status',
+        params: {
+          channel: 'inbox',
+          status: this.statusText
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
   created () {
+    this.setStatus()
+
     this.loadContactTasks()
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      // check data loaded
-      if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
-        this.setSelectedContact(data)
-        this.updateContacts(data)
-      }
+      talk2Api.V2.contacts.get(data.id).then(response => {
+        let contact = response.data
+        // check data loaded
+        if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(contact.id)) {
+          this.setSelectedContact(contact)
+          this.updateContacts(contact)
+        }
+      })
+    })
 
-      // TODO check for sort when ordering contact tasks
-      // comm type == call, dispo-stat = missed
-      // inbox/[status]/contacts/[id]
-      // only modify order if new contact task === current task
-      if (this.currentTask === data.task_status) {
-        let contact = this.contacts.find(contact => contact.id === data.id)
-        // if contact is not in the list, then automatically add it to the top
-        if (!contact) {
+    this.$VueEvent.listen('new_communication', communication => {
+      talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+        let contact = response.data
+        // only modify order if new contact task === current task
+        if (this.currentTask === contact.task_status) {
+          let foundContact = this.contacts.find(item => item.id === contact.id)
+          // if contact is not in the list, then automatically add it to the top
+
           let contacts = [...this.contacts]
-          contacts.unshift(contact)
+          if (!foundContact) {
+            if (this.contacts.length > this.perPage) {
+              contacts.pop()
+            }
+          } else {
+            // get all contacts except the current one
+            contacts = [...this.contacts.filter(item => item.id !== contact.id)]
+          }
 
-          if (this.contacts.length > this.perPage) {
-            contacts.pop()
+          if (this.sorting.order === 'asc') {
+            contacts.push(contact)
+          } else {
+            contacts.unshift(contact)
           }
           this.setContacts(contacts)
-        } else {
-          // get all contacts except the current one
-          let contacts = [...this.contacts.filter(contact => contact.id !== data.id)]
-
-          // TODO compare unreads total
-
-          // add to the top
-          contacts.unshift(data)
-          this.setContacts(contacts)
         }
-      }
+      })
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
@@ -271,14 +313,20 @@ export default {
     }
   },
   watch: {
-    currentTask () {
-      this.resetList()
-    },
     'sorting.order': function () {
       this.loadContactTasks()
     },
     'searchText': function () {
       this.loadContactTasks()
+    },
+    '$route.params.status': function () {
+      this.resetList()
+    },
+    '$route.name': function (value) {
+      if (value === 'Inbox') {
+        this.currentTask = ContactTaskStatus.STATUS_OPEN
+        this.resetList()
+      }
     }
   }
 }

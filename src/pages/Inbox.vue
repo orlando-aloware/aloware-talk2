@@ -41,7 +41,7 @@ export default {
     ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
 
     setChannel () {
-      if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
+      if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
         let channel = this.items.find(item => item.value === this.$route.params.channel)
         this.setActiveChannel(channel)
       }

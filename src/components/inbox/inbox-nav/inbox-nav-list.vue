@@ -68,14 +68,26 @@ export default {
       this.active = nextActive
       let channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
-      this.$router.push({
-        name: 'Inbox Channel',
-        params: {
-          channel: this.active
-        }
-      }).catch(err => {
-        console.log(err)
-      })
+      if (this.active === 'inbox') {
+        this.$router.push({
+          name: 'Inbox Channel Task Status',
+          params: {
+            channel: this.active,
+            status: 'open'
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      } else {
+        this.$router.push({
+          name: 'Inbox Channel',
+          params: {
+            channel: this.active
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      }
     }
   },
 
