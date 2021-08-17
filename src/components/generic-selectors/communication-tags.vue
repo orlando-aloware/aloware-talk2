@@ -9,7 +9,7 @@
       <template v-slot:button>
         <add-icon-circle height="14" width="14" color="#256EFF"/>
         <span class="ml-1">
-          Add Tags
+          {{ buttonText }}
         </span>
       </template>
     </generic-multi-select>
@@ -37,6 +37,11 @@ export default {
   props: {
     communication: {
       required: true
+    },
+    buttonText: {
+      required: false,
+      type: String,
+      default: 'Add Tags'
     }
   },
 

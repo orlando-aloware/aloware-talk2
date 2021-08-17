@@ -849,6 +849,7 @@
           <template v-if="bottomExpansion === 'tags'">
             <q-card-section class="height-240 mx-2 px-3">
               <communication-tags :communication="dialer.communication"
+                                  buttonText="Modify Tags"
                                   ref="communicationTags">
               </communication-tags>
             </q-card-section>
