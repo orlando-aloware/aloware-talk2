@@ -538,7 +538,7 @@ export default {
           for (let communication of this.filteredCommunications) {
             this.$set(communication, 'is_read', true)
           }
-          this.$VueEvent.fire('mark_contact_communications_as_read', res.data)
+          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
         }).catch(err => {
           this.$handleErrors(err.response)
