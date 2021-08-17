@@ -3,7 +3,7 @@
     <h4 class="mb-1">
       {{ label | ucwords }}
     </h4>
-    <q-field class="edittable-wrapper mt-2 w-100"
+    <q-field class="edit-wrapper mt-2 w-100"
              outlined
              stack-label
              v-if="isEdit"
@@ -14,9 +14,9 @@
         <template v-slot:control>
           <div v-for="item in formattedValues"
                :key="item.id">
-            <div :style="[ typeof item.color !== 'undefined' ? 'color: item.color;' : '' ]"
+            <div :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
                   class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
-              <div>
+              <div class="dot-wrapper d-flex align-items-center">
                 <q-badge class="is-dot mx-1"
                          rounded
                          :style="{ background: item.color }"
@@ -49,23 +49,21 @@
                  v-for="item in filteredOptions"
                  :key="item.id"
                  @click="onSelectOption(item.id)">
-              <span :style="{ color: item.color }"
-                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items ungrouped"
-                    v-if="typeof item.color !== 'undefined'">
+              <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
+                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items">
                 <q-badge class="is-dot mx-1"
+                         rounded
                          :style="{ background: item.color }"
-                         rounded>
+                         v-if="typeof item.color !== 'undefined'">
                 </q-badge>
-                <span class="tag-text">{{ item.name }}</span>
+                <span class="tag-text text-grey-100">{{ item.name }}</span>
               </span>
-              <span class="d-inline-flex align-items-center mr-1 mb-1 tag-items"
-                    v-else>
-                <span class="tag-text">{{ item.name }}</span>
-              </span>
-              <check-o-icon color="#256EFF"
-                            width="12"
-                            height="8"
-                            v-if="isSelected(item.id)"/>
+              <div>
+                <check-o-icon color="#256EFF"
+                              width="12"
+                              height="8"
+                              v-if="isSelected(item.id)"/>
+              </div>
             </div>
           </div>
         </template>
@@ -84,18 +82,14 @@
                  v-for="child in item.children"
                  :key="`child-${child.id}`"
                  @click="onSelectOption(child.id)">
-              <span :style="{ color: child.color }"
-                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items"
+              <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items"
                     v-if="typeof child.color !== 'undefined'">
                 <q-badge class="is-dot mx-1"
+                         rounded
                          :style="{ background: child.color }"
-                         rounded>
+                         v-if="typeof child.color !== 'undefined'">
                 </q-badge>
-                <span class="tag-text">{{ child.name }}</span>
-              </span>
-              <span class="d-inline-flex align-items-center mr-1 mb-1 tag-items"
-                    v-else>
-                <span class="tag-text">{{ child.name }}</span>
+                <span class="tag-text text-grey-100">{{ child.name }}</span>
               </span>
               <check-o-icon color="#256EFF"
                             width="12"
@@ -110,23 +104,20 @@
         <span>No options to select</span>
       </div>
     </q-field>
-    <div v-else>
-      <span v-for="item in formattedValues"
+    <div class="list-wrapper"
+         v-else>
+      <div v-for="item in formattedValues"
            :key="item.id">
-        <span :style="{ color: item.color }"
-              class="border border-half-rounded d-inline-flex align-items-center mr-1 mb-1 tag-items"
-              v-if="typeof item.color !== 'undefined'">
+        <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
+              class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items">
           <q-badge class="is-dot mx-1"
+                   rounded
                    :style="{ background: item.color }"
-                   rounded>
+                   v-if="typeof item.color !== 'undefined'">
           </q-badge>
           <span class="tag-text">{{ item.name }}</span>
         </span>
-        <span class="border border-half-rounded d-inline-flex align-items-center mr-1 mb-1 tag-items"
-              v-else>
-          <span class="tag-text">{{ item.name }}</span>
-        </span>
-      </span>
+      </div>
       <div class="w-100 mt-1"
            v-if="canEdit">
         <b-link href="#"
