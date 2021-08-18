@@ -60,7 +60,7 @@
           </q-btn-toggle>
         </div>
         <div class="h-100 w-100 flex-grow-1 scroll-y" @scroll="handleScroll">
-          <inbox-task-list :contacts="contacts"></inbox-task-list>
+          <inbox-task-list :contacts="contacts" @onItemSelected="onItemSelected"></inbox-task-list>
         </div>
       </div>
       <template #overlay>
@@ -232,7 +232,9 @@ export default {
     resetList () {
       this.page = 1
       this.loadContactTasks()
-      this.setSelectedContact({})
+      if (!this.$route.params.id) {
+        this.setSelectedContact({})
+      }
     },
     setStatus () {
       switch (this.$route.params.status) {
@@ -251,6 +253,19 @@ export default {
       this.$router.push({
         name: 'Inbox Channel Task Status',
         params: {
+          channel: 'inbox',
+          status: this.statusText
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    onItemSelected (contact) {
+      this.setSelectedContact(contact)
+      this.$router.push({
+        name: 'Inbox Contact Task',
+        params: {
+          id: contact.id.toString(),
           channel: 'inbox',
           status: this.statusText
         }
@@ -323,7 +338,7 @@ export default {
       this.resetList()
     },
     '$route.name': function (value) {
-      if (value === 'Inbox') {
+      if (['Inbox Channel Task Status', 'Inbox'].includes(value)) {
         this.currentTask = ContactTaskStatus.STATUS_OPEN
         this.resetList()
       }

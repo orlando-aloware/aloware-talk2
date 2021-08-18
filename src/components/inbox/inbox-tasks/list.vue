@@ -1,7 +1,8 @@
 <template>
   <div>
     <inbox-task-item v-for="contact in contacts" :key="contact.id"
-                     :contact="contact">
+                     :contact="contact"
+                     @onItemSelected="onItemSelected">
     </inbox-task-item>
   </div>
 </template>
@@ -14,6 +15,11 @@ export default {
   props: {
     contacts: {
       required: true
+    }
+  },
+  methods: {
+    onItemSelected (contact) {
+      this.$emit('onItemSelected', contact)
     }
   }
 }
