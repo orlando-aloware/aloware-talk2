@@ -21,7 +21,8 @@
             color="white"
             text-color="primary"
             :options="options"
-            v-model="currentTask" @click="onToggleStatus">
+            v-model="currentTask"
+            @click="onToggleStatus">
             <template v-slot:one>
               <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
                    :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-20' : 'active']">
@@ -338,7 +339,7 @@ export default {
       this.resetList()
     },
     '$route.name': function (value) {
-      if (['Inbox Channel Task Status', 'Inbox'].includes(value)) {
+      if (['Inbox'].includes(value)) {
         this.currentTask = ContactTaskStatus.STATUS_OPEN
         this.resetList()
       }
