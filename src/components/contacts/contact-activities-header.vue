@@ -1,7 +1,7 @@
 <template>
   <div class="calls-header d-flex justify-content-between">
     <div class="calls-header__label">
-      {{ label }} <b-badge :variant="resolveVariant" class="font-weight-light">{{ contact.task_status_name }}</b-badge>
+      {{ label }} <b-badge :variant="resolveVariant" class="font-weight-light">{{ contact.task_status | fixTaskStatusName }}</b-badge>
     </div>
    <div class="mr-1">
      <q-btn
