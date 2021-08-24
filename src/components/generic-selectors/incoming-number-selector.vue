@@ -46,7 +46,7 @@ import { mapState } from 'vuex'
 import _ from 'lodash'
 
 export default {
-  name: 'phone-number-selector',
+  name: 'incoming-number-selector',
 
   props: {
     campaign_id: {
@@ -89,7 +89,7 @@ export default {
     placeholder: {
       type: String,
       required: false,
-      default: 'Search number'
+      default: 'Select number'
     },
 
     genericStyling: {
@@ -184,11 +184,11 @@ export default {
 
   watch: {
     value () {
-      this.userId = this.value
+      this.phoneNumber = this.value
     },
 
-    userId (val) {
-      if (this.userId !== this.value) {
+    phoneNumber (val) {
+      if (this.phoneNumber !== this.value) {
         this.$emit('change', val)
       }
     }

@@ -95,7 +95,7 @@ export default {
     },
     genericMultiselect: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
 
@@ -110,15 +110,11 @@ export default {
     ...mapState(['currentCompany', 'ringGroups']),
 
     placeholder () {
-      if (this.ringGroupId) {
-        return ''
-      }
-
       if (this.multiple) {
-        return 'Select ring groups'
+        return 'Select Ring Groups'
       }
 
-      return 'Select a ring group'
+      return 'Select A Ring Group'
     },
 
     ringGroupsAlphabeticalOrder () {

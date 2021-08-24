@@ -24,7 +24,10 @@
               class="form-label"
               label="Ring Groups"
             >
-              <ring-group-selector :multiple="true" @change="(eventPayload) => onFilterChange(eventPayload, 'ring_groups')">
+              <ring-group-selector v-model="filter.ring_groups"
+                                   :multiple="true"
+                                   :generic-multiselect="false"
+                                   @change="(eventPayload) => onFilterChange(eventPayload, 'ring_groups')">
               </ring-group-selector>
             </b-form-group>
           </b-col>
@@ -32,7 +35,8 @@
 
         <h5 class="mt-4 section-header">Handling</h5>
         <b-form-row class="mt-2">
-          <b-col sm="12" md="6">
+          <b-col sm="12"
+                 md="6">
             <b-form-group class="form-label"
                           label="Direction">
               <communication-direction-selector v-model="filter.direction"
@@ -50,26 +54,31 @@
               </answer-status-selector>
             </b-form-group>
           </b-col>
-          <b-col v-if="['calls', 'recordings'].includes($route.params.channel)">
+          <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
+                 sm="12"
+                 md="6">
             <b-form-group class="form-label"
                           label="Talk Time">
               <talk-time-selector v-model="filter.min_talk_time"
-                                  @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')"></talk-time-selector>
+                                  @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')">
+              </talk-time-selector>
             </b-form-group>
           </b-col>
-          <b-col v-if="['calls', 'recordings'].includes($route.params.channel)" sm="12" md="6">
+          <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
+                 sm="12"
+                 md="6">
             <b-form-group class="form-label"
                           label="Transfer Type">
               <transfer-type-selector v-model="filter.transfer_type"
-                                      @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')"></transfer-type-selector>
+                                      @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')">
+              </transfer-type-selector>
             </b-form-group>
           </b-col>
 
           <b-col v-if="['calls', 'recordings', 'messages'].includes($route.params.channel)" sm="12" md="6">
             <b-form-group
-              id="input-group-1"
+              class="form-label"
               label="Callback Status"
-              label-for="input-1"
             >
               <callback-status-selector v-model="filter.callback_status"
                                         :clearable="true"
@@ -81,7 +90,8 @@
 
         <h5 class="mt-4 section-header">Properties</h5>
         <b-form-row class="mt-2">
-          <b-col md="6" sm="12">
+          <b-col md="6"
+                 sm="12">
             <b-form-group class="form-label"
                           label="Tags">
               <tag-selector :multiple="true"
@@ -95,15 +105,16 @@
                  sm="12">
             <b-form-group class="form-label"
                           label="Call Disposition">
-              <call-disposition-selector :multiple="true"
-                                         v-model="filter.call_dispositions"
+              <call-disposition-selector v-model="filter.call_dispositions"
+                                         :multiple="true"
                                          @change="(eventPayload) => onFilterChange(eventPayload, 'call_dispositions')">
               </call-disposition-selector>
             </b-form-group>
           </b-col>
         </b-form-row>
         <b-form-row>
-          <b-col md="3" sm="12">
+          <b-col md="3"
+                 sm="12">
             <b-form-group>
               <span class="form-label">Show Only First Time Communications</span>
               <div>
@@ -115,7 +126,8 @@
             </b-form-group>
           </b-col>
 
-          <b-col md="3" sm="12">
+          <b-col md="3"
+                 sm="12">
             <b-form-group>
               <span class="form-label">Show Only Untagged Communications</span>
               <div>
@@ -127,7 +139,8 @@
             </b-form-group>
           </b-col>
 
-          <b-col md="3" sm="12">
+          <b-col md="3"
+                 sm="12">
             <b-form-group>
               <span class="form-label">Exclude Communications Sent From Sequences</span>
               <div>
@@ -143,28 +156,36 @@
 
         <h5 class="mt-4 section-header">Attribution</h5>
         <b-form-row class="mt-2">
-          <b-col sm="12" md="6">
+          <b-col sm="12"
+                 md="6">
             <b-form-group class="form-label"
                           label="Phone Numbers">
-              <phone-number-selector :multiple="true"
-                                     :use-chips="true"
-                                     @change="(eventPayload) => onFilterChange(eventPayload, 'incoming_numbers')">
-              </phone-number-selector>
+              <incoming-number-selector v-model="filter.incoming_numbers"
+                                        :multiple="true"
+                                        :use-chips="true"
+                                        @change="(eventPayload) => onFilterChange(eventPayload, 'incoming_numbers')">
+              </incoming-number-selector>
             </b-form-group>
           </b-col>
-          <b-col v-if="['calls', 'recordings', 'messages'].includes($route.params.channel)" sm="12" md="6">
+          <b-col v-if="['calls', 'recordings', 'messages'].includes($route.params.channel)"
+                 sm="12"
+                 md="6">
             <b-form-group class="form-label"
                           label="Users">
-              <user-selector :generic-styling="false"
+              <user-selector v-model="filter.users"
+                             :generic-styling="false"
                              :multiple="true"
-                             :use-chips="true">
+                             :use-chips="true"
+                             @change="(eventPayload) => onFilterChange(eventPayload, 'users')">
               </user-selector>
             </b-form-group>
           </b-col>
-          <b-col  sm="12" md="6">
+          <b-col  sm="12"
+                  md="6">
             <b-form-group class="form-label"
                           label="Sequences">
-              <sequence-selector :multiple="true"
+              <sequence-selector v-model="filter.workflows"
+                                 :multiple="true"
                                  :generic-styling="false"
                                  :use-chips="true"
                                  @change="(eventPayload) => onFilterChange(eventPayload, 'workflows')">
@@ -174,12 +195,10 @@
           <b-col v-if="['messages'].includes($route.params.channel)"
                  sm="12"
                  md="6">
-            <b-form-group
-              id="input-group-1"
-              label="Broadcasts"
-              label-for="input-1"
-            >
-              <broadcast-selector :multiple="true"
+            <b-form-group class="form-label"
+                          label="Broadcasts">
+              <broadcast-selector v-model="filter.broadcasts"
+                                  :multiple="true"
                                   :generic-styling="false"
                                   :use-chips="true"
                                   @change="(eventPayload) => onFilterChange(eventPayload, 'broadcasts')">
@@ -202,16 +221,16 @@ import CommunicationDirectionSelector from 'components/generic-selectors/communi
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import TagSelector from 'components/generic-selectors/tag-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
-import PhoneNumberSelector from 'components/generic-selectors/phone-number-selector'
+import IncomingNumberSelector from 'components/generic-selectors/incoming-number-selector'
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 export default {
-  name: 'filter-calls',
+  name: 'filter-form',
 
   components: {
     SequenceSelector,
-    PhoneNumberSelector,
+    IncomingNumberSelector,
     UserSelector,
     CommunicationDirectionSelector,
     AnswerStatusSelector,

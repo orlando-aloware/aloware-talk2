@@ -99,7 +99,7 @@ export default {
       isEdit: false,
       tagsArray: [],
       tags: [],
-      tagId: []
+      tagId: this.value
     }
   },
 

@@ -58,6 +58,9 @@ export default {
   name: 'sequence-selector',
 
   props: {
+    value: {
+      required: false
+    },
     placeholder: {
       required: false,
       default: 'Select Sequences'
@@ -141,7 +144,7 @@ export default {
     return {
       auth: auth,
       isLoading: false,
-      sequence: null,
+      sequence: this.value,
       sequencesOptions: []
     }
   },
