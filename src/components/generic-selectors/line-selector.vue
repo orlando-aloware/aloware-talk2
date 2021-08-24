@@ -1,21 +1,22 @@
 <template>
   <div>
-    <generic-multi-select label="Lines"
-                          buttonText="Lines"
+    <generic-multi-select :label="label"
+                          :buttonText="buttonText"
                           :values="campaignId"
                           :options="campaignOptions"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
-                          v-if="multiple"
+                          v-if="genericMultiselect"
                           @valuesUpdated="updateLines">
     </generic-multi-select>
-    <q-select :options="campaignOptions"
+    <q-select v-else
+              :options="campaignOptions"
               :placeholder="placeholder"
               :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '' ]"
-              class="generic-selector"
+              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '']"
               v-model="campaignId"
-              v-else
+              :multiple="multiple"
+              :use-chips="useChips"
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
@@ -26,11 +27,8 @@
               map-options
               outlined
               dense
+              @input="updateLines"
               @filter="filterFn">
-      <template v-slot:prepend
-                v-if="prepend">
-        <span class="text-size-xs text-grey-80">{{ prepend }}</span>
-      </template>
 
       <template v-slot:no-option>
         <q-item>
@@ -40,14 +38,6 @@
         </q-item>
       </template>
 
-      <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
-          <q-item-section>
-            <q-item-label v-html="scope.opt.name"/>
-          </q-item-section>
-        </q-item>
-      </template>
     </q-select>
   </div>
 </template>
@@ -87,6 +77,33 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+    label: {
+      type: String,
+      default: 'Lines',
+      required: false
+    },
+    buttonText: {
+      type: String,
+      default: 'Modify Lines',
+      required: false
+    },
+    genericMultiselect: {
+      type: Boolean,
+      default: false
+    },
+    genericStyling: {
+      type: Boolean,
+      default: true
+    },
+    useChips: {
+      type: Boolean,
+      default: false
+    },
+    placeholder: {
+      type: String,
+      default: 'Select Lines',
+      required: false
     }
   },
 
@@ -99,18 +116,6 @@ export default {
 
   computed: {
     ...mapState(['currentCompany', 'campaigns']),
-
-    placeholder () {
-      if (this.campaignId) {
-        return ''
-      }
-
-      if (this.multiple) {
-        return 'Select lines'
-      }
-
-      return 'Select a line'
-    },
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {

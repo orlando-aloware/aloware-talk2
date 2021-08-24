@@ -1,32 +1,62 @@
 <template>
-  <div @scroll="handleScroll">
-    <b-overlay :show="isGettingTasksList"
-               class="h-100"
-               rounded="sm"
-               variant="white">
-      <task-list :communications="communications"
-                 :answer-status="answerStatus"
-                 :channel="channel"
-                 v-if="!isGettingTasksList">
-      </task-list>
-      <div class="relative py-4">
-        <b-overlay :show="isLoadingMore && !isGettingTasksList"
-                   rounded="sm">
-          <template #overlay>
-            <q-spinner-bars color="primary"/>
-          </template>
-        </b-overlay>
-      </div>
-      <template #overlay>
-        <div class="text-center">
-          <q-spinner-bars
-            color="primary"
-            size="2em"
-          />
+  <b-overlay :show="isGettingTasksList"
+             class="h-100 w-100"
+             rounded="sm"
+             variant="white">
+    <div class="w-100 h-100 d-flex flex-column">
+
+      <div class="header flex- w-100">
+        <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
+          <compact-btn borderless
+                       customClass="ml-2 fs-14 _500 position-relative mt-3"
+                       :variant="filterButtonVariant"
+                       v-b-modal:inbox-channel-filter-modal>
+              Filters
+            <b-badge class="ml-1 mt-1"
+                     pill
+                     variant="primary">
+            </b-badge>
+          </compact-btn>
+
+          <q-select class="m-0"
+                    borderless
+                    emit-value
+                    map-options
+                    v-model="filterRight"
+                    :options="optionsRight"
+                    :append="[{icon: 'ion-ios-arrow-down'}]"
+                    @input="sort">
+          </q-select>
         </div>
-      </template>
-    </b-overlay>
-  </div>
+      </div>
+      <div class="h-100 w-100 flex-grow-1 scroll-y" @scroll="handleScroll">
+        <task-list :communications="communications"
+                   :answer-status="answerStatus"
+                   :channel="channel"
+                   v-if="!isGettingTasksList">
+        </task-list>
+        <div class="relative py-4">
+          <b-overlay :show="isLoadingMore && !isGettingTasksList"
+                     rounded="sm">
+            <template #overlay>
+              <q-spinner-bars color="primary"/>
+            </template>
+          </b-overlay>
+        </div>
+      </div>
+      <filter-dialog :filter="filter"
+                     @onResetFilter="resetFilters">
+      </filter-dialog>
+    </div>
+    <template #overlay>
+      <div class="text-center">
+        <q-spinner-bars
+          color="primary"
+          size="2em"
+        />
+      </div>
+    </template>
+  </b-overlay>
 </template>
 
 <script>
@@ -39,6 +69,8 @@ import * as Filters from 'src/constants/filters'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import CompactBtn from 'components/compact-btn'
+import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 
 let scrollTimeout
 export default {
@@ -46,7 +78,7 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { TaskList },
+  components: { FilterDialog, CompactBtn, TaskList },
 
   props: {
     filterType: {
@@ -99,6 +131,10 @@ export default {
 
     nextPage () {
       return this.currentPage + 1
+    },
+
+    filterButtonVariant () {
+      return 'outlined-light'
     }
   },
 
@@ -113,7 +149,20 @@ export default {
       pagination: {
         type: Object,
         required: true
-      }
+      },
+      optionsRight: [
+        {
+          label: 'Oldest',
+          value: 'oldest',
+          disable: false
+        },
+        {
+          label: 'Newest',
+          value: 'newest',
+          disable: false
+        }
+      ],
+      filterRight: 'newest'
     }
   },
 
@@ -523,6 +572,12 @@ export default {
       if (value === 'Inbox Contact') {
         let communication = this.communications.find(item => item.id === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
+      }
+    },
+    filter: {
+      deep: true,
+      handler () {
+        this.getCommunications(this.filter)
       }
     }
   }

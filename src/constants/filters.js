@@ -18,6 +18,7 @@ export const DEFAULT_STATE = {
     per_page: 20,
     checked_table_fields: null,
     first_time_only: 0,
+    exclude_automated_communications: 0,
     untagged_only: 0,
     is_blocked: 0,
     is_dnc: 0,
@@ -31,6 +32,10 @@ export const DEFAULT_STATE = {
     incoming_numbers: [],
     users: [],
     timezone: window.timezone,
-    changed: false
+    changed: false,
+    transfer_type: null,
+    call_dispositions: [],
+    callback_status: null,
+    broadcasts: []
   }
 }

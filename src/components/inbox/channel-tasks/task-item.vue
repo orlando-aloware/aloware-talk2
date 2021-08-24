@@ -5,8 +5,8 @@
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
       <i v-if="!communication.is_read"
-         class="fa fa-circle"
-         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;"></i>
+         class="fa fa-circle position-relative"
+         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;"></i>
       <avatar width="34"
               height="34"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"

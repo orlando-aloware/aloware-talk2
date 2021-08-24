@@ -3,6 +3,7 @@ export default function () {
     selectedContactId: null,
     selectedCommunication: null,
     isGettingTasksList: false,
+    isChannelFilterOpen: false,
     activeChannel: {
       label: 'Inbox',
       value: 'inbox',

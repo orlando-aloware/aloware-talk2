@@ -1,28 +1,28 @@
 <template>
   <div>
-    <generic-multi-select label="Contact Ring Groups"
+    <generic-multi-select :label="label"
                           buttonText="Ring Groups"
                           :values="ringGroupId"
                           :options="ringGroupOptions"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
-                          v-if="multiple"
+                          v-if="genericMultiselect"
                           @valuesUpdated="updateRingGroups">
     </generic-multi-select>
-    <q-select :options="ringGroupOptions"
+    <q-select v-else
+              :options="ringGroupOptions"
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
               :class="[ prepend ? 'with-prepend' : '' ]"
-              class="generic-selector"
               v-model="ringGroupId"
-              v-else
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
               use-input
+              use-chips
               emit-value
               map-options
               outlined
@@ -88,6 +88,14 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+    label: {
+      type: String,
+      default: 'Contact Ring Groups'
+    },
+    genericMultiselect: {
+      type: Boolean,
+      default: false
     }
   },
 

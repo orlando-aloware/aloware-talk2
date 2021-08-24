@@ -3,8 +3,7 @@
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
+            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '']"
             v-model="userId"
             options-selected-class="text-primary"
             color="primary"
@@ -12,6 +11,7 @@
             option-label="name"
             input-debounce="0"
             use-input
+            :use-chips="useChips"
             emit-value
             map-options
             outlined
@@ -75,6 +75,12 @@ export default {
       required: false
     },
 
+    useChips: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
     hideExtensions: {
       required: false,
       default: false,
@@ -90,6 +96,11 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+
+    genericStyling: {
+      type: Boolean,
+      default: true
     }
   },
 

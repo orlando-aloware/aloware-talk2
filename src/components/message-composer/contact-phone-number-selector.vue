@@ -30,7 +30,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'phone-number-selector',
+  name: 'contact-phone-number-selector',
   computed: {
     ...mapGetters('contacts', ['contactPhoneNumbers', 'contact', 'messageComposer']),
     contactAndPhoneNumbers () {

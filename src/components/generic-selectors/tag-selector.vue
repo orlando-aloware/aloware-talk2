@@ -1,36 +1,95 @@
 <template>
-  <b-card class="border-0 tags-wrapper">
-    <generic-multi-select label="Tags"
-                          buttonText="Tags"
-                          :values="selectedTagIds"
+    <generic-multi-select :label="label"
+                          :buttonText="buttonText"
+                          :values="tagIds"
                           :options="tags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          @valuesUpdated="submitTags">
+                          v-if="genericMultiselect"
+                          @valuesUpdated="select">
     </generic-multi-select>
-  </b-card>
+  <q-select v-else
+            :options="tags"
+            :placeholder="placeholder"
+            :disable="disable"
+            class="multiselect always-open"
+            :class="[ prepend ? 'with-prepend' : '' ]"
+            v-model="tagId"
+            :multiple="multiple"
+            use-chips
+            options-selected-class="text-primary"
+            color="primary"
+            option-value="id"
+            option-label="name"
+            input-debounce="0"
+            use-input
+            emit-value
+            map-options
+            outlined
+            dense>
+
+    <template v-slot:no-option>
+      <q-item>
+        <q-item-section class="no-results text-grey">
+          No results
+        </q-item-section>
+      </q-item>
+    </template>
+
+  </q-select>
 </template>
 
 <script>
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import { mapState, mapActions } from 'vuex'
 
 export default {
-  name: 'contact-tags',
+  name: 'tags-selector',
 
   mixins: [aclMixin],
 
   components: { GenericMultiSelect },
 
   props: {
-    contact: {
-      required: true
+
+    value: {
+      required: false
     },
 
     no_title: {
       type: Boolean,
       required: false,
+      default: false
+    },
+    label: {
+      type: String,
+      default: 'Tags'
+    },
+    buttonText: {
+      type: String,
+      default: 'Modify Tags'
+    },
+    placeholder: {
+      type: String,
+      default: 'Select Tags'
+    },
+    disable: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
+    prepend: {
+      type: String,
+      required: false
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    genericMultiselect: {
+      type: Boolean,
       default: false
     }
   },
@@ -39,24 +98,16 @@ export default {
     return {
       isEdit: false,
       tagsArray: [],
-      tags: []
+      tags: [],
+      tagId: []
     }
   },
 
   computed: {
-    ...mapState(['tagsFullyLoaded']),
-    contactTags () {
-      return this.contact.tags
-    },
-
     getLabel () {
       return tag => {
         return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
       }
-    },
-
-    selectedTagIds () {
-      return this.contactTags ? this.contactTags.map(tag => tag.id) : []
     },
 
     displayClass () {
@@ -93,7 +144,7 @@ export default {
     },
 
     getTags () {
-      if (!this.hasPermissionTo('list tag') || this.tagsFullyLoaded) {
+      if (!this.hasPermissionTo('list tag')) {
         return
       }
 
@@ -101,24 +152,20 @@ export default {
         params: { full_load: true }
       }).then(res => {
         this.tags = res.data
-        this.setTagsFullyLoaded(true)
       }).catch(err => {
         console.log(err)
       })
+    }
+  },
+  watch: {
+    value () {
+      this.tagId = this.value
     },
-
-    submitTags (tagsArray) {
-      if (this.hasPermissionTo('tag contact')) {
-        talk2Api.V1.contact.storeTags(this.contact.id, { tags: tagsArray })
-          .then(response => {
-            this.$emit('update', response.data)
-          }).catch(err => {
-            console.log(err)
-            this.$root.handleErrors(err.response)
-          })
+    tagId (val) {
+      if (this.tagId !== this.value) {
+        this.$emit('change', val)
       }
-    },
-    ...mapActions(['setTagsFullyLoaded'])
+    }
   }
 }
 </script>

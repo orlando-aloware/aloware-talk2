@@ -4,7 +4,6 @@
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
             v-model="callDispositionId"
             options-selected-class="text-primary"
             color="primary"
@@ -12,6 +11,7 @@
             option-label="name"
             input-debounce="0"
             use-input
+            use-chips
             emit-value
             map-options
             outlined
@@ -60,7 +60,8 @@ export default {
 
   props: {
     value: {
-      required: false
+      required: false,
+      default: () => { return [] }
     },
 
     multiple: {
@@ -92,15 +93,11 @@ export default {
     ...mapState(['currentCompany', 'callDispositions']),
 
     placeholder () {
-      if (this.callDispositionId) {
-        return ''
-      }
-
       if (this.multiple) {
-        return 'Select call dispositions'
+        return 'Select Call Dispositions'
       }
 
-      return 'Select a call disposition'
+      return 'Select A Call Disposition'
     },
 
     callDispositionsAlphabeticalOrder () {

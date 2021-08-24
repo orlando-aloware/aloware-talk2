@@ -106,8 +106,9 @@
     </q-field>
     <div class="list-wrapper"
          v-else>
-      <div v-for="item in formattedValues"
-           :key="item.id">
+      <div class="selected-items-wrapper">
+        <div v-for="item in formattedValues"
+             :key="item.id">
         <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
               class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items">
           <q-badge class="is-dot mx-1"
@@ -117,6 +118,7 @@
           </q-badge>
           <span class="tag-text">{{ item.name }}</span>
         </span>
+        </div>
       </div>
       <div class="w-100 mt-1"
            v-if="canEdit">
@@ -126,7 +128,7 @@
           <slot name="button">
             <pencil-o-icon/>
             <span class="ml-1">
-              Modify {{ buttonText | ucwords }}
+              {{ buttonText | ucwords }}
             </span>
           </slot>
         </b-link>

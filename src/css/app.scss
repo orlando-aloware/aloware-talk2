@@ -1394,6 +1394,10 @@ i.option-separator {
   background: $purple-2;
 }
 
+.fs-14 {
+  font-size: $f-size-h5 !important;
+}
+
 .fs-13 {
   font-size: 13px !important;
 }
@@ -6101,5 +6105,74 @@ table.datatable {
     :after {
       display: none;
     }
+  }
+}
+
+.q-chip--dense {
+  border-radius: 5px;
+  padding: 0 0.4em;
+  height: 1.5em;
+  background: transparent;
+  border: 1px solid #dee2e6;
+  color: black;
+
+  .q-chip__content {
+    color: #1D1D1D;
+    font-size: 13px;
+  }
+}
+
+
+#inbox-channel-filter-modal {
+
+  .modal-content {
+    border-radius: 8px;
+  }
+
+  .filter-name {
+    color: $grey-90;
+    font-size: 14px;
+  }
+
+  .filter-type-description {
+    font-size: 14px;
+    font-weight: 600;
+    color: $grey-100;
+  }
+
+  .left-column-wrapper {
+
+    border-right: 1px solid $grey-60;
+    padding-right: 5px;
+
+    .filter-group-title {
+      font-size: 12px;
+      color: $grey-80;
+      margin-bottom: 10px;
+    }
+
+    .saved-filters {
+      .filter-items {
+
+        margin: 5px 0;
+
+        span {
+          font-size: 13px;
+          color: $grey-100;
+        }
+      }
+    }
+  }
+}
+
+.inbox-channel-filter-form {
+  .section-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: $grey-100;
+  }
+
+  .form-label {
+    color: $grey-90;
   }
 }

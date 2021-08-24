@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import SequenceSelector from 'components/sequence-selector'
+import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters, mapState } from 'vuex'
 export default {
