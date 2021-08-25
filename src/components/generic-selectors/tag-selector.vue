@@ -10,7 +10,6 @@
     </generic-multi-select>
     <q-select v-else
               ref="tagSelect"
-              use-chips
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
@@ -40,13 +39,33 @@
           </q-item-section>
         </q-item>
       </template>
-<!--      <template v-slot:option="scope">-->
-<!--        <q-item v-bind="scope.itemProps">-->
-<!--          <q-item-section>dsfdsf-->
-<!--            <q-item-label v-html="scope.opt.name" />-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
-<!--      </template>-->
+
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-section class="pl-2">
+            <i class="fa fa-circle position-absolute"
+               :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 45%; margin-right: 10px;`"></i>
+            <q-item-label class="ml-2" v-html="scope.opt.name"/>
+          </q-item-section>
+        </q-item>
+      </template>
+
+      <template v-slot:selected-item="scope">
+        <q-chip
+          removable
+          dense
+          @remove="scope.removeAtIndex(scope.index)"
+          :tabindex="scope.tabindex"
+          color="white"
+          class="tag-selected-chip"
+          text-color="secondary"
+        >
+          <i class="fa fa-circle position-absolute"
+             :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+          <span class="ml-3 pr-1 pl-1" :style="`color: ${scope.opt.color};`">{{ scope.opt.name }}</span>
+        </q-chip>
+      </template>
     </q-select>
   </div>
 </template>

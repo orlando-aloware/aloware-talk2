@@ -16,7 +16,7 @@
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
-              :class="[ highlighted ? highlightedClass : '']"
+              :class="[ highlighted ? highlightedClass : '', customClass]"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMenu"
               @filter="filterFn">
@@ -65,6 +65,10 @@ export default {
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
+    },
+    customClass: {
+      type: String,
+      default: ''
     }
   },
 

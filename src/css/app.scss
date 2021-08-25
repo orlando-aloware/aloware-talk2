@@ -6204,3 +6204,27 @@ button.primary {
 .btn.not-focusable:focus {
   box-shadow: none !important;
 }
+
+.tag-selected-chip {
+  height: auto !important;
+
+  .q-chip__content {
+    white-space: initial;
+  }
+}
+
+.bottom-border__none {
+  .q-field__control:before {
+    border-bottom: none !important;
+  }
+
+  .q-field__control:after {
+    background: none !important;
+  }
+}
+
+.q-field--highlighted.highlighted-primary {
+  .q-field__native, .q-field__marginal {
+    color: $primary
+  }
+}
