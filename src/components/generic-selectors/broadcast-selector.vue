@@ -1,10 +1,12 @@
 <template>
   <div>
-    <q-select options-selected-class="text-primary"
+    <q-select ref="broadcastSelect"
+              options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
               emit-value
               map-options
@@ -15,8 +17,10 @@
               :placeholder="placeholder"
               :multiple="multiple"
               :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '']"
+              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :use-chips="useChips"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
@@ -58,9 +62,8 @@ export default {
   name: 'broadcast-selector',
 
   props: {
-    placeholder: {
-      required: false,
-      default: 'Select Broadcasts'
+    value: {
+      required: false
     },
     multiple: {
       type: Boolean,
@@ -84,6 +87,14 @@ export default {
     genericStyling: {
       type: Boolean,
       default: true
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
@@ -103,6 +114,18 @@ export default {
       }
 
       return []
+    },
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.broadcast.length < 1:
+          return 'Select Broadcasts'
+        case !this.multiple && !this.broadcast:
+          return 'Select Broadcast'
+        case this.multiple && this.broadcast.length > 0:
+        case !this.multiple && this.broadcast:
+        default:
+          return ''
+      }
     }
   },
 
@@ -110,12 +133,16 @@ export default {
     return {
       auth: auth,
       isLoading: false,
-      broadcast: null,
-      broadcastsOptions: []
+      broadcast: this.value,
+      broadcastsOptions: [],
+      selectWidth: 0
     }
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.broadcastSelect.$el.offsetWidth
+    },
     filterFn (val, update) {
       if (val === '') {
         update(() => {

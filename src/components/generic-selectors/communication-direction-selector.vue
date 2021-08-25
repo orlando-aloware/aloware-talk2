@@ -1,22 +1,25 @@
 <template>
   <div>
-    <q-select
-              :options="options"
-              :multiple="multiple"
-              :placeholder="placeholder"
-              :disable="disable"
-              v-model="direction"
+    <q-select ref="communicationDirectionSelect"
               options-selected-class="text-primary"
               color="primary"
               option-value="value"
               option-label="label"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
               emit-value
               map-options
-              outlined
               dense
-              @input="onSelect">
+              v-model="direction"
+              :options="options"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ highlighted ? highlightedClass : '']"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
+              @filter="filterFn">
 
       <template v-slot:no-option>
         <q-item>
@@ -55,31 +58,73 @@ export default {
       type: Boolean,
       default: false
     },
-    placeholder: {
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
       type: String,
-      default: ''
+      default: 'q-field--highlighted'
+    }
+  },
+
+  computed: {
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.direction.length < 1:
+          return 'Select Directions'
+        case !this.multiple && !this.direction:
+          return 'Select Direction'
+        case this.multiple && this.direction.length > 0:
+        case !this.multiple && this.direction:
+        default:
+          return ''
+      }
     }
   },
 
   data () {
     return {
       direction: this.value,
-      options: [
+      optsArray: [
         { value: 'all', label: 'All' },
         { value: 'inbound', label: 'Inbound' },
         { value: 'outbound', label: 'Outbound' }
-      ]
+      ],
+      options: [],
+      selectWidth: 0
     }
   },
 
   methods: {
-    onSelect () {
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.optsArray
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.optsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    onShowMenu () {
+      this.selectWidth = this.$refs.communicationDirectionSelect.$el.offsetWidth
+    }
+  },
+  mounted () {
+    this.options = this.optsArray
+  },
+  watch: {
+    value () {
+      this.direction = this.value
+    },
+
+    direction (val) {
       this.$emit('select', this.direction ? this.direction : 'all')
     }
   }
 }
 </script>
-
-<style scoped>
-
-</style>

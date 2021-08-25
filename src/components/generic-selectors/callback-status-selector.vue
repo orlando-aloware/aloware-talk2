@@ -1,24 +1,26 @@
 <template>
   <div>
-    <q-select
-      options-selected-class="text-primary"
-      color="primary"
-      option-value="value"
-      option-label="label"
-      input-debounce="0"
-      use-input
-      emit-value
-      map-options
-      outlined
-      dense
-      :clearable="clearable"
-      v-model="callbackStatus"
-      :options="options"
-      :multiple="multiple"
-      :placeholder="placeholder"
-      :disable="disable"
-      @input="onSelect">
-
+    <q-select ref="callbackStatusSelect"
+              options-selected-class="text-primary"
+              color="primary"
+              option-value="value"
+              option-label="label"
+              input-debounce="0"
+              style="word-break: break-all;"
+              use-input
+              emit-value
+              map-options
+              dense
+              v-model="callbackStatus"
+              :clearable="clearable"
+              :options="options"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :class="[ highlighted ? highlightedClass : '' ]"
+              @popup-show="onShowMenu"
+              @filter="filterFn">
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
@@ -61,33 +63,77 @@ export default {
       type: Boolean,
       default: false
     },
-    placeholder: {
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
       type: String,
-      default: 'Select Callback Status'
+      default: 'q-field--highlighted'
+    }
+  },
+
+  computed: {
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.callbackStatus.length < 1:
+          return 'Select Callback Statuses'
+        case !this.multiple && !this.callbackStatus:
+          return 'Select Callback Status'
+        case this.multiple && this.callbackStatus.length > 0:
+        case !this.multiple && this.callbackStatus:
+        default:
+          return ''
+      }
     }
   },
 
   data () {
     return {
       callbackStatus: this.value,
-      options: [{
+      optsArray: [{
         value: CallbackStatus.CALLBACK_STATUS_INITIATED,
         label: 'Initiated'
       }, {
         value: CallbackStatus.CALLBACK_STATUS_REQUESTED,
         label: 'Requested'
-      }]
+      }],
+      options: [],
+      selectWidth: 0
     }
   },
 
   methods: {
-    onSelect () {
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.optsArray
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.optsArray.filter(item => item.label.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    onShowMenu () {
+      this.selectWidth = this.$refs.callbackStatusSelect.$el.offsetWidth
+    }
+  },
+
+  mounted () {
+    this.options = this.optsArray
+  },
+
+  watch: {
+    value () {
+      this.callbackStatus = this.value
+    },
+
+    callbackStatus () {
       this.$emit('select', this.callbackStatus)
     }
   }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -10,23 +10,28 @@
                           @valuesUpdated="updateRingGroups">
     </generic-multi-select>
     <q-select v-else
-              :options="ringGroupOptions"
-              :multiple="multiple"
-              :placeholder="placeholder"
-              :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '' ]"
-              v-model="ringGroupId"
+              ref="ringGroupSelect"
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
               use-chips
               emit-value
               map-options
               outlined
               dense
+              :options="ringGroupOptions"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              v-model="ringGroupId"
+
+              @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
@@ -96,13 +101,22 @@ export default {
     genericMultiselect: {
       type: Boolean,
       default: true
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
   data () {
     return {
       ringGroupId: this.value,
-      ringGroupOptions: []
+      ringGroupOptions: [],
+      selectWidth: 0
     }
   },
 
@@ -110,11 +124,16 @@ export default {
     ...mapState(['currentCompany', 'ringGroups']),
 
     placeholder () {
-      if (this.multiple) {
-        return 'Select Ring Groups'
+      switch (true) {
+        case this.multiple && this.ringGroupId.length < 1:
+          return 'Select Ring Groups'
+        case !this.multiple && !this.ringGroupId:
+          return 'Select Ring Group'
+        case this.multiple && this.ringGroupId.length > 0:
+        case !this.multiple && this.ringGroupId:
+        default:
+          return ''
       }
-
-      return 'Select A Ring Group'
     },
 
     ringGroupsAlphabeticalOrder () {
@@ -136,6 +155,10 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.ringGroupSelect.$el.offsetWidth
+    },
+
     filterFn (val, update) {
       if (this.ringGroupId && val === this.ringGroupId) {
         update(() => {

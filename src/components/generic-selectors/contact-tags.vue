@@ -19,6 +19,7 @@ import GenericMultiSelect from 'src/components/generic-selectors/generic-multi-s
 import * as TagCategory from 'src/constants/tag-categories'
 import _ from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
+
 export default {
   name: 'contact-tags',
 

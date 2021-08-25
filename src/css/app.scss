@@ -772,7 +772,7 @@ body,
     .q-item.q-item-type {
       padding: 5px;
       border-radius: 6px;
-      max-width: 240px !important;
+      //max-width: 240px !important;
       min-height: 32px !important;
       margin: 2px 0;
 
@@ -6124,9 +6124,13 @@ table.datatable {
 
 
 #inbox-channel-filter-modal {
-
   .modal-content {
     border-radius: 8px;
+    height: 92vh;
+
+    .modal-body {
+      overflow: hidden;
+    }
   }
 
   .filter-name {
@@ -6166,6 +6170,13 @@ table.datatable {
 }
 
 .inbox-channel-filter-form {
+  position: relative;
+  overflow: auto;
+  height: auto;
+  max-height: 83vh;
+  min-height: 83vh;
+
+
   .section-header {
     font-size: 14px;
     font-weight: 600;
@@ -6175,4 +6186,21 @@ table.datatable {
   .form-label {
     color: $grey-90;
   }
+}
+
+
+div.q-menu {
+  min-width: 0 !important;
+}
+
+button.primary {
+  color: $primary;
+}
+
+.channel-filter-actions-wrapper {
+  margin-top: 14px;
+}
+
+.btn.not-focusable:focus {
+  box-shadow: none !important;
 }

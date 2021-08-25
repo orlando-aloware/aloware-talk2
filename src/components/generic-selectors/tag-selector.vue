@@ -1,41 +1,54 @@
 <template>
+  <div>
     <generic-multi-select :label="label"
                           :buttonText="buttonText"
-                          :values="tagIds"
-                          :options="tags"
+                          :values="tags"
+                          :options="tagsOptions"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           v-if="genericMultiselect"
                           @valuesUpdated="select">
     </generic-multi-select>
-  <q-select v-else
-            :options="tags"
-            :placeholder="placeholder"
-            :disable="disable"
-            class="multiselect always-open"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            v-model="tagId"
-            :multiple="multiple"
-            use-chips
-            options-selected-class="text-primary"
-            color="primary"
-            option-value="id"
-            option-label="name"
-            input-debounce="0"
-            use-input
-            emit-value
-            map-options
-            outlined
-            dense>
+    <q-select v-else
+              ref="tagSelect"
+              use-chips
+              options-selected-class="text-primary"
+              color="primary"
+              option-value="id"
+              option-label="name"
+              input-debounce="0"
+              style="word-break: break-all;"
+              use-input
+              emit-value
+              map-options
+              menu-shrink
+              outlined
+              dense
+              v-model="tags"
+              :options="tagsOptions"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
+              :multiple="multiple"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
+              @filter="filterFn">
 
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="no-results text-grey">
-          No results
-        </q-item-section>
-      </q-item>
-    </template>
-
-  </q-select>
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="no-results text-grey">
+            No results
+          </q-item-section>
+        </q-item>
+      </template>
+<!--      <template v-slot:option="scope">-->
+<!--        <q-item v-bind="scope.itemProps">-->
+<!--          <q-item-section>dsfdsf-->
+<!--            <q-item-label v-html="scope.opt.name" />-->
+<!--          </q-item-section>-->
+<!--        </q-item>-->
+<!--      </template>-->
+    </q-select>
+  </div>
 </template>
 
 <script>
@@ -69,10 +82,6 @@ export default {
       type: String,
       default: 'Modify Tags'
     },
-    placeholder: {
-      type: String,
-      default: 'Select Tags'
-    },
     disable: {
       type: Boolean,
       default: false,
@@ -91,15 +100,14 @@ export default {
     genericMultiselect: {
       type: Boolean,
       default: false
-    }
-  },
-
-  data () {
-    return {
-      isEdit: false,
-      tagsArray: [],
-      tags: [],
-      tagId: this.value
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
@@ -112,23 +120,53 @@ export default {
 
     displayClass () {
       return !this.isEdit ? 'show-raw-value' : ''
+    },
+
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.tags.length < 1:
+          return 'Select Tags'
+        case !this.multiple && !this.tags:
+          return 'Select Tag'
+        case this.multiple && this.tags.length > 0:
+        case !this.multiple && this.tags:
+        default:
+          return ''
+      }
     }
   },
 
-  mounted () {
-    this.getTags()
+  data () {
+    return {
+      isEdit: false,
+      tagsArray: [],
+      tagsOptions: [],
+      tags: this.value,
+      selectWidth: 0
+    }
   },
 
   methods: {
-    changeTags (event) {
-      this.tagsArray = event
+    onShowMenu () {
+      this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    onModifyTags () {
-      this.isEdit = true
-      this.$nextTick(function () {
-        this.$refs.contactTagSelector.$el.focus()
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.tagsOptions = this.tagsArray
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.tagsOptions = this.tagsArray.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    changeTags (event) {
+      this.tagsArray = event
     },
 
     onSelectClose () {
@@ -136,10 +174,6 @@ export default {
     },
 
     onSelectOpen () {
-      this.isEdit = true
-    },
-
-    onRemoveTag () {
       this.isEdit = true
     },
 
@@ -151,18 +185,23 @@ export default {
       return talk2Api.V1.tags.get({
         params: { full_load: true }
       }).then(res => {
-        this.tags = res.data
+        this.tagsArray = res.data
       }).catch(err => {
         console.log(err)
       })
     }
   },
+
+  mounted () {
+    this.getTags()
+  },
+
   watch: {
     value () {
-      this.tagId = this.value
+      this.tags = this.value
     },
-    tagId (val) {
-      if (this.tagId !== this.value) {
+    tags (val) {
+      if (this.tags !== this.value) {
         this.$emit('change', val)
       }
     }

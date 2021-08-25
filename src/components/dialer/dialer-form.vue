@@ -55,6 +55,7 @@
                         :state="validCampaign"
                         class="mb-1">
             <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+                           :generic-multiselect="false"
                            prepend="From:"
                            v-model="campaignId"
                            @change="changeCampaignId">
@@ -126,6 +127,7 @@
                         class="mb-1">
             <line-selector v-model="campaignId"
                            prepend="From:"
+                           :generic-multiselect="false"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>

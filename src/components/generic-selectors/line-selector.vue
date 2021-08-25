@@ -10,26 +10,33 @@
                           @valuesUpdated="updateLines">
     </generic-multi-select>
     <q-select v-else
-              :options="campaignOptions"
-              :placeholder="placeholder"
-              :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '']"
-              v-model="campaignId"
-              :multiple="multiple"
-              :use-chips="useChips"
+              ref="lineSelect"
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
               emit-value
               map-options
               outlined
               dense
+              :options="campaignOptions"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
+              :multiple="multiple"
+              :use-chips="useChips"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              v-model="campaignId"
+              @popup-show="onShowMenu"
               @input="updateLines"
               @filter="filterFn">
-
+      <template v-slot:prepend
+                v-if="prepend">
+        <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      </template>
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
@@ -37,7 +44,6 @@
           </q-item-section>
         </q-item>
       </template>
-
     </q-select>
   </div>
 </template>
@@ -90,7 +96,7 @@ export default {
     },
     genericMultiselect: {
       type: Boolean,
-      default: false
+      default: true
     },
     genericStyling: {
       type: Boolean,
@@ -100,22 +106,39 @@ export default {
       type: Boolean,
       default: false
     },
-    placeholder: {
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
       type: String,
-      default: 'Select Lines',
-      required: false
+      default: 'q-field--highlighted'
     }
   },
 
   data () {
     return {
       campaignId: this.value,
-      campaignOptions: []
+      campaignOptions: [],
+      selectWidth: 0
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'campaigns']),
+
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.campaignId.length < 1:
+          return 'Select Lines'
+        case !this.multiple && !this.campaignId:
+          return 'Select Line'
+        case this.multiple && this.campaignId.length > 0:
+        case !this.multiple && this.campaignId:
+        default:
+          return ''
+      }
+    },
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {
@@ -154,6 +177,9 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.lineSelect.$el.offsetWidth
+    },
     filterFn (val, update) {
       if (this.campaignId && val === this.campaignId) {
         update(() => {

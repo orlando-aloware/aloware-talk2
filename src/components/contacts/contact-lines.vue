@@ -2,7 +2,6 @@
   <b-card class="border-0 contact-lines-wrapper">
     <line-selector :value="lineValues"
                    :multiple="true"
-                   :generic-multiselect="true"
                    @change="submitLines"/>
   </b-card>
 </template>

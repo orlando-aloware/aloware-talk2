@@ -5,11 +5,12 @@
     modal-class="confirm-dialog"
     hide-header-close
     hide-header
+    hide-footer
     ref="inbox-channel-filter-modal">
 
     <div class="modal-body-wrapper d-flex">
       <div class="w-25 left-column-wrapper">
-        <span class="filter-type-description">Calls & Recordings</span>
+        <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-5">
           <div class="mb-4">
@@ -36,6 +37,10 @@
           </div>
           <div>
             <b-button size="sm" @click="onResetFilter">Reset</b-button>
+            <b-button size="sm"
+                      class="ml-1"
+                      variant="success"
+                      @click="hideModal">Close</b-button>
           </div>
         </div>
         <filter-form :filter="filter"></filter-form>
@@ -46,8 +51,7 @@
         variant="success"
         class="custom-btn"
         size="sm"
-        @click="hide()"
-      >
+        @click="hide()">
         Close
       </b-button>
     </template>
@@ -60,6 +64,8 @@ import FilterForm from 'components/inbox/inbox-filters/filter-form'
 export default {
   name: 'filter-dialog',
 
+  components: { FilterForm },
+
   props: {
     filter: {
       type: Object,
@@ -67,9 +73,25 @@ export default {
     }
   },
 
-  components: { FilterForm },
+  computed: {
+    channelFilterName () {
+      switch (true) {
+        case ['messages'].includes(this.$route.params.channel):
+          return 'Messages'
+        case ['voicemails'].includes(this.$route.params.channel):
+          return 'Voicemails'
+        case ['calls', 'recordings'].includes(this.$route.params.channel):
+        default:
+          return 'Calls & Recordings'
+      }
+    }
+  },
 
   methods: {
+    hideModal () {
+      this.$refs['inbox-channel-filter-modal'].hide()
+    },
+
     onResetFilter: function () {
       this.$emit('onResetFilter')
     }

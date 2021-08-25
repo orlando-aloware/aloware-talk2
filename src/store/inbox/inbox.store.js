@@ -72,6 +72,8 @@ export default function () {
       open: 0,
       pending: 0,
       closed: 0
-    }
+    },
+    channelClonedFilter: {},
+    channelChangedFilterFields: []
   }
 }

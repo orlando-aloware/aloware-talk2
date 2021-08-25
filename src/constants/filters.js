@@ -8,7 +8,7 @@ export const DEFAULT_STATE = {
     chart_period: 'day',
     answer_status: 'all',
     export_type: 'json',
-    min_talk_time: 0,
+    min_talk_time: '0',
     contact_id: null,
     campaign_id: null,
     ring_group_id: null,

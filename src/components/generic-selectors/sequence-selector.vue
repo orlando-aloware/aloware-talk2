@@ -1,10 +1,12 @@
 <template>
   <div>
-    <q-select options-selected-class="text-primary"
+    <q-select ref="sequenceSelect"
+              options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
               emit-value
               map-options
@@ -15,8 +17,10 @@
               :placeholder="placeholder"
               :multiple="multiple"
               :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '']"
+              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :use-chips="useChips"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
@@ -61,10 +65,6 @@ export default {
     value: {
       required: false
     },
-    placeholder: {
-      required: false,
-      default: 'Select Sequences'
-    },
     exclude: {
       required: false
     },
@@ -95,6 +95,14 @@ export default {
     genericStyling: {
       type: Boolean,
       default: true
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
@@ -103,6 +111,18 @@ export default {
       currentCompany: state => state.currentCompany,
       workflows: state => state.workflows
     }),
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.sequence.length < 1:
+          return 'Select Sequences'
+        case !this.multiple && !this.sequence:
+          return 'Select Sequence'
+        case this.multiple && this.sequence.length > 0:
+        case !this.multiple && this.sequence:
+        default:
+          return ''
+      }
+    },
     formattedSequences () {
       let activeSequences = this.availableWorkflows.filter(workflow => workflow.active)
       if (activeSequences.length > 0) {
@@ -145,11 +165,15 @@ export default {
       auth: auth,
       isLoading: false,
       sequence: this.value,
-      sequencesOptions: []
+      sequencesOptions: [],
+      selectWidth: 0
     }
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.sequenceSelect.$el.offsetWidth
+    },
     filterFn (val, update) {
       if (val === '') {
         update(() => {

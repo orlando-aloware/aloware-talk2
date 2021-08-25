@@ -42,5 +42,28 @@ export default {
   },
   UPDATE_CONTACT: (state, contact) => {
     state.selectedContact = contact
+  },
+  SET_CHANNEL_CLONED_FILTER: (state, filter) => {
+    state.channelClonedFilter = { ...filter }
+  },
+  UPDATE_CHANNEL_CHANGED_FILTER_FIELDS: (state, { name, value }) => {
+    // compensate comparing of array/object values
+    let comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
+    let comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
+
+    if (comparatorA !== comparatorB) {
+      let prop = state.channelChangedFilterFields.find(item => item.property === name)
+      if (prop) {
+        prop.value = value
+      } else {
+        state.channelChangedFilterFields.push({ property: name, value: value })
+      }
+    } else {
+      let changedProp = [...state.channelChangedFilterFields]
+      state.channelChangedFilterFields = changedProp.filter(item => item.property !== name)
+    }
+  },
+  RESET_CHANNEL_CHANGED_FILTER_FIELDS: (state) => {
+    state.channelChangedFilterFields = []
   }
 }

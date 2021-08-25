@@ -1,21 +1,25 @@
 <template>
-  <q-select :options="phoneNumberOptions"
-            :multiple="multiple"
-            :placeholder="placeholder"
-            :disable="disable"
-            ::class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '']"
-            v-model="phoneNumber"
+  <q-select ref="incomingNumberSelect"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
             option-label="phone_number"
             input-debounce="0"
+            style="word-break: break-all;"
             use-input
-            :use-chips="useChips"
             emit-value
             map-options
             outlined
             dense
+            v-model="phoneNumber"
+            :options="phoneNumberOptions"
+            :multiple="multiple"
+            :placeholder="placeholder"
+            :disable="disable"
+            :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
+            :use-chips="useChips"
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -86,28 +90,44 @@ export default {
       required: false
     },
 
-    placeholder: {
-      type: String,
-      required: false,
-      default: 'Select number'
-    },
-
     genericStyling: {
       type: Boolean,
       default: true
+    },
+
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
   data () {
     return {
       phoneNumber: this.value,
-      phoneNumberOptions: []
+      phoneNumberOptions: [],
+      selectWidth: 0
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'users', 'campaigns']),
-
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.phoneNumber.length < 1:
+          return 'Select Numbers'
+        case !this.multiple && !this.phoneNumber:
+          return 'Select Number'
+        case this.multiple && this.phoneNumber.length > 0:
+        case !this.multiple && this.phoneNumber:
+        default:
+          return ''
+      }
+    },
     campaign () {
       if (!this.campaign_id) {
         return null
@@ -154,6 +174,9 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.incomingNumberSelect.$el.offsetWidth
+    },
     filterFn (val, update) {
       if (this.userId && val === this.userId) {
         update(() => {

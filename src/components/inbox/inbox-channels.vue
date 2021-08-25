@@ -7,16 +7,26 @@
 
       <div class="header flex- w-100">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <compact-btn borderless
-                       customClass="ml-2 fs-14 _500 position-relative mt-3"
-                       :variant="filterButtonVariant"
-                       v-b-modal:inbox-channel-filter-modal>
+          <div class="channel-filter-actions-wrapper">
+            <compact-btn v-if="hasChannelFilterChanges"
+                         borderless
+                         customClass="ml-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+                         :variant="filterButtonVariant"
+                         @clicked="resetFilters">
+              <i class="fa fa-times"></i>
+            </compact-btn>
+            <compact-btn borderless
+                         customClass="ml-1 fs-14 _500 position-relative primary not-focusable"
+                         :variant="filterButtonVariant"
+                         v-b-modal:inbox-channel-filter-modal>
               Filters
-            <b-badge class="ml-1 mt-1"
-                     pill
+            </compact-btn>
+            <b-badge v-if="hasChannelFilterChanges"
+                     class="ml-1 fs-12"
                      variant="primary">
+              {{ channelChangedFilterFields.length }}
             </b-badge>
-          </compact-btn>
+          </div>
 
           <q-select class="m-0"
                     borderless
@@ -127,7 +137,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields']),
 
     nextPage () {
       return this.currentPage + 1
@@ -135,12 +145,17 @@ export default {
 
     filterButtonVariant () {
       return 'outlined-light'
+    },
+
+    hasChannelFilterChanges () {
+      return this.channelChangedFilterFields.length > 0
     }
   },
 
   data () {
     return {
       filter: null,
+      clonedFilter: null,
       searchFields: ['contact.name', 'contact.phone_number'],
       currentPage: 0,
       hasMore: false,
@@ -316,6 +331,9 @@ export default {
 
       this.filter.type = this.filterType
       this.filter.answer_status = this.answerStatus
+
+      this.setChannelClonedFilter(this.filter)
+      this.resetChannelChangedFilterFields()
       this.setCommunications([])
     },
 
@@ -550,7 +568,7 @@ export default {
       }, 66)
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication'])
+    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
 
   watch: {

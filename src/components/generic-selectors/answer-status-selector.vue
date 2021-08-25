@@ -1,22 +1,25 @@
 <template>
   <div>
-    <q-select
-      :options="options"
-      :multiple="multiple"
-      :placeholder="placeholder"
-      :disable="disable"
-      v-model="answerStatus"
-      options-selected-class="text-primary"
-      color="primary"
-      option-value="value"
-      option-label="label"
-      input-debounce="0"
-      use-input
-      emit-value
-      map-options
-      outlined
-      dense
-      @input="onSelect">
+    <q-select ref="answerStatusSelect"
+              options-selected-class="text-primary"
+              color="primary"
+              option-value="value"
+              option-label="label"
+              input-debounce="0"
+              style="word-break: break-all;"
+              use-input
+              emit-value
+              map-options
+              dense
+              v-model="answerStatus"
+              :options="options"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :class="[ highlighted ? highlightedClass : '' ]"
+              @popup-show="onShowMenu"
+              @filter="filterFn">
 
       <template v-slot:no-option>
         <q-item>
@@ -55,38 +58,82 @@ export default {
       type: Boolean,
       default: false
     },
-    placeholder: {
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
       type: String,
-      default: ''
+      default: 'q-field--highlighted'
+    }
+  },
+
+  computed: {
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.answerStatus.length < 1:
+          return 'Select Answer Statuses'
+        case !this.multiple && !this.answerStatus:
+          return 'Select Answer Status'
+        case this.multiple && this.answerStatus.length > 0:
+        case !this.multiple && this.answerStatus:
+        default:
+          return ''
+      }
     }
   },
 
   data () {
     return {
       answerStatus: this.value,
-      options: [
+      optsArray: [
         { value: 'all', label: 'All' },
         { value: 'answered', label: 'Answered' },
         { value: 'missed', label: 'Missed' },
         { value: 'abandoned', label: 'Abandoned' },
         { value: 'voicemail', label: 'Voicemail' },
-        { value: 'in_progress', label: 'In Progress' },
+        { value: 'in-progress', label: 'In Progress' },
         { value: 'failed', label: 'Failed' },
         { value: 'queued', label: 'Queued' },
         { value: 'hold', label: 'Hold' },
-        { value: 'dead_end', label: 'Dead-end' }
-      ]
+        { value: 'deadend', label: 'Dead-end' }
+      ],
+      options: [],
+      selectWidth: 0
     }
   },
 
   methods: {
-    onSelect () {
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.optsArray
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.optsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    onShowMenu () {
+      this.selectWidth = this.$refs.answerStatusSelect.$el.offsetWidth
+    }
+  },
+
+  mounted () {
+    this.options = this.optsArray
+  },
+
+  watch: {
+    value () {
+      this.answerStatus = this.value
+    },
+
+    answerStatus (val) {
       this.$emit('select', this.answerStatus ? this.answerStatus : 'all')
     }
   }
 }
 </script>
-
-<style scoped>
-
-</style>
