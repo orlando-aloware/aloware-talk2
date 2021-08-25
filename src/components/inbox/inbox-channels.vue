@@ -23,7 +23,8 @@
             </compact-btn>
             <b-badge v-if="hasChannelFilterChanges"
                      class="ml-1 fs-12"
-                     variant="primary">
+                     variant="primary"
+                     v-b-modal:inbox-channel-filter-modal>
               {{ channelChangedFilterFields.length }}
             </b-badge>
           </div>
