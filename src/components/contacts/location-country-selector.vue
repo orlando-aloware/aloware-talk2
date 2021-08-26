@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-select class="inline-select"
+              ref="countrySelect"
               use-input
               clearable
               input-debounce="0"
@@ -12,9 +13,11 @@
               v-model="contact.cnam_country"
               :options="options"
               :disable="disabled"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
+              @popup-show="onShowMenu"
               @filter="filterFn"/>
   </div>
 </template>
@@ -40,7 +43,8 @@ export default {
   data () {
     return {
       countries: Countries.COUNTRIES,
-      options: Countries.COUNTRIES
+      options: Countries.COUNTRIES,
+      selectWidth: 0
     }
   },
   computed: {
@@ -49,6 +53,9 @@ export default {
     }
   },
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.countrySelect.$el.offsetWidth
+    },
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedCountryObject ? this.selectedCountryObject.name : 'Select country'
@@ -59,8 +66,9 @@ export default {
       this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
       this.$el.querySelector('.inline-select .q-field__native span').style.display = ''
     },
-    onInput () {
+    onInput (val) {
       this.$el.querySelector('.inline-select .q-field__input').blur()
+      this.$emit('select', val)
     },
     filterFn (val, update) {
       if (val === '') {
@@ -75,15 +83,6 @@ export default {
         this.options = this.countries.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
     }
-  },
-  watch: {
-    'contact.cnam_country': function (val) {
-      this.$emit('select', { val })
-    }
   }
 }
 </script>
-
-<style scoped>
-
-</style>

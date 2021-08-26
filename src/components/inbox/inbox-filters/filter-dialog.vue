@@ -36,7 +36,9 @@
             <span class="filter-name">(Unsaved) Filter</span>
           </div>
           <div>
-            <b-button size="sm" @click="onResetFilter">Reset</b-button>
+            <b-button size="sm"
+                      :disabled="channelChangedFilterFields.length < 1"
+                      @click="onResetFilter">Reset</b-button>
             <b-button size="sm"
                       class="ml-1"
                       variant="success"
@@ -60,6 +62,7 @@
 
 <script>
 import FilterForm from 'components/inbox/inbox-filters/filter-form'
+import { mapState } from 'vuex'
 
 export default {
   name: 'filter-dialog',
@@ -74,6 +77,7 @@ export default {
   },
 
   computed: {
+    ...mapState('inbox', ['channelChangedFilterFields']),
     channelFilterName () {
       switch (true) {
         case ['messages'].includes(this.$route.params.channel):

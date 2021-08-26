@@ -607,7 +607,6 @@
 import _ from 'lodash'
 import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import ContactDispositionSelector from './contacts/contact-disposition-selector'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
 import ChevronRight from 'components/icons/contact-activity/chevron-right'
@@ -641,7 +640,6 @@ export default {
     CommunicationAudio,
     CommunicationNote,
     CommunicationTags,
-    ContactDispositionSelector,
     SmsReminders,
     TargetUsersTree
   },

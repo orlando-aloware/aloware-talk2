@@ -19,7 +19,13 @@
         <p class="mb-0"
            v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
-          <span class="data-value">{{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}</span>
+          <span class="data-value">
+             <q-tooltip anchor="top middle"
+                        self="center middle">
+              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            </q-tooltip>
+            {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+          </span>
         </p>
         <p class="mb-0"
            v-if="integration_data.properties.email">

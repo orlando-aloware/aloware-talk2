@@ -6,26 +6,38 @@
       <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-0">Owner</p>
-        <contact-user-selector :disabled="!hasPermissionTo('change contact ownership')"
-                               :hide-extensions="true"
-                               v-model="contact.user_id"
-                               @updateField="onUpdateOwner">
-        </contact-user-selector>
+        <user-selector v-model="contact.user_id"
+                       :disable="!hasPermissionTo('change contact ownership')"
+                       :generic-styling="false"
+                       :multiple="false"
+                       :use-chips="false"
+                       :outlined="false"
+                       :show-placeholder="false"
+                       custom-class="inline-select"
+                       @change="(eventPayload) => onUpdateFields(eventPayload, 'user_id')">
+        </user-selector>
       </div>
 
       <div class="d-block"
            v-if="hasPermissionTo('list disposition status')">
         <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
-        <contact-disposition @select="onUpdateDisposition"
-                             :disabled="!hasPermissionTo('dispose contact')">
-        </contact-disposition>
+        <contact-disposition-selector :disable="!hasPermissionTo('dispose contact')"
+                                      :generic-styling="false"
+                                      :multiple="false"
+                                      :use-chips="false"
+                                      :outlined="false"
+                                      :show-placeholder="false"
+                                      custom-class="inline-select"
+                                      v-model="contact.disposition_status_id"
+                                      @change="(eventPayload) => onUpdateFields(eventPayload, 'disposition_status_id')">
+        </contact-disposition-selector>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Email</p>
         <contact-input-field v-model="contact.email"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateEmail">
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'email')">
         </contact-input-field>
       </div>
 
@@ -33,7 +45,7 @@
         <p class="text-muted custom-input-label mb-0">Company</p>
         <contact-input-field v-model="contact.company_name"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateCompany">
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'company_name')">
         </contact-input-field>
       </div>
 
@@ -41,7 +53,7 @@
         <p class="text-muted custom-input-label mb-0">Website</p>
         <contact-input-field v-model="contact.website"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateWebsite">
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'website')">
         </contact-input-field>
       </div>
 
@@ -49,7 +61,7 @@
         <p class="text-muted custom-input-label mb-0">City</p>
         <contact-input-field v-model="contact.cnam_city"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateCity">
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_city')">
         </contact-input-field>
       </div>
 
@@ -58,7 +70,7 @@
         <location-state-selector v-model="contact.cnam_state"
                                  :contact="contact"
                                  :disabled="!hasPermissionTo('update contact')"
-                                 @select="onUpdateState">
+                                 @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_state')">
         </location-state-selector>
       </div>
 
@@ -67,7 +79,7 @@
         <location-country-selector v-model="contact.cnam_country"
                                    :contact="contact"
                                    :disabled="!hasPermissionTo('update contact')"
-                                   @select="onUpdateCountry">
+                                   @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_country')">
         </location-country-selector>
       </div>
 
@@ -75,7 +87,7 @@
         <p class="text-muted custom-input-label mb-0">Zip Code</p>
         <contact-input-field v-model="contact.cnam_zipcode"
                              :disabled="!hasPermissionTo('update contact')"
-                             @updateField="onUpdateZipCode">
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_zipcode')">
         </contact-input-field>
       </div>
 
@@ -103,6 +115,21 @@
         <p class="text-muted custom-input-label mb-0">Intake Source</p>
         <p>{{ contact.intake_source | toUpperCase }}</p>
       </div>
+
+      <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
+        <contact-input-field v-model="contact.csf1"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
+        </contact-input-field>
+      </div>
+      <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
+        <contact-input-field v-model="contact.csf2"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
+        </contact-input-field>
+      </div>
     </div>
     <b-button pill
               variant="light"
@@ -118,11 +145,11 @@
 import { mapActions, mapGetters } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-import ContactUserSelector from 'src/components/contacts/contact-user-selector'
 import LocationStateSelector from 'src/components/contacts/location-state-selector'
 import LocationCountrySelector from 'src/components/contacts/location-country-selector'
 import ContactInputField from 'src/components/contacts/contact-input-field'
-import ContactDisposition from 'src/components/contacts/contact-disposition'
+import UserSelector from 'components/generic-selectors/user-selector'
+import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 
 export default {
   name: 'contact-information',
@@ -134,11 +161,11 @@ export default {
   },
 
   components: {
-    ContactDisposition,
+    ContactDispositionSelector,
+    UserSelector,
     ContactInputField,
     LocationCountrySelector,
-    LocationStateSelector,
-    ContactUserSelector
+    LocationStateSelector
   },
 
   computed: {
@@ -197,65 +224,11 @@ export default {
         })
     },
 
-    onUpdateOwner (params) {
+    onUpdateFields (value, prop) {
+      this.contact[prop] = value
       this.updateChangedContactProperties({
-        name: 'user_id',
-        value: params.val
-      })
-    },
-    onUpdateDisposition (dispositionStatusId) {
-      this.updateChangedContactProperties({
-        name: 'disposition_status_id',
-        value: dispositionStatusId
-      })
-    },
-
-    onUpdateZipCode (params) {
-      this.updateChangedContactProperties({
-        name: 'cnam_zipcode',
-        value: params.val
-      })
-    },
-
-    onUpdateEmail (params) {
-      this.updateChangedContactProperties({
-        name: 'email',
-        value: params.val
-      })
-    },
-
-    onUpdateWebsite (params) {
-      this.updateChangedContactProperties({
-        name: 'website',
-        value: params.val
-      })
-    },
-
-    onUpdateCompany (params) {
-      this.updateChangedContactProperties({
-        name: 'company_name',
-        value: params.val
-      })
-    },
-
-    onUpdateCity (params) {
-      this.updateChangedContactProperties({
-        name: 'cnam_city',
-        value: params.val
-      })
-    },
-
-    onUpdateCountry (params) {
-      this.updateChangedContactProperties({
-        name: 'cnam_country',
-        value: params.val
-      })
-    },
-
-    onUpdateState (params) {
-      this.updateChangedContactProperties({
-        name: 'cnam_state',
-        value: params.val
+        name: prop,
+        value: value
       })
     },
 

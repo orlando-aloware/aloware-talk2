@@ -9,14 +9,14 @@
             use-input
             emit-value
             map-options
-            outlined
+            :outlined="outlined"
             dense
             v-model="userId"
             :options="userOptions"
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
+            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             @popup-show="onShowMenu"
@@ -113,6 +113,18 @@ export default {
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
+    },
+    customClass: {
+      type: String,
+      default: ''
+    },
+    outlined: {
+      type: Boolean,
+      default: true
+    },
+    showPlaceholder: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -128,6 +140,10 @@ export default {
     ...mapState(['currentCompany', 'users']),
 
     placeholder () {
+      if (!this.showPlaceholder) {
+        return ''
+      }
+
       switch (true) {
         case this.multiple && this.userId.length < 1:
           return 'Select Users'

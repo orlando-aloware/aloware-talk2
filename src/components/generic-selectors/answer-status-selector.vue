@@ -84,15 +84,22 @@ export default {
         default:
           return ''
       }
-    }
-  },
+    },
+    optionsArray () {
+      if (this.$route.params.channel === 'messages') {
+        return [
+          { value: 'all', label: 'All' },
+          { value: 'answered', label: 'Completed' },
+          { value: 'in-progress', label: 'In Progress' },
+          { value: 'failed', label: 'Failed' }
+        ]
+      }
 
-  data () {
-    return {
-      answerStatus: this.value,
-      optsArray: [
+      return [
         { value: 'all', label: 'All' },
+        { value: 'live', label: 'Live' },
         { value: 'answered', label: 'Answered' },
+        { value: 'unanswered', label: 'Unanswered' },
         { value: 'missed', label: 'Missed' },
         { value: 'abandoned', label: 'Abandoned' },
         { value: 'voicemail', label: 'Voicemail' },
@@ -101,7 +108,13 @@ export default {
         { value: 'queued', label: 'Queued' },
         { value: 'hold', label: 'Hold' },
         { value: 'deadend', label: 'Dead-end' }
-      ],
+      ]
+    }
+  },
+
+  data () {
+    return {
+      answerStatus: this.value,
       options: [],
       selectWidth: 0
     }
@@ -111,14 +124,14 @@ export default {
     filterFn (val, update) {
       if (val === '') {
         update(() => {
-          this.options = this.optsArray
+          this.options = this.optionsArray
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.optsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
+        this.options = this.optionsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
       })
     },
     onShowMenu () {
@@ -127,7 +140,7 @@ export default {
   },
 
   mounted () {
-    this.options = this.optsArray
+    this.options = this.optionsArray
   },
 
   watch: {
