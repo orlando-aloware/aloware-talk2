@@ -161,7 +161,7 @@ export default {
       currentPage: 0,
       hasMore: false,
       isLoadingMore: false,
-      isLoaded: true,
+      isLoaded: false,
       pagination: {
         type: Object,
         required: true
@@ -527,7 +527,7 @@ export default {
           this.setCommunications(response.data.data)
           this.currentPage = response.data.current_page
           this.hasMore = response.data.next_page_url
-
+          this.isLoaded = true
           this.pagination = _.clone(response.data)
           delete this.pagination.data
           this.gettingTasksList(false)
@@ -545,7 +545,6 @@ export default {
           this.hasMore = response.data.next_page_url
           this.isLoadingMore = false
           this.isLoaded = true
-
           this.pagination = _.clone(response.data)
           delete this.pagination.data
         })
@@ -596,7 +595,9 @@ export default {
     filter: {
       deep: true,
       handler () {
-        this.getCommunications(this.filter)
+        if (this.isLoaded) {
+          this.getCommunications(this.filter)
+        }
       }
     }
   }

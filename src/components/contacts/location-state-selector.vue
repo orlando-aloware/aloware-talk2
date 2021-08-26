@@ -78,8 +78,9 @@ export default {
       this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
       this.$el.querySelector('.inline-select .q-field__native span').style.display = ''
     },
-    onInput () {
+    onInput (val) {
       this.$el.querySelector('.inline-select .q-field__input').blur()
+      this.$emit('select', val)
     },
     filterFn (val, update) {
       if (val === '') {
@@ -93,11 +94,6 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.states.filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
-    }
-  },
-  watch: {
-    'contact.cnam_state': function (val) {
-      this.$emit('select', { val })
     }
   }
 }

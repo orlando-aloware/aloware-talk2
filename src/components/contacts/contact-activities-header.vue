@@ -26,7 +26,7 @@
        color="primary"
        class="text-decoration-none"
        :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus">
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
        <q-tooltip anchor="top middle"
                   self="center middle">
          Move to Pending
@@ -50,7 +50,7 @@
        color="primary"
        class="text-decoration-none"
        :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus">
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
        <q-tooltip anchor="top middle"
                   self="center middle">
          Close
@@ -59,14 +59,14 @@
             class="mx-2">
         <check-o-icon></check-o-icon>
       </span>
-       <q-spinner-bars v-if="isUpdatingStatus"
+       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
                        class="pl-1 pr-1"
                        color="primary"
                        size="20px"
        />
      </q-btn>
      <q-btn
-       v-if="contact.task_status === ContactTaskStatus.STATUS_CLOSED"
+       v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
        borderless
        flat
        no-caps
@@ -74,7 +74,7 @@
        color="primary"
        class="text-decoration-none"
        :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus">
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
        <q-tooltip anchor="top middle"
                   self="center middle">
          Reopen
@@ -83,7 +83,7 @@
              class="mx-2">
         <inbox-o-icon></inbox-o-icon>
       </span>
-       <q-spinner-bars v-if="isUpdatingStatus"
+       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_OPEN"
                        class="pl-1 pr-1"
                        color="primary"
                        size="20px"
@@ -136,35 +136,27 @@ export default {
         default:
           return ''
       }
-    },
-    nextStat () {
-      switch (this.contact.task_status) {
-        case ContactTaskStatus.STATUS_OPEN:
-          return ContactTaskStatus.STATUS_PENDING
-        case ContactTaskStatus.STATUS_PENDING:
-          return ContactTaskStatus.STATUS_CLOSED
-        case ContactTaskStatus.STATUS_CLOSED:
-          return ContactTaskStatus.STATUS_OPEN
-      }
-      return null
     }
   },
 
   data () {
     return {
       ContactTaskStatus,
-      isUpdatingStatus: false
+      isUpdatingStatus: false,
+      nextStat: null
     }
   },
 
   methods: {
-    onUpdateTaskStatus () {
+    onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
-      talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: this.nextStat }).then(res => {
+      this.nextStat = status
+      talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
         let contact = { ...this.contact }
-        contact.task_status = this.nextStat
+        contact.task_status = status
         this.$VueEvent.fire('contact_task_status_updated', contact)
         this.isUpdatingStatus = false
+        this.nextStat = null
       })
     }
   }
