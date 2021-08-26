@@ -4,7 +4,7 @@
        @click="onItemClick(communication)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
-      <i v-if="!communication.is_read"
+      <i v-if="communication.is_read === 0"
          class="fa fa-circle position-relative"
          style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;"></i>
       <avatar width="34"
