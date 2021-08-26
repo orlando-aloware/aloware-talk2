@@ -204,12 +204,6 @@ export default {
     }
   },
 
-  mounted () {
-    if (this.contact && this.contact.id) {
-      this.getAttributes()
-    }
-  },
-
   methods: {
     ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties']),
 
@@ -302,14 +296,6 @@ export default {
     computeAndHumanize (duration, field, singular) {
       const temp = Math.floor(duration[field]())
       return `${temp} ${temp > 1 ? field : singular}`
-    }
-  },
-
-  watch: {
-    'contact.id': function () {
-      if (this.contact && this.contact.id) {
-        this.getAttributes()
-      }
     }
   }
 }
