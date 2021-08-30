@@ -7,6 +7,7 @@
               option-value="id"
               option-label="name"
               behavior="menu"
+              placeholder="Select line..."
               v-model="selectedLine"
               :options="lineOptions"
               :loading="isBusy"

@@ -877,7 +877,7 @@ i.option-separator {
     color: $grey-70;
     font-size: 40%;
     position: absolute;
-    top: 11px;
+    top: 13px;
   }
 
   .selected-option-title {
@@ -903,9 +903,10 @@ i.option-separator {
   }
 
   .q-field__input {
-    font-size: $f-size-body;
+    font-size: $f-size-body-sm;
     font-weight: 400;
     font-family: 'Inter', sans-serif;
+    margin-top: -4px;
   }
 }
 
