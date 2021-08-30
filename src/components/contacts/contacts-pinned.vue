@@ -19,7 +19,6 @@ import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
 import { DEFAULT_CONTACT_LIST, DYNAMIC, OPERATORS, STATIC } from 'src/constants/contacts-list-types'
 import ContactsPinnedItem from 'components/contacts/contacts-pinned-item'
-import auth from 'boot/auth'
 
 export default {
   components: {
@@ -28,7 +27,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loading: false,
       contactListType: {
         STATIC,
@@ -38,12 +36,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile']),
+    ...mapGetters('auth', ['profile', 'authenticated']),
     ...mapGetters('contacts', ['pinnedLists', 'pinned'])
   },
 
   mounted () {
-    if (this.auth.user.authenticated) {
+    if (this.authenticated) {
       this.loadDefaultCounts()
       this.loadPinned()
     }
