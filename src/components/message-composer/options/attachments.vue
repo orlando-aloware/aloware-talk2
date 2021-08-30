@@ -20,19 +20,19 @@
                accept=".pdf,.jpg,.jpeg,.png,.pdf,.mp4,.amr"
                @change="onAdded" />
       </b-form-group>
-      <b-progress v-if="isUploading"
+      <b-progress v-if="isUploading && !hasError"
                   class="attachment-upload-progress"
                   variant="success"
                   :max="100">
         <b-progress-bar :value="uploadPercentage"
                         :label="`${uploadPercentage}%`"/>
       </b-progress>
-      <p v-if="hasError"
+      <p v-if="hasError && !isUploading"
          class="error-notice">
         Error while uploading attachment...
       </p>
     </form>
-    <div class="text-center mt-4 notice">
+    <div class="text-center mt-2 notice">
       <p class="mb-0"><a href="https://www.twilio.com/docs/sms/accepted-mime-types#accepted-mime-types" target="_blank">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>
       <p class="mb-0">Other file types should be below 600KB</p>
@@ -96,8 +96,8 @@ export default {
       }).catch(error => {
         console.log(error)
         this.hasError = true
-      }).finally(() => {
-
+        this.isUploading = false
+        this.files = []
       })
     },
     emitFileUploaded () {
