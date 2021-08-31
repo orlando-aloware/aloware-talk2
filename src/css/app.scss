@@ -6229,3 +6229,9 @@ button.primary {
     color: $primary
   }
 }
+
+.make-primary-label {
+  display: inline-block;
+  margin-top: 3px;
+  cursor: pointer;
+}

@@ -50,15 +50,18 @@
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                   size="sm"
                   variant="light"
-                  id="btn-edit-contact-info">
+                  @click="onOpenEditForm">
           <pencil-o-icon></pencil-o-icon>
         </b-button>
-        <b-popover custom-class="edit-form-popover z-index-1"
-                   target="btn-edit-contact-info"
-                   triggers="focus"
-                   :show.sync="showEditForm">
-          <contact-name-form @close="onCloseEditForm"></contact-name-form>
-        </b-popover>
+        <q-menu content-class="mx-height-300"
+                no-focus
+                no-parent-event
+                :offset="[360, -76]"
+                v-model="showEditForm">
+          <div class="row no-wrap q-pa-md">
+            <contact-name-form @close="onCloseEditForm"></contact-name-form>
+          </div>
+        </q-menu>
       </div>
     </b-media>
     <div class="d-inline-flex flex-wrap contact-action-button">
@@ -192,6 +195,10 @@ export default {
 
     openAppointmentModal () {
       this.addAppointmentOpen(true)
+    },
+
+    onOpenEditForm () {
+      this.showEditForm = true
     },
 
     onCloseEditForm () {
