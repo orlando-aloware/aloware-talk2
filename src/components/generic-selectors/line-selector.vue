@@ -1,50 +1,46 @@
 <template>
   <div>
-    <generic-multi-select label="Lines"
-                          buttonText="Lines"
+    <generic-multi-select :label="label"
+                          :buttonText="buttonText"
                           :values="campaignId"
                           :options="campaignOptions"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
-                          v-if="multiple"
+                          v-if="genericMultiselect"
                           @valuesUpdated="updateLines">
     </generic-multi-select>
-    <q-select :options="campaignOptions"
-              :placeholder="placeholder"
-              :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '' ]"
-              class="generic-selector"
-              v-model="campaignId"
-              v-else
+    <q-select v-else
+              ref="lineSelect"
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
               emit-value
               map-options
               outlined
               dense
+              :options="campaignOptions"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
+              :multiple="multiple"
+              :use-chips="useChips"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              v-model="campaignId"
+              @popup-show="onShowMenu"
+              @input="updateLines"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
-
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
             No results
-          </q-item-section>
-        </q-item>
-      </template>
-
-      <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
-          <q-item-section>
-            <q-item-label v-html="scope.opt.name"/>
           </q-item-section>
         </q-item>
       </template>
@@ -87,13 +83,44 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+    label: {
+      type: String,
+      default: 'Lines',
+      required: false
+    },
+    buttonText: {
+      type: String,
+      default: 'Modify Lines',
+      required: false
+    },
+    genericMultiselect: {
+      type: Boolean,
+      default: true
+    },
+    genericStyling: {
+      type: Boolean,
+      default: true
+    },
+    useChips: {
+      type: Boolean,
+      default: false
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
   data () {
     return {
       campaignId: this.value,
-      campaignOptions: []
+      campaignOptions: [],
+      selectWidth: 0
     }
   },
 
@@ -101,15 +128,16 @@ export default {
     ...mapState(['currentCompany', 'campaigns']),
 
     placeholder () {
-      if (this.campaignId) {
-        return ''
+      switch (true) {
+        case this.multiple && this.campaignId.length < 1:
+          return 'Select Lines'
+        case !this.multiple && !this.campaignId:
+          return 'Select Line'
+        case this.multiple && this.campaignId.length > 0:
+        case !this.multiple && this.campaignId:
+        default:
+          return ''
       }
-
-      if (this.multiple) {
-        return 'Select lines'
-      }
-
-      return 'Select a line'
     },
 
     campaignsAlphabeticalOrder () {
@@ -149,6 +177,9 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.lineSelect.$el.offsetWidth
+    },
     filterFn (val, update) {
       if (this.campaignId && val === this.campaignId) {
         update(() => {

@@ -21,7 +21,8 @@
             color="white"
             text-color="primary"
             :options="options"
-            v-model="currentTask" @click="onToggleStatus">
+            v-model="currentTask"
+            @click="onToggleStatus">
             <template v-slot:one>
               <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
                    :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-20' : 'active']">
@@ -59,8 +60,12 @@
             </template>
           </q-btn-toggle>
         </div>
-        <div class="h-100 w-100 flex-grow-1 scroll-y" @scroll="handleScroll">
-          <inbox-task-list :contacts="contacts"></inbox-task-list>
+        <div class="h-100 w-100 flex-grow-1 scroll-y"
+             ref="taskListScroller"
+             @scroll="handleScroll">
+          <inbox-task-list :contacts="contacts"
+                           @onItemSelected="onItemSelected">
+          </inbox-task-list>
         </div>
       </div>
       <template #overlay>
@@ -86,13 +91,16 @@ import Vue from 'vue'
 let scrollTimeout
 export default {
   name: 'inbox-tab',
+
   components: { InboxTaskList, CallsHeader },
+
   props: {
     searchText: {
       type: String,
       default: ''
     }
   },
+
   computed: {
     ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact']),
     nextPage () {
@@ -110,6 +118,7 @@ export default {
       }
     }
   },
+
   data () {
     return {
       currentTask: ContactTaskStatus.STATUS_OPEN,
@@ -146,7 +155,7 @@ export default {
       isFetchingContacts: false,
       hasMore: false,
       isLoadingMore: false,
-      isLoaded: true,
+      isLoaded: false,
       currentPage: 0,
       page: 1,
       perPage: 20
@@ -168,6 +177,7 @@ export default {
     },
     loadMoreContactTasks () {
       this.isFetchingContacts = true
+      this.isLoaded = false
       this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts([...this.contacts, ...response.data.data])
         this.isFetchingContacts = false
@@ -231,8 +241,11 @@ export default {
     },
     resetList () {
       this.page = 1
+      this.isLoaded = false
       this.loadContactTasks()
-      this.setSelectedContact({})
+      if (!this.$route.params.id) {
+        this.setSelectedContact({})
+      }
     },
     setStatus () {
       switch (this.$route.params.status) {
@@ -247,7 +260,11 @@ export default {
           this.currentTask = ContactTaskStatus.STATUS_OPEN
       }
     },
-    onToggleStatus (value) {
+    onToggleStatus () {
+      this.$nextTick(() => {
+        this.$refs.taskListScroller.scrollTop = 0
+      })
+
       this.$router.push({
         name: 'Inbox Channel Task Status',
         params: {
@@ -257,9 +274,24 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    onItemSelected (contact) {
+      this.setSelectedContact(contact)
+      this.$router.push({
+        name: 'Inbox Contact Task',
+        params: {
+          id: contact.id.toString(),
+          channel: 'inbox',
+          status: this.statusText
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
+
   created () {
+    this.setContacts([])
     this.setStatus()
 
     this.loadContactTasks()
@@ -303,15 +335,17 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+    this.$VueEvent.listen('contact_task_status_updated', () => {
       this.loadContactTasks()
     })
   },
+
   mounted () {
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
       this.setSelectedContact({})
     }
   },
+
   watch: {
     'sorting.order': function () {
       this.loadContactTasks()
@@ -323,9 +357,14 @@ export default {
       this.resetList()
     },
     '$route.name': function (value) {
-      if (value === 'Inbox') {
+      if (['Inbox'].includes(value)) {
         this.currentTask = ContactTaskStatus.STATUS_OPEN
         this.resetList()
+      }
+    },
+    '$route.params.id': function (value) {
+      if (!value) {
+        this.setSelectedContact({})
       }
     }
   }

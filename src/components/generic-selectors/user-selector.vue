@@ -1,21 +1,25 @@
 <template>
-  <q-select :options="userOptions"
-            :multiple="multiple"
-            :placeholder="placeholder"
-            :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
-            v-model="userId"
+  <q-select ref="userSelect"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
             option-label="name"
             input-debounce="0"
+            style="word-break: break-all;"
             use-input
             emit-value
             map-options
-            outlined
+            :outlined="outlined"
             dense
+            v-model="userId"
+            :options="userOptions"
+            :multiple="multiple"
+            :placeholder="placeholder"
+            :disable="disable"
+            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
+            :use-chips="useChips"
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -75,6 +79,12 @@ export default {
       required: false
     },
 
+    useChips: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
     hideExtensions: {
       required: false,
       default: false,
@@ -90,13 +100,39 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+
+    genericStyling: {
+      type: Boolean,
+      default: true
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    },
+    customClass: {
+      type: String,
+      default: ''
+    },
+    outlined: {
+      type: Boolean,
+      default: true
+    },
+    showPlaceholder: {
+      type: Boolean,
+      default: true
     }
   },
 
   data () {
     return {
       userId: this.value,
-      userOptions: []
+      userOptions: [],
+      selectWidth: 0
     }
   },
 
@@ -104,15 +140,20 @@ export default {
     ...mapState(['currentCompany', 'users']),
 
     placeholder () {
-      if (this.userId) {
+      if (!this.showPlaceholder) {
         return ''
       }
 
-      if (this.multiple) {
-        return 'Select users'
+      switch (true) {
+        case this.multiple && this.userId.length < 1:
+          return 'Select Users'
+        case !this.multiple && !this.userId:
+          return 'Select User'
+        case this.multiple && this.userId.length > 0:
+        case !this.multiple && this.userId:
+        default:
+          return ''
       }
-
-      return 'Select a user'
     },
 
     availableUsers () {
@@ -168,6 +209,10 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.userSelect.$el.offsetWidth
+    },
+
     filterFn (val, update) {
       if (this.userId && val === this.userId) {
         update(() => {

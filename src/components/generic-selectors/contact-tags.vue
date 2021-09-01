@@ -2,6 +2,7 @@
   <b-card class="border-0 tags-wrapper"
           v-if="hasPermissionTo('tag contact')">
     <generic-multi-select label="Tags"
+                          button-text="Modify Tags"
                           :values="contact.tag_ids"
                           :options="combinedTags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
@@ -18,6 +19,7 @@ import GenericMultiSelect from 'src/components/generic-selectors/generic-multi-s
 import * as TagCategory from 'src/constants/tag-categories'
 import _ from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
+
 export default {
   name: 'contact-tags',
 

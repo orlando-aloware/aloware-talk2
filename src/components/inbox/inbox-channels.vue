@@ -1,32 +1,73 @@
 <template>
-  <div @scroll="handleScroll">
-    <b-overlay :show="isGettingTasksList"
-               class="h-100"
-               rounded="sm"
-               variant="white">
-      <task-list :communications="communications"
-                 :answer-status="answerStatus"
-                 :channel="channel"
-                 v-if="!isGettingTasksList">
-      </task-list>
-      <div class="relative py-4">
-        <b-overlay :show="isLoadingMore && !isGettingTasksList"
-                   rounded="sm">
-          <template #overlay>
-            <q-spinner-bars color="primary"/>
-          </template>
-        </b-overlay>
-      </div>
-      <template #overlay>
-        <div class="text-center">
-          <q-spinner-bars
-            color="primary"
-            size="2em"
-          />
+  <b-overlay :show="isGettingTasksList"
+             class="h-100 w-100"
+             rounded="sm"
+             variant="white">
+    <div class="w-100 h-100 d-flex flex-column">
+
+      <div class="header flex- w-100">
+        <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
+          <div class="channel-filter-actions-wrapper">
+            <compact-btn v-if="hasChannelFilterChanges"
+                         borderless
+                         customClass="ml-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+                         :variant="filterButtonVariant"
+                         @clicked="resetFilters">
+              <i class="fa fa-times"></i>
+            </compact-btn>
+            <compact-btn borderless
+                         customClass="ml-1 fs-14 _500 position-relative primary not-focusable"
+                         :variant="filterButtonVariant"
+                         v-b-modal:inbox-channel-filter-modal>
+              Filters
+            </compact-btn>
+            <b-badge v-if="hasChannelFilterChanges"
+                     class="ml-1 fs-12"
+                     variant="primary"
+                     v-b-modal:inbox-channel-filter-modal>
+              {{ channelChangedFilterFields.length }}
+            </b-badge>
+          </div>
+
+          <q-select class="m-0"
+                    borderless
+                    emit-value
+                    map-options
+                    v-model="filterRight"
+                    :options="optionsRight"
+                    :append="[{icon: 'ion-ios-arrow-down'}]"
+                    @input="sort">
+          </q-select>
         </div>
-      </template>
-    </b-overlay>
-  </div>
+      </div>
+      <div class="h-100 w-100 flex-grow-1 scroll-y" @scroll="handleScroll">
+        <task-list :communications="communications"
+                   :answer-status="answerStatus"
+                   :channel="channel"
+                   v-if="!isGettingTasksList">
+        </task-list>
+        <div class="relative py-4">
+          <b-overlay :show="isLoadingMore && !isGettingTasksList"
+                     rounded="sm">
+            <template #overlay>
+              <q-spinner-bars color="primary"/>
+            </template>
+          </b-overlay>
+        </div>
+      </div>
+      <filter-dialog :filter="filter"
+                     @onResetFilter="resetFilters">
+      </filter-dialog>
+    </div>
+    <template #overlay>
+      <div class="text-center">
+        <q-spinner-bars
+          color="primary"
+          size="2em"
+        />
+      </div>
+    </template>
+  </b-overlay>
 </template>
 
 <script>
@@ -39,6 +80,8 @@ import * as Filters from 'src/constants/filters'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import CompactBtn from 'components/compact-btn'
+import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 
 let scrollTimeout
 export default {
@@ -46,7 +89,7 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { TaskList },
+  components: { FilterDialog, CompactBtn, TaskList },
 
   props: {
     filterType: {
@@ -95,25 +138,47 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields']),
 
     nextPage () {
       return this.currentPage + 1
+    },
+
+    filterButtonVariant () {
+      return 'outlined-light'
+    },
+
+    hasChannelFilterChanges () {
+      return this.channelChangedFilterFields.length > 0
     }
   },
 
   data () {
     return {
       filter: null,
+      clonedFilter: null,
       searchFields: ['contact.name', 'contact.phone_number'],
       currentPage: 0,
       hasMore: false,
       isLoadingMore: false,
-      isLoaded: true,
+      isLoaded: false,
       pagination: {
         type: Object,
         required: true
-      }
+      },
+      optionsRight: [
+        {
+          label: 'Oldest',
+          value: 'oldest',
+          disable: false
+        },
+        {
+          label: 'Newest',
+          value: 'newest',
+          disable: false
+        }
+      ],
+      filterRight: 'newest'
     }
   },
 
@@ -267,6 +332,9 @@ export default {
 
       this.filter.type = this.filterType
       this.filter.answer_status = this.answerStatus
+
+      this.setChannelClonedFilter(this.filter)
+      this.resetChannelChangedFilterFields()
       this.setCommunications([])
     },
 
@@ -459,7 +527,7 @@ export default {
           this.setCommunications(response.data.data)
           this.currentPage = response.data.current_page
           this.hasMore = response.data.next_page_url
-
+          this.isLoaded = true
           this.pagination = _.clone(response.data)
           delete this.pagination.data
           this.gettingTasksList(false)
@@ -477,7 +545,6 @@ export default {
           this.hasMore = response.data.next_page_url
           this.isLoadingMore = false
           this.isLoaded = true
-
           this.pagination = _.clone(response.data)
           delete this.pagination.data
         })
@@ -501,7 +568,7 @@ export default {
       }, 66)
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication'])
+    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
 
   watch: {
@@ -523,6 +590,14 @@ export default {
       if (value === 'Inbox Contact') {
         let communication = this.communications.find(item => item.id === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
+      }
+    },
+    filter: {
+      deep: true,
+      handler () {
+        if (this.isLoaded) {
+          this.getCommunications(this.filter)
+        }
       }
     }
   }

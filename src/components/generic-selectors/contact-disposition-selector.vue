@@ -1,21 +1,23 @@
 <template>
-  <q-select :options="contactDispositionsOptions"
-            :multiple="multiple"
-            :placeholder="placeholder"
-            :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
-            v-model="contactDispositionId"
-            options-selected-class="text-primary"
+  <q-select options-selected-class="text-primary"
             color="primary"
             option-value="id"
             option-label="name"
             input-debounce="0"
+            ref="contactDispositionSelect"
             use-input
             emit-value
             map-options
-            outlined
             dense
+            :options="contactDispositionsOptions"
+            :multiple="multiple"
+            :placeholder="placeholder"
+            :disable="disable"
+            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
+            :outlined="outlined"
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            v-model="contactDispositionId"
+            @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -78,13 +80,41 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+
+    genericStyling: {
+      type: Boolean,
+      default: true
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    },
+    customClass: {
+      type: String,
+      default: ''
+    },
+
+    outlined: {
+      type: Boolean,
+      default: true
+    },
+
+    showPlaceholder: {
+      type: Boolean,
+      default: true
     }
   },
 
   data () {
     return {
       contactDispositionId: this.value,
-      contactDispositionsOptions: []
+      contactDispositionsOptions: [],
+      selectWidth: 0
     }
   },
 
@@ -92,15 +122,20 @@ export default {
     ...mapState(['currentCompany', 'dispositionStatuses']),
 
     placeholder () {
-      if (this.contactDispositionId) {
+      if (!this.showPlaceholder) {
         return ''
       }
 
-      if (this.multiple) {
-        return 'Select contact dispositions'
+      switch (true) {
+        case this.multiple && this.contactDispositionId.length < 1:
+          return 'Select Contact Dispositions'
+        case !this.multiple && !this.contactDispositionId:
+          return 'Select Contact Disposition'
+        case this.multiple && this.contactDispositionId.length > 0:
+        case !this.multiple && this.contactDispositionId:
+        default:
+          return ''
       }
-
-      return 'Select a contact disposition'
     },
 
     contactDispositionsAlphabeticalOrder () {
@@ -122,6 +157,9 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.contactDispositionSelect.$el.offsetWidth
+    },
     filterFn (val, update) {
       if (this.contactDispositionId && val === this.contactDispositionId) {
         update(() => {

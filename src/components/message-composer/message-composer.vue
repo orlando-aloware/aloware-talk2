@@ -31,7 +31,7 @@
     <div class="composer-footer d-flex justify-content-between pt-1">
       <div class="w-40 d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
-        <phone-number-selector @setSelectedPhone="setSelectedPhone"></phone-number-selector>
+        <contact-phone-number-selector @setSelectedPhone="setSelectedPhone"></contact-phone-number-selector>
       </div>
 
       <div class="w-35">
@@ -48,7 +48,7 @@
 import MessageComposerSms from 'components/message-composer/message-composer-sms'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
-import PhoneNumberSelector from 'components/message-composer/phone-number-selector'
+import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
 import talk2Api from 'src/plugins/api/api'
 import MessageComposerFax from 'components/message-composer/message-composer-fax'
@@ -58,7 +58,7 @@ import MessageComposerNote from 'components/message-composer/message-composer-no
 export default {
   name: 'message-composer',
   mixins: [contactMixin],
-  components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, PhoneNumberSelector, MessageComposerSms },
+  components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, ContactPhoneNumberSelector, MessageComposerSms },
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
     ...mapState(['currentCompany'])

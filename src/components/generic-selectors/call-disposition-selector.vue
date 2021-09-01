@@ -1,21 +1,25 @@
 <template>
-  <q-select :options="callDispositionsOptions"
-            :multiple="multiple"
-            :placeholder="placeholder"
-            :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
-            v-model="callDispositionId"
+  <q-select ref="callDispositionSelect"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
             option-label="name"
             input-debounce="0"
+            style="word-break: break-all;"
             use-input
+            use-chips
             emit-value
             map-options
             outlined
             dense
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            :options="callDispositionsOptions"
+            :multiple="multiple"
+            :placeholder="placeholder"
+            :disable="disable"
+            :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '' ]"
+            v-model="callDispositionId"
+            @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -60,7 +64,8 @@ export default {
 
   props: {
     value: {
-      required: false
+      required: false,
+      default: () => { return [] }
     },
 
     multiple: {
@@ -78,13 +83,22 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
   data () {
     return {
       callDispositionId: this.value,
-      callDispositionsOptions: []
+      callDispositionsOptions: [],
+      selectWidth: 0
     }
   },
 
@@ -92,15 +106,16 @@ export default {
     ...mapState(['currentCompany', 'callDispositions']),
 
     placeholder () {
-      if (this.callDispositionId) {
-        return ''
+      switch (true) {
+        case this.multiple && this.callDispositionId.length < 1:
+          return 'Select Call Dispositions'
+        case !this.multiple && !this.callDispositionId:
+          return 'Select Call Disposition'
+        case this.multiple && this.callDispositionId.length > 0:
+        case !this.multiple && this.callDispositionId:
+        default:
+          return ''
       }
-
-      if (this.multiple) {
-        return 'Select call dispositions'
-      }
-
-      return 'Select a call disposition'
     },
 
     callDispositionsAlphabeticalOrder () {
@@ -122,6 +137,10 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.callDispositionSelect.$el.offsetWidth
+    },
+
     filterFn (val, update) {
       if (this.callDispositionId && val === this.callDispositionId) {
         update(() => {

@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import * as LrnTypes from '../../constants/lrn-types'
+import * as ContactTaskStatus from '../../constants/contact-task-status'
 
 /**
  * Fix count format to have k suffix
@@ -153,6 +154,26 @@ const validLrnType = (type) => {
   return ![null, undefined].includes(type)
 }
 
+/**
+ * Fix task status name, returns name
+ * @param {number} taskStatusId
+ * @returns {string}
+ */
+const fixTaskStatusName = (taskStatusId) => {
+  switch (taskStatusId) {
+    case ContactTaskStatus.STATUS_PENDING:
+      return 'Pending'
+    case ContactTaskStatus.STATUS_CLOSED:
+      return 'Closed'
+    case ContactTaskStatus.STATUS_NEW:
+      return 'New'
+    case ContactTaskStatus.STATUS_OPEN:
+      return 'Open'
+    default:
+      return ''
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixDateOfBirth,
@@ -166,7 +187,8 @@ export default ({ Vue }) => {
     fixTimezone,
     fixLrnType,
     fixCount,
-    validLrnType
+    validLrnType,
+    fixTaskStatusName
   }
   Object.keys(filters).map((k) => Vue.filter(k, filters[k]))
 }

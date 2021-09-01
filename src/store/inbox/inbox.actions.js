@@ -31,5 +31,14 @@ export default {
   },
   setSelectedContact: ({ commit }, contact) => {
     commit('SET_SELECTED_CONTACT', contact)
+  },
+  setChannelClonedFilter: ({ commit }, filter) => {
+    commit('SET_CHANNEL_CLONED_FILTER', filter)
+  },
+  updateChannelChangedFilterFields: ({ commit }, params) => {
+    commit('UPDATE_CHANNEL_CHANGED_FILTER_FIELDS', params)
+  },
+  resetChannelChangedFilterFields: ({ commit }) => {
+    commit('RESET_CHANNEL_CHANGED_FILTER_FIELDS')
   }
 }

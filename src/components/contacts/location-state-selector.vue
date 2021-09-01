@@ -1,15 +1,18 @@
 <template>
   <div>
     <q-select class="inline-select"
+              ref="stateSelect"
               use-input
               clearable
               v-model="contact.cnam_state"
               :options="options"
               :loading="isBusy"
               :disable="disabled"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
+              @popup-show="onShowMenu"
               @filter="filterFn"/>
   </div>
 </template>
@@ -57,10 +60,14 @@ export default {
         US: ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'],
         CA: ['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT']
       },
-      options: this.states
+      options: this.states,
+      selectWidth: 0
     }
   },
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.stateSelect.$el.offsetWidth
+    },
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedState ? this.selectedState : 'Select state'
@@ -71,8 +78,9 @@ export default {
       this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
       this.$el.querySelector('.inline-select .q-field__native span').style.display = ''
     },
-    onInput () {
+    onInput (val) {
       this.$el.querySelector('.inline-select .q-field__input').blur()
+      this.$emit('select', val)
     },
     filterFn (val, update) {
       if (val === '') {
@@ -86,11 +94,6 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.states.filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
-    }
-  },
-  watch: {
-    'contact.cnam_state': function (val) {
-      this.$emit('select', { val })
     }
   }
 }

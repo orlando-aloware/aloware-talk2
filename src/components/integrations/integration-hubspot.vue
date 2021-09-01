@@ -19,7 +19,13 @@
         <p class="mb-0"
            v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
-          <span class="data-value">{{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}</span>
+          <span class="data-value">
+             <q-tooltip anchor="top middle"
+                        self="center middle">
+              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            </q-tooltip>
+            {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+          </span>
         </p>
         <p class="mb-0"
            v-if="integration_data.properties.email">
@@ -152,8 +158,8 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
         this.contact &&
-        this.contact.integration_data &&
-        this.contact.integration_data.hubspot &&
+        this.contact.integrations &&
+        this.contact.integrations.hubspot &&
         this.currentCompany.hubspot_marketing_portal_id) {
         return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
@@ -163,7 +169,7 @@ export default {
 
     hubspotLink () {
       if (this.hubspotContactBaseLink) {
-        return `${this.hubspotContactBaseLink}contact/${this.contact.integration_data.hubspot.contact_id}`
+        return `${this.hubspotContactBaseLink}contact/${this.contact.integrations.hubspot.contact_id}`
       }
 
       return false

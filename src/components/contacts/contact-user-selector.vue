@@ -182,7 +182,7 @@ export default {
 
   watch: {
     field (val) {
-      this.$emit('updateField', { val })
+      this.$emit('updateField', val)
     }
   }
 }

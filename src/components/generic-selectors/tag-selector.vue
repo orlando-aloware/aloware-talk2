@@ -1,37 +1,157 @@
 <template>
-  <b-card class="border-0 tags-wrapper">
-    <generic-multi-select label="Tags"
-                          buttonText="Tags"
-                          :values="selectedTagIds"
-                          :options="tags"
+  <div>
+    <generic-multi-select :label="label"
+                          :buttonText="buttonText"
+                          :values="tags"
+                          :options="tagsOptions"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          @valuesUpdated="submitTags">
+                          v-if="genericMultiselect"
+                          @valuesUpdated="select">
     </generic-multi-select>
-  </b-card>
+    <q-select v-else
+              ref="tagSelect"
+              options-selected-class="text-primary"
+              color="primary"
+              option-value="id"
+              option-label="name"
+              input-debounce="0"
+              style="word-break: break-all;"
+              use-input
+              emit-value
+              map-options
+              menu-shrink
+              outlined
+              dense
+              v-model="tags"
+              :options="tagsOptions"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
+              :multiple="multiple"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
+              @filter="filterFn">
+
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="no-results text-grey">
+            No results
+          </q-item-section>
+        </q-item>
+      </template>
+
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-section class="pl-2">
+            <i class="fa fa-circle position-absolute"
+               :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 45%; margin-right: 10px;`"></i>
+            <q-item-label class="ml-2" v-html="scope.opt.name"/>
+          </q-item-section>
+        </q-item>
+      </template>
+
+      <template v-slot:selected-item="scope">
+        <q-chip
+          removable
+          dense
+          @remove="scope.removeAtIndex(scope.index)"
+          :tabindex="scope.tabindex"
+          color="white"
+          class="tag-selected-chip"
+          text-color="secondary"
+        >
+          <i class="fa fa-circle position-absolute"
+             :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+          <span class="ml-3 pr-1 pl-1" :style="`color: ${scope.opt.color};`">{{ scope.opt.name }}</span>
+        </q-chip>
+      </template>
+    </q-select>
+  </div>
 </template>
 
 <script>
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import { mapState, mapActions } from 'vuex'
 
 export default {
-  name: 'contact-tags',
+  name: 'tags-selector',
 
   mixins: [aclMixin],
 
   components: { GenericMultiSelect },
 
   props: {
-    contact: {
-      required: true
+
+    value: {
+      required: false
     },
 
     no_title: {
       type: Boolean,
       required: false,
       default: false
+    },
+    label: {
+      type: String,
+      default: 'Tags'
+    },
+    buttonText: {
+      type: String,
+      default: 'Modify Tags'
+    },
+    disable: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
+    prepend: {
+      type: String,
+      required: false
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    genericMultiselect: {
+      type: Boolean,
+      default: false
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    }
+  },
+
+  computed: {
+    getLabel () {
+      return tag => {
+        return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
+      }
+    },
+
+    displayClass () {
+      return !this.isEdit ? 'show-raw-value' : ''
+    },
+
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.tags.length < 1:
+          return 'Select Tags'
+        case !this.multiple && !this.tags:
+          return 'Select Tag'
+        case this.multiple && this.tags.length > 0:
+        case !this.multiple && this.tags:
+        default:
+          return ''
+      }
     }
   },
 
@@ -39,45 +159,33 @@ export default {
     return {
       isEdit: false,
       tagsArray: [],
-      tags: []
+      tagsOptions: [],
+      tags: this.value,
+      selectWidth: 0
     }
-  },
-
-  computed: {
-    ...mapState(['tagsFullyLoaded']),
-    contactTags () {
-      return this.contact.tags
-    },
-
-    getLabel () {
-      return tag => {
-        return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
-      }
-    },
-
-    selectedTagIds () {
-      return this.contactTags ? this.contactTags.map(tag => tag.id) : []
-    },
-
-    displayClass () {
-      return !this.isEdit ? 'show-raw-value' : ''
-    }
-  },
-
-  mounted () {
-    this.getTags()
   },
 
   methods: {
-    changeTags (event) {
-      this.tagsArray = event
+    onShowMenu () {
+      this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    onModifyTags () {
-      this.isEdit = true
-      this.$nextTick(function () {
-        this.$refs.contactTagSelector.$el.focus()
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.tagsOptions = this.tagsArray
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.tagsOptions = this.tagsArray.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    changeTags (event) {
+      this.tagsArray = event
     },
 
     onSelectClose () {
@@ -88,37 +196,34 @@ export default {
       this.isEdit = true
     },
 
-    onRemoveTag () {
-      this.isEdit = true
-    },
-
     getTags () {
-      if (!this.hasPermissionTo('list tag') || this.tagsFullyLoaded) {
+      if (!this.hasPermissionTo('list tag')) {
         return
       }
 
       return talk2Api.V1.tags.get({
         params: { full_load: true }
       }).then(res => {
-        this.tags = res.data
-        this.setTagsFullyLoaded(true)
+        this.tagsArray = res.data
       }).catch(err => {
         console.log(err)
       })
-    },
+    }
+  },
 
-    submitTags (tagsArray) {
-      if (this.hasPermissionTo('tag contact')) {
-        talk2Api.V1.contact.storeTags(this.contact.id, { tags: tagsArray })
-          .then(response => {
-            this.$emit('update', response.data)
-          }).catch(err => {
-            console.log(err)
-            this.$root.handleErrors(err.response)
-          })
-      }
+  mounted () {
+    this.getTags()
+  },
+
+  watch: {
+    value () {
+      this.tags = this.value
     },
-    ...mapActions(['setTagsFullyLoaded'])
+    tags (val) {
+      if (this.tags !== this.value) {
+        this.$emit('change', val)
+      }
+    }
   }
 }
 </script>

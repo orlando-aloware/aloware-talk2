@@ -1,0 +1,134 @@
+<template>
+  <div>
+    <q-select ref="communicationDirectionSelect"
+              options-selected-class="text-primary"
+              color="primary"
+              option-value="value"
+              option-label="label"
+              input-debounce="0"
+              style="word-break: break-all;"
+              use-input
+              emit-value
+              map-options
+              dense
+              v-model="direction"
+              :options="options"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ highlighted ? highlightedClass : '', customClass]"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
+              @filter="filterFn">
+
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="no-results text-grey">
+            No results
+          </q-item-section>
+        </q-item>
+      </template>
+
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-section>
+            <q-item-label v-html="scope.opt.label"/>
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'communication-direction-selector',
+
+  props: {
+    value: {
+      type: String,
+      default: 'all'
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    disable: {
+      type: Boolean,
+      default: false
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    },
+    customClass: {
+      type: String,
+      default: ''
+    }
+  },
+
+  computed: {
+    placeholder () {
+      switch (true) {
+        case this.multiple && this.direction.length < 1:
+          return 'Select Directions'
+        case !this.multiple && !this.direction:
+          return 'Select Direction'
+        case this.multiple && this.direction.length > 0:
+        case !this.multiple && this.direction:
+        default:
+          return ''
+      }
+    }
+  },
+
+  data () {
+    return {
+      direction: this.value,
+      optsArray: [
+        { value: 'all', label: 'All' },
+        { value: 'inbound', label: 'Inbound' },
+        { value: 'outbound', label: 'Outbound' }
+      ],
+      options: [],
+      selectWidth: 0
+    }
+  },
+
+  methods: {
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.optsArray
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.optsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    onShowMenu () {
+      this.selectWidth = this.$refs.communicationDirectionSelect.$el.offsetWidth
+    }
+  },
+  mounted () {
+    this.options = this.optsArray
+  },
+  watch: {
+    value () {
+      this.direction = this.value
+    },
+
+    direction (val) {
+      this.$emit('select', this.direction ? this.direction : 'all')
+    }
+  }
+}
+</script>

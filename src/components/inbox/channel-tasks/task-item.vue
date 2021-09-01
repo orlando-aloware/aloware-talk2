@@ -4,9 +4,10 @@
        @click="onItemClick(communication)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
-      <i v-if="!communication.is_read"
-         class="fa fa-circle"
-         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;"></i>
+      <i v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read"
+         class="fa fa-circle position-relative"
+         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;">
+      </i>
       <avatar width="34"
               height="34"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
@@ -124,7 +125,7 @@ export default {
 
     contactName () {
       if (this.communication && this.communication.contact) {
-        return this.communication.contact.name || this.$options.filters.fixPhone(this.communication.lead_number)
+        return this.communication.contact.name || (this.$options.filters.fixPhone(this.communication.lead_number) || 'No Name')
       }
 
       if (this.communication) {
@@ -155,6 +156,18 @@ export default {
   },
 
   methods: {
+    markable (communication) {
+      // Markable if communication is SMS and the comm direction is INBOUND
+      let smsRule = communication.type === CommunicationTypes.SMS &&
+        communication.direction === CommunicationDirection.INBOUND
+      // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
+      let callRule = communication.type === CommunicationTypes.CALL &&
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2) &&
+        communication.direction === CommunicationDirection.INBOUND
+
+      return smsRule || callRule
+    },
+
     setContact (id) {
       this.setContactId(id)
     },

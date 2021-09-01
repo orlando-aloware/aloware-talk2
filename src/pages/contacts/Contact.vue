@@ -111,6 +111,14 @@ export default {
     }
   },
 
+  created () {
+    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+      if (this.contact.id === contact.id) {
+        this.setContact(contact)
+      }
+    })
+  },
+
   watch: {
     '$route.params.id': function (value) {
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name) && this.contactId !== value) {

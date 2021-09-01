@@ -1,32 +1,37 @@
 <template>
   <div>
-    <generic-multi-select label="Contact Ring Groups"
+    <generic-multi-select :label="label"
                           buttonText="Ring Groups"
                           :values="ringGroupId"
                           :options="ringGroupOptions"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
-                          v-if="multiple"
+                          v-if="genericMultiselect"
                           @valuesUpdated="updateRingGroups">
     </generic-multi-select>
-    <q-select :options="ringGroupOptions"
-              :multiple="multiple"
-              :placeholder="placeholder"
-              :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '' ]"
-              class="generic-selector"
-              v-model="ringGroupId"
-              v-else
+    <q-select v-else
+              ref="ringGroupSelect"
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
               input-debounce="0"
+              style="word-break: break-all;"
               use-input
+              use-chips
               emit-value
               map-options
               outlined
               dense
+              :options="ringGroupOptions"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              v-model="ringGroupId"
+
+              @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
@@ -88,13 +93,30 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+    label: {
+      type: String,
+      default: 'Contact Ring Groups'
+    },
+    genericMultiselect: {
+      type: Boolean,
+      default: true
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
   data () {
     return {
       ringGroupId: this.value,
-      ringGroupOptions: []
+      ringGroupOptions: [],
+      selectWidth: 0
     }
   },
 
@@ -102,15 +124,16 @@ export default {
     ...mapState(['currentCompany', 'ringGroups']),
 
     placeholder () {
-      if (this.ringGroupId) {
-        return ''
+      switch (true) {
+        case this.multiple && this.ringGroupId.length < 1:
+          return 'Select Ring Groups'
+        case !this.multiple && !this.ringGroupId:
+          return 'Select Ring Group'
+        case this.multiple && this.ringGroupId.length > 0:
+        case !this.multiple && this.ringGroupId:
+        default:
+          return ''
       }
-
-      if (this.multiple) {
-        return 'Select ring groups'
-      }
-
-      return 'Select a ring group'
     },
 
     ringGroupsAlphabeticalOrder () {
@@ -132,6 +155,10 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.ringGroupSelect.$el.offsetWidth
+    },
+
     filterFn (val, update) {
       if (this.ringGroupId && val === this.ringGroupId) {
         update(() => {

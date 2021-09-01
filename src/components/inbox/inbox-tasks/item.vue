@@ -123,16 +123,7 @@ export default {
       if (this.selectedContact && this.selectedContact.id === contact.id) {
         return
       }
-      this.setSelectedContact(contact)
-      this.$router.push({
-        name: 'Inbox Contact Task',
-        params: {
-          id: contact.id.toString(),
-          channel: 'inbox'
-        }
-      }).catch(err => {
-        console.log(err)
-      })
+      this.$emit('onItemSelected', contact)
     }
   }
 }

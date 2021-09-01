@@ -3,6 +3,7 @@ export default function () {
     selectedContactId: null,
     selectedCommunication: null,
     isGettingTasksList: false,
+    isChannelFilterOpen: false,
     activeChannel: {
       label: 'Inbox',
       value: 'inbox',
@@ -71,6 +72,8 @@ export default function () {
       open: 0,
       pending: 0,
       closed: 0
-    }
+    },
+    channelClonedFilter: {},
+    channelChangedFilterFields: []
   }
 }
