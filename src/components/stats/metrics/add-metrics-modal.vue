@@ -1,14 +1,17 @@
 <template>
-  <b-modal
+  <q-dialog
+    persistent
     v-model="modal"
-    size="md"
-    centered
-    hide-header
-    hide-footer>
+    transition-show="jump-down">
     <q-card
       flat
+      style="width: 350px;"
       class="my-card">
-      <q-card-section>
+      <q-toolbar style="height: 10px;">
+        <q-space />
+        <q-btn flat round dense icon="close" v-close-popup />
+      </q-toolbar>
+      <q-card-section class="pt-0">
         <div class="text-center text-h6 pb-4">Add Metric</div>
         <q-select
           outlined dense
@@ -60,7 +63,7 @@
           class="full-width" />
       </q-card-section>
     </q-card>
-  </b-modal>
+  </q-dialog>
 </template>
 
 <script>

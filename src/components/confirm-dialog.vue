@@ -31,7 +31,7 @@ export default {
     }
   },
   mounted () {
-    this.$refs.modal.$on('close', () => {
+    this.$refs.modal.$on('hidden', () => {
       this.$emit('close')
     })
   }

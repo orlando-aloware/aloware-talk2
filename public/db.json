@@ -1,0 +1,63 @@
+{
+  "report": [
+    {
+      "id": 1,
+      "name": "Sales Daily Pipeline",
+      "timeline": "Today"
+    },
+    {
+      "id": 2,
+      "name": "Technical Support",
+      "timeline": "Recent (Last 30 days + Today)"
+    },
+    {
+      "id": 3,
+      "name": "User Status Breakdown",
+      "timeline": "This Week"
+    }
+  ],
+  "metrics": [
+    {
+      "reportId": 1,
+      "id": 1,
+      "name": "# of calls",
+      "value": "123"
+    },
+    {
+      "reportId": 1,
+      "id": 3,
+      "name": "# of interested",
+      "value": "11"
+    },
+    {
+      "reportId": 2,
+      "id": 4,
+      "name": "Answered",
+      "value": "77"
+    },
+    {
+      "reportId": 2,
+      "id": 5,
+      "name": "Missed",
+      "value": "12"
+    },
+    {
+      "reportId": 3,
+      "id": 6,
+      "name": "Available",
+      "value": "30m"
+    },
+    {
+      "reportId": 3,
+      "id": 7,
+      "name": "On Call",
+      "value": "5h 20m"
+    },
+    {
+      "reportId": 3,
+      "id": 8,
+      "name": "On Break",
+      "value": "9m"
+    }
+  ]
+}

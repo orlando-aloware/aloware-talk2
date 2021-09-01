@@ -5,7 +5,7 @@
     @mouseleave="hovered = false">
     <b-badge
       v-if="hovered"
-      @click="removeSelectedMetric"
+      @click="confirmDeletion"
       class="bg-white p-0 m-0 contact-unread-badge d-flex justify-center align-items-center position-absolute"
       style="z-index:10; border:1px grey solid;"
       pill>
@@ -18,24 +18,24 @@
       class="mycard text-black m-2">
       <q-card-section>
         <div class="text-h4 text-weight-medium text-blue">
-          X{{ metric.name }}
+          {{ metric.value }}
         </div>
         <!-- <div class="text-subtitle2 pt-3"># of kemerut</div> -->
       </q-card-section>
 
       <q-card-section class="q-pt-none text-lowercase">
-      Lorem Ipsum
+        {{ metric.name }}
       </q-card-section>
     </q-card>
     <ConfirmDialog
-      @close="test"
-      title="Are you sure?"
-      id="remove-metric-dialog"
+      @close="closeModal"
+      title="Delete Metric"
+      :id="dialogName"
       :is-open="isOpen">
       <div slot="content">
         <div class="text-left">
-          <div class="text-dark">ass
-          <div v-html="`message here...`"></div>
+          <div class="text-dark">
+          <div v-html="`Are you sure you want to remove this metric?`"></div>
           </div>
         </div>
       </div>
@@ -43,14 +43,14 @@
         <div class="d-flex w-100">
           <div class="flex-grow-1"></div>
           <button
-            class="btn btn-sm btn-outline-success mr-2"
-            @click="test">
-            Lorem ipsum dolor
+            class="btn btn-sm btn-outline-success mr-2 px-4"
+            @click="closeModal">
+            No
           </button>
           <button
             class="btn btn-sm btn-danger mr-2"
-            @click="test">
-            Remove Metric
+            @click="removeSelectedMetric">
+            Yes, Remove Metric!
           </button>
         </div>
       </div>
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import ConfirmDialog from 'components/confirm-dialog'
 
 export default {
@@ -72,19 +73,40 @@ export default {
   components: {
     ConfirmDialog
   },
+  computed: {
+    dialogName () {
+      return `remove-metric-dialog-${this.metric.id}`
+    }
+  },
   data () {
     return {
       hovered: false,
       isOpen: false
     }
   },
+  watch: {
+    isOpen (val) {
+      if (val) {
+        this.$bvModal.show(this.dialogName)
+      } else {
+        this.$bvModal.hide(this.dialogName)
+      }
+    }
+  },
   methods: {
-    removeSelectedMetric () {
-      console.log('Metric should be removed', this.isOpen)
+    ...mapActions('stats', [
+      'deleteMetrics'
+    ]),
+    confirmDeletion () {
       this.isOpen = true
     },
-    test () {
-      console.log('hahahaha')
+    closeModal () {
+      this.isOpen = false
+    },
+    async removeSelectedMetric () {
+      console.log('Removing ', this.metric.id)
+      await this.deleteMetrics(this.metric.id)
+      this.closeModal()
     }
   }
 }

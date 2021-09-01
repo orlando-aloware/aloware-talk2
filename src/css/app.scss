@@ -4169,6 +4169,23 @@ span.mention {
   border: solid 1px $grey-light3;
   @include border-radius(10px);
   overflow: hidden;
+
+  &.no-border {
+    border: 0;
+  }
+
+  &.dashed {
+    border-style: dashed;
+    cursor: pointer;
+    background-color: lighten(grey, 47%);
+
+    .row {
+      color: darken(grey, 5%) !important;
+      span {
+        font-size: 32px;
+      }
+    }
+  }
 }
 
 .mycard--shadow {
@@ -6227,5 +6244,20 @@ button.primary {
 .q-field--highlighted.highlighted-primary {
   .q-field__native, .q-field__marginal {
     color: $primary
+  }
+}
+
+.mini-select {
+  .q-field__inner {
+    .q-field__control {
+      height: 26px !important;
+      min-height: 26px !important;
+      .q-field__control-container {
+        .q-field__native {
+          min-height: 26px !important;
+          padding: 0;
+        }
+      }
+    }    
   }
 }

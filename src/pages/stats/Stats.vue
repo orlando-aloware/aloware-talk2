@@ -1,23 +1,48 @@
 <template>
-  <q-scroll-area style="height: 100vh; max-width: 100wh;">
+  <q-scroll-area
+    class="pb-4"
+    style="height: 100vh; max-width: 100wh;">
     <div class="p-3">
-      <MetricsGroup
-        v-for="n in 7"
-        :key="n"
-        :section-title="`Metrics Group ${Math.ceil(Math.random()*99)}`" />
+      <StatsAndMetrics
+        v-for="(rg, key) in reportGroup"
+        :key="key"
+        :resources="rg" />
     </div>
-    <div class="h-100 pt-6"></div>
+    <div class="px-3">
+      <AddReportGroup />
+    </div>
   </q-scroll-area>
 </template>
 
 <script>
 
-import MetricsGroup from 'components/stats/stats-metrics-group'
+import { mapActions, mapGetters } from 'vuex'
+import StatsAndMetrics from 'components/stats/stats-and-metrics'
+import AddReportGroup from 'components/stats/report-group/add-report-group-modal'
 
 export default {
   name: 'Stats',
   components: {
-    MetricsGroup
+    StatsAndMetrics,
+    AddReportGroup
+  },
+  computed: {
+    ...mapGetters('stats', [
+      'reportGroup'
+    ])
+  },
+  mounted () {
+    this.getReportGroups()
+  },
+  data () {
+    return {
+      report_group: []
+    }
+  },
+  methods: {
+    ...mapActions('stats', [
+      'getReportGroups'
+    ])
   }
 }
 </script>
