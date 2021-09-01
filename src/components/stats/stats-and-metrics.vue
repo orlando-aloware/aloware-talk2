@@ -43,27 +43,40 @@
       @close="closeModal"
       title="Delete Report Group"
       :id="dialogName"
-      :is-open="isOpen">
+      :is-open="isOpen"
+      :hide-header="true"
+      :hide-footer="true"
+      size="sm">
       <div slot="content">
-        <div class="text-left">
+        <div class="text-center text-h6 pb-4">
+          <TrashIcon height="20" width="20" />
+          Remove Report Group?
+        </div>
+        <div class="text-center py-3">
           <div class="text-dark">
-          <div v-html="`Are you sure you wanted to remove the selected Report Group:<br/><strong>${resources.name}</strong>?`"></div>
+          <div v-html="`Do you want to remove this Report Group: <strong>${resources.name}</strong>?`"></div>
           </div>
         </div>
-      </div>
-      <div slot="footer" class="w-100">
-        <div class="d-flex w-100">
-          <div class="flex-grow-1"></div>
-          <button
-            class="btn btn-sm btn-outline-success mr-2 px-4"
-            @click="closeModal">
-            No
-          </button>
-          <button
-            class="btn btn-sm btn-danger mr-2"
-            @click="removeSelectedReportGroup">
-            Yes, Remove it!
-          </button>
+        <div class="row text-center pt-3 pb-0">
+          <div class="col-6 p-1">
+            <b-button
+              variant="dark-grey"
+              class="f-btn--cancel"
+              size="sm"
+              block
+              @click="closeModal">
+              Cancel
+            </b-button>
+          </div>
+          <div class="col-6 p-1">
+            <b-button
+              variant="danger"
+              size="sm"
+              block
+              @click="removeSelectedReportGroup">
+              Remove
+            </b-button>
+          </div>
         </div>
       </div>
     </ConfirmDialog>
@@ -76,6 +89,7 @@
 import AddMetrics from './metrics/add-metrics-trigger'
 import MetricsBox from './metrics/metrics-box'
 import ConfirmDialog from 'components/confirm-dialog'
+import TrashIcon from 'components/icons/trash-icon'
 import {
   DATE_RANGES
 } from 'src/constants/dates'
@@ -101,7 +115,8 @@ export default {
     // EditIcon,
     AddMetrics,
     MetricsBox,
-    ConfirmDialog
+    ConfirmDialog,
+    TrashIcon
   },
   computed: {
     reportGroupName () {
