@@ -21,42 +21,56 @@
       "reportId": 1,
       "id": 1,
       "name": "# of calls",
+      "color": "blue",
       "value": "123"
+    },
+    {
+      "reportId": 1,
+      "id": 2,
+      "name": "# of connected",
+      "color": "blue",
+      "value": "77"
     },
     {
       "reportId": 1,
       "id": 3,
       "name": "# of interested",
+      "color": "blue",
       "value": "11"
     },
     {
       "reportId": 2,
       "id": 4,
       "name": "Answered",
+      "color": "black",
       "value": "77"
     },
     {
       "reportId": 2,
       "id": 5,
       "name": "Missed",
+      "color": "red",
       "value": "12"
     },
     {
       "reportId": 3,
       "id": 6,
       "name": "Available",
+      "color": "blue",
       "value": "30m"
     },
     {
       "reportId": 3,
       "id": 7,
       "name": "On Call",
+      "color": "black",
       "value": "5h 20m"
     },
     {
       "reportId": 3,
       "id": 8,
       "name": "On Break",
+      "color": "black",
       "value": "9m"
     }
   ]

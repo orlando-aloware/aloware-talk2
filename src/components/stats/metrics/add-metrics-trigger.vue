@@ -1,12 +1,12 @@
 <template>
-  <div class="col-4 col-md-3 col-lg-2 p-2 position-relative">
+  <div class="p-2 position-relative">
     <q-card v-ripple flat bordered
       @click="addMetrics()"
-      class="mycard text-black full-height q-hoverable dashed">
+      class="metric-box dashed-box full-height q-hoverable">
       <span class="q-focus-helper"></span>
       <q-card-section class="full-height align-middle">
         <div class="row items-center justify-center full-height text-lead text-center text-grey lighten-3 align-middle">
-          <div class="pb-1">
+          <div class="metric-box-desc metric-box-header pb-1">
             <span>+</span>
             <br />
             Add Metrics

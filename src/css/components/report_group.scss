@@ -1,0 +1,26 @@
+.metric-box {
+  background-color: $white !important;
+  width: 199px !important;
+  border: 1px solid $grey-60;
+  border-radius: 10px;
+  min-height: 130px;
+
+  &.dashed-box {
+    border: dashed 1px $grey-70 !important;
+    background-color: $grey-40 !important;
+  }
+
+  .metric-box-label {
+    font-size: $f-box-title;
+    font-weight: 600;
+    letter-spacing: -0.25px !important;
+  }
+
+  .metric-box-desc {
+    font-size: 15px;
+    color: $grey-80;
+    &.metric-box-header {
+      font-weight: 500;
+    }
+  }
+}

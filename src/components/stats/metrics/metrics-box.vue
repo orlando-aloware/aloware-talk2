@@ -1,6 +1,6 @@
 <template>
   <div
-    class="col-4 col-md-3 col-lg-2 p-0 position-relative"
+    class="p-0 position-relative"
     @mouseover="hovered = true"
     @mouseleave="hovered = false">
     <b-badge
@@ -14,44 +14,57 @@
         class="text-grey"
         style="font-size: 14px;padding:1px;" />
     </b-badge>
-    <q-card flat bordered
-      class="mycard text-black m-2">
+    <q-card flat
+      class="metric-box text-black m-2">
       <q-card-section>
-        <div class="text-h4 text-weight-medium text-blue">
+        <div :class="`metric-box-label text-weight-medium text-${metric.color}`">
           {{ metric.value }}
         </div>
         <!-- <div class="text-subtitle2 pt-3"># of kemerut</div> -->
       </q-card-section>
 
-      <q-card-section class="q-pt-none text-lowercase">
+      <q-card-section class="metric-box-desc q-pt-none text-lowercase">
         {{ metric.name }}
       </q-card-section>
     </q-card>
     <ConfirmDialog
       @close="closeModal"
-      title="Delete Metric"
+      title="Remove Metric"
       :id="dialogName"
-      :is-open="isOpen">
+      :is-open="isOpen"
+      :hide-header="true"
+      :hide-footer="true"
+      size="sm">
       <div slot="content">
-        <div class="text-left">
+        <div class="text-center text-h6 pb-4">
+          <TrashIcon height="20" width="20" />
+          Remove Metric?
+        </div>
+        <div class="text-center py-3">
           <div class="text-dark">
-          <div v-html="`Are you sure you want to remove this metric?`"></div>
+            <div v-html="`Do you want to remove this metric?`"></div>
           </div>
         </div>
-      </div>
-      <div slot="footer" class="w-100">
-        <div class="d-flex w-100">
-          <div class="flex-grow-1"></div>
-          <button
-            class="btn btn-sm btn-outline-success mr-2 px-4"
-            @click="closeModal">
-            No
-          </button>
-          <button
-            class="btn btn-sm btn-danger mr-2"
-            @click="removeSelectedMetric">
-            Yes, Remove Metric!
-          </button>
+        <div class="row text-center pt-3 pb-0">
+          <div class="col-6 p-1">
+            <b-button
+              variant="dark-grey"
+              class="f-btn--cancel"
+              size="sm"
+              block
+              @click="closeModal">
+              Cancel
+            </b-button>
+          </div>
+          <div class="col-6 p-1">
+            <b-button
+              variant="danger"
+              size="sm"
+              block
+              @click="removeSelectedMetric">
+              Remove
+            </b-button>
+          </div>
         </div>
       </div>
     </ConfirmDialog>
@@ -61,6 +74,7 @@
 <script>
 import { mapActions } from 'vuex'
 import ConfirmDialog from 'components/confirm-dialog'
+import TrashIcon from 'components/icons/trash-icon'
 
 export default {
   name: 'MetricsBox',
@@ -71,7 +85,8 @@ export default {
     }
   },
   components: {
-    ConfirmDialog
+    ConfirmDialog,
+    TrashIcon
   },
   computed: {
     dialogName () {
