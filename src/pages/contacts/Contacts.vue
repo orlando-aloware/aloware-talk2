@@ -1,7 +1,7 @@
 <template>
-  <div class="row mx-0 content-row d-flex overflow-hidden h-100 pb-2"
+  <div class="row mx-0 content-row d-flex overflow-hidden h-100"
        v-if="authenticated">
-    <div class="col-2 pt-2 pl-2 pr-1 mb-0 h-100">
+    <div class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
       <contacts-sidebar></contacts-sidebar>
     </div>
     <div class="col-10 px-0 pr-1 mb-0 main">

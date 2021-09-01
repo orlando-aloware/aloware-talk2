@@ -26,15 +26,17 @@
           @search="onSearch"
           :disabled="isLoadingDisabled">
         </search>
-        <div class="px-3" v-if="!isMyContactsView">
+        <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
+          <label for="my-contacts" class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
           <b-form-checkbox
-            v-model="myContacts"
+            id="my-contacts"
+            class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
+            v-model="myContacts"
             @change="onFetchMyContacts"
           >
-            <span class="small text-muted text-uppercase">My Contacts</span>
           </b-form-checkbox>
         </div>
       </div>
@@ -93,17 +95,22 @@
         >
           Save
         </compact-btn>
+        <compact-btn
+          variant="primary"
+          v-if="(list.type === ContactListType.STATIC && isEditable)"
+          :disabled="!(list.type === ContactListType.STATIC && isEditable)"
+          :class="['ml-2']"
+          @clicked="onAddContactsToList"
+        >
+          <i class="fa fa-plus mr-1"></i> Add Contact
+        </compact-btn>
 
-        <b-dropdown text="More"
+        <b-dropdown text="..."
+                    no-caret
                     right
-                    variant="outline-primary"
-                    class="m-2 b-compact-dropdown-button">
+                    variant="outline-dark"
+                    class="m-2 b-compact-dropdown-button text-bold">
           <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
-          <b-dropdown-item href=""
-                           :disabled="!(list.type === ContactListType.STATIC && isEditable)"
-                           @click="onAddContactsToList">
-            <i class="fa fa-list-ul"></i> Add Contacts to this List
-          </b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
           <b-dropdown-item href=""

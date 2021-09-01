@@ -1729,7 +1729,7 @@ span.mention {
  Main layout
  */
 .main-content {
-  background: #F4F4F4;
+  background: $white;
 }
 
 /*
@@ -4756,7 +4756,8 @@ span.mention {
   min-height: 58px;
 }
 .datatable-wrapper {
-  height: calc(100vh - 180px);
+  height: calc(100vh - 160px);
+  padding-left: 1.1em;
 }
 
 .empty-state {
@@ -4776,7 +4777,7 @@ span.mention {
   position: relative;
   margin: auto;
   overflow: auto;
-  max-height: calc(100vh - 180px);
+  max-height: calc(100vh - 172px);
 }
 
 div.tableResizer {
@@ -4837,7 +4838,6 @@ table.datatable {
           padding: 0;
           display: block;
           height: 19px;
-          margin: auto;
         }
       }
 
@@ -4847,7 +4847,6 @@ table.datatable {
 
       th {
         background-color: $white;
-        border-right: solid 1px $grey-light4;
         border-bottom: solid 1px $grey-light4;
         font-size: 10px;
         text-transform: uppercase;
@@ -4868,7 +4867,7 @@ table.datatable {
           border-right: none;
         }
 
-        &:hover {
+        &:not(.checkbox):hover {
           background-color: $grey-light8;
         }
 
@@ -4935,7 +4934,7 @@ table.datatable {
           margin: auto;
         }
       }
-      td {
+      td:not(.datatable-row__checkbox) {
         background-color: $white;
         padding: 8px;
         border-bottom: solid 1px $grey-light4;
@@ -4946,6 +4945,22 @@ table.datatable {
         text-overflow: ellipsis;
         max-width: 0;
         min-width: 50px;
+        &:read-write:focus {
+          outline: 1px solid $light-green3;
+          background: white;
+        }
+      }
+      td.datatable-row__checkbox {
+        background-color: $white;
+        border-bottom: solid 1px $grey-light4;
+        font-size: 12px;
+        z-index: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 0;
+        min-width: 0;
+        padding-right: 20px;
         &:read-write:focus {
           outline: 1px solid $light-green3;
           background: white;
@@ -6234,4 +6249,33 @@ button.primary {
   display: inline-block;
   margin-top: 3px;
   cursor: pointer;
+}
+
+.bordered-right {
+  border-right: 1px solid $grey-60;
+}
+
+.bulk-action-menu {
+  margin-left: 25px;
+  margin-top: 49px;
+  position: absolute;
+  z-index: 9;
+  background: white;
+  height: 35px !important;
+  padding: 8px 10px;
+  width: 98% !important;
+
+  .menu-actions a{
+    text-decoration: none;
+    font-weight: 500;
+    .fa {
+      color: #6F6F6F;
+    }
+    svg{
+      margin-top: -5px;
+    }
+  }
+  .menu-actions{
+    font-size: 0.75rem;
+  }
 }

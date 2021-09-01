@@ -5,7 +5,7 @@
     :class="{ 'overflow-hidden': isEmpty }"
     @scroll="handleScroll"
   >
-    <table :class="computedClass" ref="table">
+    <table :class="[computedClass]" ref="table">
       <thead>
         <draggable
           :list="fixedColumns"
