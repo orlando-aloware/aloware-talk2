@@ -1395,6 +1395,10 @@ i.option-separator {
   background: $purple-2;
 }
 
+.fs-24 {
+  font-size: 24px !important;
+}
+
 .fs-14 {
   font-size: $f-size-h5 !important;
 }
@@ -6271,11 +6275,31 @@ button.primary {
     .fa {
       color: #6F6F6F;
     }
-    svg{
+    svg {
       margin-top: -5px;
     }
   }
   .menu-actions{
     font-size: 0.75rem;
+  }
+}
+
+.modal.br-8 {
+  .modal-content {
+    border-radius: 8px;
+  }
+}
+
+.btn-grey-80 {
+    color: $white;
+    background-color: $grey-80;
+    border-color: $grey-80;
+}
+
+#create-contact-modal {
+  .scrollable {
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
