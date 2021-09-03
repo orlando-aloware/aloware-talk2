@@ -2,8 +2,8 @@
   "reports": [
     {
       "id": 1,
-      "name": "Sales Daily Pipeline",
-      "timeline": "Today"
+      "name": "Sales Daily Pipeline 2",
+      "timeline": "This Week"
     },
     {
       "id": 2,
@@ -14,6 +14,11 @@
       "id": 3,
       "name": "User Status Breakdown",
       "timeline": "This Week"
+    },
+    {
+      "name": "User Test",
+      "timeline": "This Week",
+      "id": 4
     }
   ],
   "metrics": [
@@ -72,6 +77,13 @@
       "name": "On Break",
       "color": "",
       "value": "9m"
+    },
+    {
+      "reportId": 4,
+      "name": "Bad Timing",
+      "color": "negative",
+      "value": 139,
+      "id": 9
     }
   ]
 }

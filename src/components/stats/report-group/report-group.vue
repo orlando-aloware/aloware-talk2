@@ -34,7 +34,7 @@
       </b-badge>
       <div class="mycard no-border bg-white p-2 row">
         <AddMetrics
-          :title="reportGroupName" />
+          :report-group="{ id: reportGroupId, name: reportGroupName }" />
         <MetricsBox
           v-for="(metric, key) in resources.metrics"
           :key="key"

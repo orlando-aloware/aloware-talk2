@@ -8,6 +8,9 @@ export default {
   SET_METRICS: (state, data) => {
     state.metrics = data
   },
+  ADD_METRIC: (state, data) => {
+    state.metrics.push(data)
+  },
   REMOVE_METRICS: (state, data) => {
     let selectedKey = null
     state.metrics.forEach((metric, key) => {

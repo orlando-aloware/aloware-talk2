@@ -96,7 +96,6 @@
 
 <script>
 
-// import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import {
   METRIC_OPTIONS_2
 } from 'src/constants/stats'
@@ -124,35 +123,10 @@ export default {
     },
     colors () {
       return [
-        { value: '', text: 'No Color' },
-        { value: 'red', text: 'Warning' },
-        { value: 'blue', text: 'Success' }
+        { value: null, color: '', text: 'No Color' },
+        { value: 'negative', color: 'red', text: 'Warning' },
+        { value: 'positive', color: 'blue', text: 'Success' }
       ]
-    },
-    times () {
-      const times = []
-      for (let hour = 6; hour < 24; hour++) {
-        times.push({
-          label: window.moment({ hour }).format('h:mm A'),
-          value: window.moment({ hour }).format('HH:mm')
-        })
-        times.push({
-          label: window.moment({ hour, minute: 15 }).format('h:mm A'),
-          value: window.moment({ hour, minute: 15 }).format('HH:mm')
-        }
-        )
-        times.push({
-          label: window.moment({ hour, minute: 30 }).format('h:mm A'),
-          value: window.moment({ hour, minute: 30 }).format('HH:mm')
-        }
-        )
-        times.push({
-          label: window.moment({ hour, minute: 45 }).format('h:mm A'),
-          value: window.moment({ hour, minute: 45 }).format('HH:mm')
-        }
-        )
-      }
-      return times
     }
   },
   data () {
@@ -176,11 +150,11 @@ export default {
     }
   },
   methods: {
-    createNewMetric () {
-      console.log('999 :>> ', 999)
-    },
-    onSubmit (event) {
-      console.log('event :>> ', event)
+    async createNewMetric () {
+      this.$emit('create', {
+        name: this.metrics,
+        color: this.color.value
+      })
     },
     resetData () {
       this.metrics = ''

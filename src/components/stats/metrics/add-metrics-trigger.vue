@@ -1,7 +1,7 @@
 <template>
   <div class="p-2 position-relative">
     <q-card v-ripple flat bordered
-      @click="addMetrics()"
+      @click="openModal"
       class="metric-box dashed-box full-height q-hoverable">
       <span class="q-focus-helper"></span>
       <q-card-section class="full-height align-middle">
@@ -17,7 +17,8 @@
     </q-card>
     <AddMetricsModal
       @closed="closeModal"
-      :title="title"
+      @create="createNewMetric"
+      :title="groupTitle"
       :is-open="modal" />
   </div>
 </template>
@@ -30,23 +31,41 @@ import AddMetricsModal from './add-metrics-modal'
 export default {
   name: 'AddMetrics',
   props: {
-    title: {
-      type: String,
-      default: ''
+    reportGroup: {
+      type: Object,
+      default: () => {}
     }
   },
   components: {
     AddMetricsModal
   },
-  mounted () {},
+  computed: {
+    groupTitle () {
+      return this.reportGroup.name
+    },
+    groupId () {
+      return this.reportGroup.id
+    }
+  },
   data () {
     return {
       modal: false
     }
   },
   methods: {
-    ...mapActions('contacts', ['createListOpen']),
-    addMetrics () {
+    ...mapActions('stats', [
+      'createMetrics'
+    ]),
+    async createNewMetric (data) {
+      this.modal = false
+      await this.createMetrics({
+        reportId: this.groupId,
+        name: data.name,
+        color: data.color,
+        value: Math.floor(Math.random() * (199 - 1 + 1)) + 1
+      })
+    },
+    openModal () {
       this.modal = true
     },
     closeModal () {

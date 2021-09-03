@@ -15,13 +15,18 @@ export default {
     }
   },
   updateReportGroup: async ({ commit }, params = {}) => {
-    let res = await window.axios.patch(`http://localhost:3000/reports/${params.id}`, params)
-    console.log('res :>> ', res)
+    await window.axios.patch(`http://localhost:3000/reports/${params.id}`, params)
   },
   deleteReportGroup: async ({ commit }, id = '') => {
     let res = await window.axios.delete(`http://localhost:3000/reports/${id}`)
     if (res.status === 200) {
       commit('REMOVE_REPORT_GROUP', id)
+    }
+  },
+  createMetrics: async ({ commit }, params = {}) => {
+    let res = await window.axios.post('http://localhost:3000/metrics', params)
+    if (res.status === 201) {
+      commit('ADD_METRIC', res.data)
     }
   },
   deleteMetrics: async ({ commit }, id = '') => {
