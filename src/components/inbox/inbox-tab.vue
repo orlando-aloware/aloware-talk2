@@ -64,6 +64,7 @@
              ref="taskListScroller"
              @scroll="handleScroll">
           <inbox-task-list :contacts="contacts"
+                           :loading-contacts="isFetchingContacts"
                            @onItemSelected="onItemSelected">
           </inbox-task-list>
         </div>
@@ -166,7 +167,7 @@ export default {
     ...mapActions('inbox', ['setContacts', 'setSelectedContact']),
     loadContactTasks () {
       this.isFetchingContacts = true
-      this.getContactsByTaskStatus(this.currentTask).then(response => {
+      return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts(response.data.data)
         this.isFetchingContacts = false
         this.currentPage = response.data.current_page
@@ -277,12 +278,15 @@ export default {
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
+      if (this.currentTask !== contact.task_status) {
+        this.currentTask = contact.task_status
+      }
       this.$router.push({
         name: 'Inbox Contact Task',
         params: {
           id: contact.id.toString(),
           channel: 'inbox',
-          status: this.statusText
+          status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
         }
       }).catch(err => {
         console.log(err)
@@ -335,14 +339,27 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('contact_task_status_updated', () => {
-      this.loadContactTasks()
+    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+      if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status)) {
+        this.loadContactTasks().then(() => {
+          this.onItemSelected(this.contacts[0])
+        })
+      } else {
+        let index = this.contacts.findIndex(item => item.id === contact.id)
+        let contacts = [...this.contacts]
+        contacts[index] = contact
+        this.setContacts(contacts)
+      }
     })
   },
 
   mounted () {
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
       this.setSelectedContact({})
+    }
+
+    if (['Inbox Contact Task'].includes(this.$route.name) && this.selectedContact.task_status !== this.currentTask) {
+      this.onItemSelected(this.selectedContact)
     }
   },
 

@@ -1,6 +1,6 @@
 <template>
   <div v-if="contact.last_communication"
-       :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
+       :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative ${activeClass}`"
        @click="onItemClick(contact)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
@@ -60,6 +60,15 @@
         </div>
       </div>
     </div>
+
+    <div class="overlay position-absolute opacity-1 text-center pt-2" v-if="isReopened">
+      <avatar width="34"
+              height="34"
+              :style="avatarStyle(false)"
+              :name="contactName">
+      </avatar>
+      <p class="text-muted _500">You reopened this conversation</p>
+    </div>
   </div>
 </template>
 
@@ -76,13 +85,21 @@ import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 export default {
   name: 'inbox-task-item',
+
   mixins: [avatarMixin, communicationInfoMixin],
+
   components: { AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
+
   props: {
     contact: {
       required: true
+    },
+    loadingContact: {
+      type: Boolean,
+      default: false
     }
   },
+
   computed: {
     ...mapState(['campaigns']),
     ...mapState('inbox', ['selectedContact']),
@@ -108,8 +125,15 @@ export default {
         return campaign.name
       }
       return '-'
+    },
+    isReopened () {
+      return this.$route.params.status &&
+        this.$route.params.status !== 'open' &&
+        this.$options.filters.fixTaskStatusName(this.contact.task_status).toLowerCase() === 'open' &&
+        !this.loadingContact
     }
   },
+
   data () {
     return {
       CommunicationTypes,
@@ -117,10 +141,11 @@ export default {
       CommunicationCurrentStatus
     }
   },
+
   methods: {
     ...mapActions('inbox', ['setSelectedContact']),
     onItemClick (contact) {
-      if (this.selectedContact && this.selectedContact.id === contact.id) {
+      if (this.selectedContact && this.selectedContact.id === contact.id && !this.isReopened) {
         return
       }
       this.$emit('onItemSelected', contact)

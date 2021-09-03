@@ -6095,6 +6095,18 @@ table.datatable {
     height: 18px;
     width: 18px;
   }
+
+  .overlay {
+    opacity: 0.9 !important;
+    background: white;
+    width: 100%;
+    height: 98%;
+    cursor: pointer;
+
+    .avatar {
+      margin: 0 auto;
+    }
+  }
 }
 
 .table-more-rows-spinner {
