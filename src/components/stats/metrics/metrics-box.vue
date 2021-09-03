@@ -119,7 +119,6 @@ export default {
       this.isOpen = false
     },
     async removeSelectedMetric () {
-      console.log('Removing ', this.metric.id)
       await this.deleteMetrics(this.metric.id)
       this.closeModal()
     }

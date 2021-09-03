@@ -1,0 +1,15 @@
+select {
+
+  optgroup {
+    font-weight: 400;
+    color: $grey-80;
+    padding: 10px;
+
+    option {
+      color: $grey-100;
+      padding: 10px;
+    }
+
+  }
+
+}
