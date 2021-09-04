@@ -20,12 +20,14 @@
                 <b-form-group label="First Name">
                   <b-form-input
                     type="text"
-                    placeholder="First Name"
+                    placeholder="John"
                     ref="first_name"
-                    required
                     autofocus
-                    v-model="contact.first_name">
+                    :state = "validateState('first_name')"
+                    v-model.trim="$v.contact.first_name.$model">
                   </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.required">First name is required</b-form-invalid-feedback>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.maxLength">First name must not exceed 191 characters</b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
 
@@ -33,26 +35,28 @@
                 <b-form-group label="Last Name">
                   <b-form-input
                     type="text"
-                    placeholder="Last Name"
+                    placeholder="Doe"
                     ref="first_name"
-                    required
-                    v-model="contact.last_name">
+                    :state = "validateState('last_name')"
+                    v-model.trim="$v.contact.last_name.$model">
                   </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.required">Last name is required</b-form-invalid-feedback>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.maxLength">Last name must not exceed 191 characters</b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
             </b-form-row>
+
             <b-form-row class="mt-2">
               <b-col sm="12" md="6">
-                <b-form-group label="Phone Number"
-                              :invalid-feedback="invalidPhoneNumber"
-                              :state="validPhoneNumber">
+                <b-form-group label="Phone Number">
                   <b-form-input
                     type="text"
-                    placeholder="Phone Number"
+                    placeholder="+18185005050"
                     ref="phone_number"
-                    required
-                    v-model="contact.phone_number"
-                  ></b-form-input>
+                    :state="validateState('phone_number')"
+                    v-model.trim="$v.contact.phone_number.$model">
+                  </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.phone_number.validPhone">Enter valid phone number</b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
 
@@ -60,10 +64,12 @@
                 <b-form-group label="Email Address (Optional)">
                   <b-form-input
                     type="text"
-                    placeholder="Email Address"
+                    placeholder="e.g. john.doe@email.com"
                     ref="email"
-                    v-model="contact.email"
-                  ></b-form-input>
+                    :state = "validateState('email')"
+                    v-model.trim="$v.contact.email.$model">
+                  </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.email.email">Enter a valid email address</b-form-invalid-feedback>
                 </b-form-group>
               </b-col>
             </b-form-row>
@@ -123,7 +129,8 @@
                      md="6">
                 <b-button block
                           type="submit"
-                          variant="primary">
+                          variant="primary"
+                          :disabled="isCreating">
                   <q-spinner-bars v-if="isCreating" color="white" />
                   {{ isCreating ? 'Saving Contact...' : 'Save' }}
                 </b-button>
@@ -143,6 +150,7 @@ import UserSelector from 'components/generic-selectors/user-selector'
 import TagSelector from 'components/generic-selectors/tag-selector'
 import talk2Api from 'src/plugins/api/api'
 
+import { required, maxLength, email } from 'vuelidate/lib/validators'
 export default {
   name: 'contact-create-modal',
 
@@ -153,10 +161,31 @@ export default {
   computed: {
     ...mapState('inbox', ['channelChangedFilterFields']),
     validPhoneNumber () {
-      return this.$options.filters.fixPhone(this.phone_number) !== false
+      return this.$options.filters.fixPhone(this.contact.phone_number)
     },
     invalidPhoneNumber () {
-      return 'Please enter a valid phone number'
+      return 'Enter a valid phone number'
+    }
+  },
+
+  validations () {
+    return {
+      contact: {
+        first_name: {
+          required,
+          maxLength: maxLength(191)
+        },
+        last_name: {
+          required,
+          maxLength: maxLength(191)
+        },
+        phone_number: {
+          validPhone: (value) => this.$options.filters.fixPhone(value) !== false && value.length > 0
+        },
+        email: {
+          email
+        }
+      }
     }
   },
 
@@ -171,43 +200,17 @@ export default {
         user_id: null,
         tag_ids: []
       },
-      rules: {
-        first_name: [
-          {
-            validator: this.firstNameValidator,
-            trigger: 'blur'
-          }
-        ],
-        last_name: [
-          {
-            validator: this.lastNameValidator,
-            trigger: 'blur'
-          }
-        ],
-        phone_number: [
-          {
-            validator: this.phoneValidator,
-            trigger: 'blur'
-          }
-        ],
-        email: [
-          {
-            required: false,
-            message: 'Please provide an email address',
-            trigger: 'blur'
-          },
-          {
-            type: 'email',
-            message: 'Please provide correct email address',
-            trigger: 'blur'
-          }
-        ]
-      },
       isCreating: false
     }
   },
 
   methods: {
+
+    validateState (input) {
+      const { $dirty, $error } = this.$v.contact[input]
+      return $dirty ? !$error : null
+    },
+
     hideModal () {
       this.$refs['create-contact-modal'].hide()
     },
@@ -222,9 +225,15 @@ export default {
         user_id: null,
         tag_ids: []
       }
+
+      this.$v.contact.$reset()
     },
 
     onSubmit () {
+      this.$v.$touch()
+      if (this.$v.$invalid || !this.validPhoneNumber) {
+        return
+      }
       this.isCreating = true
       return talk2Api.V1.contact.create(this.contact).then(res => {
         this.$emit('created', res.data)
