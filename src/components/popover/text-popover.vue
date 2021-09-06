@@ -66,7 +66,9 @@ export default {
   methods: {
     handleInput: function (value) {
       this.active = false
-      this.$emit('input', this.content)
+      if (this.modelValue !== this.content) {
+        this.$emit('input', this.content)
+      }
     },
     closeInput (value) {
       this.active = false
