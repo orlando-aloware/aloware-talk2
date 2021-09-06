@@ -139,7 +139,7 @@ export const METRIC_OPTIONS_2 = [
 ]
 
 export const METRIC_OPTIONS_COLORS = [
-  { value: 'positive', color: 'blue', text: 'Success' },
-  { value: 'negative', color: 'red', text: 'Warning' },
+  { value: 'positive', color: 'primary', text: 'Success' },
+  { value: 'negative', color: 'danger', text: 'Warning' },
   { value: null, color: 'black', text: 'No Color' }
 ]

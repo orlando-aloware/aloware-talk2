@@ -32,7 +32,7 @@
         <q-icon
           name="fa fa-times"
           class="cursor-pointer text-grey"
-          style="font-size: 14px;padding:1px;" />
+          style="font-size: 11px;padding:3px;" />
       </b-badge>
       <div class="mycard no-border bg-white p-2 row">
         <AddMetrics

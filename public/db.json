@@ -110,13 +110,6 @@
       "id": 11
     },
     {
-      "reportId": 3,
-      "name": "Offline",
-      "color": "negative",
-      "value": 56,
-      "id": 12
-    },
-    {
       "reportId": 5,
       "name": "Open Deal",
       "color": null,
@@ -129,6 +122,41 @@
       "color": "negative",
       "value": 82,
       "id": 16
+    },
+    {
+      "reportId": 3,
+      "name": "Total Talk Time",
+      "color": "positive",
+      "value": 77,
+      "id": 17
+    },
+    {
+      "reportId": 3,
+      "name": "Inbound Calls",
+      "color": "negative",
+      "value": 146,
+      "id": 18
+    },
+    {
+      "reportId": 3,
+      "name": "Bad Timing",
+      "color": "negative",
+      "value": 192,
+      "id": 19
+    },
+    {
+      "reportId": 3,
+      "name": "Unqualified",
+      "color": "negative",
+      "value": 42,
+      "id": 20
+    },
+    {
+      "reportId": 3,
+      "name": "Total Wait Time",
+      "color": null,
+      "value": 100,
+      "id": 21
     }
   ]
 }

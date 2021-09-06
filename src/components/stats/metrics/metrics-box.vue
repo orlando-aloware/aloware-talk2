@@ -14,7 +14,7 @@
       <q-icon
         name="fa fa-times"
         class="text-grey cursor-pointer"
-        style="font-size: 14px;padding:1px;" />
+        style="font-size: 11px;padding:3px;" />
     </b-badge>
     <q-card flat
       class="metric-box text-black m-2">
@@ -25,7 +25,7 @@
         <!-- <div class="text-subtitle2 pt-3"># of kemerut</div> -->
       </q-card-section>
 
-      <q-card-section class="metric-box-desc q-pt-none text-lowercase">
+      <q-card-section class="metric-box-desc q-pt-none text-lowercase pt-2">
         {{ metric.name }}
       </q-card-section>
     </q-card>

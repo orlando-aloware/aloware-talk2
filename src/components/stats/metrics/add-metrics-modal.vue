@@ -35,7 +35,7 @@
                   <q-item-section>
                     <q-item-label
                       v-if="scope.opt.disable"
-                      class="text-subtitle2 font-weight-medium"
+                      class="text-subtitle2 font-weight-bold"
                       disabled label
                       v-html="scope.opt.text" />
                     <q-item-label
