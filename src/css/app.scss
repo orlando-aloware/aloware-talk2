@@ -6237,6 +6237,12 @@ button.primary {
 }
 
 .general-notification {
+  &.bg-green-10 {
+    border: 1px solid $green-90;
+  }
+  &.bg-red-10 {
+    border: 1px solid $red-90;
+  }
   .close-button {
     .q-btn__wrapper {
       min-height: auto !important;
@@ -6263,7 +6269,8 @@ button.primary {
   border-radius: 12px;
 }
 
-#b-toaster-bottom-right {
+#b-toaster-bottom-right,
+#b-toaster-top-center {
   .b-toaster-slot {
     max-width: 300px !important;
   }
@@ -6273,6 +6280,11 @@ button.primary {
   max-width: 300px !important;
   .action-notification {
     width: 300px !important;
+    &.incoming-call-notification {
+      .toast-header {
+        display: none;
+      }
+    }
     .toast-header {
       .close {
         position: absolute;
@@ -6295,6 +6307,7 @@ button.primary {
       }
     }
     .toast-body {
+      text-decoration: none;
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 17px;

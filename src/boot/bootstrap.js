@@ -11,6 +11,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
+import Notifications from 'vue-notification'
 
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
@@ -22,6 +23,7 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
 Vue.use(VueWaveSurfer)
+Vue.use(Notifications)
 
 window.Bowser = Bowser
 window.timezone = jstz.determine().name()
@@ -213,6 +215,125 @@ Vue.prototype.$handleUploadErrors = function (error) {
 
   this.$handleErrors(err)
 }
+
+Vue.prototype.$generalNotification = function (message, type) {
+  let colorClass = ''
+  switch (type) {
+    case 'updated':
+      colorClass = 'bg-blue-10'
+      break
+    case 'deleted':
+      colorClass = 'bg-red-10'
+      break
+    default:
+      colorClass = 'bg-green-10'
+  }
+
+  this.$q.notify({
+    group: false,
+    classes: `general-notification text-black ${colorClass} ml-3`,
+    timeout: 2000,
+    message: message,
+    position: 'bottom-left',
+    actions: [{ icon: 'close', color: 'black', class: 'close-button' }]
+  })
+}
+
+Vue.prototype.$actionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {
+  // call-voicemail-icon
+  let data = {
+    type: type,
+    data: {
+      title: title,
+      message: message,
+      messageIcon: messageIcon,
+      dateTime: dateTime,
+      contactId: contactId,
+      communicationId: communicationId
+    }
+  }
+
+  // skip if same notification
+  if (this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
+    return
+  }
+
+  let notificationTimeout = 500
+  this.$store.commit('SET_NOTIFICATIONS', data)
+
+  if (!document.getElementById(type)) {
+    notificationTimeout = 0
+  } else {
+    this.$bvToast.hide(type)
+  }
+
+  let notificationInterval = setInterval(() => {
+    if (!document.getElementById(type)) {
+      this.$bvToast.show(type)
+      clearInterval(notificationInterval)
+    }
+  }, notificationTimeout)
+}, 500)
+
+Vue.prototype.$generalActionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {
+  // action notifications that will show up many times
+  let icon = 'sms-icon'
+  messageIcon = type === 'callVoicemail' ? 'call-voicemail-icon' : ''
+
+  if (type === 'call' || type === 'call-voicemail') {
+    icon = 'call-icon'
+  }
+  // Use a shorter name for this.$createElement
+  const h = this.$createElement
+  // Create the message
+  const vNodesMsg = h(
+    'div',
+    { class: ['d-flex', 'flex-row', 'align-items-center'] },
+    [
+      h(
+        'div',
+        { class: ['mr-2'] },
+        [
+          h(icon)
+        ]
+      ),
+      h(
+        'div',
+        { class: ['w-100'] },
+        [
+          h(
+            'div',
+            { class: ['d-flex', 'flex-grow-1', 'align-items-baseline'] },
+            [
+              h('strong', { class: ['mr-auto', 'text-white', 'title'] }, title),
+              h('small', { class: ['mr-2', 'text-grey-81', 'time'] }, `${this.$options.filters.shortDateTimePassed(dateTime, false)}`)
+            ]
+          ),
+          h(
+            'div',
+            { class: ['text-grey-81', 'pt-1', 'message-body'] },
+            [
+              messageIcon ? h(messageIcon, { class: ['pr-1', 'message-icon'] }) : '',
+              message
+            ]
+          )
+        ]
+      )
+    ]
+  )
+  // Pass the VNodes as an array for message and title
+  this.$bvToast.toast([vNodesMsg], {
+    title: null,
+    solid: true,
+    toastClass: ['action-notification', 'notification-border-round', 'p-3', 'bg-grey-80'],
+    bodyClass: ['p-0'],
+    headerClass: ['bg-grey-80', 'border-0', 'p-0'],
+    toaster: 'b-toaster-bottom-right',
+    appendToast: true,
+    autoHideDelay: '30000',
+    isStatus: true
+  })
+}, 500)
 
 // eslint-disable-next-line no-extend-native
 String.prototype.capitalize = function () {
