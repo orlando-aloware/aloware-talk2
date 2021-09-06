@@ -13,7 +13,7 @@
       @blur="closeInput" />
     <div
       v-show="!active"
-      class="pr-2">
+      class="pr-0">
       {{ modelValue }}
     </div>
     <div
