@@ -3,7 +3,7 @@
     @mouseover="hovered = true"
     @mouseleave="hovered = false">
     <q-input
-      v-if="active"
+      v-show="active"
       outlined
       v-model="content"
       :ref="referenceName"
@@ -12,7 +12,7 @@
       @keyup.esc="closeInput"
       @blur="closeInput" />
     <div
-      v-else
+      v-show="!active"
       class="pr-2">
       {{ modelValue }}
     </div>
@@ -76,7 +76,9 @@ export default {
     active (val) {
       if (val) {
         this.content = this.modelValue
-        this.$refs[this.referenceName].focus()
+        setTimeout(() => {
+          this.$refs[this.referenceName].focus()
+        }, 10)
       }
     }
   },
