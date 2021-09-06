@@ -13,7 +13,7 @@
       pill>
       <q-icon
         name="fa fa-times"
-        class="text-grey"
+        class="text-grey cursor-pointer"
         style="font-size: 14px;padding:1px;" />
     </b-badge>
     <q-card flat

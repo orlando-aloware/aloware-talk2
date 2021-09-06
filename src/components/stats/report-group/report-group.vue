@@ -29,7 +29,7 @@
         pill>
         <q-icon
           name="fa fa-times"
-          class="text-grey"
+          class="cursor-pointer text-grey"
           style="font-size: 14px;padding:1px;" />
       </b-badge>
       <div class="mycard no-border bg-white p-2 row">
