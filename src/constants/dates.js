@@ -1,7 +1,7 @@
 export const DATE_RANGES = [
   'Today',
-  'This Week',
-  'This Month',
+  'This Week So Far',
+  'This Month So Far',
   'Recent (Last 30 days + Today)'
 ]
 

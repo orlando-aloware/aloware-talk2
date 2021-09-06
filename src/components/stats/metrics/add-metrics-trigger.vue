@@ -7,7 +7,7 @@
       <q-card-section class="full-height align-middle">
         <div class="row items-center justify-center full-height text-lead text-center text-grey lighten-3 align-middle">
           <div class="metric-box-desc metric-box-header pb-1">
-            <span>+</span>
+            <span class="text-h4 text-weight-light">+</span>
             <br />
             Add Metrics
           </div>
