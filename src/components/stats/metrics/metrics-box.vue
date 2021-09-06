@@ -2,7 +2,9 @@
   <div
     class="p-0 position-relative"
     @mouseover="hovered = true"
-    @mouseleave="hovered = false">
+    @mouseleave="hovered = false"
+    transtion-show="fade"
+    transtion-hide="fade">
     <b-badge
       v-if="hovered"
       @click="confirmDeletion"
