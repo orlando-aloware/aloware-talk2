@@ -137,3 +137,9 @@ export const METRIC_OPTIONS_2 = [
   { disable: false, value: null, text: 'Ringing' },
   { disable: false, value: null, text: 'Wrap-Up' }
 ]
+
+export const METRIC_OPTIONS_COLORS = [
+  { value: 'positive', color: 'blue', text: 'Success' },
+  { value: 'negative', color: 'red', text: 'Warning' },
+  { value: null, color: 'black', text: 'No Color' }
+]

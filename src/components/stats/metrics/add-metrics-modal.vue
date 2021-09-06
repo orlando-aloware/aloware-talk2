@@ -57,7 +57,7 @@
               <template v-slot:selected>
                 <template v-if="color">
                   <q-icon
-                    :color="color.value"
+                    :color="color.color"
                     name="font_download"
                     class="pr-2" />
                   {{ color.text }}
@@ -70,7 +70,7 @@
                 <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
                   <q-item-section avatar>
                     <q-icon
-                      :color="scope.opt.value"
+                      :color="scope.opt.color"
                       name="font_download" />
                   </q-item-section>
                   <q-item-section>
@@ -97,9 +97,11 @@
 <script>
 
 import {
-  METRIC_OPTIONS_2
+  METRIC_OPTIONS_2,
+  METRIC_OPTIONS_COLORS
 } from 'src/constants/stats'
 
+const colorOptions = { METRIC_OPTIONS_COLORS }
 const stats = { METRIC_OPTIONS_2 }
 
 export default {
@@ -122,11 +124,7 @@ export default {
       return []
     },
     colors () {
-      return [
-        { value: null, color: '', text: 'No Color' },
-        { value: 'negative', color: 'red', text: 'Warning' },
-        { value: 'positive', color: 'blue', text: 'Success' }
-      ]
+      return colorOptions.METRIC_OPTIONS_COLORS
     }
   },
   data () {

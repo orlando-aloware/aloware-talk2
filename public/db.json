@@ -16,8 +16,8 @@
       "timeline": "This Week"
     },
     {
-      "name": "User Test",
-      "timeline": "This Week",
+      "name": "Untitled",
+      "timeline": "This Month",
       "id": 4
     }
   ],
@@ -26,49 +26,49 @@
       "reportId": 1,
       "id": 1,
       "name": "# of calls",
-      "color": "blue",
+      "color": "positive",
       "value": "123"
     },
     {
       "reportId": 1,
       "id": 2,
       "name": "# of connected",
-      "color": "blue",
+      "color": "positive",
       "value": "77"
     },
     {
       "reportId": 1,
       "id": 3,
       "name": "# of interested",
-      "color": "blue",
+      "color": "positive",
       "value": "11"
     },
     {
       "reportId": 2,
       "id": 4,
       "name": "Answered",
-      "color": "blue",
+      "color": "positive",
       "value": "77"
     },
     {
       "reportId": 2,
       "id": 5,
       "name": "Missed",
-      "color": "red",
+      "color": "negative",
       "value": "12"
     },
     {
       "reportId": 3,
       "id": 6,
       "name": "Available",
-      "color": "blue",
+      "color": "positive",
       "value": "30m"
     },
     {
       "reportId": 3,
       "id": 7,
       "name": "On Call",
-      "color": "blue",
+      "color": "positive",
       "value": "5h 20m"
     },
     {
@@ -84,6 +84,20 @@
       "color": "negative",
       "value": 139,
       "id": 9
+    },
+    {
+      "reportId": 1,
+      "name": "All Missed Calls",
+      "color": "negative",
+      "value": 108,
+      "id": 10
+    },
+    {
+      "reportId": 4,
+      "name": "Connected",
+      "color": "positive",
+      "value": 40,
+      "id": 11
     }
   ]
 }

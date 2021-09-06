@@ -17,7 +17,7 @@
     <q-card flat
       class="metric-box text-black m-2">
       <q-card-section>
-        <div :class="`metric-box-label text-weight-medium text-${metric.color}`">
+        <div :class="`metric-box-label text-weight-medium text-${color}`">
           {{ metric.value }}
         </div>
         <!-- <div class="text-subtitle2 pt-3"># of kemerut</div> -->
@@ -75,6 +75,11 @@
 import { mapActions } from 'vuex'
 import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
+import {
+  METRIC_OPTIONS_COLORS
+} from 'src/constants/stats'
+
+const colorOptions = { METRIC_OPTIONS_COLORS }
 
 export default {
   name: 'MetricsBox',
@@ -91,6 +96,16 @@ export default {
   computed: {
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
+    },
+    color () {
+      let col = colorOptions.METRIC_OPTIONS_COLORS.find(c => {
+        return c.value === this.metric.color
+      })
+      if (col) {
+        return col.color
+      } else {
+        return 'black'
+      }
     }
   },
   data () {

@@ -98,8 +98,6 @@ import TitlePopover from 'components/popover/text-popover'
 import {
   DATE_RANGES
 } from 'src/constants/dates'
-// import Vue from 'vue'
-// const { ref } = Vue
 
 const dateRanges = { DATE_RANGES }
 
