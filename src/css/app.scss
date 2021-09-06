@@ -6248,18 +6248,3 @@ button.primary {
     color: $primary
   }
 }
-
-.mini-select {
-  .q-field__inner {
-    .q-field__control {
-      height: 26px !important;
-      min-height: 26px !important;
-      .q-field__control-container {
-        .q-field__native {
-          min-height: 26px !important;
-          padding: 0;
-        }
-      }
-    }    
-  }
-}

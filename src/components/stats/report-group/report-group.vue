@@ -15,9 +15,9 @@
         @input="changedFilter($event)"
         outlined
         rounded
-        dense
         :options="dateRange"
-        options-dense
+        :dense="dense"
+        :options-dense="denseOpts"
         class="mini-select">
       </q-select>
     </div>
@@ -161,7 +161,9 @@ export default {
       timeline: '',
       hovered: false,
       isOpen: false,
-      title: 'Untitled'
+      title: 'Untitled',
+      dense: true,
+      denseOpts: true
     }
   },
   watch: {
