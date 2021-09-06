@@ -58,12 +58,14 @@ export default {
     ]),
     async createNewMetric (data) {
       this.modal = false
+      this.$emit('open-loader', true)
       await this.createMetrics({
         reportId: this.groupId,
         name: data.name,
         color: data.color,
         value: Math.floor(Math.random() * (199 - 1 + 1)) + 1
       })
+      this.$emit('close-loader', true)
     },
     openModal () {
       this.modal = true

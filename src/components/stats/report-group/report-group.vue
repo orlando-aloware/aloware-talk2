@@ -36,11 +36,14 @@
       </b-badge>
       <div class="mycard no-border bg-white p-2 row">
         <AddMetrics
-          :report-group="{ id: reportGroupId, name: reportGroupName }" />
+          :report-group="{ id: reportGroupId, name: reportGroupName }"
+          @open-loader="loader = true"
+          @close-loader="loader = false" />
         <MetricsBox
           v-for="(metric, key) in resources.metrics"
           :key="key"
           :metric="metric" />
+        <MetricLoader v-if="loader" />
       </div>
     </div>
     <ConfirmDialog
@@ -94,6 +97,7 @@
 import { mapActions } from 'vuex'
 import AddMetrics from '../metrics/add-metrics-trigger'
 import MetricsBox from '../metrics/metrics-box'
+import MetricLoader from '../metrics/metric-loader'
 import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import TitlePopover from 'components/popover/text-popover'
@@ -114,6 +118,7 @@ export default {
   components: {
     AddMetrics,
     MetricsBox,
+    MetricLoader,
     ConfirmDialog,
     TrashIcon,
     TitlePopover
@@ -163,7 +168,8 @@ export default {
       isOpen: false,
       title: 'Untitled',
       dense: true,
-      denseOpts: true
+      denseOpts: true,
+      loader: false
     }
   },
   watch: {

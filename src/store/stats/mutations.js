@@ -28,5 +28,8 @@ export default {
       }
     })
     state.report_group.splice(selectedKey, 1)
+  },
+  TOGGLE_METRIC_LOADER: (state, value) => {
+    state.metric_loader = value
   }
 }
