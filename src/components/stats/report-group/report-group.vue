@@ -7,6 +7,7 @@
       <div class="cursor-pointer">
         <TitlePopover
           v-model="reportGroupName2"
+          :id="reportGroupId"
           @input="updateGroup" />
       </div>
       <q-select
@@ -21,6 +22,7 @@
       </q-select>
     </div>
     <div v-if="resources" class="p-0" style="position:relative;">
+      <!-- <q-skeleton square /> -->
       <b-badge
         v-if="hovered"
         @click="confirmDeletion"

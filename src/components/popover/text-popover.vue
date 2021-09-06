@@ -6,8 +6,11 @@
       v-if="active"
       outlined
       v-model="content"
+      :ref="referenceName"
       class="pr-2"
-      @keyup.enter="handleInput" />
+      @keyup.enter="handleInput"
+      @keyup.esc="closeInput"
+      @blur="closeInput" />
     <div
       v-else
       class="pr-2">
@@ -15,11 +18,13 @@
     </div>
     <div
       class="cursor-pointer"
-      @click="active = true">
-      <PencilIcon
-        v-show="hovered && active === false"
-        color="grey"
-        class="m-2" />
+      transtion-show="fade">
+      <div
+        @click="active = true">
+        <PencilIcon
+          color="grey"
+          :class="`${isVisible ? '' : 'make-invisible'} mx-2 my-1 mb-2`" />
+      </div>
     </div>
   </div>
 </template>
@@ -38,15 +43,41 @@ export default {
     modelValue: {
       type: String,
       default: ''
+    },
+    id: {
+      type: [String, Number],
+      default: 'X'
     }
   },
   components: {
     PencilIcon
   },
+  computed: {
+    isVisible () {
+      if (this.hovered && this.active === false) {
+        return true
+      }
+      return false
+    },
+    referenceName () {
+      return `update-group-name-${this.id}`
+    }
+  },
   methods: {
     handleInput: function (value) {
       this.active = false
       this.$emit('input', this.content)
+    },
+    closeInput (value) {
+      this.active = false
+    }
+  },
+  watch: {
+    active (val) {
+      if (val) {
+        this.content = this.modelValue
+        this.$refs[this.referenceName].focus()
+      }
     }
   },
   data () {
