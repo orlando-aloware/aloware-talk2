@@ -1,53 +1,28 @@
 <template>
-  <div class="folders">
+  <div class="shared">
     <div
       class="folders__header d-flex align-items-center border-top"
     >
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
-        My Lists
+        Public Lists
+        <q-icon name="info"
+                class="material-icons-outlined ml-2 cursor-pointer"
+                color="#62666E"
+                size="14px">
+          <q-tooltip anchor="top middle"
+                     self="center middle">
+            These are the contact list your admin shares with you.
+          </q-tooltip>
+        </q-icon>
       </div>
-
-      <b-popover
-        target="bs-folder-options"
-        triggers="click blur"
-        placement="bottomright"
-        boundary="window"
-        custom-class="contact-popover">
-        <contact-menu>
-          <contact-menu-item @click="onCreateFolderToggle">
-            <template slot="icon">
-              <folder-icon></folder-icon>
-            </template>
-            <template slot="title">
-              <span>Folder</span>
-            </template>
-          </contact-menu-item>
-
-          <contact-menu-item @click="onCreateList">
-            <template slot="icon">
-              <people-icon></people-icon>
-            </template>
-            <template slot="title">
-              <span>List</span>
-            </template>
-          </contact-menu-item>
-        </contact-menu>
-      </b-popover>
-
-      <button
-        class="btn btn-link btn-sm tooltip-target mr-1"
-        id="bs-folder-options">
-        <i class="fa fa-plus text-success"></i>
-      </button>
     </div>
 
     <div class="d-flex folders__content flex-column">
-      <tree-folder-create
-        v-if="isCreatingFolder"
-        :layer="0"
-        :parent_id="null"
-        @blur="onCreateFolderToggle"
-      />
+      <div v-if="!folders.length" class="ml-2 pl-2 pb-2">
+        <span class="fs-12 text-muted">
+          No public list available
+        </span>
+      </div>
       <template v-if="folders.length">
         <tree-folder
           v-for="folder in folders[0].child_folders"
@@ -78,26 +53,17 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
-import ContactMenu from './contact-menu.vue'
-import ContactMenuItem from './contact-menu-item.vue'
-import FolderIcon from 'components/icons/folder-icon.vue'
-import TreeFolderCreate from '../tree/tree-folder-create.vue'
-import PeopleIcon from 'components/icons/people-icon.vue'
 export default {
   components: {
-    TreeFolder,
-    ContactMenu,
-    ContactMenuItem,
-    FolderIcon,
-    TreeFolderCreate,
-    PeopleIcon
+    TreeFolder
   },
   data () {
     return {
       isCreatingFolder: false,
-      isLoading: false
+      isLoading: false,
+      folders: []
     }
   },
   methods: {
@@ -135,7 +101,6 @@ export default {
     }
   },
   computed: {
-    ...mapState('contacts', ['folders']),
     foldersWithoutRoot () {
       return this.folders.filter(folder => folder.name !== 'Root')
     },

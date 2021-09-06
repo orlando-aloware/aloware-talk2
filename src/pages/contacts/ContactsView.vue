@@ -26,15 +26,17 @@
           @search="onSearch"
           :disabled="isLoadingDisabled">
         </search>
-        <div class="px-3" v-if="!isMyContactsView">
+        <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
+          <label for="my-contacts" class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
           <b-form-checkbox
-            v-model="myContacts"
+            id="my-contacts"
+            class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
+            v-model="myContacts"
             @change="onFetchMyContacts"
           >
-            <span class="small text-muted text-uppercase">My Contacts</span>
           </b-form-checkbox>
         </div>
       </div>
@@ -65,45 +67,38 @@
         >
           Reset
         </compact-btn>
-        <!--b-dropdown
-          split
-          split-variant="outline-primary"
-          variant="primary"
-          text="Save"
-          class="m-2 b-compact-dropdown-button"
-          :class="saveFilterButtonClass"
-          size="sm"
-          @click="onUpdateContactList"
-        >
-          <b-dropdown-item href="#"
-                           @click="onCreateStaticList">
-            Save as New Static List
-          </b-dropdown-item>
-          <b-dropdown-item href="#"
-                           v-if="String(selectedList.type) === '2'"
-                           @click="onCreateDynamicList">
-            Save as New Dynamic List
-          </b-dropdown-item>
-        </b-dropdown-->
         <compact-btn
           variant="primary"
           :disabled="!filterHasChanges || this.defaultIds.includes(this.id)"
           :customClass="saveFilterButtonCustomClass"
-          @clicked="onUpdateContactList"
-        >
+          @clicked="onUpdateContactList">
           Save
         </compact-btn>
-
-        <b-dropdown text="More"
+        <b-dropdown text="Add Contacts"
+                    no-caret
                     right
-                    variant="outline-primary"
-                    class="m-2 b-compact-dropdown-button">
-          <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
-          <b-dropdown-item href=""
+                    variant="primary"
+                    class="m-2 b-compact-dropdown-button text-bold"
+                    v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
+          <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <i class="fa fa-list-ul"></i> Add Contacts to this List
+            <i class="fa fa-search"></i> Select Contact
           </b-dropdown-item>
+          <b-dropdown-item href="#" v-b-modal:create-contact-modal>
+            <i class="fa fa-plus mr-1"></i>
+            Create Contact
+          </b-dropdown-item>
+        </b-dropdown>
+
+        <contact-create-modal @created="onContactCreated"></contact-create-modal>
+
+        <b-dropdown text="..."
+                    no-caret
+                    right
+                    variant="outline-secondary"
+                    class="m-2 b-compact-dropdown-button text-bold">
+          <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
           <b-dropdown-item href=""
@@ -129,8 +124,7 @@
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
-        @more="onLoadMore"
-      >
+        @more="onLoadMore">
         <template slot="tbody">
           <table-row
             v-for="(contact, index) in listItems[id].data"
@@ -188,9 +182,12 @@ import TableRow from 'src/components/table-row.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters'
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+import ContactCreateModal from 'components/contacts/contact-create-modal'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   components: {
+    ContactCreateModal,
     ContactsFilters,
     BulkActionMenu,
     CompactBtn,
@@ -338,6 +335,17 @@ export default {
       }
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
+    },
+    onContactCreated (contact) {
+      if (this.list.type === this.ContactListType.STATIC) {
+        talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
+          this.fetch()
+        })
+      } else {
+        this.fetch({
+          page: this.listItems[this.id].current_page
+        })
+      }
     }
   },
   computed: {

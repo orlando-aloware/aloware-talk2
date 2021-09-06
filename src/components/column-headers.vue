@@ -176,16 +176,13 @@ export default {
             newItems[index].order = found.order
           }
         }
-        console.log('column.order: ', column.order)
-        console.log('newItems: ', newItems)
 
         // insert the column to the nearest existing neighboring column.
         let lesserOrder = newItems.find(col => col.order < column.order)
         let lesserOrderIndex = lesserOrder ? newItems.indexOf(lesserOrder) : null
         let greaterOrder = newItems.find(col => parseInt(col.order) > column.order)
         let greaterOrderIndex = greaterOrder ? newItems.indexOf(greaterOrder) : null
-        console.log('greaterOrderIndex: ', greaterOrderIndex)
-        console.log('lesserOrderIndex: ', lesserOrderIndex)
+
         if (greaterOrderIndex !== -1 && greaterOrderIndex !== null) {
           newItems.splice(greaterOrderIndex, 0, column)
         } else {

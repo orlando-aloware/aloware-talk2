@@ -1,6 +1,6 @@
 <template>
   <div class="pinned">
-    <div class="pinned__header d-flex align-items-center border-bottom">
+    <div class="pinned__header d-flex align-items-center">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         Pinned
       </div>

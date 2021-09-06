@@ -3,7 +3,7 @@
     <template v-for="column in fixedColumns">
       <td
         :key="column.name"
-        class="text-center align-middle datatable-row__checkbox"
+        class="text-center pull-left datatable-row__checkbox"
         v-if="column.name === 'checkbox'"
       >
         <input

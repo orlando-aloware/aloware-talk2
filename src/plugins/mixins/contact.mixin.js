@@ -846,6 +846,10 @@ export default {
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
         this.processFetchedContactInfo(res.data, callback)
+
+        if (['Inbox Contact Task'].includes(this.$route.name)) {
+          this.setSelectedContact(res.data)
+        }
       }).catch(() => {
         this.loadingContactsFailed()
       })
@@ -962,7 +966,8 @@ export default {
       }
     },
 
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts'])
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts']),
+    ...mapActions('inbox', ['setSelectedContact'])
   },
 
   watch: {

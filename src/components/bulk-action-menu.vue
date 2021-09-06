@@ -1,29 +1,41 @@
 <template>
   <div class="bulk-action-menu">
-    <div class="menu-actions d-flex justify-content-around">
-      <span>{{ getSelectedCount }} selected</span>
-      <a href="#" :disabled="true">
-        <i class="fa fa-layer-group"></i>
-        Enroll in Sequence
-      </a>
-      <a href="#" :disabled="true">
-        <i class="fa fa-crosshairs"></i>
-        Power Dialer
-      </a>
-      <a href=""
-         @click="onAddToStaticList">
-        <i class="fa fa-user-plus"></i>
-        Add to Static List
-      </a>
-      <a href=""
-         @click="onCreateStaticList">
-        <i class="fa fa-plus"></i>
-        Create Static List
-      </a>
-      <a href="" @click="onDelete">
-        <i class="fa fa-trash"></i>
-        Delete
-      </a>
+    <div class="menu-actions d-flex">
+      <div class="flex-fill">
+        <span>{{ getSelectedCount }} selected</span>
+      </div>
+      <div class="flex-fill">
+        <a href="#" disabled>
+          <i class="fa fa-layer-group"></i>
+          Enroll in Sequence
+        </a>
+      </div>
+      <div class="flex-fill">
+        <a href="#" disabled>
+          <i class="fa fa-crosshairs"></i>
+          Power Dialer
+        </a>
+      </div>
+      <div class="flex-fill">
+        <a href=""
+           @click="onAddToStaticList">
+          <i class="fa fa-user-plus"></i>
+          Add to Static List
+        </a>
+      </div>
+      <div class="flex-fill">
+        <a href=""
+           @click="onCreateStaticList">
+          <i class="fa fa-plus"></i>
+          Create Static List
+        </a>
+      </div>
+      <div class="flex-fill">
+        <a href="" @click="onDelete">
+          <i class="fa fa-trash"></i>
+          Delete
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -72,29 +84,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-  .bulk-action-menu{
-    margin-left: 34px;
-    margin-top: 49px;
-    position: absolute;
-    z-index: 9;
-    background: white;
-    height: 35px !important;
-    padding: 8px 10px;
-    width: 95% !important;
-  }
-  .menu-actions a{
-    text-decoration: none;
-    font-weight: 500;
-    .fa {
-      color: #6F6F6F;
-    }
-    svg{
-      margin-top: -5px;
-    }
-  }
-  .menu-actions{
-    font-size: 0.75rem;
-  }
-</style>

@@ -13,6 +13,9 @@ import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 import Notifications from 'vue-notification'
 
+import { Vuelidate } from 'vuelidate'
+Vue.use(Vuelidate)
+
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
 localStorage.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
