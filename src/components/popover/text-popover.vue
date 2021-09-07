@@ -10,7 +10,7 @@
       class="pr-2"
       @keyup.enter="handleInput"
       @keyup.esc="closeInput"
-      @blur="closeInput" />
+      @blur="handleInput" />
     <div
       v-show="!active"
       class="pr-0">
