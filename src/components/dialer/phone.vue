@@ -1581,7 +1581,7 @@ export default {
 
     answerCall () {
       this.$VueEvent.fire('answerCall')
-      this.screen = 'menu'
+      this.changeScreen('menu')
     },
 
     rejectCall () {
@@ -2065,6 +2065,15 @@ export default {
       }
     },
 
+    changeScreen (screen) {
+      // don't go from wrap-up to menu (edge case)
+      if (this.screen === 'wrap_up' && screen === 'menu') {
+        return
+      }
+
+      this.screen = screen
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -2076,7 +2085,7 @@ export default {
       this.setupDraggable()
       this.setupContactLocalTime()
       this.resetBottomExpansion()
-      this.screen = 'call'
+      this.changeScreen('call')
       this.digits = ''
     },
 
@@ -2091,7 +2100,7 @@ export default {
         }
 
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
-          this.screen = 'menu'
+          this.changeScreen('menu')
         }
       },
       deep: true
@@ -2100,46 +2109,46 @@ export default {
     'dialer.currentStatus': function () {
       switch (this.dialer.currentStatus) {
         case 'READY':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'OFFLINE':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'RECEIVED_CALL_INVITE':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'INVITE_CANCELLED':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'WRAP_UP':
-          this.screen = 'wrap-up'
+          this.changeScreen('wrap-up')
           this.resetBottomExpansion()
           break
         case 'GENERATING_TOKEN':
-          this.screen = 'call'
+          this.changeScreen('call')
           this.closePhone()
           break
         case 'TOKEN_GENERATED':
-          this.screen = 'call'
+          this.changeScreen('call')
           this.closePhone()
           break
         case 'MAKING_CALL':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'ANSWERING_CALL':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'REJECTING_CALL':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'CALL_CONNECTED':
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
-            this.screen = 'menu'
+            this.changeScreen('menu')
           }
 
           if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             setTimeout(() => {
-              this.screen = 'menu'
+              this.changeScreen('menu')
             }, 5000)
           }
           break
