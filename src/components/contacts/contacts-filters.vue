@@ -413,12 +413,14 @@ export default {
         updatedFilter.splice(index, 1)
       }
       this.setCurrentListFilters(updatedFilter)
+      this.$emit('filtersUpdated')
     },
 
     onDeleteGroupFilter (index) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       updatedFilter.splice(index, 1)
       this.setCurrentListFilters(updatedFilter)
+      this.$emit('filtersUpdated')
     },
 
     emitFiltersCount () {
