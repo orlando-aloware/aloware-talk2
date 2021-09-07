@@ -780,10 +780,7 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(true)
-
-      if (document.getElementById('incomingCall')) {
-        this.$closeActionNotification('incomingCall')
-      }
+      this.$closeActionNotification('incomingCall')
 
       if (this.callNotification) {
         this.callNotification()

@@ -240,7 +240,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
     return
   }
 
-  if (!title || !message) {
+  if (!title || (type !== 'incomingCall' && !message)) {
     return
   }
 
@@ -274,7 +274,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
-  this.$bvToast.hide(type)
+  if (document.getElementById(type)) {
+    this.$bvToast.hide(type)
+  }
 }
 
 Vue.prototype.$generalActionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {
