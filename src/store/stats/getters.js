@@ -1,5 +1,10 @@
+import { getField } from 'vuex-map-fields'
+
 export default {
   reportGroup: (state) => {
+    return state.report_group
+  },
+  consolidatedReportGroup: (state) => {
     let data = []
     let temp = []
     state.report_group.forEach(rg => {
@@ -14,5 +19,6 @@ export default {
       data.push(temp)
     })
     return data
-  }
+  },
+  getField
 }

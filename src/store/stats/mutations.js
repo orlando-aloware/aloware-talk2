@@ -1,3 +1,6 @@
+
+import { updateField } from 'vuex-map-fields'
+
 export default {
   SET_REPORT_GROUP: (state, data) => {
     state.report_group = data
@@ -31,5 +34,6 @@ export default {
   },
   TOGGLE_METRIC_LOADER: (state, value) => {
     state.metric_loader = value
-  }
+  },
+  updateField
 }
