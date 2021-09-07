@@ -194,7 +194,8 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isFiltersOpen', 'filters']),
+    ...mapState('contacts', ['isFiltersOpen']),
+    ...mapState(['filters']),
     ...mapGetters('contacts', ['currentListFilters']),
 
     filtersFiltered () {

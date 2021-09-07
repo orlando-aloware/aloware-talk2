@@ -2093,10 +2093,6 @@ export default {
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
           this.screen = 'menu'
         }
-
-        if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
-          this.$actionNotification(this.dialer.communication.contact.name, this.dialer.communication.contact.company_name, null, 'incomingCall', null, null, true)
-        }
       },
       deep: true
     },
