@@ -244,10 +244,12 @@ export default {
 
     this.$VueEvent.listen('answerCall', () => {
       this.answerCall()
+      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('rejectCall', () => {
       this.rejectCall()
+      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {

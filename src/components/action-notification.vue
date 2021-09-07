@@ -129,7 +129,7 @@ export default {
         return null
       }
       return {
-        path: `/channels/${this.type(this.id)}/contacts/${this.contactId}/communications/${this.communicationId}`
+        path: `/channels/inbox/open/contacts/${this.contactId}`
       }
     }
   },
@@ -167,11 +167,9 @@ export default {
     },
     answerCall () {
       this.$VueEvent.fire('answerCall')
-      this.$closeActionNotification('incomingCall')
     },
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
-      this.$closeActionNotification('incomingCall')
     },
     ...mapActions(['setNotifications'])
   }

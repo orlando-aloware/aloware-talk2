@@ -240,6 +240,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
     return
   }
 
+  if (!title || !message) {
+    return
+  }
+
   let data = {
     type: type,
     data: {
