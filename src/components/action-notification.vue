@@ -31,7 +31,7 @@
           <component :is="messageIcon"
                      v-if="messageIcon"/>
           <span v-if="id === 'sms'">
-            {{ message | nl2br | textTruncate(2) }}
+            {{ message | nl2br | textTruncate(4, 39) }}
           </span>
           <span v-else>
             {{ message }}
@@ -129,7 +129,7 @@ export default {
         return null
       }
       return {
-        path: `/channels/${this.type(this.id)}/contacts/${this.contactId}/communications/${this.communicationId}`
+        path: `/channels/inbox/open/contacts/${this.contactId}`
       }
     }
   },
@@ -167,11 +167,9 @@ export default {
     },
     answerCall () {
       this.$VueEvent.fire('answerCall')
-      this.$closeActionNotification('incomingCall')
     },
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
-      this.$closeActionNotification('incomingCall')
     },
     ...mapActions(['setNotifications'])
   }

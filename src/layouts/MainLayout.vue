@@ -387,7 +387,7 @@ export default {
     this.$VueEvent.listen('new_desktop_sms', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // this.handleDesktopCommunicationNotification(communication)
-        this.$actionNotification(communication.contact.phone_number, communication.body, null, 'sms', communication.id, communication.contact.id)
+        this.$actionNotification(communication.contact.phone_number, communication.body, null, 'sms', communication.contact.id, communication.id)
       }
     })
 
@@ -401,7 +401,7 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        this.$actionNotification(communication.contact.name, 'Missed Call with Voicemail', 'call-voicemail-icon', 'call', communication.id, communication.contact.id)
+        this.$actionNotification(communication.contact.name, 'Missed Call with Voicemail', 'call-voicemail-icon', 'call', communication.contact.id, communication.id)
         // this.handleDesktopVoicemailNotification(communication)
       }
     })
@@ -425,7 +425,7 @@ export default {
         return
       }
 
-      this.$actionNotification()
+      this.$actionNotification('System Updates', 'Refresh your screen', null, 'system')
     })
 
     if (this.$q.platform.is.electron) {

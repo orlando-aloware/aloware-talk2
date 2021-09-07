@@ -234,9 +234,13 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   })
 }
 
-Vue.prototype.$actionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
+Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, type, contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
   // skip if same notification
   if (type === 'call' && this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
+    return
+  }
+
+  if (!title || (type !== 'incomingCall' && !message)) {
     return
   }
 
@@ -270,7 +274,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (title = 'System 
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
-  this.$bvToast.hide(type)
+  if (document.getElementById(type)) {
+    this.$bvToast.hide(type)
+  }
 }
 
 Vue.prototype.$generalActionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {

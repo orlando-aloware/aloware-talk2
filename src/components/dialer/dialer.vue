@@ -135,6 +135,7 @@ export default {
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
+        this.$actionNotification(this.dialer.communication.contact.name, this.dialer.communication.contact.company_name, null, 'incomingCall', null, null, true)
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)
         // })
@@ -244,10 +245,12 @@ export default {
 
     this.$VueEvent.listen('answerCall', () => {
       this.answerCall()
+      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('rejectCall', () => {
       this.rejectCall()
+      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {
@@ -778,10 +781,7 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(true)
-
-      if (document.getElementById('incomingCall')) {
-        this.$closeActionNotification('incomingCall')
-      }
+      this.$closeActionNotification('incomingCall')
 
       if (this.callNotification) {
         this.callNotification()

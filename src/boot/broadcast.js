@@ -111,7 +111,6 @@ export default {
         }
       })
       .listen('.user.in-app.communication.new_sms', (event) => {
-        console.log('test1')
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
         if (campaign) {
           let communication = event.communication
@@ -242,7 +241,6 @@ export default {
         }
       })
       .listen('.user.desktop.communication.new_sms', (event) => {
-        console.log('test2')
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
         if (campaign) {
           let communication = event.communication

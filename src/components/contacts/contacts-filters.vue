@@ -194,7 +194,8 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isFiltersOpen', 'filters']),
+    ...mapState('contacts', ['isFiltersOpen']),
+    ...mapState(['filters']),
     ...mapGetters('contacts', ['currentListFilters']),
 
     filtersFiltered () {
@@ -322,20 +323,34 @@ export default {
           filterGroups.splice(groupIndex, 1)
           continue
         }
+
         for (let filterIndex in filterGroups[groupIndex].filters) {
           if (filterIndex === 'search') {
             continue
           }
+
           const found = this.filters.find(filter => filter.key === filterIndex)
           const operators = found ? _.get(found, 'operators', null) : null
+
           if (operators) {
             const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
+            const options = operator ? _.get(operator, 'options', null) : null
+            const option = options ? options.find(option => option.value === filterGroups[groupIndex].filters[filterIndex].value) : null
+            let trueValue = filterGroups[groupIndex].filters[filterIndex].value
+
+            if (option) {
+              trueValue = [option.label]
+            } else if (typeof filterGroups[groupIndex].filters[filterIndex].value === 'string') {
+              trueValue = filterGroups[groupIndex].filters[filterIndex].value.split(',')
+            }
+
+            const newValue = [trueValue.join(' and ')]
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
               label: found.label,
               operator: operator.label,
-              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
-              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+              trueValue: trueValue,
+              value: JSON.stringify(newValue)
             }
           } else {
             filterGroups[groupIndex].filters[filterIndex] = {
@@ -398,12 +413,14 @@ export default {
         updatedFilter.splice(index, 1)
       }
       this.setCurrentListFilters(updatedFilter)
+      this.$emit('filtersUpdated')
     },
 
     onDeleteGroupFilter (index) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       updatedFilter.splice(index, 1)
       this.setCurrentListFilters(updatedFilter)
+      this.$emit('filtersUpdated')
     },
 
     emitFiltersCount () {
