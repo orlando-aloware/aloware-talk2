@@ -164,6 +164,13 @@
       "color": "negative",
       "value": 55,
       "id": 22
+    },
+    {
+      "reportId": 4,
+      "name": "In Progress",
+      "color": null,
+      "value": 106,
+      "id": 23
     }
   ]
 }

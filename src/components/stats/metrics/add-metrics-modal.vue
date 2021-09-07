@@ -56,10 +56,11 @@
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
               <template v-slot:selected>
                 <template v-if="color">
-                  <q-icon
+                  <!-- <q-icon
                     :color="color.color"
                     name="font_download"
-                    class="pr-2" />
+                    class="pr-2" /> -->
+                  <i :class="`fas fa-square color-${color.color} pr-2`"></i>
                   {{ color.text }}
                 </template>
                 <template v-else>
@@ -69,9 +70,7 @@
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
                   <q-item-section avatar>
-                    <q-icon
-                      :color="scope.opt.color"
-                      name="font_download" />
+                    <i :class="`fas fa-square color-${scope.opt.color} px-2`"></i>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label v-html="scope.opt.text" />
