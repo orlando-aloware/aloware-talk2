@@ -2,7 +2,7 @@
   <Draggable
     v-model="report_group"
     v-bind="dragOptions"
-    class="list-group"
+    class="list-group movable"
     tag="ul">
     <transition-group type="transition" name="flip-list">
       <template

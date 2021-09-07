@@ -1,3 +1,9 @@
+.movable {
+  cursor: move;
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+}
+
 .color-primary {
   color: $primary;
 }
