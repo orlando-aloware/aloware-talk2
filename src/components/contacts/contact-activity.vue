@@ -334,7 +334,8 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city'
+        'cnam_city',
+        'contact_task_status'
       ],
       general_audit_properties: [
         'disposition_status_id',
