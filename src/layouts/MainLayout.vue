@@ -425,7 +425,7 @@ export default {
         return
       }
 
-      this.$actionNotification()
+      this.$actionNotification('System Updates', 'Refresh your screen', null, 'system')
     })
 
     if (this.$q.platform.is.electron) {
