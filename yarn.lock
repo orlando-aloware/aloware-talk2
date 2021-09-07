@@ -892,8 +892,6 @@
     "env-paths" "^2.2.0"
     "filenamify" "^4.1.0"
     "fs-extra" "^8.1.0"
-    "global-agent" "^2.0.2"
-    "global-tunnel-ng" "^2.7.1"
     "got" "^9.6.0"
     "progress" "^2.0.3"
     "semver" "^6.2.0"
@@ -1412,7 +1410,6 @@
     "merge-source-map" "^1.1.0"
     "postcss" "^7.0.14"
     "postcss-selector-parser" "^6.0.2"
-    "prettier" "^1.18.2"
     "source-map" "~0.6.1"
     "vue-template-es2015-compiler" "^1.9.0"
   optionalDependencies:
@@ -2720,7 +2717,6 @@
     "anymatch" "^2.0.0"
     "async-each" "^1.0.1"
     "braces" "^2.3.2"
-    "fsevents" "^1.2.7"
     "glob-parent" "^3.1.0"
     "inherits" "^2.0.3"
     "is-binary-path" "^1.0.0"
@@ -2739,7 +2735,6 @@
   dependencies:
     "anymatch" "~3.1.1"
     "braces" "~3.0.2"
-    "fsevents" "~2.3.1"
     "glob-parent" "~5.1.0"
     "is-binary-path" "~2.1.0"
     "is-glob" "~4.0.1"
@@ -4656,7 +4651,6 @@
   "resolved" "https://registry.npmjs.org/extract-zip/-/extract-zip-2.0.1.tgz"
   "version" "2.0.1"
   dependencies:
-    "@types/yauzl" "^2.9.1"
     "debug" "^4.1.1"
     "get-stream" "^5.1.0"
     "yauzl" "^2.10.0"
@@ -10672,7 +10666,6 @@
     "chokidar" "^3.4.1"
     "graceful-fs" "^4.1.2"
     "neo-async" "^2.5.0"
-    "watchpack-chokidar2" "^2.0.1"
   optionalDependencies:
     "watchpack-chokidar2" "^2.0.1"
 

@@ -83,7 +83,7 @@
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <i class="fa fa-search"></i> Select Contact
+            <i class="fa fa-search mr-1"></i> Select Contact
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
             <i class="fa fa-plus mr-1"></i>

@@ -855,8 +855,6 @@ export default {
     processFetchedContactInfo (selectedContact, callback) {
       selectedContact.tag_ids = selectedContact.tags.map((tag) => tag.id)
       this.messageObject.contact = selectedContact
-      this.contact.first_name = selectedContact.first_name
-      this.contact.last_name = selectedContact.last_name
       // TODO: update contact name in title?
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []

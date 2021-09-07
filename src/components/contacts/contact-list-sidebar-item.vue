@@ -15,16 +15,16 @@
           {{ contactName }}
         </p>
         <div class="text-sm-left contact-phone mb-1">
-          <span v-if="contact.phone_number !== '0'">{{ contact.phone_number | fixPhone }}</span>
+          <span v-if="listContact.phone_number !== '0'">{{ listContact.phone_number | fixPhone }}</span>
           <span v-else>Phone number unavailable</span>
         </div>
       </div>
       <div class="d-flex justify-center align-items-center">
-        <b-badge v-if="contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count > 0"
+        <b-badge v-if="totalUnread > 0"
                  class="contact-badge d-flex justify-center align-items-center"
                  variant="danger"
                  pill>
-          {{ contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count }}
+          {{ totalUnread }}
         </b-badge>
       </div>
     </div>
@@ -52,6 +52,9 @@ export default {
       set (val) {
         this.sideBarContact = val
       }
+    },
+    totalUnread () {
+      return this.listContact.unread_count + this.listContact.unread_missed_call_count + this.listContact.unread_voicemail_count
     }
   },
 
