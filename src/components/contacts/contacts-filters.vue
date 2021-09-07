@@ -331,12 +331,15 @@ export default {
           const operators = found ? _.get(found, 'operators', null) : null
           if (operators) {
             const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
+            const options = operator ? _.get(operator, 'options', null) : null
+            const option = options ? options.find(option => option.value === filterGroups[groupIndex].filters[filterIndex].value) : null
+            const trueValue = option ? [option.label] : filterGroups[groupIndex].filters[filterIndex].value
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
               label: found.label,
               operator: operator.label,
-              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
-              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+              trueValue: trueValue,
+              value: JSON.stringify(trueValue)
             }
           } else {
             filterGroups[groupIndex].filters[filterIndex] = {
