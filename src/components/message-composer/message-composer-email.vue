@@ -104,20 +104,10 @@ export default {
       this.isSending = true
       talk2Api.V1.contact.sendEmail(this.contact.id, this.formatMessage()).then(response => {
         this.resetMessageComposerEmail()
-        this.$q.notify({
-          message: 'Email has been sent.',
-          type: 'positive',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Email has been sent.')
       }).catch(error => {
         console.log(error)
-        this.$q.notify({
-          message: 'Error while sending email.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error while sending email.', 'error')
       }).finally(() => {
         this.isSending = false
       })

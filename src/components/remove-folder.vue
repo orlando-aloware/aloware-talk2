@@ -72,23 +72,15 @@ export default {
         this.removeFolderClose()
         this.isRemoving = false
       }).then(() => {
-        this.$q.notify({
-          message: 'Folder was successfully deleted',
-          type: 'positive',
-          textColor: 'white'
-        })
+        this.$generalNotification('Folder was successfully deleted')
       })
     },
     removeFolderRequest (id) {
       return talk2Api.V2.contactFolders.delete(id)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
     reloadFoldersRequest () {
@@ -96,16 +88,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   }

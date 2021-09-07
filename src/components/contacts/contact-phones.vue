@@ -132,21 +132,11 @@ export default {
           this.isDeleting = true
           talk2Api.V1.contact.deletePhone(this.contact.id, phone.id)
             .then(response => {
-              this.$q.notify({
-                message: 'Phone number has been deleted.',
-                type: 'positive',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Phone number has been deleted.')
               this.getPhoneNumbers()
             }).catch(error => {
               console.log(error)
-              this.$q.notify({
-                message: 'Error while deleting phone number.',
-                type: 'negative',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Error while deleting phone number.', 'error')
             }).finally(() => {
               this.isDeleting = false
             })

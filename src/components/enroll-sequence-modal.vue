@@ -71,20 +71,10 @@ export default {
       talk2Api.V1.automations.workflows.enroll(this.sequence.id, { id: this.contact.id, model: 'contact' })
         .then(response => {
           this.enrollSequenceOpen(false)
-          this.$q.notify({
-            type: 'positive',
-            textColor: 'white',
-            message: 'Contact has been enrolled to sequence.',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Contact has been enrolled to sequence.')
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            type: 'negative',
-            textColor: 'white',
-            message: 'Error while enrolling contact to sequence.',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while enrolling contact to sequence.', 'error')
         }).finally(() => {
           this.isEnrolling = false
         })

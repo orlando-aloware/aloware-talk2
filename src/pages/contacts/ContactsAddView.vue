@@ -68,12 +68,8 @@ export default {
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
           this.$router.replace('/contacts/')
         })
     }

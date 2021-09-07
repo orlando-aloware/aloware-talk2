@@ -87,16 +87,7 @@ export default {
         })
         .catch((err) => {
           console.error(err)
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   },

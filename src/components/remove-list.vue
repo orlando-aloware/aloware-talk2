@@ -66,16 +66,7 @@ export default {
           this.reloadFolders()
         })
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to remove list.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to remove list.', 'error')
         })
         .finally(() => this.removeListClose())
     },
@@ -90,16 +81,7 @@ export default {
           }
         })
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
     onRemoveListOnly () {

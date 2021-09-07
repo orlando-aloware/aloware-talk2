@@ -380,7 +380,7 @@ const momentFormat = (datetime, format, toUserTimezone = false) => {
   return window.moment(datetime).format(format)
 }
 
-const twoLinesTextTruncate = (text) => {
+const textTruncate = (text, lines, maxLength = 43) => {
   if (text) {
     let texts = text.split('<br />').filter(Boolean)
     if (texts.length >= 2) {
@@ -388,8 +388,8 @@ const twoLinesTextTruncate = (text) => {
     } else {
       texts = text
     }
-    const maxLength = 85
-    texts = texts.substring(0, (texts.length > maxLength ? maxLength : texts.length))
+    const newMaxLength = maxLength * lines
+    texts = texts.substring(0, (texts.length > newMaxLength ? newMaxLength : texts.length))
     const hasEllipse = texts.length < text.length
     texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
     return texts + (hasEllipse ? '…' : '')
@@ -543,7 +543,7 @@ export default ({ Vue }) => {
     nl2br,
     strLimit,
     momentFormat,
-    twoLinesTextTruncate,
+    textTruncate,
     numberPlusFormatter
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))

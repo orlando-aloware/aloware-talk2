@@ -1333,7 +1333,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -1492,6 +1492,10 @@ export default {
     },
 
     shouldShow () {
+      if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
+        return false
+      }
+
       return this.dialer && this.dialer.communication
     }
   },
@@ -1555,19 +1559,9 @@ export default {
 
       try {
         document.execCommand('copy')
-        this.$q.notify({
-          message: 'Phone number copied to clipboard.',
-          type: 'positive',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Phone number copied to clipboard.')
       } catch (err) {
-        this.$q.notify({
-          message: 'Error copying phone number to clipboard.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error copying phone number to clipboard.', 'error')
       }
 
       /* unselect the range */
@@ -1924,13 +1918,7 @@ export default {
         this.vmDropId = null
         this.loadingSendVmDrop = false
         this.saveAndResetExpansion($event)
-        this.$q.notify({
-          offset: 95,
-          title: 'Phone',
-          message: 'Voicemail left',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Voicemail left')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {
@@ -1951,13 +1939,7 @@ export default {
         this.template = null
         this.templateId = null
         this.loadingSendMessage = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Phone',
-          message: 'Message sent',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Message sent')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {
@@ -2110,6 +2092,10 @@ export default {
 
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
           this.screen = 'menu'
+        }
+
+        if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
+          this.$actionNotification(this.dialer.communication.contact.name, this.dialer.communication.contact.company_name, null, 'incomingCall', null, null, true)
         }
       },
       deep: true

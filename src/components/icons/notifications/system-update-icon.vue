@@ -17,10 +17,6 @@ export default {
     height: {
       type: [Number, String],
       default: 32
-    },
-    color: {
-      type: String,
-      default: '#62666E'
     }
   }
 }

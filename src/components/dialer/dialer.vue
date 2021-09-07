@@ -98,11 +98,7 @@ export default {
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
       if (this.dialer.isReady) {
-        this.$q.notify({
-          timeout: 10000,
-          type: 'negative',
-          message: 'Whoops! You have lost connection with the server. Check your internet connection and try again.'
-        })
+        this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         this.setDialerIsReady(false)
         this.setDialerCurrentStatus('OFFLINE')
       }
@@ -479,6 +475,7 @@ export default {
       console.log('Answering call')
 
       this.setDialerCurrentStatus('ANSWERING_CALL')
+      this.setShowIncomingCallNotification(false)
 
       if (this.device.activeConnection()) {
         // accept the incoming connection and start two-way audio
@@ -780,6 +777,12 @@ export default {
       this.setDialerIsHeld(false)
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
+      this.setShowIncomingCallNotification(true)
+
+      if (document.getElementById('incomingCall')) {
+        this.$closeActionNotification('incomingCall')
+      }
+
       if (this.callNotification) {
         this.callNotification()
       }
@@ -995,7 +998,8 @@ export default {
       'setCurrentInputDevice',
       'setInputDevices',
       'setCurrentOutputDevice',
-      'setOutputDevices'
+      'setOutputDevices',
+      'setShowIncomingCallNotification'
     ])
   },
 

@@ -184,20 +184,12 @@ export default {
         })
         .then(() => {
           this.$router.push('/contacts/list/' + this.contactList.id)
-          this.$q.notify({
-            message: 'Selected contacts were successfully added',
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification('Selected contacts were successfully added')
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
         .finally(() => {
           this.isLoading = false

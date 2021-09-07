@@ -117,16 +117,7 @@ export default {
           console.log(err)
         } else {
           // show notification
-          this.$q.notify({
-            message: err.response.data.error,
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification(err.response.data.error, 'error')
         }
       })
     },

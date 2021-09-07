@@ -212,19 +212,9 @@ export default {
 
       try {
         document.execCommand('copy')
-        this.$q.notify({
-          message: 'Phone number copied to clipboard.',
-          type: 'positive',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Phone number copied to clipboard.')
       } catch (err) {
-        this.$q.notify({
-          message: 'Error copying phone number to clipboard.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error copying phone number to clipboard.', 'error')
       }
 
       /* unselect the range */

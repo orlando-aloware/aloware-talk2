@@ -6393,7 +6393,7 @@ button.primary {
         line-height: 17px;
       }
       .time {
-        @include font-size($f-size-body-xxs, normal, true);
+        @include font-size($f-size-h5, normal, true);
         line-height: 16px;
       }
       .message-body {

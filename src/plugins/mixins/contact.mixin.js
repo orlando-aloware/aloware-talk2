@@ -445,13 +445,7 @@ export default {
     fetchContactCommunicationsUntilFound (tryCount = 1) {
       if (tryCount > 10) {
         this.loadingContactCommunications = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Contact',
-          message: 'Communication is too old for automatic scrolling',
-          type: 'error',
-          showClose: true
-        })
+        this.$generalNotification('Communication is too old for automatic scrolling', 'error')
         return
       }
 
@@ -512,13 +506,7 @@ export default {
 
     changeSelectedPhoneNumber (phoneNumber) {
       this.selectedPhoneNumber = phoneNumber
-      this.$q.notify({
-        offset: 95,
-        title: 'Contact',
-        message: 'Changed selected contact phone number to: ' + this.selectedPhoneNumber,
-        type: 'success',
-        showClose: true
-      })
+      this.$generalNotification(`Changed selected contact phone number to: ${this.selectedPhoneNumber}`)
       // this.setFocus()
     },
 
@@ -627,13 +615,7 @@ export default {
     },
 
     onSuccessSendMedia (res) {
-      this.$q.notify({
-        offset: 95,
-        title: 'Media Upload',
-        message: 'Media file has been uploaded successfully.',
-        type: 'success',
-        showClose: true
-      })
+      this.$generalNotification('Media file has been uploaded successfully.')
       this.$set(this.media, 'file_name', res.file_name)
       this.uploadStatus.upload = 'success'
       // TODO: validate the form

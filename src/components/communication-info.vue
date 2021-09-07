@@ -591,13 +591,13 @@
          v-if="communication.notes && !activeName">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
-         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.notes))">
+         v-html="$options.filters.textTruncate($options.filters.nl2br(communication.notes), 2)">
       </p>
     </div>
     <div class="px-3 pt-2 bottom-radius border-no-top text-left"
          v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
       <p class="text-left"
-         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.body))">
+         v-html="$options.filters.textTruncate($options.filters.nl2br(communication.body), 2)">
       </p>
     </div>
   </div>
@@ -853,13 +853,7 @@ export default {
       this.loadingDispose = true
       this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/dispose`, { dispositionStatus }).then((res) => {
         this.loadingDispose = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Contact',
-          message: 'Contact disposed',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Contact disposed')
         this.communication.contact.disposition_status_id = res.data.disposition_status_id
       }).catch((err) => {
         this.loadingDispose = false
@@ -875,14 +869,7 @@ export default {
       this.loadingUpdateEngagement = true
       this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/${this.communication.id}/update-engagement`, params).then(res => {
         this.loadingUpdateEngagement = false
-        this.$q.notify({
-          offset: 95,
-          textColor: 'white',
-          title: 'Contact',
-          message: 'Engagement updated.',
-          type: 'positive',
-          showClose: true
-        })
+        this.$generalNotification('Engagement updated.')
         this.$emit('update', res.data)
       }).catch(err => {
         this.loadingUpdateEngagement = false

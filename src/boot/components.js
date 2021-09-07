@@ -63,3 +63,13 @@ Vue.component('note-icon', require('src/components/icons/contact-activity/note-i
 
 // masonry gallery for giphy component
 Vue.component('vue-masonry-gallery', VueMasonryGallery)
+
+// notification icons
+
+Vue.component('sms-icon', require('src/components/icons/notifications/sms-icon').default)
+Vue.component('system-update-icon', require('src/components/icons/notifications/system-update-icon').default)
+Vue.component('call-icon', require('src/components/icons/notifications/call-icon').default)
+Vue.component('call-voicemail-icon', require('src/components/icons/notifications/call-voicemail-icon').default)
+Vue.component('voicemail-icon', require('src/components/icons/notifications/voicemail-icon').default)
+Vue.component('mention-icon', require('src/components/icons/notifications/mention-icon').default)
+Vue.component('call-incoming-icon', require('src/components/icons/notifications/call-incoming-icon').default)

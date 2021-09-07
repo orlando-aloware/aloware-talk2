@@ -257,20 +257,10 @@ export default {
           this.isDeleting = true
           talk2Api.V1.message.deleteScheduledMessage(message.id)
             .then(response => {
-              this.$q.notify({
-                message: 'Scheduled message has been deleted.',
-                type: 'positive',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Scheduled message has been deleted.')
               this.getMessages()
             }).catch(() => {
-              this.$q.notify({
-                message: 'Error while deleting scheduled message.',
-                type: 'negative',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Error while deleting scheduled message.', 'error')
             }).finally(() => {
               this.isDeleting = false
             })

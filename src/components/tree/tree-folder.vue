@@ -269,12 +269,8 @@ export default {
             message,
             html
           } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
 
@@ -284,16 +280,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
 

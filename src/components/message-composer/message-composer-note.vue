@@ -91,20 +91,10 @@ export default {
       talk2Api.V1.contact.addEngagement(this.contact.id, this.formatMessage())
         .then(response => {
           this.resetMessageComposerNote()
-          this.$q.notify({
-            message: 'Note has been added.',
-            type: 'positive',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Note has been added.')
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            message: 'Error while adding note.',
-            type: 'negative',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while adding note.', 'error')
         }).finally(() => {
           this.isAdding = false
           // this.$refs.noteMessageBody.focus()

@@ -223,28 +223,10 @@ export default {
         // emit on parent if there's a need to do after workflow enrollment
         this.$emit('enrolledToWorkflow', this.workflow)
         this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
-        this.$q.notify({
-          message: 'Contact has been successfully enrolled to the workflow.',
-          type: 'positive',
-          textColor: 'white',
-          actions: [
-            {
-              icon: 'close'
-            }
-          ]
-        })
+        this.$generalNotification('Contact has been successfully enrolled to the workflow.')
       }).catch(err => {
         console.log(err)
-        this.$q.notify({
-          message: 'Error while enrolling contact to the workflow.',
-          type: 'negative',
-          textColor: 'white',
-          actions: [
-            {
-              icon: 'close'
-            }
-          ]
-        })
+        this.$generalNotification('Error while enrolling contact to the workflow.', 'error')
       }).finally(() => {
         this.isEnrolling = false
       })

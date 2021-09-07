@@ -157,6 +157,7 @@ import AppSidebar from '../components/layout/app-sidebar'
 import Dialer from '../components/dialer/dialer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'MyLayout',
@@ -215,6 +216,7 @@ export default {
 
   created () {
     this.resetCall()
+    this.resetNotifications()
 
     // Quasar global config
     this.$q.iconSet.arrow.dropdown = 'o_expand_more'
@@ -322,85 +324,109 @@ export default {
       this.$VueEvent.listen('decrease_badge', (count) => {
         this.decreaseAppBadge(count)
       })
-
-      // new desktop contact assigned notification
-      this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
-        if (this.checkContactMatchesUserAccessibility(contact)) {
-          this.handleDesktopContactNotification(contact)
-        }
-      })
-
-      // new desktop appointment notification
-      this.$VueEvent.listen(
-        'new_desktop_appointment',
-        ({
-          engagement,
-          contact,
-          timeDiff,
-          unit
-        }) => {
-          this.handleDesktopAppointmentNotification(
-            engagement,
-            contact,
-            timeDiff,
-            unit
-          )
-        }
-      )
-
-      // new desktop reminder notification
-      this.$VueEvent.listen(
-        'new_desktop_reminder',
-        ({
-          engagement,
-          contact,
-          timeDiff,
-          unit
-        }) => {
-          this.handleDesktopReminderNotification(
-            engagement,
-            contact,
-            timeDiff,
-            unit
-          )
-        }
-      )
-
-      // new desktop call notification
-      this.$VueEvent.listen('new_desktop_call', (communication) => {
-        if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-          this.handleDesktopCommunicationNotification(communication)
-        }
-      })
-
-      // answered desktop call notification
-      this.$VueEvent.listen('answered_desktop_call', (communication) => {
-        if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-          this.handleDesktopCommunicationNotification(communication)
-        }
-      })
-
-      // new desktop sms notification
-      this.$VueEvent.listen('new_desktop_sms', (communication) => {
-        if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-          this.handleDesktopCommunicationNotification(communication)
-        }
-      })
-
-      // new desktop fax notification
-      this.$VueEvent.listen('new_desktop_fax', (communication) => {
-        if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-          this.handleDesktopCommunicationNotification(communication)
-        }
-      })
-
-      // new desktop voicemail notification
-      this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
-        if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-          this.handleDesktopVoicemailNotification(communication)
-        }
-      })
     }
+
+    // new desktop contact assigned notification
+    this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
+      if (this.checkContactMatchesUserAccessibility(contact)) {
+        this.handleDesktopContactNotification(contact)
+      }
+    })
+
+    // new desktop appointment notification
+    this.$VueEvent.listen(
+      'new_desktop_appointment',
+      ({
+        engagement,
+        contact,
+        timeDiff,
+        unit
+      }) => {
+        this.handleDesktopAppointmentNotification(
+          engagement,
+          contact,
+          timeDiff,
+          unit
+        )
+      }
+    )
+
+    // new desktop reminder notification
+    this.$VueEvent.listen(
+      'new_desktop_reminder',
+      ({
+        engagement,
+        contact,
+        timeDiff,
+        unit
+      }) => {
+        this.handleDesktopReminderNotification(
+          engagement,
+          contact,
+          timeDiff,
+          unit
+        )
+      }
+    )
+
+    // new desktop call notification
+    this.$VueEvent.listen('new_desktop_call', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        this.handleDesktopCommunicationNotification(communication)
+      }
+    })
+
+    // answered desktop call notification
+    this.$VueEvent.listen('answered_desktop_call', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        this.handleDesktopCommunicationNotification(communication)
+      }
+    })
+
+    // new desktop sms notification
+    this.$VueEvent.listen('new_desktop_sms', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        // this.handleDesktopCommunicationNotification(communication)
+        this.$actionNotification(communication.contact.phone_number, communication.body, null, 'sms', communication.id, communication.contact.id)
+      }
+    })
+
+    // new desktop fax notification
+    this.$VueEvent.listen('new_desktop_fax', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        this.handleDesktopCommunicationNotification(communication)
+      }
+    })
+
+    // new desktop voicemail notification
+    this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        this.$actionNotification(communication.contact.name, 'Missed Call with Voicemail', 'call-voicemail-icon', 'call', communication.id, communication.contact.id)
+        // this.handleDesktopVoicemailNotification(communication)
+      }
+    })
+
+    // user mention notification
+    this.$VueEvent.listen('user_mentioned', (data) => {
+      if (this.checkCommunicationMatchesUserAccessibility(data.communication)) {
+        this.$actionNotification(data.mentioner, 'Mentions message', null, 'mention')
+      }
+    })
+
+    // missed call notification
+    this.$VueEvent.listen('update_communication', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+        this.$actionNotification(communication.contact.name, 'Missed Call', null, 'call', communication.contact.id, communication.id)
+      }
+    })
+
+    this.$VueEvent.listen('new_version', () => {
+      if (this.isWidget) {
+        return
+      }
+
+      this.$actionNotification()
+    })
 
     if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
@@ -1281,6 +1307,7 @@ export default {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
+      this.resetNotifications()
     },
 
     ...mapActions([
@@ -1302,7 +1329,8 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted',
       'setFilters',
-      'setTagsFullyLoaded'
+      'setTagsFullyLoaded',
+      'resetNotifications'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
     ...mapActions('inbox', ['resetInboxVuex']),

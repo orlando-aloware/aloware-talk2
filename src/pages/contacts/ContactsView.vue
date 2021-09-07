@@ -288,28 +288,10 @@ export default {
         .then(() => {
           this.initialListFilters = this.currentListFilters
           this.updateFilterHasChanges()
-          this.$q.notify({
-            message: 'Changes to contact list has been saved.',
-            type: 'positive',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Changes to contact list has been saved.')
         })
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to update contact list.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to update contact list.', 'error')
         })
     },
     updateFiltersCount (count) {

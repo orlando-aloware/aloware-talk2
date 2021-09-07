@@ -223,20 +223,10 @@ export default {
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
           this.resetMessageComposerSms()
-          this.$q.notify({
-            message: 'Text has been sent.',
-            type: 'positive',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Text has been sent.')
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            message: 'Error while sending text.',
-            type: 'negative',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while sending text.', 'error')
         }).finally(() => {
           this.isSending = false
         })

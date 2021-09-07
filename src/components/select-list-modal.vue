@@ -105,11 +105,7 @@ export default {
     },
     onSubmit () {
       if (!this.selectedStaticList.hasEdit) {
-        this.$q.notify({
-          message: 'You are not authorized to edit this resource.',
-          type: 'negative',
-          textColor: 'white'
-        })
+        this.$generalNotification('You are not authorized to edit this resource.', 'error')
         return
       }
 
@@ -125,22 +121,14 @@ export default {
 
           this.selectListClose()
 
-          this.$q.notify({
-            message,
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification(message)
 
           this.loadFolders()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
         .finally(() => {
           this.isLoading = false
@@ -152,16 +140,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   },

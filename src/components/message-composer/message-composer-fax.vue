@@ -144,21 +144,11 @@ export default {
         .then(response => {
           if (response.status === 201) {
             this.sendCallback()
-            this.$q.notify({
-              message: 'Fax has been sent.',
-              type: 'positive',
-              textColor: 'white',
-              position: 'bottom-right'
-            })
+            this.$generalNotification('Fax has been sent.')
           }
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            message: 'Error while sending fax.',
-            type: 'negative',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while sending fax.', 'error')
         }).finally(() => {
           this.isSending = false
         })

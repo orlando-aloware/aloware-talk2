@@ -114,12 +114,7 @@ export default {
         this.onClose()
       }).catch(err => {
         console.log(err)
-        this.$q.notify({
-          message: 'Error while updating phone number.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error while updating phone number.', 'error')
       }).finally(() => {
         this.isBusy = false
       })
@@ -134,12 +129,7 @@ export default {
         this.onClose()
       }).catch(err => {
         console.log(err)
-        this.$q.notify({
-          message: 'Error while creating phone number.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error while creating phone number.', 'error')
       }).finally(() => {
         this.isBusy = false
       })

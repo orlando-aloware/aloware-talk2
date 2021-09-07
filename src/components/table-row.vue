@@ -472,13 +472,7 @@ export default {
           phone_number: this.contact.phone_number
         })
         .then((res) => {
-          // this.$notify({
-          //   offset: 95,
-          //   title: 'Call Lead',
-          //   message: `We are calling your phone to connect you to ${this.contact.name}`,
-          //   type: 'success',
-          //   showClose: true
-          // })
+          // this.$generalNotification(`We are calling your phone to connect you to ${this.contact.name}`)
         })
         .catch((_err) => {
           // this.$root.handleErrors(err.response)

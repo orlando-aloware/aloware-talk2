@@ -78,11 +78,7 @@ export default {
       return this.$axios
         .delete(`/api/v2/contacts-list/${this.listToRemove.id}`, { params })
         .then(() => {
-          this.$q.notify({
-            message: 'Contact list was successfully removed.',
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification('Contact list was successfully removed.')
           this.removeListFromFolders(this.listToRemove.id, this.folders)
           this.removeListFromPinned(this.listToRemove.id)
           // if current route is equals to list page being deleted then redirect to all contacts
@@ -91,11 +87,7 @@ export default {
           }
         })
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to remove contacts please try again.',
-            type: 'negative',
-            textColor: 'white'
-          })
+          this.$generalNotification('Unable to remove contacts please try again.', 'error')
         }).finally(() => {
           this.isBusy = false
           this.removeListClose()
@@ -134,16 +126,7 @@ export default {
         .then(this.foldersLoaded)
         .catch((err) => {
           console.error(err)
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   }

@@ -11,7 +11,6 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
-import Notifications from 'vue-notification'
 
 import { Vuelidate } from 'vuelidate'
 Vue.use(Vuelidate)
@@ -26,7 +25,6 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
 Vue.use(VueWaveSurfer)
-Vue.use(Notifications)
 
 window.Bowser = Bowser
 window.timezone = jstz.determine().name()
@@ -187,14 +185,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         message = 'Oops! We are having some problems right now, please try again later.'
         break
     }
-    this.$q.notify({
-      offset: 95,
-      title: title || 'Error',
-      dangerouslyUseHTMLString: true,
-      message: message,
-      type: 'error',
-      showClose: true
-    })
+    this.$generalNotification(message, 'error')
   }
 }
 
@@ -219,13 +210,14 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err)
 }
 
-Vue.prototype.$generalNotification = function (message, type) {
+Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000) {
   let colorClass = ''
   switch (type) {
     case 'updated':
       colorClass = 'bg-blue-10'
       break
     case 'deleted':
+    case 'error':
       colorClass = 'bg-red-10'
       break
     default:
@@ -235,15 +227,19 @@ Vue.prototype.$generalNotification = function (message, type) {
   this.$q.notify({
     group: false,
     classes: `general-notification text-black ${colorClass} ml-3`,
-    timeout: 2000,
+    timeout: timeout,
     message: message,
     position: 'bottom-left',
     actions: [{ icon: 'close', color: 'black', class: 'close-button' }]
   })
 }
 
-Vue.prototype.$actionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {
-  // call-voicemail-icon
+Vue.prototype.$actionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
+  // skip if same notification
+  if (type === 'call' && this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
+    return
+  }
+
   let data = {
     type: type,
     data: {
@@ -256,15 +252,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (title = 'System 
     }
   }
 
-  // skip if same notification
-  if (this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
-    return
-  }
-
   let notificationTimeout = 500
   this.$store.commit('SET_NOTIFICATIONS', data)
 
-  if (!document.getElementById(type)) {
+  if (!document.getElementById(type) || noDelay) {
     notificationTimeout = 0
   } else {
     this.$bvToast.hide(type)
@@ -276,12 +267,15 @@ Vue.prototype.$actionNotification = window._.debounce(function (title = 'System 
       clearInterval(notificationInterval)
     }
   }, notificationTimeout)
-}, 500)
+}, 100)
+
+Vue.prototype.$closeActionNotification = function (type) {
+  this.$bvToast.hide(type)
+}
 
 Vue.prototype.$generalActionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {
   // action notifications that will show up many times
   let icon = 'sms-icon'
-  messageIcon = type === 'callVoicemail' ? 'call-voicemail-icon' : ''
 
   if (type === 'call' || type === 'call-voicemail') {
     icon = 'call-icon'
