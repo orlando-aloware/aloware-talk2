@@ -31,7 +31,7 @@
           <component :is="messageIcon"
                      v-if="messageIcon"/>
           <span v-if="id === 'sms'">
-            {{ message | nl2br | textTruncate(2) }}
+            {{ message | nl2br | textTruncate(4, 39) }}
           </span>
           <span v-else>
             {{ message }}
