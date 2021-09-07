@@ -1,10 +1,14 @@
 <template>
-  <Draggable v-model="report_group">
-    <transition-group type="transition">
-    <template
-      v-for="(report_group_resources, key) in reportGroupList">
-      <ReportGroup :key="key" :resources="report_group_resources" />
-    </template>
+  <Draggable
+    v-model="report_group"
+    v-bind="dragOptions"
+    class="list-group"
+    tag="ul">
+    <transition-group type="transition" name="flip-list">
+      <template
+        v-for="(report_group_resources, key) in reportGroupList">
+        <ReportGroup :key="key" :resources="report_group_resources" />
+      </template>
     </transition-group>
   </Draggable>
 </template>
@@ -41,6 +45,14 @@ export default {
     ]),
     reportGroupList () {
       return this.consolidatedReportGroup
+    },
+    dragOptions () {
+      return {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
+      }
     }
   },
   components: {
