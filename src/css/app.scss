@@ -5650,6 +5650,10 @@ table.datatable {
   }
 }
 
+.select-list-tree-list-item.list--active {
+  background-color: #F2FBF6;
+}
+
 .select-list-tree-list-item {
   .folder {
     line-height: 34px;
@@ -5703,10 +5707,6 @@ table.datatable {
         -moz-outline-radius: 0;
       }
     }
-  }
-
-  .list--active{
-    background-color: #F2FBF6;
   }
 }
 
@@ -6314,4 +6314,9 @@ button.primary {
     overflow-y: auto;
     overflow-x: hidden;
   }
+}
+
+
+.task-list-scroller {
+  //height: 91% !important;
 }

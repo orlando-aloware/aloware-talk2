@@ -81,7 +81,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import _ from 'lodash'
 export default {
   name: 'inbox-task-item',
@@ -143,12 +143,16 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setSelectedContact']),
     onItemClick (contact) {
       if (this.selectedContact && this.selectedContact.id === contact.id && !this.isReopened) {
         return
       }
       this.$emit('onItemSelected', contact)
+    }
+  },
+  watch: {
+    'contact.first_name': function () {
+      console.trace()
     }
   }
 }

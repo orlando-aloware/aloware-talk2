@@ -169,7 +169,11 @@ export default {
           const data = response.data.data
           const message = response.data.message
 
-          this.$router.push(`/contacts/list/${data.id}?start=1`)
+          if (this.createList.mode === FROM_BULK_MENU) {
+            this.$router.push(`/contacts/list/${data.id}`)
+          } else {
+            this.$router.push(`/contacts/list/${data.id}?start=1`)
+          }
 
           this.createListClose()
 

@@ -43,7 +43,6 @@
                   block
                   variant="primary"
                   size="sm"
-                  class="mt-2"
                   :disabled="isLoading || !selectedStaticList.id"
                   @click="onSubmit"
                 >
@@ -116,7 +115,7 @@ export default {
       this.isLoading = true
       this.$axios
         .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, {
-          contacts: this.selectedContacts[this.selectedList.id]
+          contacts: this.selectedContacts[this.selectedList.id].map(item => item.id)
         })
         .then((response) => {
           const message = response.data.message

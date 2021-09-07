@@ -42,7 +42,7 @@
        />
      </q-btn>
      <q-btn
-       v-if="contact.task_status === ContactTaskStatus.STATUS_PENDING"
+       v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
        borderless
        flat
        no-caps
