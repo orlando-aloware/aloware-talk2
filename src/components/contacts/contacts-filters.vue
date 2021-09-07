@@ -11,7 +11,7 @@
         <template #header>
           <div class="d-flex justify-content-between">
             <div class="d-inline-flex">
-              <b-button variant="outline-primary header-buttons"
+              <b-button variant="outline-primary header-buttons border-0"
                         size="sm"
                         @click="backToStep"
                         v-if="step !== 1">
@@ -20,7 +20,7 @@
               <h6 class="mb-0">Filters</h6>
             </div>
 
-            <b-button variant="outline-primary header-buttons btn-close-filter"
+            <b-button variant="outline-primary header-buttons btn-close-filter border-0"
                       size="sm"
                       @click="onCloseFilter">
               <i class="fa fa-times"></i>
@@ -108,7 +108,7 @@
             <div class="filter-contents step-2 p-2"
                  v-else-if="step === 2">
               <div class="mb-3">
-                <h6 class="contact-prop-label">Contact properties</h6>
+                <h6 class="contact-prop-label mb-1">Contact properties</h6>
                 <search placeholder="Search"
                         @search="searchFilter"/>
               </div>

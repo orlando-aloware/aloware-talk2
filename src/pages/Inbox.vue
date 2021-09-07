@@ -70,8 +70,10 @@ export default {
   },
 
   mounted () {
-    this.setChannel()
-    this.fetchTaskCounts()
+    if (this.authenticated) {
+      this.setChannel()
+      this.fetchTaskCounts()
+    }
   },
 
   watch: {

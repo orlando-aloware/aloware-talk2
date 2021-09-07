@@ -36,13 +36,16 @@
         variant="danger"
         class="mr-2"
         v-if="hasSelected"
+        :disabled="isMoving"
         @clicked="onConfirmMove"
       >
-        Yes
+        <q-spinner-bars v-if="isMoving" color="white" />
+        {{ isMoving ? '' : 'Yes' }}
       </compact-btn>
       <compact-btn
         variant="outlined-light"
         v-if="hasSelected"
+        :disabled="isMoving"
         @clicked="closeMoveDialog"
       >
         No
@@ -70,7 +73,8 @@ export default {
   data () {
     return {
       searchValue: '',
-      itemsList: []
+      itemsList: [],
+      isMoving: false
     }
   },
   computed: {
@@ -99,20 +103,28 @@ export default {
       return this.moveFolderRequest()
     },
     moveFolderRequest () {
+      this.isMoving = true
       return this.$axios
         .patch('/api/v2/contact-folders/move/' + this.moveDialog.id, {
           parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
-        .then(this.reloadFolders)
+        .then(() => {
+          this.reloadFolders()
+          this.isMoving = false
+        })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
     },
     moveListRequest () {
+      this.isMoving = true
       return this.$axios
         .patch('/api/v2/contacts-list/' + this.moveDialog.id, {
           contact_folder_id: this.moveDialog.target
         })
-        .then(this.reloadFolders)
+        .then(() => {
+          this.reloadFolders()
+          this.isMoving = false
+        })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
     },

@@ -72,7 +72,8 @@
           :disabled="!filterHasChanges || this.defaultIds.includes(this.id)"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
-          Save
+          <q-spinner-bars v-if="isUpdatingList" color="white"/>
+          {{ isUpdatingList ? 'Saving...' : 'Save' }}
         </compact-btn>
         <b-dropdown text="Add Contacts"
                     no-caret
@@ -207,7 +208,8 @@ export default {
   data () {
     return {
       filterHasChanges: false,
-      defaultContactLists: DEFAULT_CONTACT_LIST
+      defaultContactLists: DEFAULT_CONTACT_LIST,
+      isUpdatingList: false
     }
   },
   methods: {
@@ -283,11 +285,13 @@ export default {
       if (this.selectedList.type === this.ContactListType.STATIC || this.defaultIds.includes(this.id)) {
         return
       }
+      this.isUpdatingList = true
       return this.$axios
         .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
         .then(() => {
           this.initialListFilters = this.currentListFilters
           this.updateFilterHasChanges()
+          this.isUpdatingList = false
           this.$generalNotification('Changes to contact list has been saved.')
         })
         .catch((_err) => {
@@ -395,7 +399,7 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function () {
-        this.fetch(this.currentListFilters)
+        this.fetch(typeof this.currentListFilters === 'string' ? [] : this.currentListFilters)
         this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }
     },
