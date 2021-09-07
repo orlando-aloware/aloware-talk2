@@ -1,6 +1,6 @@
 <template>
   <div class="p-2 position-relative">
-    <q-card v-ripple flat bordered
+    <q-card flat bordered
       @click="openModal"
       class="metric-box dashed-box full-height q-hoverable cursor-pointer">
       <span class="q-focus-helper"></span>
