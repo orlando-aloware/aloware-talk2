@@ -2,7 +2,7 @@
   <div
     @mouseover="hovered = true"
     @mouseleave="hovered = false"
-    class="pt-4">
+    class="pt-0 pb-4">
     <div class="row no-wrap q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
         <TitlePopover

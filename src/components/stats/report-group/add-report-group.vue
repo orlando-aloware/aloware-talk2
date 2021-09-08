@@ -1,21 +1,21 @@
 <template>
-  <div class="q-pa-md q-gutter-sm p-0">
-    <div class="py-5 mb-5">
-      <q-btn
-        @click="newReportGroup"
-        unelevated
-        no-caps
-        :disabled="disabled"
-        class="px-4 py-1"
-        color="primary">
-        <div class="row items-center no-wrap">
-          <div class="text-center">
-            + Add Report Group
-          </div>
+  <q-card-actions class="px-0 pt-3 pb-0">
+    <q-space />
+    <q-btn
+      @click="newReportGroup"
+      unelevated
+      no-caps dense
+      :disabled="disabled"
+      class="px-4 py-1"
+      color="primary">
+      <div class="row items-center no-wrap">
+        <div class="text-center">
+          + Add Report Group
         </div>
-      </q-btn>
-    </div>
-  </div>
+      </div>
+    </q-btn>
+    <!-- <q-space /> -->
+  </q-card-actions>
 </template>
 
 <script>

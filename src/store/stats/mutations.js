@@ -6,7 +6,7 @@ export default {
     state.report_group = data
   },
   ADD_REPORT_GROUP: (state, data) => {
-    state.report_group.push(data)
+    state.report_group.unshift(data)
   },
   REMOVE_REPORT_GROUP: (state, data) => {
     let selectedKey = null

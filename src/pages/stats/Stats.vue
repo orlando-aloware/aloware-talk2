@@ -3,10 +3,10 @@
     class="pb-4"
     style="height: 100vh; max-width: 100wh;">
     <div class="px-4 py-0">
-      <StatsAndMetrics />
-    </div>
-    <div class="px-4 py-0">
       <AddReportGroup />
+    </div>
+    <div class="px-4 pt-0 pb-5">
+      <StatsAndMetrics />
     </div>
   </q-scroll-area>
 </template>

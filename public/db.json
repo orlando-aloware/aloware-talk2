@@ -26,9 +26,19 @@
       "id": 5
     },
     {
-      "name": "The Untitled Report",
+      "name": "The Untitled Report 2121",
       "timeline": "Recent (Last 30 days + Today)",
       "id": 7
+    },
+    {
+      "name": "Untitled",
+      "timeline": "Recent (Last 30 days + Today)",
+      "id": 8
+    },
+    {
+      "name": "Untitled",
+      "timeline": "Recent (Last 30 days + Today)",
+      "id": 9
     }
   ],
   "metrics": [
@@ -136,6 +146,34 @@
       "color": "negative",
       "value": 55,
       "id": 22
+    },
+    {
+      "reportId": 4,
+      "name": "Total Duration",
+      "color": null,
+      "value": 55,
+      "id": 23
+    },
+    {
+      "reportId": 4,
+      "name": "On Call",
+      "color": "positive",
+      "value": 55,
+      "id": 24
+    },
+    {
+      "reportId": 4,
+      "name": "Average Wait Time",
+      "color": "negative",
+      "value": 154,
+      "id": 25
+    },
+    {
+      "reportId": 5,
+      "name": "Attempted to Contact",
+      "color": null,
+      "value": 142,
+      "id": 26
     }
   ]
 }
