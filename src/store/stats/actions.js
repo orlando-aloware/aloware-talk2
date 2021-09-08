@@ -45,5 +45,6 @@ export default {
     if (res.status === 200) {
       commit('REMOVE_METRICS', id)
     }
+    return res
   }
 }

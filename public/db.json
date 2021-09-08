@@ -89,32 +89,11 @@
       "value": "9m"
     },
     {
-      "reportId": 4,
-      "name": "Bad Timing",
-      "color": "negative",
-      "value": 139,
-      "id": 9
-    },
-    {
       "reportId": 1,
       "name": "All Missed Calls",
       "color": "negative",
       "value": 108,
       "id": 10
-    },
-    {
-      "reportId": 4,
-      "name": "Connected",
-      "color": "positive",
-      "value": 40,
-      "id": 11
-    },
-    {
-      "reportId": 7,
-      "name": "All Email",
-      "color": "negative",
-      "value": 82,
-      "id": 16
     },
     {
       "reportId": 3,
@@ -157,20 +136,6 @@
       "color": "negative",
       "value": 55,
       "id": 22
-    },
-    {
-      "reportId": 4,
-      "name": "In Progress",
-      "color": null,
-      "value": 106,
-      "id": 23
-    },
-    {
-      "reportId": 5,
-      "name": "Total Duration",
-      "color": "positive",
-      "value": 103,
-      "id": 24
     }
   ]
 }
