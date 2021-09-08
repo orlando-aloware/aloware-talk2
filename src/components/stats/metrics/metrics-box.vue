@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="p-0">
     <MetricLoader v-if="loader" />
     <div
       v-else
-      class="p-0 position-relative"
+      class="box-container"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
       transtion-show="fade"
@@ -11,8 +11,7 @@
       <b-badge
         v-if="hovered"
         @click="confirmDeletion"
-        class="bg-white p-0 m-0 contact-unread-badge d-flex justify-center align-items-center position-absolute"
-        style="z-index:10; border:1px grey solid;"
+        class="box-container-badge floating-left bg-white"
         pill>
         <q-icon
           name="fa fa-times"
@@ -143,9 +142,7 @@ export default {
     }
   },
   mounted () {
-    this.metricName = this.metric.name
-    this.metricValue = this.metric.value
-    this.metricColor = this.metric.color
+    this.updateLocalResources()
   },
   data () {
     return {
@@ -167,7 +164,8 @@ export default {
       }
     },
     metric () {
-      console.log('Metric has changed')
+      this.loader = false
+      this.updateLocalResources()
     }
   },
   methods: {
@@ -194,11 +192,13 @@ export default {
     },
     async removeSelectedMetric () {
       this.loader = true
-      let res = await this.deleteMetrics(this.metric.id)
+      await this.deleteMetrics(this.metric.id)
       this.closeModal()
-      if (!res.status === 200) {
-        this.loader = false
-      }
+    },
+    updateLocalResources () {
+      this.metricName = this.metric.name
+      this.metricValue = this.metric.value
+      this.metricColor = this.metric.color
     }
   }
 }

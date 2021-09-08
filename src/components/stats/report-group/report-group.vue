@@ -37,8 +37,7 @@
       <div class="mycard no-border bg-white p-2 row">
         <AddMetrics
           :report-group="{ id: reportGroupId, name: reportGroupName }"
-          @open-loader="loader = true"
-          @close-loader="loader = false" />
+          @toggle-loader="toggleLoad" />
         <MetricsBox
           v-for="(metric, key) in resources.metrics"
           :key="key"
@@ -156,6 +155,10 @@ export default {
     },
     dialogName () {
       return `remove-group-dialog-${this.resources.id}`
+    },
+    metrics () {
+      let { metrics } = this.resources
+      return metrics
     }
   },
   mounted () {
@@ -205,11 +208,15 @@ export default {
       })
     },
     async changedFilter (val) {
+      console.log('999 :>> ', 999)
       await this.updateReportGroup({
         id: this.resources.id,
         name: this.title,
         timeline: val
       })
+    },
+    toggleLoad (val) {
+      this.loader = val
     }
   }
 }

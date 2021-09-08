@@ -79,6 +79,7 @@
             <br />
             <q-btn
               @click="submit"
+              :disable="!validData"
               unelevated
               color="blue"
               text-color="white"
@@ -97,6 +98,7 @@ import {
   METRIC_OPTIONS_2,
   METRIC_OPTIONS_COLORS
 } from 'src/constants/stats'
+import { isEmpty } from 'lodash'
 
 const colorOptions = { METRIC_OPTIONS_COLORS }
 const stats = { METRIC_OPTIONS_2 }
@@ -136,6 +138,12 @@ export default {
         return true
       }
       return false
+    },
+    validData () {
+      if (isEmpty(this.color) || isEmpty(this.metrics)) {
+        return false
+      }
+      return true
     }
   },
   data () {

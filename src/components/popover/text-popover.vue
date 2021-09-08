@@ -65,12 +65,15 @@ export default {
   },
   methods: {
     handleInput: function (value) {
-      this.active = false
-      if (this.modelValue !== this.content) {
-        this.$emit('input', this.content)
+      if (!this.flag) {
+        this.active = false
+        if (this.modelValue !== this.content) {
+          this.$emit('input', this.content)
+        }
       }
     },
     closeInput (value) {
+      this.flag = true
       this.active = false
     }
   },
@@ -78,6 +81,7 @@ export default {
     active (val) {
       if (val) {
         this.content = this.modelValue
+        this.flag = false
         setTimeout(() => {
           this.$refs[this.referenceName].focus()
         }, 10)
@@ -88,7 +92,8 @@ export default {
     return {
       content: this.modelValue,
       hovered: false,
-      active: false
+      active: false,
+      flag: false
     }
   }
 }

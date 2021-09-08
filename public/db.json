@@ -2,12 +2,12 @@
   "reports": [
     {
       "id": 1,
-      "name": "Sales Daily Pipeline 102",
-      "timeline": "This Week"
+      "name": "Sales Daily Pipeline",
+      "timeline": "Today"
     },
     {
       "id": 2,
-      "name": "Technical Support 2",
+      "name": "Technical Support",
       "timeline": "Recent (Last 30 days + Today)"
     },
     {
@@ -16,36 +16,12 @@
       "timeline": "This Week"
     },
     {
-      "name": "User Test",
-      "timeline": "This Month",
+      "name": "User Stats",
+      "timeline": "Recent (Last 30 days + Today)",
       "id": 4
-    },
-    {
-      "name": "Test 101",
-      "timeline": "Recent (Last 30 days + Today)",
-      "id": 5
-    },
-    {
-      "name": "Newly Added Metric Group",
-      "timeline": "Recent (Last 30 days + Today)",
-      "id": 10
     }
   ],
   "metrics": [
-    {
-      "reportId": 1,
-      "id": 1,
-      "name": "# of calls",
-      "color": "positive",
-      "value": "123"
-    },
-    {
-      "reportId": 1,
-      "id": 2,
-      "name": "# of connected",
-      "color": "positive",
-      "value": "77"
-    },
     {
       "reportId": 1,
       "id": 3,
@@ -55,31 +31,10 @@
     },
     {
       "reportId": 2,
-      "id": 4,
-      "name": "Answered",
-      "color": "positive",
-      "value": "77"
-    },
-    {
-      "reportId": 2,
       "id": 5,
-      "name": "Total Talk Time",
-      "color": "positive",
+      "name": "Missed",
+      "color": "negative",
       "value": "12"
-    },
-    {
-      "reportId": 3,
-      "id": 6,
-      "name": "Available",
-      "color": "positive",
-      "value": "30m"
-    },
-    {
-      "reportId": 3,
-      "id": 7,
-      "name": "On Call",
-      "color": "positive",
-      "value": "5h 20m"
     },
     {
       "reportId": 3,
@@ -87,90 +42,6 @@
       "name": "On Break",
       "color": "",
       "value": "9m"
-    },
-    {
-      "reportId": 1,
-      "name": "All Missed Calls",
-      "color": "negative",
-      "value": 108,
-      "id": 10
-    },
-    {
-      "reportId": 3,
-      "name": "Total Talk Time",
-      "color": "positive",
-      "value": 77,
-      "id": 17
-    },
-    {
-      "reportId": 3,
-      "name": "Inbound Calls",
-      "color": "negative",
-      "value": 146,
-      "id": 18
-    },
-    {
-      "reportId": 3,
-      "name": "Bad Timing",
-      "color": "negative",
-      "value": 192,
-      "id": 19
-    },
-    {
-      "reportId": 3,
-      "name": "Unqualified",
-      "color": "negative",
-      "value": 42,
-      "id": 20
-    },
-    {
-      "reportId": 3,
-      "name": "Total Wait Time",
-      "color": null,
-      "value": 100,
-      "id": 21
-    },
-    {
-      "reportId": 3,
-      "name": "Bad Timing",
-      "color": "negative",
-      "value": 55,
-      "id": 22
-    },
-    {
-      "reportId": 4,
-      "name": "Total Duration",
-      "color": null,
-      "value": 55,
-      "id": 23
-    },
-    {
-      "reportId": 4,
-      "name": "On Call",
-      "color": "positive",
-      "value": 55,
-      "id": 24
-    },
-    {
-      "reportId": 4,
-      "name": "Average Wait Time",
-      "color": "negative",
-      "value": 154,
-      "id": 25
-    },
-    {
-      "reportId": 5,
-      "name": "Attempted to Contact",
-      "color": null,
-      "value": 142,
-      "id": 26
-    },
-    {
-      "reportId": 5,
-      "name": "Bad Timing",
-      "color": "negative",
-      "value": 81,
-      "id": 27
     }
   ]
 }
