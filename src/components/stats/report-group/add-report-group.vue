@@ -10,7 +10,7 @@
       color="primary">
       <div class="row items-center no-wrap">
         <div class="text-center">
-          + Add Report Group
+          + Add Metric Group
         </div>
       </div>
     </q-btn>
