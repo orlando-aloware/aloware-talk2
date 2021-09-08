@@ -52,3 +52,23 @@
   }
   
 }
+
+.metric-group {
+  .metric-group-drawer {
+    position: absolute;
+    right: 0px;
+    top: 0;
+    height: 100%;
+    width: 50px;
+    padding: 10px;
+    margin: 0;
+
+    .drawer-icon {
+      position: absolute;
+      bottom: 20px;
+      i {
+        font-size: 20px;
+      }
+    }
+  }
+}

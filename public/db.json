@@ -42,6 +42,48 @@
       "name": "On Break",
       "color": "",
       "value": "9m"
+    },
+    {
+      "reportId": 2,
+      "name": "Attempted to Contact",
+      "color": null,
+      "value": 179,
+      "id": 9
+    },
+    {
+      "reportId": 2,
+      "name": "Active",
+      "color": "positive",
+      "value": 97,
+      "id": 10
+    },
+    {
+      "reportId": 2,
+      "name": "In Progress",
+      "color": "positive",
+      "value": 38,
+      "id": 11
+    },
+    {
+      "reportId": 2,
+      "name": "New",
+      "color": "positive",
+      "value": 106,
+      "id": 12
+    },
+    {
+      "reportId": 2,
+      "name": "Open Deal",
+      "color": null,
+      "value": 159,
+      "id": 13
+    },
+    {
+      "reportId": 2,
+      "name": "Unqualified",
+      "color": "negative",
+      "value": 28,
+      "id": 14
     }
   ]
 }

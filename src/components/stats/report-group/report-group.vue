@@ -1,9 +1,6 @@
 <template>
-  <div
-    @mouseover="hovered = true"
-    @mouseleave="hovered = false"
-    class="pt-0 pb-4">
-    <div class="row no-wrap q-pt-none text-subtitle1 text-bold text-capitalize">
+  <div class="pt-0 pb-4">
+    <div class="row no-wrap report-group-header q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
         <TitlePopover
           v-model="reportGroupName2"
@@ -21,12 +18,17 @@
         class="mini-select">
       </q-select>
     </div>
-    <div v-if="resources" class="p-0" style="position:relative;">
+    <div
+      v-if="resources"
+      @mouseover="hovered = true"
+      @mouseleave="hovered = false"
+      class="metric-group p-0"
+      style="position:relative;">
       <!-- <q-skeleton square /> -->
       <b-badge
         v-if="hovered"
         @click="confirmDeletion"
-        class="bg-white p-0 m-0 contact-unread-badge d-flex justify-center floating"
+        class="bg-white p-0 m-0"
         style="z-index:10; border:1px grey solid;right:-5px;top:-5px;position:absolute;"
         pill>
         <q-icon
@@ -34,7 +36,7 @@
           class="cursor-pointer text-grey"
           style="font-size: 11px;padding:3px;" />
       </b-badge>
-      <div class="mycard no-border bg-white p-2 row">
+      <div class="no-border bg-white p-2 pr-5 row">
         <AddMetrics
           :report-group="{ id: reportGroupId, name: reportGroupName }"
           @toggle-loader="toggleLoad" />
@@ -43,6 +45,11 @@
           :key="key"
           :metric="metric" />
         <MetricLoader v-if="loader" />
+        <div v-if="hovered" class="metric-group-drawer">
+          <div class="drawer-icon movable">
+            <i class="fa fa-bars mr-2 text-muted"></i>
+          </div>
+        </div>
       </div>
     </div>
     <ConfirmDialog

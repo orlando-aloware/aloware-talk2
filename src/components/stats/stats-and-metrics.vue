@@ -2,7 +2,8 @@
   <Draggable
     v-model="report_group"
     v-bind="dragOptions"
-    class="list-group movable"
+    class="list-group"
+    :options="{handle:'.movable'}"
     tag="ul">
     <transition-group type="transition" name="flip-list">
       <template
