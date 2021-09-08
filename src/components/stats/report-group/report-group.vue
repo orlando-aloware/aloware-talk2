@@ -208,7 +208,6 @@ export default {
       })
     },
     async changedFilter (val) {
-      console.log('999 :>> ', 999)
       await this.updateReportGroup({
         id: this.resources.id,
         name: this.title,
