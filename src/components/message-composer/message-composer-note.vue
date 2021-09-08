@@ -66,7 +66,8 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validNote () {
-      return this.messageComposer.note.body && this.messageComposer.note.body.trim().length > 0
+      const content = this.messageComposer.note.body.replace(/(<([^>]+)>)/gi, '')
+      return content && content.trim().length > 0
     }
   },
   data () {

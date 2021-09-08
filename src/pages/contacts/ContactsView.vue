@@ -69,11 +69,13 @@
         </compact-btn>
         <compact-btn
           variant="primary"
-          :disabled="!filterHasChanges || this.defaultIds.includes(this.id)"
+          :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
-          <q-spinner-bars v-if="isUpdatingList" color="white"/>
-          {{ isUpdatingList ? 'Saving...' : 'Save' }}
+          <q-spinner-bars v-if="isUpdatingList"
+                          color="white"
+                          class="mr-1"/>
+          {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
         <b-dropdown text="Add Contacts"
                     no-caret
