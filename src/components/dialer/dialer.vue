@@ -94,6 +94,7 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
+      this.$closeActionNotification('incomingCall')
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {

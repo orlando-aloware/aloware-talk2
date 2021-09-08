@@ -241,6 +241,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
   }
 
   if (!title || (type !== 'incomingCall' && !message)) {
+    this.$bvToast.hide(type)
     return
   }
 

@@ -109,6 +109,10 @@ export default {
       const title = _.get(this.notifications[this.id], 'title', '')
       const fixedTitle = this.$options.filters.fixPhone(title)
 
+      if (!title && this.id === 'system') {
+        this.$closeActionNotification('system')
+      }
+
       if (!['sms', 'call'].includes(this.id) || !fixedTitle) {
         return title
       }
