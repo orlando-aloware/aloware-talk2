@@ -63,8 +63,8 @@
     {
       "reportId": 2,
       "id": 5,
-      "name": "Missed",
-      "color": "negative",
+      "name": "Total Talk Time",
+      "color": "positive",
       "value": "12"
     },
     {
@@ -108,13 +108,6 @@
       "color": "positive",
       "value": 40,
       "id": 11
-    },
-    {
-      "reportId": 5,
-      "name": "Open Deal",
-      "color": null,
-      "value": 194,
-      "id": 15
     },
     {
       "reportId": 7,
@@ -171,6 +164,13 @@
       "color": null,
       "value": 106,
       "id": 23
+    },
+    {
+      "reportId": 5,
+      "name": "Total Duration",
+      "color": "positive",
+      "value": 103,
+      "id": 24
     }
   ]
 }

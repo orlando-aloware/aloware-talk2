@@ -18,7 +18,8 @@
     <AddMetricsModal
       @closed="closeModal"
       @create="createNewMetric"
-      :title="groupTitle"
+      title="Add Metric"
+      button-label="Create Metric"
       :is-open="modal" />
   </div>
 </template>
@@ -26,7 +27,7 @@
 <script>
 
 import { mapActions } from 'vuex'
-import AddMetricsModal from './add-metrics-modal'
+import AddMetricsModal from './form-metrics-modal'
 
 export default {
   name: 'AddMetrics',
@@ -57,7 +58,6 @@ export default {
       'createMetrics'
     ]),
     async createNewMetric (data) {
-      this.modal = false
       this.$emit('open-loader', true)
       await this.createMetrics({
         reportId: this.groupId,
@@ -66,6 +66,7 @@ export default {
         value: Math.floor(Math.random() * (199 - 1 + 1)) + 1
       })
       this.$emit('close-loader', true)
+      this.modal = false
     },
     openModal () {
       this.modal = true

@@ -11,7 +11,9 @@
           flat
           style="width: 300px;">
           <q-card-section class="pt-4">
-            <div class="text-center text-h6 pt-3 pb-4">Add Metric</div>
+            <div class="text-center text-h6 pt-3 pb-4">
+              {{ title }}
+            </div>
             <q-select
               @popup-show="onShowMetricsMenu"
               outlined dense emit-value
@@ -56,10 +58,6 @@
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
               <template v-slot:selected>
                 <template v-if="color">
-                  <!-- <q-icon
-                    :color="color.color"
-                    name="font_download"
-                    class="pr-2" /> -->
                   <i :class="`fas fa-square color-${color.color} pr-2`"></i>
                   {{ color.text }}
                 </template>
@@ -80,11 +78,11 @@
             </q-select>
             <br />
             <q-btn
-              @click="createNewMetric"
+              @click="submit"
               unelevated
               color="blue"
               text-color="white"
-              label="Create Metric"
+              :label="buttonLabel"
               class="full-width" />
           </q-card-section>
         </q-card>
@@ -104,7 +102,7 @@ const colorOptions = { METRIC_OPTIONS_COLORS }
 const stats = { METRIC_OPTIONS_2 }
 
 export default {
-  name: 'AddMetricsModal',
+  name: 'FormMetricsModal',
   props: {
     isOpen: {
       type: Boolean,
@@ -113,6 +111,14 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    buttonLabel: {
+      type: String,
+      default: 'Submit'
+    },
+    resources: {
+      type: Object,
+      default: () => {}
     }
   },
   computed: {
@@ -124,6 +130,12 @@ export default {
     },
     colors () {
       return colorOptions.METRIC_OPTIONS_COLORS
+    },
+    actionCreate () {
+      if (this.resources?.id) {
+        return true
+      }
+      return false
     }
   },
   data () {
@@ -143,18 +155,37 @@ export default {
       if (val === false) {
         this.$emit('closed', true)
         this.resetData()
+      } else {
+        if (this.actionCreate) {
+          let { color, name } = this.resources
+          this.color = this.colors.find(col => {
+            return col.value === color
+          })
+          this.metrics = name
+        }
       }
     }
   },
   methods: {
-    async createNewMetric () {
-      this.$emit('create', {
-        name: this.metrics,
-        color: this.color.value
-      })
+    async submit () {
+      if (this.actionCreate) {
+        this.$emit('update', {
+          id: this.resources.id,
+          name: this.metrics,
+          color: this.color.value,
+          reportId: this.resources.reportId,
+          value: this.resources.value
+        })
+      } else {
+        this.$emit('create', {
+          name: this.metrics,
+          color: this.color.value
+        })
+      }
     },
     resetData () {
       this.metrics = ''
+      this.color = ''
     },
     onShowColorMenu () {
       this.selectWidth = this.$refs.statsSelectTextColor.$el.offsetWidth

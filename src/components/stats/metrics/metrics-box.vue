@@ -17,16 +17,29 @@
         style="font-size: 11px;padding:3px;" />
     </b-badge>
     <q-card flat
-      class="metric-box text-black m-2">
-      <q-card-section>
+      class="metric-box text-black m-2 p-0">
+      <q-card-actions>
+        <div :class="`metric-box-label text-weight-medium text-${color}`">
+          {{ val }}
+        </div>
+        <q-space />
+        <div
+          @click="openEditModal"
+          class="metric-floating-btn cursor-pointer mr-2">
+          <PencilIcon
+            v-if="hovered"
+            color="grey" />
+        </div>
+      </q-card-actions>
+
+      <!-- <q-card-section>
         <div :class="`metric-box-label text-weight-medium text-${color}`">
           {{ metric.value }}
         </div>
-        <!-- <div class="text-subtitle2 pt-3"># of kemerut</div> -->
-      </q-card-section>
+      </q-card-section> -->
 
-      <q-card-section class="metric-box-desc q-pt-none text-lowercase pt-2">
-        {{ metric.name }}
+      <q-card-section class="metric-box-desc q-pt-none text-lowercase pt-4">
+        {{ name }}
       </q-card-section>
     </q-card>
     <ConfirmDialog
@@ -70,13 +83,22 @@
         </div>
       </div>
     </ConfirmDialog>
+    <EditMetricsModal
+      @closed="closeModal"
+      @update="updateExistingMetric"
+      :resources="preformattedMetric"
+      :is-open="editModal"
+      button-label="Update Metric"
+      title="Update Metric" />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import EditMetricsModal from './form-metrics-modal'
 import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
+import PencilIcon from 'components/icons/pencil-o-icon'
 import {
   METRIC_OPTIONS_COLORS
 } from 'src/constants/stats'
@@ -92,7 +114,9 @@ export default {
     }
   },
   components: {
+    EditMetricsModal,
     ConfirmDialog,
+    PencilIcon,
     TrashIcon
   },
   computed: {
@@ -101,19 +125,37 @@ export default {
     },
     color () {
       let col = colorOptions.METRIC_OPTIONS_COLORS.find(c => {
-        return c.value === this.metric.color
+        return c.value === this.col
       })
       if (col) {
         return col.color
       } else {
         return 'black'
       }
+    },
+    preformattedMetric () {
+      return {
+        id: this.metric.id,
+        name: this.name,
+        color: this.col,
+        reportId: this.metric.reportId,
+        value: this.metric.value
+      }
     }
+  },
+  mounted () {
+    this.name = this.metric.name
+    this.val = this.metric.value
+    this.col = this.metric.color
   },
   data () {
     return {
       hovered: false,
-      isOpen: false
+      isOpen: false,
+      editModal: false,
+      name: '',
+      val: '',
+      col: ''
     }
   },
   watch: {
@@ -127,13 +169,25 @@ export default {
   },
   methods: {
     ...mapActions('stats', [
-      'deleteMetrics'
+      'deleteMetrics',
+      'updateMetrics'
     ]),
+    async updateExistingMetric (data) {
+      await this.updateMetrics(data)
+      this.name = data.name
+      this.val = data.value
+      this.col = data.color
+      this.editModal = false
+    },
     confirmDeletion () {
       this.isOpen = true
     },
     closeModal () {
       this.isOpen = false
+      this.editModal = false
+    },
+    openEditModal () {
+      this.editModal = true
     },
     async removeSelectedMetric () {
       await this.deleteMetrics(this.metric.id)
