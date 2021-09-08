@@ -147,6 +147,7 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
+      this.$closeActionNotification('incomingCall')
       this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
@@ -185,6 +186,7 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+      this.$closeActionNotification('incomingCall')
       if (this.callNotification) {
         this.callNotification()
       }
