@@ -143,6 +143,7 @@ export default {
       }
 
       if (!this.title) {
+        this.onHidden()
         this.$closeActionNotification(this.id)
       }
     },
