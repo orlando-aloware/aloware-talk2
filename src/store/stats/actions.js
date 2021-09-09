@@ -26,6 +26,10 @@ export default {
       commit('REMOVE_REPORT_GROUP', id)
     }
   },
+  updateMetricGroupOrder: async ({ commit }, params = {}) => {
+    // await window.axios.patch('http://localhost:3000/metrics')
+    await console.log(`REQUEST PAYLOAD: .../metric-group/${params.id}/order?direction=${params.direction}&step=${params.step}`)
+  },
   /**
    * Actual API calls for
    * METRICS

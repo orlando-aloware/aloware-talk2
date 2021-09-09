@@ -1,5 +1,6 @@
 <template>
   <Draggable
+    @change="updateSortedGroup"
     v-model="report_group"
     v-bind="dragOptions"
     class="list-group"
@@ -64,8 +65,26 @@ export default {
   },
   methods: {
     ...mapActions('stats', [
-      'getReportGroups'
-    ])
+      'getReportGroups',
+      'updateMetricGroupOrder'
+    ]),
+    async updateSortedGroup (val) {
+      // direction and step
+      let { newIndex, oldIndex, element } = val.moved
+      let step = null
+      let direction = oldIndex > newIndex ? 'up' : 'down'
+      let id = element.id
+      if (oldIndex > newIndex) {
+        step = oldIndex - newIndex
+      } else {
+        step = newIndex - oldIndex
+      }
+      await this.updateMetricGroupOrder({
+        id: id,
+        direction: direction,
+        step: step
+      })
+    }
   }
 }
 </script>

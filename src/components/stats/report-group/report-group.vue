@@ -188,12 +188,6 @@ export default {
       'updateReportGroup',
       'deleteReportGroup'
     ]),
-    confirmDeletion () {
-      this.isOpen = true
-    },
-    closeModal () {
-      this.isOpen = false
-    },
     async removeSelectedReportGroup () {
       await this.deleteReportGroup(this.reportGroupId)
       this.closeModal()
@@ -212,6 +206,12 @@ export default {
         name: this.title,
         timeline: val
       })
+    },
+    confirmDeletion () {
+      this.isOpen = true
+    },
+    closeModal () {
+      this.isOpen = false
     },
     toggleLoad (val) {
       this.loader = val
