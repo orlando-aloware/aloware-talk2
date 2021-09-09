@@ -100,7 +100,7 @@ const routes = [
       {
         path: 'power-dialer',
         name: 'Power Dialer',
-        component: () => import('pages/PowerDialer.vue'),
+        component: () => import('pages/power-dialer/PowerDialer.vue'),
         meta: {
           title: 'Power Dialer'
         }

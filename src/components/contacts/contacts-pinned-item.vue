@@ -11,7 +11,7 @@
        @click="navigate">
       <div class="px-2 icon">
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
-        <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon>
+        <!-- <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon> -->
       </div>
       <div class="pr-3 flex-grow-1 item-name">{{ item.name }}</div>
       <div class="pr-2">
@@ -23,13 +23,13 @@
 
 <script>
 import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+// import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
 
 export default {
   name: 'contacts-pinned-item',
   components: {
-    FolderDynamicIcon,
+    // FolderDynamicIcon,
     FolderStaticIcon
   },
   data () {
