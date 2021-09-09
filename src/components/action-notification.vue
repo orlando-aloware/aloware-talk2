@@ -8,6 +8,7 @@
            :no-auto-hide="['system', 'incomingCall'].includes(this.id)"
            :id="id"
            :to="link"
+           v-if="title"
            @hidden="onHidden"
            @shown="autoClose">
     <div class="d-flex flex-row align-items-center">
