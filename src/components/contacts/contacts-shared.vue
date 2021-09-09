@@ -1,8 +1,6 @@
 <template>
   <div class="shared">
-    <div
-      class="folders__header d-flex align-items-center border-top"
-    >
+    <div class="folders__header d-flex align-items-center border-top list--header">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         Public Lists
         <q-icon name="info"

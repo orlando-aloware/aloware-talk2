@@ -15,7 +15,7 @@
         <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
       </div>
       <div class="folder__icon" @click="onToggleFolder">
-        <folder-icon></folder-icon>
+        <folder-icon color="#62666E"></folder-icon>
       </div>
 
       <div class="flex-grow-1 d-flex align-items-center">

@@ -1,11 +1,10 @@
 <template>
   <div
     ref="scrollableArea"
-    class="scrollableArea position-relative d-flex flex-column h-100 w-100"
-    :class="{ 'overflow-hidden': isEmpty }"
+    :class="['scrollableArea position-relative d-flex flex-column h-100 w-100', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
     @scroll="handleScroll"
   >
-    <table :class="[computedClass]" ref="table">
+    <table :class="[computedClass, 'ml-3']" ref="table">
       <thead>
         <draggable
           :list="fixedColumns"
@@ -28,21 +27,17 @@
               minWidth: column.minWidth ? `${column.minWidth}px` : ''
             }"
           >
-            <input
-              class="data-table-check-all"
-              ref="dataTableCheckAll"
-              type="checkbox"
-              v-if="column.name === 'checkbox'"
-              @change="onCheckboxClicked"
-            />
+            <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
+              <input type="checkbox"
+                     class="data-table-check-all"
+                     ref="dataTableCheckAll"
+                     @change="onCheckboxClicked"/>
+              <span class="checkmark"></span>
+            </label>
             <template v-if="column.name && column.name !== 'checkbox'">
-              <span :class="{ handle: column.draggable }"
-                ><i
-                  class="fa fa-bars mr-2 text-muted"
-                  v-if="column.draggable"
-                ></i>
-                {{ column.label }}</span
-              >
+              <span :class="{ handle: column.draggable }">
+                {{ column.label }}
+              </span>
               <a
                 href="#"
                 class="sorter"
@@ -237,6 +232,10 @@ export default {
     isLoadingMore: {
       type: Boolean,
       default: false
+    },
+    scrollAreaClass: {
+      type: String,
+      default: ''
     }
   },
   mounted () {

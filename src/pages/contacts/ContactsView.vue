@@ -3,9 +3,6 @@
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="pr-2">{{ list.name }}</div>
-        <div class="small text-muted">
-          {{ listItemsTotalContacts | numFormat }} contacts found
-        </div>
       </div>
     </template>
     <template slot="options">
@@ -42,33 +39,42 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
-        <div class="mr-4">
-          <span class="small text-muted">{{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts</span>
+        <div class="mr-3">
+          <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
+          <span class="small text-muted fs-13" v-else> {{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts</span>
         </div>
-        <compact-btn
-          borderless
-          :variant="filterButtonVariant"
-          customClass="mr-2"
-          @clicked="onFiltersClicked"
-        >
-          Filters
-          <b-badge class="ml-1 mt-1"
-                   pill
-                   :variant="filterBadgeVariant">
-            {{ filtersCount }}
-          </b-badge>
-        </compact-btn>
-        <compact-btn
-          customClass="mr-2"
-          borderless
-          :variant="resetButtonVariant"
-          :disabled="isResetDisabled"
-          @clicked="resetFilters"
-        >
-          Reset
-        </compact-btn>
+        <div class="v-divider">
+        </div>
+        <div :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
+          <compact-btn
+            borderless
+            variant="outlined-light"
+            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+            @clicked="onFiltersClicked"
+          >
+            <b-badge v-if="hasAppliedFilters"
+                     class="ml-2 mt-1"
+                     pill
+                     variant="primary">
+              {{ filtersCount }}
+            </b-badge>
+            <span class="pl-2  pr-2">Filters</span>
+
+          </compact-btn>
+          <compact-btn
+                       borderless
+                       customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+                       variant="outlined-light"
+                       v-if="hasAppliedFilters"
+                       :disabled="isResetDisabled"
+                       @clicked="resetFilters">
+            <i class="fa fa-times"></i>
+          </compact-btn>
+        </div>
+
         <compact-btn
           variant="primary"
+          v-if="selectedList.type !== ContactListType.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
           :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
@@ -77,16 +83,15 @@
                           class="mr-1"/>
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
-        <b-dropdown text="Add Contacts"
-                    no-caret
+        <b-dropdown text="Add Contact"
                     right
-                    variant="primary"
-                    class="m-2 b-compact-dropdown-button text-bold"
+                    variant="outline-secondary"
+                    class="m-2 b-compact-dropdown-button text-bold text-black"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <i class="fa fa-search mr-1"></i> Select Contact
+            <i class="fa fa-search mr-1"></i> Select Contacts
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
             <i class="fa fa-plus mr-1"></i>
@@ -101,6 +106,9 @@
                     right
                     variant="outline-secondary"
                     class="m-2 b-compact-dropdown-button text-bold">
+          <template #button-content>
+            <i class="fa fa-ellipsis-h"></i>
+          </template>
           <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
@@ -385,6 +393,9 @@ export default {
       }
 
       return false
+    },
+    hasAppliedFilters () {
+      return this.filtersCount > 0
     }
   },
   mounted () {

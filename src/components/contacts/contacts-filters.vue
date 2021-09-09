@@ -5,22 +5,22 @@
                spinner-variant="success"
                spinner-type="grow"
                rounded="sm">
-      <b-card header="Primary"
-              header-bg-variant="primary"
-              header-text-variant="white">
+      <b-card class="filter-container">
         <template #header>
           <div class="d-flex justify-content-between">
             <div class="d-inline-flex">
-              <b-button variant="outline-primary header-buttons border-0"
+              <b-button variant="light"
+                        class="header-buttons border-0 grey-90"
                         size="sm"
                         @click="backToStep"
                         v-if="step !== 1">
                 <i class="fa fa-arrow-left"></i>
               </b-button>
-              <h6 class="mb-0">Filters</h6>
+              <h6 class="mb-0 ml-1">Filters</h6>
             </div>
 
-            <b-button variant="outline-primary header-buttons btn-close-filter border-0"
+            <b-button variant="light"
+                      class="header-buttons btn-close-filter border-0 grey-90"
                       size="sm"
                       @click="onCloseFilter">
               <i class="fa fa-times"></i>
@@ -91,13 +91,6 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <!--compact-btn
-                  variant="outlined-light"
-                  customClass="mb-2 mr-2 add-filters with-border conjunction-button"
-                  @clicked="toAddFiltersStep(visibleListFilters.length, true)"
-                >
-                  AND
-                </compact-btn-->
                 <compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
                              @clicked="toAddFiltersStep(visibleListFilters.length, false)">

@@ -12,10 +12,10 @@
       >
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon">
-          <folder-static-icon
+          <folder-static-icon color="#62666E"
             v-if="type === ContactListTypes.STATIC"
           ></folder-static-icon>
-          <folder-dynamic-icon
+          <folder-dynamic-icon color="#62666E"
             v-if="type === ContactListTypes.DYNAMIC"
           ></folder-dynamic-icon>
         </div>
