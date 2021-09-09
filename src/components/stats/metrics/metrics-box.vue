@@ -19,7 +19,7 @@
           style="font-size: 11px;padding:3px;" />
       </b-badge>
       <q-card flat
-        class="metric-box text-black m-2 p-0">
+        class="metric-box text-black m-2 p-1">
         <q-card-actions>
           <div :class="`metric-box-label text-weight-medium text-${color}`">
             {{ metricValue }}
@@ -173,6 +173,11 @@ export default {
       'deleteMetrics',
       'updateMetrics'
     ]),
+    async removeSelectedMetric () {
+      this.loader = true
+      await this.deleteMetrics(this.metric.id)
+      this.closeModal()
+    },
     async updateExistingMetric (data) {
       await this.updateMetrics(data)
       this.metricName = data.name
@@ -189,11 +194,6 @@ export default {
     },
     openEditModal () {
       this.editModal = true
-    },
-    async removeSelectedMetric () {
-      this.loader = true
-      await this.deleteMetrics(this.metric.id)
-      this.closeModal()
     },
     updateLocalResources () {
       this.metricName = this.metric.name

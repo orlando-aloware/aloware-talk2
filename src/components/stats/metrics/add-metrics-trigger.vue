@@ -12,7 +12,6 @@
             Add Metrics
           </div>
         </div>
-        <!-- <div class="text-subtitle2 pt-3"># of kemerut</div> -->
       </q-card-section>
     </q-card>
     <AddMetricsModal
@@ -41,9 +40,6 @@ export default {
     AddMetricsModal
   },
   computed: {
-    groupTitle () {
-      return this.reportGroup.name
-    },
     groupId () {
       return this.reportGroup.id
     }

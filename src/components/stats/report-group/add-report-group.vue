@@ -14,7 +14,6 @@
         </div>
       </div>
     </q-btn>
-    <!-- <q-space /> -->
   </q-card-actions>
 </template>
 

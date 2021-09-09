@@ -7,7 +7,7 @@
     },
     {
       "id": 2,
-      "name": "Technical Support",
+      "name": "Technical Support 101",
       "timeline": "Recent (Last 30 days + Today)"
     },
     {
@@ -16,7 +16,7 @@
       "timeline": "This Week"
     },
     {
-      "name": "Untitled",
+      "name": "Untitled Section",
       "timeline": "This Week So Far",
       "id": 4
     }
@@ -84,6 +84,69 @@
       "color": "negative",
       "value": 28,
       "id": 14
+    },
+    {
+      "reportId": 3,
+      "name": "New",
+      "color": "positive",
+      "value": 54,
+      "id": 15
+    },
+    {
+      "reportId": 4,
+      "name": "On Call",
+      "color": "positive",
+      "value": 72,
+      "id": 16
+    },
+    {
+      "reportId": 2,
+      "name": "Outbound SMS",
+      "color": "positive",
+      "value": 4,
+      "id": 17
+    },
+    {
+      "reportId": 2,
+      "name": "Busy",
+      "color": "negative",
+      "value": 141,
+      "id": 18
+    },
+    {
+      "reportId": 2,
+      "name": "Qualified Outbound Calls",
+      "color": null,
+      "value": 159,
+      "id": 19
+    },
+    {
+      "reportId": 2,
+      "name": "All Abandoned Calls",
+      "color": "negative",
+      "value": 130,
+      "id": 20
+    },
+    {
+      "reportId": 3,
+      "name": "Bad Timing",
+      "color": "negative",
+      "value": 75,
+      "id": 21
+    },
+    {
+      "reportId": 3,
+      "name": "Unqualified",
+      "color": "negative",
+      "value": 72,
+      "id": 22
+    },
+    {
+      "reportId": 1,
+      "name": "Attempted to Contact",
+      "color": null,
+      "value": 48,
+      "id": 23
     }
   ]
 }

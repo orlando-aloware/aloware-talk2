@@ -3,7 +3,7 @@
     <div class="row no-wrap report-group-header q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
         <TitlePopover
-          v-model="reportGroupName2"
+          v-model="reportGroupName"
           :id="reportGroupId"
           @input="updateGroup" />
       </div>
@@ -130,14 +130,7 @@ export default {
     TitlePopover
   },
   computed: {
-    reportGroupName () {
-      let { name } = this.resources
-      if (name) {
-        return name
-      }
-      return 'Untitled'
-    },
-    reportGroupName2: {
+    reportGroupName: {
       get () {
         let { name } = this.resources
         if (this.title === 'Untitled') {
@@ -162,10 +155,6 @@ export default {
     },
     dialogName () {
       return `remove-group-dialog-${this.resources.id}`
-    },
-    metrics () {
-      let { metrics } = this.resources
-      return metrics
     }
   },
   mounted () {
@@ -210,7 +199,7 @@ export default {
       this.closeModal()
     },
     async updateGroup (val) {
-      this.reportGroupName2 = val
+      this.reportGroupName = val
       await this.updateReportGroup({
         id: this.resources.id,
         name: this.title,
@@ -231,7 +220,3 @@ export default {
 }
 
 </script>
-
-<style lang="scss" scoped>
-
-</style>

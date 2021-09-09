@@ -41,7 +41,6 @@ export default {
       'report_group'
     ]),
     ...mapGetters('stats', [
-      'reportGroup',
       'consolidatedReportGroup'
     ]),
     reportGroupList () {
@@ -60,8 +59,8 @@ export default {
     Draggable,
     ReportGroup
   },
-  mounted () {
-    this.getReportGroups()
+  async mounted () {
+    await this.getReportGroups()
   },
   methods: {
     ...mapActions('stats', [
