@@ -189,6 +189,9 @@ export default {
       } else {
         this.$bvModal.hide(this.dialogName)
       }
+    },
+    resources () {
+      this.timeline = this.resources.timeline
     }
   },
   methods: {
