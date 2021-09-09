@@ -53,6 +53,10 @@ export default {
   methods: {
     ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'openFilters']),
     loadList (id) {
+      if (!id) {
+        id = 'all'
+      }
+
       const stringId = String(id)
 
       if (!this.listItems[stringId]) {

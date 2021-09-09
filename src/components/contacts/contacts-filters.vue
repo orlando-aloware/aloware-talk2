@@ -312,8 +312,13 @@ export default {
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       for (let groupIndex in filterGroups) {
-        if (groupIndex === 'search') {
-          filterGroups.splice(groupIndex, 1)
+        if (isNaN(groupIndex / 1) || groupIndex === 'search') {
+          if (filterGroups instanceof Array) {
+            filterGroups.splice(groupIndex, 1)
+          } else {
+            delete filterGroups[groupIndex]
+          }
+
           continue
         }
 
@@ -337,7 +342,11 @@ export default {
               trueValue = filterGroups[groupIndex].filters[filterIndex].value.split(',')
             }
 
-            const newValue = [trueValue.join(' and ')]
+            let newValue = trueValue
+            if (newValue) {
+              newValue = [trueValue.join(' and ')]
+            }
+
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
               label: found.label,
