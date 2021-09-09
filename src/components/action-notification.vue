@@ -8,7 +8,8 @@
            :no-auto-hide="['system', 'incomingCall'].includes(this.id)"
            :id="id"
            :to="link"
-           @hidden="onHidden">
+           @hidden="onHidden"
+           @shown="autoClose">
     <div class="d-flex flex-row align-items-center">
       <div class="mr-2">
         <system-update-icon v-if="id === 'system'"/>
@@ -98,7 +99,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['notifications']),
+    ...mapState(['notifications', 'dialer']),
     message () {
       return _.get(this.notifications[this.id], 'message', '')
     },
@@ -108,10 +109,6 @@ export default {
     title () {
       const title = _.get(this.notifications[this.id], 'title', '')
       const fixedTitle = this.$options.filters.fixPhone(title)
-
-      if (!title && this.id === 'system') {
-        this.$closeActionNotification('system')
-      }
 
       if (!['sms', 'call'].includes(this.id) || !fixedTitle) {
         return title
@@ -138,6 +135,17 @@ export default {
     }
   },
   methods: {
+    autoClose () {
+      if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
+
+      if (!this.title) {
+        this.$closeActionNotification(this.id)
+      }
+    },
     onHidden () {
       if (this.id === 'call') {
         return
