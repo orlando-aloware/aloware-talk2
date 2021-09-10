@@ -69,7 +69,6 @@ export default {
       'updateMetricGroupOrder'
     ]),
     async updateSortedGroup (val) {
-      // direction and step
       let { newIndex, oldIndex, element } = val.moved
       let step = null
       let direction = oldIndex > newIndex ? 'up' : 'down'
