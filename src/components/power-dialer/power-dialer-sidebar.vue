@@ -1,6 +1,7 @@
 <template>
   <card class="h-100 border-0 no-border-radius">
     <PowerDialerQueueList />
+    <PowerDialerQueueList />
     <PowerDialerResourcesList />
   </card>
 </template>

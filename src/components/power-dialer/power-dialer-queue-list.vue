@@ -33,6 +33,13 @@ export default {
           link: '/power-dialer/',
           name: 'My Queue',
           to: '/power-dialer'
+        },
+        {
+          count: 188,
+          id: 'all',
+          link: '/power-dialer/',
+          name: 'My Queue',
+          to: '/power-dialer/1'
         }
       ]
     }
