@@ -124,7 +124,7 @@
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'unread_count'"
       >
@@ -136,7 +136,7 @@
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'unread_missed_call_count'"
       >
@@ -148,7 +148,7 @@
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'unread_voicemail_count'"
       >
@@ -190,13 +190,13 @@
       </td>
 
       <td
-        class="text-center datatable-row__actions"
+        class="text-left datatable-row__actions"
         :key="column.name"
         v-else-if="column.name === 'actions'"
       >
         <div>
           <button
-            class="btn btn-sm btn-link datatable-row__actions__action--call"
+            class="btn btn-sm btn-link datatable-row__actions__action--call pl-0"
             @click="onCall"
           >
             <call-o-icon color="#62666E"></call-o-icon>

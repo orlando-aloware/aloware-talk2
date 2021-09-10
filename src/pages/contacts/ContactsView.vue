@@ -2,7 +2,19 @@
   <contacts-screen v-if="list" :loading="isLoadingDisabled">
     <template slot="title">
       <div class="d-flex flex-column">
-        <div class="pr-2">{{ list.name }}</div>
+        <div class="pr-2">
+          <folder-static-icon class="mr-1 title-static-icon"
+                              height="20"
+                              width="20"
+                              v-if="list.type === ContactListTypes.STATIC">
+          </folder-static-icon>
+          <folder-dynamic-icon class="mr-1"
+                               height="20"
+                               width="20"
+                               v-if="list.type === ContactListTypes.DYNAMIC">
+          </folder-dynamic-icon>
+          <span>{{ list.name }}</span>
+        </div>
       </div>
     </template>
     <template slot="options">
@@ -41,7 +53,7 @@
         <div class="flex-grow-1"></div>
         <div class="mr-3">
           <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
-          <span class="small text-muted fs-13" v-else> {{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts</span>
+          <span class="small text-muted fs-13" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</span>
         </div>
         <div class="v-divider">
         </div>
@@ -49,7 +61,7 @@
           <compact-btn
             borderless
             variant="outlined-light"
-            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
             @clicked="onFiltersClicked"
           >
             <b-badge v-if="hasAppliedFilters"
@@ -83,11 +95,16 @@
                           class="mr-1"/>
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
-        <b-dropdown text="Add Contact"
+        <b-dropdown text="Add Contacts"
                     right
-                    variant="outline-secondary"
-                    class="m-2 b-compact-dropdown-button text-bold text-black"
+                    no-caret
+                    variant="light"
+                    class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
+          <template #button-content>
+            Add Contacts
+            <i class="fa fa-chevron-down fs-12"></i>
+          </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
@@ -104,8 +121,8 @@
         <b-dropdown text="..."
                     no-caret
                     right
-                    variant="outline-secondary"
-                    class="m-2 b-compact-dropdown-button text-bold">
+                    variant="light"
+                    class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
           <template #button-content>
             <i class="fa fa-ellipsis-h"></i>
           </template>
@@ -195,9 +212,13 @@ import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
+import FolderStaticIcon from 'components/icons/folder-static-icon'
+import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 
 export default {
   components: {
+    FolderDynamicIcon,
+    FolderStaticIcon,
     ContactCreateModal,
     ContactsFilters,
     BulkActionMenu,
@@ -234,7 +255,9 @@ export default {
       'createListOpen',
       'setCurrentListFilters',
       'removeListOpen',
-      'resetSearch'
+      'resetSearch',
+      'setShouldUpdateSelectedListContactCount',
+      'setSelectedListContactCount'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -299,6 +322,7 @@ export default {
       return this.$axios
         .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
         .then(() => {
+          this.setSelectedListContactCount(this.listItemsTotalContacts)
           this.initialListFilters = this.currentListFilters
           this.updateFilterHasChanges()
           this.isUpdatingList = false
@@ -335,6 +359,7 @@ export default {
     onContactCreated (contact) {
       if (this.list.type === this.ContactListType.STATIC) {
         talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
+          this.setShouldUpdateSelectedListContactCount(true)
           this.fetch()
         })
       } else {
@@ -399,19 +424,22 @@ export default {
     }
   },
   mounted () {
+    this.setShouldUpdateSelectedListContactCount(true)
     this.fetch()
     // force close filter
-    // this.closeFilters()
+    this.closeFilters()
   },
   watch: {
     '$route.params.id': function () {
       this.resetFilters()
       this.initialListFilters = this.currentListFilters
       this.myContacts = false
+      this.setShouldUpdateSelectedListContactCount(true)
     },
     currentListFilters: {
       deep: true,
       handler: function () {
+        // this.setSelectedListContactCount(this.listItemsTotalContacts)
         this.fetch(typeof this.currentListFilters === 'string' ? [] : this.currentListFilters)
         this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }

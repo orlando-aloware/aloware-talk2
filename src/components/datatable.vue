@@ -112,8 +112,10 @@ export default {
       if (column) {
         for (let i = 0; i < evt.pageX; i++) {
           requestAnimationFrame(() => {
-            column.style.minWidth = `${this.startOffset + i}px`
-            column.style.maxWidth = `${this.startOffset + i}px`
+            if (column) {
+              column.style.minWidth = `${this.startOffset + i}px`
+              column.style.maxWidth = `${this.startOffset + i}px`
+            }
           })
         }
       }

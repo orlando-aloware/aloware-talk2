@@ -83,7 +83,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactClose']),
+    ...mapActions('contacts', ['removeContactClose', 'setShouldUpdateSelectedListContactCount']),
     onCancel () {
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
@@ -143,6 +143,7 @@ export default {
         })
     },
     onConfirm () {
+      this.setShouldUpdateSelectedListContactCount(true)
       if (this.contactToRemove && !this.isBulkDelete) {
         this.handleSingleDeletion()
       }
