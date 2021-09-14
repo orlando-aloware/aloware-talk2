@@ -82,7 +82,6 @@ export default {
   },
   mounted () {
     this.loadList(this.$route.params.id)
-    console.log(this.contactList)
     if (this.contactList && this.contactList.type === this.ContactListType.DYNAMIC) {
       this.openFilters()
     }

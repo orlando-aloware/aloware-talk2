@@ -16,9 +16,9 @@
             </a>
           </router-link>
           Add contacts to
-          <span class="title-icon"
-          ><folder-static-icon height="20" width="20"
-          /></span>
+          <span class="title-icon">
+            <folder-static-icon height="20" width="20"/>
+          </span>
           {{ contactList.name }}
         </div>
         <div class="text-muted small action-desc">
@@ -213,7 +213,8 @@ export default {
       'openFilters',
       'closeFilters',
       'contactsLoaded',
-      'columnsReordered'
+      'columnsReordered',
+      'setShouldUpdateSelectedListContactCount'
     ]),
     addSelectedContacts () {
       this.isLoading = true
@@ -224,6 +225,7 @@ export default {
           contacts: this.checked
         })
         .then(() => {
+          this.setShouldUpdateSelectedListContactCount(true)
           this.$router.push('/contacts/list/' + this.contactList.id)
           this.$generalNotification('Selected contacts were successfully added')
         })
@@ -281,6 +283,9 @@ export default {
       }
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
+    },
+    hasFilterChanges () {
+      return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()

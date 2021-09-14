@@ -289,7 +289,7 @@ export default {
         this.$router.push({
           name: 'Inbox Contact Task',
           params: {
-            id: contact.id.toString(),
+            id: contactId.toString(),
             channel: 'inbox',
             status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
           }

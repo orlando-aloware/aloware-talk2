@@ -5762,16 +5762,16 @@ table.datatable {
     background-color: $light-green2;
 
     .folder__option {
-      display: block;
+      opacity: 1;
     }
   }
 
   .folder__option {
-    display: none;
+    opacity: 0;
   }
 
   .folder__option:focus {
-    display: block;
+    opacity: 1;
   }
 
   &__name {
@@ -6312,7 +6312,7 @@ button.grey-90 {
 
 .bulk-action-menu {
   margin-left: 25px;
-  margin-top: 49px;
+  margin-top: 51px;
   position: absolute;
   z-index: 9;
   background: white;
@@ -6398,7 +6398,6 @@ button.grey-90 {
 .b-toast {
   max-width: 300px !important;
   .action-notification {
-    padding: 12px 12px 15px 12px;
     width: 300px !important;
     &.incoming-call-notification {
       .toast-header {
@@ -6435,26 +6434,10 @@ button.grey-90 {
       .time {
         @include font-size($f-size-h5, normal, true);
         line-height: 16px;
-        padding-top: 1px;
-      }
-      .notification-icon {
-        padding-top: 4px;
       }
       .message-body {
         @include font-size($f-size-body-xs, normal);
         line-height: 15px;
-        .message {
-          display: -webkit-box;
-          -webkit-line-clamp: 4;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .attachment {
-          border-radius: 5px;
-          max-width: 32px;
-          height: 32px;
-        }
       }
     }
   }
@@ -6554,10 +6537,29 @@ button.grey-90 {
   background: $red-80 !important;
 }
 
-.b-dropdown.text-black {
-  .dropdown-toggle {
+.dropdown-white {
+  height: 28px;
+
+  button {
+    background: $white !important;
+    border: 1px solid $grey-70 !important;
     color: $grey-100 !important;
   }
+}
+
+.dropdown-white.contacts-options-dropdown {
+  button {
+    color: $grey-90 !important;
+  }
+}
+
+.filter-toggle-button {
+  height: 28px;
+}
+
+
+.title-static-icon {
+  margin-top: -4px;
 }
 
 .notes-body {
