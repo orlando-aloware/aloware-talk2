@@ -6398,6 +6398,7 @@ button.grey-90 {
 .b-toast {
   max-width: 300px !important;
   .action-notification {
+    padding: 12px 12px 15px 12px;
     width: 300px !important;
     &.incoming-call-notification {
       .toast-header {
@@ -6434,10 +6435,26 @@ button.grey-90 {
       .time {
         @include font-size($f-size-h5, normal, true);
         line-height: 16px;
+        padding-top: 1px;
+      }
+      .notification-icon {
+        padding-top: 4px;
       }
       .message-body {
         @include font-size($f-size-body-xs, normal);
         line-height: 15px;
+        .message {
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .attachment {
+          border-radius: 5px;
+          max-width: 32px;
+          height: 32px;
+        }
       }
     }
   }
