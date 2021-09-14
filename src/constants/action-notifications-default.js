@@ -3,6 +3,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''
@@ -11,6 +12,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''
@@ -19,6 +21,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''
@@ -27,6 +30,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''
@@ -35,6 +39,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''
@@ -43,6 +48,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''
@@ -51,6 +57,7 @@ export const DEFAULT_STATE = {
     title: '',
     message: '',
     messageIcon: null,
+    attachment: null,
     dateTime: null,
     contactId: '',
     communicationId: ''

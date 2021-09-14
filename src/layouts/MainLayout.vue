@@ -158,6 +158,7 @@ import Dialer from '../components/dialer/dialer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import _ from 'lodash'
 
 export default {
   name: 'MyLayout',
@@ -387,7 +388,8 @@ export default {
     this.$VueEvent.listen('new_desktop_sms', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // this.handleDesktopCommunicationNotification(communication)
-        this.$actionNotification(communication.contact.phone_number, communication.body, null, 'sms', communication.contact.id, communication.id)
+        const firstAttachment = _.get(communication.attachments, '0.url', null)
+        this.$actionNotification(communication.contact.phone_number, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id)
       }
     })
 
@@ -401,22 +403,20 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        this.$actionNotification(communication.contact.name, 'Missed Call with Voicemail', 'call-voicemail-icon', 'call', communication.contact.id, communication.id)
+        this.$actionNotification(communication.contact.name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id)
         // this.handleDesktopVoicemailNotification(communication)
       }
     })
 
     // user mention notification
-    this.$VueEvent.listen('user_mentioned', (data) => {
-      if (this.checkCommunicationMatchesUserAccessibility(data.communication)) {
-        this.$actionNotification(data.mentioner, 'Mentions message', null, 'mention')
-      }
+    this.$VueEvent.listen('mention', (data) => {
+      this.$actionNotification(data.mentioner, data.message, null, null, 'mention', data.contact_id)
     })
 
     // missed call notification
     this.$VueEvent.listen('update_communication', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication) && communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-        this.$actionNotification(communication.contact.name, 'Missed Call', null, 'call', communication.contact.id, communication.id)
+        this.$actionNotification(communication.contact.name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
       }
     })
 
@@ -425,7 +425,7 @@ export default {
         return
       }
 
-      this.$actionNotification('System Updates', 'Refresh your screen', null, 'system')
+      this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
     })
 
     if (this.$q.platform.is.electron) {

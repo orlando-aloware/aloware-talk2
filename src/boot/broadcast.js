@@ -306,8 +306,8 @@ export default {
       .notification((notification) => {
         if (!this.profile.sleep_mode) {
           switch (notification.type) {
-            case 'App\\Notifications\\UserMentioned':
-              window.VueEvent.fire('user_mentioned', notification)
+            case 'App\\Notifications\\MentionNotification':
+              window.VueEvent.fire('mention', notification)
               break
           }
         }
@@ -319,40 +319,43 @@ export default {
         }
       })
       .listen('.communication.created', (event) => {
+        let communication = event.communication
+        if (event.tags) {
+          communication.tags = event.tags
+          communication.tag_ids = communication.tags.map((a) => a.id)
+        }
+        if (event.contact) {
+          communication.contact = event.contact
+        }
+        if (event.owner) {
+          communication.owner = event.owner
+        }
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
         if (campaign) {
-          let communication = event.communication
           communication.campaign = campaign
-          if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = communication.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            communication.contact = event.contact
-          }
-          if (event.owner) {
-            communication.owner = event.owner
-          }
-          window.VueEvent.fire('new_communication', communication)
         }
+        window.VueEvent.fire('new_communication', communication)
       })
       .listen('.communication.updated', (event) => {
+        let communication = event.communication
+        if (event.tags) {
+          communication.tags = event.tags
+          communication.tag_ids = communication.tags.map((a) => a.id)
+        }
+        if (event.contact) {
+          communication.contact = event.contact
+        }
+        if (event.owner) {
+          communication.owner = event.owner
+        }
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
         if (campaign) {
-          let communication = event.communication
           communication.campaign = campaign
-          if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = communication.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            communication.contact = event.contact
-          }
-          if (event.owner) {
-            communication.owner = event.owner
-          }
-          window.VueEvent.fire('update_communication', communication)
         }
+        window.VueEvent.fire('update_communication', communication)
+      })
+      .listen('.communication.deleted', (event) => {
+        window.VueEvent.fire('delete_communication', event.communication)
       })
       .listen('.incoming_number.created', (event) => {
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)

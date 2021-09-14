@@ -255,7 +255,7 @@
                  :title="communication.current_status2 | translateCurrentStatusText | fixName"
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
 
-              <i class="material-icons help text-red-500"
+              <i class="material-icons help text-danger"
                  :title="communication.current_status2 | translateCurrentStatusText | fixName"
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
             </template>

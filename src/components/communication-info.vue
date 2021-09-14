@@ -587,17 +587,17 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
          v-if="communication.notes && !activeName">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
-         v-html="$options.filters.textTruncate($options.filters.nl2br(communication.notes), 2)">
+         v-html="$options.filters.nl2br(communication.notes)">
       </p>
     </div>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left notes-body"
          v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
       <p class="text-left"
-         v-html="$options.filters.textTruncate($options.filters.nl2br(communication.body), 2)">
+         v-html="$options.filters.nl2br(this.communication.body)">
       </p>
     </div>
   </div>
