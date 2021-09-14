@@ -5,7 +5,7 @@
            :toast-class="toastClass"
            :header-class="headerClass"
            :toaster="position"
-           :no-auto-hide="['system', 'sms', 'incomingCall'].includes(this.id)"
+           :no-auto-hide="['system', 'incomingCall'].includes(this.id)"
            :id="id"
            :to="link"
            v-show="title.length > 0"
