@@ -1,11 +1,11 @@
 <template>
   <div>
-    Power Dialer Resources Lists
+    PowerDialerViewList
   </div>
 </template>
 
 <script>
 export default {
-  name: 'PowerDialerResourcesList'
+  name: 'PowerDialerViewList'
 }
 </script>

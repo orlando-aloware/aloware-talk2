@@ -1,10 +1,11 @@
 <template>
   <div>
+    PowerDialerAddView
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Dashboard'
+  name: 'PowerDialerAddView'
 }
 </script>

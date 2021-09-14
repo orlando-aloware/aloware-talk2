@@ -1,0 +1,40 @@
+select {
+
+  optgroup {
+    font-weight: 400;
+    color: $grey-80;
+    padding: 10px;
+
+    option {
+      color: $grey-100;
+      padding: 10px;
+    }
+
+  }
+
+}
+
+.square-box {
+  height: 10px;
+  width: 10px;
+}
+
+.make-invisible {
+  opacity: 0;
+}
+
+.mini-select {
+  .q-field__inner {
+    .q-field__control {
+      height: 26px !important;
+      min-height: 26px !important;
+      .q-field__control-container {
+        .q-field__native {
+          min-height: 26px !important;
+          font-size: 13px;
+          padding: 0;
+        }
+      }
+    }    
+  }
+}

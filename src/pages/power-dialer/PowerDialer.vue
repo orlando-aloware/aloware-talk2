@@ -6,14 +6,14 @@
     </div>
     <div class="col-10 px-0 pr-1 mb-0 main">
       <!-- Router Here -->
-      Router Viewer here
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 
 export default {
@@ -23,6 +23,14 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['authenticated'])
+  },
+  methods: {
+    ...mapActions('power-dialer', [
+      'getPowerDialerList'
+    ]),
+    async fetchAutoDialer () {
+      await this.getPowerDialerList()
+    }
   }
 }
 </script>

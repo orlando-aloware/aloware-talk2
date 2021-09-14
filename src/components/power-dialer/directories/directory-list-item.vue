@@ -1,23 +1,19 @@
 <template>
   <router-link
-    class="tree-list-item pl-2"
-    :to="'/contacts/list/' + id"
-    v-slot="{ navigate, isExactActive }"
-  >
+    class="tree-list-item"
+    :to="'/power-dialer/list/' + id"
+    v-slot="{ navigate, isExactActive }">
     <div :data-layer="layer">
       <div
         :title="name"
         :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
-        class="folder d-flex align-items-center"
-      >
+        class="folder d-flex align-items-center">
         <div class="folder__indent" :style="indentStyle"></div>
-        <div class="folder__icon">
-          <folder-static-icon
-            v-if="type === ContactListTypes.STATIC"
-          ></folder-static-icon>
-          <folder-dynamic-icon
-            v-if="type === ContactListTypes.DYNAMIC"
-          ></folder-dynamic-icon>
+        <div class="folder__icon pl-2">
+          <FolderStaticIcon
+            v-if="type === ContactListTypes.STATIC" />
+          <FolderDynamicIcon
+            v-if="type === ContactListTypes.DYNAMIC" />
         </div>
         <div class="folder__name">
           <input
@@ -29,31 +25,28 @@
             class="folder__input d-inline"
             @blur="onInputBlur"
             @keydown="onKeyDown"
-            autofocus
-          />
-          <span @click="navigate" v-if="!isEditing">
+            autofocus />
+          <span
+            v-if="!isEditing"
+            @click="navigate">
             {{ name }}
           </span>
         </div>
-
         <button
           :tabindex="id"
           :data-popper-target="'list-' + id"
           :id="'folder-option-' + id + '-' + layer"
-          class="folder__option btn btn-link p-0"
-        >
+          class="folder__option btn btn-link p-0">
           <folder-option></folder-option>
         </button>
       </div>
-
       <b-popover
         :target="'folder-option-' + id + '-' + layer"
         triggers="click blur"
         placement="bottomright"
         boundary="window"
-        custom-class="contact-popover"
-      >
-        <list-actions
+        custom-class="contact-popover">
+        <ListActions
           :type="type"
           @remove="onRemoveList"
           @rename="onRenameList"
@@ -63,25 +56,26 @@
           @clonestatic="onCloneStatic"
           :hasEdit="hasEdit"
           :hasDelete="hasDelete"
-          :isPinned="isPinned"
-        ></list-actions>
+          :isPinned="isPinned" />
       </b-popover>
     </div>
   </router-link>
 </template>
 
 <script>
+
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import FolderOption from 'components/icons/folder-option.vue'
-import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
-import ListActions from '../list-actions.vue'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import FolderOption from 'components/icons/folder-option'
+import FolderStaticIcon from 'components/icons/folder-static-icon'
+import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+import ListActions from './../../list-actions'
+import errorMessages from 'src/plugins/helpers/extract-error-message'
 
 let inputTimeout
 
 export default {
+  name: 'DirectoryListItem',
   components: {
     FolderOption,
     FolderStaticIcon,
@@ -92,7 +86,7 @@ export default {
     ...mapGetters('contacts', ['pinned', 'moveDialog']),
     indentStyle () {
       return {
-        width: `${this.layer * 10}px`
+        width: `${(this.layer * 10) + 2}px`
       }
     },
     isPinned () {
@@ -175,7 +169,7 @@ export default {
           this.reloadFolders()
         })
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const { message, html } = errorMessages(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })
@@ -269,7 +263,7 @@ export default {
       return this.$axios
         .patch('/api/v2/contacts-list/' + id, params)
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const { message, html } = errorMessages(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })
@@ -279,7 +273,7 @@ export default {
         .get('/api/v2/contacts-list/' + id)
         .then((response) => response.data)
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const { message, html } = errorMessages(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })

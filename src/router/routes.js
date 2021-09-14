@@ -99,16 +99,44 @@ const routes = [
       },
       {
         path: 'power-dialer',
-        name: 'Power Dialer',
         component: () => import('pages/power-dialer/PowerDialer.vue'),
         meta: {
           title: 'Power Dialer'
-        }
+        },
+        children: [
+          {
+            name: 'Power Dialer',
+            path: '',
+            component: () => import('src/pages/power-dialer/PowerDialerBase')
+          },
+          {
+            name: 'Power Dialer Base Filter',
+            path: 'list/:id(in-queue|called|failed|scheduled|all)+',
+            component: () => import('src/pages/power-dialer/PowerDialerBase')
+          },
+          {
+            name: 'Power Dialer Individual',
+            path: 'list/:id(\\d+)+',
+            component: () => import('src/pages/power-dialer/PowerDialerBase'),
+            children: [
+              {
+                name: 'Power Dialer Individual Advance',
+                path: ':filter(in-queue|called|failed|scheduled|all)+',
+                component: () => import('src/pages/power-dialer/PowerDialerBase')
+              }
+            ]
+          },
+          {
+            name: 'Power Dialer Add-list',
+            path: 'list/:id(\\d+)+/add',
+            component: () => import('src/pages/power-dialer/PowerDialerAddView')
+          }
+        ]
       },
       {
         path: 'stats',
         name: 'Stats',
-        component: () => import('pages/Stats.vue'),
+        component: () => import('pages/stats/Stats.vue'),
         meta: {
           title: 'Stats'
         }

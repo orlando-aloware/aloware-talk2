@@ -1,0 +1,54 @@
+.f-btn--cancel {
+  background-color: $grey-80;
+  color: $white;
+}
+
+.modal-content {
+  border-radius: 8px !important;
+}
+
+.t-badge {
+  padding: 1px;
+  &__warning {
+    background-color: $red-50 !important;
+  }
+}
+
+.t-badge-name {
+  padding: 3px;
+}
+
+.t-grouped-buttons {
+  background-color: $grey-60;
+  padding: 3px;
+  display: inline-block;
+  border-radius: 7px;
+  a.link {
+    //display: inline-flex;
+    text-decoration: none;
+  }
+  &__btn {
+    background-color: $grey-60;
+    padding: 3px 18px;
+    color: $grey-90;
+    display: inline-flex;
+    margin: 2px 0;
+    
+    .t__badge {
+      background-color: lighten($primary, 10%);
+      font-size: 11px;
+      padding: 2px 4px;
+      margin: 1px 5px;
+      border-radius: 3px;
+      color: $white;
+    }
+  }
+  &__btn:active,
+  &__btn.active {
+    background-color: $primary;
+    padding: 3px 18px;
+    border-radius: 5px;
+    color: $white;
+  }
+  
+}

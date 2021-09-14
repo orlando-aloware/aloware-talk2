@@ -1,32 +1,51 @@
 <template>
-  <router-link
-    :to="item.to"
-    :key="item.id"
-    v-slot="{ href, route, navaigate, isActive, isExactActive }">
-    <a
-      href="/"
-      :class="[
-        isActive && 'router-link-active',
-        isExactActive && 'router-link-exact-active'
-      ]"
-      class="d-flex align-items-center item"
-      @click="{}">
-      <div class="px-2 icon">
-        <FolderStaticIcon />
-        <FolderDynamicIcon />
+  <div class="item item__no-cursor d-flex py-2">
+    <div class="pl-3 pr-2 py-2 icon">
+      <ListIcon />
+    </div>
+    <div class="py-1 flex-grow-1 item-name">
+      {{ item.name }}
+    </div>
+    <div class="pr-2">
+      <div
+        class="d-inline align-items-center">
+        <b-popover
+          target="bs-folder-options"
+          triggers="click blur"
+          placement="bottomright"
+          boundary="window"
+          custom-class="contact-popover">
+          <contact-menu>
+            <contact-menu-item @click="{}">
+              <template slot="icon">
+                <folder-icon></folder-icon>
+              </template>
+              <template slot="title">
+                <span>Folder</span>
+              </template>
+            </contact-menu-item>
+
+            <contact-menu-item @click="{}">
+              <template slot="icon">
+                <AddUserIcon />
+              </template>
+              <template slot="title">
+                <span>List</span>
+              </template>
+            </contact-menu-item>
+          </contact-menu>
+        </b-popover>
+        <AddUserIcon class="cursor-pointer" />
       </div>
-      <div class="pr-3 flex-grow-1 item-name">{{ item.name }}</div>
-      <div class="pr-2">
-        <b-badge pill variant="light text-muted">{{ item.count }}</b-badge>
-      </div>
-    </a>
-  </router-link>
+      <b-badge class="t-badge t-badge__warning ml-2 text-white">{{ item.count }}</b-badge>
+    </div>
+  </div>
 </template>
 
 <script>
 
-import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+import ListIcon from 'components/icons/list-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
 
 export default {
   name: 'PowerDialerQueueListItem',
@@ -36,8 +55,8 @@ export default {
     }
   },
   components: {
-    FolderStaticIcon,
-    FolderDynamicIcon
+    ListIcon,
+    AddUserIcon
   }
 }
 </script>

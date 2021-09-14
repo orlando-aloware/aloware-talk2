@@ -1,0 +1,85 @@
+.movable {
+  cursor: move;
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+}
+
+.color-primary {
+  color: $primary;
+}
+
+.color-danger {
+  color: $danger;
+}
+
+.color-black {
+  color: $black;
+}
+
+.t-menu {
+  display: flex;
+  flex-direction: column;
+  &__header {
+    min-height: 40px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-top: 1px solid $grey-70;
+  }
+
+  &__content {
+    height: calc(100% - 40px);
+    overflow: auto;
+  }
+  .icon {
+    margin-top: -5px;
+  }
+
+  .item {
+    color: $dark;
+    cursor: pointer;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    transition: background-color 100ms ease-in-out;
+    white-space: nowrap;
+
+    &__no-cursor {
+      cursor: context-menu !important;
+    }
+  }
+
+  .item:hover {
+    background: $grey-40;
+    color: $dark;
+    text-decoration: none;
+  }
+
+  .item.router-link-exact-active {
+    background: $grey-40;
+  }
+}
+
+.border-bottom {
+  border-bottom: 1px solid $grey-60 !important;
+  border-radius: 0;
+}
+
+.border-top {
+  border-top: 1px solid $grey-60 !important;
+  border-radius: 0;
+}
+
+.border-left {
+  border-left: 1px solid $grey-60 !important;
+  border-radius: 0;
+}
+
+.border-right {
+  border-right: 1px solid $grey-60 !important;
+  border-radius: 0;
+}

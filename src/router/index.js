@@ -20,7 +20,7 @@ window.addEventListener('popstate', () => {
  * with the Router instance.
  */
 
-export default function (/* { store, ssrContext } */) {
+export default function ({ store }) {
   const Router = new VueRouter({
     scrollBehavior: () => ({
       x: 0,
@@ -43,6 +43,14 @@ export default function (/* { store, ssrContext } */) {
       documentTitle = (record.meta.title || '')
     }
     document.title = documentTitle + ' | Aloware Talk'
+  })
+
+  Router.afterEach((to, from) => {
+    store.commit('SET_PREV_ROUTE', {
+      fullPath: from.fullPath,
+      name: from.name,
+      path: from.path
+    })
   })
 
   return Router

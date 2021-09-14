@@ -1,5 +1,7 @@
 export default function () {
   return {
-    filters: []
+    filters: [],
+    powerDialerList: null,
+    contactResources: []
   }
 }

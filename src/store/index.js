@@ -9,6 +9,8 @@ import createPersistedState from 'vuex-persistedstate'
 import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
+import stats from './stats'
+import powerDialer from './power-dialer'
 
 Vue.use(Vuex)
 
@@ -26,7 +28,9 @@ export default function (/* { ssrContext } */) {
     modules: {
       auth,
       contacts,
-      inbox
+      inbox,
+      stats,
+      powerDialer
     },
     state: {
       filter: {},
@@ -133,7 +137,8 @@ export default function (/* { ssrContext } */) {
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
-      tagsFullyLoaded: false
+      tagsFullyLoaded: false,
+      prevRoute: null
     },
 
     getters: {
@@ -895,6 +900,10 @@ export default function (/* { ssrContext } */) {
 
       RESET_NOTIFICATIONS (state) {
         state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
+      },
+
+      SET_PREV_ROUTE (state, data) {
+        state.prevRoute = data
       }
     },
     plugins: [
