@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import _ from 'lodash'
 
 export default {
   SET_CONTACT_ID: (state, id) => {
@@ -39,8 +40,9 @@ export default {
   },
   SET_CONTACT: (state, payload) => {
     const contact = state.contacts.find(contact => contact.id === payload.contact_id)
+    const lastCommunication = _.get(contact, 'last_communication', null)
 
-    if (contact.last_communication.id !== payload.id) {
+    if (!lastCommunication || (lastCommunication && lastCommunication.id !== payload.id)) {
       return
     }
 
