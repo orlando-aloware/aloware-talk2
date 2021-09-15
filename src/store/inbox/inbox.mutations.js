@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export default {
   SET_CONTACT_ID: (state, id) => {
     state.selectedContactId = id
@@ -34,6 +36,19 @@ export default {
   },
   SET_CLOSED_TASK_COUNT: (state, count) => {
     state.taskCounts = { ...state.taskCounts, closed: count }
+  },
+  SET_CONTACT: (state, payload) => {
+    const contact = state.contacts.find(contact => contact.id === payload.contact_id)
+
+    if (contact.last_communication.id !== payload.id) {
+      return
+    }
+
+    const index = contact ? state.contacts.indexOf(contact) : null
+    if (index !== -1 && index !== null) {
+      state.contacts[index].last_communication = payload
+      Vue.set(state.contacts[index], 'last_communication', payload)
+    }
   },
   SET_CONTACTS: (state, contacts) => {
     state.contacts = contacts

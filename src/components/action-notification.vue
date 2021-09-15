@@ -23,18 +23,18 @@
       <div :class="[this.id !== 'incomingCall' ? 'w-100' : 'flex-grow-1']">
         <div class="d-flex flex-grow-1 align-items-baseline w-100">
           <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
-          <strong class="mr-auto text-white title">{{ title }}</strong>
-          <small class="mr-2 text-grey-82 time"
+          <strong class="mr-auto text-white title pr-1">{{ title }}</strong>
+          <small class="mr-2 text-grey-82 time text-nowrap"
                  v-if="id !== 'incomingCall'">
             {{ dateTime | shortDateTimePassed(false) }}
           </small>
         </div>
         <div class="text-grey-81 pt-2 message-body text-break d-flex">
-          <div class="flex-grow-1">
-            <component class="message-icon"
+          <div class="flex-grow-1 d-flex align-items-center">
+            <component class="message-icon mr-1"
                        :is="messageIcon"
                        v-if="messageIcon"/>
-            <span class="message"
+            <span class="message-text"
                   v-html="$options.filters.nl2br(message, false)">
             </span>
           </div>

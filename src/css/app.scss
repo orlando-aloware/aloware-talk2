@@ -6446,7 +6446,7 @@ button.grey-90 {
       .message-body {
         @include font-size($f-size-body-xs, normal);
         line-height: 15px;
-        .message {
+        .message-text {
           display: -webkit-box;
           -webkit-line-clamp: 4;
           -webkit-box-orient: vertical;
