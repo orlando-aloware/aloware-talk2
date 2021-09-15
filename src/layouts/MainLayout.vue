@@ -410,7 +410,11 @@ export default {
 
     // user mention notification
     this.$VueEvent.listen('mention', (data) => {
-      this.$actionNotification(data.mentioner, data.message, null, null, 'mention', data.contact_id)
+      const name = _.get(data, 'mentioner_user.name', '')
+      const contactId = _.get(data, 'contact_id', null)
+      const communicationId = _.get(data, 'mention_subject_id', null)
+      const message = _.get(data, 'preview_text', '')
+      this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
     })
 
     // missed call notification

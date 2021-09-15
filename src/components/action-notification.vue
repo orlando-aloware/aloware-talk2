@@ -34,8 +34,8 @@
             <component class="message-icon"
                        :is="messageIcon"
                        v-if="messageIcon"/>
-            <span class="message">
-              {{ message | nl2br(false) }}
+            <span class="message"
+                  v-html="$options.filters.nl2br(message, false)">
             </span>
           </div>
           <template v-if="id === 'sms' && attachment">
