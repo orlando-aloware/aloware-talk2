@@ -40,12 +40,47 @@
           </q-select>
         </div>
       </div>
+      <div class="w-100" v-if="$route.params.channel === 'mentions'">
+        <q-btn-toggle
+          class="current-tasks border mx-2 mt-2 mb-1"
+          no-caps
+          dense
+          spread
+          unelevated
+          toggle-color="grey-9"
+          color="white"
+          text-color="primary"
+          :options="mentionTypeOptions"
+          v-model="mentionType"
+          @click="toggleMentionType">
+          <template v-slot:one>
+            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options">
+                <span class="text-left">
+                  Received
+                </span>
+            </div>
+          </template>
+
+          <template v-slot:two>
+            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
+                 :class="['active']">
+                <span class="text-left">
+                  Sent
+                </span>
+            </div>
+          </template>
+        </q-btn-toggle>
+      </div>
       <div class="h-100 w-100 flex-grow-1 scroll-y" @scroll="handleScroll">
         <task-list :communications="communications"
                    :answer-status="answerStatus"
                    :channel="channel"
-                   v-if="!isGettingTasksList">
+                   v-if="!isGettingTasksList && $route.params.channel !== 'mentions'">
         </task-list>
+        <task-mention-list :communications="communications"
+                           :direction="mentionType"
+                           v-if="!isGettingTasksList && $route.params.channel === 'mentions'">
+        </task-mention-list>
         <div class="relative py-4">
           <b-overlay :show="isLoadingMore && !isGettingTasksList"
                      rounded="sm">
@@ -82,6 +117,8 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
+import * as MentionType from 'src/constants/mention-type'
+import TaskMentionList from 'components/inbox/channel-tasks/task-mention-list'
 
 let scrollTimeout
 export default {
@@ -89,7 +126,7 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { FilterDialog, CompactBtn, TaskList },
+  components: { TaskMentionList, FilterDialog, CompactBtn, TaskList },
 
   props: {
     filterType: {
@@ -178,7 +215,18 @@ export default {
           disable: false
         }
       ],
-      filterRight: 'newest'
+      filterRight: 'newest',
+      mentionTypeOptions: [
+        {
+          value: MentionType.TYPE_RECEIVED,
+          slot: 'one'
+        },
+        {
+          value: MentionType.TYPE_SENT,
+          slot: 'two'
+        }
+      ],
+      mentionType: MentionType.TYPE_RECEIVED
     }
   },
 
@@ -297,7 +345,7 @@ export default {
     })
 
     let _this = this
-    if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name)) {
+    if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
       this.getCommunications(this.filter).then(function () {
         if (_this.$route.name === 'Inbox Contact') {
           let communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
@@ -521,8 +569,15 @@ export default {
 
     getCommunications (params) {
       this.gettingTasksList(true)
-      return talk2Api.V1.reports.communications
-        .get({ params: params })
+
+      let api = talk2Api.V1.reports.communications
+
+      if (this.$route.params.channel === 'mentions') {
+        api = talk2Api.V2.mentions
+        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page } }
+      }
+
+      return api.get({ params: params })
         .then(response => {
           this.setCommunications(response.data.data)
           this.currentPage = response.data.current_page
@@ -568,6 +623,22 @@ export default {
       }, 66)
     },
 
+    toggleMentionType () {
+      this.$nextTick(() => {
+        // this.$refs.taskListScroller.scrollTop = 0
+      })
+
+      this.$router.push({
+        name: 'Inbox Channel Task Status',
+        params: {
+          channel: 'mentions',
+          status: this.mentionType
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
     ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
 
@@ -590,6 +661,11 @@ export default {
       if (value === 'Inbox Contact') {
         let communication = this.communications.find(item => item.id === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
+      }
+    },
+    '$route.params.status': function (value) {
+      if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value)) {
+        this.getCommunications(this.filter)
       }
     },
     filter: {

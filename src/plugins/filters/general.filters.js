@@ -3,6 +3,7 @@ import numeral from 'numeral'
 import numFormat from 'vue-filter-number-format'
 import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
+import store from 'src/store/index'
 
 /**
  * Convert to uppercase
@@ -513,6 +514,29 @@ const numberPlusFormatter = (value, limit = 99) => {
   return value
 }
 
+const parseMentionToView = (content) => {
+  let markups = content.match(/(<user:([^>]+)>)/gi)
+  let parsedBody = content
+  let users = store().state['users']
+
+  if (markups) {
+    markups.forEach(function (value, i) {
+      let userId = value.match(/\d/g).join('')
+      let user = users.find(user => user.id.toString() === userId)
+      if (user) {
+        let idPattern = new RegExp(`<user:${userId}>`, 'gi')
+        parsedBody = parsedBody.replace(idPattern, `<span class="mention-tag">@${user.name}</span>`)
+      }
+    })
+  }
+
+  return parsedBody
+}
+
+const parseMentionToMarkup = (content) => {
+
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -544,7 +568,9 @@ export default ({ Vue }) => {
     strLimit,
     momentFormat,
     textTruncate,
-    numberPlusFormatter
+    numberPlusFormatter,
+    parseMentionToView,
+    parseMentionToMarkup
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

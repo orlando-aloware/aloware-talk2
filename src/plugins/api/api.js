@@ -221,6 +221,11 @@ export default {
           contacts: contacts
         })
       }
+    },
+    mentions: {
+      get (params) {
+        return window.axios.get(`${suffixV2}mentions`, params)
+      }
     }
   }
 }

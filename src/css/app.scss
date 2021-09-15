@@ -2708,10 +2708,6 @@ span.mention {
   [contenteditable=true]:focus-visible {
     outline: none;
   }
-
-  .mention-tag {
-    color: $green;
-  }
 }
 
 // SCHEDULED MESSAGES MODAL
@@ -3241,10 +3237,17 @@ span.mention {
     @include font-size(12px, 'normal');
     line-height: 15px;
   }
+  .comm-label.mention-content > span {
+    width: 10vw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 
   .campaign-name {
     @include font-size(10px, 'normal');
     line-height: 12px;
+    color: $grey-10 !important;
   }
 
   .time-passed {
@@ -6560,4 +6563,10 @@ button.grey-90 {
 
 .title-static-icon {
   margin-top: -4px;
+}
+
+
+.mention-tag {
+  color: $primary;
+  font-weight: 500;
 }

@@ -3,6 +3,7 @@ export default {
     state.selectedContactId = id
   },
   SET_SELECTED_COMMUNICATION: (state, communication) => {
+    console.log(communication)
     state.selectedCommunication = communication
   },
   SET_COMMUNICATIONS: (state, communications) => {

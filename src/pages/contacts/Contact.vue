@@ -79,7 +79,7 @@ export default {
       return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
     },
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox'].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     }
   },
 
@@ -121,7 +121,7 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -132,7 +132,8 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (['Inbox Contact'].includes(this.$route.name)) {
+      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+        console.log('hello')
         this.fetchContactCommunicationsUntilFound()
       }
     }

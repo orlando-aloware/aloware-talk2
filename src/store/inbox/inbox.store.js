@@ -45,7 +45,7 @@ export default function () {
         label: 'Mentions',
         value: 'mentions',
         icon: 'mention',
-        disabled: true
+        disabled: false
       },
       {
         label: 'Voicemails',
