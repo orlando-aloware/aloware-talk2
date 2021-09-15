@@ -358,9 +358,9 @@ const fixBooleanType = (val) => {
   return val ? 'Yes' : 'No'
 }
 
-const nl2br = (value) => {
+const nl2br = (value, noValue = true) => {
   if (!value) {
-    return '-'
+    return noValue ? '-' : ''
   } else {
     let breakTag = '<br />'
     return (value + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
