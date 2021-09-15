@@ -234,14 +234,15 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   })
 }
 
-Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, type, contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
+Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, attachment = null, type, contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
   // skip if same notification
   if (type === 'call' && this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
     return
   }
 
-  if (!title || (type !== 'incomingCall' && !message)) {
-    this.$bvToast.hide(type)
+  if (!title ||
+    (!['sms', 'incomingCall'].includes(type) && !message) ||
+    (type === 'sms' && !message && !attachment)) {
     return
   }
 
@@ -251,27 +252,27 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
       title: title,
       message: message,
       messageIcon: messageIcon,
+      attachment: attachment,
       dateTime: dateTime,
       contactId: contactId,
       communicationId: communicationId
     }
   }
 
-  let notificationTimeout = 500
-  this.$store.commit('SET_NOTIFICATIONS', data)
-
+  this.$bvToast.hide(type)
   if (!document.getElementById(type) || noDelay) {
-    notificationTimeout = 0
-  } else {
-    this.$bvToast.hide(type)
+    this.$store.commit('SET_NOTIFICATIONS', data)
+    this.$bvToast.show(type)
+    return
   }
 
   let notificationInterval = setInterval(() => {
     if (!document.getElementById(type)) {
+      this.$store.commit('SET_NOTIFICATIONS', data)
       this.$bvToast.show(type)
       clearInterval(notificationInterval)
     }
-  }, notificationTimeout)
+  }, 500)
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {

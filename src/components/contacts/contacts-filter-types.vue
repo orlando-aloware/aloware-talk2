@@ -140,7 +140,8 @@ export default {
       initialListFilters: [],
       validated: false,
       debounceDelay: 0,
-      format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' }
+      format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' },
+      allFilters: []
     }
   },
   computed: {
@@ -190,17 +191,17 @@ export default {
         this.$refs.filterOperation[0].add(this.filterOptions[0].originalLabel, true)
         this.$refs.filterOperation[0].updateInputValue('')
       }
-      let allFilters = []
+      this.allFilters = []
       // if (!_.isEmpty(this.initialListFilters)) {
       //   allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
       // }
-      allFilters[this.filterGroupIndex] = {
+      this.allFilters[this.filterGroupIndex] = {
         filters: {},
         is_conjunction: this.filterConjunction
       }
       const filterGroup = _.get(this.initialListFilters, this.filterGroupIndex, null)
       if (filterGroup) {
-        allFilters[this.filterGroupIndex].filters = JSON.parse(JSON.stringify(filterGroup.filters))
+        this.allFilters[this.filterGroupIndex].filters = JSON.parse(JSON.stringify(filterGroup.filters))
       }
 
       let value = null
@@ -222,18 +223,17 @@ export default {
           value = this.filterOperatorValue
       }
 
-      const currentFilter = _.get(allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      let toDelete = _.get(allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+      const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+      let toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
       if (!value && currentFilter && !this.validated && toDelete) {
-        delete allFilters[this.filterGroupIndex].filters[this.filter.key]
+        delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
       } else {
-        allFilters[this.filterGroupIndex].filters[this.filter.key] = {
+        this.allFilters[this.filterGroupIndex].filters[this.filter.key] = {
           value: JSON.parse(JSON.stringify(value)),
           operator: this.filterOperator
         }
       }
 
-      this.setCurrentListFilters(allFilters)
       this.$VueEvent.stop('filters-back')
       this.$VueEvent.listen('filters-back', () => {
         this.setCurrentListFilters(this.initialListFilters)
@@ -267,6 +267,7 @@ export default {
       this.$refs.filterOperation[0].focus()
     },
     applyFilter () {
+      this.setCurrentListFilters(this.allFilters)
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')
     },

@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
@@ -279,7 +280,8 @@ export default {
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
-      if (contact) {
+      const contactId = _.get(contact, 'id', null)
+      if (contactId) {
         if (this.currentTask !== contact.task_status) {
           this.currentTask = contact.task_status
         }
@@ -287,7 +289,7 @@ export default {
         this.$router.push({
           name: 'Inbox Contact Task',
           params: {
-            id: contact.id.toString(),
+            id: contactId.toString(),
             channel: 'inbox',
             status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
           }

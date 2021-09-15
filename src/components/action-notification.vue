@@ -8,11 +8,11 @@
            :no-auto-hide="['system', 'incomingCall'].includes(this.id)"
            :id="id"
            :to="link"
-           v-if="title"
+           v-show="title.length > 0"
            @hidden="onHidden"
            @shown="autoClose">
-    <div class="d-flex flex-row align-items-center">
-      <div class="mr-2">
+    <div class="d-flex flex-row align-items-start">
+      <div class="mr-2 notification-icon">
         <system-update-icon v-if="id === 'system'"/>
         <sms-icon v-if="id === 'sms'"/>
         <call-icon v-if="id === 'call'"/>
@@ -29,15 +29,22 @@
             {{ dateTime | shortDateTimePassed(false) }}
           </small>
         </div>
-        <div class="text-grey-81 pt-1 message-body">
-          <component :is="messageIcon"
-                     v-if="messageIcon"/>
-          <span v-if="id === 'sms'">
-            {{ message | nl2br | textTruncate(4, 39) }}
-          </span>
-          <span v-else>
-            {{ message }}
-          </span>
+        <div class="text-grey-81 pt-2 message-body text-break d-flex">
+          <div class="flex-grow-1">
+            <component class="message-icon"
+                       :is="messageIcon"
+                       v-if="messageIcon"/>
+            <span class="message">
+              {{ message | nl2br(false) }}
+            </span>
+          </div>
+          <template v-if="id === 'sms' && attachment">
+            <q-img
+              :src="attachment"
+              class="attachment mr-2"
+              fit="cover"
+            />
+          </template>
         </div>
       </div>
       <div class="d-flex justify-content-center align-items-center"
@@ -89,7 +96,7 @@ export default {
     }
   },
   mounted () {
-    this.toastClass = 'action-notification notification-border-round p-3'
+    this.toastClass = 'action-notification notification-border-round'
     this.headerClass = 'border-0 p-0'
     if (this.id !== 'incomingCall') {
       this.toastClass += ' bg-grey-80'
@@ -131,8 +138,11 @@ export default {
         return null
       }
       return {
-        path: `/channels/inbox/open/contacts/${this.contactId}`
+        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
       }
+    },
+    attachment () {
+      return _.get(this.notifications[this.id], 'attachment', '')
     }
   },
   methods: {
@@ -159,6 +169,7 @@ export default {
           title: '',
           message: '',
           messageIcon: null,
+          attachment: null,
           dateTime: null,
           contactId: '',
           communicationId: ''

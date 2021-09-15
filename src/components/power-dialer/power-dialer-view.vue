@@ -21,7 +21,7 @@
         99 Contacts
       </div>
       <StartDialOptions />
-      <AddContacts />
+      <StartDialing />
     </template>
 
     <template slot="table">
@@ -38,7 +38,7 @@
                 <div class="t-badge-name">
                   {{ filter.name }}
                 </div>
-                <div class="t__badge">
+                <div :class="`t__badge ${id === filter.id ? 'active' : ''}`">
                   999+
                 </div>
               </div>
@@ -46,7 +46,7 @@
 
           </div>
         </b-card>
-        <b-container fluid class="bv-example-row m-0 p-0">
+        <b-container fluid class="bv-example-row m-0 p-0 pl-3">
           <b-row class="pr-2">
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
@@ -93,7 +93,8 @@
           <Datatable
             :stickyHeaders="true"
             :columns="columns"
-            :has-more="true">
+            :has-more="true"
+            scroll-area-class="none">
             <template slot="tbody">
               <TableRow
                 v-for="(contact, key) in contactResources"
@@ -122,8 +123,8 @@ import SummaryInfoLabels from './details/summary-info-labels'
 import Datatable from 'src/components/datatable'
 import TableRow from 'src/components/table-row'
 import SearchList from 'src/components/search'
-import AddContacts from './session-settings/add-contacts-sessions-settings'
-import { DEFAULT_LIST, ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
+import StartDialing from './session-settings/start-dial-sessions-settings'
+import { DEFAULT_FILTER_LIST, ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerView',
@@ -139,7 +140,7 @@ export default {
     Datatable,
     SearchList,
     SummaryInfoLabels,
-    AddContacts,
+    StartDialing,
     TableRow,
     ListIcon
   },
@@ -149,7 +150,7 @@ export default {
       'contactResources'
     ]),
     listFilters () {
-      return DEFAULT_LIST
+      return DEFAULT_FILTER_LIST
     },
     columns () {
       return ALL_COLUMNS

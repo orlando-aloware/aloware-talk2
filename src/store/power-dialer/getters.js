@@ -47,7 +47,7 @@ export default {
                 'child_folders': [],
                 'lists': [
                   {
-                    'id': 21,
+                    'id': 565,
                     'company_id': 7,
                     'contact_folder_id': 145,
                     'name': 'Untitled List',
@@ -429,7 +429,7 @@ export default {
             ],
             'lists': [
               {
-                'id': 21,
+                'id': 878,
                 'company_id': 7,
                 'contact_folder_id': 145,
                 'name': 'Google Map Scrapping 2',

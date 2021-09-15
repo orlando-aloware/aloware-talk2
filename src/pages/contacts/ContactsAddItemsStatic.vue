@@ -16,9 +16,9 @@
             </a>
           </router-link>
           Add contacts to
-          <span class="title-icon"
-            ><folder-static-icon height="20" width="20"
-          /></span>
+          <span class="title-icon">
+            <folder-static-icon height="20" width="20"/>
+          </span>
           {{ contactList.name }}
         </div>
         <div class="text-muted small action-desc">
@@ -42,7 +42,7 @@
         </compact-btn>
         <compact-btn variant="outlined-light"
                      @clicked="onCancel"
-          >
+        >
           Cancel
         </compact-btn
         >
@@ -68,18 +68,44 @@
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
-        <div
-          class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end"
-        >
-          <span class="small text-muted selected-contacts"
-            >{{ totalCount }} Contacts</span
-          >
+        <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
+          <span class="small text-muted selected-contacts mr-2">{{ totalCount }} Contacts</span>
+
+          <div class="v-divider">
+          </div>
+          <div :class="['btn-filter-wrapper mr-2', hasAppliedFilters ? 'background' : '' ]">
+            <compact-btn
+              borderless
+              variant="outlined-light"
+              customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+              @clicked="onFiltersClicked"
+            >
+              <b-badge v-if="hasAppliedFilters"
+                       class="ml-2 mt-1"
+                       pill
+                       variant="primary">
+                {{ filtersCount }}
+              </b-badge>
+              <span class="pl-2  pr-2">Filters</span>
+
+            </compact-btn>
+            <compact-btn
+              borderless
+              customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+              variant="outlined-light"
+              v-if="hasAppliedFilters"
+              :disabled="!hasAppliedFilters"
+              @clicked="resetFilters">
+              <i class="fa fa-times"></i>
+            </compact-btn>
+          </div>
         </div>
       </div>
     </template>
 
     <template slot="table">
       <datatable
+        scroll-area-class="static-list-add-item"
         :stickyHeaders="true"
         :columns="columns"
         :hasMore="hasMore"
@@ -104,6 +130,10 @@
       </datatable>
     </template>
 
+    <template slot="filters">
+      <contacts-filters @filtersUpdated="updateFilterHasChanges"
+                        @filtersCount="updateFiltersCount"/>
+    </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
     </template>
@@ -122,10 +152,12 @@ import TableRow from 'src/components/table-row.vue'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import ContactsFilters from 'components/contacts/contacts-filters'
 
 export default {
   mixins: [contactsMixins],
   components: {
+    ContactsFilters,
     CompactBtn,
     ContactsScreen,
     Search,
@@ -143,12 +175,13 @@ export default {
   data () {
     return {
       checked: [],
-      id: 'all'
+      id: 'all',
+      filterHasChanges: false
     }
   },
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'isFiltersOpen']),
     items () {
       if (this.listItems[this.id]) {
         return this.listItems[this.id].data
@@ -166,23 +199,33 @@ export default {
         return this.listItems[this.id].current_page
       }
       return 1
+    },
+    hasAppliedFilters () {
+      return this.filtersCount > 0
+    },
+    isResetDisabled () {
+      return !this.filterHasChanges
     }
   },
   methods: {
     ...mapActions('contacts', [
       'columnsOpen',
       'openFilters',
+      'closeFilters',
       'contactsLoaded',
-      'columnsReordered'
+      'columnsReordered',
+      'setShouldUpdateSelectedListContactCount'
     ]),
     addSelectedContacts () {
       this.isLoading = true
+      this.closeFilters()
       return this.$axios
         .post('api/v2/contact-list-items', {
           contact_list_id: this.contactList.id,
           contacts: this.checked
         })
         .then(() => {
+          this.setShouldUpdateSelectedListContactCount(true)
           this.$router.push('/contacts/list/' + this.contactList.id)
           this.$generalNotification('Selected contacts were successfully added')
         })
@@ -201,6 +244,7 @@ export default {
       )
     },
     onCancel () {
+      this.closeFilters()
       this.$router.push('/contacts/list/' + this.contactList.id)
     },
     onColumnsReordered (nextColumns) {
@@ -223,6 +267,31 @@ export default {
     },
     onCheckedRows (checked) {
       this.checked = checked
+    },
+    onFiltersClicked () {
+      if (this.isFiltersOpen) {
+        this.closeFilters()
+      } else {
+        this.openFilters()
+      }
+    },
+    resetFilters (resetSearch = false) {
+      const defaultFilters = this.fixDefaultFilters()
+      this.setCurrentListFilters(defaultFilters)
+      if (resetSearch) {
+        this.resetSearch()
+      }
+      this.$VueEvent.fire('filters-reset')
+      this.filterHasChanges = false
+    },
+    hasFilterChanges () {
+      return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
+    },
+    updateFilterHasChanges () {
+      this.filterHasChanges = this.hasFilterChanges()
+    },
+    updateFiltersCount (count) {
+      this.filtersCount = count
     }
   },
   mounted () {

@@ -1,7 +1,7 @@
 export const STATIC = 1
 export const DYNAMIC = 2
 
-export const DEFAULT_LIST = {
+export const DEFAULT_FILTER_LIST = {
   IN_QUEUE: {
     id: 'in-queue',
     name: 'In Queue',
@@ -29,6 +29,78 @@ export const DEFAULT_LIST = {
   }
 }
 
+export const DIRECTORY_LIST = [
+  {
+    id: 1,
+    label: 'Interested Leads',
+    disabled: false,
+    children: []
+  },
+  {
+    id: 2,
+    label: 'Outbound Sales',
+    disabled: false,
+    children: [
+      {
+        id: 3,
+        label: 'Google Map Scraping',
+        disabled: false,
+        children: [
+          {
+            id: 4,
+            label: 'Untitled List',
+            disabled: false,
+            children: []
+          },
+          {
+            id: 5,
+            label: 'Chicago',
+            disabled: false,
+            children: []
+          },
+          {
+            id: 6,
+            label: 'Important Contacts',
+            disabled: false,
+            children: []
+          }
+        ]
+      },
+      {
+        id: 7,
+        label: 'ZoomInfo List Aug\'21',
+        disabled: false,
+        children: [
+          {
+            id: 8,
+            label: 'Temporary List',
+            disabled: false,
+            children: []
+          },
+          {
+            id: 9,
+            label: 'New York',
+            disabled: false,
+            children: []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 10,
+    label: 'Company Wide Outbound Sales',
+    disabled: false,
+    children: [
+      {
+        label: 'Missed Calls',
+        disabled: false,
+        children: []
+      }
+    ]
+  }
+]
+
 export const ALL_COLUMNS = [
   {
     default: true,
@@ -46,7 +118,7 @@ export const ALL_COLUMNS = [
     draggable: false,
     resizable: true,
     default: true,
-    minWidth: 225
+    minWidth: 150
   },
   {
     name: 'phone_number',
@@ -57,7 +129,7 @@ export const ALL_COLUMNS = [
     draggable: true,
     resizable: true,
     default: false,
-    minWidth: 225
+    minWidth: 150
   },
   {
     name: 'date_added',
@@ -68,7 +140,7 @@ export const ALL_COLUMNS = [
     draggable: true,
     resizable: true,
     default: false,
-    minWidth: 225
+    minWidth: 150
   },
   {
     name: 'tags',
@@ -79,7 +151,7 @@ export const ALL_COLUMNS = [
     draggable: true,
     resizable: true,
     default: false,
-    minWidth: 225
+    minWidth: 150
   },
   {
     name: 'pd_status',
@@ -90,7 +162,7 @@ export const ALL_COLUMNS = [
     draggable: true,
     resizable: true,
     default: false,
-    minWidth: 225
+    minWidth: 150
   },
   {
     name: 'actions',
@@ -103,6 +175,10 @@ export const ALL_COLUMNS = [
     default: false,
     minWidth: 50
   }
+]
+
+export const WARM_UP_PERIOD_LIST = [
+  'No Warm Up'
 ]
 
 export const TEST_DATA = [
@@ -256,7 +332,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -386,7 +462,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -748,7 +824,7 @@ export const TEST_DATA = [
             'label': 'Name',
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -825,7 +901,7 @@ export const TEST_DATA = [
             'label': 'Name',
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -897,7 +973,7 @@ export const TEST_DATA = [
             'label': 'First Name',
             'default': false,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'sortable': true,
             'draggable': true,
             'resizable': true
@@ -907,7 +983,7 @@ export const TEST_DATA = [
             'label': 'Last Name',
             'default': false,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'sortable': true,
             'draggable': true,
             'resizable': true
@@ -1219,7 +1295,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -1349,7 +1425,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -1479,7 +1555,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -1609,7 +1685,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -1977,7 +2053,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -1989,7 +2065,7 @@ export const TEST_DATA = [
             'order': 1,
             'default': false,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'sortable': true,
             'draggable': true,
             'resizable': true
@@ -2000,7 +2076,7 @@ export const TEST_DATA = [
             'order': 2,
             'default': false,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'sortable': true,
             'draggable': true,
             'resizable': true
@@ -2216,7 +2292,7 @@ export const TEST_DATA = [
             'label': 'Name',
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -2288,7 +2364,7 @@ export const TEST_DATA = [
             'label': 'First Name',
             'default': false,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'sortable': true,
             'draggable': true,
             'resizable': true
@@ -2298,7 +2374,7 @@ export const TEST_DATA = [
             'label': 'Last Name',
             'default': false,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'sortable': true,
             'draggable': true,
             'resizable': true
@@ -2610,7 +2686,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,
@@ -2740,7 +2816,7 @@ export const TEST_DATA = [
             'order': 0,
             'default': true,
             'category': 0,
-            'minWidth': 225,
+            'minWidth': 150,
             'required': true,
             'sortable': true,
             'draggable': false,

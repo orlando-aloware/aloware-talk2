@@ -1,7 +1,9 @@
 <template>
   <contacts-add-items-static
     v-if="isLoaded && contactList.type === ContactListType.STATIC"
+    :id="contactList.id"
     :contactList="contactList"
+    :name="contactList.name"
   />
   <contacts-view
     v-else-if="isLoaded && contactList.type === ContactListType.DYNAMIC"
@@ -80,7 +82,7 @@ export default {
   },
   mounted () {
     this.loadList(this.$route.params.id)
-    if (this.contactList.type === this.ContactListType.DYNAMIC) {
+    if (this.contactList && this.contactList.type === this.ContactListType.DYNAMIC) {
       this.openFilters()
     }
   },

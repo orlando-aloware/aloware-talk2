@@ -3,16 +3,18 @@
     <template v-for="column in fixedColumns">
       <td
         :key="column.name"
-        class="text-center pull-left datatable-row__checkbox"
+        class="text-left pull-left datatable-row__checkbox"
         v-if="column.name === 'checkbox'"
       >
-        <input
-          type="checkbox"
-          class="checker"
-          :value="contact.id"
-          :checked="checked.find(item => item.id === contact.id)"
-          @change="onCheckerClicked"
-        />
+
+        <label class="custom-checkbox-container">
+          <input type="checkbox"
+                 class="checker"
+                 :value="contact.id"
+                 :checked="checked.find(item => item.id === contact.id)"
+                 @change="onCheckerClicked"/>
+          <span class="checkmark"></span>
+        </label>
       </td>
 
       <td
@@ -31,7 +33,7 @@
             >
               <a :href="href"
                  @click="navigate"
-                 class="d-flex align-items-center item"
+                 class="d-flex align-items-center item contact-name"
               >
                 <template v-if="contact.name">
                   <div class="ellipse">
@@ -122,46 +124,37 @@
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'unread_count'"
       >
         <span
-          class="badge badge-danger"
+          class="badge badge-danger unread-text bg-red-80"
           v-if="contact.unread_count > 0">
-          {{ contact.unread_count }}
-        </span>
-        <span v-else>
           {{ contact.unread_count }}
         </span>
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'unread_missed_call_count'"
       >
         <span
-          class="badge badge-danger"
+          class="badge badge-danger unread-text bg-red-80"
           v-if="contact.unread_missed_call_count > 0">
-          {{ contact.unread_missed_call_count }}
-        </span>
-        <span v-else>
           {{ contact.unread_missed_call_count }}
         </span>
       </td>
 
       <td
-        class="text-center"
+        class="text-left"
         :key="column.name"
         v-else-if="column.name === 'unread_voicemail_count'"
       >
         <span
-          class="badge badge-danger"
+          class="badge badge-danger unread-text bg-red-80"
           v-if="contact.unread_voicemail_count > 0">
-          {{ contact.unread_voicemail_count }}
-        </span>
-        <span v-else>
           {{ contact.unread_voicemail_count }}
         </span>
       </td>
@@ -197,28 +190,28 @@
       </td>
 
       <td
-        class="text-center datatable-row__actions"
+        class="text-left datatable-row__actions"
         :key="column.name"
         v-else-if="column.name === 'actions'"
       >
         <div>
           <button
-            class="btn btn-sm btn-link datatable-row__actions__action--call"
+            class="btn btn-sm btn-link datatable-row__actions__action--call pl-0"
             @click="onCall"
           >
-            <i class="fa fa-phone"></i>
+            <call-o-icon color="#62666E"></call-o-icon>
           </button>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--chat"
             @click="onMessage"
           >
-            <i class="fa fa-comment"></i>
+            <message-o-icon></message-o-icon>
           </button>
           <button
             @click="onRemove"
             class="btn btn-sm btn-link datatable-row__actions__action--trash"
           >
-            <i class="fa fa-trash-alt"></i>
+            <trash-o-icon></trash-o-icon>
           </button>
         </div>
       </td>
@@ -299,9 +292,15 @@ import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
 import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
+import CallOIcon from 'components/icons/call-o-icon'
+import MessageOIcon from 'components/icons/message-o-icon'
+import TrashOIcon from 'components/icons/trash-o-icon'
 
 export default {
   components: {
+    TrashOIcon,
+    MessageOIcon,
+    CallOIcon,
     Avatar
   },
   props: {

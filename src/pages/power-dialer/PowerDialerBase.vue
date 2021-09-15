@@ -5,7 +5,9 @@
 </template>
 
 <script>
+
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
+
 export default {
   name: 'PowerDialerViewAll',
   components: {

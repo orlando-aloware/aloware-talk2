@@ -1,8 +1,6 @@
 <template>
   <div class="folders">
-    <div
-      class="folders__header d-flex align-items-center border-top"
-    >
+    <div class="folders__header d-flex align-items-center border-top list--header">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         My Lists
       </div>
@@ -37,7 +35,7 @@
       <button
         class="btn btn-link btn-sm tooltip-target mr-1"
         id="bs-folder-options">
-        <i class="fa fa-plus text-success"></i>
+        <i class="fa fa-plus text-primary"></i>
       </button>
     </div>
 

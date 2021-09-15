@@ -19,6 +19,11 @@
       "name": "Untitled Section",
       "timeline": "This Week So Far",
       "id": 4
+    },
+    {
+      "name": "Untitled",
+      "timeline": "Recent (Last 30 days + Today)",
+      "id": 5
     }
   ],
   "metrics": [

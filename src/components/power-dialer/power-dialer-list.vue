@@ -41,6 +41,25 @@
           :layer="0" />
       </template>
     </div>
+    <!-- <MyDirectory :directory="directoryList">
+      <template slot-scope="props">
+        <div
+          v-if="props.item.children.length > 0"
+          class="text-weight-medium pl-1">
+          <FolderIcon class="mr-1 mb-1" />
+          {{ props.item.label }}
+        </div>
+        <div
+          v-else
+          class="text-weight-medium pl-4">
+          <router-link
+            class="tree-list-item text-body2"
+            :to="`/power-dialer/list/${props.item.id}`">
+            {{ props.item.label }}
+          </router-link>
+        </div>
+      </template>
+    </MyDirectory> -->
   </div>
 </template>
 
@@ -49,12 +68,17 @@
 import { mapGetters } from 'vuex'
 import DirectoryFolder from './directories/directory-folder'
 import DirectoryFolderCreate from './directories/directory-folder-create'
+// import MyDirectory from './directories/directory'
+// import FolderIcon from 'components/icons/folder-icon'
+import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerResourcesList',
   components: {
     DirectoryFolder,
     DirectoryFolderCreate
+    // MyDirectory,
+    // FolderIcon
   },
   computed: {
     ...mapGetters('powerDialer', [
@@ -62,6 +86,9 @@ export default {
     ]),
     list () {
       return this.powerDialerList || []
+    },
+    directoryList () {
+      return DIRECTORY_LIST
     }
   },
   data () {

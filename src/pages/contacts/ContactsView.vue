@@ -2,9 +2,18 @@
   <contacts-screen v-if="list" :loading="isLoadingDisabled">
     <template slot="title">
       <div class="d-flex flex-column">
-        <div class="pr-2">{{ list.name }}</div>
-        <div class="small text-muted">
-          {{ listItemsTotalContacts | numFormat }} contacts found
+        <div class="pr-2">
+          <folder-static-icon class="mr-1 title-static-icon"
+                              height="20"
+                              width="20"
+                              v-if="list.type === ContactListTypes.STATIC">
+          </folder-static-icon>
+          <folder-dynamic-icon class="mr-1"
+                               height="20"
+                               width="20"
+                               v-if="list.type === ContactListTypes.DYNAMIC">
+          </folder-dynamic-icon>
+          <span>{{ list.name }}</span>
         </div>
       </div>
     </template>
@@ -42,33 +51,42 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1"></div>
-        <div class="mr-4">
-          <span class="small text-muted">{{ listItemsDataCount }} of {{ listItemsTotalContacts }} Contacts</span>
+        <div class="mr-3">
+          <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
+          <span class="small text-muted fs-13" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</span>
         </div>
-        <compact-btn
-          borderless
-          :variant="filterButtonVariant"
-          customClass="mr-2"
-          @clicked="onFiltersClicked"
-        >
-          Filters
-          <b-badge class="ml-1 mt-1"
-                   pill
-                   :variant="filterBadgeVariant">
-            {{ filtersCount }}
-          </b-badge>
-        </compact-btn>
-        <compact-btn
-          customClass="mr-2"
-          borderless
-          :variant="resetButtonVariant"
-          :disabled="isResetDisabled"
-          @clicked="resetFilters"
-        >
-          Reset
-        </compact-btn>
+        <div class="v-divider">
+        </div>
+        <div :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
+          <compact-btn
+            borderless
+            variant="outlined-light"
+            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
+            @clicked="onFiltersClicked"
+          >
+            <b-badge v-if="hasAppliedFilters"
+                     class="ml-2 mt-1"
+                     pill
+                     variant="primary">
+              {{ filtersCount }}
+            </b-badge>
+            <span class="pl-2  pr-2">Filters</span>
+
+          </compact-btn>
+          <compact-btn
+                       borderless
+                       customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+                       variant="outlined-light"
+                       v-if="hasAppliedFilters"
+                       :disabled="isResetDisabled"
+                       @clicked="resetFilters">
+            <i class="fa fa-times"></i>
+          </compact-btn>
+        </div>
+
         <compact-btn
           variant="primary"
+          v-if="selectedList.type !== ContactListType.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
           :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
@@ -78,15 +96,19 @@
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
         <b-dropdown text="Add Contacts"
-                    no-caret
                     right
-                    variant="primary"
-                    class="m-2 b-compact-dropdown-button text-bold"
+                    no-caret
+                    variant="light"
+                    class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
+          <template #button-content>
+            Add Contacts
+            <i class="fa fa-chevron-down fs-12"></i>
+          </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <i class="fa fa-search mr-1"></i> Select Contact
+            <i class="fa fa-search mr-1"></i> Select Contacts
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
             <i class="fa fa-plus mr-1"></i>
@@ -99,8 +121,11 @@
         <b-dropdown text="..."
                     no-caret
                     right
-                    variant="outline-secondary"
-                    class="m-2 b-compact-dropdown-button text-bold">
+                    variant="light"
+                    class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+          <template #button-content>
+            <i class="fa fa-ellipsis-h"></i>
+          </template>
           <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
@@ -187,9 +212,13 @@ import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
+import FolderStaticIcon from 'components/icons/folder-static-icon'
+import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 
 export default {
   components: {
+    FolderDynamicIcon,
+    FolderStaticIcon,
     ContactCreateModal,
     ContactsFilters,
     BulkActionMenu,
@@ -226,7 +255,9 @@ export default {
       'createListOpen',
       'setCurrentListFilters',
       'removeListOpen',
-      'resetSearch'
+      'resetSearch',
+      'setShouldUpdateSelectedListContactCount',
+      'setSelectedListContactCount'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -291,6 +322,7 @@ export default {
       return this.$axios
         .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
         .then(() => {
+          this.setSelectedListContactCount(this.listItemsTotalContacts)
           this.initialListFilters = this.currentListFilters
           this.updateFilterHasChanges()
           this.isUpdatingList = false
@@ -327,6 +359,7 @@ export default {
     onContactCreated (contact) {
       if (this.list.type === this.ContactListType.STATIC) {
         talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
+          this.setShouldUpdateSelectedListContactCount(true)
           this.fetch()
         })
       } else {
@@ -385,22 +418,28 @@ export default {
       }
 
       return false
+    },
+    hasAppliedFilters () {
+      return this.filtersCount > 0
     }
   },
   mounted () {
+    this.setShouldUpdateSelectedListContactCount(true)
     this.fetch()
     // force close filter
-    // this.closeFilters()
+    this.closeFilters()
   },
   watch: {
     '$route.params.id': function () {
       this.resetFilters()
       this.initialListFilters = this.currentListFilters
       this.myContacts = false
+      this.setShouldUpdateSelectedListContactCount(true)
     },
     currentListFilters: {
       deep: true,
       handler: function () {
+        // this.setSelectedListContactCount(this.listItemsTotalContacts)
         this.fetch(typeof this.currentListFilters === 'string' ? [] : this.currentListFilters)
         this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }

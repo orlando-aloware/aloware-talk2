@@ -10,12 +10,8 @@
         class="folder d-flex align-items-center">
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon pl-2">
-          <FolderStaticIcon
-            v-if="type === ContactListTypes.STATIC" />
-          <FolderDynamicIcon
-            v-if="type === ContactListTypes.DYNAMIC" />
         </div>
-        <div class="folder__name">
+        <div class="folder__name pl-3">
           <input
             :id="'folder-input-' + id"
             v-if="isEditing"
@@ -67,8 +63,6 @@
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderOption from 'components/icons/folder-option'
-import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import ListActions from './../../list-actions'
 import errorMessages from 'src/plugins/helpers/extract-error-message'
 
@@ -78,8 +72,6 @@ export default {
   name: 'DirectoryListItem',
   components: {
     FolderOption,
-    FolderStaticIcon,
-    FolderDynamicIcon,
     ListActions
   },
   computed: {

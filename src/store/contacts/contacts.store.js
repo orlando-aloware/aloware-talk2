@@ -120,8 +120,10 @@ export default function () {
     selectedContacts: {},
     selectedList: {
       id: 'all',
-      name: 'All Contacts'
+      name: 'All Contacts',
+      contactCount: 0
     },
+    shouldUpdateSelectedListContactCount: false,
     selectedStaticList: {
       id: null,
       name: '',

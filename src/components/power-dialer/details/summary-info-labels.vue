@@ -3,7 +3,7 @@
     <div
       v-for="(info, key) in infos"
       :key="key"
-      class="summary-info-labels__div d-flex px-4">
+      class="summary-info-labels__div d-flex px-4 pt-1">
       {{ info.label}} <strong class="pl-2">{{ info.value }}</strong>
     </div>
   </div>

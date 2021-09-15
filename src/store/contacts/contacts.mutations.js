@@ -145,6 +145,14 @@ export default {
     state.selectedList = { ...state.selectedList, ...payload }
   },
 
+  SET_SELECTED_LIST_CONTACT_COUNT: (state, count) => {
+    state.selectedList = { ...state.selectedList, contactCount: count }
+  },
+
+  SET_SHOULD_UPDATE_SELECTED_LIST_CONTACT_COUNT: (state, shouldUpdate = false) => {
+    state.shouldUpdateSelectedListContactCount = shouldUpdate
+  },
+
   SET_SELECTED_STATIC_LIST: (state, payload) => {
     state.selectedStaticList = { ...state.selectedStaticList, ...payload }
   },
