@@ -455,7 +455,7 @@ export default {
         this.showRefreshButton = false
       }).catch(() => {
         if (this.$route.name !== 'Login') {
-          this.$router.push({ name: 'Login' }).catch((err) => {
+          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } }).catch((err) => {
             console.log(err)
             this.showRefreshButton = true
           })

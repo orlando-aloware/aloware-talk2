@@ -210,7 +210,7 @@ export default {
   },
 
   created () {
-    this.contact_id = _.get(this.$route, 'params.id', null)
+    this.contactId = _.get(this.$route, 'params.id', null)
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })
@@ -241,7 +241,7 @@ export default {
 
     this.$VueEvent.listen('contact_audit_created', (data) => {
       // check data loaded
-      if (parseInt(data.contact_id) === parseInt(this.contact_id)) {
+      if (parseInt(data.contact_id) === parseInt(this.contactId)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
       }
@@ -497,7 +497,7 @@ export default {
 
     loadMorePreviousActivities () {
       this.isLoadingPreviousActivities = true
-      this.fetchContactCommunications(this.contact_id).then(() => {
+      this.fetchContactCommunications(this.contactId).then(() => {
         this.isLoadingPreviousActivities = false
       }).catch(() => {
         this.isLoadingPreviousActivities = false
@@ -858,7 +858,7 @@ export default {
       // TODO: update contact name in title?
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
-      this.$VueEvent.fire('contact_selected', this.contact_id)
+      this.$VueEvent.fire('contact_selected', this.contactId)
       if (typeof callback !== 'undefined') {
         callback(selectedContact)
       }
