@@ -11,6 +11,7 @@
           class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
           spread
+          dense
           unelevated
           toggle-color="grey-90"
           color="transparent"
