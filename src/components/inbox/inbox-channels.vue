@@ -70,6 +70,7 @@
           no-caps
           spread
           unelevated
+          dense
           toggle-color="grey-90"
           color="transparent"
           text-color="primary"
