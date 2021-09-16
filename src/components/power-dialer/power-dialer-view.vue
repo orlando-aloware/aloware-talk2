@@ -111,39 +111,18 @@
                     <td
                       v-if="column.name === 'checkbox'"
                       :key="key">
-                      <label class="custom-checkbox-container">
-                        <input
-                          type="checkbox"
-                          class="checker"
-                          :value="contact.id"
-                          :checked="checked.find(item => item.id === contact.id)" />
-                        <span class="checkmark"></span>
-                      </label>
+                      <CheckBox
+                        :resource="contact"
+                        :checked-items="checked" />
                     </td>
-                    <!-- COLUMN: Name -->
+                    <!-- COLUMN: Name  -->
                     <td
                       v-else-if="column.name === 'name'"
                       :key="column.name"
                       class="datatable-row__name">
-                      <div class="d-flex align-items-center">
-                        <div class="pr-2">
-                          <avatar :name="contact.name"/>
-                        </div>
-                        <div class="flex-grow-1">
-                          <router-link
-                            :to="`/power-dialer/${contact.id}`"
-                            v-slot="{ href, route, navigate }">
-                            <a :href="href"
-                              @click="navigate"
-                              class="d-flex align-items-center item contact-name">
-                              <template v-if="contact.name">
-                                <div class="ellipse">{{ contact.name | ucwords }}</div>
-                              </template>
-                              <template v-if="!contact.name">No Name</template>
-                            </a>
-                          </router-link>
-                        </div>
-                      </div>
+                      <NameWrapper
+                        :resource="contact"
+                        link-path="/power-dialer/" />
                     </td>
                     <!-- COLUMN: Phone Number -->
                     <td
@@ -174,6 +153,7 @@
                       <TagPopover
                         :resource="contact" />
                     </td>
+                    <!-- COLUMN: PD Status -->
                     <td
                       v-else-if="column.name === 'pd_status'"
                       :key="key">
@@ -183,9 +163,18 @@
                         :outline="true" />
                     </td>
                     <td
+                      v-else-if="column.name === 'actions'"
+                      :key="key">
+                      <button
+                        @click="onRemove(contact)"
+                        class="btn btn-sm btn-link datatable-row__actions__action--trash">
+                        <TrashOIcon />
+                      </button>
+                    </td>
+                    <td
                       v-else
                       :key="key">
-                      --- {{ column.name }}
+                      --
                     </td>
                   </template>
                 </template>
@@ -195,6 +184,47 @@
 
         </div>
       </div>
+      <ConfirmDialog
+        @close="closeModal"
+        id="dialogName-dsad3ds-4"
+        :is-open="isOpen"
+        :hide-header="true"
+        :hide-footer="true"
+        title="Are you really really sure?"
+        size="sm">
+        <div slot="content">
+          <div class="text-center text-h6 pb-4">
+            <TrashOIcon height="20" width="20" />
+            Remove Contact?
+          </div>
+          <div class="text-center py-3">
+            <div class="text-dark">
+              <div v-html="`Do you want to remove the contact: ${selectedItem.name}?`"></div>
+            </div>
+          </div>
+          <div class="row text-center pt-3 pb-0">
+            <div class="col-6 p-1">
+              <b-button
+                variant="dark-grey"
+                class="f-btn--cancel"
+                size="sm"
+                block
+                @click="{}">
+                Cancel
+              </b-button>
+            </div>
+            <div class="col-6 p-1">
+              <b-button
+                variant="danger"
+                size="sm"
+                block
+                @click="{}">
+                Remove
+              </b-button>
+            </div>
+          </div>
+        </div>
+      </ConfirmDialog>
     </template>
   </PowerDialerViewScreen>
 </template>
@@ -211,7 +241,11 @@ import SearchList from 'src/components/search'
 import StartDialing from './session-settings/start-dial-sessions-settings'
 import StatusChip from '../status-chip'
 import TagPopover from '../tag-popover'
+import CheckBox from '../checkbox-interactive'
+import NameWrapper from '../name-wrapper'
 import Breadcrumbs from 'src/components/breadcrumbs'
+import TrashOIcon from 'components/icons/trash-o-icon'
+import ConfirmDialog from 'components/confirm-dialog'
 import { DEFAULT_FILTER_LIST, ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
@@ -232,6 +266,10 @@ export default {
     TableRow,
     StatusChip,
     TagPopover,
+    CheckBox,
+    NameWrapper,
+    TrashOIcon,
+    ConfirmDialog,
     Breadcrumbs
   },
   computed: {
@@ -264,19 +302,31 @@ export default {
         return `/power-dialer/list/${this.$route.params.id}`
       }
       return '/power-dialer/list'
+    },
+    dialogName () {
+      return `remove-power-dialer-item-dialog-323`
     }
   },
   data () {
     return {
-      checked: []
+      checked: [],
+      isOpen: false,
+      selectedItem: { id: '' }
     }
   },
   methods: {
+    onRemove (obj) {
+      this.selectedItem = obj
+      this.isOpen = true
+    },
     processedLink (id = '') {
       return `${this.activeRoute.fullPath}/${id}`
     },
     onCheckedRows (data) {
       console.log('data from table : ', data)
+    },
+    closeModal () {
+      this.isOpen = false
     }
   }
 }

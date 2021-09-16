@@ -1,5 +1,6 @@
 <template>
   <b-modal
+    v-model="isOpen"
     :id="id"
     :size="size"
     :title="title"
