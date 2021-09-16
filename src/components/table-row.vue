@@ -1,6 +1,9 @@
 <template>
   <tr class="datatable-row">
-    <template v-for="column in fixedColumns">
+    <template v-if="customRowContent">
+      <slot name="custom-content" />
+    </template>
+    <template v-else v-for="column in fixedColumns">
       <td
         :key="column.name"
         class="text-left pull-left datatable-row__checkbox"
@@ -317,6 +320,10 @@ export default {
     },
     contactListId: {
       type: [Number, String]
+    },
+    customRowContent: {
+      type: Boolean,
+      default: false
     }
   },
 

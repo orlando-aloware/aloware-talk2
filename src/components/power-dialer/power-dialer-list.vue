@@ -4,12 +4,12 @@
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         POWER DIALER LISTS
       </div>
-      <button
+      <!-- <button
         size="sm"
         class="btn btn-link btn-sm tooltip-target mr-1"
         id="bs-folder-options">
         <i class="fa fa-plus text-primary"></i>
-      </button>
+      </button> -->
     </div>
     <div class="d-flex folders__content flex-column p-0">
       <DirectoryFolderCreate
@@ -55,7 +55,9 @@
           <router-link
             class="tree-list-item text-body2"
             :to="`/power-dialer/list/${props.item.id}`">
-            {{ props.item.label }}
+            <div class="link-item">
+              {{ props.item.label }}
+            </div>
           </router-link>
         </div>
       </template>

@@ -138,7 +138,8 @@ export default function (/* { ssrContext } */) {
       currentCompany: null,
       smsTemplates: [],
       tagsFullyLoaded: false,
-      prevRoute: null
+      prevRoute: null,
+      breadcrumbs: ''
     },
 
     getters: {

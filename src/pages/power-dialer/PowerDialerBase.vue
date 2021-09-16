@@ -14,11 +14,14 @@ export default {
     PowerDialerView
   },
   computed: {
+    objId () {
+      return this.$route
+    },
     id () {
       if (this.$route.params.id) {
         return this.$route.params.id
       }
-      return 'all'
+      return 'in-queue'
     }
   },
   data () {
@@ -29,7 +32,7 @@ export default {
   watch: {
     '$route.params.id': function (id) {
       if (!id && this.$route.name === 'Power Dialer') {
-        id = 'all'
+        id = 'in-queue'
       }
       if (id && this.$route.name === 'Power Dialer') {
         // console.log('id :>> ', id)

@@ -56,12 +56,51 @@
 
           <LineSelector
             v-else-if="cform.name === 'line'"
+            v-model="resources[cform.name]"
             :multiple="false"
             :use-chips="true"
             :generic-styling="false"
             :generic-multiselect="false"
-            v-model="resources[cform.name]"
             @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')"></LineSelector>
+
+          <ScriptSelector
+            v-else-if="cform.name === 'phoneScript'"
+            v-model="resources[cform.name]"
+            :communication="true"
+            class="w-100"></ScriptSelector>
+
+          <CallDispositionSelector
+            v-else-if="cform.name === 'setCallDispostionShortcuts'"
+            v-model="resources[cform.name]"
+            :multiple="false"
+            :highlighted="isChanged('call_dispositions')"
+            @change="{}"></CallDispositionSelector>
+
+          <ContactDispositionSelector
+            v-else-if="cform.name === 'setContactDispostionShortcuts'"
+            v-model="resources[cform.name]"
+            :generic-styling="false"
+            :multiple="false"
+            :use-chips="false"
+            :outlined="true"
+            :show-placeholder="false"
+            custom-class="generic-selector"
+            @change="{}">
+          </ContactDispositionSelector>
+
+          <VmDropSelector
+            v-else-if="cform.name === 'setVmDropShortcuts'"
+            v-model="resources[cform.name]"
+            class="w-100"
+            @change="{}">
+          </VmDropSelector>
+
+          <p v-else-if="cform.name === 'skipOutsideDaytimeHours'">
+            <q-toggle
+              v-model="resources[cform.name]"
+              size="md"
+              val="md" />
+          </p>
 
           <q-select
             v-else-if="cform.name === 'warmupPeriod'"
@@ -70,12 +109,14 @@
             ref="warmupPeriod"
             :options="warmUpPeriods"
             outlined dense
+            class="generic-selector"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"></q-select>
 
           <q-select
             v-else
             v-model="resources[cform.name]"
             :options="[]"
+            class="generic-selector"
             outlined dense />
 
         </div>
@@ -88,6 +129,10 @@
 
 import { mapState } from 'vuex'
 import LineSelector from 'components/generic-selectors/line-selector'
+import ScriptSelector from 'components/generic-selectors/script-selector'
+import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
+import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
+import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { METRIC_OPTIONS_2 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -103,7 +148,11 @@ export default {
     }
   },
   components: {
-    LineSelector
+    LineSelector,
+    ScriptSelector,
+    ContactDispositionSelector,
+    VmDropSelector,
+    CallDispositionSelector
   },
   computed: {
     ...mapState('inbox', [
@@ -156,7 +205,7 @@ export default {
         warmupPeriod: '',
         phoneScript: '',
         setSessionMetrics: '',
-        setCallDispostionShortcuts: '',
+        setCallDispostionShortcuts: [],
         setContactDispostionShortcuts: '',
         setVmDropShortcuts: ''
       }
