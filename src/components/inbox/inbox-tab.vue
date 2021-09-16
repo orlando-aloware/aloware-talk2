@@ -162,7 +162,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setContacts', 'setSelectedContact']),
+    ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact']),
     loadContactTasks () {
       this.isFetchingContacts = true
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
@@ -339,6 +339,14 @@ export default {
           this.setContacts(contacts)
         }
       })
+    })
+
+    this.$VueEvent.listen('update_communication', communication => {
+      if (!communication.contact_id) {
+        return
+      }
+
+      this.setContact(communication)
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {

@@ -106,7 +106,6 @@ export default {
 
   mounted () {
     if (this.authenticated) {
-      this.contactId = this.$route.params.id
       this.fetchContact()
     }
   },

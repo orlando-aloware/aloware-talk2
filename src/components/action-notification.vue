@@ -5,10 +5,11 @@
            :toast-class="toastClass"
            :header-class="headerClass"
            :toaster="position"
-           :no-auto-hide="['system', 'incomingCall'].includes(this.id)"
+           :no-auto-hide="noAutoHide"
            :id="id"
            :to="link"
            v-show="title.length > 0"
+           @hide="clearDateTimeInterval"
            @hidden="onHidden"
            @shown="autoClose">
     <div class="d-flex flex-row align-items-start">
@@ -23,19 +24,19 @@
       <div :class="[this.id !== 'incomingCall' ? 'w-100' : 'flex-grow-1']">
         <div class="d-flex flex-grow-1 align-items-baseline w-100">
           <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
-          <strong class="mr-auto text-white title">{{ title }}</strong>
-          <small class="mr-2 text-grey-82 time"
+          <strong class="mr-auto text-white title pr-1">{{ title }}</strong>
+          <small class="mr-2 text-grey-82 time text-nowrap"
                  v-if="id !== 'incomingCall'">
-            {{ dateTime | shortDateTimePassed(false) }}
+            {{ runningDateTime }}
           </small>
         </div>
         <div class="text-grey-81 pt-2 message-body text-break d-flex">
-          <div class="flex-grow-1">
-            <component class="message-icon"
+          <div class="flex-grow-1 d-flex align-items-center">
+            <component class="message-icon mr-1"
                        :is="messageIcon"
                        v-if="messageIcon"/>
-            <span class="message">
-              {{ message | nl2br(false) }}
+            <span class="message-text"
+                  v-html="$options.filters.nl2br(message, false)">
             </span>
           </div>
           <template v-if="id === 'sms' && attachment">
@@ -92,7 +93,9 @@ export default {
   data () {
     return {
       toastClass: '',
-      headerClass: ''
+      headerClass: '',
+      runningDateTime: null,
+      runningDateTimeInterval: null
     }
   },
   mounted () {
@@ -143,11 +146,21 @@ export default {
     },
     attachment () {
       return _.get(this.notifications[this.id], 'attachment', '')
+    },
+    noAutoHide () {
+      return ['system', 'incomingCall'].includes(this.id)
     }
   },
   methods: {
     autoClose () {
+      this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
+
+      if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
@@ -158,11 +171,25 @@ export default {
         this.$closeActionNotification(this.id)
       }
     },
+    runDateTimeInterval () {
+      if (this.dateTime) {
+        this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
+        this.runningDateTimeInterval = setInterval(() => {
+          this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
+        }, 60000)
+      }
+    },
+    clearDateTimeInterval () {
+      if (!this.noAutoHide) {
+        clearInterval(this.runningDateTimeInterval)
+      }
+    },
     onHidden () {
       if (this.id === 'call') {
         return
       }
 
+      this.clearDateTimeInterval()
       this.setNotifications({
         type: this.id,
         data: {
