@@ -788,7 +788,7 @@ export default {
       }, 5000)
     },
 
-    fetchIncomingNumber () {
+    fetchIncomingNumber: _.debounce(function () {
       this.contactIncomingNumber = null
       this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
         this.contactIncomingNumber = res.data
@@ -796,7 +796,7 @@ export default {
         this.$handleErrors(err.response)
         console.log(err)
       })
-    },
+    }, 200),
 
     checkEmailCapability () {
       if (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled) {

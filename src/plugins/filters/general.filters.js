@@ -515,6 +515,10 @@ const numberPlusFormatter = (value, limit = 99) => {
 }
 
 const parseMentionToView = (content) => {
+  if (!content) {
+    return content
+  }
+
   let markups = content.match(/(<user:([^>]+)>)/gi)
   let parsedBody = content
   let users = store().state['users']

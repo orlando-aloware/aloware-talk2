@@ -6466,6 +6466,10 @@ button.grey-90 {
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
+          .mention-tag {
+            color: $grey-81 !important;
+            font-weight: normal;
+          }
         }
         .attachment {
           border-radius: 5px;
