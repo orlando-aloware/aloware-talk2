@@ -534,7 +534,16 @@ const parseMentionToView = (content) => {
 }
 
 const parseMentionToMarkup = (content) => {
+  let parser = new DOMParser()
+  let doc = parser.parseFromString(content, 'text/html')
 
+  let spanEl = doc.querySelectorAll('span.mention-tag')
+  spanEl.forEach(function (value, i) {
+    let id = value.getAttribute('data-id')
+
+    value.parentNode.replaceChild(document.createTextNode('<user:' + id + '>'), value)
+  })
+  return doc.body.innerText
 }
 
 export default ({ Vue }) => {

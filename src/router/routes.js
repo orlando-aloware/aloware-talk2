@@ -43,14 +43,6 @@ const routes = [
             }
           },
           {
-            path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
-            name: 'Inbox Contact',
-            component: () => import('src/pages/contacts/Contact.vue'),
-            meta: {
-              title: 'Inbox'
-            }
-          },
-          {
             path: 'channels/:channel/contacts/:id/communications/:communicationId',
             name: 'Inbox Contact',
             component: () => import('src/pages/contacts/Contact.vue'),

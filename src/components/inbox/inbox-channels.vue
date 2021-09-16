@@ -5,7 +5,7 @@
              variant="white">
     <div class="w-100 h-100 d-flex flex-column">
 
-      <div class="header flex- w-100">
+      <div class="header flex- w-100" v-if="$route.params.channel !== 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper">
             <compact-btn v-if="hasChannelFilterChanges"
@@ -40,21 +40,44 @@
           </q-select>
         </div>
       </div>
+      <div class="header flex- w-100" v-if="$route.params.channel === 'mentions'">
+        <div class="calls-header__label w-100 d-flex justify-content-between pl-2 pr-2">
+          <div class="mention-filter-actions-wrapper mt-3">
+            <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
+            <user-selector :clearable="true"
+                           :hide-dropdown-icon="true"
+                           :outlined="false"
+                           :borderless="true"
+                           custom-placeholder="Filter by User"
+                           @change="userMentionSelected">
+            </user-selector>
+          </div>
+
+          <q-select class="m-0"
+                    borderless
+                    emit-value
+                    map-options
+                    v-model="filterRight"
+                    :options="optionsRight"
+                    :append="[{icon: 'ion-ios-arrow-down'}]"
+                    @input="sortFilter">
+          </q-select>
+        </div>
+      </div>
       <div class="w-100" v-if="$route.params.channel === 'mentions'">
         <q-btn-toggle
-          class="current-tasks border mx-2 mt-2 mb-1"
+          class="custom-toggle-button mx-2 mt-2 mb-1"
           no-caps
-          dense
           spread
           unelevated
-          toggle-color="grey-9"
-          color="white"
+          toggle-color="grey-90"
+          color="transparent"
           text-color="primary"
           :options="mentionTypeOptions"
           v-model="mentionType"
           @click="toggleMentionType">
           <template v-slot:one>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options">
+            <div class="d-flex justify-content-center align-items-center w-100 px-1 options">
                 <span class="text-left">
                   Received
                 </span>
@@ -62,7 +85,7 @@
           </template>
 
           <template v-slot:two>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
+            <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
                  :class="['active']">
                 <span class="text-left">
                   Sent
@@ -119,6 +142,8 @@ import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import * as MentionType from 'src/constants/mention-type'
 import TaskMentionList from 'components/inbox/channel-tasks/task-mention-list'
+import UserSelector from 'components/generic-selectors/user-selector'
+import SearchIcon from 'components/icons/search-icon'
 
 let scrollTimeout
 export default {
@@ -126,7 +151,7 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { TaskMentionList, FilterDialog, CompactBtn, TaskList },
+  components: { SearchIcon, UserSelector, TaskMentionList, FilterDialog, CompactBtn, TaskList },
 
   props: {
     filterType: {
@@ -226,13 +251,16 @@ export default {
           slot: 'two'
         }
       ],
-      mentionType: MentionType.TYPE_RECEIVED
+      mentionType: MentionType.TYPE_RECEIVED,
+      sorting: {
+        order: 'desc'
+      }
     }
   },
 
   created () {
     this.resetFilters()
-
+    this.setMentionType()
     this.$VueEvent.listen('new_communication', (data) => {
       // disable live dashboard for end clients
       if (this.hasRole('Company Reporter Access')) {
@@ -347,8 +375,15 @@ export default {
     let _this = this
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
       this.getCommunications(this.filter).then(function () {
-        if (_this.$route.name === 'Inbox Contact') {
-          let communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
+        if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(_this.$route.name)) {
+          let communication
+
+          if (_this.$route.name === 'Inbox Contact Mention Communication') {
+            communication = _this.communications.find(item => item.mention_subject_id.toString() === _this.$route.params.communicationId.toString())
+          } else {
+            communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
+          }
+          console.log(communication)
           if (communication) {
             _this.setSelectedCommunication(communication)
           }
@@ -574,8 +609,10 @@ export default {
 
       if (this.$route.params.channel === 'mentions') {
         api = talk2Api.V2.mentions
-        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page } }
+        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, mentioner_user_id: params.mentioner_user_id, mentioned_user_id: params.mentioned_user_id } }
       }
+
+      params = { ...params, order_by: this.sorting.order }
 
       return api.get({ params: params })
         .then(response => {
@@ -592,8 +629,15 @@ export default {
     loadMoreCommunications (params) {
       this.isLoadingMore = true
       this.isLoaded = false
-      talk2Api.V1.reports.communications
-        .get({ params: params })
+
+      let api = talk2Api.V1.reports.communications
+
+      if (this.$route.params.channel === 'mentions') {
+        api = talk2Api.V2.mentions
+        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page } }
+      }
+
+      return api.get({ params: params })
         .then(response => {
           this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
@@ -639,6 +683,35 @@ export default {
       })
     },
 
+    setMentionType () {
+      if (this.$route.params.channel === 'mentions') {
+        switch (this.$route.params.direction) {
+          case 'sent':
+            this.mentionType = MentionType.TYPE_SENT
+            break
+          case 'received':
+          default:
+            this.mentionType = MentionType.TYPE_RECEIVED
+        }
+      }
+    },
+
+    userMentionSelected (value) {
+      this.resetFilters()
+
+      if (this.mentionType === MentionType.TYPE_RECEIVED) {
+        this.filter.mentioner_user_id = value
+      }
+
+      if (this.mentionType === MentionType.TYPE_SENT) {
+        this.filter.mentioned_user_id = value
+      }
+    },
+
+    sortFilter (value) {
+      this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
+    },
+
     ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
 
@@ -653,8 +726,7 @@ export default {
       this.filter.search_text = value
       this.getCommunications(this.filter)
     },
-    'sort': function (value) {
-      this.filter.sort = value
+    'sorting.order': function () {
       this.getCommunications(this.filter)
     },
     '$route.name': function (value) {
@@ -665,6 +737,7 @@ export default {
     },
     '$route.params.status': function (value) {
       if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value)) {
+        this.resetFilters()
         this.getCommunications(this.filter)
       }
     },

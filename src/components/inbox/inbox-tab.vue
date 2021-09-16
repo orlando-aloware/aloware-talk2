@@ -8,49 +8,45 @@
       </calls-header>
       <div class="w-100">
         <q-btn-toggle
-          class="current-tasks border mx-2 mt-2 mb-1"
+          class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
-          dense
           spread
           unelevated
-          toggle-color="grey-9"
-          color="white"
+          toggle-color="grey-90"
+          color="transparent"
           text-color="primary"
           :options="options"
           v-model="currentTask"
           @click="onToggleStatus">
           <template v-slot:one>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                 :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-20' : 'active']">
-                <span class="text-left">
-                  Open
-                </span>
-              <span class="text-right">
+            <div class="d-flex justify-content-center w-100 options"
+                 :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
+              <span class="text-left">
+                Open
+              </span>
+              <span class="text-right task-count ml-1">
                   {{ taskCounts.open | numberPlusFormatter(99) }}
                 </span>
             </div>
           </template>
 
           <template v-slot:two>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                 :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-20' : 'active']">
-                <span class="text-left">
-                  Pending
-                </span>
-              <span class="text-right">
+            <div class="d-flex justify-content-centerw-100 options"
+                 :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-90' : 'active']">
+              <span class="text-left">
+                Pending
+              </span>
+              <span class="text-center task-count ml-1">
                   {{ taskCounts.pending | numberPlusFormatter(99) }}
                 </span>
             </div>
           </template>
 
           <template v-slot:three>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                 :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-20' : 'active']">
-                <span class="text-left">
+            <div class="w-100 options"
+                 :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-90' : 'active']">
+                <span class="text-center">
                   Closed
-                </span>
-              <span class="text-right">
-                  &nbsp;
                 </span>
             </div>
           </template>

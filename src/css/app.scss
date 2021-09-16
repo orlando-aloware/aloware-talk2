@@ -3988,8 +3988,8 @@ span.mention {
 }
 
 .q-item--active{
-  background: $grey-60 !important;
-  color: $grey-100 !important;
+  background: $primary !important;
+  color: $white !important;
 }
 
 .q-manual-focusable--focused{
@@ -6225,16 +6225,30 @@ table.datatable {
       margin-bottom: 10px;
     }
 
-    .saved-filters {
-      .filter-items {
+    .filter-items {
 
-        margin: 5px 0;
+      margin: 5px 0;
+      padding: 5px;
 
-        span {
-          font-size: 13px;
-          color: $grey-100;
-        }
+      span {
+        font-size: 13px;
+        color: $grey-100;
       }
+    }
+
+    .filter-items.active {
+      background: $grey-60;
+
+      border-radius: 5px;
+    }
+
+    .filter-group-title,
+    .filter-type-description {
+      padding: 5px;
+    }
+
+    .saved-filters {
+
     }
   }
 }
@@ -6605,3 +6619,85 @@ button.grey-90 {
     }
   }
 }
+
+
+.custom-toggle-button {
+  background: $grey-60;
+  padding: 5px;
+
+  button:not(:last-child),
+  button:not(:first-child) {
+    margin: 0 1px;
+  }
+
+  button.bg-transparent:hover {
+    .task-count {
+      background: transparent;
+    }
+  }
+
+  button {
+    border-radius: 5px !important;
+    border: none !important;
+
+    .options {
+      font-size: 14px !important;
+      font-weight: 500;
+      width: 100% !important;
+      text-align: center;
+      font-family: 'Inter', sans-serif !important;
+
+      .task-count {
+        background: $grey-60;
+        border-radius: 5px;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 0 2px;
+        color: $grey-90;
+        height: 21px;
+        width: 23px;
+      }
+    }
+  }
+}
+
+.mention-filter-actions-wrapper {
+
+  width: 65%;
+
+  div.search-icon {
+    margin-top: -2px;
+  }
+
+  .generic-selector {
+
+    margin-top: -3px;
+
+    .q-field__control:before {
+      border: none !important;
+    }
+
+    .q-field__native {
+      padding-left: 20px !important;
+
+      span {
+        font-size: 14px;
+        color: $grey-100;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 7vw;
+        overflow: hidden;
+      }
+    }
+
+    .q-field__input {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .q-field__marginal {
+      font-size: 14px;
+    }
+  }
+}
+

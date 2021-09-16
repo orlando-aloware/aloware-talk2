@@ -594,7 +594,7 @@
          v-html="$options.filters.nl2br(communication.notes)">
       </p>
     </div>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left notes-body"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
          v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
       <p class="text-left"
          v-html="$options.filters.textTruncate($options.filters.nl2br(parseBody), 2)">

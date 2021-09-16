@@ -133,7 +133,6 @@ export default {
 
     '$route.params.communicationId': function (value) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
-        console.log('hello')
         this.fetchContactCommunicationsUntilFound()
       }
     }

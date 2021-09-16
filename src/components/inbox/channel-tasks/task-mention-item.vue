@@ -90,7 +90,7 @@ export default {
     ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
 
     contactName () {
-      return 'No Name'
+      return this.mention.mention_subject.contact ? this.mention.mention_subject.contact.name : 'No Name'
     },
 
     directionSummaryText () {
@@ -135,7 +135,7 @@ export default {
       this.$router.push({
         name: 'Inbox Contact Mention Communication',
         params: {
-          id: '182965', // mention.contact_id.toString(),
+          id: mention.mention_subject.contact_id, // mention.contact_id.toString(),
           communicationId: mention.mention_subject_id,
           direction: this.direction,
           channel: 'mentions'
