@@ -35,7 +35,8 @@
             <component class="message-icon mr-1"
                        :is="messageIcon"
                        v-if="messageIcon"/>
-            <span class="message-text"
+            <span v-if="message"
+                  class="message-text"
                   v-html="$options.filters.nl2br(message, false)">
             </span>
           </div>
@@ -112,7 +113,8 @@ export default {
   computed: {
     ...mapState(['notifications', 'dialer']),
     message () {
-      return _.get(this.notifications[this.id], 'message', '')
+      const message = _.get(this.notifications[this.id], 'message', '')
+      return this.$options.filters.parseMentionToView(message)
     },
     messageIcon () {
       return _.get(this.notifications[this.id], 'messageIcon', null)

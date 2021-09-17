@@ -93,7 +93,7 @@ export default {
   mounted () {
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
-      this.setDefaultLine(this.contact.id)
+      // this.setDefaultLine(this.contact.id)
       this.showPlaceholder()
     }
   },
@@ -175,9 +175,9 @@ export default {
   watch: {
     selectedLine (value) {
       this.setSelectedLine(value)
-      if (value && this.contact && this.contact.id) {
-        this.getIncomingNumber()
-      }
+      // if (value && this.contact && this.contact.id) {
+      //   this.getIncomingNumber()
+      // }
     },
 
     'contact.id': function (value) {

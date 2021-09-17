@@ -91,8 +91,7 @@
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
         <div class=""
              v-if="communication.attachments && communication.attachments.length > 0">
-          <div class="px-2"
-               v-for="(attachment, index) in communication.attachments"
+          <div v-for="(attachment, index) in communication.attachments"
                :key="index">
             <q-img
               class="border-rounded img-fluid d-block r-2x mb-1"
