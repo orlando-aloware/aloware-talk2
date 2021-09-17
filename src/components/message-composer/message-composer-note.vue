@@ -22,9 +22,8 @@
           </template>
           <template v-slot:embeddedItem="props">
             <span>
-                <span class="mention-tag"
-                      :data-id="props.current.id"
-                      :data-key="generateKey(32)">
+                <span :data-id="props.current.id"
+                      class="mention-tag">
                   @{{ props.current.full_name }}
                 </span>
             </span>
@@ -66,7 +65,8 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
     validNote () {
-      return this.messageComposer.note.body && this.messageComposer.note.body.trim().length > 0
+      const content = this.messageComposer.note.body.replace(/(<([^>]+)>)/gi, '')
+      return content && content.trim().length > 0
     }
   },
   data () {
@@ -82,7 +82,7 @@ export default {
     },
     formatMessage () {
       return {
-        body: this.messageComposer.note.body,
+        body: this.$options.filters.parseMentionToMarkup(this.messageComposer.note.body),
         type: 10
       }
     },
@@ -91,20 +91,10 @@ export default {
       talk2Api.V1.contact.addEngagement(this.contact.id, this.formatMessage())
         .then(response => {
           this.resetMessageComposerNote()
-          this.$q.notify({
-            message: 'Note has been added.',
-            type: 'positive',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Note has been added.')
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            message: 'Error while adding note.',
-            type: 'negative',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while adding note.', 'error')
         }).finally(() => {
           this.isAdding = false
           // this.$refs.noteMessageBody.focus()
@@ -114,15 +104,6 @@ export default {
       return talk2Api.V1.users.withAccessToContact(this.contact.id).then(response => {
         this.items = response.data
       })
-    },
-    generateKey (length) {
-      let result = ''
-      let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-      let charactersLength = characters.length
-      for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-      }
-      return result
     },
     focusInput () {
       let el = document.getElementById('noteContentEditable')

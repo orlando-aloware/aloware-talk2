@@ -14,7 +14,7 @@
 
         <div class="mt-5">
           <div class="mb-4">
-            <b-button size="sm" block disabled>Create New</b-button>
+            <div class="filter-items active">Create New</div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
           <div class="saved-filters">
@@ -39,10 +39,13 @@
             <b-button size="sm"
                       :disabled="channelChangedFilterFields.length < 1"
                       @click="onResetFilter">Reset</b-button>
+
             <b-button size="sm"
-                      class="ml-1"
-                      variant="success"
-                      @click="hideModal">Close</b-button>
+                      class="ml-2 mr-2"
+                      variant="primary">Save</b-button>
+
+            <b-button size="sm"
+                      variant="primary">Save as New</b-button>
           </div>
         </div>
         <filter-form :filter="filter"></filter-form>
@@ -84,6 +87,8 @@ export default {
           return 'Messages'
         case ['voicemails'].includes(this.$route.params.channel):
           return 'Voicemails'
+        case ['mentions'].includes(this.$route.params.channel):
+          return 'Mentions'
         case ['calls', 'recordings'].includes(this.$route.params.channel):
         default:
           return 'Calls & Recordings'

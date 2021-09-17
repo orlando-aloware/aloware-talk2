@@ -169,26 +169,22 @@ export default {
           const data = response.data.data
           const message = response.data.message
 
-          this.$router.push(`/contacts/list/${data.id}?start=1`)
+          if (this.createList.mode === FROM_BULK_MENU) {
+            this.$router.push(`/contacts/list/${data.id}`)
+          } else {
+            this.$router.push(`/contacts/list/${data.id}?start=1`)
+          }
 
           this.createListClose()
 
-          this.$q.notify({
-            message,
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification(message)
 
           this.loadFolders()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
         .finally(() => {
           this.isLoading = false
@@ -200,16 +196,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   },

@@ -43,6 +43,135 @@ export default {
       .listen('.user.status.updated', (event) => {
         store().commit('SET_USER_STATUS', event.status)
       })
+      .listen('.user.in-app.contact.contact_assigned', (event) => {
+        let contact = event.contact
+        if (event.tags) {
+          contact.tags = event.tags
+          contact.tag_ids = contact.tags.map((a) => a.id)
+        }
+        if (event.user) {
+          contact.user = event.user
+        }
+        window.VueEvent.fire('new_in_app_contact_assigned', contact)
+      })
+      .listen('.user.in-app.appointment', (event) => {
+        let engagement = event.engagement
+        let contact = event.contact
+        let timeDiff = event.time_diff
+        let unit = event.unit
+        window.VueEvent.fire('new_in_app_appointment', { engagement, contact, timeDiff, unit })
+      })
+      .listen('.user.in-app.reminder', (event) => {
+        let engagement = event.engagement
+        let contact = event.contact
+        let timeDiff = event.timeDiff
+        let unit = event.unit
+        window.VueEvent.fire('new_in_app_reminder', { engagement, contact, timeDiff, unit })
+      })
+      .listen('.user.in-app.communication.new_call', (event) => {
+        let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+        if (campaign) {
+          let communication = event.communication
+          communication.campaign = campaign
+          if (event.tags) {
+            communication.tags = event.tags
+            communication.tag_ids = communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            communication.contact = event.contact
+          }
+          if (event.contact_tags && communication && communication.contact) {
+            communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            communication.owner = event.owner
+          }
+          window.VueEvent.fire('new_in_app_call', communication)
+        }
+      })
+      .listen('.user.in-app.communication.answered_call', (event) => {
+        let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+        if (campaign) {
+          let communication = event.communication
+          communication.campaign = campaign
+          if (event.tags) {
+            communication.tags = event.tags
+            communication.tag_ids = communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            communication.contact = event.contact
+          }
+          if (event.contact_tags && communication && communication.contact) {
+            communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            communication.owner = event.owner
+          }
+          window.VueEvent.fire('answered_in_app_call', communication)
+        }
+      })
+      .listen('.user.in-app.communication.new_sms', (event) => {
+        let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+        if (campaign) {
+          let communication = event.communication
+          communication.campaign = campaign
+          if (event.tags) {
+            communication.tags = event.tags
+            communication.tag_ids = communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            communication.contact = event.contact
+          }
+          if (event.contact_tags && communication && communication.contact) {
+            communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            communication.owner = event.owner
+          }
+          window.VueEvent.fire('new_in_app_sms', communication)
+        }
+      })
+      .listen('.user.in-app.communication.new_voicemail', (event) => {
+        let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+        if (campaign) {
+          let communication = event.communication
+          if (event.tags) {
+            communication.tags = event.tags
+            communication.tag_ids = event.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            communication.contact = event.contact
+          }
+          if (event.contact_tags && communication && communication.contact) {
+            communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            communication.owner = event.owner
+          }
+          window.VueEvent.fire('new_in_app_voicemail', communication)
+        }
+      })
+      .listen('.user.in-app.communication.new_fax', (event) => {
+        let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+        if (campaign) {
+          let communication = event.communication
+          communication.campaign = campaign
+          if (event.tags) {
+            communication.tags = event.tags
+            communication.tag_ids = communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            communication.contact = event.contact
+          }
+          if (event.contact_tags && communication && communication.contact) {
+            communication.contact.tags = event.contact_tags
+          }
+          if (event.owner) {
+            communication.owner = event.owner
+          }
+          window.VueEvent.fire('new_in_app_fax', communication)
+        }
+      })
       .listen('.user.desktop.contact.contact_assigned', (event) => {
         let contact = event.contact
         if (event.tags) {
@@ -174,6 +303,15 @@ export default {
           window.VueEvent.fire('new_desktop_fax', communication)
         }
       })
+      .notification((notification) => {
+        if (!this.profile.sleep_mode) {
+          switch (notification.type) {
+            case 'App\\Notifications\\MentionNotification':
+              window.VueEvent.fire('mention', notification)
+              break
+          }
+        }
+      })
     window.Echo.private('company-' + this.profile.company_id)
       .listen('.company.updated', (event) => {
         if (store().state.currentCompany && store().state.currentCompany.id === event.company.id) {
@@ -181,40 +319,43 @@ export default {
         }
       })
       .listen('.communication.created', (event) => {
+        let communication = event.communication
+        if (event.tags) {
+          communication.tags = event.tags
+          communication.tag_ids = communication.tags.map((a) => a.id)
+        }
+        if (event.contact) {
+          communication.contact = event.contact
+        }
+        if (event.owner) {
+          communication.owner = event.owner
+        }
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
         if (campaign) {
-          let communication = event.communication
           communication.campaign = campaign
-          if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = communication.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            communication.contact = event.contact
-          }
-          if (event.owner) {
-            communication.owner = event.owner
-          }
-          window.VueEvent.fire('new_communication', communication)
         }
+        window.VueEvent.fire('new_communication', communication)
       })
       .listen('.communication.updated', (event) => {
+        let communication = event.communication
+        if (event.tags) {
+          communication.tags = event.tags
+          communication.tag_ids = communication.tags.map((a) => a.id)
+        }
+        if (event.contact) {
+          communication.contact = event.contact
+        }
+        if (event.owner) {
+          communication.owner = event.owner
+        }
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
         if (campaign) {
-          let communication = event.communication
           communication.campaign = campaign
-          if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = communication.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            communication.contact = event.contact
-          }
-          if (event.owner) {
-            communication.owner = event.owner
-          }
-          window.VueEvent.fire('update_communication', communication)
         }
+        window.VueEvent.fire('update_communication', communication)
+      })
+      .listen('.communication.deleted', (event) => {
+        window.VueEvent.fire('delete_communication', event.communication)
       })
       .listen('.incoming_number.created', (event) => {
         let campaign = store().state.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
@@ -368,6 +509,10 @@ export default {
         window.VueEvent.fire('workflow_deleted', event.workflow)
       })
     window.Echo.join('online-users-company-' + this.profile.company_id)
+      // as long as this broadcast will fire, everyone on the presence channel will receive this event
+      .listen('.app.newversion', (event) => {
+        window.VueEvent.fire('new_version', event.data.message)
+      })
   },
 
   leave () {

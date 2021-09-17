@@ -1,7 +1,8 @@
 <template>
   <div>
-    <inbox-task-item v-for="contact in contacts" :key="contact.id"
+    <inbox-task-item v-for="(contact, index) in contacts" :key="`contact-item-${index}`"
                      :contact="contact"
+                     :loading-contact="loadingContacts"
                      @onItemSelected="onItemSelected">
     </inbox-task-item>
   </div>
@@ -15,6 +16,10 @@ export default {
   props: {
     contacts: {
       required: true
+    },
+    loadingContacts: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

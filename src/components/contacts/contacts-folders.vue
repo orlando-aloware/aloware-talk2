@@ -1,8 +1,6 @@
 <template>
   <div class="folders">
-    <div
-      class="folders__header d-flex align-items-center border-bottom border-top"
-    >
+    <div class="folders__header d-flex align-items-center border-top list--header">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         My Lists
       </div>
@@ -12,8 +10,7 @@
         triggers="click blur"
         placement="bottomright"
         boundary="window"
-        custom-class="contact-popover"
-      >
+        custom-class="contact-popover">
         <contact-menu>
           <contact-menu-item @click="onCreateFolderToggle">
             <template slot="icon">
@@ -38,7 +35,7 @@
       <button
         class="btn btn-link btn-sm tooltip-target mr-1"
         id="bs-folder-options">
-        <i class="fa fa-plus text-success"></i>
+        <i class="fa fa-plus text-primary"></i>
       </button>
     </div>
 
@@ -122,16 +119,7 @@ export default {
         })
         .catch((err) => {
           console.error(err)
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   },

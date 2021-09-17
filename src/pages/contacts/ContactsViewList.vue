@@ -35,6 +35,10 @@ export default {
   methods: {
     ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters', 'setSelectedList']),
     loadList (id) {
+      if (!id) {
+        id = 'all'
+      }
+
       const stringId = String(id)
 
       if (!this.listItems[stringId]) {
@@ -60,17 +64,12 @@ export default {
           if (response.type === DYNAMIC) {
             filters = response.filters
           }
-          console.log(filters)
           this.setCurrentListFilters(filters)
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
           this.$router.replace('/contacts/')
         })
     }

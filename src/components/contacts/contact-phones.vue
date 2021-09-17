@@ -14,22 +14,25 @@
                                  @composerMedia="setComposerVariables">
       </contact-phones-list-items>
 
-      <b-link id="btn-show-phone-form"
-              ref="phone_form"
+      <b-link ref="phone_form"
               href="#"
-              class="custom-link text-decoration-none">
+              class="custom-link text-decoration-none"
+              @click="onAddPhone">
         <plus-circle-icon></plus-circle-icon>
         Add Phone Number
       </b-link>
+
+      <q-menu content-class="mx-height-300"
+              ref="templatesMenu"
+              no-parent-event
+              no-focus
+              :offset="[284, -105]"
+              v-model="showPhonesForm">
+        <div class="row no-wrap q-pa-md">
+          <contact-phones-form :phone="phone" @close="onClosePhoneForm"></contact-phones-form>
+        </div>
+      </q-menu>
     </b-card>
-    <b-popover custom-class="contact-phone-popover z-index-1"
-               id="contact-phone-form-popover"
-               target="btn-show-phone-form"
-               triggers="focus"
-               :show.sync="showPhonesForm"
-               @hidden="onPopoverHidden">
-      <contact-phones-form @close="onClosePhoneForm"></contact-phones-form>
-    </b-popover>
   </div>
 </template>
 
@@ -69,7 +72,13 @@ export default {
       LRN_TYPE_LANDLINE,
       LRN_TYPE_WIRELESS,
       LRN_TYPE_VOIP,
-      LRN_TYPE_OTHER
+      LRN_TYPE_OTHER,
+      phone: {
+        id: null,
+        title: '',
+        number: '',
+        isPrimary: false
+      }
     }
   },
 
@@ -87,17 +96,30 @@ export default {
       })
     },
 
-    onEditPhone (phoneNumber) {
-      this.setContactSelectedPhone(phoneNumber)
-      this.$root.$emit('bv::show::popover', 'contact-phone-form-popover')
+    onAddPhone () {
+      this.setContactSelectedPhone(null)
+      this.phone = {
+        id: null,
+        title: '',
+        number: '',
+        isPrimary: 0
+      }
+      this.showPhonesForm = true
+    },
+
+    onEditPhone (phone) {
+      this.setContactSelectedPhone(phone)
+      this.phone = {
+        id: phone.id,
+        title: phone.title,
+        number: phone.phone_number,
+        isPrimary: phone.phone_number === this.contact.phone_number || false
+      }
+      this.showPhonesForm = true
     },
 
     onClosePhoneForm () {
       this.showPhonesForm = false
-    },
-
-    onPopoverHidden () {
-      this.setContactSelectedPhone(null)
     },
 
     onDeletePhone (phone) {
@@ -110,21 +132,11 @@ export default {
           this.isDeleting = true
           talk2Api.V1.contact.deletePhone(this.contact.id, phone.id)
             .then(response => {
-              this.$q.notify({
-                message: 'Phone number has been deleted.',
-                type: 'positive',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Phone number has been deleted.')
               this.getPhoneNumbers()
             }).catch(error => {
               console.log(error)
-              this.$q.notify({
-                message: 'Error while deleting phone number.',
-                type: 'negative',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Error while deleting phone number.', 'error')
             }).finally(() => {
               this.isDeleting = false
             })

@@ -36,13 +36,16 @@
         variant="danger"
         class="mr-2"
         v-if="hasSelected"
+        :disabled="isMoving"
         @clicked="onConfirmMove"
       >
-        Yes
+        <q-spinner-bars v-if="isMoving" color="white" />
+        {{ isMoving ? '' : 'Yes' }}
       </compact-btn>
       <compact-btn
         variant="outlined-light"
         v-if="hasSelected"
+        :disabled="isMoving"
         @clicked="closeMoveDialog"
       >
         No
@@ -70,7 +73,8 @@ export default {
   data () {
     return {
       searchValue: '',
-      itemsList: []
+      itemsList: [],
+      isMoving: false
     }
   },
   computed: {
@@ -99,31 +103,35 @@ export default {
       return this.moveFolderRequest()
     },
     moveFolderRequest () {
+      this.isMoving = true
       return this.$axios
         .patch('/api/v2/contact-folders/move/' + this.moveDialog.id, {
           parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
-        .then(this.reloadFolders)
+        .then(() => {
+          this.reloadFolders()
+          this.isMoving = false
+        })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
     },
     moveListRequest () {
+      this.isMoving = true
       return this.$axios
         .patch('/api/v2/contacts-list/' + this.moveDialog.id, {
           contact_folder_id: this.moveDialog.target
         })
-        .then(this.reloadFolders)
+        .then(() => {
+          this.reloadFolders()
+          this.isMoving = false
+        })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
     },
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
-      this.$q.notify({
-        message,
-        type: 'negative',
-        textColor: 'white',
-        html
-      })
+      console.log(html)
+      this.$generalNotification(message, 'error')
     },
     reloadFolders () {
       return this.$axios
@@ -131,16 +139,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
     filterByActiveId (items) {

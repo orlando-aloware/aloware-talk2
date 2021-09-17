@@ -1,10 +1,14 @@
 <template>
-  <q-select :options="vmDropOptions"
-            :placeholder="placeholder"
+  <q-select ref="vmDropSelect"
+            :options="vmDropOptions"
+            :placeholder="placeholderText"
             :loading="loadingVmDrops"
             :disable="disable || loadingVmDrops"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
+            :class="[ prepend ? 'with-prepend' : '', genericSelector ? 'generic-selector' : '', highlighted ? highlightedClass : '' ]"
+            :multiple="multiple"
+            :use-chips="useChips"
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            style="word-break: break-all;"
             v-model="vmDropId"
             options-selected-class="text-primary"
             color="primary"
@@ -16,6 +20,7 @@
             map-options
             outlined
             dense
+            @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -62,6 +67,38 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+
+    useChips: {
+      type: Boolean,
+      default: false
+    },
+
+    genericSelector: {
+      type: Boolean,
+      default: true
+    },
+
+    multiple: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
+    placeholder: {
+      type: String,
+      required: false,
+      default: 'Select a voicemail'
+    },
+
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
     }
   },
 
@@ -70,7 +107,8 @@ export default {
       vmDropId: this.value,
       vmDrops: [],
       vmDropOptions: [],
-      loadingVmDrops: false
+      loadingVmDrops: false,
+      selectWidth: 0
     }
   },
 
@@ -78,12 +116,12 @@ export default {
     ...mapGetters('auth', ['profile']),
     ...mapState(['currentCompany']),
 
-    placeholder () {
+    placeholderText () {
       if (this.vmDropId) {
         return ''
       }
 
-      return 'Select a voicemail'
+      return this.placeholder
     },
 
     vmDropAlphabeticalOrder () {
@@ -107,6 +145,9 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.vmDropSelect.$el.offsetWidth
+    },
 
     fetchVmDropFiles () {
       this.loadingVmDrop = true

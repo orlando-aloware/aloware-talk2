@@ -43,7 +43,6 @@
                   block
                   variant="primary"
                   size="sm"
-                  class="mt-2"
                   :disabled="isLoading || !selectedStaticList.id"
                   @click="onSubmit"
                 >
@@ -105,18 +104,14 @@ export default {
     },
     onSubmit () {
       if (!this.selectedStaticList.hasEdit) {
-        this.$q.notify({
-          message: 'You are not authorized to edit this resource.',
-          type: 'negative',
-          textColor: 'white'
-        })
+        this.$generalNotification('You are not authorized to edit this resource.', 'error')
         return
       }
 
       this.isLoading = true
       this.$axios
         .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, {
-          contacts: this.selectedContacts[this.selectedList.id]
+          contacts: this.selectedContacts[this.selectedList.id].map(item => item.id)
         })
         .then((response) => {
           const message = response.data.message
@@ -125,22 +120,14 @@ export default {
 
           this.selectListClose()
 
-          this.$q.notify({
-            message,
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification(message)
 
           this.loadFolders()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
         .finally(() => {
           this.isLoading = false
@@ -152,16 +139,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
   },

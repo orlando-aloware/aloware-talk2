@@ -50,15 +50,18 @@
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                   size="sm"
                   variant="light"
-                  id="btn-edit-contact-info">
+                  @click="onOpenEditForm">
           <pencil-o-icon></pencil-o-icon>
         </b-button>
-        <b-popover custom-class="edit-form-popover z-index-1"
-                   target="btn-edit-contact-info"
-                   triggers="focus"
-                   :show.sync="showEditForm">
-          <contact-name-form @close="onCloseEditForm"></contact-name-form>
-        </b-popover>
+        <q-menu content-class="mx-height-300"
+                no-focus
+                no-parent-event
+                :offset="[360, -76]"
+                v-model="showEditForm">
+          <div class="row no-wrap q-pa-md">
+            <contact-name-form @close="onCloseEditForm"></contact-name-form>
+          </div>
+        </q-menu>
       </div>
     </b-media>
     <div class="d-inline-flex flex-wrap contact-action-button">
@@ -194,6 +197,10 @@ export default {
       this.addAppointmentOpen(true)
     },
 
+    onOpenEditForm () {
+      this.showEditForm = true
+    },
+
     onCloseEditForm () {
       this.showEditForm = false
     },
@@ -205,19 +212,9 @@ export default {
 
       try {
         document.execCommand('copy')
-        this.$q.notify({
-          message: 'Phone number copied to clipboard.',
-          type: 'positive',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Phone number copied to clipboard.')
       } catch (err) {
-        this.$q.notify({
-          message: 'Error copying phone number to clipboard.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error copying phone number to clipboard.', 'error')
       }
 
       /* unselect the range */

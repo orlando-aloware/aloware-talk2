@@ -1333,7 +1333,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -1492,6 +1492,10 @@ export default {
     },
 
     shouldShow () {
+      if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
+        return false
+      }
+
       return this.dialer && this.dialer.communication
     }
   },
@@ -1555,19 +1559,9 @@ export default {
 
       try {
         document.execCommand('copy')
-        this.$q.notify({
-          message: 'Phone number copied to clipboard.',
-          type: 'positive',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Phone number copied to clipboard.')
       } catch (err) {
-        this.$q.notify({
-          message: 'Error copying phone number to clipboard.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error copying phone number to clipboard.', 'error')
       }
 
       /* unselect the range */
@@ -1587,7 +1581,7 @@ export default {
 
     answerCall () {
       this.$VueEvent.fire('answerCall')
-      this.screen = 'menu'
+      this.changeScreen('menu')
     },
 
     rejectCall () {
@@ -1924,13 +1918,7 @@ export default {
         this.vmDropId = null
         this.loadingSendVmDrop = false
         this.saveAndResetExpansion($event)
-        this.$q.notify({
-          offset: 95,
-          title: 'Phone',
-          message: 'Voicemail left',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Voicemail left')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {
@@ -1951,13 +1939,7 @@ export default {
         this.template = null
         this.templateId = null
         this.loadingSendMessage = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Phone',
-          message: 'Message sent',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Message sent')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {
@@ -2083,6 +2065,15 @@ export default {
       }
     },
 
+    changeScreen (screen) {
+      // don't go from wrap-up to menu (edge case)
+      if (this.screen === 'wrap_up' && screen === 'menu') {
+        return
+      }
+
+      this.screen = screen
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -2094,7 +2085,7 @@ export default {
       this.setupDraggable()
       this.setupContactLocalTime()
       this.resetBottomExpansion()
-      this.screen = 'call'
+      this.changeScreen('call')
       this.digits = ''
     },
 
@@ -2109,7 +2100,7 @@ export default {
         }
 
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
-          this.screen = 'menu'
+          this.changeScreen('menu')
         }
       },
       deep: true
@@ -2118,46 +2109,46 @@ export default {
     'dialer.currentStatus': function () {
       switch (this.dialer.currentStatus) {
         case 'READY':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'OFFLINE':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'RECEIVED_CALL_INVITE':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'INVITE_CANCELLED':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'WRAP_UP':
-          this.screen = 'wrap-up'
+          this.changeScreen('wrap-up')
           this.resetBottomExpansion()
           break
         case 'GENERATING_TOKEN':
-          this.screen = 'call'
+          this.changeScreen('call')
           this.closePhone()
           break
         case 'TOKEN_GENERATED':
-          this.screen = 'call'
+          this.changeScreen('call')
           this.closePhone()
           break
         case 'MAKING_CALL':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'ANSWERING_CALL':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'REJECTING_CALL':
-          this.screen = 'call'
+          this.changeScreen('call')
           break
         case 'CALL_CONNECTED':
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
-            this.screen = 'menu'
+            this.changeScreen('menu')
           }
 
           if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             setTimeout(() => {
-              this.screen = 'menu'
+              this.changeScreen('menu')
             }, 5000)
           }
           break

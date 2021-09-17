@@ -6,6 +6,7 @@
         placeholder="First Name"
         ref="first_name"
         required
+        autofocus
         v-model="selected_contact.first_name"
       ></b-form-input>
     </b-form-group>

@@ -59,7 +59,7 @@
               <div v-if="communication.body">
                 <div class="text-muted mb-2"
                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
-                     v-html="$options.filters.nl2br(communication.body)"
+                     v-html="$options.filters.nl2br(parseBody)"
                      v-linkify:options="{ target: '_blank' }">
                 </div>
                 <div class="font-weight-light-bold my-2"
@@ -73,7 +73,7 @@
                 <span class="text-muted"
                       v-else
                       v-linkify:options="{ target: '_blank' }">
-                  {{ communication.body }}
+                  <span v-html="parseBody"></span>
                 </span>
               </div>
             </template>
@@ -587,17 +587,17 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
          v-if="communication.notes && !activeName">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
-         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.notes))">
+         v-html="$options.filters.nl2br(communication.notes)">
       </p>
     </div>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
          v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
       <p class="text-left"
-         v-html="$options.filters.twoLinesTextTruncate($options.filters.nl2br(communication.body))">
+         v-html="$options.filters.textTruncate($options.filters.nl2br(parseBody), 2)">
       </p>
     </div>
   </div>
@@ -760,6 +760,13 @@ export default {
       return (this.communication.notes ||
         (this.communication.body &&
           this.communication.type === CommunicationTypes.NOTE))
+    },
+    parseBody () {
+      if (this.communication.type === CommunicationTypes.NOTE) {
+        return this.$options.filters.parseMentionToView(this.communication.body)
+      }
+
+      return this.communication.body
     }
   },
 
@@ -853,13 +860,7 @@ export default {
       this.loadingDispose = true
       this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/dispose`, { dispositionStatus }).then((res) => {
         this.loadingDispose = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Contact',
-          message: 'Contact disposed',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Contact disposed')
         this.communication.contact.disposition_status_id = res.data.disposition_status_id
       }).catch((err) => {
         this.loadingDispose = false
@@ -875,14 +876,7 @@ export default {
       this.loadingUpdateEngagement = true
       this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/${this.communication.id}/update-engagement`, params).then(res => {
         this.loadingUpdateEngagement = false
-        this.$q.notify({
-          offset: 95,
-          textColor: 'white',
-          title: 'Contact',
-          message: 'Engagement updated.',
-          type: 'positive',
-          showClose: true
-        })
+        this.$generalNotification('Engagement updated.')
         this.$emit('update', res.data)
       }).catch(err => {
         this.loadingUpdateEngagement = false

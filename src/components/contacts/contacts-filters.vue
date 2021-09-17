@@ -5,22 +5,22 @@
                spinner-variant="success"
                spinner-type="grow"
                rounded="sm">
-      <b-card header="Primary"
-              header-bg-variant="primary"
-              header-text-variant="white">
+      <b-card class="filter-container">
         <template #header>
           <div class="d-flex justify-content-between">
             <div class="d-inline-flex">
-              <b-button variant="outline-primary header-buttons"
+              <b-button variant="light"
+                        class="header-buttons border-0 grey-90"
                         size="sm"
                         @click="backToStep"
                         v-if="step !== 1">
                 <i class="fa fa-arrow-left"></i>
               </b-button>
-              <h6 class="mb-0">Filters</h6>
+              <h6 class="mb-0 ml-1">Filters</h6>
             </div>
 
-            <b-button variant="outline-primary header-buttons btn-close-filter"
+            <b-button variant="light"
+                      class="header-buttons btn-close-filter border-0 grey-90"
                       size="sm"
                       @click="onCloseFilter">
               <i class="fa fa-times"></i>
@@ -91,13 +91,6 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <!--compact-btn
-                  variant="outlined-light"
-                  customClass="mb-2 mr-2 add-filters with-border conjunction-button"
-                  @clicked="toAddFiltersStep(visibleListFilters.length, true)"
-                >
-                  AND
-                </compact-btn-->
                 <compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
                              @clicked="toAddFiltersStep(visibleListFilters.length, false)">
@@ -108,7 +101,7 @@
             <div class="filter-contents step-2 p-2"
                  v-else-if="step === 2">
               <div class="mb-3">
-                <h6 class="contact-prop-label">Contact properties</h6>
+                <h6 class="contact-prop-label mb-1">Contact properties</h6>
                 <search placeholder="Search"
                         @search="searchFilter"/>
               </div>
@@ -194,7 +187,8 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isFiltersOpen', 'filters']),
+    ...mapState('contacts', ['isFiltersOpen']),
+    ...mapState(['filters']),
     ...mapGetters('contacts', ['currentListFilters']),
 
     filtersFiltered () {
@@ -318,24 +312,47 @@ export default {
     generateListFilters () {
       let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       for (let groupIndex in filterGroups) {
-        if (groupIndex === 'search') {
-          filterGroups.splice(groupIndex, 1)
+        if (isNaN(groupIndex / 1) || groupIndex === 'search') {
+          if (filterGroups instanceof Array) {
+            filterGroups.splice(groupIndex, 1)
+          } else {
+            delete filterGroups[groupIndex]
+          }
+
           continue
         }
+
         for (let filterIndex in filterGroups[groupIndex].filters) {
           if (filterIndex === 'search') {
             continue
           }
+
           const found = this.filters.find(filter => filter.key === filterIndex)
           const operators = found ? _.get(found, 'operators', null) : null
+
           if (operators) {
             const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
+            const options = operator ? _.get(operator, 'options', null) : null
+            const option = options ? options.find(option => option.value === filterGroups[groupIndex].filters[filterIndex].value) : null
+            let trueValue = filterGroups[groupIndex].filters[filterIndex].value
+
+            if (option) {
+              trueValue = [option.label]
+            } else if (typeof filterGroups[groupIndex].filters[filterIndex].value === 'string') {
+              trueValue = filterGroups[groupIndex].filters[filterIndex].value.split(',')
+            }
+
+            let newValue = trueValue
+            if (newValue) {
+              newValue = [trueValue.join(' and ')]
+            }
+
             filterGroups[groupIndex].filters[filterIndex] = {
               key: filterIndex,
               label: found.label,
               operator: operator.label,
-              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
-              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+              trueValue: trueValue,
+              value: JSON.stringify(newValue)
             }
           } else {
             filterGroups[groupIndex].filters[filterIndex] = {
@@ -398,12 +415,14 @@ export default {
         updatedFilter.splice(index, 1)
       }
       this.setCurrentListFilters(updatedFilter)
+      this.$emit('filtersUpdated')
     },
 
     onDeleteGroupFilter (index) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       updatedFilter.splice(index, 1)
       this.setCurrentListFilters(updatedFilter)
+      this.$emit('filtersUpdated')
     },
 
     emitFiltersCount () {

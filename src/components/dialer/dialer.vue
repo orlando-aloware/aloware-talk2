@@ -94,15 +94,12 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
+      this.$closeActionNotification('incomingCall')
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
       if (this.dialer.isReady) {
-        this.$q.notify({
-          timeout: 10000,
-          type: 'negative',
-          message: 'Whoops! You have lost connection with the server. Check your internet connection and try again.'
-        })
+        this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         this.setDialerIsReady(false)
         this.setDialerCurrentStatus('OFFLINE')
       }
@@ -139,6 +136,7 @@ export default {
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
+        this.$actionNotification(this.dialer.communication.contact.name, this.dialer.communication.contact.company_name, null, null, 'incomingCall', null, null, true)
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)
         // })
@@ -150,6 +148,7 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
+      this.$closeActionNotification('incomingCall')
       this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
@@ -188,6 +187,7 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+      this.$closeActionNotification('incomingCall')
       if (this.callNotification) {
         this.callNotification()
       }
@@ -248,10 +248,12 @@ export default {
 
     this.$VueEvent.listen('answerCall', () => {
       this.answerCall()
+      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('rejectCall', () => {
       this.rejectCall()
+      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {
@@ -479,6 +481,7 @@ export default {
       console.log('Answering call')
 
       this.setDialerCurrentStatus('ANSWERING_CALL')
+      this.setShowIncomingCallNotification(false)
 
       if (this.device.activeConnection()) {
         // accept the incoming connection and start two-way audio
@@ -780,6 +783,9 @@ export default {
       this.setDialerIsHeld(false)
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
+      this.setShowIncomingCallNotification(true)
+      this.$closeActionNotification('incomingCall')
+
       if (this.callNotification) {
         this.callNotification()
       }
@@ -995,7 +1001,8 @@ export default {
       'setCurrentInputDevice',
       'setInputDevices',
       'setCurrentOutputDevice',
-      'setOutputDevices'
+      'setOutputDevices',
+      'setShowIncomingCallNotification'
     ])
   },
 

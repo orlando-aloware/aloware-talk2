@@ -1,11 +1,10 @@
 <template>
   <div
     ref="scrollableArea"
-    class="scrollableArea position-relative d-flex flex-column h-100 w-100"
-    :class="{ 'overflow-hidden': isEmpty }"
+    :class="['scrollableArea position-relative d-flex flex-column h-100 w-100', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
     @scroll="handleScroll"
   >
-    <table :class="computedClass" ref="table">
+    <table :class="[computedClass, 'ml-3']" ref="table">
       <thead>
         <draggable
           :list="fixedColumns"
@@ -24,25 +23,21 @@
               sticky: column.sticky
             }"
             :style="{
-              maxWidth: column.maxWidth ? `${column.maxWidth}px` : '',
-              minWidth: column.minWidth ? `${column.minWidth}px` : ''
+              maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
+              minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
             }"
           >
-            <input
-              class="data-table-check-all"
-              ref="dataTableCheckAll"
-              type="checkbox"
-              v-if="column.name === 'checkbox'"
-              @change="onCheckboxClicked"
-            />
+            <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
+              <input type="checkbox"
+                     class="data-table-check-all"
+                     ref="dataTableCheckAll"
+                     @change="onCheckboxClicked"/>
+              <span class="checkmark"></span>
+            </label>
             <template v-if="column.name && column.name !== 'checkbox'">
-              <span :class="{ handle: column.draggable }"
-                ><i
-                  class="fa fa-bars mr-2 text-muted"
-                  v-if="column.draggable"
-                ></i>
-                {{ column.label }}</span
-              >
+              <span :class="{ handle: column.draggable }">
+                {{ column.label }}
+              </span>
               <a
                 href="#"
                 class="sorter"
@@ -99,12 +94,86 @@ import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
 let column
 let scrollTimeout
 
-const dragOffset = 100
-
 export default {
   components: {
     draggable
   },
+
+  props: {
+    columns: {
+      type: Array
+    },
+    customClass: {
+      type: String
+    },
+    stickyHeaders: {
+      type: Boolean,
+      default: false
+    },
+    isEmpty: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingMore: {
+      type: Boolean,
+      default: false
+    },
+    scrollAreaClass: {
+      type: String,
+      default: ''
+    }
+  },
+
+  computed: {
+    ...mapState(['currentCompany']),
+    defaultContactDateFilter () {
+      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+        return 'created_at'
+      }
+      return 'last_engagement_at'
+    },
+    computedClass () {
+      return {
+        datatable: true,
+        [this.customClass]: !!this.customClass,
+        'datatable--sticky-columns': this.stickyHeaders
+      }
+    },
+    hasEmptySlot () {
+      return !!this.$slots.empty
+    },
+    fixedColumns () {
+      let newItems = JSON.parse(JSON.stringify(this.columns))
+      // now, check if columns have order, label, maxWidth or minWidth property, or
+      // check if column is required then update sortable.
+      for (let index in newItems) {
+        let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+        if (found && found.required) {
+          newItems[index].sortable = found.sortable
+        }
+        if (found) {
+          newItems[index].label = found.label
+          newItems[index].default = found.default
+          newItems[index].sortable = found.sortable
+          newItems[index].maxWidth = found.maxWidth
+          newItems[index].minWidth = found.minWidth
+        }
+      }
+      return newItems
+    }
+  },
+
+  data () {
+    return {
+      sorts: { order: 'asc' },
+      tableColumns: [],
+      startOffset: 0,
+      loading: true,
+      scrolling: false,
+      isLoaderVisible: false
+    }
+  },
+
   methods: {
     handleScroll: function (element) {
       if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= (element.srcElement.scrollHeight + 5)) {
@@ -117,8 +186,10 @@ export default {
       if (column) {
         for (let i = 0; i < evt.pageX; i++) {
           requestAnimationFrame(() => {
-            column.style.minWidth = `${this.startOffset + i}px`
-            column.style.maxWidth = `${this.startOffset + i}px`
+            if (column) {
+              column.style.minWidth = `${this.startOffset + i}px`
+              column.style.maxWidth = `${this.startOffset + i}px`
+            }
           })
         }
       }
@@ -130,7 +201,7 @@ export default {
     },
     onResizerMouseDown (evt) {
       column = evt.target.parentNode
-      this.startOffset = column.offsetWidth - evt.pageX - dragOffset
+      this.startOffset = column.offsetWidth - evt.pageX
       document.body.style.cursor = 'col-resize'
     },
     onCheckboxClicked (evt) {
@@ -171,74 +242,7 @@ export default {
       }, 66)
     }
   },
-  data () {
-    return {
-      sorts: { order: 'asc' },
-      tableColumns: [],
-      startOffset: 0,
-      loading: true,
-      scrolling: false,
-      isLoaderVisible: false
-    }
-  },
-  computed: {
-    ...mapState(['currentCompany']),
-    defaultContactDateFilter () {
-      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
-        return 'created_at'
-      }
-      return 'last_engagement_at'
-    },
-    computedClass () {
-      return {
-        datatable: true,
-        [this.customClass]: !!this.customClass,
-        'datatable--sticky-columns': this.stickyHeaders
-      }
-    },
-    hasEmptySlot () {
-      return !!this.$slots.empty
-    },
-    fixedColumns () {
-      let newItems = JSON.parse(JSON.stringify(this.columns))
-      // now, check if columns have order, label, maxWidth or minWidth property, or
-      // check if column is required then update sortable.
-      for (let index in newItems) {
-        let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
-        if (found && found.required) {
-          newItems[index].sortable = found.sortable
-        }
-        if (found) {
-          newItems[index].label = found.label
-          newItems[index].default = found.default
-          newItems[index].sortable = found.sortable
-          newItems[index].maxWidth = found.maxWidth
-          newItems[index].minWidth = found.minWidth
-        }
-      }
-      return newItems
-    }
-  },
-  props: {
-    columns: {
-      type: Array
-    },
-    customClass: {
-      type: String
-    },
-    stickyHeaders: {
-      type: Boolean,
-      default: false
-    },
-    isEmpty: {
-      type: Boolean,
-      default: false
-    },
-    isLoadingMore: {
-      type: Boolean,
-      default: false
-    }
-  },
+
   mounted () {
     if (this.$refs.scrollableArea) {
       // this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
@@ -249,6 +253,7 @@ export default {
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },
+
   beforeDestroy () {
     clearTimeout(scrollTimeout)
     this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)

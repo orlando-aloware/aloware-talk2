@@ -12,38 +12,11 @@
               class="no-border position-relative"
               @scroll="handScroll">
         <b-list-group class="p-2 pr-3">
-          <b-list-group-item v-for="contact in contacts"
+          <b-list-group-item v-for="(contact, index) in contacts"
                              :key="contact.id"
                              :to="`/contacts/${contact.id}`"
                              class="d-flex align-items-center border-0">
-            <avatar class="contact-avatar"
-                    width="34"
-                    height="34"
-                    :name="getContactName(contact)">
-            </avatar>
-            <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between align-items-center contact-details pt-0">
-              <div class="mr-auto">
-                <p class="text-bold contact-name mb-0">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ getContactName(contact) }}
-                  </q-tooltip>
-                  {{ getContactName(contact) }}
-                </p>
-                <div class="text-sm-left contact-phone mb-1">
-                  <span v-if="contact.phone_number !== '0'">{{ contact.phone_number | fixPhone }}</span>
-                  <span v-else>Phone number unavailable</span>
-                </div>
-              </div>
-              <div class="d-flex justify-center align-items-center">
-                <b-badge v-if="contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count > 0"
-                         class="contact-badge d-flex justify-center align-items-center"
-                         variant="danger"
-                         pill>
-                  {{ contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count }}
-                </b-badge>
-              </div>
-            </div>
+            <contact-list-sidebar-item v-model="contacts[index]" :key="contact.id"></contact-list-sidebar-item>
           </b-list-group-item>
         </b-list-group>
         <div class="relative py-4">
@@ -61,8 +34,8 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import Avatar from 'components/avatar'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import ContactListSidebarItem from 'components/contacts/contact-list-sidebar-item'
 
 let scrollTimeout
 export default {
@@ -71,7 +44,7 @@ export default {
   mixins: [contactsMixins],
 
   components: {
-    Avatar
+    ContactListSidebarItem
   },
 
   data () {
@@ -82,7 +55,7 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['selectedList', 'listItems']),
+    ...mapState('contacts', ['selectedList', 'listItems', 'contact']),
 
     id () {
       return this.selectedList.id
@@ -99,9 +72,6 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed']),
-    getContactName (contact) {
-      return contact.name || 'No Name'
-    },
     onBottomScroll () {
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
@@ -133,6 +103,15 @@ export default {
 
   beforeDestroy () {
     clearTimeout(scrollTimeout)
+  },
+
+  watch: {
+    'contact': function (value) {
+      let index = this.listItems[this.selectedList.id].data.findIndex(item => item.id === value.id)
+      if (index) {
+        this.listItems[this.selectedList.id].data[index] = value
+      }
+    }
   }
 }
 </script>

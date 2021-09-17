@@ -86,6 +86,14 @@ export default {
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
   },
+
+  setSelectedListContactCount: ({ commit }, count) => {
+    commit('SET_SELECTED_LIST_CONTACT_COUNT', count)
+  },
+  setShouldUpdateSelectedListContactCount: ({ commit }, shouldUpdate) => {
+    commit('SET_SHOULD_UPDATE_SELECTED_LIST_CONTACT_COUNT', shouldUpdate)
+  },
+
   setSelectedStaticList: ({ commit }, payload) => {
     commit('SET_SELECTED_STATIC_LIST', payload)
   },

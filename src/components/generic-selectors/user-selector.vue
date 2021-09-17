@@ -9,9 +9,12 @@
             use-input
             emit-value
             map-options
-            :outlined="outlined"
             dense
             v-model="userId"
+            :hide-dropdown-icon="hideDropdownIcon"
+            :clearable="clearable"
+            :outlined="outlined"
+            :borderless="borderless"
             :options="userOptions"
             :multiple="multiple"
             :placeholder="placeholder"
@@ -23,7 +26,7 @@
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
-      <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      {{prepend}}
     </template>
 
     <template v-slot:no-option>
@@ -122,9 +125,25 @@ export default {
       type: Boolean,
       default: true
     },
+    borderless: {
+      type: Boolean,
+      default: false
+    },
     showPlaceholder: {
       type: Boolean,
       default: true
+    },
+    clearable: {
+      type: Boolean,
+      default: false
+    },
+    hideDropdownIcon: {
+      type: Boolean,
+      default: false
+    },
+    customPlaceholder: {
+      type: String,
+      default: ''
     }
   },
 
@@ -146,9 +165,9 @@ export default {
 
       switch (true) {
         case this.multiple && this.userId.length < 1:
-          return 'Select Users'
+          return this.customPlaceholder || 'Select Users'
         case !this.multiple && !this.userId:
-          return 'Select User'
+          return this.customPlaceholder || 'Select User'
         case this.multiple && this.userId.length > 0:
         case !this.multiple && this.userId:
         default:

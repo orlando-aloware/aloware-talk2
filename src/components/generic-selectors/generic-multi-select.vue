@@ -13,7 +13,8 @@
                stack-label>
         <template v-slot:control>
           <div v-for="item in formattedValues"
-               :key="item.id">
+               :key="item.id"
+               class="w-100 text-break">
             <div :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
                   class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
               <div class="dot-wrapper d-flex align-items-center">
@@ -50,7 +51,7 @@
                  :key="item.id"
                  @click="onSelectOption(item.id)">
               <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
-                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items">
+                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break">
                 <q-badge class="is-dot mx-1"
                          rounded
                          :style="{ background: item.color }"
@@ -82,7 +83,7 @@
                  v-for="child in item.children"
                  :key="`child-${child.id}`"
                  @click="onSelectOption(child.id)">
-              <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items"
+              <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break"
                     v-if="typeof child.color !== 'undefined'">
                 <q-badge class="is-dot mx-1"
                          rounded
@@ -110,7 +111,7 @@
         <div v-for="item in formattedValues"
              :key="item.id">
         <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
-              class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items">
+              class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break">
           <q-badge class="is-dot mx-1"
                    rounded
                    :style="{ background: item.color }"

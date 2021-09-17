@@ -28,36 +28,50 @@ export const dateTimePassed = (dt) => {
  * @param {datetime|string|Moment} dt
  * @returns {string|*}
  */
-export const shortDateTimePassed = (dt) => {
+export const shortDateTimePassed = (dt, replaceAgo = true) => {
+  let dateTimePassed = ''
   if (dt) {
-    let dateTimePassed = ''
     if (window.timezone) {
       dateTimePassed = window.moment.utc(dt).tz(window.timezone).fromNow()
     } else {
       dateTimePassed = window.moment.utc(dt).local().fromNow()
     }
-    dateTimePassed = dateTimePassed.split(' ')
-    if (dateTimePassed.length > 0 && ['a', 'an'].includes(dateTimePassed[0])) {
-      dateTimePassed[0] = '1'
+  } else {
+    if (window.timezone) {
+      dateTimePassed = window.moment.utc().tz(window.timezone).fromNow()
+    } else {
+      dateTimePassed = window.moment.utc().local().fromNow()
     }
-    dateTimePassed = dateTimePassed.join(' ')
-    return dateTimePassed.replace(' ago', '')
-      .replace(' few', '')
-      .replace(' seconds', 's')
-      .replace(' second', 's')
-      .replace(' minutes', 'm')
-      .replace(' minute', 'm')
-      .replace(' hours', 'h')
-      .replace(' hour', 'h')
-      .replace(' days', 'd')
-      .replace(' day', 'd')
-      .replace(' weeks', 'w')
-      .replace(' week', 'w')
-      .replace(' months', 'mo')
-      .replace(' month', 'mo')
-      .replace(' years', 'y')
-      .replace(' year', 'y')
   }
+  dateTimePassed = dateTimePassed.split(' ')
+
+  if (dateTimePassed.length > 0 && ['a', 'an'].includes(dateTimePassed[0])) {
+    dateTimePassed[0] = '1'
+  }
+
+  dateTimePassed = dateTimePassed.join(' ')
+
+  if (replaceAgo) {
+    dateTimePassed = dateTimePassed.replace(' ago', '')
+  } else {
+    dateTimePassed = dateTimePassed.replace('1 few seconds ago', 'Now')
+  }
+
+  return dateTimePassed.replace(' few', '')
+    .replace(' seconds', 's')
+    .replace(' second', 's')
+    .replace(' minutes', 'm')
+    .replace(' minute', 'm')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' weeks', 'w')
+    .replace(' week', 'w')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo')
+    .replace(' years', 'y')
+    .replace(' year', 'y')
 }
 
 /**

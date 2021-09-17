@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    v-model="isScheduledMessageListOpen"
+    v-model="isOpen"
     size="lg"
     :title="title"
     modal-class="scheduled-messages-modal"
@@ -193,6 +193,9 @@ export default {
       totalRows: 0
     }
   },
+  created () {
+    this.isOpen = this.isScheduledMessageListOpen
+  },
   methods: {
     onPagination (page) {
       this.filter.page = page
@@ -257,20 +260,10 @@ export default {
           this.isDeleting = true
           talk2Api.V1.message.deleteScheduledMessage(message.id)
             .then(response => {
-              this.$q.notify({
-                message: 'Scheduled message has been deleted.',
-                type: 'positive',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Scheduled message has been deleted.')
               this.getMessages()
             }).catch(() => {
-              this.$q.notify({
-                message: 'Error while deleting scheduled message.',
-                type: 'negative',
-                textColor: 'white',
-                position: 'bottom-right'
-              })
+              this.$generalNotification('Error while deleting scheduled message.', 'error')
             }).finally(() => {
               this.isDeleting = false
             })

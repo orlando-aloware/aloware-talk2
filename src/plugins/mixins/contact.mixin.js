@@ -210,7 +210,7 @@ export default {
   },
 
   created () {
-    this.contact_id = _.get(this.$route, 'params.id', null)
+    this.contactId = _.get(this.$route, 'params.id', null)
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })
@@ -241,7 +241,7 @@ export default {
 
     this.$VueEvent.listen('contact_audit_created', (data) => {
       // check data loaded
-      if (parseInt(data.contact_id) === parseInt(this.contact_id)) {
+      if (parseInt(data.contact_id) === parseInt(this.contactId)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
       }
@@ -445,13 +445,7 @@ export default {
     fetchContactCommunicationsUntilFound (tryCount = 1) {
       if (tryCount > 10) {
         this.loadingContactCommunications = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Contact',
-          message: 'Communication is too old for automatic scrolling',
-          type: 'error',
-          showClose: true
-        })
+        this.$generalNotification('Communication is too old for automatic scrolling', 'error')
         return
       }
 
@@ -503,7 +497,7 @@ export default {
 
     loadMorePreviousActivities () {
       this.isLoadingPreviousActivities = true
-      this.fetchContactCommunications(this.contact_id).then(() => {
+      this.fetchContactCommunications(this.contactId).then(() => {
         this.isLoadingPreviousActivities = false
       }).catch(() => {
         this.isLoadingPreviousActivities = false
@@ -512,13 +506,7 @@ export default {
 
     changeSelectedPhoneNumber (phoneNumber) {
       this.selectedPhoneNumber = phoneNumber
-      this.$q.notify({
-        offset: 95,
-        title: 'Contact',
-        message: 'Changed selected contact phone number to: ' + this.selectedPhoneNumber,
-        type: 'success',
-        showClose: true
-      })
+      this.$generalNotification(`Changed selected contact phone number to: ${this.selectedPhoneNumber}`)
       // this.setFocus()
     },
 
@@ -627,13 +615,7 @@ export default {
     },
 
     onSuccessSendMedia (res) {
-      this.$q.notify({
-        offset: 95,
-        title: 'Media Upload',
-        message: 'Media file has been uploaded successfully.',
-        type: 'success',
-        showClose: true
-      })
+      this.$generalNotification('Media file has been uploaded successfully.')
       this.$set(this.media, 'file_name', res.file_name)
       this.uploadStatus.upload = 'success'
       // TODO: validate the form
@@ -806,7 +788,7 @@ export default {
       }, 5000)
     },
 
-    fetchIncomingNumber () {
+    fetchIncomingNumber: _.debounce(function () {
       this.contactIncomingNumber = null
       this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
         this.contactIncomingNumber = res.data
@@ -814,7 +796,7 @@ export default {
         this.$handleErrors(err.response)
         console.log(err)
       })
-    },
+    }, 200),
 
     checkEmailCapability () {
       if (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled) {
@@ -846,6 +828,10 @@ export default {
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
         this.processFetchedContactInfo(res.data, callback)
+
+        if (['Inbox Contact Task'].includes(this.$route.name)) {
+          this.setSelectedContact(res.data)
+        }
       }).catch(() => {
         this.loadingContactsFailed()
       })
@@ -869,12 +855,10 @@ export default {
     processFetchedContactInfo (selectedContact, callback) {
       selectedContact.tag_ids = selectedContact.tags.map((tag) => tag.id)
       this.messageObject.contact = selectedContact
-      this.contact.first_name = selectedContact.first_name
-      this.contact.last_name = selectedContact.last_name
       // TODO: update contact name in title?
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
-      this.$VueEvent.fire('contact_selected', this.contact_id)
+      this.$VueEvent.fire('contact_selected', this.contactId)
       if (typeof callback !== 'undefined') {
         callback(selectedContact)
       }
@@ -962,7 +946,8 @@ export default {
       }
     },
 
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts'])
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts']),
+    ...mapActions('inbox', ['setSelectedContact'])
   },
 
   watch: {

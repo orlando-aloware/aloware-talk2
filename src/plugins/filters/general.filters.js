@@ -3,6 +3,7 @@ import numeral from 'numeral'
 import numFormat from 'vue-filter-number-format'
 import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
+import store from 'src/store/index'
 
 /**
  * Convert to uppercase
@@ -357,9 +358,9 @@ const fixBooleanType = (val) => {
   return val ? 'Yes' : 'No'
 }
 
-const nl2br = (value) => {
+const nl2br = (value, noValue = true) => {
   if (!value) {
-    return '-'
+    return noValue ? '-' : ''
   } else {
     let breakTag = '<br />'
     return (value + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
@@ -380,7 +381,7 @@ const momentFormat = (datetime, format, toUserTimezone = false) => {
   return window.moment(datetime).format(format)
 }
 
-const twoLinesTextTruncate = (text) => {
+const textTruncate = (text, lines, maxLength = 43) => {
   if (text) {
     let texts = text.split('<br />').filter(Boolean)
     if (texts.length >= 2) {
@@ -388,8 +389,8 @@ const twoLinesTextTruncate = (text) => {
     } else {
       texts = text
     }
-    const maxLength = 85
-    texts = texts.substring(0, (texts.length > maxLength ? maxLength : texts.length))
+    const newMaxLength = maxLength * lines
+    texts = texts.substring(0, (texts.length > newMaxLength ? newMaxLength : texts.length))
     const hasEllipse = texts.length < text.length
     texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
     return texts + (hasEllipse ? '…' : '')
@@ -513,6 +514,42 @@ const numberPlusFormatter = (value, limit = 99) => {
   return value
 }
 
+const parseMentionToView = (content) => {
+  if (!content) {
+    return content
+  }
+
+  let markups = content.match(/(<user:([^>]+)>)/gi)
+  let parsedBody = content
+  let users = store().state['users']
+
+  if (markups) {
+    markups.forEach(function (value, i) {
+      let userId = value.match(/\d/g).join('')
+      let user = users.find(user => user.id.toString() === userId)
+      if (user) {
+        let idPattern = new RegExp(`<user:${userId}>`, 'gi')
+        parsedBody = parsedBody.replace(idPattern, `<span class="mention-tag">@${user.name}</span>`)
+      }
+    })
+  }
+
+  return parsedBody
+}
+
+const parseMentionToMarkup = (content) => {
+  let parser = new DOMParser()
+  let doc = parser.parseFromString(content, 'text/html')
+
+  let spanEl = doc.querySelectorAll('span.mention-tag')
+  spanEl.forEach(function (value, i) {
+    let id = value.getAttribute('data-id')
+
+    value.parentNode.replaceChild(document.createTextNode('<user:' + id + '>'), value)
+  })
+  return doc.body.innerText
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -543,8 +580,10 @@ export default ({ Vue }) => {
     nl2br,
     strLimit,
     momentFormat,
-    twoLinesTextTruncate,
-    numberPlusFormatter
+    textTruncate,
+    numberPlusFormatter,
+    parseMentionToView,
+    parseMentionToMarkup
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

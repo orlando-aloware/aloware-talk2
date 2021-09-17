@@ -11,6 +11,9 @@ export default {
         }
         return window.axios.get(`${suffixV1}contact/${id}`)
       },
+      create (params) {
+        return window.axios.post(`${suffixV1}contact`, params)
+      },
       getAttributes (id) {
         if (!id) {
           return null
@@ -208,7 +211,20 @@ export default {
         return window.axios.get(`${suffixV2}contact-folders`)
       },
       delete (id) {
-        return window.axios.delete('/api/v2/contact-folders/' + id)
+        return window.axios.delete(`${suffixV2}contact-folders/${id}`)
+      }
+    },
+    contactListItem: {
+      addContact (contactListId, contacts = []) {
+        return window.axios.post(`${suffixV2}contact-list-items`, {
+          contact_list_id: contactListId,
+          contacts: contacts
+        })
+      }
+    },
+    mentions: {
+      get (params) {
+        return window.axios.get(`${suffixV2}mentions`, params)
       }
     }
   }

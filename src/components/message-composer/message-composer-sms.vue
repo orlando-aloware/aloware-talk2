@@ -214,7 +214,8 @@ export default {
         contact_id: this.contact.id,
         campaign_id: this.selectedLine.id,
         phone_number: this.messageComposer.sms.phone_number,
-        attachments: this.messageComposer.sms.attachments.map(attachment => attachment.uuid)
+        attachments: this.messageComposer.sms.attachments.map(attachment => attachment.uuid),
+        gif: this.messageComposer.sms.gif_url
       }
     },
     onSend () {
@@ -222,27 +223,17 @@ export default {
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
           this.resetMessageComposerSms()
-          this.$q.notify({
-            message: 'Text has been sent.',
-            type: 'positive',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Text has been sent.')
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            message: 'Error while sending text.',
-            type: 'negative',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while sending text.', 'error')
         }).finally(() => {
           this.isSending = false
         })
     },
     setMessageGif (gif) {
       this.setMessageComposerSmsGif(gif)
-      this.$root.$emit('bv::hide::popover', 'gif-popover')
+      this.$refs.giphyMenu.hide()
     },
     removeMessageGif () {
       this.setMessageComposerSmsGif('')

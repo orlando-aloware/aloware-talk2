@@ -30,7 +30,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts']),
+    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts', 'setShouldUpdateSelectedListContactCount', 'setSelectedListContactCount']),
     init () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
@@ -104,6 +104,12 @@ export default {
             append: false,
             ...data
           })
+
+          if (this.shouldUpdateSelectedListContactCount) {
+            this.setSelectedListContactCount(data.total)
+            this.setShouldUpdateSelectedListContactCount(false)
+          }
+
           this.markCheckedAll()
         })
         .finally(() => {
@@ -206,7 +212,7 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['search']),
+    ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount']),
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
     ...mapState(['currentCompany']),

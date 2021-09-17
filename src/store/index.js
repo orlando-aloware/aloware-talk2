@@ -4,6 +4,7 @@ import _ from 'lodash'
 import * as Default from '../constants/default'
 import * as ContactsDefault from '../constants/contacts-default'
 import * as InboxDefault from '../constants/inbox-default'
+import * as ActionNotificationsDefault from '../constants/action-notifications-default'
 import createPersistedState from 'vuex-persistedstate'
 import auth from './auth'
 import contacts from './contacts'
@@ -71,11 +72,74 @@ export default function (/* { ssrContext } */) {
       inputDevices: [],
       currentOutputDevice: 'default',
       outputDevices: [],
+      notifications: {
+        system: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        },
+        sms: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        },
+        call: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        },
+        callVoicemail: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        },
+        voicemail: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        },
+        mention: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        },
+        incomingCall: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: ''
+        }
+      },
+      showIncomingCallNotification: true,
       // cached states
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
       tagsFullyLoaded: false
+    },
+
+    getters: {
+      notifications: (state) => state.notifications
     },
 
     actions: {
@@ -361,6 +425,18 @@ export default function (/* { ssrContext } */) {
 
       setTagsFullyLoaded ({ commit }, tagsFullyLoaded) {
         commit('SET_TAGS_FULLY_LOADED', tagsFullyLoaded)
+      },
+
+      setNotifications ({ commit }, payload) {
+        commit('SET_NOTIFICATIONS', payload)
+      },
+
+      resetNotifications ({ commit }) {
+        commit('RESET_NOTIFICATIONS')
+      },
+
+      setShowIncomingCallNotification ({ commit }, value) {
+        commit('SET_SHOW_INCOMING_CALL_NOTIFICATION', value)
       }
     },
 
@@ -807,6 +883,20 @@ export default function (/* { ssrContext } */) {
 
       SET_TAGS_FULLY_LOADED (state, tagsFullyLoaded) {
         state.tagsFullyLoaded = tagsFullyLoaded
+      },
+
+      SET_NOTIFICATIONS (state, payload) {
+        for (let index in payload.data) {
+          Vue.set(state.notifications[payload.type], `${index}`, payload.data[index])
+        }
+      },
+
+      SET_SHOW_INCOMING_CALL_NOTIFICATION (state, value) {
+        state.showIncomingCallNotification = value
+      },
+
+      RESET_NOTIFICATIONS (state) {
+        state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
       }
     },
     plugins: [

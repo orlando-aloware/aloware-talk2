@@ -7,7 +7,6 @@
       :value="item.value"
       :icon="item.icon"
       :group="item.group"
-      :disabled="item.disabled"
       :isActive="activeChannel && activeChannel.value === item.value"
       :closed="closed"
       :badge="true"

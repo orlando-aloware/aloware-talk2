@@ -1,86 +1,86 @@
 <template>
-    <b-overlay :show="isFetchingContacts"
-               class="h-100 w-100"
-               rounded="sm"
-               variant="white">
-      <div class="w-100 h-100 d-flex flex-column">
-        <calls-header :openCount="taskCounts.open"
-                      :pendingCount="taskCounts.pending"
-                      :commCampaigns="[]"
-                      :commRingGroups="[]"
-                      @sort="sortContactTasks">
-        </calls-header>
-        <div class="w-100">
-          <q-btn-toggle
-            class="current-tasks border mx-2 mt-2 mb-1"
-            no-caps
-            dense
-            spread
-            unelevated
-            toggle-color="grey-9"
-            color="white"
-            text-color="primary"
-            :options="options"
-            v-model="currentTask"
-            @click="onToggleStatus">
-            <template v-slot:one>
-              <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                   :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-20' : 'active']">
-                  <span class="text-left">
-                    Open
-                  </span>
-                <span class="text-right">
-                    {{ taskCounts.open | numberPlusFormatter(99) }}
-                  </span>
-              </div>
-            </template>
+    <div class="w-100 h-100 d-flex flex-column">
+      <calls-header :openCount="taskCounts.open"
+                    :pendingCount="taskCounts.pending"
+                    :commCampaigns="[]"
+                    :commRingGroups="[]"
+                    @sort="sortContactTasks">
+      </calls-header>
+      <div class="w-100">
+        <q-btn-toggle
+          class="mx-2 mt-2 mb-1 custom-toggle-button"
+          no-caps
+          spread
+          dense
+          unelevated
+          toggle-color="grey-90"
+          color="transparent"
+          text-color="primary"
+          :options="options"
+          v-model="currentTask"
+          @click="onToggleStatus">
+          <template v-slot:one>
+            <div class="d-flex justify-content-center w-100 options"
+                 :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
+              <span class="text-left">
+                Open
+              </span>
+              <span class="text-right task-count ml-1">
+                  {{ taskCounts.open | numberPlusFormatter(99) }}
+                </span>
+            </div>
+          </template>
 
-            <template v-slot:two>
-              <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                   :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-20' : 'active']">
-                  <span class="text-left">
-                    Pending
-                  </span>
-                <span class="text-right">
-                    {{ taskCounts.pending | numberPlusFormatter(99) }}
-                  </span>
-              </div>
-            </template>
+          <template v-slot:two>
+            <div class="d-flex justify-content-centerw-100 options"
+                 :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-90' : 'active']">
+              <span class="text-left">
+                Pending
+              </span>
+              <span class="text-center task-count ml-1">
+                  {{ taskCounts.pending | numberPlusFormatter(99) }}
+                </span>
+            </div>
+          </template>
 
-            <template v-slot:three>
-              <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                   :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-20' : 'active']">
-                  <span class="text-left">
-                    Closed
-                  </span>
-                <span class="text-right">
-                    &nbsp;
-                  </span>
-              </div>
-            </template>
-          </q-btn-toggle>
-        </div>
-        <div class="h-100 w-100 flex-grow-1 scroll-y"
-             ref="taskListScroller"
-             @scroll="handleScroll">
-          <inbox-task-list :contacts="contacts"
-                           @onItemSelected="onItemSelected">
-          </inbox-task-list>
-        </div>
+          <template v-slot:three>
+            <div class="w-100 options"
+                 :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-90' : 'active']">
+                <span class="text-center">
+                  Closed
+                </span>
+            </div>
+          </template>
+        </q-btn-toggle>
       </div>
-      <template #overlay>
-        <div class="text-center">
-          <q-spinner-bars
-            color="primary"
-            size="2em"
-          />
-        </div>
-      </template>
-    </b-overlay>
-
+      <div class="h-75 w-100 flex-grow-1">
+        <b-overlay :show="isFetchingContacts"
+                 class="w-100 h-100"
+                 rounded="sm"
+                 variant="white">
+          <div class="h-100 w-100 scroll-y task-list-scroller"
+               ref="taskListScroller"
+               @scroll="handleScroll">
+            <inbox-task-list :contacts="contacts"
+                             :loading-contacts="isFetchingContacts"
+                             @onItemSelected="onItemSelected">
+            </inbox-task-list>
+          </div>
+        <template #overlay>
+          <div class="text-center">
+            <q-spinner-bars
+              color="primary"
+              size="2em"
+            />
+          </div>
+        </template>
+      </b-overlay>
+      </div>
+    </div>
 </template>
 
 <script>
+import _ from 'lodash'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
@@ -163,10 +163,10 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setContacts', 'setSelectedContact']),
+    ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact']),
     loadContactTasks () {
       this.isFetchingContacts = true
-      this.getContactsByTaskStatus(this.currentTask).then(response => {
+      return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts(response.data.data)
         this.isFetchingContacts = false
         this.currentPage = response.data.current_page
@@ -277,16 +277,23 @@ export default {
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
-      this.$router.push({
-        name: 'Inbox Contact Task',
-        params: {
-          id: contact.id.toString(),
-          channel: 'inbox',
-          status: this.statusText
+      const contactId = _.get(contact, 'id', null)
+      if (contactId) {
+        if (this.currentTask !== contact.task_status) {
+          this.currentTask = contact.task_status
         }
-      }).catch(err => {
-        console.log(err)
-      })
+
+        this.$router.push({
+          name: 'Inbox Contact Task',
+          params: {
+            id: contactId.toString(),
+            channel: 'inbox',
+            status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      }
     }
   },
 
@@ -335,14 +342,34 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('contact_task_status_updated', () => {
-      this.loadContactTasks()
+    this.$VueEvent.listen('update_communication', communication => {
+      if (!communication.contact_id) {
+        return
+      }
+
+      this.setContact(communication)
+    })
+
+    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+      let index = this.contacts.findIndex(item => item.id === contact.id)
+      if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status)) {
+        this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
+        this.loadContactTasks()
+      } else {
+        let contacts = [...this.contacts]
+        contacts[index] = contact
+        this.setContacts(contacts)
+      }
     })
   },
 
   mounted () {
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
       this.setSelectedContact({})
+    }
+
+    if (['Inbox Contact Task'].includes(this.$route.name) && this.selectedContact.task_status !== this.currentTask) {
+      this.onItemSelected(this.selectedContact)
     }
   },
 

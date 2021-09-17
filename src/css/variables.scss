@@ -71,10 +71,21 @@ $spaces: (
  Design style guide
  */
 
+// greens
+$green-90: #04BE4C;
+$green-10: #CCF2DB;
+$green-3: #6FCF97;
+
+// blues
+$blue-80: #15163F;
+$blue-10: #D3E2FF;
+$blue-3: #56CCF2;
 
 // Greys
 $grey-100: #040404;
 $grey-90: #62666E;
+$grey-82: #D5D6D8;
+$grey-81: #EAEAEC;
 $grey-80: #95989E;
 $grey-70: #D8D8D8;
 $grey-60: #EBEBEB;
@@ -86,7 +97,11 @@ $grey-10: #828282;
 $grey-9: #767C89;
 
 // Red
-$red-100: #EB5757;
+$red-100: #C4183C;
+$red-90: #F23333;
+$red-80: #EB5757;
+$red-10: #FECCD9;
+
 
 // Primary colors
 $primary: #256eff;
@@ -114,6 +129,8 @@ $primary-hover: #054CDB;
 @include text-color('dark-grey', $dark-grey, true);
 @include text-color('grey-100', $grey-100);
 @include text-color('grey-90', $grey-90);
+@include text-color('grey-82', $grey-82);
+@include text-color('grey-81', $grey-81);
 @include text-color('grey-80', $grey-80);
 @include text-color('grey-70', $grey-70);
 @include text-color('grey-60', $grey-60);
@@ -127,8 +144,16 @@ $primary-hover: #054CDB;
 // Background Colors
 @include bg-color('grey-50', $grey-50, true);
 @include bg-color('grey-9', $grey-9, true);
+@include bg-color('grey-90', $grey-90, true);
 @include bg-color('red-100', $red-100, true);
+@include bg-color('blue-80', $blue-80, true);
+@include bg-color('blue-10', $blue-10, true);
 @include bg-color('blue', $primary, true);
+@include bg-color('green-90', $green-10, true);
+@include bg-color('green-10', $green-10, true);
+@include bg-color('red-90', $red-10, true);
+@include bg-color('red-10', $red-10, true);
+@include bg-color('grey-80', $grey-80, true);
 
 .bg-primary {
   background: $primary !important;
@@ -341,17 +366,16 @@ $red: $danger;
 $light-green: #cff8df;
 $light-green2: #F2FBF6;
 $light-green3: #B2EBC8;
+$light-green4: #CCF2DB;
 $flesh: #feefe5;
 $light-red: #ffe8ee;
+$light-red1: #FECCD9;
 $light-blue: #e1ebfe;
+$light-blue1: #D3E2FF;
 $light-orange: #fff2df;
 
-$green-3: #6FCF97;
 $yellow-1: #F2C94C;
-$blue-3: #56CCF2;
 $purple-2: #BB6BD9;
-
-$red-100: #C4183C;
 
 $f-size-12: 12px;
 $f-size-13: 13px;

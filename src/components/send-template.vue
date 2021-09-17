@@ -126,13 +126,7 @@ export default {
       }).then(res => {
         this.message = null
         this.loading_send_message = false
-        this.$notify({
-          offset: 95,
-          title: 'Contact',
-          message: 'Message sent',
-          type: 'success',
-          showClose: true,
-        })
+        this.$generalNotification('Message sent')
         this.$emit('messageSent')
       }).catch(err => {
         this.$root.handleErrors(err.response)

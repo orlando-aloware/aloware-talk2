@@ -1,6 +1,6 @@
 <template>
   <b-modal class="schedule-message-modal"
-           size="sm"
+           size="md"
            modal-class="column-headers-modal"
            scrollable
            v-model="isOpen"
@@ -8,15 +8,16 @@
            @hidden="onHidden">
     <div>
       <b-row>
-        <b-col cols="12">
+        <b-col cols="12 p-0">
           <b-calendar :min="minDate"
                       v-model="date"
                       locale="en-US"
                       hide-header
+                      block
                       @context="onContext">
           </b-calendar>
         </b-col>
-        <b-col cols="12">
+        <b-col cols="12 p-0">
           <b-time v-model="time"
                   class="mt-2 w-100"
                   locale="en"
@@ -25,7 +26,7 @@
           </b-time>
         </b-col>
 
-        <b-col cols="12">
+        <b-col cols="12 p-0">
           <b-alert class="schedule-notice p-1 mt-2 mb-0"
                    :show="!isScheduleDeliverable"
                    variant="warning">
@@ -75,6 +76,14 @@ export default {
 
     minDate () {
       return new Date()
+    },
+    isOpen: {
+      get () {
+        return this.isScheduleMessageOpen
+      },
+      set (isOpen) {
+        return isOpen
+      }
     }
   },
 
@@ -85,7 +94,6 @@ export default {
   data () {
     return {
       isSending: false,
-      isOpen: false,
       title: 'Schedule Message',
       date: new Date(),
       time: '',
@@ -167,9 +175,6 @@ export default {
         .set('hour', time.slice(0, 2))
         .set('minute', time.slice(3, 5))
       this.validateScheduleDate()
-    },
-    'isScheduleMessageOpen': function (value) {
-      this.isOpen = value
     }
   }
 }

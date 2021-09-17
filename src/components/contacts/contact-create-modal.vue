@@ -1,0 +1,259 @@
+<template>
+  <b-modal
+    id="create-contact-modal"
+    size="lg"
+    modal-class="confirm-dialog br-8"
+    hide-header-close
+    hide-header
+    hide-footer
+    ref="create-contact-modal"
+    @hidden="onReset">
+
+    <div class="modal-body-wrapper">
+
+        <b-form @submit.prevent="onSubmit">
+          <h5 class="mb-4 section-header fs-24 text-bold _600 text-center">Create Contact</h5>
+
+          <div class="scrollable p-2">
+            <b-form-row class="mt-2">
+              <b-col sm="12" md="6">
+                <b-form-group label="First Name">
+                  <b-form-input
+                    type="text"
+                    placeholder="John"
+                    ref="first_name"
+                    autofocus
+                    :state = "validateState('first_name')"
+                    v-model.trim="$v.contact.first_name.$model">
+                  </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.required">First name is required</b-form-invalid-feedback>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.maxLength">First name must not exceed 191 characters</b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+
+              <b-col sm="12" md="6">
+                <b-form-group label="Last Name">
+                  <b-form-input
+                    type="text"
+                    placeholder="Doe"
+                    ref="first_name"
+                    :state = "validateState('last_name')"
+                    v-model.trim="$v.contact.last_name.$model">
+                  </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.required">Last name is required</b-form-invalid-feedback>
+                  <b-form-invalid-feedback v-if="!$v.contact.first_name.maxLength">Last name must not exceed 191 characters</b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-form-row>
+
+            <b-form-row class="mt-2">
+              <b-col sm="12" md="6">
+                <b-form-group label="Phone Number">
+                  <b-form-input
+                    type="text"
+                    placeholder="+18185005050"
+                    ref="phone_number"
+                    :state="validateState('phone_number')"
+                    v-model.trim="$v.contact.phone_number.$model">
+                  </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.phone_number.validPhone">Enter valid phone number</b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+
+              <b-col sm="12" md="6">
+                <b-form-group label="Email Address (Optional)">
+                  <b-form-input
+                    type="text"
+                    placeholder="e.g. john.doe@email.com"
+                    ref="email"
+                    :state = "validateState('email')"
+                    v-model.trim="$v.contact.email.$model">
+                  </b-form-input>
+                  <b-form-invalid-feedback v-if="!$v.contact.email.email">Enter a valid email address</b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-form-row>
+            <b-form-row class="mt-2">
+              <b-col sm="12" md="6">
+                <b-form-group
+                  label="Initial Line (Optional)"
+                  class="form-label">
+                  <line-selector v-model="contact.initial_campaign_id"
+                                 :multiple="false"
+                                 :use-chips="false"
+                                 :generic-styling="false"
+                                 :generic-multiselect="false"
+                                 @change="onLineSelected">
+                  </line-selector>
+                </b-form-group>
+              </b-col>
+
+              <b-col sm="12"
+                     md="6">
+                <b-form-group class="form-label"
+                              label="Owner (Optional)">
+                  <user-selector v-model="contact.user_id"
+                                 :generic-styling="false"
+                                 :multiple="false"
+                                 :use-chips="false"
+                                 @change="onUserSelected">
+                  </user-selector>
+                </b-form-group>
+              </b-col>
+            </b-form-row>
+            <b-form-row class="mt-2">
+              <b-col md="12">
+                <b-form-group
+                  label="Tags (Optional)"
+                  class="form-label">
+                  <tag-selector :multiple="true"
+                                v-model="contact.tag_ids"
+                                @change="onTagsSelected">
+                  </tag-selector>
+                </b-form-group>
+              </b-col>
+            </b-form-row>
+          </div>
+          <div class="p-2">
+            <b-form-row class="mt-2">
+              <b-col sm="12"
+                     md="6">
+                <b-button block
+                          class="btn-grey-80"
+                          @click="hideModal">
+                  Cancel
+                </b-button>
+              </b-col>
+
+              <b-col sm="12"
+                     md="6">
+                <b-button block
+                          type="submit"
+                          variant="primary"
+                          :disabled="isCreating">
+                  <q-spinner-bars v-if="isCreating" color="white" />
+                  {{ isCreating ? 'Saving Contact...' : 'Save' }}
+                </b-button>
+              </b-col>
+            </b-form-row>
+          </div>
+        </b-form>
+    </div>
+  </b-modal>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+import { formValidationMixin } from 'src/plugins/mixins'
+import LineSelector from 'components/generic-selectors/line-selector'
+import UserSelector from 'components/generic-selectors/user-selector'
+import TagSelector from 'components/generic-selectors/tag-selector'
+import talk2Api from 'src/plugins/api/api'
+
+import { required, maxLength, email } from 'vuelidate/lib/validators'
+export default {
+  name: 'contact-create-modal',
+
+  mixins: [ formValidationMixin ],
+
+  components: { UserSelector, LineSelector, TagSelector },
+
+  computed: {
+    ...mapState('inbox', ['channelChangedFilterFields']),
+    validPhoneNumber () {
+      return this.$options.filters.fixPhone(this.contact.phone_number)
+    },
+    invalidPhoneNumber () {
+      return 'Enter a valid phone number'
+    }
+  },
+
+  validations () {
+    return {
+      contact: {
+        first_name: {
+          required,
+          maxLength: maxLength(191)
+        },
+        last_name: {
+          required,
+          maxLength: maxLength(191)
+        },
+        phone_number: {
+          validPhone: (value) => this.$options.filters.fixPhone(value) !== false && value.length > 0
+        },
+        email: {
+          email
+        }
+      }
+    }
+  },
+
+  data () {
+    return {
+      contact: {
+        first_name: '',
+        last_name: '',
+        phone_number: '',
+        email: '',
+        initial_campaign_id: null,
+        user_id: null,
+        tag_ids: []
+      },
+      isCreating: false
+    }
+  },
+
+  methods: {
+
+    validateState (input) {
+      const { $dirty, $error } = this.$v.contact[input]
+      return $dirty ? !$error : null
+    },
+
+    hideModal () {
+      this.$refs['create-contact-modal'].hide()
+    },
+
+    onReset () {
+      this.contact = {
+        first_name: '',
+        last_name: '',
+        phone_number: '',
+        email: '',
+        initial_campaign_id: null,
+        user_id: null,
+        tag_ids: []
+      }
+
+      this.$v.contact.$reset()
+    },
+
+    onSubmit () {
+      this.$v.$touch()
+      if (this.$v.$invalid || !this.validPhoneNumber) {
+        return
+      }
+      this.isCreating = true
+      return talk2Api.V1.contact.create(this.contact).then(res => {
+        this.$emit('created', res.data)
+        this.onReset()
+        this.isCreating = false
+        this.hideModal()
+      })
+    },
+
+    onLineSelected (lineId) {
+      this.contact.initial_campaign_id = lineId
+    },
+
+    onUserSelected (userId) {
+      this.contact.user_id = userId
+    },
+
+    onTagsSelected (tags) {
+      this.contact.tag_ids = tags
+    }
+  }
+}
+</script>

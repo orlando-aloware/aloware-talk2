@@ -83,7 +83,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactClose']),
+    ...mapActions('contacts', ['removeContactClose', 'setShouldUpdateSelectedListContactCount']),
     onCancel () {
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
@@ -107,18 +107,10 @@ export default {
           url
         )
         .then(() => {
-          this.$q.notify({
-            message: 'Contact was successfully removed.',
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification('Contact was successfully removed.')
         })
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to remove contact please try again.',
-            type: 'negative',
-            textColor: 'white'
-          })
+          this.$generalNotification('Unable to remove contact please try again.', 'error')
         }).finally(() => {
           this.isBusy = false
           this.contactsToDelete = null
@@ -139,18 +131,10 @@ export default {
       return this.$axios
         .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id].map(contact => contact.id) } })
         .then(() => {
-          this.$q.notify({
-            message: 'Contacts was successfully removed.',
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to remove contacts please try again.',
-            type: 'negative',
-            textColor: 'white'
-          })
+          this.$generalNotification('Unable to remove contacts please try again.', 'error')
         }).finally(() => {
           this.contactsToDelete = null
           this.isBusy = false
@@ -159,6 +143,7 @@ export default {
         })
     },
     onConfirm () {
+      this.setShouldUpdateSelectedListContactCount(true)
       if (this.contactToRemove && !this.isBulkDelete) {
         this.handleSingleDeletion()
       }

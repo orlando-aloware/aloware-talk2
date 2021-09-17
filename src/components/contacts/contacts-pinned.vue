@@ -1,6 +1,6 @@
 <template>
   <div class="pinned">
-    <div class="pinned__header d-flex align-items-center border-bottom">
+    <div class="pinned__header d-flex align-items-center list--header">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         Pinned
       </div>
@@ -108,7 +108,6 @@ export default {
     },
 
     loadPinnedCount (id) {
-      console.log(id)
       return this.$axios.get(`api/v2/contacts-list/${id}/items?per_page=1`).then((response) => {
         this.pinnedCountLoaded({
           id: id,

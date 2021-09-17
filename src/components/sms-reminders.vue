@@ -78,14 +78,7 @@ export default {
 
     sendDefaultSmsReminder () {
       if (!this.selectedCampaign) {
-        this.$q.notify({
-          duration: 2500,
-          title: 'Line is required',
-          message: 'Please select a line where to send from.',
-          type: 'warning',
-          showClose: true,
-          position: 'top-right'
-        })
+        this.$generalNotification('Please select a line where to send from.', 'error')
       }
 
       if (this.selectedCampaign) {
@@ -98,37 +91,16 @@ export default {
             this.loading = false
             switch (res.status) {
               case 200:
-                this.$q.notify({
-                  duration: 5000,
-                  title: 'SMS reminder',
-                  message: 'SMS reminder is sent.',
-                  type: 'success',
-                  showClose: true,
-                  position: 'top-right'
-                })
+                this.$generalNotification('SMS reminder is sent.')
                 break
               default:
-                this.$q.notify({
-                  duration: 5000,
-                  title: 'Sending SMS reminder',
-                  message: res.data.message,
-                  type: 'error',
-                  showClose: true,
-                  position: 'top-right'
-                })
+                this.$generalNotification(res.data.message, 'error')
             }
           })
           .catch(err => {
             console.log(err)
             this.loading = false
-            this.$q.notify({
-              duration: 5000,
-              title: 'Sending SMS reminder',
-              message: 'Something went wrong.',
-              type: 'error',
-              showClose: true,
-              position: 'top-right'
-            })
+            this.$generalNotification('Something went wrong.', 'error')
           })
       }
     },

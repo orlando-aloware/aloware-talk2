@@ -38,13 +38,7 @@ export default {
         this.loadingContactDisposition = false
         this.dispositionStatusId = dispositionStatusId
         this.$emit('change', dispositionStatusId)
-        this.$q.notify({
-          offset: 95,
-          title: 'Contact',
-          message: 'Contact disposed',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Contact disposed')
       }).catch((err) => {
         this.loadingContactDisposition = false
         console.log(err)

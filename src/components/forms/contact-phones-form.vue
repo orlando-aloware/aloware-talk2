@@ -5,21 +5,19 @@
         type="text"
         placeholder="e.g. Wireless"
         ref="title"
-        v-model="phone.title"
-      ></b-form-input>
+        autofocus
+        v-model="phone.title">
+      </b-form-input>
     </b-form-group>
 
-    <b-form-group label="Phone Number">
-      <b-form-input
-        type="text"
-        placeholder="Phone Number"
-        :state="validPhoneNumber"
-        v-model="phone.number"
-        required>
+    <b-form-group label="Phone Number"
+                  :invalid-feedback="invalidPhoneNumber"
+                  :state="validPhoneNumber">
+      <b-form-input type="text"
+                    placeholder="Phone Number"
+                    v-model="phone.number"
+                    required>
       </b-form-input>
-      <b-form-invalid-feedback :state="validPhoneNumber">
-        {{ invalidPhoneNumber }}
-      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group v-if="this.contactSelectedPhone && this.contactSelectedPhone.phone_number !== contact.phone_number"
@@ -38,7 +36,7 @@
       <b-button type="button"
                 size="sm"
                 variant="primary"
-                :disabled="isBusy"
+                :disabled="isBusy || !validPhoneNumber || !phone.number || phone.number.length < 1"
                 @click="onSubmit">
         <b-spinner v-if="isBusy"
                    small label="Small Spinner"
@@ -55,6 +53,7 @@ import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'contact-phones-form',
+
   computed: {
     ...mapGetters('contacts', ['contact', 'contactSelectedPhone']),
     validPhoneNumber () {
@@ -64,21 +63,27 @@ export default {
       return 'Please enter a valid phone number'
     }
   },
-  data () {
-    return {
-      isBusy: false,
-      phone: {
-        title: null,
-        number: null,
-        isPrimary: false
+
+  props: {
+    phone: {
+      type: Object,
+      default: () => {
+        return {}
       }
     }
   },
+
+  data () {
+    return {
+      isBusy: false
+    }
+  },
+
   methods: {
     ...mapActions('contacts', ['setContact', 'addContactPhoneNumber', 'setContactSelectedPhone', 'updateContactSelectedPhone']),
     onSubmit (e) {
       this.isBusy = true
-      if (this.contactSelectedPhone) {
+      if (this.phone.id) {
         this.handleUpdate()
       } else {
         this.handleCreate()
@@ -98,7 +103,7 @@ export default {
       this.setContactSelectedPhone(null)
     },
     handleUpdate () {
-      return talk2Api.V1.contact.updatePhone(this.contact.id, this.contactSelectedPhone.id, {
+      return talk2Api.V1.contact.updatePhone(this.contact.id, this.phone.id, {
         title: this.phone.title,
         phone_number: this.phone.number,
         is_primary: this.phone.isPrimary
@@ -109,12 +114,7 @@ export default {
         this.onClose()
       }).catch(err => {
         console.log(err)
-        this.$q.notify({
-          message: 'Error while updating phone number.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error while updating phone number.', 'error')
       }).finally(() => {
         this.isBusy = false
       })
@@ -129,35 +129,11 @@ export default {
         this.onClose()
       }).catch(err => {
         console.log(err)
-        this.$q.notify({
-          message: 'Error while creating phone number.',
-          type: 'negative',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Error while creating phone number.', 'error')
       }).finally(() => {
         this.isBusy = false
       })
     }
-  },
-  mounted () {
-    this.$refs.title.focus()
-    if (this.contactSelectedPhone) {
-      this.phone = {
-        id: this.contactSelectedPhone.id,
-        title: this.contactSelectedPhone.title,
-        number: this.contactSelectedPhone.phone_number,
-        isPrimary: this.contactSelectedPhone ? this.contactSelectedPhone.phone_number === this.contact.phone_number : false
-      }
-    }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .make-primary-label {
-    display: inline-block;
-    margin-top: 1px;
-    cursor: pointer;
-  }
-</style>

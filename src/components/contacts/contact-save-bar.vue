@@ -60,12 +60,7 @@ export default {
       ]).finally(() => {
         this.resetChangedContactProperties()
         this.isBusy = false
-        this.$q.notify({
-          message: 'Your changes has been saved.',
-          type: 'positive',
-          textColor: 'white',
-          position: 'bottom-right'
-        })
+        this.$generalNotification('Your changes has been saved.')
       })
     },
     saveChanges () {

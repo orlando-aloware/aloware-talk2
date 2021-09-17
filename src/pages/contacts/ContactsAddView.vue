@@ -1,7 +1,9 @@
 <template>
   <contacts-add-items-static
     v-if="isLoaded && contactList.type === ContactListType.STATIC"
+    :id="contactList.id"
     :contactList="contactList"
+    :name="contactList.name"
   />
   <contacts-view
     v-else-if="isLoaded && contactList.type === ContactListType.DYNAMIC"
@@ -51,6 +53,10 @@ export default {
   methods: {
     ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'openFilters']),
     loadList (id) {
+      if (!id) {
+        id = 'all'
+      }
+
       const stringId = String(id)
 
       if (!this.listItems[stringId]) {
@@ -68,19 +74,15 @@ export default {
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
           this.$router.replace('/contacts/')
         })
     }
   },
   mounted () {
     this.loadList(this.$route.params.id)
-    if (this.contactList.type === this.ContactListType.DYNAMIC) {
+    if (this.contactList && this.contactList.type === this.ContactListType.DYNAMIC) {
       this.openFilters()
     }
   },

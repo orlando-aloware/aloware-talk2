@@ -91,8 +91,7 @@
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
         <div class=""
              v-if="communication.attachments && communication.attachments.length > 0">
-          <div class="px-2"
-               v-for="(attachment, index) in communication.attachments"
+          <div v-for="(attachment, index) in communication.attachments"
                :key="index">
             <q-img
               class="border-rounded img-fluid d-block r-2x mb-1"
@@ -255,7 +254,7 @@
                  :title="communication.current_status2 | translateCurrentStatusText | fixName"
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
 
-              <i class="material-icons help text-red-500"
+              <i class="material-icons help text-danger"
                  :title="communication.current_status2 | translateCurrentStatusText | fixName"
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
             </template>
@@ -334,7 +333,8 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city'
+        'cnam_city',
+        'contact_task_status'
       ],
       general_audit_properties: [
         'disposition_status_id',

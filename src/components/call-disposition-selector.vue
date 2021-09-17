@@ -224,13 +224,7 @@ export default {
         call_disposition_id: this.selectCallDisposition(this.callDispositionId, true)
       }).then((res) => {
         this.loadingCallDisposition = false
-        this.$q.notify({
-          offset: 95,
-          title: 'Communication',
-          message: 'Call disposed',
-          type: 'success',
-          showClose: true
-        })
+        this.$generalNotification('Call disposed')
         this.$emit('callDisposed', res.data.call_disposition_id)
       }).catch((err) => {
         this.loadingCallDisposition = false

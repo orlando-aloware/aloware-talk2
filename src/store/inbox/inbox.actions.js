@@ -26,6 +26,9 @@ export default {
   setPendingTaskCount: ({ commit }, count = 0) => {
     commit('SET_PENDING_TASK_COUNT', count)
   },
+  setContact: ({ commit }, payload) => {
+    commit('SET_CONTACT', payload)
+  },
   setContacts: ({ commit }, contacts) => {
     commit('SET_CONTACTS', contacts)
   },

@@ -182,22 +182,10 @@ export default {
       }
 
       request.then(response => {
-        this.$q.notify({
-          duration: 2500,
-          title: 'Event',
-          message: `Event has been ${pastActionText.toLowerCase()}.`,
-          type: 'positive',
-          position: 'bottom-right'
-        })
+        this.$generalNotification(`Event has been ${pastActionText.toLowerCase()}.`)
       }).catch(error => {
         console.log(error)
-        this.$q.notify({
-          duration: 2500,
-          title: 'Event',
-          message: `Error while ${presentActionText.toLowerCase()} event.`,
-          type: 'negative',
-          position: 'bottom-right'
-        })
+        this.$generalNotification(`Error while ${presentActionText.toLowerCase()} event`, 'error')
       }).finally(() => {
         this.isSaving = false
       })

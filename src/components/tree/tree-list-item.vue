@@ -12,10 +12,10 @@
       >
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon">
-          <folder-static-icon
+          <folder-static-icon color="#62666E"
             v-if="type === ContactListTypes.STATIC"
           ></folder-static-icon>
-          <folder-dynamic-icon
+          <folder-dynamic-icon color="#62666E"
             v-if="type === ContactListTypes.DYNAMIC"
           ></folder-dynamic-icon>
         </div>
@@ -170,22 +170,14 @@ export default {
 
           this.$router.push(`/contacts/list/${data.id}`)
 
-          this.$q.notify({
-            message,
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification(message)
 
           this.reloadFolders()
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
     onMove () {
@@ -224,11 +216,7 @@ export default {
       this.pinRequest(this.id, isPinned).finally(() => {
         this.getContactList(this.id).then((response) => {
           this.listLoaded(response)
-          this.$q.notify({
-            message: isPinned ? 'Successfully pinned' : 'Successfully unpinned',
-            type: 'positive',
-            textColor: 'white'
-          })
+          this.$generalNotification((isPinned ? 'Successfully pinned' : 'Successfully unpinned'))
         })
       })
     },
@@ -282,12 +270,8 @@ export default {
         .patch('/api/v2/contacts-list/' + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
     getContactList (id) {
@@ -296,12 +280,8 @@ export default {
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          this.$q.notify({
-            message,
-            type: 'negative',
-            textColor: 'white',
-            html
-          })
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
     getItems (id) {
@@ -314,16 +294,7 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$q.notify({
-            message: 'Unable to load folders please try again.',
-            type: 'negative',
-            textColor: 'white',
-            actions: [
-              {
-                icon: 'close'
-              }
-            ]
-          })
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
     onClickItem () {

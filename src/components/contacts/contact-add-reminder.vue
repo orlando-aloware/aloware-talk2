@@ -72,20 +72,10 @@ export default {
       talk2Api.V1.contact.addEngagement(this.contact.id, this.formatParameters())
         .then(response => {
           this.$emit('close')
-          this.$q.notify({
-            message: 'Reminder has been added.',
-            type: 'positive',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Reminder has been added.')
         }).catch(error => {
           console.log(error)
-          this.$q.notify({
-            message: 'Error while adding reminder.',
-            type: 'negative',
-            textColor: 'white',
-            position: 'bottom-right'
-          })
+          this.$generalNotification('Error while adding reminder.', 'error')
         }).finally(() => {
           this.isAdding = false
         })
