@@ -182,7 +182,7 @@
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            {{ getUser(communication.user_id).name }}
+            {{ !communication.campaign_id ? 'By ' : '' }}{{ getUser(communication.user_id).name }}
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
@@ -191,12 +191,12 @@
 
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND">
-            Sent from {{ communication.lead_number | fixPhone }}
+            {{ communication.type === CommunicationTypes.CALL ? 'Called' : 'Sent' }} from {{ communication.lead_number | fixPhone }}
         </span>
 
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            &nbsp;used {{ getCampaign(communication.campaign_id).name }} to send
+            &nbsp;used {{ getCampaign(communication.campaign_id).name }} to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }}
         </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
@@ -221,7 +221,7 @@
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
               [CommunicationTypes.SMS].includes(communication.type) &&
               communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            &nbsp;Failed to send from {{ getCampaign(communication.campaign_id).name }} to {{ communication.lead_number | fixPhone }}
+            &nbsp;Failed to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }} from {{ getCampaign(communication.campaign_id).name }} to {{ communication.lead_number | fixPhone }}
         </span>
 
         <q-badge class="is-dot mx-1 grey-light"
