@@ -1,7 +1,7 @@
 <template>
   <b-modal
     id="inbox-channel-filter-modal"
-    size="xl"
+    size="lg"
     modal-class="confirm-dialog"
     hide-header-close
     hide-header
@@ -9,7 +9,7 @@
     ref="inbox-channel-filter-modal">
 
     <div class="modal-body-wrapper d-flex">
-      <div class="w-25 left-column-wrapper">
+      <div class="w-50 left-column-wrapper">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-5">

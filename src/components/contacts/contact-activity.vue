@@ -26,7 +26,7 @@
     <div class="w-100"
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
       <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
-        <div class="contact-audit text-xxs">
+        <div class="contact-audit">
           <span>
             {{ communication.body }}
           </span>
@@ -51,7 +51,7 @@
     <div class="w-100"
          v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) && (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
       <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
-        <div class="contact-audit text-xxs">
+        <div class="contact-audit">
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
           </span>
@@ -171,22 +171,22 @@
         </div>
       </div>
 
-      <div class="activity-bottom-info text-xxs width-500 m-b d-flex align-items-center"
+      <div class="activity-bottom-info text-xs width-500 m-b d-flex align-items-center"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id)">
+              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ getWorkflow(communication.workflow_id).name }} sequence
         </span>
         <span class="text-muted"
-              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.broadcast_id && getBroadcast(communication.broadcast_id)">
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.broadcast_id && getBroadcast(communication.broadcast_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ getBroadcast(communication.broadcast_id).name }} broadcast
         </span>
         <span class="text-muted"
-              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length">
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ getUser(communication.user_id).name }}
         </span>
         <span class="text-muted"
-              v-else-if="communication.direction === CommunicationDirection.OUTBOUND">
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ currentCompany.name }}
         </span>
 
@@ -196,7 +196,7 @@
         </span>
 
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
+              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             &nbsp;used {{ getCampaign(communication.campaign_id).name }} to send
         </span>
         <span class="text-muted"
@@ -206,8 +206,23 @@
 
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
-              ![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              ![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             &nbsp;to {{ communication.lead_number | fixPhone }}
+        </span>
+        <span href="#"
+           class="text-sm text-primary cursor-pointer"
+           v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              [CommunicationTypes.SMS].includes(communication.type) &&
+              communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW"
+           @click="retrySendingSms">
+          {{ isRetryingSendSms ? 'Retrying...' : 'Retry?' }}
+        </span>
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              [CommunicationTypes.SMS].includes(communication.type) &&
+              communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+            &nbsp;Failed to send from {{ getCampaign(communication.campaign_id).name }} to {{ communication.lead_number | fixPhone }}
         </span>
 
         <q-badge class="is-dot mx-1 grey-light"
@@ -262,7 +277,7 @@
 
             <i class="material-icons help text-danger"
                :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
-               v-else>errors</i>
+               v-else>cancel</i>
           </router-link>
         </template>
       </div>
@@ -286,6 +301,8 @@ import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-t
 import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import FileIcon from 'components/icons/contact-activity/file-icon'
+
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   mixins: [
@@ -319,6 +336,7 @@ export default {
 
   data () {
     return {
+      isRetryingSendSms: false,
       datetimePassed: null,
       relativeDatetime: null,
       excluded_audits: [
@@ -687,6 +705,28 @@ export default {
 
     isAttachmentApplication (mimeType) {
       return mimeType.includes('application/')
+    },
+
+    retrySendingSms (e) {
+      e.preventDefault()
+      this.isRetryingSendSms = true
+      return talk2Api.V1.message.send(
+        {
+          body: this.communication.body,
+          contact_id: this.communication.contact_id,
+          campaign_id: this.communication.campaign_id,
+          phone_number: this.communication.lead_number,
+          attachments: this.communication.attachments,
+          gif: ''
+        }
+      ).then(response => {
+        this.$generalNotification('Text has been sent.')
+      }).catch(error => {
+        console.log(error)
+        this.$generalNotification('Error while sending text.', 'error')
+      }).finally(() => {
+        this.isRetryingSendSms = false
+      })
     }
   }
 }

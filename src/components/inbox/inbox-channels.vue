@@ -731,8 +731,10 @@ export default {
       this.getCommunications(this.filter)
     },
     '$route.name': function (value) {
-      if (value === 'Inbox Contact') {
-        let communication = this.communications.find(item => item.id === this.$route.params.communicationId)
+      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(value)) {
+        // since mention has different data structure to other channels, need to set property to compare as comm id
+        let identifierProp = value === 'Inbox Contact Mention Communication' ? 'mention_subject_id' : 'id'
+        let communication = this.communications.find(item => item[identifierProp] === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
       }
     },

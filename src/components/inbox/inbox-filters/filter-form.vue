@@ -41,7 +41,7 @@
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
-                   md="3">
+                   md="6">
               <b-form-group class="form-label"
                             label="Direction">
                 <communication-direction-selector v-model="filter.direction"
@@ -53,7 +53,7 @@
             </b-col>
             <b-col v-if="['calls', 'messages'].includes($route.params.channel)"
                    sm="12"
-                   md="3">
+                   md="6">
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector v-model="filter.answer_status"
@@ -65,7 +65,7 @@
             </b-col>
             <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
                    sm="12"
-                   md="3">
+                   md="6">
               <b-form-group class="form-label"
                             label="Talk Time">
                 <talk-time-selector v-model="filter.min_talk_time"
@@ -77,7 +77,7 @@
             </b-col>
             <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
                    sm="12"
-                   md="3">
+                   md="6">
               <b-form-group class="form-label"
                             label="Transfer Type">
                 <transfer-type-selector v-model="filter.transfer_type"
@@ -133,7 +133,7 @@
             </b-col>
           </b-form-row>
           <b-form-row>
-            <b-col md="3"
+            <b-col md="6"
                    sm="12">
               <b-form-group>
                 <span class="form-label">Show Only First Time Communications</span>
@@ -146,7 +146,7 @@
               </b-form-group>
             </b-col>
 
-            <b-col md="3"
+            <b-col md="6"
                    sm="12">
               <b-form-group>
                 <span class="form-label">Show Only Untagged Communications</span>
@@ -159,7 +159,7 @@
               </b-form-group>
             </b-col>
 
-            <b-col md="3"
+            <b-col md="6"
                    sm="12">
               <b-form-group>
                 <span class="form-label">Exclude Communications Sent From Sequences</span>

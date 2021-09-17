@@ -25,9 +25,11 @@
               <span class="text-left">
                 Open
               </span>
-              <span class="text-right task-count ml-1">
-                  {{ taskCounts.open | numberPlusFormatter(99) }}
-                </span>
+              <div class="text-right task-count ml-2">
+                  <span>
+                    {{ taskCounts.open | numberPlusFormatter(99) }}
+                  </span>
+              </div>
             </div>
           </template>
 
@@ -37,9 +39,11 @@
               <span class="text-left">
                 Pending
               </span>
-              <span class="text-center task-count ml-1">
+              <div class="text-center task-count ml-2">
+                <span>
                   {{ taskCounts.pending | numberPlusFormatter(99) }}
                 </span>
+              </div>
             </div>
           </template>
 

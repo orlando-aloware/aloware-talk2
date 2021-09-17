@@ -1,5 +1,6 @@
 <template>
   <div class="task-list scrollable w-100">
+    <p class="text-center mt-5" v-if="communications.length < 1">No Mentions</p>
     <task-mention-item v-for="communication in communications"
                        :key="communication.id"
                        :mention="communication"

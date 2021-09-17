@@ -736,6 +736,11 @@ body,
     color: $grey-90 !important;
   }
 
+  .contact-audit {
+    font-size: $f-size-body-xs;
+    color: $grey-90 !important;
+  }
+
   &:hover {
     .mark-as {
       display: block !important;
@@ -6655,9 +6660,14 @@ button.grey-90 {
         font-weight: 600;
         padding: 0 2px;
         color: $grey-90;
-        height: 20px;
+        height: 16px;
         width: 22px;
-        margin-top: 0.1px;
+        margin-top: 1.5px;
+
+        span {
+          top: -3px;
+          position: relative;
+        }
       }
     }
   }

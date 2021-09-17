@@ -3,7 +3,7 @@
        @click="onItemClick(mention)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
-      <i v-if="(markable(mention) || (mention.type === CommunicationTypes.SMS || (mention.type === CommunicationTypes.NOTE && mention.direction === CommunicationDirection.INBOUND)) && (mention.body || mention.attachments)) && !mention.is_read"
+      <i v-if="!mention.mention_subject.is_read && mention.mention_subject.direction === CommunicationDirection.INBOUND"
          class="fa fa-circle position-relative"
          style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;">
       </i>
