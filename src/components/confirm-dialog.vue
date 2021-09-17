@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    v-model="isOpen"
+    v-model="modelValue"
     :id="id"
     :size="size"
     :title="title"
@@ -47,8 +47,17 @@ export default {
   },
   mounted () {
     this.$refs.modal.$on('hidden', () => {
+      console.log('100 :>> ', 100)
       this.$emit('close')
     })
+  },
+  computed: {
+    modelValue: {
+      get () {
+        return this.isOpen
+      },
+      set (val) {}
+    }
   }
 }
 </script>

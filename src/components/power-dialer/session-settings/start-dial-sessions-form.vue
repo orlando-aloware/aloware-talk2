@@ -165,7 +165,8 @@ export default {
       return []
     },
     warmUpPeriods () {
-      let values = WARM_UP_PERIOD_LIST
+      let values = []
+      values = [WARM_UP_PERIOD_LIST]
       for (let i = 1; i <= 10; i++) {
         values.push(`${i * 5} seconds`)
       }

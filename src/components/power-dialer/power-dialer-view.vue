@@ -185,6 +185,7 @@
         </div>
       </div>
       <ConfirmDialog
+        v-model="isOpen"
         @close="closeModal"
         id="dialogName-dsad3ds-4"
         :is-open="isOpen"
@@ -209,7 +210,7 @@
                 class="f-btn--cancel"
                 size="sm"
                 block
-                @click="{}">
+                @click="closeModal">
                 Cancel
               </b-button>
             </div>

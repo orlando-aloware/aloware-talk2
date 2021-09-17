@@ -71,13 +71,6 @@
     },
     {
       "reportId": 2,
-      "name": "New",
-      "color": "positive",
-      "value": 106,
-      "id": 12
-    },
-    {
-      "reportId": 2,
       "name": "Open Deal",
       "color": null,
       "value": 159,
