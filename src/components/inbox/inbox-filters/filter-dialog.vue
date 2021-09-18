@@ -14,38 +14,47 @@
 
         <div class="mt-5">
           <div class="mb-4">
-            <div class="filter-items active">Create New</div>
+            <div class="filter-items active text-italic"><span>Create New</span></div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
           <div class="saved-filters">
-            <div class="filter-items"><span>Saved Filter #1</span></div>
-            <div class="filter-items"><span>Saved Filter #2</span></div>
-            <div class="filter-items"><span>Saved Filter #3</span></div>
+            <div class="filter-items d-flex justify-content-between pr-0" v-for="index in 3" :key="index">
+              <span>Saved Filter #1</span>
+
+              <b-dropdown text="..."
+                          no-caret
+                          variant="light"
+                          class="m-2 b-compact-dropdown-button text-bold">
+                <template #button-content>
+                  <i class="fa fa-ellipsis-h"></i>
+                </template>
+                <b-dropdown-item href="#"><pencil-icon></pencil-icon> Rename</b-dropdown-item>
+                <b-dropdown-item href="#"><trash-o-icon></trash-o-icon> Delete</b-dropdown-item>
+              </b-dropdown>
+            </div>
           </div>
           <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
           <div class="saved-filters">
-            <div class="filter-items"><span>Saved Company Filter #1</span></div>
+            <div class="filter-items"><span>Saved Company Filter Saved Company Filter #1</span></div>
             <div class="filter-items"><span>Saved Company Filter #2</span></div>
             <div class="filter-items"><span>Saved Company Filter #3</span></div>
           </div>
         </div>
       </div>
       <div class="flex-grow-1">
-        <div class="container d-flex justify-content-between mb-3">
+        <div class="container d-flex justify-content-between mb-3 action-option-container">
           <div>
             <span class="filter-name">(Unsaved) Filter</span>
           </div>
           <div>
-            <b-button size="sm"
-                      :disabled="channelChangedFilterFields.length < 1"
-                      @click="onResetFilter">Reset</b-button>
-
-            <b-button size="sm"
-                      class="ml-2 mr-2"
-                      variant="primary">Save</b-button>
-
-            <b-button size="sm"
-                      variant="primary">Save as New</b-button>
+            <compact-btn variant="secondary"
+                         class="bg-grey-80 mr-3"
+                         :disabled="channelChangedFilterFields.length < 1"
+                         @clicked="onResetFilter">Reset</compact-btn>
+            <compact-btn variant="primary">Save</compact-btn>
+            <compact-btn variant="primary"
+                         class="ml-3"
+                         v-show="false">Save as New</compact-btn>
           </div>
         </div>
         <filter-form :filter="filter"></filter-form>
@@ -66,11 +75,14 @@
 <script>
 import FilterForm from 'components/inbox/inbox-filters/filter-form'
 import { mapState } from 'vuex'
+import CompactBtn from 'components/compact-btn'
+import PencilIcon from 'components/icons/pencil-icon'
+import TrashOIcon from 'components/icons/trash-o-icon'
 
 export default {
   name: 'filter-dialog',
 
-  components: { FilterForm },
+  components: { TrashOIcon, PencilIcon, CompactBtn, FilterForm },
 
   props: {
     filter: {

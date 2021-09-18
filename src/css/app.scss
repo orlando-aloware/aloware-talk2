@@ -6208,6 +6208,10 @@ table.datatable {
     }
   }
 
+  .action-option-container {
+    padding-right: 20px;
+  }
+
   .filter-name {
     color: $grey-90;
     font-size: 14px;
@@ -6238,6 +6242,38 @@ table.datatable {
       span {
         font-size: 13px;
         color: $grey-100;
+        width: 7vw;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline-block;
+      }
+
+      .b-dropdown {
+        height: 10px !important;
+        margin-top: 0 !important;
+
+        button {
+          margin-top: -1px;
+          background: none;
+          padding: 2px;
+          border: none !important;
+          display: none;
+          height: 20px !important;
+          font-size: 10px;
+        }
+      }
+
+      button:hover,
+      button:focus,
+      button:active {
+        border: none;
+      }
+    }
+
+    .filter-items:hover {
+      button {
+        display: block;
       }
     }
 
@@ -6255,6 +6291,14 @@ table.datatable {
     .saved-filters {
 
     }
+  }
+
+  .q-field__focusable-action {
+    font-size: 0.8em;
+  }
+
+  .q-toggle {
+    margin-left: -10px !important;
   }
 }
 
@@ -6319,6 +6363,12 @@ button.grey-90 {
 .q-field--highlighted.highlighted-primary {
   .q-field__native, .q-field__marginal {
     color: $primary
+  }
+}
+
+.padding-left__none {
+  .q-field__native {
+    padding-left: 0 !important;
   }
 }
 

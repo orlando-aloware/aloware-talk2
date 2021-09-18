@@ -4,7 +4,19 @@
                     :pendingCount="taskCounts.pending"
                     :commCampaigns="[]"
                     :commRingGroups="[]"
+                    :has-custom-left-content="true"
                     @sort="sortContactTasks">
+        <template slot="customLeftContent">
+          <div class="mention-filter-actions-wrapper mt-3 ml-2">
+            <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
+            <line-and-ring-group-selector custom-placeholder="Filter"
+                           :clearable="true"
+                           :hide-dropdown-icon="true"
+                           :outlined="false"
+                           :borderless="true">
+            </line-and-ring-group-selector>
+          </div>
+        </template>
       </calls-header>
       <div class="w-100">
         <q-btn-toggle
@@ -91,12 +103,14 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
+import SearchIcon from 'components/icons/search-icon'
+import LineAndRingGroupSelector from 'components/generic-selectors/line-and-ring-group-selector'
 
 let scrollTimeout
 export default {
   name: 'inbox-tab',
 
-  components: { InboxTaskList, CallsHeader },
+  components: { LineAndRingGroupSelector, SearchIcon, InboxTaskList, CallsHeader },
 
   props: {
     searchText: {

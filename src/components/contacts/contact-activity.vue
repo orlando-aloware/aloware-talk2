@@ -213,7 +213,8 @@
            class="text-sm text-primary cursor-pointer"
            v-if="communication.direction === CommunicationDirection.OUTBOUND &&
               [CommunicationTypes.SMS].includes(communication.type) &&
-              communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW"
+              communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW &&
+              isRetryingSendSmsEnabled"
            @click="retrySendingSms">
           {{ isRetryingSendSms ? 'Retrying...' : 'Retry?' }}
         </span>
@@ -336,6 +337,7 @@ export default {
   data () {
     return {
       isRetryingSendSms: false,
+      isRetryingSendSmsEnabled: false,
       datetimePassed: null,
       relativeDatetime: null,
       excluded_audits: [

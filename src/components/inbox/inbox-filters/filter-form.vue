@@ -3,7 +3,7 @@
     <b-form class="inbox-channel-filter-form">
       <b-container>
         <div v-if="!['mentions'].includes($route.params.channel)">
-          <h5 class="mb-4 section-header">Quick Access</h5>
+          <h5 class="section-header">Quick Access</h5>
           <b-form-row class="mt-2">
             <b-col sm="12" md="6">
               <b-form-group
@@ -45,7 +45,7 @@
               <b-form-group class="form-label"
                             label="Direction">
                 <communication-direction-selector v-model="filter.direction"
-                                                  custom-class="bottom-border__none highlighted-primary"
+                                                  custom-class="bottom-border__none highlighted-primary padding-left__none"
                                                   :highlighted="isChanged('direction')"
                                                   @select="(eventPayload) => onFilterChange(eventPayload, 'direction')">
                 </communication-direction-selector>
@@ -57,7 +57,7 @@
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector v-model="filter.answer_status"
-                                        custom-class="bottom-border__none highlighted-primary"
+                                        custom-class="bottom-border__none highlighted-primary padding-left__none"
                                         :highlighted="isChanged('answer_status')"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'answer_status')">
                 </answer-status-selector>
@@ -69,7 +69,7 @@
               <b-form-group class="form-label"
                             label="Talk Time">
                 <talk-time-selector v-model="filter.min_talk_time"
-                                    custom-class="bottom-border__none highlighted-primary"
+                                    custom-class="bottom-border__none highlighted-primary padding-left__none"
                                     :highlighted="isChanged('min_talk_time')"
                                     @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')">
                 </talk-time-selector>
@@ -81,7 +81,7 @@
               <b-form-group class="form-label"
                             label="Transfer Type">
                 <transfer-type-selector v-model="filter.transfer_type"
-                                        custom-class="bottom-border__none highlighted-primary"
+                                        custom-class="bottom-border__none highlighted-primary padding-left__none"
                                         :highlighted="isChanged('transfer_type')"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')">
                 </transfer-type-selector>
@@ -89,13 +89,13 @@
             </b-col>
             <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
                    sm="12"
-                   md="3">
+                   md="6">
               <b-form-group
                 class="form-label"
                 label="Callback Status"
               >
                 <callback-status-selector v-model="filter.callback_status"
-                                          custom-class="bottom-border__none highlighted-primary"
+                                          custom-class="bottom-border__none highlighted-primary padding-left__none"
                                           :clearable="true"
                                           :highlighted="isChanged('callback_status')"
                                           @select="(eventPayload) => onFilterChange(eventPayload, 'callback_status')">
@@ -139,6 +139,7 @@
                 <span class="form-label">Show Only First Time Communications</span>
                 <div>
                   <q-toggle color="green"
+                            class="pl-0"
                             v-model="filter.first_time_only"
                             :true-value="1"
                             :false-value="0"/>

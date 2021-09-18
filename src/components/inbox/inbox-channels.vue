@@ -44,11 +44,12 @@
         <div class="calls-header__label w-100 d-flex justify-content-between pl-2 pr-2">
           <div class="mention-filter-actions-wrapper mt-3">
             <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
-            <user-selector :clearable="true"
+            <user-selector custom-placeholder="Filter by User"
+                           :clearable="true"
                            :hide-dropdown-icon="true"
                            :outlined="false"
                            :borderless="true"
-                           custom-placeholder="Filter by User"
+                           :value="mentionUserId"
                            @change="userMentionSelected">
             </user-selector>
           </div>
@@ -255,7 +256,8 @@ export default {
       mentionType: MentionType.TYPE_RECEIVED,
       sorting: {
         order: 'desc'
-      }
+      },
+      mentionUserId: null
     }
   },
 
@@ -384,7 +386,7 @@ export default {
           } else {
             communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
           }
-          console.log(communication)
+
           if (communication) {
             _this.setSelectedCommunication(communication)
           }
@@ -416,6 +418,7 @@ export default {
 
       this.filter.type = this.filterType
       this.filter.answer_status = this.answerStatus
+      this.mentionUserId = null
 
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
@@ -686,7 +689,7 @@ export default {
 
     setMentionType () {
       if (this.$route.params.channel === 'mentions') {
-        switch (this.$route.params.direction) {
+        switch (this.$route.params.status) {
           case 'sent':
             this.mentionType = MentionType.TYPE_SENT
             break
@@ -699,13 +702,14 @@ export default {
 
     userMentionSelected (value) {
       this.resetFilters()
+      this.mentionUserId = value
 
       if (this.mentionType === MentionType.TYPE_RECEIVED) {
-        this.filter.mentioner_user_id = value
+        this.filter.mentioner_user_id = this.mentionUserId
       }
 
       if (this.mentionType === MentionType.TYPE_SENT) {
-        this.filter.mentioned_user_id = value
+        this.filter.mentioned_user_id = this.mentionUserId
       }
     },
 

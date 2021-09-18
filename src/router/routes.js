@@ -51,7 +51,7 @@ const routes = [
             }
           },
           {
-            path: 'channels/:channel/:direction/contacts/:id/communications/:communicationId',
+            path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
             name: 'Inbox Contact Mention Communication',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {

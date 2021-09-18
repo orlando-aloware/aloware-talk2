@@ -1,6 +1,6 @@
 <template>
   <q-select ref="userSelect"
-            class="q-user-selector"
+            class="q-line-and-ring-group-selector"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -8,15 +8,13 @@
             input-debounce="0"
             style="word-break: break-all;"
             use-input
-            emit-value
-            map-options
             dense
-            v-model="userId"
+            v-model="selected"
             :hide-dropdown-icon="hideDropdownIcon"
             :clearable="clearable"
             :outlined="outlined"
             :borderless="borderless"
-            :options="userOptions"
+            :options="options"
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
@@ -47,22 +45,15 @@
               v-on="scope.itemEvents">
         <q-item-section>
           <q-item-label>
-            <div class="break-all">{{ scope.opt.name }}</div>
+            <div class="break-all pl-3">{{ scope.opt.name }}</div>
           </q-item-label>
-          <q-item-label v-if="!scope.opt.is_destination"
-                        caption>
-            <div class="break-all">{{ scope.opt.email }} - {{ getLabel(scope.opt) }}</div>
-          </q-item-label>
-          <q-item-label v-else
-                        caption>
-            <div>{{ getLabel(scope.opt) }}</div>
-          </q-item-label>
+
         </q-item-section>
       </q-item>
       <q-item v-if="scope.opt.group"
               v-bind="scope.itemProps"
               v-on="scope.itemEvents">
-        <q-item-label header class="text-size-xs">{{ scope.opt.group }}</q-item-label>
+        <q-item-label header class="text-size-rg text-grey-10">{{ scope.opt.group }}</q-item-label>
       </q-item>
     </template>
   </q-select>
@@ -70,10 +61,10 @@
 
 <script>
 import { mapState } from 'vuex'
-import * as AnswerTypes from 'src/constants/answer-types'
+import _ from 'lodash'
 
 export default {
-  name: 'user-selector',
+  name: 'line-and-ring-group-selector',
 
   props: {
     value: {
@@ -153,15 +144,28 @@ export default {
 
   data () {
     return {
-      isFocused: false,
-      userId: this.value,
-      userOptions: [],
-      selectWidth: 0
+      selected: this.value,
+      options: [],
+      selectWidth: 0,
+      isFocused: false
     }
   },
 
   computed: {
-    ...mapState(['currentCompany', 'users']),
+    ...mapState(['currentCompany', 'users', 'campaigns', 'ringGroups']),
+
+    campaignsAlphabeticalOrder () {
+      if (this.campaigns) {
+        let campaigns = _.clone(this.campaigns)
+        return campaigns.sort((a, b) => {
+          let textA = a.name.toUpperCase()
+          let textB = b.name.toUpperCase()
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+        })
+      }
+
+      return []
+    },
 
     placeholder () {
       if (!this.showPlaceholder) {
@@ -169,108 +173,72 @@ export default {
       }
 
       switch (true) {
-        case this.multiple && this.userId.length < 1:
-          return this.customPlaceholder || 'Select Users'
-        case !this.multiple && !this.userId:
-          return this.customPlaceholder || 'Select User'
-        case this.multiple && this.userId.length > 0:
-        case !this.multiple && this.userId:
+        case this.multiple && this.selected.length < 1:
+          return this.customPlaceholder || 'Select Lines or Ring Groups'
+        case !this.multiple && !this.selected:
+          return this.customPlaceholder || 'Select Line or Ring Group'
+        case this.multiple && this.selected.length > 0:
+        case !this.multiple && this.selected:
         default:
           return ''
       }
     },
 
-    availableUsers () {
-      return this.users
-    },
-
-    filteredUsers () {
-      if (this.availableUsers) {
-        let filteredUsers = this.availableUsers.filter((user) =>
-          !(user.role_names.length === 1 && user.read_only_access) &&
-          user.answer_by !== AnswerTypes.BY_NONE
-        )
-
-        return filteredUsers
-      }
-
-      return []
-    },
-
-    normalUsers () {
-      return this.filteredUsers.filter((user) => !user.is_destination)
-    },
-
-    extensionUsers () {
-      return this.filteredUsers.filter((user) => user.is_destination)
-    },
-
     formattedOptions () {
-      let normalUsers = [...this.normalUsers]
+      let campaignOptions = [...this.sortToAlphabeticalOrder(this.campaigns)]
 
-      normalUsers.unshift({
-        group: 'Users',
+      campaignOptions.unshift({
+        group: 'Filter by Line',
         disable: true
       })
 
-      let usersArray = normalUsers
+      let campaignAndRingGroupArray = campaignOptions
+      let ringGroupOptions = [...this.sortToAlphabeticalOrder(this.ringGroups)]
+      ringGroupOptions.unshift({
+        group: 'Filter by Ring Group',
+        disable: true
+      })
+      campaignAndRingGroupArray = [...campaignOptions, ...ringGroupOptions]
 
-      if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
-        let extensionUsers = [...this.extensionUsers]
-        extensionUsers.unshift({
-          group: 'Extensions',
-          disable: true
-        })
-        usersArray = [...normalUsers, ...extensionUsers]
-      }
-
-      return usersArray
-    },
-
-    userObject () {
-      if (!this.userId) {
-        return null
-      }
-
-      return this.formattedOptions.find(item => item.id === this.userId)
+      return campaignAndRingGroupArray
     }
   },
 
   created () {
-    this.userOptions = this.formattedOptions
+    this.options = this.formattedOptions
   },
 
   methods: {
 
     onFocus () {
       this.isFocused = true
-      this.$el.querySelector('.q-user-selector .q-field__input').placeholder = this.userObject ? this.userObject.name : this.placeholder
-      this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'block'
-      if (this.userObject) {
-        this.$el.querySelector('.q-user-selector .q-field__native span').style.display = 'none'
+      this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').placeholder = this.selected ? this.selected.name : this.placeholder
+      this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').style.display = 'block'
+      if (this.selected) {
+        this.$el.querySelector('.q-line-and-ring-group-selector .q-field__native span').style.display = 'none'
       }
     },
 
     onBlur () {
       this.isFocused = false
-      this.$el.querySelector('.q-user-selector .q-field__input').placeholder = ''
+      this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').placeholder = ''
       this.showInputPlaceholder()
-      if (this.userObject) {
-        this.$el.querySelector('.q-user-selector .q-field__native span').style.display = ''
+      if (this.selected) {
+        this.$el.querySelector('.q-line-and-ring-group-selector .q-field__native span').style.display = ''
       }
     },
 
     showInputPlaceholder () {
-      if (!this.userObject) {
-        this.$el.querySelector('.q-user-selector .q-field__input').placeholder = this.placeholder
-        this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'block'
+      if (!this.selected) {
+        this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').placeholder = this.placeholder
+        this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').style.display = 'block'
       } else {
-        this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'none'
+        this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').style.display = 'none'
       }
     },
 
     onInput () {
-      this.$el.querySelector('.q-user-selector .q-field__input').blur()
+      this.$el.querySelector('.q-line-and-ring-group-selector .q-field__input').blur()
     },
 
     onShowMenu () {
@@ -278,22 +246,22 @@ export default {
     },
 
     filterFn (val, update) {
-      if (this.userId && val === this.userId) {
+      if (this.selected && val === this.selected) {
         update(() => {
-          this.userOptions = this.formattedOptions.filter(user => user.id === this.userId)
+          this.options = this.formattedOptions.filter(item => item.id === this.selected)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.userOptions = this.formattedOptions
+          this.options = this.formattedOptions
         })
         return
       }
 
       update(() => {
-        this.userOptions = this.formattedOptions.filter((user) =>
+        this.options = this.formattedOptions.filter((user) =>
           (user.name && user.name.toLowerCase().includes(val.toLowerCase())) ||
           (user.phone_number && user.phone_number.includes(val)) ||
           (user.email && user.email.toLowerCase().includes(val.toLowerCase()))
@@ -301,31 +269,27 @@ export default {
       })
     },
 
-    getLabel (user) {
-      if (!user) {
-        return
+    sortToAlphabeticalOrder (items) {
+      if (items) {
+        let sortable = _.clone(items)
+        return sortable.sort((a, b) => {
+          let textA = a.name.toUpperCase()
+          let textB = b.name.toUpperCase()
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+        })
       }
 
-      switch (user.answer_by) {
-        case AnswerTypes.BY_PHONE_NUMBER:
-          return 'Phone Number (' + user.phone_number + ')'
-        case AnswerTypes.BY_BROWSER:
-          return 'Apps'
-        case AnswerTypes.BY_IP_PHONE:
-          return 'SIP (IP Phone)'
-        case AnswerTypes.BY_NONE:
-          return 'Will Not Answer'
-      }
+      return []
     }
   },
 
   watch: {
     value () {
-      this.userId = this.value
+      this.selected = this.value
     },
 
-    userId (val) {
-      if (this.userId !== this.value) {
+    selected (val) {
+      if (this.selected !== this.value) {
         this.$emit('change', val)
       }
     }
