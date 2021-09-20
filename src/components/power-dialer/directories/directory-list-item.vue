@@ -135,21 +135,21 @@ export default {
     ]),
     onDuplicate () {
       this.$root.$emit('bv::hide::popover')
-      this.createList({
-        id: this.id,
-        type: this.type
-      })
+      // this.createList({
+      //   id: this.id,
+      //   type: this.type
+      // })
     },
     onCloneStatic () {
       this.$root.$emit('bv::hide::popover')
-      this.createList({
-        id: this.id,
-        type: ContactListTypes.STATIC
-      })
+      // this.createList({
+      //   id: this.id,
+      //   type: ContactListTypes.STATIC
+      // })
     },
     createList (params) {
       this.$axios
-        .post('/api/v2/contacts-list/' + this.id + '/duplicate', params)
+        .post('/api/v2/power-dialer/' + this.id + '/duplicate', params)
         .then((response) => {
           const data = response.data.data
           const message = response.data.message

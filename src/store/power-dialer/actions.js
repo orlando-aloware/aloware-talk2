@@ -13,5 +13,36 @@ export default {
     if (res.status === 200) {
       commit('SET_CONTACT_RESOURCES', res.data)
     }
+  },
+
+  /**
+   * DIRECTORIES
+   */
+  toggleFolder: ({ commit }, id) => {
+    commit('TOGGLE_FOLDER', id)
+  },
+  foldersLoaded: ({ commit }, payload) => {
+    commit('FOLDERS_LOADED', payload)
+  },
+  openFolder: ({ commit }, id) => {
+    commit('OPEN_FOLDER', id)
+  },
+  closeFolder: ({ commit }, id) => {
+    commit('CLOSE_FOLDER', id)
+  },
+  removeFolderOpen: ({ commit }, folder) => {
+    commit('REMOVE_FOLDER_OPEN', folder)
+  },
+  openMoveDialog: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_OPEN', payload)
+  },
+  createListOpen: ({ commit }, payload) => {
+    commit('CREATE_LIST_OPEN', payload)
+  },
+  removeListOpen: ({ commit }, list) => {
+    commit('REMOVE_LIST_OPEN', list)
+  },
+  listLoaded: ({ commit }, payload) => {
+    commit('LIST_LOADED', payload)
   }
 }

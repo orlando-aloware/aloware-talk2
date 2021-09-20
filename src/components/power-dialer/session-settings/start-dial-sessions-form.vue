@@ -19,49 +19,20 @@
             {{ cform.label }}
             </label>
 
-          <q-select
+          <MetricSelector
             v-if="cform.name === 'setSessionMetrics'"
-            @popup-show="onShowMetricsMenu"
-            outlined dense emit-value
             v-model="resources[cform.name]"
             :options="metricOptions"
-            option-value="text"
-            option-label="text"
-            ref="setSessionMetrics"
-            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
-            <template v-slot:selected>
-              <template v-if="resources[cform.name]">
-                {{ resources[cform.name] }}
-              </template>
-              <template v-else>
-                Add Metrics
-              </template>
-            </template>
-            <template v-slot:option="scope">
-              <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-                <q-item-section v-if="!scope.opt.disable" avatar></q-item-section>
-                <q-item-section>
-                  <q-item-label
-                    v-if="scope.opt.disable"
-                    class="text-subtitle2 font-weight-bold"
-                    disabled label
-                    v-html="scope.opt.text" />
-                  <q-item-label
-                    v-else
-                    v-html="scope.opt.text" />
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
+            custom-class="generic-selector" />
 
           <LineSelector
             v-else-if="cform.name === 'line'"
             v-model="resources[cform.name]"
-            :multiple="false"
+            :multiple="true"
             :use-chips="true"
             :generic-styling="false"
             :generic-multiselect="false"
-            @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')"></LineSelector>
+            @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
 
           <ScriptSelector
             v-else-if="cform.name === 'phoneScript'"
@@ -102,7 +73,11 @@
               val="md" />
           </p>
 
-          <q-select
+          <WarmupPeriodSelector
+            v-else-if="cform.name === 'warmupPeriod'"
+            v-model="resources[cform.name]" />
+
+          <!-- <q-select
             v-else-if="cform.name === 'warmupPeriod'"
             v-model="resources[cform.name]"
             @popup-show="onShowWarmUpMenu"
@@ -110,7 +85,7 @@
             :options="warmUpPeriods"
             outlined dense
             class="generic-selector"
-            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"></q-select>
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"></q-select> -->
 
           <q-select
             v-else
@@ -128,16 +103,18 @@
 <script>
 
 import { mapState } from 'vuex'
+import MetricSelector from 'components/generic-selectors/session-metric-selector'
+import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
 import ScriptSelector from 'components/generic-selectors/script-selector'
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-import { METRIC_OPTIONS_2 } from 'src/constants/stats'
+import { METRIC_OPTIONS_3 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
-const stats = { METRIC_OPTIONS_2 }
+const stats = { METRIC_OPTIONS_3 }
 
 export default {
   name: 'StartDialSessionsForm',
@@ -148,6 +125,8 @@ export default {
     }
   },
   components: {
+    MetricSelector,
+    WarmupPeriodSelector,
     LineSelector,
     ScriptSelector,
     ContactDispositionSelector,
@@ -160,7 +139,7 @@ export default {
     ]),
     metricOptions () {
       if (stats) {
-        return stats.METRIC_OPTIONS_2
+        return stats.METRIC_OPTIONS_3
       }
       return []
     },
@@ -177,9 +156,10 @@ export default {
     }
   },
   methods: {
-    onFilterChange (value, prop) {
+    onLineFilterChange (value, prop) {
       console.log('value :>> ', value)
       console.log('prop :>> ', prop)
+      this.resources.line = value
       // this.filter[prop] = value
       // this.updateChannelChangedFilterFields({
       //   name: prop,

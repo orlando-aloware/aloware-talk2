@@ -170,7 +170,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList']),
+    ...mapGetters('powerDialer', [
+      'opened',
+      'moveDialog',
+      'createList'
+    ]),
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
@@ -187,7 +191,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', [
+    ...mapActions('powerDialog', [
       'toggleFolder',
       'openFolder',
       'closeFolder',

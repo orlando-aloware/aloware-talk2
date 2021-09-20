@@ -45,7 +45,7 @@ export default {
         width: `${this.layer * 10}px`
       }
     },
-    ...mapGetters('contacts', ['opened'])
+    ...mapGetters('powerDialer', ['opened'])
   },
   props: {
     parent_id: {
@@ -64,7 +64,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', [
+    ...mapActions('powerDialer', [
       'toggleFolder',
       'foldersLoaded'
     ]),

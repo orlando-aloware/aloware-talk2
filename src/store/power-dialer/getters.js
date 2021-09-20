@@ -1,7 +1,13 @@
 import { TEST_DATA } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
+  opened: (state) => new Set(state.opened),
   filters: (state) => state.filters,
+  moveDialog: (state) => state.moveDialog,
+  createList: (state) => state.createList,
+  isRemoveListOpen: (state) => !!state.removeList,
+  pinned: (state) => state.pinned,
+  selectedContacts: (state) => state.selectedContacts,
   powerDialerList: (state) => {
     /**
      * TEMPORARY VALUES

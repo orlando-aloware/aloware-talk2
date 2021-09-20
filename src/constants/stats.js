@@ -138,6 +138,32 @@ export const METRIC_OPTIONS_2 = [
   { disable: false, value: null, text: 'Wrap-Up' }
 ]
 
+export const METRIC_OPTIONS_3 = [
+  { disable: true, value: null, text: 'Contact Dispositions' },
+  { disable: false, value: null, text: 'Active' },
+  { disable: false, value: null, text: 'Attempted to Contact' },
+  { disable: false, value: null, text: 'Bad Timing' },
+  { disable: false, value: null, text: 'Connected' },
+  { disable: false, value: null, text: 'In Progress' },
+  { disable: false, value: null, text: 'New' },
+  { disable: false, value: null, text: 'Open' },
+  { disable: false, value: null, text: 'Open Deal' },
+  { disable: false, value: null, text: 'Unqualified' },
+  { disable: true, value: null, text: 'Call Dispositions' },
+  { disable: false, value: null, text: 'Busy' },
+  { disable: false, value: null, text: 'Connected' },
+  { disable: false, value: null, text: 'Left live message' },
+  { disable: false, value: null, text: 'Left voicemail' },
+  { disable: false, value: null, text: 'No answer' },
+  { disable: false, value: null, text: 'Wrong number' },
+  { disable: true, value: null, text: 'Session Metrics' },
+  { disable: false, value: null, text: 'Qualified Outbound Calls' },
+  { disable: false, value: null, text: 'Average Duration' },
+  { disable: false, value: null, text: 'Total Duration' },
+  { disable: false, value: null, text: 'Average Talk Time' },
+  { disable: false, value: null, text: 'Total Talk Time' }
+]
+
 export const METRIC_OPTIONS_COLORS = [
   { value: 'positive', color: 'primary', text: 'Success' },
   { value: 'negative', color: 'danger', text: 'Warning' },

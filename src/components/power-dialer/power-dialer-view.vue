@@ -24,7 +24,7 @@
       <StartDialing />
     </template>
 
-    <template slot="table">
+    <template slot="actions">
       <div>
         <b-card class="border-0 text-center">
           <div class="t-grouped-buttons">
@@ -88,6 +88,18 @@
             </b-col>
           </b-row>
         </b-container>
+      </div>
+    </template>
+
+    <template slot="actions">
+      <div v-if="checked.length > 0" class="px-3 text-caption">
+        Menu here if selected multiple items...
+      </div>
+      <!-- <bulk-action-menu :id="id" v-if="checked.length > 0"></bulk-action-menu> -->
+    </template>
+
+    <template slot="table">
+      <div>
         <div class="pr-2">
 
           <Datatable
@@ -113,7 +125,8 @@
                       :key="key">
                       <CheckBox
                         :resource="contact"
-                        :checked-items="checked" />
+                        :checked-items="checked"
+                        @checked="onCheckboxCheck" />
                     </td>
                     <!-- COLUMN: Name  -->
                     <td
@@ -187,7 +200,7 @@
       <ConfirmDialog
         v-model="isOpen"
         @close="closeModal"
-        id="dialogName-dsad3ds-4"
+        :id="dialogName"
         :is-open="isOpen"
         :hide-header="true"
         :hide-footer="true"
@@ -226,13 +239,14 @@
           </div>
         </div>
       </ConfirmDialog>
+      --> {{ selectedContacts }}
     </template>
   </PowerDialerViewScreen>
 </template>
 
 <script>
 
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapMutations } from 'vuex'
 import PowerDialerViewScreen from './power-dialer-view-screen'
 import StartDialOptions from './activities/start-dial-options'
 import SummaryInfoLabels from './details/summary-info-labels'
@@ -276,11 +290,13 @@ export default {
   computed: {
     ...mapState(['prevRoute']),
     ...mapGetters('powerDialer', [
-      'contactResources'
-    ]),
-    ...mapGetters('powerDialer', [
+      'contactResources',
+      'selectedContacts',
       'powerDialerList'
     ]),
+    checked () {
+      return this.selectedContacts[this.id] || []
+    },
     powerDialerListOfObjects () {
       return this.powerDialerList || []
     },
@@ -310,12 +326,14 @@ export default {
   },
   data () {
     return {
-      checked: [],
       isOpen: false,
       selectedItem: { id: '' }
     }
   },
   methods: {
+    ...mapMutations('powerDialer', [
+      'SET_LIST_SELECTED_CONTACTS'
+    ]),
     onRemove (obj) {
       this.selectedItem = obj
       this.isOpen = true
@@ -323,8 +341,15 @@ export default {
     processedLink (id = '') {
       return `${this.activeRoute.fullPath}/${id}`
     },
+    onCheckboxCheck (data) {
+      console.log('data :>> ', data)
+      this.SET_LIST_SELECTED_CONTACTS({
+        id: this.id,
+        contacts: data
+      })
+    },
     onCheckedRows (data) {
-      console.log('data from table : ', data)
+      console.log('data from table 999 : ', data)
     },
     closeModal () {
       this.isOpen = false

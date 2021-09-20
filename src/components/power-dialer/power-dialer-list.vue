@@ -41,7 +41,7 @@
           :layer="0" />
       </template>
     </div>
-    <!-- <MyDirectory :directory="directoryList">
+    <MyDirectory :directory="directoryList">
       <template slot-scope="props">
         <div
           v-if="props.item.children.length > 0"
@@ -61,7 +61,7 @@
           </router-link>
         </div>
       </template>
-    </MyDirectory> -->
+    </MyDirectory>
   </div>
 </template>
 
@@ -70,17 +70,17 @@
 import { mapGetters } from 'vuex'
 import DirectoryFolder from './directories/directory-folder'
 import DirectoryFolderCreate from './directories/directory-folder-create'
-// import MyDirectory from './directories/directory'
-// import FolderIcon from 'components/icons/folder-icon'
+import MyDirectory from './directories/directory'
+import FolderIcon from 'components/icons/folder-icon'
 import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerResourcesList',
   components: {
     DirectoryFolder,
-    DirectoryFolderCreate
-    // MyDirectory,
-    // FolderIcon
+    DirectoryFolderCreate,
+    MyDirectory,
+    FolderIcon
   },
   computed: {
     ...mapGetters('powerDialer', [
