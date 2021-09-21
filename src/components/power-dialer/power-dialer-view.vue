@@ -20,7 +20,7 @@
       <div class="pr-5">
         99 Contacts
       </div>
-      <StartDialOptions />
+      <!-- <StartDialOptions /> -->
       <StartDialing />
     </template>
 
@@ -60,29 +60,34 @@
             <b-col col lg="4" class="p-0 m-0">
               <div class="px-0 d-flex align-items-center float-right">
 
-                <b-dropdown
-                  text="..."
-                  no-caret
-                  right size="sm"
-                  variant="white"
-                  class="m-0 p-0 pr-2 b-compact-dropdown-button text-bold">
-                  <b-dropdown-item href="#">
-                    <i class="fa fa-search mr-1"></i> Select Contact
-                  </b-dropdown-item>
-                  <b-dropdown-item href="#" v-b-modal:create-contact-modal>
-                    <i class="fa fa-plus mr-1"></i>
-                    Create Contact
-                  </b-dropdown-item>
-                </b-dropdown>
-
                 <q-btn
                   no-caps
                   unelevated
                   size="sm"
                   color="primary"
-                  class="px-2">
+                  class="px-2"
+                  v-b-modal:create-contact-modal>
                   Add Contacts
                 </q-btn>
+                <b-dropdown
+                  text="..."
+                  no-caret
+                  right size="sm"
+                  variant="white"
+                  class="m-0 p-0 pl-2 b-compact-dropdown-button text-bold">
+                  <b-dropdown-item href="#">
+                    <i class="fa fa-bars mr-1"></i>
+                    Edit Columns
+                  </b-dropdown-item>
+                  <b-dropdown-item href="#">
+                    <i class="fa fa-file-csv mr-1"></i>
+                    Export as CSV
+                  </b-dropdown-item>
+                  <b-dropdown-item href="#">
+                    <i class="fa fa-trash-alt mr-1"></i>
+                    Delete
+                  </b-dropdown-item>
+                </b-dropdown>
 
               </div>
             </b-col>
@@ -239,7 +244,6 @@
           </div>
         </div>
       </ConfirmDialog>
-      --> {{ selectedContacts }}
     </template>
   </PowerDialerViewScreen>
 </template>
@@ -248,7 +252,7 @@
 
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import PowerDialerViewScreen from './power-dialer-view-screen'
-import StartDialOptions from './activities/start-dial-options'
+// import StartDialOptions from './activities/start-dial-options'
 import SummaryInfoLabels from './details/summary-info-labels'
 import Datatable from 'src/components/datatable'
 import TableRow from 'src/components/table-row'
@@ -273,7 +277,7 @@ export default {
   },
   components: {
     PowerDialerViewScreen,
-    StartDialOptions,
+    // StartDialOptions,
     Datatable,
     SearchList,
     SummaryInfoLabels,

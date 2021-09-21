@@ -276,7 +276,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get('/api/v2/power-dialer-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

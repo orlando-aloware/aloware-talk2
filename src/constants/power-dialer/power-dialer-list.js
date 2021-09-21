@@ -38,7 +38,7 @@ export const DIRECTORY_LIST = [
   },
   {
     id: 2,
-    label: 'Outbound Sales',
+    label: 'Outbound Sales 1',
     disabled: false,
     children: [
       {
@@ -93,6 +93,7 @@ export const DIRECTORY_LIST = [
     disabled: false,
     children: [
       {
+        id: 11,
         label: 'Missed Calls',
         disabled: false,
         children: []

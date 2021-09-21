@@ -47,7 +47,6 @@ export default {
   },
   mounted () {
     this.$refs.modal.$on('hidden', () => {
-      console.log('100 :>> ', 100)
       this.$emit('close')
     })
   },

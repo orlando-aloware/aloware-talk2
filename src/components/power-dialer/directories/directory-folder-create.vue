@@ -86,7 +86,7 @@ export default {
     },
     createFolderRequest (params) {
       return this.$axios
-        .post('/api/v2/contact-folders', params)
+        .post('/api/v2/power-dialer-folders', params)
         .then(() => this.reloadFolders())
         .catch((error) => {
           const { message, html } = errorMessages(error)
@@ -110,7 +110,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get('/api/v2/power-dialer-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
