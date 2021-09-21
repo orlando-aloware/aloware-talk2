@@ -1,6 +1,5 @@
 <template>
   <b-card class="border-0 text-center">
-    -- {{ id }}
     <div class="t-grouped-buttons">
       <router-link
         v-for="(filter, key) in listFilters"
