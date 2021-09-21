@@ -320,9 +320,9 @@ export default {
       return ''
     },
     activeRoute () {
-      if (this.$route.name === 'Power Dialer Individual') {
+      if (this.$route.meta === 'Power Dialer Individual') {
         return this.$route.fullPath
-      } else if (this.$route.name === 'Power Dialer Individual Advance') {
+      } else if (this.$route.meta === 'Power Dialer Individual Advance') {
         return `/power-dialer/list/${this.$route.params.id}`
       }
       return '/power-dialer/list'

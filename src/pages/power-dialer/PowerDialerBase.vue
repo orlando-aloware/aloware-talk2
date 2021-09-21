@@ -19,15 +19,14 @@ export default {
     },
     id () {
       if (this.$route.params.id) {
-        if (this.$route.name === 'Power Dialer' || this.$route.name === 'Power Dialer Base Filter') {
-          console.log('101 :>> ', this.$route)
+        if (this.$route.meta === 'Power Dialer' || this.$route.meta === 'Power Dialer Base Filter') {
+          return this.$route.params.id
         } else {
           if (this.$route.params.filter) {
             return this.$route.params.filter
           }
           return 'in-queue'
         }
-        return this.$route.params.id
       }
       return 'in-queue'
     }
