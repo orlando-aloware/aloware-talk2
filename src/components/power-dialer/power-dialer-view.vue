@@ -26,7 +26,11 @@
 
     <template slot="actions">
       <div>
-        <b-card class="border-0 text-center">
+        <PowerDialerFilter
+          v-if="activeRoute"
+          :id="id"
+          :active-route="activeRoute" />
+        <!-- <b-card class="border-0 text-center">
           <div class="t-grouped-buttons">
 
             <router-link
@@ -45,7 +49,7 @@
             </router-link>
 
           </div>
-        </b-card>
+        </b-card> -->
         <b-container fluid class="bv-example-row m-0 p-0 pl-3">
           <b-row class="pr-2">
             <b-col class="p-0 pr-2 m-0">
@@ -252,6 +256,7 @@
 
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import PowerDialerViewScreen from './power-dialer-view-screen'
+import PowerDialerFilter from './details/power-dialer-filters'
 // import StartDialOptions from './activities/start-dial-options'
 import SummaryInfoLabels from './details/summary-info-labels'
 import Datatable from 'src/components/datatable'
@@ -265,7 +270,7 @@ import NameWrapper from '../name-wrapper'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
-import { DEFAULT_FILTER_LIST, ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
+import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerView',
@@ -277,6 +282,7 @@ export default {
   },
   components: {
     PowerDialerViewScreen,
+    PowerDialerFilter,
     // StartDialOptions,
     Datatable,
     SearchList,
@@ -303,9 +309,6 @@ export default {
     },
     powerDialerListOfObjects () {
       return this.powerDialerList || []
-    },
-    listFilters () {
-      return DEFAULT_FILTER_LIST
     },
     columns () {
       return ALL_COLUMNS

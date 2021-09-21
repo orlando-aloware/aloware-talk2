@@ -9,7 +9,7 @@
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
 
 export default {
-  name: 'PowerDialerViewAll',
+  name: 'PowerDialerBase',
   components: {
     PowerDialerView
   },
@@ -19,6 +19,14 @@ export default {
     },
     id () {
       if (this.$route.params.id) {
+        if (this.$route.name === 'Power Dialer' || this.$route.name === 'Power Dialer Base Filter') {
+          console.log('101 :>> ', this.$route)
+        } else {
+          if (this.$route.params.filter) {
+            return this.$route.params.filter
+          }
+          return 'in-queue'
+        }
         return this.$route.params.id
       }
       return 'in-queue'
@@ -30,15 +38,17 @@ export default {
     }
   },
   watch: {
-    '$route.params.id': function (id) {
-      if (!id && this.$route.name === 'Power Dialer') {
-        id = 'in-queue'
-      }
-      if (id && this.$route.name === 'Power Dialer') {
-        // console.log('id :>> ', id)
-        // this.setData(id)
-      }
-    }
+    // '$route.params.id': function (id) {
+    //   if (!id && this.$route.name === 'Power Dialer') {
+    //     console.log('199 :>> ', 199)
+    //     id = 'in-queue'
+    //   } else if (id && this.$route.name === 'Power Dialer') {
+    //     console.log('id :>> ', id)
+    //     // this.setData(id)
+    //   } else {
+    //     console.log('200 :>> ', 200)
+    //   }
+    // }
   }
 }
 </script>

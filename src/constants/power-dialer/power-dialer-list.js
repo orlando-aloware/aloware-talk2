@@ -42,7 +42,7 @@ export const DIRECTORY_LIST = [
     disabled: false,
     children: [
       {
-        id: 3,
+        id: 312,
         label: 'Google Map Scraping',
         disabled: false,
         children: [
@@ -53,7 +53,7 @@ export const DIRECTORY_LIST = [
             children: []
           },
           {
-            id: 5,
+            id: 5112,
             label: 'Chicago',
             disabled: false,
             children: []

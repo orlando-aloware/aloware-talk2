@@ -193,10 +193,10 @@ export default {
                     'deleted_at': null
                   },
                   {
-                    'id': 321,
+                    'id': 989,
                     'company_id': 7,
                     'contact_folder_id': 111,
-                    'name': 'Chicago',
+                    'name': 'Chicago 1',
                     'type': 1,
                     'headers': [
                       {

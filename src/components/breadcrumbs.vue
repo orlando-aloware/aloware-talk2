@@ -34,7 +34,7 @@ export default {
     }
   },
   mounted () {
-    console.log('---', this.findParents(this.listObjects, 'Untitled List'))
+    // console.log('---', this.findParents(this.listObjects, 'Untitled List'))
   },
   data () {
     return {
