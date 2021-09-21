@@ -328,7 +328,7 @@ export default {
       return '/power-dialer/list'
     },
     dialogName () {
-      return `remove-power-dialer-item-dialog-323`
+      return `remove-power-dialer-item-dialog`
     }
   },
   data () {
@@ -349,7 +349,6 @@ export default {
       return `${this.activeRoute.fullPath}/${id}`
     },
     onCheckboxCheck (data) {
-      console.log('data :>> ', data)
       this.SET_LIST_SELECTED_CONTACTS({
         id: this.id,
         contacts: data

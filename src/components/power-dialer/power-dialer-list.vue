@@ -144,7 +144,6 @@ export default {
       }
     },
     onCreateFolderToggle () {
-      console.log('199 :>> ', 199)
       this.isCreatingFolder = !this.isCreatingFolder
     }
   }
