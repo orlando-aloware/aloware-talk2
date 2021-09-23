@@ -119,6 +119,12 @@ const routes = [
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {
+            name: 'Power Dialer Session',
+            meta: 'Power Dialer Session',
+            path: 'session',
+            component: () => import('src/pages/power-dialer/PowerDialerSession')
+          },
+          {
             name: 'Power Dialer',
             meta: 'Power Dialer Base Filter',
             path: 'list/:id(in-queue|called|failed|scheduled|all)+',
@@ -148,7 +154,7 @@ const routes = [
       },
       {
         path: 'power-dialer/:id',
-        name: 'Power Dialer',
+        name: 'Power Dialer1',
         component: () => import('src/pages/power-dialer/PowerDialerIndividual.vue'),
         meta: {
           title: 'Power Dialer'

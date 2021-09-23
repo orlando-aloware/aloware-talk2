@@ -138,6 +138,7 @@
                         class="px-3 py-0"
                         color="primary">Save As New</q-btn>
                       <q-btn
+                        @click="beginDial"
                         unelevated
                         no-caps
                         size="sm"
@@ -204,6 +205,12 @@ export default {
         { label: 'Warm Leads', name: 'company-warm-leads', disabled: false, hovered: false, type: 'link' },
         { label: 'Cold Leads', name: 'company-cold-leads', disabled: false, hovered: false, type: 'link' }
       ]
+    }
+  },
+  methods: {
+    beginDial () {
+      this.dialog = false
+      this.$emit('start')
     }
   }
 }

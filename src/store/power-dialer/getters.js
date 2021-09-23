@@ -8,6 +8,7 @@ export default {
   isRemoveListOpen: (state) => !!state.removeList,
   pinned: (state) => state.pinned,
   selectedContacts: (state) => state.selectedContacts,
+  isStartingDial: (state) => state.isStartingDial,
   powerDialerList: (state) => {
     /**
      * TEMPORARY VALUES

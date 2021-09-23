@@ -21,7 +21,8 @@
         99 Contacts
       </div>
       <!-- <StartDialOptions /> -->
-      <StartDialing />
+      <StartDialing
+        @start="beginDial" />
     </template>
 
     <template slot="actions">
@@ -102,7 +103,7 @@
 
     <template slot="actions">
       <div v-if="checked.length > 0" class="px-3 text-caption">
-        Menu here if selected multiple items...
+        <!-- Menu here if selected multiple items... -->
       </div>
       <!-- <bulk-action-menu :id="id" v-if="checked.length > 0"></bulk-action-menu> -->
     </template>
@@ -115,7 +116,8 @@
             :stickyHeaders="true"
             :columns="columns"
             :has-more="true"
-            scroll-area-class="none">
+            scroll-area-class="none"
+            @reordered="onColumnsReordered">
             <template slot="tbody">
               <TableRow
                 v-for="(contact, key) in contactResources"
@@ -339,8 +341,16 @@ export default {
   },
   methods: {
     ...mapMutations('powerDialer', [
-      'SET_LIST_SELECTED_CONTACTS'
+      'SET_LIST_SELECTED_CONTACTS',
+      'START_DIAL_TOGGLE'
     ]),
+    beginDial () {
+      this.START_DIAL_TOGGLE(true)
+      this.$router.push({ name: 'Power Dialer Session' })
+    },
+    onColumnsReordered (reorderedColumns) {
+      console.log('Re-ordered columns...', reorderedColumns)
+    },
     onRemove (obj) {
       this.selectedItem = obj
       this.isOpen = true

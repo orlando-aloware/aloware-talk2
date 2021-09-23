@@ -2,7 +2,9 @@
   <div
     v-if="authenticated"
     class="row mx-0 content-row d-flex overflow-hidden h-100">
-    This should display individual details of the selected item in the list
+    <div class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
+      Here is the individual contact page...
+    </div>
   </div>
 </template>
 

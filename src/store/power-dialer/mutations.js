@@ -56,5 +56,8 @@ export default {
         ...list
       }
     }
+  },
+  START_DIAL_TOGGLE: (state, value) => {
+    state.isStartingDial = value
   }
 }
