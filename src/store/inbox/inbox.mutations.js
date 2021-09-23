@@ -1,3 +1,6 @@
+import Vue from 'vue'
+import _ from 'lodash'
+
 export default {
   SET_CONTACT_ID: (state, id) => {
     state.selectedContactId = id
@@ -34,6 +37,20 @@ export default {
   SET_CLOSED_TASK_COUNT: (state, count) => {
     state.taskCounts = { ...state.taskCounts, closed: count }
   },
+  SET_CONTACT: (state, payload) => {
+    const contact = state.contacts.find(contact => contact.id === payload.contact_id)
+    const lastCommunication = _.get(contact, 'last_communication', null)
+
+    if (!lastCommunication || (lastCommunication && lastCommunication.id !== payload.id)) {
+      return
+    }
+
+    const index = contact ? state.contacts.indexOf(contact) : null
+    if (index !== -1 && index !== null) {
+      state.contacts[index].last_communication = payload
+      Vue.set(state.contacts[index], 'last_communication', payload)
+    }
+  },
   SET_CONTACTS: (state, contacts) => {
     state.contacts = contacts
   },
@@ -65,5 +82,11 @@ export default {
   },
   RESET_CHANNEL_CHANGED_FILTER_FIELDS: (state) => {
     state.channelChangedFilterFields = []
+  },
+  TOGGLE_FILTER_MODEL_FORM: (state, isShown = false) => {
+    state.isFilterModelFormShown = isShown
+  },
+  SET_SELECTED_FILTER: (state, selectedFilter) => {
+    state.selectedFilter = selectedFilter
   }
 }

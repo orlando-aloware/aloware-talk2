@@ -210,7 +210,7 @@ export default {
   },
 
   created () {
-    this.contact_id = _.get(this.$route, 'params.id', null)
+    this.contactId = _.get(this.$route, 'params.id', null)
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })
@@ -241,7 +241,7 @@ export default {
 
     this.$VueEvent.listen('contact_audit_created', (data) => {
       // check data loaded
-      if (parseInt(data.contact_id) === parseInt(this.contact_id)) {
+      if (parseInt(data.contact_id) === parseInt(this.contactId)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
       }
@@ -497,7 +497,7 @@ export default {
 
     loadMorePreviousActivities () {
       this.isLoadingPreviousActivities = true
-      this.fetchContactCommunications(this.contact_id).then(() => {
+      this.fetchContactCommunications(this.contactId).then(() => {
         this.isLoadingPreviousActivities = false
       }).catch(() => {
         this.isLoadingPreviousActivities = false
@@ -788,7 +788,7 @@ export default {
       }, 5000)
     },
 
-    fetchIncomingNumber () {
+    fetchIncomingNumber: _.debounce(function () {
       this.contactIncomingNumber = null
       this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
         this.contactIncomingNumber = res.data
@@ -796,7 +796,7 @@ export default {
         this.$handleErrors(err.response)
         console.log(err)
       })
-    },
+    }, 200),
 
     checkEmailCapability () {
       if (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled) {
@@ -858,7 +858,7 @@ export default {
       // TODO: update contact name in title?
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
-      this.$VueEvent.fire('contact_selected', this.contact_id)
+      this.$VueEvent.fire('contact_selected', this.contactId)
       if (typeof callback !== 'undefined') {
         callback(selectedContact)
       }

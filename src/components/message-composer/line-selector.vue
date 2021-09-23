@@ -11,6 +11,8 @@
               v-model="selectedLine"
               :options="lineOptions"
               :loading="isBusy"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
@@ -86,19 +88,23 @@ export default {
       selectedLine: null,
       lineOptions: this.formattedLineOptions,
       incomingNumber: null,
-      isFocused: false
+      isFocused: false,
+      selectWidth: 0
     }
   },
 
   mounted () {
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
-      this.setDefaultLine(this.contact.id)
+      // this.setDefaultLine(this.contact.id)
       this.showPlaceholder()
     }
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
+    },
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
@@ -175,9 +181,9 @@ export default {
   watch: {
     selectedLine (value) {
       this.setSelectedLine(value)
-      if (value && this.contact && this.contact.id) {
-        this.getIncomingNumber()
-      }
+      // if (value && this.contact && this.contact.id) {
+      //   this.getIncomingNumber()
+      // }
     },
 
     'contact.id': function (value) {

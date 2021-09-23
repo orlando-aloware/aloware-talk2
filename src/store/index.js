@@ -11,6 +11,7 @@ import contacts from './contacts'
 import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
+import settings from './settings'
 
 Vue.use(Vuex)
 
@@ -30,7 +31,8 @@ export default function (/* { ssrContext } */) {
       contacts,
       inbox,
       stats,
-      powerDialer
+      powerDialer,
+      settings
     },
     state: {
       filter: {},

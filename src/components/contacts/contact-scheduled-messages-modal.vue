@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    v-model="isScheduledMessageListOpen"
+    v-model="isOpen"
     size="lg"
     :title="title"
     modal-class="scheduled-messages-modal"
@@ -192,6 +192,9 @@ export default {
       currentPage: 1,
       totalRows: 0
     }
+  },
+  created () {
+    this.isOpen = this.isScheduledMessageListOpen
   },
   methods: {
     onPagination (page) {

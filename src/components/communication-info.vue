@@ -59,7 +59,7 @@
               <div v-if="communication.body">
                 <div class="text-muted mb-2"
                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
-                     v-html="$options.filters.nl2br(communication.body)"
+                     v-html="$options.filters.nl2br(parseBody)"
                      v-linkify:options="{ target: '_blank' }">
                 </div>
                 <div class="font-weight-light-bold my-2"
@@ -73,7 +73,7 @@
                 <span class="text-muted"
                       v-else
                       v-linkify:options="{ target: '_blank' }">
-                  {{ communication.body }}
+                  <span v-html="parseBody"></span>
                 </span>
               </div>
             </template>
@@ -594,10 +594,10 @@
          v-html="$options.filters.nl2br(communication.notes)">
       </p>
     </div>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left notes-body"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
          v-if="communication.body && communication.type === CommunicationTypes.NOTE && !activeName">
       <p class="text-left"
-         v-html="$options.filters.nl2br(this.communication.body)">
+         v-html="$options.filters.nl2br(parseBody)">
       </p>
     </div>
   </div>
@@ -760,6 +760,13 @@ export default {
       return (this.communication.notes ||
         (this.communication.body &&
           this.communication.type === CommunicationTypes.NOTE))
+    },
+    parseBody () {
+      if (this.communication.type === CommunicationTypes.NOTE) {
+        return this.$options.filters.parseMentionToView(this.communication.body)
+      }
+
+      return this.communication.body
     }
   },
 

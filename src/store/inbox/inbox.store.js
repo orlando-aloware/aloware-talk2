@@ -45,7 +45,7 @@ export default function () {
         label: 'Mentions',
         value: 'mentions',
         icon: 'mention',
-        disabled: true
+        disabled: false
       },
       {
         label: 'Voicemails',
@@ -74,6 +74,8 @@ export default function () {
       closed: 0
     },
     channelClonedFilter: {},
-    channelChangedFilterFields: []
+    channelChangedFilterFields: [],
+    isFilterModelFormShown: false,
+    selectedFilter: null
   }
 }

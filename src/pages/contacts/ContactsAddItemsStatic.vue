@@ -16,10 +16,14 @@
             </a>
           </router-link>
           Add contacts to
-          <span class="title-icon">
-            <folder-static-icon height="20" width="20"/>
-          </span>
-          {{ contactList.name }}
+          <div class="text-grey-90">
+            <span class="title-icon">
+              <folder-static-icon color="#62666E"
+                                  height="20"
+                                  width="20"/>
+            </span>
+            {{ contactList.name }}
+          </div>
         </div>
         <div class="text-muted small action-desc">
           Manually select contacts or create a filter
@@ -107,7 +111,7 @@
       <datatable
         scroll-area-class="static-list-add-item"
         :stickyHeaders="true"
-        :columns="columns"
+        :columns="validColumns"
         :hasMore="hasMore"
         :isEmpty="isEmpty"
         :isLoadingMore="isLoadingMore"
@@ -121,7 +125,7 @@
             v-for="(contact, index) in items"
             :key="contact.id + index + Math.random()"
             :contact="contact"
-            :columns="columns"
+            :columns="validColumns"
             :checked="checked"
             :contactListId="1"
             @checked="onCheckedRows"
@@ -205,6 +209,9 @@ export default {
     },
     isResetDisabled () {
       return !this.filterHasChanges
+    },
+    validColumns () {
+      return this.columns.filter(column => column.label !== 'Actions')
     }
   },
   methods: {

@@ -6,7 +6,7 @@
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side></inbox-side>
       <div class="d-flex flex-grow-1"
-           v-if="['Inbox Contact', 'Inbox Contact Task'].includes($route.name)">
+           v-if="['Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes($route.name)">
         <router-view></router-view>
       </div>
     </div>
@@ -41,7 +41,7 @@ export default {
     ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
 
     setChannel () {
-      if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+      if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
         let channel = this.items.find(item => item.value === this.$route.params.channel)
         this.setActiveChannel(channel)
       }

@@ -1,5 +1,6 @@
 <template>
   <q-select ref="userSelect"
+            class="q-user-selector"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -9,9 +10,12 @@
             use-input
             emit-value
             map-options
-            :outlined="outlined"
             dense
             v-model="userId"
+            :hide-dropdown-icon="hideDropdownIcon"
+            :clearable="clearable"
+            :outlined="outlined"
+            :borderless="borderless"
             :options="userOptions"
             :multiple="multiple"
             :placeholder="placeholder"
@@ -20,10 +24,13 @@
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             @popup-show="onShowMenu"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
-      <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      {{prepend}}
     </template>
 
     <template v-slot:no-option>
@@ -122,14 +129,31 @@ export default {
       type: Boolean,
       default: true
     },
+    borderless: {
+      type: Boolean,
+      default: false
+    },
     showPlaceholder: {
       type: Boolean,
       default: true
+    },
+    clearable: {
+      type: Boolean,
+      default: false
+    },
+    hideDropdownIcon: {
+      type: Boolean,
+      default: false
+    },
+    customPlaceholder: {
+      type: String,
+      default: ''
     }
   },
 
   data () {
     return {
+      isFocused: false,
       userId: this.value,
       userOptions: [],
       selectWidth: 0
@@ -146,9 +170,9 @@ export default {
 
       switch (true) {
         case this.multiple && this.userId.length < 1:
-          return 'Select Users'
+          return this.customPlaceholder || 'Select Users'
         case !this.multiple && !this.userId:
-          return 'Select User'
+          return this.customPlaceholder || 'Select User'
         case this.multiple && this.userId.length > 0:
         case !this.multiple && this.userId:
         default:
@@ -201,6 +225,14 @@ export default {
       }
 
       return usersArray
+    },
+
+    userObject () {
+      if (!this.userId) {
+        return null
+      }
+
+      return this.formattedOptions.find(item => item.id === this.userId)
     }
   },
 
@@ -209,6 +241,38 @@ export default {
   },
 
   methods: {
+
+    onFocus () {
+      this.isFocused = true
+      this.$el.querySelector('.q-user-selector .q-field__input').placeholder = this.userObject ? this.userObject.name : this.placeholder
+      this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'block'
+      if (this.userObject) {
+        this.$el.querySelector('.q-user-selector .q-field__native span').style.display = 'none'
+      }
+    },
+
+    onBlur () {
+      this.isFocused = false
+      this.$el.querySelector('.q-user-selector .q-field__input').placeholder = ''
+      this.showInputPlaceholder()
+      if (this.userObject) {
+        this.$el.querySelector('.q-user-selector .q-field__native span').style.display = ''
+      }
+    },
+
+    showInputPlaceholder () {
+      if (!this.userObject) {
+        this.$el.querySelector('.q-user-selector .q-field__input').placeholder = this.placeholder
+        this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'block'
+      } else {
+        this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'none'
+      }
+    },
+
+    onInput () {
+      this.$el.querySelector('.q-user-selector .q-field__input').blur()
+    },
+
     onShowMenu () {
       this.selectWidth = this.$refs.userSelect.$el.offsetWidth
     },

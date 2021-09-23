@@ -1,18 +1,20 @@
 <template>
   <div class="header flex- w-100">
-    <search placeholder=""
+    <search :placeholder="searchPlaceholder"
             :border="false"
             v-if="isSearch"
             @search="search">
     </search>
     <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2"
          v-else>
+      <slot name="customLeftContent" v-if="hasCustomLeftContent"></slot>
       <q-select class="m-0"
                 ref="select"
                 borderless
                 emit-value
                 map-options
                 v-model="filterLeft"
+                v-else
                 :disable="true"
                 :options="filterOptions"
                 :append="[{icon: 'ion-ios-arrow-down'}]">
@@ -70,6 +72,10 @@ export default {
       type: Boolean,
       default: false
     },
+    searchPlaceholder: {
+      type: String,
+      default: ''
+    },
     commCampaigns: {
       required: false
     },
@@ -83,6 +89,10 @@ export default {
     pendingCount: {
       required: false,
       default: 0
+    },
+    hasCustomLeftContent: {
+      type: Boolean,
+      default: false
     }
   },
 

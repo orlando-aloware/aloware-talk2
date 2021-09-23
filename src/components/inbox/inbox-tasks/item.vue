@@ -149,11 +149,6 @@ export default {
       }
       this.$emit('onItemSelected', contact)
     }
-  },
-  watch: {
-    'contact.first_name': function () {
-      console.trace()
-    }
   }
 }
 </script>

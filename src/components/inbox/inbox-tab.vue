@@ -4,53 +4,66 @@
                     :pendingCount="taskCounts.pending"
                     :commCampaigns="[]"
                     :commRingGroups="[]"
+                    :has-custom-left-content="true"
                     @sort="sortContactTasks">
+        <template slot="customLeftContent">
+          <div class="mention-filter-actions-wrapper mt-3 ml-2">
+            <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
+            <line-and-ring-group-selector custom-placeholder="Filter"
+                           :clearable="true"
+                           :hide-dropdown-icon="true"
+                           :outlined="false"
+                           :borderless="true">
+            </line-and-ring-group-selector>
+          </div>
+        </template>
       </calls-header>
       <div class="w-100">
         <q-btn-toggle
-          class="current-tasks border mx-2 mt-2 mb-1"
+          class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
-          dense
           spread
+          dense
           unelevated
-          toggle-color="grey-9"
-          color="white"
+          toggle-color="grey-90"
+          color="transparent"
           text-color="primary"
           :options="options"
           v-model="currentTask"
           @click="onToggleStatus">
           <template v-slot:one>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                 :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-20' : 'active']">
-                <span class="text-left">
-                  Open
-                </span>
-              <span class="text-right">
-                  {{ taskCounts.open | numberPlusFormatter(99) }}
-                </span>
+            <div class="d-flex justify-content-center w-100 options"
+                 :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
+              <span class="text-left">
+                Open
+              </span>
+              <div class="text-right task-count ml-2">
+                  <span>
+                    {{ taskCounts.open | numberPlusFormatter(99) }}
+                  </span>
+              </div>
             </div>
           </template>
 
           <template v-slot:two>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                 :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-20' : 'active']">
-                <span class="text-left">
-                  Pending
-                </span>
-              <span class="text-right">
+            <div class="d-flex justify-content-centerw-100 options"
+                 :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-90' : 'active']">
+              <span class="text-left">
+                Pending
+              </span>
+              <div class="text-center task-count ml-2">
+                <span>
                   {{ taskCounts.pending | numberPlusFormatter(99) }}
                 </span>
+              </div>
             </div>
           </template>
 
           <template v-slot:three>
-            <div class="d-flex flex-row justify-content-between align-items-center w-100 px-1 options"
-                 :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-20' : 'active']">
-                <span class="text-left">
+            <div class="w-100 options"
+                 :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-90' : 'active']">
+                <span class="text-center">
                   Closed
-                </span>
-              <span class="text-right">
-                  &nbsp;
                 </span>
             </div>
           </template>
@@ -90,12 +103,14 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
+import SearchIcon from 'components/icons/search-icon'
+import LineAndRingGroupSelector from 'components/generic-selectors/line-and-ring-group-selector'
 
 let scrollTimeout
 export default {
   name: 'inbox-tab',
 
-  components: { InboxTaskList, CallsHeader },
+  components: { LineAndRingGroupSelector, SearchIcon, InboxTaskList, CallsHeader },
 
   props: {
     searchText: {
@@ -166,7 +181,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setContacts', 'setSelectedContact']),
+    ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact']),
     loadContactTasks () {
       this.isFetchingContacts = true
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
@@ -343,6 +358,14 @@ export default {
           this.setContacts(contacts)
         }
       })
+    })
+
+    this.$VueEvent.listen('update_communication', communication => {
+      if (!communication.contact_id) {
+        return
+      }
+
+      this.setContact(communication)
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
