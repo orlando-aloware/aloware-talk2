@@ -127,7 +127,17 @@ const routes = [
         component: () => import('pages/Settings.vue'),
         meta: {
           title: 'Settings'
-        }
+        },
+        children: [
+          {
+            path: '/settings/:tab',
+            name: 'Settings Tab',
+            component: () => import('src/pages/Settings.vue'),
+            meta: {
+              title: 'Settings'
+            }
+          }
+        ]
       },
       {
         path: 'account',

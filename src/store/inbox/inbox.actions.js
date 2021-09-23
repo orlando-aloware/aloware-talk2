@@ -43,5 +43,11 @@ export default {
   },
   resetChannelChangedFilterFields: ({ commit }) => {
     commit('RESET_CHANNEL_CHANGED_FILTER_FIELDS')
+  },
+  toggleFilterModelForm: ({ commit }, isShown = false) => {
+    commit('TOGGLE_FILTER_MODEL_FORM', isShown)
+  },
+  setSelectedFilter: ({ commit }, selectedFilter) => {
+    commit('SET_SELECTED_FILTER', selectedFilter)
   }
 }

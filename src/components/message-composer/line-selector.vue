@@ -11,6 +11,8 @@
               v-model="selectedLine"
               :options="lineOptions"
               :loading="isBusy"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
@@ -86,7 +88,8 @@ export default {
       selectedLine: null,
       lineOptions: this.formattedLineOptions,
       incomingNumber: null,
-      isFocused: false
+      isFocused: false,
+      selectWidth: 0
     }
   },
 
@@ -99,6 +102,9 @@ export default {
   },
 
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
+    },
     onFocus () {
       this.isFocused = true
       this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'

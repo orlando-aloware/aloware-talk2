@@ -9,6 +9,7 @@ import createPersistedState from 'vuex-persistedstate'
 import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
+import settings from './settings'
 
 Vue.use(Vuex)
 
@@ -26,7 +27,8 @@ export default function (/* { ssrContext } */) {
     modules: {
       auth,
       contacts,
-      inbox
+      inbox,
+      settings
     },
     state: {
       filter: {},

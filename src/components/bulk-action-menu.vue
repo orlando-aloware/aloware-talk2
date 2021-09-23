@@ -1,36 +1,36 @@
 <template>
   <div class="bulk-action-menu">
-    <div class="menu-actions d-flex">
-      <div class="flex-fill">
+    <div class="menu-actions d-flex flex-row">
+      <div class="items">
         <span>{{ getSelectedCount }} selected</span>
       </div>
-      <div class="flex-fill">
+      <div class="items">
         <a href="#" disabled>
           <i class="fa fa-layer-group"></i>
           Enroll in Sequence
         </a>
       </div>
-      <div class="flex-fill">
+      <div class="items">
         <a href="#" disabled>
           <i class="fa fa-crosshairs"></i>
           Power Dialer
         </a>
       </div>
-      <div class="flex-fill">
+      <div class="items">
         <a href=""
            @click="onAddToStaticList">
           <i class="fa fa-user-plus"></i>
           Add to Static List
         </a>
       </div>
-      <div class="flex-fill">
+      <div class="items">
         <a href=""
            @click="onCreateStaticList">
           <i class="fa fa-plus"></i>
           Create Static List
         </a>
       </div>
-      <div class="flex-fill">
+      <div class="items">
         <a href="" @click="onDelete">
           <i class="fa fa-trash"></i>
           Delete

@@ -1,6 +1,6 @@
 <template>
   <div class="header flex- w-100">
-    <search placeholder=""
+    <search :placeholder="searchPlaceholder"
             :border="false"
             v-if="isSearch"
             @search="search">
@@ -71,6 +71,10 @@ export default {
     isSearch: {
       type: Boolean,
       default: false
+    },
+    searchPlaceholder: {
+      type: String,
+      default: ''
     },
     commCampaigns: {
       required: false

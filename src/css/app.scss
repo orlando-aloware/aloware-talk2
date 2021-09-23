@@ -368,7 +368,7 @@ body,
 }
 
 .tag-text {
-  font-weight: 500;
+  font-weight: normal;
   font-size: $f-size-body-sm;
   letter-spacing: -0.0025em;
   line-height: 16px;
@@ -391,12 +391,15 @@ body,
 .generic-multi-select {
   .list-wrapper {
     .is-dot {
-      margin-top: 5px;
+      top: 40%;
+      position: absolute;
     }
   }
   .edit-wrapper {
     .dot-wrapper {
       height: 16px;
+      //top: 48%;
+      //position: absolute;
     }
     & > .q-field__inner > .q-field__control {
       &:before {
@@ -438,7 +441,8 @@ body,
     }
     .tag-items {
       .is-dot {
-        margin-top: 5px;
+        top: 43%;
+        left: -8px;
       }
     }
   }
@@ -1398,6 +1402,10 @@ i.option-separator {
 
 .badge-purple-2 {
   background: $purple-2;
+}
+
+.fs-20 {
+  font-size: 20px !important;
 }
 
 .fs-24 {
@@ -2480,7 +2488,7 @@ span.mention {
     height: 128px;
     font-size: 14px;
     font-weight: 500;
-    border: 1px dashed #D8D8D8;
+    border: 1px dashed $grey-70;
     border-radius: 4px;
     padding-top: 30px;
   }
@@ -3111,6 +3119,73 @@ span.mention {
 /* (Optional) Apply a "closed-hand" cursor during drag operation. */
 .grabbable:active {
   cursor: grabbing;
+}
+
+.page-side-menubar {
+  max-width: 508px;
+  background-color: $white;
+  border: solid 1px $grey-light3;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  overflow-x: auto;
+
+  @include screen('md') {
+    width: auto;
+  }
+
+  &__nav {
+    padding-top: 10px;
+  }
+
+  &__left {
+    max-width: 200px;
+    width: 100%;
+    overflow: hidden;
+
+    &--closed {
+      min-width: 40px;
+    }
+
+    @include screen('lg') {
+      &--closed {
+        min-width: 40px;
+      }
+    }
+  }
+
+  &__left.settings {
+    max-width: 300px;
+  }
+
+  &__right {
+    max-width: 308px;
+    width: 100%;
+    flex-grow: 1;
+    border-left: solid 1px $grey-light3;
+    overflow: hidden;
+    height: 100%;
+
+    @include screen('lg') {
+    }
+  }
+
+  .header {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    border-bottom: solid 1px $grey-light3;
+
+    &__label {
+      padding-left: 20px;
+      font-weight: bold;
+      font-size: $f-size-body-xs;
+      letter-spacing: 0.3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 }
 
 .inbox-side {
@@ -4032,11 +4107,6 @@ span.mention {
 .title-icon {
   padding-left: 5px;
   padding-right: 5px;
-  svg {
-    path {
-      stroke: $dark;
-    }
-  }
 }
 
 .selected-contacts {
@@ -5435,8 +5505,8 @@ table.datatable {
 
 .move-dialog {
   width: 258px;
-  min-height: 300px;
-  max-height: calc(100vh - 200px);
+  //min-height: 300px;
+  max-height: 300px;
   background: $white;
   border: solid 1px $grey-light;
   position: absolute;
@@ -5484,7 +5554,7 @@ table.datatable {
     justify-content: center;
     padding-left: 10px;
     padding-right: 10px;
-    border-bottom: solid 1px $grey-light;
+    //border-bottom: solid 1px $grey-light;
     min-height: 50px;
 
     input {
@@ -5516,10 +5586,15 @@ table.datatable {
     margin-right: 5px;
   }
   &--target {
-    background-color: $light-green2;
+    background-color: $grey-60;
+
+    .folder__option {
+      display: block;
+      opacity: 1 !important;
+    }
   }
   &:hover {
-    background-color: $light-green2;
+    background-color: $grey-60;
     .folder__option {
       display: block;
     }
@@ -5971,6 +6046,84 @@ table.datatable {
   }
 }
 
+.page-side-menubar-list-item {
+  @include border-radius(10px);
+  display: flex;
+  align-items: center;
+  height: 40px;
+  color: $grey-dark;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 100ms ease-in;
+
+  &--closed {
+    overflow: hidden;
+  }
+
+  &__active {
+    background-color: $grey-50;
+    color: $black;
+  }
+
+  @include screen('lg') {
+    overflow: auto;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  &__icon {
+    padding-right: 10px;
+  }
+
+  &__label {
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: -0.0025em;
+    flex-grow: 1;
+
+    &--opened {
+      display: block;
+    }
+
+    &--closed {
+      display: none;
+    }
+
+    @include screen('lg') {
+      display: block;
+      &--closed {
+        display: none;
+      }
+    }
+  }
+  .count-label {
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 8px;
+    color: $grey-30;
+  }
+  .open-count {
+    color: $grey-20;
+  }
+  .pending-count {
+    font-weight: 500;
+  }
+}
+
 //
 .pinned {
   display: flex;
@@ -6209,7 +6362,7 @@ table.datatable {
   }
 
   .action-option-container {
-    padding-right: 20px;
+    padding-right: 22px;
   }
 
   .filter-name {
@@ -6227,22 +6380,24 @@ table.datatable {
 
     border-right: 1px solid $grey-60;
     padding-right: 5px;
+    max-width: 50%;
 
     .filter-group-title {
       font-size: 12px;
       color: $grey-80;
       margin-bottom: 10px;
+      font-weight: 400;
     }
 
     .filter-items {
 
       margin: 5px 0;
-      padding: 5px;
+      padding: 5px 5px 0 5px;
 
       span {
         font-size: 13px;
         color: $grey-100;
-        width: 7vw;
+        width: 8vw;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -6252,6 +6407,7 @@ table.datatable {
       .b-dropdown {
         height: 10px !important;
         margin-top: 0 !important;
+        right: 0;
 
         button {
           margin-top: -1px;
@@ -6272,15 +6428,18 @@ table.datatable {
     }
 
     .filter-items:hover {
+      background: $grey-50;
       button {
         display: block;
       }
     }
 
+    .filter-items {
+      border-radius: 5px;
+    }
+
     .filter-items.active {
       background: $grey-60;
-
-      border-radius: 5px;
     }
 
     .filter-group-title,
@@ -6319,8 +6478,24 @@ table.datatable {
   .form-label {
     color: $grey-90;
   }
+
+  .custom-control-input ~ .custom-control-label::before,
+  .custom-control-input ~ .custom-control-label::after {
+    cursor: pointer;
+  }
+
+  .custom-control-input:checked ~ .custom-control-label::before {
+    color: $white;
+    border-color: $success;
+    background-color: $success;
+  }
 }
 
+#create-filter-modal {
+  .modal-content {
+    border-radius: 8px;
+  }
+}
 
 div.q-menu {
   min-width: 0 !important;
@@ -6384,7 +6559,7 @@ button.grey-90 {
 
 .bulk-action-menu {
   margin-left: 25px;
-  margin-top: 51px;
+  margin-top: 52px;
   position: absolute;
   z-index: 9;
   background: white;
@@ -6404,6 +6579,10 @@ button.grey-90 {
   }
   .menu-actions{
     font-size: 0.75rem;
+
+    .items {
+      margin-right: 80px;
+    }
   }
 }
 
@@ -6767,3 +6946,36 @@ button.grey-90 {
   }
 }
 
+
+.settings-form-wrapper {
+  .form-label {
+    font-weight: 500;
+    font-size: 13px;
+    color: $grey-100;
+  }
+
+  .form-helper-text {
+    font-size: 12px;
+    color: $grey-90;
+    letter-spacing: -0.0025em;
+  }
+
+  form {
+    height: calc(100vh - 113px) !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .form-row {
+      margin-right: 0 !important;
+      margin-left: 0 !important;
+    }
+  }
+}
+
+.r-0 {
+  right: 0 !important;
+}
+
+.q-item__label {
+  font-weight: normal !important;
+}

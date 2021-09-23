@@ -74,6 +74,8 @@ export default function () {
       closed: 0
     },
     channelClonedFilter: {},
-    channelChangedFilterFields: []
+    channelChangedFilterFields: [],
+    isFilterModelFormShown: false,
+    selectedFilter: null
   }
 }

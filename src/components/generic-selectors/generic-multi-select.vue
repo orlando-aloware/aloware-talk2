@@ -15,16 +15,15 @@
           <div v-for="item in formattedValues"
                :key="item.id"
                class="w-100 text-break">
-            <div :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
-                  class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
-              <div class="dot-wrapper d-flex align-items-center">
+            <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
+              <div class="dot-wrapper d-flex align-items-center position-absolute">
                 <q-badge class="is-dot mx-1"
                          rounded
                          :style="{ background: item.color }"
                          v-if="typeof item.color !== 'undefined'">
                 </q-badge>
               </div>
-              <div class="tag-text">{{ item.name }}</div>
+              <div class="tag-text ml-3">{{ item.name }}</div>
               <div role="button" class="custom__remove d-flex align-items-center"
                     @click="remove(item.id)">
                 <remove-tag-icon class="ml-1 remove-tag-icon">
@@ -51,13 +50,13 @@
                  :key="item.id"
                  @click="onSelectOption(item.id)">
               <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
-                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break">
-                <q-badge class="is-dot mx-1"
+                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
+                <q-badge class="is-dot mx-1 position-absolute"
                          rounded
                          :style="{ background: item.color }"
                          v-if="typeof item.color !== 'undefined'">
                 </q-badge>
-                <span class="tag-text text-grey-100">{{ item.name }}</span>
+                <span class="tag-text text-grey-100 ml-2">{{ item.name }}</span>
               </span>
               <div>
                 <check-o-icon color="#256EFF"
@@ -83,14 +82,14 @@
                  v-for="child in item.children"
                  :key="`child-${child.id}`"
                  @click="onSelectOption(child.id)">
-              <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break"
+              <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
                     v-if="typeof child.color !== 'undefined'">
-                <q-badge class="is-dot mx-1"
+                <q-badge class="is-dot mx-1 position-absolute"
                          rounded
                          :style="{ background: child.color }"
                          v-if="typeof child.color !== 'undefined'">
                 </q-badge>
-                <span class="tag-text text-grey-100">{{ child.name }}</span>
+                <span class="tag-text text-grey-100 ml-2">{{ child.name }}</span>
               </span>
               <check-o-icon color="#256EFF"
                             width="12"
@@ -110,14 +109,13 @@
       <div class="selected-items-wrapper">
         <div v-for="item in formattedValues"
              :key="item.id">
-        <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
-              class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break">
+        <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
           <q-badge class="is-dot mx-1"
                    rounded
                    :style="{ background: item.color }"
                    v-if="typeof item.color !== 'undefined'">
           </q-badge>
-          <span class="tag-text">{{ item.name }}</span>
+          <span class="tag-text ml-3">{{ item.name }}</span>
         </span>
         </div>
       </div>

@@ -1,18 +1,10 @@
 <template>
   <div class="move-dialog shadow-sm" ref="moveDialog">
-    <div class="move-dialog-title">
-      <div class="flex-grow-1">
-        Move {{ moveDialog.type === 'folder' ? 'Folder' : 'List' }}
-      </div>
-      <button class="btn btn-link move-dialog-close" @click="closeMoveDialog">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
     <div class="move-dialog-input">
       <div>
         <search
           ref="folder-search"
-          placeholder="Search..."
+          placeholder="Move to..."
           @search="onSearch"
         ></search>
       </div>
@@ -28,8 +20,8 @@
         :layer="0"
       />
     </div>
-    <div class="move-dialog-footer">
-      <div class="text-muted small pr-2" v-if="hasSelected">
+    <div class="move-dialog-footer" v-if="hasSelected">
+      <div class="text-muted small pr-2">
         Would you like to continue?
       </div>
       <compact-btn

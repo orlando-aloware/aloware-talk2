@@ -36,7 +36,7 @@
                     v-model="filterRight"
                     :options="optionsRight"
                     :append="[{icon: 'ion-ios-arrow-down'}]"
-                    @input="sort">
+                    @input="sortFilter">
           </q-select>
         </div>
       </div>
@@ -616,7 +616,11 @@ export default {
         params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, mentioner_user_id: params.mentioner_user_id, mentioned_user_id: params.mentioned_user_id } }
       }
 
-      params = { ...params, order_by: this.sorting.order }
+      if (this.$route.params.channel !== 'mentions') {
+        params = { ...params, order: this.sorting.order }
+      } else {
+        params = { ...params, order_by: this.sorting.order }
+      }
 
       return api.get({ params: params })
         .then(response => {

@@ -154,6 +154,7 @@ $primary-hover: #054CDB;
 @include bg-color('red-90', $red-10, true);
 @include bg-color('red-10', $red-10, true);
 @include bg-color('grey-80', $grey-80, true);
+@include bg-color('grey-70', $grey-70, true);
 
 .bg-primary {
   background: $primary !important;

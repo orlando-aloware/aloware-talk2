@@ -138,11 +138,13 @@
               <b-form-group>
                 <span class="form-label">Show Only First Time Communications</span>
                 <div>
-                  <q-toggle color="green"
-                            class="pl-0"
-                            v-model="filter.first_time_only"
-                            :true-value="1"
-                            :false-value="0"/>
+                  <b-form-checkbox switch
+                                   class="cursor-pointer"
+                                   size="lg"
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   v-model="filter.first_time_only">
+                  </b-form-checkbox>
                 </div>
               </b-form-group>
             </b-col>
@@ -152,10 +154,12 @@
               <b-form-group>
                 <span class="form-label">Show Only Untagged Communications</span>
                 <div>
-                  <q-toggle color="green"
-                            v-model="filter.untagged_only"
-                            :true-value="1"
-                            :false-value="0" />
+                  <b-form-checkbox switch
+                                   size="lg"
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   v-model="filter.untagged_only">
+                  </b-form-checkbox>
                 </div>
               </b-form-group>
             </b-col>
@@ -165,10 +169,12 @@
               <b-form-group>
                 <span class="form-label">Exclude Communications Sent From Sequences</span>
                 <div>
-                  <q-toggle color="green"
-                            v-model="filter.exclude_automated_communications"
-                            :true-value="1"
-                            :false-value="0" />
+                  <b-form-checkbox switch
+                                   size="lg"
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   v-model="filter.exclude_automated_communications">
+                  </b-form-checkbox>
                 </div>
               </b-form-group>
             </b-col>

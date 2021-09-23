@@ -550,6 +550,9 @@ const parseMentionToMarkup = (content) => {
   return doc.body.innerText
 }
 
+// eslint-disable-next-line no-return-assign,no-sequences
+const sortObjectByKey = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {})
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -583,7 +586,8 @@ export default ({ Vue }) => {
     textTruncate,
     numberPlusFormatter,
     parseMentionToView,
-    parseMentionToMarkup
+    parseMentionToMarkup,
+    sortObjectByKey
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
