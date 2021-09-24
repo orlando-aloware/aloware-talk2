@@ -1,25 +1,6 @@
 <template>
   <div class="t-menu">
-    <div class="t-menu__header d-flex align-items-center">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
-        POWER DIALER LISTS
-      </div>
-      <b-dropdown size="xs" variant="link" toggle-class="text-decoration-none" no-caret>
-        <template class="p-0 m-0" #button-content>
-          <button
-            size="sm"
-            class="btn btn-link btn-sm tooltip-target mr-1"
-            id="bs-folder-options">
-            <i class="fa fa-plus text-primary"></i>
-          </button>
-        </template>
-        <b-dropdown-item
-          @click="onCreateFolderToggle"
-          class="text-capitalize text-body2" href="#">Folder</b-dropdown-item>
-        <b-dropdown-item class="text-capitalize text-body2" href="#">List</b-dropdown-item>
-      </b-dropdown>
-    </div>
-    <div class="d-flex folders__content flex-column p-0">
+    <!-- <div class="d-flex folders__content flex-column p-0">
       <DirectoryFolderCreate
         v-if="isCreatingFolder"
         :layer="0"
@@ -48,7 +29,11 @@
           :lists="list[0].lists"
           :layer="0" />
       </template>
-    </div>
+    </div> -->
+    <DirectoryBase
+      @create-folder="{}"
+      title="Power Dialer Lists"
+      :directory="list" />
     <!-- <MyDirectory class="t-directory" :directory="directoryList">
       <template slot-scope="props">
         <div
@@ -93,8 +78,9 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import DirectoryFolder from './directories/directory-folder'
-import DirectoryFolderCreate from './directories/directory-folder-create'
+// import DirectoryFolder from './directories/directory-folder'
+// import DirectoryFolderCreate from './directories/directory-folder-create'
+import DirectoryBase from './directories/directory-base'
 // import MyDirectory from './directories/directory'
 // import FolderIcon from 'components/icons/folder-icon'
 import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -102,8 +88,9 @@ import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
 export default {
   name: 'PowerDialerList',
   components: {
-    DirectoryFolder,
-    DirectoryFolderCreate
+    DirectoryBase
+    // DirectoryFolder,
+    // DirectoryFolderCreate
     // MyDirectory,
     // FolderIcon
   },

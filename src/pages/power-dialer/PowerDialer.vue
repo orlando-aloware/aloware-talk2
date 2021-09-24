@@ -11,40 +11,61 @@
       <!-- Router Here -->
       <router-view></router-view>
     </div>
+    <MoveDialog />
+    <RemoveListModal />
+    <RemoveFolderDialog />
   </div>
 </template>
 
 <script>
 
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
+import MoveDialog from 'components/move-dialog'
+import RemoveListModal from 'components/power-dialer/custom/remove-list'
+import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
 
 export default {
   name: 'PowerDialer',
   components: {
-    PowerDialerSidebar
+    PowerDialerSidebar,
+    MoveDialog,
+    RemoveListModal,
+    RemoveFolderDialog
   },
   computed: {
     ...mapGetters('auth', ['authenticated']),
-    ...mapGetters('powerDialer', ['isStartingDial'])
+    ...mapGetters('powerDialer', ['isStartingDial']),
+    ...mapState(['currentRoute'])
   },
   mounted () {
     this.START_DIAL_TOGGLE(false)
   },
   beforeRouteUpdate (to, from, next) {
-    console.log('to :>> ', to)
-    console.log('from :>> ', from)
     if (to.meta !== 'Power Dialer Session') {
       this.START_DIAL_TOGGLE(false)
     }
     next()
+  },
+  watch: {
+    'currentRoute': {
+      handler () {
+        if (this.currentRoute.name === 'Power Dialer') {
+          this.RESET_LIST()
+          this.SET_POWER_DIALER_LIST([])
+        }
+      },
+      deep: true
+    }
   },
   methods: {
     ...mapActions('power-dialer', [
       'getPowerDialerList'
     ]),
     ...mapMutations('powerDialer', [
-      'START_DIAL_TOGGLE'
+      'START_DIAL_TOGGLE',
+      'SET_POWER_DIALER_LIST',
+      'RESET_LIST'
     ]),
     async fetchAutoDialer () {
       await this.getPowerDialerList()

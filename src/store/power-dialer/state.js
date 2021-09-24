@@ -21,7 +21,7 @@ export default function () {
       type: 'folder',
       target: null
     },
-    powerDialerList: null,
+    // powerDialerList: null,
     contactResources: [],
     selectedContacts: {},
     isStartingDial: false

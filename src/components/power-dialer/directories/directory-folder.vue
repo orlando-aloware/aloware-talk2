@@ -85,7 +85,8 @@
       triggers="click blur"
       placement="bottomright"
       boundary="window"
-      custom-class="contact-popover">
+      custom-class="t-popover"
+    >
 
       <FolderActions
         @create="onCreateFolder"
@@ -103,7 +104,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import FolderIcon from 'components/icons/folder-icon'
+import FolderIcon from 'components/icons/folder-2-icon'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
 import FolderOption from 'components/icons/folder-option'
@@ -170,16 +171,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', [
+    ...mapGetters('powerDialer', [
       'opened',
       'moveDialog',
       'createList'
     ]),
-    // ...mapGetters('powerDialer', [
-    //   'opened',
-    //   'moveDialog',
-    //   'createList'
-    // ]),
     indentStyle () {
       return {
         width: `${this.layer * 10}px`
@@ -206,6 +202,7 @@ export default {
       'createListOpen'
     ]),
     onMove () {
+      console.log('Moving folders...')
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
         id: this.id,

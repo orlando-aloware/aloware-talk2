@@ -9,9 +9,10 @@
         :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
         class="folder d-flex align-items-center">
         <div class="folder__indent" :style="indentStyle"></div>
-        <div class="folder__icon pl-2">
+        <div class="folder__icon pl-3">
+          <DialIcon color="#62666E" />
         </div>
-        <div class="folder__name pl-3">
+        <div class="folder__name">
           <input
             :id="'folder-input-' + id"
             v-if="isEditing"
@@ -63,6 +64,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderOption from 'components/icons/folder-option'
+import DialIcon from 'components/icons/dial-icon'
 import ListActions from './../../list-actions'
 import errorMessages from 'src/plugins/helpers/extract-error-message'
 
@@ -72,10 +74,11 @@ export default {
   name: 'DirectoryListItem',
   components: {
     FolderOption,
-    ListActions
+    ListActions,
+    DialIcon
   },
   computed: {
-    ...mapGetters('contacts', ['pinned', 'moveDialog']),
+    ...mapGetters('powerDialer', ['pinned', 'moveDialog']),
     indentStyle () {
       return {
         width: `${(this.layer * 10) + 2}px`
@@ -125,7 +128,7 @@ export default {
     clearTimeout(inputTimeout)
   },
   methods: {
-    ...mapActions('contacts', [
+    ...mapActions('powerDialer', [
       'removeListOpen',
       'foldersLoaded',
       'listLoaded',
@@ -154,7 +157,7 @@ export default {
           const data = response.data.data
           const message = response.data.message
 
-          this.$router.push(`/contacts/list/${data.id}`)
+          this.$router.push(`/power-dialer/list/${data.id}`)
 
           this.$generalNotification(message)
 
@@ -167,6 +170,7 @@ export default {
         })
     },
     onMove () {
+      console.log('Moving items...')
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
         id: this.id,
@@ -184,7 +188,7 @@ export default {
 
       if (isPinned) {
         this.$axios
-          .get(`api/v2/contacts-list/${this.id}/items?per_page=1`)
+          .get(`api/v2/power-dialer-list/${this.id}/items?per_page=1`)
           .then((response) => {
             this.pinnedCountLoaded({
               id: this.id,
@@ -207,11 +211,11 @@ export default {
       })
     },
     pinRequest (id, isPinned) {
-      if (isPinned) {
-        return this.$axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
-      } else {
-        return this.$axios.delete('/api/v2/contact-list-bookmark/' + id)
-      }
+      // if (isPinned) {
+      //   return this.$axios.post('/api/v2/power-dialer-list-bookmark', { contact_list_id: id, order: id })
+      // } else {
+      //   return this.$axios.delete('/api/v2/power-dialer-list-bookmark/' + id)
+      // }
     },
     onRenameList () {
       this.isEditing = true
@@ -253,7 +257,7 @@ export default {
     },
     updateListRequest (id, params) {
       return this.$axios
-        .patch('/api/v2/contacts-list/' + id, params)
+        .patch('/api/v2/power-dialer-list/' + id, params)
         .catch((error) => {
           const { message, html } = errorMessages(error)
           console.log(html)
@@ -262,7 +266,7 @@ export default {
     },
     getContactList (id) {
       return this.$axios
-        .get('/api/v2/contacts-list/' + id)
+        .get('/api/v2/power-dialer-list/' + id)
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = errorMessages(error)
@@ -272,7 +276,7 @@ export default {
     },
     getItems (id) {
       return this.$axios
-        .get(`api/v2/contacts-list/${id}/items?per_page=1`)
+        .get(`api/v2/power-dialer-list/${id}/items?per_page=1`)
     },
     reloadFolders () {
       return this.$axios
@@ -284,7 +288,7 @@ export default {
         })
     },
     onClickItem () {
-      this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
+      this.$router.push(`/power-dialer/list/${this.id}`).catch((_err) => {})
     },
     onRemoveList () {
       this.removeListOpen({ id: this.id, name: this.name })

@@ -33,6 +33,9 @@ export default {
   removeFolderOpen: ({ commit }, folder) => {
     commit('REMOVE_FOLDER_OPEN', folder)
   },
+  removeFolderClose: ({ commit }) => {
+    commit('REMOVE_FOLDER_CLOSE')
+  },
   openMoveDialog: ({ commit }, payload) => {
     commit('MOVE_DIALOG_OPEN', payload)
   },
@@ -44,5 +47,11 @@ export default {
   },
   listLoaded: ({ commit }, payload) => {
     commit('LIST_LOADED', payload)
+  },
+  removeListClose: ({ commit }) => {
+    commit('REMOVE_LIST_CLOSE')
+  },
+  setRemoveListActionType: ({ commit }, payload) => {
+    commit('SET_REMOVE_LIST_ACTION_TYPE', payload)
   }
 }

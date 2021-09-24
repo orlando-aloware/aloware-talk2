@@ -9,7 +9,7 @@
     <div class="pr-2">
       <div
         class="d-inline align-items-center">
-        <b-popover
+        <!-- <b-popover
           target="bs-folder-options"
           triggers="click blur"
           placement="bottomright"
@@ -34,10 +34,12 @@
               </template>
             </contact-menu-item>
           </contact-menu>
-        </b-popover>
+        </b-popover> -->
         <AddUserIcon class="cursor-pointer" />
       </div>
-      <b-badge class="t-badge t-badge__warning ml-2 text-white">{{ item.count }}</b-badge>
+      <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
+        {{ item.count }}
+      </b-badge>
     </div>
   </div>
 </template>

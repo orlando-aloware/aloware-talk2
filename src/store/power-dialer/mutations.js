@@ -1,9 +1,16 @@
+import { POWER_DIALER_LIST } from 'src/constants/power-dialer/power-dialer'
+
 export default {
   SET_POWER_DIALER_LIST: (state, data) => {
-    state.lists = data
+    let list = POWER_DIALER_LIST
+    state.lists = list.concat(data)
   },
   SET_CONTACT_RESOURCES: (state, data) => {
     state.contactResources = data
+  },
+  RESET_LIST: (state) => {
+    state.opened = []
+    state.lists = []
   },
   SET_LIST_SELECTED_CONTACTS: (state, data) => {
     console.log('data :>> ', data)
@@ -39,6 +46,9 @@ export default {
   REMOVE_FOLDER_OPEN: (state, folder) => {
     state.removeFolder = folder
   },
+  REMOVE_FOLDER_CLOSE: (state) => {
+    state.removeFolder = null
+  },
   MOVE_DIALOG_OPEN: (state, { id, type }) => {
     state.moveDialog = { open: true, id, type }
   },
@@ -59,5 +69,8 @@ export default {
   },
   START_DIAL_TOGGLE: (state, value) => {
     state.isStartingDial = value
+  },
+  REMOVE_LIST_CLOSE: (state) => {
+    state.removeList = null
   }
 }

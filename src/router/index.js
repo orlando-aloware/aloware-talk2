@@ -51,6 +51,11 @@ export default function ({ store }) {
       name: from.name,
       path: from.path
     })
+    store.commit('SET_CURRENT_ROUTE', {
+      fullPath: to.fullPath,
+      name: to.name,
+      path: to.path
+    })
   })
 
   return Router

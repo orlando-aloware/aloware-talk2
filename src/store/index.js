@@ -141,6 +141,7 @@ export default function (/* { ssrContext } */) {
       smsTemplates: [],
       tagsFullyLoaded: false,
       prevRoute: null,
+      currentRoute: null,
       breadcrumbs: ''
     },
 
@@ -907,6 +908,9 @@ export default function (/* { ssrContext } */) {
 
       SET_PREV_ROUTE (state, data) {
         state.prevRoute = data
+      },
+      SET_CURRENT_ROUTE (state, data) {
+        state.currentRoute = data
       }
     },
     plugins: [
