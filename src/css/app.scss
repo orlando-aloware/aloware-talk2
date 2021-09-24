@@ -7008,3 +7008,15 @@ button.grey-90 {
 .q-item__label {
   font-weight: normal !important;
 }
+
+.filter-types {
+  .q-field__native.row {
+    .q-field__input {
+      padding-left: 0 !important;
+    }
+  }
+  .b-calendar-inner {
+    min-width: 215px !important;
+    width: 215px !important;
+  }
+}
