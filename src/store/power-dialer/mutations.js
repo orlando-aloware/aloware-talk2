@@ -9,7 +9,7 @@ export default {
     state.contactResources = data
   },
   RESET_LIST: (state) => {
-    state.opened = []
+    // state.opened = []
     state.lists = []
   },
   SET_LIST_SELECTED_CONTACTS: (state, data) => {

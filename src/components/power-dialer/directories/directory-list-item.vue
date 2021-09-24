@@ -10,7 +10,7 @@
         class="folder d-flex align-items-center">
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon pl-3">
-          <DialIcon color="#62666E" />
+          <DialIcon class="ml-2" color="#62666E" />
         </div>
         <div class="folder__name">
           <input

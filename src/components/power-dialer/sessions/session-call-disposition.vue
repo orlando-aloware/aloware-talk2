@@ -1,11 +1,11 @@
 <template>
   <div class="t-menu">
-    <div class="t-menu__header d-flex align-items-center">
+    <div class="t-menu__header t-dense d-flex align-items-center">
       <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
         CALL DISPOSITION
       </div>
     </div>
-    <div class="d-flex t-menu__content px-3">
+    <div class="d-flex t-menu__content px-3 pb-2">
       <q-chip
         v-for="chip in callDisposition"
         :key="chip.name"
@@ -18,12 +18,12 @@
       <q-chip square outline color="grey" class="p-0">...</q-chip>
     </div>
 
-    <div class="t-menu__header d-flex align-items-center no-border pt-0">
+    <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
       <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
         CONTACT DISPOSITION
       </div>
     </div>
-    <div class="d-flex t-menu__content px-3">
+    <div class="d-flex t-menu__content px-3 pb-2">
       <q-chip
         v-for="chip in contactDisposition"
         :key="chip.name"
@@ -36,12 +36,12 @@
       <q-chip square outline color="primary" class="p-0">...</q-chip>
     </div>
 
-    <div class="t-menu__header d-flex align-items-center no-border pt-0">
+    <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
       <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
         VOICEMAIL
       </div>
     </div>
-    <div class="d-flex t-menu__content px-3">
+    <div class="d-flex t-menu__content px-3 pb-0">
       <q-chip
         v-for="chip in voicemail"
         :key="chip.name"
