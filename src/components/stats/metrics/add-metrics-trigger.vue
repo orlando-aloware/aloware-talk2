@@ -25,13 +25,13 @@
 
 <script>
 
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import AddMetricsModal from './form-metrics-modal'
 
 export default {
   name: 'AddMetrics',
   props: {
-    reportGroup: {
+    metricGroup: {
       type: Object,
       default: () => {}
     }
@@ -40,8 +40,9 @@ export default {
     AddMetricsModal
   },
   computed: {
+    ...mapState('auth', ['profile']),
     groupId () {
-      return this.reportGroup.id
+      return this.metricGroup.id
     }
   },
   data () {
@@ -50,19 +51,27 @@ export default {
     }
   },
   methods: {
-    ...mapActions('stats', [
-      'createMetrics'
-    ]),
-    async createNewMetric (data) {
+    ...mapActions('stats', ['addMetric']),
+    createNewMetric (data) {
       this.$emit('toggle-loader', true)
-      await this.createMetrics({
-        reportId: this.groupId,
-        name: data.name,
+      this.$axios.post(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.groupId}/metrics`, {
+        metric_id: data.metricId,
         color: data.color,
-        value: Math.floor(Math.random() * (199 - 1 + 1)) + 1
+        type: data.type
+      }).then(res => {
+        this.addMetric({
+          metricGroupId: this.groupId,
+          data: res.data
+        })
+        this.$generalNotification('Metric successfully added.')
+        this.$emit('toggle-loader', false)
+        this.modal = false
+      }).catch(err => {
+        console.log(err)
+        this.$generalNotification('Failed to add metric.', 'error')
+        this.$emit('toggle-loader', false)
+        this.modal = false
       })
-      this.$emit('toggle-loader', false)
-      this.modal = false
     },
     openModal () {
       this.modal = true

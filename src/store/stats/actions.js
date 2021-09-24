@@ -5,49 +5,41 @@ export default {
    * Actual API calls for
    * REPORT GROUPS
    */
-  createReportGroup: async ({ commit }, params = {}) => {
-    let res = await window.axios.post('http://localhost:3000/reports', params)
-    if (res.status === 201) {
-      commit('ADD_REPORT_GROUP', res.data)
-    }
+  addMetricGroup: async ({ commit }, data) => {
+    commit('ADD_METRIC_GROUP', data)
   },
-  getReportGroups: async ({ commit }) => {
-    let res1 = await window.axios.get(`http://localhost:3000/reports`)
-    let res2 = await window.axios.get(`http://localhost:3000/metrics`)
-    commit('SET_REPORT_GROUP', res1.data)
-    commit('SET_METRICS', res2.data)
+  setMetricGroups: async ({ commit }, data) => {
+    commit('SET_METRIC_GROUPS', data)
   },
-  updateReportGroup: async ({ commit }, params = {}) => {
-    await window.axios.patch(`http://localhost:3000/reports/${params.id}`, params)
+  updateMetricGroup: async ({ commit }, data) => {
+    commit('UPDATE_METRIC_GROUP', data)
   },
-  deleteReportGroup: async ({ commit }, id = '') => {
-    let res = await window.axios.delete(`http://localhost:3000/reports/${id}`)
-    if (res.status === 200) {
-      commit('REMOVE_REPORT_GROUP', id)
-    }
+  deleteMetricGroup: async ({ commit }, metricGroupId) => {
+    commit('REMOVE_METRIC_GROUP', metricGroupId)
   },
-  updateMetricGroupOrder: async ({ commit }, params = {}) => {
-    // await window.axios.patch('http://localhost:3000/metrics')
-    await console.log(`REQUEST PAYLOAD: .../metric-group/${params.id}/order?direction=${params.direction}&step=${params.step}`)
+  updateMetric: async ({ commit }, params = {}) => {
+    await window.axios.patch(`/api/v2/agents/${params.userId}/statistics/metric-groups/${params.metricGroupId}/order`)
+    commit('UPDATE_METRIC', params.metricGroupId)
+    // await console.log(`REQUEST PAYLOAD: .../metric-group/${params.id}/order?direction=${params.direction}&step=${params.step}`)
+  },
+  setAvailableMetrics: async ({ commit }, data) => {
+    commit('SET_AVAILABLE_METRICS', data)
   },
   /**
    * Actual API calls for
    * METRICS
    */
-  createMetrics: async ({ commit }, params = {}) => {
-    let res = await window.axios.post('http://localhost:3000/metrics', params)
-    if (res.status === 201) {
-      commit('ADD_METRIC', res.data)
-    }
+  addMetric: async ({ commit }, payload) => {
+    commit('ADD_METRIC', payload)
   },
   updateMetrics: async ({ commit }, params = {}) => {
-    await window.axios.patch(`http://localhost:3000/metrics/${params.id}`, params)
+    await window.axios.patch(`/api/v2/agents/${params.userId}/statistics/metric-groups/${params.metricGroupId}/metrics/{metric_id}`, params.data)
   },
-  deleteMetrics: async ({ commit }, id = '') => {
+  deleteMetric: async ({ commit }, params = {}) => {
     // Actual API call
-    let res = await window.axios.delete(`http://localhost:3000/metrics/${id}`)
+    let res = await window.axios.delete(`/api/v2/agents/${params.userId}/statistics/metric-groups/${params.metricGroupId}/metrics/${params.metricId}`)
     if (res.status === 200) {
-      commit('REMOVE_METRICS', id)
+      commit('REMOVE_METRICS', params.metricId)
     }
     return res
   }

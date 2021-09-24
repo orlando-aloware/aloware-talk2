@@ -3,19 +3,23 @@
     <div class="row no-wrap report-group-header q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
         <TitlePopover
-          v-model="reportGroupName"
-          :id="reportGroupId"
+          v-model="metricGroupName"
+          :id="metricGroupId"
           @input="updateGroup" />
       </div>
       <q-select
-        v-model="timeline"
-        @input="changedFilter($event)"
+        class="mini-select"
         outlined
         rounded
+        map-options
+        emit-value
+        option-value="id"
+        option-label="label"
         :options="dateRange"
         :dense="dense"
         :options-dense="denseOpts"
-        class="mini-select">
+        v-model="timeline"
+        @input="changedFilter($event)">
       </q-select>
     </div>
     <div
@@ -36,14 +40,28 @@
           class="cursor-pointer text-grey"
           style="font-size: 11px;padding:3px;" />
       </b-badge>
-      <div class="no-border bg-white p-2 pr-5 row">
+      <div class="no-border bg-white p-2 pr-5 rowd d-flex">
         <AddMetrics
-          :report-group="{ id: reportGroupId, name: reportGroupName }"
+          :metric-group="{ id: metricGroupId, name: metricGroupName }"
           @toggle-loader="toggleLoad" />
-        <MetricsBox
-          v-for="(metric, key) in resources.metrics"
-          :key="key"
-          :metric="metric" />
+        <template v-if="resources.agent_metrics">
+          <Draggable
+            class="list-group w-100"
+            :options="{handle:'.movable'}"
+            v-model="resources.agent_metrics"
+            v-bind="dragOptions"
+            @change="updateSortedMetric"
+            tag="ul">
+            <transition-group :key="key"
+                              type="transition"
+                              name="flip-list">
+              <MetricsBox
+                v-for="metric in resources.agent_metrics"
+                :key="metric.id"
+                :metric="metric" />
+            </transition-group>
+          </Draggable>
+        </template>
         <MetricLoader v-if="loader" />
         <div v-if="hovered" class="metric-group-drawer">
           <div class="drawer-icon movable">
@@ -54,7 +72,7 @@
     </div>
     <ConfirmDialog
       @close="closeModal"
-      title="Delete Report Group"
+      title="Delete Metric Group"
       :id="dialogName"
       :is-open="isOpen"
       :hide-header="true"
@@ -65,11 +83,11 @@
           <TrashIcon
             height="20"
             width="20" />
-          Remove Report Group?
+          Remove Metric Group?
         </div>
         <div class="text-center py-3">
           <div class="text-dark">
-          <div v-html="`Do you want to remove this Report Group: <strong>${resources.name}</strong>?`"></div>
+          <div v-html="`Do you want to remove this Metric Group: <strong>${resources.name}</strong>?`"></div>
           </div>
         </div>
         <div class="row text-center pt-3 pb-0">
@@ -88,7 +106,7 @@
               variant="danger"
               size="sm"
               block
-              @click="removeSelectedReportGroup">
+              @click="removeSelectedMetricGroup">
               Remove
             </b-button>
           </div>
@@ -99,22 +117,18 @@
 </template>
 
 <script>
-
-import { mapActions } from 'vuex'
+import Draggable from 'vuedraggable'
+import { mapActions, mapState } from 'vuex'
 import AddMetrics from '../metrics/add-metrics-trigger'
 import MetricsBox from '../metrics/metrics-box'
 import MetricLoader from '../metrics/metric-loader'
 import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import TitlePopover from 'components/popover/text-popover'
-import {
-  DATE_RANGES
-} from 'src/constants/dates'
-
-const dateRanges = { DATE_RANGES }
+import * as DateRanges from 'src/constants/dates'
 
 export default {
-  name: 'ReportGroup',
+  name: 'MetricGroup',
   props: {
     resources: {
       type: Object,
@@ -123,6 +137,7 @@ export default {
   },
   components: {
     AddMetrics,
+    Draggable,
     MetricsBox,
     MetricLoader,
     ConfirmDialog,
@@ -130,7 +145,8 @@ export default {
     TitlePopover
   },
   computed: {
-    reportGroupName: {
+    ...mapState('auth', ['profile']),
+    metricGroupName: {
       get () {
         let { name } = this.resources
         if (this.title === 'Untitled') {
@@ -144,21 +160,18 @@ export default {
         this.title = val
       }
     },
-    reportGroupId () {
+    metricGroupId () {
       return this.resources.id
     },
     dateRange () {
-      if (dateRanges) {
-        return dateRanges.DATE_RANGES
-      }
-      return []
+      return this.DateRanges.DATE_RANGES
     },
     dialogName () {
       return `remove-group-dialog-${this.resources.id}`
     }
   },
   mounted () {
-    this.timeline = this.resources.timeline || 'Today'
+    this.timeline = this.resources.date_range_type || 1
   },
   data () {
     return {
@@ -168,7 +181,14 @@ export default {
       title: 'Untitled',
       dense: true,
       denseOpts: true,
-      loader: false
+      loader: false,
+      dragOptions: {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
+      },
+      DateRanges
     }
   },
   watch: {
@@ -180,31 +200,49 @@ export default {
       }
     },
     resources () {
-      this.timeline = this.resources.timeline
+      this.timeline = this.resources.date_range_type
     }
   },
   methods: {
     ...mapActions('stats', [
-      'updateReportGroup',
-      'deleteReportGroup'
+      'updateMetricGroup',
+      'deleteMetricGroup'
     ]),
-    async removeSelectedReportGroup () {
-      await this.deleteReportGroup(this.reportGroupId)
-      this.closeModal()
+    async removeSelectedMetricGroup () {
+      this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metricGroupId}`)
+        .then(res => {
+          this.deleteMetricGroup(res.data.id)
+          this.$generalNotification('Metric group successfully removed.')
+          this.closeModal()
+        }).catch(err => {
+          console.log(err)
+          this.$generalNotification('Failed to remove metric group.')
+          this.closeModal()
+        })
     },
-    async updateGroup (val) {
-      this.reportGroupName = val
-      await this.updateReportGroup({
-        id: this.resources.id,
-        name: this.title,
-        timeline: this.timeline
+    updateGroup (val) {
+      this.metricGroupName = val
+      this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
+        name: val,
+        date_range_type: this.resources.date_range_type
+      }).then(res => {
+        this.updateMetricGroup(res.data)
+        this.$generalNotification('Metric group updated successfully.')
+      }).catch(err => {
+        console.log(err)
+        this.$generalNotification('Failed to updated metric group.', 'error')
       })
     },
     async changedFilter (val) {
-      await this.updateReportGroup({
-        id: this.resources.id,
+      this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
         name: this.title,
-        timeline: val
+        date_range_type: val
+      }).then(res => {
+        this.updateMetricGroup(res.data)
+        this.$generalNotification('Metric group updated successfully.')
+      }).catch(err => {
+        console.log(err)
+        this.$generalNotification('Failed to updated metric group.', 'error')
       })
     },
     confirmDeletion () {
@@ -215,6 +253,24 @@ export default {
     },
     toggleLoad (val) {
       this.loader = val
+    },
+    async updateSortedMetric (val) {
+      let { newIndex, oldIndex, element } = val.moved
+      let step = null
+      let direction = oldIndex > newIndex ? 'up' : 'down'
+      let id = element.id
+
+      if (oldIndex > newIndex) {
+        step = oldIndex - newIndex
+      } else {
+        step = newIndex - oldIndex
+      }
+
+      await this.updateMetric({
+        id: id,
+        direction: direction,
+        step: step
+      })
     }
   }
 }

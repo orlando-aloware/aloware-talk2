@@ -15,17 +15,20 @@
               {{ title }}
             </div>
             <q-select
-              @popup-show="onShowMetricsMenu"
-              outlined dense emit-value
-              v-model="metrics"
-              :options="metricOptions"
-              option-value="text"
-              option-label="text"
+              outlined
+              dense
+              map-options
+              emit-value
+              option-value="metric_id"
+              option-label="label"
               ref="statsSelectMetrics"
-              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
+              v-model="metric"
+              :options="metricOptions"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMetricsMenu">
               <template v-slot:selected>
-                <template v-if="metrics">
-                  {{ metrics }}
+                <template v-if="metric">
+                  {{ getOptionsText(metric) }}
                 </template>
                 <template v-else>
                   Add Metrics
@@ -39,10 +42,10 @@
                       v-if="scope.opt.disable"
                       class="text-subtitle2 font-weight-bold"
                       disabled label
-                      v-html="scope.opt.text" />
+                      v-html="scope.opt.label" />
                     <q-item-label
                       v-else
-                      v-html="scope.opt.text" />
+                      v-html="scope.opt.label" />
                   </q-item-section>
                 </q-item>
               </template>
@@ -93,15 +96,10 @@
 </template>
 
 <script>
-
-import {
-  METRIC_OPTIONS_2,
-  METRIC_OPTIONS_COLORS
-} from 'src/constants/stats'
-import { isEmpty } from 'lodash'
-
-const colorOptions = { METRIC_OPTIONS_COLORS }
-const stats = { METRIC_OPTIONS_2 }
+import _ from 'lodash'
+import { mapState } from 'vuex'
+import * as MetricOptionColors from 'src/constants/metric-option-colors'
+import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 
 export default {
   name: 'FormMetricsModal',
@@ -124,14 +122,41 @@ export default {
     }
   },
   computed: {
+    ...mapState('stats', ['availableMetrics']),
     metricOptions () {
-      if (stats) {
-        return stats.METRIC_OPTIONS_2
+      if (_.isEmpty(this.availableMetrics)) {
+        return []
       }
-      return []
+
+      let structuredMetricGroups = []
+      const availableMetrics = JSON.parse(JSON.stringify(this.availableMetrics))
+      for (let index in availableMetrics) {
+        let optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
+        structuredMetricGroups.push({
+          disable: true,
+          value: null,
+          label: optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
+        })
+
+        if (availableMetrics[index].constructor.name === 'Array') {
+          for (let option of availableMetrics[index]) {
+            option.disable = false
+            structuredMetricGroups.push(option)
+          }
+        }
+
+        if (availableMetrics[index].constructor.name === 'Object') {
+          for (let key of Object.keys(availableMetrics[index])) {
+            availableMetrics[index][key].disable = false
+            structuredMetricGroups.push(availableMetrics[index][key])
+          }
+        }
+      }
+
+      return structuredMetricGroups
     },
     colors () {
-      return colorOptions.METRIC_OPTIONS_COLORS
+      return this.MetricOptionColors.METRIC_OPTIONS_COLORS
     },
     actionCreate () {
       if (this.resources?.id) {
@@ -140,7 +165,7 @@ export default {
       return false
     },
     validData () {
-      if (isEmpty(this.color) || isEmpty(this.metrics)) {
+      if (!this.color || !this.metric) {
         return false
       }
       return true
@@ -149,10 +174,12 @@ export default {
   data () {
     return {
       modal: false,
-      metrics: null,
+      metric: null,
       model: '',
       color: '',
-      selectWidth: 0
+      selectWidth: 0,
+      MetricOptionColors,
+      MetricOptionGroups
     }
   },
   watch: {
@@ -169,7 +196,7 @@ export default {
           this.color = this.colors.find(col => {
             return col.value === color
           })
-          this.metrics = name
+          this.metric = name
         }
       }
     }
@@ -178,21 +205,26 @@ export default {
     async submit () {
       if (this.actionCreate) {
         this.$emit('update', {
-          id: this.resources.id,
-          name: this.metrics,
+          id: this.metric,
           color: this.color.value,
           reportId: this.resources.reportId,
           value: this.resources.value
         })
       } else {
+        const option = this.metricOptions.find(option => option.metric_id === this.metric)
         this.$emit('create', {
-          name: this.metrics,
+          type: option ? option.type : null,
+          metricId: this.metric,
           color: this.color.value
         })
       }
     },
+    getOptionsText (id) {
+      const option = this.metricOptions.find(option => option.metric_id === id)
+      return option ? option.label : ''
+    },
     resetData () {
-      this.metrics = ''
+      this.metric = ''
       this.color = ''
     },
     onShowColorMenu () {

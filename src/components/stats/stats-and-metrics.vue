@@ -1,29 +1,31 @@
 <template>
   <Draggable
-    @change="updateSortedGroup"
-    v-model="report_group"
-    v-bind="dragOptions"
     class="list-group"
     :options="{handle:'.movable'}"
+    v-model="metricGroups"
+    v-bind="dragOptions"
+    @change="updateSortedGroup"
     tag="ul">
     <transition-group type="transition" name="flip-list">
       <template
-        v-for="(report_group_resources, key) in reportGroupList">
-        <ReportGroup :key="key" :resources="report_group_resources" />
+        v-for="(metricGroupResources, key) in metricGroups">
+        <MetricGroup :key="key" :resources="metricGroupResources" />
       </template>
     </transition-group>
   </Draggable>
 </template>
 
 <script>
-
-import { mapActions, mapGetters } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
+import { mapActions, mapState } from 'vuex'
 import Draggable from 'vuedraggable'
-import ReportGroup from './report-group/report-group'
+import MetricGroup from './metric-group/metric-group'
 
 export default {
   name: 'StatsMetricsGroup',
+  components: {
+    Draggable,
+    MetricGroup
+  },
   props: {
     resources: {
       type: Object,
@@ -38,15 +40,8 @@ export default {
     }
   },
   computed: {
-    ...mapFields('stats', [
-      'report_group'
-    ]),
-    ...mapGetters('stats', [
-      'consolidatedReportGroup'
-    ]),
-    reportGroupList () {
-      return this.consolidatedReportGroup
-    },
+    ...mapState('stats', ['metricGroups']),
+    ...mapState('auth', ['profile']),
     dragOptions () {
       return {
         animation: 200,
@@ -56,17 +51,9 @@ export default {
       }
     }
   },
-  components: {
-    Draggable,
-    ReportGroup
-  },
-  async mounted () {
-    await this.getReportGroups()
-  },
   methods: {
     ...mapActions('stats', [
-      'getReportGroups',
-      'updateMetricGroupOrder'
+      'updateMetricGroup'
     ]),
     async updateSortedGroup (val) {
       let { newIndex, oldIndex, element } = val.moved
@@ -78,7 +65,7 @@ export default {
       } else {
         step = newIndex - oldIndex
       }
-      await this.updateMetricGroupOrder({
+      await this.updateMetricGroup({
         id: id,
         direction: direction,
         step: step

@@ -185,6 +185,8 @@ export default {
       loadingTemplates: false,
       loadingBroadcasts: false,
       loadingFilters: false,
+      loadingAvailableMetrics: false,
+      loadingMetricGroups: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -888,6 +890,54 @@ export default {
       }
     },
 
+    getAvailableMetrics: function () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingAvailableMetrics = true
+      this.$axios
+        .get('/api/v2/agents/metrics', {
+          params: {
+            group_by_category: true
+          }
+        })
+        .then(response => {
+          this.loadingAvailableMetrics = false
+          this.setAvailableMetrics(response.data)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingAvailableMetrics = false
+          return Promise.reject()
+        })
+    },
+
+    getMetricGroups: function () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingMetricGroups = true
+      this.$axios
+        .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
+          params: {
+            include_metrics: true
+          }
+        })
+        .then(response => {
+          this.loadingMetricGroups = false
+          this.setMetricGroups(response.data)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingMetricGroups = false
+          return Promise.reject()
+        })
+    },
+
     async initAccount () {
       if (this.profile) {
         this.$Sentry.configureScope((scope) => {
@@ -912,6 +962,8 @@ export default {
         let getTemplates = this.getTemplates()
         let getBroadcasts = this.getBroadcasts()
         let getFilters = this.getFilters()
+        let getAvailableMetrics = this.getAvailableMetrics()
+        let getMetricGroups = this.getMetricGroups()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -923,7 +975,9 @@ export default {
           getCallDispositions,
           getTemplates,
           getBroadcasts,
-          getFilters
+          getFilters,
+          getAvailableMetrics,
+          getMetricGroups
         ])
       }
     },
@@ -1341,7 +1395,8 @@ export default {
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
-    })
+    }),
+    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },
 
   watch: {

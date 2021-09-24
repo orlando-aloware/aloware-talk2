@@ -1,9 +1,9 @@
 <template>
-  <div class="p-0">
+  <div class="p-0 d-inline-block">
     <MetricLoader v-if="loader" />
     <div
       v-else
-      class="box-container"
+      class="box-container w-auto"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
       transtion-show="fade"
@@ -90,17 +90,13 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import EditMetricsModal from './form-metrics-modal'
 import MetricLoader from '../metrics/metric-loader'
 import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import PencilIcon from 'components/icons/pencil-o-icon'
-import {
-  METRIC_OPTIONS_COLORS
-} from 'src/constants/stats'
-
-const colorOptions = { METRIC_OPTIONS_COLORS }
+import * as MetricOptionColors from 'src/constants/metric-option-colors'
 
 export default {
   name: 'MetricsBox',
@@ -118,11 +114,12 @@ export default {
     TrashIcon
   },
   computed: {
+    ...mapState('auth', ['profile']),
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
     },
     color () {
-      let col = colorOptions.METRIC_OPTIONS_COLORS.find(c => {
+      let col = this.MetricOptionColors.METRIC_OPTIONS_COLORS.find(c => {
         return c.value === this.metricColor
       })
       if (col) {
@@ -152,7 +149,8 @@ export default {
       metricName: '',
       metricValue: '',
       metricColor: '',
-      loader: false
+      loader: false,
+      MetricOptionColors
     }
   },
   watch: {
@@ -170,17 +168,25 @@ export default {
   },
   methods: {
     ...mapActions('stats', [
-      'deleteMetrics',
+      'deleteMetric',
       'updateMetrics'
     ]),
     async removeSelectedMetric () {
       this.loader = true
-      await this.deleteMetrics(this.metric.id)
+      this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`)
+        .then(res => {
+          this.closeModal()
+        })
+      await this.deleteMetric({
+        userId: this.profile.id,
+        metricGroupId: this.metric.agent_metric_group_id,
+        metricId: this.metric.id
+      })
       this.closeModal()
     },
     async updateExistingMetric (data) {
       await this.updateMetrics(data)
-      this.metricName = data.name
+      this.metricName = data.label
       this.metricValue = data.value
       this.metricColor = data.color
       this.editModal = false
@@ -196,7 +202,7 @@ export default {
       this.editModal = true
     },
     updateLocalResources () {
-      this.metricName = this.metric.name
+      this.metricName = this.metric.label
       this.metricValue = this.metric.value
       this.metricColor = this.metric.color
     }
