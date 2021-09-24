@@ -47,14 +47,13 @@ import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'components/icons/folder-icon'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
-// import MoveFolderLists from './move-folder-lists'
 
 export default {
   components: {
     FolderIcon,
     FolderArrowOpenIcon,
-    FolderArrowCloseIcon
-    // MoveFolderLists
+    FolderArrowCloseIcon,
+    MoveFolderLists: () => import('./move-folder-list')
   },
   props: {
     id: {

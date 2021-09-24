@@ -2,46 +2,43 @@
   <div class="move-dialog shadow-sm" ref="moveDialog">
     <div class="move-dialog-input">
       <div>
-        <search
+        <Search
           ref="folder-search"
           placeholder="Move to..."
           @search="onSearch"
-        ></search>
+        ></Search>
       </div>
     </div>
     <div class="move-dialog-lists">
-      <move-folder-item
+      <MoveFolderItem
         v-for="folder in searchedItemsList"
         :name="folder.name"
         :key="folder.id"
         :id="folder.id"
         :order="folder.order"
         :folders="folder.child_folders"
-        :layer="0"
-      />
+        :layer="0" />
     </div>
     <div class="move-dialog-footer" v-if="hasSelected">
       <div class="text-muted small pr-2">
-        Would you like to continue?
+        Move to this location?
       </div>
-      <compact-btn
-        variant="danger"
+      <CompactBtn
+        variant="primary"
         class="mr-2"
         v-if="hasSelected"
         :disabled="isMoving"
-        @clicked="onConfirmMove"
-      >
+        @clicked="onConfirmMove">
         <q-spinner-bars v-if="isMoving" color="white" />
         {{ isMoving ? '' : 'Yes' }}
-      </compact-btn>
-      <compact-btn
+      </CompactBtn>
+      <!-- <CompactBtn
         variant="outlined-light"
         v-if="hasSelected"
         :disabled="isMoving"
-        @clicked="closeMoveDialog"
-      >
+        @clicked="closeMoveDialog">
         No
-      </compact-btn>
+      </CompactBtn> -->
     </div>
   </div>
 </template>
@@ -49,7 +46,7 @@
 <script>
 import { createPopper } from '@popperjs/core'
 import { mapActions, mapGetters } from 'vuex'
-import MoveFolderItem from 'src/components/move-folder-item.vue'
+import MoveFolderItem from 'src/components/power-dialer/custom/move-folder-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -80,6 +77,7 @@ export default {
       return this.filterByActiveId(this.itemsList)
     },
     hasSelected () {
+      console.log('888 :>> ', this.moveDialog)
       return (
         typeof this.moveDialog.target === 'number' &&
         this.moveDialog.target >= 0
@@ -89,6 +87,7 @@ export default {
   methods: {
     ...mapActions('powerDialer', ['closeMoveDialog', 'foldersLoaded']),
     onConfirmMove () {
+      console.log('this.moveDialog :>> ', this.moveDialog)
       if (this.moveDialog.type === 'list') {
         return this.moveListRequest()
       }
@@ -126,7 +125,6 @@ export default {
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {
-      console.log('777 :>> ', 777)
       return this.$axios
         .get('/api/v2/power-dialer-folders')
         .then((response) => response.data)
