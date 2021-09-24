@@ -70,7 +70,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['moveDialog', 'folders']),
+    ...mapGetters('powerDialer', ['moveDialog', 'folders', 'powerDialerList']),
     searchedItemsList () {
       if (this.searchValue) {
         return this.filterByActiveId(
@@ -87,7 +87,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['closeMoveDialog', 'foldersLoaded']),
+    ...mapActions('powerDialer', ['closeMoveDialog', 'foldersLoaded']),
     onConfirmMove () {
       if (this.moveDialog.type === 'list') {
         return this.moveListRequest()
@@ -97,7 +97,7 @@ export default {
     moveFolderRequest () {
       this.isMoving = true
       return this.$axios
-        .patch('/api/v2/contact-folders/move/' + this.moveDialog.id, {
+        .patch('/api/v2/power-dialer-folders/move/' + this.moveDialog.id, {
           parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
         .then(() => {
@@ -110,7 +110,7 @@ export default {
     moveListRequest () {
       this.isMoving = true
       return this.$axios
-        .patch('/api/v2/contacts-list/' + this.moveDialog.id, {
+        .patch('/api/v2/power-dialer-list/' + this.moveDialog.id, {
           contact_folder_id: this.moveDialog.target
         })
         .then(() => {
@@ -126,8 +126,9 @@ export default {
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {
+      console.log('777 :>> ', 777)
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get('/api/v2/power-dialer-folders')
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

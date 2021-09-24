@@ -7,9 +7,9 @@
       <div
         :title="name"
         :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
-        class="folder d-flex align-items-center">
+        class="folder d-flex align-items-center pl-2">
         <div class="folder__indent" :style="indentStyle"></div>
-        <div class="folder__icon pl-3">
+        <div class="folder__icon pl-1">
           <DialIcon class="ml-2" color="#62666E" />
         </div>
         <div class="folder__name">
@@ -47,10 +47,7 @@
           :type="type"
           @remove="onRemoveList"
           @rename="onRenameList"
-          @pin="onPin"
           @move="onMove"
-          @duplicate="onDuplicate"
-          @clonestatic="onCloneStatic"
           :hasEdit="hasEdit"
           :hasDelete="hasDelete"
           :isPinned="isPinned" />
@@ -65,7 +62,7 @@ import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderOption from 'components/icons/folder-option'
 import DialIcon from 'components/icons/dial-icon'
-import ListActions from './../../list-actions'
+import ListActions from './directory-list-actions'
 import errorMessages from 'src/plugins/helpers/extract-error-message'
 
 let inputTimeout
@@ -136,20 +133,6 @@ export default {
       'openMoveDialog',
       'pinnedCountLoaded'
     ]),
-    onDuplicate () {
-      this.$root.$emit('bv::hide::popover')
-      // this.createList({
-      //   id: this.id,
-      //   type: this.type
-      // })
-    },
-    onCloneStatic () {
-      this.$root.$emit('bv::hide::popover')
-      // this.createList({
-      //   id: this.id,
-      //   type: ContactListTypes.STATIC
-      // })
-    },
     createList (params) {
       this.$axios
         .post('/api/v2/power-dialer/' + this.id + '/duplicate', params)
@@ -170,44 +153,10 @@ export default {
         })
     },
     onMove () {
-      console.log('Moving items...')
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
         id: this.id,
         type: 'list'
-      })
-    },
-    onPin () {
-      this.$root.$emit('bv::hide::popover')
-
-      const isPinned = !this.isPinned
-      this.listPinToggled({
-        id: this.id,
-        isPinned
-      })
-
-      if (isPinned) {
-        this.$axios
-          .get(`api/v2/power-dialer-list/${this.id}/items?per_page=1`)
-          .then((response) => {
-            this.pinnedCountLoaded({
-              id: this.id,
-              count: response.data.total
-            })
-          })
-      }
-
-      this.listLoaded({
-        id: this.id,
-        name: this.name,
-        type: this.type
-      })
-
-      this.pinRequest(this.id, isPinned).finally(() => {
-        this.getContactList(this.id).then((response) => {
-          this.listLoaded(response)
-          this.$generalNotification((isPinned ? 'Successfully pinned' : 'Successfully unpinned'))
-        })
       })
     },
     pinRequest (id, isPinned) {

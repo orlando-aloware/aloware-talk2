@@ -12,6 +12,7 @@ export default {
   folderToRemove: (state) => state.removeFolder || {},
   listToRemove: (state) => state.removeList || {},
   isRemoveFolderOpen: (state) => !!state.removeFolder,
+  folders: (state) => state.folders,
   powerDialerList: (state) => {
     /**
      * TEMPORARY VALUES

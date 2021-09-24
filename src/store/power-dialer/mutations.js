@@ -33,7 +33,11 @@ export default {
     state.opened = Array.from(opened)
   },
   FOLDERS_LOADED: (state, folders) => {
-    state.folders = folders
+    /**
+     * TODOs
+     * Temporary implementation
+     */
+    state.folders = state.lists
   },
   OPEN_FOLDER: (state, id) => {
     const opened = new Set(state.opened).add(id)
@@ -51,6 +55,12 @@ export default {
   },
   MOVE_DIALOG_OPEN: (state, { id, type }) => {
     state.moveDialog = { open: true, id, type }
+  },
+  MOVE_DIALOG_TARGET: (state, { target }) => {
+    state.moveDialog = {
+      ...state.moveDialog,
+      target: target === state.moveDialog.target ? null : target
+    }
   },
   CREATE_LIST_OPEN: (state, payload) => {
     state.createList = { ...state.createList, ...payload, open: true }
@@ -72,5 +82,8 @@ export default {
   },
   REMOVE_LIST_CLOSE: (state) => {
     state.removeList = null
+  },
+  MOVE_DIALOG_CLOSE: (state) => {
+    state.moveDialog = { open: false }
   }
 }

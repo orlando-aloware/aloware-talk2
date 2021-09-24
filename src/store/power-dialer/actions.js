@@ -53,5 +53,11 @@ export default {
   },
   setRemoveListActionType: ({ commit }, payload) => {
     commit('SET_REMOVE_LIST_ACTION_TYPE', payload)
+  },
+  setMoveDialogTarget: ({ commit }, payload) => {
+    commit('MOVE_DIALOG_TARGET', payload)
+  },
+  closeMoveDialog: ({ commit }) => {
+    commit('MOVE_DIALOG_CLOSE')
   }
 }

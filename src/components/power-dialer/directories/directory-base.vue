@@ -102,9 +102,13 @@ export default {
     FolderIcon,
     PeopleIcon
   },
+  mounted () {
+    this.loadFolders()
+  },
   methods: {
     ...mapActions('powerDialer', [
-      'createListOpen'
+      'createListOpen',
+      'foldersLoaded'
     ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
@@ -113,6 +117,21 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
+    },
+    loadFolders () {
+      this.isLoading = false
+      this.foldersLoaded()
+      // this.$axios
+      //   .get('/api/v2/contact-folders')
+      //   .then((response) => response.data)
+      //   .then(this.foldersLoaded)
+      //   .finally(() => {
+      //     this.isLoading = false
+      //   })
+      //   .catch((err) => {
+      //     console.error(err)
+      //     this.$generalNotification('Unable to load folders please try again.', 'error')
+      //   })
     }
   },
   data () {
