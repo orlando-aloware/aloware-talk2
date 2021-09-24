@@ -191,15 +191,19 @@ export default {
         this.$refs.filterOperation[0].add(this.filterOptions[0].originalLabel, true)
         this.$refs.filterOperation[0].updateInputValue('')
       }
+
       this.allFilters = []
-      // if (!_.isEmpty(this.initialListFilters)) {
-      //   allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
-      // }
+
+      if (!_.isEmpty(this.initialListFilters)) {
+        this.allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
+      }
+
       this.allFilters[this.filterGroupIndex] = {
         filters: {},
         is_conjunction: this.filterConjunction
       }
       const filterGroup = _.get(this.initialListFilters, this.filterGroupIndex, null)
+
       if (filterGroup) {
         this.allFilters[this.filterGroupIndex].filters = JSON.parse(JSON.stringify(filterGroup.filters))
       }
@@ -225,6 +229,7 @@ export default {
 
       const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
       let toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+
       if (!value && currentFilter && !this.validated && toDelete) {
         delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
       } else {
@@ -244,6 +249,7 @@ export default {
         (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
         done(value, 'add-unique')
       }
+
       this.$nextTick(() => {
         this.$refs.filterOperation[0].showPopup()
       })
@@ -257,9 +263,11 @@ export default {
         this.filterOptions[0].label = 'Add a new option'
         return
       }
+
       if (this.filterOptions[0].disabled) {
         this.filterOptions[0].disabled = false
       }
+
       this.$set(this.filterOptions[0], 'label', `Create option "${event}"`)
       this.filterOptions[0].originalLabel = event
       this.$refs.filterOperation[0].hidePopup()
@@ -332,12 +340,14 @@ export default {
     filterOperator () {
       this.filterOperatorValue = null
       this.secondaryFilterOperatorValue = null
+
       if (!this.hasValue) {
         const debounce = _.debounce(() => {
           this.addValue()
         }, this.debounceDelay)
         debounce()
       }
+
       this.validateValue()
     },
     filterOperatorValue () {
@@ -357,17 +367,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.filter-types {
-  .q-field__native.row {
-    .q-field__input {
-      padding-left: 0 !important;
-    }
-  }
-  .b-calendar-inner {
-    min-width: 215px !important;
-    width: 215px !important;
-  }
-}
-</style>
