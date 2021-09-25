@@ -30,14 +30,18 @@
           {{ stats.position }}
           <span class="text-subtitle2 text-grey"> | {{ stats.company }}</span>
         </div>
-        <div class="text-h6 text-subtitle1 text-capitalize py-2">
-          {{ stats.address }}
+        <div class="text-h6 text-subtitle1 text-capitalize py-0">
+          <DropIcon width="18px" height="18px" class="mr-0 py-0" style="position:relative;top:-2px;" />
+          {{ stats.address }} - {{ stats.time }}
         </div>
         <div class="text-h6 text-h6 text-capitalize text-weight-normal">
           {{ stats.group }}
           <span class="text-subtitle2 text-grey"></span>
         </div>
-        {{ stats.line }}
+        <div class="text-h6 text-subtitle1 text-capitalize py-0">
+          <HeadphoneIcon width="12px" height="12px" class="mr-0 py-0" style="position:relative;top:-2px;" />
+          {{ stats.line }}
+        </div>
       </div>
       <!-- RIGHT SIDE -->
     </div>
@@ -45,8 +49,16 @@
 </template>
 
 <script>
+
+import DropIcon from 'components/icons/drop-location-icon'
+import HeadphoneIcon from 'components/icons/headphone-icon'
+
 export default {
   name: 'SessionCallStatus',
+  components: {
+    DropIcon,
+    HeadphoneIcon
+  },
   data () {
     return {
       stats: {
@@ -55,7 +67,8 @@ export default {
         phone_number: '(888) 217 1436',
         position: 'Sales Manager',
         company: 'AI Learning',
-        address: 'Albany, New York - 6:15 PM',
+        address: 'Albany, New York',
+        time: '6:15 PM',
         group: 'Google Map List',
         line: 'Bently Personal'
       }

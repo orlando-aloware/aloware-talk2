@@ -2,11 +2,11 @@
   <b-card class="bg-transparent border-0 text-center">
     <div class="t-grouped-buttons" style="display:inline-flex !important;">
       <div
-        v-for="(filter, key) in list"
+        v-for="(filter, key) in tabs"
         :key="key"
         class="link px-1" style="display:contents;">
         <div
-          @click="clicked(filter.id)"
+          @click="clicked(filter)"
           :class="`t-grouped-buttons__btn ${id === filter.id ? 'active' : ''}`">
           <div class="t-badge-name">
             {{ filter.name }}
@@ -27,27 +27,14 @@ export default {
     }
   },
   methods: {
-    clicked (id) {
-      this.id = id
+    clicked (val) {
+      this.id = val.id
+      this.$emit('selected-tab', val)
     }
   },
   data () {
     return {
-      id: 1,
-      list: [
-        {
-          id: 1,
-          name: 'Details'
-        },
-        {
-          id: 2,
-          name: 'Activity'
-        },
-        {
-          id: 3,
-          name: 'CRM View'
-        }
-      ]
+      id: 1
     }
   }
 }
