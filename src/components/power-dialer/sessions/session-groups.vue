@@ -6,6 +6,7 @@
           placeholder="Search" class="text-capitalize" />
       </div>
     </div>
+    <div class="t-scroll-y">
     <div v-for="(group, key) in groups"
       :key="`session-expanded-${key}`">
 
@@ -54,6 +55,7 @@
 
       <q-separator />
     </div>
+    </div>
   </div>
 </template>
 
@@ -82,6 +84,20 @@ export default {
               id: 1,
               first_name: 'John',
               last_name: 'Nicholson',
+              contact_number: '(782) 636 3465',
+              position: 'Sales Manager',
+              company: '123 Labs'
+            }
+          ]
+        },
+        {
+          id: 2323,
+          label: 'In Queue',
+          children: [
+            {
+              id: 55,
+              first_name: 'Mary',
+              last_name: 'Urdotah',
               contact_number: '(782) 636 3465',
               position: 'Sales Manager',
               company: '123 Labs'

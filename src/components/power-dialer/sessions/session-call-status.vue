@@ -1,6 +1,6 @@
 <template>
   <div class="t-menu-2 no-border">
-    <div class="d-flex align-items-center pt-3">
+    <div class="d-flex align-items-center pt-3 pb-0">
       <div class="font-weight-bold pl-3 flex-grow-1">
         <q-chip class="p-0">
           <div class="text-lowercase text-capitalize">
@@ -20,7 +20,7 @@
         <div class="px-2 text-subtitle1">...</div>
       </q-btn>
     </div>
-    <div class="t-menu__header no-border d-flex align-items-center py-3">
+    <div class="t-menu__header no-border d-flex align-items-center py-1">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         <div class="text-h5 text-capitalize text-weight-bold pb-1">
           {{ stats.first_name }} {{ stats.last_name }}

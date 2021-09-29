@@ -20,6 +20,9 @@
       </calls-header>
       <div class="w-100">
         <q-btn-toggle
+          v-model="currentTask"
+          @click="onToggleStatus"
+          :options="options"
           class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
           spread
@@ -27,10 +30,7 @@
           unelevated
           toggle-color="grey-90"
           color="transparent"
-          text-color="primary"
-          :options="options"
-          v-model="currentTask"
-          @click="onToggleStatus">
+          text-color="primary">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">

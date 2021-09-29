@@ -16,7 +16,8 @@
   color: $black;
 }
 
-.t-menu {
+.t-menu,
+.t-menu1 {
   display: flex;
   flex-direction: column;
   &__header {
@@ -67,6 +68,23 @@
   .item.router-link-exact-active {
     background: $grey-40;
   }
+  
+}
+
+.t-scroll-y {
+  height: calc(100vh - 382px) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.t-scroll-y1 {
+  height: calc(100vh - 478px) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.t-scroll-y2 {
+  height: calc(100vh - 478px) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .no-border {
@@ -174,4 +192,38 @@
 
 .t-directory {
   padding: 0 !important;
+}
+
+.t-flex-group,
+.t-flex-group__no-bg {
+  display: table;
+  table-layout: fixed;
+  border-spacing: 0;
+  width: 100%;
+  height: 90%;
+  position: relative;
+}
+.t-flex-group {
+  background-color: $white;
+}
+.t-flex-group__no-bg {
+  background-color: $grey-1;
+  overflow: hidden;
+  .card {
+    flex: 0 1 auto;
+  }
+  .t-panel-container {
+    flex: 1 1 auto;
+    .q-panel {
+      overflow: hidden;
+    }
+  }
+}
+
+.t-panel-container {
+  .q-tab-panels {
+    .q-panel {
+
+    }
+  }
 }

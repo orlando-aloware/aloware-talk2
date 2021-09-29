@@ -40,6 +40,7 @@ export default {
   },
   mounted () {
     this.START_DIAL_TOGGLE(false)
+    console.log('666 :>> ', this.isStartingDial)
   },
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Session') {

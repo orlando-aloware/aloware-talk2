@@ -1,14 +1,12 @@
 <template>
-  <div class="row">
-    <div class="col-12">
-      <SessionTabsHeaders
-        :tabs="panelList"
-        @selected-tab="selectTab" />
-    </div>
-    <div class="col-12">
+  <div class="t-flex-group__no-bg flex-column border-top">
+    <SessionTabsHeaders
+      :tabs="panelList"
+      @selected-tab="selectTab" />
+    <div class="t-panel-container">
       <q-tab-panels
         v-model="panel"
-        class="bg-transparent rounded-borders">
+        class="bg-transparent">
 
         <q-tab-panel class="p-0" name="Details">
           <!-- <div class="text-h6">Mails</div> -->

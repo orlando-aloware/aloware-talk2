@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="folders">
     <div class="t-menu__header d-flex align-items-center">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         {{ title }}
@@ -39,7 +39,7 @@
 
     </div>
 
-    <div class="d-flex folders__content flex-column p-0">
+    <div class="d-flex t-menu__content flex-column p-0">
       <DirectoryFolderCreate
         v-if="isCreatingFolder"
         :layer="0"
