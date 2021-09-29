@@ -1,15 +1,19 @@
 <template>
   <Draggable
     class="list-group"
-    :options="{handle:'.movable'}"
-    v-model="metricGroups"
+    v-model="metricGroupList"
     v-bind="dragOptions"
+    :options="{handle:'.movable'}"
+    :move="checkMove"
     @change="updateSortedGroup"
     tag="ul">
     <transition-group type="transition" name="flip-list">
       <template
         v-for="(metricGroupResources, key) in metricGroups">
-        <MetricGroup :key="key" :resources="metricGroupResources" />
+        <MetricGroup :key="key"
+                     :resources="metricGroupResources"
+                     :editMetricGroupId="editGroupId"
+                     @updated="metricGroupUpdated"/>
       </template>
     </transition-group>
   </Draggable>
@@ -37,6 +41,15 @@ export default {
           timeline: ''
         }
       }
+    },
+    editGroupId: {
+      default: null,
+      required: false
+    }
+  },
+  data () {
+    return {
+      metricGroupList: []
     }
   },
   computed: {
@@ -51,25 +64,67 @@ export default {
       }
     }
   },
+  mounted () {
+    this.metricGroupList = JSON.parse(JSON.stringify(this.metricGroups))
+  },
   methods: {
     ...mapActions('stats', [
-      'updateMetricGroup'
+      'updateMetricGroupOrder'
     ]),
     async updateSortedGroup (val) {
-      let { newIndex, oldIndex, element } = val.moved
-      let step = null
-      let direction = oldIndex > newIndex ? 'up' : 'down'
-      let id = element.id
-      if (oldIndex > newIndex) {
-        step = oldIndex - newIndex
-      } else {
-        step = newIndex - oldIndex
+      if (typeof val.moved === 'undefined') {
+        return
       }
-      await this.updateMetricGroup({
-        id: id,
-        direction: direction,
-        step: step
+
+      let { newIndex, oldIndex, element } = val.moved
+      const group = this.metricGroupList.find(group => group.id === element.id)
+
+      if (!group) {
+        return
+      }
+
+      const previousMetricGroups = JSON.parse(JSON.stringify(this.metricGroups))
+
+      let order = this.metricGroupList[newIndex].order
+      let step = 0
+
+      if (newIndex > oldIndex) {
+        step = (newIndex - oldIndex)
+        order += step
+      } else {
+        step = (oldIndex - newIndex)
+        order -= step
+      }
+
+      await this.updateMetricGroupOrder({
+        metricGroupId: element.id,
+        order: order,
+        step: oldIndex > newIndex ? (-1 * step) : step
       })
+
+      await this.$axios.patch(`api/v2/agents/${this.profile.id}/statistics/metric-groups/${element.id}/order`, {
+        order: order
+      }).then(res => {
+        this.$generalNotification('Metric group successfully updated.')
+      }).catch(err => {
+        this.setMetricGroups(previousMetricGroups)
+        console.log(err)
+        this.$generalNotification('Failed to update metric group.', 'error')
+      })
+    },
+    metricGroupUpdated () {
+      this.$emit('updated')
+    },
+    checkMove (event) {
+      return event.from === event.to
+    }
+  },
+  watch: {
+    metricGroups: {
+      deep: true,
+      handler: function () {
+        this.metricGroupList = JSON.parse(JSON.stringify(this.metricGroups))
+      }
     }
   }
 }

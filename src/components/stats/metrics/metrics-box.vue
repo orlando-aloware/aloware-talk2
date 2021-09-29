@@ -33,7 +33,7 @@
               color="grey" />
           </div>
         </q-card-actions>
-        <q-card-section class="metric-box-desc q-pt-none text-lowercase pt-4">
+        <q-card-section class="metric-box-desc q-pt-none pt-4">
           {{ metricName }}
         </q-card-section>
       </q-card>
@@ -115,6 +115,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState('stats', ['availableMetrics']),
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
     },
@@ -130,11 +131,8 @@ export default {
     },
     preformattedMetric () {
       return {
-        id: this.metric.id,
-        name: this.metricName,
         color: this.metricColor,
-        reportId: this.metric.reportId,
-        value: this.metric.value
+        metricId: this.metric.metric_id
       }
     }
   },
@@ -169,27 +167,44 @@ export default {
   methods: {
     ...mapActions('stats', [
       'deleteMetric',
-      'updateMetrics'
+      'updateMetric'
     ]),
-    async removeSelectedMetric () {
+    removeSelectedMetric () {
       this.loader = true
       this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`)
         .then(res => {
+          this.deleteMetric({
+            metricGroupId: this.metric.agent_metric_group_id,
+            id: this.metric.id
+          })
+          this.$generalNotification('Metric successfully removed.')
+          this.closeModal()
+        }).catch(err => {
+          console.log(err)
+          this.$generalNotification('Failed to remove metric.', 'error')
           this.closeModal()
         })
-      await this.deleteMetric({
-        userId: this.profile.id,
-        metricGroupId: this.metric.agent_metric_group_id,
-        metricId: this.metric.id
-      })
-      this.closeModal()
     },
-    async updateExistingMetric (data) {
-      await this.updateMetrics(data)
-      this.metricName = data.label
-      this.metricValue = data.value
-      this.metricColor = data.color
-      this.editModal = false
+    updateExistingMetric (data) {
+      this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`, {
+        metric_id: data.metricId,
+        type: data.type,
+        color: data.color
+      }).then(res => {
+        let newData = { ...this.metric }
+        newData.metric_id = data.metricId
+        newData.color = data.color
+        const metric = this.availableMetrics.find(metric => metric.metric_id === data.metricId)
+        newData.label = metric ? metric.label : ''
+        newData.order = res.data.order
+        this.updateMetric(newData)
+        this.$generalNotification('Metric updated successfully.')
+        this.editModal = false
+      }).catch(err => {
+        console.log(err)
+        this.$generalNotification('Failed to update metric.', 'error')
+        this.editModal = false
+      })
     },
     confirmDeletion () {
       this.isOpen = true
@@ -203,7 +218,7 @@ export default {
     },
     updateLocalResources () {
       this.metricName = this.metric.label
-      this.metricValue = this.metric.value
+      this.metricValue = this.metric.value ? this.metric.value : 0
       this.metricColor = this.metric.color
     }
   }

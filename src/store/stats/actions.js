@@ -11,16 +11,17 @@ export default {
   setMetricGroups: async ({ commit }, data) => {
     commit('SET_METRIC_GROUPS', data)
   },
+  setMetricGroupMetrics: async ({ commit }, data) => {
+    commit('SET_METRIC_GROUP_METRICS', data)
+  },
   updateMetricGroup: async ({ commit }, data) => {
     commit('UPDATE_METRIC_GROUP', data)
   },
+  updateMetricGroupOrder: async ({ commit }, data) => {
+    commit('UPDATE_METRIC_GROUP_ORDER', data)
+  },
   deleteMetricGroup: async ({ commit }, metricGroupId) => {
     commit('REMOVE_METRIC_GROUP', metricGroupId)
-  },
-  updateMetric: async ({ commit }, params = {}) => {
-    await window.axios.patch(`/api/v2/agents/${params.userId}/statistics/metric-groups/${params.metricGroupId}/order`)
-    commit('UPDATE_METRIC', params.metricGroupId)
-    // await console.log(`REQUEST PAYLOAD: .../metric-group/${params.id}/order?direction=${params.direction}&step=${params.step}`)
   },
   setAvailableMetrics: async ({ commit }, data) => {
     commit('SET_AVAILABLE_METRICS', data)
@@ -29,18 +30,16 @@ export default {
    * Actual API calls for
    * METRICS
    */
-  addMetric: async ({ commit }, payload) => {
-    commit('ADD_METRIC', payload)
+  addMetric: async ({ commit }, data) => {
+    commit('ADD_METRIC', data)
   },
-  updateMetrics: async ({ commit }, params = {}) => {
-    await window.axios.patch(`/api/v2/agents/${params.userId}/statistics/metric-groups/${params.metricGroupId}/metrics/{metric_id}`, params.data)
+  updateMetric: async ({ commit }, data) => {
+    commit('UPDATE_METRIC', data)
   },
-  deleteMetric: async ({ commit }, params = {}) => {
-    // Actual API call
-    let res = await window.axios.delete(`/api/v2/agents/${params.userId}/statistics/metric-groups/${params.metricGroupId}/metrics/${params.metricId}`)
-    if (res.status === 200) {
-      commit('REMOVE_METRICS', params.metricId)
-    }
-    return res
+  updateMetricOrder: async ({ commit }, data) => {
+    commit('UPDATE_METRIC_ORDER', data)
+  },
+  deleteMetric: async ({ commit }, data) => {
+    commit('REMOVE_METRICS', data)
   }
 }

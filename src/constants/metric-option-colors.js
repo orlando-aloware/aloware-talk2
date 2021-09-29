@@ -1,5 +1,5 @@
 export const METRIC_OPTIONS_COLORS = [
   { value: 'positive', color: 'primary', text: 'Success' },
   { value: 'negative', color: 'danger', text: 'Warning' },
-  { value: null, color: 'black', text: 'No Color' }
+  { value: 'black', color: 'black', text: 'No Color' }
 ]

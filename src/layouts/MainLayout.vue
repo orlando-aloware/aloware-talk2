@@ -158,6 +158,7 @@ import Dialer from '../components/dialer/dialer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import _ from 'lodash'
 
 export default {
@@ -208,13 +209,15 @@ export default {
       reminderNotifiedDesktop: [],
       sidebarVisible: false,
       lightMode: true,
-      CommunicationTypes
+      CommunicationTypes,
+      MetricOptionGroups
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('stats', ['availableMetrics'])
   },
 
   created () {
@@ -904,7 +907,35 @@ export default {
         })
         .then(response => {
           this.loadingAvailableMetrics = false
-          this.setAvailableMetrics(response.data)
+          if (_.isEmpty(response.data)) {
+            this.setAvailableMetrics([])
+          }
+
+          let structuredMetricGroups = []
+          const availableMetrics = response.data
+          for (let index in availableMetrics) {
+            let optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
+            structuredMetricGroups.push({
+              disable: true,
+              value: null,
+              label: optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
+            })
+
+            if (availableMetrics[index].constructor.name === 'Array') {
+              for (let option of availableMetrics[index]) {
+                option.disable = false
+                structuredMetricGroups.push(option)
+              }
+            }
+
+            if (availableMetrics[index].constructor.name === 'Object') {
+              for (let key of Object.keys(availableMetrics[index])) {
+                availableMetrics[index][key].disable = false
+                structuredMetricGroups.push(availableMetrics[index][key])
+              }
+            }
+          }
+          this.setAvailableMetrics(structuredMetricGroups)
           return Promise.resolve()
         })
         .catch((err) => {
@@ -928,6 +959,20 @@ export default {
         })
         .then(response => {
           this.loadingMetricGroups = false
+          for (let index in response.data) {
+            if (typeof response.data[index].agent_metrics === 'undefined') {
+              continue
+            }
+
+            for (let metricIndex in response.data[index].agent_metrics) {
+              if (typeof response.data[index].agent_metrics[metricIndex].label !== 'undefined') {
+                continue
+              }
+
+              const metric = this.availableMetrics.find(metric => metric.metric_id === response.data[index].agent_metrics[metricIndex].metric_id)
+              response.data[index].agent_metrics[metricIndex].label = metric.label
+            }
+          }
           this.setMetricGroups(response.data)
           return Promise.resolve()
         })

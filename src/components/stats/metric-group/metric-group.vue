@@ -5,7 +5,9 @@
         <TitlePopover
           v-model="metricGroupName"
           :id="metricGroupId"
-          @input="updateGroup" />
+          :editMetricGroupId="editMetricGroupId"
+          @input="updateGroup"
+          @close="editClosed"/>
       </div>
       <q-select
         class="mini-select"
@@ -15,6 +17,7 @@
         emit-value
         option-value="id"
         option-label="label"
+        bg-color="white"
         :options="dateRange"
         :dense="dense"
         :options-dense="denseOpts"
@@ -26,43 +29,47 @@
       v-if="resources"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
-      class="metric-group p-0"
-      style="position:relative;">
+      class="metric-group p-0">
       <!-- <q-skeleton square /> -->
       <b-badge
         v-if="hovered"
         @click="confirmDeletion"
-        class="bg-white p-0 m-0"
-        style="z-index:10; border:1px grey solid;right:-5px;top:-5px;position:absolute;"
+        class="bg-white p-0 m-0 group-delete"
         pill>
         <q-icon
           name="fa fa-times"
-          class="cursor-pointer text-grey"
-          style="font-size: 11px;padding:3px;" />
+          class="cursor-pointer text-grey"/>
       </b-badge>
-      <div class="no-border bg-white p-2 pr-5 rowd d-flex">
-        <AddMetrics
-          :metric-group="{ id: metricGroupId, name: metricGroupName }"
-          @toggle-loader="toggleLoad" />
-        <template v-if="resources.agent_metrics">
+      <div class="no-border bg-white p-2 pr-5 rowd d-flex group-wrapper">
+        <template>
           <Draggable
-            class="list-group w-100"
-            :options="{handle:'.movable'}"
-            v-model="resources.agent_metrics"
+            class="list-group"
+            :options="{handle: '.movable'}"
+            v-model="metricsList"
             v-bind="dragOptions"
             @change="updateSortedMetric"
+            :move="checkMove"
             tag="ul">
-            <transition-group :key="key"
-                              type="transition"
+            <transition-group type="transition"
                               name="flip-list">
-              <MetricsBox
-                v-for="metric in resources.agent_metrics"
-                :key="metric.id"
-                :metric="metric" />
+              <template v-if="metricsList">
+                <MetricsBox
+                  class="movable"
+                  v-for="metric in metricsList"
+                  :key="metric.id"
+                  :metric="metric" />
+                <MetricLoader :key="`metric-loader-` + metricGroupId"
+                              v-if="loader" />
+              </template>
+              <AddMetrics
+                ref="addMetric"
+                draggable="false"
+                :key="`add-metrics-` + metricGroupId"
+                :metric-group="{ id: metricGroupId, name: metricGroupName }"
+                @toggle-loader="toggleLoad" />
             </transition-group>
           </Draggable>
         </template>
-        <MetricLoader v-if="loader" />
         <div v-if="hovered" class="metric-group-drawer">
           <div class="drawer-icon movable">
             <i class="fa fa-bars mr-2 text-muted"></i>
@@ -117,6 +124,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import Draggable from 'vuedraggable'
 import { mapActions, mapState } from 'vuex'
 import AddMetrics from '../metrics/add-metrics-trigger'
@@ -133,6 +141,10 @@ export default {
     resources: {
       type: Object,
       default: () => {}
+    },
+    editMetricGroupId: {
+      default: null,
+      required: false
     }
   },
   components: {
@@ -149,11 +161,11 @@ export default {
     metricGroupName: {
       get () {
         let { name } = this.resources
-        if (this.title === 'Untitled') {
-          if (name) {
-            return name
-          }
+
+        if (name) {
+          return name
         }
+
         return this.title
       },
       set (val) {
@@ -172,6 +184,7 @@ export default {
   },
   mounted () {
     this.timeline = this.resources.date_range_type || 1
+    this.metricsList = this.resources.agent_metrics ? JSON.parse(JSON.stringify(this.resources.agent_metrics)) : []
   },
   data () {
     return {
@@ -188,54 +201,47 @@ export default {
         disabled: false,
         ghostClass: 'ghost'
       },
+      metricsList: [],
       DateRanges
-    }
-  },
-  watch: {
-    isOpen (val) {
-      if (val) {
-        this.$bvModal.show(this.dialogName)
-      } else {
-        this.$bvModal.hide(this.dialogName)
-      }
-    },
-    resources () {
-      this.timeline = this.resources.date_range_type
     }
   },
   methods: {
     ...mapActions('stats', [
       'updateMetricGroup',
+      'updateMetricOrder',
       'deleteMetricGroup'
     ]),
     async removeSelectedMetricGroup () {
       this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metricGroupId}`)
         .then(res => {
-          this.deleteMetricGroup(res.data.id)
-          this.$generalNotification('Metric group successfully removed.')
           this.closeModal()
+          setTimeout(() => {
+            this.deleteMetricGroup(this.metricGroupId)
+          }, 500)
+          this.$generalNotification('Metric group successfully removed.')
         }).catch(err => {
           console.log(err)
           this.$generalNotification('Failed to remove metric group.')
           this.closeModal()
         })
     },
-    updateGroup (val) {
+    updateGroup: _.debounce(function (val) {
       this.metricGroupName = val
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
         name: val,
         date_range_type: this.resources.date_range_type
       }).then(res => {
         this.updateMetricGroup(res.data)
+        this.$emit('updated')
         this.$generalNotification('Metric group updated successfully.')
       }).catch(err => {
         console.log(err)
         this.$generalNotification('Failed to updated metric group.', 'error')
       })
-    },
+    }, 200),
     async changedFilter (val) {
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
-        name: this.title,
+        name: this.metricGroupName,
         date_range_type: val
       }).then(res => {
         this.updateMetricGroup(res.data)
@@ -255,22 +261,71 @@ export default {
       this.loader = val
     },
     async updateSortedMetric (val) {
-      let { newIndex, oldIndex, element } = val.moved
-      let step = null
-      let direction = oldIndex > newIndex ? 'up' : 'down'
-      let id = element.id
-
-      if (oldIndex > newIndex) {
-        step = oldIndex - newIndex
-      } else {
-        step = newIndex - oldIndex
+      if (typeof val.moved === 'undefined') {
+        return
       }
 
-      await this.updateMetric({
-        id: id,
-        direction: direction,
-        step: step
+      let { newIndex, oldIndex, element } = val.moved
+      const metric = this.resources.agent_metrics.find(metric => metric.id === element.id)
+
+      if (!metric) {
+        return
+      }
+
+      const previousMetrics = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+
+      let order = this.resources.agent_metrics[newIndex].order
+      let step = 0
+
+      if (newIndex > oldIndex) {
+        step = (newIndex - oldIndex)
+        order += (step + 1)
+      } else {
+        step = (oldIndex - newIndex)
+        order -= (step + 1)
+      }
+
+      await this.updateMetricOrder({
+        metricGroupId: this.metricGroupId,
+        metricId: element.id,
+        order: order,
+        step: oldIndex > newIndex ? (-1 * step) : step
       })
+
+      await this.$axios.patch(`api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metricGroupId}/metrics/${element.id}/order`, {
+        order: order
+      }).then(res => {
+        this.$generalNotification('Metric successfully updated.')
+      }).catch(err => {
+        this.setMetricGroupMetrics(previousMetrics)
+        console.log(err)
+        this.$generalNotification('Failed to update metric.', 'error')
+      })
+    },
+    editClosed () {
+      this.$emit('updated')
+    },
+    checkMove (event) {
+      let element = _.get(this.$refs.addMetric, '$el', null)
+      return event.from === event.to && event.related !== element
+    }
+  },
+  watch: {
+    isOpen (val) {
+      if (val) {
+        this.$bvModal.show(this.dialogName)
+      } else {
+        this.$bvModal.hide(this.dialogName)
+      }
+    },
+    resources () {
+      this.timeline = this.resources.date_range_type
+    },
+    'resources.agent_metrics': {
+      deep: true,
+      handler: function () {
+        this.metricsList = this.resources.agent_metrics ? JSON.parse(JSON.stringify(this.resources.agent_metrics)) : []
+      }
     }
   }
 }

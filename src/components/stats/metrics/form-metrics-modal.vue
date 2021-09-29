@@ -23,7 +23,7 @@
               option-label="label"
               ref="statsSelectMetrics"
               v-model="metric"
-              :options="metricOptions"
+              :options="availableMetrics"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMetricsMenu">
               <template v-slot:selected>
@@ -96,7 +96,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { mapState } from 'vuex'
 import * as MetricOptionColors from 'src/constants/metric-option-colors'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
@@ -123,43 +122,11 @@ export default {
   },
   computed: {
     ...mapState('stats', ['availableMetrics']),
-    metricOptions () {
-      if (_.isEmpty(this.availableMetrics)) {
-        return []
-      }
-
-      let structuredMetricGroups = []
-      const availableMetrics = JSON.parse(JSON.stringify(this.availableMetrics))
-      for (let index in availableMetrics) {
-        let optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
-        structuredMetricGroups.push({
-          disable: true,
-          value: null,
-          label: optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
-        })
-
-        if (availableMetrics[index].constructor.name === 'Array') {
-          for (let option of availableMetrics[index]) {
-            option.disable = false
-            structuredMetricGroups.push(option)
-          }
-        }
-
-        if (availableMetrics[index].constructor.name === 'Object') {
-          for (let key of Object.keys(availableMetrics[index])) {
-            availableMetrics[index][key].disable = false
-            structuredMetricGroups.push(availableMetrics[index][key])
-          }
-        }
-      }
-
-      return structuredMetricGroups
-    },
     colors () {
       return this.MetricOptionColors.METRIC_OPTIONS_COLORS
     },
     actionCreate () {
-      if (this.resources?.id) {
+      if (this.resources?.metricId) {
         return true
       }
       return false
@@ -192,27 +159,27 @@ export default {
         this.resetData()
       } else {
         if (this.actionCreate) {
-          let { color, name } = this.resources
+          let { color, metricId } = this.resources
           this.color = this.colors.find(col => {
             return col.value === color
           })
-          this.metric = name
+          this.metric = metricId
         }
       }
     }
   },
   methods: {
     async submit () {
+      const option = this.availableMetrics.find(option => option.metric_id === this.metric)
       if (this.actionCreate) {
         this.$emit('update', {
-          id: this.metric,
-          color: this.color.value,
-          reportId: this.resources.reportId,
-          value: this.resources.value
+          type: option ? option.type : null,
+          metricId: this.metric,
+          color: this.color.value
         })
       } else {
-        const option = this.metricOptions.find(option => option.metric_id === this.metric)
         this.$emit('create', {
+          label: option ? option.label : '',
           type: option ? option.type : null,
           metricId: this.metric,
           color: this.color.value
@@ -220,7 +187,7 @@ export default {
       }
     },
     getOptionsText (id) {
-      const option = this.metricOptions.find(option => option.metric_id === id)
+      const option = this.availableMetrics.find(option => option.metric_id === id)
       return option ? option.label : ''
     },
     resetData () {

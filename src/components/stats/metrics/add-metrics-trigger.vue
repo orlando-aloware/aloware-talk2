@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2 position-relative">
+  <div class="add-metrics p-0 d-inline-block position-relative m-2">
     <q-card flat bordered
       @click="openModal"
       class="metric-box dashed-box full-height q-hoverable cursor-pointer">
@@ -59,6 +59,8 @@ export default {
         color: data.color,
         type: data.type
       }).then(res => {
+        res.data.label = data.label
+        res.data.value = 0
         this.addMetric({
           metricGroupId: this.groupId,
           data: res.data

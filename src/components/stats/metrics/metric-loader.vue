@@ -1,5 +1,5 @@
 <template>
-  <div class="q-gutter-md p-2">
+  <div class="metric-loader p-0 d-inline-block m-2">
     <q-card flat
       class="metric-box text-black p-3">
       <div>

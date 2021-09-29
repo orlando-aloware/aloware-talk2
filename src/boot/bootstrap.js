@@ -226,7 +226,7 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
 
   this.$q.notify({
     group: false,
-    classes: `general-notification text-black ${colorClass} ml-3`,
+    classes: `general-notification text-black ${colorClass} ml-7`,
     timeout: timeout,
     message: message,
     position: 'bottom-left',
