@@ -4195,7 +4195,7 @@ span.mention {
     overflow: hidden !important;
 
     .filter-list {
-      height: calc(100vh - 332px);
+      height: calc(100vh - 220px);
       overflow: auto;
     }
   }
@@ -5482,10 +5482,6 @@ table.datatable {
 }
 
 .custom-multi-select {
-  .multiselect__content-wrapper {
-    overflow: hidden;
-  }
-
   .multiselect__option {
     padding: 5px !important;
   }
@@ -6518,7 +6514,7 @@ table.datatable {
 }
 
 div.q-menu {
-  min-width: 0 !important;
+  min-width: 0;
 }
 
 button.primary {
