@@ -51,7 +51,7 @@ const routes = [
             }
           },
           {
-            path: 'channels/:channel/:direction/contacts/:id/communications/:communicationId',
+            path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
             name: 'Inbox Contact Mention Communication',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
@@ -127,7 +127,17 @@ const routes = [
         component: () => import('pages/Settings.vue'),
         meta: {
           title: 'Settings'
-        }
+        },
+        children: [
+          {
+            path: '/settings/:tab',
+            name: 'Settings Tab',
+            component: () => import('src/pages/Settings.vue'),
+            meta: {
+              title: 'Settings'
+            }
+          }
+        ]
       },
       {
         path: 'account',

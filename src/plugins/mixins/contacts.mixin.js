@@ -168,7 +168,12 @@ export default {
       }
 
       if (!_.isEmpty(this.currentListFilters)) {
-        query.filter_groups = query.filter_groups.concat(this.currentListFilters[0])
+        for (let filterIndex of Object.keys(this.currentListFilters)) {
+          // check if filter index is a number
+          if (!isNaN(filterIndex / 1)) {
+            query.filter_groups = query.filter_groups.concat(this.currentListFilters[filterIndex])
+          }
+        }
       }
 
       if (params.sort) {

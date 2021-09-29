@@ -82,5 +82,11 @@ export default {
   },
   RESET_CHANNEL_CHANGED_FILTER_FIELDS: (state) => {
     state.channelChangedFilterFields = []
+  },
+  TOGGLE_FILTER_MODEL_FORM: (state, isShown = false) => {
+    state.isFilterModelFormShown = isShown
+  },
+  SET_SELECTED_FILTER: (state, selectedFilter) => {
+    state.selectedFilter = selectedFilter
   }
 }

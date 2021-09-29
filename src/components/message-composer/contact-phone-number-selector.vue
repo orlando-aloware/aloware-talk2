@@ -1,12 +1,15 @@
 <template>
   <div>
     <q-select class="inline-select show-caret__always caret__grey-90"
+              ref="phoneNumberSelector"
               input-debounce="0"
               option-value="id"
               option-label="phone_number"
               behavior="menu"
               v-model="selectedPhone"
               :options="contactPhoneNumbers"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
               @input="onPhoneChange">
       <template v-slot:selected>
         <div class="selected-option-container"
@@ -40,10 +43,14 @@ export default {
   data () {
     return {
       selectedPhone: {},
-      isFocused: false
+      isFocused: false,
+      selectWidth: 0
     }
   },
   methods: {
+    onShowMenu () {
+      this.selectWidth = this.$refs.phoneNumberSelector.$el.offsetWidth
+    },
     getSelectedPhoneLabel () {
       let title = (this.selectedPhone.phone_number === this.contact.phone_number) ? 'Primary' : this.selectedPhone.title
       let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''

@@ -7,9 +7,9 @@
       <div
         class="folder__indent"
         :style="indentStyle"
-        @click="onToggleFolder"
-      ></div>
-      <div class="folder__arrow" @click="onToggleFolder">
+        @click="onToggleFolder">
+      </div>
+      <div class="folder__arrow" @click="onToggleFolder" v-if="folders.length > 0">
         <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
         <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
       </div>

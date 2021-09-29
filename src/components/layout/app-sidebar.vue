@@ -85,30 +85,23 @@
            flat>
     </q-btn>
 
-    <q-btn icon="img:app-icons/menu/settings_gray.svg"
+    <q-btn :to="{ name: 'Settings' }"
+           :ripple="false"
+           icon="img:app-icons/menu/settings_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Settings')"
+           flat>
+    </q-btn>
+    <q-btn :to="{ name: 'Settings' }"
+           :ripple="false"
+           icon="img:app-icons/menu/settings_gray.svg"
            align="center"
-           class="nav-icons w-100">
-      <q-menu fit anchor="top right"
-              elf="bottom left"
-              :offset="[10, 0]">
-        <q-item clickable
-                class="pl-3 pr-3"
-                v-close-popup>
-          <q-item-section>
-            Profile
-          </q-item-section>
-        </q-item>
-        <q-separator class="separator-blur"
-                     color="black"/>
-        <q-item clickable
-                v-close-popup
-                @click="logoutAction"
-                class="pl-3 pr-3">
-          <q-item-section>
-            Log-out
-          </q-item-section>
-        </q-item>
-      </q-menu>
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Settings')"
+           flat>
     </q-btn>
     <div class="mt-auto w-100">
       <div class="width-40 margin-auto position-relative">

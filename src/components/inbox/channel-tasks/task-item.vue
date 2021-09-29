@@ -36,6 +36,9 @@
           <span v-if="communication.type !== CommunicationTypes.SMS">
             {{ communication.direction | fixCommDirection }} {{ communication.type | fixCommType }}
           </span>
+          <span v-if="communication.type === CommunicationTypes.SMS && (communication.body === null || !communication.body ||communication.body.length < 1)">
+            {{ smsEmptyBodyAlternativeText }}
+          </span>
           <span v-if="communication.body !== null">
             {{ communication.body | truncate(22) }}
           </span>
@@ -152,6 +155,26 @@ export default {
 
     channelAnswerStatus () {
       return this.activeChannel.answerStatus || ''
+    },
+
+    smsEmptyBodyAlternativeText () {
+      let directionText = (this.communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      let lastAttachment = this.communication.attachments.pop()
+
+      switch (true) {
+        case ['text'].includes(lastAttachment.mime_type):
+          return directionText + ' a text file'
+        case ['audio'].includes(lastAttachment.mime_type):
+          return directionText + ' an audio file'
+        case ['image'].includes(lastAttachment.mime_type):
+          return directionText + ' an image'
+        case ['video'].includes(lastAttachment.mime_type):
+          return directionText + ' a video file'
+        case ['application'].includes(lastAttachment.mime_type):
+        default:
+          return directionText + ' a file'
+      }
     }
   },
 

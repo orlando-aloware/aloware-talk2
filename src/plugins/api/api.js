@@ -226,6 +226,22 @@ export default {
       get (params) {
         return window.axios.get(`${suffixV2}mentions`, params)
       }
+    },
+    inbox: {
+      filters: {
+        get (params) {
+          return window.axios.get(`${suffixV2}filters`, { params: params })
+        },
+        save (params) {
+          return window.axios.post(`${suffixV2}filters`, params)
+        },
+        update (filterId, params) {
+          return window.axios.put(`${suffixV2}filters/${filterId}`, params)
+        },
+        delete (filterId) {
+          return window.axios.delete(`${suffixV2}filters/${filterId}`)
+        }
+      }
     }
   }
 }
