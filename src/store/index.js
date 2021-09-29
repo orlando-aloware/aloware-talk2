@@ -29,8 +29,7 @@ export default function (/* { ssrContext } */) {
       auth,
       contacts,
       inbox,
-      settings
-      inbox,
+      settings,
       stats
     },
     state: {
