@@ -965,11 +965,18 @@ export default {
             }
 
             for (let metricIndex in response.data[index].agent_metrics) {
+              const metric = this.availableMetrics.find(metric => metric.metric_id === response.data[index].agent_metrics[metricIndex].metric_id)
+
+              if (!metric) {
+                continue
+              }
+
+              response.data[index].agent_metrics[metricIndex].category = metric.category
+
               if (typeof response.data[index].agent_metrics[metricIndex].label !== 'undefined') {
                 continue
               }
 
-              const metric = this.availableMetrics.find(metric => metric.metric_id === response.data[index].agent_metrics[metricIndex].metric_id)
               response.data[index].agent_metrics[metricIndex].label = metric.label
             }
           }
