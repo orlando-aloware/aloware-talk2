@@ -1,24 +1,56 @@
 <template>
   <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
+    :width="width"
+    :height="height"
+    :viewBox="`0 0 ${width} ${height}`"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M8 3.5V12.5"
-      stroke="#333333"
-      stroke-width="1.25"
+      :d="firstD"
+      :stroke="color"
+      :stroke-width="strokeWidth"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
     <path
-      d="M12.5 8H3.5"
-      stroke="#333333"
-      stroke-width="1.25"
+      :d="secondD"
+      :stroke="color"
+      :stroke-width="strokeWidth"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
   </svg>
 </template>
+
+<script>
+export default {
+  name: 'plus-icon',
+  props: {
+    width: {
+      type: [Number, String],
+      default: 16
+    },
+    height: {
+      type: [Number, String],
+      default: 16
+    },
+    color: {
+      type: String,
+      default: '#333333'
+    },
+    firstD: {
+      type: String,
+      default: 'M8 3.5V12.5'
+    },
+    secondD: {
+      type: String,
+      default: 'M12.5 8H3.5'
+    },
+    strokeWidth: {
+      type: String,
+      default: '1.25'
+    }
+  }
+}
+</script>

@@ -4,6 +4,8 @@
 @import 'fonts.scss';
 @import 'variables.scss';
 @import 'svg.scss';
+@import 'components/styles.scss';
+
 
 html {
   overflow-y: hidden;
@@ -4255,6 +4257,23 @@ span.mention {
   border: solid 1px $grey-light3;
   @include border-radius(10px);
   overflow: hidden;
+
+  &.no-border {
+    border: 0;
+  }
+
+  &.dashed {
+    border-style: dashed;
+    cursor: pointer;
+    background-color: lighten(grey, 47%);
+
+    .row {
+      color: darken(grey, 5%) !important;
+      span {
+        font-size: 32px;
+      }
+    }
+  }
 }
 
 .mycard--shadow {
@@ -6942,6 +6961,9 @@ button.grey-90 {
   }
 }
 
+.ml-7 {
+  margin-left: 5rem !important;
+}
 
 .settings-form-wrapper {
   .form-label {

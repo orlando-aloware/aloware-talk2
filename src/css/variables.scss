@@ -83,6 +83,7 @@ $blue-3: #56CCF2;
 
 // Greys
 $grey-100: #040404;
+$grey-91: #E5E5E5;
 $grey-90: #62666E;
 $grey-82: #D5D6D8;
 $grey-81: #EAEAEC;
@@ -142,9 +143,13 @@ $primary-hover: #054CDB;
 @include text-color('red-100', $red-100);
 
 // Background Colors
-@include bg-color('grey-50', $grey-50, true);
-@include bg-color('grey-9', $grey-9, true);
+@include bg-color('grey-91', $grey-91, true);
 @include bg-color('grey-90', $grey-90, true);
+@include bg-color('grey-80', $grey-80, true);
+@include bg-color('grey-70', $grey-70, true);
+@include bg-color('grey-50', $grey-50, true);
+@include bg-color('grey-40', $grey-40, true);
+@include bg-color('grey-9', $grey-9, true);
 @include bg-color('red-100', $red-100, true);
 @include bg-color('blue-80', $blue-80, true);
 @include bg-color('blue-10', $blue-10, true);
@@ -153,8 +158,6 @@ $primary-hover: #054CDB;
 @include bg-color('green-10', $green-10, true);
 @include bg-color('red-90', $red-10, true);
 @include bg-color('red-10', $red-10, true);
-@include bg-color('grey-80', $grey-80, true);
-@include bg-color('grey-70', $grey-70, true);
 
 .bg-primary {
   background: $primary !important;
@@ -226,6 +229,7 @@ $f-size-body: 14px;
 $f-size-body-sm: 13px;
 $f-size-body-xs: 12px;
 $f-size-body-xxs: 11px;
+$f-box-title: 28px;
 
 // Texts
 h1 {

@@ -158,6 +158,7 @@ import Dialer from '../components/dialer/dialer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import _ from 'lodash'
 
 export default {
@@ -185,6 +186,8 @@ export default {
       loadingTemplates: false,
       loadingBroadcasts: false,
       loadingFilters: false,
+      loadingAvailableMetrics: false,
+      loadingMetricGroups: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -206,13 +209,15 @@ export default {
       reminderNotifiedDesktop: [],
       sidebarVisible: false,
       lightMode: true,
-      CommunicationTypes
+      CommunicationTypes,
+      MetricOptionGroups
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('stats', ['availableMetrics'])
   },
 
   created () {
@@ -888,6 +893,96 @@ export default {
       }
     },
 
+    getAvailableMetrics: function () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingAvailableMetrics = true
+      this.$axios
+        .get('/api/v2/agents/metrics', {
+          params: {
+            group_by_category: true
+          }
+        })
+        .then(response => {
+          this.loadingAvailableMetrics = false
+          if (_.isEmpty(response.data)) {
+            this.setAvailableMetrics([])
+          }
+
+          let structuredMetricGroups = []
+          const availableMetrics = response.data
+          for (let index in availableMetrics) {
+            let optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
+            structuredMetricGroups.push({
+              disable: true,
+              value: null,
+              label: optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
+            })
+
+            if (availableMetrics[index].constructor.name === 'Array') {
+              for (let option of availableMetrics[index]) {
+                option.disable = false
+                structuredMetricGroups.push(option)
+              }
+            }
+
+            if (availableMetrics[index].constructor.name === 'Object') {
+              for (let key of Object.keys(availableMetrics[index])) {
+                availableMetrics[index][key].disable = false
+                structuredMetricGroups.push(availableMetrics[index][key])
+              }
+            }
+          }
+          this.setAvailableMetrics(structuredMetricGroups)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingAvailableMetrics = false
+          return Promise.reject()
+        })
+    },
+
+    getMetricGroups: function () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingMetricGroups = true
+      this.$axios
+        .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
+          params: {
+            include_metrics: true
+          }
+        })
+        .then(response => {
+          this.loadingMetricGroups = false
+          for (let index in response.data) {
+            if (typeof response.data[index].agent_metrics === 'undefined') {
+              continue
+            }
+
+            for (let metricIndex in response.data[index].agent_metrics) {
+              if (typeof response.data[index].agent_metrics[metricIndex].label !== 'undefined') {
+                continue
+              }
+
+              const metric = this.availableMetrics.find(metric => metric.metric_id === response.data[index].agent_metrics[metricIndex].metric_id)
+              response.data[index].agent_metrics[metricIndex].label = metric.label
+            }
+          }
+          this.setMetricGroups(response.data)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingMetricGroups = false
+          return Promise.reject()
+        })
+    },
+
     async initAccount () {
       if (this.profile) {
         this.$Sentry.configureScope((scope) => {
@@ -912,6 +1007,8 @@ export default {
         let getTemplates = this.getTemplates()
         let getBroadcasts = this.getBroadcasts()
         let getFilters = this.getFilters()
+        let getAvailableMetrics = this.getAvailableMetrics()
+        let getMetricGroups = this.getMetricGroups()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -923,7 +1020,9 @@ export default {
           getCallDispositions,
           getTemplates,
           getBroadcasts,
-          getFilters
+          getFilters,
+          getAvailableMetrics,
+          getMetricGroups
         ])
       }
     },
@@ -1341,7 +1440,8 @@ export default {
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
-    })
+    }),
+    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },
 
   watch: {

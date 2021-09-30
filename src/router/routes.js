@@ -116,7 +116,7 @@ const routes = [
       {
         path: 'stats',
         name: 'Stats',
-        component: () => import('pages/Stats.vue'),
+        component: () => import('pages/stats/Stats.vue'),
         meta: {
           title: 'Stats'
         }
