@@ -294,6 +294,7 @@ export default {
       })
     },
     onItemSelected (contact) {
+      console.log('contact :> ---> ', contact)
       this.setSelectedContact(contact)
       const contactId = _.get(contact, 'id', null)
       if (contactId) {

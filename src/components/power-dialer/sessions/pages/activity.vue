@@ -36,6 +36,8 @@ export default {
     contactMixins
   ],
   mounted () {
+    this.setContact(this.contact2)
+    this.setSelectedContact(this.contact2)
     if (this.authenticated) {
       this.fetchContact()
     }
@@ -51,6 +53,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions('inbox', [
+      'setContact',
+      'setContacts',
+      'setSelectedContact'
+    ]),
     ...mapActions('contacts', [
       'resetChangedContactProperties',
       'selectedContactChanging',
@@ -60,12 +67,15 @@ export default {
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
-      this.processFetchContactInfo(function (selectedContact) {
-        _this.setContact(selectedContact)
-        _this.setContactClone(selectedContact)
-        _this.resetChangedContactProperties([])
-        _this.selectedContactChanging(false)
-      })
+      console.log('this.selectedContact :>> ', this.selectedContact)
+      if (this.selectedContact?.id) {
+        this.processFetchContactInfo(function (selectedContact) {
+          _this.setContact(selectedContact)
+          _this.setContactClone(selectedContact)
+          _this.resetChangedContactProperties([])
+          _this.selectedContactChanging(false)
+        })
+      }
     },
     markAllAsRead2 () {
       console.log('888 :>> ', 888)
@@ -73,6 +83,1050 @@ export default {
   },
   data () {
     return {
+      selectedContact: {
+        'id': 237587,
+        'company_id': 7,
+        'first_name': null,
+        'last_name': null,
+        'phone_number': '+13046355799',
+        'email': null,
+        'created_at': '2021-09-30 14:04:25',
+        'updated_at': '2021-09-30 14:04:42',
+        'date_of_birth': null,
+        'text_authorized_at': null,
+        'address': null,
+        'cnam_state': 'WV',
+        'cnam_city': 'ELKINS',
+        'cnam_zipcode': '26254',
+        'cnam_country': 'US',
+        'timezone': 'America/New_York',
+        'website': null,
+        'company_name': null,
+        'intake_source': 'voip-call',
+        'initial_campaign_id': 541,
+        'lead_source_id': null,
+        'user_id': null,
+        'disposition_status_id': null,
+        'is_dnc': false,
+        'unread_count': 0,
+        'unread_voicemail_count': 1,
+        'unread_missed_call_count': 0,
+        'notes': null,
+        'csf1': null,
+        'csf2': null,
+        'uuid_v4': 'b7c89725-f5f1-45c8-bd35-2a6333c52972',
+        'name': '',
+        'communications_count': 1,
+        'inbound_communications_count': 1,
+        'outbound_communications_count': 0,
+        'outbound_texts_count': 0,
+        'inbound_texts_count': 0,
+        'outbound_calls_count': 0,
+        'inbound_calls_count': 1,
+        'last_outbound_engagement_at': null,
+        'last_inbound_engagement_at': '2021-09-30 14:04:26',
+        'last_engagement_at': '2021-09-30 14:04:26',
+        'unread_texts_count': 0,
+        'unread_voicemails_count': 0,
+        'unread_missed_calls_count': 0,
+        'task_status': 2,
+        'task_status_name': 'Open',
+        'integrations': {
+          'hubspot': {
+            'contact_id': '224251',
+            'link': 'https://app.hubspot.com/contacts/8446098/contact/224251',
+            'data': {
+              'vid': 224251,
+              'canonical-vid': 224251,
+              'merged-vids': [],
+              'portal-id': 8446098,
+              'is-contact': true,
+              'properties': {
+                'zip': {
+                  'value': '26254',
+                  'versions': [
+                    {
+                      'value': '26254',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'country': {
+                  'value': 'US',
+                  'versions': [
+                    {
+                      'value': 'US',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'firstname': {
+                  'value': 'Aloware Contact',
+                  'versions': [
+                    {
+                      'value': 'Aloware Contact',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'phone': {
+                  'value': '+13046355799',
+                  'versions': [
+                    {
+                      'value': '+13046355799',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'city': {
+                  'value': 'ELKINS',
+                  'versions': [
+                    {
+                      'value': 'ELKINS',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'lastmodifieddate': {
+                  'value': '1633010679161',
+                  'versions': [
+                    {
+                      'value': '1633010679161',
+                      'source-type': 'CALCULATED',
+                      'source-id': null,
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010679161,
+                      'selected': false
+                    }
+                  ]
+                },
+                'state': {
+                  'value': 'WV',
+                  'versions': [
+                    {
+                      'value': 'WV',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'hs_calculated_phone_number': {
+                  'value': '+13046355799',
+                  'versions': [
+                    {
+                      'value': '+13046355799',
+                      'source-type': 'CALCULATED',
+                      'source-id': null,
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668042,
+                      'selected': false
+                    }
+                  ]
+                },
+                'lastname': {
+                  'value': '(+13046355799)',
+                  'versions': [
+                    {
+                      'value': '(+13046355799)',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1633010668032,
+                      'selected': false
+                    }
+                  ]
+                },
+                'deals': []
+              },
+              'form-submissions': [],
+              'list-memberships': [
+                {
+                  'static-list-id': 71,
+                  'internal-list-id': 115,
+                  'timestamp': 1633010691797,
+                  'vid': 224251,
+                  'is-member': true
+                },
+                {
+                  'static-list-id': 72,
+                  'internal-list-id': 77,
+                  'timestamp': 1633010691797,
+                  'vid': 224251,
+                  'is-member': true
+                },
+                {
+                  'static-list-id': 107,
+                  'internal-list-id': 112,
+                  'timestamp': 1633010717536,
+                  'vid': 224251,
+                  'is-member': true
+                }
+              ],
+              'identity-profiles': [
+                {
+                  'vid': 224251,
+                  'saved-at-timestamp': 1633010668079,
+                  'deleted-changed-timestamp': 0,
+                  'identities': [
+                    {
+                      'type': 'LEAD_GUID',
+                      'value': '7b76791f-d1b8-49da-839d-157462a903b8',
+                      'timestamp': 1633010668074
+                    }
+                  ]
+                }
+              ],
+              'merge-audits': []
+            }
+          }
+        },
+        'phone_numbers': [
+          {
+            'id': 243676,
+            'company_id': 7,
+            'contact_id': 237587,
+            'phone_number': '+13046355799',
+            'title': '',
+            'cnam_source': null,
+            'cnam_city': 'ELKINS',
+            'cnam_state': 'WV',
+            'cnam_zipcode': '26254',
+            'cnam_country': 'US',
+            'lrn_type': 0,
+            'created_at': '2021-09-30 14:04:26'
+          }
+        ],
+        'lead_source': null,
+        'broadcasts': [],
+        'user': null,
+        'disposition_status': null,
+        'campaigns': [
+          {
+            'id': 541,
+            'name': '+19893751545',
+            'pivot': {
+              'contact_id': 237587,
+              'campaign_id': 541
+            }
+          }
+        ],
+        'initial_campaign': {
+          'id': 541,
+          'name': '+19893751545'
+        },
+        'contact_lists': [],
+        'ring_groups': [],
+        'tags': [],
+        'workflow': null,
+        'sequence': null,
+        'first_communication': {
+          'id': 48601,
+          'company_id': 7,
+          'campaign_id': 541,
+          'ring_group_id': null,
+          'owner_id': null,
+          'workflow_id': null,
+          'sequence_id': null,
+          'broadcast_id': null,
+          'creator_type': null,
+          'incoming_number_id': 2068,
+          'incoming_number': '+19893751545',
+          'incoming_sip_uri': null,
+          'contact_id': 237587,
+          'call_disposition_id': null,
+          'lead_number': '+13046355799',
+          'is_international': false,
+          'target_users': null,
+          'attempt': null,
+          'attempting_users': null,
+          'user_id': null,
+          'destination_number': null,
+          'transfer_prior_user_ids': null,
+          'transferred_from': null,
+          'transfer_target_user_ids': null,
+          'transferred_to': null,
+          'in_cold_transfer': false,
+          'proxy_number_id': null,
+          'forward_sid': null,
+          'direction': 1,
+          'type': 1,
+          'call_router_behavior': 3,
+          'is_read': false,
+          'recording_url': null,
+          'recorded_file_is_migrated': false,
+          'voicemail_url': 'https://app.alodev.org/static/uploaded_file/52ccb661-a70a-4ac7-bbcf-43fd46367c50',
+          'voicemail_is_migrated': true,
+          'voicemail_duration': 5,
+          'sid': 'CA30616e2a067d59e67bac220d080bcef8',
+          'customer_leg_sid': 'CA30616e2a067d59e67bac220d080bcef8',
+          'customer_leg_status': 6,
+          'agent_leg_sid': null,
+          'agent_leg_status': null,
+          'legc_uuid': null,
+          'legc_status': null,
+          'legz_uuid': null,
+          'legz_status': null,
+          'conference_sid': null,
+          'first_time_caller': 1,
+          'body': '',
+          'attachments': null,
+          'conference_status': null,
+          'conference_status2': null,
+          'current_status': 'completed',
+          'current_status2': 9,
+          'disposition_status': 'dead-end',
+          'disposition_status2': 6,
+          'resolution': 'voicemail',
+          'resolution2': 3,
+          'queue_resolution': null,
+          'queue_resolution2': null,
+          'callback_status': null,
+          'transfer_type': null,
+          'rejected_by_app': 0,
+          'duration': 21,
+          'hold_time': 0,
+          'talk_time': 0,
+          'wait_time': 21,
+          'csat_score': 0,
+          'provider_cost': '0.000000',
+          'notes': 'Sys (07:04am PDT): Routed to line voicemail\nSystem: Dead end call.\n',
+          'country': 'US',
+          'state': 'WV',
+          'city': 'ELKINS',
+          'customer_leg_called_at': '2021-09-30 14:04:25',
+          'customer_leg_transferred_at': '2021-09-30 14:04:25',
+          'customer_leg_hangup_at': '2021-09-30 14:04:48',
+          'agent_leg_called_at': null,
+          'agent_leg_transferred_at': null,
+          'agent_leg_hangup_at': null,
+          'conference_start_at': null,
+          'conference_end_at': null,
+          'hold_at': null,
+          'should_broadcast': true,
+          'metadata': {
+            'callback_asked_at': [
+                
+            ],
+            'asked_for_callback': false,
+            'requested_callback': false,
+            'voicemail_asked_at': [
+                
+            ],
+            'asked_for_voicemail': false,
+            'authorized_for_text': false,
+            'requested_voicemail': false,
+            'user_replied_digits': {
+              'callback': null,
+              'voicemail': null,
+              'handle_by_text': null,
+              'text_authorization': null
+            },
+            'handle_by_text_asked_at': [
+                
+            ],
+            'asked_for_handle_by_text': false,
+            'requested_handle_by_text': false,
+            'text_authorization_asked_at': null,
+            'asked_for_text_authorization': false
+          },
+          'engagement_data': null,
+          'created_at': '2021-09-30 14:04:26',
+          'updated_at': '2021-09-30 14:05:06',
+          'deleted_at': null,
+          'is_migrated': 0
+        },
+        'last_communication': {
+          'id': 48601,
+          'company_id': 7,
+          'campaign_id': 541,
+          'ring_group_id': null,
+          'owner_id': null,
+          'workflow_id': null,
+          'sequence_id': null,
+          'broadcast_id': null,
+          'creator_type': null,
+          'incoming_number_id': 2068,
+          'incoming_number': '+19893751545',
+          'incoming_sip_uri': null,
+          'contact_id': 237587,
+          'call_disposition_id': null,
+          'lead_number': '+13046355799',
+          'is_international': false,
+          'target_users': null,
+          'attempt': null,
+          'attempting_users': null,
+          'user_id': null,
+          'destination_number': null,
+          'transfer_prior_user_ids': null,
+          'transferred_from': null,
+          'transfer_target_user_ids': null,
+          'transferred_to': null,
+          'in_cold_transfer': false,
+          'proxy_number_id': null,
+          'forward_sid': null,
+          'direction': 1,
+          'type': 1,
+          'call_router_behavior': 3,
+          'is_read': false,
+          'recording_url': null,
+          'recorded_file_is_migrated': false,
+          'voicemail_url': 'https://app.alodev.org/static/uploaded_file/52ccb661-a70a-4ac7-bbcf-43fd46367c50',
+          'voicemail_is_migrated': true,
+          'voicemail_duration': 5,
+          'sid': 'CA30616e2a067d59e67bac220d080bcef8',
+          'customer_leg_sid': 'CA30616e2a067d59e67bac220d080bcef8',
+          'customer_leg_status': 6,
+          'agent_leg_sid': null,
+          'agent_leg_status': null,
+          'legc_uuid': null,
+          'legc_status': null,
+          'legz_uuid': null,
+          'legz_status': null,
+          'conference_sid': null,
+          'first_time_caller': 1,
+          'body': '',
+          'attachments': null,
+          'conference_status': null,
+          'conference_status2': null,
+          'current_status': 'completed',
+          'current_status2': 9,
+          'disposition_status': 'dead-end',
+          'disposition_status2': 6,
+          'resolution': 'voicemail',
+          'resolution2': 3,
+          'queue_resolution': null,
+          'queue_resolution2': null,
+          'callback_status': null,
+          'transfer_type': null,
+          'rejected_by_app': 0,
+          'duration': 21,
+          'hold_time': 0,
+          'talk_time': 0,
+          'wait_time': 21,
+          'csat_score': 0,
+          'provider_cost': '0.000000',
+          'notes': 'Sys (07:04am PDT): Routed to line voicemail\nSystem: Dead end call.\n',
+          'country': 'US',
+          'state': 'WV',
+          'city': 'ELKINS',
+          'customer_leg_called_at': '2021-09-30 14:04:25',
+          'customer_leg_transferred_at': '2021-09-30 14:04:25',
+          'customer_leg_hangup_at': '2021-09-30 14:04:48',
+          'agent_leg_called_at': null,
+          'agent_leg_transferred_at': null,
+          'agent_leg_hangup_at': null,
+          'conference_start_at': null,
+          'conference_end_at': null,
+          'hold_at': null,
+          'should_broadcast': true,
+          'metadata': {
+            'callback_asked_at': [
+                
+            ],
+            'asked_for_callback': false,
+            'requested_callback': false,
+            'voicemail_asked_at': [
+                
+            ],
+            'asked_for_voicemail': false,
+            'authorized_for_text': false,
+            'requested_voicemail': false,
+            'user_replied_digits': {
+              'callback': null,
+              'voicemail': null,
+              'handle_by_text': null,
+              'text_authorization': null
+            },
+            'handle_by_text_asked_at': [
+                
+            ],
+            'asked_for_handle_by_text': false,
+            'requested_handle_by_text': false,
+            'text_authorization_asked_at': null,
+            'asked_for_text_authorization': false
+          },
+          'engagement_data': null,
+          'created_at': '2021-09-30 14:04:26',
+          'updated_at': '2021-09-30 14:05:06',
+          'deleted_at': null,
+          'is_migrated': 0
+        },
+        'external_integration_data': [
+          {
+            'id': 64589,
+            'company_id': 7,
+            'model_id': 237587,
+            'model_type': 'App\\Models\\Contact',
+            'source': 'hubspot',
+            'field': 'contact_id',
+            'data': '224251',
+            'textual_data': null,
+            'created_at': '2021-09-30 14:04:28',
+            'updated_at': '2021-09-30 14:04:28'
+          }
+        ],
+        'company': {
+          'id': 7,
+          'name': 'USS Enterprise',
+          'hubspot_integration_enabled': true
+        },
+        'tag_ids': []
+      },
+      contact2: {
+        'id': 210470,
+        'company_id': 7,
+        'first_name': 'Aloware Contact',
+        'last_name': '(+16033166810)',
+        'phone_number': '+16033166810',
+        'email': null,
+        'created_at': '2021-09-29 17:58:41',
+        'updated_at': '2021-09-29 17:58:47',
+        'date_of_birth': null,
+        'text_authorized_at': null,
+        'address': null,
+        'cnam_state': 'NH',
+        'cnam_city': 'Manchester',
+        'cnam_zipcode': '03824',
+        'cnam_country': 'US',
+        'timezone': 'America/New_York',
+        'website': null,
+        'company_name': null,
+        'intake_source': 'hubspot',
+        'initial_campaign_id': 542,
+        'lead_source_id': null,
+        'user_id': null,
+        'disposition_status_id': null,
+        'is_dnc': false,
+        'unread_count': 0,
+        'unread_voicemail_count': 0,
+        'unread_missed_call_count': 0,
+        'notes': null,
+        'csf1': null,
+        'csf2': null,
+        'uuid_v4': '9deaee2c-b074-4444-a832-abcb2333487f',
+        'name': 'Aloware Contact (+16033166810)',
+        'communications_count': 1,
+        'inbound_communications_count': 1,
+        'outbound_communications_count': 0,
+        'outbound_texts_count': 0,
+        'inbound_texts_count': 0,
+        'outbound_calls_count': 0,
+        'inbound_calls_count': 1,
+        'last_outbound_engagement_at': null,
+        'last_inbound_engagement_at': '2021-09-29 17:58:43',
+        'last_engagement_at': '2021-09-29 17:58:43',
+        'unread_texts_count': 0,
+        'unread_voicemails_count': 0,
+        'unread_missed_calls_count': 0,
+        'task_status': 1,
+        'task_status_name': 'New',
+        'integrations': {
+          'hubspot': {
+            'contact_id': '219601',
+            'link': 'https://app.hubspot.com/contacts/8446098/contact/219601',
+            'data': {
+              'vid': 219601,
+              'canonical-vid': 219601,
+              'merged-vids': [],
+              'portal-id': 8446098,
+              'is-contact': true,
+              'properties': {
+                'zip': {
+                  'value': '03824',
+                  'versions': [
+                    {
+                      'value': '03824',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'country': {
+                  'value': 'US',
+                  'versions': [
+                    {
+                      'value': 'US',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'firstname': {
+                  'value': 'Aloware Contact',
+                  'versions': [
+                    {
+                      'value': 'Aloware Contact',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'phone': {
+                  'value': '+16033166810',
+                  'versions': [
+                    {
+                      'value': '+16033166810',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'city': {
+                  'value': 'DURHAM',
+                  'versions': [
+                    {
+                      'value': 'DURHAM',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'lastmodifieddate': {
+                  'value': '1632938358060',
+                  'versions': [
+                    {
+                      'value': '1632938358060',
+                      'source-type': 'CALCULATED',
+                      'source-id': null,
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938358060,
+                      'selected': false
+                    }
+                  ]
+                },
+                'state': {
+                  'value': 'NH',
+                  'versions': [
+                    {
+                      'value': 'NH',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'hs_calculated_phone_number': {
+                  'value': '+16033166810',
+                  'versions': [
+                    {
+                      'value': '+16033166810',
+                      'source-type': 'CALCULATED',
+                      'source-id': null,
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311360,
+                      'selected': false
+                    }
+                  ]
+                },
+                'lastname': {
+                  'value': '(+16033166810)',
+                  'versions': [
+                    {
+                      'value': '(+16033166810)',
+                      'source-type': 'INTEGRATION',
+                      'source-id': '185969',
+                      'source-label': null,
+                      'updated-by-user-id': null,
+                      'timestamp': 1632938311350,
+                      'selected': false
+                    }
+                  ]
+                },
+                'deals': []
+              },
+              'form-submissions': [],
+              'list-memberships': [
+                {
+                  'static-list-id': 71,
+                  'internal-list-id': 115,
+                  'timestamp': 1632938327583,
+                  'vid': 219601,
+                  'is-member': true
+                },
+                {
+                  'static-list-id': 72,
+                  'internal-list-id': 77,
+                  'timestamp': 1632938327583,
+                  'vid': 219601,
+                  'is-member': true
+                },
+                {
+                  'static-list-id': 107,
+                  'internal-list-id': 112,
+                  'timestamp': 1632938370958,
+                  'vid': 219601,
+                  'is-member': true
+                }
+              ],
+              'identity-profiles': [
+                {
+                  'vid': 219601,
+                  'saved-at-timestamp': 1632938311415,
+                  'deleted-changed-timestamp': 0,
+                  'identities': [
+                    {
+                      'type': 'LEAD_GUID',
+                      'value': 'a8fc9782-7e48-43d3-841d-5b2bca3d3b23',
+                      'timestamp': 1632938311411
+                    }
+                  ]
+                }
+              ],
+              'merge-audits': []
+            }
+          }
+        },
+        'phone_numbers': [
+          {
+            'id': 215524,
+            'company_id': 7,
+            'contact_id': 210470,
+            'phone_number': '+16033166810',
+            'title': '',
+            'cnam_source': 'libgphone',
+            'cnam_city': 'DURHAM',
+            'cnam_state': 'NH',
+            'cnam_zipcode': '03824',
+            'cnam_country': 'US',
+            'lrn_type': 0,
+            'created_at': '2021-09-29 17:58:41'
+          },
+          {
+            'id': 215525,
+            'company_id': 7,
+            'contact_id': 210470,
+            'phone_number': '+17754506234',
+            'title': null,
+            'cnam_source': 'libgphone',
+            'cnam_city': 'Gardnerville',
+            'cnam_state': 'NV',
+            'cnam_zipcode': null,
+            'cnam_country': 'US',
+            'lrn_type': 1,
+            'created_at': '2021-09-29 18:12:06'
+          }
+        ],
+        'lead_source': null,
+        'broadcasts': [],
+        'user': null,
+        'disposition_status': null,
+        'campaigns': [
+          {
+            'id': 542,
+            'name': '+19893751337',
+            'pivot': {
+              'contact_id': 210470,
+              'campaign_id': 542
+            }
+          }
+        ],
+        'initial_campaign': {
+          'id': 542,
+          'name': '+19893751337'
+        },
+        'contact_lists': [],
+        'ring_groups': [],
+        'tags': [],
+        'workflow': null,
+        'sequence': null,
+        'first_communication': {
+          'id': 48578,
+          'company_id': 7,
+          'campaign_id': 542,
+          'ring_group_id': null,
+          'owner_id': null,
+          'workflow_id': null,
+          'sequence_id': null,
+          'broadcast_id': null,
+          'creator_type': null,
+          'incoming_number_id': 2069,
+          'incoming_number': '+19893751337',
+          'incoming_sip_uri': null,
+          'contact_id': 210470,
+          'call_disposition_id': null,
+          'lead_number': '+16033166810',
+          'is_international': false,
+          'target_users': null,
+          'attempt': null,
+          'attempting_users': null,
+          'user_id': null,
+          'destination_number': null,
+          'transfer_prior_user_ids': null,
+          'transferred_from': null,
+          'transfer_target_user_ids': null,
+          'transferred_to': null,
+          'in_cold_transfer': false,
+          'proxy_number_id': null,
+          'forward_sid': null,
+          'direction': 1,
+          'type': 1,
+          'call_router_behavior': 3,
+          'is_read': null,
+          'recording_url': null,
+          'recorded_file_is_migrated': false,
+          'voicemail_url': null,
+          'voicemail_is_migrated': false,
+          'voicemail_duration': null,
+          'sid': 'CA372f93b54d8dd2d01751142817f23784',
+          'customer_leg_sid': 'CA372f93b54d8dd2d01751142817f23784',
+          'customer_leg_status': 6,
+          'agent_leg_sid': null,
+          'agent_leg_status': null,
+          'legc_uuid': null,
+          'legc_status': null,
+          'legz_uuid': null,
+          'legz_status': null,
+          'conference_sid': null,
+          'first_time_caller': 1,
+          'body': '',
+          'attachments': null,
+          'conference_status': null,
+          'conference_status2': null,
+          'current_status': 'completed',
+          'current_status2': 9,
+          'disposition_status': 'dead-end',
+          'disposition_status2': 6,
+          'resolution': 'voicemail',
+          'resolution2': 3,
+          'queue_resolution': null,
+          'queue_resolution2': null,
+          'callback_status': null,
+          'transfer_type': null,
+          'rejected_by_app': 0,
+          'duration': 10,
+          'hold_time': 0,
+          'talk_time': 0,
+          'wait_time': 10,
+          'csat_score': 0,
+          'provider_cost': '0.000000',
+          'notes': 'Sys (10:58am PDT): Routed to line voicemail\nSystem: Dead end call.\n',
+          'country': 'US',
+          'state': 'NH',
+          'city': 'DURHAM',
+          'customer_leg_called_at': '2021-09-29 17:58:43',
+          'customer_leg_transferred_at': '2021-09-29 17:58:43',
+          'customer_leg_hangup_at': '2021-09-29 17:58:55',
+          'agent_leg_called_at': null,
+          'agent_leg_transferred_at': null,
+          'agent_leg_hangup_at': null,
+          'conference_start_at': null,
+          'conference_end_at': null,
+          'hold_at': null,
+          'should_broadcast': true,
+          'metadata': {
+            'callback_asked_at': [],
+            'asked_for_callback': false,
+            'requested_callback': false,
+            'voicemail_asked_at': [],
+            'asked_for_voicemail': false,
+            'authorized_for_text': false,
+            'requested_voicemail': false,
+            'user_replied_digits': {
+              'callback': null,
+              'voicemail': null,
+              'handle_by_text': null,
+              'text_authorization': null
+            },
+            'handle_by_text_asked_at': [],
+            'asked_for_handle_by_text': false,
+            'requested_handle_by_text': false,
+            'text_authorization_asked_at': null,
+            'asked_for_text_authorization': false
+          },
+          'engagement_data': null,
+          'created_at': '2021-09-29 17:58:43',
+          'updated_at': '2021-09-29 17:58:55',
+          'deleted_at': null,
+          'is_migrated': 0
+        },
+        'last_communication': {
+          'id': 48578,
+          'company_id': 7,
+          'campaign_id': 542,
+          'ring_group_id': null,
+          'owner_id': null,
+          'workflow_id': null,
+          'sequence_id': null,
+          'broadcast_id': null,
+          'creator_type': null,
+          'incoming_number_id': 2069,
+          'incoming_number': '+19893751337',
+          'incoming_sip_uri': null,
+          'contact_id': 210470,
+          'call_disposition_id': null,
+          'lead_number': '+16033166810',
+          'is_international': false,
+          'target_users': null,
+          'attempt': null,
+          'attempting_users': null,
+          'user_id': null,
+          'destination_number': null,
+          'transfer_prior_user_ids': null,
+          'transferred_from': null,
+          'transfer_target_user_ids': null,
+          'transferred_to': null,
+          'in_cold_transfer': false,
+          'proxy_number_id': null,
+          'forward_sid': null,
+          'direction': 1,
+          'type': 1,
+          'call_router_behavior': 3,
+          'is_read': null,
+          'recording_url': null,
+          'recorded_file_is_migrated': false,
+          'voicemail_url': null,
+          'voicemail_is_migrated': false,
+          'voicemail_duration': null,
+          'sid': 'CA372f93b54d8dd2d01751142817f23784',
+          'customer_leg_sid': 'CA372f93b54d8dd2d01751142817f23784',
+          'customer_leg_status': 6,
+          'agent_leg_sid': null,
+          'agent_leg_status': null,
+          'legc_uuid': null,
+          'legc_status': null,
+          'legz_uuid': null,
+          'legz_status': null,
+          'conference_sid': null,
+          'first_time_caller': 1,
+          'body': '',
+          'attachments': null,
+          'conference_status': null,
+          'conference_status2': null,
+          'current_status': 'completed',
+          'current_status2': 9,
+          'disposition_status': 'dead-end',
+          'disposition_status2': 6,
+          'resolution': 'voicemail',
+          'resolution2': 3,
+          'queue_resolution': null,
+          'queue_resolution2': null,
+          'callback_status': null,
+          'transfer_type': null,
+          'rejected_by_app': 0,
+          'duration': 10,
+          'hold_time': 0,
+          'talk_time': 0,
+          'wait_time': 10,
+          'csat_score': 0,
+          'provider_cost': '0.000000',
+          'notes': 'Sys (10:58am PDT): Routed to line voicemail\nSystem: Dead end call.\n',
+          'country': 'US',
+          'state': 'NH',
+          'city': 'DURHAM',
+          'customer_leg_called_at': '2021-09-29 17:58:43',
+          'customer_leg_transferred_at': '2021-09-29 17:58:43',
+          'customer_leg_hangup_at': '2021-09-29 17:58:55',
+          'agent_leg_called_at': null,
+          'agent_leg_transferred_at': null,
+          'agent_leg_hangup_at': null,
+          'conference_start_at': null,
+          'conference_end_at': null,
+          'hold_at': null,
+          'should_broadcast': true,
+          'metadata': {
+            'callback_asked_at': [],
+            'asked_for_callback': false,
+            'requested_callback': false,
+            'voicemail_asked_at': [],
+            'asked_for_voicemail': false,
+            'authorized_for_text': false,
+            'requested_voicemail': false,
+            'user_replied_digits': {
+              'callback': null,
+              'voicemail': null,
+              'handle_by_text': null,
+              'text_authorization': null
+            },
+            'handle_by_text_asked_at': [],
+            'asked_for_handle_by_text': false,
+            'requested_handle_by_text': false,
+            'text_authorization_asked_at': null,
+            'asked_for_text_authorization': false
+          },
+          'engagement_data': null,
+          'created_at': '2021-09-29 17:58:43',
+          'updated_at': '2021-09-29 17:58:55',
+          'deleted_at': null,
+          'is_migrated': 0
+        },
+        'external_integration_data': [
+          {
+            'id': 64239,
+            'company_id': 7,
+            'model_id': 210470,
+            'model_type': 'App\\Models\\Contact',
+            'source': 'hubspot',
+            'field': 'contact_id',
+            'data': '219601',
+            'textual_data': null,
+            'created_at': '2021-09-29 17:58:41',
+            'updated_at': '2021-09-29 17:58:41'
+          }
+        ],
+        'company': {
+          'id': 7,
+          'name': 'USS Enterprise',
+          'hubspot_integration_enabled': true
+        },
+        'tag_ids': []
+      },
       selectedId: {
         'id': 10,
         'company_id': 7,
