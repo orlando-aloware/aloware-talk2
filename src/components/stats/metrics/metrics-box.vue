@@ -22,7 +22,12 @@
         class="metric-box text-black m-2 p-1">
         <q-card-actions>
           <div :class="`metric-box-label text-weight-medium text-${color}`">
-            {{ metricValue }}
+            <span v-if="metric && metric.category === 'call_metadata'">
+              {{ metricValue | fixFullDuration }}
+            </span>
+            <span v-else>
+              {{ metricValue }}
+            </span>
           </div>
           <q-space />
           <div

@@ -41,9 +41,16 @@
     font-size: 15px;
     color: $grey-80;
     letter-spacing: -0.6px;
+    width: 100%;
     &.metric-box-header {
       font-weight: 500;
       letter-spacing: 0;
+    }
+    .add-metrics-wrapper {
+      margin-top: 20px;
+      font-size: 14px;
+      color: $grey-90;
+      font-weight: 600;
     }
   }
 
