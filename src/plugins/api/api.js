@@ -189,6 +189,46 @@ export default {
           return window.axios.get(`${suffixV1}reports/communications`, params)
         }
       }
+    },
+    user: {
+      getById (id) {
+        return window.axios.get(`${suffixV1}user/${id}`)
+      },
+      update (id, params) {
+        return window.axios.put(`${suffixV1}user/${id}`, params)
+      },
+      diagnosis (id) {
+        return window.axios.get(`${suffixV1}diagnosis/user/${id}`)
+      },
+      uploadMissedCallVM (id, params) {
+        return window.axios.post(`${suffixV1}user/${id}/missed-call-voicemail`, params)
+      },
+      deleteMissedCallVM (id) {
+        return window.axios.delete(`${suffixV1}user/${id}/missed-call-voicemail`)
+      }
+    },
+    communication: {
+      forceTerminate (id) {
+        return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
+      }
+    },
+    statics: {
+      get () {
+        return window.axios.get('/get-statics')
+      }
+    },
+    library: {
+      voicemailDrop: {
+        get (params) {
+          return window.axios.get(`${suffixV1}voicemail-drop`, params)
+        },
+        create (params) {
+          return window.axios.post(`${suffixV1}voicemail-drop`, params)
+        },
+        delete (id) {
+          return window.axios.delete(`${suffixV1}voicemail-drop/${id}`)
+        }
+      }
     }
   },
   V2: {

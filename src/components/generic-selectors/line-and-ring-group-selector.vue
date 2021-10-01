@@ -180,12 +180,12 @@ export default {
         case this.multiple && this.selected.length > 0:
         case !this.multiple && this.selected:
         default:
-          return ''
+          return this.customPlaceholder
       }
     },
 
     formattedOptions () {
-      let campaignOptions = [...this.sortToAlphabeticalOrder(this.campaigns)]
+      let campaignOptions = [...this.sortToAlphabeticalOrder(this.campaigns.map(function (item) { return { ...item, model: 'lines' } }))]
 
       campaignOptions.unshift({
         group: 'Filter by Line',
@@ -193,7 +193,7 @@ export default {
       })
 
       let campaignAndRingGroupArray = campaignOptions
-      let ringGroupOptions = [...this.sortToAlphabeticalOrder(this.ringGroups)]
+      let ringGroupOptions = [...this.sortToAlphabeticalOrder(this.ringGroups.map(function (item) { return { ...item, model: 'ring_groups' } }))]
       ringGroupOptions.unshift({
         group: 'Filter by Ring Group',
         disable: true
@@ -292,6 +292,7 @@ export default {
       if (this.selected !== this.value) {
         this.$emit('change', val)
       }
+      this.showInputPlaceholder()
     }
   }
 }

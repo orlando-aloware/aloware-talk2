@@ -22,6 +22,13 @@
               View
             </q-tooltip>
             <eye-icon height="16" width="16"></eye-icon>
+            <q-menu content-class="mx-height-300"
+                    ref="templatesMenu"
+                    anchor="bottom left" self="top middle">
+              <div class="row no-wrap q-pa-md">
+                {{ template.body }}
+              </div>
+            </q-menu>
           </b-link>
           <b-link href="#"
                   @click="onEdit(template)">

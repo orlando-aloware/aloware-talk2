@@ -55,6 +55,9 @@ export default function () {
         icon: 'diagnosis',
         disabled: false
       }
-    ]
+    ],
+    user: null,
+    userClone: null,
+    changedUserProperties: []
   }
 }

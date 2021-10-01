@@ -1,86 +1,111 @@
 <template>
-  <div
-    ref="scrollableArea"
-    :class="['scrollableArea position-relative d-flex flex-column h-100 w-100', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
-    @scroll="handleScroll"
-  >
-    <table :class="[computedClass, 'ml-3']" ref="table">
-      <thead>
-        <draggable
-          :list="fixedColumns"
-          tag="tr"
-          ghost-class="ghost"
-          handle=".handle"
-          @change="onOrderChanged"
-          :move="onCheckMove"
-        >
-          <th
-            v-for="column in fixedColumns"
-            :key="column.name"
-            :data-column-id="column.name"
-            :class="{
-              checkbox: column.name === 'checkbox',
-              sticky: column.sticky
-            }"
-            :style="{
-              maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
-              minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
-            }"
-          >
-            <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
-              <input type="checkbox"
-                     class="data-table-check-all"
-                     ref="dataTableCheckAll"
-                     @change="onCheckboxClicked"/>
-              <span class="checkmark"></span>
-            </label>
-            <template v-if="column.name && column.name !== 'checkbox'">
-              <span :class="{ handle: column.draggable }">
-                {{ column.label }}
-              </span>
-              <a
-                href="#"
-                class="sorter"
-                :class="{
-                  'sorter-asc':
-                    sorts.order === 'asc' && sorts.orderBy === column.name,
-                  'sorter-desc':
-                    sorts.order === 'desc' && sorts.orderBy === column.name
-                }"
-                v-if="column.sortable"
-                @click.prevent="onColumnSort(column)"
-              ></a>
-              <div
-                class="tableResizer"
-                :data-resizer-id="column.name"
-                v-if="column.resizable"
-                @mousedown="onResizerMouseDown"
-              >
-                {{ column.label }}
-              </div>
-            </template>
-          </th>
-        </draggable>
-      </thead>
-      <tbody>
-        <slot name="tbody" />
-      </tbody>
-    </table>
-    <b-overlay
-      class="table-more-rows-spinner"
-      :show="isLoadingMore"
-      rounded="sm"
+  <div class="d-flex flex-column" :class="[paginated ? 'paginated' : '']">
+    <div
+      ref="scrollableArea"
+      :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
+      @scroll="handleScroll"
     >
-      <template #overlay>
-        <q-spinner-bars color="primary" size="20px" />
-      </template>
-    </b-overlay>
+      <table :class="[computedClass, 'ml-3']" ref="table">
+        <thead>
+          <draggable
+            :list="fixedColumns"
+            tag="tr"
+            ghost-class="ghost"
+            handle=".handle"
+            @change="onOrderChanged"
+            :move="onCheckMove"
+          >
+            <th
+              v-for="column in fixedColumns"
+              :key="column.name"
+              :data-column-id="column.name"
+              :class="{
+                checkbox: column.name === 'checkbox',
+                sticky: column.sticky
+              }"
+              :style="{
+                maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
+                minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
+              }"
+            >
+              <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
+                <input type="checkbox"
+                       class="data-table-check-all"
+                       ref="dataTableCheckAll"
+                       @change="onCheckboxClicked"/>
+                <span class="checkmark"></span>
+              </label>
+              <template v-if="column.name && column.name !== 'checkbox'">
+                <span :class="{ handle: column.draggable }">
+                  {{ column.label }}
+                </span>
+                <a
+                  href="#"
+                  class="sorter"
+                  :class="{
+                    'sorter-asc':
+                      sorts.order === 'asc' && sorts.orderBy === column.name,
+                    'sorter-desc':
+                      sorts.order === 'desc' && sorts.orderBy === column.name
+                  }"
+                  v-if="column.sortable"
+                  @click.prevent="onColumnSort(column)"
+                ></a>
+                <div
+                  class="tableResizer"
+                  :data-resizer-id="column.name"
+                  v-if="column.resizable"
+                  @mousedown="onResizerMouseDown"
+                >
+                  {{ column.label }}
+                </div>
+              </template>
+            </th>
+          </draggable>
+        </thead>
+        <tbody>
+          <slot name="tbody" />
+        </tbody>
+      </table>
+      <b-overlay
+        class="table-more-rows-spinner"
+        :show="isLoadingMore"
+        rounded="sm"
+        v-if="!paginated"
+      >
+        <template #overlay>
+          <q-spinner-bars color="primary" size="20px" />
+        </template>
+      </b-overlay>
 
-    <template v-if="hasEmptySlot && isEmpty">
-      <slot name="empty" />
-    </template>
-    <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty">
-      <div class="h5">No contacts found based on the current filters</div>
+      <template v-if="hasEmptySlot && isEmpty">
+        <slot name="empty" />
+      </template>
+      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty">
+        <div class="h5">No contacts found based on the current filters</div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-center" v-if="paginated">
+      <q-pagination
+        boundary-links
+        direction-links
+        class="table-pagination"
+        v-model="paginationPage"
+        :max="lastPage"
+        :max-pages="11"
+        :ellipses="false"
+      ></q-pagination>
+
+      <q-select outlined
+                dense
+                emit-value
+                option-value="value"
+                option-label="label"
+                class="mt-2"
+                v-model="perPage"
+                :options="perPageOptions"
+                :display-value="`${perPage} per page`">
+      </q-select>
     </div>
   </div>
 </template>
@@ -121,6 +146,22 @@ export default {
     scrollAreaClass: {
       type: String,
       default: ''
+    },
+    paginated: {
+      type: Boolean,
+      default: false
+    },
+    totalRows: {
+      type: Number,
+      default: 0
+    },
+    currentPage: {
+      type: Number,
+      default: 1
+    },
+    lastPage: {
+      type: Number,
+      default: 1
     }
   },
 
@@ -170,7 +211,14 @@ export default {
       startOffset: 0,
       loading: true,
       scrolling: false,
-      isLoaderVisible: false
+      isLoaderVisible: false,
+      paginationPage: 1,
+      perPage: 25,
+      perPageOptions: [
+        { value: 25, label: '25 Per Page' },
+        { value: 50, label: '50 Per Page' },
+        { value: 100, label: '100 Per Page' }
+      ]
     }
   },
 
@@ -232,6 +280,10 @@ export default {
       this.isLoaderVisible = isLoaderVisible
     },
     onScroll () {
+      if (this.paginated) {
+        return
+      }
+
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
       scrollTimeout = setTimeout(() => {
@@ -259,6 +311,15 @@ export default {
     this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)
+  },
+
+  watch: {
+    paginationPage: function () {
+      this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
+    },
+    perPage: function () {
+      this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
+    }
   }
 }
 </script>

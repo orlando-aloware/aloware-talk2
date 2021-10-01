@@ -25,7 +25,7 @@
 
       <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
         <i class="fa fa-circle small" v-if="!isTarget"></i>
-        <i class="fa fa-check-circle text-success small" v-if="isTarget"></i>
+        <i class="fa fa-check-circle text-primary small" v-if="isTarget"></i>
       </button>
     </div>
 

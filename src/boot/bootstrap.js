@@ -12,8 +12,8 @@ import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 
+import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
-Vue.use(Vuelidate)
 
 // local storage
 localStorage.setItem('api_url', process.env.API_URL)
@@ -25,6 +25,8 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
 Vue.use(VueWaveSurfer)
+Vue.use(Vuelidate)
+Vue.use(BusinessHours)
 
 window.Bowser = Bowser
 window.timezone = jstz.determine().name()

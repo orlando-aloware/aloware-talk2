@@ -113,7 +113,7 @@ body,
 
       & + .q-field__control-container {
         .q-field__native {
-          padding-left: 5px !important;
+          padding-left: 10px !important;
         }
       }
     }
@@ -2543,6 +2543,11 @@ span.mention {
   }
 }
 
+.file-uploader-wrapper {
+  width: 100% !important;
+  padding: 0 !important;
+}
+
 // MESSAGE COMPOSER FAX
 .message-composer-fax-wrapper {
   .file-info {
@@ -3124,7 +3129,7 @@ span.mention {
 .page-side-menubar {
   max-width: 508px;
   background-color: $white;
-  border: solid 1px $grey-light3;
+  //border: solid 1px $grey-light3;
   display: flex;
   position: relative;
   overflow: hidden;
@@ -3174,7 +3179,8 @@ span.mention {
     height: 45px;
     display: flex;
     align-items: center;
-    border-bottom: solid 1px $grey-light3;
+    margin-left: 7px;
+    //border-bottom: solid 1px $grey-light3;
 
     &__label {
       padding-left: 20px;
@@ -3184,6 +3190,14 @@ span.mention {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .form-control-search {
+      font-size: 14px !important;
+
+      .q-field__native {
+        padding-left: 15px !important;
+      }
     }
   }
 }
@@ -4871,6 +4885,18 @@ span.mention {
   max-height: calc(100vh - 172px);
 }
 
+.paginated {
+  .scrollableArea {
+    max-height: calc(100vh - 229px);
+    min-height: calc(100vh - 229px);
+  }
+  .table-pagination {
+    .q-btn__wrapper {
+      min-height: 35px !important;
+    }
+  }
+}
+
 .static-list-add-item.scrollableArea {
   max-height: calc(100vh - 196px);
 }
@@ -4886,8 +4912,17 @@ div.tableResizer {
   cursor: col-resize;
   z-index: 10;
   background-color: transparent;
+  padding-left: 5px;
   &.resizing {
-    background-color: $light-green3;
+    background-color: rgba(37, 110, 255, 0.7);
+  }
+
+  &:hover {
+    border-right: 2px solid rgba(37, 110, 255, 0.7);
+  }
+
+  &:active {
+    border-right: 2px solid rgba(37, 110, 255, 0.7);
   }
 }
 
@@ -4971,7 +5006,7 @@ table.datatable {
         }
 
         &:not(.checkbox):hover {
-          background-color: $grey-light8;
+          background-color: #EBECFE;
         }
 
         a.sorter {
@@ -5543,10 +5578,9 @@ table.datatable {
     justify-content: flex-end;
     padding-left: 10px;
     padding-right: 10px;
-    border-top: solid 1px $grey-light;
-    background-color: $grey-light2;
     font-size: 12px;
     min-height: 35px;
+    box-shadow: 0px -1px 3px 0px #bbbaba;
   }
   &-input {
     display: flex;
@@ -5554,7 +5588,6 @@ table.datatable {
     justify-content: center;
     padding-left: 10px;
     padding-right: 10px;
-    //border-bottom: solid 1px $grey-light;
     min-height: 50px;
 
     input {
@@ -5586,7 +5619,7 @@ table.datatable {
     margin-right: 5px;
   }
   &--target {
-    background-color: $grey-60;
+    background-color: rgba(37, 110, 255, 0.09);
 
     .folder__option {
       display: block;
@@ -5594,7 +5627,7 @@ table.datatable {
     }
   }
   &:hover {
-    background-color: $grey-60;
+    background-color: $grey-50;
     .folder__option {
       display: block;
     }
@@ -5842,7 +5875,7 @@ table.datatable {
   }
 
   &:hover {
-    background-color: $light-green2;
+    background-color: $grey-50;
 
     .folder__option {
       opacity: 1;
@@ -6276,6 +6309,10 @@ table.datatable {
     100% {
       background-color: rgba(255, 247, 223, 1);
     }
+  }
+
+  a.linkified {
+    color: $grey-50;
   }
 }
 
@@ -6879,6 +6916,19 @@ button.grey-90 {
     border: none !important;
     height: 24px;
 
+    &.active:hover {
+      background: lighten($primary, 10%) !important;
+    }
+
+    &:not(.active) {
+      color: transparent !important;
+
+      .task-count {
+        background: $grey-70 !important;
+        color: $grey-90 !important;
+      }
+    }
+
     .options {
       font-size: 14px !important;
       font-weight: 500;
@@ -6887,15 +6937,15 @@ button.grey-90 {
       font-family: 'Inter', sans-serif !important;
 
       .task-count {
-        background: $grey-60;
+        background: rgba(255, 255, 255, 0.22);
         border-radius: 5px;
         font-size: 10px;
         font-weight: 600;
         padding: 0 2px;
-        color: $grey-90;
+        color: $white;
         height: 16px;
         width: 22px;
-        margin-top: 1.5px;
+        margin-top: 1.8px;
 
         span {
           top: -3px;
@@ -6930,7 +6980,7 @@ button.grey-90 {
         color: $grey-100;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 7vw;
+        width: 6.5vw;
         overflow: hidden;
       }
     }
@@ -6948,6 +6998,9 @@ button.grey-90 {
 
 
 .settings-form-wrapper {
+
+  padding-bottom: 5rem;
+
   .form-label {
     font-weight: 500;
     font-size: 13px;
@@ -6958,13 +7011,10 @@ button.grey-90 {
     font-size: 12px;
     color: $grey-90;
     letter-spacing: -0.0025em;
+    margin-top: 10px;
   }
 
   form {
-    height: calc(100vh - 113px) !important;
-    overflow-y: auto;
-    overflow-x: hidden;
-
     .form-row {
       margin-right: 0 !important;
       margin-left: 0 !important;
@@ -6978,4 +7028,116 @@ button.grey-90 {
 
 .q-item__label {
   font-weight: normal !important;
+}
+
+
+.flex-table {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin: 0.75em 0;
+  height: 45px;
+  width: 100%;
+}
+
+.flex-row.day {
+  width: 110px;
+}
+
+.flex-row.toggle {
+  width: 110px;
+}
+
+.business-hours-wrapper {
+  .selector-container {
+    width: 110px;
+  }
+}
+
+.group-checkbox {
+  .custom-checkbox {
+    width: 120px;
+  }
+}
+
+.recording{
+  animation-name: pulse;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes pulse{
+  0%{
+    box-shadow: 0 0 5px 0 rgba(173,0,0,.3);
+  }
+  65%{
+    box-shadow: 0 0 5px 13px rgba(173,0,0,.3);
+  }
+  90%{
+    box-shadow: 0 0 5px 13px rgba(173,0,0,0);
+  }
+}
+
+.ring-group-list {
+  li {
+    list-style: circle;
+    left: 0;
+    margin-left: -22px;
+  }
+}
+
+
+.custom-control {
+  .custom-control-label {
+    cursor: pointer;
+    padding-top: 2px;
+  }
+}
+
+.business-hours-container {
+
+  font-family: 'Inter' , sans-serif !important;
+
+  div.hours {
+    select {
+      border-radius: 6px;
+      background: $white;
+      height: 40px;
+      padding: 0 10px;
+      font-weight: 400;
+      font-size: 14px;
+    }
+
+    select:focus-visible {
+      border: 2px solid $primary;
+      outline-width: inherit;
+    }
+  }
+
+  .add-hours {
+    font-weight: normal !important;
+  }
+}
+
+
+.fixed-header{
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.fixed-header tbody{
+  display:block;
+  width: 100%;
+  overflow: auto;
+  height: 100px;
+}
+
+.fixed-header thead tr {
+  display: block;
+}
+
+.fixed-header th, .fixed-header td {
+  padding: 5px;
+  text-align: left;
 }

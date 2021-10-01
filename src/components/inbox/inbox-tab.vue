@@ -7,13 +7,15 @@
                     :has-custom-left-content="true"
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
-          <div class="mention-filter-actions-wrapper mt-3 ml-2">
+          <div class="mention-filter-actions-wrapper mt-3 ml-2 pr-4">
             <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
             <line-and-ring-group-selector custom-placeholder="Filter"
-                           :clearable="true"
-                           :hide-dropdown-icon="true"
-                           :outlined="false"
-                           :borderless="true">
+                                          v-model="lineOrRingGroupFilter"
+                                          :clearable="true"
+                                          :hide-dropdown-icon="true"
+                                          :outlined="false"
+                                          :borderless="true"
+                                          @change="onFilterItemSelected">
             </line-and-ring-group-selector>
           </div>
         </template>
@@ -25,7 +27,7 @@
           spread
           dense
           unelevated
-          toggle-color="grey-90"
+          toggle-color="primary active"
           color="transparent"
           text-color="primary"
           :options="options"
@@ -163,6 +165,7 @@ export default {
           value: [ContactTaskStatus.STATUS_OPEN],
           operator: 1
         },
+
         search: {
         }
       },
@@ -176,7 +179,9 @@ export default {
       isLoaded: false,
       currentPage: 0,
       page: 1,
-      perPage: 20
+      perPage: 20,
+      lineOrRingGroupFilter: null,
+      lineOrRingGroupFilteredId: null
     }
   },
 
@@ -221,6 +226,12 @@ export default {
       }
 
       this.filters.contact_task_status.value = [this.currentTask]
+
+      if (this.lineOrRingGroupFilter) {
+        this.lineOrRingGroupFilteredId = this.lineOrRingGroupFilter.id
+        this.filters = { ...this.filters, [this.lineOrRingGroupFilter.model]: { value: [this.lineOrRingGroupFilter.id], operator: 1 } }
+      }
+
       query.filters = this.filters
       return query
     },
@@ -312,6 +323,10 @@ export default {
           console.log(err)
         })
       }
+    },
+    onFilterItemSelected (item) {
+      this.resetFilters()
+      this.lineOrRingGroupFilter = item
     }
   },
 
@@ -398,7 +413,11 @@ export default {
     'searchText': function () {
       this.loadContactTasks()
     },
+    'lineOrRingGroupFilter': function () {
+      this.loadContactTasks()
+    },
     '$route.params.status': function () {
+      this.lineOrRingGroupFilter = null
       this.resetList()
     },
     '$route.name': function (value) {

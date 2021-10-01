@@ -1,0 +1,1602 @@
+[
+  {
+    "state_code": "AK",
+    "state_name": "Alaska",
+    "area_codes": [
+      {
+        "value": "907",
+        "label": "Anchorage, Juneau, Ketchikan"
+      }
+    ]
+  },
+  {
+    "state_code": "AL",
+    "state_name": "Alabama",
+    "area_codes": [
+      {
+        "value": "205",
+        "label": "Birmingham, Hoover, Tuscaloosa"
+      },
+      {
+        "value": "256",
+        "label": "Decatur, Huntsville"
+      },
+      {
+        "value": "938",
+        "label": "Decatur, Huntsville"
+      },
+      {
+        "value": "334",
+        "label": "Dothan, Montgomery"
+      },
+      {
+        "value": "251",
+        "label": "Mobile"
+      }
+    ]
+  },
+  {
+    "state_code": "AR",
+    "state_name": "Arkansas",
+    "area_codes": [
+      {
+        "value": "501",
+        "label": "Little Rock, North Little Rock"
+      },
+      {
+        "value": "479",
+        "label": "Fort Smith, Fayetteville"
+      },
+      {
+        "value": "870",
+        "label": "Jonesboro, Pine Bluff"
+      }
+    ]
+  },
+  {
+    "state_code": "AZ",
+    "state_name": "Arizona",
+    "area_codes": [
+      {
+        "value": "928",
+        "label": "Flagstaff, Yuma, Kingman"
+      },
+      {
+        "value": "480",
+        "label": "Chandler, Mesa, Phoenix, Scottsdale, Tempe"
+      },
+      {
+        "value": "602",
+        "label": "Phoenix"
+      },
+      {
+        "value": "520",
+        "label": "Casa Adobes, Catalina Foothills, Tucson"
+      },
+      {
+        "value": "623",
+        "label": "Glendale, Peoria, Phoenix"
+      }
+    ]
+  },
+  {
+    "state_code": "CA",
+    "state_name": "California",
+    "area_codes": [
+      {
+        "value": "209",
+        "label": "Lodi, Merced, Modesto, Stockton, Tracy, Turlock"
+      },
+      {
+        "value": "310",
+        "label": "Carson, Compton, Gardena, Hawthorne, Inglewood, Lynwood, Redondo Beach, Santa Monica, Torrance"
+      },
+      {
+        "value": "424",
+        "label": "Carson, Compton, Gardena, Hawthorne, Inglewood, Lynwood, Redondo Beach, Santa Monica, Torrance"
+      },
+      {
+        "value": "323",
+        "label": "Los Angeles"
+      },
+      {
+        "value": "213",
+        "label": "Los Angeles"
+      },
+      {
+        "value": "408",
+        "label": "Cupertino, Milpitas, San Jose, Santa Clara, Sunnyvale"
+      },
+      {
+        "value": "669",
+        "label": "Cupertino, Milpitas, San Jose, Santa Clara, Sunnyvale"
+      },
+      {
+        "value": "415",
+        "label": "San Francisco, San Rafael"
+      },
+      {
+        "value": "628",
+        "label": "San Francisco, San Rafael"
+      },
+      {
+        "value": "510",
+        "label": "Alameda, Berkeley, Castro Valley, Fremont, Hayward, Oakland, Richmond, San Leandro, Union City"
+      },
+      {
+        "value": "341",
+        "label": "Alameda, Berkeley, Castro Valley, Fremont, Hayward, Oakland, Richmond, San Leandro, Union City"
+      },
+      {
+        "value": "530",
+        "label": "Chico, Davis, Redding"
+      },
+      {
+        "value": "559",
+        "label": "Clovis, Fresno, Visalia"
+      },
+      {
+        "value": "562",
+        "label": "Bellflower, Cerritos, Downey, La Habra, Lakewood, Long Beach, Norwalk, Paramount, Pico Rivera, Whittier"
+      },
+      {
+        "value": "619",
+        "label": "Chula Vista, El Cajon, La Mesa, National City, San Diego, Santee"
+      },
+      {
+        "value": "626",
+        "label": "Alhambra, Arcadia, Baldwin Park, El Monte, Hacienda Heights, Monterey Park, Pasadena, Rosemead, West Covina"
+      },
+      {
+        "value": "650",
+        "label": "Daly City, Mountain View, Palo Alto, Redwood City, San Mateo, South San Francisco"
+      },
+      {
+        "value": "661",
+        "label": "Bakersfield, Lancaster, Palmdale, Santa Clarita"
+      },
+      {
+        "value": "707",
+        "label": "Fairfield, Napa, Petaluma, Santa Rosa, Vacaville, Vallejo"
+      },
+      {
+        "value": "714",
+        "label": "Anaheim, Buena Park, Fountain Valley, Fullerton, Garden Grove, Huntington Beach, Orange, Santa Ana, Tustin, Westminster, Yorba Linda"
+      },
+      {
+        "value": "657",
+        "label": "Anaheim, Buena Park, Fountain Valley, Fullerton, Garden Grove, Huntington Beach, Orange, Santa Ana, Tustin, Westminster, Yorba Linda"
+      },
+      {
+        "value": "760",
+        "label": "Apple Valley, Carlsbad, Encinitas, Escondido, Hesperia, Oceanside, San Marcos, Victorville, Vista"
+      },
+      {
+        "value": "442",
+        "label": "Apple Valley, Carlsbad, Encinitas, Escondido, Hesperia, Oceanside, San Marcos, Victorville, Vista"
+      },
+      {
+        "value": "805",
+        "label": "Camarillo, Goleta, Oxnard, San Buenaventura, Santa Barbara, Santa Maria, Simi Valley, Thousand Oaks, San Luis Obispo"
+      },
+      {
+        "value": "820",
+        "label": "Camarillo, Goleta, Oxnard, San Buenaventura, Santa Barbara, Santa Maria, Simi Valley, Thousand Oaks, San Luis Obispo"
+      },
+      {
+        "value": "818",
+        "label": "Burbank, Glendale"
+      },
+      {
+        "value": "747",
+        "label": "Burbank, Glendale"
+      },
+      {
+        "value": "831",
+        "label": "Salinas, Santa Cruz"
+      },
+      {
+        "value": "858",
+        "label": "San Diego"
+      },
+      {
+        "value": "909",
+        "label": "Chino, Chino Hills, Diamond Bar, Fontana, Ontario, Pomona, Rancho Cucamonga, Redlands, Rialto, San Bernardino, Upland"
+      },
+      {
+        "value": "916",
+        "label": "Arden-Arcade, Citrus Heights, Elk Grove, Folsom, Rancho Cordova, Roseville, Sacramento"
+      },
+      {
+        "value": "279",
+        "label": "Arden-Arcade, Citrus Heights, Elk Grove, Folsom, Rancho Cordova, Roseville, Sacramento"
+      },
+      {
+        "value": "925",
+        "label": "Antioch, Concord, Livermore, Pittsburg, Pleasanton, Walnut Creek"
+      },
+      {
+        "value": "949",
+        "label": "Costa Mesa, Irvine, Laguna Niguel, Lake Forest, Mission Viejo, Newport Beach, San Clemente"
+      },
+      {
+        "value": "951",
+        "label": "Corona, Hemet, Moreno Valley, Riverside, Temecula, Perris"
+      }
+    ]
+  },
+  {
+    "state_code": "CO",
+    "state_name": "Colorado",
+    "area_codes": [
+      {
+        "value": "303",
+        "label": "Arvada, Aurora, Boulder, Denver, Highlands Ranch, Lakewood, Longmont, Thornton, Westminster"
+      },
+      {
+        "value": "720",
+        "label": "Arvada, Aurora, Boulder, Denver, Highlands Ranch, Lakewood, Longmont, Thornton, Westminster, Englewood"
+      },
+      {
+        "value": "719",
+        "label": "Colorado Springs, Pueblo"
+      },
+      {
+        "value": "970",
+        "label": "Fort Collins, Greeley, Loveland"
+      }
+    ]
+  },
+  {
+    "state_code": "CT",
+    "state_name": "Connecticut",
+    "area_codes": [
+      {
+        "value": "203",
+        "label": "Bridgeport, Danbury, Fairfield, Greenwich, Hamden, Meriden, Milford, New Haven, Norwalk, Stamford, Waterbury, West Haven"
+      },
+      {
+        "value": "475",
+        "label": "Bridgeport, Danbury, Fairfield, Greenwich, Hamden, Meriden, Milford, New Haven, Norwalk, Stamford, Waterbury, West Haven"
+      },
+      {
+        "value": "860",
+        "label": "Bristol, Hartford, Manchester, New Britain, West Hartford"
+      },
+      {
+        "value": "959",
+        "label": "Bristol, Hartford, Manchester, New Britain, West Hartford"
+      }
+    ]
+  },
+  {
+    "state_code": "DC",
+    "state_name": "D.C.",
+    "area_codes": [
+      {
+        "value": "202",
+        "label": "Washington D.C. area"
+      }
+    ]
+  },
+  {
+    "state_code": "DE",
+    "state_name": "Delaware",
+    "area_codes": [
+      {
+        "value": "302",
+        "label": "Wilmington"
+      }
+    ]
+  },
+  {
+    "state_code": "FL",
+    "state_name": "Florida",
+    "area_codes": [
+      {
+        "value": "239",
+        "label": "Cape Coral, Naples"
+      },
+      {
+        "value": "305",
+        "label": "Carol City, Hialeah, Kendale Lakes, Kendall, Miami, Miami Beach, Miramar, Tamiami, Homestead"
+      },
+      {
+        "value": "786",
+        "label": "Carol City, Hialeah, Kendale Lakes, Kendall, Miami, Miami Beach, Miramar, Tamiami, Homestead"
+      },
+      {
+        "value": "352",
+        "label": "Gainesville, Spring Hill, Ocala"
+      },
+      {
+        "value": "386",
+        "label": "Daytona Beach, Deltona, Lake City"
+      },
+      {
+        "value": "407",
+        "label": "Melbourne, Orlando, Palm Bay, Sanford"
+      },
+      {
+        "value": "689",
+        "label": "Melbourne, Orlando, Palm Bay, Sanford"
+      },
+      {
+        "value": "321",
+        "label": "Melbourne, Orlando, Palm Bay, Sanford"
+      },
+      {
+        "value": "561",
+        "label": "Boca Raton, Boynton Beach, Delray Beach, West Palm Beach, Belle Glade, Riveria Beach"
+      },
+      {
+        "value": "727",
+        "label": "Clearwater, Largo, Palm Harbor, St. Petersburg"
+      },
+      {
+        "value": "772",
+        "label": "Port St. Lucie, Port St Lucie, Port st Lucie"
+      },
+      {
+        "value": "813",
+        "label": "Tampa"
+      },
+      {
+        "value": "850",
+        "label": "Pensacola, Tallahassee"
+      },
+      {
+        "value": "863",
+        "label": "Lakeland, Lake Wales, Sebring"
+      },
+      {
+        "value": "904",
+        "label": "Jacksonville"
+      },
+      {
+        "value": "941",
+        "label": "Sarasota, Bradenton"
+      },
+      {
+        "value": "954",
+        "label": "Coral Springs, Davie, Deerfield Beach, Fort Lauderdale, Hollywood, Lauderhill, Margate, Pembroke Pines, Plantation, Pompano Beach, Sunrise, Tamarac"
+      },
+      {
+        "value": "754",
+        "label": "Coral Springs, Davie, Deerfield Beach, Fort Lauderdale, Hollywood, Lauderhill, Margate, Pembroke Pines, Plantation, Pompano Beach, Sunrise, Tamarac"
+      }
+    ]
+  },
+  {
+    "state_code": "GA",
+    "state_name": "Georgia",
+    "area_codes": [
+      {
+        "value": "229",
+        "label": "Albany, Tifton, Valdosta"
+      },
+      {
+        "value": "404",
+        "label": "Atlanta, Sandy Springs"
+      },
+      {
+        "value": "678",
+        "label": "Atlanta, Marietta, Roswell, Sandy Springs, Villa Rica"
+      },
+      {
+        "value": "478",
+        "label": "Macon"
+      },
+      {
+        "value": "706",
+        "label": "Athens, Augusta, Columbus"
+      },
+      {
+        "value": "762",
+        "label": "Athens, Augusta, Columbus"
+      },
+      {
+        "value": "770",
+        "label": "Atlanta, Marietta, Roswell, Sandy Springs, Villa Rica"
+      },
+      {
+        "value": "470",
+        "label": "Atlanta, Marietta, Roswell, Sandy Springs, Villa Rica"
+      },
+      {
+        "value": "912",
+        "label": "Savannah"
+      }
+    ]
+  },
+  {
+    "state_code": "HI",
+    "state_name": "Hawaii",
+    "area_codes": [
+      {
+        "value": "808",
+        "label": "Honolulu"
+      }
+    ]
+  },
+  {
+    "state_code": "IA",
+    "state_name": "Iowa",
+    "area_codes": [
+      {
+        "value": "319",
+        "label": "Cedar Rapids, Iowa City, Waterloo"
+      },
+      {
+        "value": "515",
+        "label": "Ames, Des Moines"
+      },
+      {
+        "value": "563",
+        "label": "Davenport, Dubuque"
+      },
+      {
+        "value": "641",
+        "label": "Fairfield, Mason City"
+      },
+      {
+        "value": "712",
+        "label": "Council Bluffs, Sioux City"
+      }
+    ]
+  },
+  {
+    "state_code": "ID",
+    "state_name": "Idaho",
+    "area_codes": [
+      {
+        "value": "208",
+        "label": "Boise, Idaho Falls, Nampa, Pocatelllo"
+      },
+      {
+        "value": "986",
+        "label": "Boise, Idaho Falls, Nampa, Pocatelllo"
+      }
+    ]
+  },
+  {
+    "state_code": "IL",
+    "state_name": "Illinois",
+    "area_codes": [
+      {
+        "value": "217",
+        "label": "Champaign, Decatur, Springfield"
+      },
+      {
+        "value": "309",
+        "label": "Bloomington, Peoria"
+      },
+      {
+        "value": "312",
+        "label": "Chicago"
+      },
+      {
+        "value": "872",
+        "label": "Chicago"
+      },
+      {
+        "value": "618",
+        "label": "Belleville, Harrisburg"
+      },
+      {
+        "value": "630",
+        "label": "Aurora, Naperville, Wheaton"
+      },
+      {
+        "value": "331",
+        "label": "Aurora, Naperville, Wheaton"
+      },
+      {
+        "value": "708",
+        "label": "Berwyn, Cicero, Oak Lawn, Oak Park, Orland Park"
+      },
+      {
+        "value": "773",
+        "label": "Chicago"
+      },
+      {
+        "value": "815",
+        "label": "Joliet, Rockford, Morris"
+      },
+      {
+        "value": "779",
+        "label": "Joliet, Rockford, Morris, South Beloit"
+      },
+      {
+        "value": "847",
+        "label": "Arlington Heights, Des Plaines, Elgin, Evanston, Mount Prospect, Palatine, Schaumburg, Skokie, Waukegan, Deerfield"
+      },
+      {
+        "value": "224",
+        "label": "Arlington Heights, Des Plaines, Elgin, Evanston, Mount Prospect, Palatine, Schaumburg, Skokie, Waukegan"
+      }
+    ]
+  },
+  {
+    "state_code": "IN",
+    "state_name": "Indiana",
+    "area_codes": [
+      {
+        "value": "219",
+        "label": "Gary, Hammond"
+      },
+      {
+        "value": "260",
+        "label": "Fort Wayne"
+      },
+      {
+        "value": "317",
+        "label": "Indianapolis"
+      },
+      {
+        "value": "463",
+        "label": "Indianapolis"
+      },
+      {
+        "value": "574",
+        "label": "Elkhart, South Bend"
+      },
+      {
+        "value": "765",
+        "label": "Anderson, Lafayette, Muncie"
+      },
+      {
+        "value": "812",
+        "label": "Bloomington, Evansville, Terre Haute"
+      },
+      {
+        "value": "930",
+        "label": "Bloomington, Evansville, Terre Haute"
+      }
+    ]
+  },
+  {
+    "state_code": "KA",
+    "state_name": "Kansas",
+    "area_codes": [
+      {
+        "value": "316",
+        "label": "Wichita"
+      },
+      {
+        "value": "620",
+        "label": "Hutchinson"
+      },
+      {
+        "value": "785",
+        "label": "Lawrence, Topeka"
+      },
+      {
+        "value": "913",
+        "label": "Kansas City, Olathe, Overland Park"
+      }
+    ]
+  },
+  {
+    "state_code": "KY",
+    "state_name": "Kentucky",
+    "area_codes": [
+      {
+        "value": "270",
+        "label": "Bowling Green, Owensboro, Paducah"
+      },
+      {
+        "value": "364",
+        "label": "Bowling Green, Owensboro, Paducah"
+      },
+      {
+        "value": "502",
+        "label": "Louisville"
+      },
+      {
+        "value": "606",
+        "label": "Maysville"
+      },
+      {
+        "value": "859",
+        "label": "Lexington, Verona"
+      }
+    ]
+  },
+  {
+    "state_code": "LA",
+    "state_name": "Louisiana",
+    "area_codes": [
+      {
+        "value": "225",
+        "label": "Baton Rouge"
+      },
+      {
+        "value": "318",
+        "label": "Bossier City, Monroe, Shreveport"
+      },
+      {
+        "value": "337",
+        "label": "Lafayette, Lake Charles"
+      },
+      {
+        "value": "504",
+        "label": "Kenner, Metairie, New Orleans"
+      },
+      {
+        "value": "985",
+        "label": "Laplace, St. Rose"
+      }
+    ]
+  },
+  {
+    "state_code": "MA",
+    "state_name": "Massachusetts",
+    "area_codes": [
+      {
+        "value": "413",
+        "label": "Chicopee, Pittsfield, Springfield"
+      },
+      {
+        "value": "508",
+        "label": "Brockton, Fall River, Framingham, New Bedford, Taunton, Worcester, Shrewsbury"
+      },
+      {
+        "value": "774",
+        "label": "Brockton, Fall River, Framingham, New Bedford, Taunton, Worcester, Shrewsbury"
+      },
+      {
+        "value": "617",
+        "label": "Boston, Cambridge, Newton, Quincy, Waltham, Roslindale"
+      },
+      {
+        "value": "857",
+        "label": "Boston, Cambridge, Newton, Quincy, Waltham, Roslindale"
+      },
+      {
+        "value": "781",
+        "label": "Lynn, Malden, Medford, Waltham, Weymouth"
+      },
+      {
+        "value": "339",
+        "label": "Lynn, Malden, Medford, Waltham, Weymouth"
+      },
+      {
+        "value": "978",
+        "label": "Haverhill, Lawrence, Lowell"
+      },
+      {
+        "value": "351",
+        "label": "Haverhill, Lawrence, Lowell"
+      }
+    ]
+  },
+  {
+    "state_code": "MD",
+    "state_name": "Maryland",
+    "area_codes": [
+      {
+        "value": "301",
+        "label": "Aspen Hill, Bethesda, Bowie, Frederick, Gaithersburg, Germantown, Silver Spring, Wheaton-Glenmont"
+      },
+      {
+        "value": "240",
+        "label": "Aspen Hill, Bethesda, Bowie, Frederick, Gaithersburg, Germantown, Silver Spring, Wheaton-Glenmont"
+      },
+      {
+        "value": "410",
+        "label": "Baltimore, Columbia, Dundalk, Ellicott City, Towson"
+      },
+      {
+        "value": "443",
+        "label": "Baltimore, Columbia, Dundalk, Ellicott City, Towson"
+      },
+      {
+        "value": "667",
+        "label": "Baltimore, Columbia, Dundalk, Ellicott City, Towson"
+      }
+    ]
+  },
+  {
+    "state_code": "ME",
+    "state_name": "Maine",
+    "area_codes": [
+      {
+        "value": "207",
+        "label": "Portland"
+      }
+    ]
+  },
+  {
+    "state_code": "MI",
+    "state_name": "Michigan",
+    "area_codes": [
+      {
+        "value": "231",
+        "label": "Muskegon, Shelby"
+      },
+      {
+        "value": "248",
+        "label": "Farmington Hills, Pontiac, Rochester Hills, Royal Oak, Southfield, Troy, Waterford"
+      },
+      {
+        "value": "947",
+        "label": "Farmington Hills, Pontiac, Rochester Hills, Royal Oak, Southfield, Troy, Waterford"
+      },
+      {
+        "value": "269",
+        "label": "Battle Creek, Battlecreek, Kalamazoo"
+      },
+      {
+        "value": "313",
+        "label": "Dearborn, Dearborn Heights, Detroit, Redford, Taylor"
+      },
+      {
+        "value": "517",
+        "label": "Clinton, Lansing, Charlotte, Charolette"
+      },
+      {
+        "value": "586",
+        "label": "St. Clair Shores, Sterling Heights, Warren"
+      },
+      {
+        "value": "616",
+        "label": "Grand Rapids, Wyoming"
+      },
+      {
+        "value": "734",
+        "label": "Ann Arbor, Canton, Livonia, Westland"
+      },
+      {
+        "value": "810",
+        "label": "Flint"
+      },
+      {
+        "value": "906",
+        "label": "Sainte Marie"
+      },
+      {
+        "value": "989",
+        "label": "Saginaw"
+      }
+    ]
+  },
+  {
+    "state_code": "MN",
+    "state_name": "Minnesota",
+    "area_codes": [
+      {
+        "value": "218",
+        "label": "Duluth"
+      },
+      {
+        "value": "320",
+        "label": "St Cloud, Vado"
+      },
+      {
+        "value": "507",
+        "label": "Rochester, Medford"
+      },
+      {
+        "value": "612",
+        "label": "Minneapolis"
+      },
+      {
+        "value": "651",
+        "label": "St. Paul, St Paul"
+      },
+      {
+        "value": "763",
+        "label": "Brooklyn Park, Coon Rapids, Maple Grove, Plymouth"
+      },
+      {
+        "value": "952",
+        "label": "Bloomington, Burnsville, Minnetonka"
+      }
+    ]
+  },
+  {
+    "state_code": "MO",
+    "state_name": "Missouri",
+    "area_codes": [
+      {
+        "value": "314",
+        "label": "Florissant, St. Louis"
+      },
+      {
+        "value": "417",
+        "label": "Springfield, Jonesboro, Joplin"
+      },
+      {
+        "value": "573",
+        "label": "Columbia"
+      },
+      {
+        "value": "636",
+        "label": "St. Charles, St. Peters, Cedar Hill"
+      },
+      {
+        "value": "660",
+        "label": "Clinton, Warrensburg"
+      },
+      {
+        "value": "816",
+        "label": "Independence, Kansas City, Lee's Summit, St. Joseph, Odessa"
+      }
+    ]
+  },
+  {
+    "state_code": "MS",
+    "state_name": "Mississippi",
+    "area_codes": [
+      {
+        "value": "228",
+        "label": "Biloxi, Gulfport"
+      },
+      {
+        "value": "601",
+        "label": "Jackson, Laurel"
+      },
+      {
+        "value": "769",
+        "label": "Jackson, Laurel"
+      },
+      {
+        "value": "662",
+        "label": "Greenville, Tupelo"
+      }
+    ]
+  },
+  {
+    "state_code": "MT",
+    "state_name": "Montana",
+    "area_codes": [
+      {
+        "value": "406",
+        "label": "Billings, Great Falls, Missoula, Helena"
+      }
+    ]
+  },
+  {
+    "state_code": "NE",
+    "state_name": "Nebraska",
+    "area_codes": [
+      {
+        "value": "308",
+        "label": "North Platte, Scottsbluff"
+      },
+      {
+        "value": "402",
+        "label": "Lincoln, Omaha"
+      },
+      {
+        "value": "531",
+        "label": "Lincoln, Omaha"
+      }
+    ]
+  },
+  {
+    "state_code": "NV",
+    "state_name": "Nevada",
+    "area_codes": [
+      {
+        "value": "702",
+        "label": "Henderson, Las Vegas, Paradise, Spring Valley, Sunrise Manor"
+      },
+      {
+        "value": "725",
+        "label": "Henderson, Las Vegas, Paradise, Spring Valley, Sunrise Manor"
+      },
+      {
+        "value": "775",
+        "label": "Carson City, Reno, Sparks"
+      }
+    ]
+  },
+  {
+    "state_code": "NH",
+    "state_name": "New Hampshire",
+    "area_codes": [
+      {
+        "value": "603",
+        "label": "Manchester, Nashua"
+      }
+    ]
+  },
+  {
+    "state_code": "NJ",
+    "state_name": "New Jersey",
+    "area_codes": [
+      {
+        "value": "201",
+        "label": "Bayonne, Jersey City, Union City, Hackensack"
+      },
+      {
+        "value": "551",
+        "label": "Bayonne, Jersey City, Union City, Hackensack"
+      },
+      {
+        "value": "609",
+        "label": "Trenton"
+      },
+      {
+        "value": "640",
+        "label": "Trenton"
+      },
+      {
+        "value": "732",
+        "label": "Brick Township, Edison, Toms River"
+      },
+      {
+        "value": "848",
+        "label": "Brick Township, Edison, Toms River"
+      },
+      {
+        "value": "856",
+        "label": "Camden, Vineland"
+      },
+      {
+        "value": "908",
+        "label": "Elizabeth"
+      },
+      {
+        "value": "973",
+        "label": "Clifton, East Orange, Irvington, Newark, Passaic, Paterson, Wayne"
+      },
+      {
+        "value": "862",
+        "label": "Clifton, East Orange, Irvington, Newark, Passaic, Paterson, Wayne"
+      }
+    ]
+  },
+  {
+    "state_code": "NM",
+    "state_name": "New Mexico",
+    "area_codes": [
+      {
+        "value": "505",
+        "label": "Albuquerque, Farmington, Gallup, Santa Fe"
+      },
+      {
+        "value": "575",
+        "label": "Alamogordo, Las Cruces, Rio Rancho, Anthony, Carlsbad"
+      }
+    ]
+  },
+  {
+    "state_code": "NY",
+    "state_name": "New York",
+    "area_codes": [
+      {
+        "value": "212",
+        "label": "New York City - Manhattan area, Bronx, Brooklyn, Queens"
+      },
+      {
+        "value": "917",
+        "label": "New York City, New York City - Manhattan area, Bronx, Brooklyn, Queens"
+      },
+      {
+        "value": "332",
+        "label": "New York City - Manhattan area, Bronx, Brooklyn, Queens"
+      },
+      {
+        "value": "646",
+        "label": "New York City - Manhattan area, Bronx, Brooklyn, Queens"
+      },
+      {
+        "value": "315",
+        "label": "Syracuse, Utica, Rome"
+      },
+      {
+        "value": "680",
+        "label": "Syracuse, Utica, Rome"
+      },
+      {
+        "value": "516",
+        "label": "Hempstead"
+      },
+      {
+        "value": "518",
+        "label": "Albany, Schenectady"
+      },
+      {
+        "value": "838",
+        "label": "Albany, Schenectady"
+      },
+      {
+        "value": "585",
+        "label": "Rochester"
+      },
+      {
+        "value": "607",
+        "label": "Endicott, Ithaca"
+      },
+      {
+        "value": "631",
+        "label": "Babylon, Brentwood, Brookhaven, Southampton"
+      },
+      {
+        "value": "934",
+        "label": "Babylon, Brentwood, Brookhaven, Southampton"
+      },
+      {
+        "value": "716",
+        "label": "Buffalo, Cheektowaga, Niagara Falls, Tonawanda, Scranton, Hamburg"
+      },
+      {
+        "value": "929",
+        "label": "New York City"
+      },
+      {
+        "value": "347",
+        "label": "New York City, Flushing"
+      },
+      {
+        "value": "845",
+        "label": "Cornwall, Montgomery, Woodstock"
+      },
+      {
+        "value": "914",
+        "label": "Mount Vernon, New Rochelle, White Plains, Yonkers"
+      }
+    ]
+  },
+  {
+    "state_code": "NC",
+    "state_name": "North Carolina",
+    "area_codes": [
+      {
+        "value": "252",
+        "label": "Greenville, Rocky Mount"
+      },
+      {
+        "value": "336",
+        "label": "Greensboro, High Point, Winston-Salem"
+      },
+      {
+        "value": "743",
+        "label": "Greensboro, High Point, Winston-Salem"
+      },
+      {
+        "value": "704",
+        "label": "Charlotte, Concord, Gastonia"
+      },
+      {
+        "value": "980",
+        "label": "Charlotte, Concord, Gastonia"
+      },
+      {
+        "value": "828",
+        "label": "Asheville, Hickory"
+      },
+      {
+        "value": "910",
+        "label": "Fayetteville, Jacksonville, Wilmington"
+      },
+      {
+        "value": "919",
+        "label": "Cary, Durham, Raleigh, Louisburg"
+      },
+      {
+        "value": "984",
+        "label": "Cary, Durham, Raleigh, Louisburg"
+      }
+    ]
+  },
+  {
+    "state_code": "ND",
+    "state_name": "North Dakota",
+    "area_codes": [
+      {
+        "value": "701",
+        "label": "Bismarck, Fargo"
+      }
+    ]
+  },
+  {
+    "state_code": "OH",
+    "state_name": "Ohio",
+    "area_codes": [
+      {
+        "value": "216",
+        "label": "Cleveland, Euclid, Lakewood, Parma"
+      },
+      {
+        "value": "330",
+        "label": "Akron, Canton, Youngstown"
+      },
+      {
+        "value": "234",
+        "label": "Akron, Canton, Youngstown"
+      },
+      {
+        "value": "419",
+        "label": "Sandusky, Toledo"
+      },
+      {
+        "value": "567",
+        "label": "Sandusky, Toledo"
+      },
+      {
+        "value": "440",
+        "label": "Elyria, Lorain, Mentor, Walton Hills"
+      },
+      {
+        "value": "513",
+        "label": "Cincinnati, Hamilton"
+      },
+      {
+        "value": "614",
+        "label": "Columbus"
+      },
+      {
+        "value": "380",
+        "label": "Columbus"
+      },
+      {
+        "value": "740",
+        "label": "Chillicothe, Zanesville"
+      },
+      {
+        "value": "220",
+        "label": "Chillicothe, Zanesville"
+      },
+      {
+        "value": "937",
+        "label": "Dayton, Kettering, Springfield"
+      }
+    ]
+  },
+  {
+    "state_code": "OK",
+    "state_name": "Oklahoma",
+    "area_codes": [
+      {
+        "value": "405",
+        "label": "Midwest City, Norman, Oklahoma City"
+      },
+      {
+        "value": "580",
+        "label": "Lawton"
+      },
+      {
+        "value": "918",
+        "label": "Broken Arrow, Tulsa"
+      },
+      {
+        "value": "539",
+        "label": "Broken Arrow, Tulsa"
+      }
+    ]
+  },
+  {
+    "state_code": "OR",
+    "state_name": "Oregon",
+    "area_codes": [
+      {
+        "value": "503",
+        "label": "Beaverton, Gresham, Hillsboro, Portland, Salem, Milwaukie"
+      },
+      {
+        "value": "971",
+        "label": "Beaverton, Gresham, Hillsboro, Portland, Salem, Milwaukie"
+      },
+      {
+        "value": "541",
+        "label": "Bend, Eugene, Medford, Springfield"
+      },
+      {
+        "value": "458",
+        "label": "Bend, Eugene, Medford, Springfield"
+      }
+    ]
+  },
+  {
+    "state_code": "PA",
+    "state_name": "Pennsylvania",
+    "area_codes": [
+      {
+        "value": "215",
+        "label": "Levittown, Philadelphia"
+      },
+      {
+        "value": "445",
+        "label": "Levittown, Philadelphia"
+      },
+      {
+        "value": "267",
+        "label": "Levittown, Philadelphia"
+      },
+      {
+        "value": "412",
+        "label": "Pittsburgh"
+      },
+      {
+        "value": "878",
+        "label": "Pittsburgh, Elwood City, Kensington"
+      },
+      {
+        "value": "570",
+        "label": "Scranton, Wilkes-Barre"
+      },
+      {
+        "value": "272",
+        "label": "Scranton, Wilkes-Barre"
+      },
+      {
+        "value": "610",
+        "label": "Allentown, Bethlehem, Reading, Plymouth Meeting, Plymouth Meeting"
+      },
+      {
+        "value": "484",
+        "label": "Allentown, Bethlehem, Reading, Plymouth Meeting, Plymouth Meeting"
+      },
+      {
+        "value": "717",
+        "label": "Lancaster"
+      },
+      {
+        "value": "223",
+        "label": "Lancaster"
+      },
+      {
+        "value": "724",
+        "label": "Elwood City, Kensington"
+      },
+      {
+        "value": "814",
+        "label": "Erie"
+      }
+    ]
+  },
+  {
+    "state_code": "PR",
+    "state_name": "Puerto Rico",
+    "area_codes": [
+      {
+        "value": "787",
+        "label": "Arecibo, Humacao, San Juan, Trujillo Alto"
+      },
+      {
+        "value": "939",
+        "label": "Arecibo, Humacao, San Juan, Trujillo Alto"
+      }
+    ]
+  },
+  {
+    "state_code": "RI",
+    "state_name": "Rhode Island",
+    "area_codes": [
+      {
+        "value": "401",
+        "label": "Cranston, Pawtucket, Providence, Warwick"
+      }
+    ]
+  },
+  {
+    "state_code": "SC",
+    "state_name": "South Carolina",
+    "area_codes": [
+      {
+        "value": "803",
+        "label": "Columbia"
+      },
+      {
+        "value": "843",
+        "label": "Charleston, Florence, Myrtle Beach"
+      },
+      {
+        "value": "854",
+        "label": "Charleston"
+      },
+      {
+        "value": "864",
+        "label": "Greenville"
+      }
+    ]
+  },
+  {
+    "state_code": "SD",
+    "state_name": "South Dakota",
+    "area_codes": [
+      {
+        "value": "605",
+        "label": "Rapid City, Sioux Falls"
+      }
+    ]
+  },
+  {
+    "state_code": "TN",
+    "state_name": "Tennessee",
+    "area_codes": [
+      {
+        "value": "423",
+        "label": "Chattanooga, Johnson City, Jonesboro"
+      },
+      {
+        "value": "615",
+        "label": "Murfreesboro, Nashville"
+      },
+      {
+        "value": "629",
+        "label": "Murfreesboro, Nashville"
+      },
+      {
+        "value": "731",
+        "label": "Jackson"
+      },
+      {
+        "value": "865",
+        "label": "Knoxville"
+      },
+      {
+        "value": "901",
+        "label": "Memphis"
+      },
+      {
+        "value": "931",
+        "label": "Clarksville"
+      }
+    ]
+  },
+  {
+    "state_code": "TX",
+    "state_name": "Texas",
+    "area_codes": [
+      {
+        "value": "210",
+        "label": "San Antonio"
+      },
+      {
+        "value": "726",
+        "label": "San Antonio"
+      },
+      {
+        "value": "214",
+        "label": "Arlington, Carrollton, Dallas, Flower Mound, Garland, Grand Prairie, Irving, Lewisville, McKinney, Mesquite, Plano, Richardson"
+      },
+      {
+        "value": "972",
+        "label": "Arlington, Carrollton, Dallas, Flower Mound, Garland, Grand Prairie, Irving, Lewisville, McKinney, Mesquite, Plano, Richardson"
+      },
+      {
+        "value": "469",
+        "label": "Arlington, Carrollton, Dallas, Flower Mound, Garland, Grand Prairie, Irving, Lewisville, McKinney, Mesquite, Plano, Richardson, Frisco"
+      },
+      {
+        "value": "254",
+        "label": "Killeen, Kileen, Temple, Waco"
+      },
+      {
+        "value": "325",
+        "label": "Abilene, San Angelo"
+      },
+      {
+        "value": "361",
+        "label": "Corpus Christi, Victoria"
+      },
+      {
+        "value": "409",
+        "label": "Beaumont, Galveston, Port Arthur"
+      },
+      {
+        "value": "432",
+        "label": "Midland, Odessa"
+      },
+      {
+        "value": "512",
+        "label": "Austin, Round Rock, Kyle"
+      },
+      {
+        "value": "737",
+        "label": "Austin, Round Rock, Kyle"
+      },
+      {
+        "value": "713",
+        "label": "Baytown, Houston, Missouri City, Pasadena, Sugar Land, The Woodlands, Homestead, Humble"
+      },
+      {
+        "value": "832",
+        "label": "Baytown, Houston, Missouri City, Pasadena, Sugar Land, The Woodlands, Homestead, Humble"
+      },
+      {
+        "value": "346",
+        "label": "Baytown, Houston, Missouri City, Pasadena, Sugar Land, The Woodlands, Homestead, Humble"
+      },
+      {
+        "value": "281",
+        "label": "Baytown, Houston, Missouri City, Pasadena, Sugar Land, The Woodlands, Homestead, Humble"
+      },
+      {
+        "value": "806",
+        "label": "Amarillo, Lubbock"
+      },
+      {
+        "value": "817",
+        "label": "Arlington, Fort Worth, North Richland Hills"
+      },
+      {
+        "value": "682",
+        "label": "Arlington, Fort Worth, North Richland Hills"
+      },
+      {
+        "value": "830",
+        "label": "Boerne, Canyon Lake, Gonzales"
+      },
+      {
+        "value": "903",
+        "label": "Longview, Tyler"
+      },
+      {
+        "value": "430",
+        "label": "Longview, Tyler"
+      },
+      {
+        "value": "915",
+        "label": "El Paso, Cantutillo, Canutillo"
+      },
+      {
+        "value": "936",
+        "label": "Diboll, Lufkin, Waller"
+      },
+      {
+        "value": "940",
+        "label": "Bowie, Lake Dallas, Wichita Falls"
+      },
+      {
+        "value": "956",
+        "label": "Brownsville, Harlingen, Laredo, McAllen"
+      },
+      {
+        "value": "979",
+        "label": "Bryan, College Station"
+      }
+    ]
+  },
+  {
+    "state_code": "UT",
+    "state_name": "Utah",
+    "area_codes": [
+      {
+        "value": "435",
+        "label": "Brigham City, Logan, Tremonton, Lake Point, Moab"
+      },
+      {
+        "value": "801",
+        "label": "Layton, Ogden, Orem, Provo, Salt Lake City, Sandy, Taylorsville, West Jordan, West Valley City, Lake Point"
+      },
+      {
+        "value": "385",
+        "label": "Layton, Ogden, Orem, Provo, Salt Lake City, Sandy, Taylorsville, West Jordan, West Valley City, Lake Point"
+      }
+    ]
+  },
+  {
+    "state_code": "VA",
+    "state_name": "Virginia",
+    "area_codes": [
+      {
+        "value": "276",
+        "label": "Castlewood, Hillsville, Woodlawn"
+      },
+      {
+        "value": "434",
+        "label": "Lynchburg"
+      },
+      {
+        "value": "540",
+        "label": "Roanoke"
+      },
+      {
+        "value": "703",
+        "label": "Alexandria, Annandale, Arlington, Burke, Dale City, Reston, Fairfax"
+      },
+      {
+        "value": "571",
+        "label": "Alexandria, Annandale, Arlington, Burke, Dale City, Reston"
+      },
+      {
+        "value": "757",
+        "label": "Chesapeake, Hampton, Newport News, Norfolk, Portsmouth, Suffolk, Virginia Beach"
+      },
+      {
+        "value": "804",
+        "label": "Richmond"
+      }
+    ]
+  },
+  {
+    "state_code": "VT",
+    "state_name": "Vermont",
+    "area_codes": [
+      {
+        "value": "802",
+        "label": "Colchester, Burlington"
+      }
+    ]
+  },
+  {
+    "state_code": "WA",
+    "state_name": "Washington",
+    "area_codes": [
+      {
+        "value": "206",
+        "label": "Kent, Seattle, Shoreline"
+      },
+      {
+        "value": "253",
+        "label": "Federal Way, Lakewood, Tacoma"
+      },
+      {
+        "value": "360",
+        "label": "Belingham, Vancouver, Chehalis, Tumwater"
+      },
+      {
+        "value": "564",
+        "label": "Belingham, Vancouver, Chehalis, Tumwater"
+      },
+      {
+        "value": "425",
+        "label": "Bellevue, Everett, Renton"
+      },
+      {
+        "value": "509",
+        "label": "Kennewick, Spokane, Yakima"
+      }
+    ]
+  },
+  {
+    "state_code": "WI",
+    "state_name": "Wisconsin",
+    "area_codes": [
+      {
+        "value": "262",
+        "label": "Kenosha, Racine"
+      },
+      {
+        "value": "414",
+        "label": "Milwaukee"
+      },
+      {
+        "value": "608",
+        "label": "Janesville, La Crosse, Madison"
+      },
+      {
+        "value": "715",
+        "label": "Eau Claire"
+      },
+      {
+        "value": "534",
+        "label": "Eau Claire"
+      },
+      {
+        "value": "920",
+        "label": "Appleton, Green Bay, Oshkosh, Sheboygan"
+      }
+    ]
+  },
+  {
+    "state_code": "WV",
+    "state_name": "West Virginia",
+    "area_codes": [
+      {
+        "value": "304",
+        "label": "Charleston, Huntington, Ellenboro"
+      },
+      {
+        "value": "681",
+        "label": "Charleston, Huntington"
+      }
+    ]
+  },
+  {
+    "state_code": "WY",
+    "state_name": "Wyoming",
+    "area_codes": [
+      {
+        "value": "307",
+        "label": "Cheyenne"
+      }
+    ]
+  }
+]

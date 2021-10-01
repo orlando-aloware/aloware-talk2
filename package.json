@@ -18,6 +18,7 @@
     "deploy-win32": "quasar build -m electron -T win32 -b builder -P always"
   },
   "dependencies": {
+    "@gkt/microphone": "^1.0.3",
     "@popperjs/core": "^2.9.2",
     "@quasar/extras": "^1.9.15",
     "@sentry/vue": "^6.0.3",
@@ -52,6 +53,7 @@
     "vue": "^2.6.12",
     "vue-at": "^2.5.0-beta",
     "vue-bootstrap-typeahead": "^0.2.6",
+    "vue-business-hours": "^1.4.1",
     "vue-ctk-date-time-picker": "^2.5.0",
     "vue-custom-scrollbar": "^1.4.0",
     "vue-filter-number-format": "^3.0.1",

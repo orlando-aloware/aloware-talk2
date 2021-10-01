@@ -553,6 +553,16 @@ const parseMentionToMarkup = (content) => {
 // eslint-disable-next-line no-return-assign,no-sequences
 const sortObjectByKey = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {})
 
+const objAlphabeticalOrder = (object, sortProp) => {
+  object = object.sort((a, b) => {
+    let textA = a[sortProp].toUpperCase()
+    let textB = b[sortProp].toUpperCase()
+    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+  })
+
+  return object
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -587,7 +597,8 @@ export default ({ Vue }) => {
     numberPlusFormatter,
     parseMentionToView,
     parseMentionToMarkup,
-    sortObjectByKey
+    sortObjectByKey,
+    objAlphabeticalOrder
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
