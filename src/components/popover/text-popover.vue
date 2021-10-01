@@ -6,8 +6,8 @@
       v-show="active"
       outlined
       v-model="content"
+      class="mr-2 input-field-shadow rounded-input"
       :ref="referenceName"
-      class="pr-2"
       @keyup.enter="handleInput"
       @keyup.esc="closeInput"
       @blur="handleInput" />

@@ -66,7 +66,7 @@
                 draggable="false"
                 :key="`add-metrics-` + metricGroupId"
                 :metric-group="{ id: metricGroupId, name: metricGroupName }"
-                @toggle-loader="toggleLoad" />
+                @toggle-loader="toggleLoad"/>
             </transition-group>
           </Draggable>
         </template>
@@ -259,6 +259,9 @@ export default {
     },
     toggleLoad (val) {
       this.loader = val
+      if (!this.loader && this.metricsList.length !== this.resources.agent_metrics.length) {
+        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      }
     },
     async updateSortedMetric (val) {
       if (typeof val.moved === 'undefined') {
@@ -320,12 +323,6 @@ export default {
     },
     resources () {
       this.timeline = this.resources.date_range_type
-    },
-    'resources.agent_metrics': {
-      deep: true,
-      handler: function () {
-        this.metricsList = this.resources.agent_metrics ? JSON.parse(JSON.stringify(this.resources.agent_metrics)) : []
-      }
     }
   }
 }

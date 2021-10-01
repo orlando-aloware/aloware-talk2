@@ -909,6 +909,7 @@ export default {
           this.loadingAvailableMetrics = false
           if (_.isEmpty(response.data)) {
             this.setAvailableMetrics([])
+            return
           }
 
           let structuredMetricGroups = []
@@ -959,6 +960,11 @@ export default {
         })
         .then(response => {
           this.loadingMetricGroups = false
+          if (_.isEmpty(response.data)) {
+            this.setMetricGroups([])
+            return
+          }
+
           for (let index in response.data) {
             if (typeof response.data[index].agent_metrics === 'undefined') {
               continue
