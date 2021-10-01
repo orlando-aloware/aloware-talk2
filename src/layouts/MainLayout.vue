@@ -1496,21 +1496,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@media (min-height: 439px) {
-  .sidebar-wrapper {
-    & .sidebar {
-      & .q-list {
-        height: 100% !important;
-      }
-    }
-  }
-}
-
-.guest {
-  & .main-content {
-    padding: 0 !important;
-  }
-}
-</style>
