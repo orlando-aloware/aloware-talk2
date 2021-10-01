@@ -243,6 +243,33 @@ export const fixDuration = (duration, forceDuration = false) => {
 }
 
 /**
+ * Fix full duration
+ * @param duration
+ * @returns {string|*}
+ */
+export const fixFullDuration = (duration) => {
+  if (duration !== undefined) {
+    let seconds = duration
+    let hour = Math.floor(seconds / 3600)
+    let min = Math.floor(seconds / 60 % 60)
+    let sec = Math.floor(seconds % 60)
+    let result = ''
+
+    if (hour) {
+      result += `${hour}h`
+    }
+
+    if (min) {
+      result += `${min}m`
+    }
+
+    return result + `${sec}s`
+  } else {
+    return '-'
+  }
+}
+
+/**
  * Humanize duration
  * @param duration
  * @returns {string|*}
@@ -397,6 +424,7 @@ export default ({ Vue }) => {
     fixTime,
     fixTimeLocal,
     fixDuration,
+    fixFullDuration,
     humanizeDuration,
     fixDurationHumanize,
     fixDurationUTCRelative,

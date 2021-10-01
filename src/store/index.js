@@ -10,6 +10,7 @@ import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
 import settings from './settings'
+import stats from './stats'
 
 Vue.use(Vuex)
 
@@ -28,7 +29,8 @@ export default function (/* { ssrContext } */) {
       auth,
       contacts,
       inbox,
-      settings
+      settings,
+      stats
     },
     state: {
       filter: {},

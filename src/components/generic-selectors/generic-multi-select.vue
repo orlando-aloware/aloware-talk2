@@ -107,7 +107,8 @@
     <div class="list-wrapper"
          v-else>
       <div class="selected-items-wrapper">
-        <div v-for="item in formattedValues"
+        <div class="d-inline-block"
+             v-for="item in formattedValues"
              :key="item.id">
         <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
           <q-badge class="is-dot mx-1"

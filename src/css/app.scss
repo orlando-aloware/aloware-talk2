@@ -4,6 +4,8 @@
 @import 'fonts.scss';
 @import 'variables.scss';
 @import 'svg.scss';
+@import 'components/styles.scss';
+
 
 html {
   overflow-y: hidden;
@@ -187,6 +189,9 @@ body,
   .page-container {
     padding: 0 0 0 0 !important;
     margin: 0 0 0 0 !important;
+  }
+  & .main-content {
+    padding: 0 !important;
   }
 }
 
@@ -4207,7 +4212,7 @@ span.mention {
     overflow: hidden !important;
 
     .filter-list {
-      height: calc(100vh - 332px);
+      height: calc(100vh - 220px);
       overflow: auto;
     }
   }
@@ -4269,6 +4274,23 @@ span.mention {
   border: solid 1px $grey-light3;
   @include border-radius(10px);
   overflow: hidden;
+
+  &.no-border {
+    border: 0;
+  }
+
+  &.dashed {
+    border-style: dashed;
+    cursor: pointer;
+    background-color: lighten(grey, 47%);
+
+    .row {
+      color: darken(grey, 5%) !important;
+      span {
+        font-size: 32px;
+      }
+    }
+  }
 }
 
 .mycard--shadow {
@@ -5497,10 +5519,6 @@ table.datatable {
 }
 
 .custom-multi-select {
-  .multiselect__content-wrapper {
-    overflow: hidden;
-  }
-
   .multiselect__option {
     padding: 5px !important;
   }
@@ -6535,7 +6553,7 @@ table.datatable {
 }
 
 div.q-menu {
-  min-width: 0 !important;
+  min-width: 0;
 }
 
 button.primary {
@@ -6996,6 +7014,9 @@ button.grey-90 {
   }
 }
 
+.ml-7 {
+  margin-left: 5rem !important;
+}
 
 .settings-form-wrapper {
 
@@ -7029,7 +7050,6 @@ button.grey-90 {
 .q-item__label {
   font-weight: normal !important;
 }
-
 
 .flex-table {
   display: flex;
@@ -7141,3 +7161,37 @@ button.grey-90 {
   padding: 5px;
   text-align: left;
 }
+
+.filter-types {
+  .q-field__native.row {
+    .q-field__input {
+      padding-left: 0 !important;
+    }
+  }
+  .b-calendar-inner {
+    min-width: 215px !important;
+    width: 215px !important;
+  }
+}
+
+.input-field-shadow {
+  box-shadow: 0px 0px 0px 1.5px rgba(37, 110, 255, 0.12);
+  border-radius: 6px;
+}
+
+.rounded-input {
+  .q-field__control {
+    border-radius: 6px;
+  }
+}
+
+@media (min-height: 378px) {
+  .sidebar-wrapper {
+    & .sidebar {
+      & .q-list {
+        height: 100% !important;
+      }
+    }
+  }
+}
+

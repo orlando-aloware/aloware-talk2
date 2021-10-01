@@ -1,9 +1,10 @@
 <template>
   <div class="h-100"
        :class="[
-      authenticated ? 'dashboard' : 'guest',
-      lightMode ? 'light-mode' : 'night-mode'
-    ]">
+          authenticated ? 'dashboard' : 'guest',
+          lightMode ? 'light-mode' : 'night-mode'
+        ]"
+       v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               :height="'100%'">
@@ -158,6 +159,7 @@ import Dialer from '../components/dialer/dialer'
 import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import _ from 'lodash'
 
 export default {
@@ -185,6 +187,8 @@ export default {
       loadingTemplates: false,
       loadingBroadcasts: false,
       loadingFilters: false,
+      loadingAvailableMetrics: false,
+      loadingMetricGroups: false,
       isWidget: false,
       enableAudio: false,
       transitionName: null,
@@ -206,13 +210,18 @@ export default {
       reminderNotifiedDesktop: [],
       sidebarVisible: false,
       lightMode: true,
-      CommunicationTypes
+      CommunicationTypes,
+      MetricOptionGroups
     }
   },
 
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('stats', ['availableMetrics']),
+    isGuest () {
+      return _.get(this.$route.meta, 'isGuest', false)
+    }
   },
 
   created () {
@@ -454,8 +463,18 @@ export default {
         this.authCheckStatus = true
         this.showRefreshButton = false
       }).catch(() => {
-        if (this.$route.name !== 'Login') {
-          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } }).catch((err) => {
+        if (!this.isGuest) {
+          let route = {
+            name: 'Login'
+          }
+
+          if (this.$route.fullPath !== '/') {
+            route.query = {
+              redirect: this.$route.fullPath
+            }
+          }
+
+          this.$router.push(route).catch((err) => {
             console.log(err)
             this.showRefreshButton = true
           })
@@ -888,6 +907,113 @@ export default {
       }
     },
 
+    getAvailableMetrics: function () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingAvailableMetrics = true
+      this.$axios
+        .get('/api/v2/agents/metrics', {
+          params: {
+            group_by_category: true
+          }
+        })
+        .then(response => {
+          this.loadingAvailableMetrics = false
+          if (_.isEmpty(response.data)) {
+            this.setAvailableMetrics([])
+            return
+          }
+
+          let structuredMetricGroups = []
+          const availableMetrics = response.data
+          for (let index in availableMetrics) {
+            const optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
+            const categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
+            structuredMetricGroups.push({
+              disable: true,
+              value: null,
+              label: categoryLabel
+            })
+
+            if (availableMetrics[index].constructor.name === 'Array') {
+              for (let option of availableMetrics[index]) {
+                option.disable = false
+                option.categoryLabel = categoryLabel
+                structuredMetricGroups.push(option)
+              }
+            }
+
+            if (availableMetrics[index].constructor.name === 'Object') {
+              for (let key of Object.keys(availableMetrics[index])) {
+                availableMetrics[index][key].disable = false
+                availableMetrics[index][key].categoryLabel = categoryLabel
+                structuredMetricGroups.push(availableMetrics[index][key])
+              }
+            }
+          }
+          this.setAvailableMetrics(structuredMetricGroups)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingAvailableMetrics = false
+          return Promise.reject()
+        })
+    },
+
+    getMetricGroups: function () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingMetricGroups = true
+      this.$axios
+        .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
+          params: {
+            include_metrics: true
+          }
+        })
+        .then(response => {
+          this.loadingMetricGroups = false
+          if (_.isEmpty(response.data)) {
+            this.setMetricGroups([])
+            return
+          }
+
+          for (let index in response.data) {
+            if (typeof response.data[index].agent_metrics === 'undefined') {
+              continue
+            }
+
+            for (let metricIndex in response.data[index].agent_metrics) {
+              const metric = this.availableMetrics.find(metric => metric.metric_id === response.data[index].agent_metrics[metricIndex].metric_id)
+
+              if (!metric) {
+                continue
+              }
+
+              response.data[index].agent_metrics[metricIndex].category = metric.category
+              response.data[index].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
+
+              if (typeof response.data[index].agent_metrics[metricIndex].label !== 'undefined') {
+                continue
+              }
+
+              response.data[index].agent_metrics[metricIndex].label = metric.label
+            }
+          }
+          this.setMetricGroups(response.data)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingMetricGroups = false
+          return Promise.reject()
+        })
+    },
+
     async initAccount () {
       if (this.profile) {
         this.$Sentry.configureScope((scope) => {
@@ -912,6 +1038,8 @@ export default {
         let getTemplates = this.getTemplates()
         let getBroadcasts = this.getBroadcasts()
         let getFilters = this.getFilters()
+        let getAvailableMetrics = this.getAvailableMetrics()
+        let getMetricGroups = this.getMetricGroups()
         await Promise.all([
           getCurrentCompany,
           getCampaigns,
@@ -923,7 +1051,9 @@ export default {
           getCallDispositions,
           getTemplates,
           getBroadcasts,
-          getFilters
+          getFilters,
+          getAvailableMetrics,
+          getMetricGroups
         ])
       }
     },
@@ -1341,7 +1471,8 @@ export default {
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
-    })
+    }),
+    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },
 
   watch: {
@@ -1383,21 +1514,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@media (min-height: 439px) {
-  .sidebar-wrapper {
-    & .sidebar {
-      & .q-list {
-        height: 100% !important;
-      }
-    }
-  }
-}
-
-.guest {
-  & .main-content {
-    padding: 0 !important;
-  }
-}
-</style>

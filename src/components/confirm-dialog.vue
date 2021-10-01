@@ -1,11 +1,13 @@
 <template>
   <b-modal
     :id="id"
-    size="md"
+    :size="size"
     :title="title"
     modal-class="confirm-dialog"
     ref="modal"
     centered
+    :hide-header="hideHeader"
+    :hide-footer="hideFooter"
   >
     <slot name="content" />
     <template slot="modal-footer">
@@ -28,10 +30,22 @@ export default {
     isOpen: {
       type: Boolean,
       default: false
+    },
+    size: {
+      type: String,
+      default: 'md'
+    },
+    hideHeader: {
+      type: Boolean,
+      default: false
+    },
+    hideFooter: {
+      type: Boolean,
+      default: false
     }
   },
   mounted () {
-    this.$refs.modal.$on('close', () => {
+    this.$refs.modal.$on('hidden', () => {
       this.$emit('close')
     })
   }

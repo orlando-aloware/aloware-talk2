@@ -6,16 +6,25 @@ const routes = [
       {
         path: 'login',
         name: 'Login',
+        meta: {
+          isGuest: true
+        },
         component: () => import('pages/Login.vue')
       },
       {
         path: 'forgot-password',
         name: 'Forgot Password',
+        meta: {
+          isGuest: true
+        },
         component: () => import('pages/ForgotPassword.vue')
       },
       {
         path: 'reset/:token',
         name: 'Reset Password',
+        meta: {
+          isGuest: true
+        },
         component: () => import('pages/ResetPassword.vue')
       },
       {
@@ -116,7 +125,7 @@ const routes = [
       {
         path: 'stats',
         name: 'Stats',
-        component: () => import('pages/Stats.vue'),
+        component: () => import('pages/stats/Stats.vue'),
         meta: {
           title: 'Stats'
         }

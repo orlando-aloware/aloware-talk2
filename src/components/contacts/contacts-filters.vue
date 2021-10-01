@@ -93,7 +93,7 @@
                 </template>
                 <compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
-                             @clicked="toAddFiltersStep(visibleListFilters.length, false)">
+                             @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, false)">
                   OR
                 </compact-btn>
               </div>
@@ -196,6 +196,7 @@ export default {
         (!this.filterSearch || !this.filterSearch.length)) {
         return this.filters
       }
+
       return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
     },
 
@@ -228,11 +229,13 @@ export default {
           const filterB = b.label.toUpperCase()
 
           let comparison = 0
+
           if (filterA > filterB) {
             comparison = 1
           } else if (filterA < filterB) {
             comparison = -1
           }
+
           return comparison
         }
 
@@ -253,6 +256,7 @@ export default {
 
   mounted () {
     this.step = 1
+
     if (this.isFiltersOpen) {
       this.show = true
     }
@@ -264,11 +268,14 @@ export default {
     },
 
     toAddFiltersStep (index, conjunction = true, skipStep = false) {
-      if (typeof index === 'number') {
-        this.filterGroupIndex = index
+      // check if index is a number
+      if (!isNaN(index / 1)) {
+        this.filterGroupIndex = parseInt(index)
       }
+
       this.filterConjunction = conjunction
       this.$VueEvent.stop('filters-back')
+
       if (!skipStep) {
         this.step = 2
       }
@@ -281,6 +288,7 @@ export default {
 
     selectFilterByKey (key, index, conjunction) {
       const found = this.filters.find(filter => filter.key === key)
+
       if (found) {
         this.selectedFilter = found
         this.toAddFiltersStep(index, conjunction, true)
@@ -295,6 +303,7 @@ export default {
 
     backToStep () {
       this.$VueEvent.fire('filters-back')
+
       if (this.step > 1) {
         this.step -= 1
         // make all filters visible
@@ -343,6 +352,7 @@ export default {
             }
 
             let newValue = trueValue
+
             if (newValue) {
               newValue = [trueValue.join(' and ')]
             }
@@ -371,6 +381,7 @@ export default {
       if (!filter.trueValue) {
         return ''
       }
+
       const filterFound = this.filters.find(filter => filter.key === key)
       const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
@@ -386,6 +397,7 @@ export default {
             return filter.trueValue.join(' and ')
         }
         let labels = []
+
         if (filterFound && isRelationType) {
           for (let item of values) {
             const optionFound = filterFound.options.find(option => option.value === item)
@@ -394,10 +406,12 @@ export default {
         } else {
           labels = filter.trueValue
         }
+
         const joinedValues = labels.join(', ')
         if (labels > 1) {
           return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
         }
+
         return joinedValues
       } else {
         return !isSimpleType ? filter.trueValue : ''
@@ -411,16 +425,30 @@ export default {
     onDeleteFilter (index, key) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
-      if (_.isEmpty(updatedFilter[index].filters)) {
+
+      if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
       }
+
+      if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Object') {
+        delete updatedFilter[index]
+      }
+
       this.setCurrentListFilters(updatedFilter)
       this.$emit('filtersUpdated')
     },
 
     onDeleteGroupFilter (index) {
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
-      updatedFilter.splice(index, 1)
+
+      if (updatedFilter.constructor.name === 'Array') {
+        updatedFilter.splice(index, 1)
+      }
+
+      if (updatedFilter.constructor.name === 'Object') {
+        delete updatedFilter[index]
+      }
+
       this.setCurrentListFilters(updatedFilter)
       this.$emit('filtersUpdated')
     },
@@ -433,6 +461,7 @@ export default {
           filtersCount += filter ? Object.keys(filter).length : 0
         }
       }
+
       this.$emit('filtersCount', filtersCount)
     },
 

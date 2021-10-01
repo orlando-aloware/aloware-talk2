@@ -1,0 +1,17 @@
+.movable {
+  cursor: move;
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+}
+
+.color-primary {
+  color: $primary;
+}
+
+.color-danger {
+  color: $danger;
+}
+
+.color-black {
+  color: $black;
+}

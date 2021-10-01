@@ -28,7 +28,7 @@
           </div>
           <div class="flex-grow-1">
             <router-link
-              :to="`/contacts/${contact.id}`"
+              :to="generateRoute(contact.id)"
               v-slot="{ href, route, navigate }"
             >
               <a :href="href"
@@ -476,6 +476,19 @@ export default {
         .catch((_err) => {
           // this.$root.handleErrors(err.response)
         })
+    },
+    generateRoute (contactId) {
+      let routeData = {
+        path: `/contacts/${contactId}`
+      }
+
+      if (this.$route.name !== 'Contacts') {
+        routeData.query = {
+          previousPage: this.$route.name
+        }
+      }
+
+      return routeData
     }
   }
 }
