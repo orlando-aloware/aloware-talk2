@@ -194,6 +194,7 @@ export default {
         })
       } else {
         this.$emit('create', {
+          categoryLabel: option ? option.categoryLabel : '',
           label: option ? option.label : '',
           type: option ? option.type : null,
           metricId: this.metric,
