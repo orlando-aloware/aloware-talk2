@@ -39,7 +39,7 @@
                       v-if="scope.opt.disable"
                       class="text-subtitle2 font-weight-bold"
                       disabled label
-                      v-html="scope.opt.label" />
+                      v-html="pluralizeLabel(scope.opt.label)" />
                     <q-item-label
                       v-else
                       v-html="scope.opt.label" />
@@ -226,6 +226,12 @@ export default {
       update(() => {
         this.filteredMetricOptions = this.availableMetrics.filter(metric => metric.label.toLowerCase().indexOf(val.toLowerCase()) !== -1)
       })
+    },
+    pluralizeLabel (label) {
+      if (label && label.toLowerCase()[(label.length - 1)] !== 's') {
+        return `${label}s`
+      }
+      return label
     }
   }
 }

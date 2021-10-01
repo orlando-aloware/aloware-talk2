@@ -19,17 +19,16 @@
           style="font-size: 11px;padding:3px;" />
       </b-badge>
       <q-card flat
-        class="metric-box text-black m-2 p-1">
+        class="metric-box text-black m-2">
         <q-card-actions>
           <div :class="`metric-box-label text-weight-medium text-${color}`">
             <span v-if="metric && metric.category === 'call_metadata'">
-              {{ metricValue | fixFullDuration }}
+              {{ (metric.value ? metric.value : 0) | fixFullDuration }}
             </span>
             <span v-else>
               {{ metricValue }}
             </span>
           </div>
-          <q-space />
           <div
             @click="openEditModal"
             class="metric-floating-btn cursor-pointer mr-2">
@@ -38,8 +37,13 @@
               color="grey" />
           </div>
         </q-card-actions>
-        <q-card-section class="metric-box-desc q-pt-none pt-4">
-          {{ metricName }}
+        <q-card-section class="metric-box-desc q-pt-none">
+          <div class="metric-label w-100 text-truncate">
+            {{ metric.label }}
+          </div>
+          <div class="category-label w-100 text-truncate text-grey-80 fs-12">
+            {{ metricCategory }}
+          </div>
         </q-card-section>
       </q-card>
       <ConfirmDialog
@@ -126,7 +130,7 @@ export default {
     },
     color () {
       let col = this.MetricOptionColors.METRIC_OPTIONS_COLORS.find(c => {
-        return c.value === this.metricColor
+        return c.value === this.metric.color
       })
       if (col) {
         return col.color
@@ -136,22 +140,22 @@ export default {
     },
     preformattedMetric () {
       return {
-        color: this.metricColor,
+        color: this.metric.color,
         metricId: this.metric.metric_id
       }
+    },
+    metricValue () {
+      return this.metric.value ? this.metric.value : 0
+    },
+    metricCategory () {
+      return this.$options.filters.ucwords(this.metric.categoryLabel.replace(/_/g, ' '))
     }
-  },
-  mounted () {
-    this.updateLocalResources()
   },
   data () {
     return {
       hovered: false,
       isOpen: false,
       editModal: false,
-      metricName: '',
-      metricValue: '',
-      metricColor: '',
       loader: false,
       MetricOptionColors
     }
@@ -166,7 +170,6 @@ export default {
     },
     metric () {
       this.loader = false
-      this.updateLocalResources()
     }
   },
   methods: {
@@ -220,11 +223,6 @@ export default {
     },
     openEditModal () {
       this.editModal = true
-    },
-    updateLocalResources () {
-      this.metricName = this.metric.label
-      this.metricValue = this.metric.value ? this.metric.value : 0
-      this.metricColor = this.metric.color
     }
   }
 }
