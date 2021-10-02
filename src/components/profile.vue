@@ -44,7 +44,6 @@
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                   dense
                   clickable>
             <div class="d-flex align-items-center justify-content-between w-100">
@@ -61,10 +60,8 @@
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                   dense
                   clickable>
-
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
@@ -79,10 +76,8 @@
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
                   dense
                   clickable>
-
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
