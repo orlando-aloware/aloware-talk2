@@ -7195,3 +7195,16 @@ button.grey-90 {
   }
 }
 
+.avatar-menu, .tab-avatar-menu {
+
+  min-width: 244px !important;
+
+  .q-list {
+    padding: 10px;
+
+    .q-item {
+      padding: 0 10px;
+      border-radius: 6px;
+    }
+  }
+}
