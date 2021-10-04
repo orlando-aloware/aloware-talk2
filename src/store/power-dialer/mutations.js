@@ -14,10 +14,10 @@ export default {
   },
   SET_LIST_SELECTED_CONTACTS: (state, data) => {
     console.log('data :>> ', data)
-    // state.selectedContacts = {
-    //   ...state.selectedContacts,
-    //   [data.id]: data.contacts
-    // }
+    state.selectedContacts = {
+      ...state.selectedContacts,
+      [data.id]: data.contacts
+    }
   },
 
   /**

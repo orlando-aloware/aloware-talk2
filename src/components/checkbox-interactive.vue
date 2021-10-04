@@ -4,7 +4,7 @@
       type="checkbox"
       class="checker"
       :value="resource.id"
-      :checked="isChecked"
+      :checked="checked"
       @change="onCheckerClicked" />
     <span class="checkmark"></span>
   </label>
@@ -23,6 +23,11 @@ export default {
       default: () => []
     }
   },
+  computed: {
+    checked () {
+      return this.checkedItems.find(item => item.id === this.resource.id)
+    }
+  },
   data () {
     return {
       isChecked: false
@@ -32,7 +37,6 @@ export default {
     onCheckerClicked () {
       let items = []
       let found = this.checkedItems.find(item => item.id === this.resource.id)
-      console.log('found : ', found)
       if (found) {
         items = this.checkedItems.filter(item => item.id !== this.resource.id)
       } else {
