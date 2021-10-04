@@ -89,7 +89,7 @@
 import { mapState } from 'vuex'
 import draggable from 'vuedraggable'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
-import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 
 let column
 let scrollTimeout

@@ -209,7 +209,7 @@ import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import TableRow from 'src/components/table-row.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters'
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
-import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
@@ -239,7 +239,7 @@ export default {
   data () {
     return {
       filterHasChanges: false,
-      defaultContactLists: DEFAULT_CONTACT_LIST,
+      defaultContactLists: DEFAULT_PINNED_LIST,
       isUpdatingList: false
     }
   },

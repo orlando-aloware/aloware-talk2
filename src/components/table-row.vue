@@ -291,7 +291,7 @@
 import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
-import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import CallOIcon from 'components/icons/call-o-icon'
 import MessageOIcon from 'components/icons/message-o-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'

@@ -1,5 +1,7 @@
 <template>
-  <div class="tree-folder" :data-layer="layer">
+  <div class="tree-folder"
+       :data-layer="layer"
+       :class="[isRootList ? 'pl-2' : '']">
     <div
       v-if="!isRootList"
       class="folder d-flex align-items-center"

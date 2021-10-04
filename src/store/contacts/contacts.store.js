@@ -1,9 +1,9 @@
 import {
   DEFAULT_COLUMNS,
-  DEFAULT_CONTACT_LIST_ITEMS,
-  OPERATORS,
   STATIC_COLUMNS
-} from 'src/constants/contacts-list-types'
+} from 'src/constants/contacts-columns'
+import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default function () {
   return {

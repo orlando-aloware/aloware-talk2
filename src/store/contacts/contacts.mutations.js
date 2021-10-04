@@ -1,5 +1,5 @@
 import * as ContactsListDefaultList from 'src/constants/default-lists'
-import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-types'
+import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import Vue from 'vue'
 
 export default {

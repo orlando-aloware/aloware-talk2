@@ -4,19 +4,19 @@ export const METRIC_OPTION_GROUPS = [
     label: 'Contact Disposition'
   },
   {
-    name: 'type_of_calls',
+    name: 'call_types',
     label: 'Call Type'
   },
   {
-    name: 'call_metadata',
+    name: 'call_time_&_duration',
     label: 'Call Time & Duration'
   },
   {
-    name: 'type_of_sms',
+    name: 'sms_type',
     label: 'SMS Type'
   },
   {
-    name: 'type_of_emails',
+    name: 'email_types',
     label: 'Email Type'
   },
   {
