@@ -19,21 +19,18 @@
               dense
               map-options
               emit-value
+              use-input
+              clearable
+              input-debounce="0"
               option-value="metric_id"
               option-label="label"
               ref="statsSelectMetrics"
               v-model="metric"
-              :options="availableMetrics"
+              :options="filteredMetricOptions"
+              :placeholder="placeholder"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-              @popup-show="onShowMetricsMenu">
-              <template v-slot:selected>
-                <template v-if="metric">
-                  {{ getOptionsText(metric) }}
-                </template>
-                <template v-else>
-                  Add Metrics
-                </template>
-              </template>
+              @popup-show="onShowMetricsMenu"
+              @filter="filterFn">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
                   <q-item-section v-if="!scope.opt.disable" avatar></q-item-section>
@@ -42,7 +39,7 @@
                       v-if="scope.opt.disable"
                       class="text-subtitle2 font-weight-bold"
                       disabled label
-                      v-html="scope.opt.label" />
+                      v-html="pluralizeLabel(scope.opt.label)" />
                     <q-item-label
                       v-else
                       v-html="scope.opt.label" />
@@ -145,9 +142,14 @@ export default {
       model: '',
       color: '',
       selectWidth: 0,
+      filteredMetricOptions: [],
+      placeholder: 'Add Metrics',
       MetricOptionColors,
       MetricOptionGroups
     }
+  },
+  mounted () {
+    this.filteredMetricOptions = this.availableMetrics
   },
   watch: {
     isOpen (val) {
@@ -166,6 +168,19 @@ export default {
           this.metric = metricId
         }
       }
+    },
+    availableMetrics: {
+      deep: true,
+      handler: function () {
+        this.filteredMetricOptions = this.availableMetrics
+      }
+    },
+    metric () {
+      if (this.metric) {
+        this.placeholder = ''
+      } else {
+        this.placeholder = 'Add Metrics'
+      }
     }
   },
   methods: {
@@ -179,6 +194,7 @@ export default {
         })
       } else {
         this.$emit('create', {
+          categoryLabel: option ? option.categoryLabel : '',
           label: option ? option.label : '',
           type: option ? option.type : null,
           metricId: this.metric,
@@ -199,6 +215,24 @@ export default {
     },
     onShowMetricsMenu () {
       this.selectWidth = this.$refs.statsSelectMetrics.$el.offsetWidth
+    },
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.filteredMetricOptions = this.availableMetrics
+        })
+        return
+      }
+
+      update(() => {
+        this.filteredMetricOptions = this.availableMetrics.filter(metric => metric.label.toLowerCase().indexOf(val.toLowerCase()) !== -1)
+      })
+    },
+    pluralizeLabel (label) {
+      if (label && label.toLowerCase()[(label.length - 1)] !== 's') {
+        return `${label}s`
+      }
+      return label
     }
   }
 }

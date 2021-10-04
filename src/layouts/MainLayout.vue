@@ -1,9 +1,10 @@
 <template>
   <div class="h-100"
        :class="[
-      authenticated ? 'dashboard' : 'guest',
-      lightMode ? 'light-mode' : 'night-mode'
-    ]">
+          authenticated ? 'dashboard' : 'guest',
+          lightMode ? 'light-mode' : 'night-mode'
+        ]"
+       v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
     <q-layout class="page-layout h-100 pb-sm-0"
               view="lHh Lpr lff"
               :height="'100%'">
@@ -217,7 +218,10 @@ export default {
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns']),
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState('stats', ['availableMetrics'])
+    ...mapState('stats', ['availableMetrics']),
+    isGuest () {
+      return _.get(this.$route.meta, 'isGuest', false)
+    }
   },
 
   created () {
@@ -459,8 +463,18 @@ export default {
         this.authCheckStatus = true
         this.showRefreshButton = false
       }).catch(() => {
-        if (this.$route.name !== 'Login') {
-          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } }).catch((err) => {
+        if (!this.isGuest) {
+          let route = {
+            name: 'Login'
+          }
+
+          if (this.$route.fullPath !== '/') {
+            route.query = {
+              redirect: this.$route.fullPath
+            }
+          }
+
+          this.$router.push(route).catch((err) => {
             console.log(err)
             this.showRefreshButton = true
           })
@@ -909,21 +923,24 @@ export default {
           this.loadingAvailableMetrics = false
           if (_.isEmpty(response.data)) {
             this.setAvailableMetrics([])
+            return
           }
 
           let structuredMetricGroups = []
           const availableMetrics = response.data
           for (let index in availableMetrics) {
-            let optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
+            const optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
+            const categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
             structuredMetricGroups.push({
               disable: true,
               value: null,
-              label: optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
+              label: categoryLabel
             })
 
             if (availableMetrics[index].constructor.name === 'Array') {
               for (let option of availableMetrics[index]) {
                 option.disable = false
+                option.categoryLabel = categoryLabel
                 structuredMetricGroups.push(option)
               }
             }
@@ -931,6 +948,7 @@ export default {
             if (availableMetrics[index].constructor.name === 'Object') {
               for (let key of Object.keys(availableMetrics[index])) {
                 availableMetrics[index][key].disable = false
+                availableMetrics[index][key].categoryLabel = categoryLabel
                 structuredMetricGroups.push(availableMetrics[index][key])
               }
             }
@@ -959,6 +977,11 @@ export default {
         })
         .then(response => {
           this.loadingMetricGroups = false
+          if (_.isEmpty(response.data)) {
+            this.setMetricGroups([])
+            return
+          }
+
           for (let index in response.data) {
             if (typeof response.data[index].agent_metrics === 'undefined') {
               continue
@@ -972,6 +995,7 @@ export default {
               }
 
               response.data[index].agent_metrics[metricIndex].category = metric.category
+              response.data[index].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
 
               if (typeof response.data[index].agent_metrics[metricIndex].label !== 'undefined') {
                 continue
@@ -1490,21 +1514,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@media (min-height: 439px) {
-  .sidebar-wrapper {
-    & .sidebar {
-      & .q-list {
-        height: 100% !important;
-      }
-    }
-  }
-}
-
-.guest {
-  & .main-content {
-    padding: 0 !important;
-  }
-}
-</style>

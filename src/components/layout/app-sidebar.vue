@@ -148,6 +148,10 @@ export default {
         return true
       }
 
+      if (['Settings Tab'].includes(this.$route.name) && name === 'Settings') {
+        return true
+      }
+
       return this.$route.name === name
     },
 

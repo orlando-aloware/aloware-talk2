@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 /**
  * date time passed
  * @param {datetime|string|Moment} dt
@@ -405,6 +407,10 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
   }
 }
 
+export const formatTime = (time, formatTo24Hr) => {
+  return moment(time, 'HHmm').format(formatTo24Hr ? 'HH:mm' : 'hh:mm A')
+}
+
 export default ({ Vue }) => {
   const filters = {
     dateTimePassed,
@@ -425,7 +431,8 @@ export default ({ Vue }) => {
     fixFullDateUTC,
     fixFullDateLocal,
     fixFullDateUTCRelative,
-    fixCommunicationDateTime
+    fixCommunicationDateTime,
+    formatTime
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

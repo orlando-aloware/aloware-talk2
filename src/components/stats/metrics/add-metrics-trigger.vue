@@ -66,6 +66,7 @@ export default {
         type: data.type
       }).then(res => {
         res.data.label = data.label
+        res.data.categoryLabel = data.categoryLabel
         res.data.value = 0
         this.addMetric({
           metricGroupId: this.groupId,

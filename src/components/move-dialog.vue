@@ -21,26 +21,17 @@
       />
     </div>
     <div class="move-dialog-footer" v-if="hasSelected">
-      <div class="text-muted small pr-2">
-        Would you like to continue?
+      <div class="fs-12 text-grey-100 pr-4">
+        Move to this location?
       </div>
       <compact-btn
-        variant="danger"
-        class="mr-2"
+        variant="primary"
         v-if="hasSelected"
         :disabled="isMoving"
         @clicked="onConfirmMove"
       >
         <q-spinner-bars v-if="isMoving" color="white" />
-        {{ isMoving ? '' : 'Yes' }}
-      </compact-btn>
-      <compact-btn
-        variant="outlined-light"
-        v-if="hasSelected"
-        :disabled="isMoving"
-        @clicked="closeMoveDialog"
-      >
-        No
+        {{ isMoving ? '' : 'Move' }}
       </compact-btn>
     </div>
   </div>

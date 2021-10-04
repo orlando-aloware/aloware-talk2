@@ -42,7 +42,7 @@
       </div>
       <div class="header flex- w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-2 pr-2">
-          <div class="mention-filter-actions-wrapper mt-3">
+          <div class="mention-filter-actions-wrapper mt-3 pr-4">
             <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
             <user-selector custom-placeholder="Filter by User"
                            :clearable="true"
@@ -72,14 +72,15 @@
           spread
           unelevated
           dense
-          toggle-color="grey-90"
+          toggle-color="primary active"
           color="transparent"
           text-color="primary"
           :options="mentionTypeOptions"
           v-model="mentionType"
           @click="toggleMentionType">
           <template v-slot:one>
-            <div class="d-flex justify-content-center align-items-center w-100 px-1 options">
+            <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
+                 :class="[$route.params.status === 'received' ? 'active' : 'text-grey-90']">
                 <span class="text-left">
                   Received
                 </span>
@@ -88,7 +89,7 @@
 
           <template v-slot:two>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
-                 :class="['active']">
+                 :class="[$route.params.status === 'sent' ? 'active' : 'text-grey-90']">
                 <span class="text-left">
                   Sent
                 </span>

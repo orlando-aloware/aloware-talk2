@@ -75,6 +75,9 @@ export default {
           })
       }
     },
+    onPaginate (params) {
+      this.fetch(params)
+    },
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
@@ -143,6 +146,8 @@ export default {
       if (params.page) {
         query.page = params.page
       }
+
+      query.per_page = params.per_page || 25
 
       query.filter_groups = []
 
