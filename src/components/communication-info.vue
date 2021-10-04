@@ -561,7 +561,7 @@
                 </router-link-->
                 <sms-reminders ref="sms-reminder"
                                v-if="communication.type === CommunicationTypes.APPOINTMENT"
-                               class="d-flex flex-row text-left w-100"
+                               class="d-flex flex-row justify-content-center w-100"
                                :communicationId="communication.id"
                                :campaignId="campaignId"
                                :appointmentDatetime="communication.engagement_data.appointment_datetime">
@@ -715,7 +715,7 @@ export default {
         },
         {
           label: 'Attended',
-          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SHOWN
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED
         },
         {
           label: 'Cancelled',

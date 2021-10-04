@@ -45,6 +45,13 @@
             size="sm"
           >
             Add Variable
+            <q-menu content-class="mx-height-300"
+                    persistent auto-close
+                    anchor="bottom right" self="bottom left">
+              <div class="row no-wrap q-pa-md">
+                <variables @variableSelected="variableSelected" always-open></variables>
+              </div>
+            </q-menu>
           </b-button>
         </div>
         <div class="flex-grow-1"></div>
@@ -68,13 +75,6 @@
         </b-button>
       </div>
     </template>
-    <b-popover ref="popover"
-               id="templates-sms-variables-popover"
-               placement="topright"
-               target="btn-sms-variables"
-               triggers="click blur">
-      <variables @variableSelected="variableSelected" always-open></variables>
-    </b-popover>
   </b-modal>
 </template>
 
@@ -164,6 +164,7 @@ export default {
         this.getSmsTemplates()
         this.onHidden()
         this.$generalNotification(`Template has been ${pastActionText.toLowerCase()}.`)
+        this.$emit('templateSaved', response.data)
       }).catch(error => {
         console.log(error)
         this.$generalNotification(`Error while ${presentActionText.toLowerCase()} event.`, 'error')

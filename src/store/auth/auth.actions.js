@@ -189,6 +189,10 @@ const setAgentStatus = async ({ commit }, agentStatus) => {
   commit('SET_AGENT_STATUS', agentStatus)
 }
 
+const setProfile = async ({ commit }, user) => {
+  commit('SET_PROFILE', user)
+}
+
 export default {
-  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus
+  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile
 }

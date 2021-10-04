@@ -1,7 +1,7 @@
 <template>
   <div class="page-side-menubar-list inbox-nav-list" :class="{'inbox-nav-list--closed': closed}">
     <nav-item
-      v-for="item in items"
+      v-for="item in agentItems"
       :key="item.name"
       :label="item.label"
       :value="item.value"
@@ -24,9 +24,12 @@
 <script>
 import NavItem from './settings-nav-item'
 import { mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'settings-nav-list',
+
+  mixins: [aclMixin],
 
   components: {
     NavItem
@@ -54,7 +57,15 @@ export default {
   },
 
   computed: {
-    ...mapState('settings', ['items'])
+    ...mapState('settings', ['items']),
+
+    agentItems () {
+      if (this.hasRole('Company Admin')) {
+        return this.items
+      }
+
+      return this.items.filter(item => item.value !== 'visibility')
+    }
   },
 
   data () {

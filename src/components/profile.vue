@@ -5,12 +5,14 @@
     </q-item-section>
     <q-item-section class="profile-menu"
                     avatar>
+
       <q-btn-dropdown :ripple="false"
                       :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
                       :menu-offset="[4, 16]"
+                      content-class="tab-avatar-menu"
                       class="tab-dropdown"
                       ref="menu"
-                      auto-close
+                      persistent
                       flat>
         <template v-slot:label>
           <q-avatar size="34px"
@@ -26,51 +28,86 @@
 
         <q-list class="tab-dropdown-list no-select">
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary _500' : '']"
                   dense
                   clickable>
-            <div class="d-flex align-items-center">
-              <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
-                       class="rounded-badge bordered q-mr-sm">
-              </q-badge>
-              Offline
+            <div class="d-flex align-items-center justify-content-between w-100">
+              <div>
+                <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
+                         class="rounded-badge bordered q-mr-sm">
+                </q-badge>
+                Offline
+              </div>
+              <div v-if="agentStatus === AgentStatus.AGENT_STATUS_OFFLINE">
+                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary' : '']"></i>
+              </div>
             </div>
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                   dense
                   clickable>
-            <div class="d-flex align-items-center">
-              <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                       class="rounded-badge bordered q-mr-sm">
-              </q-badge>
-              Available
+            <div class="d-flex align-items-center justify-content-between w-100">
+              <div>
+                <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
+                         class="rounded-badge bordered q-mr-sm">
+                </q-badge>
+                Available
+              </div>
+              <div v-if="agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS">
+                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
+              </div>
             </div>
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary _500' : '']"
                   dense
                   clickable>
-            <div class="d-flex align-items-center">
-              <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                       class="rounded-badge bordered q-mr-sm">
-              </q-badge>
-              Busy
+            <div class="d-flex align-items-center justify-content-between w-100">
+              <div>
+                <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
+                         class="rounded-badge bordered q-mr-sm">
+                </q-badge>
+                Busy
+              </div>
+              <div v-if="agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS">
+                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
+              </div>
             </div>
           </q-item>
 
           <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary _500' : '']"
                   dense
                   clickable>
-            <div class="d-flex align-items-center">
-              <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                       class="rounded-badge bordered q-mr-sm">
-              </q-badge>
-              On-break
+            <div class="d-flex align-items-center justify-content-between w-100">
+              <div>
+                <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
+                         class="rounded-badge bordered q-mr-sm">
+                </q-badge>
+                On-break
+              </div>
+              <div v-if="agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK">
+                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary' : '']"></i>
+              </div>
             </div>
+          </q-item>
+
+          <q-separator class="mt-1 mb-1"></q-separator>
+          <q-item dense
+                  clickable>
+            <q-item-section>
+              <div>
+                <i class="fa fa-moon"></i> Turn Notifications On
+              </div>
+            </q-item-section>
+          </q-item>
+          <q-item @click="logoutAction"
+                  dense
+                  clickable>
+            <q-item-section>
+              <div>
+                <i class="fa fa-sign-out-alt"></i> Logout
+              </div>
+            </q-item-section>
           </q-item>
         </q-list>
       </q-btn-dropdown>
@@ -79,7 +116,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 
@@ -128,10 +165,26 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['logout']),
     changeStatus (status) {
       this.changeAgentStatus(status)
-      this.$refs.menu.hide()
+    },
+
+    async logoutAction () {
+      try {
+        const response = await this.logout()
+
+        this.response = response?.data
+
+        await this.$router.push({ name: 'Login' })
+      } catch (err) {
+        console.error(err)
+      }
     }
+  },
+
+  mounted () {
+    this.agentStatus = this.profile.agent_status
   }
 }
 </script>

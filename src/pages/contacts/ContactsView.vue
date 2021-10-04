@@ -149,9 +149,14 @@
         :isEmpty="isEmpty || isStartState"
         :isLoadingMore="isLoadingMore"
         :contact-list-id="id"
+        :paginated="true"
+        :total-rows="listItems[id].total"
+        :current-page="listItems[id].current_page"
+        :last-page="listItems[id].last_page"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
+        @paginated="onPaginate"
         @more="onLoadMore">
         <template slot="tbody">
           <table-row

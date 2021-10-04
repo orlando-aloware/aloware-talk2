@@ -1,6 +1,13 @@
 <template>
   <b-container>
     <b-form>
+      <b-form-row>
+        <b-col sm="12" md="12">
+          <div class="d-inline-flex">
+            <h1 class="mt-2"> Personalization </h1>
+          </div>
+        </b-col>
+      </b-form-row>
       <b-form-row class="mt-4">
         <b-col sm="12" md="12">
           <div>
@@ -10,15 +17,12 @@
 
           <b-form-group
             label=""
-            v-slot="{ ariaDescribedby }"
           >
-            <b-form-checkbox-group
-              v-model="selected"
-              :options="communicationNotificationOptions"
-              :aria-describedby="ariaDescribedby"
-              switches
-              stacked
-            ></b-form-checkbox-group>
+            <b-form-checkbox switch
+                             v-model="user.focus_mode"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'focus_mode')">
+              Enable focus mode
+            </b-form-checkbox>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -33,15 +37,12 @@
 
           <b-form-group
             label=""
-            v-slot="{ ariaDescribedby }"
           >
-            <b-form-checkbox-group
-              v-model="selected"
-              :options="communicationNotificationOptions"
-              :aria-describedby="ariaDescribedby"
-              switches
-              stacked
-            ></b-form-checkbox-group>
+            <b-form-checkbox switch
+                             v-model="user.go_to_available_after_login"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'go_to_available_after_login')">
+              Enable available by default, but allow manual changes
+            </b-form-checkbox>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -50,66 +51,16 @@
       <b-form-row class="mt-4">
         <b-col sm="12" md="12">
           <div>
-            <h5 class="form-label">Wrap up duration</h5>
+            <h5 class="form-label">Wrap up duration <b-badge variant="warning" v-if="currentCompany && currentCompany.force_wrap_up">Forced at account level</b-badge></h5>
             <p class="form-helper-text">Stay on wrap up for this amount of time before you go back to available for the next call.</p>
           </div>
-
+        </b-col>
+        <b-col sm="12" md="6">
           <b-form-group label="" >
-            <b-form-checkbox
-              id="checkbox-1"
-              v-model="status"
-              name="checkbox-1"
-              value="accepted"
-              unchecked-value="not_accepted"
-            >
-              It is created
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group label="" >
-            <b-form-checkbox
-              id="checkbox-1"
-              v-model="status"
-              name="checkbox-1"
-              value="accepted"
-              unchecked-value="not_accepted"
-            >
-              One minute before
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group label="" >
-            <b-form-checkbox
-              id="checkbox-1"
-              v-model="status"
-              name="checkbox-1"
-              value="accepted"
-              unchecked-value="not_accepted"
-            >
-              Fifteen minutes before
-            </b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label="" >
-            <b-form-checkbox
-              id="checkbox-1"
-              v-model="status"
-              name="checkbox-1"
-              value="accepted"
-              unchecked-value="not_accepted"
-            >
-              One hour before
-            </b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label="" >
-            <b-form-checkbox
-              id="checkbox-1"
-              v-model="status"
-              name="checkbox-1"
-              value="accepted"
-              unchecked-value="not_accepted"
-            >
-              One day before
-            </b-form-checkbox>
+            <wrap-up-selector v-model="user.wrap_up_seconds"
+                              :disable="currentCompany && currentCompany.force_wrap_up"
+                              @select="(eventPayload) => onUpdateFields(eventPayload, 'wrap_up_seconds')">
+            </wrap-up-selector>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -118,29 +69,41 @@
 </template>
 
 <script>
+import WrapUpSelector from 'components/generic-selectors/wrap-up-selector'
+import { mapActions, mapState } from 'vuex'
 export default {
   name: 'personalization',
 
+  components: { WrapUpSelector },
+
+  props: {
+    user: {
+      type: Object,
+      required: true
+    }
+  },
+
+  computed: {
+    ...mapState(['currentCompany'])
+  },
+
   data () {
     return {
-      user: {
-        first_name: '',
-        last_name: ''
-      },
-      showPasswordFields: false,
-      selected: '',
       options: [
         { text: 'Admin', value: '1' },
         { text: 'Agent', value: '2' }
-      ],
-      communicationNotificationOptions: [
-        { text: 'Call to personal line or to the ring groups this user belongs to', value: '1' },
-        { text: 'Text message to personal line or to the ring groups this user belongs to', value: '2' },
-        { text: 'Voicemail to personal line or to the ring groups this user belongs to', value: '3' },
-        { text: 'When this user is mentioned', value: '4' },
-        { text: 'When an appointment is assigned to this user', value: '5' },
-        { text: 'When a reminder is assigned to this user', value: '6' }
       ]
+    }
+  },
+
+  methods: {
+    ...mapActions('settings', ['updateChangedUserProperties']),
+    onUpdateFields (value, prop) {
+      this.user[prop] = value
+      this.updateChangedUserProperties({
+        name: prop,
+        value: value
+      })
     }
   }
 }
