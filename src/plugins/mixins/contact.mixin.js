@@ -119,6 +119,7 @@ export default {
   computed: {
     ...mapState(['campaigns', 'currentCompany']),
     ...mapState('contacts', ['contact']),
+    ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -210,7 +211,7 @@ export default {
   },
 
   created () {
-    this.contactId = _.get(this.$route, 'params.id', null)
+    this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })
@@ -315,29 +316,33 @@ export default {
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
-      console.log('fetching comms')
-      return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
-        this.fetchContactCommunications(this.contactId, false).then(() => {
-          this.loadingContact = false
-          console.log('fetched comms')
+      console.log('fetching comms', this.contactId)
+      if (this.contactId) {
+        return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
+          this.fetchContactCommunications(this.contactId, false).then(() => {
+            this.loadingContact = false
+            console.log('fetched comms')
 
-          // if route has communication id
-          // until id is found
-          if (this.hasCommunication()) {
-            this.loadingContactCommunications = true
-            this.fetchContactCommunicationsUntilFound()
-          } else {
-            this.loadingContactCommunications = false
-          }
-          this.scrollMessages()
+            // if route has communication id
+            // until id is found
+            if (this.hasCommunication()) {
+              this.loadingContactCommunications = true
+              this.fetchContactCommunicationsUntilFound()
+            } else {
+              this.loadingContactCommunications = false
+            }
+            this.scrollMessages()
+          })
+          return res
+        }).catch(err => {
+          this.loadingContact = false
+          this.loadingContactCommunications = false
+          this.$handleErrors(err.response)
+          console.log(err)
         })
-        return res
-      }).catch(err => {
-        this.loadingContact = false
-        this.loadingContactCommunications = false
-        this.$handleErrors(err.response)
-        console.log(err)
-      })
+      }
+      this.loadingContact = false
+      this.loadingContactCommunications = false
     },
 
     showContactInfo (contactId, forceClearLoading = false) {

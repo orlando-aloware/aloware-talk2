@@ -1,19 +1,23 @@
 <template>
-  <div class="p-2 position-relative">
-    <q-card flat bordered
+  <div class="add-metrics p-0 d-inline-block position-relative m-2">
+    <div flat bordered
       @click="openModal"
-      class="metric-box dashed-box full-height q-hoverable cursor-pointer">
+      class="metric-box dashed-box h-100 w-100 q-hoverable cursor-pointer">
       <span class="q-focus-helper"></span>
-      <q-card-section class="full-height align-middle">
-        <div class="row items-center justify-center full-height text-lead text-center text-grey lighten-3 align-middle">
-          <div class="metric-box-desc metric-box-header pb-1">
-            <span class="text-h4 text-weight-light">+</span>
-            <br />
-            Add Metrics
+      <div class="h-100 w-100 align-middle position-absolute">
+        <div class="h-100 w-100 text-lead text-center text-grey lighten-3">
+          <div class="metric-box-desc metric-box-header d-flex flex-column justify-content-center align-items-center h-100">
+            <plus-icon color="#62666E"
+                       width="19"
+                       height="19"
+                       firstD="M9.5 2V17"
+                       secondD="M17 9.5H2"
+                       strokeWidth="2.5"/>
+            <span class="add-metrics-wrapper w-100">Add Metric</span>
           </div>
         </div>
-      </q-card-section>
-    </q-card>
+      </div>
+    </div>
     <AddMetricsModal
       @closed="closeModal"
       @create="createNewMetric"
@@ -25,23 +29,26 @@
 
 <script>
 
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import AddMetricsModal from './form-metrics-modal'
+import PlusIcon from 'components/icons/plus-icon'
 
 export default {
   name: 'AddMetrics',
   props: {
-    reportGroup: {
+    metricGroup: {
       type: Object,
       default: () => {}
     }
   },
   components: {
+    PlusIcon,
     AddMetricsModal
   },
   computed: {
+    ...mapState('auth', ['profile']),
     groupId () {
-      return this.reportGroup.id
+      return this.metricGroup.id
     }
   },
   data () {
@@ -50,19 +57,29 @@ export default {
     }
   },
   methods: {
-    ...mapActions('stats', [
-      'createMetrics'
-    ]),
-    async createNewMetric (data) {
+    ...mapActions('stats', ['addMetric']),
+    createNewMetric (data) {
       this.$emit('toggle-loader', true)
-      await this.createMetrics({
-        reportId: this.groupId,
-        name: data.name,
+      this.$axios.post(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.groupId}/metrics`, {
+        metric_id: data.metricId,
         color: data.color,
-        value: Math.floor(Math.random() * (199 - 1 + 1)) + 1
+        type: data.type
+      }).then(res => {
+        res.data.label = data.label
+        res.data.value = 0
+        this.addMetric({
+          metricGroupId: this.groupId,
+          data: res.data
+        })
+        this.$generalNotification('Metric successfully added.')
+        this.$emit('toggle-loader', false)
+        this.modal = false
+      }).catch(err => {
+        console.log(err)
+        this.$generalNotification('Failed to add metric.', 'error')
+        this.$emit('toggle-loader', false)
+        this.modal = false
       })
-      this.$emit('toggle-loader', false)
-      this.modal = false
     },
     openModal () {
       this.modal = true

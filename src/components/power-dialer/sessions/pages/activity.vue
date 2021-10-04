@@ -1,4 +1,10 @@
 <template>
+  <b-overlay :show="changingSelectedContact"
+             :opacity="0.85"
+             class="h-100"
+             variant="white"
+             rounded="sm"
+             v-if="authenticated">
   <div class="row">
     <div class="col-12 p-1">
       <!-- <q-card flat class="p-3">
@@ -6,19 +12,37 @@
           <div class="text-subtitle1 text-weight-medium">Juan Dela Cruz</div>
         </q-card-section>
       </q-card> -->
-      <div :class="`contact-activity-wrapper ${widthClass}`">
+      <div
+        :class="`contact-activity-wrapper ${widthClass}`"
+        style="height:calc(100vh - 362px);">
         <ContactActivities
           ref="contactActivities"
           :communications="communications"
           :campaign-id="selectedId"
           @mark-all-as-read="markAllAsRead">
           <template v-slot:moreActivities>
-            fd
+            <q-btn outline
+                   dense
+                   rounded
+                   no-caps
+                   class="prev-activities mx-2"
+                   color="primary"
+                   size="md"
+                   :isLoadingMore="isLoadingMore"
+                   :loading="isLoadingPreviousActivities"
+                   :disable="isLoadingPreviousActivities"
+                   v-if="hasMoreCommunications"
+                   @click="loadMorePreviousActivities">
+              <div class="px-2">
+                Previous Activities
+              </div>
+            </q-btn>
           </template>
         </ContactActivities>
       </div>
     </div>
   </div>
+  </b-overlay>
 </template>
 
 <script>
@@ -36,19 +60,21 @@ export default {
     contactMixins
   ],
   mounted () {
-    this.setContact(this.contact2)
-    this.setSelectedContact(this.contact2)
+    console.log('199 :>> ', 199)
+    this.setContact(this.tempContact)
+    this.setSelectedContact(this.tempContact)
     if (this.authenticated) {
       this.fetchContact()
     }
   },
   computed: {
     ...mapGetters('auth', ['authenticated']),
+    ...mapGetters('contacts', ['changingSelectedContact']),
     widthClass () {
       if (this.isInbox) {
         return 'w-less-330px'
       }
-      return '500px'
+      return 'w-less-500px'
       // !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
     }
   },
@@ -79,6 +105,13 @@ export default {
     },
     markAllAsRead2 () {
       console.log('888 :>> ', 888)
+    }
+  },
+  watch: {
+    selectContact (val) {
+      if (val?.id) {
+        this.setContact(this.tempContact)
+      }
     }
   },
   data () {
@@ -436,14 +469,10 @@ export default {
           'hold_at': null,
           'should_broadcast': true,
           'metadata': {
-            'callback_asked_at': [
-                
-            ],
+            'callback_asked_at': [],
             'asked_for_callback': false,
             'requested_callback': false,
-            'voicemail_asked_at': [
-                
-            ],
+            'voicemail_asked_at': [],
             'asked_for_voicemail': false,
             'authorized_for_text': false,
             'requested_voicemail': false,
@@ -453,9 +482,7 @@ export default {
               'handle_by_text': null,
               'text_authorization': null
             },
-            'handle_by_text_asked_at': [
-                
-            ],
+            'handle_by_text_asked_at': [],
             'asked_for_handle_by_text': false,
             'requested_handle_by_text': false,
             'text_authorization_asked_at': null,
@@ -552,14 +579,10 @@ export default {
           'hold_at': null,
           'should_broadcast': true,
           'metadata': {
-            'callback_asked_at': [
-                
-            ],
+            'callback_asked_at': [],
             'asked_for_callback': false,
             'requested_callback': false,
-            'voicemail_asked_at': [
-                
-            ],
+            'voicemail_asked_at': [],
             'asked_for_voicemail': false,
             'authorized_for_text': false,
             'requested_voicemail': false,
@@ -569,9 +592,7 @@ export default {
               'handle_by_text': null,
               'text_authorization': null
             },
-            'handle_by_text_asked_at': [
-                
-            ],
+            'handle_by_text_asked_at': [],
             'asked_for_handle_by_text': false,
             'requested_handle_by_text': false,
             'text_authorization_asked_at': null,
@@ -604,7 +625,7 @@ export default {
         },
         'tag_ids': []
       },
-      contact2: {
+      tempContact: {
         'id': 210470,
         'company_id': 7,
         'first_name': 'Aloware Contact',

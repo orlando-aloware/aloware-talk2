@@ -6592,6 +6592,11 @@ button.grey-90 {
   padding: 8px 10px;
   width: 98% !important;
 
+  &__power-dialer {
+    margin-left: 42px !important;
+    margin-top: 104px !important;
+  }
+
   .menu-actions a{
     text-decoration: none;
     font-weight: 500;
@@ -6971,6 +6976,9 @@ button.grey-90 {
   }
 }
 
+.ml-7 {
+  margin-left: 5rem !important;
+}
 
 .settings-form-wrapper {
   .form-label {

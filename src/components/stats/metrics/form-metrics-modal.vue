@@ -15,17 +15,20 @@
               {{ title }}
             </div>
             <q-select
-              @popup-show="onShowMetricsMenu"
-              outlined dense emit-value
-              v-model="metrics"
-              :options="metricOptions"
-              option-value="text"
-              option-label="text"
+              outlined
+              dense
+              map-options
+              emit-value
+              option-value="metric_id"
+              option-label="label"
               ref="statsSelectMetrics"
-              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
+              v-model="metric"
+              :options="availableMetrics"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMetricsMenu">
               <template v-slot:selected>
-                <template v-if="metrics">
-                  {{ metrics }}
+                <template v-if="metric">
+                  {{ getOptionsText(metric) }}
                 </template>
                 <template v-else>
                   Add Metrics
@@ -39,10 +42,10 @@
                       v-if="scope.opt.disable"
                       class="text-subtitle2 font-weight-bold"
                       disabled label
-                      v-html="scope.opt.text" />
+                      v-html="scope.opt.label" />
                     <q-item-label
                       v-else
-                      v-html="scope.opt.text" />
+                      v-html="scope.opt.label" />
                   </q-item-section>
                 </q-item>
               </template>
@@ -93,15 +96,9 @@
 </template>
 
 <script>
-
-import {
-  METRIC_OPTIONS_2,
-  METRIC_OPTIONS_COLORS
-} from 'src/constants/stats'
-import { isEmpty } from 'lodash'
-
-const colorOptions = { METRIC_OPTIONS_COLORS }
-const stats = { METRIC_OPTIONS_2 }
+import { mapState } from 'vuex'
+import * as MetricOptionColors from 'src/constants/metric-option-colors'
+import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 
 export default {
   name: 'FormMetricsModal',
@@ -124,23 +121,18 @@ export default {
     }
   },
   computed: {
-    metricOptions () {
-      if (stats) {
-        return stats.METRIC_OPTIONS_2
-      }
-      return []
-    },
+    ...mapState('stats', ['availableMetrics']),
     colors () {
-      return colorOptions.METRIC_OPTIONS_COLORS
+      return this.MetricOptionColors.METRIC_OPTIONS_COLORS
     },
     actionCreate () {
-      if (this.resources?.id) {
+      if (this.resources?.metricId) {
         return true
       }
       return false
     },
     validData () {
-      if (isEmpty(this.color) || isEmpty(this.metrics)) {
+      if (!this.color || !this.metric) {
         return false
       }
       return true
@@ -149,10 +141,12 @@ export default {
   data () {
     return {
       modal: false,
-      metrics: null,
+      metric: null,
       model: '',
       color: '',
-      selectWidth: 0
+      selectWidth: 0,
+      MetricOptionColors,
+      MetricOptionGroups
     }
   },
   watch: {
@@ -165,34 +159,39 @@ export default {
         this.resetData()
       } else {
         if (this.actionCreate) {
-          let { color, name } = this.resources
+          let { color, metricId } = this.resources
           this.color = this.colors.find(col => {
             return col.value === color
           })
-          this.metrics = name
+          this.metric = metricId
         }
       }
     }
   },
   methods: {
     async submit () {
+      const option = this.availableMetrics.find(option => option.metric_id === this.metric)
       if (this.actionCreate) {
         this.$emit('update', {
-          id: this.resources.id,
-          name: this.metrics,
-          color: this.color.value,
-          reportId: this.resources.reportId,
-          value: this.resources.value
+          type: option ? option.type : null,
+          metricId: this.metric,
+          color: this.color.value
         })
       } else {
         this.$emit('create', {
-          name: this.metrics,
+          label: option ? option.label : '',
+          type: option ? option.type : null,
+          metricId: this.metric,
           color: this.color.value
         })
       }
     },
+    getOptionsText (id) {
+      const option = this.availableMetrics.find(option => option.metric_id === id)
+      return option ? option.label : ''
+    },
     resetData () {
-      this.metrics = ''
+      this.metric = ''
       this.color = ''
     },
     onShowColorMenu () {

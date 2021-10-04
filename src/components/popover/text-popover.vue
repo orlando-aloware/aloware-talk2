@@ -20,6 +20,7 @@
       class="cursor-pointer"
       transtion-show="fade">
       <div
+        ref="editGroup"
         @click="active = true">
         <PencilIcon
           color="grey"
@@ -47,6 +48,10 @@ export default {
     id: {
       type: [String, Number],
       default: 'X'
+    },
+    editMetricGroupId: {
+      default: null,
+      required: false
     }
   },
   components: {
@@ -69,12 +74,15 @@ export default {
         this.active = false
         if (this.modelValue !== this.content) {
           this.$emit('input', this.content)
+        } else {
+          this.$emit('close')
         }
       }
     },
     closeInput (value) {
       this.flag = true
       this.active = false
+      this.$emit('close')
     }
   },
   watch: {
@@ -86,6 +94,11 @@ export default {
           this.$refs[this.referenceName].focus()
         }, 10)
       }
+    },
+    editMetricGroupId () {
+      if (this.editMetricGroupId === this.id) {
+        this.active = this.editMetricGroupId !== null
+      }
     }
   },
   data () {
@@ -93,7 +106,7 @@ export default {
       content: this.modelValue,
       hovered: false,
       active: false,
-      flag: false
+      flag: true
     }
   }
 }

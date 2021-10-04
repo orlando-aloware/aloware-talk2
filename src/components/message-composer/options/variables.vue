@@ -40,6 +40,7 @@
 
 import { mapGetters } from 'vuex'
 import VueMultiselect from 'vue-multiselect'
+import * as Variables from 'src/constants/variables'
 
 export default {
   name: 'variables',
@@ -54,7 +55,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['messageComposer']),
     formattedOptions () {
-      let contactVariables = [...this.contactVariables]
+      let contactVariables = [...this.Variables.CONTACT_VARIABLES]
 
       contactVariables.unshift({
         group: 'Contact Variables',
@@ -63,8 +64,8 @@ export default {
 
       let variablesArray = contactVariables
 
-      if (this.agentVariables && this.agentVariables.length > 0) {
-        let agentVariables = [...this.agentVariables]
+      if (this.Variables.AGENT_VARIABLES && this.Variables.AGENT_VARIABLES.length > 0) {
+        let agentVariables = [...this.Variables.AGENT_VARIABLES]
         agentVariables.unshift({
           group: 'Agent Variables',
           disable: true
@@ -72,8 +73,8 @@ export default {
         variablesArray = [...contactVariables, ...agentVariables]
       }
 
-      if (this.lineVariables && this.lineVariables.length > 0) {
-        let lineVariables = [...this.lineVariables]
+      if (this.Variables.LINE_VARIABLES && this.Variables.LINE_VARIABLES.length > 0) {
+        let lineVariables = [...this.Variables.LINE_VARIABLES]
         lineVariables.unshift({
           group: 'Line Variables',
           disable: true
@@ -81,8 +82,8 @@ export default {
         variablesArray = [...contactVariables, ...lineVariables]
       }
 
-      if (this.accountVariables && this.accountVariables.length > 0) {
-        let accountVariables = [...this.accountVariables]
+      if (this.Variables.ACCOUNT_VARIABLES && this.Variables.ACCOUNT_VARIABLES.length > 0) {
+        let accountVariables = [...this.Variables.ACCOUNT_VARIABLES]
         accountVariables.unshift({
           group: 'Account Variables',
           disable: true
@@ -90,8 +91,8 @@ export default {
         variablesArray = [...contactVariables, ...accountVariables]
       }
 
-      if (this.csfVariables && this.csfVariables.length > 0) {
-        let csfVariables = [...this.csfVariables]
+      if (this.Variables.CSF_VARIABLES && this.Variables.CSF_VARIABLES.length > 0) {
+        let csfVariables = [...this.Variables.CSF_VARIABLES]
         csfVariables.unshift({
           group: 'CSF Variables',
           disable: true
@@ -105,40 +106,40 @@ export default {
       let groups = [
         {
           type: 'Contact Variables',
-          variables: this.contactVariables
+          variables: this.Variables.CONTACT_VARIABLES
         }
       ]
 
-      if (this.agentVariables && this.agentVariables.length > 0) {
+      if (this.Variables.AGENT_VARIABLES && this.Variables.AGENT_VARIABLES.length > 0) {
         groups.push(
           {
             type: 'Agent Variables',
-            variables: this.agentVariables
+            variables: this.Variables.AGENT_VARIABLES
           }
         )
       }
 
-      if (this.lineVariables && this.lineVariables.length > 0) {
+      if (this.Variables.LINE_VARIABLES && this.Variables.LINE_VARIABLES.length > 0) {
         groups.push(
           {
             type: 'Line Variables',
-            variables: this.lineVariables
+            variables: this.Variables.LINE_VARIABLES
           }
         )
       }
-      if (this.accountVariables && this.accountVariables.length > 0) {
+      if (this.Variables.ACCOUNT_VARIABLES && this.Variables.ACCOUNT_VARIABLES.length > 0) {
         groups.push(
           {
             type: 'Account Variables',
-            variables: this.accountVariables
+            variables: this.Variables.ACCOUNT_VARIABLES
           }
         )
       }
-      if (this.csfVariables && this.csfVariables.length > 0) {
+      if (this.Variables.CSF_VARIABLES && this.Variables.CSF_VARIABLES.length > 0) {
         groups.push(
           {
             type: 'CSF Variables',
-            variables: this.csfVariables
+            variables: this.Variables.CSF_VARIABLES
           }
         )
       }
@@ -154,151 +155,7 @@ export default {
       is_busy: false,
       variable: null,
       options: this.formattedOptions,
-      contactVariables: [
-        {
-          label: '[FirstName]',
-          value: '[FirstName]',
-          description: 'to include contact’s first name'
-        },
-        {
-          label: '[LastName]',
-          value: '[LastName]',
-          description: 'to include contact’s last name'
-        },
-        {
-          label: '[FullName]',
-          value: '[FullName]',
-          description: 'to include contact’s full name'
-        },
-        {
-          label: '[Email]',
-          value: '[Email]',
-          description: 'to include contact’s email address'
-        },
-        {
-          label: '[Website]',
-          value: '[Website]',
-          description: 'to include contact’s website'
-        },
-        {
-          label: '[Address]',
-          value: '[Address]',
-          description: 'to include contact’s address'
-        },
-        {
-          label: '[CompanyName]',
-          value: '[CompanyName]',
-          description: 'to include contact’s company name'
-        },
-        {
-          label: '[ContactNotes]',
-          value: '[ContactNotes]',
-          description: 'to include contact’s notes'
-        },
-        {
-          label: '[OwnerName]',
-          value: '[OwnerName]',
-          description: 'to include lead owner’s full name'
-        },
-        {
-          label: '[OwnerFirstName]',
-          value: '[OwnerFirstName]',
-          description: 'to include contact owner’s first name'
-        },
-        {
-          label: '[OwnerLastName]',
-          value: '[OwnerLastName]',
-          description: 'to include contact owner’s last name'
-        },
-        {
-          label: '[LeadNumber]',
-          value: '[LeadNumber]',
-          description: 'to include contact’s phone number'
-        },
-        {
-          label: '[City]',
-          value: '[City]',
-          description: 'to include contact’s city'
-        },
-        {
-          label: '[State]',
-          value: '[State]',
-          description: 'to include contact’s state (abbr)'
-        },
-        {
-          label: '[FullState]',
-          value: '[FullState]',
-          description: 'to include contact’s state full name'
-        },
-        {
-          label: '[ZipCode]',
-          value: '[ZipCode]',
-          description: 'to include contact’s zip code'
-        },
-        {
-          label: '[Country]',
-          value: '[Country]',
-          description: 'to include contact’s country'
-        },
-        {
-          label: '[DateOfBirth]',
-          value: '[DateOfBirth]',
-          description: 'to include contact’s date of birth'
-        },
-        {
-          label: '[ContactId]',
-          value: '[ContactId]',
-          description: 'to include the id of the contact (this is mostly used in tracking individual contacts through links)'
-        }
-      ],
-      agentVariables: [
-        {
-          label: '[AgentName]',
-          value: '[AgentName]',
-          description: 'to include agent’s full name'
-        },
-        {
-          label: '[AgentFirstName]',
-          value: '[AgentFirstName]',
-          description: 'to include agent’s first name'
-        },
-        {
-          label: '[AgentLastName]',
-          value: '[AgentLastName]',
-          description: 'to include agent’s last name'
-        }
-      ],
-      lineVariables: [
-        {
-          label: '[LineName]',
-          value: '[LineName]',
-          description: 'to include name of this line'
-        },
-        {
-          label: '[TrackingNumber]',
-          value: '[TrackingNumber]',
-          description: 'to include tracking number of this line'
-        }
-      ],
-      accountVariables: [
-        {
-          label: '[AccountName]',
-          value: '[AccountName]',
-          description: 'to include the name of your account'
-        }
-      ],
-      csfVariables: [
-        {
-          label: '[CSF1]',
-          value: '[CSF1]',
-          description: 'to include contact’s custom field 1'
-        },
-        {
-          label: '[CSF2]',
-          value: '[CSF2]',
-          description: 'to include contact’s custom field 2'
-        }
-      ]
+      Variables
     }
   },
   methods: {

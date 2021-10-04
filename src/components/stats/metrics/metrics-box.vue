@@ -1,9 +1,9 @@
 <template>
-  <div class="p-0">
+  <div class="p-0 d-inline-block">
     <MetricLoader v-if="loader" />
     <div
       v-else
-      class="box-container"
+      class="box-container w-auto"
       @mouseover="hovered = true"
       @mouseleave="hovered = false"
       transtion-show="fade"
@@ -22,7 +22,12 @@
         class="metric-box text-black m-2 p-1">
         <q-card-actions>
           <div :class="`metric-box-label text-weight-medium text-${color}`">
-            {{ metricValue }}
+            <span v-if="metric && metric.category === 'call_metadata'">
+              {{ metricValue | fixFullDuration }}
+            </span>
+            <span v-else>
+              {{ metricValue }}
+            </span>
           </div>
           <q-space />
           <div
@@ -33,7 +38,7 @@
               color="grey" />
           </div>
         </q-card-actions>
-        <q-card-section class="metric-box-desc q-pt-none text-lowercase pt-4">
+        <q-card-section class="metric-box-desc q-pt-none pt-4">
           {{ metricName }}
         </q-card-section>
       </q-card>
@@ -90,17 +95,13 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import EditMetricsModal from './form-metrics-modal'
 import MetricLoader from '../metrics/metric-loader'
 import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import PencilIcon from 'components/icons/pencil-o-icon'
-import {
-  METRIC_OPTIONS_COLORS
-} from 'src/constants/stats'
-
-const colorOptions = { METRIC_OPTIONS_COLORS }
+import * as MetricOptionColors from 'src/constants/metric-option-colors'
 
 export default {
   name: 'MetricsBox',
@@ -118,11 +119,13 @@ export default {
     TrashIcon
   },
   computed: {
+    ...mapState('auth', ['profile']),
+    ...mapState('stats', ['availableMetrics']),
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
     },
     color () {
-      let col = colorOptions.METRIC_OPTIONS_COLORS.find(c => {
+      let col = this.MetricOptionColors.METRIC_OPTIONS_COLORS.find(c => {
         return c.value === this.metricColor
       })
       if (col) {
@@ -133,11 +136,8 @@ export default {
     },
     preformattedMetric () {
       return {
-        id: this.metric.id,
-        name: this.metricName,
         color: this.metricColor,
-        reportId: this.metric.reportId,
-        value: this.metric.value
+        metricId: this.metric.metric_id
       }
     }
   },
@@ -152,7 +152,8 @@ export default {
       metricName: '',
       metricValue: '',
       metricColor: '',
-      loader: false
+      loader: false,
+      MetricOptionColors
     }
   },
   watch: {
@@ -170,20 +171,45 @@ export default {
   },
   methods: {
     ...mapActions('stats', [
-      'deleteMetrics',
-      'updateMetrics'
+      'deleteMetric',
+      'updateMetric'
     ]),
-    async removeSelectedMetric () {
+    removeSelectedMetric () {
       this.loader = true
-      await this.deleteMetrics(this.metric.id)
-      this.closeModal()
+      this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`)
+        .then(res => {
+          this.deleteMetric({
+            metricGroupId: this.metric.agent_metric_group_id,
+            id: this.metric.id
+          })
+          this.$generalNotification('Metric successfully removed.')
+          this.closeModal()
+        }).catch(err => {
+          console.log(err)
+          this.$generalNotification('Failed to remove metric.', 'error')
+          this.closeModal()
+        })
     },
-    async updateExistingMetric (data) {
-      await this.updateMetrics(data)
-      this.metricName = data.name
-      this.metricValue = data.value
-      this.metricColor = data.color
-      this.editModal = false
+    updateExistingMetric (data) {
+      this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`, {
+        metric_id: data.metricId,
+        type: data.type,
+        color: data.color
+      }).then(res => {
+        let newData = { ...this.metric }
+        newData.metric_id = data.metricId
+        newData.color = data.color
+        const metric = this.availableMetrics.find(metric => metric.metric_id === data.metricId)
+        newData.label = metric ? metric.label : ''
+        newData.order = res.data.order
+        this.updateMetric(newData)
+        this.$generalNotification('Metric updated successfully.')
+        this.editModal = false
+      }).catch(err => {
+        console.log(err)
+        this.$generalNotification('Failed to update metric.', 'error')
+        this.editModal = false
+      })
     },
     confirmDeletion () {
       this.isOpen = true
@@ -196,8 +222,8 @@ export default {
       this.editModal = true
     },
     updateLocalResources () {
-      this.metricName = this.metric.name
-      this.metricValue = this.metric.value
+      this.metricName = this.metric.label
+      this.metricValue = this.metric.value ? this.metric.value : 0
       this.metricColor = this.metric.color
     }
   }

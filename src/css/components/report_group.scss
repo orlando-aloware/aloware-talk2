@@ -41,35 +41,61 @@
     font-size: 15px;
     color: $grey-80;
     letter-spacing: -0.6px;
+    width: 100%;
     &.metric-box-header {
       font-weight: 500;
       letter-spacing: 0;
     }
+    .add-metrics-wrapper {
+      margin-top: 20px;
+      font-size: 14px;
+      color: $grey-90;
+      font-weight: 600;
+    }
   }
-  
+
   .metric-floating-btn {
     right: 5px;
     top: 5px;
     position: absolute;
   }
-  
+
 }
 
 .metric-group {
-  .metric-group-drawer {
-    position: absolute;
-    right: 0px;
-    top: 0;
-    height: 100%;
-    width: 50px;
-    padding: 10px;
-    margin: 0;
-
-    .drawer-icon {
+  position: relative;
+  .group-delete {
+    z-index:10;
+    border:1px grey solid;
+    right:-5px;
+    top:-5px;
+    position:absolute;
+    i {
+      font-size: 11px;
+      padding:3px;
+    }
+  }
+  .group-wrapper {
+    border-radius: 12px;
+    .add-metrics,
+    .metric-loader {
+      vertical-align: top;
+    }
+    .metric-group-drawer {
       position: absolute;
-      bottom: 20px;
-      i {
-        font-size: 20px;
+      right: 0px;
+      top: 0;
+      height: 100%;
+      width: 50px;
+      padding: 10px;
+      margin: 0;
+
+      .drawer-icon {
+        position: absolute;
+        bottom: 20px;
+        i {
+          font-size: 20px;
+        }
       }
     }
   }

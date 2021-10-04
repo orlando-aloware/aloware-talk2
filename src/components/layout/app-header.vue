@@ -3,7 +3,7 @@
     <div class="d-flex h-100 align-items-center">
       <b-link v-if="['Contact'].includes($route.name)" class="btn-header-nav-back mr-3"
               href="#"
-              @click="navigateToContacts">
+              @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
       </b-link>
 
@@ -57,6 +57,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
@@ -115,7 +116,15 @@ export default {
       this.dialerStatus = false
     },
 
-    navigateToContacts (e) {
+    navigateBack (e) {
+      let previousName = _.get(this.$route.query, 'previousName', null)
+
+      if (previousName === 'Power Dialer') {
+        this.$router.push({
+          name: previousName
+        })
+      }
+
       if (this.selectedList.id.toString() === 'all') {
         this.$router.push({
           name: 'Contacts'

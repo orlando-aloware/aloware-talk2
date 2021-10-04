@@ -102,10 +102,11 @@
     </template>
 
     <template slot="actions">
-      <div v-if="checked.length > 0" class="px-3 text-caption">
-        <!-- Menu here if selected multiple items... -->
-      </div>
-      <!-- <bulk-action-menu :id="id" v-if="checked.length > 0"></bulk-action-menu> -->
+      <!-- <div v-if="checked.length > 0" class="px-3 text-caption">
+        dsfdsf
+        Menu here if selected multiple items...
+      </div> -->
+      <BulkActionMenu :id="id" v-if="checked.length > 0" />
     </template>
 
     <template slot="table">
@@ -256,7 +257,7 @@
 
 <script>
 
-import { mapState, mapGetters, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerViewScreen from './power-dialer-view-screen'
 import PowerDialerFilter from './details/power-dialer-filters'
 // import StartDialOptions from './activities/start-dial-options'
@@ -272,6 +273,7 @@ import NameWrapper from '../name-wrapper'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
+import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
@@ -297,7 +299,8 @@ export default {
     NameWrapper,
     TrashOIcon,
     ConfirmDialog,
-    Breadcrumbs
+    Breadcrumbs,
+    BulkActionMenu
   },
   computed: {
     ...mapState(['prevRoute']),
@@ -344,8 +347,12 @@ export default {
       'SET_LIST_SELECTED_CONTACTS',
       'START_DIAL_TOGGLE'
     ]),
+    ...mapActions('inbox', [
+      'setSelectedContact'
+    ]),
     beginDial () {
       this.START_DIAL_TOGGLE(true)
+      this.setSelectedContact({})
       this.$router.push({ name: 'Power Dialer Session' })
     },
     onColumnsReordered (reorderedColumns) {

@@ -1,13 +1,13 @@
 <template>
   <b-card class="bg-transparent border-0 text-center">
-    <div class="t-grouped-buttons" style="display:inline-flex !important;">
+    <div class="t-grouped-buttons pr-1">
       <div
         v-for="(filter, key) in tabs"
         :key="key"
         class="link px-1" style="display:contents;">
         <div
           @click="clicked(filter)"
-          :class="`t-grouped-buttons__btn ${id === filter.id ? 'active' : ''}`">
+          :class="`t-grouped-buttons__btn ml-1 ${id === filter.id ? 'active' : ''}`">
           <div class="t-badge-name">
             {{ filter.name }}
           </div>

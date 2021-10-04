@@ -20,7 +20,7 @@
 
 .t-grouped-buttons {
   background-color: $grey-60;
-  padding: 3px;
+  padding: 2px 0px;
   display: inline-block;
   border-radius: 7px;
   a.link {
@@ -29,10 +29,10 @@
   }
   &__btn {
     background-color: $grey-60;
-    padding: 3px 18px;
+    padding: 1px 12px;
     color: $grey-90;
     display: inline-flex;
-    margin: 2px 0;
+    margin: 1px 0;
     
     .t__badge {
       background-color: $grey-70;
@@ -46,7 +46,7 @@
   &__btn:active,
   &__btn.active {
     background-color: $primary;
-    padding: 3px 18px;
+    padding: 1px 12px;
     border-radius: 5px;
     color: $white;
     .t__badge {
@@ -57,7 +57,7 @@
 
   &__btn:hover {
     background-color: lighten($primary, 10%);
-    padding: 3px 18px;
+    padding: 1px 12px;
     border-radius: 5px;
     color: $white;
     .t__badge {
