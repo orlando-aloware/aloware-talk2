@@ -10,7 +10,7 @@
         <q-card
           flat
           style="width: 300px;">
-          <q-card-section class="pt-4">
+          <q-card-section class="pt-4 no-default-padding">
             <div class="text-center text-h6 pt-3 pb-4">
               {{ title }}
             </div>

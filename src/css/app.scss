@@ -4899,6 +4899,9 @@ span.mention {
   .item:hover {
     background: $light-green2;
   }
+  .folder {
+    padding-left: 0 !important;
+  }
 }
 
 .contact-popover .popover-body {
@@ -7312,4 +7315,20 @@ button.grey-90 {
 .badge-task-status {
   position: absolute;
   top: 13.5px;
+}
+
+.default-btn-padding {
+  .q-btn,
+  .btn {
+    padding: 7px 12px !important;
+    display: flex;
+    align-items: center;
+
+    .fa-chevron-down {
+      height: 17px;
+      display: flex;
+      margin-left: 4px;
+      align-items: flex-end;
+    }
+  }
 }

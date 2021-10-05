@@ -122,14 +122,15 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { ALL_COLUMNS, COLUMN_CATEGORIES, DEFAULT_COLUMNS, DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+import { ALL_COLUMNS, COLUMN_CATEGORIES, DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import Search from 'src/components/search.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
-const DEFAULT_CONTACT_LIST_IDS = Object.keys(DEFAULT_CONTACT_LIST).map(
-  (i) => DEFAULT_CONTACT_LIST[i].id
+const DEFAULT_PINNED_LIST_IDS = Object.keys(DEFAULT_PINNED_LIST).map(
+  (i) => DEFAULT_PINNED_LIST[i].id
 )
 
 export default {
@@ -214,7 +215,7 @@ export default {
       this.columnsClose()
     },
     onApplyChanges () {
-      if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
         this.closeAndMutate()
         return
       }
@@ -242,7 +243,7 @@ export default {
         })
     },
     onResetAllColumns () {
-      if (DEFAULT_CONTACT_LIST_IDS.includes(this.columns.id)) {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
         this.closeAndReset()
         return
       }

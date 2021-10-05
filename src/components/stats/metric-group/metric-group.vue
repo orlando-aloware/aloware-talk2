@@ -323,6 +323,12 @@ export default {
     },
     resources () {
       this.timeline = this.resources.date_range_type
+    },
+    'resources.agent_metrics': {
+      deep: true,
+      handler: function () {
+        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      }
     }
   }
 }

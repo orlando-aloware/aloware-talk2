@@ -8,7 +8,8 @@
 </template>
 
 <script>
-import { DEFAULT_CONTACT_LIST_ITEMS, DYNAMIC } from 'src/constants/contacts-list-types'
+import { DYNAMIC } from 'src/constants/contacts-list-types'
+import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import { mapActions, mapGetters } from 'vuex'
 import ContactsView from './ContactsView.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'

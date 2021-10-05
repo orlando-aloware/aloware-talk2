@@ -43,7 +43,7 @@
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
-import * as ContactListTypes from 'src/constants/contacts-list-types'
+import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
   components: {
@@ -70,7 +70,7 @@ export default {
     return {
       isBusy: false,
       contactsToDelete: null,
-      ContactListTypes
+      ContactsListRemoveFromTypes
     }
   },
   watch: {
@@ -91,13 +91,13 @@ export default {
     handleSingleDeletion () {
       let url = null
       switch (this.removeContactActionType) {
-        case ContactListTypes.REMOVE_FROM_LIST_ONLY:
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
           url = '/api/v2/contact-list-item/' +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
           break
-        case ContactListTypes.REMOVE_FROM_CONTACTS:
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v2/contacts/${this.contactToRemove.id}`
           break
       }
@@ -120,10 +120,10 @@ export default {
     handleBulkDeletion () {
       let url = null
       switch (this.removeContactActionType) {
-        case ContactListTypes.REMOVE_FROM_LIST_ONLY:
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
           url = `/api/v2/contact-list-item/bulk/${this.selectedList.id}`
           break
-        case ContactListTypes.REMOVE_FROM_CONTACTS:
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v2/contacts/bulk-delete`
           break
       }

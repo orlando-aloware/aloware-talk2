@@ -1,4 +1,8 @@
-import { DEFAULT_COLUMNS, OPERATORS, STATIC_COLUMNS } from 'src/constants/contacts-list-types'
+import {
+  DEFAULT_COLUMNS,
+  STATIC_COLUMNS
+} from 'src/constants/contacts-columns'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export const DEFAULT_STATE = {
   lists: {

@@ -5,7 +5,7 @@
         Pinned
       </div>
     </div>
-    <div class="d-flex pinned__content flex-column">
+    <div class="d-flex pinned__content flex-column pl-2">
       <contacts-pinned-item v-for="item in pinnedLists"
                             :item="item"
                             :key="item.id">
@@ -17,7 +17,9 @@
 <script>
 import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
-import { DEFAULT_CONTACT_LIST, DYNAMIC, OPERATORS, STATIC } from 'src/constants/contacts-list-types'
+import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import ContactsPinnedItem from 'components/contacts/contacts-pinned-item'
 
 export default {
@@ -61,23 +63,23 @@ export default {
         this.loadStatusCounts()
       ]).then(([allContacts, myContacts, statusCounts]) => {
         this.pinnedCountLoaded({
-          id: DEFAULT_CONTACT_LIST.ALL_CONTACTS.id,
+          id: DEFAULT_PINNED_LIST.ALL_CONTACTS.id,
           count: allContacts
         })
         this.pinnedCountLoaded({
-          id: DEFAULT_CONTACT_LIST.MY_CONTACTS.id,
+          id: DEFAULT_PINNED_LIST.MY_CONTACTS.id,
           count: myContacts
         })
         this.pinnedCountLoaded({
-          id: DEFAULT_CONTACT_LIST.NEWLEADS.id,
+          id: DEFAULT_PINNED_LIST.NEWLEADS.id,
           count: statusCounts['new_contacts_count']
         })
         this.pinnedCountLoaded({
-          id: DEFAULT_CONTACT_LIST.UNANSWERED.id,
+          id: DEFAULT_PINNED_LIST.UNANSWERED.id,
           count: statusCounts['unanswered_contacts_count']
         })
         this.pinnedCountLoaded({
-          id: DEFAULT_CONTACT_LIST.UNASSIGNED.id,
+          id: DEFAULT_PINNED_LIST.UNASSIGNED.id,
           count: statusCounts['unassigned_contacts_count']
         })
       }).finally(() => {

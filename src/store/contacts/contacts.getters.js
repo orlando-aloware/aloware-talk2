@@ -1,4 +1,4 @@
-import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 export default {
   opened: (state) => new Set(state.opened),
@@ -27,7 +27,7 @@ export default {
   isFiltersOpen: (state) => state.isFiltersOpen,
   isBulkDelete: (state) => state.isBulkDelete,
   pinnedLists: (state) => {
-    const pinnedLists = Object.values(DEFAULT_CONTACT_LIST)
+    const pinnedLists = Object.values(DEFAULT_PINNED_LIST)
       .map((item) => {
         return {
           ...item,
