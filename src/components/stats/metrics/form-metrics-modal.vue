@@ -15,6 +15,7 @@
               {{ title }}
             </div>
             <q-select
+              rounded
               outlined
               dense
               map-options
@@ -24,6 +25,7 @@
               input-debounce="0"
               option-value="metric_id"
               option-label="label"
+              class="border-half-rounded"
               ref="statsSelectMetrics"
               v-model="metric"
               :options="filteredMetricOptions"
@@ -48,14 +50,17 @@
               </template>
             </q-select>
             <q-select
-              @popup-show="onShowColorMenu"
-              outlined dense
-              v-model="color"
-              :options="colors"
+              rounded
+              outlined
+              dense
+              ref="statsSelectTextColor"
               option-value="text"
               option-label="text"
-              ref="statsSelectTextColor"
-              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
+              class="border-half-rounded"
+              v-model="color"
+              :options="colors"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowColorMenu">
               <template v-slot:selected>
                 <template v-if="color">
                   <i :class="`fas fa-square color-${color.color} pr-2`"></i>
@@ -84,7 +89,7 @@
               color="blue"
               text-color="white"
               :label="buttonLabel"
-              class="full-width" />
+              class="full-width stats-page-btn border-half-rounded" />
           </q-card-section>
         </q-card>
       </div>

@@ -86,7 +86,7 @@
             v-if="contact.id"
           >
             <span :style="`color: ${contact.tags[0].color};`">
-              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`"></i>
+              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
               <span v-if="contact.tags.length > 1">
                 {{ contact.tags[0].name | truncate(17) }}
               </span>

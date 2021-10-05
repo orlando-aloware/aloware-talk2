@@ -432,6 +432,9 @@ body,
     height: 100%;
     .tag-items {
       max-width: 200px;
+      .tag-text {
+        padding-left: 4px;
+      }
     }
     .select-option {
       &:hover {
@@ -465,9 +468,13 @@ body,
   line-height: 18px;
 }
 
-.q-btn {
+.stats-page-btn {
+  padding: 11px 29px 11px 28px !important;
+  line-height: 18px;
+
   .q-btn__wrapper {
     padding: 0;
+    min-height: auto !important;
 
     .q-btn__content {
       align-items: center;
@@ -1253,6 +1260,11 @@ i.option-separator {
 
 .border-half-rounded {
   border-radius: 6px;
+  &.q-field--rounded {
+    .q-field__control {
+      border-radius: 6px;
+    }
+  }
 }
 
 .border-rounded {
@@ -1571,8 +1583,12 @@ i.option-separator {
 }
 
 .is-dot {
-  padding: 3px 3px;
-
+  min-height: 5px;
+  min-width: 4.8px;
+  height: 5px;
+  width: 4.8px;
+  padding: 0;
+  margin: 0;
   &.unread-dot {
     transform: translateX(-14px);
   }
@@ -7226,4 +7242,8 @@ button.grey-90 {
       align-items: flex-end;
     }
   }
+}
+
+.transparent {
+  opacity: 0;
 }

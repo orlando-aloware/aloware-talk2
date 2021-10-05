@@ -260,10 +260,10 @@ export const fixFullDuration = (duration) => {
     }
 
     if (min) {
-      result += `${min}m`
+      result += ` ${min}m`
     }
 
-    return result + `${sec}s`
+    return (result + ` ${sec}s`).trim()
   } else {
     return '-'
   }

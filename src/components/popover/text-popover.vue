@@ -3,6 +3,7 @@
     @mouseover="hovered = true"
     @mouseleave="hovered = false">
     <q-input
+      style="height: 32px;"
       v-show="active"
       outlined
       v-model="content"
@@ -12,8 +13,9 @@
       @keyup.esc="closeInput"
       @blur="handleInput" />
     <div
+      style="height: 32px;"
       v-show="!active"
-      class="pr-0">
+      class="pr-0 d-flex align-items-center">
       {{ modelValue }}
     </div>
     <div
