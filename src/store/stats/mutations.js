@@ -31,7 +31,7 @@ export default {
     const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.id)
     const index = metricGroup ? state.metricGroups.indexOf(metricGroup) : null
 
-    if (index === -1 || index === null) {
+    if (index === -1 || index === null || typeof data.agent_metrics === 'undefined') {
       return
     }
 
