@@ -7,7 +7,7 @@
               option-label="label"
               input-debounce="0"
               style="word-break: break-all;"
-              use-input
+              :use-input="useInput"
               emit-value
               map-options
               dense
@@ -69,6 +69,10 @@ export default {
     customClass: {
       type: String,
       default: ''
+    },
+    useInput: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {

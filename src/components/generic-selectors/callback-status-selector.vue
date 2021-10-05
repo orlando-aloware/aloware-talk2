@@ -7,7 +7,7 @@
               option-label="label"
               input-debounce="0"
               style="word-break: break-all;"
-              use-input
+              :use-input="useInput"
               emit-value
               map-options
               dense
@@ -74,6 +74,10 @@ export default {
     customClass: {
       type: String,
       default: ''
+    },
+    useInput: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -123,15 +127,27 @@ export default {
     },
     onShowMenu () {
       this.selectWidth = this.$refs.callbackStatusSelect.$el.offsetWidth
+    },
+    setAlternativePlaceholder () {
+      this.$el.querySelector('.q-field__native > span').classList.remove('text-muted')
+      if (!this.value && !this.useInput) {
+        let _this = this
+        setTimeout(function () {
+          _this.$el.querySelector('.q-field__native > span').innerText = 'None'
+          _this.$el.querySelector('.q-field__native > span').classList.add('text-muted')
+        }, 300)
+      }
     }
   },
 
   mounted () {
     this.options = this.optsArray
+    this.setAlternativePlaceholder()
   },
 
   watch: {
     value () {
+      this.setAlternativePlaceholder()
       this.callbackStatus = this.value
     },
 

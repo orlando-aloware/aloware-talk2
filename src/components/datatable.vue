@@ -89,11 +89,12 @@
       <q-pagination
         boundary-links
         direction-links
-        class="table-pagination"
+        class="table-pagination mr-1"
         v-model="paginationPage"
         :max="lastPage"
         :max-pages="11"
         :ellipses="false"
+        :boundary-numbers="false"
       ></q-pagination>
 
       <q-select outlined

@@ -167,7 +167,6 @@ export default {
   },
   mounted () {
     this.diagnose()
-    console.log('mounted')
   }
 }
 </script>

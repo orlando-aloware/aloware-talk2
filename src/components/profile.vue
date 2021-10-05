@@ -1,7 +1,15 @@
 <template>
-  <q-item v-if="profile">
+  <q-item v-if="profile" class="menu-avatar-wrapper">
     <q-item-section>
-      <q-item-label class="text-regular _500">{{ profile.first_name }}</q-item-label>
+      <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
+        <half-moon-icon v-if="!profile.sleep_mode"
+                         color="#9B51E0"
+                         class="focus-mode-icon"
+                         width="12"
+                         height="12">
+        </half-moon-icon>
+      </q-item-label>
+      <q-item-label class="text-regular _500 user-company-name">{{ profile.company_name }}</q-item-label>
     </q-item-section>
     <q-item-section class="profile-menu"
                     avatar>
@@ -12,7 +20,6 @@
                       content-class="tab-avatar-menu"
                       class="tab-dropdown"
                       ref="menu"
-                      persistent
                       flat>
         <template v-slot:label>
           <q-avatar size="34px"
@@ -35,7 +42,7 @@
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
                          class="rounded-badge bordered q-mr-sm">
                 </q-badge>
-                Offline
+                <span class="user-status-name">Offline</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_OFFLINE">
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary' : '']"></i>
@@ -49,9 +56,9 @@
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                         class="rounded-badge bordered q-mr-sm">
+                         class="rounded-badge bordered q-mr-sm mt-1">
                 </q-badge>
-                Available
+                <span class="user-status-name">Available</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS">
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
@@ -67,7 +74,7 @@
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
                          class="rounded-badge bordered q-mr-sm">
                 </q-badge>
-                Busy
+                <span class="user-status-name">Busy</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS">
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
@@ -83,7 +90,7 @@
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
                          class="rounded-badge bordered q-mr-sm">
                 </q-badge>
-                On-break
+                <span class="user-status-name">On-break</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK">
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary' : '']"></i>
@@ -93,10 +100,17 @@
 
           <q-separator class="mt-1 mb-1"></q-separator>
           <q-item dense
-                  clickable>
+                  clickable
+                  @click="toggleSleepMode">
             <q-item-section>
               <div>
-                <i class="fa fa-moon"></i> Turn Notifications On
+                <half-moon-icon :color="!profile.sleep_mode ? '#9B51E0' : '#040404'"
+                                class="focus-mode-icon"
+                                width="12"
+                                height="12">
+                </half-moon-icon> Turn Notifications <span class="user-notification-status _800">
+                {{ !profile.sleep_mode ? 'On' : 'Off' }}
+              </span>
               </div>
             </q-item-section>
           </q-item>
@@ -104,8 +118,9 @@
                   dense
                   clickable>
             <q-item-section>
-              <div>
-                <i class="fa fa-sign-out-alt"></i> Logout
+              <div class="text-red-80">
+                <logout-icon width="15"
+                             height="15"/> Logout
               </div>
             </q-item-section>
           </q-item>
@@ -119,10 +134,13 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
+import LogoutIcon from 'components/icons/logout-icon'
+import HalfMoonIcon from 'components/icons/half-moon-icon'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'profile',
-
+  components: { HalfMoonIcon, LogoutIcon },
   mixins: [aclMixin, avatarMixin, agentMixin],
 
   data () {
@@ -165,9 +183,16 @@ export default {
   },
 
   methods: {
-    ...mapActions('auth', ['logout']),
+    ...mapActions('auth', ['logout', 'setProfile']),
     changeStatus (status) {
       this.changeAgentStatus(status)
+    },
+
+    toggleSleepMode () {
+      talk2Api.V1.profile.store({ sleep_mode: !this.profile.sleep_mode }).then(response => {
+        this.setProfile({ ...this.profile, sleep_mode: response.data.sleep_mode })
+      })
+      this.$refs.menu.hide()
     },
 
     async logoutAction () {
@@ -175,7 +200,7 @@ export default {
         const response = await this.logout()
 
         this.response = response?.data
-
+        this.$refs.menu.hide()
         await this.$router.push({ name: 'Login' })
       } catch (err) {
         console.error(err)
