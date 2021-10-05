@@ -407,6 +407,7 @@ export default {
   },
 
   methods: {
+    ...mapActions('inbox', ['setSelectedFilter']),
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
       this.filter.search_text = this.searchText
@@ -434,6 +435,7 @@ export default {
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setCommunications([])
+      this.setSelectedFilter(null)
     },
 
     checkCommunicationMatchesFilters (communication) {
