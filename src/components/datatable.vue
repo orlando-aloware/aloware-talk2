@@ -89,6 +89,7 @@
       <q-pagination
         boundary-links
         direction-links
+        dense
         class="table-pagination mr-1"
         v-model="paginationPage"
         :max="lastPage"

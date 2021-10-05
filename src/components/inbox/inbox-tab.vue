@@ -8,9 +8,12 @@
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
           <div class="mention-filter-actions-wrapper ml-2 pr-4">
-            <div class="position-absolute search-icon"><search-icon color="#95989E"
-                                                                    width="14"
-                                                                    height="14"></search-icon></div>
+            <div class="position-absolute search-icon">
+              <search-icon color="#95989E"
+                           width="14"
+                           height="14">
+              </search-icon>
+            </div>
             <line-and-ring-group-selector custom-placeholder="Filter"
                                           v-model="lineOrRingGroupFilter"
                                           :clearable="true"
@@ -419,8 +422,11 @@ export default {
       this.loadContactTasks()
     },
     '$route.params.status': function () {
-      this.lineOrRingGroupFilter = null
-      this.resetList()
+      this.setStatus()
+      if (this.$route.name === 'Inbox Channel Task Status') {
+        this.lineOrRingGroupFilter = null
+        this.resetList()
+      }
     },
     '$route.name': function (value) {
       if (['Inbox'].includes(value)) {
