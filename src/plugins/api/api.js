@@ -229,6 +229,11 @@ export default {
           return window.axios.delete(`${suffixV1}voicemail-drop/${id}`)
         }
       }
+    },
+    profile: {
+      store (params) {
+        return window.axios.post(`${suffixV1}profile`, params)
+      }
     }
   },
   V2: {

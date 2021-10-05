@@ -7,8 +7,10 @@
                     :has-custom-left-content="true"
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
-          <div class="mention-filter-actions-wrapper mt-3 ml-2 pr-4">
-            <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
+          <div class="mention-filter-actions-wrapper ml-2 pr-4">
+            <div class="position-absolute search-icon"><search-icon color="#95989E"
+                                                                    width="14"
+                                                                    height="14"></search-icon></div>
             <line-and-ring-group-selector custom-placeholder="Filter"
                                           v-model="lineOrRingGroupFilter"
                                           :clearable="true"
@@ -36,7 +38,7 @@
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
-              <span class="text-left">
+              <span class="text-left task-status-name">
                 Open
               </span>
               <div class="text-center task-count ml-2">
@@ -48,9 +50,9 @@
           </template>
 
           <template v-slot:two>
-            <div class="d-flex justify-content-centerw-100 options"
+            <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-90' : 'active']">
-              <span class="text-left">
+              <span class="text-left task-status-name">
                 Pending
               </span>
               <div class="text-center task-count ml-2">
@@ -64,7 +66,7 @@
           <template v-slot:three>
             <div class="w-100 options"
                  :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-90' : 'active']">
-                <span class="text-center">
+                <span class="text-center task-status-name">
                   Closed
                 </span>
             </div>

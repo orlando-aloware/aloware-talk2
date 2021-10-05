@@ -141,6 +141,7 @@ $primary-hover: #054CDB;
 @include text-color('grey-20', $grey-20);
 @include text-color('grey-10', $grey-10, true);
 @include text-color('red-100', $red-100);
+@include text-color('red-80', $red-80);
 
 // Background Colors
 @include bg-color('grey-91', $grey-91, true);

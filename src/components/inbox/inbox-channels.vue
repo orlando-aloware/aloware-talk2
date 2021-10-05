@@ -16,10 +16,15 @@
               <i class="fa fa-times"></i>
             </compact-btn>
             <compact-btn borderless
-                         customClass="ml-1 fs-14 _500 position-relative primary not-focusable"
+                         customClass="ml-1 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
                          :variant="filterButtonVariant"
                          v-b-modal:inbox-channel-filter-modal>
-              Filters
+              <q-tooltip v-if="selectedFilter"
+                         anchor="top middle"
+                         self="center middle">
+                {{ selectedFilter.name }}
+              </q-tooltip>
+              {{ !selectedFilter ? 'Filters' : selectedFilter.name }}
             </compact-btn>
             <b-badge v-if="hasChannelFilterChanges"
                      class="ml-1 fs-12"
@@ -42,8 +47,13 @@
       </div>
       <div class="header flex- w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-2 pr-2">
-          <div class="mention-filter-actions-wrapper mt-3 pr-4">
-            <div class="position-absolute search-icon"><search-icon color="#95989E"></search-icon></div>
+          <div class="mention-filter-actions-wrapper pr-4">
+            <div class="position-absolute search-icon">
+              <search-icon color="#95989E"
+                           width="14"
+                           height="14">
+              </search-icon>
+            </div>
             <user-selector custom-placeholder="Filter by User"
                            :clearable="true"
                            :hide-dropdown-icon="true"
@@ -203,7 +213,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter']),
 
     nextPage () {
       return this.currentPage + 1

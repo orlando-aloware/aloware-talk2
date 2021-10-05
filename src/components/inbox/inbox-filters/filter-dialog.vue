@@ -8,7 +8,7 @@
     hide-footer
     ref="inbox-channel-filter-modal"
     @hidden="onHidden"
-    @show="getFilters">
+    @show="onShow">
 
     <div class="modal-body-wrapper d-flex">
       <div class="w-50 left-column-wrapper">
@@ -25,7 +25,7 @@
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
           <div class="saved-filters">
             <q-skeleton type="rect" v-if="isGettingFilters" />
-            <p class="text-muted fs-12 text-center text-italic" v-show="!isGettingFilters" v-if="personalFilters.length < 1">No personal filters found</p>
+            <p class="text-muted fs-12 empty-filter-placeholder" v-show="!isGettingFilters" v-if="personalFilters.length < 1">None</p>
             <filter-list-items v-for="item in personalFilters"
                                :key="item.id"
                                :filter="item"
@@ -37,7 +37,7 @@
           <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
           <div class="saved-filters">
             <q-skeleton type="rect" v-if="isGettingFilters" />
-            <p class="text-muted fs-12 text-center text-italic" v-show="!isGettingFilters" v-if="companyFilters.length < 1">No company filters found</p>
+            <p class="text-muted fs-12 empty-filter-placeholder" v-show="!isGettingFilters" v-if="companyFilters.length < 1">None</p>
             <div class="filter-items cursor-pointer"
                  v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === item.id }"
                  v-for="item in companyFilters"
@@ -54,14 +54,13 @@
           </div>
         </div>
       </div>
-      <div class="flex-grow-1">
+      <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
           <div>
             <span class="filter-name">(Unsaved) Filter</span>
           </div>
           <div>
-            <compact-btn variant="secondary"
-                         class="bg-grey-80 mr-3"
+            <compact-btn class="mr-3 btn-tertiary"
                          :disabled="channelChangedFilterFields.length < 1"
                          @clicked="onResetFilter">Reset</compact-btn>
             <compact-btn variant="primary"
@@ -70,8 +69,7 @@
               <q-spinner-bars v-if="isUpdatingFilter" color="white" />
               {{ isUpdatingFilter ? ' Saving...' : ' Save' }}
               </compact-btn>
-            <compact-btn variant="primary"
-                         class="ml-3"
+            <compact-btn class="ml-3 btn-secondary"
                          :disabled="!(selectedFilter && selectedFilterHasChanges)"
                          v-b-modal:create-filter-modal>
               Save as New
@@ -246,7 +244,11 @@ export default {
     },
 
     onHidden () {
-      this.setSelectedFilter(null)
+      // this.setSelectedFilter(null)
+    },
+
+    onShow () {
+      this.getFilters()
     },
 
     onResetFilter: function () {
