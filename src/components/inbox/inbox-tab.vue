@@ -44,7 +44,7 @@
               <span class="text-left task-status-name">
                 Open
               </span>
-              <div class="text-right task-count ml-2">
+              <div class="text-center task-count ml-2">
                   <span>
                     {{ taskCounts.open | numberPlusFormatter(99) }}
                   </span>

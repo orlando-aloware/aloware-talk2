@@ -1,78 +1,85 @@
 <template>
-  <router-link
-    class="tree-list-item"
-    :to="'/contacts/list/' + id"
-    v-slot="{ navigate, isExactActive }"
-  >
-    <div :data-layer="layer">
-      <div
-        :title="name"
-        :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
-        class="folder d-flex align-items-center"
-      >
-        <div class="folder__indent" :style="indentStyle"></div>
-        <div class="folder__icon">
-          <folder-static-icon color="#62666E"
-            v-if="type === ContactListTypes.STATIC"
-          ></folder-static-icon>
-          <folder-dynamic-icon color="#62666E"
-            v-if="type === ContactListTypes.DYNAMIC"
-          ></folder-dynamic-icon>
-        </div>
-        <div class="folder__name">
-          <input
-            :id="'folder-input-' + id"
-            v-if="isEditing"
-            type="text"
-            :value="name"
-            :disabled="isRenaming"
-            class="folder__input d-inline"
-            @blur="onInputBlur"
-            @keydown="onKeyDown"
-            autofocus
-          />
-          <span @click="navigate" v-if="!isEditing">
-            {{ name }}
-          </span>
-        </div>
-
-        <button
-          :tabindex="id"
-          :data-popper-target="'list-' + id"
-          :id="'folder-option-' + id + '-' + layer"
-          class="folder__option btn btn-link p-0"
-        >
-          <folder-option></folder-option>
-        </button>
-      </div>
-
-      <b-popover
-        :target="'folder-option-' + id + '-' + layer"
-        triggers="click blur"
-        placement="bottomright"
-        boundary="window"
-        custom-class="contact-popover"
-      >
-        <list-actions
-          :type="type"
-          @remove="onRemoveList"
-          @rename="onRenameList"
-          @pin="onPin"
-          @move="onMove"
-          @duplicate="onDuplicate"
-          @clonestatic="onCloneStatic"
-          :hasEdit="hasEdit"
-          :hasDelete="hasDelete"
-          :isPinned="isPinned"
-        ></list-actions>
-      </b-popover>
+  <div class="folder d-flex align-items-center">
+    <div class="folder__arrow">
+      <folder-arrow-close-icon class="transparent">
+      </folder-arrow-close-icon>
     </div>
-  </router-link>
+    <router-link
+      class="tree-list-item flex-grow-1 d-flex-shrink-0"
+      :to="'/contacts/list/' + id"
+      v-slot="{ navigate, isExactActive }"
+    >
+      <div :data-layer="layer">
+        <div
+          :title="name"
+          :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
+          class="folder d-flex align-items-center"
+        >
+          <div class="folder__indent" :style="indentStyle"></div>
+          <div class="folder__icon">
+            <folder-static-icon color="#62666E"
+              v-if="type === ContactListTypes.STATIC"
+            ></folder-static-icon>
+            <folder-dynamic-icon color="#62666E"
+              v-if="type === ContactListTypes.DYNAMIC"
+            ></folder-dynamic-icon>
+          </div>
+          <div class="folder__name">
+            <input
+              :id="'folder-input-' + id"
+              v-if="isEditing"
+              type="text"
+              :value="name"
+              :disabled="isRenaming"
+              class="folder__input d-inline"
+              @blur="onInputBlur"
+              @keydown="onKeyDown"
+              autofocus
+            />
+            <span @click="navigate" v-if="!isEditing">
+              {{ name }}
+            </span>
+          </div>
+
+          <button
+            :tabindex="id"
+            :data-popper-target="'list-' + id"
+            :id="'folder-option-' + id + '-' + layer"
+            class="folder__option btn btn-link p-0"
+          >
+            <folder-option></folder-option>
+          </button>
+        </div>
+
+        <b-popover
+          :target="'folder-option-' + id + '-' + layer"
+          triggers="click blur"
+          placement="bottomright"
+          boundary="window"
+          custom-class="contact-popover"
+        >
+          <list-actions
+            :type="type"
+            @remove="onRemoveList"
+            @rename="onRenameList"
+            @pin="onPin"
+            @move="onMove"
+            @duplicate="onDuplicate"
+            @clonestatic="onCloneStatic"
+            :hasEdit="hasEdit"
+            :hasDelete="hasDelete"
+            :isPinned="isPinned"
+          ></list-actions>
+        </b-popover>
+      </div>
+    </router-link>
+  </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
+import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
@@ -83,6 +90,7 @@ let inputTimeout
 
 export default {
   components: {
+    FolderArrowCloseIcon,
     FolderOption,
     FolderStaticIcon,
     FolderDynamicIcon,
@@ -92,7 +100,9 @@ export default {
     ...mapGetters('contacts', ['pinned', 'moveDialog']),
     indentStyle () {
       return {
-        width: `${this.layer * 10}px`
+        'flex-basis': `${this.layer * 10}px`,
+        'flex-grow': 0,
+        'flex-shrink': 0
       }
     },
     isPinned () {

@@ -26,15 +26,21 @@ select {
 .mini-select {
   .q-field__inner {
     .q-field__control {
-      height: 26px !important;
-      min-height: 26px !important;
+      height: auto !important;
+      min-height: auto !important;
+      padding-top: 7px!important;
+      padding-bottom: 7px!important;
       .q-field__control-container {
         .q-field__native {
-          min-height: 26px !important;
+          min-height: auto !important;
           font-size: 13px;
           padding: 0;
+          padding-left: 15px !important;
         }
       }
-    }    
+      .q-field__append {
+        padding-right: 14px !important;
+      }
+    }
   }
 }

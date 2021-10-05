@@ -300,7 +300,10 @@ export default {
       }).then(res => {
         this.$generalNotification('Metric successfully updated.')
       }).catch(err => {
-        this.setMetricGroupMetrics(previousMetrics)
+        this.setMetricGroupMetrics({
+          metricGroupId: this.metricGroupId,
+          data: previousMetrics
+        })
         console.log(err)
         this.$generalNotification('Failed to update metric.', 'error')
       })

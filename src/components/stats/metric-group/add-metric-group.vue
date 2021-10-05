@@ -1,12 +1,12 @@
 <template>
-  <q-card-actions class="px-0 pt-3 pb-0 default-btn-padding">
+  <q-card-actions class="px-0 pt-3 pb-0">
     <q-space />
     <q-btn
       @click="createMetricGroup"
       unelevated
       no-caps dense
       :disabled="disabled"
-      class="px-4 py-1 border-half-rounded"
+      class="px-4 border-half-rounded stats-page-btn"
       color="primary">
       <div class="row items-center no-wrap">
         <div class="d-flex justify-content-center align-items-center">
