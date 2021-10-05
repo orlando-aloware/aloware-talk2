@@ -2,7 +2,7 @@
   <q-item v-if="profile" class="menu-avatar-wrapper">
     <q-item-section>
       <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
-        <half-moon-icon v-if="!profile.sleep_mode"
+        <half-moon-icon v-if="profile.sleep_mode"
                          color="#9B51E0"
                          class="focus-mode-icon"
                          width="12"
@@ -109,7 +109,7 @@
                                 width="12"
                                 height="12">
                 </half-moon-icon> Turn Notifications <span class="user-notification-status _800">
-                {{ !profile.sleep_mode ? 'On' : 'Off' }}
+                {{ profile.sleep_mode ? 'On' : 'Off' }}
               </span>
               </div>
             </q-item-section>
