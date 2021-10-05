@@ -9,7 +9,7 @@
                          height="12">
         </half-moon-icon>
       </q-item-label>
-      <q-item-label class="text-regular _500 user-company-name">{{ profile.company_name }}</q-item-label>
+      <q-item-label class="text-regular _500 user-company-name text-right">{{ profile.company_name }}</q-item-label>
     </q-item-section>
     <q-item-section class="profile-menu"
                     avatar>
