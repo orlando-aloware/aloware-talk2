@@ -206,7 +206,8 @@ export default {
     handleClick (evt) {
       if (
         evt.target &&
-        !this.$refs.moveDialog.contains(evt.target) &&
+        !(this.$refs.moveDialog && this.$refs.moveDialog.constructor.name === 'Object' && this.$refs.moveDialog.contains(evt.target)) &&
+        !evt.path.find(path => path.className && typeof path.className === 'string' && path.className.split(' ').includes('move-dialog')) &&
         !evt.target.classList.contains('contact-menu-item') &&
         !evt.target.classList.contains('move-item')
       ) {

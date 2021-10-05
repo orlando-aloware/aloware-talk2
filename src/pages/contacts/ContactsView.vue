@@ -36,13 +36,14 @@
           :disabled="isLoadingDisabled">
         </search>
         <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
-          <label for="my-contacts" class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
+            :disabled="isLoading"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -57,25 +58,25 @@
         </div>
         <div class="v-divider">
         </div>
-        <div :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
-          <compact-btn
-            borderless
-            variant="outlined-light"
-            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
-            @clicked="onFiltersClicked"
-          >
+        <div class="d-flex align-items-center px-2"
+             :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
+          <compact-btn borderless
+                       variant="outlined-light"
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       @clicked="onFiltersClicked">
             <b-badge v-if="hasAppliedFilters"
-                     class="ml-2 mt-1"
+                     style="top: 0; padding-top: 3px;"
+                     class="d-flex align-items-center"
                      pill
                      variant="primary">
               {{ filtersCount }}
             </b-badge>
-            <span class="pl-2  pr-2">Filters</span>
+            <span class="pl-2 pr-2 d-flex align-items-center">Filters</span>
 
           </compact-btn>
-          <compact-btn
-                       borderless
-                       customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+          <compact-btn borderless
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       style="padding-top: 2px;"
                        variant="outlined-light"
                        v-if="hasAppliedFilters"
                        :disabled="isResetDisabled"
@@ -192,8 +193,7 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters @filtersUpdated="updateFilterHasChanges"
-                        @filtersCount="updateFiltersCount"/>
+      <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
@@ -336,9 +336,6 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to update contact list.', 'error')
         })
-    },
-    updateFiltersCount (count) {
-      this.filtersCount = count
     },
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)

@@ -279,6 +279,10 @@ export default {
       if (!skipStep) {
         this.step = 2
       }
+
+      if (this.isEmptyListFilters) {
+        this.filterSearch = ''
+      }
     },
 
     selectFilter (filter) {
@@ -453,18 +457,6 @@ export default {
       this.$emit('filtersUpdated')
     },
 
-    emitFiltersCount () {
-      let filtersCount = 0
-      if (this.currentListFilters.length) {
-        for (let group of this.currentListFilters) {
-          const filter = _.get(group, 'filters', null)
-          filtersCount += filter ? Object.keys(filter).length : 0
-        }
-      }
-
-      this.$emit('filtersCount', filtersCount)
-    },
-
     ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters'])
   },
 
@@ -474,7 +466,6 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
-      this.emitFiltersCount()
     }
   }
 }
