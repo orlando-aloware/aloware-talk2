@@ -42,8 +42,9 @@ export default {
     ])
   },
   created () {
+    console.log('this.isStartingDial :>> ', this.isStartingDial)
     if (!this.isStartingDial) {
-      // this.$router.push({ name: 'Power Dialer' })
+      this.$router.push({ name: 'Power Dialer' })
     }
   }
 }

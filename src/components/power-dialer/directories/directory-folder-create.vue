@@ -20,6 +20,7 @@
           v-model="text"
           class="folder-create__input d-inline"
           ref="input"
+          placeholder="Name of List"
           autofocus />
       </div>
     </div>

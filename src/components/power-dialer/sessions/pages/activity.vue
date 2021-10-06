@@ -93,7 +93,6 @@ export default {
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
-      console.log('this.selectedContact :>> ', this.selectedContact)
       if (this.selectedContact?.id) {
         this.processFetchContactInfo(function (selectedContact) {
           _this.setContact(selectedContact)
@@ -104,7 +103,7 @@ export default {
       }
     },
     markAllAsRead2 () {
-      console.log('888 :>> ', 888)
+      console.log('900 :>> ', 900)
     }
   },
   watch: {

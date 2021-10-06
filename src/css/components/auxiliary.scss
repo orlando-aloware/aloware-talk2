@@ -229,3 +229,11 @@
     }
   }
 }
+
+.t-cascade-card {
+  width: 100%;
+  width: 426px;
+  &__mini {
+    width: 150px;
+  }
+}

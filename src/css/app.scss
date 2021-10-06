@@ -4844,8 +4844,19 @@ span.mention {
   }
 }
 
-.contact-popover .popover-body {
-  padding: 0;
+.contact-popover {
+  &__custom {
+    padding: 4px !important;
+    width: 260px;
+    .popover-body {
+      .contact-menu {
+        width: 100%;
+      }
+    }
+  }
+  .popover-body {
+    padding: 0;
+  }
 }
 
 .create-list-modal {

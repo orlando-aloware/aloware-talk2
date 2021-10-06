@@ -202,7 +202,6 @@ export default {
       'createListOpen'
     ]),
     onMove () {
-      console.log('Moving folders...')
       this.$root.$emit('bv::hide::popover')
       this.openMoveDialog({
         id: this.id,

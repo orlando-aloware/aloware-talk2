@@ -4,6 +4,7 @@ export default {
   opened: (state) => new Set(state.opened),
   filters: (state) => state.filters,
   moveDialog: (state) => state.moveDialog,
+  createDialog: (state) => state.createDialog,
   createList: (state) => state.createList,
   isRemoveListOpen: (state) => !!state.removeList,
   pinned: (state) => state.pinned,

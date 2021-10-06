@@ -21,6 +21,12 @@ export default function () {
       type: 'folder',
       target: null
     },
+    createDialog: {
+      open: false,
+      id: null,
+      type: 'list',
+      target: null
+    },
     // powerDialerList: null,
     contactResources: [],
     selectedContacts: {},

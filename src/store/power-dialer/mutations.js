@@ -56,6 +56,12 @@ export default {
   MOVE_DIALOG_OPEN: (state, { id, type }) => {
     state.moveDialog = { open: true, id, type }
   },
+  MOVE_DIALOG_CLOSE: (state) => {
+    state.moveDialog = { open: false }
+  },
+  CREATE_DIALOG_OPEN: (state) => {
+    state.createDialog = { open: false }
+  },
   MOVE_DIALOG_TARGET: (state, { target }) => {
     state.moveDialog = {
       ...state.moveDialog,
@@ -82,8 +88,5 @@ export default {
   },
   REMOVE_LIST_CLOSE: (state) => {
     state.removeList = null
-  },
-  MOVE_DIALOG_CLOSE: (state) => {
-    state.moveDialog = { open: false }
   }
 }

@@ -1,6 +1,7 @@
 <template>
-  <div class="move-dialog shadow-sm" ref="moveDialog">
-    <div class="move-dialog-input">
+  <div class="create-dialog shadow-sm" ref="createDialog">
+    -- {{ hasSelected }}
+    <div class="create-dialog-input">
       <div>
         <Search
           ref="folder-search"
@@ -9,7 +10,7 @@
         ></Search>
       </div>
     </div>
-    <div class="move-dialog-lists">
+    <div class="create-dialog-lists">
       <MoveFolderItem
         v-for="folder in searchedItemsList"
         :name="folder.name"
@@ -19,7 +20,7 @@
         :folders="folder.child_folders"
         :layer="0" />
     </div>
-    <div class="move-dialog-footer" v-if="hasSelected">
+    <div class="create-dialog-footer" v-if="hasSelected">
       <div class="text-muted small pr-2">
         {{ message }}
       </div>
@@ -77,7 +78,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('powerDialer', ['moveDialog', 'folders', 'powerDialerList']),
+    ...mapGetters('powerDialer', ['createDialog', 'folders', 'powerDialerList']),
     searchedItemsList () {
       if (this.searchValue) {
         return this.filterByActiveId(
@@ -87,17 +88,18 @@ export default {
       return this.filterByActiveId(this.itemsList)
     },
     hasSelected () {
+      console.log('---', this.createDialog)
       return (
-        typeof this.moveDialog.target === 'number' &&
-        this.moveDialog.target >= 0
+        typeof this.createDialog.target === 'number' &&
+        this.createDialog.target >= 0
       )
     }
   },
   methods: {
     ...mapActions('powerDialer', ['closeMoveDialog', 'foldersLoaded']),
     onConfirmMove () {
-      console.log('this.moveDialog :>> ', this.moveDialog)
-      if (this.moveDialog.type === 'list') {
+      console.log('this.moveDialog :>> ', this.createDialog)
+      if (this.createDialog.type === 'list') {
         return this.moveListRequest()
       }
       return this.moveFolderRequest()
@@ -105,7 +107,7 @@ export default {
     moveFolderRequest () {
       this.isMoving = true
       return this.$axios
-        .patch('/api/v2/power-dialer-folders/move/' + this.moveDialog.id, {
+        .patch('/api/v2/power-dialer-folders/move/' + this.createDialog.id, {
           parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
         .then(() => {
@@ -118,8 +120,8 @@ export default {
     moveListRequest () {
       this.isMoving = true
       return this.$axios
-        .patch('/api/v2/power-dialer-list/' + this.moveDialog.id, {
-          contact_folder_id: this.moveDialog.target
+        .patch('/api/v2/power-dialer-list/' + this.createDialog.id, {
+          contact_folder_id: this.createDialog.target
         })
         .then(() => {
           this.reloadFolders()
@@ -144,7 +146,7 @@ export default {
     },
     filterByActiveId (items) {
       return items
-        .filter((i) => i.id !== this.moveDialog.id)
+        .filter((i) => i.id !== this.createDialog.id)
         .map((i) => {
           return {
             ...i,
@@ -204,16 +206,16 @@ export default {
         '[data-popper-target="' + elId + '"]'
       )
 
-      this.$refs.moveDialog.classList.add('d-flex')
+      this.$refs.createDialog.classList.add('d-flex')
 
-      popperInstance = createPopper(reference, this.$refs.moveDialog, {
+      popperInstance = createPopper(reference, this.$refs.createDialog, {
         placement: 'auto'
       })
 
       document.body.addEventListener('click', this.handleClick)
     },
     destroyDialogInstance () {
-      this.$refs.moveDialog.classList.remove('d-flex')
+      this.$refs.createDialog.classList.remove('d-flex')
 
       if (popperInstance) {
         popperInstance.destroy()
@@ -223,7 +225,7 @@ export default {
     handleClick (evt) {
       if (
         evt.target &&
-        !this.$refs.moveDialog.contains(evt.target) &&
+        !this.$refs.createDialog.contains(evt.target) &&
         !evt.target.classList.contains('contact-menu-item') &&
         !evt.target.classList.contains('move-item')
       ) {
@@ -237,7 +239,7 @@ export default {
     this.destroyDialogInstance()
   },
   watch: {
-    moveDialog: function ({ open, ...state }) {
+    createDialog: function ({ open, ...state }) {
       if (open) {
         this.createDialogInstance(state)
       } else {

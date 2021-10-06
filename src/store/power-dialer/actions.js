@@ -39,11 +39,17 @@ export default {
   openMoveDialog: ({ commit }, payload) => {
     commit('MOVE_DIALOG_OPEN', payload)
   },
+  closeMoveDialog: ({ commit }) => {
+    commit('MOVE_DIALOG_CLOSE')
+  },
   createListOpen: ({ commit }, payload) => {
     commit('CREATE_LIST_OPEN', payload)
   },
   removeListOpen: ({ commit }, list) => {
     commit('REMOVE_LIST_OPEN', list)
+  },
+  openCreateListDialog: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_OPEN', payload)
   },
   listLoaded: ({ commit }, payload) => {
     commit('LIST_LOADED', payload)
@@ -56,8 +62,5 @@ export default {
   },
   setMoveDialogTarget: ({ commit }, payload) => {
     commit('MOVE_DIALOG_TARGET', payload)
-  },
-  closeMoveDialog: ({ commit }) => {
-    commit('MOVE_DIALOG_CLOSE')
   }
 }

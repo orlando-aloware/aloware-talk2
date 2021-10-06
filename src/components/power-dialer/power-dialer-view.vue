@@ -351,6 +351,7 @@ export default {
       'setSelectedContact'
     ]),
     beginDial () {
+      console.log('Stating sessions...')
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.$router.push({ name: 'Power Dialer Session' })

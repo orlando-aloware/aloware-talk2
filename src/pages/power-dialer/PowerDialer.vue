@@ -2,6 +2,7 @@
   <div
     v-if="authenticated"
     class="row mx-0 content-row d-flex overflow-hidden h-100">
+
     <div
       v-if="!isStartingDial"
       class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
@@ -11,9 +12,12 @@
       <!-- Router Here -->
       <router-view></router-view>
     </div>
+
     <MoveDialog />
+    <CreateListDialog />
     <RemoveListModal />
     <RemoveFolderDialog />
+
   </div>
 </template>
 
@@ -22,6 +26,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 import MoveDialog from 'components/power-dialer/custom/move-dialog'
+import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
 
@@ -30,6 +35,7 @@ export default {
   components: {
     PowerDialerSidebar,
     MoveDialog,
+    CreateListDialog,
     RemoveListModal,
     RemoveFolderDialog
   },
@@ -40,10 +46,10 @@ export default {
   },
   mounted () {
     this.START_DIAL_TOGGLE(false)
-    console.log('666 :>> ', this.isStartingDial)
+    // console.log('666 :>> ', this.isStartingDial)
   },
   beforeRouteUpdate (to, from, next) {
-    console.log('100 :>> ', 100)
+    console.log('445 :>> ', 445)
     if (to.meta !== 'Power Dialer Session') {
       this.START_DIAL_TOGGLE(false)
     }
@@ -53,8 +59,10 @@ export default {
   watch: {
     'currentRoute': {
       handler () {
+        console.log('object :>> ', this.currentRoute.name)
         if (this.currentRoute.name === 'Power Dialer') {
           this.RESET_LIST()
+          this.START_DIAL_TOGGLE(false)
           this.SET_POWER_DIALER_LIST([])
         }
       },
