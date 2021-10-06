@@ -97,9 +97,11 @@
 import { mapActions, mapGetters } from 'vuex'
 import {
   STATIC,
-  DYNAMIC,
-  DEFAULT_COLUMNS
+  DYNAMIC
 } from 'src/constants/contacts-list-types'
+import {
+  DEFAULT_COLUMNS
+} from 'src/constants/contacts-columns'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'

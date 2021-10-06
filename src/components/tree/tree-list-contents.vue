@@ -1,7 +1,9 @@
 <template>
   <div class="sublists"
-       :class="{'is-root': isRootList}">
+       :class="{'is-root': isRootList}"
+       v-if="lists.length">
     <tree-list-item
+      class="flex-grow-1 w-100"
       v-for="list in lists"
       :name="list.name"
       :key="list.id"

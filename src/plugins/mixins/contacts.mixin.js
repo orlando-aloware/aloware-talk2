@@ -5,10 +5,10 @@ import qs from 'qs'
 import _ from 'lodash'
 
 import {
-  DEFAULT_CONTACT_LIST,
   DYNAMIC,
   STATIC
 } from 'src/constants/contacts-list-types'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 export default {
   data () {
@@ -190,12 +190,18 @@ export default {
     },
     getFiltersCount (filters) {
       let filtersCount = 0
-      if (filters.length) {
+      if (filters.constructor.name === 'Object' && Object.keys(filters).length) {
+        for (let index of Object.keys(filters)) {
+          const filter = _.get(filters[index], 'filters', null)
+          filtersCount += filter ? Object.keys(filter).length : 0
+        }
+      } else if (filters.constructor.name === 'Array' && filters.length) {
         for (let group of filters) {
           const filter = _.get(group, 'filters', null)
           filtersCount += filter ? Object.keys(filter).length : 0
         }
       }
+
       return filtersCount
     },
     markCheckedAll () {
@@ -250,14 +256,14 @@ export default {
       return this.isLoaded && !this.listItems[this.id].data.length
     },
     isMyContactsView () {
-      return DEFAULT_CONTACT_LIST.MY_CONTACTS.id === this.id
+      return DEFAULT_PINNED_LIST.MY_CONTACTS.id === this.id
     },
     isEditable () {
       return !this.defaultIds.includes(this.list.id)
     },
     defaultIds () {
-      return Object.keys(DEFAULT_CONTACT_LIST)
-        .map((k) => DEFAULT_CONTACT_LIST[k].id)
+      return Object.keys(DEFAULT_PINNED_LIST)
+        .map((k) => DEFAULT_PINNED_LIST[k].id)
         .concat(['static'])
     },
     columns () {

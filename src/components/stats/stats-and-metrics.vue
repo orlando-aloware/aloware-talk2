@@ -85,15 +85,13 @@ export default {
 
       const previousMetricGroups = JSON.parse(JSON.stringify(this.metricGroups))
 
-      let order = this.metricGroupList[newIndex].order
+      let order = previousMetricGroups[newIndex].order
       let step = 0
 
       if (newIndex > oldIndex) {
         step = (newIndex - oldIndex)
-        order += step
       } else {
         step = (oldIndex - newIndex)
-        order -= step
       }
 
       await this.updateMetricGroupOrder({

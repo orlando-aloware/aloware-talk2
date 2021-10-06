@@ -6,11 +6,12 @@
       unelevated
       no-caps dense
       :disabled="disabled"
-      class="px-4 py-1"
+      class="px-4 border-half-rounded stats-page-btn"
       color="primary">
       <div class="row items-center no-wrap">
-        <div class="text-center">
-          <plus-icon width="10"
+        <div class="d-flex justify-content-center align-items-center">
+          <plus-icon style="margin-right: 6px;"
+                     width="10"
                      height="10"
                      firstD="M5 1V9"
                      secondD="M9 5H1"

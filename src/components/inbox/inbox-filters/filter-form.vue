@@ -47,6 +47,7 @@
                 <communication-direction-selector v-model="filter.direction"
                                                   custom-class="bottom-border__none highlighted-primary padding-left__none"
                                                   :highlighted="isChanged('direction')"
+                                                  :use-input="false"
                                                   @select="(eventPayload) => onFilterChange(eventPayload, 'direction')">
                 </communication-direction-selector>
               </b-form-group>
@@ -59,6 +60,7 @@
                 <answer-status-selector v-model="filter.answer_status"
                                         custom-class="bottom-border__none highlighted-primary padding-left__none"
                                         :highlighted="isChanged('answer_status')"
+                                        :use-input="false"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'answer_status')">
                 </answer-status-selector>
               </b-form-group>
@@ -71,6 +73,7 @@
                 <talk-time-selector v-model="filter.min_talk_time"
                                     custom-class="bottom-border__none highlighted-primary padding-left__none"
                                     :highlighted="isChanged('min_talk_time')"
+                                    :use-input="false"
                                     @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')">
                 </talk-time-selector>
               </b-form-group>
@@ -83,6 +86,7 @@
                 <transfer-type-selector v-model="filter.transfer_type"
                                         custom-class="bottom-border__none highlighted-primary padding-left__none"
                                         :highlighted="isChanged('transfer_type')"
+                                        :use-input="false"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')">
                 </transfer-type-selector>
               </b-form-group>
@@ -98,6 +102,7 @@
                                           custom-class="bottom-border__none highlighted-primary padding-left__none"
                                           :clearable="true"
                                           :highlighted="isChanged('callback_status')"
+                                          :use-input="false"
                                           @select="(eventPayload) => onFilterChange(eventPayload, 'callback_status')">
                 </callback-status-selector>
               </b-form-group>

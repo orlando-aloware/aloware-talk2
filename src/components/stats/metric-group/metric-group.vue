@@ -300,7 +300,10 @@ export default {
       }).then(res => {
         this.$generalNotification('Metric successfully updated.')
       }).catch(err => {
-        this.setMetricGroupMetrics(previousMetrics)
+        this.setMetricGroupMetrics({
+          metricGroupId: this.metricGroupId,
+          data: previousMetrics
+        })
         console.log(err)
         this.$generalNotification('Failed to update metric.', 'error')
       })
@@ -323,6 +326,12 @@ export default {
     },
     resources () {
       this.timeline = this.resources.date_range_type
+    },
+    'resources.agent_metrics': {
+      deep: true,
+      handler: function () {
+        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      }
     }
   }
 }

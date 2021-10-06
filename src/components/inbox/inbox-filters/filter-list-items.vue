@@ -1,5 +1,5 @@
 <template>
-  <div class="filter-items cursor-pointer d-flex justify-content-between pr-0 pb-1 position-relative"
+  <div class="filter-items cursor-pointer d-flex justify-content-between position-relative"
        v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === filter.id && !isRenaming }"
        @click="onItemSelect">
               <span v-if="!isRenaming">

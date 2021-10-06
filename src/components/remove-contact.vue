@@ -34,6 +34,7 @@
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListType from 'src/constants/contacts-list-types'
+import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
   components: {
@@ -77,12 +78,12 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeContactClose', 'setContactRemoveActionType']),
     onRemoveFromList () {
-      this.setContactRemoveActionType(ContactListType.REMOVE_FROM_LIST_ONLY)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     },
     onRemoveFromContacts () {
-      this.setContactRemoveActionType(ContactListType.REMOVE_FROM_CONTACTS)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     }

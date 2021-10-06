@@ -97,12 +97,8 @@
             :id="`popover-tags-${contact.id}`"
             class="d-flex align-items-center contact-tags-item">
             <span :style="`color: ${contact.tags[0].color};`">
-              <i
-                class="fa fa-circle"
-                :style="`color: ${contact.tags[0].color};font-size:50%;position: relative; top: -2px;`">
-              </i>
-              <span
-                v-if="contact.tags.length > 1">
+              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
+              <span v-if="contact.tags.length > 1">
                 {{ contact.tags[0].name | truncate(17) }}
               </span>
               <span
@@ -309,7 +305,7 @@
 import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
-import { ALL_COLUMNS } from 'src/constants/contacts-list-types'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import CallOIcon from 'components/icons/call-o-icon'
 import MessageOIcon from 'components/icons/message-o-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'

@@ -1,12 +1,20 @@
 import Vue from 'vue'
 import { updateField } from 'vuex-map-fields'
+import _ from 'lodash'
 
 export default {
   SET_METRIC_GROUPS: (state, data) => {
     state.metricGroups = data
   },
   SET_METRIC_GROUP_METRICS: (state, data) => {
-    // Vue.set(state.metricGroups = data
+    const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.metricGroupId)
+    const index = metricGroup ? state.metricGroups.indexOf(metricGroup) : null
+
+    if (index === -1 || index === null) {
+      return
+    }
+
+    Vue.set(state.metricGroups[index], 'agent_metrics', data.data)
   },
   ADD_METRIC_GROUP: (state, data) => {
     state.metricGroups.unshift(data)
@@ -23,11 +31,34 @@ export default {
     const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.id)
     const index = metricGroup ? state.metricGroups.indexOf(metricGroup) : null
 
-    if (index === -1 || index === null) {
+    if (index === -1 || index === null || typeof data.agent_metrics === 'undefined') {
       return
     }
 
-    data.agent_metrics = metricGroup.agent_metrics
+    for (let metricIndex in data.agent_metrics) {
+      let metric = _.get(metricGroup.agent_metrics, metricIndex, null)
+      let metricInfo = !metric ? state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex].name) : null
+
+      if (metricInfo) {
+        data.agent_metrics[metricIndex].category = metricInfo.category
+        data.agent_metrics[metricIndex].categoryLabel = metricInfo.categoryLabel
+        continue
+      }
+
+      metricInfo = state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex].name)
+
+      if (!metricInfo) {
+        continue
+      }
+
+      for (let metricKey in metricInfo) {
+        let metricPropValue = _.get(data.agent_metrics[metricIndex], metricKey, null)
+        if (!metricPropValue) {
+          data.agent_metrics[metricIndex][metricKey] = metricInfo[metricKey]
+        }
+      }
+    }
+
     Vue.set(state.metricGroups, index, data)
   },
   UPDATE_METRIC_GROUP_ORDER: (state, data) => {

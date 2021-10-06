@@ -36,20 +36,21 @@
           :disabled="isLoadingDisabled">
         </search>
         <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
-          <label for="my-contacts" class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
+            :disabled="isLoading"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
           </b-form-checkbox>
         </div>
       </div>
-      <div class="col-lg-6 px-0 d-flex align-items-center">
+      <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
         <div class="flex-grow-1"></div>
         <div class="mr-3">
           <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
@@ -57,25 +58,25 @@
         </div>
         <div class="v-divider">
         </div>
-        <div :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
-          <compact-btn
-            borderless
-            variant="outlined-light"
-            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
-            @clicked="onFiltersClicked"
-          >
+        <div class="d-flex align-items-center px-2"
+             :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
+          <compact-btn borderless
+                       variant="outlined-light"
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       @clicked="onFiltersClicked">
             <b-badge v-if="hasAppliedFilters"
-                     class="ml-2 mt-1"
+                     style="top: 0; padding-top: 3px;"
+                     class="d-flex align-items-center"
                      pill
                      variant="primary">
               {{ filtersCount }}
             </b-badge>
-            <span class="pl-2  pr-2">Filters</span>
+            <span class="pl-2 pr-2 d-flex align-items-center">Filters</span>
 
           </compact-btn>
-          <compact-btn
-                       borderless
-                       customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+          <compact-btn borderless
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       style="padding-top: 2px;"
                        variant="outlined-light"
                        v-if="hasAppliedFilters"
                        :disabled="isResetDisabled"
@@ -192,8 +193,7 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters @filtersUpdated="updateFilterHasChanges"
-                        @filtersCount="updateFiltersCount"/>
+      <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
@@ -214,7 +214,7 @@ import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import TableRow from 'src/components/table-row.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters'
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
-import { DEFAULT_CONTACT_LIST } from 'src/constants/contacts-list-types'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
@@ -244,7 +244,7 @@ export default {
   data () {
     return {
       filterHasChanges: false,
-      defaultContactLists: DEFAULT_CONTACT_LIST,
+      defaultContactLists: DEFAULT_PINNED_LIST,
       isUpdatingList: false
     }
   },
@@ -336,9 +336,6 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to update contact list.', 'error')
         })
-    },
-    updateFiltersCount (count) {
-      this.filtersCount = count
     },
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
