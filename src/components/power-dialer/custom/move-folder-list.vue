@@ -20,6 +20,14 @@
         :layer="layer"
         :items="itemFolders[key]"
       />
+      <CreateListItem
+        v-for="(item, key) in itemLists"
+        :id="item.id"
+        :key="key"
+        :folders="[]"
+        :layer="layer"
+        :items="[item]"
+      />
     </template>
   </div>
 </template>

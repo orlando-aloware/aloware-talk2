@@ -1,6 +1,7 @@
 <template>
-  <div :data-layer="layer">
+  <div :data-layer="layer" :class="`layer-indent-${layer}`">
     <div
+      v-if="name"
       class="folder d-flex align-items-center"
       :class="{ 'folder--target': isTarget }"
     >
@@ -20,9 +21,6 @@
       <div  class="flex-grow-1 d-flex align-items-center">
         <div @click="onToggleFolder" class="folder__name">
           {{ name }}
-          <q-chip dense size="sm">
-            {{ folders.length }}
-          </q-chip>
         </div>
       </div>
 
@@ -42,7 +40,7 @@
 
         <div class="folder folder__indent flex-grow-1 d-flex align-items-center">
           <div class="folder__name">
-            -{{ item.name }}
+            {{ item.name }}
           </div>
         </div>
 
@@ -102,8 +100,8 @@ export default {
       type: Number
     },
     items: {
-      type: Object,
-      default: () => {}
+      type: [Array, Object],
+      default: () => []
     }
   },
   computed: {
@@ -119,7 +117,7 @@ export default {
       if (this.layer === 0) {
         return []
       }
-      return this.items.lists || []
+      return this.items || []
     },
     itemLists () {
       return this.items.lists || []
@@ -139,12 +137,13 @@ export default {
   },
   data () {
     return {
-      isOpen: false
+      isOpen: true
     }
   },
   methods: {
     ...mapActions('powerDialer', ['setCreateDialogTarget']),
     onToggleFolder () {
+      console.log('299 :>> ', 299)
       this.isOpen = !this.isOpen
     },
     onTarget () {
@@ -155,6 +154,7 @@ export default {
     }
   },
   mounted () {
+    console.log('100 :>> ', 100)
     this.isOpen = this.layer < 1
   }
 }
