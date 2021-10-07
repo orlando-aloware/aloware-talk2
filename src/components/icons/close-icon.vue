@@ -31,6 +31,7 @@
 
 <script>
 export default {
+  name: 'close-icon',
   props: {
     width: {
       type: [Number, String],

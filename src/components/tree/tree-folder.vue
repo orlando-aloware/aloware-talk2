@@ -11,16 +11,20 @@
         :style="indentStyle"
         @click="onToggleFolder"
       ></div>
-      <div class="folder__arrow" @click="onToggleFolder">
-        <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
+      <div class="folder__arrow d-flex align-items-center" @click="onToggleFolder">
+        <folder-arrow-open-icon v-if="isOpen"
+                                color="#62666E"></folder-arrow-open-icon>
+        <folder-arrow-close-icon v-else
+                                 color="#62666E"></folder-arrow-close-icon>
       </div>
-      <div class="folder__icon" @click="onToggleFolder">
+      <div class="folder__icon d-flex align-items-center" @click="onToggleFolder">
         <folder-icon color="#62666E"></folder-icon>
       </div>
 
       <div class="flex-grow-1 d-flex align-items-center">
-        <div v-if="!isEditing" @click="onToggleFolder" class="folder__name">
+        <div v-if="!isEditing"
+             class="folder__name d-flex align-items-center"
+             @click="onToggleFolder">
           {{ name }}
         </div>
         <input
@@ -39,7 +43,7 @@
       <button
         :data-popper-target="'folder-' + id"
         :id="'folder-option-' + id"
-        class="folder__option btn btn-link p-0"
+        class="folder__option btn btn-link p-0 shadow-0"
         :class="{ 'folder__option--hide': isEditing }"
       >
         <folder-option></folder-option>
@@ -183,7 +187,7 @@ export default {
 
     indentStyle () {
       return {
-        width: `${this.layer * 10}px`
+        flex: `0 0 ${this.layer * 10}px`
       }
     },
 

@@ -42,6 +42,7 @@ export default {
     ...mapGetters('contacts', ['selectedStaticList']),
     indentStyle () {
       return {
+        flex: `0 0 ${this.layer * 10}px`,
         width: `${this.layer * 10}px`
       }
     }

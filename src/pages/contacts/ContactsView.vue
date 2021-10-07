@@ -61,9 +61,22 @@
         <div class="d-flex align-items-center px-2"
              :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
           <compact-btn borderless
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       variant="outlined-light"
+                       v-if="hasAppliedFilters"
+                       :disabled="isResetDisabled"
+                       @clicked="resetFilters">
+            <!--i class="fa fa-times"></i-->
+            <close-icon width="14px"
+                        height="14px"
+                        icon-color="#62666E">
+            </close-icon>
+          </compact-btn>
+          <compact-btn borderless
                        variant="outlined-light"
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        @clicked="onFiltersClicked">
+            <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
             <b-badge v-if="hasAppliedFilters"
                      style="top: 0; padding-top: 3px;"
                      class="d-flex align-items-center"
@@ -71,17 +84,7 @@
                      variant="primary">
               {{ filtersCount }}
             </b-badge>
-            <span class="pl-2 pr-2 d-flex align-items-center">Filters</span>
 
-          </compact-btn>
-          <compact-btn borderless
-                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                       style="padding-top: 2px;"
-                       variant="outlined-light"
-                       v-if="hasAppliedFilters"
-                       :disabled="isResetDisabled"
-                       @clicked="resetFilters">
-            <i class="fa fa-times"></i>
           </compact-btn>
         </div>
 
@@ -100,11 +103,16 @@
                     right
                     no-caret
                     variant="light"
-                    class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white"
+                    class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                    toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
-          <template #button-content>
-            Add Contacts
-            <i class="fa fa-chevron-down fs-12"></i>
+          <template #button-content class="filter-toggle-button">
+            <div class="filter-toggle-button d-flex align-items-center"
+                 style="margin-top: -2px;">
+              Add Contacts
+            </div>
+            <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
+               style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
@@ -219,9 +227,11 @@ import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+import CloseIcon from 'components/icons/close-icon'
 
 export default {
   components: {
+    CloseIcon,
     FolderDynamicIcon,
     FolderStaticIcon,
     ContactCreateModal,
