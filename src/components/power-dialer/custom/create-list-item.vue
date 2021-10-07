@@ -14,7 +14,7 @@
         <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
         <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
       </div>
-      <div class="folder__icon"  @click="onToggleFolder">
+      <div class="folder__icon" @click="onToggleFolder">
         <folder-icon></folder-icon>
       </div>
 
@@ -38,8 +38,9 @@
         class="folder d-flex align-items-center"
         @clicked="{}">
 
-        <div class="folder folder__indent flex-grow-1 d-flex align-items-center">
+        <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
           <div class="folder__name">
+            <DialIcon color="grey" class="mr-1" />
             {{ item.name }}
           </div>
         </div>
@@ -71,6 +72,7 @@ import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'components/icons/folder-icon'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
+import DialIcon from 'components/icons/dial-icon'
 
 export default {
   name: 'CreateListItem',
@@ -78,6 +80,7 @@ export default {
     FolderIcon,
     FolderArrowOpenIcon,
     FolderArrowCloseIcon,
+    DialIcon,
     MoveFolderLists: () => import('./move-folder-list')
   },
   props: {
@@ -143,19 +146,13 @@ export default {
   methods: {
     ...mapActions('powerDialer', ['setCreateDialogTarget']),
     onToggleFolder () {
-      console.log('299 :>> ', 299)
       this.isOpen = !this.isOpen
     },
     onTarget () {
-      console.log('Clicked')
       this.setCreateDialogTarget({
         target: this.id
       })
     }
-  },
-  mounted () {
-    console.log('100 :>> ', 100)
-    this.isOpen = this.layer < 1
   }
 }
 </script>

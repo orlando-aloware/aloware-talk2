@@ -4,37 +4,28 @@
       <div class="items">
         <span>{{ getSelectedCount }} selected</span>
       </div>
-      <!-- <div class="items">
-        <a href="#" disabled>
-          <i class="fa fa-layer-group"></i>
-          Enroll in Sequence
-        </a>
+      <div class="items">
+        <div
+          @click="onMoveToTop"
+          class="cursor-pointer">
+          <i class="fa fa-chevron-up"></i>
+          Move to Top
+        </div>
       </div>
       <div class="items">
-        <a href="#" disabled>
-          <i class="fa fa-crosshairs"></i>
-          Power Dialer
-        </a>
-      </div> -->
-      <div class="items">
-        <a href=""
-           @click="onAddToStaticList">
-          <i class="fa fa-user-plus"></i>
-          Add to Static List
-        </a>
+        <div
+          @click="onMoveToBottom"
+          class="cursor-pointer">
+          <i class="fa fa-chevron-down"></i>
+          Move to Bottom
+        </div>
       </div>
       <div class="items">
-        <a href=""
-           @click="onCreateStaticList">
-          <i class="fa fa-plus"></i>
-          Create Static List
-        </a>
-      </div>
-      <div class="items">
-        <a href="" @click="onDelete">
+        <div
+          @click="onDelete">
           <i class="fa fa-trash"></i>
           Delete
-        </a>
+        </div>
       </div>
     </div>
   </div>
@@ -62,9 +53,16 @@ export default {
   methods: {
     ...mapActions('powerDialer', ['removeContactOpen', 'setBulkDelete', 'createListOpen', 'selectListOpen', 'setSelectedStaticList']),
     onDelete (e) {
-      this.setBulkDelete(true)
-      this.$bvModal.show('remove-contact-dialog')
-      e.preventDefault()
+      console.log('Deleting items...')
+      // this.setBulkDelete(true)
+      // this.$bvModal.show('remove-contact-dialog')
+      // e.preventDefault()
+    },
+    onMoveToTop () {
+      console.log('Moving to top...')
+    },
+    onMoveToBottom () {
+      console.log('Moving to bottom...')
     },
     onCreateStaticList (e) {
       this.createListOpen({

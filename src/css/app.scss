@@ -4469,14 +4469,25 @@ span.mention {
       padding-right: 0;
     }
   }
+  > .layer-indent-1 {
+    > .folder {
+      > .folder-item {
+        padding-left: 20px;
+      }
+    }
+  }
   > .layer-indent-2 {
     > .folder {
-      padding-left: 15px;
+      > .folder-item {
+        padding-left: 30px;
+      }
     }
   }
   > .layer-indent-3 {
     > .folder {
-      padding-left: 40px;
+      > .folder-item {
+        padding-left: 40px;
+      }
     }
   }
 }
