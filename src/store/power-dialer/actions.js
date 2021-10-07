@@ -49,7 +49,11 @@ export default {
     commit('REMOVE_LIST_OPEN', list)
   },
   openCreateListDialog: ({ commit }, payload) => {
+    console.log('payload :>> ', payload)
     commit('CREATE_DIALOG_OPEN', payload)
+  },
+  closeCreateListDialog: ({ commit }) => {
+    commit('CREATE_DIALOG_CLOSE')
   },
   listLoaded: ({ commit }, payload) => {
     commit('LIST_LOADED', payload)
@@ -62,5 +66,8 @@ export default {
   },
   setMoveDialogTarget: ({ commit }, payload) => {
     commit('MOVE_DIALOG_TARGET', payload)
+  },
+  setCreateDialogTarget: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_TARGET', payload)
   }
 }

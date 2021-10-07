@@ -1,23 +1,39 @@
 <template>
   <div class="sublists">
-    <MoveFolderItem
-      v-for="folder in folders"
-      :name="folder.name"
-      :key="folder.id"
-      :id="folder.id"
-      :folders="folder.child_folders"
-      :layer="layer"
-    />
+    <template v-if="action === 'move'">
+      <MoveFolderItem
+        v-for="folder in folders"
+        :name="folder.name"
+        :key="folder.id"
+        :id="folder.id"
+        :folders="folder.child_folders"
+        :layer="layer"
+      />
+    </template>
+    <template v-else>
+      <CreateListItem
+        v-for="(folder, key) in folders"
+        :name="folder.name"
+        :key="folder.id"
+        :id="folder.id"
+        :folders="folder.child_folders"
+        :layer="layer"
+        :items="itemFolders[key]"
+      />
+    </template>
   </div>
 </template>
 
 <script>
 
 import MoveFolderItem from 'src/components/power-dialer/custom/move-folder-item.vue'
+import CreateListItem from 'src/components/power-dialer/custom/create-list-item.vue'
+
 export default {
   name: 'MoveFolderList',
   components: {
-    MoveFolderItem
+    MoveFolderItem,
+    CreateListItem
   },
   props: {
     folders: {
@@ -25,6 +41,18 @@ export default {
     },
     layer: {
       type: Number
+    },
+    action: {
+      type: String,
+      default: 'move'
+    },
+    itemFolders: {
+      type: Array,
+      default: () => []
+    },
+    itemLists: {
+      type: Array,
+      default: () => []
     }
   }
 }

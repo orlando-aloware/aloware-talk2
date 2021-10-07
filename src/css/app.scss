@@ -5652,7 +5652,7 @@ table.datatable {
 .move-dialog {
   width: 258px;
   //min-height: 300px;
-  max-height: 300px;
+  max-height: 600px;
   background: $white;
   border: solid 1px $grey-light;
   position: absolute;
@@ -5711,6 +5711,10 @@ table.datatable {
     overflow-y: auto;
     min-height: calc(300px - 120px);
     max-height: calc(100vh - 200px);
+  }
+  &__create {
+    left: 334px;
+    top: 178px;
   }
 }
 

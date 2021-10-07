@@ -8,7 +8,7 @@
       <!-- Display menu for adding list or folders -->
       <b-popover
         target="bs-folder-options"
-        triggers="click blur"
+        triggers="click "
         placement="bottomright"
         boundary="window"
         custom-class="contact-popover"

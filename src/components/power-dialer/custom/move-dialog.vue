@@ -96,7 +96,6 @@ export default {
   methods: {
     ...mapActions('powerDialer', ['closeMoveDialog', 'foldersLoaded']),
     onConfirmMove () {
-      console.log('this.moveDialog :>> ', this.moveDialog)
       if (this.moveDialog.type === 'list') {
         return this.moveListRequest()
       }

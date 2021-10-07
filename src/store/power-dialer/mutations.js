@@ -59,13 +59,23 @@ export default {
   MOVE_DIALOG_CLOSE: (state) => {
     state.moveDialog = { open: false }
   },
-  CREATE_DIALOG_OPEN: (state) => {
+  CREATE_DIALOG_OPEN: (state, { id, type }) => {
+    state.createDialog = { open: true, id, type }
+  },
+  CREATE_DIALOG_CLOSE: (state) => {
     state.createDialog = { open: false }
   },
   MOVE_DIALOG_TARGET: (state, { target }) => {
     state.moveDialog = {
       ...state.moveDialog,
       target: target === state.moveDialog.target ? null : target
+    }
+  },
+  CREATE_DIALOG_TARGET: (state, { target }) => {
+    console.log('target :>> ', target)
+    state.createDialog = {
+      ...state.createDialog,
+      target: target === state.createDialog.target ? null : target
     }
   },
   CREATE_LIST_OPEN: (state, payload) => {

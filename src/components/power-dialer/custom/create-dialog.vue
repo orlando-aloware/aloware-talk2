@@ -1,7 +1,6 @@
 <template>
-  <div class="create-dialog shadow-sm" ref="createDialog">
-    -- {{ hasSelected }}
-    <div class="create-dialog-input">
+  <div class="move-dialog move-dialog__create shadow-sm" ref="createDialog">
+    <div class="move-dialog-input">
       <div>
         <Search
           ref="folder-search"
@@ -10,17 +9,18 @@
         ></Search>
       </div>
     </div>
-    <div class="create-dialog-lists">
-      <MoveFolderItem
+    <div class="move-dialog-lists">
+      <CreateListItem
         v-for="folder in searchedItemsList"
         :name="folder.name"
         :key="folder.id"
         :id="folder.id"
         :order="folder.order"
         :folders="folder.child_folders"
-        :layer="0" />
+        :layer="0"
+        :items="rootItems" />
     </div>
-    <div class="create-dialog-footer" v-if="hasSelected">
+    <div class="move-dialog-footer" v-if="hasSelected">
       <div class="text-muted small pr-2">
         {{ message }}
       </div>
@@ -31,13 +31,13 @@
         :disabled="isMoving"
         @clicked="onConfirmMove">
         <q-spinner-bars v-if="isMoving" color="white" />
-        {{ isMoving ? '' : 'Yes' }}
+        {{ isMoving ? '' : 'Create' }}
       </CompactBtn>
       <!-- <CompactBtn
         variant="outlined-light"
         v-if="hasSelected"
         :disabled="isMoving"
-        @clicked="closeMoveDialog">
+        @clicked="closeCreateListDialog">
         No
       </CompactBtn> -->
     </div>
@@ -47,7 +47,7 @@
 <script>
 import { createPopper } from '@popperjs/core'
 import { mapActions, mapGetters } from 'vuex'
-import MoveFolderItem from 'src/components/power-dialer/custom/move-folder-item'
+import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -55,18 +55,19 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 let popperInstance
 
 export default {
+  name: 'CreateDialog',
   props: {
     message: {
       type: String,
-      default: 'Move to this location?'
+      default: 'Create Power Dialer List?'
     },
     placeholder: {
       type: String,
-      default: 'Move to...'
+      default: 'Select Contact List'
     }
   },
   components: {
-    MoveFolderItem,
+    CreateListItem,
     Search,
     CompactBtn
   },
@@ -87,6 +88,9 @@ export default {
       }
       return this.filterByActiveId(this.itemsList)
     },
+    rootItems () {
+      return this.powerDialerList.find(item => item.name === 'Root')
+    },
     hasSelected () {
       console.log('---', this.createDialog)
       return (
@@ -96,7 +100,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('powerDialer', ['closeMoveDialog', 'foldersLoaded']),
+    ...mapActions('powerDialer', ['closeCreateListDialog', 'foldersLoaded']),
     onConfirmMove () {
       console.log('this.moveDialog :>> ', this.createDialog)
       if (this.createDialog.type === 'list') {
@@ -115,7 +119,7 @@ export default {
           this.isMoving = false
         })
         .catch(this.handleRequestError)
-        .finally(this.closeMoveDialog)
+        .finally(this.closeCreateListDialog)
     },
     moveListRequest () {
       this.isMoving = true
@@ -128,7 +132,7 @@ export default {
           this.isMoving = false
         })
         .catch(this.handleRequestError)
-        .finally(this.closeMoveDialog)
+        .finally(this.closeCreateListDialog)
     },
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
@@ -229,7 +233,8 @@ export default {
         !evt.target.classList.contains('contact-menu-item') &&
         !evt.target.classList.contains('move-item')
       ) {
-        this.closeMoveDialog()
+        console.log('Closing dialog...')
+        this.closeCreateListDialog()
         document.body.removeEventListener('click', this.handleClick)
       }
     }
