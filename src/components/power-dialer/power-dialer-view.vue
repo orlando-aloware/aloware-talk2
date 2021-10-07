@@ -2,17 +2,6 @@
   <PowerDialerViewScreen>
 
     <template slot="title">
-      <!-- <div class="row d-flex py-2">
-        <div class="d-flex flex-column">
-          <div class="small text-muted pt-1">
-            Outbound Sales / Google Map Scaping /
-          </div>
-        </div>
-        <div class="px-2 py-0">
-          <ListIcon />
-        </div>
-        Chicago
-      </div> -->
       <Breadcrumbs :list-objects="powerDialerListOfObjects" />
     </template>
 
@@ -20,7 +9,6 @@
       <div class="pr-5">
         99 Contacts
       </div>
-      <!-- <StartDialOptions /> -->
       <StartDialing
         @start="beginDial" />
     </template>
@@ -31,26 +19,6 @@
           v-if="activeRoute"
           :id="id"
           :active-route="activeRoute" />
-        <!-- <b-card class="border-0 text-center">
-          <div class="t-grouped-buttons">
-
-            <router-link
-              v-for="(filter, key) in listFilters"
-              :key="key"
-              :to="`${activeRoute}/${filter.id}`"
-              class="link px-1">
-              <div :class="`t-grouped-buttons__btn ${id === filter.id ? 'active' : ''}`">
-                <div class="t-badge-name">
-                  {{ filter.name }}
-                </div>
-                <div :class="`t__badge ${id === filter.id ? 'active' : ''}`">
-                  99+
-                </div>
-              </div>
-            </router-link>
-
-          </div>
-        </b-card> -->
         <b-container fluid class="bv-example-row m-0 p-0 pl-3 pb-2 border-bottom">
           <b-row class="pr-2">
             <b-col class="p-0 pr-2 m-0">
@@ -102,10 +70,6 @@
     </template>
 
     <template slot="actions">
-      <!-- <div v-if="checked.length > 0" class="px-3 text-caption">
-        dsfdsf
-        Menu here if selected multiple items...
-      </div> -->
       <BulkActionMenu :id="id" v-if="checked.length > 0" />
     </template>
 
@@ -134,7 +98,8 @@
                     <!-- COLUMN: Checkboxes -->
                     <td
                       v-if="column.name === 'checkbox'"
-                      :key="key">
+                      :key="key"
+                      class="p-0">
                       <CheckBox
                         :resource="contact"
                         :checked-items="checked"

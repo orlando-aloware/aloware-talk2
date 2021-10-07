@@ -5210,7 +5210,7 @@ table.datatable {
         white-space: nowrap;
         text-overflow: ellipsis;
         max-width: 0;
-        min-width: 50px;
+        min-width: 0;
         &:read-write:focus {
           outline: 1px solid $light-green3;
           background: white;
