@@ -22,11 +22,13 @@
   flex-direction: column;
   &__header {
     min-height: 40px;
-    font-size: 10px;
-    font-weight: bold;
+    font-size: 13px;
+    font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
     border-top: 1px solid $grey-70;
+    color: $grey-90;
+    letter-spacing: 1px;
 
     &.t-dense {
       min-height: 25px !important;

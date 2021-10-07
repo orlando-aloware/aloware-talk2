@@ -2,7 +2,7 @@
   <div class="tree-folder" :data-layer="layer">
     <div
       v-if="!isRootList"
-      class="folder d-flex align-items-center"
+      class="folder folder-pad-1 d-flex align-items-center"
       :class="{ 'folder--selected': isSelected }">
       <div
         @click="onToggleFolder"

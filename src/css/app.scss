@@ -4917,6 +4917,9 @@ span.mention {
   }
   .folder {
     padding-left: 0 !important;
+    &.folder-pad-1 {
+      padding-left: 15px !important;
+    }
   }
 }
 

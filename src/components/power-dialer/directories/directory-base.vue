@@ -1,7 +1,7 @@
 <template>
   <div class="folders">
     <div class="t-menu__header d-flex align-items-center">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
+      <div class="header__header__title pl-3 flex-grow-1">
         {{ title }}
       </div>
 
@@ -87,7 +87,7 @@
       <button
         class="btn btn-link btn-sm tooltip-target mr-1"
         id="bs-folder-options">
-        <i class="fa fa-plus text-primary"></i>
+        <PlusIcon color="blue" />
       </button>
 
     </div>
@@ -135,6 +135,7 @@ import DirectoryFolder from './directory-folder'
 import DirectoryFolderCreate from './directory-folder-create'
 import FolderIcon from 'components/icons/folder-icon'
 import PeopleIcon from 'components/icons/people-icon'
+import PlusIcon from 'components/icons/plus-icon'
 // import CreateListDialog from 'components/power-dialer/custom/move-dialog'
 
 export default {
@@ -154,7 +155,8 @@ export default {
     DirectoryFolderCreate,
     // CreateListDialog,
     FolderIcon,
-    PeopleIcon
+    PeopleIcon,
+    PlusIcon
   },
   mounted () {
     this.loadFolders()
