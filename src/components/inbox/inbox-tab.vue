@@ -312,6 +312,28 @@ export default {
     if (['Inbox Contact Task'].includes(this.$route.name) && this.selectedContact.task_status !== this.currentTask) {
       this.onItemSelected(this.selectedContact)
     }
+
+    this.$VueEvent.listen('load_and_navigate_inbox_tab', (lastNavigatedIndex) => {
+      this.page = this.nextPage
+      this.loadMoreContactTasks().then(() => {
+        let contact = this.contacts[lastNavigatedIndex + 1]
+        this.setSelectedContact(contact)
+
+        this.$router.push({
+          name: 'Inbox Contact Task',
+          params: { id: JSON.stringify(contact.id) }
+        })
+      })
+    })
+
+    this.$VueEvent.listen('navigate_task_tab', (contact) => {
+      this.setSelectedContact(contact)
+
+      this.$router.push({
+        name: 'Inbox Contact Task',
+        params: { id: JSON.stringify(contact.id) }
+      })
+    })
   },
 
   watch: {

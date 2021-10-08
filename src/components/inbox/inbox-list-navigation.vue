@@ -5,7 +5,7 @@
                 variant="light"
                 class="btn-white btn-contact-prev-next"
                 :disabled="disablePreviousButton"
-                @click="onPrevContact">
+                @click="onPreviousItem">
         <i class="material-icons">keyboard_arrow_left</i>
       </b-button>
     </b-button-group>
@@ -14,7 +14,7 @@
                 variant="light"
                 class="btn-white btn-contact-prev-next"
                 :disabled="disableNextButton"
-                @click="onNextContact">
+                @click="onNextItem">
         <i class="material-icons">keyboard_arrow_right</i>
       </b-button>
     </b-button-group>
@@ -22,13 +22,10 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
-import { inboxMixin } from 'src/plugins/mixins'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'inbox-list-navigation',
-
-  mixins: [inboxMixin],
 
   computed: {
     ...mapState('inbox', ['contacts', 'hasMoreContacts']),
@@ -42,50 +39,32 @@ export default {
     lastIndex () {
       return this.contacts.length - 1
     },
-    prevContact () {
+    previousItem () {
       let index = this.currentIndex - 1
       return this.currentIndex !== 0 ? this.contacts[index] : null
     },
-    nextContact () {
+    nextItem () {
       let index = this.currentIndex + 1
       return this.currentIndex !== this.lastIndex ? this.contacts[index] : null
     },
     disablePreviousButton () {
-      return this.changingSelectedContact || !this.prevContact
+      return this.changingSelectedContact || !this.previousItem
     },
     disableNextButton () {
-      return this.changingSelectedContact || (!this.nextContact && !this.hasMoreContacts)
+      return this.changingSelectedContact || (!this.nextItem && !this.hasMoreContacts)
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact']),
-    ...mapActions('inbox', ['setSelectedContact']),
-    onPrevContact () {
-      this.setSelectedContact(this.prevContact)
-      this.navigate(this.prevContact)
+    onPreviousItem () {
+      window.VueEvent.fire('navigate_task_tab', this.previousItem)
     },
-    onNextContact () {
+    onNextItem () {
       if (this.currentIndex === this.lastIndex) {
-        this.page = this.nextPage
-        this.loadMoreContactTasks().then(() => {
-          this.setSelectedContact(this.nextContact)
-          this.navigate(this.nextContact)
-        })
+        window.VueEvent.fire('load_and_navigate_inbox_tab', this.currentIndex)
       } else {
-        this.setSelectedContact(this.nextContact)
-        this.navigate(this.nextContact)
+        window.VueEvent.fire('navigate_task_tab', this.nextItem)
       }
-    },
-    navigate (contact) {
-      this.$router.push({
-        name: 'Inbox Contact Task',
-        params: { id: JSON.stringify(contact.id) }
-      })
     }
   }
 }
 </script>
-
-<style scoped>
-
-</style>

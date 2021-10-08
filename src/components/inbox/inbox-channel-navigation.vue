@@ -59,7 +59,6 @@ export default {
   },
   methods: {
     onPreviousItem () {
-      // this.navigate(this.previousItem)
       window.VueEvent.fire('navigate_channel', this.previousItem)
     },
     onNextItem () {
@@ -72,7 +71,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
