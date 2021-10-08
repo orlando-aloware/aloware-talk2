@@ -9,12 +9,12 @@
           ]"
        class="d-flex align-items-center item"
        @click="navigate">
-      <div class="px-2 icon">
+      <div class="px-2 icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
         <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon>
       </div>
-      <div class="pr-3 flex-grow-1 item-name">{{ item.name }}</div>
-      <div class="pr-2">
+      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">{{ item.name }}</div>
+      <div class="pr-2 counts d-flex align-items-center">
         <b-badge pill variant="light text-muted">{{ item.count | fixCount }}</b-badge>
       </div>
     </a>

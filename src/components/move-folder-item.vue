@@ -9,21 +9,28 @@
         :style="indentStyle"
         @click="onToggleFolder">
       </div>
-      <div class="folder__arrow" @click="onToggleFolder" v-if="folders.length > 0">
-        <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
+      <div class="folder__arrow d-flex align-items-center" @click="onToggleFolder">
+        <folder-arrow-open-icon v-if="isOpen"
+                                :class="{ 'transparent': folders.length === 0 }"
+                                color="#62666E">
+        </folder-arrow-open-icon>
+        <folder-arrow-close-icon v-if="!isOpen"
+                                 :class="{ 'transparent': folders.length === 0 }"
+                                 color="#62666E">
+        </folder-arrow-close-icon>
       </div>
-      <div class="folder__icon" @click="onToggleFolder">
-        <folder-icon></folder-icon>
+      <div class="folder__icon d-flex align-items-center" @click="onToggleFolder">
+        <folder-icon color="#62666E"></folder-icon>
       </div>
 
-      <div class="flex-grow-1 d-flex align-items-center">
-        <div @click="onToggleFolder" class="folder__name">
+      <div class="folder__name d-flex align-items-center"
+           @click="onToggleFolder">
+        <div class="folder__name d-flex align-items-center">
           {{ name }}
         </div>
       </div>
 
-      <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
+      <button class="folder__option btn btn-link p-0 shadow-none" @click="onTarget" v-if="isTargetable">
         <i class="fa fa-circle small" v-if="!isTarget"></i>
         <i class="fa fa-check-circle text-primary small" v-if="isTarget"></i>
       </button>
@@ -59,7 +66,7 @@ export default {
     ...mapGetters('contacts', ['moveDialog']),
     indentStyle () {
       return {
-        width: `${this.layer * 10}px`
+        flex: `0 0 ${this.layer * 10}px`
       }
     },
     isTarget () {

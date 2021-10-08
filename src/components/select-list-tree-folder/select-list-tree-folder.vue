@@ -11,11 +11,13 @@
       ></div>
       <div class="folder__arrow"
            @click="onToggleFolder">
-        <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
+        <folder-arrow-open-icon v-if="isOpen"
+                                color="#62666E"></folder-arrow-open-icon>
+        <folder-arrow-close-icon v-else
+                                 color="#62666E"></folder-arrow-close-icon>
       </div>
       <div class="folder__icon" @click="onToggleFolder">
-        <folder-icon></folder-icon>
+        <folder-icon color="#62666E"></folder-icon>
       </div>
 
       <div class="flex-grow-1 d-flex align-items-center">
@@ -117,6 +119,7 @@ export default {
 
     indentStyle () {
       return {
+        flex: `0 0 ${this.layer * 10}px`,
         width: `${this.layer * 10}px`
       }
     },

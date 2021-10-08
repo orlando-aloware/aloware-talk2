@@ -5,13 +5,13 @@
     @mouseover="onMouseOver"
     @mouseleave="onMouseLeave"
   >
-    <div class="contact-menu-item__icon pr-2">
+    <div class="contact-menu-item__icon pr-2 align-items-center d-flex">
       <slot name="icon"></slot>
     </div>
-    <div class="contact-menu-item__title flex-grow-1 move-item">
+    <div class="contact-menu-item__title flex-grow-1 move-item align-items-center d-flex">
       <slot name="title"></slot>
     </div>
-    <div class="contact-menu-item__suffix">
+    <div class="contact-menu-item__suffix align-items-center d-flex">
       <slot name="suffix"></slot>
     </div>
   </div>

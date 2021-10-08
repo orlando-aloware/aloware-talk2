@@ -1,5 +1,6 @@
 <template>
-  <div class="folder d-flex align-items-center">
+  <div class="folder d-flex align-items-center"
+       :class="{ 'folder--active': activeFolder }">
     <div class="folder__arrow">
       <folder-arrow-close-icon class="transparent">
       </folder-arrow-close-icon>
@@ -16,7 +17,7 @@
           class="folder d-flex align-items-center"
         >
           <div class="folder__indent" :style="indentStyle"></div>
-          <div class="folder__icon">
+          <div class="folder__icon d-flex align-items-center">
             <folder-static-icon color="#62666E"
               v-if="type === ContactListTypes.STATIC"
             ></folder-static-icon>
@@ -24,7 +25,7 @@
               v-if="type === ContactListTypes.DYNAMIC"
             ></folder-dynamic-icon>
           </div>
-          <div class="folder__name">
+          <div class="folder__name d-flex align-items-center">
             <input
               :id="'folder-input-' + id"
               v-if="isEditing"
@@ -45,7 +46,7 @@
             :tabindex="id"
             :data-popper-target="'list-' + id"
             :id="'folder-option-' + id + '-' + layer"
-            class="folder__option btn btn-link p-0"
+            class="folder__option btn btn-link p-0 shadow-0"
           >
             <folder-option></folder-option>
           </button>
@@ -77,6 +78,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
@@ -100,9 +102,7 @@ export default {
     ...mapGetters('contacts', ['pinned', 'moveDialog']),
     indentStyle () {
       return {
-        'flex-basis': `${this.layer * 10}px`,
-        'flex-grow': 0,
-        'flex-shrink': 0
+        flex: `0 0 ${this.layer * 10}px`
       }
     },
     isPinned () {
@@ -112,6 +112,10 @@ export default {
     },
     isMoving () {
       return this.id === this.moveDialog.id && this.moveDialog.type === 'list'
+    },
+    activeFolder () {
+      const id = _.get(this.$route.params, 'id', null)
+      return id && parseInt(id) === this.id
     }
   },
   props: {

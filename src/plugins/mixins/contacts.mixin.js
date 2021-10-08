@@ -190,12 +190,18 @@ export default {
     },
     getFiltersCount (filters) {
       let filtersCount = 0
-      if (filters.length) {
+      if (filters.constructor.name === 'Object' && Object.keys(filters).length) {
+        for (let index of Object.keys(filters)) {
+          const filter = _.get(filters[index], 'filters', null)
+          filtersCount += filter ? Object.keys(filter).length : 0
+        }
+      } else if (filters.constructor.name === 'Array' && filters.length) {
         for (let group of filters) {
           const filter = _.get(group, 'filters', null)
           filtersCount += filter ? Object.keys(filter).length : 0
         }
       }
+
       return filtersCount
     },
     markCheckedAll () {

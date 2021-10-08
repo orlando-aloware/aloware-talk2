@@ -14,7 +14,7 @@
         <contact-menu>
           <contact-menu-item @click="onCreateFolderToggle">
             <template slot="icon">
-              <folder-icon></folder-icon>
+              <folder-icon color="#62666E"></folder-icon>
             </template>
             <template slot="title">
               <span>Folder</span>

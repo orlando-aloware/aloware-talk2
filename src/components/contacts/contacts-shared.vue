@@ -98,7 +98,7 @@ export default {
     }
   },
   mounted () {
-    this.loadFolders()
+    // this.loadFolders()
   }
 }
 </script>

@@ -36,13 +36,14 @@
           :disabled="isLoadingDisabled">
         </search>
         <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
-          <label for="my-contacts" class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
+            :disabled="isLoading"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -57,30 +58,33 @@
         </div>
         <div class="v-divider">
         </div>
-        <div :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
-          <compact-btn
-            borderless
-            variant="outlined-light"
-            customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
-            @clicked="onFiltersClicked"
-          >
-            <b-badge v-if="hasAppliedFilters"
-                     class="ml-2 mt-1"
-                     pill
-                     variant="primary">
-              {{ filtersCount }}
-            </b-badge>
-            <span class="pl-2  pr-2">Filters</span>
-
-          </compact-btn>
-          <compact-btn
-                       borderless
-                       customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+        <div class="d-flex align-items-center px-2"
+             :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
+          <compact-btn borderless
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        variant="outlined-light"
                        v-if="hasAppliedFilters"
                        :disabled="isResetDisabled"
                        @clicked="resetFilters">
-            <i class="fa fa-times"></i>
+            <!--i class="fa fa-times"></i-->
+            <close-icon width="14px"
+                        height="14px"
+                        icon-color="#62666E">
+            </close-icon>
+          </compact-btn>
+          <compact-btn borderless
+                       variant="outlined-light"
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       @clicked="onFiltersClicked">
+            <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
+            <b-badge v-if="hasAppliedFilters"
+                     style="top: 0; padding-top: 3px;"
+                     class="d-flex align-items-center"
+                     pill
+                     variant="primary">
+              {{ filtersCount }}
+            </b-badge>
+
           </compact-btn>
         </div>
 
@@ -99,11 +103,16 @@
                     right
                     no-caret
                     variant="light"
-                    class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white"
+                    class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                    toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
-          <template #button-content>
-            Add Contacts
-            <i class="fa fa-chevron-down fs-12"></i>
+          <template #button-content class="filter-toggle-button">
+            <div class="filter-toggle-button d-flex align-items-center"
+                 style="margin-top: -2px;">
+              Add Contacts
+            </div>
+            <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
+               style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
@@ -192,8 +201,7 @@
       </datatable>
     </template>
     <template slot="filters">
-      <contacts-filters @filtersUpdated="updateFilterHasChanges"
-                        @filtersCount="updateFiltersCount"/>
+      <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
@@ -219,9 +227,11 @@ import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+import CloseIcon from 'components/icons/close-icon'
 
 export default {
   components: {
+    CloseIcon,
     FolderDynamicIcon,
     FolderStaticIcon,
     ContactCreateModal,
@@ -336,9 +346,6 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to update contact list.', 'error')
         })
-    },
-    updateFiltersCount (count) {
-      this.filtersCount = count
     },
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
