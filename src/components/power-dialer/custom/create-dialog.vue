@@ -46,7 +46,7 @@
 
 <script>
 import { createPopper } from '@popperjs/core'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapMutations, mapGetters } from 'vuex'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
@@ -79,7 +79,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('powerDialer', ['createDialog', 'folders', 'powerDialerList']),
+    ...mapGetters('powerDialer', [
+      'createDialog',
+      'folders',
+      'powerDialerList',
+      'searchedListItem'
+    ]),
     searchedItemsList () {
       if (this.searchValue) {
         return this.filterByActiveId(
@@ -92,7 +97,6 @@ export default {
       return this.powerDialerList.find(item => item.name === 'Root')
     },
     hasSelected () {
-      console.log('---', this.createDialog)
       return (
         typeof this.createDialog.target === 'number' &&
         this.createDialog.target >= 0
@@ -100,7 +104,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions('powerDialer', ['closeCreateListDialog', 'foldersLoaded']),
+    ...mapActions('powerDialer', [
+      'closeCreateListDialog',
+      'foldersLoaded'
+    ]),
+    ...mapMutations('powerDialer', [
+      'ON_SEARCH_LIST_ITEM'
+    ]),
     onConfirmMove () {
       console.log('this.moveDialog :>> ', this.createDialog)
       if (this.createDialog.type === 'list') {
@@ -149,7 +159,7 @@ export default {
         })
     },
     filterByActiveId (items) {
-      return items
+      let filteredItems = items
         .filter((i) => i.id !== this.createDialog.id)
         .map((i) => {
           return {
@@ -157,6 +167,7 @@ export default {
             child_folders: this.filterByActiveId(i.child_folders)
           }
         })
+      return filteredItems
     },
     filterBySearchValue (items, searchValue) {
       return items
@@ -172,7 +183,8 @@ export default {
         })
     },
     onSearch (searchValue) {
-      this.searchValue = searchValue
+      // this.searchValue = searchValue
+      this.ON_SEARCH_LIST_ITEM(searchValue)
     },
     createFolders (names = '', newFolders = []) {
       return newFolders.map((i) => {

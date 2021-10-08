@@ -23,5 +23,6 @@ export default {
   contactResources: (state) => {
     // return state.contactResources
     return TEST_DATA
-  }
+  },
+  searchedListItem: (state) => state.searchedListItem
 }

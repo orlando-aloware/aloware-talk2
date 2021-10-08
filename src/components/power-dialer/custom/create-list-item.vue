@@ -32,24 +32,27 @@
 
     <template
       v-if="listOfItems.length > 0">
-      <div
-        v-for="(item, key) in listOfItems"
-        :key="key"
-        class="folder d-flex align-items-center"
-        @clicked="{}">
+      <template
+        v-for="(item, key) in listOfItems">
+        <div
+          v-if="filteredSearchList(item.name)"
+          :key="key"
+          class="folder d-flex align-items-center"
+          @clicked="{}">
 
-        <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
-          <div class="folder__name">
-            <DialIcon color="grey" class="mr-1" />
-            {{ item.name }}
+          <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
+            <div class="folder__name">
+              <DialIcon color="grey" class="mr-1" />
+              {{ item.name }}
+            </div>
           </div>
-        </div>
 
-        <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
-          <i class="fa fa-circle small" v-if="!isTarget"></i>
-          <i class="fa fa-check-circle text-success small" v-if="isTarget"></i>
-        </button>
-      </div>
+          <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
+            <i class="fa fa-circle small" v-if="!isTarget"></i>
+            <i class="fa fa-check-circle text-success small" v-if="isTarget"></i>
+          </button>
+        </div>
+      </template>
     </template>
 
     <div
@@ -73,6 +76,7 @@ import FolderIcon from 'components/icons/folder-icon'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
 import DialIcon from 'components/icons/dial-icon'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'CreateListItem',
@@ -109,7 +113,8 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'createDialog'
+      'createDialog',
+      'searchedListItem'
     ]),
     indentStyle () {
       return {
@@ -152,6 +157,14 @@ export default {
       this.setCreateDialogTarget({
         target: this.id
       })
+    },
+    filteredSearchList (value = '') {
+      if (!isEmpty(value) && !isEmpty(this.searchedListItem)) {
+        let isValid = value.toLowerCase().includes(this.searchedListItem.toLowerCase())
+        console.log(`${this.searchedListItem} === ${value}`, isValid)
+        return isValid
+      }
+      return true
     }
   }
 }

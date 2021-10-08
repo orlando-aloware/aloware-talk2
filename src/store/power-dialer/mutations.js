@@ -98,5 +98,8 @@ export default {
   },
   REMOVE_LIST_CLOSE: (state) => {
     state.removeList = null
+  },
+  ON_SEARCH_LIST_ITEM: (state, value) => {
+    state.searchedListItem = value
   }
 }

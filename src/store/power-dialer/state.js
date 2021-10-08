@@ -30,6 +30,7 @@ export default function () {
     // powerDialerList: null,
     contactResources: [],
     selectedContacts: {},
-    isStartingDial: false
+    isStartingDial: false,
+    searchedListItem: ''
   }
 }

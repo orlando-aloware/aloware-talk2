@@ -11,15 +11,18 @@
       />
     </template>
     <template v-else>
-      <CreateListItem
-        v-for="(folder, key) in folders"
-        :name="folder.name"
-        :key="folder.id"
-        :id="folder.id"
-        :folders="folder.child_folders"
-        :layer="layer"
-        :items="itemFolders[key]"
-      />
+      <template
+        v-for="(folder, key) in folders">
+        <CreateListItem
+          v-if="itemFolders[key].lists.length > 0"
+          :name="folder.name"
+          :key="folder.id"
+          :id="folder.id"
+          :folders="folder.child_folders"
+          :layer="layer"
+          :items="itemFolders[key]"
+        />
+      </template>
       <CreateListItem
         v-for="(item, key) in itemLists"
         :id="item.id"
