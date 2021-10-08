@@ -8,8 +8,10 @@
           </div>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.extension.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Extension</h5>
             <p class="form-helper-text">An extension is a unique company-wide identifier for a user. You can select an extension here and setup your line's IVR to listen for extensions. When a caller enters an extension we will automatically connect the call to the respective user.</p>
@@ -23,8 +25,10 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.operating_hours.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Working Hours</h5>
             <p class="form-helper-text">
@@ -40,26 +44,27 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
-          <div>
-            <h5 class="form-label">Personal Voicemail</h5>
-            <p class="form-helper-text">Should {{ statics.name }} take a voicemail when this user is not available and their extension is dialed?</p>
-          </div>
-          <p class="text-bold fs-12">When a direct call is missed:</p>
-          <b-form-group label="" v-slot="{ ariaDescribedby }">
-            <b-form-radio-group
-              id="radio-slots"
-              name="radio-options-slots"
-              v-model="user.missed_calls_settings.missed_call_handling_mode"
-              :options="options"
-              :aria-describedby="ariaDescribedby"
-              @change="(eventPayload) => onUpdateFields(eventPayload, 'missed_calls_settings.missed_call_handling_mode')">
-            </b-form-radio-group>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
-      <div v-if="user.missed_calls_settings && user.missed_calls_settings.missed_call_handling_mode === MISSED_CALL_BEHAVIOR_VOICEMAIL">
+      <div :id="`${SettingsMap.missed_calls_settings.hash_keyword}-container`">
+        <b-form-row class="mt-4">
+          <b-col sm="12" md="12">
+            <div>
+              <h5 class="form-label">Personal Voicemail</h5>
+              <p class="form-helper-text">Should {{ statics.name }} take a voicemail when this user is not available and their extension is dialed?</p>
+            </div>
+            <p class="text-bold fs-12">When a direct call is missed:</p>
+            <b-form-group label="" v-slot="{ ariaDescribedby }">
+              <b-form-radio-group
+                id="radio-slots"
+                name="radio-options-slots"
+                v-model="user.missed_calls_settings.missed_call_handling_mode"
+                :options="options"
+                :aria-describedby="ariaDescribedby"
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'missed_calls_settings.missed_call_handling_mode')">
+              </b-form-radio-group>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
+        <div v-if="user.missed_calls_settings && user.missed_calls_settings.missed_call_handling_mode === MISSED_CALL_BEHAVIOR_VOICEMAIL">
         <b-card
           header-tag="header"
           footer-tag="footer"
@@ -111,8 +116,12 @@
         </b-card>
       </b-card-group>
       </div>
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      </div>
+
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.operating_states_limit.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Operating States</h5>
             <p class="form-helper-text">Check all that apply. If you operate nation-wide, click "Check All".</p>
@@ -152,26 +161,28 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
-          <div>
-            <h5 class="form-label">Operating Area Codes (Beta)</h5>
-            <p class="form-helper-text">Customize the area codes that you operate on.</p>
-          </div>
+      <div :id="`${SettingsMap.operating_area_codes_limit.hash_keyword}-container`">
+        <b-form-row class="mt-4">
+          <b-col sm="12" md="12">
+            <div>
+              <h5 class="form-label">Operating Area Codes (Beta)</h5>
+              <p class="form-helper-text">Customize the area codes that you operate on.</p>
+            </div>
 
-          <b-form-group label="" >
-            <b-form-checkbox
-              v-model="disableAreaCodeRouting"
-              :value="true"
-              :unchecked-value="false"
-              :disabled="!hasRole(['Company Admin', 'Company Agent'])"
-              @change="(eventPayload) => onUpdateFields(eventPayload, 'disableAreaCodeRouting')">
-              Do not enable area code routing for this user
-            </b-form-checkbox>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
-      <b-form-row class="mt-4" v-if="!disableAreaCodeRouting">
+            <b-form-group label="" >
+              <b-form-checkbox
+                v-model="disableAreaCodeRouting"
+                :value="true"
+                :unchecked-value="false"
+                :disabled="!hasRole(['Company Admin', 'Company Agent'])"
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'disableAreaCodeRouting')">
+                Do not enable area code routing for this user
+              </b-form-checkbox>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
+
+        <b-form-row class="mt-4" v-if="!disableAreaCodeRouting">
         <b-col sm="12" md="6">
           <b-form-group
             label=""
@@ -186,9 +197,12 @@
           </b-form-group>
         </b-col>
       </b-form-row>
+      </div>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.should_message_if_missed.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Follow up</h5>
             <p class="form-helper-text">Send a message to the attempted agent who missed a call. The lead information (phone number) will be automatically appended.</p>
@@ -205,8 +219,12 @@
           </b-form-group>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-4" v-if="user.should_message_if_missed">
-        <b-col sm="12" md="12">
+
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.missed_call_message.hash_keyword}-container`"
+                  v-if="user.should_message_if_missed">
+        <b-col sm="12"
+               md="12">
           <b-form-group
             label=""
             class="form-label"
@@ -249,8 +267,9 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4" :id="`${SettingsMap.should_message_caller_if_completed.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Caller Notification</h5>
             <p class="form-helper-text">Notify caller with a text message</p>
@@ -268,8 +287,11 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="user.should_message_caller_if_completed">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.completed_call_message_caller.hash_keyword}-container`"
+                  v-if="user.should_message_caller_if_completed">
+        <b-col sm="12"
+               md="12">
           <b-form-group
             label=""
             class="form-label"
@@ -329,6 +351,7 @@ import talk2Api from 'src/plugins/api/api'
 import FileUploader from 'components/file-uploader'
 import { mapActions, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
+import SettingsMap from 'components/settings/settings-map'
 
 export default {
   name: 'inbound-call',
@@ -374,7 +397,8 @@ export default {
       },
       MISSED_CALL_BEHAVIOR_VOICEMAIL,
       MISSED_CALL_BEHAVIOR_NOTHING,
-      timeIncrement: 30
+      timeIncrement: 30,
+      SettingsMap
     }
   },
 

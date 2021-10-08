@@ -5,22 +5,22 @@
     </div>
     <div class="d-flex w-100 h-100 animate__animated animate__fadeIn position-relative">
       <settings-side></settings-side>
-        <div class="d-flex flex-grow-1 overflow-y-scroll" v-if="user">
-          <b-row class="w-50">
-            <b-col md="12" class="settings-form-wrapper">
-              <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'"></general-information>
-              <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading"></profile>
-              <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading"></notification-settings>
-              <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading"></personalization>
-              <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"></visibility>
-              <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading"></inbound-call>
-              <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading"></outbound-call>
-              <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading"></diagnosis>
-              <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading"></sms-templates>
-              <settings-save-bar  :user="user"></settings-save-bar>
-            </b-col>
-          </b-row>
-        </div>
+      <div class="d-flex flex-grow-1 overflow-y-scroll settings-content-wrapper" v-if="user">
+        <b-row class="w-50">
+          <b-col md="12" class="settings-form-wrapper">
+            <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'"></general-information>
+            <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading"></profile>
+            <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading"></notification-settings>
+            <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading"></personalization>
+            <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"></visibility>
+            <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading"></inbound-call>
+            <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading"></outbound-call>
+            <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading"></diagnosis>
+            <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading"></sms-templates>
+            <settings-save-bar  :user="user"></settings-save-bar>
+          </b-col>
+        </b-row>
+      </div>
     </div>
   </div>
 </template>
@@ -41,7 +41,7 @@ import SmsTemplates from 'components/settings/sms-templates'
 import talk2Api from 'src/plugins/api/api'
 import SettingsSaveBar from 'components/settings/settings-save-bar'
 
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import _ from 'lodash'
@@ -49,7 +49,7 @@ import _ from 'lodash'
 export default {
   name: 'Settings',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, settingsMixin],
 
   components: { SettingsSaveBar, SmsTemplates, Diagnosis, OutboundCall, InboundCall, Visibility, Personalization, NotificationSettings, Profile, GeneralInformation, SettingsSide },
 

@@ -90,7 +90,7 @@
           @click="toggleMentionType">
           <template v-slot:one>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
-                 :class="[$route.params.status === 'received' ? 'active' : 'text-grey-90']">
+                 :class="[mentionType === 'received' ? 'active' : 'text-grey-90']">
                 <span class="text-left">
                   Received
                 </span>
@@ -99,7 +99,7 @@
 
           <template v-slot:two>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
-                 :class="[$route.params.status === 'sent' ? 'active' : 'text-grey-90']">
+                 :class="[mentionType === 'sent' ? 'active' : 'text-grey-90']">
                 <span class="text-left">
                   Sent
                 </span>
@@ -213,7 +213,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter', 'hasMoreCommunications']),
 
     nextPage () {
       return this.currentPage + 1
@@ -234,7 +234,6 @@ export default {
       clonedFilter: null,
       searchFields: ['contact.name', 'contact.phone_number'],
       currentPage: 0,
-      hasMore: false,
       isLoadingMore: false,
       isLoaded: false,
       pagination: {
@@ -407,7 +406,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setSelectedFilter']),
+    ...mapActions('inbox', ['setSelectedFilter', 'setHasMoreCommunications']),
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
       this.filter.search_text = this.searchText
@@ -639,7 +638,7 @@ export default {
         .then(response => {
           this.setCommunications(response.data.data)
           this.currentPage = response.data.current_page
-          this.hasMore = response.data.next_page_url
+          this.setHasMoreCommunications(response.data.next_page_url)
           this.isLoaded = true
           this.pagination = _.clone(response.data)
           delete this.pagination.data
@@ -662,7 +661,7 @@ export default {
         .then(response => {
           this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
-          this.hasMore = response.data.next_page_url
+          this.setHasMoreCommunications(response.data.next_page_url)
           this.isLoadingMore = false
           this.isLoaded = true
           this.pagination = _.clone(response.data)
@@ -681,7 +680,7 @@ export default {
       // Set a timeout to run after scrolling ends
       scrollTimeout = setTimeout(() => {
         // Run the callback
-        if (this.hasMore && this.isLoaded) {
+        if (this.hasMoreCommunications && this.isLoaded) {
           this.filter.page = this.nextPage
           this.loadMoreCommunications(this.filter)
         }
@@ -734,6 +733,33 @@ export default {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
 
+    redirectMentionsChannel (mention) {
+      this.$router.push({
+        name: 'Inbox Contact Mention Communication',
+        params: {
+          id: mention.mention_subject.contact_id,
+          communicationId: mention.mention_subject_id,
+          status: this.mentionType,
+          channel: 'mentions'
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    redirectChannel (communication) {
+      this.$router.push({
+        name: 'Inbox Contact',
+        params: {
+          id: communication.contact_id.toString(),
+          communicationId: communication.id,
+          channel: this.channel
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
     ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
 
@@ -773,6 +799,37 @@ export default {
         }
       }
     }
+  },
+
+  mounted () {
+    let _this = this
+    this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
+      _this.filter.page = _this.nextPage
+      _this.loadMoreCommunications(this.filter).then(() => {
+        let communication = this.communications[lastNavigatedIndex + 1]
+        this.setSelectedCommunication(communication)
+
+        if (this.$route.name === 'Inbox Contact') {
+          this.redirectChannel(communication)
+        }
+
+        if (this.$route.name === 'Inbox Contact Mention Communication') {
+          this.redirectMentionsChannel(communication)
+        }
+      })
+    })
+
+    this.$VueEvent.listen('navigate_channel', (communication) => {
+      this.setSelectedCommunication(communication)
+
+      if (this.$route.name === 'Inbox Contact') {
+        this.redirectChannel(communication)
+      }
+
+      if (this.$route.name === 'Inbox Contact Mention Communication') {
+        this.redirectMentionsChannel(communication)
+      }
+    })
   }
 }
 </script>

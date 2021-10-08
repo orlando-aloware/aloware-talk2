@@ -3,6 +3,8 @@
     <search :placeholder="searchPlaceholder"
             :border="false"
             v-if="isSearch"
+            @focus="onFocus"
+            @blur="onBlur"
             @search="search">
     </search>
     <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2"
@@ -159,6 +161,12 @@ export default {
   methods: {
     search (value) {
       this.$emit('search', value)
+    },
+    onFocus (value) {
+      this.$emit('focus', value)
+    },
+    onBlur (value) {
+      this.$emit('blur', value)
     },
     sort (value) {
       this.$emit('sort', value)

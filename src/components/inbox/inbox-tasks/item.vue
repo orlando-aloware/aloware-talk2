@@ -21,8 +21,9 @@
       <div class="contact-name">
         {{ contactName | truncate(20) }}
         <q-tooltip content-class="bg-grey-light11"
-                   anchor="top middle"
-                   self="center middle">
+                   anchor="top left"
+                   self="top left"
+                   :offset="[0, 33]">
           {{ contactName }}
         </q-tooltip>
       </div>
@@ -52,10 +53,10 @@
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
            v-else-if="contact.last_communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(contact.last_communication.current_status2)">
-        <div class="px-2">
+        <div class="pl-0">
           <cancel-call-icon role="button"/>
         </div>
-        <div class="px-2">
+        <div class="pl-2 pr-0">
           <accept-call-icon role="button"/>
         </div>
       </div>

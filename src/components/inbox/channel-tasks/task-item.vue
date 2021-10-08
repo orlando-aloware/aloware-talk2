@@ -20,8 +20,9 @@
       <div class="contact-name">
         {{ contactName | truncate(20) }}
         <q-tooltip content-class="bg-grey-light11"
-                   anchor="top middle"
-                   self="center middle">
+                   anchor="top left"
+                   self="top left"
+                   :offset="[0, 33]">
           {{ contactName }}
         </q-tooltip>
       </div>

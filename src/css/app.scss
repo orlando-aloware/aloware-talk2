@@ -119,6 +119,11 @@ body,
   left: 300px;
 }
 
+.btn-inbox-list-navigation {
+  position: absolute;
+  left: 197px;
+}
+
 .q-separator--horizontal-inset {
   margin-left: 10px !important;
   margin-right: 10px !important;
@@ -3248,7 +3253,6 @@ span.mention {
     height: 45px;
     display: flex;
     align-items: center;
-    margin-left: 7px;
     //border-bottom: solid 1px $grey-light3;
 
     &__label {
@@ -3368,7 +3372,7 @@ span.mention {
   }
 
   .q-field__prepend {
-    padding-left: 10px !important;
+    padding-left: 15px !important;
     padding-right: 0;
   }
 
@@ -3452,9 +3456,20 @@ span.mention {
 }
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::before, {
+  background: $primary !important;
+  border: none !important;
+}
+
+.custom-switch.switch-success .custom-control-input:checked ~ .custom-control-label::before, {
   background: $success !important;
   border: none !important;
 }
+
+.custom-switch.switch-primary .custom-control-input:checked ~ .custom-control-label::before, {
+  background: $primary !important;
+  border: none !important;
+}
+
 .custom-switch .custom-control-input ~ .custom-control-label::after, {
   background: $white !important;
   border: none !important;
@@ -3462,6 +3477,14 @@ span.mention {
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
   background: white !important;
+}
+
+.custom-checkbox-w-50 .custom-control {
+  width: 50% !important;
+}
+
+.custom-checkbox-w-100 .custom-control {
+  width: 100% !important;
 }
 
 .dialer {
@@ -4993,10 +5016,14 @@ span.mention {
       min-height: 35px !important;
     }
 
-    .q-field, .q-btn {
-      font-size: 12px !important;
+    .q-btn {
+      font-size: $f-size-12 !important;
     }
   }
+}
+
+.q-select-pager.q-field {
+  font-size: $f-size-12 !important;
 }
 
 .static-list-add-item.scrollableArea {
@@ -7060,10 +7087,9 @@ button.grey-90 {
         border-radius: 5px;
         font-size: 10px;
         font-weight: 600;
-        padding: 0 4px;
+        padding: 0 2px;
         color: $white;
         height: 16px;
-        //width: 22px;
         margin-top: 1px;
 
         span {
@@ -7142,6 +7168,12 @@ button.grey-90 {
       margin-right: 0 !important;
       margin-left: 0 !important;
     }
+  }
+  .highlighted{
+    background: #FFFBD4;
+    border-radius: 6px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 }
 
@@ -7303,6 +7335,7 @@ button.grey-90 {
     font-weight: 500 !important;
     font-size: $f-size-body !important;
     color: $grey-100;
+    margin-top: 8px;
 
     .focus-mode-icon {
       margin-top: -2px;
@@ -7355,4 +7388,13 @@ button.grey-90 {
 
 .transparent {
   opacity: 0;
+}
+
+.q-menu.settings-menu-links {
+  padding: 10px;
+
+  .q-item {
+    padding: 10px;
+    border-radius: 6px;
+  }
 }

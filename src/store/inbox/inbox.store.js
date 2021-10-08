@@ -3,6 +3,7 @@ export default function () {
     selectedContactId: null,
     selectedCommunication: null,
     isGettingTasksList: false,
+    isFetchingContacts: false,
     isChannelFilterOpen: false,
     activeChannel: {
       label: 'Inbox',
@@ -65,7 +66,11 @@ export default function () {
       }
     ],
     communications: [],
+    communicationsCurrentPage: 0,
+    hasMoreCommunications: false,
     contacts: [],
+    contactsCurrentPage: 0,
+    hasMoreContacts: false,
     selectedContact: {},
     taskCounts: {
       new: 0,

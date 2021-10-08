@@ -8,8 +8,10 @@
           </div>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-3">
-        <b-col sm="12" md="6">
+      <b-form-row class="mt-3"
+                  :id="`${SettingsMap.contacts_visibility.hash_keyword}-container`">
+        <b-col sm="12"
+               md="6">
           <div>
             <h5 class="form-label">Contacts Visibility</h5>
             <p class="form-helper-text">Select the contacts visibility settings for this user</p>
@@ -23,8 +25,10 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="6">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.communications_visibility.hash_keyword}-container`">
+        <b-col sm="12"
+               md="6">
           <div>
             <h5 class="form-label">Communications Visibility</h5>
             <p class="form-helper-text">Communication visibility settings for this user</p>
@@ -39,8 +43,10 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.line_access_limit.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Line Visibility Limit</h5>
             <p class="form-helper-text">By default, agents have access to all lines. Here, you can define exactly what lines they have access to.</p>
@@ -63,11 +69,11 @@
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-checkbox-group
               stacked
-              class="group-checkbox d-flex flex-wrap"
+              class="group-checkbox d-flex flex-wrap custom-checkbox-w-100"
               value-field="id"
               text-field="name"
               v-model="user.selected_campaign_ids"
-              :options="campaigns"
+              :options="sortedCampaigns"
               :aria-describedby="ariaDescribedby"
             ></b-form-checkbox-group>
           </b-form-group>
@@ -104,8 +110,10 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.read_only_access.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Reporter Access</h5>
             <p class="form-helper-text">Users with reporter access can only see the reports and they can not interact with the contacts or make calls.</p>
@@ -124,8 +132,11 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="user.role_name && user.read_only_access && hasRole('Company Admin')">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.user_access_limit.hash_keyword}-container`"
+                  v-if="user.role_name && user.read_only_access && hasRole('Company Admin')">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">User Access Limit</h5>
             <p class="form-helper-text">Limit which users this user has reporting access to.</p>
@@ -149,7 +160,7 @@
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-checkbox-group
               stacked
-              class="group-checkbox d-flex flex-wrap"
+              class="group-checkbox d-flex flex-wrap custom-checkbox-w-100"
               value-field="id"
               text-field="name"
               v-model="user.selected_user_ids"
@@ -167,6 +178,9 @@
 import VisibilitySelector from 'components/generic-selectors/visibility-selector'
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
+
+import SettingsMap from 'components/settings/settings-map'
+
 export default {
   name: 'visibility',
 
@@ -185,11 +199,15 @@ export default {
     ...mapState(['campaigns', 'users']),
     sortedUsers () {
       return this.$options.filters.objAlphabeticalOrder(this.users, 'name')
+    },
+    sortedCampaigns () {
+      return this.$options.filters.objAlphabeticalOrder(this.campaigns, 'name')
     }
   },
 
   data () {
     return {
+      SettingsMap
     }
   },
 

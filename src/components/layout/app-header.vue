@@ -10,6 +10,8 @@
       <h1 v-if="!['Contact'].includes($route.name)">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name)"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name)" />
+      <inbox-list-navigation v-if="['Inbox Contact Task'].includes($route.name)" />
+      <inbox-channel-navigation v-if="['Inbox Contact', 'Inbox Contact Mention Communication'].includes($route.name)" />
     </div>
     <div class="ml-auto d-none d-lg-block h-100">
       <div class="d-flex h-100 align-items-center">
@@ -67,13 +69,15 @@ import Phone from 'components/dialer/phone'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
 import ParkedCall from 'components/dialer/parked-call'
+import InboxListNavigation from 'components/inbox/inbox-list-navigation'
+import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
 
 export default {
   name: 'app-header',
 
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
-  components: { ParkedCall, ContactAppHeader, ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
+  components: { InboxChannelNavigation, InboxListNavigation, ParkedCall, ContactAppHeader, ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
 
   data () {
     return {

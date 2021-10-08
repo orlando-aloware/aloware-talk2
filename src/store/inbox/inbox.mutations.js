@@ -11,6 +11,9 @@ export default {
   SET_COMMUNICATIONS: (state, communications) => {
     state.communications = communications
   },
+  SET_COMMUNICATIONS_CURRENT_PAGE: (state, page) => {
+    state.communicationsCurrentPage = page
+  },
   RESET_INBOX_VUEX: (state) => {
     state.activeChannel = null
     state.selectedContactId = null
@@ -18,6 +21,9 @@ export default {
   },
   GETTING_TASKS_LIST: (state, isGetting) => {
     state.isGettingTasksList = isGetting
+  },
+  GETTING_CONTACTS_LIST: (state, isGetting) => {
+    state.isFetchingContacts = isGetting
   },
   SET_ACTIVE_CHANNEL: (state, channel) => {
     state.activeChannel = channel
@@ -54,6 +60,9 @@ export default {
   SET_CONTACTS: (state, contacts) => {
     state.contacts = contacts
   },
+  SET_CONTACTS_CURRENT_PAGE: (state, page) => {
+    state.contactsCurrentPage = page
+  },
   SET_SELECTED_CONTACT: (state, contact) => {
     state.selectedContact = contact
   },
@@ -88,5 +97,11 @@ export default {
   },
   SET_SELECTED_FILTER: (state, selectedFilter) => {
     state.selectedFilter = selectedFilter
+  },
+  SET_HAS_MORE_CONTACTS: (state, hasMore) => {
+    state.hasMoreContacts = hasMore
+  },
+  SET_HAS_MORE_COMMUNICATIONS: (state, hasMore) => {
+    state.hasMoreCommunications = hasMore
   }
 }

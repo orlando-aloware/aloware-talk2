@@ -137,7 +137,7 @@ export default {
         params: {
           id: mention.mention_subject.contact_id, // mention.contact_id.toString(),
           communicationId: mention.mention_subject_id,
-          direction: this.direction,
+          status: this.direction,
           channel: 'mentions'
         }
       }).catch(err => {
