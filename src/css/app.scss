@@ -7204,13 +7204,12 @@ button.grey-90 {
     .form-row {
       margin-right: 0 !important;
       margin-left: 0 !important;
+      padding: 0.5rem !important;
     }
   }
   .highlighted{
     background: #FFFBD4;
     border-radius: 6px;
-    padding-top: 10px;
-    padding-bottom: 10px;
   }
 }
 
@@ -7433,5 +7432,18 @@ button.grey-90 {
   .q-item {
     padding: 10px;
     border-radius: 6px;
+  }
+}
+
+.settings-searcher {
+
+  .q-field__prepend {
+    i.material-icons.q-icon {
+      font-size: 18px;
+    }
+  }
+
+  .q-field__focusable-action.q-icon {
+    font-size: 14px !important;
   }
 }

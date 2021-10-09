@@ -107,7 +107,7 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-100 w-100 flex-grow-1 scroll-y" @scroll="handleScroll">
+      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller" @scroll="handleScroll">
         <task-list :communications="communications"
                    :answer-status="answerStatus"
                    :channel="channel"
@@ -267,7 +267,9 @@ export default {
       sorting: {
         order: 'desc'
       },
-      mentionUserId: null
+      mentionUserId: null,
+      scrollContainerEl: null,
+      activeItemEl: null
     }
   },
 
@@ -760,6 +762,15 @@ export default {
       })
     },
 
+    makeSelectedItemVisible () {
+      this.scrollContainerEl = document.querySelector('.task-list-scroller')
+      this.activeItemEl = document.querySelector('.task-item.active')
+
+      if (this.activeItemEl.offsetTop > (this.scrollContainerEl.offsetHeight - 100)) {
+        this.scrollContainerEl.scrollTop = this.activeItemEl.offsetTop - 757
+      }
+    },
+
     ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
 
@@ -816,6 +827,8 @@ export default {
         if (this.$route.name === 'Inbox Contact Mention Communication') {
           this.redirectMentionsChannel(communication)
         }
+
+        this.makeSelectedItemVisible()
       })
     })
 
@@ -829,6 +842,8 @@ export default {
       if (this.$route.name === 'Inbox Contact Mention Communication') {
         this.redirectMentionsChannel(communication)
       }
+
+      this.makeSelectedItemVisible()
     })
   }
 }

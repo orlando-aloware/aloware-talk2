@@ -4,7 +4,7 @@
       <b-button size="sm"
                 variant="light"
                 class="btn-white btn-contact-prev-next"
-                :disabled="disablePreviousButton"
+                :disabled="disablePreviousButton || disabled"
                 @click="onPreviousItem">
         <i class="material-icons">keyboard_arrow_left</i>
       </b-button>
@@ -13,7 +13,7 @@
       <b-button size="sm"
                 variant="light"
                 class="btn-white btn-contact-prev-next"
-                :disabled="disableNextButton"
+                :disabled="disableNextButton || disabled"
                 @click="onNextItem">
         <i class="material-icons">keyboard_arrow_right</i>
       </b-button>
@@ -52,8 +52,12 @@ export default {
     },
     disableNextButton () {
       return this.changingSelectedContact || (!this.nextItem && !this.hasMoreContacts)
+    },
+    disabled () {
+      return !['Inbox Contact Task'].includes(this.$route.name)
     }
   },
+
   methods: {
     onPreviousItem () {
       window.VueEvent.fire('navigate_task_tab', this.previousItem)

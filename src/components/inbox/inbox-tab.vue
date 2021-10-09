@@ -76,29 +76,28 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-75 w-100 flex-grow-1">
-        <b-overlay :show="isFetchingContacts"
-                 class="w-100 h-100"
-                 rounded="sm"
-                 variant="white">
-          <div class="h-100 w-100 scroll-y task-list-scroller"
-               ref="taskListScroller"
-               @scroll="handleScroll">
-            <inbox-task-list :contacts="contacts"
-                             :loading-contacts="isFetchingContacts"
-                             @onItemSelected="onItemSelected">
-            </inbox-task-list>
+      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+             ref="taskListScroller"
+             @scroll="handleScroll">
+          <inbox-task-list :contacts="contacts"
+                           :loading-contacts="isFetchingContacts"
+                           @onItemSelected="onItemSelected">
+          </inbox-task-list>
+          <div class="relative py-4">
+            <b-overlay :show="isLoadingMore"
+                       rounded="sm"
+                       variant="white">
+              <template #overlay>
+                <div class="text-center">
+                  <q-spinner-bars
+                    color="primary"
+                    size="2em"
+                  />
+                </div>
+              </template>
+            </b-overlay>
           </div>
-        <template #overlay>
-          <div class="text-center">
-            <q-spinner-bars
-              color="primary"
-              size="2em"
-            />
-          </div>
-        </template>
-      </b-overlay>
-      </div>
+        </div>
     </div>
 </template>
 
@@ -235,6 +234,14 @@ export default {
     onFilterItemSelected (item) {
       this.resetFilters()
       this.lineOrRingGroupFilter = item
+    },
+    makeSelectedItemVisible () {
+      let container = document.querySelector('.task-list-scroller')
+      let target = document.querySelector('.contact-task-item.active')
+
+      if (target.offsetTop > (container.offsetHeight - 100)) {
+        container.scrollTop = target.offsetTop - 757
+      }
     }
   },
 
@@ -323,6 +330,8 @@ export default {
           name: 'Inbox Contact Task',
           params: { id: JSON.stringify(contact.id) }
         })
+
+        this.makeSelectedItemVisible()
       })
     })
 
@@ -333,6 +342,8 @@ export default {
         name: 'Inbox Contact Task',
         params: { id: JSON.stringify(contact.id) }
       })
+
+      this.makeSelectedItemVisible()
     })
   },
 

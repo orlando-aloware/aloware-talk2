@@ -67,6 +67,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isAddReminderOpen']),
+    ...mapState('auth', ['profile']),
     isValid () {
       return this.reminder.date && this.reminder.time && this.reminder.note
     },
@@ -119,7 +120,7 @@ export default {
         body: this.reminder.note,
         date: this.reminder.date,
         time: this.reminder.time,
-        timezone: '',
+        timezone: this.profile.timezone,
         type: 13
       }
     },

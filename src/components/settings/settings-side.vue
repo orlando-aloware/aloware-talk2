@@ -3,13 +3,56 @@
     <div class="page-side-menubar__left settings"
          :class="{'page-side-menubar__left--closed': closed }">
 
-      <calls-header :isSearch="true"
-                    ref="searcher"
-                    search-placeholder="Search settings"
-                    @blur="onSearchBlur"
-                    @focus="onSearchFocus"
-                    @search="search">
-      </calls-header>
+      <div class="header flex- w-100 ml-3 mt-2">
+        <q-select
+            ref="settingsSearcher"
+            class="bottom-border__none padding-left__none settings-searcher"
+            placeholder="Search settings..."
+            hide-dropdown-icon
+            clearable
+            dense
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="0"
+            option-value="title"
+            option-label="description"
+            map-options
+            v-model="link"
+            :display-value="link ? link.title : ''"
+            :options="options"
+            @filter="filterFn"
+            style="width: 250px;"
+        >
+
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps"
+                    v-on="scope.itemEvents"
+            >
+              <q-item-section>
+                <q-item-label v-html="scope.opt.title"></q-item-label>
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+
+          <template v-slot:selected-item="scope">
+            <q-item-label v-html="scope.opt.title"/>
+          </template>
+
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey pt-1 pb-1 pl-2 pr-2">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+      </div>
       <div>
         <q-menu no-parent-event
                 auto-close
@@ -47,8 +90,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
-import CallsHeader from 'components/inbox/calls/calls-header'
+import { mapState } from 'vuex'
 import SettingsNavList from 'components/settings/settings-nav/settings-nav-list'
 import settingsMap from './settings-map'
 import _ from 'lodash'
@@ -57,8 +99,7 @@ export default {
   name: 'settings-side',
 
   components: {
-    SettingsNavList,
-    CallsHeader
+    SettingsNavList
   },
 
   data () {
@@ -72,6 +113,8 @@ export default {
       hasMore: false,
       isLoadingMore: false,
       isLoaded: true,
+      options: [],
+      link: null,
       settingsMap
     }
   },
@@ -115,42 +158,17 @@ export default {
       this.closed = window.innerWidth < 992
     },
 
-    search (value) {
-      this.searchText = value || ''
-    },
-
-    onSearchFocus (value) {
-      // this.toggleLinks()
-    },
-
-    onSearchBlur () {
-      // this.$refs.menuLinks.hide()
-    },
-
-    newActive (active) {
-      this.setActiveChannel(active)
-    },
-
-    redirectTo (item) {
-      this.resetSearch()
-      this.$router.push({
-        path: item.route + (item.hash_keyword ? '#' + item.hash_keyword : '')
-      })
-    },
-
-    resetSearch () {
-      this.searchText = ''
-    },
-
-    toggleLinks () {
-      if (this.searchResult && this.searchResult.length > 0) {
-        this.$refs.menuLinks.show()
-      } else {
-        this.$refs.menuLinks.hide()
+    filterFn (val, update, abort) {
+      if (val.length < 2) {
+        abort()
+        return
       }
-    },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.searchResult.filter(item => item.title.toLowerCase().indexOf(needle) > -1 || item.description.toLowerCase().indexOf(needle) > -1)
+      })
+    }
   },
 
   beforeDestroy () {
@@ -158,8 +176,14 @@ export default {
   },
 
   watch: {
-    'searchResult': function (results) {
-      this.toggleLinks()
+    link: function () {
+      if (this.link) {
+        this.$router.push({
+          path: this.link.route + (this.link.hash_keyword ? '#' + this.link.hash_keyword : '')
+        })
+        this.$refs.settingsSearcher.blur()
+        this.link = null
+      }
     }
   }
 }

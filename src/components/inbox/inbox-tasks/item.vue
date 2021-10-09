@@ -52,7 +52,7 @@
         <task-item-time :from-time="contact.last_engagement_at" :update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-           v-else-if="contact.last_communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(contact.last_communication.current_status2)">
+           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND && contact.last_communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(contact.last_communication.current_status2)">
         <div class="pl-0">
           <cancel-call-icon role="button"/>
         </div>
@@ -79,6 +79,7 @@ import { avatarMixin, communicationInfoMixin } from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -139,7 +140,8 @@ export default {
     return {
       CommunicationTypes,
       CommunicationDispositionStatus,
-      CommunicationCurrentStatus
+      CommunicationCurrentStatus,
+      CommunicationDirection
     }
   },
 

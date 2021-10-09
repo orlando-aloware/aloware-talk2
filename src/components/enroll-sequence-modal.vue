@@ -25,7 +25,7 @@
         variant="primary"
         class="custom-btn"
         size="sm"
-        :disabled="isEnrolling || !sequence"
+        :disabled="isEnrolling || !sequenceId"
         @click="onSubmit"
       >
         <q-spinner-bars v-if="isEnrolling" color="white" />
@@ -57,18 +57,18 @@ export default {
   data () {
     return {
       isEnrolling: false,
-      sequence: null
+      sequenceId: null
     }
   },
   methods: {
     ...mapActions('contacts', ['enrollSequenceOpen']),
-    onSequenceSelected (sequence) {
-      this.sequence = sequence
+    onSequenceSelected (sequenceId) {
+      this.sequenceId = sequenceId
     },
     onSubmit (event) {
       event.preventDefault()
       this.isEnrolling = true
-      talk2Api.V1.automations.workflows.enroll(this.sequence.id, { id: this.contact.id, model: 'contact' })
+      talk2Api.V1.automations.workflows.enroll(this.sequenceId, { id: this.contact.id, model: 'contact' })
         .then(response => {
           this.enrollSequenceOpen(false)
           this.$generalNotification('Contact has been enrolled to sequence.')
