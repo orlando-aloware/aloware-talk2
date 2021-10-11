@@ -29,6 +29,7 @@ export default function () {
     },
     // powerDialerList: null,
     contactResources: [],
+    contacts: [],
     selectedContacts: {},
     isStartingDial: false,
     searchedListItem: ''

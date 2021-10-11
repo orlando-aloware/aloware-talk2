@@ -14,7 +14,7 @@
       <template
         v-for="(folder, key) in folders">
         <CreateListItem
-          v-if="itemFolders[key].lists.length > 0"
+          v-if="foldersHasLists"
           :name="folder.name"
           :key="folder.id"
           :id="folder.id"
@@ -64,6 +64,14 @@ export default {
     itemLists: {
       type: Array,
       default: () => []
+    }
+  },
+  methods: {
+    foldersHasLists (obj) {
+      if (obj?.lists.length > 0) {
+        return true
+      }
+      return false
     }
   }
 }

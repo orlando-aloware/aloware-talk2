@@ -44,12 +44,13 @@ export default {
     ...mapGetters('powerDialer', ['isStartingDial']),
     ...mapState(['currentRoute'])
   },
-  mounted () {
+  async mounted () {
+    this.RESET_LIST()
     this.START_DIAL_TOGGLE(false)
-    // console.log('666 :>> ', this.isStartingDial)
+    this.SET_POWER_DIALER_LIST([])
+    await this.fetchContacts()
   },
   beforeRouteUpdate (to, from, next) {
-    console.log('445 :>> ', 445)
     if (to.meta !== 'Power Dialer Session') {
       this.START_DIAL_TOGGLE(false)
     }
@@ -58,28 +59,40 @@ export default {
   },
   watch: {
     'currentRoute': {
-      handler () {
-        console.log('object :>> ', this.currentRoute.name)
+      async handler () {
         if (this.currentRoute.name === 'Power Dialer') {
-          this.RESET_LIST()
-          this.START_DIAL_TOGGLE(false)
-          this.SET_POWER_DIALER_LIST([])
+          this.resetValues()
+          await this.fetchContacts()
         }
       },
       deep: true
     }
   },
   methods: {
-    ...mapActions('power-dialer', [
-      'getPowerDialerList'
+    ...mapActions('powerDialer', [
+      'getPowerDialerList',
+      'getContactResources'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
       'SET_POWER_DIALER_LIST',
       'RESET_LIST'
     ]),
-    async fetchAutoDialer () {
+    async fetchContacts () {
       await this.getPowerDialerList()
+      await this.getContactResources({
+        params: {
+          page: 1,
+          per_page: 25,
+          sort: 'last_engagement_at',
+          order: 'desc'
+        }
+      })
+    },
+    resetValues () {
+      this.RESET_LIST()
+      this.START_DIAL_TOGGLE(false)
+      this.SET_POWER_DIALER_LIST([])
     }
   }
 }

@@ -21,8 +21,9 @@ export default {
     return state.lists
   },
   contactResources: (state) => {
-    // return state.contactResources
     return TEST_DATA
   },
+  contactResources2: (state) => state.contactResources,
+  contacts: (state) => state.contacts,
   searchedListItem: (state) => state.searchedListItem
 }

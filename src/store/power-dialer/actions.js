@@ -4,14 +4,15 @@ export default {
    * POWER-DIALER
    */
   getPowerDialerList: async ({ commit }) => {
-    console.log('Fetching power dialer lists...')
-    let res = await window.axios.get('/api/v1/auto-dialer?status=1&page=1&per_page=10&order=1')
-    console.log('res :>> ', res)
+    let res = await window.axios.get('api/v2/contact-folders')
+    if (res.status === 200) {
+      commit('SET_POWER_DIALER_LIST', res.data)
+    }
   },
   getContactResources: async ({ commit }, params = {}) => {
-    let res = await window.axios.get('...URL_here...')
+    let res = await window.axios.get('api/v2/contacts', params)
     if (res.status === 200) {
-      commit('SET_CONTACT_RESOURCES', res.data)
+      commit('SET_CONTACT_RESOURCES', res.data.data)
     }
   },
 

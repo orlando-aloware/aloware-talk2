@@ -98,7 +98,7 @@
         :layer="0"
         :parent_id="null"
         @blur="onCreateFolderToggle" />
-      <template v-if="directory">
+      <template v-if="directoryHasContent">
         <DirectoryFolder
           v-for="folder in directory[0].child_folders"
           :name="folder.name"
@@ -157,6 +157,12 @@ export default {
     FolderIcon,
     PeopleIcon,
     PlusIcon
+  },
+  computed: {
+    directoryHasContent () {
+      if (this.directory.length) return true
+      return false
+    }
   },
   mounted () {
     this.loadFolders()

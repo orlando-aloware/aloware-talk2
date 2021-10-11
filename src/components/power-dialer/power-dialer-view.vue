@@ -85,8 +85,8 @@
             @reordered="onColumnsReordered">
             <template slot="tbody">
               <TableRow
-                v-for="(contact, key) in contactResources"
-                :key="contact.id + key"
+                v-for="(contact, nkey) in contacts"
+                :key="`power-dialer-${contact.id}-${nkey}`"
                 :contact="contact"
                 :columns="columns"
                 :checked="checked"
@@ -271,6 +271,7 @@ export default {
     ...mapState(['prevRoute']),
     ...mapGetters('powerDialer', [
       'contactResources',
+      'contacts',
       'selectedContacts',
       'powerDialerList'
     ]),
@@ -316,7 +317,6 @@ export default {
       'setSelectedContact'
     ]),
     beginDial () {
-      console.log('Stating sessions...')
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.$router.push({ name: 'Power Dialer Session' })

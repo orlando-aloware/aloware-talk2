@@ -1,19 +1,15 @@
-import { POWER_DIALER_LIST } from 'src/constants/power-dialer/power-dialer'
-
 export default {
   SET_POWER_DIALER_LIST: (state, data) => {
-    let list = POWER_DIALER_LIST
-    state.lists = list.concat(data)
+    state.lists = data
   },
   SET_CONTACT_RESOURCES: (state, data) => {
-    state.contactResources = data
+    state.contacts = data
   },
   RESET_LIST: (state) => {
     // state.opened = []
     state.lists = []
   },
   SET_LIST_SELECTED_CONTACTS: (state, data) => {
-    console.log('data :>> ', data)
     state.selectedContacts = {
       ...state.selectedContacts,
       [data.id]: data.contacts

@@ -3,7 +3,7 @@
     <div class="pl-3 pr-2 py-2 icon">
       <ListIcon />
     </div>
-    <div class="py-1 flex-grow-1 item-name">
+    <div class="py-1 flex-grow-1 item-name cursor-pointer">
       {{ item.name }}
     </div>
     <div class="pr-2">
