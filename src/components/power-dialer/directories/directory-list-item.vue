@@ -9,10 +9,10 @@
         :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
         class="folder d-flex align-items-center pl-2">
         <div class="folder__indent" :style="indentStyle"></div>
-        <div class="folder__icon pl-1">
+        <div class="folder__icon item-icon pl-1">
           <DialIcon class="ml-2" color="#62666E" />
         </div>
-        <div class="folder__name">
+        <div class="item__name">
           <input
             :id="'folder-input-' + id"
             v-if="isEditing"

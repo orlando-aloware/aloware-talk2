@@ -50,6 +50,16 @@
         padding-top: 8px;
       }
 
+      .item__name {
+        padding: 0;
+      }
+
+      .folder__icon {
+        &.item-icon {
+          margin-top: -5px !important;
+        }
+      }
+
       > .sublists {
         > .tree-list-item {
           > .folder {
