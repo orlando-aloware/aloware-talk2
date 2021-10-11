@@ -45,7 +45,7 @@
           <button
             :tabindex="id"
             :data-popper-target="'list-' + id"
-            :id="'folder-option-' + id + '-' + layer"
+            :id="'folder-option-' + id"
             class="folder__option btn btn-link p-0 shadow-0"
           >
             <folder-option></folder-option>
@@ -53,7 +53,7 @@
         </div>
 
         <b-popover
-          :target="'folder-option-' + id + '-' + layer"
+          :target="'folder-option-' + id"
           triggers="click blur"
           placement="bottomright"
           boundary="window"

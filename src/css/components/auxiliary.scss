@@ -50,8 +50,10 @@
         padding-top: 8px;
       }
 
-      .item__name {
-        padding: 0;
+      .folder__name {
+        &.item-name {
+          padding: 0 !important;
+        }
       }
 
       .folder__icon {

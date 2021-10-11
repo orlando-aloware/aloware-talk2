@@ -12,7 +12,7 @@
         <div class="folder__icon item-icon pl-1">
           <DialIcon class="ml-2" color="#62666E" />
         </div>
-        <div class="item__name">
+        <div class="folder__name item-name">
           <input
             :id="'folder-input-' + id"
             v-if="isEditing"
@@ -32,13 +32,13 @@
         <button
           :tabindex="id"
           :data-popper-target="'list-' + id"
-          :id="'folder-option-' + id + '-' + layer"
+          :id="'folder-option-' + id"
           class="folder__option btn btn-link p-0">
           <folder-option></folder-option>
         </button>
       </div>
       <b-popover
-        :target="'folder-option-' + id + '-' + layer"
+        :target="'folder-option-' + id"
         triggers="click blur"
         placement="bottomright"
         boundary="window"
