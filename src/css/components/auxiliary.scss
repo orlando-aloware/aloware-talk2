@@ -41,6 +41,15 @@
     overflow: auto;
     > .tree-folder {
 
+      .folder__arrow,
+      .folder__icon {
+        margin-top: 5px !important;
+      }
+
+      .folder__name {
+        padding-top: 8px;
+      }
+
       > .sublists {
         > .tree-list-item {
           > .folder {

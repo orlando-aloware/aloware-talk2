@@ -258,6 +258,7 @@ export default {
         })
     },
     reloadFolders () {
+      console.log('Folders reloading')
       return this.$axios
         .get('/api/v2/power-dialer-folders')
         .then((response) => response.data)
