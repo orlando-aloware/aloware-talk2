@@ -143,12 +143,12 @@
                       <TagPopover
                         :resource="contact" />
                     </td>
-                    <!-- COLUMN: PD Status -->
+                    <!-- COLUMN: Status -->
                     <td
-                      v-else-if="column.name === 'pd_status'"
+                      v-else-if="column.name === 'status'"
                       :key="key">
                       <StatusChip
-                        :status="contact.pd_status"
+                        :status="contact.status"
                         size="12px"
                         :outline="true" />
                     </td>
