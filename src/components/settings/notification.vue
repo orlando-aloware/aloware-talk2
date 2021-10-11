@@ -15,7 +15,8 @@
             <p class="form-helper-text">Notify me when the following events happen:</p>
           </div>
 
-          <b-form-group label="">
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_calls.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myCalls"
                              value="true"
@@ -24,63 +25,55 @@
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_texts.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myTexts">
               Text message to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_voicemail.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myVoicemails">
               Voicemail to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_faxes.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myFaxes">
               Fax to personal line
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_mentions.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myMentions">
               When this user is mentioned
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_contacts.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myContacts">
               When a contact is assigned to this user
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label=""
+                        :id="`${SettingsMap.my_appointments.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myAppointments">
               When an appointment is assigned to this user
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label="" :id="`${SettingsMap.my_reminders.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myReminders">
               When a reminder is assigned to this user
@@ -97,9 +90,7 @@
             <p class="form-helper-text">Receive daily emails for account activity:</p>
           </div>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label="" :id="`${SettingsMap.enabled_billing_warnings.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_billing_warnings"
                              value="true"
@@ -109,7 +100,7 @@
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.enabled_sync_reports.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_sync_reports"
                              value="true"
@@ -119,7 +110,7 @@
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.enabled_account_reports.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_account_reports"
                              value="true"
@@ -129,7 +120,7 @@
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.enabled_other_reports.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_other_reports"
                              value="true"
@@ -142,8 +133,9 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4" :id="`${SettingsMap.reminder_options.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Event Notifications</h5>
             <p class="form-helper-text">Notify this user when the following appointment or reminder event occurs:</p>
@@ -161,78 +153,85 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
-          <div>
-            <h5 class="form-label">Line Notifications</h5>
-            <p class="form-helper-text">Get extra notifications from the lines you choose below.</p>
-          </div>
+      <div :id="`${SettingsMap.line_notifications.hash_keyword}-container`">
+        <b-form-row class="mt-4">
+          <b-col sm="12"
+                 md="12">
+            <div>
+              <h5 class="form-label">Line Notifications</h5>
+              <p class="form-helper-text">Get extra notifications from the lines you choose below.</p>
+            </div>
 
-          <b-form-group label="">
-            <b-form-checkbox switch
-                             value="true"
-                             unchecked-value="false"
-                             v-model="shouldObserve"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'shouldObserve')">
-              Receive notifications from lines
-            </b-form-checkbox>
-          </b-form-group>
+            <b-form-group label="">
+              <b-form-checkbox switch
+                               value="true"
+                               unchecked-value="false"
+                               v-model="shouldObserve"
+                               @change="(eventPayload) => onUpdateFields(eventPayload, 'shouldObserve')">
+                Receive notifications from lines
+              </b-form-checkbox>
+            </b-form-group>
 
-        </b-col>
-      </b-form-row>
-      <b-form-row class="mt-4" v-if="shouldObserve">
-        <b-col sm="12" md="6">
-          <b-form-group
-            label="Select the lines to get notified from"
-            class="form-label"
-          >
-            <line-selector v-model="user.observing_campaigns"
-                           :multiple="true"
-                           :use-chips="true"
-                           :generic-styling="false"
-                           :generic-multiselect="false"
-                           @change="(eventPayload) => onUpdateFields(eventPayload, 'observing_campaigns')">
-            </line-selector>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
+          </b-col>
+        </b-form-row>
+        <b-form-row class="mt-4"
+                    v-if="shouldObserve">
+          <b-col sm="12"
+                 md="6">
+            <b-form-group
+              label="Select the lines to get notified from"
+              class="form-label"
+            >
+              <line-selector v-model="user.observing_campaigns"
+                             :multiple="true"
+                             :use-chips="true"
+                             :generic-styling="false"
+                             :generic-multiselect="false"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'observing_campaigns')">
+              </line-selector>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
+      </div>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.notifications_channel.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Notification Channels</h5>
             <p class="form-helper-text">Choose what channels you want this user to get notified on.</p>
           </div>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.inAppNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="inAppNotifications">
               In-App
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.desktopNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="desktopNotifications">
               Desktop
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.mobileNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="mobileNotifications">
               Mobile
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.emailNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="emailNotifications">
               Email
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="">
+          <b-form-group label="" :id="`${SettingsMap.textNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="textNotifications">
               Text Message
@@ -247,6 +246,8 @@
 <script>
 import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions } from 'vuex'
+import SettingsMap from 'components/settings/settings-map'
+
 export default {
   name: 'notification-settings',
 
@@ -322,7 +323,8 @@ export default {
       desktopNotifications: false,
       mobileNotifications: false,
       textNotifications: false,
-      shouldObserve: false
+      shouldObserve: false,
+      SettingsMap
     }
   },
 

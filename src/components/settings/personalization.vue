@@ -8,8 +8,10 @@
           </div>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.focus_mode.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Focus Mode</h5>
             <p class="form-helper-text">Only show me contacts that are assigned to me.</p>
@@ -28,8 +30,10 @@
       </b-form-row>
       <hr/>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.go_to_available_after_login.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Available by Default, But Allow Manual Changes</h5>
             <p class="form-helper-text">Put user on available status after login and disable idle mode detection (auto offline).</p>
@@ -48,10 +52,17 @@
       </b-form-row>
       <hr/>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.wrap_up_seconds.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
-            <h5 class="form-label">Wrap up duration <b-badge variant="warning" v-if="currentCompany && currentCompany.force_wrap_up">Forced at account level</b-badge></h5>
+            <h5 class="form-label">Wrap up duration
+              <b-badge variant="warning"
+                       v-if="currentCompany && currentCompany.force_wrap_up">
+                Forced at account level
+              </b-badge>
+            </h5>
             <p class="form-helper-text">Stay on wrap up for this amount of time before you go back to available for the next call.</p>
           </div>
         </b-col>
@@ -71,6 +82,8 @@
 <script>
 import WrapUpSelector from 'components/generic-selectors/wrap-up-selector'
 import { mapActions, mapState } from 'vuex'
+import SettingsMap from 'components/settings/settings-map'
+
 export default {
   name: 'personalization',
 
@@ -92,7 +105,8 @@ export default {
       options: [
         { text: 'Admin', value: '1' },
         { text: 'Agent', value: '2' }
-      ]
+      ],
+      SettingsMap
     }
   },
 

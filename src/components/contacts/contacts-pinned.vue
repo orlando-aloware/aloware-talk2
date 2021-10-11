@@ -58,29 +58,34 @@ export default {
 
     loadDefaultCounts () {
       return Promise.all([
-        this.loadAllCount(),
-        this.loadMyContactsCount(),
+        // this.loadAllCount(),
+        // this.loadMyContactsCount(),
         this.loadStatusCounts()
-      ]).then(([allContacts, myContacts, statusCounts]) => {
+      ]).then((
+        [
+          // allContacts,
+          // myContacts,
+          statusCounts
+        ]) => {
         this.pinnedCountLoaded({
           id: DEFAULT_PINNED_LIST.ALL_CONTACTS.id,
-          count: allContacts
+          count: statusCounts.all_contacts_count
         })
         this.pinnedCountLoaded({
           id: DEFAULT_PINNED_LIST.MY_CONTACTS.id,
-          count: myContacts
+          count: statusCounts.my_contacts_count
         })
         this.pinnedCountLoaded({
           id: DEFAULT_PINNED_LIST.NEWLEADS.id,
-          count: statusCounts['new_contacts_count']
+          count: statusCounts.new_contacts_count
         })
         this.pinnedCountLoaded({
           id: DEFAULT_PINNED_LIST.UNANSWERED.id,
-          count: statusCounts['unanswered_contacts_count']
+          count: statusCounts.unanswered_contacts_count
         })
         this.pinnedCountLoaded({
           id: DEFAULT_PINNED_LIST.UNASSIGNED.id,
-          count: statusCounts['unassigned_contacts_count']
+          count: statusCounts.unassigned_contacts_count
         })
       }).finally(() => {
         this.loading = false
@@ -94,12 +99,15 @@ export default {
     loadMyContactsCount () {
       return this.$axios.get('api/v2/contacts/count', {
         params: {
-          filters: {
-            contact_owner: {
-              operator: OPERATORS.IS_ANY_OF,
-              value: [this.profile.id]
-            }
-          }
+          filter_groups: [{
+            filters: {
+              contact_owner: {
+                operator: OPERATORS.IS_ANY_OF,
+                value: [this.profile.id]
+              }
+            },
+            is_conjunction: true
+          }]
         },
         paramsSerializer: qs.stringify
       }).then((response) => response.data.count)

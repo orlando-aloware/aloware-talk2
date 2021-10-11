@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 import At from 'vue-at'
@@ -64,6 +64,7 @@ export default {
   components: { Avatar, At },
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapState('auth', ['profile']),
     validNote () {
       const content = this.messageComposer.note.body.replace(/(<([^>]+)>)/gi, '')
       return content && content.trim().length > 0
@@ -82,6 +83,9 @@ export default {
     },
     formatMessage () {
       return {
+        time: null,
+        date: null,
+        timezone: this.profile.timezone,
         body: this.$options.filters.parseMentionToMarkup(this.messageComposer.note.body),
         type: 10
       }

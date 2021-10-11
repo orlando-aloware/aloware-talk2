@@ -20,8 +20,9 @@
       <div class="contact-name">
         {{ contactName | truncate(20) }}
         <q-tooltip content-class="bg-grey-light11"
-                   anchor="top middle"
-                   self="center middle">
+                   anchor="top left"
+                   self="top left"
+                   :offset="[0, 33]">
           {{ contactName }}
         </q-tooltip>
       </div>
@@ -55,7 +56,7 @@
         <task-item-time :from-time="communication.created_at" :update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-           v-else-if="communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
+           v-else-if="communication.direction === CommunicationDirection.INBOUND && communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
         <div class="px-2">
           <cancel-call-icon role="button"/>
         </div>

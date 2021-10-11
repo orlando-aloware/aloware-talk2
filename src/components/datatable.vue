@@ -101,9 +101,9 @@
       <q-select outlined
                 dense
                 emit-value
+                class="mt-2 q-select-pager"
                 option-value="value"
                 option-label="label"
-                class="mt-2"
                 v-model="perPage"
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`">

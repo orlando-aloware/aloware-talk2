@@ -6,7 +6,7 @@
         <folder-arrow-close-icon></folder-arrow-close-icon>
       </div>
       <div class="folder-create__icon">
-        <folder-icon></folder-icon>
+        <folder-icon color="#62666E"></folder-icon>
       </div>
       <div class="folder-create__name flex-grow-1 d-flex align-items-center">
         <input

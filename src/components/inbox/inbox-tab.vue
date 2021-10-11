@@ -44,7 +44,7 @@
               <span class="text-left task-status-name">
                 Open
               </span>
-              <div class="text-center task-count ml-2">
+              <div class="text-center task-count ml-1">
                   <span>
                     {{ taskCounts.open | numberPlusFormatter(99) }}
                   </span>
@@ -58,7 +58,7 @@
               <span class="text-left task-status-name">
                 Pending
               </span>
-              <div class="text-center task-count ml-2">
+              <div class="text-center task-count ml-1">
                 <span>
                   {{ taskCounts.pending | numberPlusFormatter(99) }}
                 </span>
@@ -76,29 +76,28 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-75 w-100 flex-grow-1">
-        <b-overlay :show="isFetchingContacts"
-                 class="w-100 h-100"
-                 rounded="sm"
-                 variant="white">
-          <div class="h-100 w-100 scroll-y task-list-scroller"
-               ref="taskListScroller"
-               @scroll="handleScroll">
-            <inbox-task-list :contacts="contacts"
-                             :loading-contacts="isFetchingContacts"
-                             @onItemSelected="onItemSelected">
-            </inbox-task-list>
+      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+             ref="taskListScroller"
+             @scroll="handleScroll">
+          <inbox-task-list :contacts="contacts"
+                           :loading-contacts="isFetchingContacts"
+                           @onItemSelected="onItemSelected">
+          </inbox-task-list>
+          <div class="relative py-4">
+            <b-overlay :show="isLoadingMore"
+                       rounded="sm"
+                       variant="white">
+              <template #overlay>
+                <div class="text-center">
+                  <q-spinner-bars
+                    color="primary"
+                    size="2em"
+                  />
+                </div>
+              </template>
+            </b-overlay>
           </div>
-        <template #overlay>
-          <div class="text-center">
-            <q-spinner-bars
-              color="primary"
-              size="2em"
-            />
-          </div>
-        </template>
-      </b-overlay>
-      </div>
+        </div>
     </div>
 </template>
 
@@ -106,16 +105,19 @@
 import _ from 'lodash'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
 import SearchIcon from 'components/icons/search-icon'
 import LineAndRingGroupSelector from 'components/generic-selectors/line-and-ring-group-selector'
+import { inboxMixin } from 'src/plugins/mixins'
 
 let scrollTimeout
 export default {
   name: 'inbox-tab',
+
+  mixins: [inboxMixin],
 
   components: { LineAndRingGroupSelector, SearchIcon, InboxTaskList, CallsHeader },
 
@@ -127,10 +129,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact']),
-    nextPage () {
-      return this.currentPage + 1
-    },
+    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts']),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -145,100 +144,12 @@ export default {
   },
 
   data () {
-    return {
-      currentTask: ContactTaskStatus.STATUS_OPEN,
-      options: [
-        {
-          value: ContactTaskStatus.STATUS_OPEN,
-          slot: 'one'
-        },
-        {
-          value: ContactTaskStatus.STATUS_PENDING,
-          slot: 'two'
-        },
-        {
-          value: ContactTaskStatus.STATUS_CLOSED,
-          slot: 'three'
-        }
-      ],
-      ContactTaskStatusNew: ContactTaskStatus.STATUS_NEW,
-      ContactTaskStatusOpen: ContactTaskStatus.STATUS_OPEN,
-      ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
-      ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
-      filters: {
-        contact_task_status: {
-          value: [ContactTaskStatus.STATUS_OPEN],
-          operator: 1
-        },
-
-        search: {
-        }
-      },
-      sorting: {
-        sort: 'last_engagement_at',
-        order: 'desc'
-      },
-      isFetchingContacts: false,
-      hasMore: false,
-      isLoadingMore: false,
-      isLoaded: false,
-      currentPage: 0,
-      page: 1,
-      perPage: 20,
-      lineOrRingGroupFilter: null,
-      lineOrRingGroupFilteredId: null
-    }
+    return {}
   },
 
   methods: {
-    ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact']),
-    loadContactTasks () {
-      this.isFetchingContacts = true
-      return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts(response.data.data)
-        this.isFetchingContacts = false
-        this.currentPage = response.data.current_page
-        this.hasMore = response.data.next_page_url
-        this.isLoadingMore = false
-        this.isLoaded = true
-      })
-    },
-    loadMoreContactTasks () {
-      this.isFetchingContacts = true
-      this.isLoaded = false
-      this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts([...this.contacts, ...response.data.data])
-        this.isFetchingContacts = false
-
-        this.currentPage = response.data.current_page
-        this.hasMore = response.data.next_page_url
-        this.isLoadingMore = false
-        this.isLoaded = true
-      })
-    },
-    getContactsByTaskStatus () {
-      return talk2Api.V2.contacts.list(this.getParameters())
-    },
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
-    },
-    getParameters () {
-      const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
-
-      this.resetFilters()
-      if (this.searchText && this.searchText.trim()) {
-        this.filters.search.value = this.searchText
-      }
-
-      this.filters.contact_task_status.value = [this.currentTask]
-
-      if (this.lineOrRingGroupFilter) {
-        this.lineOrRingGroupFilteredId = this.lineOrRingGroupFilter.id
-        this.filters = { ...this.filters, [this.lineOrRingGroupFilter.model]: { value: [this.lineOrRingGroupFilter.id], operator: 1 } }
-      }
-
-      query.filters = this.filters
-      return query
     },
     handleScroll (el) {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
@@ -250,22 +161,13 @@ export default {
       // Set a timeout to run after scrolling ends
       scrollTimeout = setTimeout(() => {
         // Run the callback
-        if (this.hasMore && this.isLoaded) {
+        if (this.hasMoreContacts && this.isLoaded) {
           this.page = this.nextPage
           this.loadMoreContactTasks()
         }
       }, 66)
     },
-    resetFilters () {
-      this.filters = {
-        contact_task_status: {
-          value: [ContactTaskStatus.STATUS_OPEN],
-          operator: 1
-        },
-        search: {
-        }
-      }
-    },
+
     updateContacts (updatedContact) {
       let index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
@@ -333,6 +235,14 @@ export default {
     onFilterItemSelected (item) {
       this.resetFilters()
       this.lineOrRingGroupFilter = item
+    },
+    makeSelectedItemVisible () {
+      let container = document.querySelector('.task-list-scroller')
+      let target = document.querySelector('.contact-task-item.active')
+
+      if (target.offsetTop > (container.offsetHeight - 100)) {
+        container.scrollTop = target.offsetTop - 757
+      }
     }
   },
 
@@ -410,6 +320,32 @@ export default {
     if (['Inbox Contact Task'].includes(this.$route.name) && this.selectedContact.task_status !== this.currentTask) {
       this.onItemSelected(this.selectedContact)
     }
+
+    this.$VueEvent.listen('load_and_navigate_inbox_tab', (lastNavigatedIndex) => {
+      this.page = this.nextPage
+      this.loadMoreContactTasks().then(() => {
+        let contact = this.contacts[lastNavigatedIndex + 1]
+        this.setSelectedContact(contact)
+
+        this.$router.push({
+          name: 'Inbox Contact Task',
+          params: { id: JSON.stringify(contact.id) }
+        })
+
+        this.makeSelectedItemVisible()
+      })
+    })
+
+    this.$VueEvent.listen('navigate_task_tab', (contact) => {
+      this.setSelectedContact(contact)
+
+      this.$router.push({
+        name: 'Inbox Contact Task',
+        params: { id: JSON.stringify(contact.id) }
+      })
+
+      this.makeSelectedItemVisible()
+    })
   },
 
   watch: {

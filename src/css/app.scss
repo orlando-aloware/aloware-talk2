@@ -119,6 +119,11 @@ body,
   left: 300px;
 }
 
+.btn-inbox-list-navigation {
+  position: absolute;
+  left: 197px;
+}
+
 .q-separator--horizontal-inset {
   margin-left: 10px !important;
   margin-right: 10px !important;
@@ -3248,7 +3253,6 @@ span.mention {
     height: 45px;
     display: flex;
     align-items: center;
-    margin-left: 7px;
     //border-bottom: solid 1px $grey-light3;
 
     &__label {
@@ -3368,7 +3372,7 @@ span.mention {
   }
 
   .q-field__prepend {
-    padding-left: 10px !important;
+    padding-left: 15px !important;
     padding-right: 0;
   }
 
@@ -3452,9 +3456,20 @@ span.mention {
 }
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::before, {
+  background: $primary !important;
+  border: none !important;
+}
+
+.custom-switch.switch-success .custom-control-input:checked ~ .custom-control-label::before, {
   background: $success !important;
   border: none !important;
 }
+
+.custom-switch.switch-primary .custom-control-input:checked ~ .custom-control-label::before, {
+  background: $primary !important;
+  border: none !important;
+}
+
 .custom-switch .custom-control-input ~ .custom-control-label::after, {
   background: $white !important;
   border: none !important;
@@ -3462,6 +3477,14 @@ span.mention {
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
   background: white !important;
+}
+
+.custom-checkbox-w-50 .custom-control {
+  width: 50% !important;
+}
+
+.custom-checkbox-w-100 .custom-control {
+  width: 100% !important;
 }
 
 .dialer {
@@ -4412,8 +4435,7 @@ span.mention {
     }
 
     &:hover,
-    &--moving,
-    &--active {
+    &--moving {
       background-color: $grey-50;
     }
 
@@ -4442,8 +4464,8 @@ span.mention {
     }
 
     &__option {
-      margin-top: -5px;
       margin-left: 5px;
+      height: 34px;
     }
 
     &__input {
@@ -4751,7 +4773,7 @@ span.mention {
   cursor: pointer;
   transition: background-color 100ms ease-in-out;
   &__title {
-    line-height: 14px;
+    line-height: 12px;
     font-size: 12px;
     font-weight: 400;
   }
@@ -4942,6 +4964,13 @@ span.mention {
       padding-left: 15px !important;
     }
   }
+  .sublists {
+    .folder {
+      &--active {
+        background-color: $grey-50;
+      }
+    }
+  }
 }
 
 .contact-popover {
@@ -5029,10 +5058,14 @@ span.mention {
       min-height: 35px !important;
     }
 
-    .q-field, .q-btn {
-      font-size: 12px !important;
+    .q-btn {
+      font-size: $f-size-12 !important;
     }
   }
+}
+
+.q-select-pager.q-field {
+  font-size: $f-size-12 !important;
 }
 
 .static-list-add-item.scrollableArea {
@@ -5715,7 +5748,7 @@ table.datatable {
     padding-right: 10px;
     font-size: 12px;
     min-height: 35px;
-    box-shadow: 0px -1px 3px 0px #bbbaba;
+    box-shadow: 0px -1px 3px 0px rgb(187, 186, 186, .5);
   }
   &-input {
     display: flex;
@@ -5750,12 +5783,20 @@ table.datatable {
   user-select: none;
   transition: background-color 100ms ease-in-out;
   &__arrow {
+    min-height: 34px;
     margin-top: -5px;
     margin-right: 5px;
+    svg {
+      margin-top: 5px;
+    }
   }
   &__icon {
+    min-height: 34px;
     margin-top: -5px;
     margin-right: 5px;
+    svg {
+      margin-top: 5px;
+    }
   }
   &--target {
     background-color: rgba(37, 110, 255, 0.09);
@@ -5772,11 +5813,12 @@ table.datatable {
     }
   }
   &__name {
+    min-height: 34px;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: calc(100% - 30px);
+    width: 100%;
   }
   &__sub {
     padding-left: 10px;
@@ -5791,15 +5833,18 @@ table.datatable {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-top: 1px !important;
+    height: 34px;
     &:hover,
     &:active,
     &:focus {
       text-decoration: none !important;
     }
     i {
-      margin-top: 5px;
       color: $grey-light4;
+      &.fa.fa-circle,
+      &.fa.fa-check-circle {
+        font-size: 16px;
+      }
     }
   }
   &__input {
@@ -6000,13 +6045,21 @@ table.datatable {
   transition: background-color 100ms ease-in-out;
 
   &__arrow {
+    min-height: 34px;
     margin-top: -5px;
     margin-right: 5px;
+    svg {
+      margin-top: 5px;
+    }
   }
 
   &__icon {
+    min-height: 34px;
     margin-top: -5px;
     margin-right: 5px;
+    svg {
+      margin-top: 5px;
+    }
   }
 
   &--selected {
@@ -6030,11 +6083,12 @@ table.datatable {
   }
 
   &__name {
+    min-height: 34px;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: calc(100% - 30px);
+    width: 100%;
   }
 
   &__sub {
@@ -6046,8 +6100,6 @@ table.datatable {
   }
 
   &__option {
-    margin-top: -5px;
-
     &--hide {
       width: 0;
       overflow: hidden;
@@ -6083,6 +6135,7 @@ table.datatable {
     }
 
     &__icon {
+      min-height: 34px;
       margin-top: -5px;
       margin-right: 5px;
     }
@@ -6117,8 +6170,6 @@ table.datatable {
     }
 
     &__option {
-      margin-top: -5px;
-
       &--hide {
         width: 0;
         overflow: hidden;
@@ -6314,9 +6365,6 @@ table.datatable {
     height: calc(100% - 40px);
     overflow: auto;
   }
-  .icon {
-    margin-top: -5px;
-  }
 
   .item {
     color: $dark;
@@ -6329,6 +6377,22 @@ table.datatable {
     text-overflow: ellipsis;
     transition: background-color 100ms ease-in-out;
     white-space: nowrap;
+    .icon {
+      svg {
+        margin-top: 1px;
+      }
+    }
+    .counts {
+      .badge {
+        font-size: 10px;
+        line-height: 10px;
+      }
+    }
+    .icon,
+    .item-name,
+    .counts {
+      min-height: 40px;
+    }
   }
 
   .item:hover {
@@ -7114,10 +7178,9 @@ button.grey-90 {
         border-radius: 5px;
         font-size: 10px;
         font-weight: 600;
-        padding: 0 4px;
+        padding: 0 2px;
         color: $white;
         height: 16px;
-        //width: 22px;
         margin-top: 1px;
 
         span {
@@ -7195,7 +7258,12 @@ button.grey-90 {
     .form-row {
       margin-right: 0 !important;
       margin-left: 0 !important;
+      padding: 0.5rem !important;
     }
+  }
+  .highlighted{
+    background: #FFFBD4;
+    border-radius: 6px;
   }
 }
 
@@ -7357,6 +7425,7 @@ button.grey-90 {
     font-weight: 500 !important;
     font-size: $f-size-body !important;
     color: $grey-100;
+    margin-top: 8px;
 
     .focus-mode-icon {
       margin-top: -2px;
@@ -7409,4 +7478,26 @@ button.grey-90 {
 
 .transparent {
   opacity: 0;
+}
+
+.q-menu.settings-menu-links {
+  padding: 10px;
+
+  .q-item {
+    padding: 10px;
+    border-radius: 6px;
+  }
+}
+
+.settings-searcher {
+
+  .q-field__prepend {
+    i.material-icons.q-icon {
+      font-size: 18px;
+    }
+  }
+
+  .q-field__focusable-action.q-icon {
+    font-size: 14px !important;
+  }
 }
