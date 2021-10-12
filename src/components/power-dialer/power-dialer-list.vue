@@ -1,6 +1,7 @@
 <template>
   <div class="t-menu">
     <DirectoryBase
+      v-if="list.length > 0"
       @create-folder="{}"
       title="Power Dialer Lists"
       :directory="list" />
@@ -23,7 +24,7 @@ export default {
       'powerDialerList'
     ]),
     list () {
-      return this.powerDialerList || []
+      return this.powerDialerList || this.directoryList
     },
     directoryList () {
       return DIRECTORY_LIST
@@ -32,16 +33,16 @@ export default {
   data () {
     return {
       isCreatingFolder: false,
-      active: '',
-      listItems: [
-        {
-          count: 99,
-          id: 'all',
-          link: '/power-dialer/',
-          name: 'My Queue',
-          to: '/power-dialer'
-        }
-      ]
+      active: ''
+      // listItems: [
+      //   {
+      //     count: 99,
+      //     id: 'all',
+      //     link: '/power-dialer/',
+      //     name: 'My Queue',
+      //     to: '/power-dialer'
+      //   }
+      // ]
     }
   },
   methods: {

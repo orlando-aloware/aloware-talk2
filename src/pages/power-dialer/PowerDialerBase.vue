@@ -35,19 +35,6 @@ export default {
     return {
       name: 'Power Dialer X'
     }
-  },
-  watch: {
-    // '$route.params.id': function (id) {
-    //   if (!id && this.$route.name === 'Power Dialer') {
-    //     console.log('199 :>> ', 199)
-    //     id = 'in-queue'
-    //   } else if (id && this.$route.name === 'Power Dialer') {
-    //     console.log('id :>> ', id)
-    //     // this.setData(id)
-    //   } else {
-    //     console.log('200 :>> ', 200)
-    //   }
-    // }
   }
 }
 </script>

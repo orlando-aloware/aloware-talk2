@@ -47,7 +47,7 @@ export default {
   async mounted () {
     this.RESET_LIST()
     this.START_DIAL_TOGGLE(false)
-    this.SET_POWER_DIALER_LIST([])
+    // this.SET_POWER_DIALER_LIST([])
     await this.fetchContacts()
   },
   beforeRouteUpdate (to, from, next) {
@@ -62,10 +62,22 @@ export default {
       async handler () {
         if (this.currentRoute.name === 'Power Dialer') {
           this.resetValues()
-          await this.fetchContacts()
         }
       },
       deep: true
+    },
+    '$route.params': async function (route) {
+      if (!route.id && this.$route.name === 'Power Dialer') {
+        console.log('301 :>> ', route)
+        route.id = 'in-queue'
+        await this.fetchContacts()
+      } else if (route.id && this.$route.name === 'Power Dialer') {
+        console.log('302 :>> ', route)
+        // this.setData(id)
+        await this.fetchContacts()
+      } else {
+        console.log('303 :>> ', route)
+      }
     }
   },
   methods: {
@@ -90,9 +102,9 @@ export default {
       })
     },
     resetValues () {
-      this.RESET_LIST()
+      // this.RESET_LIST()
       this.START_DIAL_TOGGLE(false)
-      this.SET_POWER_DIALER_LIST([])
+      // this.SET_POWER_DIALER_LIST([])
     }
   }
 }

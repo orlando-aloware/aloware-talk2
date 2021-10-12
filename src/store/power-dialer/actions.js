@@ -4,6 +4,7 @@ export default {
    * POWER-DIALER
    */
   getPowerDialerList: async ({ commit }) => {
+    console.log('Calling API')
     let res = await window.axios.get('api/v2/contact-folders')
     if (res.status === 200) {
       commit('SET_POWER_DIALER_LIST', res.data)

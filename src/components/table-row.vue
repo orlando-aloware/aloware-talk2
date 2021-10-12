@@ -485,7 +485,7 @@ export default {
 
     makeTwoLeggedCall () {
       this.$axios
-        .post('/api/v1/powerDialer/' + this.contact.id + '/make-two-legged-call', {
+        .post('/api/v1/contacts/' + this.contact.id + '/make-two-legged-call', {
           phone_number: this.contact.phone_number
         })
         .then((res) => {
@@ -497,7 +497,7 @@ export default {
     },
     generateRoute (contactId) {
       let routeData = {
-        path: `/powerDialer/${contactId}`
+        path: `/contacts/${contactId}`
       }
 
       if (this.$route.name !== 'Power Dialer') {

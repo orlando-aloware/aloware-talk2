@@ -98,7 +98,7 @@
         :layer="0"
         :parent_id="null"
         @blur="onCreateFolderToggle" />
-      <template v-if="directoryHasContent">
+      <template v-if="true">
         <DirectoryFolder
           v-for="folder in directory[0].child_folders"
           :name="folder.name"
@@ -162,6 +162,12 @@ export default {
     directoryHasContent () {
       if (this.directory.length) return true
       return false
+    },
+    directoryChildren () {
+      if (this.directory?.[0]?.child_folders) {
+        return this.directory[0].child_folders
+      }
+      return this.valueWrapper
     }
   },
   mounted () {
@@ -253,7 +259,12 @@ export default {
           ]
         }
       ],
-      createSubItems: []
+      createSubItems: [],
+      valueWrapper: {
+        has_edit: false,
+        has_delete: false,
+        child_folders: []
+      }
     }
   }
 }
