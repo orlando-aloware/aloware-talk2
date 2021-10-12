@@ -1,6 +1,6 @@
 <template>
   <div class="move-dialog move-dialog__create shadow-sm" ref="createDialog">
-    <div class="move-dialog-input">
+    <div class="move-dialog-input mdi_input_2">
       <div>
         <Search
           ref="folder-search"

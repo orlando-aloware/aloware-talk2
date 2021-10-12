@@ -4493,7 +4493,7 @@ span.mention {
   }
   > .layer-indent-1 {
     > .folder {
-      padding-right: 0px !important;
+      // padding-right: 0px !important;
       > .folder-item {
         padding-left: 18px;
       }
@@ -5719,6 +5719,9 @@ table.datatable {
   display: none;
   flex-direction: column;
   z-index: 100;
+  &.move-dialog__create {
+    width: 280px !important;
+  }
   &-close {
     margin-right: -5px;
     padding: 5px 5px 5px 5px;
@@ -5758,6 +5761,11 @@ table.datatable {
     padding-left: 10px;
     padding-right: 10px;
     min-height: 50px;
+
+    &.mdi_input_2 {
+      display: block !important;
+      padding-top: 10px !important;
+    }
 
     input {
       height: 30px;
@@ -6052,6 +6060,13 @@ table.datatable {
     svg {
       margin-top: 5px;
     }
+    &.pd-arrow {
+      margin-top: 0 !important;
+    }
+    &.pd-arrow-create {
+      top: 8px !important;
+      position: relative;
+    }
   }
 
   &__icon {
@@ -6060,6 +6075,10 @@ table.datatable {
     margin-right: 5px;
     svg {
       margin-top: 5px;
+    }
+    &.pd-icon-create {
+      top: 8px !important;
+      position: relative;
     }
   }
 
@@ -6090,6 +6109,10 @@ table.datatable {
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
+    &.pd-name-create {
+      top: 8px !important;
+      position: relative;
+    }
   }
 
   &__sub {

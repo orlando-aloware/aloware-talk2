@@ -10,16 +10,16 @@
         :style="indentStyle"
         @click="onToggleFolder">
       </div>
-      <div class="folder__arrow" @click="onToggleFolder" >
+      <div class="folder__arrow pd-arrow-create" @click="onToggleFolder" >
         <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
         <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
       </div>
-      <div class="folder__icon" @click="onToggleFolder">
+      <div class="folder__icon pd-icon-create" @click="onToggleFolder">
         <folder-icon></folder-icon>
       </div>
 
       <div  class="flex-grow-1 d-flex align-items-center">
-        <div @click="onToggleFolder" class="folder__name">
+        <div @click="onToggleFolder" class="folder__name pd-name-create">
           {{ name }}
         </div>
       </div>
@@ -41,7 +41,7 @@
           @clicked="{}">
 
           <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
-            <div class="folder__name">
+            <div class="folder__name pd-name-create">
               <DialIcon color="grey" class="mr-1" />
               {{ item.name }}
             </div>
