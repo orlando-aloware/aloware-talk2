@@ -29,6 +29,7 @@ import MoveDialog from 'components/power-dialer/custom/move-dialog'
 import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
+import powermixin from 'src/plugins/mixins/power-dialer'
 
 export default {
   name: 'PowerDialer',
@@ -39,6 +40,7 @@ export default {
     RemoveListModal,
     RemoveFolderDialog
   },
+  mixins: [powermixin],
   computed: {
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', ['isStartingDial']),
@@ -58,14 +60,14 @@ export default {
     next()
   },
   watch: {
-    'currentRoute': {
-      async handler () {
-        if (this.currentRoute.name === 'Power Dialer') {
-          this.resetValues()
-        }
-      },
-      deep: true
-    },
+    // 'currentRoute': {
+    //   async handler () {
+    //     if (this.currentRoute.name === 'Power Dialer') {
+    //       this.resetValues()
+    //     }
+    //   },
+    //   deep: true
+    // },
     '$route.params': async function (route) {
       if (!route.id && this.$route.name === 'Power Dialer') {
         console.log('301 :>> ', route)
@@ -91,14 +93,15 @@ export default {
       'RESET_LIST'
     ]),
     async fetchContacts () {
+      console.log('filterParams :>> ', this.$route.params)
       await this.getPowerDialerList()
       await this.getContactResources({
-        params: {
-          page: 1,
-          per_page: 25,
-          sort: 'last_engagement_at',
-          order: 'desc'
-        }
+        'page': 1,
+        'per_page': 25,
+        'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
+        'filter_groups[0][filters][contact_lists][operator]': 1,
+        'filter_groups[0][is_conjunction]': true,
+        'order': 'desc'
       })
     },
     resetValues () {

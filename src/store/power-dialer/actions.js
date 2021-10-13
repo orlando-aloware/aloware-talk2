@@ -1,17 +1,23 @@
+import qs from 'qs'
 export default {
   /**
    * Actual API Calls for
    * POWER-DIALER
    */
-  getPowerDialerList: async ({ commit }) => {
-    console.log('Calling API')
-    let res = await window.axios.get('api/v2/contact-folders')
+  getPowerDialerList: async ({ commit }, params = {}) => {
+    let res = await window.axios.get('api/v2/contact-folders', {
+      params: params,
+      paramsSerializer: qs.stringify
+    })
     if (res.status === 200) {
       commit('SET_POWER_DIALER_LIST', res.data)
     }
   },
   getContactResources: async ({ commit }, params = {}) => {
-    let res = await window.axios.get('api/v2/contacts', params)
+    let res = await window.axios.get('api/v2/contacts', {
+      params: params,
+      paramsSerializer: qs.stringify
+    })
     if (res.status === 200) {
       commit('SET_CONTACT_RESOURCES', res.data.data)
     }
