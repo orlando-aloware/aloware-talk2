@@ -392,10 +392,6 @@ export default {
     generateFolderPath (folders = [], folderNames = [], level = 0) {
       let tempFolderNames = _.clone(folderNames)
 
-      if (!folders.length && level === 0) {
-        return []
-      }
-
       if (!folders.length && level > 0) {
         return [tempFolderNames, false]
       }
@@ -429,7 +425,6 @@ export default {
 
         if (childFolders.length === 0 && !found) {
           tempFolderNames.pop()
-          return [tempFolderNames, found]
         }
 
         if (childFolders.length === 0 && found) {
