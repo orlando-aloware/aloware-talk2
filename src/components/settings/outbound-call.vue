@@ -8,8 +8,11 @@
           </div>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.outbound_calling_selector.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Caller ID</h5>
             <p class="form-helper-text">Decide what line is used when this user makes an outbound call.</p>
@@ -26,8 +29,11 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="user.outbound_calling_selector === 1">
-        <b-col sm="12" md="6">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.default_outbound_campaign_id.hash_keyword}-container`"
+                  v-if="user.outbound_calling_selector === 1">
+        <b-col sm="12"
+               md="6">
           <b-form-group
             label="Select the lines to get notified from"
             class="form-label"
@@ -43,8 +49,10 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.outbound_call_recording_mode.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Call Recordings <b-badge variant="warning" v-if="currentCompany && currentCompany.force_outbound_recording">Forced at account level</b-badge></h5>
             <p class="form-helper-text">Should outbound calls</p>
@@ -61,8 +69,10 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.enabled_two_legged_outbound.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Two Legged Outbound Calls (Beta)</h5>
             <p class="form-helper-text">By enabling this option we will call your contacts with your secondary phone number.</p>
@@ -82,8 +92,11 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-0" v-show="user.enabled_two_legged_outbound">
-        <b-col sm="12" md="6">
+      <b-form-row class="mt-0"
+                  :id="`${SettingsMap.secondary_phone_number.hash_keyword}-container`"
+                  v-show="user.enabled_two_legged_outbound">
+        <b-col sm="12"
+               md="6">
           <b-form-group
             label="Secondary Phone Number"
             class="form-label"
@@ -99,15 +112,18 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="12">
-          <div>
-            <h5 class="form-label">Voicemail Drop Library</h5>
-            <p class="form-helper-text">Build you voicemail drop library here. When using the PowerDialer or calling a lot of leads manually, you can use voicemail drop to put a voicemail after the beep without being on the call.</p>
-          </div>
-        </b-col>
-      </b-form-row>
-      <user-vm-drop-library :user="user"></user-vm-drop-library>
+      <div :id="`${SettingsMap.vm_drop_library.hash_keyword}-container`">
+        <b-form-row class="mt-4">
+          <b-col sm="12"
+                 md="12">
+            <div>
+              <h5 class="form-label">Voicemail Drop Library</h5>
+              <p class="form-helper-text">Build your voicemail drop library here. When using the PowerDialer or calling a lot of leads manually, you can use voicemail drop to put a voicemail after the beep without being on the call.</p>
+            </div>
+          </b-col>
+        </b-form-row>
+        <user-vm-drop-library :user="user"></user-vm-drop-library>
+      </div>
     </b-form>
   </b-container>
 </template>
@@ -117,6 +133,7 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import UserVmDropLibrary from 'components/user-vm-drop-library'
+import SettingsMap from 'components/settings/settings-map'
 
 export default {
   name: 'outbound-call',
@@ -156,7 +173,8 @@ export default {
         { text: 'Use Account Default', value: 1 },
         { text: 'Always Record', value: 2 },
         { text: 'Never Record', value: 3 }
-      ]
+      ],
+      SettingsMap
     }
   },
 

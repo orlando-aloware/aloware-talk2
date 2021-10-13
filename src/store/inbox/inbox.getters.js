@@ -1,3 +1,5 @@
 export default {
-  selectedFilter: (state) => state.selectedFilter
+  selectedFilter: (state) => state.selectedFilter,
+  hasMoreContacts: (state) => state.hasMoreContacts,
+  hasMoreCommunications: (state) => state.hasMoreCommunications
 }

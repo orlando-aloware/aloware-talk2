@@ -789,13 +789,15 @@ export default {
     },
 
     fetchIncomingNumber: _.debounce(function () {
-      this.contactIncomingNumber = null
-      this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
-        this.contactIncomingNumber = res.data
-      }).catch(err => {
-        this.$handleErrors(err.response)
-        console.log(err)
-      })
+      if (this.contact && this.selectedCampaign) {
+        this.contactIncomingNumber = null
+        this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
+          this.contactIncomingNumber = res.data
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          console.log(err)
+        })
+      }
     }, 200),
 
     checkEmailCapability () {

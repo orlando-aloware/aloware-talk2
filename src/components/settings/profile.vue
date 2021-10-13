@@ -8,8 +8,10 @@
           </div>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="6">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.profile_settings_name.hash_keyword}-container`">
+        <b-col sm="12"
+               md="6">
           <b-form-group
             label="First Name"
             class="form-label"
@@ -23,9 +25,8 @@
             </b-form-input>
           </b-form-group>
         </b-col>
-        <b-col
-          sm="12"
-          md="6">
+        <b-col sm="12"
+               md="6">
           <b-form-group
             class="form-label"
             label="Last Name"
@@ -39,10 +40,12 @@
             </b-form-input>
           </b-form-group>
         </b-col>
-
+      </b-form-row>
+      <b-form-row class="mt-4">
         <b-col
           sm="12"
-          md="12">
+          md="12"
+          :id="`${SettingsMap.profile_settings_description.hash_keyword}-container`">
           <b-form-group
             class="form-label"
             label="Description (Optional)"
@@ -60,7 +63,8 @@
 
         <b-col
           sm="12"
-          md="6">
+          md="6"
+          :id="`${SettingsMap.profile_settings_email.hash_keyword}-container`">
           <b-form-group
             class="form-label"
             label="Email"
@@ -76,20 +80,28 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="hasRole('Company Admin') && !user.is_destination">
-        <b-col sm="12" md="12" class="d-flex justify-between">
+      <b-form-row :id="`${SettingsMap.profile_settings_password.hash_keyword}-container`"
+                  class="mt-4"
+                  v-if="hasRole('Company Admin') && !user.is_destination">
+        <b-col sm="12"
+               md="12"
+               class="d-flex justify-between">
           <div>
             <h5 class="form-label">Change Password</h5>
             <p class="form-helper-text">Toggle the switch to change password</p>
+            <b-form-group label="" >
+              <b-form-checkbox
+                switch
+                v-model="showPasswordFields"
+                :value="true"
+                :unchecked-value="false">
+                Change password
+              </b-form-checkbox>
+            </b-form-group>
           </div>
-          <b-form-group
-            label=""
-            class="form-label"
-          >
-            <b-form-checkbox switch size="md" v-model="showPasswordFields"></b-form-checkbox>
-          </b-form-group>
         </b-col>
       </b-form-row>
+
       <b-form-row class="mt-4" v-if="showPasswordFields">
         <b-col sm="12" md="6">
           <b-form-group
@@ -121,7 +133,9 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="!user.is_destination && hasRole('Company Admin')">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.role.hash_keyword}-container`"
+                  v-if="!user.is_destination && hasRole('Company Admin')">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Role</h5>
@@ -141,7 +155,8 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
+      <b-form-row  class="mt-4"
+                   :id="`${SettingsMap.answer_type.hash_keyword}-container`">
         <b-col sm="12" md="6">
           <div>
             <h5 class="form-label">Answer Type</h5>
@@ -156,7 +171,8 @@
         </b-col>
       </b-form-row>
 
-      <div v-if="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
+      <div :id="`${SettingsMap.backup_routing.hash_keyword}-container`"
+           v-if="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
         <b-form-row class="mt-4">
           <b-col sm="12" md="12">
             <div>
@@ -177,7 +193,9 @@
         </b-form-row>
       </div>
 
-      <b-form-row class="mt-4" v-show="userDestinationEditable && (([AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by) && user.phone_number_as_backup) || user.answer_by === AnswerTypes.BY_PHONE_NUMBER)">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.backup_phone_number.hash_keyword}-container`"
+                  v-show="userDestinationEditable && (([AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by) && user.phone_number_as_backup) || user.answer_by === AnswerTypes.BY_PHONE_NUMBER)">
         <b-col sm="12" md="6">
           <b-form-group
             label="Backup Phone Number"
@@ -193,7 +211,8 @@
         </b-col>
       </b-form-row>
 
-      <div v-if="canBeEdited && user.answer_by !== AnswerTypes.BY_BROWSER && user.answer_by !== AnswerTypes.BY_NONE">
+      <div :id="`${SettingsMap.respect_agent_status.hash_keyword}-container`"
+           v-if="canBeEdited && user.answer_by !== AnswerTypes.BY_BROWSER && user.answer_by !== AnswerTypes.BY_NONE">
         <b-form-row class="mt-4">
           <b-col sm="12" md="12">
             <div>
@@ -215,7 +234,7 @@
         </b-form-row>
       </div>
 
-      <b-form-row class="mt-4">
+      <b-form-row class="mt-4" :id="`${SettingsMap.text_message_handling.hash_keyword}-container`">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Text Message Handling (Beta)</h5>
@@ -235,7 +254,8 @@
         </b-col>
       </b-form-row>
 
-      <div v-if="isNotOwnSettings">
+      <div :id="`${SettingsMap.can_change_contact_ownership.hash_keyword}-container`"
+           v-if="isNotOwnSettings">
         <b-form-row class="mt-4">
           <b-col sm="12" md="12">
             <div>
@@ -258,7 +278,9 @@
 
       </div>
 
-      <b-form-row class="mt-4" v-if="isNotOwnSettings">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.can_modify_contact_ring_groups.hash_keyword}-container`"
+                  v-if="isNotOwnSettings">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Allow Contact Ring Groups Modification</h5>
@@ -278,8 +300,11 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="isNotOwnSettings">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.can_barge_and_whisper_on_call.hash_keyword}-container`"
+                  v-if="isNotOwnSettings">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Allow Call Barge and Whisper</h5>
             <p class="form-helper-text">If you don't want to allow this user to barge and/or whisper on a call, please uncheck "Can barge and whisper on a call".</p>
@@ -298,13 +323,16 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4">
-        <b-col sm="12" md="6">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.campaign_id.hash_keyword}-container`">
+        <b-col sm="12"
+               md="6">
           <div>
             <h5 class="form-label">User's Personal Line</h5>
           </div>
 
-          <b-form-group label=""  class="mt-2">
+          <b-form-group label=""
+                        class="mt-2">
             <user-campaign-selector v-model="user.campaign_id"
                                     :user="user"
                                     @select="(eventPayload) => onUpdateFields(eventPayload, 'campaign_id')">
@@ -313,8 +341,11 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="isNotOwnSettings">
-        <b-col sm="12" md="12">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.has_broadcast_access.hash_keyword}-container`"
+                  v-if="isNotOwnSettings">
+        <b-col sm="12"
+               md="12">
           <div>
             <h5 class="form-label">Can Broadcast</h5>
             <p class="form-helper-text">Grant broadcast access to the user</p>
@@ -340,13 +371,14 @@ import AnswerTypeSelector from 'components/generic-selectors/answer-type-selecto
 import UserCampaignSelector from 'components/generic-selectors/user-campaign-selector'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as Roles from 'src/constants/roles'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
+import SettingsMap from 'components/settings/settings-map'
 
 export default {
   name: 'profile',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, settingsMixin],
 
   components: { UserCampaignSelector, AnswerTypeSelector },
 
@@ -371,7 +403,8 @@ export default {
         { text: 'Agent', value: 'Company Agent' }
       ],
       AnswerTypes,
-      Roles
+      Roles,
+      SettingsMap
     }
   },
 

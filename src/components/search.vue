@@ -7,6 +7,8 @@
              v-model="searchValue"
              borderless
              clearable
+             @blur="onBlur"
+             @focus="onFocus"
              @input="onInput">
       <template v-slot:prepend>
         <search-icon/>
@@ -58,6 +60,14 @@ export default {
     onInput: _.debounce(function () {
       this.$emit('search', this.searchValue)
     }, 500),
+
+    onFocus: function () {
+      this.$emit('focus', this.searchValue)
+    },
+
+    onBlur: function () {
+      this.$emit('blur', this.searchValue)
+    },
 
     clearSearch () {
       this.searchValue = ''

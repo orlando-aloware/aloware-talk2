@@ -144,7 +144,7 @@
                 <span class="form-label">Show Only First Time Communications</span>
                 <div>
                   <b-form-checkbox switch
-                                   class="cursor-pointer"
+                                   class="cursor-pointer switch-success"
                                    size="lg"
                                    :value="1"
                                    :unchecked-value="0"
@@ -160,6 +160,7 @@
                 <span class="form-label">Show Only Untagged Communications</span>
                 <div>
                   <b-form-checkbox switch
+                                   class="switch-success"
                                    size="lg"
                                    :value="1"
                                    :unchecked-value="0"
@@ -175,6 +176,7 @@
                 <span class="form-label">Exclude Communications Sent From Sequences</span>
                 <div>
                   <b-form-checkbox switch
+                                   class="switch-success"
                                    size="lg"
                                    :value="1"
                                    :unchecked-value="0"

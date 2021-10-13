@@ -137,7 +137,11 @@ export default {
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
           icon += `missed-`
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          icon += `failed-`
+          if (type === CommunicationTypes.FAX) {
+            icon += `inprogress-`
+          } else {
+            icon += `failed-`
+          }
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
           icon += `failed-`
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
