@@ -81,6 +81,8 @@
             :stickyHeaders="true"
             :columns="columns"
             :has-more="true"
+            :is-empty="!hasContacts"
+            :paginated="true"
             scroll-area-class="none"
             @reordered="onColumnsReordered">
             <template slot="tbody">
@@ -300,6 +302,9 @@ export default {
     },
     dialogName () {
       return `remove-power-dialer-item-dialog`
+    },
+    hasContacts () {
+      return this.contacts.length > 0
     }
   },
   data () {
