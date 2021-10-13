@@ -12,10 +12,6 @@ if (Platform.is.desktop) {
   window.axios.defaults.headers.common['Requested-From'] = 'talk2-web'
 }
 
-if (Platform.is.mobile) {
-  window.axios.defaults.headers.common['Requested-From'] = 'mobile-web'
-}
-
 if (Platform.is.electron) {
   window.axios.defaults.headers.common['Requested-From'] = 'talk2-desktop'
 }
