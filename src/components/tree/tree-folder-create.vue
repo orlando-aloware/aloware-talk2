@@ -62,6 +62,14 @@ export default {
   methods: {
     ...mapActions('contacts', ['toggleFolder', 'foldersLoaded']),
     onInputBlur () {
+      if (this.text.length > 60) {
+        this.$generalNotification('Folder name should have up to 60 characters.', 'error')
+        this.resetState()
+        this.$refs.input.blur()
+        this.$emit('cancel')
+        return
+      }
+
       if (this.text) {
         this.createNewFolder()
       } else {
@@ -70,6 +78,11 @@ export default {
       }
     },
     onKeyDown (evt) {
+      if (evt.keyCode === 13 && this.text.length > 60) {
+        this.$generalNotification('Folder name should have up to 60 characters.', 'error')
+        return
+      }
+
       if (evt.keyCode === 13) {
         this.onInputBlur()
       } else if (evt.keyCode === 27) {

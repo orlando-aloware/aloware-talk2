@@ -2,18 +2,24 @@
   <contacts-screen v-if="list" :loading="isLoadingDisabled">
     <template slot="title">
       <div class="d-flex flex-column">
-        <div class="pr-2">
-          <folder-static-icon class="mr-1 title-static-icon"
-                              height="20"
-                              width="20"
+        <div class="pr-2 contacts__title d-flex align-items-center">
+          <div class="d-flex align-items-center">
+            <div v-for="folderName in folderPath"
+                 :key="folderName"
+                 class="d-flex align-items-center title-path">
+              <div class="title-breadcrumb d-flex align-items-center">{{ folderName }}</div>
+              <slash-icon class="title-slash d-flex align-items-center" />
+            </div>
+          </div>
+          <folder-static-icon class="title-static-icon"
                               v-if="list.type === ContactListTypes.STATIC">
           </folder-static-icon>
           <folder-dynamic-icon class="mr-1"
-                               height="20"
-                               width="20"
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
-          <span>{{ list.name }}</span>
+          <div class="d-flex align-items-center">
+            <span class="list-name">{{ list.name }}</span>
+          </div>
         </div>
       </div>
     </template>
@@ -210,7 +216,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
@@ -228,9 +234,11 @@ import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import CloseIcon from 'components/icons/close-icon'
+import SlashIcon from 'components/icons/slash-icon'
 
 export default {
   components: {
+    SlashIcon,
     CloseIcon,
     FolderDynamicIcon,
     FolderStaticIcon,
@@ -255,7 +263,8 @@ export default {
     return {
       filterHasChanges: false,
       defaultContactLists: DEFAULT_PINNED_LIST,
-      isUpdatingList: false
+      isUpdatingList: false,
+      folderPath: []
     }
   },
   methods: {
@@ -379,10 +388,77 @@ export default {
           page: this.listItems[this.id].current_page
         })
       }
+    },
+    generateFolderPath (folders = [], folderNames = [], level = 0) {
+      let tempFolderNames = _.clone(folderNames)
+
+      if (!folders.length && level === 0) {
+        return []
+      }
+
+      if (!folders.length && level > 0) {
+        return [tempFolderNames, false]
+      }
+
+      for (let item of folders) {
+        if (level > 0) {
+          tempFolderNames.push(item.name)
+        } else {
+          tempFolderNames = []
+        }
+
+        let found = false
+
+        if (item.lists.length) {
+          for (let list of item.lists) {
+            const isNotNumber = isNaN(this.id / 1)
+
+            if (isNotNumber || (!isNotNumber && list.id !== parseInt(this.id))) {
+              continue
+            }
+
+            if (level === 0) {
+              return []
+            }
+
+            return [tempFolderNames, true]
+          }
+        }
+
+        const childFolders = _.get(item, 'child_folders', [])
+
+        if (childFolders.length === 0 && !found) {
+          tempFolderNames.pop()
+          return [tempFolderNames, found]
+        }
+
+        if (childFolders.length === 0 && found) {
+          return [tempFolderNames, found]
+        }
+
+        [tempFolderNames, found] = this.generateFolderPath(item.child_folders, tempFolderNames, (level + 1))
+
+        if (found && level > 0) {
+          return [tempFolderNames, found]
+        }
+
+        if (found && level === 0) {
+          return tempFolderNames
+        }
+
+        tempFolderNames.pop()
+      }
+
+      if (level > 0) {
+        return [tempFolderNames, false]
+      }
+
+      return []
     }
   },
   computed: {
     ...mapGetters('auth', ['profile']),
+    ...mapState('contacts', ['folders']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
     checked () {
       return this.selectedContacts[this.id] || []
@@ -440,6 +516,7 @@ export default {
     this.fetch()
     // force close filter
     this.closeFilters()
+    this.folderPath = this.generateFolderPath(this.folders)
   },
   watch: {
     '$route.params.id': function () {
@@ -460,6 +537,7 @@ export default {
       if (this.selectedContacts[value.id]) {
         this.setListSelectedContacts({ id: value.id, contacts: [] })
       }
+      this.folderPath = this.generateFolderPath(this.folders)
     }
   }
 }

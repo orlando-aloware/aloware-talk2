@@ -14,7 +14,7 @@
         <div
           :title="name"
           :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
-          class="folder d-flex align-items-center"
+          class="folder d-flex align-items-center p-0"
         >
           <div class="folder__indent" :style="indentStyle"></div>
           <div class="folder__icon d-flex align-items-center">

@@ -48,12 +48,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.item-name {
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 500;
-}
-</style>

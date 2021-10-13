@@ -18,9 +18,7 @@
           Add contacts to
           <div class="text-grey-90">
             <span class="title-icon">
-              <folder-static-icon color="#62666E"
-                                  height="20"
-                                  width="20"/>
+              <folder-static-icon/>
             </span>
             {{ contactList.name }}
           </div>

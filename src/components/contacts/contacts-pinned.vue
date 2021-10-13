@@ -1,11 +1,11 @@
 <template>
   <div class="pinned">
     <div class="pinned__header d-flex align-items-center list--header">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
+      <div class="header__header__title font-weight-bold flex-grow-1">
         Pinned
       </div>
     </div>
-    <div class="d-flex pinned__content flex-column pl-2">
+    <div class="d-flex pinned__content flex-column">
       <contacts-pinned-item v-for="item in pinnedLists"
                             :item="item"
                             :key="item.id">

@@ -125,7 +125,7 @@ export default {
           document.getElementById('folder-submenu-' + this.id),
           document.getElementById('folder-submenu-items-' + this.id),
           {
-            placement: 'auto'
+            placement: 'right-start'
           }
         )
       })
