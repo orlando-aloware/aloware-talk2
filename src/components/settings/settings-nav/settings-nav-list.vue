@@ -23,7 +23,7 @@
 
 <script>
 import NavItem from './settings-nav-item'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -57,7 +57,7 @@ export default {
   },
 
   computed: {
-    ...mapState('settings', ['items']),
+    ...mapState('settings', ['items', 'changedUserProperties', 'userClone']),
 
     agentItems () {
       if (this.hasRole('Company Admin')) {
@@ -75,7 +75,14 @@ export default {
   },
 
   methods: {
+    ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
     onItemClicked (nextActive) {
+      if (this.changedUserProperties.length > 0) {
+        this.setUser({ ...this.userClone })
+        this.resetChangedUserProperties()
+        this.setFormValidity(true)
+      }
+
       this.active = nextActive
       let tab = this.items.find(item => item.value === nextActive)
       this.$router.push({

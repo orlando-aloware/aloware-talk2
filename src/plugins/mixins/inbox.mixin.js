@@ -68,12 +68,10 @@ export default {
       })
     },
     loadMoreContactTasks () {
-      this.gettingContactsList(true)
       this.isLoaded = false
       this.isLoadingMore = true
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts([...this.contacts, ...response.data.data])
-        this.gettingContactsList(false)
 
         this.setContactsCurrentPage(response.data.current_page)
         this.setHasMoreContacts(response.data.next_page_url)

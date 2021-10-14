@@ -17,7 +17,7 @@
             <h5 class="form-label">Caller ID</h5>
             <p class="form-helper-text">Decide what line is used when this user makes an outbound call.</p>
           </div>
-          <p class="text-bold fs-12">Outbound line:</p>
+          <p class="text-bold fs-12">Outbound line: <b-badge variant="warning" v-if="currentCompany && currentCompany.force_outbound_line">Forced at account level</b-badge></p>
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-radio-group
               v-model="user.outbound_calling_selector"
@@ -29,26 +29,28 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4"
-                  :id="`${SettingsMap.default_outbound_campaign_id.hash_keyword}-container`"
-                  v-if="user.outbound_calling_selector === 1">
+      <b-form-row :id="`${SettingsMap.default_outbound_campaign_id.hash_keyword}-container`"
+                  v-if="showOutboundLineSelector">
         <b-col sm="12"
                md="6">
           <b-form-group
-            label="Select the lines to get notified from"
-            class="form-label"
+            label="Outbound Calling"
+            class="form-label is-invalid"
           >
-            <line-selector v-model="user.default_outbound_campaign_id"
+            <line-selector v-model.trim="$v.user.default_outbound_campaign_id.$model"
+                           :class="[$v.user['default_outbound_campaign_id'].$invalid ? 'is-invalid' : '']"
+                           :hasError="$v.user['default_outbound_campaign_id'].$invalid"
+                           :state="validateState('default_outbound_campaign_id')"
                            :multiple="false"
                            :use-chips="true"
                            :generic-styling="false"
                            :generic-multiselect="false"
                            @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')">
             </line-selector>
+            <b-form-invalid-feedback v-if="!$v.user.default_outbound_campaign_id.required">Please select an outbound line.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
-
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.outbound_call_recording_mode.hash_keyword}-container`">
         <b-col sm="12"
@@ -60,6 +62,7 @@
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-radio-group
               v-model="user.outbound_call_recording_mode"
+              :disabled="!hasRole(['Company Admin', 'Company Agent']) || (currentCompany && currentCompany.force_outbound_recording)"
               :options="callRecordingsOptions"
               :aria-describedby="ariaDescribedby"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'outbound_call_recording_mode')"
@@ -83,9 +86,9 @@
           >
             <b-form-checkbox switch
                              v-model="user.enabled_two_legged_outbound"
-                             value="true"
-                             unchecked-value="false"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'outbound_call_recording_mode')">
+                             :value="true"
+                             :unchecked-value="false"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_two_legged_outbound')">
               Enable Two Legged Outbound Calls
             </b-form-checkbox>
           </b-form-group>
@@ -94,7 +97,7 @@
 
       <b-form-row class="mt-0"
                   :id="`${SettingsMap.secondary_phone_number.hash_keyword}-container`"
-                  v-show="user.enabled_two_legged_outbound">
+                  v-if="user.enabled_two_legged_outbound">
         <b-col sm="12"
                md="6">
           <b-form-group
@@ -104,10 +107,13 @@
             <b-form-input
               type="text"
               placeholder="(123) 456-7890"
-              v-model="user.secondary_phone_number"
+              v-model.trim="$v.user.secondary_phone_number.$model"
+              :state="validateState('secondary_phone_number')"
               :disabled="user.role_name && user.read_only_access"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'secondary_phone_number')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.secondary_phone_number.required">Enter secondary phone number.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.secondary_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -131,14 +137,15 @@
 <script>
 import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
+import { required } from 'vuelidate/lib/validators'
 
 export default {
   name: 'outbound-call',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, settingsMixin],
 
   components: { UserVmDropLibrary, LineSelector },
 
@@ -151,17 +158,46 @@ export default {
 
   computed: {
     ...mapState(['currentCompany']),
+    ...mapState('settings', ['userClone']),
     outboundCallSettingEnabled () {
       return !this.hasRole(['Company Admin', 'Company Agent']) || (this.currentCompany && this.currentCompany.force_outbound_recording)
     },
     vmDropUploadUrl () {
       return `${window.axios.defaults.baseURL}/api/v1/user/pre-recorded-voicemail`
+    },
+    rules () {
+      let rulesObject = {}
+
+      if (this.showOutboundLineSelector) {
+        rulesObject = { ...rulesObject,
+          default_outbound_campaign_id: {
+            required
+          }
+        }
+      }
+
+      if (this.user.enabled_two_legged_outbound) {
+        rulesObject = { ...rulesObject,
+          secondary_phone_number: {
+            required,
+            validPhone: (value) => this.$options.filters.fixPhone(value) !== false
+          }
+        }
+      }
+
+      return rulesObject
+    }
+  },
+
+  validations () {
+    return {
+      user: this.rules
     }
   },
 
   data () {
     return {
-      showPasswordFields: false,
+      showOutboundLineSelector: false,
       selected: '',
       status: '',
       options: [
@@ -193,12 +229,9 @@ export default {
         value: value
       })
 
-      if (prop === 'outbound_calling_selector' && this.user[prop] !== 1) {
-        this.user.outbound_calling_selector = this.userClone.outbound_calling_selector
-        this.updateChangedUserProperties({
-          name: 'outbound_calling_selector',
-          value: this.userClone.outbound_calling_selector
-        })
+      if (prop === 'outbound_calling_selector') {
+        this.showOutboundLineSelector = this.user.outbound_calling_selector === 1
+        console.log(this.$v.user['default_outbound_campaign_id'].$invalid)
       }
 
       if (prop === 'enabled_two_legged_outbound' && !this.user[prop]) {
@@ -208,7 +241,12 @@ export default {
           value: this.userClone.secondary_phone_number
         })
       }
+
+      this.updateFormValidity()
     }
+  },
+  mounted () {
+    this.showOutboundLineSelector = this.user.outbound_calling_selector === 1
   }
 }
 </script>

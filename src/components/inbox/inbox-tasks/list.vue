@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-center mt-5" v-if="contacts.length < 1">No Tasks</p>
+    <p class="text-center mt-5" v-if="contacts.length < 1 && !loadingContacts">No Tasks</p>
     <inbox-task-item v-for="(contact, index) in contacts" :key="`contact-item-${index}`"
                      :contact="contact"
                      :loading-contact="loadingContacts"

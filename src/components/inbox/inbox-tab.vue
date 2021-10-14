@@ -1,4 +1,8 @@
 <template>
+  <b-overlay :show="isFetchingContacts"
+             class="h-100 w-100"
+             rounded="sm"
+             variant="white">
     <div class="w-100 h-100 d-flex flex-column">
       <calls-header :openCount="taskCounts.open"
                     :pendingCount="taskCounts.pending"
@@ -99,6 +103,15 @@
           </div>
         </div>
     </div>
+    <template #overlay>
+      <div class="text-center">
+        <q-spinner-bars
+          color="primary"
+          size="2em"
+        />
+      </div>
+    </template>
+  </b-overlay>
 </template>
 
 <script>
@@ -176,6 +189,7 @@ export default {
       }
     },
     resetList () {
+      this.setContacts([])
       this.page = 1
       this.isLoaded = false
       this.loadContactTasks()

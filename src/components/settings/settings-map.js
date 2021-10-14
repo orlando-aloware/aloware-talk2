@@ -244,7 +244,7 @@ const SettingsMap = {
     visible: true
   },
   'default_outbound_campaign_id': {
-    title: 'Line',
+    title: 'Outbound Line',
     description: 'The lines to get notified from.',
     route: '/settings/outbound-call',
     hash_keyword: 'outbound-calling-selector',

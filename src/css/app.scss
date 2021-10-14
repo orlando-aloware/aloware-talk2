@@ -377,6 +377,10 @@ body,
   }
 }
 
+.text-regular {
+  text-transform: none !important;
+}
+
 .small-text {
   color: #202125;
   font-family: $font-family-body;
@@ -3023,6 +3027,12 @@ span.mention {
       margin-top: 6px;
       margin-left: 0;
     }
+  }
+
+  .q-separator {
+    margin-left: 18px !important;
+    margin-right: 18px !important;
+    background: $grey-50 !important;
   }
 }
 
@@ -7367,6 +7377,11 @@ button.grey-90 {
 
 .menu-avatar-wrapper {
 
+  .contact-info-wrapper {
+    margin-right: 5px;
+    margin-top: -10px;
+  }
+
   .user-full-name {
     font-weight: 500 !important;
     font-size: $f-size-body !important;
@@ -7375,6 +7390,7 @@ button.grey-90 {
 
     .focus-mode-icon {
       margin-top: -2px;
+      margin-left: 7px;
     }
   }
 
@@ -7390,13 +7406,24 @@ button.grey-90 {
   min-width: 186px !important;
   max-width: 186px !important;
 
+  padding-top: 8px;
+  padding-bottom: 8px;
+
   .q-list {
-    padding: 10px;
+    padding: 0;
 
     .q-item {
-      padding: 0 12px !important;
-      border-radius: 6px;
+      padding: 0 16px !important;
       font-size: $f-size-body-xs !important;
+
+      .rounded-badge {
+        margin-right: 15px !important;
+      }
+
+      .focus-mode-icon,
+      .logout-icon {
+        margin-right: 8px;
+      }
     }
   }
 }
@@ -7446,4 +7473,14 @@ button.grey-90 {
   .q-field__focusable-action.q-icon {
     font-size: 14px !important;
   }
+}
+
+
+.form-control.is-invalid,
+.form-control.is-valid {
+  background-image: none !important;
+}
+
+.form-control.is-valid {
+  border-color: #ced4da !important;
 }

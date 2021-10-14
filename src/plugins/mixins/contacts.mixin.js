@@ -21,7 +21,8 @@ export default {
       initialListFilters: null,
       filtersCount: 0,
       DefaultContactDateFilter,
-      ContactListTypes
+      ContactListTypes,
+      sorts: null
     }
   },
 
@@ -39,6 +40,7 @@ export default {
     },
     onSortByField (sorts) {
       this.isLoaded = false
+      this.sorts = sorts
       this.fetch({
         search: this.search,
         page: this.listItems[this.id].current_page,
@@ -124,8 +126,8 @@ export default {
         })
     }, 1000),
     fetch (params = {}) {
-      const sort = _.get(params, 'sort', this.defaultContactDateFilter)
-      const order = _.get(params, 'order', 'desc')
+      const sort = (this.sorts) ? this.sorts.orderBy : _.get(params, 'sort', this.defaultContactDateFilter)
+      const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
       params.sort = sort
       params.order = order
       this.isLoading = true

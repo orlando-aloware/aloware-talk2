@@ -19,8 +19,9 @@
                         :id="`${SettingsMap.my_calls.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myCalls"
-                             value="true"
-                             unchecked-value="false">
+                             :value="true"
+                             :unchecked-value="false"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myCalls')">
               Call to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
@@ -28,7 +29,8 @@
           <b-form-group label=""
                         :id="`${SettingsMap.my_texts.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myTexts">
+                             v-model="myTexts"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myTexts')">
               Text message to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
@@ -36,7 +38,8 @@
           <b-form-group label=""
                         :id="`${SettingsMap.my_voicemail.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myVoicemails">
+                             v-model="myVoicemails"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myVoicemails')">
               Voicemail to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
@@ -44,7 +47,8 @@
           <b-form-group label=""
                         :id="`${SettingsMap.my_faxes.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myFaxes">
+                             v-model="myFaxes"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myFaxes')">
               Fax to personal line
             </b-form-checkbox>
           </b-form-group>
@@ -52,7 +56,8 @@
           <b-form-group label=""
                         :id="`${SettingsMap.my_mentions.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myMentions">
+                             v-model="myMentions"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myMentions')">
               When this user is mentioned
             </b-form-checkbox>
           </b-form-group>
@@ -60,7 +65,8 @@
           <b-form-group label=""
                         :id="`${SettingsMap.my_contacts.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myContacts">
+                             v-model="myContacts"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myContacts')">
               When a contact is assigned to this user
             </b-form-checkbox>
           </b-form-group>
@@ -68,14 +74,16 @@
           <b-form-group label=""
                         :id="`${SettingsMap.my_appointments.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myAppointments">
+                             v-model="myAppointments"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myAppointments')">
               When an appointment is assigned to this user
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label="" :id="`${SettingsMap.my_reminders.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="myReminders">
+                             v-model="myReminders"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myReminders')">
               When a reminder is assigned to this user
             </b-form-checkbox>
           </b-form-group>
@@ -93,8 +101,8 @@
           <b-form-group label="" :id="`${SettingsMap.enabled_billing_warnings.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_billing_warnings"
-                             value="true"
-                             unchecked-value="false"
+                             :value="true"
+                             :unchecked-value="false"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
               Billing Warnings
             </b-form-checkbox>
@@ -103,8 +111,8 @@
           <b-form-group label="" :id="`${SettingsMap.enabled_sync_reports.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_sync_reports"
-                             value="true"
-                             unchecked-value="false"
+                             :value="true"
+                             :unchecked-value="false"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_sync_reports')">
               Integration Sync Report
             </b-form-checkbox>
@@ -113,8 +121,8 @@
           <b-form-group label="" :id="`${SettingsMap.enabled_account_reports.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_account_reports"
-                             value="true"
-                             unchecked-value="false"
+                             :value="true"
+                             :unchecked-value="false"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_account_reports')">
               Account Reports
             </b-form-checkbox>
@@ -123,8 +131,8 @@
           <b-form-group label="" :id="`${SettingsMap.enabled_other_reports.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="user.enabled_other_reports"
-                             value="true"
-                             unchecked-value="false"
+                             :value="true"
+                             :unchecked-value="false"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_other_reports')">
               Other Notifications
             </b-form-checkbox>
@@ -143,11 +151,11 @@
 
           <b-form-checkbox-group
             stacked
-            v-model="user.reminder_options"
-            :options="reminderOptions"
             class="mb-3"
             value-field="value"
             text-field="title"
+            v-model="user.reminder_options"
+            :options="reminderOptions"
             @change="(eventPayload) => onUpdateFields(eventPayload, 'reminder_options')">
           </b-form-checkbox-group>
         </b-col>
@@ -164,10 +172,9 @@
 
             <b-form-group label="">
               <b-form-checkbox switch
-                               value="true"
-                               unchecked-value="false"
-                               v-model="shouldObserve"
-                               @change="(eventPayload) => onUpdateFields(eventPayload, 'shouldObserve')">
+                               :value="true"
+                               :unchecked-value="false"
+                               v-model="shouldObserve">
                 Receive notifications from lines
               </b-form-checkbox>
             </b-form-group>
@@ -183,12 +190,15 @@
               class="form-label"
             >
               <line-selector v-model="user.observing_campaigns"
+                             :class="[$v.user['observing_campaigns'].$invalid ? 'is-invalid' : '']"
+                             :has-error="$v.user['observing_campaigns'].$invalid"
                              :multiple="true"
                              :use-chips="true"
                              :generic-styling="false"
                              :generic-multiselect="false"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'observing_campaigns')">
               </line-selector>
+              <b-form-invalid-feedback v-if="!$v.user.observing_campaigns.required">Please select lines to get notified from.</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -247,9 +257,13 @@
 import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
+import { settingsMixin } from 'src/plugins/mixins'
+import { required } from 'vuelidate/lib/validators'
 
 export default {
   name: 'notification-settings',
+
+  mixins: [settingsMixin],
 
   components: { LineSelector },
 
@@ -269,13 +283,31 @@ export default {
     },
     hasAdminRole () {
       return this.isCompanyAdmin || this.isBillingAdmin
+    },
+
+    rules () {
+      let rulesObject = {}
+
+      if (this.shouldObserve) {
+        rulesObject = { ...rulesObject,
+          observing_campaigns: {
+            required
+          }
+        }
+      }
+
+      return rulesObject
+    }
+  },
+
+  validations () {
+    return {
+      user: this.rules
     }
   },
 
   data () {
     return {
-      showPasswordFields: false,
-      selected: '',
       options: [
         { text: 'Admin', value: '1' },
         { text: 'Agent', value: '2' }
@@ -331,7 +363,7 @@ export default {
   methods: {
     ...mapActions('settings', ['updateChangedUserProperties']),
     onUpdateFields (value, prop) {
-      if (!['shouldObserve'].includes(prop)) {
+      if (!['shouldObserve', 'myCalls', 'myTexts', 'myVoicemails', 'myContacts', 'myAppointments', 'myFaxes', 'myReminders', 'myMentions'].includes(prop)) {
         this.user[prop] = value
         this.updateChangedUserProperties({
           name: prop,
@@ -339,21 +371,259 @@ export default {
         })
       }
 
-      if (prop === 'myCalls' && this.user[prop] !== 1) {
-        this.user.outbound_calling_selector = this.userClone.outbound_calling_selector
+      // if (prop === 'shouldObserve' && !this.user[prop]) {
+      //   this.user.observing_campaigns = this.userClone.observing_campaigns
+      //   this.updateChangedUserProperties({
+      //     name: 'observing_campaigns',
+      //     value: this.userClone.observing_campaigns
+      //   })
+      // }
+
+      if (prop === 'myCalls') {
+        this.user.calls_inapp_notifs = this.inAppNotifications && this.myCalls
         this.updateChangedUserProperties({
-          name: 'outbound_calling_selector',
-          value: this.userClone.outbound_calling_selector
+          name: 'calls_inapp_notifs',
+          value: value
+        })
+
+        this.user.calls_desktop_notifs = this.desktopNotifications && this.myCalls
+        this.updateChangedUserProperties({
+          name: 'calls_desktop_notifs',
+          value: value
+        })
+
+        this.user.calls_push_notifs = this.mobileNotifications && this.myCalls
+        this.updateChangedUserProperties({
+          name: 'calls_push_notifs',
+          value: value
+        })
+
+        this.user.calls_email_notifs = this.emailNotifications && this.myCalls
+        this.updateChangedUserProperties({
+          name: 'calls_email_notifs',
+          value: value
+        })
+
+        this.user.calls_text_notifs = this.textNotifications && this.myCalls
+        this.updateChangedUserProperties({
+          name: 'calls_text_notifs',
+          value: value
         })
       }
 
-      if (prop === 'shouldObserve' && !this.user[prop]) {
-        this.user.observing_campaigns = this.userClone.observing_campaigns
+      if (prop === 'myTexts') {
+        this.user.texts_inapp_notifs = this.inAppNotifications && this.myTexts
         this.updateChangedUserProperties({
-          name: 'observing_campaigns',
-          value: this.userClone.observing_campaigns
+          name: 'texts_inapp_notifs',
+          value: value
+        })
+
+        this.user.texts_desktop_notifs = this.desktopNotifications && this.myTexts
+        this.updateChangedUserProperties({
+          name: 'texts_desktop_notifs',
+          value: value
+        })
+
+        this.user.texts_push_notifs = this.mobileNotifications && this.myTexts
+        this.updateChangedUserProperties({
+          name: 'texts_push_notifs',
+          value: value
+        })
+
+        this.user.texts_email_notifs = this.emailNotifications && this.myTexts
+        this.updateChangedUserProperties({
+          name: 'texts_email_notifs',
+          value: value
+        })
+
+        this.user.texts_text_notifs = this.textNotifications && this.myTexts
+        this.updateChangedUserProperties({
+          name: 'texts_text_notifs',
+          value: value
         })
       }
+
+      if (prop === 'myVoicemails') {
+        this.user.voicemails_inapp_notifs = this.inAppNotifications && this.myVoicemails
+        this.updateChangedUserProperties({
+          name: 'voicemails_inapp_notifs',
+          value: value
+        })
+
+        this.user.voicemails_desktop_notifs = this.desktopNotifications && this.myVoicemails
+        this.updateChangedUserProperties({
+          name: 'voicemails_desktop_notifs',
+          value: value
+        })
+
+        this.user.voicemails_push_notifs = this.mobileNotifications && this.myVoicemails
+        this.updateChangedUserProperties({
+          name: 'voicemails_push_notifs',
+          value: value
+        })
+
+        this.user.voicemails_email_notifs = this.emailNotifications && this.myVoicemails
+        this.updateChangedUserProperties({
+          name: 'voicemails_email_notifs',
+          value: value
+        })
+
+        this.user.voicemails_text_notifs = this.textNotifications && this.myVoicemails
+        this.updateChangedUserProperties({
+          name: 'voicemails_text_notifs',
+          value: value
+        })
+      }
+
+      if (prop === 'myContacts') {
+        this.user.contacts_inapp_notifs = this.inAppNotifications && this.myContacts
+        this.updateChangedUserProperties({
+          name: 'contacts_inapp_notifs',
+          value: value
+        })
+
+        this.user.contacts_desktop_notifs = this.desktopNotifications && this.myContacts
+        this.updateChangedUserProperties({
+          name: 'contacts_desktop_notifs',
+          value: value
+        })
+
+        this.user.contacts_push_notifs = this.mobileNotifications && this.myContacts
+        this.updateChangedUserProperties({
+          name: 'contacts_push_notifs',
+          value: value
+        })
+
+        this.user.contacts_email_notifs = this.emailNotifications && this.myContacts
+        this.updateChangedUserProperties({
+          name: 'contacts_email_notifs',
+          value: value
+        })
+
+        this.user.contacts_text_notifs = this.textNotifications && this.myContacts
+        this.updateChangedUserProperties({
+          name: 'contacts_text_notifs',
+          value: value
+        })
+      }
+
+      if (prop === 'myAppointments') {
+        this.user.appointments_inapp_notifs = this.inAppNotifications && this.myAppointments
+        this.updateChangedUserProperties({
+          name: 'appointments_inapp_notifs',
+          value: value
+        })
+
+        this.user.appointments_desktop_notifs = this.desktopNotifications && this.myAppointments
+        this.updateChangedUserProperties({
+          name: 'appointments_desktop_notifs',
+          value: value
+        })
+
+        this.user.appointments_push_notifs = this.mobileNotifications && this.myAppointments
+        this.updateChangedUserProperties({
+          name: 'appointments_push_notifs',
+          value: value
+        })
+
+        this.user.appointments_email_notifs = this.emailNotifications && this.myAppointments
+        this.updateChangedUserProperties({
+          name: 'appointments_email_notifs',
+          value: value
+        })
+      }
+
+      if (prop === 'myFaxes') {
+        this.user.faxes_inapp_notifs = this.inAppNotifications && this.myFaxes
+        this.updateChangedUserProperties({
+          name: 'faxes_inapp_notifs',
+          value: value
+        })
+
+        this.user.faxes_desktop_notifs = this.desktopNotifications && this.myFaxes
+        this.updateChangedUserProperties({
+          name: 'faxes_desktop_notifs',
+          value: value
+        })
+
+        this.user.faxes_push_notifs = this.mobileNotifications && this.myFaxes
+        this.updateChangedUserProperties({
+          name: 'faxes_push_notifs',
+          value: value
+        })
+
+        this.user.faxes_email_notifs = this.emailNotifications && this.myFaxes
+        this.updateChangedUserProperties({
+          name: 'faxes_email_notifs',
+          value: value
+        })
+
+        this.user.faxes_text_notifs = this.textNotifications && this.myFaxes
+        this.updateChangedUserProperties({
+          name: 'faxes_text_notifs',
+          value: value
+        })
+      }
+
+      if (prop === 'myReminders') {
+        this.user.reminders_inapp_notifs = this.inAppNotifications && this.myReminders
+        this.updateChangedUserProperties({
+          name: 'reminders_inapp_notifs',
+          value: value
+        })
+
+        this.user.reminders_desktop_notifs = this.desktopNotifications && this.myReminders
+        this.updateChangedUserProperties({
+          name: 'reminders_desktop_notifs',
+          value: value
+        })
+
+        this.user.reminders_push_notifs = this.mobileNotifications && this.myReminders
+        this.updateChangedUserProperties({
+          name: 'reminders_push_notifs',
+          value: value
+        })
+
+        this.user.reminders_email_notifs = this.emailNotifications && this.myReminders
+        this.updateChangedUserProperties({
+          name: 'reminders_email_notifs',
+          value: value
+        })
+      }
+
+      if (prop === 'myMentions') {
+        this.user.mentions_inapp_notifs = this.inAppNotifications && this.myMentions
+        this.updateChangedUserProperties({
+          name: 'mentions_inapp_notifs',
+          value: value
+        })
+
+        this.user.mentions_desktop_notifs = this.desktopNotifications && this.myMentions
+        this.updateChangedUserProperties({
+          name: 'mentions_desktop_notifs',
+          value: value
+        })
+
+        this.user.mentions_push_notifs = this.mobileNotifications && this.myMentions
+        this.updateChangedUserProperties({
+          name: 'mentions_push_notifs',
+          value: value
+        })
+
+        this.user.mentions_email_notifs = this.emailNotifications && this.myMentions
+        this.updateChangedUserProperties({
+          name: 'mentions_email_notifs',
+          value: value
+        })
+
+        this.user.mentions_text_notifs = this.textNotifications && this.myMentions
+        this.updateChangedUserProperties({
+          name: 'mentions_text_notifs',
+          value: value
+        })
+      }
+
+      this.updateFormValidity()
     }
   },
 

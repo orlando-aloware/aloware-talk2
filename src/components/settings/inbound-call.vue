@@ -138,24 +138,53 @@
           </b-form-group>
 
           <div v-if="!disableGeoRouting">
-            <b-form-group label="United States" v-slot="{ ariaDescribedby }">
+            <b-form-group label="United States"
+                          v-if="user.country !== 'CA'"
+                          v-slot="{ ariaDescribedby }">
               <b-form-checkbox-group
                 class="group-checkbox d-flex flex-wrap"
                 v-model="user.operating_states_limit.us"
                 :options="states.us"
                 :aria-describedby="ariaDescribedby"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'operating_states_limit.us')"
-              ></b-form-checkbox-group>
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'operating_states_limit.us')">
+              </b-form-checkbox-group>
+              <br>
+              <br>
+              <b-form-group label="" >
+                <b-form-checkbox
+                  switch
+                  v-model="checkAllUS"
+                  :value="true"
+                  :unchecked-value="false"
+                  @change="(eventPayload) => onUpdateFields(eventPayload, 'checkAllUS')">
+                  Check All
+                </b-form-checkbox>
+              </b-form-group>
             </b-form-group>
 
-            <b-form-group label="Canada" v-slot="{ ariaDescribedby }" v-if="user.country === 'CA'">
+            <b-form-group label="Canada"
+                          v-if="user.country === 'CA'"
+                          v-slot="{ ariaDescribedby }">
               <b-form-checkbox-group
                 class="group-checkbox d-flex flex-wrap"
                 v-model="user.operating_states_limit.ca"
                 :options="states.ca"
                 :aria-describedby="ariaDescribedby"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'operating_states_limit.ca')"
-              ></b-form-checkbox-group>
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'operating_states_limit.ca')">
+              </b-form-checkbox-group>
+
+              <br>
+              <br>
+              <b-form-group label="" >
+                <b-form-checkbox
+                  switch
+                  v-model="checkAllCA"
+                  :value="true"
+                  :unchecked-value="false"
+                  @change="(eventPayload) => onUpdateFields(eventPayload, 'checkAllCA')">
+                  Check All
+                </b-form-checkbox>
+              </b-form-group>
             </b-form-group>
           </div>
         </b-col>
@@ -230,13 +259,16 @@
             class="form-label"
           >
             <b-form-textarea
-              id="textarea"
-              v-model="user.missed_call_message"
               placeholder="Enter missed call message here..."
               rows="3"
               max-rows="6"
+              v-model.trim="$v.user.missed_call_message.$model"
+              :state="validateState('missed_call_message')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'missed_call_message')"
             ></b-form-textarea>
+
+            <b-form-invalid-feedback v-if="!$v.user.missed_call_message.required">Please provide a missed call message.</b-form-invalid-feedback>
+
             <b-button size="sm" variant="primary" class="mt-2">
               <q-menu content-class="mx-height-300"
                       ref="templatesMenu"
@@ -297,13 +329,15 @@
             class="form-label"
           >
             <b-form-textarea
-              id="textarea"
-              v-model="user.completed_call_message_caller"
               placeholder="Enter missed call message here..."
               rows="3"
               max-rows="6"
+              v-model.trim="$v.user.completed_call_message_caller.$model"
+              :state="validateState('completed_call_message_caller')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'completed_call_message_caller')"
             ></b-form-textarea>
+            <b-form-invalid-feedback v-if="!$v.user.completed_call_message_caller.required">Please provide a completed call message to the caller.</b-form-invalid-feedback>
+
             <b-button size="sm" variant="primary" class="mt-2">
               <q-menu content-class="mx-height-300"
                       ref="templatesMenu"
@@ -350,13 +384,13 @@ import AudioRecorder from 'components/audio-recorder'
 import talk2Api from 'src/plugins/api/api'
 import FileUploader from 'components/file-uploader'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import SettingsMap from 'components/settings/settings-map'
-
+import { required } from 'vuelidate/lib/validators'
 export default {
   name: 'inbound-call',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, settingsMixin],
 
   components: { FileUploader, AudioRecorder, UsAreaCodeSelector, VariableIcon, Variables, CalendarTodayIcon, MessageTemplates, ExtensionSelector },
 
@@ -371,6 +405,12 @@ export default {
     }
   },
 
+  validations () {
+    return {
+      user: this.rules
+    }
+  },
+
   computed: {
     ...mapState('settings', ['userClone']),
     baseUrl () {
@@ -378,6 +418,22 @@ export default {
     },
     missedCallVMUploadUrl () {
       return `${window.axios.defaults.baseURL}/api/v1/user/${this.user.id}/missed-call-voicemail`
+    },
+    shouldMessageIfCallCompleted () {
+      return true// this.user.should_message_caller_if_completed === 1
+    },
+    rules () {
+      let rulesObject = {}
+
+      if (this.user.should_message_if_missed) {
+        rulesObject = { ...rulesObject, missed_call_message: { required } }
+      }
+
+      if (this.user.should_message_caller_if_completed) {
+        rulesObject = { ...rulesObject, completed_call_message_caller: { required } }
+      }
+
+      return rulesObject
     }
   },
 
@@ -387,6 +443,8 @@ export default {
       isDeletingMissedCallVMAudioFile: false,
       disableAreaCodeRouting: true,
       disableGeoRouting: true,
+      checkAllUS: false,
+      checkAllCA: false,
       options: [
         { text: 'Do Nothing', value: MISSED_CALL_BEHAVIOR_NOTHING },
         { text: 'Voicemail', value: MISSED_CALL_BEHAVIOR_VOICEMAIL }
@@ -441,7 +499,7 @@ export default {
       this.user.missed_calls_settings.voicemail_file = file['file_name']
     },
     onUpdateFields (value, prop) {
-      if (!['disableGeoRouting', 'disableAreaCodeRouting'].includes(prop)) {
+      if (!['disableGeoRouting', 'disableAreaCodeRouting', 'onCheckAllUs', 'onCheckAllCA'].includes(prop)) {
         this.user[prop] = value
         this.updateChangedUserProperties({
           name: prop,
@@ -470,6 +528,16 @@ export default {
           value: this.userClone.operating_area_codes_limit
         })
       }
+
+      if (prop === 'checkAllUS') {
+        this.user.operating_states_limit.us = value ? this.states.us : []
+      }
+
+      if (prop === 'checkAllCA') {
+        this.user.operating_states_limit.ca = value ? this.states.ca : []
+      }
+
+      this.updateFormValidity()
     }
   },
 
@@ -482,6 +550,12 @@ export default {
         })
       },
       deep: true
+    },
+    'user.operating_states_limit.us': function (value) {
+      this.checkAllUS = value.length === this.states.us.length
+    },
+    'user.operating_states_limit.ca': function (value) {
+      this.checkAllCA = value.length === this.states.ca.length
     }
   },
 

@@ -22,6 +22,16 @@
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'contacts_visibility')">
             </visibility-selector>
           </b-form-group>
+          <b-form-group label="" v-if="user.contacts_visibility !== ContactAccessTypes.CONTACTS_ACCESS_EVERYONE">
+            <b-form-checkbox
+              v-model="user.can_view_unassigned_contacts"
+              :value="true"
+              :unchecked-value="false"
+              @change="(eventPayload) => onUpdateFields(eventPayload, 'can_view_unassigned_contacts')"
+            >
+              Can view unassigned contacts
+            </b-form-checkbox>
+          </b-form-group>
         </b-col>
       </b-form-row>
 
@@ -75,6 +85,7 @@
               v-model="user.selected_campaign_ids"
               :options="sortedCampaigns"
               :aria-describedby="ariaDescribedby"
+              @change="(eventPayload) => onUpdateFields(eventPayload, 'selected_campaign_ids')"
             ></b-form-checkbox-group>
           </b-form-group>
         </b-col>
@@ -166,6 +177,7 @@
               v-model="user.selected_user_ids"
               :options="sortedUsers"
               :aria-describedby="ariaDescribedby"
+              @change="(eventPayload) => onUpdateFields(eventPayload, 'selected_user_ids')"
             ></b-form-checkbox-group>
           </b-form-group>
         </b-col>
@@ -178,6 +190,7 @@
 import VisibilitySelector from 'components/generic-selectors/visibility-selector'
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
+import * as ContactAccessTypes from 'src/constants/contact-access-types'
 
 import SettingsMap from 'components/settings/settings-map'
 
@@ -197,6 +210,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'users']),
+    ...mapState('settings', ['userClone']),
     sortedUsers () {
       return this.$options.filters.objAlphabeticalOrder(this.users, 'name')
     },
@@ -207,7 +221,8 @@ export default {
 
   data () {
     return {
-      SettingsMap
+      SettingsMap,
+      ContactAccessTypes
     }
   },
 
@@ -254,6 +269,14 @@ export default {
           value: this.userClone.user_access_limit
         })
 
+        this.user.selected_user_ids = this.userClone.selected_user_ids
+        this.updateChangedUserProperties({
+          name: 'selected_user_ids',
+          value: this.userClone.selected_user_ids
+        })
+      }
+
+      if (prop === 'user_access_limit' && !this.user[prop]) {
         this.user.selected_user_ids = this.userClone.selected_user_ids
         this.updateChangedUserProperties({
           name: 'selected_user_ids',
