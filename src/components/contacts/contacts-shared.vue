@@ -1,7 +1,7 @@
 <template>
-  <div class="shared">
-    <div class="folders__header d-flex align-items-center border-top list--header">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
+  <div class="shared border-top ">
+    <div class="folders__header d-flex align-items-center list--header">
+      <div class="header__header__title font-weight-bold flex-grow-1 d-flex align-items-center">
         Public Lists
         <q-icon name="info"
                 class="material-icons-outlined ml-2 cursor-pointer"
@@ -15,8 +15,9 @@
       </div>
     </div>
 
-    <div class="d-flex folders__content flex-column">
-      <div v-if="!folders.length" class="ml-2 pl-2 pb-2">
+    <div class="d-flex folders__content flex-column"
+         :class="[ !folders.length ? 'no-folder' : '' ]">
+      <div>
         <span class="fs-12 text-muted">
           No public list available
         </span>

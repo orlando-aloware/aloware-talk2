@@ -4440,13 +4440,8 @@ span.mention {
     }
 
     &__icon {
-      margin-top: -5px;
+      margin-top: 1px;
       margin-right: 5px;
-    }
-
-    &:hover,
-    &--moving {
-      background-color: $grey-50;
     }
 
     &__name {
@@ -4456,12 +4451,13 @@ span.mention {
 
       span {
         display: inline-block;
-        font-size: 13px;
+        font-size: $f-size-h5;
+        line-height: 17px;
+        color: $grey-100;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         width: 100%;
-        font-weight: 500;
       }
     }
 
@@ -4758,8 +4754,10 @@ span.mention {
 }
 
 .contact-menu-item {
-  height: 31px;
+  height: 40px;
   cursor: pointer;
+  padding-left: 17px;
+  padding-right: 8px;
   transition: background-color 100ms ease-in-out;
   &__title {
     line-height: 12px;
@@ -4768,6 +4766,11 @@ span.mention {
   }
   &__icon {
     margin-top: -2px;
+  }
+  &__title,
+  &__icon,
+  &__suffix * {
+    height: 40px;
   }
   &:hover {
     background-color: $light-green2;
@@ -4804,7 +4807,6 @@ span.mention {
 
 .contact-menu {
   width: 200px;
-  padding-top: 5px;
   &__title {
     padding-left: 2px;
     padding-right: 2px;
@@ -4928,15 +4930,31 @@ span.mention {
   flex-grow: 1;
   height: calc(100vh - 410px);
   padding-bottom: 5px;
+  &.border-top {
+    .folders__header {
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+  }
   &__header {
-    min-height: 40px;
-    font-size: 10px;
+    font-size: $f-size-body-sm;
+    line-height: 16px;
+    letter-spacing: 0.03em;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    padding-bottom: 16px;
+    &__title {
+      color: $grey-90;
+    }
   }
   &__content {
-    height: calc(100% - 40px);
     overflow: auto;
+    &:not(.no-folder) {
+      height: calc(100% - 40px);
+    }
+    &.no-folder {
+      padding-left: 20px;
+    }
   }
   .item {
     cursor: pointer;
@@ -4945,14 +4963,11 @@ span.mention {
     transition: background-color 100ms ease-in-out;
   }
   .item:hover {
-    background: $light-green2;
-  }
-  .folder {
-    padding-left: 0 !important;
+    background: $light-blue3;
   }
   .sublists {
     .folder {
-      &--active {
+      &--active:not(:hover) {
         background-color: $grey-50;
       }
     }
@@ -5282,8 +5297,6 @@ table.datatable {
   border: solid 1px $grey-light;
   display: none;
   flex-direction: column;
-  padding-bottom: 2px;
-  padding-top: 2px;
   position: absolute;
   width: 200px;
 }
@@ -5593,7 +5606,7 @@ table.datatable {
     }
 
     &:hover {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
 
     &__name {
@@ -5746,7 +5759,6 @@ table.datatable {
 }
 
 .folder {
-  padding-left: 10px;
   padding-right: 0px;
   min-height: 34px;
   cursor: pointer;
@@ -5762,11 +5774,7 @@ table.datatable {
   }
   &__icon {
     min-height: 34px;
-    margin-top: -5px;
     margin-right: 5px;
-    svg {
-      margin-top: 5px;
-    }
   }
   &--target {
     background-color: rgba(37, 110, 255, 0.09);
@@ -5777,13 +5785,11 @@ table.datatable {
     }
   }
   &:hover {
-    background-color: $grey-50;
     .folder__option {
       display: block;
     }
   }
   &__name {
-    min-height: 34px;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -5798,12 +5804,12 @@ table.datatable {
   }
   &__option {
     line-height: 0;
-    height: 20px;
     width: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 34px;
+    margin-left: 5px;
     &:hover,
     &:active,
     &:focus {
@@ -5895,11 +5901,11 @@ table.datatable {
     }
 
     &--selected {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
 
     &:hover {
-      background-color: $light-green2;
+      background-color: $light-blue3;
 
       .folder__option {
         display: block;
@@ -5947,7 +5953,7 @@ table.datatable {
 }
 
 .select-list-tree-list-item.list--active {
-  background-color: #F2FBF6;
+  background-color: $light-blue3;
 }
 
 .select-list-tree-list-item {
@@ -5967,7 +5973,7 @@ table.datatable {
     &:hover,
     &--moving,
     &--active {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
     &__name {
       width: calc(100% - 54px);
@@ -6007,7 +6013,6 @@ table.datatable {
 }
 
 .folder {
-  padding-left: 10px;
   padding-right: 10px;
   min-height: 34px;
   cursor: pointer;
@@ -6016,6 +6021,7 @@ table.datatable {
 
   &__arrow {
     min-height: 34px;
+    min-width: 6px;
     margin-top: -5px;
     margin-right: 5px;
     svg {
@@ -6025,20 +6031,14 @@ table.datatable {
 
   &__icon {
     min-height: 34px;
-    margin-top: -5px;
     margin-right: 5px;
-    svg {
-      margin-top: 5px;
-    }
   }
 
   &--selected {
-    background-color: $light-green2;
+    background-color: $light-blue3;
   }
 
   &:hover {
-    background-color: $grey-50;
-
     .folder__option {
       opacity: 1;
     }
@@ -6053,7 +6053,6 @@ table.datatable {
   }
 
   &__name {
-    min-height: 34px;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -6091,8 +6090,20 @@ table.datatable {
 }
 
 .tree-folder {
+  & > .folder,
+  & > .sublists > .folder,
+  & > .animated > .sublists > .folder {
+    padding-left: 9px;
+  }
+  & > .folder,
+  & > .sublists > .folder,
+  & > .animated > .sublists > .folder,
+  & .subfolders .sublists > .folder {
+    &:hover {
+      background-color: $light-blue3 !important;
+    }
+  }
   .folder {
-    padding-left: 10px;
     padding-right: 10px;
     min-height: 34px;
     cursor: pointer;
@@ -6106,29 +6117,33 @@ table.datatable {
 
     &__icon {
       min-height: 34px;
-      margin-top: -5px;
       margin-right: 5px;
     }
 
     &--selected {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
 
     &:hover {
-      background-color: $light-green2;
-
       .folder__option {
         display: block;
       }
     }
 
-    &__name {
-      font-size: 13px;
+    &__name-wrapper {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       max-width: calc(100% - 30px);
-      font-weight: 500;
+      &__name {
+        font-size: $f-size-h5;
+        line-height: 17px;
+        color: $grey-100;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+      }
     }
 
     &__sub {
@@ -6322,13 +6337,19 @@ table.datatable {
   display: flex;
   flex-direction: column;
   height: 20rem;
+  padding-top: 16px;
+  padding-bottom: 16px;
 
   &__header {
-    min-height: 40px;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-size: $f-size-body-sm;
+    line-height: 16px;
+    letter-spacing: 0.03em;
+    font-weight: 600;
     text-transform: uppercase;
+    padding-bottom: 16px;
+    &__title {
+      color: $grey-90;
+    }
   }
 
   &__content {
@@ -6337,6 +6358,7 @@ table.datatable {
   }
 
   .item {
+    padding-left: 12px;
     color: $dark;
     cursor: pointer;
     min-height: 40px;
@@ -6354,8 +6376,9 @@ table.datatable {
     }
     .counts {
       .badge {
-        font-size: 10px;
-        line-height: 10px;
+        font-weight: 500;
+        font-size: 11px;
+        line-height: 11px;
       }
     }
     .icon,
@@ -6363,10 +6386,17 @@ table.datatable {
     .counts {
       min-height: 40px;
     }
+    .item-name {
+      font-size: $f-size-h5;
+      line-height: 17px;
+      color: $grey-100;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .item:hover {
-    background: $light-green2;
+    background: $light-blue3;
     color: $dark;
     text-decoration: none;
   }
@@ -7057,7 +7087,7 @@ button.grey-90 {
 
 
 .title-static-icon {
-  margin-top: -4px;
+  margin-right: 10px;
 }
 
 .mention-tag {
@@ -7475,7 +7505,6 @@ button.grey-90 {
   }
 }
 
-
 .form-control.is-invalid,
 .form-control.is-valid {
   background-image: none !important;
@@ -7483,4 +7512,51 @@ button.grey-90 {
 
 .form-control.is-valid {
   border-color: #ced4da !important;
+}
+
+.shared {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.pinned,
+.shared,
+.folders {
+  .header__header__title {
+    padding-left: 20px;
+  }
+}
+
+.contacts {
+  &__title {
+    height: 19px;
+    .list-name {
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 19px;
+    }
+  }
+  .title-breadcrumb {
+    font-family: Roboto;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14px;
+    color: $grey-90;
+  }
+  .title-breadcrumb {
+    height: 19px;
+    margin-right: 5px;
+  }
+  .title-path:not(:last-child) {
+    .title-slash {
+      height: 19px;
+      margin-right: 5px;
+    }
+  }
+  .title-path:last-child {
+    .title-slash {
+      height: 19px;
+      margin-right: 15.5px;
+    }
+  }
 }

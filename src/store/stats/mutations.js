@@ -74,9 +74,19 @@ export default {
     const newIndex = (index + data.step)
     state.metricGroups.splice(newIndex, 0, metricGroup)
 
-    for (let index in state.metricGroups) {
-      if (index > newIndex && state.metricGroups[index].order >= data.order) {
-        Vue.set(state.metricGroups[index], 'order', (state.metricGroups[index].order + 1))
+    if (data.step > 0) {
+      for (let index in state.metricGroups) {
+        if (index < newIndex) {
+          Vue.set(state.metricGroups[index], 'order', (state.metricGroups[index].order - 1))
+        }
+      }
+    }
+
+    if (data.step < 0) {
+      for (let index in state.metricGroups) {
+        if (index > newIndex) {
+          Vue.set(state.metricGroups[index], 'order', (state.metricGroups[index].order + 1))
+        }
       }
     }
   },

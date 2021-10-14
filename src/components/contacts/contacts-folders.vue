@@ -1,7 +1,7 @@
 <template>
-  <div class="folders">
-    <div class="folders__header d-flex align-items-center border-top list--header">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
+  <div class="folders border-top">
+    <div class="folders__header d-flex align-items-center list--header">
+      <div class="header__header__title font-weight-bold flex-grow-1">
         My Lists
       </div>
 
@@ -35,16 +35,22 @@
       <button
         class="btn btn-link btn-sm tooltip-target mr-1"
         id="bs-folder-options">
-        <i class="fa fa-plus text-primary"></i>
+        <plus-icon color="#256EFF"
+                   width="14"
+                   height="14"
+                   firstD="M7 1.5V12.5"
+                   secondD="M12.5 7H1.5"
+                   strokeWidth="1.5"/>
       </button>
     </div>
 
-    <div class="d-flex folders__content flex-column pl-2">
+    <div class="d-flex folders__content flex-column">
       <tree-folder-create
         v-if="isCreatingFolder"
         :layer="0"
         :parent_id="null"
         @blur="onCreateFolderToggle"
+        @cancel="onCreateFolderCancel"
       />
       <template v-if="folders.length">
         <tree-folder
@@ -83,6 +89,7 @@ import ContactMenuItem from './contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-icon.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
+import PlusIcon from 'components/icons/plus-icon.vue'
 export default {
   components: {
     TreeFolder,
@@ -90,7 +97,8 @@ export default {
     ContactMenuItem,
     FolderIcon,
     TreeFolderCreate,
-    PeopleIcon
+    PeopleIcon,
+    PlusIcon
   },
   data () {
     return {
@@ -107,6 +115,9 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
+    },
+    onCreateFolderCancel () {
+      this.isCreatingFolder = false
     },
     loadFolders () {
       this.isLoading = false

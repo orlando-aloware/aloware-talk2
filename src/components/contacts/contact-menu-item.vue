@@ -1,6 +1,6 @@
 <template>
   <div
-    class="contact-menu-item align-items-center d-flex px-2 move-item"
+    class="contact-menu-item align-items-center d-flex move-item"
     @click="onClick"
     @mouseover="onMouseOver"
     @mouseleave="onMouseLeave"
