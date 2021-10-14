@@ -1,6 +1,5 @@
 <template>
-  <div v-if="contact.last_communication"
-       :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative ${activeClass}`"
+  <div :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative ${activeClass}`"
        @click="onItemClick(contact)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
@@ -27,7 +26,7 @@
           {{ contactName }}
         </q-tooltip>
       </div>
-      <div class="d-flex flex-row">
+      <div class="d-flex flex-row" v-if="contact.last_communication">
         <div class="pr-2">
           <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction)"
                      height="18px"
@@ -41,11 +40,11 @@
 
         </div>
       </div>
-      <div class="campaign-name text-grey-10">
+      <div class="campaign-name text-grey-10" v-if="contact.last_communication">
         {{ campaignName }}
       </div>
     </div>
-    <div class="actions text-right pb-1">
+    <div class="actions text-right pb-1" v-if="contact.last_communication">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="(contact.last_communication.type === CommunicationTypes.CALL && contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || contact.last_communication.type !== CommunicationTypes.CALL">

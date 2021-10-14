@@ -1,10 +1,5 @@
 <template>
-  <b-overlay :show="isGettingTasksList"
-             class="h-100 w-100"
-             rounded="sm"
-             variant="white">
     <div class="w-100 h-100 d-flex flex-column">
-
       <div class="header flex- w-100" v-if="$route.params.channel !== 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper">
@@ -117,11 +112,12 @@
                            :direction="mentionType"
                            v-if="!isGettingTasksList && $route.params.channel === 'mentions'">
         </task-mention-list>
-        <div class="relative py-4">
-          <b-overlay :show="isLoadingMore && !isGettingTasksList"
+        <div :class="[isGettingTasksList ? 'py-5' : 'py-4', 'relative']">
+          <b-overlay :show="isLoadingMore || isGettingTasksList"
                      rounded="sm">
             <template #overlay>
-              <q-spinner-bars color="primary"/>
+              <q-spinner-bars color="primary"
+                              size="2em"/>
             </template>
           </b-overlay>
         </div>
@@ -130,15 +126,6 @@
                      @onResetFilter="resetFilters">
       </filter-dialog>
     </div>
-    <template #overlay>
-      <div class="text-center">
-        <q-spinner-bars
-          color="primary"
-          size="2em"
-        />
-      </div>
-    </template>
-  </b-overlay>
 </template>
 
 <script>
@@ -408,7 +395,15 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setSelectedFilter', 'setHasMoreCommunications']),
+    ...mapActions('inbox', [
+      'gettingTasksList',
+      'setCommunications',
+      'setSelectedCommunication',
+      'setChannelClonedFilter',
+      'resetChannelChangedFilterFields',
+      'setSelectedFilter',
+      'setHasMoreCommunications']),
+
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
       this.filter.search_text = this.searchText
@@ -638,13 +633,13 @@ export default {
 
       return api.get({ params: params })
         .then(response => {
+          this.gettingTasksList(false)
           this.setCommunications(response.data.data)
           this.currentPage = response.data.current_page
           this.setHasMoreCommunications(response.data.next_page_url)
           this.isLoaded = true
           this.pagination = _.clone(response.data)
           delete this.pagination.data
-          this.gettingTasksList(false)
         })
     },
 

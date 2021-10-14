@@ -111,8 +111,6 @@
         </b-col>
       </b-form-row>
 
-      {{ getInvalidFields }}
-
       <b-form-row class="mt-4" v-if="showPasswordFields">
         <b-col sm="12" md="6">
           <b-form-group

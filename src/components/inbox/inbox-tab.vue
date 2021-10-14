@@ -1,8 +1,4 @@
 <template>
-  <b-overlay :show="isFetchingContacts"
-             class="h-100 w-100"
-             rounded="sm"
-             variant="white">
     <div class="w-100 h-100 d-flex flex-column">
       <calls-header :openCount="taskCounts.open"
                     :pendingCount="taskCounts.pending"
@@ -80,15 +76,15 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+        <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
              ref="taskListScroller"
              @scroll="handleScroll">
           <inbox-task-list :contacts="contacts"
                            :loading-contacts="isFetchingContacts"
                            @onItemSelected="onItemSelected">
           </inbox-task-list>
-          <div class="relative py-4">
-            <b-overlay :show="isLoadingMore"
+          <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
+            <b-overlay :show="isLoadingMore || isFetchingContacts"
                        rounded="sm"
                        variant="white">
               <template #overlay>
@@ -103,15 +99,6 @@
           </div>
         </div>
     </div>
-    <template #overlay>
-      <div class="text-center">
-        <q-spinner-bars
-          color="primary"
-          size="2em"
-        />
-      </div>
-    </template>
-  </b-overlay>
 </template>
 
 <script>
@@ -363,6 +350,7 @@ export default {
 
   watch: {
     'sorting.order': function () {
+      this.setContacts([])
       this.loadContactTasks()
     },
     'searchText': function () {
