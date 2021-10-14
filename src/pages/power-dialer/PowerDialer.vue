@@ -30,6 +30,7 @@ import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
 import powermixin from 'src/plugins/mixins/power-dialer'
+// import { get } from 'lodash'
 
 export default {
   name: 'PowerDialer',
@@ -60,26 +61,23 @@ export default {
     next()
   },
   watch: {
-    // 'currentRoute': {
-    //   async handler () {
-    //     if (this.currentRoute.name === 'Power Dialer') {
-    //       this.resetValues()
-    //     }
-    //   },
-    //   deep: true
-    // },
     '$route.params': async function (route) {
       if (!route.id && this.$route.name === 'Power Dialer') {
-        console.log('301 :>> ', route)
+        console.log('101 :>> ', 101)
         route.id = 'in-queue'
+        this.id = 'in-queue'
         await this.fetchContacts()
       } else if (route.id && this.$route.name === 'Power Dialer') {
-        console.log('302 :>> ', route)
+        console.log('102 :>> ', 102)
+        this.id = route.id
         // this.setData(id)
         await this.fetchContacts()
-      } else {
-        console.log('303 :>> ', route)
       }
+    }
+  },
+  data () {
+    return {
+      id: ''
     }
   },
   methods: {
@@ -93,16 +91,25 @@ export default {
       'RESET_LIST'
     ]),
     async fetchContacts () {
-      console.log('filterParams :>> ', this.$route.params)
-      await this.getPowerDialerList()
-      await this.getContactResources({
+      let params = {
         'page': 1,
         'per_page': 25,
         'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
         'filter_groups[0][filters][contact_lists][operator]': 1,
         'filter_groups[0][is_conjunction]': true,
         'order': 'desc'
-      })
+      }
+
+      await this.getPowerDialerList()
+      await this.processFetch(params)
+      // await this.getContactResources({
+      //   'page': 1,
+      //   'per_page': 25,
+      //   'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
+      //   'filter_groups[0][filters][contact_lists][operator]': 1,
+      //   'filter_groups[0][is_conjunction]': true,
+      //   'order': 'desc'
+      // })
     },
     resetValues () {
       // this.RESET_LIST()

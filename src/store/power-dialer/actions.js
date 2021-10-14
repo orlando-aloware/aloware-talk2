@@ -22,6 +22,9 @@ export default {
       commit('SET_CONTACT_RESOURCES', res.data.data)
     }
   },
+  contactsLoaded: ({ commit }, payload) => {
+    commit('CONTACTS_LOADED', payload)
+  },
 
   /**
    * DIRECTORIES

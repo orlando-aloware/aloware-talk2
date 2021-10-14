@@ -1,6 +1,7 @@
 <template>
   <PowerDialerView
-    :id="this.id"
+    :filter="filter"
+    :id="id"
     :name="name" />
 </template>
 
@@ -18,8 +19,11 @@ export default {
       return this.$route
     },
     id () {
+      return this.$route.params.id || 'all'
+    },
+    filter () {
       if (this.$route.params.id) {
-        if (this.$route.meta === 'Power Dialer' || this.$route.meta === 'Power Dialer Base Filter') {
+        if (this.$route.meta === 'Power Dialer' || (this.$route.meta === 'Power Dialer Base Filter' || this.$route.meta === 'Power Dialer Individual Advance')) {
           return this.$route.params.id
         } else {
           if (this.$route.params.filter) {

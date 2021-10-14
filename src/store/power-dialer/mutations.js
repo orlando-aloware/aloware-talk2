@@ -15,6 +15,28 @@ export default {
       [data.id]: data.contacts
     }
   },
+  CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
+    if (append) {
+      let newData = data
+      for (let item of state.powerDialerLists[String(id)].data) {
+        let found = newData.find(contact => contact.id === item.id)
+        let index = found ? newData.indexOf(found) : null
+        if (index !== -1 && index !== null) {
+          newData.splice(index, 1)
+        }
+      }
+      state.powerDialerLists = {
+        ...state.powerDialerLists,
+        [String(id)]: {
+          ...state.powerDialerLists[String(id)],
+          ...rest,
+          data: state.powerDialerLists[String(id)].data.concat(newData)
+        }
+      }
+    } else {
+      state.powerDialerLists = { ...state.powerDialerLists, [String(id)]: { data, ...rest } }
+    }
+  },
 
   /**
    * DIRECTORIES

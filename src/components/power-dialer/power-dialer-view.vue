@@ -17,7 +17,7 @@
       <div>
         <PowerDialerFilter
           v-if="activeRoute"
-          :id="id"
+          :id="filter"
           :active-route="activeRoute" />
         <b-container fluid class="bv-example-row m-0 p-0 pl-3 pb-2 border-bottom">
           <b-row class="pr-2">
@@ -84,10 +84,11 @@
             :is-empty="!hasContacts"
             :paginated="true"
             scroll-area-class="none"
+            :total-rows="powerDialerLists[id].total"
             @reordered="onColumnsReordered">
             <template slot="tbody">
               <TableRow
-                v-for="(contact, nkey) in contacts"
+                v-for="(contact, nkey) in currentContacts"
                 :key="`power-dialer-${contact.id}-${nkey}`"
                 :contact="contact"
                 :columns="columns"
@@ -97,6 +98,7 @@
                 @checked="onCheckedRows">
                 <template slot="custom-content">
                   <template v-for="(column, key) in columns">
+                    <!-- change date added to date created -->
                     <!-- COLUMN: Checkboxes -->
                     <td
                       v-if="column.name === 'checkbox'"
@@ -242,6 +244,8 @@ import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
+import powermixin from 'src/plugins/mixins/power-dialer'
+// import { get } from 'lodash'
 
 export default {
   name: 'PowerDialerView',
@@ -249,8 +253,13 @@ export default {
     id: {
       type: String,
       required: true
+    },
+    filter: {
+      type: String,
+      required: true
     }
   },
+  mixins: [powermixin],
   components: {
     PowerDialerViewScreen,
     PowerDialerFilter,
@@ -275,22 +284,20 @@ export default {
       'contactResources',
       'contacts',
       'selectedContacts',
-      'powerDialerList'
+      'powerDialerList',
+      'powerDialerLists'
     ]),
     checked () {
       return this.selectedContacts[this.id] || []
+    },
+    currentContacts () {
+      return this.powerDialerLists[this.id].data
     },
     powerDialerListOfObjects () {
       return this.powerDialerList || []
     },
     columns () {
       return ALL_COLUMNS
-    },
-    activeFilter () {
-      if (this.$router.currentRoute.params.id) {
-        return this.$router.currentRoute.params.id
-      }
-      return ''
     },
     activeRoute () {
       if (this.$route.meta === 'Power Dialer Individual') {
@@ -304,7 +311,7 @@ export default {
       return `remove-power-dialer-item-dialog`
     },
     hasContacts () {
-      return this.contacts.length > 0
+      return this.currentContacts.length > 0
     }
   },
   data () {
