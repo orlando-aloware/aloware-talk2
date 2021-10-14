@@ -1,11 +1,11 @@
 <template>
   <div class="h-100"
        v-if="authenticated">
-    <div class="call-active">
-    </div>
+    <!--div class="call-active">
+    </div-->
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side></inbox-side>
-      <div class="d-flex flex-grow-1"
+      <div class="inbox-details d-flex flex-grow-1"
            v-if="['Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes($route.name)">
         <router-view></router-view>
       </div>
@@ -33,7 +33,8 @@ export default {
     return {
       contactInfoOpen: false,
       title: 'Inbox',
-      contactId: null
+      contactId: null,
+      miniState: true
     }
   },
 

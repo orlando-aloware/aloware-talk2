@@ -1915,7 +1915,7 @@ span.mention {
     overflow: auto;
 
     .card {
-      width: 300px;
+      width: 100%;
       margin: 0 auto 10px auto;
     }
   }
@@ -1991,7 +1991,7 @@ span.mention {
   }
 
   .contact-action-button {
-    button {
+    button:not(:last-child) {
       margin-right: 10px;
     }
 
@@ -3276,7 +3276,7 @@ span.mention {
 }
 
 .inbox-side {
-  max-width: 508px;
+  max-width: 430px;
   width: 100% !important;
   background-color: $white;
   border: solid 1px $grey-light3;
@@ -3294,7 +3294,7 @@ span.mention {
   }
 
   &__left {
-    max-width: 200px;
+    max-width: 160px;
     width: 100%;
     overflow: hidden;
 
@@ -3310,7 +3310,6 @@ span.mention {
   }
 
   &__right {
-    max-width: 308px;
     width: 100%;
     flex-grow: 1;
     border-left: solid 1px $grey-light3;
@@ -4708,6 +4707,7 @@ span.mention {
   align-items: center;
   border-bottom: solid 1px $grey-light3;
   &__label {
+    max-width: 224px;
     padding-left: 20px;
     font-weight: 600;
     font-size: 16px;
@@ -6907,7 +6907,7 @@ button.grey-90 {
         position: absolute;
         width: 18px;
         height: 18px;
-        background: #62666E;
+        background: $grey-90;
         opacity: 0.7;
         color: white;
         margin-bottom: 0 !important;
@@ -7396,7 +7396,6 @@ button.grey-90 {
 }
 
 .menu-avatar-wrapper {
-
   .user-full-name {
     font-weight: 500 !important;
     font-size: $f-size-body !important;
@@ -7432,8 +7431,7 @@ button.grey-90 {
 }
 
 .badge-task-status {
-  position: absolute;
-  top: 13.5px;
+  margin-top: 1px;
 }
 
 .default-btn-padding {
@@ -7523,4 +7521,156 @@ button.grey-90 {
       margin-right: 15.5px;
     }
   }
+}
+
+.contact-details-container {
+  max-width: 250px;
+  width: 100%;
+  margin-left: 15px;
+  margin-top: 15px;
+  &-drawer {
+    aside {
+      border-radius: 0.25rem;
+      background: $grey-50;
+      padding: 15px 5px;
+      box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
+    }
+    &__close {
+      border-radius: 50%;
+      background: $grey-90;
+      position: absolute;
+      top: 0;
+      right: 12px;
+      z-index: 9;
+      padding: 0 0;
+      width: 24px;
+    }
+    .contact-details-wrapper .details-component-container {
+      height: calc(100vh - 83px);
+    }
+  }
+}
+
+.contact-activity-wrapper {
+  min-width: 400px;
+  width: 100%;
+}
+
+.contact-activities-actions {
+  margin-right: 22px;
+  &__mobile {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 1261px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 121px;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1159px) {
+  .inbox-side {
+    max-width: 305px;
+    &__nav {
+      padding-top: 2.92px;
+    }
+  }
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 171px;
+      }
+    }
+  }
+  .contact-details-container {
+    width: 250px;
+  }
+  .contact-activity-wrapper {
+    width: 100%;
+  }
+  .inbox-side {
+    &__right {
+      width: 270px;
+    }
+    &__left {
+      max-width: 35px;
+      .header,
+      .inbox-nav-item__label,
+      .count-label {
+        display: none;
+      }
+      .inbox-nav-list div:nth-child(2) {
+        height: 30px;
+      }
+      .inbox-nav-item {
+        margin: 0 0 !important;
+        &__icon {
+          padding: 0 0 !important;
+        }
+      }
+      .inbox-nav-item-group-header {
+        opacity: 0;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1084px) {
+  .contact-activities-actions {
+    margin-right: 18px;
+    &__mobile {
+      display: block;
+    }
+    &__desktop {
+      display: none;
+    }
+    &-dropdown {
+      button {
+        height: 18px;
+        padding: 0 5px;
+      }
+      button:not(:hover):not([aria-expanded="true"]) {
+        border: 1px solid white !important;
+      }
+    }
+  }
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 240px;
+      }
+    }
+  }
+  .contact-details-container {
+    display: none;
+  }
+  .contact-activities-actions__mobile {
+    display: flex;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .inbox-side {
+    border-left: 0 !important;
+    &__left {
+      display: none;
+      border-left: 0 !important;
+    }
+    &__right {
+      border-left: 0 !important;
+    }
+  }
+}
+
+.mark-all-as-read-icon {
+  margin-top: -2px;
+}
+
+.dropdown-icon {
+  margin-right: 10px;
 }
