@@ -349,7 +349,19 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'unread_missed_call_count',
+    name: 'unread_missed_calls_count',
+    label: 'Unread Missed Calls',
+    category: 3,
+    order: 32,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
+    maxWidth: 190,
+    minWidth: 190
+  },,
+  {
+    name: 'unread_missed_calls_count',
     label: 'Unread Missed Calls',
     category: 3,
     order: 32,
@@ -361,7 +373,7 @@ export const ALL_COLUMNS = [
     minWidth: 190
   },
   {
-    name: 'unread_voicemail_count',
+    name: 'unread_voicemails_count',
     label: 'Unread Voicemails',
     category: 3,
     order: 33,
@@ -373,7 +385,7 @@ export const ALL_COLUMNS = [
     minWidth: 175
   },
   {
-    name: 'unread_count',
+    name: 'unread_texts_count',
     label: 'Unread Messages',
     category: 3,
     order: 34,
