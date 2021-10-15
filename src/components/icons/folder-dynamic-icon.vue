@@ -1,35 +1,9 @@
 <template>
-  <svg
-    :width="width"
-    :height="height"
-    viewBox="0 0 14 14"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M8.75 3.28076L10.0625 4.59326L8.75 5.90576"
-      :stroke="color"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M9.625 4.59229H3.9375C3.35787 4.59402 2.80248 4.82504 2.39262 5.2349C1.98276 5.64476 1.75173 6.20016 1.75 6.77979V7.21729"
-      :stroke="color"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M5.25 10.7188L3.9375 9.40625L5.25 8.09375"
-      :stroke="color"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M4.375 9.40625H10.0625C10.6421 9.40452 11.1975 9.17349 11.6074 8.76363C12.0172 8.35377 12.2483 7.79838 12.25 7.21875V6.78125"
-      :stroke="color"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
+  <svg :width="width" :height="height" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 1L10.5 2.41176L9 3.82353" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10 2.40967H3.5C2.83757 2.41153 2.20283 2.66003 1.73442 3.10089C1.26601 3.54174 1.00198 4.13914 1 4.76261V5.2332" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M5 10.0003L3.5 8.58852L5 7.17676" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4 8.58818H10.5C11.1624 8.58632 11.7972 8.33782 12.2656 7.89696C12.734 7.4561 12.998 6.8587 13 6.23524V5.76465" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </template>
 
@@ -42,11 +16,11 @@ export default {
     },
     height: {
       type: [Number, String],
-      default: 14
+      default: 11
     },
     color: {
       type: String,
-      default: '#BDBDBD'
+      default: '#62666E'
     }
   }
 }

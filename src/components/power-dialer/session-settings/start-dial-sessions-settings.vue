@@ -4,10 +4,12 @@
       @click="dialog = true"
       no-caps
       unelevated
-      size="sm"
       color="success"
-      class="px-2">
-      Start Dialing
+      class="start-dial-button p-0">
+      <PhoneIcon color="white" height="12" width="12" class="mr-2" />
+      <div class="button-label">
+        Start Dialing
+      </div>
     </q-btn>
     <q-dialog
       v-model="dialog"
@@ -175,11 +177,13 @@
 <script>
 
 import SessionsForm from './start-dial-sessions-form'
+import PhoneIcon from 'components/icons/call-icon'
 
 export default {
   name: 'StartDialsSessionsSettings',
   components: {
-    SessionsForm
+    SessionsForm,
+    PhoneIcon
   },
   computed: {
     tabCollections () {

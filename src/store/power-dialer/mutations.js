@@ -71,6 +71,11 @@ export default {
   REMOVE_FOLDER_CLOSE: (state) => {
     state.removeFolder = null
   },
+
+  /**
+   * MOVE &
+   * CREATE MODAL for LISTS
+   */
   MOVE_DIALOG_OPEN: (state, { id, type }) => {
     state.moveDialog = { open: true, id, type }
   },
@@ -90,7 +95,6 @@ export default {
     }
   },
   CREATE_DIALOG_TARGET: (state, { target }) => {
-    console.log('target :>> ', target)
     state.createDialog = {
       ...state.createDialog,
       target: target === state.createDialog.target ? null : target
@@ -119,5 +123,21 @@ export default {
   },
   ON_SEARCH_LIST_ITEM: (state, value) => {
     state.searchedListItem = value
+  },
+  TOGGLE_TABLE_LOADER: (state, value) => {
+    state.datatableLoader = value
+  },
+
+  /**
+   * DATATABLE ACTIONS
+   */
+  COLUMNS_REORDERED: (state, { id, headers }) => {
+    state.lists = {
+      ...state.lists,
+      [String(id)]: {
+        ...(state.lists[String(id)] || {}),
+        headers
+      }
+    }
   }
 }

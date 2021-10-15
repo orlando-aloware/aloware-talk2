@@ -23,5 +23,9 @@ export default {
   },
   RESET_CHANGED_USER_PROPERTIES: (state) => {
     state.changedUserProperties = []
+  },
+
+  SET_FORM_VALIDITY: (state, isValid) => {
+    state.formIsValid = isValid
   }
 }

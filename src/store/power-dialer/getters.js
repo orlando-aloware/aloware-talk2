@@ -28,5 +28,6 @@ export default {
   },
   contactResources2: (state) => state.contactResources,
   contacts: (state) => state.contacts,
-  searchedListItem: (state) => state.searchedListItem
+  searchedListItem: (state) => state.searchedListItem,
+  datatableLoader: (state) => state.datatableLoader
 }

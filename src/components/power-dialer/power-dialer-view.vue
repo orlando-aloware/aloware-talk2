@@ -1,12 +1,13 @@
 <template>
-  <PowerDialerViewScreen>
+  <PowerDialerViewScreen
+    :loading="datatableLoader">
 
     <template slot="title">
       <Breadcrumbs :list-objects="powerDialerListOfObjects" />
     </template>
 
     <template slot="options">
-      <div class="pr-5">
+      <div class="text-13 pr-3 border-right right-spacing-2">
         99 Contacts
       </div>
       <StartDialing
@@ -33,7 +34,7 @@
             <b-col col lg="4" class="p-0 m-0">
               <div class="px-0 d-flex align-items-center float-right">
 
-                <q-btn
+                <!-- <q-btn
                   no-caps
                   unelevated
                   size="sm"
@@ -41,13 +42,49 @@
                   class="px-2"
                   v-b-modal:create-contact-modal>
                   Add Contacts
-                </q-btn>
+                </q-btn> -->
+
+                <b-dropdown text="Add Contacts"
+                  right
+                  no-caret
+                  variant="light"
+                  class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                  toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center">
+                  <template
+                    #button-content class="filter-toggle-button">
+                    <div
+                      class="filter-toggle-button d-flex align-items-center"
+                      style="margin-top: -2px;font-size:13px;">
+                      Add Contacts
+                    </div>
+                    <i
+                      class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
+                      style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;">
+                    </i>
+                  </template>
+                  <b-dropdown-item
+                    href="#"
+                    @click="{}">
+                    <i class="fa fa-search mr-1"></i>
+                    Select Contacts
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    href="#"
+                    v-b-modal:create-contact-modal>
+                    <i class="fa fa-plus mr-1"></i>
+                    Create Contact
+                  </b-dropdown-item>
+                </b-dropdown>
+
                 <b-dropdown
                   text="..."
                   no-caret
                   right size="sm"
                   variant="white"
-                  class="m-0 p-0 pl-2 b-compact-dropdown-button text-bold">
+                  class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+                  <template #button-content>
+                    <i class="fa fa-ellipsis-h"></i>
+                  </template>
                   <b-dropdown-item href="#">
                     <i class="fa fa-bars mr-1"></i>
                     Edit Columns
@@ -82,10 +119,12 @@
             :columns="columns"
             :has-more="true"
             :is-empty="!hasContacts"
+            :is-loading-more="true"
             :paginated="true"
             scroll-area-class="none"
             :total-rows="powerDialerLists[id].total"
-            @reordered="onColumnsReordered">
+            @reordered="onColumnsReordered"
+            @more="onLoadMore">
             <template slot="tbody">
               <TableRow
                 v-for="(contact, nkey) in currentContacts"
@@ -285,7 +324,8 @@ export default {
       'contacts',
       'selectedContacts',
       'powerDialerList',
-      'powerDialerLists'
+      'powerDialerLists',
+      'datatableLoader'
     ]),
     checked () {
       return this.selectedContacts[this.id] || []

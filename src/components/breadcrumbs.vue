@@ -1,15 +1,17 @@
 <template>
-  <div class="row d-flex py-2">
-        <div class="d-flex flex-column">
+  <div class="row breadcrumbs d-flex py-2">
+    <div class="breadcrumbs__directory d-flex flex-column">
       <!-- <div class="pr-2">LOL</div> -->
       <div class="small text-muted pt-1">
         {{ crumbs }}
       </div>
     </div>
-    <div class="px-2 py-0">
+    <div class="breadcrumbs__icon px-2 py-0">
       <ListIcon />
     </div>
-    {{ name }}
+    <div class="breadcrumbs__name">
+      {{ name }}
+    </div>
   </div>
 </template>
 

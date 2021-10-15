@@ -133,6 +133,7 @@ export default function () {
     selectedContacts: {},
     isStartingDial: false,
     searchedListItem: '',
-    currentListFilters: []
+    currentListFilters: [],
+    datatableLoader: false
   }
 }

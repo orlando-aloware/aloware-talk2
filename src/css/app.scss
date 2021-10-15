@@ -377,6 +377,10 @@ body,
   }
 }
 
+.text-regular {
+  text-transform: none !important;
+}
+
 .small-text {
   color: #202125;
   font-family: $font-family-body;
@@ -675,7 +679,7 @@ body,
 }
 
 .profile-menu {
-  padding-left: 6px !important;
+  padding: 0 5px !important;
 }
 
 .no-results {
@@ -3024,6 +3028,12 @@ span.mention {
       margin-left: 0;
     }
   }
+
+  .q-separator {
+    margin-left: 18px !important;
+    margin-right: 18px !important;
+    background: $grey-50 !important;
+  }
 }
 
 .q-menu {
@@ -3450,27 +3460,27 @@ span.mention {
   color: $grey-90;
 }
 
-.custom-switch .custom-control-input ~ .custom-control-label::before, {
+.custom-switch .custom-control-input ~ .custom-control-label::before {
   background: $grey-70 !important;
   border: none !important;
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::before, {
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
   background: $primary !important;
   border: none !important;
 }
 
-.custom-switch.switch-success .custom-control-input:checked ~ .custom-control-label::before, {
+.custom-switch.switch-success .custom-control-input:checked ~ .custom-control-label::before {
   background: $success !important;
   border: none !important;
 }
 
-.custom-switch.switch-primary .custom-control-input:checked ~ .custom-control-label::before, {
+.custom-switch.switch-primary .custom-control-input:checked ~ .custom-control-label::before {
   background: $primary !important;
   border: none !important;
 }
 
-.custom-switch .custom-control-input ~ .custom-control-label::after, {
+.custom-switch .custom-control-input ~ .custom-control-label::after {
   background: $white !important;
   border: none !important;
 }
@@ -4430,13 +4440,8 @@ span.mention {
     }
 
     &__icon {
-      margin-top: -5px;
+      margin-top: 1px;
       margin-right: 5px;
-    }
-
-    &:hover,
-    &--moving {
-      background-color: $grey-50;
     }
 
     &__name {
@@ -4446,12 +4451,13 @@ span.mention {
 
       span {
         display: inline-block;
-        font-size: 13px;
+        font-size: $f-size-h5;
+        line-height: 17px;
+        color: $grey-100;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         width: 100%;
-        font-weight: 500;
       }
     }
 
@@ -4770,8 +4776,10 @@ span.mention {
 }
 
 .contact-menu-item {
-  height: 31px;
+  height: 40px;
   cursor: pointer;
+  padding-left: 17px;
+  padding-right: 8px;
   transition: background-color 100ms ease-in-out;
   &__title {
     line-height: 12px;
@@ -4780,6 +4788,11 @@ span.mention {
   }
   &__icon {
     margin-top: -2px;
+  }
+  &__title,
+  &__icon,
+  &__suffix * {
+    height: 40px;
   }
   &:hover {
     background-color: $light-green2;
@@ -4816,7 +4829,6 @@ span.mention {
 
 .contact-menu {
   width: 200px;
-  padding-top: 5px;
   &__title {
     padding-left: 2px;
     padding-right: 2px;
@@ -4940,15 +4952,31 @@ span.mention {
   flex-grow: 1;
   height: calc(100vh - 200px);
   padding-bottom: 5px;
+  &.border-top {
+    .folders__header {
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+  }
   &__header {
-    min-height: 40px;
-    font-size: 10px;
+    font-size: $f-size-body-sm;
+    line-height: 16px;
+    letter-spacing: 0.03em;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    padding-bottom: 16px;
+    &__title {
+      color: $grey-90;
+    }
   }
   &__content {
-    height: calc(100% - 40px);
     overflow: auto;
+    &:not(.no-folder) {
+      height: calc(100% - 40px);
+    }
+    &.no-folder {
+      padding-left: 20px;
+    }
   }
   .item {
     cursor: pointer;
@@ -4957,21 +4985,17 @@ span.mention {
     transition: background-color 100ms ease-in-out;
   }
   .item:hover {
-    background: $light-green2;
+    background: $light-blue3;
   }
-  .folder {
-    padding-left: 0 !important;
-    &.folder-pad-1 {
-      padding-left: 15px !important;
-    }
-  }
+  
   .sublists {
     .folder {
-      &--active {
+      &--active:not(:hover) {
         background-color: $grey-50;
       }
     }
   }
+  
 }
 
 .contact-popover {
@@ -5153,12 +5177,12 @@ table.datatable {
 
       .handle {
         cursor: move;
-        margin-right: 15px;
+        margin-right: 0px;
       }
 
       th {
         background-color: $white;
-        border-bottom: solid 1px $grey-light4;
+        border-bottom: solid 1px $grey-light3;
         font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -5182,6 +5206,14 @@ table.datatable {
           background-color: #EBECFE;
         }
 
+        &:hover {
+          // .tableResizer {
+          //   border-right: 2px solid rgba(37, 110, 255, 0.7);
+          // }
+          // border-left: 1px $grey-light3 solid;
+          // border-right: 1px $grey-light3 solid;
+        }
+
         a.sorter {
           position: absolute;
           height: 30px;
@@ -5195,7 +5227,7 @@ table.datatable {
 
         a.sorter:before,
         a.sorter:after {
-          border: 4px solid transparent;
+          border: 3px solid transparent;
           content: '';
           display: block;
           height: 0;
@@ -5203,14 +5235,14 @@ table.datatable {
         }
 
         a.sorter:before {
-          border-bottom-color: $grey-light10;
-          margin-top: -10px;
+          border-bottom-color: $grey-30;
+          margin-top: -9px;
         }
 
         a.sorter:after {
-          border-top-color: $grey-light10;
-          margin-top: 10px;
-          margin-left: -8px;
+          border-top-color: $grey-30;
+          margin-top: 7px;
+          margin-left: -6px;
         }
 
         a.sorter.sorter-desc:before {
@@ -5309,8 +5341,6 @@ table.datatable {
   border: solid 1px $grey-light;
   display: none;
   flex-direction: column;
-  padding-bottom: 2px;
-  padding-top: 2px;
   position: absolute;
   width: 200px;
 }
@@ -5620,7 +5650,7 @@ table.datatable {
     }
 
     &:hover {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
 
     &__name {
@@ -5785,7 +5815,6 @@ table.datatable {
 }
 
 .folder {
-  padding-left: 10px;
   padding-right: 0px;
   min-height: 34px;
   cursor: pointer;
@@ -5801,11 +5830,7 @@ table.datatable {
   }
   &__icon {
     min-height: 34px;
-    margin-top: -5px;
     margin-right: 5px;
-    svg {
-      margin-top: 5px;
-    }
   }
   &--target {
     background-color: rgba(37, 110, 255, 0.09);
@@ -5816,13 +5841,11 @@ table.datatable {
     }
   }
   &:hover {
-    background-color: $grey-50;
     .folder__option {
       display: block;
     }
   }
   &__name {
-    min-height: 34px;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -5837,12 +5860,12 @@ table.datatable {
   }
   &__option {
     line-height: 0;
-    height: 20px;
     width: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 34px;
+    margin-left: 5px;
     &:hover,
     &:active,
     &:focus {
@@ -5934,11 +5957,11 @@ table.datatable {
     }
 
     &--selected {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
 
     &:hover {
-      background-color: $light-green2;
+      background-color: $light-blue3;
 
       .folder__option {
         display: block;
@@ -5986,7 +6009,7 @@ table.datatable {
 }
 
 .select-list-tree-list-item.list--active {
-  background-color: #F2FBF6;
+  background-color: $light-blue3;
 }
 
 .select-list-tree-list-item {
@@ -6006,7 +6029,7 @@ table.datatable {
     &:hover,
     &--moving,
     &--active {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
     &__name {
       width: calc(100% - 54px);
@@ -6046,7 +6069,6 @@ table.datatable {
 }
 
 .folder {
-  padding-left: 10px;
   padding-right: 10px;
   min-height: 34px;
   cursor: pointer;
@@ -6055,6 +6077,7 @@ table.datatable {
 
   &__arrow {
     min-height: 34px;
+    min-width: 6px;
     margin-top: -5px;
     margin-right: 5px;
     svg {
@@ -6071,10 +6094,9 @@ table.datatable {
 
   &__icon {
     min-height: 34px;
-    margin-top: -5px;
     margin-right: 5px;
     svg {
-      margin-top: 5px;
+      margin-top: 0px;
     }
     &.pd-icon-create {
       top: 8px !important;
@@ -6083,12 +6105,10 @@ table.datatable {
   }
 
   &--selected {
-    background-color: $light-green2;
+    background-color: $light-blue3;
   }
 
   &:hover {
-    background-color: $grey-50;
-
     .folder__option {
       opacity: 1;
     }
@@ -6103,7 +6123,6 @@ table.datatable {
   }
 
   &__name {
-    min-height: 34px;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -6145,8 +6164,20 @@ table.datatable {
 }
 
 .tree-folder {
+  & > .folder,
+  & > .sublists > .folder,
+  & > .animated > .sublists > .folder {
+    padding-left: 9px;
+  }
+  & > .folder,
+  & > .sublists > .folder,
+  & > .animated > .sublists > .folder,
+  & .subfolders .sublists > .folder {
+    &:hover {
+      background-color: $light-blue3 !important;
+    }
+  }
   .folder {
-    padding-left: 10px;
     padding-right: 10px;
     min-height: 34px;
     cursor: pointer;
@@ -6160,29 +6191,33 @@ table.datatable {
 
     &__icon {
       min-height: 34px;
-      margin-top: -5px;
       margin-right: 5px;
     }
 
     &--selected {
-      background-color: $light-green2;
+      background-color: $light-blue3;
     }
 
     &:hover {
-      background-color: $light-green2;
-
       .folder__option {
         display: block;
       }
     }
 
-    &__name {
-      font-size: 13px;
+    &__name-wrapper {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       max-width: calc(100% - 30px);
-      font-weight: 500;
+      &__name {
+        font-size: $f-size-h5;
+        line-height: 17px;
+        color: $grey-100;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+      }
     }
 
     &__sub {
@@ -6376,13 +6411,19 @@ table.datatable {
   display: flex;
   flex-direction: column;
   height: 20rem;
+  padding-top: 16px;
+  padding-bottom: 16px;
 
   &__header {
-    min-height: 40px;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-size: $f-size-body-sm;
+    line-height: 16px;
+    letter-spacing: 0.03em;
+    font-weight: 600;
     text-transform: uppercase;
+    padding-bottom: 16px;
+    &__title {
+      color: $grey-90;
+    }
   }
 
   &__content {
@@ -6391,6 +6432,7 @@ table.datatable {
   }
 
   .item {
+    padding-left: 12px;
     color: $dark;
     cursor: pointer;
     min-height: 40px;
@@ -6408,8 +6450,9 @@ table.datatable {
     }
     .counts {
       .badge {
-        font-size: 10px;
-        line-height: 10px;
+        font-weight: 500;
+        font-size: 11px;
+        line-height: 11px;
       }
     }
     .icon,
@@ -6417,10 +6460,17 @@ table.datatable {
     .counts {
       min-height: 40px;
     }
+    .item-name {
+      font-size: $f-size-h5;
+      line-height: 17px;
+      color: $grey-100;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .item:hover {
-    background: $light-green2;
+    background: $light-blue3;
     color: $dark;
     text-decoration: none;
   }
@@ -7125,7 +7175,7 @@ button.grey-90 {
 
 
 .title-static-icon {
-  margin-top: -4px;
+  margin-right: 10px;
 }
 
 .mention-tag {
@@ -7445,6 +7495,11 @@ button.grey-90 {
 
 .menu-avatar-wrapper {
 
+  .contact-info-wrapper {
+    margin-right: 5px;
+    margin-top: -10px;
+  }
+
   .user-full-name {
     font-weight: 500 !important;
     font-size: $f-size-body !important;
@@ -7453,6 +7508,7 @@ button.grey-90 {
 
     .focus-mode-icon {
       margin-top: -2px;
+      margin-left: 7px;
     }
   }
 
@@ -7468,13 +7524,24 @@ button.grey-90 {
   min-width: 186px !important;
   max-width: 186px !important;
 
+  padding-top: 8px;
+  padding-bottom: 8px;
+
   .q-list {
-    padding: 10px;
+    padding: 0;
 
     .q-item {
-      padding: 0 12px !important;
-      border-radius: 6px;
+      padding: 0 16px !important;
       font-size: $f-size-body-xs !important;
+
+      .rounded-badge {
+        margin-right: 15px !important;
+      }
+
+      .focus-mode-icon,
+      .logout-icon {
+        margin-right: 8px;
+      }
     }
   }
 }
@@ -7523,5 +7590,61 @@ button.grey-90 {
 
   .q-field__focusable-action.q-icon {
     font-size: 14px !important;
+  }
+}
+
+.form-control.is-invalid,
+.form-control.is-valid {
+  background-image: none !important;
+}
+
+.form-control.is-valid {
+  border-color: #ced4da !important;
+}
+
+.shared {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.pinned,
+.shared,
+.folders {
+  .header__header__title {
+    padding-left: 20px;
+  }
+}
+
+.contacts {
+  &__title {
+    height: 19px;
+    .list-name {
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 19px;
+    }
+  }
+  .title-breadcrumb {
+    font-family: Roboto;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14px;
+    color: $grey-90;
+  }
+  .title-breadcrumb {
+    height: 19px;
+    margin-right: 5px;
+  }
+  .title-path:not(:last-child) {
+    .title-slash {
+      height: 19px;
+      margin-right: 5px;
+    }
+  }
+  .title-path:last-child {
+    .title-slash {
+      height: 19px;
+      margin-right: 15.5px;
+    }
   }
 }

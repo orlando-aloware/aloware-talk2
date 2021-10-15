@@ -41,13 +41,21 @@
     overflow: auto;
     > .tree-folder {
 
-      .folder__arrow,
+      .folder__arrow {
+        svg {
+          margin-top: 10px !important;
+          color: $grey-90;
+        }
+      }
+
       .folder__icon {
-        margin-top: 5px !important;
+        svg {
+          margin-top: 8px !important;
+        }
       }
 
       .folder__name {
-        padding-top: 8px;
+        padding-top: 0px;
       }
 
       .folder__name {
@@ -64,9 +72,14 @@
 
       > .sublists {
         > .tree-list-item {
+          &:hover {
+            background-color: $light-blue3;
+          }
           > .folder {
             .folder__icon {
-              padding-left: 18px !important;
+              padding-left: 5px !important;
+              top: -2px;
+              position: relative;
             }
           }
         }        
@@ -75,9 +88,14 @@
       > .animated {
         > .sublists {
           > .tree-list-item {
+            &:hover {
+              background-color: $light-blue3;
+            }
             > .folder {
               .folder__icon {
-                padding-left: 18px !important;
+                padding-left: 5px !important;
+                top: -2px;
+                position: relative;
               }
             }
           }
@@ -87,9 +105,14 @@
             > .animated {
               > .sublists {
                 > .tree-list-item {
+                  &:hover {
+                    background-color: $light-blue3;
+                  }
                   > .folder {
                     > .folder__icon {
-                      padding-left: 20px !important;
+                      padding-left: 5px !important;
+                      top: -2px;
+                      position: relative;
                     }
                   }
                 }
@@ -298,4 +321,30 @@
   &__mini {
     width: 150px;
   }
+}
+
+.breadcrumbs {
+  &__directory {
+    padding-right: 5px;
+    div {
+      font-family: Roboto;
+      font-size: 12px;
+    }
+  }
+  &__name {
+    top: 2px;
+    position: relative;
+  }
+}
+
+.right-spacing-1 {
+  margin-right: 10px;
+}
+
+.right-spacing-2 {
+  margin-right: 15px;
+}
+
+.text-13 {
+  font-size: 13px;
 }

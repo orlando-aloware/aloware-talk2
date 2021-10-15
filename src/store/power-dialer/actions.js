@@ -29,6 +29,9 @@ export default {
   /**
    * DIRECTORIES
    */
+  columnsReordered: ({ commit }, payload) => {
+    commit('COLUMNS_REORDERED', payload)
+  },
   toggleFolder: ({ commit }, id) => {
     commit('TOGGLE_FOLDER', id)
   },

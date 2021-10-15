@@ -74,3 +74,13 @@
   }
   
 }
+
+.start-dial-button {
+  border-radius: 6px;
+  height: 28px;
+  width: 121px;
+  font-size: 13px;
+  .q-btn__wrapper {
+    top: -2px;
+  }
+}

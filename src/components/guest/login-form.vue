@@ -43,7 +43,7 @@
         <div class="field text-left"
              v-if="!$q.platform.is.electron">
           <router-link :to="{ name: 'Forgot Password' }">
-            <label class="link mb-3 w-100 pb-2">
+            <label class="link mb-3 w-100 pb-2 cursor-pointer">
               Forgot Password?
             </label>
           </router-link>

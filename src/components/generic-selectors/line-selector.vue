@@ -22,6 +22,7 @@
               map-options
               outlined
               dense
+              :error="hasError"
               :options="campaignOptions"
               :placeholder="placeholder"
               :disable="disable"
@@ -113,6 +114,10 @@ export default {
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
+    },
+    hasError: {
+      type: Boolean,
+      default: false
     }
   },
 

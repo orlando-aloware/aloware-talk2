@@ -1,7 +1,6 @@
-// import { mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import qs from 'qs'
 import { isEmpty, get } from 'lodash'
-import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data () {
@@ -41,6 +40,9 @@ export default {
     ...mapActions('powerDialer', [
       'contactsLoaded'
     ]),
+    ...mapMutations('powerDialer', [
+      'TOGGLE_TABLE_LOADER'
+    ]),
     async fetchContacts () {
       await this.getPowerDialerList()
       await this.getContactResources({
@@ -66,6 +68,7 @@ export default {
             append: false,
             ...data
           })
+          this.TOGGLE_TABLE_LOADER(false)
         })
     },
     buildQueryString (params) {
@@ -87,9 +90,6 @@ export default {
       query.per_page = params.per_page || 25
 
       query.filter_groups = []
-
-      console.log('this.powerDialerLists :>> ', this.powerDialerLists)
-      console.log('this.tempId :>> ', this.tempId)
 
       if (typeof this.powerDialerLists[this.tempId] !== 'undefined' && this.tempId !== 'all') {
         query.filter_groups = [
@@ -126,8 +126,6 @@ export default {
         query.order = params.order ? params.order : 'asc'
       }
 
-      console.log('query :>> ', query)
-
       return query
     },
     fetch (params = {}) {
@@ -139,13 +137,18 @@ export default {
       this.processFetch(params)
     },
     onSortByField (sorts) {
+      console.log('sorts :>> ', sorts)
       // this.isLoaded = false
+      this.TOGGLE_TABLE_LOADER(true)
       this.fetch({
         search: this.search,
         page: '1',
         sort: sorts.orderBy,
         order: sorts.order
       })
+    },
+    onLoadMore () {
+      console.log('...on load more...')
     }
   }
 }

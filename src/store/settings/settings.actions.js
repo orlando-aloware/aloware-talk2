@@ -13,5 +13,9 @@ export default {
   },
   resetChangedUserProperties: ({ commit }) => {
     commit('RESET_CHANGED_USER_PROPERTIES')
+  },
+
+  setFormValidity: ({ commit }, isValid) => {
+    commit('SET_FORM_VALIDITY', isValid)
   }
 }

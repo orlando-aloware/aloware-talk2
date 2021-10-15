@@ -13,9 +13,9 @@
         @click="onToggleFolder"
         class="folder__arrow">
         <FolderArrowOpenIcon
-          v-if="isOpen" />
+          v-if="isOpen" color="#62666E" />
         <FolderArrowCloseIcon
-          v-if="!isOpen" />
+          v-if="!isOpen" color="#62666E" />
       </div>
       <div
         @click="onToggleFolder"

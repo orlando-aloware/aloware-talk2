@@ -21,9 +21,9 @@
         <folder-icon color="#62666E"></folder-icon>
       </div>
 
-      <div class="flex-grow-1 d-flex align-items-center">
+      <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
         <div v-if="!isEditing"
-             class="folder__name d-flex align-items-center"
+             class="folder__name"
              @click="onToggleFolder">
           {{ name }}
         </div>
@@ -55,6 +55,7 @@
       :layer="layer + 1"
       :parent_id="id"
       @blur="onCloseFolder"
+      @cancel="onCreateFolderCancel"
     />
 
     <div
@@ -232,7 +233,16 @@ export default {
       this.onToggleFolder()
     },
 
+    onCreateFolderCancel () {
+      this.onCloseFolder()
+    },
+
     onKeyDown (evt) {
+      if (evt.keyCode === 13 && evt.target.value.length > 60) {
+        this.$generalNotification('Folder name should have up to 60 characters.', 'error')
+        return
+      }
+
       if (evt.keyCode === 13) {
         this.updateFolderName(evt.target.value)
       } else if (evt.keyCode === 27) {
@@ -242,6 +252,14 @@ export default {
     },
 
     onInputBlur (evt) {
+      if (evt.target.value.length > 60) {
+        this.$generalNotification('Folder name should have up to 60 characters.', 'error')
+        this.isEditing = false
+        this.onCloseFolder()
+        evt.target.value = this.name
+        return
+      }
+
       if (evt.target.value !== this.name && evt.target.value !== '') {
         this.updateFolderName(evt.target.value)
       } else {

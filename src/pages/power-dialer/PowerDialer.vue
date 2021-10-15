@@ -63,12 +63,10 @@ export default {
   watch: {
     '$route.params': async function (route) {
       if (!route.id && this.$route.name === 'Power Dialer') {
-        console.log('101 :>> ', 101)
         route.id = 'in-queue'
         this.id = 'in-queue'
         await this.fetchContacts()
       } else if (route.id && this.$route.name === 'Power Dialer') {
-        console.log('102 :>> ', 102)
         this.id = route.id
         // this.setData(id)
         await this.fetchContacts()
@@ -88,9 +86,11 @@ export default {
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
       'SET_POWER_DIALER_LIST',
-      'RESET_LIST'
+      'RESET_LIST',
+      'TOGGLE_TABLE_LOADER'
     ]),
     async fetchContacts () {
+      this.TOGGLE_TABLE_LOADER(true)
       let params = {
         'page': 1,
         'per_page': 25,
