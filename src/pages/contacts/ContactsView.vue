@@ -524,7 +524,8 @@ export default {
       deep: true,
       handler: function () {
         // this.setSelectedListContactCount(this.listItemsTotalContacts)
-        this.fetch(typeof this.currentListFilters === 'string' ? [] : this.currentListFilters)
+        let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+        this.fetch(params)
         this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }
     },
