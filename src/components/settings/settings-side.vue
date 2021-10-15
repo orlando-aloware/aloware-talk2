@@ -54,32 +54,6 @@
         </q-select>
       </div>
       <div>
-        <q-menu no-parent-event
-                auto-close
-                no-focus
-                no-refocus
-                ref="menuLinks"
-                content-class="settings-menu-links"
-                max-width="20vw"
-                max-height="80vh"
-                :offset="[-40, -5]">
-          <q-list style="min-width: 100px">
-            <q-item clickable v-close-popup
-                    v-for="result in searchResult"
-                    :key="result.title"
-                    @click="redirectTo(result)">
-              <q-item-section>
-                <q-item-label>{{ result.title }}</q-item-label>
-                <q-item-label caption>
-                  {{ result.description }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </div>
-
-      <div>
         <div class="inbox-side__nav">
           <settings-nav-list>
           </settings-nav-list>
@@ -90,7 +64,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import SettingsNavList from 'components/settings/settings-nav/settings-nav-list'
 import settingsMap from './settings-map'
 import _ from 'lodash'
@@ -121,6 +95,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
+    ...mapState('settings', ['userClone', 'changedUserProperties']),
     searchResult () {
       let query = this.searchText.trim().toLocaleLowerCase()
 
@@ -150,6 +125,7 @@ export default {
   },
 
   methods: {
+    ...mapActions('settings', ['resetChangedUserProperties', 'setUser', 'setFormValidity']),
     toggle () {
       this.closed = !this.closed
     },
@@ -178,6 +154,12 @@ export default {
   watch: {
     link: function () {
       if (this.link) {
+        if (this.changedUserProperties.length > 0 && this.link.route !== this.$route.path) {
+          this.setUser({ ...this.userClone })
+          this.resetChangedUserProperties()
+          this.setFormValidity(true)
+        }
+
         this.$router.push({
           path: this.link.route + (this.link.hash_keyword ? '#' + this.link.hash_keyword : '')
         })

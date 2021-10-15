@@ -17,12 +17,15 @@
             class="form-label"
           >
             <b-form-input
-              v-model="user.first_name"
               type="text"
               placeholder="First Name"
               required
+              v-model.trim="$v.user.first_name.$model"
+              :state = "validateState('first_name')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'first_name')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.first_name.required">Enter your first name.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.first_name.maxLength">First name must not exceed 191 characters</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
         <b-col sm="12"
@@ -32,12 +35,15 @@
             label="Last Name"
           >
             <b-form-input
-              v-model="user.last_name"
+              v-model.trim="$v.user.last_name.$model"
+              :state = "validateState('last_name')"
               type="text"
               placeholder="Last Name"
               required
               @input="(eventPayload) => onUpdateFields(eventPayload, 'last_name')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.last_name.required">Enter your last name.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.last_name.maxLength">First name must not exceed 191 characters</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -70,12 +76,15 @@
             label="Email"
           >
             <b-form-input
-              v-model="user.email"
               type="text"
               placeholder="name@company.com"
               required
+              v-model.trim="$v.user.email.$model"
+              :state="validateState('email')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'email')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.email.required">Enter your email address.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.email.email">Enter a valid email address.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -108,11 +117,14 @@
             label="Password"
             class="form-label">
             <b-form-input
-              v-model="user.password"
               type="password"
               placeholder="New Password"
+              v-model.trim="$v.user.password.$model"
+              :state="validateState('password')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.password.required">Enter your new password.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.password.minLength">Password must be at least 6 character length.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
         <b-col
@@ -123,12 +135,14 @@
             label="Password Confirmation"
           >
             <b-form-input
-
-              v-model="user.confirm_password"
-              type="text"
+              type="password"
               placeholder="Password Confirmation"
-              required>
+              required
+              v-model.trim="$v.user.password_confirmation.$model"
+              :state="validateState('password_confirmation')"
+              @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAs">Password did not match.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -143,14 +157,31 @@
           </div>
 
           <b-form-group label="" v-slot="{ ariaDescribedby }">
-            <b-form-radio-group
-              id="radio-slots"
-              v-model="user.role_name"
-              :options="options"
-              :aria-describedby="ariaDescribedby"
-              name="radio-options-slots"
-              @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">
-            </b-form-radio-group>
+            <b-form-radio inline
+                          value="Company Admin"
+                          v-model="user.role_name"
+                          :aria-describedby="ariaDescribedby"
+                          @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">
+              Admin
+              <q-tooltip anchor="top left"
+                         self="top left"
+                         :offset="[0, -33]">
+                Admins have full access to everything.
+            </q-tooltip>
+            </b-form-radio>
+            <b-form-radio inline
+                          value="Company Agent"
+                          v-model="user.role_name"
+                          :aria-describedby="ariaDescribedby"
+                          @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">
+              Agent
+              <q-tooltip anchor="top left"
+                         self="top left"
+                         :offset="[0, -33]">
+                Agents have read access to all your lines, users, contacts, and sequences. <br/>
+                Agent's visibility can be configured in the Visibility Settings tab.
+              </q-tooltip>
+            </b-form-radio>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -172,7 +203,7 @@
       </b-form-row>
 
       <div :id="`${SettingsMap.backup_routing.hash_keyword}-container`"
-           v-if="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
+           v-show="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
         <b-form-row class="mt-4">
           <b-col sm="12" md="12">
             <div>
@@ -198,15 +229,17 @@
                   v-show="userDestinationEditable && (([AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by) && user.phone_number_as_backup) || user.answer_by === AnswerTypes.BY_PHONE_NUMBER)">
         <b-col sm="12" md="6">
           <b-form-group
-            label="Backup Phone Number"
+            :label="`Backup Phone Number`"
             class="form-label"
           >
             <b-form-input
-              v-model="user.phone_number"
               type="text"
               placeholder="(123) 456-7890"
+              v-model.trim="$v.user.phone_number.$model"
+              :state="validateState('phone_number')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'phone_number')">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -374,6 +407,7 @@ import * as Roles from 'src/constants/roles'
 import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
+import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
 
 export default {
   name: 'profile',
@@ -383,13 +417,70 @@ export default {
   components: { UserCampaignSelector, AnswerTypeSelector },
 
   computed: {
-    ...mapState('settings', ['userClone'])
+    ...mapState('settings', ['userClone']),
+    userDestinationEditable () {
+      return this.user.role_name && !this.user.read_only_access
+    },
+
+    isNotOwnSettings () {
+      if (this.auth && (!this.auth.hasOwnProperty('user') || !this.auth.user.hasOwnProperty('profile'))) {
+        return false
+      }
+
+      return this.hasRole(Roles.COMPANY_ADMIN) && +this.user.id !== +this.auth.user.profile.id
+    },
+
+    canBeEdited () {
+      return this.user.role_name && !this.user.read_only_access && !this.user.is_destination
+    },
+    requirePassword () {
+      return this.showPasswordFields
+    },
+    rules () {
+      let rulesObject = {
+        first_name: {
+          required,
+          maxLength: maxLength(191)
+        },
+        last_name: {
+          required,
+          maxLength: maxLength(191)
+        },
+        email: {
+          required,
+          email
+        },
+        phone_number: {
+          validPhone: (value) => this.$options.filters.fixPhone(value) !== false && value.length > 0
+        }
+      }
+
+      if (this.showPasswordFields) {
+        rulesObject = { ...rulesObject,
+          password: {
+            required,
+            minLength: minLength(6)
+          },
+          password_confirmation: {
+            sameAsPassword: sameAs('password')
+          }
+        }
+      }
+
+      return rulesObject
+    }
   },
 
   props: {
     user: {
       type: Object,
       required: true
+    }
+  },
+
+  validations () {
+    return {
+      user: this.rules
     }
   },
 
@@ -409,30 +500,17 @@ export default {
   },
 
   methods: {
-    ...mapActions('settings', ['updateChangedUserProperties']),
-
-    userDestinationEditable () {
-      return this.user.role_name && !this.user.read_only_access
-    },
-
-    isNotOwnSettings () {
-      if (this.auth && (!this.auth.hasOwnProperty('user') || !this.auth.user.hasOwnProperty('profile'))) {
-        return false
-      }
-
-      return this.hasRole(Roles.COMPANY_ADMIN) && +this.user.id !== +this.auth.user.profile.id
-    },
-
-    canBeEdited () {
-      return this.user.role_name && !this.user.read_only_access && !this.user.is_destination
-    },
+    ...mapActions('settings', ['updateChangedUserProperties', 'setFormValidity']),
 
     onUpdateFields (value, prop) {
-      this.user[prop] = value
-      this.updateChangedUserProperties({
-        name: prop,
-        value: value
-      })
+      if (!['password_confirmation'].includes(prop)) {
+        this.user[prop] = value
+        this.updateChangedUserProperties({
+          name: prop,
+          value: value
+          // value: ['', null].includes(value) ? this.userClone[prop] : value
+        })
+      }
 
       // reset phone number when backup routing is disabled
       if (prop === 'phone_number_as_backup' && !this.user[prop]) {
@@ -442,6 +520,14 @@ export default {
           value: this.userClone.phone_number
         })
       }
+
+      this.updateFormValidity()
+    }
+  },
+
+  watch: {
+    'showPasswordFields': function () {
+      this.updateFormValidity()
     }
   }
 }

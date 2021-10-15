@@ -1,19 +1,7 @@
 <template>
   <q-item v-if="profile" class="menu-avatar-wrapper">
-    <q-item-section>
-      <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
-        <half-moon-icon v-if="profile.sleep_mode"
-                         color="#9B51E0"
-                         class="focus-mode-icon"
-                         width="12"
-                         height="12">
-        </half-moon-icon>
-      </q-item-label>
-      <q-item-label class="text-regular _500 user-company-name text-right">{{ profile.company_name }}</q-item-label>
-    </q-item-section>
     <q-item-section class="profile-menu"
                     avatar>
-
       <q-btn-dropdown :ripple="false"
                       :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
                       :menu-offset="[4, 16]"
@@ -22,6 +10,17 @@
                       ref="menu"
                       flat>
         <template v-slot:label>
+          <q-item-section class="contact-info-wrapper">
+            <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
+              <half-moon-icon v-if="profile.sleep_mode"
+                              color="#9B51E0"
+                              class="focus-mode-icon"
+                              width="12"
+                              height="12">
+              </half-moon-icon>
+            </q-item-label>
+            <q-item-label class="text-regular _500 user-company-name text-right">{{ profile.company_name }}</q-item-label>
+          </q-item-section>
           <q-avatar size="34px"
                     v-if="profile"
                     :style="avatarStyle(profile.name)">
@@ -40,7 +39,7 @@
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
-                         class="rounded-badge bordered q-mr-sm">
+                         class="rounded-badge bordered q-mr-sm ">
                 </q-badge>
                 <span class="user-status-name">Offline</span>
               </div>
@@ -56,7 +55,7 @@
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                         class="rounded-badge bordered q-mr-sm mt-1">
+                         class="rounded-badge bordered q-mr-sm mt-1 ">
                 </q-badge>
                 <span class="user-status-name">Available</span>
               </div>
@@ -72,7 +71,7 @@
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                         class="rounded-badge bordered q-mr-sm">
+                         class="rounded-badge bordered q-mr-sm ">
                 </q-badge>
                 <span class="user-status-name">Busy</span>
               </div>
@@ -88,7 +87,7 @@
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                         class="rounded-badge bordered q-mr-sm">
+                         class="rounded-badge bordered q-mr-sm ">
                 </q-badge>
                 <span class="user-status-name">On-break</span>
               </div>
@@ -108,9 +107,9 @@
                                 class="focus-mode-icon"
                                 width="12"
                                 height="12">
-                </half-moon-icon> Turn Notifications <span class="user-notification-status _800">
-                {{ profile.sleep_mode ? 'On' : 'Off' }}
-              </span>
+                </half-moon-icon>
+                <span>Turn Notifications</span>
+                <span class="user-notification-status _800"> {{ profile.sleep_mode ? 'Off' : 'Off' }}</span>
               </div>
             </q-item-section>
           </q-item>
@@ -120,7 +119,9 @@
             <q-item-section>
               <div class="text-red-80">
                 <logout-icon width="15"
-                             height="15"/> Logout
+                             height="15"
+                             class="logout-icon" />
+                <span>Logout</span>
               </div>
             </q-item-section>
           </q-item>
@@ -188,20 +189,27 @@ export default {
       this.changeAgentStatus(status)
     },
 
+    hideMenu () {
+      if (this.$refs && this.$refs.menu) {
+        this.$refs.menu.hide()
+      }
+    },
+
     toggleSleepMode () {
       talk2Api.V1.profile.store({ sleep_mode: !this.profile.sleep_mode }).then(response => {
         this.setProfile({ ...this.profile, sleep_mode: response.data.sleep_mode })
       })
-      this.$refs.menu.hide()
+      this.hideMenu()
     },
 
-    async logoutAction () {
+    logoutAction () {
       try {
-        const response = await this.logout()
-
-        this.response = response?.data
-        this.$refs.menu.hide()
-        await this.$router.push({ name: 'Login' })
+        this.hideMenu()
+        const response = this.logout()
+        response.then(() => {
+          this.response = response?.data
+          this.$router.push({ name: 'Login' })
+        })
       } catch (err) {
         console.error(err)
       }

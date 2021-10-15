@@ -15,7 +15,7 @@
               class="ml-2"
               variant="primary"
               @click="onSave"
-              :disabled="isBusy">
+              :disabled="isBusy || !formIsValid">
       <q-spinner-bars v-if="isBusy" color="white" />
       {{ saveButtonLabel }}
     </b-button>
@@ -36,7 +36,7 @@ export default {
 
   computed: {
     ...mapGetters('settings', ['changedUserProperties']),
-    ...mapState('settings', ['userClone']),
+    ...mapState('settings', ['userClone', 'formIsValid']),
     ...mapState('auth', ['profile']),
     saveButtonLabel () {
       if (this.isBusy) {
@@ -55,10 +55,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser']),
+    ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
     onCancel () {
       this.setUser({ ...this.userClone })
       this.resetChangedUserProperties()
+      this.setFormValidity(true)
     },
     onSave () {
       this.isBusy = true

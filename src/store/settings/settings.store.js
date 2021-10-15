@@ -58,6 +58,7 @@ export default function () {
     ],
     user: null,
     userClone: null,
-    changedUserProperties: []
+    changedUserProperties: [],
+    formIsValid: true
   }
 }

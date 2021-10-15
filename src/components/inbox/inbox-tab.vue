@@ -76,15 +76,15 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+        <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
              ref="taskListScroller"
              @scroll="handleScroll">
           <inbox-task-list :contacts="contacts"
                            :loading-contacts="isFetchingContacts"
                            @onItemSelected="onItemSelected">
           </inbox-task-list>
-          <div class="relative py-4">
-            <b-overlay :show="isLoadingMore"
+          <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
+            <b-overlay :show="isLoadingMore || isFetchingContacts"
                        rounded="sm"
                        variant="white">
               <template #overlay>
@@ -176,6 +176,7 @@ export default {
       }
     },
     resetList () {
+      this.setContacts([])
       this.page = 1
       this.isLoaded = false
       this.loadContactTasks()
@@ -349,6 +350,7 @@ export default {
 
   watch: {
     'sorting.order': function () {
+      this.setContacts([])
       this.loadContactTasks()
     },
     'searchText': function () {

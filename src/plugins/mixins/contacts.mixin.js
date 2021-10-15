@@ -1,6 +1,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import qs from 'qs'
 import _ from 'lodash'
 
@@ -9,6 +10,7 @@ import {
   STATIC
 } from 'src/constants/contacts-list-types'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import { RELATIONS } from 'src/constants/contacts-list-relations'
 
 export default {
   data () {
@@ -21,7 +23,9 @@ export default {
       initialListFilters: null,
       filtersCount: 0,
       DefaultContactDateFilter,
-      ContactListTypes
+      ContactListTypes,
+      sorts: null,
+      ALL_COLUMNS
     }
   },
 
@@ -39,12 +43,15 @@ export default {
     },
     onSortByField (sorts) {
       this.isLoaded = false
-      this.fetch({
+      this.sorts = sorts
+      let params = {
         search: this.search,
         page: this.listItems[this.id].current_page,
         sort: sorts.orderBy,
         order: sorts.order
-      })
+      }
+
+      this.fetch(params)
     },
     onLoadMore () {
       if (this.hasMore) {
@@ -80,19 +87,30 @@ export default {
     },
     onFetchMyContacts (checked) {
       this.isLoading = true
-      this.fetch({
+      let params = {
         contact_owner: checked ? this.profile.id : undefined,
         search: this.search,
         page: this.listItems[this.id].page
-      })
+      }
+
+      this.fetch(params)
     },
     onSearch (searchText) {
       this.isLoaded = false
       this.setSearch(searchText)
-      this.fetch({ search: this.search })
+      let params = {
+        search: this.search
+      }
+
+      this.fetch(params)
     },
     processFetch: _.debounce(function (params = {}) {
       params.search = this.search
+
+      if (this.$route.name === 'Contacts') {
+        params.relations = this.contactsRelations
+      }
+
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
       return this.$axios
@@ -124,10 +142,11 @@ export default {
         })
     }, 1000),
     fetch (params = {}) {
-      const sort = _.get(params, 'sort', this.defaultContactDateFilter)
-      const order = _.get(params, 'order', 'desc')
+      const sort = (this.sorts) ? this.sorts.orderBy : _.get(params, 'sort', this.defaultContactDateFilter)
+      const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
       params.sort = sort
       params.order = order
+
       this.isLoading = true
       this.processFetch(params)
     },
@@ -146,6 +165,8 @@ export default {
       if (params.page) {
         query.page = params.page
       }
+
+      query.relations = _.get(params, 'relations', [])
 
       query.per_page = params.per_page || 25
 
@@ -280,6 +301,21 @@ export default {
           throw new Error('Headers field is broken')
         }
 
+        for (let key in headers) {
+          const found = ALL_COLUMNS.find(column => column.name === headers[key].name)
+
+          if (!found) {
+            continue
+          }
+
+          let headerRelation = _.get(headers[key], 'relationName', null)
+          let columnRelation = _.get(found, 'relationName', null)
+
+          if (columnRelation && columnRelation !== headerRelation) {
+            headers[key].relationName = columnRelation
+          }
+        }
+
         return headers
       } catch (err) {
         console.log(err)
@@ -303,6 +339,16 @@ export default {
         return this.lists['all']
       }
       return this.lists[this.$route.params.id]
+    },
+    contactsRelations () {
+      let relations = []
+      for (let column of this.columns) {
+        const relationName = _.get(column, 'relationName', null)
+        if (relationName && RELATIONS.includes(relationName)) {
+          relations.push(relationName)
+        }
+      }
+      return relations
     }
   },
   watch: {
