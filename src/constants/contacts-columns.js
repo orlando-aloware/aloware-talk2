@@ -359,7 +359,7 @@ export const ALL_COLUMNS = [
     default: true,
     maxWidth: 190,
     minWidth: 190
-  },,
+  },
   {
     name: 'unread_missed_calls_count',
     label: 'Unread Missed Calls',
