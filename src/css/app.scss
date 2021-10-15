@@ -7569,7 +7569,7 @@ button.grey-90 {
     aside {
       border-radius: 0.25rem;
       background: $grey-50;
-      padding: 15px 5px;
+      padding: 15px 15px;
       box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
     }
     &__close {
@@ -7577,7 +7577,7 @@ button.grey-90 {
       background: $grey-90;
       position: absolute;
       top: 0;
-      right: 12px;
+      right: 5px;
       z-index: 9;
       padding: 0 0;
       width: 24px;
@@ -7597,6 +7597,22 @@ button.grey-90 {
   margin-right: 22px;
   &__mobile {
     display: none;
+  }
+  &__drawer_btn {
+    border-radius: 50%;
+    height: 24px;
+    width: 24px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    .q-btn__wrapper {
+      padding: 0 0 !important;
+    }
+    .q-btn__wrapper,
+    .q-btn__content {
+      height: 24px;
+      min-height: 24px;
+    }
   }
 }
 
@@ -7659,17 +7675,22 @@ button.grey-90 {
 
 @media only screen and (max-width: 1084px) {
   .contact-activities-actions {
-    margin-right: 18px;
+    margin-right: 22.81px;
     &__mobile {
-      display: block;
+      display: flex;
+      align-items: center;
     }
     &__desktop {
       display: none;
     }
     &-dropdown {
       button {
-        height: 18px;
-        padding: 0 5px;
+        flex: 0 0 20px !important;
+        height: 20px !important;
+        width: 20px !important;
+        display: flex;
+        justify-content: center;
+        padding: 0 0 !important;
       }
       button:not(:hover):not([aria-expanded="true"]) {
         border: 1px solid white !important;

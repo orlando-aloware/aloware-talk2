@@ -40,6 +40,7 @@
         </b-dropdown>
         <q-btn borderless
                flat
+               class="contact-activities-actions__drawer_btn"
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
         </q-btn>
