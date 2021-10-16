@@ -7330,6 +7330,9 @@ button.grey-90 {
   font-family: 'Inter' , sans-serif !important;
 
   div.hours {
+
+    position: relative;
+
     select {
       border-radius: 6px;
       background: $white;
@@ -7337,12 +7340,24 @@ button.grey-90 {
       padding: 0 10px;
       font-weight: 400;
       font-size: 14px;
+
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     select:focus-visible {
       border: 2px solid $primary;
       outline-width: inherit;
     }
+  }
+
+  div.hours::after {
+    content: "▼";
+    //content: "\f078";
+    font-size: 0.75rem;
+    top: 12px;
+    right: 10px;
+    position: absolute;
   }
 
   .add-hours {

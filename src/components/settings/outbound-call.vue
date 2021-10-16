@@ -231,7 +231,6 @@ export default {
 
       if (prop === 'outbound_calling_selector') {
         this.showOutboundLineSelector = this.user.outbound_calling_selector === 1
-        console.log(this.$v.user['default_outbound_campaign_id'].$invalid)
       }
 
       if (prop === 'enabled_two_legged_outbound' && !this.user[prop]) {
