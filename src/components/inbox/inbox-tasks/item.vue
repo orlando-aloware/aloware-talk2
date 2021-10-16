@@ -115,7 +115,7 @@ export default {
       return this.selectedContact && this.selectedContact.id === this.contact.id ? 'active' : ''
     },
     totalUnreads () {
-      return this.contact.unread_count + this.contact.unread_missed_call_count + this.contact.unread_voicemail_count
+      return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     },
     campaignName () {
       if (_.isEmpty(this.campaigns) || !this.contact.last_communication.campaign_id) {

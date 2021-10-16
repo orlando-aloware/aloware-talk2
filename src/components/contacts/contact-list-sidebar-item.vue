@@ -54,7 +54,7 @@ export default {
       }
     },
     totalUnread () {
-      return this.listContact.unread_count + this.listContact.unread_missed_call_count + this.listContact.unread_voicemail_count
+      return this.listContact.unread_texts_count + this.listContact.unread_missed_calls_count + this.listContact.unread_voicemails_count
     }
   },
 
