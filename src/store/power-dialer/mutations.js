@@ -18,24 +18,31 @@ export default {
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
       let newData = data
-      for (let item of state.powerDialerLists[String(id)].data) {
+      for (let item of state.powerDialerListItems[String(id)].data) {
         let found = newData.find(contact => contact.id === item.id)
         let index = found ? newData.indexOf(found) : null
         if (index !== -1 && index !== null) {
           newData.splice(index, 1)
         }
       }
-      state.powerDialerLists = {
-        ...state.powerDialerLists,
+      state.powerDialerListItems = {
+        ...state.powerDialerListItems,
         [String(id)]: {
-          ...state.powerDialerLists[String(id)],
+          ...state.powerDialerListItems[String(id)],
           ...rest,
-          data: state.powerDialerLists[String(id)].data.concat(newData)
+          data: state.powerDialerListItems[String(id)].data.concat(newData)
         }
       }
     } else {
-      state.powerDialerLists = { ...state.powerDialerLists, [String(id)]: { data, ...rest } }
+      state.powerDialerListItems = { ...state.powerDialerListItems, [String(id)]: { data, ...rest } }
     }
+  },
+
+  /**
+   * POWER DIALER LISTS
+   */
+  SET_CURRENT_LIST: (state, data) => {
+    state.currentList = data
   },
 
   /**

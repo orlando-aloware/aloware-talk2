@@ -21,10 +21,10 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'powerDialerList'
+      'powerDialerDirectoryList'
     ]),
     list () {
-      return this.powerDialerList || this.directoryList
+      return this.powerDialerDirectoryList || this.directoryList
     },
     directoryList () {
       return DIRECTORY_LIST

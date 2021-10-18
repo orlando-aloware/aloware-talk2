@@ -82,7 +82,7 @@ export default {
     ...mapGetters('powerDialer', [
       'createDialog',
       'folders',
-      'powerDialerList',
+      'powerDialerDirectoryList',
       'searchedListItem'
     ]),
     searchedItemsList () {
@@ -94,7 +94,7 @@ export default {
       return this.filterByActiveId(this.itemsList)
     },
     rootItems () {
-      return this.powerDialerList.find(item => item.name === 'Root')
+      return this.powerDialerDirectoryList.find(item => item.name === 'Root')
     },
     hasSelected () {
       return (

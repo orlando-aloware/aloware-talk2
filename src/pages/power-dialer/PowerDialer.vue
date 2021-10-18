@@ -30,7 +30,8 @@ import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
 import powermixin from 'src/plugins/mixins/power-dialer'
-// import { get } from 'lodash'
+import { isEmpty } from 'lodash'
+import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialer',
@@ -44,14 +45,34 @@ export default {
   mixins: [powermixin],
   computed: {
     ...mapGetters('auth', ['authenticated']),
-    ...mapGetters('powerDialer', ['isStartingDial']),
-    ...mapState(['currentRoute'])
+    ...mapGetters('powerDialer', [
+      'isStartingDial',
+      'powerDialerListItems',
+      'currentList'
+    ]),
+    ...mapState(['currentRoute']),
+    filterKeys () {
+      let filterKeys = []
+      let keys = DEFAULT_FILTER_LIST
+      Object.keys(keys).forEach(f => {
+        filterKeys.push(keys[f].id)
+      })
+      return filterKeys
+    },
+    isFilterKey () {
+      if (this.filterKeys.includes(this.id)) {
+        return false
+      }
+      return true
+    }
   },
   async mounted () {
     this.RESET_LIST()
     this.START_DIAL_TOGGLE(false)
     // this.SET_POWER_DIALER_LIST([])
-    await this.fetchContacts()
+    await this.getPowerDialerLists()
+    await this.initialize()
+    // await this.fetchContacts()
   },
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Session') {
@@ -62,15 +83,7 @@ export default {
   },
   watch: {
     '$route.params': async function (route) {
-      if (!route.id && this.$route.name === 'Power Dialer') {
-        route.id = 'in-queue'
-        this.id = 'in-queue'
-        await this.fetchContacts()
-      } else if (route.id && this.$route.name === 'Power Dialer') {
-        this.id = route.id
-        // this.setData(id)
-        await this.fetchContacts()
-      }
+      await this.initialize()
     }
   },
   data () {
@@ -80,8 +93,8 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'getPowerDialerList',
-      'getContactResources'
+      'getPowerDialerLists',
+      'getPowerDialerListItem'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
@@ -94,22 +107,47 @@ export default {
       let params = {
         'page': 1,
         'per_page': 25,
-        'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
-        'filter_groups[0][filters][contact_lists][operator]': 1,
-        'filter_groups[0][is_conjunction]': true,
+        // 'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
+        // 'filter_groups[0][filters][contact_lists][operator]': 1,
+        // 'filter_groups[0][is_conjunction]': true,
         'order': 'desc'
       }
+      console.log('this.id :>> ', this.id)
+      console.log('this.powerDialerListItems :>> ', this.powerDialerListItems)
+      console.log('this.powerDialerListItems[this.id] :>> ', this.powerDialerListItems[this.id])
 
-      await this.getPowerDialerList()
-      await this.processFetch(params)
-      // await this.getContactResources({
-      //   'page': 1,
-      //   'per_page': 25,
-      //   'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
-      //   'filter_groups[0][filters][contact_lists][operator]': 1,
-      //   'filter_groups[0][is_conjunction]': true,
-      //   'order': 'desc'
-      // })
+      if (this.isFilterKey) {
+        await this.getPowerDialerListItem(this.id)
+      }
+
+      if (this.powerDialerListItems[this.id] === undefined) {
+        if (isEmpty(this.id)) {
+          console.log('401 :>> ', 401)
+          await this.processFetch(params)
+        } else {
+          console.log('402 :>> ', 402)
+          console.log('ELSE is now an option...')
+          await this.processFetch(params)
+        }
+        console.log('this.currentList :>> ', this.currentList)
+      } else {
+        console.log('403 :>> ', 403)
+        await this.processFetch(params)
+      }
+
+      this.TOGGLE_TABLE_LOADER(false)
+    },
+    async initialize () {
+      let route = this.$route.params
+      if (!route.id && this.$route.name === 'Power Dialer') {
+        route.id = 'in-queue'
+        this.id = 'in-queue'
+        await this.fetchContacts()
+      } else if (route.id && this.$route.name === 'Power Dialer') {
+        this.id = route.id
+        // this.setData(id)
+        await this.fetchContacts()
+      }
     },
     resetValues () {
       // this.RESET_LIST()

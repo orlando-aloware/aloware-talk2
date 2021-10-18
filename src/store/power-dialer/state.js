@@ -14,13 +14,13 @@ export default function () {
     pinned: [],
     removeFolder: null,
     lists: null,
-    listItems: {
+    powerDialerListItems: {
+      'all': DEFAULT_CONTACT_LIST_ITEMS,
       'my-queue': DEFAULT_CONTACT_LIST_ITEMS,
       'in-queue': DEFAULT_CONTACT_LIST_ITEMS,
       'called': DEFAULT_CONTACT_LIST_ITEMS,
       'failed': DEFAULT_CONTACT_LIST_ITEMS,
-      'scheduled': DEFAULT_CONTACT_LIST_ITEMS,
-      'all': DEFAULT_CONTACT_LIST_ITEMS
+      'scheduled': DEFAULT_CONTACT_LIST_ITEMS
     },
     powerDialerLists: {
       'all': {
@@ -134,6 +134,7 @@ export default function () {
     isStartingDial: false,
     searchedListItem: '',
     currentListFilters: [],
+    currentList: null,
     datatableLoader: false
   }
 }

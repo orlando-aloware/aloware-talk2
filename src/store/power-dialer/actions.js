@@ -4,7 +4,14 @@ export default {
    * Actual API Calls for
    * POWER-DIALER
    */
-  getPowerDialerList: async ({ commit }, params = {}) => {
+  getPowerDialerListItem: async ({ commit }, id = '') => {
+    console.log(`api/v2/contacts-list/${id}`, id)
+    let res = await window.axios.get(`api/v2/contacts-list/${id}`)
+    if (res.status === 200) {
+      commit('SET_CURRENT_LIST', res.data)
+    }
+  },
+  getPowerDialerLists: async ({ commit }, params = {}) => {
     let res = await window.axios.get('api/v2/contact-folders', {
       params: params,
       paramsSerializer: qs.stringify

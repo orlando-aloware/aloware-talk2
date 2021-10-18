@@ -116,14 +116,15 @@
 
           <Datatable
             :stickyHeaders="true"
-            :columns="columns"
+            :columns="columns2"
             :has-more="true"
             :is-empty="!hasContacts"
             :is-loading-more="true"
             :paginated="true"
             scroll-area-class="none"
-            :total-rows="powerDialerLists[id].total"
+            :total-rows="totalList"
             @reordered="onColumnsReordered"
+            @sort="onSortByField"
             @more="onLoadMore">
             <template slot="tbody">
               <TableRow
@@ -204,11 +205,11 @@
                         <TrashOIcon />
                       </button>
                     </td>
-                    <td
+                    <!-- <td
                       v-else
                       :key="key">
-                      --
-                    </td>
+                      -> {{ column.name }}
+                    </td> -->
                   </template>
                 </template>
               </TableRow>
@@ -323,20 +324,24 @@ export default {
       'contactResources',
       'contacts',
       'selectedContacts',
-      'powerDialerList',
       'powerDialerLists',
+      'powerDialerListItems',
+      'powerDialerDirectoryList',
       'datatableLoader'
     ]),
     checked () {
       return this.selectedContacts[this.id] || []
     },
+    totalList () {
+      return this.powerDialerListItems[this.id]?.total || 0
+    },
     currentContacts () {
-      return this.powerDialerLists[this.id].data
+      return this.powerDialerListItems?.[this.id]?.data || []
     },
     powerDialerListOfObjects () {
-      return this.powerDialerList || []
+      return this.powerDialerDirectoryList || []
     },
-    columns () {
+    columns2 () {
       return ALL_COLUMNS
     },
     activeRoute () {
@@ -365,16 +370,20 @@ export default {
       'SET_LIST_SELECTED_CONTACTS',
       'START_DIAL_TOGGLE'
     ]),
+    ...mapActions('powerDialer', [
+      'columnsReordered'
+    ]),
     ...mapActions('inbox', [
       'setSelectedContact'
     ]),
+
     beginDial () {
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.$router.push({ name: 'Power Dialer Session' })
     },
-    onColumnsReordered (reorderedColumns) {
-      console.log('Re-ordered columns...', reorderedColumns)
+    onColumnsReordered (nextColumns) {
+      console.log('Re-ordered columns...', nextColumns)
     },
     onRemove (obj) {
       this.selectedItem = obj

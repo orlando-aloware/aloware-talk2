@@ -77,7 +77,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('powerDialer', ['moveDialog', 'folders', 'powerDialerList']),
+    ...mapGetters('powerDialer', ['moveDialog', 'folders', 'powerDialerDirectoryList']),
     searchedItemsList () {
       if (this.searchValue) {
         return this.filterByActiveId(

@@ -20,11 +20,11 @@ export default {
     ...mapGetters('powerDialer', [
       'listItems',
       'currentListFilters',
-      'powerDialerLists'
+      'powerDialerListItems',
+      'currentList'
     ]),
     columns () {
-      let headers = []
-      return headers
+      return this.currentList?.headers || []
     },
     list () {
       if (!this.$route.params.id) {
@@ -43,17 +43,6 @@ export default {
     ...mapMutations('powerDialer', [
       'TOGGLE_TABLE_LOADER'
     ]),
-    async fetchContacts () {
-      await this.getPowerDialerList()
-      await this.getContactResources({
-        'page': 1,
-        'per_page': 25,
-        'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
-        'filter_groups[0][filters][contact_lists][operator]': 1,
-        'filter_groups[0][is_conjunction]': true,
-        'order': 'desc'
-      })
-    },
     async processFetch (params) {
       return this.$axios
         .get('api/v2/contacts', {
@@ -62,6 +51,7 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          console.log('params :>> ', params)
           console.log('data from api : ', data)
           this.contactsLoaded({
             id: this.tempId || '',
@@ -90,8 +80,8 @@ export default {
       query.per_page = params.per_page || 25
 
       query.filter_groups = []
-
-      if (typeof this.powerDialerLists[this.tempId] !== 'undefined' && this.tempId !== 'all') {
+      // debugger
+      if (typeof this.powerDialerListItems[this.tempId] !== 'undefined' && this.tempId !== 'all') {
         query.filter_groups = [
           {
             filters: {
