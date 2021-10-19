@@ -1,6 +1,6 @@
 <template>
   <div class="position-relative">
-    <q-input :class="[border ? 'form-control' : '']"
+    <q-input :class="[border ? 'form-control' : 'border-0']"
              :placeholder="placeholder"
              :disabled="disabled"
              class="form-control-search"
