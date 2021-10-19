@@ -5179,12 +5179,15 @@ table.datatable {
       .handle {
         cursor: move;
         margin-right: 0px;
+        top: 2px;
+        position: relative;
+        color: $grey-100;
       }
 
       th {
         background-color: $white;
         border-bottom: solid 1px $grey-light3;
-        font-size: 10px;
+        font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         padding: 10px 30px 10px 8px;
@@ -5194,6 +5197,7 @@ table.datatable {
         white-space: nowrap;
         text-overflow: ellipsis;
         user-select: none;
+        font-weight: 600;
 
         &.ghost {
           background-color: $light-green2;

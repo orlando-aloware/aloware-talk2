@@ -36,6 +36,7 @@
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
+                <MoveIcon />
                 <span :class="{ handle: column.draggable }">
                   {{ column.label }}
                 </span>
@@ -57,7 +58,7 @@
                   v-if="column.resizable"
                   @mousedown="onResizerMouseDown"
                 >
-                  {{ column.label }}
+                  -{{ column.label }}
                 </div>
               </template>
             </th>
@@ -115,6 +116,7 @@
 <script>
 import { mapState } from 'vuex'
 import draggable from 'vuedraggable'
+import MoveIcon from 'components/icons/move-icon-2'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 
@@ -123,7 +125,8 @@ let scrollTimeout
 
 export default {
   components: {
-    draggable
+    draggable,
+    MoveIcon
   },
 
   props: {
