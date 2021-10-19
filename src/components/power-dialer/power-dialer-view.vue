@@ -20,7 +20,7 @@
           v-if="activeRoute"
           :id="filter"
           :active-route="activeRoute" />
-        <b-container fluid class="bv-example-row m-0 p-0 pl-3 pb-2 border-bottom">
+        <b-container fluid class="bv-example-row m-0 p-0 pl-3 pb-0 border-bottom">
           <b-row class="pr-2">
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
