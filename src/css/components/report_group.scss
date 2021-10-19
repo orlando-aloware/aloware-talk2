@@ -27,6 +27,11 @@
   min-height: 130px;
   padding: 25px 20px 13px 20px;
 
+  &-item {
+    width: 215px;
+    height: 146px;
+  }
+
   &.dashed-box {
     border: dashed 1px $grey-70 !important;
     background-color: $grey-40 !important;

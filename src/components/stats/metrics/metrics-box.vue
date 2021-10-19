@@ -179,6 +179,7 @@ export default {
     ]),
     removeSelectedMetric () {
       this.loader = true
+      this.$emit('remove', true)
       this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`)
         .then(res => {
           this.deleteMetric({
@@ -186,9 +187,11 @@ export default {
             id: this.metric.id
           })
           this.$generalNotification('Metric successfully removed.')
+          this.$emit('remove', false)
           this.closeModal()
         }).catch(err => {
           console.log(err)
+          this.$emit('remove', false)
           this.$generalNotification('Failed to remove metric.', 'error')
           this.closeModal()
         })

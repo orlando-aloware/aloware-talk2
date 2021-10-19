@@ -197,15 +197,16 @@ export default {
           metricId: this.metric,
           color: this.color.value
         })
-      } else {
-        this.$emit('create', {
-          categoryLabel: option ? option.categoryLabel : '',
-          label: option ? option.label : '',
-          type: option ? option.type : null,
-          metricId: this.metric,
-          color: this.color.value
-        })
+        return
       }
+      this.$emit('create', {
+        categoryLabel: option ? option.categoryLabel : '',
+        label: option ? option.label : '',
+        type: option ? option.type : null,
+        metricId: this.metric,
+        color: this.color.value
+      })
+      this.modal = true
     },
     getOptionsText (id) {
       const option = this.availableMetrics.find(option => option.metric_id === id)
