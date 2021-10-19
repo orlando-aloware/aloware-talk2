@@ -19,7 +19,7 @@
 
           <b-form-group label="" class="w-50">
             <extension-selector v-model="user.extension"
-                                @select="(eventPayload) => onUpdateFields(eventPayload, 'observing_campaigns')">
+                                @select="(eventPayload) => onUpdateFields(eventPayload, 'extension')">
             </extension-selector>
           </b-form-group>
         </b-col>
@@ -35,11 +35,13 @@
               This setting sets the working hours for this user. If a call comes in outside of these hours it won't ring this user. Note that the times are local to <b>your company</b> timezone, currently set to <b>America/Los_Angeles</b>
             </p>
           </div>
-          <business-hours v-if="!isLoadingOperatingHours && user.operating_hours"
+          <business-hours v-if="!isLoadingOperatingHours && operatingHours"
                           type="select"
                           color="#256EFF"
                           :days="user.operating_hours"
-                          :time-increment="timeIncrement">
+                          :time-increment="timeIncrement"
+                          :switch-width="75"
+                          @updated-hours="(eventPayload) => onUpdateFields(eventPayload, 'operating_hours')">
           </business-hours>
         </b-col>
       </b-form-row>
@@ -56,66 +58,66 @@
               <b-form-radio-group
                 id="radio-slots"
                 name="radio-options-slots"
-                v-model="user.missed_calls_settings.missed_call_handling_mode"
+                v-model="missedCallHandlingMode"
                 :options="options"
                 :aria-describedby="ariaDescribedby"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'missed_calls_settings.missed_call_handling_mode')">
+                @input="(eventPayload) => onUpdateFields(eventPayload, 'missedCallHandlingMode')">
               </b-form-radio-group>
             </b-form-group>
           </b-col>
         </b-form-row>
         <div v-if="user.missed_calls_settings && user.missed_calls_settings.missed_call_handling_mode === MISSED_CALL_BEHAVIOR_VOICEMAIL">
-        <b-card
-          header-tag="header"
-          footer-tag="footer"
-          v-if="user.missed_calls_settings.voicemail_file !== null">
-          <div>
-            <audio
-                ref="vmAudio"
-                id="vm-audio-file"
-                controls>
-              <source :src="`${baseUrl}/static/uploaded_file/${user.missed_calls_settings.voicemail_file}`">
-              Your browser does not support the audio element.
-            </audio>
-          </div>
+          <b-card
+            header-tag="header"
+            footer-tag="footer"
+            v-if="user.missed_calls_settings.voicemail_file !== null">
+            <div>
+              <audio
+                  ref="vmAudio"
+                  id="vm-audio-file"
+                  controls>
+                <source :src="`${baseUrl}/static/uploaded_file/${user.missed_calls_settings.voicemail_file}`">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
 
-          <template #footer>
-            <b-button size="sm"
-                      variant="primary"
-                      :disabled="isDeletingMissedCallVMAudioFile"
-                      @click="playMissedCallVMAudioFile">
-              <i class="fa fa-play"></i> Play
-            </b-button>
-            <b-button size="sm"
-                      variant="danger"
-                      class="ml-2"
-                      :disabled="isDeletingMissedCallVMAudioFile"
-                      @click="deleteMissedCallVMFile">
-              <q-spinner-bars v-if="isDeletingMissedCallVMAudioFile" color="white" />
-              <i class="fa fa-trash" v-else></i>
-              {{ isDeletingMissedCallVMAudioFile ? 'Removing File...' : 'Remove File' }}
-            </b-button>
-          </template>
-        </b-card>
-        <b-card-group deck v-if="!user.missed_calls_settings.voicemail_file">
-        <audio-recorder :upload-url="missedCallVMUploadUrl"
-                        @recordedAudioUploaded="applyMissedCallVMAudioFile">
-        </audio-recorder>
-
-        <b-card title="Upload an audio file" header-tag="header" footer-tag="footer">
-          <file-uploader accepted-file-types=".mp3, .wav"
-                         :upload-url="missedCallVMUploadUrl"
-                         @fileUploaded="fileUploaded">
-            <template slot="description">
-              <div class="text-center mt-2 notice">
-                <p class="mb-0">Supports MP3/WAV only.</p>
-                <p class="mb-0">Max. files size for images is 8MB</p>
-              </div>
+            <template #footer>
+              <b-button size="sm"
+                        variant="primary"
+                        :disabled="isDeletingMissedCallVMAudioFile"
+                        @click="playMissedCallVMAudioFile">
+                <i class="fa fa-play"></i> Play
+              </b-button>
+              <b-button size="sm"
+                        variant="danger"
+                        class="ml-2"
+                        :disabled="isDeletingMissedCallVMAudioFile"
+                        @click="deleteMissedCallVMFile">
+                <q-spinner-bars v-if="isDeletingMissedCallVMAudioFile" color="white" />
+                <i class="fa fa-trash" v-else></i>
+                {{ isDeletingMissedCallVMAudioFile ? 'Removing File...' : 'Remove File' }}
+              </b-button>
             </template>
-          </file-uploader>
-        </b-card>
-      </b-card-group>
-      </div>
+          </b-card>
+          <b-card-group deck v-if="!user.missed_calls_settings.voicemail_file">
+            <audio-recorder :upload-url="missedCallVMUploadUrl"
+                            @recordedAudioUploaded="applyMissedCallVMAudioFile">
+            </audio-recorder>
+
+            <b-card title="Upload an audio file" header-tag="header" footer-tag="footer">
+              <file-uploader accepted-file-types=".mp3, .wav"
+                             :upload-url="missedCallVMUploadUrl"
+                             @fileUploaded="fileUploaded">
+                <template slot="description">
+                  <div class="text-center mt-2 notice">
+                    <p class="mb-0">Supports MP3/WAV only.</p>
+                    <p class="mb-0">Max. files size for images is 8MB</p>
+                  </div>
+                </template>
+              </file-uploader>
+            </b-card>
+          </b-card-group>
+        </div>
       </div>
 
       <b-form-row class="mt-4"
@@ -139,7 +141,7 @@
 
           <div v-if="!disableGeoRouting">
             <b-form-group label="United States"
-                          v-if="user.country !== 'CA'"
+                          v-if="[null, 'US'].includes(user.country)"
                           v-slot="{ ariaDescribedby }">
               <b-form-checkbox-group
                 class="group-checkbox d-flex flex-wrap"
@@ -420,7 +422,7 @@ export default {
       return `${window.axios.defaults.baseURL}/api/v1/user/${this.user.id}/missed-call-voicemail`
     },
     shouldMessageIfCallCompleted () {
-      return true// this.user.should_message_caller_if_completed === 1
+      return this.user.should_message_caller_if_completed === 1
     },
     rules () {
       let rulesObject = {}
@@ -445,6 +447,10 @@ export default {
       disableGeoRouting: true,
       checkAllUS: false,
       checkAllCA: false,
+      operatingStatesLimit: {
+        us: [],
+        ca: []
+      },
       options: [
         { text: 'Do Nothing', value: MISSED_CALL_BEHAVIOR_NOTHING },
         { text: 'Voicemail', value: MISSED_CALL_BEHAVIOR_VOICEMAIL }
@@ -456,7 +462,9 @@ export default {
       MISSED_CALL_BEHAVIOR_VOICEMAIL,
       MISSED_CALL_BEHAVIOR_NOTHING,
       timeIncrement: 30,
-      SettingsMap
+      SettingsMap,
+      missedCallHandlingMode: null,
+      operatingHours: null
     }
   },
 
@@ -499,7 +507,7 @@ export default {
       this.user.missed_calls_settings.voicemail_file = file['file_name']
     },
     onUpdateFields (value, prop) {
-      if (!['disableGeoRouting', 'disableAreaCodeRouting', 'onCheckAllUs', 'onCheckAllCA'].includes(prop)) {
+      if (!['disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'missed_calls_settings.missed_call_handling_mode', 'operating_states_limit.us', 'operating_states_limit.ca', 'missedCallHandlingMode', 'operatingHours'].includes(prop)) {
         this.user[prop] = value
         this.updateChangedUserProperties({
           name: prop,
@@ -507,34 +515,81 @@ export default {
         })
       }
 
-      if (prop === 'disableGeoRouting' && !this.user[prop]) {
-        this.user.operating_states_limit.us = this.userClone.operating_states_limit.us
+      if (prop === 'operating_hours') {
+        let key = Object.keys(value)[0]
+        this.user['operating_hours'] = { ...this.user['operating_hours'], key: value[key] }
         this.updateChangedUserProperties({
-          name: 'operating_states_limit.us',
-          value: this.userClone.operating_states_limit.us
-        })
-
-        this.user.operating_states_limit.ca = this.userClone.operating_states_limit.ca
-        this.updateChangedUserProperties({
-          name: 'operating_states_limit.ca',
-          value: this.userClone.operating_states_limit.ca
+          name: 'operating_hours',
+          value: this.user[prop]
         })
       }
 
-      if (prop === 'disableAreaCodeRouting' && !this.user[prop]) {
-        this.user.operating_area_codes_limit = this.userClone.operating_area_codes_limit
+      if (prop === 'missedCallHandlingMode') {
+        this.user['missed_calls_settings'] = { ...this.user.missed_calls_settings, 'missed_call_handling_mode': value }
         this.updateChangedUserProperties({
-          name: 'operating_area_codes_limit',
-          value: this.userClone.operating_area_codes_limit
+          name: 'missed_calls_settings.missed_call_handling_mode',
+          value: value
+        })
+      }
+
+      if (prop === 'disableGeoRouting' && value) {
+        if ([null, 'US'].includes(this.user.country)) {
+          this.user.operating_states_limit.us = []
+          this.updateChangedUserProperties({
+            name: 'operating_states_limit.us',
+            value: []
+          })
+        }
+
+        if (this.user.country === 'CA') {
+          this.user.operating_states_limit.ca = []
+          this.updateChangedUserProperties({
+            name: 'operating_states_limit.ca',
+            value: []
+          })
+        }
+      }
+
+      if (prop === 'operating_states_limit.us') {
+        this.user['operating_states_limit'] = { ...this.user.operating_states_limit, us: value }
+        this.updateChangedUserProperties({
+          name: prop,
+          value: value
         })
       }
 
       if (prop === 'checkAllUS') {
-        this.user.operating_states_limit.us = value ? this.states.us : []
+        let states = value ? this.states.us : []
+        this.user['operating_states_limit'] = { ...this.user.operating_states_limit, us: states }
+        this.updateChangedUserProperties({
+          name: 'operating_states_limit.us',
+          value: states
+        })
+      }
+
+      if (prop === 'operating_states_limit.ca') {
+        this.user.operating_states_limit.ca = value
+        this.updateChangedUserProperties({
+          name: prop,
+          value: value
+        })
       }
 
       if (prop === 'checkAllCA') {
-        this.user.operating_states_limit.ca = value ? this.states.ca : []
+        let states = value ? this.states.ca : []
+        this.user.operating_states_limit.ca = states
+        this.updateChangedUserProperties({
+          name: 'operating_states_limit.ca',
+          value: states
+        })
+      }
+
+      if (prop === 'disableAreaCodeRouting' && value) {
+        // this.user.operating_area_codes_limit = this.clone.operating_area_codes_limit
+        // this.updateChangedUserProperties({
+        //   name: 'operating_area_codes_limit',
+        //   value: this.clone.operating_area_codes_limit
+        // })
       }
 
       this.updateFormValidity()
@@ -542,20 +597,18 @@ export default {
   },
 
   watch: {
-    'user.operating_hours': {
-      handler () {
-        this.updateChangedUserProperties({
-          name: 'operating_hours',
-          value: this.user.operating_hours
-        })
-      },
-      deep: true
-    },
     'user.operating_states_limit.us': function (value) {
-      this.checkAllUS = value.length === this.states.us.length
+      if (value) {
+        this.checkAllUS = value.length === this.states.us.length
+      }
     },
     'user.operating_states_limit.ca': function (value) {
-      this.checkAllCA = value.length === this.states.ca.length
+      if (value) {
+        this.checkAllCA = value.length === this.states.ca.length
+      }
+    },
+    'user.missed_calls_settings.missed_call_handling_mode': function (value) {
+      this.missedCallHandlingMode = value
     }
   },
 
@@ -564,9 +617,8 @@ export default {
       this.disableGeoRouting = false
     }
 
-    if (this.user.operating_area_codes_limit.length) {
-      this.disableAreaCodeRouting = false
-    }
+    this.missedCallHandlingMode = this.user.missed_calls_settings.missed_call_handling_mode
+    this.operatingHours = { ...this.user.operating_hours }
   }
 }
 </script>

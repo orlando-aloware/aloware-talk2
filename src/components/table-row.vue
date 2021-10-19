@@ -135,35 +135,38 @@
       </td>
 
       <td
-        v-else-if="column.name === 'unread_count'"
         class="text-left"
-        :key="column.name">
+        :key="column.name"
+        v-else-if="column.name === 'unread_texts_count'"
+      >
         <span
-          v-if="contact.unread_count > 0"
-          class="badge badge-danger unread-text bg-red-80">
-          {{ contact.unread_count }}
+          class="badge badge-danger unread-text bg-red-80"
+          v-if="contact.unread_texts_count > 0">
+          {{ contact.unread_texts_count }}
         </span>
       </td>
 
       <td
-        v-else-if="column.name === 'unread_missed_call_count'"
         class="text-left"
-        :key="column.name">
+        :key="column.name"
+        v-else-if="column.name === 'unread_missed_calls_count'"
+      >
         <span
           class="badge badge-danger unread-text bg-red-80"
-          v-if="contact.unread_missed_call_count > 0">
-          {{ contact.unread_missed_call_count }}
+          v-if="contact.unread_missed_calls_count > 0">
+          {{ contact.unread_missed_calls_count }}
         </span>
       </td>
 
       <td
-        v-else-if="column.name === 'unread_voicemail_count'"
         class="text-left"
-        :key="column.name">
+        :key="column.name"
+        v-else-if="column.name === 'unread_voicemails_count'"
+      >
         <span
           class="badge badge-danger unread-text bg-red-80"
-          v-if="contact.unread_voicemail_count > 0">
-          {{ contact.unread_voicemail_count }}
+          v-if="contact.unread_voicemails_count > 0">
+          {{ contact.unread_voicemails_count }}
         </span>
       </td>
 
@@ -342,9 +345,9 @@ export default {
     return {
       moment,
       countFields: [
-        'unread_count',
-        'unread_missed_call_count',
-        'unread_voicemail_count',
+        'unread_texts_count',
+        'unread_missed_calls_count',
+        'unread_voicemails_count',
         'inbound_calls_count',
         'inbound_texts_count',
         'inbound_communications_count',

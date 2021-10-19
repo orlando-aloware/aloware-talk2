@@ -43,8 +43,9 @@ export default {
         tags: [],
         tag_ids: [],
         unread_count: 0,
-        unread_voicemail_count: 0,
-        unread_missed_call_count: 0
+        unread_voicemails_count: 0,
+        unread_missed_calls_count: 0,
+        unread_texts_count: 0
       },
       selectedContactCampaigns: [],
       contactPhoneNumbers: [],

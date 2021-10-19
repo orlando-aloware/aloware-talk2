@@ -1,6 +1,7 @@
 let suffixV1 = '/api/v1/'
 let suffixV2 = '/api/v2/'
 import qs from 'qs'
+import _ from 'lodash'
 
 export default {
   V1: {
@@ -242,6 +243,14 @@ export default {
         return window.axios.get(`/api/v2/contacts/${id}`)
       },
       list (params) {
+        const relations = _.get(params, 'relations', [
+          'lastCommunication',
+          'initialCampaign',
+          'dispositionStatus'
+        ])
+
+        params.relations = relations
+
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify })
       },
       inboxCounts () {

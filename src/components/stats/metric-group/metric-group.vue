@@ -51,13 +51,15 @@
             :move="checkMove"
             tag="ul">
             <transition-group type="transition"
+                              :class="{ 'd-flex': loaderToggled }"
                               name="flip-list">
               <template v-if="metricsList">
                 <MetricsBox
-                  class="movable"
+                  class="metric-box-item movable"
                   v-for="metric in metricsList"
                   :key="metric.id"
-                  :metric="metric" />
+                  :metric="metric"
+                  @remove="onLoaderToggled"/>
                 <MetricLoader :key="`metric-loader-` + metricGroupId"
                               v-if="loader" />
               </template>
@@ -202,6 +204,7 @@ export default {
         ghostClass: 'ghost'
       },
       metricsList: [],
+      loaderToggled: false,
       DateRanges
     }
   },
@@ -314,6 +317,9 @@ export default {
     checkMove (event) {
       let element = _.get(this.$refs.addMetric, '$el', null)
       return event.from === event.to && event.related !== element
+    },
+    onLoaderToggled (toggle) {
+      this.loaderToggled = toggle
     }
   },
   watch: {
@@ -330,7 +336,8 @@ export default {
     'resources.agent_metrics': {
       deep: true,
       handler: function () {
-        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+        const metrics = _.get(this.resources, 'agent_metrics', [])
+        this.metricsList = JSON.parse(JSON.stringify(metrics))
       }
     }
   }

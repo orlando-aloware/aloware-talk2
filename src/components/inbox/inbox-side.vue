@@ -64,7 +64,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'taskCounts']),
+    ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts']),
 
     nextPage () {
       return this.currentPage + 1

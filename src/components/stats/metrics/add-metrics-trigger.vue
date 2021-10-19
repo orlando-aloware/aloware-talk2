@@ -22,7 +22,7 @@
       @closed="closeModal"
       @create="createNewMetric"
       title="Add Metric"
-      button-label="Create Metric"
+      button-label="Add Metric"
       :is-open="modal" />
   </div>
 </template>
@@ -60,6 +60,7 @@ export default {
     ...mapActions('stats', ['addMetric']),
     createNewMetric (data) {
       this.$emit('toggle-loader', true)
+      this.modal = false
       this.$axios.post(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.groupId}/metrics`, {
         metric_id: data.metricId,
         color: data.color,
@@ -67,19 +68,17 @@ export default {
       }).then(res => {
         res.data.label = data.label
         res.data.categoryLabel = data.categoryLabel
-        res.data.value = 0
+        res.data.value = res.data.value ?? 0
         this.addMetric({
           metricGroupId: this.groupId,
           data: res.data
         })
         this.$generalNotification('Metric successfully added.')
         this.$emit('toggle-loader', false)
-        this.modal = false
       }).catch(err => {
         console.log(err)
         this.$generalNotification('Failed to add metric.', 'error')
         this.$emit('toggle-loader', false)
-        this.modal = false
       })
     },
     openModal () {

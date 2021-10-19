@@ -103,15 +103,14 @@
                 switch
                 v-model="showPasswordFields"
                 :value="true"
-                :unchecked-value="false">
+                :unchecked-value="false"
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'showPasswordFields')">
                 Change password
               </b-form-checkbox>
             </b-form-group>
           </div>
         </b-col>
       </b-form-row>
-
-      {{ getInvalidFields }}
 
       <b-form-row class="mt-4" v-if="showPasswordFields">
         <b-col sm="12" md="6">
@@ -144,7 +143,7 @@
               :state="validateState('password_confirmation')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAs">Password did not match.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">Password did not match.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -505,12 +504,25 @@ export default {
     ...mapActions('settings', ['updateChangedUserProperties', 'setFormValidity']),
 
     onUpdateFields (value, prop) {
-      if (!['password_confirmation'].includes(prop)) {
+      if (!['showPasswordFields'].includes(prop)) {
         this.user[prop] = value
         this.updateChangedUserProperties({
           name: prop,
           value: value
-          // value: ['', null].includes(value) ? this.userClone[prop] : value
+        })
+      }
+
+      if (prop === 'showPasswordFields' && !value) {
+        this.user.password = ''
+        this.updateChangedUserProperties({
+          name: 'password',
+          value: ''
+        })
+
+        this.user.password_confirmation = ''
+        this.updateChangedUserProperties({
+          name: 'password_confirmation',
+          value: ''
         })
       }
 
@@ -525,6 +537,14 @@ export default {
 
       this.updateFormValidity()
     }
+  },
+
+  mounted () {
+    this.$VueEvent.listen('resetSettingsForm', () => {
+      this.user.password = ''
+      this.user.password_confirmation = ''
+      this.showPasswordFields = false
+    })
   },
 
   watch: {

@@ -58,6 +58,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'phone_numbers',
+    relationName: 'phoneNumbers',
     label: 'All Phone Numbers',
     category: 0,
     order: 4,
@@ -79,6 +80,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'disposition_status',
+    relationName: 'dispositionStatus',
     label: 'Contact Disposition',
     category: 3,
     order: 6,
@@ -255,6 +257,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'lead_source',
+    relationName: 'leadSource',
     label: 'Lead Source',
     category: 2,
     order: 23,
@@ -265,6 +268,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'tags',
+    relationName: 'tags',
     label: 'Tags',
     category: 2,
     order: 24,
@@ -315,40 +319,20 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
-    name: 'inbound_communications_count',
-    label: 'Inbound Communications',
-    category: 3,
-    order: 29,
-    sortable: true,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
-    name: 'outbound_communications_count',
-    label: 'Outbound Communications',
-    category: 3,
-    order: 30,
-    sortable: true,
-    draggable: true,
-    resizable: true,
-    default: false
-  },
-  {
     name: 'communications_count',
     label: 'Number of Communications',
     category: 3,
-    order: 31,
+    order: 29,
     sortable: false,
     draggable: true,
     resizable: true,
     default: false
   },
   {
-    name: 'unread_missed_call_count',
+    name: 'unread_missed_calls_count',
     label: 'Unread Missed Calls',
     category: 3,
-    order: 32,
+    order: 30,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -357,10 +341,22 @@ export const ALL_COLUMNS = [
     minWidth: 190
   },
   {
-    name: 'unread_voicemail_count',
+    name: 'unread_missed_calls_count',
+    label: 'Unread Missed Calls',
+    category: 3,
+    order: 31,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: true,
+    maxWidth: 190,
+    minWidth: 190
+  },
+  {
+    name: 'unread_voicemails_count',
     label: 'Unread Voicemails',
     category: 3,
-    order: 33,
+    order: 32,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -369,10 +365,10 @@ export const ALL_COLUMNS = [
     minWidth: 175
   },
   {
-    name: 'unread_count',
+    name: 'unread_texts_count',
     label: 'Unread Messages',
     category: 3,
-    order: 34,
+    order: 33,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -382,9 +378,10 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'campaigns',
+    relationName: 'campaigns',
     label: 'Lines',
     category: 2,
-    order: 35,
+    order: 34,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -393,9 +390,10 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'ring_groups',
+    relationName: 'ringGroups',
     label: 'Ring Groups',
     category: 2,
-    order: 36,
+    order: 35,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -403,9 +401,10 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'broadcasts',
+    relationName: 'broadcasts',
     label: 'Broadcasts',
     category: 2,
-    order: 37,
+    order: 36,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -414,9 +413,10 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'contact_lists',
+    relationName: 'contactLists',
     label: 'Contact Lists',
     category: 2,
-    order: 38,
+    order: 37,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -426,9 +426,10 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'initial_campaign_id',
+    relationName: 'initialCampaign',
     label: 'Initial Line',
     category: 2,
-    order: 39,
+    order: 38,
     sortable: false,
     draggable: true,
     resizable: true,
@@ -438,7 +439,7 @@ export const ALL_COLUMNS = [
     id: '426108ce-7d6e-43e1-b13e-e406a9362db0',
     label: 'Actions',
     name: 'actions',
-    order: 40,
+    order: 39,
     sortable: false,
     draggable: false,
     resizable: false,

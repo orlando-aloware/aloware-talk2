@@ -1,5 +1,3 @@
-import { TEST_DATA } from 'src/constants/power-dialer/power-dialer-list'
-
 export default {
   opened: (state) => new Set(state.opened),
   filters: (state) => state.filters,
@@ -26,7 +24,7 @@ export default {
     return state.lists
   },
   contactResources: (state) => {
-    return TEST_DATA
+    return []
   },
   contactResources2: (state) => state.contactResources,
   contacts: (state) => state.contacts,

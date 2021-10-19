@@ -3371,6 +3371,7 @@ span.mention {
   height: 32px !important;
   font-size: $f-size-body-xs;
   margin-bottom: 0;
+  border: 1px solid $grey-60;
 
   input {
     line-height: 30px;
@@ -3631,6 +3632,10 @@ span.mention {
 
     span {
       position: absolute;
+      overflow: hidden;
+      width: 100%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 
@@ -3713,10 +3718,6 @@ span.mention {
   .tab-dropdown {
     &.q-btn {
       line-height: 1;
-    }
-
-    .q-btn__wrapper {
-      min-height: 12px;
     }
   }
 
@@ -7418,6 +7419,9 @@ button.grey-90 {
   font-family: 'Inter' , sans-serif !important;
 
   div.hours {
+
+    position: relative;
+
     select {
       border-radius: 6px;
       background: $white;
@@ -7425,12 +7429,24 @@ button.grey-90 {
       padding: 0 10px;
       font-weight: 400;
       font-size: 14px;
+
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     select:focus-visible {
       border: 2px solid $primary;
       outline-width: inherit;
     }
+  }
+
+  div.hours::after {
+    content: "▼";
+    //content: "\f078";
+    font-size: 0.75rem;
+    top: 12px;
+    right: 10px;
+    position: absolute;
   }
 
   .add-hours {
@@ -7646,5 +7662,31 @@ button.grey-90 {
       height: 19px;
       margin-right: 15.5px;
     }
+  }
+}
+
+.border {
+  border: 1px solid $grey-60;
+  &-bottom {
+    border-bottom: 1px solid $grey-60 !important;
+  }
+  &-top {
+    border-top: 1px solid $grey-60 !important;
+  }
+  &-left {
+    border-left: 1px solid $grey-60 !important;
+  }
+  &-right {
+    border-left: 1px solid $grey-60 !important;
+  }
+}
+
+.stats-refresh-btn {
+  height: 32px;
+  font-size: $f-size-body-sm;
+  &:hover {
+    border-color: #000;
+    border: 1px solid #000 !important;
+    transition: border-color 0.36s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }

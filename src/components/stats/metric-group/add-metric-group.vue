@@ -1,5 +1,15 @@
 <template>
   <q-card-actions class="px-0 pt-3 pb-0">
+    <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center"
+                 :disabled="loading"
+                 @clicked="refreshMetricGroup">
+      <span v-if="!loading">
+        Refresh
+      </span>
+      <q-spinner-bars color="primary"
+                      size="28px"
+                      v-if="loading"/>
+    </compact-btn>
     <q-space />
     <q-btn
       @click="createMetricGroup"
@@ -27,12 +37,13 @@
 <script>
 
 import { mapState, mapActions } from 'vuex'
+import CompactBtn from 'components/compact-btn'
 import PlusIcon from 'src/components/icons/plus-icon'
 import * as DateRanges from 'src/constants/dates'
 
 export default {
   name: 'AddMetricGroup',
-  components: { PlusIcon },
+  components: { PlusIcon, CompactBtn },
   computed: {
     ...mapState('auth', ['profile']),
     defaultDateRange () {
@@ -42,11 +53,12 @@ export default {
   data () {
     return {
       disabled: false,
+      loading: false,
       DateRanges
     }
   },
   methods: {
-    ...mapActions('stats', ['addMetricGroup']),
+    ...mapActions('stats', ['addMetricGroup', 'setMetricGroups']),
     createMetricGroup () {
       this.disabled = true
       const data = {
@@ -62,6 +74,25 @@ export default {
         }).catch(err => {
           console.log(err)
           this.$generalNotification('Failed to create a metric group.', 'error')
+        })
+    },
+    refreshMetricGroup () {
+      console.log('test')
+      this.loading = true
+      this.$axios
+        .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
+          params: {
+            include_metrics: true
+          }
+        })
+        .then(response => {
+          this.loading = false
+          this.setMetricGroups(response.data)
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loading = false
+          this.$generalNotification('Failed to fetch metric groups.', 'error')
         })
     }
   }

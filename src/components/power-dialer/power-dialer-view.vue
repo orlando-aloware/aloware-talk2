@@ -176,7 +176,7 @@
                     <td
                       class="text-left"
                       :key="column.name"
-                      v-else-if="column.name === 'date_added'">
+                      v-else-if="column.name === 'created_at'">
                       <div class="ellipse">
                         {{ contact.created_at | fixDate }}
                       </div>
