@@ -81,12 +81,12 @@ export default {
     },
 
     hasUnreads () {
-      return this.contact.unread_count > 0 ||
-        this.contact.unread_missed_call_count > 0 ||
-        this.contact.unread_voicemail_count > 0
+      return this.contact.unread_texts_count > 0 ||
+        this.contact.unread_missed_calls_count > 0 ||
+        this.contact.unread_voicemails_count > 0
     },
     unreadCount () {
-      return this.contact.unread_count + this.contact.unread_missed_call_count + this.contact.unread_voicemail_count
+      return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
 

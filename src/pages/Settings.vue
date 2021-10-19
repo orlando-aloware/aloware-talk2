@@ -165,9 +165,11 @@ export default {
       }
 
       this.localUser.ring_group_ids = _.uniq(this.localUser.ring_group_ids)
+      this.localUser.password = ''
+      this.localUser.password_confirmation = ''
 
       this.setUser(this.localUser)
-      this.setUserClone(this.localUser)
+      this.setUserClone(_.cloneDeep(this.localUser))
     },
     fixOperatingHours () {
       this.loadingOperatingHours = true
@@ -215,7 +217,7 @@ export default {
       })
     },
     resetUserChanges () {
-      this.setUser(this.userClone)
+      this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
     },
     onUpdateFields (value, prop) {
@@ -230,6 +232,7 @@ export default {
   mounted () {
     this.setUser(null)
     this.getUser()
+    this.resetChangedUserProperties()
   },
 
   created () {

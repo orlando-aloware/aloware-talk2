@@ -316,7 +316,7 @@ export default {
           }
         }
 
-        return headers
+        return _.uniqBy(headers, 'name')
       } catch (err) {
         console.log(err)
         return []

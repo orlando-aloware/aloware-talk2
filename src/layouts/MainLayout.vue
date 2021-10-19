@@ -977,33 +977,6 @@ export default {
         })
         .then(response => {
           this.loadingMetricGroups = false
-          if (_.isEmpty(response.data)) {
-            this.setMetricGroups([])
-            return
-          }
-
-          for (let index in response.data) {
-            if (typeof response.data[index].agent_metrics === 'undefined') {
-              continue
-            }
-
-            for (let metricIndex in response.data[index].agent_metrics) {
-              const metric = this.availableMetrics.find(metric => metric.metric_id === response.data[index].agent_metrics[metricIndex].metric_id)
-
-              if (!metric) {
-                continue
-              }
-
-              response.data[index].agent_metrics[metricIndex].category = metric.category
-              response.data[index].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
-
-              if (typeof response.data[index].agent_metrics[metricIndex].label !== 'undefined') {
-                continue
-              }
-
-              response.data[index].agent_metrics[metricIndex].label = metric.label
-            }
-          }
           this.setMetricGroups(response.data)
           return Promise.resolve()
         })

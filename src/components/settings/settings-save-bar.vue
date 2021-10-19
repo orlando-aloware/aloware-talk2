@@ -25,6 +25,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
 export default {
   name: 'settings-save-bar',
 
@@ -57,9 +58,11 @@ export default {
   methods: {
     ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
     onCancel () {
-      this.setUser({ ...this.userClone })
+      this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
       this.setFormValidity(true)
+
+      this.$VueEvent.fire('resetSettingsForm')
     },
     onSave () {
       this.isBusy = true
