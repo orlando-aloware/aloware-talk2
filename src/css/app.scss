@@ -7581,8 +7581,11 @@ button.grey-90 {
     aside {
       border-radius: 0.25rem;
       background: $grey-50;
-      padding: 15px 15px;
+      padding: 15px 0px 15px 15px;
       box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
+      .details-component-container {
+        padding-right: 15px;
+      }
     }
     &__close {
       border-radius: 50%;
@@ -7624,6 +7627,15 @@ button.grey-90 {
     .q-btn__content {
       height: 24px;
       min-height: 24px;
+    }
+  }
+  &-dropdown {
+    width: 20px;
+    height: 20px;
+    margin-right: 14.25px !important;
+    button {
+      width: 100%;
+      height: 100%;
     }
   }
 }
@@ -7697,10 +7709,8 @@ button.grey-90 {
     }
     &-dropdown {
       button {
-        flex: 0 0 20px !important;
-        height: 20px !important;
-        width: 20px !important;
         display: flex;
+        flex-grow: 1;
         justify-content: center;
         padding: 0 0 !important;
       }
@@ -7722,6 +7732,10 @@ button.grey-90 {
   .contact-activities-actions__mobile {
     display: flex;
   }
+}
+
+@media only screen and (max-width: 768px) {
+  
 }
 
 @media only screen and (max-width: 575px) {

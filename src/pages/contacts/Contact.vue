@@ -5,7 +5,7 @@
              variant="white"
              rounded="sm"
              v-if="authenticated">
-    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between">
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
       <template v-if="!isInbox">
         <contact-list-sidebar></contact-list-sidebar>
       </template>
