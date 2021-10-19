@@ -36,7 +36,9 @@ export default {
     }
   },
   mounted () {
-    // console.log('---', this.findParents(this.listObjects, 'Untitled List'))
+    console.log('404 :>> ', this.$route.params)
+    let id = this.$route.params.id
+    this.findParents(this.listObjects, id)
   },
   data () {
     return {
