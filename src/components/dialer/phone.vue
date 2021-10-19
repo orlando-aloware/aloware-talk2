@@ -2148,7 +2148,9 @@ export default {
 
           if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             setTimeout(() => {
-              this.changeScreen('menu')
+              if (this.screen !== 'wrap-up') {
+                this.changeScreen('menu')
+              }
             }, 5000)
           }
           break
