@@ -7588,3 +7588,13 @@ button.grey-90 {
     border-left: 1px solid $grey-60 !important;
   }
 }
+
+.stats-refresh-btn {
+  height: 32px;
+  font-size: $f-size-body-sm;
+  &:hover {
+    border-color: #000;
+    border: 1px solid #000 !important;
+    transition: border-color 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
