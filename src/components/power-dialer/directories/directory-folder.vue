@@ -85,7 +85,7 @@
       triggers="click blur"
       placement="bottomright"
       boundary="window"
-      custom-class="t-popover"
+      custom-class="contact-popover t-popover"
     >
 
       <FolderActions

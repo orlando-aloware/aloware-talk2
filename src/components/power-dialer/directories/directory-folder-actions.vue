@@ -1,17 +1,21 @@
 <template>
   <contact-menu>
-    <contact-menu-item @click="$emit('edit')" v-if="hasEdit">
+    <ContactMenuItem
+      v-if="hasEdit"
+      @click="$emit('edit')">
       <template slot="icon">
-        <pencil-icon></pencil-icon>
+        <PencilIcon />
       </template>
       <template slot="title">
         <span>Rename</span>
       </template>
-    </contact-menu-item>
+    </ContactMenuItem>
 
-    <contact-menu-item @mouseover="createSubmenu" @mouseleave="destroySubmenu">
+    <ContactMenuItem
+      @mouseover="createSubmenu"
+      @mouseleave="destroySubmenu">
       <template slot="icon">
-        <plus-icon></plus-icon>
+        <PlusIcon />
       </template>
       <template slot="title">
         <span>New</span>
@@ -20,71 +24,113 @@
         <span
           :id="'folder-submenu-' + id"
           class="submenu-icon"
-          @click="createSubmenu"
-        >
-          <folder-arrow-close-icon></folder-arrow-close-icon>
+          @click="createSubmenu">
+          <FolderArrowCloseIcon />
         </span>
       </template>
-    </contact-menu-item>
+    </ContactMenuItem>
 
     <div
-      :id="'folder-submenu-items-' + id"
-      class="folder-submenu-items"
-      :class="{ 'd-flex': isMenuOpen }"
       @mouseleave="destroySubmenu"
       @mouseover="createSubmenu"
-    >
-      <contact-menu-item @click="$emit('create')" v-if="hasEdit">
+      :id="'folder-submenu-items-' + id"
+      class="folder-submenu-items"
+      :class="{ 'd-flex': isMenuOpen }">
+      <ContactMenuItem
+        v-if="hasEdit"
+        @click="$emit('create')">
         <template slot="icon">
-          <folder-icon></folder-icon>
+          <FolderIcon />
         </template>
         <template slot="title">
           <span>Folder</span>
         </template>
-      </contact-menu-item>
+      </ContactMenuItem>
 
-      <contact-menu-item @click="$emit('createlist')" v-if="hasEdit">
+      <ContactMenuItem
+        v-if="hasEdit"
+        @mouseover="createChildmenu"
+        @mouseleave="destroyChildmenu">
         <template slot="icon">
-          <people-icon></people-icon>
+          <PeopleIcon />
         </template>
         <template slot="title">
           <span>List</span>
         </template>
-      </contact-menu-item>
+        <template slot="suffix">
+          <span
+            :id="'folder-childmenu-' + id"
+            class="childmenu-icon"
+            @click="createChildmenu">
+            <FolderArrowCloseIcon />
+          </span>
+        </template>
+      </ContactMenuItem>
+      <div
+        @mouseleave="destroyChildmenu"
+        @mouseover="createChildmenu"
+        :id="'folder-childmenu-items-' + id"
+        class="folder-childmenu-items"
+        :class="{ 'd-flex': isChildMenuOpen }">
+        <ContactMenuItem
+          v-if="hasEdit"
+          @click="$emit('create-existing')">
+          <template slot="icon">
+            <FolderIcon />
+          </template>
+          <template slot="title">
+            <span>Create from Existing Contacts List</span>
+          </template>
+        </ContactMenuItem>
+        <ContactMenuItem
+          v-if="hasEdit"
+          @click="$emit('create-manual')">
+          <template slot="icon">
+            <FolderIcon />
+          </template>
+          <template slot="title">
+            <span>Create by Manually Selecting Contacts</span>
+          </template>
+        </ContactMenuItem>
+      </div>
     </div>
 
-    <contact-menu-item @click="$emit('move')" v-if="hasEdit">
+    <ContactMenuItem
+      v-if="hasEdit"
+      @click="$emit('move')">
       <template slot="icon">
-        <move-icon></move-icon>
+        <MoveIcon />
       </template>
       <template slot="title">
         <span class="move-item">Move</span>
       </template>
-    </contact-menu-item>
+    </ContactMenuItem>
 
-    <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
+    <ContactMenuItem
+      v-if="hasDelete"
+      @click="$emit('remove')">
       <template slot="icon">
-        <trash-icon></trash-icon>
+        <TrashIcon />
       </template>
       <template slot="title">
         <span>Delete</span>
       </template>
-    </contact-menu-item>
+    </ContactMenuItem>
   </contact-menu>
 </template>
 
 <script>
 import { createPopper } from '@popperjs/core'
 import { mapActions } from 'vuex'
-import ContactMenu from 'components/contacts/contact-menu.vue'
-import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
+import ContactMenu from 'components/contacts/contact-menu'
+import ContactMenuItem from 'components/contacts/contact-menu-item'
 import FolderIcon from 'components/icons/folder-2-icon'
-import PencilIcon from 'components/icons/pencil-icon.vue'
-import MoveIcon from 'components/icons/move-icon.vue'
-import TrashIcon from 'components/icons/trash-icon.vue'
-import PlusIcon from 'components/icons/plus-icon.vue'
-import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
-import PeopleIcon from 'components/icons/people-icon.vue'
+import PencilIcon from 'components/icons/pencil-icon'
+import MoveIcon from 'components/icons/move-icon'
+import TrashIcon from 'components/icons/trash-icon'
+import PlusIcon from 'components/icons/plus-icon'
+import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
+import PeopleIcon from 'components/icons/people-icon'
 
 let popperInstance
 
@@ -114,7 +160,8 @@ export default {
   },
   data () {
     return {
-      isMenuOpen: false
+      isMenuOpen: false,
+      isChildMenuOpen: false
     }
   },
   methods: {
@@ -126,13 +173,32 @@ export default {
           document.getElementById('folder-submenu-' + this.id),
           document.getElementById('folder-submenu-items-' + this.id),
           {
-            placement: 'auto'
+            placement: 'right-start'
+          }
+        )
+      })
+    },
+    createChildmenu () {
+      this.isChildMenuOpen = true
+      this.$nextTick(() => {
+        popperInstance = createPopper(
+          document.getElementById('folder-childmenu-' + this.id),
+          document.getElementById('folder-childmenu-items-' + this.id),
+          {
+            placement: 'right-start'
           }
         )
       })
     },
     destroySubmenu (evt) {
       this.isMenuOpen = false
+      if (popperInstance) {
+        popperInstance.destroy()
+        popperInstance = null
+      }
+    },
+    destroyChildmenu (evt) {
+      this.isChildMenuOpen = false
       if (popperInstance) {
         popperInstance.destroy()
         popperInstance = null

@@ -5336,14 +5336,21 @@ table.datatable {
   }
 }
 
-.folder-submenu-items {
+.folder-submenu-items,
+.folder-childmenu-items {
   background: white;
   border-radius: 5px;
   border: solid 1px $grey-light;
   display: none;
   flex-direction: column;
   position: absolute;
+}
+.folder-submenu-items {
   width: 200px;
+}
+
+.folder-childmenu-items {
+  width: 300px;
 }
 
 .import-modal {
