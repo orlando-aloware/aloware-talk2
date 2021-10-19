@@ -3,7 +3,7 @@
     <div class="page-side-menubar__left settings"
          :class="{'page-side-menubar__left--closed': closed }">
 
-      <div class="header flex- w-100 ml-3 mt-2">
+      <div class="header w-100 ml-3 mt-2">
         <q-select
             ref="settingsSearcher"
             class="bottom-border__none padding-left__none settings-searcher"

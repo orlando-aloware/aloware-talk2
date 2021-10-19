@@ -1,6 +1,6 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column">
-      <div class="header flex- w-100" v-if="$route.params.channel !== 'mentions'">
+      <div class="header w-100" v-if="$route.params.channel !== 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper">
             <compact-btn v-if="hasChannelFilterChanges"
@@ -40,7 +40,7 @@
           </q-select>
         </div>
       </div>
-      <div class="header flex- w-100" v-if="$route.params.channel === 'mentions'">
+      <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-2 pr-2">
           <div class="mention-filter-actions-wrapper pr-4">
             <div class="position-absolute search-icon">
