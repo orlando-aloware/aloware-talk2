@@ -39,6 +39,16 @@ export default {
   },
 
   /**
+   * GENERAL MUTATIONS
+   */
+  SET_SEARCH: (state, value) => {
+    state.search = value
+  },
+  RESET_SEARCH: (state) => {
+    state.search = ''
+  },
+
+  /**
    * POWER DIALER LISTS
    */
   SET_CURRENT_LIST: (state, data) => {

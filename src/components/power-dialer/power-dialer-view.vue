@@ -26,6 +26,8 @@
               <div class="d-flex">
 
                 <SearchList
+                  @search="onSearch"
+                  :search="search"
                   class="width-250" />
                 <SummaryInfoLabels />
 
@@ -131,13 +133,13 @@
                 v-for="(contact, nkey) in currentContacts"
                 :key="`power-dialer-${contact.id}-${nkey}`"
                 :contact="contact"
-                :columns="columns"
+                :columns="columns2"
                 :checked="checked"
                 :contactListId="id"
                 :custom-row-content="true"
                 @checked="onCheckedRows">
                 <template slot="custom-content">
-                  <template v-for="(column, key) in columns">
+                  <template v-for="(column, key) in columns2">
                     <!-- change date added to date created -->
                     <!-- COLUMN: Checkboxes -->
                     <td

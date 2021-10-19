@@ -34,6 +34,13 @@ export default {
   },
 
   /**
+   * General Actions
+   */
+  setSearch: ({ commit }, value) => {
+    commit('SET_SEARCH', value)
+  },
+
+  /**
    * DIRECTORIES
    */
   columnsReordered: ({ commit }, payload) => {

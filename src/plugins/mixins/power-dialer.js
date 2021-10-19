@@ -21,7 +21,8 @@ export default {
       'listItems',
       'currentListFilters',
       'powerDialerListItems',
-      'currentList'
+      'currentList',
+      'search'
     ]),
     columns () {
       return this.currentList?.headers || []
@@ -33,17 +34,24 @@ export default {
       return this.listItems[this.$route.params.id]
     },
     tempId () {
-      return this.id || 'all'
+      if (this.filter === 'in-queue') {
+        return 'in-queue'
+      }
+      return this.id
     }
   },
   methods: {
     ...mapActions('powerDialer', [
-      'contactsLoaded'
+      'contactsLoaded',
+      'setSearch'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_TABLE_LOADER'
     ]),
     async processFetch (params) {
+      // console.log('100 :>> ', this.powerDialerListItems[this.tempId])
+      // console.log('101 :>> ', this.powerDialerListItems)
+      // console.log('102 :>> ', this.tempId)
       return this.$axios
         .get('api/v2/contacts', {
           params: this.buildQueryString(params),
@@ -51,8 +59,8 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          console.log('params :>> ', params)
-          console.log('data from api : ', data)
+          // console.log('params :>> ', params)
+          // console.log('data from api : ', data)
           this.contactsLoaded({
             id: this.tempId || '',
             append: false,
@@ -80,7 +88,7 @@ export default {
       query.per_page = params.per_page || 25
 
       query.filter_groups = []
-      // debugger
+
       if (typeof this.powerDialerListItems[this.tempId] !== 'undefined' && this.tempId !== 'all') {
         query.filter_groups = [
           {
@@ -96,6 +104,7 @@ export default {
       }
 
       if (!isEmpty(filters)) {
+        // console.log('200 :>> ', 200)
         query.filter_groups.push({
           is_conjunction: true,
           filters: filters
@@ -103,6 +112,7 @@ export default {
       }
 
       if (!isEmpty(this.currentListFilters)) {
+        // console.log('300 :>> ', 300)
         for (let filterIndex of Object.keys(this.currentListFilters)) {
           // check if filter index is a number
           if (!isNaN(filterIndex / 1)) {
@@ -112,6 +122,7 @@ export default {
       }
 
       if (params.sort) {
+        // console.log('400 :>> ', 400)
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
       }
@@ -125,6 +136,11 @@ export default {
       params.order = order
       this.isLoading = true
       this.processFetch(params)
+    },
+    onSearch (searchText) {
+      this.isLoaded = false
+      this.setSearch(searchText)
+      this.fetch({ search: this.search })
     },
     onSortByField (sorts) {
       console.log('sorts :>> ', sorts)

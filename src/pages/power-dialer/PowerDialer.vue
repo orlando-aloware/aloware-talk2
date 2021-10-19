@@ -32,6 +32,7 @@ import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 
 export default {
   name: 'PowerDialer',
@@ -107,31 +108,29 @@ export default {
       let params = {
         'page': 1,
         'per_page': 25,
-        // 'filter_groups[0][filters][contact_lists][value][0]': this.$route.params.id,
-        // 'filter_groups[0][filters][contact_lists][operator]': 1,
-        // 'filter_groups[0][is_conjunction]': true,
-        'order': 'desc'
+        'order': 'desc',
+        'sort': 'last_engagement_at'
       }
-      console.log('this.id :>> ', this.id)
-      console.log('this.powerDialerListItems :>> ', this.powerDialerListItems)
-      console.log('this.powerDialerListItems[this.id] :>> ', this.powerDialerListItems[this.id])
 
       if (this.isFilterKey) {
         await this.getPowerDialerListItem(this.id)
+        console.log(' ---> this.powerDialerListItems :>> ', this.powerDialerListItems)
       }
 
       if (this.powerDialerListItems[this.id] === undefined) {
         if (isEmpty(this.id)) {
-          console.log('401 :>> ', 401)
+          console.log('901 :>> ', 901)
           await this.processFetch(params)
         } else {
-          console.log('402 :>> ', 402)
-          console.log('ELSE is now an option...')
+          this.contactsLoaded({
+            id: this.tempId,
+            ...DEFAULT_LIST_ITEMS
+          })
+          console.log('902 :>> ', 902)
           await this.processFetch(params)
         }
-        console.log('this.currentList :>> ', this.currentList)
       } else {
-        console.log('403 :>> ', 403)
+        console.log('903 :>> ', 903)
         await this.processFetch(params)
       }
 

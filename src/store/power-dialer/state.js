@@ -49,14 +49,14 @@ export default function () {
         id: 'in-queue',
         headers: DEFAULT_COLUMNS,
         filters: [
-          {
-            filters: {
-              in_queue: {
-                value: 1
-              }
-            },
-            is_conjunction: true
-          }
+          // {
+          //   filters: {
+          //     in_queue: {
+          //       value: 1
+          //     }
+          //   },
+          //   is_conjunction: true
+          // }
         ],
         name: 'In Queue'
       },
@@ -135,6 +135,7 @@ export default function () {
     searchedListItem: '',
     currentListFilters: [],
     currentList: null,
-    datatableLoader: false
+    datatableLoader: false,
+    search: ''
   }
 }

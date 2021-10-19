@@ -133,8 +133,8 @@ export const ALL_COLUMNS = [
     minWidth: 150
   },
   {
-    name: 'date_added',
-    label: 'Date Added',
+    name: 'created_at',
+    label: 'Created At',
     category: 0,
     order: 2,
     sortable: true,

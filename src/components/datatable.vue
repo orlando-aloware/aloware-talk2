@@ -133,6 +133,10 @@ export default {
     customClass: {
       type: String
     },
+    customHeaders: {
+      type: Array,
+      default: () => []
+    },
     stickyHeaders: {
       type: Boolean,
       default: false
