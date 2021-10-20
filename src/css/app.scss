@@ -5184,6 +5184,13 @@ table.datatable {
         color: $grey-100;
       }
 
+      .handle-label {
+        margin-right: 0px;
+        top: 2px;
+        position: relative;
+        color: $grey-100;
+      }
+
       th {
         background-color: $white;
         border-bottom: solid 1px $grey-light3;
@@ -5199,7 +5206,7 @@ table.datatable {
         user-select: none;
         font-weight: 600;
 
-        > .move-icon-drag {
+        > .move-icon-drag-container {
           opacity: 0;
         }
 
@@ -5212,7 +5219,16 @@ table.datatable {
         }
 
         &:not(.checkbox):hover {
-          background-color: #EBECFE;
+          // background-color: rgba(37, 110, 255, 0.1);
+          background-color: $grey-60;
+          &.hovering {
+            background-color: rgba(37, 110, 255, 0.1);
+          }
+        }
+
+        &:not(.checkbox) .move-icon-drag:hover {
+          // background-color: rgba(37, 110, 255, 0.1);
+          // background-color: $grey-60;
         }
 
         &:hover {
@@ -5221,7 +5237,7 @@ table.datatable {
           }
           // border-left: 1px $grey-light3 solid;
           // border-right: 1px $grey-light3 solid;
-          > .move-icon-drag {
+          > .move-icon-drag-container {
             opacity: 1;
           }
         }

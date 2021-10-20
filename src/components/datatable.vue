@@ -16,18 +16,21 @@
             :move="onCheckMove"
           >
             <th
-              v-for="column in fixedColumns"
+              v-for="(column, key) in fixedColumns"
               :key="column.name"
               :data-column-id="column.name"
               :class="{
                 checkbox: column.name === 'checkbox',
-                sticky: column.sticky
+                sticky: column.sticky,
+                hovering: hoverKey === key ? isHovering : false
               }"
               :style="{
                 maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
                 minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
               }"
-            >
+              @mouseout="onInitReorder(false, null)"
+              >
+
               <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
                 <input type="checkbox"
                        class="data-table-check-all"
@@ -36,8 +39,17 @@
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
-                <MoveIcon class="move-icon-drag" :class="{ handle: column.draggable }" />
-                <span :class="{ handle: column.draggable }">
+                <div
+                  v-if="column.draggable"
+                  @mouseover="onInitReorder(true, key)"
+                  class="move-icon-drag-container"
+                  style="display:inline-block;">
+                  <MoveIcon
+                    v-if="column.draggable"
+                    class="move-icon-drag"
+                    :class="{ handle: column.draggable }" />
+                </div>
+                <span class="handle-label">
                   {{ column.label }}
                 </span>
                 <a
@@ -227,7 +239,9 @@ export default {
         { value: 25, label: '25 Per Page' },
         { value: 50, label: '50 Per Page' },
         { value: 100, label: '100 Per Page' }
-      ]
+      ],
+      isHovering: false,
+      hoverKey: null
     }
   },
 
@@ -301,6 +315,10 @@ export default {
           this.$emit('more')
         }
       }, 66)
+    },
+    onInitReorder (value, key) {
+      this.isHovering = value
+      this.hoverKey = key
     }
   },
 
