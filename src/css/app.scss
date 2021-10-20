@@ -1654,6 +1654,9 @@ i.option-separator {
 
 .activity-bottom-info {
   height: 30px;
+  span {
+    white-space: nowrap;
+  }
 }
 
 //VUECTK DATETIMEPICKER
@@ -3152,6 +3155,11 @@ span.mention {
   width: 380px;
 }
 
+.max-width-380 {
+  max-width: 380px;
+  width: 100%;
+}
+
 .width-0 {
   width: 0;
 }
@@ -3286,7 +3294,7 @@ span.mention {
 }
 
 .inbox-side {
-  max-width: 430px;
+  max-width: 508px;
   width: 100% !important;
   background-color: $white;
   border: solid 1px $grey-light3;
@@ -3334,6 +3342,7 @@ span.mention {
     height: 45px;
     display: flex;
     align-items: center;
+    flex-grow: 1;
     border-bottom: solid 1px $grey-light3;
 
     &__label {
@@ -4718,7 +4727,6 @@ span.mention {
   align-items: center;
   border-bottom: solid 1px $grey-light3;
   &__label {
-    max-width: 224px;
     padding-left: 20px;
     font-weight: 600;
     font-size: 16px;
@@ -7180,8 +7188,7 @@ button.grey-90 {
 }
 
 .mention-filter-actions-wrapper {
-
-  width: 65%;
+  width: 50%;
   margin-top: 15px;
 
   div.search-icon {
@@ -7608,7 +7615,6 @@ button.grey-90 {
 }
 
 .contact-activity-wrapper {
-  min-width: 400px;
   width: 100%;
 }
 
@@ -7644,7 +7650,37 @@ button.grey-90 {
   }
 }
 
-@media only screen and (max-width: 1261px) {
+@media screen and (max-width: 1425px) and (min-width: 1085px),
+screen and (max-width: 956px) {
+  .inbox {
+    .inbox-details {
+      .contact-activity-container {
+        .composer-footer {
+          flex-direction: column;
+          .inline-select.q-select--with-input {
+            min-width: unset;
+          }
+          & > div {
+            width: auto !important;
+            height: 24px;
+            > div {
+              float: none !important;
+              .q-field__append {
+                align-items: center;
+                height: 29px !important;
+              }
+            }
+          }
+          .q-field__control {
+            flex-direction: column;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1261px) {
   .contact-activity-container {
     .calls-header {
       &__label {
@@ -7654,7 +7690,13 @@ button.grey-90 {
   }
 }
 
-@media only screen and (max-width: 1159px) {
+@media screen and (max-width: 1237px) {
+  .inbox-side {
+    max-width: 430px;
+  }
+}
+
+@media screen and (max-width: 1159px) {
   .inbox-side {
     max-width: 305px;
     &__nav {
@@ -7701,7 +7743,7 @@ button.grey-90 {
   }
 }
 
-@media only screen and (max-width: 1084px) {
+@media screen and (max-width: 1084px) {
   .contact-activities-actions {
     margin-right: 22.81px;
     &__mobile {
@@ -7738,11 +7780,11 @@ button.grey-90 {
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
 }
 
-@media only screen and (max-width: 575px) {
+@media screen and (max-width: 575px) {
   .inbox-side {
     border-left: 0 !important;
     &__left {

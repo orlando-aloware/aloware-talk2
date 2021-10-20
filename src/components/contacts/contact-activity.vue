@@ -151,7 +151,7 @@
         </div>
       </div>
 
-      <div class="item width-380"
+      <div class="item max-width-380"
            v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
         <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
@@ -170,7 +170,8 @@
         </div>
       </div>
 
-      <div class="activity-bottom-info text-xs width-500 m-b d-flex align-items-center"
+      <div class="activity-bottom-info text-xs width-500 m-b d-flex align-items-center flex-wrap"
+           :class="[ communication.direction === CommunicationDirection.INBOUND ? 'justify-content-start' : 'justify-content-end' ]"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
