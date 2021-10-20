@@ -229,6 +229,9 @@ export default {
     },
     openEditModal () {
       this.editModal = true
+    },
+    toggleLoader (value) {
+      this.loader = value
     }
   }
 }
