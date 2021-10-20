@@ -1,6 +1,6 @@
 <template>
   <div class="t-menu">
-    <div class="t-menu__header d-flex align-items-center">
+    <div class="t-menu__header d-flex align-items-center pr-3">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         SESSION
       </div>
@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="d-flex t-menu__content flex-column pb-3 pl-2">
-      <q-card class="py-0 my-0 px-1" flat>
+      <q-card class="py-0 my-0 pl-1" flat>
         <div class="row">
           <div
             class="col col-4 p-0 px-1"
@@ -32,11 +32,11 @@
             :key="stat.name">
             <q-card-section
               class="p-0">
-              <div class="text-subtitle1 text-weight-medium d-flex">
+              <div class="t-value text-subtitle1 text-weight-medium d-flex">
                 {{ stat.values.primary }}
                 <div class="text-caption pt-1 pl-1 text-grey">{{stat.values.secondary}}</div>
               </div>
-              <div class="text-caption text-grey">{{ stat.name }}</div>
+              <div class="t-label text-caption text-grey">{{ stat.name }}</div>
             </q-card-section>
             </div>
         </div>

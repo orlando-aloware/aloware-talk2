@@ -5,7 +5,7 @@
         CALL DISPOSITION
       </div>
     </div>
-    <div class="d-flex t-menu__content px-3 pb-2">
+    <div class="d-flex t-menu__content over-flow px-3 pb-2">
       <q-chip
         v-for="chip in callDisposition"
         :key="chip.name"
@@ -13,9 +13,29 @@
         :outline="chip.outlined"
         square
         :class="`p-0 mx-2 ${chip.outlined ? '' : 'text-white'}`">
-        {{ chip.label }}
+        <div :class="`${chip.outlined ? 'text-black' : 'text-white'}`">
+          {{ chip.label }}
+        </div>
       </q-chip>
-      <q-chip square outline color="grey" class="p-0">...</q-chip>
+      <b-dropdown
+        text="..."
+        no-caret
+        right size="sm"
+        variant="white"
+        class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+        <template #button-content>
+          <i class="fa fa-ellipsis-h"></i>
+        </template>
+        <b-dropdown-item href="#">
+          Option 1
+        </b-dropdown-item>
+        <b-dropdown-item href="#">
+          Option 2
+        </b-dropdown-item>
+        <b-dropdown-item href="#">
+          Option 3
+        </b-dropdown-item>
+      </b-dropdown>
     </div>
 
     <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
@@ -23,7 +43,7 @@
         CONTACT DISPOSITION
       </div>
     </div>
-    <div class="d-flex t-menu__content px-3 pb-2">
+    <div class="d-flex t-menu__content over-flow px-3 pb-2">
       <q-chip
         v-for="chip in contactDisposition"
         :key="chip.name"
@@ -33,7 +53,22 @@
         :class="`p-0 mx-2 ${chip.outlined ? '' : 'text-white'}`">
         {{ chip.label }}
       </q-chip>
-      <q-chip square outline color="primary" class="p-0">...</q-chip>
+      <b-dropdown
+        text="..."
+        no-caret
+        right size="sm"
+        variant="white"
+        class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+        <template #button-content>
+          <i class="fa fa-ellipsis-h"></i>
+        </template>
+        <b-dropdown-item href="#">
+          DNC
+        </b-dropdown-item>
+        <b-dropdown-item href="#">
+          Not Interested
+        </b-dropdown-item>
+      </b-dropdown>
     </div>
 
     <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
@@ -41,7 +76,7 @@
         VOICEMAIL
       </div>
     </div>
-    <div class="d-flex t-menu__content px-3 pb-0">
+    <div class="d-flex t-menu__content over-flow px-3 pb-0">
       <q-chip
         v-for="chip in voicemail"
         :key="chip.name"
@@ -51,7 +86,22 @@
         :class="`p-0 mx-2 ${chip.outlined ? '' : 'text-blue'}`">
         {{ chip.label }}
       </q-chip>
-      <q-chip square outline color="grey-7" class="p-0">...</q-chip>
+      <b-dropdown
+        text="..."
+        no-caret
+        right size="sm"
+        variant="white"
+        class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+        <template #button-content>
+          <i class="fa fa-ellipsis-h"></i>
+        </template>
+        <b-dropdown-item href="#">
+          Option 101
+        </b-dropdown-item>
+        <b-dropdown-item href="#">
+          Option 201
+        </b-dropdown-item>
+      </b-dropdown>
     </div>
 
   </div>

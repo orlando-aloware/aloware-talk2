@@ -84,3 +84,15 @@
     top: -2px;
   }
 }
+
+.dropdown {
+
+  &.show {
+    .dropdown-toggle {
+      border: $primary solid 1px !important;
+    }    
+  }
+  .dropdown-toggle {
+    border-radius: 6px;
+  }
+}
