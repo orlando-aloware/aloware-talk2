@@ -112,7 +112,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('contacts', ['selectedList']),
-    ...mapState('stats', ['metricLoader']),
+    ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
     ...mapState(['dialer']),
 
     isDialerReady () {
@@ -193,6 +193,9 @@ export default {
     },
     metricLoader () {
       this.loading = this.metricLoader
+    },
+    groupMetricLoader () {
+      this.loading = this.groupMetricLoader
     }
   }
 }

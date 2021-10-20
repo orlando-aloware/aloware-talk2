@@ -179,7 +179,7 @@ export default {
     ...mapActions('stats', [
       'deleteMetric',
       'updateMetric',
-      'setMetricLoader'
+      'setGroupMetricLoader'
     ]),
     removeSelectedMetric () {
       this.loader = true
@@ -232,7 +232,8 @@ export default {
       this.editModal = true
     },
     toggleLoader (value) {
-      this.setMetricLoader(value)
+      this.setGroupMetricLoader(value)
+      this.loader = value
     }
   }
 }

@@ -8,6 +8,9 @@ export default {
   setMetricLoader: async ({ commit }, value) => {
     commit('TOGGLE_METRIC_LOADER', value)
   },
+  setGroupMetricLoader: async ({ commit }, value) => {
+    commit('TOGGLE_GROUP_METRIC_LOADER', value)
+  },
   addMetricGroup: async ({ commit }, data) => {
     commit('ADD_METRIC_GROUP', data)
   },

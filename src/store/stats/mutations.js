@@ -211,6 +211,9 @@ export default {
   TOGGLE_METRIC_LOADER: (state, value) => {
     state.metricLoader = value
   },
+  TOGGLE_GROUP_METRIC_LOADER: (state, value) => {
+    state.groupMetricLoader = value
+  },
   SET_AVAILABLE_METRICS: (state, data) => {
     state.availableMetrics = data
   },
