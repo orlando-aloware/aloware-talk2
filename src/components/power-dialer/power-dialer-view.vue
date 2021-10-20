@@ -167,7 +167,7 @@
                       class="datatable-row__phone">
                       <div
                         v-if="contact.phone_number"
-                        class="ellipse">
+                        :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
                         {{ contact.phone_number | fixPhone('NATIONAL', true) }}
                       </div>
                       <span v-else class="ml-1 text-grey-7 text-center">--</span>
@@ -177,14 +177,14 @@
                       class="text-left"
                       :key="column.name"
                       v-else-if="column.name === 'created_at'">
-                      <div class="ellipse">
+                      <div :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
                         {{ contact.created_at | fixDate }}
                       </div>
                     </td>
                     <!-- COLUMN: Tags -->
                     <td
                       v-else-if="column.name === 'tags'"
-                      class="tags-cell"
+                      :class="`tags-cell ${column.draggable ? 'pl-4' : ''}`"
                       :key="column.name">
                       <TagPopover
                         :resource="contact" />
@@ -192,6 +192,7 @@
                     <!-- COLUMN: Status -->
                     <td
                       v-else-if="column.name === 'status'"
+                      :class="`tags-cell ${column.draggable ? 'pl-4' : ''}`"
                       :key="key">
                       <StatusChip
                         :status="contact.status"
