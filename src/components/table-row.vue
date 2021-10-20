@@ -41,7 +41,7 @@
                 @click="navigate"
                 class="d-flex align-items-center item contact-name">
                 <template v-if="contact.name">
-                  <div class="ellipse">
+                  <div :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
                     {{ contact.name | ucwords }}
                   </div>
                 </template>
@@ -59,7 +59,7 @@
         class="datatable-row__phone">
         <div
           v-if="contact.phone_number"
-          class="ellipse">
+          :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
           {{ contact.phone_number | fixPhone('NATIONAL', true) }}
         </div>
         <span
@@ -72,7 +72,7 @@
       <td
         v-else-if="column.name === 'last_engagement_text'"
         :key="column.name">
-        <div class="ellipse">
+        <div :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
           <div>{{ contact.last_engagement_text }}</div>
           <div class="small text-muted">
             {{ moment(contact.last_engagement_at).format('LLL') }}
@@ -82,7 +82,7 @@
 
       <td
         v-else-if="column.name === 'tags'"
-        class="tags-cell"
+        :class="`tags-cell ${column.draggable ? 'pl-4' : ''}`"
         :key="column.name">
 
         <template
@@ -135,7 +135,7 @@
       </td>
 
       <td
-        class="text-left"
+        :class="`text-left ${column.draggable ? 'pl-4' : ''}`"
         :key="column.name"
         v-else-if="column.name === 'unread_texts_count'"
       >
@@ -147,7 +147,7 @@
       </td>
 
       <td
-        class="text-left"
+        :class="`text-left ${column.draggable ? 'pl-4' : ''}`"
         :key="column.name"
         v-else-if="column.name === 'unread_missed_calls_count'"
       >
@@ -159,7 +159,7 @@
       </td>
 
       <td
-        class="text-left"
+        :class="`text-left ${column.draggable ? 'pl-4' : ''}`"
         :key="column.name"
         v-else-if="column.name === 'unread_voicemails_count'"
       >
@@ -174,7 +174,7 @@
         v-else-if="column.name === 'text_authorized_at'"
         class="text-left"
         :key="column.name">
-        <div class="ellipse">
+        <div :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
           {{ contact.text_authorized_at ? 'Yes' : 'No' }}
         </div>
       </td>
@@ -183,7 +183,7 @@
         v-else-if="column.name === 'initial_campaign_id'"
         class="text-left"
         :key="column.name">
-        <div class="ellipse">
+        <div :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
           {{ getLineName(contact.initial_campaign_id) }}
         </div>
       </td>
@@ -192,7 +192,7 @@
         v-else-if="column.name === 'created_at'"
         class="text-left"
         :key="column.name">
-        <div class="ellipse">
+        <div :class="`ellipse ${column.draggable === true ? 'pl-3' : ''}`">
           {{ contact.created_at | fixDate }}
         </div>
       </td>
@@ -238,12 +238,12 @@
             :id="`${column.name}-${contact.id}`">
             <div
               v-if="`${typeof contact[column.name][0].phone_number !== 'undefined'}`"
-              class="ellipse">
+              :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
               {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
             </div>
             <div
               v-else
-              class="ellipse">
+              :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
               {{ contact[column.name][0].name }}
             </div>
             <span
@@ -282,7 +282,7 @@
         <div
           v-else-if="`${contact[column.name] && contact[column.name] instanceof Object}`"
           class="text-left">
-          <div class="ellipse">
+          <div :class="`ellipse ${column.draggable ? 'pl-3' : ''}`">
             {{ contact[column.name].name }}
           </div>
         </div>
@@ -294,7 +294,7 @@
         <div
           v-else
           class="ellipse"
-          :class="[isCountField(column.name) ? 'text-center' : 'text-left']">
+          :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'pl-3' : ''}`">
           {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
             (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : contact[column.name]) }}
         </div>

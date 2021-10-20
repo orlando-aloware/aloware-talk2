@@ -36,7 +36,7 @@
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
-                <MoveIcon />
+                <MoveIcon class="move-icon-drag" :class="{ handle: column.draggable }" />
                 <span :class="{ handle: column.draggable }">
                   {{ column.label }}
                 </span>

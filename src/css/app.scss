@@ -5109,13 +5109,13 @@ div.tableResizer {
   cursor: col-resize;
   z-index: 10;
   background-color: transparent;
-  border-right: 2px solid rgba(37, 110, 255, 0.08);
+  border-right: 2px solid rgba(37, 110, 255, 0);
   &.resizing {
     background-color: rgba(37, 110, 255, 0.7);
   }
 
   &:hover {
-    border-right: 2px solid rgba(37, 110, 255, 0.7);
+    border-right: 2px solid rgba(37, 110, 255, 0.7) !important;
   }
 
   &:active {
@@ -5199,6 +5199,10 @@ table.datatable {
         user-select: none;
         font-weight: 600;
 
+        > .move-icon-drag {
+          opacity: 0;
+        }
+
         &.ghost {
           background-color: $light-green2;
         }
@@ -5212,27 +5216,31 @@ table.datatable {
         }
 
         &:hover {
-          // .tableResizer {
-          //   border-right: 2px solid rgba(37, 110, 255, 0.7);
-          // }
+          .tableResizer {
+            border-right: 2px solid $grey-80;
+          }
           // border-left: 1px $grey-light3 solid;
           // border-right: 1px $grey-light3 solid;
+          > .move-icon-drag {
+            opacity: 1;
+          }
         }
 
         a.sorter {
           position: absolute;
           height: 30px;
           width: 30px;
-          display: flex;
-          align-items: center;
+          // display: flex;
+          // align-items: center;
           justify-content: center;
-          right: 15px;
-          top: 9%;
+          padding-left: 6px;
+          // right: 15px;
+          // top: 9%;
         }
 
         a.sorter:before,
         a.sorter:after {
-          border: 3px solid transparent;
+          border: 4px solid transparent;
           content: '';
           display: block;
           height: 0;
@@ -5241,13 +5249,13 @@ table.datatable {
 
         a.sorter:before {
           border-bottom-color: $grey-30;
-          margin-top: -9px;
+          margin-top: 2px;
         }
 
         a.sorter:after {
           border-top-color: $grey-30;
-          margin-top: 7px;
-          margin-left: -6px;
+          margin-top: 2px;
+          margin-left: 0px;
         }
 
         a.sorter.sorter-desc:before {
