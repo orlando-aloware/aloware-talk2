@@ -1,11 +1,16 @@
 <template>
-  <div class="d-flex flex-column" :class="[paginated ? 'paginated' : '']">
+  <div
+    class="d-flex flex-column"
+    :class="[paginated ? 'paginated' : '']">
     <div
       ref="scrollableArea"
       :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
-      @scroll="handleScroll"
-    >
-      <table :class="[computedClass, 'ml-3']" ref="table">
+      @scroll="handleScroll">
+
+      <table
+        :class="[computedClass, 'ml-3']"
+        ref="table">
+
         <thead>
           <draggable
             :list="fixedColumns"
@@ -13,8 +18,8 @@
             ghost-class="ghost"
             handle=".handle"
             @change="onOrderChanged"
-            :move="onCheckMove"
-          >
+            :move="onCheckMove">
+
             <th
               v-for="(column, key) in fixedColumns"
               :key="column.name"
@@ -28,14 +33,16 @@
                 maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
                 minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
               }"
-              @mouseout="onInitReorder(false, null)"
-              >
+              @mouseout="onInitReorder(false, null)">
 
-              <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
-                <input type="checkbox"
-                       class="data-table-check-all"
-                       ref="dataTableCheckAll"
-                       @change="onCheckboxClicked"/>
+              <label
+                v-if="column.name === 'checkbox'"
+                class="custom-checkbox-container check-all">
+                <input
+                  type="checkbox"
+                  class="data-table-check-all"
+                  ref="dataTableCheckAll"
+                  @change="onCheckboxClicked" />
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
@@ -52,6 +59,9 @@
                 <span class="handle-label">
                   {{ column.label }}
                 </span>
+                <div
+                  class="sorter-container"
+                  :class="{ 'has-sorting': sorts.orderBy === column.name }">
                 <a
                   href="#"
                   class="sorter"
@@ -62,15 +72,15 @@
                       sorts.order === 'desc' && sorts.orderBy === column.name
                   }"
                   v-if="column.sortable"
-                  @click.prevent="onColumnSort(column)"
-                ></a>
+                  @click.prevent="onColumnSort(column)">
+                </a>
+                </div>
                 <div
                   class="tableResizer"
                   :data-resizer-id="column.name"
                   v-if="column.resizable"
-                  @mousedown="onResizerMouseDown"
-                >
-                  -{{ column.label }}
+                  @mousedown="onResizerMouseDown">
+                  {{ column.label }}
                 </div>
               </template>
             </th>
@@ -84,8 +94,7 @@
         class="table-more-rows-spinner"
         :show="isLoadingMore"
         rounded="sm"
-        v-if="!paginated"
-      >
+        v-if="!paginated">
         <template #overlay>
           <q-spinner-bars color="primary" size="20px" />
         </template>
@@ -98,6 +107,7 @@
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
+
     <div class="d-flex justify-content-center" v-if="paginated">
       <q-pagination
         boundary-links
@@ -108,19 +118,21 @@
         :max="lastPage"
         :max-pages="11"
         :ellipses="false"
-        :boundary-numbers="false"
-      ></q-pagination>
+        :boundary-numbers="false">
+      </q-pagination>
 
-      <q-select outlined
-                dense
-                emit-value
-                class="mt-2 q-select-pager"
-                option-value="value"
-                option-label="label"
-                v-model="perPage"
-                :options="perPageOptions"
-                :display-value="`${perPage} per page`">
+      <q-select
+        outlined
+        dense
+        emit-value
+        class="mt-2 q-select-pager"
+        option-value="value"
+        option-label="label"
+        v-model="perPage"
+        :options="perPageOptions"
+        :display-value="`${perPage} per page`">
       </q-select>
+
     </div>
   </div>
 </template>

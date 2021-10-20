@@ -5231,6 +5231,35 @@ table.datatable {
           // background-color: $grey-60;
         }
 
+        .sorter-container {
+          display: inline;
+          &.has-sorting {
+
+            a.sorter.sorter-desc {
+              &:before {
+                opacity: 1 !important;
+                position: relative;
+                top: 3px;
+              }
+              &:after {
+                opacity: 0 !important;
+              }
+            }
+
+            a.sorter.sorter-asc {
+              &:before {
+                opacity: 0 !important;
+              }
+              &:after {
+                opacity: 1 !important;
+                position: relative;
+                top: -3px;
+              }
+            }
+
+          }
+        }
+
         &:hover {
           .tableResizer {
             border-right: 2px solid $grey-80;
@@ -5239,6 +5268,39 @@ table.datatable {
           // border-right: 1px $grey-light3 solid;
           > .move-icon-drag-container {
             opacity: 1;
+          }
+          a.sorter:before,
+          a.sorter:after {
+            opacity: 1;
+          }
+
+          .sorter-container {
+            display: inline;
+            &.has-sorting {
+  
+              a.sorter.sorter-desc {
+                &:before {
+                  opacity: 1 !important;
+                  position: relative;
+                  top: 0px;
+                }
+                &:after {
+                  opacity: 1 !important;
+                }
+              }
+  
+              a.sorter.sorter-asc {
+                &:before {
+                  opacity: 1 !important;
+                }
+                &:after {
+                  opacity: 1 !important;
+                  position: relative;
+                  top: 0px;
+                }
+              }
+  
+            }
           }
         }
 
@@ -5265,21 +5327,25 @@ table.datatable {
 
         a.sorter:before {
           border-bottom-color: $grey-30;
-          margin-top: 2px;
+          margin-top: 1px;
+          // opacity: 0;
         }
 
         a.sorter:after {
           border-top-color: $grey-30;
           margin-top: 2px;
           margin-left: 0px;
+          // opacity: 0;
         }
 
         a.sorter.sorter-desc:before {
           border-bottom-color: $green;
+          opacity: 1;
         }
 
         a.sorter.sorter-asc:after {
           border-top-color: $green;
+          opacity: 1;
         }
       }
     }
