@@ -178,7 +178,8 @@ export default {
   methods: {
     ...mapActions('stats', [
       'deleteMetric',
-      'updateMetric'
+      'updateMetric',
+      'setMetricLoader'
     ]),
     removeSelectedMetric () {
       this.loader = true
@@ -229,6 +230,9 @@ export default {
     },
     openEditModal () {
       this.editModal = true
+    },
+    toggleLoader (value) {
+      this.setMetricLoader(value)
     }
   }
 }

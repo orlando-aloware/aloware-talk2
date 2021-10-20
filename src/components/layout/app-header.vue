@@ -113,6 +113,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('contacts', ['selectedList']),
+    ...mapState('stats', ['metricLoader']),
     ...mapState(['dialer']),
 
     isDialerReady () {
@@ -165,7 +166,6 @@ export default {
       e.preventDefault()
     },
     refreshMetricGroup () {
-      this.loading = true
       this.setMetricLoader(true)
       this.$axios
         .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
@@ -174,13 +174,11 @@ export default {
           }
         })
         .then(response => {
-          this.loading = false
           this.setMetricLoader(false)
           this.setMetricGroups(response.data)
         })
         .catch((err) => {
           console.error(err)
-          this.loading = false
           this.setMetricLoader(false)
           this.$generalNotification('Failed to fetch metric groups.', 'error')
         })
@@ -193,6 +191,9 @@ export default {
       if (!this.authenticated) {
         this.hideDialer()
       }
+    },
+    metricLoader () {
+      this.loading = this.metricLoader
     }
   }
 }
