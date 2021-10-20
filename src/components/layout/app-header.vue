@@ -12,6 +12,14 @@
       <contact-list-navigation v-if="['Contact'].includes($route.name)" />
       <inbox-list-navigation v-if="['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)" />
       <inbox-channel-navigation v-if="['Inbox Contact', 'Inbox Contact Mention Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)" />
+
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
+                   v-if="$route.name === 'Stats'"
+                   :disabled="loading"
+                   @clicked="refreshMetricGroup">
+        <refresh-icon />
+        Refresh
+      </compact-btn>
     </div>
     <div class="ml-auto d-none d-lg-block h-100">
       <div class="d-flex h-100 align-items-center">
@@ -60,34 +68,49 @@
 
 <script>
 import _ from 'lodash'
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
 import Profile from 'components/profile'
 import Phone from 'components/dialer/phone'
+import CompactBtn from 'components/compact-btn'
 import ContactListNavigation from 'components/contacts/contact-list-navigation'
 import ContactAppHeader from 'components/contacts/contact-app-header'
 import ParkedCall from 'components/dialer/parked-call'
 import InboxListNavigation from 'components/inbox/inbox-list-navigation'
 import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
+import RefreshIcon from 'components/icons/refresh-icon'
 
 export default {
   name: 'app-header',
 
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
-  components: { InboxChannelNavigation, InboxListNavigation, ParkedCall, ContactAppHeader, ContactListNavigation, Phone, ActiveCall, DialerForm, Profile },
+  components: {
+    InboxChannelNavigation,
+    InboxListNavigation,
+    ParkedCall,
+    ContactAppHeader,
+    ContactListNavigation,
+    Phone,
+    ActiveCall,
+    DialerForm,
+    Profile,
+    CompactBtn,
+    RefreshIcon
+  },
 
   data () {
     return {
       dialerIcon: 'img:app-icons/header/dialer_gray.svg',
-      dialerStatus: false
+      dialerStatus: false,
+      loading: false
     }
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated']),
+    ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('contacts', ['selectedList']),
     ...mapState(['dialer']),
 
@@ -139,7 +162,29 @@ export default {
         })
       }
       e.preventDefault()
-    }
+    },
+    refreshMetricGroup () {
+      this.loading = true
+      this.setMetricLoader(true)
+      this.$axios
+        .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
+          params: {
+            include_metrics: true
+          }
+        })
+        .then(response => {
+          this.loading = false
+          this.setMetricLoader(false)
+          this.setMetricGroups(response.data)
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loading = false
+          this.setMetricLoader(false)
+          this.$generalNotification('Failed to fetch metric groups.', 'error')
+        })
+    },
+    ...mapActions('stats', ['setMetricGroups', 'setMetricLoader'])
   },
 
   watch: {

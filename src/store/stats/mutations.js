@@ -139,6 +139,13 @@ export default {
       index = Object.keys(state.metricGroups[metricGroupIndex].agent_metrics).length
     }
 
+    const metric = state.availableMetrics.find(metric => metric.metric_id === data.data.metric_id)
+
+    if (metric) {
+      data.data.category = metric.category
+      data.data.categoryLabel = metric.categoryLabel
+    }
+
     Vue.set(state.metricGroups[metricGroupIndex].agent_metrics, index, data.data)
   },
   UPDATE_METRIC: (state, data) => {

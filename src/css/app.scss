@@ -7596,9 +7596,16 @@ button.grey-90 {
 .stats-refresh-btn {
   height: 32px;
   font-size: $f-size-body-sm;
+  margin-left: 27px;
+  font-size: $f-size-h5;
+  font-weight: 500;
   &:hover {
     border-color: #000;
     border: 1px solid #000 !important;
     transition: border-color 0.36s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  svg {
+    margin-right: 5px;
+  }
 }
+
