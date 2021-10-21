@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div class="d-flex folders__content flex-column"
+    <div class="d-flex justify-content-center folders__content flex-column"
          :class="[ !folders.length ? 'no-folder' : '' ]">
       <div>
         <span class="fs-12 text-muted">

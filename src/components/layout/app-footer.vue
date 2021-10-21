@@ -9,88 +9,81 @@
             content-class="q-tabs__content--align-justify"
             dense>
       <q-route-tab name="inbox"
-                   label="Inbox"
                    to="/"
-                   :icon="icons.inbox"
                    content-class="tab-icons xs-text"
                    :ripple="false"
                    no-caps
                    exact>
+        <span class="tab-icon">
+          <inbox-mobile-icon/>
+        </span>
+        Inbox
       </q-route-tab>
       <q-route-tab name="contacts"
-                   label="Contacts"
                    to="/contacts"
-                   :icon="icons.contacts"
                    content-class="tab-icons xs-text"
                    :ripple="false"
                    no-caps
                    exact>
+        <span class="tab-icon">
+          <contacts-mobile-icon/>
+        </span>
+        Contacts
       </q-route-tab>
       <q-route-tab to="/"
-                   icon="img:app-icons/menu/dialer.svg"
                    :ripple="false"
-                   class="dialpad"
+                   class="tab-icons xs-text"
                    no-caps
                    exact>
+        <span class="tab-icon">
+          <keypad-mobile-icon/>
+        </span>
+        Keypad
       </q-route-tab>
-      <q-route-tab name="settings"
-                   label="Settings"
-                   to="/settings"
-                   :icon="icons.settings"
+      <q-route-tab name="stats"
+                   to="/stats"
                    content-class="tab-icons xs-text"
                    :ripple="false"
                    no-caps
                    exact>
+        <span class="tab-icon">
+          <stats-mobile-icon/>
+        </span>
+        Stats
+      </q-route-tab>
+      <q-route-tab name="settings"
+                   to="/settings"
+                   content-class="tab-icons xs-text"
+                   :ripple="false"
+                   no-caps
+                   exact>
+        <span class="tab-icon">
+          <more-mobile-icon/>
+        </span>
+        More
       </q-route-tab>
     </q-tabs>
-    <div class="w-100 d-flex justify-content-center">
-      <q-separator class="separator mt-1"
-                   color="black"
-                   size="5px" />
-    </div>
   </div>
 </template>
 
 <script>
+import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
+import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
+import KeypadMobileIcon from 'components/icons/mobile-menu/keypad-mobile-icon'
+import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'
+import MoreMobileIcon from 'components/icons/mobile-menu/more-mobile-icon'
 export default {
   name: 'app-footer',
+  components: { MoreMobileIcon, StatsMobileIcon, KeypadMobileIcon, ContactsMobileIcon, InboxMobileIcon },
   data () {
     return {
-      tab: 'inbox',
-      icons: {
-        inbox: '',
-        contacts: '',
-        settings: '',
-        account: ''
-      }
-    }
-  },
-
-  created () {
-    this.initIcons()
-  },
-
-  methods: {
-    initIcons () {
-      for (let key in this.icons) {
-        this.setIcon(key)
-      }
-    },
-
-    setIcon (icon) {
-      let page = null
-      if (this.$route.name) {
-        page = this.$route.name.toLowerCase().replace(' ')
-      }
-
-      let iconColor = (page === icon) ? '_active' : '_gray'
-      this.icons[icon] = 'img:app-icons/menu/' + icon + iconColor + '.svg'
+      tab: 'inbox'
     }
   },
 
   watch: {
     '$route.name': function () {
-      this.initIcons()
+      // this.initIcons()
     }
   }
 }

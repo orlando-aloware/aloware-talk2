@@ -622,9 +622,6 @@ body,
 }
 
 .page-footer {
-  height: 78px;
-  box-shadow: 0 0px 15px 0px rgba(0, 0, 0, 0.1);
-
   .tab-icons {
     .q-tab__icon {
       height: 20px;
@@ -7879,20 +7876,47 @@ screen and (max-width: 956px) {
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 739px) {
+  .contact-activity-container .calls-header__label {
+    max-width: 171px;
+  }
+}
 
+@media screen and (max-width: 667px) {
+  .contact-activity-container .calls-header__label {
+    max-width: 100px;
+    padding-left: 15px;
+  }
 }
 
 @media screen and (max-width: 575px) {
   .inbox-side {
+    max-width: 300px;
     border-left: 0 !important;
     &__left {
-      display: none;
       border-left: 0 !important;
     }
     &__right {
       border-left: 0 !important;
     }
+  }
+  .sidebar-active {
+    .q-header {
+      .page-header {
+        div:not(:first-child) {
+          display: none !important;
+        }
+      }
+    }
+  }
+  .page-footer, {
+    height: 49px;
+    .tab-icon {
+      height: 28px;
+    }
+  }
+  .page-layout {
+    padding-bottom: 49px;
   }
 }
 
