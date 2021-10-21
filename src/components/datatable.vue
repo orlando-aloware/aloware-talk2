@@ -41,7 +41,7 @@
                 </span>
                 <a
                   href="#"
-                  class="sorter"
+                  class="sorter sample"
                   :class="{
                     'sorter-asc':
                       sorts.order === 'asc' && sorts.orderBy === column.name,

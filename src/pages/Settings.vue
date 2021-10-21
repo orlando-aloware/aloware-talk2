@@ -26,7 +26,11 @@
 </template>
 
 <script>
+import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import * as AnswerTypes from 'src/constants/answer-types'
+import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import _ from 'lodash'
 import SettingsSide from 'components/settings/settings-side'
 import GeneralInformation from 'components/settings/general-information'
 import Profile from 'components/settings/profile'
@@ -37,14 +41,8 @@ import InboundCall from 'components/settings/inbound-call'
 import OutboundCall from 'components/settings/outbound-call'
 import Diagnosis from 'components/settings/diagnosis'
 import SmsTemplates from 'components/settings/sms-templates'
-
 import talk2Api from 'src/plugins/api/api'
 import SettingsSaveBar from 'components/settings/settings-save-bar'
-
-import { aclMixin, settingsMixin } from 'src/plugins/mixins'
-import * as AnswerTypes from 'src/constants/answer-types'
-import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import _ from 'lodash'
 
 export default {
   name: 'Settings',
@@ -236,6 +234,10 @@ export default {
   },
 
   created () {
+    if (!this.isAdmin && this.$route.path === '/settings/visibility') {
+      this.$router.push(`/settings`)
+    }
+
     this.getStatics()
     this.setItems([
       {

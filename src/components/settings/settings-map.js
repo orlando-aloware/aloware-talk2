@@ -116,35 +116,40 @@ const SettingsMap = {
     description: 'Contacts visibility setting.',
     route: '/settings/visibility',
     hash_keyword: 'contacts-visibility',
-    visible: true
+    visible: true,
+    tag: 'visibility'
   },
   'communications_visibility': {
     title: 'Communications Visibility',
     description: 'Communications visibility setting.',
     route: '/settings/visibility',
     hash_keyword: 'communications-visibility',
-    visible: true
+    visible: true,
+    tag: 'visibility'
   },
   'line_access_limit': {
     title: 'Line Visibility Limit',
     description: 'Define what lines user has access to.',
     route: '/settings/visibility',
     hash_keyword: 'line-access-limit',
-    visible: true
+    visible: true,
+    tag: 'visibility'
   },
   'read_only_access': {
     title: 'Reporter Access',
     description: 'Users with reporter access can only see the reports and they can not interact with the contacts or make calls.',
     route: '/settings/visibility',
     hash_keyword: 'read-only-access',
-    visible: true
+    visible: true,
+    tag: 'visibility'
   },
   'user_access_limit': {
     title: 'User Access Limit',
     description: 'Limit visibility of other users',
     route: '/settings/visibility',
     hash_keyword: 'user-access-limit',
-    visible: true
+    visible: true,
+    tag: 'visibility'
   },
 
   // PERSONALIZATION SETTINGS

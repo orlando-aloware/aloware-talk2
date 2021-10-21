@@ -7,21 +7,25 @@
                     :has-custom-left-content="true"
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
-          <div class="mention-filter-actions-wrapper ml-2 pr-4">
-            <div class="position-absolute search-icon">
-              <search-icon color="#95989E"
-                           width="14"
-                           height="14">
-              </search-icon>
+          <div class="inbox-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
+            <inbox-searcher
+              @search="onSearch"
+              @closed="onSearchClosed"
+              @opened="onSearchOpened"></inbox-searcher>
+            <div class="filter-wrapper">
+              <div class="position-absolute filter-icon">
+                <filter-icon>
+                </filter-icon>
+              </div>
+              <line-and-ring-group-selector custom-placeholder="Filter"
+                                            v-model="lineOrRingGroupFilter"
+                                            :clearable="true"
+                                            :hide-dropdown-icon="true"
+                                            :outlined="false"
+                                            :borderless="true"
+                                            @change="onFilterItemSelected">
+              </line-and-ring-group-selector>
             </div>
-            <line-and-ring-group-selector custom-placeholder="Filter"
-                                          v-model="lineOrRingGroupFilter"
-                                          :clearable="true"
-                                          :hide-dropdown-icon="true"
-                                          :outlined="false"
-                                          :borderless="true"
-                                          @change="onFilterItemSelected">
-            </line-and-ring-group-selector>
           </div>
         </template>
       </calls-header>
@@ -109,9 +113,10 @@ import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
-import SearchIcon from 'components/icons/search-icon'
 import LineAndRingGroupSelector from 'components/generic-selectors/line-and-ring-group-selector'
 import { inboxMixin } from 'src/plugins/mixins'
+import FilterIcon from 'components/icons/filter-icon'
+import InboxSearcher from 'components/inbox/inbox-searcher'
 
 let scrollTimeout
 export default {
@@ -119,14 +124,7 @@ export default {
 
   mixins: [inboxMixin],
 
-  components: { LineAndRingGroupSelector, SearchIcon, InboxTaskList, CallsHeader },
-
-  props: {
-    searchText: {
-      type: String,
-      default: ''
-    }
-  },
+  components: { InboxSearcher, FilterIcon, LineAndRingGroupSelector, InboxTaskList, CallsHeader },
 
   computed: {
     ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts']),
@@ -144,7 +142,9 @@ export default {
   },
 
   data () {
-    return {}
+    return {
+      searchText: ''
+    }
   },
 
   methods: {
@@ -243,14 +243,60 @@ export default {
       if (target.offsetTop > (container.offsetHeight - 100)) {
         container.scrollTop = target.offsetTop - 757
       }
+    },
+    onSearch (value) {
+      this.searchText = value
+    },
+    onSearchOpened () {
+      this.setHasMoreContacts(null)
+      this.setContacts([])
+    },
+    onSearchClosed () {
+      this.searchText = ''
+      this.setContacts([])
+      this.loadContactTasks()
     }
   },
 
-  created () {
+  mounted () {
     this.setContacts([])
     this.setStatus()
 
     this.loadContactTasks()
+
+    if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
+      this.setSelectedContact({})
+    }
+
+    if (['Inbox Contact Task'].includes(this.$route.name) && this.selectedContact.task_status !== this.currentTask) {
+      this.onItemSelected(this.selectedContact)
+    }
+
+    this.$VueEvent.listen('load_and_navigate_inbox_tab', (lastNavigatedIndex) => {
+      this.page = this.nextPage
+      this.loadMoreContactTasks().then(() => {
+        let contact = this.contacts[lastNavigatedIndex + 1]
+        this.setSelectedContact(contact)
+
+        this.$router.push({
+          name: 'Inbox Contact Task',
+          params: { id: JSON.stringify(contact.id) }
+        })
+
+        this.makeSelectedItemVisible()
+      })
+    })
+
+    this.$VueEvent.listen('navigate_task_tab', (contact) => {
+      this.setSelectedContact(contact)
+
+      this.$router.push({
+        name: 'Inbox Contact Task',
+        params: { id: JSON.stringify(contact.id) }
+      })
+
+      this.makeSelectedItemVisible()
+    })
 
     this.$VueEvent.listen('contact_updated', (data) => {
       talk2Api.V2.contacts.get(data.id).then(response => {
@@ -312,49 +358,17 @@ export default {
     })
   },
 
-  mounted () {
-    if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
-      this.setSelectedContact({})
-    }
-
-    if (['Inbox Contact Task'].includes(this.$route.name) && this.selectedContact.task_status !== this.currentTask) {
-      this.onItemSelected(this.selectedContact)
-    }
-
-    this.$VueEvent.listen('load_and_navigate_inbox_tab', (lastNavigatedIndex) => {
-      this.page = this.nextPage
-      this.loadMoreContactTasks().then(() => {
-        let contact = this.contacts[lastNavigatedIndex + 1]
-        this.setSelectedContact(contact)
-
-        this.$router.push({
-          name: 'Inbox Contact Task',
-          params: { id: JSON.stringify(contact.id) }
-        })
-
-        this.makeSelectedItemVisible()
-      })
-    })
-
-    this.$VueEvent.listen('navigate_task_tab', (contact) => {
-      this.setSelectedContact(contact)
-
-      this.$router.push({
-        name: 'Inbox Contact Task',
-        params: { id: JSON.stringify(contact.id) }
-      })
-
-      this.makeSelectedItemVisible()
-    })
-  },
-
   watch: {
     'sorting.order': function () {
       this.setContacts([])
       this.loadContactTasks()
     },
-    'searchText': function () {
-      this.loadContactTasks()
+    'searchText': function (value) {
+      if (value === '') {
+        this.setContacts([])
+      } else {
+        this.loadContactTasks()
+      }
     },
     'lineOrRingGroupFilter': function () {
       this.loadContactTasks()

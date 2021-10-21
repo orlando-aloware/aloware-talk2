@@ -42,7 +42,8 @@
                            :hasError="$v.user['default_outbound_campaign_id'].$invalid"
                            :state="validateState('default_outbound_campaign_id')"
                            :multiple="false"
-                           :use-chips="true"
+                           :use-chips="false"
+                           :use-input="true"
                            :generic-styling="false"
                            :generic-multiselect="false"
                            @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')">

@@ -9,6 +9,7 @@
         </b-col>
       </b-form-row>
       <b-form-row class="mt-4"
+                  v-if="isAdmin"
                   :id="`${SettingsMap.focus_mode.hash_keyword}-container`">
         <b-col sm="12"
                md="12">
@@ -28,7 +29,6 @@
           </b-form-group>
         </b-col>
       </b-form-row>
-      <hr/>
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.go_to_available_after_login.hash_keyword}-container`">
@@ -50,7 +50,6 @@
           </b-form-group>
         </b-col>
       </b-form-row>
-      <hr/>
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.wrap_up_seconds.hash_keyword}-container`">
@@ -83,9 +82,12 @@
 import WrapUpSelector from 'components/generic-selectors/wrap-up-selector'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'personalization',
+
+  mixins: [aclMixin],
 
   components: { WrapUpSelector },
 

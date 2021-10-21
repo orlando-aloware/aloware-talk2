@@ -2,8 +2,6 @@
   <div class="inbox-side border-top-0 flex-shrink-0">
     <div class="inbox-side__left"
          :class="{'inbox-side__left--closed': closed }">
-      <calls-header :isSearch="true"
-                    @search="search"/>
       <div>
         <div class="inbox-side__nav">
           <inbox-nav-list :closed="closed"
@@ -34,7 +32,6 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
-import CallsHeader from 'components/inbox/calls/calls-header'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
 
@@ -44,7 +41,6 @@ export default {
   components: {
     InboxTab,
     InboxChannels,
-    CallsHeader,
     InboxNavList
   },
 

@@ -17,11 +17,11 @@
               option-label="name"
               input-debounce="0"
               style="word-break: break-all;"
-              use-input
               emit-value
               map-options
               outlined
               dense
+              :use-input="useInput"
               :error="hasError"
               :options="campaignOptions"
               :placeholder="placeholder"
@@ -106,6 +106,10 @@ export default {
     useChips: {
       type: Boolean,
       default: false
+    },
+    useInput: {
+      type: Boolean,
+      default: true
     },
     highlighted: {
       type: Boolean,
