@@ -4,6 +4,34 @@ import _ from 'lodash'
 
 export default {
   SET_METRIC_GROUPS: (state, data) => {
+    if (_.isEmpty(data)) {
+      state.metricGroups = []
+      return
+    }
+
+    for (let index in data) {
+      if (typeof data[index].agent_metrics === 'undefined') {
+        continue
+      }
+
+      for (let metricIndex in data[index].agent_metrics) {
+        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index].agent_metrics[metricIndex].metric_id)
+
+        if (!metric) {
+          continue
+        }
+
+        data[index].agent_metrics[metricIndex].category = metric.category
+        data[index].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
+
+        if (typeof data[index].agent_metrics[metricIndex].label !== 'undefined') {
+          continue
+        }
+
+        data[index].agent_metrics[metricIndex].label = metric.label
+      }
+    }
+
     state.metricGroups = data
   },
   SET_METRIC_GROUP_METRICS: (state, data) => {
@@ -111,6 +139,13 @@ export default {
       index = Object.keys(state.metricGroups[metricGroupIndex].agent_metrics).length
     }
 
+    const metric = state.availableMetrics.find(metric => metric.metric_id === data.data.metric_id)
+
+    if (metric) {
+      data.data.category = metric.category
+      data.data.categoryLabel = metric.categoryLabel
+    }
+
     Vue.set(state.metricGroups[metricGroupIndex].agent_metrics, index, data.data)
   },
   UPDATE_METRIC: (state, data) => {
@@ -175,6 +210,9 @@ export default {
   },
   TOGGLE_METRIC_LOADER: (state, value) => {
     state.metricLoader = value
+  },
+  TOGGLE_GROUP_METRIC_LOADER: (state, value) => {
+    state.groupMetricLoader = value
   },
   SET_AVAILABLE_METRICS: (state, data) => {
     state.availableMetrics = data

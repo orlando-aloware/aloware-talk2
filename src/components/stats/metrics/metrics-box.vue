@@ -124,7 +124,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['profile']),
-    ...mapState('stats', ['availableMetrics']),
+    ...mapState('stats', ['availableMetrics', 'metricLoader']),
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
     },
@@ -170,15 +170,20 @@ export default {
     },
     metric () {
       this.loader = false
+    },
+    metricLoader () {
+      this.loader = this.metricLoader
     }
   },
   methods: {
     ...mapActions('stats', [
       'deleteMetric',
-      'updateMetric'
+      'updateMetric',
+      'setGroupMetricLoader'
     ]),
     removeSelectedMetric () {
       this.loader = true
+      this.$emit('remove', true)
       this.$axios.delete(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`)
         .then(res => {
           this.deleteMetric({
@@ -186,9 +191,11 @@ export default {
             id: this.metric.id
           })
           this.$generalNotification('Metric successfully removed.')
+          this.$emit('remove', false)
           this.closeModal()
         }).catch(err => {
           console.log(err)
+          this.$emit('remove', false)
           this.$generalNotification('Failed to remove metric.', 'error')
           this.closeModal()
         })
@@ -223,6 +230,10 @@ export default {
     },
     openEditModal () {
       this.editModal = true
+    },
+    toggleLoader (value) {
+      this.setGroupMetricLoader(value)
+      this.loader = value
     }
   }
 }

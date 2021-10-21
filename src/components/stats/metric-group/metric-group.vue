@@ -21,6 +21,8 @@
         :options="dateRange"
         :dense="dense"
         :options-dense="denseOpts"
+        :disabled="updateLoading || metricsList.length === 0"
+        :readonly="updateLoading || metricsList.length === 0"
         v-model="timeline"
         @input="changedFilter($event)">
       </q-select>
@@ -51,13 +53,16 @@
             :move="checkMove"
             tag="ul">
             <transition-group type="transition"
+                              :class="{ 'd-flex': loaderToggled }"
                               name="flip-list">
               <template v-if="metricsList">
                 <MetricsBox
-                  class="movable"
-                  v-for="metric in metricsList"
+                  :ref="`metric-box-${index}`"
+                  class="metric-box-item movable"
+                  v-for="(metric, index) in metricsList"
                   :key="metric.id"
-                  :metric="metric" />
+                  :metric="metric"
+                  @remove="onLoaderToggled"/>
                 <MetricLoader :key="`metric-loader-` + metricGroupId"
                               v-if="loader" />
               </template>
@@ -202,6 +207,8 @@ export default {
         ghostClass: 'ghost'
       },
       metricsList: [],
+      loaderToggled: false,
+      updateLoading: false,
       DateRanges
     }
   },
@@ -239,15 +246,26 @@ export default {
         this.$generalNotification('Failed to updated metric group.', 'error')
       })
     }, 200),
+    toggleLoader (value) {
+      this.updateLoading = value
+      for (let index in this.metricsList) {
+        if (this.$refs[`metric-box-${index}`]) {
+          this.$refs[`metric-box-${index}`][0].toggleLoader(value)
+        }
+      }
+    },
     async changedFilter (val) {
+      this.toggleLoader(true)
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
         name: this.metricGroupName,
         date_range_type: val
       }).then(res => {
+        this.toggleLoader(false)
         this.updateMetricGroup(res.data)
         this.$generalNotification('Metric group updated successfully.')
       }).catch(err => {
         console.log(err)
+        this.toggleLoader(false)
         this.$generalNotification('Failed to updated metric group.', 'error')
       })
     },
@@ -314,6 +332,9 @@ export default {
     checkMove (event) {
       let element = _.get(this.$refs.addMetric, '$el', null)
       return event.from === event.to && event.related !== element
+    },
+    onLoaderToggled (toggle) {
+      this.loaderToggled = toggle
     }
   },
   watch: {
@@ -330,7 +351,8 @@ export default {
     'resources.agent_metrics': {
       deep: true,
       handler: function () {
-        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+        const metrics = _.get(this.resources, 'agent_metrics', [])
+        this.metricsList = JSON.parse(JSON.stringify(metrics))
       }
     }
   }

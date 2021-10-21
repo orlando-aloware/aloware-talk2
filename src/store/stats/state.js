@@ -2,6 +2,7 @@ export default function () {
   return {
     availableMetrics: [],
     metricGroups: [],
-    metricLoader: false
+    metricLoader: false,
+    groupMetricLoader: false
   }
 }

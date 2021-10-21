@@ -3371,6 +3371,7 @@ span.mention {
   height: 32px !important;
   font-size: $f-size-body-xs;
   margin-bottom: 0;
+  border: 1px solid $grey-60;
 
   input {
     line-height: 30px;
@@ -3631,6 +3632,10 @@ span.mention {
 
     span {
       position: absolute;
+      overflow: hidden;
+      width: 100%;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 
@@ -3713,10 +3718,6 @@ span.mention {
   .tab-dropdown {
     &.q-btn {
       line-height: 1;
-    }
-
-    .q-btn__wrapper {
-      min-height: 12px;
     }
   }
 
@@ -5146,7 +5147,7 @@ table.datatable {
 
       th {
         background-color: $white;
-        border-bottom: solid 1px $grey-light4;
+        border-bottom: solid 1px $grey-60;
         font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -7621,6 +7622,7 @@ button.grey-90 {
 }
 
 
+
 .custom-control-input:disabled {
   opacity: 0 !important;
 }
@@ -7672,4 +7674,36 @@ button.grey-90 {
 
 .mt-37 {
   margin-top: 37px;
+}
+
+.border {
+  border: 1px solid $grey-60;
+  &-bottom {
+    border-bottom: 1px solid $grey-60 !important;
+  }
+  &-top {
+    border-top: 1px solid $grey-60 !important;
+  }
+  &-left {
+    border-left: 1px solid $grey-60 !important;
+  }
+  &-right {
+    border-left: 1px solid $grey-60 !important;
+  }
+}
+
+.stats-refresh-btn {
+  height: 32px;
+  font-size: $f-size-body-sm;
+  margin-left: 27px;
+  font-size: $f-size-h5;
+  font-weight: 500;
+  &:hover {
+    border-color: #000;
+    border: 1px solid #000 !important;
+    transition: border-color 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  svg {
+    margin-right: 5px;
+  }
 }
