@@ -18,17 +18,22 @@
 
         <template v-slot:header>
           <q-item-section class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
-            <div>
+            <div class="text-13">
               {{ group.label }}
-              <q-chip size="sm" square class="p-0">{{ chipped(group.children) }}</q-chip> </div>
+              <q-chip size="xs" square class="p-0">
+                {{ chipped(group.children) }}
+              </q-chip> </div>
           </q-item-section>
         </template>
 
-        <q-card>
-          <q-list class="px-3">
+        <q-card class="t-cards">
+          <q-list class="px-2 pb-2">
             <template
               v-for="(item, i) in group.children">
-              <q-item :key="`acc-item-${i}`">
+              <q-item
+                :key="`acc-item-${i}`"
+                :class="{ active: item.id === activeSession.id }"
+                class="px-2">
                 <div class="py-2">
                   <q-avatar size="30px" color="grey">J</q-avatar>
                 </div>
@@ -45,7 +50,7 @@
                 </q-item-section>
 
               </q-item>
-              <q-separator :key="`acc-item-line-${i}`" spaced inset />
+              <!-- <q-separator :key="`acc-item-line-${i}`" spaced inset /> -->
             </template>
           </q-list>
         </q-card>
@@ -75,6 +80,10 @@ export default {
   },
   data () {
     return {
+      activeSession: {
+        id: 1,
+        label: 'In Progress'
+      },
       groups: [
         {
           id: 1,
@@ -87,6 +96,14 @@ export default {
               contact_number: '(782) 636 3465',
               position: 'Sales Manager',
               company: '123 Labs'
+            },
+            {
+              id: 11,
+              first_name: 'Tracy',
+              last_name: 'McGrady',
+              contact_number: '(782) 122 3455',
+              position: 'IT Manager',
+              company: 'NBA Labs'
             }
           ]
         },

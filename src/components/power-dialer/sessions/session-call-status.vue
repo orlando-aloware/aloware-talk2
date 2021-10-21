@@ -2,9 +2,12 @@
   <div class="t-menu-2 no-border">
     <div class="d-flex align-items-center pt-3 pb-0">
       <div class="font-weight-bold pl-3 flex-grow-1">
-        <q-chip class="p-0">
-          <div class="text-lowercase text-capitalize">
-            Will call in <span class="text-caption text-weight-bold text-grey-7 text-lowercase">99s</span>
+        <q-chip color="grey-50" class="p-0">
+          <div class="text-15 text-lowercase text-capitalize px-2">
+            Will call in
+            <span class="text-weight-bold text-grey-7 text-lowercase">
+              99s
+            </span>
           </div>
         </q-chip>
       </div>
@@ -22,9 +25,9 @@
     </div>
     <div class="t-menu__header no-border d-flex align-items-center py-1">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
-        <div class="text-h5 text-capitalize text-weight-bold pb-1">
+        <div class="text-18 text-black text-capitalize text-weight-bold pb-1">
           {{ stats.first_name }} {{ stats.last_name }}
-          <span class="text-subtitle1">{{ stats.phone_number }}</span>
+          <span class="text-15 text-subtitle1">{{ stats.phone_number }}</span>
         </div>
         <div class="text-h6 text-subtitle1 text-capitalize">
           {{ stats.position }}

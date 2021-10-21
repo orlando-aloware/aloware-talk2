@@ -5,7 +5,7 @@
         CALL DISPOSITION
       </div>
     </div>
-    <div class="d-flex t-menu__content over-flow px-3 pb-2">
+    <div class="d-flex t-menu__content over-flow px-3 pb-1">
       <q-chip
         v-for="chip in callDisposition"
         :key="chip.name"
@@ -43,7 +43,7 @@
         CONTACT DISPOSITION
       </div>
     </div>
-    <div class="d-flex t-menu__content over-flow px-3 pb-2">
+    <div class="d-flex t-menu__content over-flow px-3 pb-1">
       <q-chip
         v-for="chip in contactDisposition"
         :key="chip.name"

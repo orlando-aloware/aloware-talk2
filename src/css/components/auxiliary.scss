@@ -34,6 +34,10 @@
       min-height: 25px !important;
       padding-top: 12px;
     }
+
+    .header__header__title  {
+      font-size: 11px;
+    }
   }
 
   &__content {
@@ -352,11 +356,13 @@
 .right-spacing-1 {
   margin-right: 10px;
 }
-
 .right-spacing-2 {
   margin-right: 15px;
 }
 
 .text-13 {
   font-size: 13px;
+}
+.text-14 {
+  font-size: 14px;
 }
