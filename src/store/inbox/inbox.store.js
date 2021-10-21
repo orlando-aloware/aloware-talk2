@@ -5,6 +5,7 @@ export default function () {
     isGettingTasksList: false,
     isFetchingContacts: false,
     isChannelFilterOpen: false,
+    isSearcherOpen: false,
     activeChannel: {
       label: 'Inbox',
       value: 'inbox',

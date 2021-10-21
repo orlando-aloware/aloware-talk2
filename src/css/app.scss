@@ -7187,6 +7187,38 @@ button.grey-90 {
   }
 }
 
+.channel-filter-actions-wrapper.inbox-tab--filter {
+  .filter-wrapper {
+
+    .filter-icon {
+      margin-top: -4px;
+    }
+  }
+
+  .search-icon {
+    top: 6px;
+  }
+}
+
+.inbox-tab--filter {
+  .filter-wrapper {
+    margin-left: 30px;
+
+    .filter-icon {
+      margin-top: 1px;
+    }
+  }
+
+  .search-wrapper {
+    .compact-button {
+      padding-left: 0 !important;
+    }
+  }
+}
+
+.inbox-filter-actions-wrapper {
+
+  width: 65%;
 .mention-filter-actions-wrapper {
   width: 50%;
   margin-top: 15px;
@@ -7235,6 +7267,11 @@ button.grey-90 {
 
   padding-bottom: 5rem;
 
+  .scrollableArea {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
   .form-label {
     font-weight: 500;
     font-size: 13px;
@@ -7258,6 +7295,16 @@ button.grey-90 {
   .highlighted{
     background: #FFFBD4;
     border-radius: 6px;
+  }
+
+  .q-field--with-bottom {
+    padding-bottom: 0 !important;
+  }
+
+  .q-field--error {
+    .q-field__marginal {
+      display: none !important;
+    }
   }
 }
 
@@ -7583,6 +7630,61 @@ button.grey-90 {
   }
 }
 
+
+
+.custom-control-input:disabled {
+  opacity: 0 !important;
+}
+
+
+.inbox-search {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  z-index: 1;
+
+  .q-item {
+    padding: 0 !important;
+
+    label.q-field {
+      height: 48px;
+      margin-bottom: 0;
+      background: rgb(255 255 255);
+    }
+
+    .q-field--filled .q-field__control {
+      padding: 0;
+      background: rgb(255 255 255);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .q-field--filled.q-field--highlighted .q-field__control:before {
+      opacity: 1;
+      background: rgb(241 241 241 / 12%);
+    }
+
+    .q-field--filled .q-field__control:after {
+      background: transparent !important;
+    }
+
+    .q-field--filled .q-field__control:before {
+      border-bottom: none !important;
+    }
+
+    .q-field__marginal {
+      font-size: 14px !important;
+    }
+
+    .q-field--filled .q-field__control:hover:before {
+      opacity: 0 !important;
+    }
+
+  }
+}
+
+.mt-37 {
+  margin-top: 37px;
+}
+
 .contact-details-container {
   max-width: 250px;
   width: 100%;
@@ -7817,7 +7919,7 @@ screen and (max-width: 956px) {
     border-left: 1px solid $grey-60 !important;
   }
   &-right {
-    border-left: 1px solid $grey-60 !important;
+    border-right: 1px solid $grey-60 !important;
   }
 }
 
@@ -7836,4 +7938,3 @@ screen and (max-width: 956px) {
     margin-right: 5px;
   }
 }
-

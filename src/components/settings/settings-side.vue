@@ -67,7 +67,6 @@
 import { mapActions, mapState } from 'vuex'
 import SettingsNavList from 'components/settings/settings-nav/settings-nav-list'
 import settingsMap from './settings-map'
-import _ from 'lodash'
 
 export default {
   name: 'settings-side',
@@ -95,21 +94,28 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'ringGroups']),
-    ...mapState('settings', ['userClone', 'changedUserProperties']),
+    ...mapState('settings', ['userClone', 'changedUserProperties', 'user']),
     searchResult () {
       let query = this.searchText.trim().toLocaleLowerCase()
 
-      if (!query) {
-        return Object.values(this.settingsMap)
+      let mapping = Object.values(this.settingsMap)
+
+      if (!this.isAdmin) {
+        // eslint-disable-next-line no-return-assign
+        mapping.filter(item => ['visibility'].includes(item.tag)).map(item => item.visible = false)
       }
 
-      return _.filter(this.settingsMap, data => {
-        return data.title.toLocaleLowerCase().includes(query) || data.description.toLocaleLowerCase().includes(query)
+      // eslint-disable-next-line no-return-assign
+      mapping.filter(item => ['secondary-phone-number'].includes(item.hash_keyword)).map((item) => item.visible = this.user.enabled_two_legged_outbound)
+
+      if (!query) {
+        return mapping
+      }
+
+      return mapping.filter(data => {
+        return (data.title.toLocaleLowerCase().includes(query) || data.description.toLocaleLowerCase().includes(query)) && data.visible
       })
     }
-  },
-
-  created () {
   },
 
   mounted () {
@@ -142,7 +148,7 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.searchResult.filter(item => item.title.toLowerCase().indexOf(needle) > -1 || item.description.toLowerCase().indexOf(needle) > -1)
+        this.options = this.searchResult.filter(item => (item.title.toLowerCase().indexOf(needle) > -1 || item.description.toLowerCase().indexOf(needle) > -1) && item.visible)
       })
     }
   },

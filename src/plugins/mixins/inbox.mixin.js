@@ -33,10 +33,10 @@ export default {
       ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
       ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
       filters: {
-        contact_task_status: {
-          value: [ContactTaskStatus.STATUS_OPEN],
-          operator: 1
-        },
+        // contact_task_status: {
+        //   value: [ContactTaskStatus.STATUS_OPEN],
+        //   operator: 1
+        // },
 
         search: {
         }
@@ -88,9 +88,10 @@ export default {
       this.resetFilters()
       if (this.searchText && this.searchText.trim()) {
         this.filters.search.value = this.searchText
+        delete this.filters.contact_task_status
+      } else {
+        this.filters.contact_task_status.value = [this.currentTask]
       }
-
-      this.filters.contact_task_status.value = [this.currentTask]
 
       if (this.lineOrRingGroupFilter) {
         this.lineOrRingGroupFilteredId = this.lineOrRingGroupFilter.id

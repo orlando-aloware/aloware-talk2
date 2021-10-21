@@ -1,5 +1,6 @@
 <template>
-  <contacts-screen v-if="list" :loading="isLoadingDisabled">
+  <contacts-screen v-if="list"
+                   :loading="isLoadingDisabled">
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="pr-2 contacts__title d-flex align-items-center">
@@ -62,8 +63,7 @@
           <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
           <span class="small text-muted fs-13" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</span>
         </div>
-        <div class="v-divider">
-        </div>
+        <hr role="separator" aria-orientation="vertical" class="q-separator height-28 ml-3 mr-3 margin-auto position-relative q-separator q-separator--vertical">
         <div class="d-flex align-items-center px-2"
              :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
           <compact-btn borderless

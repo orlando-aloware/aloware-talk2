@@ -2,31 +2,38 @@
     <div class="w-100 h-100 d-flex flex-column">
       <div class="header w-100" v-if="$route.params.channel !== 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <div class="channel-filter-actions-wrapper">
-            <compact-btn v-if="hasChannelFilterChanges"
-                         borderless
-                         customClass="ml-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
-                         :variant="filterButtonVariant"
-                         @clicked="resetFilters">
-              <i class="fa fa-times"></i>
-            </compact-btn>
-            <compact-btn borderless
-                         customClass="ml-1 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
-                         :variant="filterButtonVariant"
-                         v-b-modal:inbox-channel-filter-modal>
-              <q-tooltip v-if="selectedFilter"
-                         anchor="top middle"
-                         self="center middle">
-                {{ selectedFilter.name }}
-              </q-tooltip>
-              {{ !selectedFilter ? 'Filters' : selectedFilter.name }}
-            </compact-btn>
-            <b-badge v-if="hasChannelFilterChanges"
-                     class="ml-1 fs-12"
-                     variant="primary"
-                     v-b-modal:inbox-channel-filter-modal>
-              {{ channelChangedFilterFields.length }}
-            </b-badge>
+          <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
+            <inbox-searcher @search="onSearch"
+                            @closed="onSearchClosed"
+                            @opened="onSearchOpened"></inbox-searcher>
+            <div class="filter-wrapper">
+              <compact-btn v-if="hasChannelFilterChanges"
+                           borderless
+                           customClass="ml-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+                           :variant="filterButtonVariant"
+                           @clicked="resetFilters">
+                <i class="fa fa-times"></i>
+              </compact-btn>
+              <compact-btn borderless
+                           customClass="pl-0 pr-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
+                           :variant="filterButtonVariant"
+                           v-b-modal:inbox-channel-filter-modal>
+                <q-tooltip v-if="selectedFilter"
+                           anchor="top middle"
+                           self="center middle">
+                  {{ selectedFilter.name }}
+                </q-tooltip>
+                <filter-icon v-if="!selectedFilter"
+                             color="#256EFF"
+                             class="filter-icon"></filter-icon> {{ !selectedFilter ? 'Filters' : selectedFilter.name }}
+              </compact-btn>
+              <b-badge v-if="hasChannelFilterChanges"
+                       class="ml-1 fs-12"
+                       variant="primary"
+                       v-b-modal:inbox-channel-filter-modal>
+                {{ channelChangedFilterFields.length }}
+              </b-badge>
+            </div>
           </div>
 
           <q-select class="m-0"
@@ -41,22 +48,24 @@
         </div>
       </div>
       <div class="header w-100" v-if="$route.params.channel === 'mentions'">
-        <div class="calls-header__label w-100 d-flex justify-content-between pl-2 pr-2">
-          <div class="mention-filter-actions-wrapper pr-4">
-            <div class="position-absolute search-icon">
-              <search-icon color="#95989E"
-                           width="14"
-                           height="14">
-              </search-icon>
+        <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
+          <div class="inbox-filter-actions-wrapper inbox-tab--filter pr-1 ml-2">
+            <inbox-searcher @search="onSearch"
+                            @closed="onSearchClosed"
+                            @opened="onSearchOpened"></inbox-searcher>
+            <div class="filter-wrapper">
+              <div class="position-absolute filter-icon">
+                <filter-icon></filter-icon>
+              </div>
+              <user-selector custom-placeholder="Filter by User"
+                             :clearable="true"
+                             :hide-dropdown-icon="true"
+                             :outlined="false"
+                             :borderless="true"
+                             :value="mentionUserId"
+                             @change="userMentionSelected">
+              </user-selector>
             </div>
-            <user-selector custom-placeholder="Filter by User"
-                           :clearable="true"
-                           :hide-dropdown-icon="true"
-                           :outlined="false"
-                           :borderless="true"
-                           :value="mentionUserId"
-                           @change="userMentionSelected">
-            </user-selector>
           </div>
 
           <q-select class="m-0"
@@ -102,7 +111,9 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller" @scroll="handleScroll">
+      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+           :class="[$route.params.channel !== 'mentions' ? scrollerTopClass : '']"
+           @scroll="handleScroll">
         <task-list :communications="communications"
                    :answer-status="answerStatus"
                    :channel="channel"
@@ -143,7 +154,8 @@ import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import * as MentionType from 'src/constants/mention-type'
 import TaskMentionList from 'components/inbox/channel-tasks/task-mention-list'
 import UserSelector from 'components/generic-selectors/user-selector'
-import SearchIcon from 'components/icons/search-icon'
+import FilterIcon from 'components/icons/filter-icon'
+import InboxSearcher from 'components/inbox/inbox-searcher'
 
 let scrollTimeout
 export default {
@@ -151,7 +163,7 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { SearchIcon, UserSelector, TaskMentionList, FilterDialog, CompactBtn, TaskList },
+  components: { InboxSearcher, FilterIcon, UserSelector, TaskMentionList, FilterDialog, CompactBtn, TaskList },
 
   props: {
     filterType: {
@@ -170,11 +182,6 @@ export default {
       type: String,
       required: false,
       default: 'all'
-    },
-
-    searchText: {
-      type: String,
-      default: ''
     },
 
     sort: {
@@ -200,7 +207,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter', 'hasMoreCommunications']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter', 'hasMoreCommunications', 'isSearcherOpen']),
 
     nextPage () {
       return this.currentPage + 1
@@ -256,7 +263,9 @@ export default {
       },
       mentionUserId: null,
       scrollContainerEl: null,
-      activeItemEl: null
+      activeItemEl: null,
+      searchText: '',
+      scrollerTopClass: 'mt-0'
     }
   },
 
@@ -402,7 +411,8 @@ export default {
       'setChannelClonedFilter',
       'resetChannelChangedFilterFields',
       'setSelectedFilter',
-      'setHasMoreCommunications']),
+      'setHasMoreCommunications',
+      'setSearcherOpen']),
 
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
@@ -765,6 +775,20 @@ export default {
         this.scrollContainerEl.scrollTop = this.activeItemEl.offsetTop - 757
       }
     },
+    onSearch (value) {
+      this.searchText = value
+    },
+    onSearchOpened () {
+      this.scrollerTopClass = 'mt-37'
+      this.setHasMoreCommunications(null)
+      this.setCommunications([])
+    },
+    onSearchClosed () {
+      this.searchText = null
+      this.scrollerTopClass = 'mt-0'
+      this.filter.page = 1
+      this.getCommunications(this.filter)
+    },
 
     ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
   },
@@ -777,8 +801,16 @@ export default {
       }
     },
     'searchText': function (value) {
-      this.filter.search_text = value
-      this.getCommunications(this.filter)
+      if (!this.isSearcherOpen) {
+        return
+      }
+
+      if (value === '') {
+        this.setCommunications([])
+      } else {
+        this.filter.search_text = value
+        this.getCommunications(this.filter)
+      }
     },
     'sorting.order': function () {
       this.getCommunications(this.filter)
@@ -809,6 +841,8 @@ export default {
 
   mounted () {
     let _this = this
+    this.setSearcherOpen(false)
+
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
       _this.filter.page = _this.nextPage
       _this.loadMoreCommunications(this.filter).then(() => {

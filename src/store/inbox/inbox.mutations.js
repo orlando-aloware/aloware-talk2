@@ -103,5 +103,8 @@ export default {
   },
   SET_HAS_MORE_COMMUNICATIONS: (state, hasMore) => {
     state.hasMoreCommunications = hasMore
+  },
+  SET_SEARCHER_OPEN: (state, isOpen) => {
+    state.isSearcherOpen = isOpen
   }
 }
