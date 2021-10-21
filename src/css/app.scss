@@ -5233,7 +5233,10 @@ table.datatable {
 
         .sorter-container {
           display: inline;
+          opacity: 0;
+
           &.has-sorting {
+            opacity: 1;
 
             a.sorter.sorter-desc {
               &:before {
@@ -5276,6 +5279,8 @@ table.datatable {
 
           .sorter-container {
             display: inline;
+            opacity: 1;
+
             &.has-sorting {
   
               a.sorter.sorter-desc {

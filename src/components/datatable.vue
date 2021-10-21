@@ -54,6 +54,7 @@
                   <MoveIcon
                     v-if="column.draggable"
                     class="move-icon-drag"
+                    :color="moveColor"
                     :class="{ handle: column.draggable }" />
                 </div>
                 <span class="handle-label">
@@ -253,7 +254,8 @@ export default {
         { value: 100, label: '100 Per Page' }
       ],
       isHovering: false,
-      hoverKey: null
+      hoverKey: null,
+      moveColor: '#4F4F4F'
     }
   },
 
@@ -329,6 +331,11 @@ export default {
       }, 66)
     },
     onInitReorder (value, key) {
+      if (value) {
+        this.moveColor = '#256eff'
+      } else {
+        this.moveColor = '#4F4F4F'
+      }
       this.isHovering = value
       this.hoverKey = key
     }
