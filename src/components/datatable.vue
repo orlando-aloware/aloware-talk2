@@ -27,7 +27,8 @@
               :class="{
                 checkbox: column.name === 'checkbox',
                 sticky: column.sticky,
-                hovering: hoverKey === key ? isHovering : false
+                hovering: hoverKey === key ? isHovering : false,
+                'th-name': column.name === 'name'
               }"
               :style="{
                 maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),

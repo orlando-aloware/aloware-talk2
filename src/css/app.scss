@@ -5210,6 +5210,12 @@ table.datatable {
           opacity: 0;
         }
 
+        &.th-name {
+          .handle-label {
+            padding-left: 38px;
+          }
+        }
+
         &.ghost {
           background-color: $light-green2;
         }
