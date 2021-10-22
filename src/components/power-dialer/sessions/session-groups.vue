@@ -13,7 +13,7 @@
       <q-expansion-item
         :label="group.label"
         :default-opened="key === 0 ? true : false"
-        class="px-0"
+        class="t-expansion-panels px-0"
         header-class="text-black">
 
         <template v-slot:header>
@@ -44,9 +44,15 @@
                   <q-item-label caption lines="2">{{ item.company }}</q-item-label>
                 </q-item-section>
 
-                <q-item-section side top>
-                  <q-item-label class="text-red" color="red" caption>...</q-item-label>
-                  <q-icon name="dots" color="yellow" />
+                <q-item-section
+                  v-if=" item.id === activeSession.id"
+                  class="t-item-icon"
+                  side top>
+                  <q-avatar color="red" size="md">
+                    <PhoneIcon color="white" />
+                  </q-avatar>
+                  <!-- <q-item-label class="text-red" color="red" caption>...</q-item-label> -->
+                  <!-- <q-icon name="dots" color="yellow" /> -->
                 </q-item-section>
 
               </q-item>
@@ -67,11 +73,13 @@
 <script>
 
 import SearchList from 'src/components/search'
+import PhoneIcon from 'components/icons/call-drop-icon'
 
 export default {
   name: 'SessionGroups',
   components: {
-    SearchList
+    SearchList,
+    PhoneIcon
   },
   methods: {
     chipped (data) {

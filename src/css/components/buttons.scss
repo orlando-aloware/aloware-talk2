@@ -85,6 +85,26 @@
   }
 }
 
+.sessions-button {
+  border-radius: 6px;
+  height: 28px;
+  width: 121px;
+  font-size: 13px;
+  &.no-outline {
+    .q-btn__wrapper {
+      top: 0px !important;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+  }
+  &.free-width {
+    width: auto !important;
+  }
+  .q-btn__wrapper {
+    top: -2px;
+  }
+}
+
 .dropdown {
 
   &.show {

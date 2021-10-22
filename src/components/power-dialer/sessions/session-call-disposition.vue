@@ -1,5 +1,5 @@
 <template>
-  <div class="t-menu">
+  <div class="t-menu pb-2">
     <div class="t-menu__header t-dense d-flex align-items-center">
       <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
         CALL DISPOSITION
