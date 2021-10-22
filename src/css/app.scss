@@ -5350,12 +5350,12 @@ table.datatable {
         }
 
         a.sorter.sorter-desc:before {
-          border-bottom-color: $green;
+          border-bottom-color: $primary;
           opacity: 1;
         }
 
         a.sorter.sorter-asc:after {
-          border-top-color: $green;
+          border-top-color: $primary;
           opacity: 1;
         }
       }
