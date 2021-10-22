@@ -5,7 +5,7 @@
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
-    <q-layout class="page-layout h-100 pb-sm-0"
+    <q-layout class="page-layout h-100"
               view="lHh Lpr lff"
               :height="'100%'">
       <div class="h-100"
@@ -58,7 +58,7 @@
       <q-drawer v-model="sidebarVisible"
                 v-if="authenticated"
                 :breakpoint="0"
-                class="h-100 sidebar-wrapper d-none d-sm-block"
+                class="h-100 sidebar-wrapper d-block"
                 :width="64"
                 content-class="sidebar">
         <q-list>

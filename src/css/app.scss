@@ -286,10 +286,6 @@ body,
   }
 }
 
-.page-layout {
-  padding-bottom: 78px;
-}
-
 .rectangle {
   box-sizing: border-box;
   height: 60px;
@@ -3352,6 +3348,10 @@ span.mention {
       white-space: nowrap;
     }
   }
+}
+
+.inbox-details {
+  border: solid 1px $grey-light3;
 }
 
 .inbox-info {
@@ -7803,7 +7803,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media screen and (max-width: 1159px) {
+@media screen and (min-width: 601px) and (max-width: 1159px) {
   .inbox-side {
     max-width: 305px;
     &__nav {
@@ -7900,6 +7900,7 @@ screen and (max-width: 956px) {
   }
 }
 
+/*
 @media screen and (max-width: 575px) {
   .inbox-side {
     max-width: 300px;
@@ -7928,6 +7929,56 @@ screen and (max-width: 956px) {
   }
   .page-layout {
     padding-bottom: 49px;
+  }
+}
+*/
+
+@media screen and (max-width: 600px) {
+  .sidebar-wrapper {
+    display: none !important;
+  }
+  .page-layout {
+    padding-bottom: 49px;
+    .page-container {
+      padding-left: 0 !important;
+    }
+    .page-footer {
+      z-index: 9;
+    }
+  }
+  .sidebar-active {
+    .q-header {
+      left: 0 !important;
+      display: flex;
+      justify-content: center;
+      .page-header {
+        div:not(:first-child) {
+          display: none !important;
+        }
+      }
+    }
+  }
+  .inbox {
+    overflow-x: hidden;
+    &-side,
+    &-details {
+      border-left: unset;
+      border-right: unset;
+    }
+    &-side {
+      max-width: unset;
+      overflow-x: inherit;
+      &__left {
+        max-width: unset;
+        min-width: unset;
+        z-index: 1;
+      }
+
+      &__right {
+        width: 0;
+        z-index: 2;
+      }
+    }
   }
 }
 
