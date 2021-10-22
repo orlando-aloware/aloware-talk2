@@ -11,9 +11,14 @@
           </div>
         </q-chip>
       </div>
-      <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
-        <PauseIcon class="mr-2" color="#62666E" />
-        <div class="text-body2 text-black">Hold</div>
+      <q-btn
+        @click="toggleHold = !toggleHold"
+        no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+        <UnholdIcon v-if="toggleHold" class="mr-2" color="#F2994A" />
+        <PauseIcon v-else class="mr-2" color="#62666E" />
+        <div class="text-body2 text-black">
+          {{ toggleHold ? 'Unhold' : 'Hold' }}
+        </div>
       </q-btn>
       <q-btn no-wrap unelevated no-caps size="sm" color="red-7" class="sessions-button free-width mx-1">
         <CallDropIcon class="mr-2" color="white" />
@@ -40,25 +45,30 @@
       </b-dropdown>
     </div>
     <div class="d-flex align-items-center p-0">
-      <div class="text-18 font-weight-bold pl-3 flex-grow-1">
+      <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
         {{ stats.first_name }} {{ stats.last_name }}
         <span class="text-15 text-subtitle1">{{ stats.phone_number }}</span>
       </div>
     </div>
     <div class="d-flex align-items-center p-0">
-      <div class="text-h6 pl-3 text-subtitle1 text-capitalize">
+      <div class="text-14 pl-3 text-subtitle1 text-capitalize">
         {{ stats.position }}
-        <span class="text-subtitle2 text-grey"> | {{ stats.company }}</span>
+        <span class="text-13 text-subtitle2 text-grey"> | {{ stats.company }}</span>
       </div>
     </div>
     <div class="d-flex align-items-center p-0">
-      <div class="flex-grow-1 text-h6 text-subtitle1 text-capitaliz pl-3 py-0">
+      <div class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
         <DropIcon width="18px" height="18px" class="mr-0 py-0" style="position:relative;top:-2px;" />
         {{ stats.address }} - {{ stats.time }}
       </div>
-      <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
-        <StopIcon class="mr-2" color="#62666E" />
-        <div class="text-body2 text-black">Stop Rec.</div>
+      <q-btn
+        @click="toggleRecording = !toggleRecording"
+        no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+        <StopIcon v-if="toggleRecording" class="mr-2" color="#62666E" />
+        <RecordIcon v-else class="mr-2" color="red" />
+        <div class="text-body2 text-black">
+          {{ toggleRecording ? 'Stop Rec.' : 'Record' }}
+        </div>
       </q-btn>
     </div>
     <div class="d-flex align-items-center p-0 pt-2">
@@ -70,9 +80,16 @@
           {{ stats.line }}
         </div>
       </div>
-      <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+      <q-btn
+        @click="togglePause = !togglePause"
+        :color="`${togglePause ? 'red-3' : 'grey-4'}`"
+        unelevated outline
+        no-wrap no-caps size="sm"
+        :class="`${togglePause ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
         <PauseIcon class="mr-2" color="#62666E" />
-        <div class="text-body2 text-black">Pause Session</div>
+        <div class="text-body2 text-black">
+          {{ togglePause ? 'Pausing Session' : 'Pause Session' }}
+        </div>
       </q-btn>
       <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
         <EndCallIcon class="mr-2" color="#62666E" />
@@ -87,9 +104,11 @@
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
+import UnholdIcon from 'components/icons/pause-icon-3'
 import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
+import RecordIcon from 'components/icons/record-icon'
 
 export default {
   name: 'SessionCallStatus',
@@ -97,12 +116,47 @@ export default {
     DropIcon,
     HeadphoneIcon,
     PauseIcon,
+    UnholdIcon,
     CallDropIcon,
     StopIcon,
-    EndCallIcon
+    EndCallIcon,
+    RecordIcon
+  },
+  computed: {
+    togglePause: {
+      get () {
+        return this.statuses.pause
+      },
+      set (val) {
+        this.statuses.pause = val
+      }
+    },
+    toggleRecording: {
+      get () {
+        return this.statuses.recording
+      },
+      set (val) {
+        this.statuses.recording = val
+      }
+    },
+    toggleHold: {
+      get () {
+        return this.statuses.hold
+      },
+      set (val) {
+        this.statuses.hold = val
+      }
+    }
   },
   data () {
     return {
+      statuses: {
+        pause: false,
+        end: false,
+        recording: false,
+        hold: false,
+        next: false
+      },
       stats: {
         first_name: 'Jimmy',
         last_name: 'Raynor',
