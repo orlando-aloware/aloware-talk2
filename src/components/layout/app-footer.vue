@@ -32,7 +32,7 @@
       </q-route-tab>
       <q-route-tab to="/"
                    :ripple="false"
-                   class="tab-icons xs-text"
+                   content-class="tab-icons xs-text"
                    no-caps
                    exact>
         <span class="tab-icon">
