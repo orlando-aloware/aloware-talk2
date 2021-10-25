@@ -3004,8 +3004,9 @@ span.mention {
   padding: 0px;
 
   &.small {
-    height: 6px;
-    width: 6px;
+    height: 6px !important;
+    width: 6px !important;
+    min-height: unset;
   }
 
   &.bordered {
@@ -7733,14 +7734,6 @@ button.grey-90 {
   .contact-menu-item {
     padding: 6px 10px;
     border-radius: 6px;
-    &:first-child {
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-    }
-    &:last-child {
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
-    }
     &__icon {
       margin-right: 10px;
     }
@@ -7762,14 +7755,6 @@ button.grey-90 {
       a {
         padding: 6px 10px;
         border-radius: 6px;
-        &:first-child {
-          border-top-left-radius: 8px;
-          border-top-right-radius: 8px;
-        }
-        &:last-child {
-          border-bottom-left-radius: 8px;
-          border-bottom-right-radius: 8px;
-        }
         i {
           margin-right: 10px;
         }
