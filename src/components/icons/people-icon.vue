@@ -1,33 +1,53 @@
 <template>
   <svg
-    width="16"
-    height="17"
+    :width="width"
+    :height="height"
     viewBox="0 0 16 17"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M12.5613 5.55566C12.4697 6.8266 11.5269 7.80566 10.4988 7.80566C9.47065 7.80566 8.52627 6.82691 8.43627 5.55566C8.34252 4.23348 9.26034 3.30566 10.4988 3.30566C11.7372 3.30566 12.655 4.25754 12.5613 5.55566Z"
-      stroke="#4F4F4F"
+      :stroke="color"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
     <path
       d="M10.4999 9.80566C8.46331 9.80566 6.50488 10.8172 6.01425 12.7872C5.94925 13.0479 6.11269 13.3057 6.3805 13.3057H14.6196C14.8874 13.3057 15.0499 13.0479 14.9858 12.7872C14.4952 10.7857 12.5368 9.80566 10.4999 9.80566Z"
-      stroke="#4F4F4F"
+      :stroke="color"
       stroke-miterlimit="10"
     />
     <path
       d="M6.25127 6.11629C6.17815 7.13129 5.41627 7.93066 4.59502 7.93066C3.77377 7.93066 3.01065 7.1316 2.93877 6.11629C2.86409 5.06035 3.60565 4.30566 4.59502 4.30566C5.5844 4.30566 6.32596 5.07973 6.25127 6.11629Z"
-      stroke="#4F4F4F"
+      :stroke="color"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
     <path
       d="M6.4378 9.86855C5.87374 9.61012 5.25249 9.51074 4.59405 9.51074C2.96905 9.51074 1.40343 10.3186 1.01124 11.892C0.959681 12.1001 1.09031 12.3061 1.30406 12.3061H4.8128"
-      stroke="#4F4F4F"
+      :stroke="color"
       stroke-miterlimit="10"
       stroke-linecap="round"
     />
   </svg>
 </template>
+
+<script>
+export default {
+  name: 'people-icon',
+  props: {
+    width: {
+      type: [Number, String],
+      default: 16
+    },
+    height: {
+      type: [Number, String],
+      default: 17
+    },
+    color: {
+      type: String,
+      default: '#62666E'
+    }
+  }
+}
+</script>

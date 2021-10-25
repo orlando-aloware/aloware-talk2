@@ -15,9 +15,9 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-center folders__content flex-column"
+    <div class="folders__content"
          :class="[ !folders.length ? 'no-folder' : '' ]">
-      <div>
+      <div class="d-flex justify-content-center flex-column h-100">
         <span class="fs-12 text-muted">
           No public list available
         </span>
