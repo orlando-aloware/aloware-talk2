@@ -656,6 +656,12 @@ body,
       color: $white;
     }
   }
+
+  .q-router-link--active {
+    .q-tab__content {
+      color: $blue-90;
+    }
+  }
 }
 
 .sidebar-wrapper,
@@ -7767,6 +7773,11 @@ screen and (max-width: 956px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
+        .calls-header {
+          &__label {
+            max-width: 210px;
+          }
+        }
         .composer-footer {
           flex-direction: column;
           .inline-select.q-select--with-input {
@@ -7792,11 +7803,31 @@ screen and (max-width: 956px) {
   }
 }
 
+@media screen and (max-width: 1327px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 170px !important;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1287px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 130px !important;
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 1261px) {
   .contact-activity-container {
     .calls-header {
       &__label {
-        max-width: 121px;
+        max-width: 121px !important;
       }
     }
   }
@@ -7893,6 +7924,15 @@ screen and (max-width: 956px) {
 }
 
 @media screen and (max-width: 784px) {
+  .page-footer {
+    border-top: solid 1px #e4e4e4;
+  }
+  .inbox {
+    &-side,
+    &-details {
+      border-bottom: unset;
+    }
+  }
   .sidebar-wrapper {
     display: none !important;
   }
@@ -7970,6 +8010,11 @@ screen and (max-width: 956px) {
     &-side {
       max-width: unset;
       overflow-x: inherit;
+      &__nav {
+        .inbox-nav-item-group-header {
+          display: none;
+        }
+      }
       &__left {
         max-width: unset;
         min-width: unset;

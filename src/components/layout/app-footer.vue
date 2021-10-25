@@ -15,7 +15,8 @@
                    no-caps
                    exact>
         <span class="tab-icon">
-          <inbox-mobile-icon/>
+          <inbox-mobile-icon
+            :color="tab === 'inbox' ? '#2F80ED' : '#A3A3A3'"/>
         </span>
         Inbox
       </q-route-tab>
@@ -26,11 +27,12 @@
                    no-caps
                    exact>
         <span class="tab-icon">
-          <contacts-mobile-icon/>
+          <contacts-mobile-icon
+            :color="tab === 'contacts' ? '#2F80ED' : '#A3A3A3'"/>
         </span>
         Contacts
       </q-route-tab>
-      <q-route-tab to="/"
+      <q-route-tab to="/#"
                    :ripple="false"
                    content-class="tab-icons xs-text"
                    no-caps
@@ -47,7 +49,8 @@
                    no-caps
                    exact>
         <span class="tab-icon">
-          <stats-mobile-icon/>
+          <stats-mobile-icon
+            :color="tab === 'stats' ? '#2F80ED' : '#A3A3A3'"/>
         </span>
         Stats
       </q-route-tab>
@@ -83,7 +86,17 @@ export default {
 
   watch: {
     '$route.name': function () {
-      // this.initIcons()
+      switch (this.$route.name) {
+        case 'Inbox':
+          this.tab = 'inbox'
+          break
+        case 'Contacts':
+          this.tab = 'contacts'
+          break
+        case 'Stats':
+          this.tab = 'stats'
+          break
+      }
     }
   }
 }
