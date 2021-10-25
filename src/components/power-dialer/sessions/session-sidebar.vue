@@ -1,11 +1,11 @@
 <template>
   <div class="h-100 border-0 no-border-radius">
     <div class="contact-list-sidebar-wrapper d-block">
-    <b-button
+      <b-button
         variant="light"
         size="sm"
         class="sidebar-toggle"
-        @click="() => ( alert(1) )">
+        @click="toggleSidebar">
         <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
     <SessionStats />
@@ -27,6 +27,11 @@ export default {
   data () {
     return {
       isExpanded: true
+    }
+  },
+  methods: {
+    toggleSidebar () {
+      this.isExpanded = !this.isExpanded
     }
   }
 }

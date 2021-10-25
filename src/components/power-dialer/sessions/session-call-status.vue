@@ -61,9 +61,14 @@
         <DropIcon width="18px" height="18px" class="mr-0 py-0" style="position:relative;top:-2px;" />
         {{ stats.address }} - {{ stats.time }}
       </div>
-      <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+      <q-btn
+        @click="toggleMute = !toggleMute"
+        no-wrap outline no-caps size="sm" color="grey-4"
+        class="sessions-button free-width mx-1">
         <MuteIcon height="13px" class="mr-2" color="#62666E" />
-        <div class="text-body2 text-black">Mute</div>
+        <div class="text-body2 text-black">
+          {{ toggleMute ? 'Unmute' : 'Mute' }}
+        </div>
       </q-btn>
       <q-btn
         @click="toggleRecording = !toggleRecording"
@@ -152,6 +157,14 @@ export default {
       set (val) {
         this.statuses.hold = val
       }
+    },
+    toggleMute: {
+      get () {
+        return this.statuses.mute
+      },
+      set (val) {
+        this.statuses.mute = val
+      }
     }
   },
   data () {
@@ -161,7 +174,8 @@ export default {
         end: false,
         recording: false,
         hold: false,
-        next: false
+        next: false,
+        mute: false
       },
       stats: {
         first_name: 'Jimmy',

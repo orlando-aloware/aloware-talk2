@@ -116,3 +116,46 @@
     border-radius: 6px;
   }
 }
+
+.t-expansion-panels {
+  .t-expansion-panel {
+    padding: 14px 5px;
+    position: relative;
+
+    &:hover {
+      .dropdown {
+        &.t-btn-floater {
+          &__top {
+            .btn {
+              display: block;
+            }
+          }
+          &__bottom {
+            display: block;
+          }
+        }
+      }
+    }
+    .dropdown {
+      &.t-btn-floater {
+        
+        &__bottom {
+          position: absolute;
+          bottom: 10px;
+          right: 15px;
+        }
+        &__top {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+
+          .btn {
+            display: none;
+            padding: 0 5px !important;
+            border: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}

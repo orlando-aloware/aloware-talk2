@@ -33,9 +33,11 @@
               <q-item
                 :key="`acc-item-${i}`"
                 :class="{ active: item.id === activeSession.id }"
-                class="px-2">
+                class="t-expansion-panel px-2">
                 <div class="py-2">
-                  <q-avatar size="30px" color="grey">J</q-avatar>
+                  <q-avatar size="30px" color="grey">
+                    {{ avatarName(item.first_name) }}
+                  </q-avatar>
                 </div>
 
                 <q-item-section class="pl-2">
@@ -54,6 +56,29 @@
                   <!-- <q-item-label class="text-red" color="red" caption>...</q-item-label> -->
                   <!-- <q-icon name="dots" color="yellow" /> -->
                 </q-item-section>
+                <b-dropdown
+                  v-else
+                  text="..."
+                  no-caret
+                  right size="xs"
+                  variant="white"
+                  class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top">
+                  <template #button-content>
+                    <i class="fa fa-ellipsis-h"></i>
+                  </template>
+                  <b-dropdown-item href="#">
+                    Option 1
+                  </b-dropdown-item>
+                  <b-dropdown-item href="#">
+                    Option 2
+                  </b-dropdown-item>
+                  <b-dropdown-item href="#">
+                    Option 3
+                  </b-dropdown-item>
+                </b-dropdown>
+                <div class="dropdown t-btn-floater t-btn-floater__bottom">
+                  <RedialIcon height="15px" width="15px" />
+                </div>
 
               </q-item>
               <!-- <q-separator :key="`acc-item-line-${i}`" spaced inset /> -->
@@ -74,16 +99,21 @@
 
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
+import RedialIcon from 'components/icons/refresh-icon-2'
 
 export default {
   name: 'SessionGroups',
   components: {
     SearchList,
-    PhoneIcon
+    PhoneIcon,
+    RedialIcon
   },
   methods: {
     chipped (data) {
       return data.length || 0
+    },
+    avatarName (name) {
+      return name[0]
     }
   },
   data () {
