@@ -61,6 +61,10 @@
         <DropIcon width="18px" height="18px" class="mr-0 py-0" style="position:relative;top:-2px;" />
         {{ stats.address }} - {{ stats.time }}
       </div>
+      <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+        <MuteIcon height="13px" class="mr-2" color="#62666E" />
+        <div class="text-body2 text-black">Mute</div>
+      </q-btn>
       <q-btn
         @click="toggleRecording = !toggleRecording"
         no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
@@ -109,6 +113,7 @@ import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
+import MuteIcon from 'components/icons/mute-icon'
 
 export default {
   name: 'SessionCallStatus',
@@ -120,7 +125,8 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon
+    RecordIcon,
+    MuteIcon
   },
   computed: {
     togglePause: {
