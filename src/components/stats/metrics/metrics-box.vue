@@ -124,7 +124,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['profile']),
-    ...mapState('stats', ['availableMetrics']),
+    ...mapState('stats', ['availableMetrics', 'metricLoader']),
     dialogName () {
       return `remove-metric-dialog-${this.metric.id}`
     },
@@ -170,12 +170,16 @@ export default {
     },
     metric () {
       this.loader = false
+    },
+    metricLoader () {
+      this.loader = this.metricLoader
     }
   },
   methods: {
     ...mapActions('stats', [
       'deleteMetric',
-      'updateMetric'
+      'updateMetric',
+      'setGroupMetricLoader'
     ]),
     removeSelectedMetric () {
       this.loader = true
@@ -226,6 +230,10 @@ export default {
     },
     openEditModal () {
       this.editModal = true
+    },
+    toggleLoader (value) {
+      this.setGroupMetricLoader(value)
+      this.loader = value
     }
   }
 }

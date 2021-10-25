@@ -47,6 +47,7 @@
     font-weight: 600;
     letter-spacing: -0.25px !important;
     line-height: 34px;
+    white-space: nowrap;
   }
 
   .metric-box-desc {
@@ -130,8 +131,4 @@
 
 .report-group-header {
   margin-bottom: 3px;
-}
-
-.stats-refresh-btn {
-  width: 67px;
 }

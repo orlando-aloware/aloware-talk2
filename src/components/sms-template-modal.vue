@@ -3,7 +3,8 @@
            size="md"
            v-model="isOpen"
            scrollable
-           @hidden="onHidden">
+           @hidden="onHidden"
+           @shown="onShown">
 
     <b-form class="appointment-form"
             ref="appointmentForm"
@@ -135,6 +136,12 @@ export default {
       this.setSmsTemplateModal({
         isOpen: false
       })
+    },
+
+    onShown () {
+      if (this.smsTemplateModal.template) {
+        this.template = { ...this.template, body: this.smsTemplateModal.template.body, name: this.smsTemplateModal.template.name, id: this.smsTemplateModal.template.id }
+      }
     },
 
     variableSelected (variable) {

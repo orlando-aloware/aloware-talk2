@@ -21,6 +21,8 @@
         :options="dateRange"
         :dense="dense"
         :options-dense="denseOpts"
+        :disabled="updateLoading || metricsList.length === 0"
+        :readonly="updateLoading || metricsList.length === 0"
         v-model="timeline"
         @input="changedFilter($event)">
       </q-select>
@@ -55,8 +57,9 @@
                               name="flip-list">
               <template v-if="metricsList">
                 <MetricsBox
+                  :ref="`metric-box-${index}`"
                   class="metric-box-item movable"
-                  v-for="metric in metricsList"
+                  v-for="(metric, index) in metricsList"
                   :key="metric.id"
                   :metric="metric"
                   @remove="onLoaderToggled"/>
@@ -205,6 +208,7 @@ export default {
       },
       metricsList: [],
       loaderToggled: false,
+      updateLoading: false,
       DateRanges
     }
   },
@@ -242,15 +246,26 @@ export default {
         this.$generalNotification('Failed to updated metric group.', 'error')
       })
     }, 200),
+    toggleLoader (value) {
+      this.updateLoading = value
+      for (let index in this.metricsList) {
+        if (this.$refs[`metric-box-${index}`]) {
+          this.$refs[`metric-box-${index}`][0].toggleLoader(value)
+        }
+      }
+    },
     async changedFilter (val) {
+      this.toggleLoader(true)
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
         name: this.metricGroupName,
         date_range_type: val
       }).then(res => {
+        this.toggleLoader(false)
         this.updateMetricGroup(res.data)
         this.$generalNotification('Metric group updated successfully.')
       }).catch(err => {
         console.log(err)
+        this.toggleLoader(false)
         this.$generalNotification('Failed to updated metric group.', 'error')
       })
     },

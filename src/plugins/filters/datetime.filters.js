@@ -254,13 +254,20 @@ export const fixFullDuration = (duration) => {
     let min = Math.floor(seconds / 60 % 60)
     let sec = Math.floor(seconds % 60)
     let result = ''
+    let unitCount = 0
 
     if (hour) {
       result += `${hour}h`
+      unitCount++
     }
 
     if (min) {
       result += ` ${min}m`
+      unitCount++
+    }
+
+    if (unitCount === 2) {
+      return result
     }
 
     return (result + ` ${sec}s`).trim()

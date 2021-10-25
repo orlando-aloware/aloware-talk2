@@ -64,5 +64,9 @@ export default {
   },
   setHasMoreCommunications: ({ commit }, hasMore = false) => {
     commit('SET_HAS_MORE_COMMUNICATIONS', hasMore)
+  },
+
+  setSearcherOpen: ({ commit }, isOpen = false) => {
+    commit('SET_SEARCHER_OPEN', isOpen)
   }
 }

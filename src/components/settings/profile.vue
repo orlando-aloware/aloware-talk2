@@ -91,7 +91,7 @@
 
       <b-form-row :id="`${SettingsMap.profile_settings_password.hash_keyword}-container`"
                   class="mt-4"
-                  v-if="hasRole('Company Admin') && !user.is_destination">
+                  v-if="isAdmin && !user.is_destination">
         <b-col sm="12"
                md="12"
                class="d-flex justify-between">
@@ -369,6 +369,7 @@
                         class="mt-2">
             <user-campaign-selector v-model="user.campaign_id"
                                     :user="user"
+                                    :disable="!isAdmin"
                                     @select="(eventPayload) => onUpdateFields(eventPayload, 'campaign_id')">
             </user-campaign-selector>
           </b-form-group>
@@ -381,7 +382,8 @@
         <b-col sm="12"
                md="12">
           <div>
-            <h5 class="form-label">Can Broadcast</h5>
+            <h5 class="
+            form-label">Can Broadcast</h5>
             <p class="form-helper-text">Grant broadcast access to the user</p>
           </div>
 
@@ -452,7 +454,7 @@ export default {
           email
         },
         phone_number: {
-          validPhone: (value) => this.$options.filters.fixPhone(value) !== false && value.length > 0
+          validPhone: (value) => this.$options.filters.fixPhone(value) !== false
         }
       }
 
