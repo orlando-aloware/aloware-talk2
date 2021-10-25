@@ -123,10 +123,12 @@
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <i class="fa fa-search mr-1"></i> Select Contacts
+            <search-icon color="#62666E">
+            </search-icon>
+            Select Contacts
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
-            <i class="fa fa-plus mr-1"></i>
+            <plus-icon color="#62666E"></plus-icon>
             Create Contact
           </b-dropdown-item>
         </b-dropdown>
@@ -222,7 +224,6 @@ import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
-import Search from 'src/components/search.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import TableRow from 'src/components/table-row.vue'
@@ -234,11 +235,15 @@ import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import CloseIcon from 'components/icons/close-icon'
+import PlusIcon from 'components/icons/plus-icon.vue'
 import SlashIcon from 'components/icons/slash-icon'
+import SearchIcon from 'components/icons/search-icon'
 
 export default {
   components: {
+    SearchIcon,
     SlashIcon,
+    PlusIcon,
     CloseIcon,
     FolderDynamicIcon,
     FolderStaticIcon,
@@ -247,7 +252,6 @@ export default {
     BulkActionMenu,
     CompactBtn,
     ContactsScreen,
-    Search,
     Datatable,
     ImportContactsModal,
     TableRow

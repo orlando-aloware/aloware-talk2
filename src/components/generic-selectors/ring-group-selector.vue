@@ -27,6 +27,7 @@
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
+              class="generic-selector"
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="ringGroupId"
