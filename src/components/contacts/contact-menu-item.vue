@@ -5,7 +5,7 @@
     @mouseover="onMouseOver"
     @mouseleave="onMouseLeave"
   >
-    <div class="contact-menu-item__icon pr-2 align-items-center d-flex">
+    <div class="contact-menu-item__icon align-items-center d-flex">
       <slot name="icon"></slot>
     </div>
     <div class="contact-menu-item__title flex-grow-1 move-item align-items-center d-flex">

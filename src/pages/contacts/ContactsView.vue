@@ -123,13 +123,13 @@
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <search-icon class="mr-1"></search-icon>
+
+            <search-icon color="#62666E">
+            </search-icon>
             Select Contacts
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
-            <plus-icon class="mr-1"
-                       width="22"
-                       height="22"></plus-icon>
+            <plus-icon color="#62666E"></plus-icon>
             Create Contact
           </b-dropdown-item>
         </b-dropdown>
@@ -225,7 +225,6 @@ import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
-import Search from 'src/components/search.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import TableRow from 'src/components/table-row.vue'
@@ -241,9 +240,11 @@ import SlashIcon from 'components/icons/slash-icon'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import SearchIcon from 'components/icons/search-icon'
 import PlusIcon from 'components/icons/plus-icon'
+import Search from 'components/search'
 
 export default {
   components: {
+    Search,
     PlusIcon,
     SearchIcon,
     EllipseIcon,
@@ -256,7 +257,6 @@ export default {
     BulkActionMenu,
     CompactBtn,
     ContactsScreen,
-    Search,
     Datatable,
     ImportContactsModal,
     TableRow

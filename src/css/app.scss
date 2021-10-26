@@ -3004,8 +3004,9 @@ span.mention {
   padding: 0;
 
   &.small {
-    height: 6px;
-    width: 6px;
+    height: 6px !important;
+    width: 6px !important;
+    min-height: unset;
   }
 
   &.bordered {
@@ -4465,7 +4466,7 @@ span.mention {
     }
 
     &__name {
-      width: calc(100% - 54px);
+      width: calc(100% - 61px);
       display: flex;
       align-items: center;
 
@@ -4793,7 +4794,7 @@ span.mention {
     height: 40px;
   }
   &:hover {
-    background-color: $light-green2;
+    background-color: $grey-60;
   }
 }
 
@@ -4952,8 +4953,8 @@ span.mention {
   padding-bottom: 5px;
   &.border-top {
     .folders__header {
-      padding-top: 10px;
-      padding-bottom: 7px;
+      padding-top: 16px;
+      padding-bottom: 10px;
 
       button#bs-folder-options {
         margin-top: -1px;
@@ -4966,7 +4967,7 @@ span.mention {
     letter-spacing: 0.03em;
     font-weight: 600;
     text-transform: uppercase;
-    padding-bottom: 16px;
+    padding-bottom: 10px;
     &__title {
       color: $grey-90;
     }
@@ -4977,7 +4978,8 @@ span.mention {
       max-height: calc(100% - 163px);
     }
     &.no-folder {
-      padding-left: 20px;
+      padding-left: 18px;
+      height: 34px;
     }
   }
   .item {
@@ -5315,13 +5317,6 @@ table.datatable {
 }
 
 .submenu {
-  &-icon {
-    svg {
-      path {
-        fill: $black;
-      }
-    }
-  }
   &-items {
     background: white;
     width: 130px;
@@ -5330,12 +5325,14 @@ table.datatable {
 
 .folder-submenu-items {
   background: white;
-  border-radius: 5px;
+  border-radius: 8px;
+  padding: 6px 6px;
   border: solid 1px $grey-light;
   display: none;
   flex-direction: column;
   position: absolute;
   width: 200px;
+  box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
 }
 
 .import-modal {
@@ -5824,6 +5821,7 @@ table.datatable {
   &:hover {
     .folder__option {
       display: block;
+      border: 0 !important;
     }
   }
   &__name {
@@ -6141,7 +6139,7 @@ table.datatable {
     }
   }
   .folder {
-    padding-right: 10px;
+    padding-right: 17px;
     min-height: 34px;
     cursor: pointer;
     user-select: none;
@@ -6392,13 +6390,20 @@ table.datatable {
   &__content {
     height: calc(100% - 32px);
     overflow: auto;
+    .counts {
+      padding-right: 17px;
+      .badge-pill {
+        padding-right: 6px;
+        padding-left: 6px;
+      }
+    }
   }
 
   .item {
     padding-left: 18px;
     color: $dark;
     cursor: pointer;
-    min-height: 40px;
+    min-height: 34px;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -6421,7 +6426,7 @@ table.datatable {
     .icon,
     .item-name,
     .counts {
-      min-height: 40px;
+      min-height: 34px;
     }
     .item-name {
       font-size: $f-size-body-sm;
@@ -7628,8 +7633,12 @@ button.grey-90 {
 .pinned,
 .shared,
 .folders {
+  .folders__header button,
   .header__header__title {
-    padding-left: 18px;
+    margin-left: 18px !important;
+    margin-right: 10px !important;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -7751,5 +7760,57 @@ button.grey-90 {
   }
   svg {
     margin-right: 5px;
+  }
+}
+
+.contact-popover {
+  border-radius: 8px;
+  padding: 6px 6px;
+  box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+  .arrow {
+    display: none;
+  }
+  .contact-menu-item {
+    padding: 6px 10px;
+    border-radius: 6px;
+    &__icon {
+      margin-right: 10px;
+    }
+    &__title {
+      span {
+        color: $grey-100;
+      }
+    }
+  }
+}
+
+.filter-toggle-button,
+.contacts-options-dropdown {
+  .dropdown-menu {
+    border-radius: 8px;
+    padding: 6px 6px;
+    box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+    li {
+      a {
+        display: flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        &:not(.disabled) {
+          color: $grey-100;
+          i {
+            color: $grey-90;
+          }
+        }
+        i {
+          margin-right: 14px;
+        }
+        svg {
+          margin-right: 10px;
+        }
+      }
+    }
   }
 }

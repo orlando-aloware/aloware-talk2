@@ -1041,6 +1041,7 @@
                       <q-item-section>
                         <template v-if="transfer.mode === 'ring-group'">
                           <ring-group-selector v-model="transfer.ringGroupId"
+                                               :genericMultiselect="false"
                                                @change="changeTransferRingGroup">
                           </ring-group-selector>
                         </template>

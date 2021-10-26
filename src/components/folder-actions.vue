@@ -2,7 +2,7 @@
   <contact-menu>
     <contact-menu-item @click="$emit('edit')" v-if="hasEdit">
       <template slot="icon">
-        <pencil-icon></pencil-icon>
+        <pencil-icon color="#62666E"></pencil-icon>
       </template>
       <template slot="title">
         <span>Rename</span>
@@ -11,7 +11,7 @@
 
     <contact-menu-item @mouseover="createSubmenu" @mouseleave="destroySubmenu">
       <template slot="icon">
-        <plus-icon></plus-icon>
+        <plus-icon color="#62666E"></plus-icon>
       </template>
       <template slot="title">
         <span>New</span>
@@ -22,7 +22,8 @@
           class="submenu-icon"
           @click="createSubmenu"
         >
-          <folder-arrow-close-icon></folder-arrow-close-icon>
+          <folder-arrow-close-icon color="#62666E">
+          </folder-arrow-close-icon>
         </span>
       </template>
     </contact-menu-item>
@@ -45,7 +46,7 @@
 
       <contact-menu-item @click="$emit('createlist')" v-if="hasEdit">
         <template slot="icon">
-          <people-icon></people-icon>
+          <people-icon color="#62666E"></people-icon>
         </template>
         <template slot="title">
           <span>List</span>
@@ -55,7 +56,7 @@
 
     <contact-menu-item @click="$emit('move')" v-if="hasEdit">
       <template slot="icon">
-        <move-icon></move-icon>
+        <move-icon color="#62666E"></move-icon>
       </template>
       <template slot="title">
         <span class="move-item">Move</span>
@@ -64,7 +65,7 @@
 
     <contact-menu-item @click="$emit('remove')" v-if="hasDelete">
       <template slot="icon">
-        <trash-icon></trash-icon>
+        <trash-icon color="#62666E"></trash-icon>
       </template>
       <template slot="title">
         <span>Delete</span>

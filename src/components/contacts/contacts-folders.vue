@@ -44,7 +44,7 @@
       </button>
     </div>
 
-    <div class="d-flex folders__content flex-column">
+    <div class="folders__content">
       <tree-folder-create
         v-if="isCreatingFolder"
         :layer="0"
