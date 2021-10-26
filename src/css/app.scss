@@ -7750,12 +7750,15 @@ button.grey-90 {
         align-items: center;
         padding: 6px 10px;
         border-radius: 6px;
+        &:not(.disabled) {
+          color: $grey-100;
+          i {
+            color: $grey-90;
+          }
+        }
         i,
         svg {
           margin-right: 10px;
-        }
-        :not(i) {
-          color: $grey-100;
         }
       }
     }
