@@ -40,6 +40,9 @@
           </template>
         </div>
       </q-card-section>
+      <q-card-section>
+
+      </q-card-section>
     </q-card>
   </div>
 </template>
@@ -85,7 +88,9 @@ export default {
         { label: 'Country', name: 'country', type: 'select', disabled: false },
         { label: 'Zip Code', name: 'zip_code', type: 'text', disabled: false },
         { label: 'TCPA Approved', name: 'tcpa_approved', type: 'text', disabled: true },
-        { label: 'Created At', name: 'created_at', type: 'text', disabled: true },
+        { label: 'Created At', name: 'created_at', type: 'text', disabled: true }
+      ],
+      customFields: [
         { label: 'Custom Fields', name: 'label', type: '', disabled: false },
         { label: 'Intake Source', name: 'intake-source', type: 'select', disabled: false },
         { label: 'Job Title', name: 'custom-field', type: 'select', disabled: false },
