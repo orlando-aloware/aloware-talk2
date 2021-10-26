@@ -57,11 +57,14 @@
                   <!-- <q-icon name="dots" color="yellow" /> -->
                 </q-item-section>
                 <b-dropdown
+                  @mouseover="onOver"
+                  @mouseleave="onLeave"
                   v-else
                   text="..."
                   no-caret
                   right size="xs"
                   variant="white"
+                  ref="dropdown"
                   class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top">
                   <template #button-content>
                     <i class="fa fa-ellipsis-h"></i>
@@ -114,6 +117,12 @@ export default {
     },
     avatarName (name) {
       return name[0]
+    },
+    onOver () {
+      this.$refs.dropdown.visible = true
+    },
+    onLeave () {
+      this.$refs.dropdown.visible = false
     }
   },
   data () {
