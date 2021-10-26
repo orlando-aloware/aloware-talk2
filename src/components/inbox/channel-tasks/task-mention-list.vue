@@ -37,7 +37,7 @@ export default {
 
   computed: {
     emptyPlaceholder () {
-      return [1, 2].includes(this.searchText.length) ? 'Type at least 3 characters' : 'No Mentions'
+      return this.searchText && [1, 2].includes(this.searchText.length) ? 'Type at least 3 characters' : 'No Mentions'
     }
   }
 }
