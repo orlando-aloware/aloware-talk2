@@ -62,7 +62,7 @@
       <q-item v-if="scope.opt.group"
               v-bind="scope.itemProps"
               v-on="scope.itemEvents">
-        <q-item-label header class="text-size-xs">{{ scope.opt.group }}sfsdf</q-item-label>
+        <q-item-label header class="text-size-xs">{{ scope.opt.group }}</q-item-label>
       </q-item>
     </template>
   </q-select>
