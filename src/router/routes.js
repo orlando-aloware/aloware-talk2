@@ -102,7 +102,10 @@ const routes = [
           {
             name: 'Contacts List Public',
             path: 'list/public/:id(\\d+)+',
-            component: () => import('src/pages/contacts/ContactsViewList.vue')
+            component: () => import('src/pages/contacts/ContactsViewList.vue'),
+            meta: {
+              title: 'Contacts'
+            }
           },
           {
             name: 'Contacts',
