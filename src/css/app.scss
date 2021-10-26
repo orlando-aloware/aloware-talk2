@@ -2998,10 +2998,10 @@ span.mention {
 }
 
 .rounded-badge {
-  height: 12px;
+  height: 8px;
   width: 12px;
   border-radius: 50%;
-  padding: 0px;
+  padding: 0;
 
   &.small {
     height: 6px;
@@ -3024,7 +3024,7 @@ span.mention {
     }
 
     .rounded-badge {
-      margin-top: 6px;
+      margin-top: 8px;
       margin-left: 0;
     }
   }
@@ -3301,6 +3301,11 @@ span.mention {
 
   &__nav {
     padding-top: 10px;
+
+    .nav-item-separator {
+      margin: 20px 17px;
+      border-color: $grey-60 !important;
+    }
   }
 
   &__left {
@@ -3371,7 +3376,7 @@ span.mention {
   height: 32px !important;
   font-size: $f-size-body-xs;
   margin-bottom: 0;
-  border: 1px solid $grey-60;
+  border: 1px solid $grey-70;
 
   input {
     line-height: 30px;
@@ -3414,9 +3419,14 @@ span.mention {
   .comm-label {
     @include font-size(12px, 'normal');
     line-height: 15px;
+
+    svg.item-identifier-icon {
+      margin-top: -2px;
+    }
   }
+
   .comm-label.mention-content > span {
-    width: 10vw;
+    width: 165px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -3451,6 +3461,15 @@ span.mention {
   height: 100%;
   width: 100%;
   display: flex;
+
+  .not-in-inbox-label {
+    padding: 0 12px;
+
+    span.badge {
+      margin-top: -2px;
+      position: relative;
+    }
+  }
 }
 
 .opacity-1 {
@@ -4933,8 +4952,12 @@ span.mention {
   padding-bottom: 5px;
   &.border-top {
     .folders__header {
-      padding-top: 7px;
+      padding-top: 10px;
       padding-bottom: 7px;
+
+      button#bs-folder-options {
+        margin-top: -1px;
+      }
     }
   }
   &__header {
@@ -4951,7 +4974,7 @@ span.mention {
   &__content {
     overflow: auto;
     &:not(.no-folder) {
-      height: calc(100% - 40px);
+      max-height: calc(100% - 163px);
     }
     &.no-folder {
       padding-left: 20px;
@@ -5048,9 +5071,22 @@ span.mention {
       min-height: 35px !important;
     }
 
+    .q-btn__wrapper:before {
+      box-shadow: none !important;
+    }
+
     .q-btn {
       font-size: $f-size-12 !important;
     }
+
+    .q-btn:nth-child(2) {
+      margin-right: 10px;
+    }
+
+    .q-btn:nth-child(4) {
+      margin-left: 10px;
+    }
+
   }
 }
 
@@ -6094,7 +6130,7 @@ table.datatable {
   & > .folder,
   & > .sublists > .folder,
   & > .animated > .sublists > .folder {
-    padding-left: 9px;
+    padding-left: 7px;
   }
   & > .folder,
   & > .sublists > .folder,
@@ -6339,7 +6375,7 @@ table.datatable {
   flex-direction: column;
   height: 20rem;
   padding-top: 16px;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
 
   &__header {
     font-size: $f-size-body-sm;
@@ -6347,19 +6383,19 @@ table.datatable {
     letter-spacing: 0.03em;
     font-weight: 600;
     text-transform: uppercase;
-    padding-bottom: 16px;
+    padding-bottom: 10px;
     &__title {
       color: $grey-90;
     }
   }
 
   &__content {
-    height: calc(100% - 40px);
+    height: calc(100% - 32px);
     overflow: auto;
   }
 
   .item {
-    padding-left: 12px;
+    padding-left: 18px;
     color: $dark;
     cursor: pointer;
     min-height: 40px;
@@ -6388,11 +6424,15 @@ table.datatable {
       min-height: 40px;
     }
     .item-name {
-      font-size: $f-size-h5;
+      font-size: $f-size-body-sm;
       line-height: 17px;
       color: $grey-100;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .icon {
+      padding-right: 6px;
     }
   }
 
@@ -6400,6 +6440,10 @@ table.datatable {
     background: $light-blue3;
     color: $dark;
     text-decoration: none;
+  }
+
+  .item-empty {
+    padding-left: 20px;
   }
 
   .item.router-link-exact-active {
@@ -7493,21 +7537,23 @@ button.grey-90 {
 
 .tab-avatar-menu {
 
-  min-width: 186px !important;
-  max-width: 186px !important;
+  min-width: 227px !important;
+  max-width: 227px !important;
 
   padding-top: 8px;
   padding-bottom: 8px;
+  border-radius: 6px !important;
 
   .q-list {
     padding: 0;
 
     .q-item {
-      padding: 0 16px !important;
-      font-size: $f-size-body-xs !important;
+      padding: 0 17px 0  16px !important;
+      font-size: $f-size-body !important;
+      height: 33px !important;
 
       .rounded-badge {
-        margin-right: 15px !important;
+        margin-right: 14px !important;
       }
 
       .focus-mode-icon,
@@ -7583,7 +7629,7 @@ button.grey-90 {
 .shared,
 .folders {
   .header__header__title {
-    padding-left: 20px;
+    padding-left: 18px;
   }
 }
 

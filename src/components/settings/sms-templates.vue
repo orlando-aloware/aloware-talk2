@@ -202,6 +202,12 @@ export default {
 
   mounted () {
     this.getTemplates()
+
+    this.setSmsTemplateModal(
+      {
+        isOpen: false
+      }
+    )
   }
 }
 </script>

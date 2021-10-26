@@ -1,5 +1,7 @@
 <template>
   <div>
+    <hr v-if="value === 'voicemails'"
+        class="nav-item-separator"/>
     <a
       class="inbox-nav-item mx-2 px-1"
       v-bind:class="{

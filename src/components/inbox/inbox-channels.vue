@@ -1,6 +1,6 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column">
-      <div class="header flex- w-100" v-if="$route.params.channel !== 'mentions'">
+      <div class="header w-100" v-if="$route.params.channel !== 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
             <inbox-searcher @search="onSearch"
@@ -9,14 +9,13 @@
             <div class="filter-wrapper">
               <compact-btn v-if="hasChannelFilterChanges"
                            borderless
-                           customClass="ml-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
+                           customClass="ml-2 pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"
                            @clicked="resetFilters">
                 <i class="fa fa-times"></i>
               </compact-btn>
               <compact-btn borderless
-                           customClass="pl-0 pr-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button"
-                           :variant="filterButtonVariant"
+                           customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            v-b-modal:inbox-channel-filter-modal>
                 <q-tooltip v-if="selectedFilter"
                            anchor="top middle"
@@ -24,8 +23,9 @@
                   {{ selectedFilter.name }}
                 </q-tooltip>
                 <filter-icon v-if="!selectedFilter"
-                             color="#256EFF"
-                             class="filter-icon"></filter-icon> {{ !selectedFilter ? 'Filters' : selectedFilter.name }}
+                             color="#62666E"
+                             class="filter-icon">
+                </filter-icon> {{ !selectedFilter ? 'Filters' : selectedFilter.name }}
               </compact-btn>
               <b-badge v-if="hasChannelFilterChanges"
                        class="ml-1 fs-12"
@@ -47,7 +47,7 @@
           </q-select>
         </div>
       </div>
-      <div class="header flex- w-100" v-if="$route.params.channel === 'mentions'">
+      <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="inbox-filter-actions-wrapper inbox-tab--filter pr-1 ml-2">
             <inbox-searcher @search="onSearch"
@@ -117,10 +117,12 @@
         <task-list :communications="communications"
                    :answer-status="answerStatus"
                    :channel="channel"
+                   :search-text="searchText"
                    v-if="!isGettingTasksList && $route.params.channel !== 'mentions'">
         </task-list>
         <task-mention-list :communications="communications"
                            :direction="mentionType"
+                           :search-text="searchText"
                            v-if="!isGettingTasksList && $route.params.channel === 'mentions'">
         </task-mention-list>
         <div :class="[isGettingTasksList ? 'py-5' : 'py-4', 'relative']">
@@ -787,6 +789,7 @@ export default {
       this.searchText = null
       this.scrollerTopClass = 'mt-0'
       this.filter.page = 1
+      this.filter.search_text = null
       this.getCommunications(this.filter)
     },
 
@@ -801,15 +804,13 @@ export default {
       }
     },
     'searchText': function (value) {
-      if (!this.isSearcherOpen) {
-        return
-      }
-
-      if (value === '') {
-        this.setCommunications([])
-      } else {
-        this.filter.search_text = value
-        this.getCommunications(this.filter)
+      if ((value && value.length >= 3) || value === '') {
+        if (value === '') {
+          this.setCommunications([])
+        } else {
+          this.filter.search_text = value
+          this.getCommunications(this.filter)
+        }
       }
     },
     'sorting.order': function () {

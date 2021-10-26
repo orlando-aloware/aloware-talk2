@@ -43,30 +43,6 @@
        />
      </q-btn>
      <q-btn
-       v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
-       borderless
-       flat
-       no-caps
-       type="a"
-       color="primary"
-       class="text-decoration-none"
-       :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
-       <q-tooltip anchor="top middle"
-                  self="center middle">
-         Close
-       </q-tooltip>
-      <span v-if="!isUpdatingStatus"
-            class="mx-2">
-        <check-o-icon></check-o-icon>
-      </span>
-       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
-                       class="pl-1 pr-1"
-                       color="primary"
-                       size="20px"
-       />
-     </q-btn>
-     <q-btn
        v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
        borderless
        flat
@@ -85,6 +61,30 @@
         <inbox-o-icon></inbox-o-icon>
       </span>
        <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_OPEN"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
+     </q-btn>
+     <q-btn
+       v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+       borderless
+       flat
+       no-caps
+       type="a"
+       color="primary"
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
+       <q-tooltip anchor="top middle"
+                  self="center middle">
+         Close
+       </q-tooltip>
+      <span v-if="!isUpdatingStatus"
+            class="mx-2">
+        <check-o-icon></check-o-icon>
+      </span>
+       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
                        class="pl-1 pr-1"
                        color="primary"
                        size="20px"

@@ -8,10 +8,11 @@
       <q-menu :offset="[271, 0]"
               content-class="inbox-search"
               ref="inboxSearch"
-              no-focus
               separate-close-popup
               anchor="bottom end"
               self="top right"
+              no-focus
+              persistent
               @hide="onHideMenu"
               @show="onShowMenu">
         <q-list style="min-width: 305px">
@@ -23,7 +24,10 @@
                        debounce="500"
                        v-model="searchText">
                 <template v-slot:append>
-                  <q-icon name="cancel" @click.stop="onSearchClose" class="cursor-pointer" />
+                  <q-item-section @click.stop="onSearchClose"
+                                  class="cursor-pointer">
+                    <close-o-icon></close-o-icon>
+                  </q-item-section>
                 </template>
               </q-input>
             </q-item-section>
@@ -38,20 +42,22 @@
 import CompactBtn from 'components/compact-btn'
 import SearchIcon from 'components/icons/search-icon'
 import { mapActions } from 'vuex'
+import CloseOIcon from 'components/icons/close-o-icon'
 export default {
   name: 'inbox-searcher',
 
-  components: { SearchIcon, CompactBtn },
+  components: { CloseOIcon, SearchIcon, CompactBtn },
 
   computed: {
     searchIconColor () {
-      return !this.searchText ? '#62666E' : '#256EFF'
+      return !this.isOpen ? '#62666E' : '#256EFF'
     }
   },
 
   data () {
     return {
-      searchText: ''
+      searchText: '',
+      isOpen: false
     }
   },
 
@@ -63,14 +69,15 @@ export default {
     onSearchClose () {
       this.searchText = null
       this.$refs.inboxSearch.hide()
-      this.$emit('closed')
     },
     onShowMenu () {
+      this.isOpen = true
       this.setSearcherOpen(true)
       this.$emit('opened')
       this.$refs.inboxSearchInput.$refs.input.focus()
     },
     onHideMenu () {
+      this.isOpen = false
       this.setSearcherOpen()
       this.searchText = null
       this.$emit('closed')
@@ -82,9 +89,7 @@ export default {
 
   watch: {
     'searchText': function (value) {
-      if ((value && value.length >= 3) || value === '') {
-        this.$emit('search', value)
-      }
+      this.$emit('search', value)
     },
     '$route.params.channel': function () {
       if (this.$route.name === 'Inbox Channel') {

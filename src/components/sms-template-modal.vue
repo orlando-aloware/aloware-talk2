@@ -47,8 +47,11 @@
           >
             Add Variable
             <q-menu content-class="mx-height-300"
-                    persistent auto-close
-                    anchor="bottom right" self="bottom left">
+                    anchor="bottom right"
+                    self="bottom left"
+                    ref="variablesMenu"
+                    persistent
+                    auto-close>
               <div class="row no-wrap q-pa-md">
                 <variables @variableSelected="variableSelected" always-open></variables>
               </div>
@@ -146,7 +149,7 @@ export default {
 
     variableSelected (variable) {
       this.template.body = (this.template.body ?? '') + ' ' + variable
-      this.$root.$emit('bv::hide::popover', 'templates-sms-variables-popover')
+      this.$refs.variablesMenu.hide()
     },
 
     onSubmit () {

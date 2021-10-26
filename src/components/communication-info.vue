@@ -2,8 +2,9 @@
   <div class="communication-info"
        v-if="communication">
     <q-list class="rounded-contact-activity">
-      <q-expansion-item :class="activityExpansionClass"
-                        class="contact-activity"
+      <q-expansion-item class="contact-activity"
+                        ref="communicationInfoExpansionItem"
+                        :class="activityExpansionClass"
                         v-model="activeName"
                         @before-show="onBeforeActivityShow"
                         @after-show="onAfterActivityShow"
