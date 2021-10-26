@@ -78,8 +78,9 @@ export default {
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Session') {
       this.START_DIAL_TOGGLE(false)
+    } else {
+      this.START_DIAL_TOGGLE(true)
     }
-    this.START_DIAL_TOGGLE(false)
     next()
   },
   watch: {
@@ -119,18 +120,15 @@ export default {
 
       if (this.powerDialerListItems[this.id] === undefined) {
         if (isEmpty(this.id)) {
-          console.log('901 :>> ', 901)
           await this.processFetch(params)
         } else {
           this.contactsLoaded({
             id: this.tempId,
             ...DEFAULT_LIST_ITEMS
           })
-          console.log('902 :>> ', 902)
           await this.processFetch(params)
         }
       } else {
-        console.log('903 :>> ', 903)
         await this.processFetch(params)
       }
 
@@ -138,6 +136,10 @@ export default {
     },
     async initialize () {
       let route = this.$route.params
+      console.log('Route : ', this.$route.name)
+      if (this.$route.name !== 'Power Dialer Session') {
+        this.START_DIAL_TOGGLE(false)
+      }
       if (!route.id && this.$route.name === 'Power Dialer') {
         route.id = 'in-queue'
         this.id = 'in-queue'
