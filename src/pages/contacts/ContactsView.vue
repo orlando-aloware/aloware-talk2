@@ -12,10 +12,10 @@
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
           </div>
-          <folder-static-icon class="title-static-icon"
+          <folder-static-icon class="title-static-icon mr-3"
                               v-if="list.type === ContactListTypes.STATIC">
           </folder-static-icon>
-          <folder-dynamic-icon class="mr-1"
+          <folder-dynamic-icon class="mr-3"
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
           <div class="d-flex align-items-center">
@@ -117,16 +117,19 @@
                  style="margin-top: -2px;">
               Add Contacts
             </div>
-            <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
+            <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
                style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
-            <i class="fa fa-search mr-1"></i> Select Contacts
+
+            <search-icon color="#62666E">
+            </search-icon>
+            Select Contacts
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
-            <i class="fa fa-plus mr-1"></i>
+            <plus-icon color="#62666E"></plus-icon>
             Create Contact
           </b-dropdown-item>
         </b-dropdown>
@@ -139,7 +142,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
           <template #button-content>
-            <i class="fa fa-ellipsis-h"></i>
+            <ellipse-icon></ellipse-icon>
           </template>
           <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
@@ -222,7 +225,6 @@ import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
-import Search from 'src/components/search.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import TableRow from 'src/components/table-row.vue'
@@ -235,9 +237,17 @@ import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import CloseIcon from 'components/icons/close-icon'
 import SlashIcon from 'components/icons/slash-icon'
+import EllipseIcon from 'components/icons/ellipse-icon'
+import SearchIcon from 'components/icons/search-icon'
+import PlusIcon from 'components/icons/plus-icon'
+import Search from 'components/search'
 
 export default {
   components: {
+    Search,
+    PlusIcon,
+    SearchIcon,
+    EllipseIcon,
     SlashIcon,
     CloseIcon,
     FolderDynamicIcon,
@@ -247,7 +257,6 @@ export default {
     BulkActionMenu,
     CompactBtn,
     ContactsScreen,
-    Search,
     Datatable,
     ImportContactsModal,
     TableRow

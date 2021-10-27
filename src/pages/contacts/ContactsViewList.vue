@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters', 'setSelectedList']),
-    loadList (id) {
+    loadList (id, isPublic = false) {
       if (!id) {
         id = 'all'
       }
@@ -50,7 +50,7 @@ export default {
       }
 
       this.$axios
-        .get('/api/v2/contacts-list/' + stringId)
+        .get('/api/v2/contacts-list/' + stringId + (isPublic ? '?is_public_list=true' : ''))
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })
@@ -76,12 +76,20 @@ export default {
     }
   },
   mounted () {
-    this.loadList(this.$route.params.id)
+    console.log(this.$route.name)
+    this.loadList(this.$route.params.id, this.$route.name === 'Contacts List Public')
   },
   watch: {
     '$route.params.id': function (id) {
       if (this.$route.name === 'Contacts') {
         this.loadList(id)
+        this.setCurrentListFilters({})
+      }
+
+      console.log(this.$route.name)
+
+      if (this.$route.name === 'Contacts List Public') {
+        this.loadList(id, true)
         this.setCurrentListFilters({})
       }
     }

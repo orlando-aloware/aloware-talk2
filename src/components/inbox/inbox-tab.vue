@@ -11,7 +11,8 @@
             <inbox-searcher
               @search="onSearch"
               @closed="onSearchClosed"
-              @opened="onSearchOpened"></inbox-searcher>
+              @opened="onSearchOpened">
+            </inbox-searcher>
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
                 <filter-icon>
@@ -39,7 +40,7 @@
           spread
           dense
           unelevated
-          toggle-color="primary active"
+          :toggle-color="statusToggleColor"
           color="transparent"
           text-color="primary">
           <template v-slot:one>
@@ -85,6 +86,7 @@
              @scroll="handleScroll">
           <inbox-task-list :contacts="contacts"
                            :loading-contacts="isFetchingContacts"
+                           :search-text="searchText"
                            @onItemSelected="onItemSelected">
           </inbox-task-list>
           <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
@@ -138,6 +140,9 @@ export default {
         default:
           return 'open'
       }
+    },
+    statusToggleColor () {
+      return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
     }
   },
 
@@ -193,8 +198,8 @@ export default {
           this.currentTask = ContactTaskStatus.STATUS_CLOSED
           break
         case 'open':
+          break
         default:
-          this.currentTask = ContactTaskStatus.STATUS_OPEN
       }
     },
     onToggleStatus () {
@@ -255,7 +260,10 @@ export default {
     onSearchClosed () {
       this.searchText = ''
       this.setContacts([])
-      this.loadContactTasks()
+
+      if (this.$route.params.status === this.statusText || this.$route.name === 'Inbox') {
+        this.loadContactTasks()
+      }
     }
   },
 
@@ -263,7 +271,13 @@ export default {
     this.setContacts([])
     this.setStatus()
 
-    this.loadContactTasks()
+    if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+      if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
+        // do other possible actions
+      } else {
+        this.loadContactTasks()
+      }
+    }
 
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
       this.setSelectedContact({})
@@ -365,10 +379,12 @@ export default {
       this.loadContactTasks()
     },
     'searchText': function (value) {
-      if (value === '') {
-        this.setContacts([])
-      } else {
-        this.loadContactTasks()
+      if ((value && value.length >= 3) || value === '') {
+        if (value === '') {
+          this.setContacts([])
+        } else {
+          this.loadContactTasks()
+        }
       }
     },
     'lineOrRingGroupFilter': function () {

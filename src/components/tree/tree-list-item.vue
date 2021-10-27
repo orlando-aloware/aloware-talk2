@@ -38,7 +38,7 @@
               autofocus
             />
             <span @click="navigate" v-if="!isEditing">
-              {{ name }}
+              {{ itemName }}
             </span>
           </div>
 
@@ -116,6 +116,9 @@ export default {
     activeFolder () {
       const id = _.get(this.$route.params, 'id', null)
       return id && parseInt(id) === this.id
+    },
+    itemName () {
+      return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
     }
   },
   props: {

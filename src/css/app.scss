@@ -2998,14 +2998,15 @@ span.mention {
 }
 
 .rounded-badge {
-  height: 12px;
+  height: 8px;
   width: 12px;
   border-radius: 50%;
-  padding: 0px;
+  padding: 0;
 
   &.small {
-    height: 6px;
-    width: 6px;
+    height: 6px !important;
+    width: 6px !important;
+    min-height: unset;
   }
 
   &.bordered {
@@ -3024,7 +3025,7 @@ span.mention {
     }
 
     .rounded-badge {
-      margin-top: 6px;
+      margin-top: 8px;
       margin-left: 0;
     }
   }
@@ -3301,6 +3302,11 @@ span.mention {
 
   &__nav {
     padding-top: 10px;
+
+    .nav-item-separator {
+      margin: 20px 17px;
+      border-color: $grey-60 !important;
+    }
   }
 
   &__left {
@@ -3371,7 +3377,7 @@ span.mention {
   height: 32px !important;
   font-size: $f-size-body-xs;
   margin-bottom: 0;
-  border: 1px solid $grey-60;
+  border: 1px solid $grey-70;
 
   input {
     line-height: 30px;
@@ -3414,9 +3420,14 @@ span.mention {
   .comm-label {
     @include font-size(12px, 'normal');
     line-height: 15px;
+
+    svg.item-identifier-icon {
+      margin-top: -2px;
+    }
   }
+
   .comm-label.mention-content > span {
-    width: 10vw;
+    width: 165px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -3451,6 +3462,15 @@ span.mention {
   height: 100%;
   width: 100%;
   display: flex;
+
+  .not-in-inbox-label {
+    padding: 0 12px;
+
+    span.badge {
+      margin-top: -2px;
+      position: relative;
+    }
+  }
 }
 
 .opacity-1 {
@@ -4796,7 +4816,7 @@ span.mention {
     height: 40px;
   }
   &:hover {
-    background-color: $light-green2;
+    background-color: $grey-60;
   }
 }
 
@@ -4957,6 +4977,10 @@ span.mention {
     .folders__header {
       padding-top: 16px;
       padding-bottom: 10px;
+
+      button#bs-folder-options {
+        margin-top: -1px;
+      }
     }
   }
   &__header {
@@ -4973,7 +4997,7 @@ span.mention {
   &__content {
     overflow: auto;
     &:not(.no-folder) {
-      height: calc(100% - 40px);
+      max-height: calc(100% - 163px);
     }
     &.no-folder {
       padding-left: 18px;
@@ -5085,9 +5109,22 @@ span.mention {
       min-height: 35px !important;
     }
 
+    .q-btn__wrapper:before {
+      box-shadow: none !important;
+    }
+
     .q-btn {
       font-size: $f-size-12 !important;
     }
+
+    .q-btn:nth-child(2) {
+      margin-right: 10px;
+    }
+
+    .q-btn:nth-child(4) {
+      margin-left: 10px;
+    }
+
   }
 }
 
@@ -5429,13 +5466,6 @@ table.datatable {
 }
 
 .submenu {
-  &-icon {
-    svg {
-      path {
-        fill: $black;
-      }
-    }
-  }
   &-items {
     background: white;
     width: 130px;
@@ -5445,7 +5475,8 @@ table.datatable {
 .folder-submenu-items,
 .folder-childmenu-items {
   background: white;
-  border-radius: 5px;
+  border-radius: 8px;
+  padding: 6px 6px;
   border: solid 1px $grey-light;
   display: none;
   flex-direction: column;
@@ -5453,6 +5484,7 @@ table.datatable {
 }
 .folder-submenu-items {
   width: 200px;
+  box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
 }
 
 .folder-childmenu-items {
@@ -5966,6 +5998,7 @@ table.datatable {
   &:hover {
     .folder__option {
       display: block;
+      border: 0 !important;
     }
   }
   &__name {
@@ -6535,7 +6568,7 @@ table.datatable {
   flex-direction: column;
   height: 20rem;
   padding-top: 16px;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
 
   &__header {
     font-size: $f-size-body-sm;
@@ -6550,7 +6583,7 @@ table.datatable {
   }
 
   &__content {
-    height: calc(100% - 40px);
+    height: calc(100% - 32px);
     overflow: auto;
     .counts {
       padding-right: 17px;
@@ -6562,7 +6595,7 @@ table.datatable {
   }
 
   .item {
-    padding-left: 10px;
+    padding-left: 18px;
     color: $dark;
     cursor: pointer;
     min-height: 34px;
@@ -6591,11 +6624,15 @@ table.datatable {
       min-height: 34px;
     }
     .item-name {
-      font-size: $f-size-h5;
+      font-size: $f-size-body-sm;
       line-height: 17px;
       color: $grey-100;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .icon {
+      padding-right: 6px;
     }
   }
 
@@ -6603,6 +6640,10 @@ table.datatable {
     background: $light-blue3;
     color: $dark;
     text-decoration: none;
+  }
+
+  .item-empty {
+    padding-left: 20px;
   }
 
   .item.router-link-exact-active {
@@ -7710,21 +7751,23 @@ button.grey-90 {
 
 .tab-avatar-menu {
 
-  min-width: 186px !important;
-  max-width: 186px !important;
+  min-width: 227px !important;
+  max-width: 227px !important;
 
   padding-top: 8px;
   padding-bottom: 8px;
+  border-radius: 6px !important;
 
   .q-list {
     padding: 0;
 
     .q-item {
-      padding: 0 16px !important;
-      font-size: $f-size-body-xs !important;
+      padding: 0 17px 0  16px !important;
+      font-size: $f-size-body !important;
+      height: 33px !important;
 
       .rounded-badge {
-        margin-right: 15px !important;
+        margin-right: 14px !important;
       }
 
       .focus-mode-icon,
@@ -7801,7 +7844,8 @@ button.grey-90 {
 .folders {
   .folders__header button,
   .header__header__title {
-    padding-left: 18px;
+    margin-left: 18px !important;
+    margin-right: 10px !important;
     display: flex;
     align-items: center;
   }
@@ -7925,5 +7969,57 @@ button.grey-90 {
   }
   svg {
     margin-right: 5px;
+  }
+}
+
+.contact-popover {
+  border-radius: 8px;
+  padding: 6px 6px;
+  box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+  .arrow {
+    display: none;
+  }
+  .contact-menu-item {
+    padding: 6px 10px;
+    border-radius: 6px;
+    &__icon {
+      margin-right: 10px;
+    }
+    &__title {
+      span {
+        color: $grey-100;
+      }
+    }
+  }
+}
+
+.filter-toggle-button,
+.contacts-options-dropdown {
+  .dropdown-menu {
+    border-radius: 8px;
+    padding: 6px 6px;
+    box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+    li {
+      a {
+        display: flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        &:not(.disabled) {
+          color: $grey-100;
+          i {
+            color: $grey-90;
+          }
+        }
+        i {
+          margin-right: 14px;
+        }
+        svg {
+          margin-right: 10px;
+        }
+      }
+    }
   }
 }

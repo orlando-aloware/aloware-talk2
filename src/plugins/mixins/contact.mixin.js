@@ -764,7 +764,7 @@ export default {
             inline: 'start'
           })
           // highlight the activity
-          this.highlightActivity(communicationActivity.$el)
+          this.highlightActivity(communicationActivity)
           clearInterval(scrollInterval)
         }
 
@@ -778,9 +778,14 @@ export default {
       }, 250)
     },
 
-    highlightActivity (element) {
+    highlightActivity (commActivity) {
+      let element = commActivity.$el
       if (!element) {
         return
+      }
+
+      if (commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
+        commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
       }
 
       let highlighted = document.querySelector('.shine')

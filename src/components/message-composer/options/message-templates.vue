@@ -2,12 +2,16 @@
   <div class="templates-list-wrapper">
     <div class="list-group-title d-flex justify-content-between p-2">
       <span>Agent Templates</span>
-      <b-link class="action-links" href="" @click="onAdd('user')">
+      <b-link class="action-links"
+              href=""
+              @click="onAdd('user')">
         <add-icon-circle width="14" height="14"></add-icon-circle>
         New
       </b-link>
     </div>
-    <message-templates-list @templateSelected="templateSelected" @templateDeleted="onDelete" template_scope="user"></message-templates-list>
+    <message-templates-list template_scope="user"
+                            @templateSelected="templateSelected"
+                            @templateDeleted="onDelete" ></message-templates-list>
     <hr/>
     <div class="list-group-title d-flex justify-content-between p-2">
       <span>Account Templates</span>
@@ -16,11 +20,17 @@
         New
       </b-link>
     </div>
-    <message-templates-list @templateSelected="templateSelected" @templateDeleted="onDelete" template_scope="company"></message-templates-list>
-    <b-overlay :show="showDeleteConfirmation" no-wrap @shown="onShown" @hidden="onHidden">
+    <message-templates-list template_scope="company"
+                            @templateSelected="templateSelected"
+                            @templateDeleted="onDelete" ></message-templates-list>
+    <b-overlay :show="showDeleteConfirmation"
+               no-wrap @shown="onShown"
+               @hidden="onHidden">
       <template #overlay>
-        <div v-if="isDeleting" class="text-center p-4 text-light rounded">
-          <q-spinner-bars color="success" size="40px" />
+        <div v-if="isDeleting"
+             class="text-center p-4 text-light rounded">
+          <q-spinner-bars color="success"
+                          size="40px" />
           <div class="mb-3">Deleting template...</div>
         </div>
         <div
@@ -34,7 +44,9 @@
         >
           <p><strong id="form-confirm-label">Do you wish to delete selected template?</strong></p>
           <div class="d-flex">
-            <b-button variant="outline-danger" class="mr-3" @click="onCancel">
+            <b-button variant="outline-danger"
+                      class="mr-3"
+                      @click="onCancel">
               No, keep
             </b-button>
             <b-button variant="outline-success" @click="onConfirmDeletion">Yes, delete</b-button>

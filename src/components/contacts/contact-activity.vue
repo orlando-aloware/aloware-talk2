@@ -161,7 +161,8 @@
 
           <div class="p-y-sm"
                :class="[communication.direction === CommunicationDirection.INBOUND ? 'text-left' : 'text-right']">
-            <communication-info :communication="communication"
+            <communication-info ref="communicationInfo"
+                                :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
                                 :campaignId="campaignId">

@@ -298,7 +298,7 @@ export default {
   ADD_REMINDER_OPEN: (state, isOpen) => {
     state.isAddReminderOpen = isOpen
   },
-  SMS_TEMPLATE_MODAL: (state, { isOpen, scope, template }) => {
+  SMS_TEMPLATE_MODAL: (state, { isOpen, scope = 'user', template }) => {
     state.smsTemplateModal = { ...state.smsTemplateModal, open: isOpen, scope: scope, template: template }
   },
   CHANGING_SELECTED_CONTACT: (state, isChanging) => {

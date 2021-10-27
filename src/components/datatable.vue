@@ -66,7 +66,7 @@
                   :class="{ 'has-sorting': sorts.orderBy === column.name }">
                 <a
                   href="#"
-                  class="sorter sample"
+                  class="sorter"
                   :class="{
                     'sorter-asc':
                       sorts.order === 'asc' && sorts.orderBy === column.name,
@@ -115,7 +115,7 @@
         boundary-links
         direction-links
         dense
-        class="table-pagination mr-1"
+        class="table-pagination"
         v-model="paginationPage"
         :max="lastPage"
         :max-pages="11"

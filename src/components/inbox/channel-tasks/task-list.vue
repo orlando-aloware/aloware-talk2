@@ -1,7 +1,7 @@
 <template>
   <div class="task-list scrollable w-100">
     <p class="text-center mt-5" v-if="communications.length < 1">
-      No {{ this.channel | capitalize }}
+        {{ emptyPlaceholder }}
     </p>
     <task-item v-for="communication in communications"
                :key="communication.id"
@@ -35,6 +35,18 @@ export default {
       type: String,
       required: false,
       default: 'all'
+    },
+
+    searchText: {
+      type: String,
+      required: false,
+      default: ''
+    }
+  },
+
+  computed: {
+    emptyPlaceholder () {
+      return this.searchText && [1, 2].includes(this.searchText.length) ? 'Type at least 3 characters' : 'No ' + this.$options.filters.capitalize(this.channel)
     }
   }
 }

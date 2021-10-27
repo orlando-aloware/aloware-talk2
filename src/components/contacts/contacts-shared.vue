@@ -1,7 +1,7 @@
 <template>
-  <div class="shared border-top ">
-    <div class="folders__header d-flex align-items-center list--header">
-      <div class="header__header__title font-weight-bold flex-grow-1 d-flex align-items-center">
+  <div class="pinned border-top ">
+    <div class="pinned__header d-flex align-items-center list--header">
+      <div class="header__header__title font-weight-bold flex-grow-1">
         Public Lists
         <q-icon name="info"
                 class="material-icons-outlined ml-2 cursor-pointer"
@@ -14,55 +14,38 @@
         </q-icon>
       </div>
     </div>
-
-    <div class="d-flex justify-content-center folders__content flex-column"
-         :class="[ !folders.length ? 'no-folder' : '' ]">
-      <div>
+    <div class="d-flex pinned__content flex-column">
+      <div v-if="!lists.length"
+           class="item-empty">
         <span class="fs-12 text-muted">
           No public list available
         </span>
       </div>
-      <template v-if="folders.length">
-        <tree-folder
-          v-for="folder in folders[0].child_folders"
-          :name="folder.name"
-          :key="folder.id"
-          :id="folder.id"
-          :order="folder.order"
-          :hasEdit="folders[0].has_edit"
-          :hasDelete="folders[0].has_delete"
-          :folders="folder.child_folders"
-          :lists="folder.lists"
-          :layer="0"
-        />
-        <tree-folder
-          :name="folders[0].name"
-          :id="folders[0].id"
-          :order="folders[0].order"
-          :hasEdit="folders[0].has_edit"
-          :hasDelete="folders[0].has_delete"
-          :isRootList="true"
-          :folders="[]"
-          :lists="folders[0].lists"
-          :layer="0"
-        />
-      </template>
+      <contacts-shared-item v-else
+                            v-for="item in lists"
+                            :item="item"
+                            :key="item.id">
+      </contacts-shared-item>
     </div>
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import TreeFolder from '../tree/tree-folder.vue'
+import talk2Api from 'src/plugins/api/api'
+import ContactsSharedItem from 'components/contacts/contacts-shared-item'
+
 export default {
   components: {
-    TreeFolder
+    ContactsSharedItem
+
   },
   data () {
     return {
       isCreatingFolder: false,
       isLoading: false,
-      folders: []
+      lists: [],
+      layer: 1
     }
   },
   methods: {
@@ -77,29 +60,24 @@ export default {
     },
     loadFolders () {
       this.isLoading = false
-      this.$axios
-        .get('/api/v2/contact-folders')
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .finally(() => {
-          this.isLoading = false
-        })
-        .catch((err) => {
-          console.error(err)
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
+      talk2Api.V2.contactList.public().then(response => {
+        this.lists = response.data.data
+      }).catch((err) => {
+        console.error(err)
+        this.$generalNotification('Unable to load folders please try again.', 'error')
+      })
     }
   },
   computed: {
     foldersWithoutRoot () {
-      return this.folders.filter(folder => folder.name !== 'Root')
+      return this.lists.filter(folder => folder.name !== 'Root')
     },
     rootFolder () {
-      return this.folders.find(folder => folder.name === 'Root')
+      return this.lists.find(folder => folder.name === 'Root')
     }
   },
   mounted () {
-    // this.loadFolders()
+    this.loadFolders()
   }
 }
 </script>
