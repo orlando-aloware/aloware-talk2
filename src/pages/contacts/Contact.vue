@@ -14,7 +14,8 @@
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
-                            @toggleDrawer="toggleDrawer">
+                            @toggleDrawer="toggleDrawer"
+                            @showDetails="showDetails">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -122,6 +123,9 @@ export default {
     },
     toggleDrawer () {
       this.drawer = !this.drawer
+    },
+    showDetails () {
+      // test
     }
   },
 

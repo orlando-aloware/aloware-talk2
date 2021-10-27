@@ -6,7 +6,8 @@
       :unreadCount="unreadCount"
       :contact="contact"
       @markAllAsRead="markAllAsRead"
-      @toggleDrawer="$emit('toggleDrawer')"/>
+      @toggleDrawer="$emit('toggleDrawer')"
+      @showDetails="$emit('showDetails')"/>
     <div class="contact-activities">
       <div class="inner-1">
         <div class="inner-2 scrollbar-white"

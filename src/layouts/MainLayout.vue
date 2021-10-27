@@ -68,7 +68,7 @@
           </app-sidebar>
         </q-list>
       </q-drawer>
-      <app-footer class="page-footer row d-block w-100 m-0 px-3"
+      <app-footer class="page-footer row d-block w-100 m-0 px-1"
                   ref="appFooter"
                   v-if="authenticated && !isWidget && !loading">
       </app-footer>

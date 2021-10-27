@@ -619,7 +619,7 @@ body,
 
 .page-footer {
   .tab-icons {
-    padding-top: 5px !important;
+    padding-top: 8px !important;
     padding-bottom: 2px !important;
     .tab-icon {
       display: flex;
@@ -657,10 +657,9 @@ body,
     }
   }
 
-  .q-router-link--active {
-    .q-tab__content {
-      color: $blue-90;
-    }
+  .q-router-link--active .q-tab__content,
+  .q-tab__content.tab-active{
+    color: $blue-90;
   }
 }
 
@@ -3313,7 +3312,7 @@ span.mention {
   }
 
   &__left {
-    max-width: 160px;
+    max-width: 200px;
     width: 100%;
     overflow: hidden;
 
@@ -7762,6 +7761,9 @@ button.grey-90 {
   }
 }
 
+.contact-activities-actions__mobile_btn {
+  display: none !important;
+}
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .inbox {
@@ -7807,7 +7809,13 @@ screen and (max-width: 956px) {
   }
 }
 
-@media screen and (max-width: 1287px) {
+@media screen and (min-width: 1319px) {
+  .contact-details-container {
+    max-width: 330px;
+  }
+}
+
+@media screen and (max-width: 1298px) {
   .contact-activity-container {
     .calls-header {
       &__label {
@@ -7818,18 +7826,39 @@ screen and (max-width: 956px) {
 }
 
 @media screen and (max-width: 1261px) {
+  .inbox-side {
+    max-width: 430px;
+    &__left {
+      max-width: 160px;
+      .count-label {
+        margin-left: 10px;
+      }
+    }
+    .inbox-nav-list {
+      > div:not(:first-child) {
+        .inbox-nav-item__label {
+          margin-right: 41px;
+          min-width: 73.88px;
+        }
+      }
+    }
+  }
   .contact-activity-container {
     .calls-header {
       &__label {
-        max-width: 121px !important;
+        max-width: 160px !important;
       }
     }
   }
 }
 
-@media screen and (max-width: 1237px) {
-  .inbox-side {
-    max-width: 430px;
+@media screen and (max-width: 1209px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 110px !important;
+      }
+    }
   }
 }
 
@@ -7843,7 +7872,7 @@ screen and (max-width: 956px) {
   .contact-activity-container {
     .calls-header {
       &__label {
-        max-width: 171px;
+        max-width: 200px !important;
       }
     }
   }
@@ -7880,6 +7909,16 @@ screen and (max-width: 956px) {
   }
 }
 
+@media screen and (max-width: 1124px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 155px !important;
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 1084px) {
   .contact-activities-actions {
     margin-right: 22.81px;
@@ -7905,7 +7944,7 @@ screen and (max-width: 956px) {
   .contact-activity-container {
     .calls-header {
       &__label {
-        max-width: 240px;
+        max-width: unset !important;
       }
     }
   }
@@ -7953,6 +7992,15 @@ screen and (max-width: 956px) {
   }
 }
 
+@media screen and (max-width: 707px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 180px !important;
+      }
+    }
+  }
+}
 @media screen and (max-width: 667px) {
   .contact-activity-container .calls-header__label {
     max-width: 100px;
@@ -7994,6 +8042,17 @@ screen and (max-width: 956px) {
 */
 
 @media screen and (max-width: 600px) {
+  .sidebar-active .q-header {
+    justify-content: flex-start;
+  }
+  .contact-activities-actions {
+    &__drawer_btn {
+      display: none;
+    }
+    &__mobile_btn {
+      display: block !important;
+    }
+  }
   .inbox {
     overflow-x: hidden;
     &-side,
@@ -8018,6 +8077,38 @@ screen and (max-width: 956px) {
       &__right {
         width: 0;
         z-index: 2;
+      }
+    }
+  }
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: unset !important;
+      }
+    }
+  }
+  .inbox {
+    &-side.mobile-contact-active {
+      width: 0 !important;
+    }
+  }
+}
+
+@media screen and (max-width: 395px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 200px !important;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 328px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 180px !important;
       }
     }
   }

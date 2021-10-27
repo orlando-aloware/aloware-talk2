@@ -44,6 +44,12 @@
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
         </q-btn>
+        <q-btn borderless
+               flat
+               class="contact-activities-actions__mobile_btn"
+               @click="$emit('showDetails')">
+          <information-circle-icon/>
+        </q-btn>
       </div>
       <div class="contact-activities-actions__desktop">
         <q-btn
