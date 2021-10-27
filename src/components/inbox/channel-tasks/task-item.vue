@@ -36,6 +36,18 @@
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <span v-if="communication.type !== CommunicationTypes.SMS">
             {{ communication.direction | fixCommDirection }} {{ communication.type | fixCommType }}
+            <record-icon v-if="communication.type === CommunicationTypes.CALL && channelAnswerStatus === 'recorded'"
+                         class="item-identifier-icon"
+                         height="10"
+                         width="10"
+                         color="#62666E">
+            </record-icon>
+            <voicemail-icon v-if="communication.type === CommunicationTypes.CALL && channelAnswerStatus === 'voicemail'"
+                            class="item-identifier-icon"
+                         height="16"
+                         width="16"
+                         color="#62666E">
+            </voicemail-icon>
           </span>
           <span v-if="communication.type === CommunicationTypes.SMS && (communication.body === null || !communication.body ||communication.body.length < 1)">
             {{ smsEmptyBodyAlternativeText }}
@@ -80,6 +92,8 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
+import RecordIcon from 'components/icons/inbox/record-icon'
+import VoicemailIcon from 'components/icons/inbox/voicemail-icon'
 
 export default {
   name: 'task-item',
@@ -90,6 +104,8 @@ export default {
   ],
 
   components: {
+    RecordIcon,
+    VoicemailIcon,
     TaskItemTime,
     AcceptCallIcon,
     CancelCallIcon,

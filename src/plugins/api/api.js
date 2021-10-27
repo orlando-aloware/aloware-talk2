@@ -276,6 +276,12 @@ export default {
         })
       }
     },
+    contactList: {
+      get () {},
+      public () {
+        return window.axios.get(`${suffixV2}contacts-list/public`)
+      }
+    },
     mentions: {
       get (params) {
         return window.axios.get(`${suffixV2}mentions`, params)

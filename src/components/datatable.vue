@@ -41,7 +41,7 @@
                 </span>
                 <a
                   href="#"
-                  class="sorter sample"
+                  class="sorter"
                   :class="{
                     'sorter-asc':
                       sorts.order === 'asc' && sorts.orderBy === column.name,
@@ -90,7 +90,7 @@
         boundary-links
         direction-links
         dense
-        class="table-pagination mr-1"
+        class="table-pagination"
         v-model="paginationPage"
         :max="lastPage"
         :max-pages="11"
@@ -101,7 +101,7 @@
       <q-select outlined
                 dense
                 emit-value
-                class="mt-2 q-select-pager"
+                class="mt-2 ml-4 q-select-pager"
                 option-value="value"
                 option-label="label"
                 v-model="perPage"

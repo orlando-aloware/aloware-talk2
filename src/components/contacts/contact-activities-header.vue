@@ -1,9 +1,7 @@
 <template>
   <div class="calls-header d-flex justify-content-between">
-    <div class="calls-header__label-container d-flex justify-content-between align-items-center">
-      <div class="calls-header__label">
-        {{ label }}
-      </div>
+    <div class="calls-header__label">
+      {{ label }}
       <b-badge :variant="resolveVariant" class="font-weight-light badge-task-status ml-1">{{ contact.task_status | fixTaskStatusName }}</b-badge>
     </div>
     <div class="contact-activities-actions">
@@ -139,6 +137,93 @@
         </q-btn>
       </div>
     </div>
+   <div class="mr-1">
+     <q-btn
+       borderless
+       flat
+       no-caps
+       type="a"
+       color="primary"
+       class="text-decoration-none mr-2"
+       v-if="hasUnreads"
+       @click="$emit('markAllAsRead')">
+      <span class="mx-2">
+        Mark All as Read ({{ unreadCount }})
+      </span>
+     </q-btn>
+     <q-btn
+       v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
+       borderless
+       flat
+       no-caps
+       type="a"
+       color="primary"
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
+       <q-tooltip anchor="top middle"
+                  self="center middle">
+         Move to Pending
+       </q-tooltip>
+      <span v-if="!isUpdatingStatus"
+            class="mx-2">
+        <timer-o-icon></timer-o-icon>
+      </span>
+       <q-spinner-bars v-if="isUpdatingStatus"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
+     </q-btn>
+     <q-btn
+       v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+       borderless
+       flat
+       no-caps
+       type="a"
+       color="primary"
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
+       <q-tooltip anchor="top middle"
+                  self="center middle">
+         Reopen
+       </q-tooltip>
+       <span v-if="!isUpdatingStatus"
+             class="mx-2">
+        <inbox-o-icon></inbox-o-icon>
+      </span>
+       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_OPEN"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
+     </q-btn>
+     <q-btn
+       v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+       borderless
+       flat
+       no-caps
+       type="a"
+       color="primary"
+       class="text-decoration-none"
+       :disable="isUpdatingStatus"
+       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
+       <q-tooltip anchor="top middle"
+                  self="center middle">
+         Close
+       </q-tooltip>
+      <span v-if="!isUpdatingStatus"
+            class="mx-2">
+        <check-o-icon></check-o-icon>
+      </span>
+       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
+                       class="pl-1 pr-1"
+                       color="primary"
+                       size="20px"
+       />
+     </q-btn>
+   </div>
   </div>
 </template>
 
@@ -155,7 +240,7 @@ import EllipsisIcon from 'components/icons/ellipsis-icon'
 export default {
   name: 'contact-activities-header',
 
-  components: { EllipsisIcon, MailOpenIcon, InformationCircleIcon, InboxOIcon, CheckOIcon, TimerOIcon },
+  components: { InboxOIcon, CheckOIcon, TimerOIcon },
 
   props: {
     contact: {

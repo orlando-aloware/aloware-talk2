@@ -12,10 +12,10 @@
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
           </div>
-          <folder-static-icon class="title-static-icon"
+          <folder-static-icon class="title-static-icon mr-3"
                               v-if="list.type === ContactListTypes.STATIC">
           </folder-static-icon>
-          <folder-dynamic-icon class="mr-1"
+          <folder-dynamic-icon class="mr-3"
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
           <div class="d-flex align-items-center">
@@ -117,12 +117,13 @@
                  style="margin-top: -2px;">
               Add Contacts
             </div>
-            <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
+            <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
                style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
                            @click="onAddContactsToList">
+
             <search-icon color="#62666E">
             </search-icon>
             Select Contacts
@@ -141,7 +142,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
           <template #button-content>
-            <i class="fa fa-ellipsis-h"></i>
+            <ellipse-icon></ellipse-icon>
           </template>
           <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
           <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
@@ -235,15 +236,19 @@ import talk2Api from 'src/plugins/api/api'
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import CloseIcon from 'components/icons/close-icon'
-import PlusIcon from 'components/icons/plus-icon.vue'
 import SlashIcon from 'components/icons/slash-icon'
+import EllipseIcon from 'components/icons/ellipse-icon'
 import SearchIcon from 'components/icons/search-icon'
+import PlusIcon from 'components/icons/plus-icon'
+import Search from 'components/search'
 
 export default {
   components: {
-    SearchIcon,
-    SlashIcon,
+    Search,
     PlusIcon,
+    SearchIcon,
+    EllipseIcon,
+    SlashIcon,
     CloseIcon,
     FolderDynamicIcon,
     FolderStaticIcon,

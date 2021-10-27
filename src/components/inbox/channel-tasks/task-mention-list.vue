@@ -1,6 +1,6 @@
 <template>
   <div class="task-list scrollable w-100">
-    <p class="text-center mt-5" v-if="communications.length < 1">No Mentions</p>
+    <p class="text-center mt-5" v-if="communications.length < 1">{{ emptyPlaceholder }}</p>
     <task-mention-item v-for="communication in communications"
                        :key="communication.id"
                        :mention="communication"
@@ -26,6 +26,18 @@ export default {
       type: String,
       required: false,
       default: 'received'
+    },
+
+    searchText: {
+      type: String,
+      required: false,
+      default: ''
+    }
+  },
+
+  computed: {
+    emptyPlaceholder () {
+      return this.searchText && [1, 2].includes(this.searchText.length) ? 'Type at least 3 characters' : 'No Mentions'
     }
   }
 }

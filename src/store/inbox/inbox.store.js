@@ -58,7 +58,7 @@ export default function () {
         answerStatus: 'voicemail'
       },
       {
-        label: 'Recordings',
+        label: 'Call Recordings',
         value: 'recordings',
         icon: 'record',
         disabled: false,
