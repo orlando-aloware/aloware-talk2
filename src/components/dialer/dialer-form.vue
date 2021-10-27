@@ -54,7 +54,7 @@
           <b-form-group :invalid-feedback="invalidCampaign"
                         :state="validCampaign"
                         class="mb-1">
-            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+            <line-selector :disable="defaultOutboundCampaignId && mode === 'call'"
                            :generic-multiselect="false"
                            prepend="From:"
                            v-model="campaignId"
