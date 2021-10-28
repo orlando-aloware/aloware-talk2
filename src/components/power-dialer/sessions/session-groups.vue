@@ -29,7 +29,7 @@
         <q-card class="t-cards">
           <q-list class="px-2 pb-2">
             <template
-              v-for="(item, i) in group.children">
+              v-for="(item, i) in list">
               <q-item
                 :key="`acc-item-${i}`"
                 :class="{ active: item.id === activeSession.id }"
@@ -42,8 +42,8 @@
 
                 <q-item-section class="pl-2">
                   <q-item-label>{{ item.first_name }} {{ item.last_name }}</q-item-label>
-                  <q-item-label caption lines="2">{{ item.contact_number }}</q-item-label>
-                  <q-item-label caption lines="2">{{ item.company }}</q-item-label>
+                  <q-item-label caption lines="2">{{ item.phone_number }}</q-item-label>
+                  <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
                 </q-item-section>
 
                 <q-item-section
@@ -100,6 +100,7 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
 import RedialIcon from 'components/icons/refresh-icon-2'
@@ -110,6 +111,18 @@ export default {
     SearchList,
     PhoneIcon,
     RedialIcon
+  },
+  computed: {
+    ...mapGetters('powerDialer', [
+      'powerDialerListItems',
+      'currentList'
+    ]),
+    listObject () {
+      return this.powerDialerListItems[this.currentList.id]
+    },
+    list () {
+      return this.listObject.data
+    }
   },
   methods: {
     chipped (data) {
@@ -125,12 +138,14 @@ export default {
       this.$refs.dropdown.visible = false
     }
   },
+  watch: {
+    list (lists) {
+      this.activeSession = lists[0]
+    }
+  },
   data () {
     return {
-      activeSession: {
-        id: 1,
-        label: 'In Progress'
-      },
+      activeSession: null,
       groups: [
         {
           id: 1,
@@ -140,17 +155,17 @@ export default {
               id: 1,
               first_name: 'John',
               last_name: 'Nicholson',
-              contact_number: '(782) 636 3465',
+              phone_number: '(782) 636 3465',
               position: 'Sales Manager',
-              company: '123 Labs'
+              company_name: '123 Labs'
             },
             {
               id: 11,
               first_name: 'Tracy',
               last_name: 'McGrady',
-              contact_number: '(782) 122 3455',
+              phone_number: '(782) 122 3455',
               position: 'IT Manager',
-              company: 'NBA Labs'
+              company_name: 'NBA Labs'
             }
           ]
         },
@@ -162,9 +177,9 @@ export default {
               id: 55,
               first_name: 'Mary',
               last_name: 'Urdotah',
-              contact_number: '(782) 636 3465',
+              phone_number: '(782) 636 3465',
               position: 'Sales Manager',
-              company: '123 Labs'
+              company_name: '123 Labs'
             }
           ]
         },
@@ -176,17 +191,17 @@ export default {
               id: 2,
               first_name: 'Steve',
               last_name: 'Welsch',
-              contact_number: '(782) 636 3465',
+              phone_number: '(782) 636 3465',
               position: 'Sales Manager',
-              company: 'Orange Inc'
+              company_name: 'Orange Inc'
             },
             {
               id: 3,
               first_name: 'Jane',
               last_name: 'Doe',
-              contact_number: '(782) 636 3465',
+              phone_number: '(782) 636 3465',
               position: 'Sales Manager',
-              company: 'Cisco Labs'
+              company_name: 'Cisco Labs'
             }
           ]
         },
@@ -198,9 +213,9 @@ export default {
               id: 5,
               first_name: 'Mike',
               last_name: 'Johnson',
-              contact_number: '(782) 636 3465',
+              phone_number: '(782) 636 3465',
               position: 'Marketing Manager',
-              company: 'Banana Co'
+              company_name: 'Banana Co'
             }
           ]
         },
@@ -212,9 +227,9 @@ export default {
               id: 6,
               first_name: 'John',
               last_name: 'Nicholson',
-              contact_number: '(782) 636 3465',
+              phone_number: '(782) 636 3465',
               position: 'CEO',
-              company: 'Project Donut'
+              company_name: 'Project Donut'
             }
           ]
         }
