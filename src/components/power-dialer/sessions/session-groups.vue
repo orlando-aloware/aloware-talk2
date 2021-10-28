@@ -32,7 +32,7 @@
               v-for="(item, i) in list">
               <q-item
                 :key="`acc-item-${i}`"
-                :class="{ active: item.id === activeSession.id }"
+                :class="{ active: item.id === activeSession.id && group.label === 'In Progress' }"
                 class="t-expansion-panel px-2">
                 <div class="py-2">
                   <q-avatar size="30px" color="grey">
@@ -47,7 +47,7 @@
                 </q-item-section>
 
                 <q-item-section
-                  v-if=" item.id === activeSession.id"
+                  v-if=" item.id === activeSession.id && group.label === 'In Progress'"
                   class="t-item-icon"
                   side top>
                   <q-avatar color="red" size="md">
@@ -118,10 +118,10 @@ export default {
       'currentList'
     ]),
     listObject () {
-      return this.powerDialerListItems[this.currentList.id]
+      return this.powerDialerListItems[this.currentList?.id]
     },
     list () {
-      return this.listObject.data
+      return this.listObject.data || []
     }
   },
   methods: {

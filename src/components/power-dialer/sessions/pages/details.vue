@@ -1,35 +1,48 @@
 <template>
   <div class="row w-100 h-100 d-flex">
-    <div class="col-4 p-1" style="height:63vh;">
-      <q-card flat class="p-3">
-        <q-card-section class="p-0">
-          <div class="text-18 text-weight-medium">Scripts</div>
-        </q-card-section>
-      </q-card>
 
-      <DetailsLeads
-        :resources="scripts" />
+    <b-overlay
+      :show="loading"
+      rounded="sm"
+      class="d-flex">
+      <template #overlay>
+        <q-spinner-bars color="primary" size="40px" />
+      </template>
 
-    </div>
-    <div class="col-4 p-1" style="height:63vh;">
-      <q-card flat class="p-3">
-        <q-card-section class="p-0">
-          <div class="text-18 text-weight-medium">
-            <HubSpotIcon />
-            Open in HubSpot
-          </div>
-        </q-card-section>
-      </q-card>
+      <div class="col-4 p-1" style="height:63vh;">
+        <q-card flat class="p-3">
+          <q-card-section class="p-0">
+            <div class="text-18 text-weight-medium">Scripts</div>
+          </q-card-section>
+        </q-card>
 
-      <DetailsForm
-        :resources="form" />
+        <DetailsLeads
+          :resources="scripts" />
 
-    </div>
-    <div class="col-4 p-1" style="height:63vh;">
+      </div>
 
-      <DetailsTools />
+      <div class="col-4 p-1" style="height:63vh;">
+        <q-card flat class="p-3">
+          <q-card-section class="p-0">
+            <div class="text-18 text-weight-medium">
+              <HubSpotIcon />
+              Open in HubSpot
+            </div>
+          </q-card-section>
+        </q-card>
 
-    </div>
+        <DetailsForm
+          :resources="form" />
+
+      </div>
+      <div class="col-4 p-1" style="height:63vh;">
+
+        <DetailsTools />
+
+      </div>
+
+    </b-overlay>
+
   </div>
 </template>
 
@@ -50,6 +63,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       scripts: {
         leads: '',
         options: [
