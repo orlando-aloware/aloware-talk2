@@ -12,6 +12,9 @@ import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 
+import { Screen } from 'quasar'
+Screen.setSizes({ sm: 300, md: 600, lg: 1000, xl: 2000 })
+
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
 

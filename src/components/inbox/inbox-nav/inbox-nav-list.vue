@@ -7,7 +7,7 @@
       :value="item.value"
       :icon="item.icon"
       :group="item.group"
-      :isActive="activeChannel && activeChannel.value === item.value"
+      :isActive="isActive(item.value)"
       :closed="closed"
       :badge="true"
       :openCount="openCount"
@@ -52,7 +52,10 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['items', 'activeChannel'])
+    ...mapState('inbox', ['items', 'activeChannel']),
+    isShowActive () {
+      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && ['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Mention Communication', 'Inbox Channel'].includes(this.$route.name))
+    }
   },
 
   data () {
@@ -67,6 +70,7 @@ export default {
       this.active = nextActive
       let channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
+      this.$emit('channelClicked')
       if (this.active === 'inbox') {
         this.$router.push({
           name: 'Inbox Channel Task Status',
@@ -87,6 +91,9 @@ export default {
           console.log(err)
         })
       }
+    },
+    isActive (value) {
+      return this.isShowActive && this.activeChannel && this.activeChannel.value === value
     }
   },
 
