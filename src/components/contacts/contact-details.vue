@@ -1,24 +1,31 @@
 <template>
-  <div class="contact-details-wrapper">
-    <div class="details-component-container"
-         ref="detailsComponentContainer">
-      <contact-info></contact-info>
-      <contact-phones></contact-phones>
-      <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
-      </contact-information>
-      <contact-tags :contact="contact">
-      </contact-tags>
-      <contact-notes :contact="contact"
-                     @input="onNotesInput">
-      </contact-notes>
-      <contact-integrations :contact="contact"></contact-integrations>
-      <contact-scheduled-messages></contact-scheduled-messages>
-      <contact-activity-counts></contact-activity-counts>
-      <contact-lines></contact-lines>
-      <contact-ring-groups></contact-ring-groups>
-      <contact-broadcast></contact-broadcast>
+  <div>
+    <div class="mobile-header d-flex align-items-center justify-content-start"
+         v-if="$q.screen.lt.md">
+      <back-button @click="$emit('back')"/>
+      <span>{{ contactName }} Details</span>
+    </div>
+    <div class="contact-details-wrapper">
+      <div class="details-component-container"
+           ref="detailsComponentContainer">
+        <contact-info></contact-info>
+        <contact-phones></contact-phones>
+        <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
+        </contact-information>
+        <contact-tags :contact="contact">
+        </contact-tags>
+        <contact-notes :contact="contact"
+                       @input="onNotesInput">
+        </contact-notes>
+        <contact-integrations :contact="contact"></contact-integrations>
+        <contact-scheduled-messages></contact-scheduled-messages>
+        <contact-activity-counts></contact-activity-counts>
+        <contact-lines></contact-lines>
+        <contact-ring-groups></contact-ring-groups>
+        <contact-broadcast></contact-broadcast>
 
-      <contact-save-bar></contact-save-bar>
+        <contact-save-bar></contact-save-bar>
+      </div>
     </div>
   </div>
 </template>
@@ -35,12 +42,14 @@ import ContactInformation from 'src/components/contacts/contact-information'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import ContactTags from 'src/components/generic-selectors/contact-tags'
+import BackButton from 'components/back-button'
 import { mapGetters, mapActions } from 'vuex'
 import { contact as contactMixins } from 'src/plugins/mixins'
 
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
+import _ from 'lodash'
 
 export default {
   name: 'contact-details',
@@ -59,11 +68,24 @@ export default {
     ContactNotes,
     ContactInfo,
     ContactPhones,
-    ContactTags
+    ContactTags,
+    BackButton
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactClone'])
+    ...mapGetters('contacts', ['contact', 'contactClone']),
+
+    contactName () {
+      if (this.contact && this.contact.name) {
+        return _.get(this.contact, 'name', '')
+      }
+
+      if (this.contact && this.contact.first_name && this.contact.last_name) {
+        return `${this.contact.first_name} ${this.contact.last_name}`
+      }
+
+      return 'No Name'
+    }
   },
 
   methods: {

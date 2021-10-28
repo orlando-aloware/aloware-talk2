@@ -1,30 +1,39 @@
 <template>
-  <div class="inbox-side border-top-0 flex-shrink-0">
-    <div class="inbox-side__left"
-         :class="{'inbox-side__left--closed': closed }">
-      <div>
-        <div class="inbox-side__nav">
-          <inbox-nav-list :closed="closed"
-                          :openCount="taskCounts.open"
-                          :pendingCount="taskCounts.pending"
-                          :value.sync="active"
-                          v-model="active"
-                          @active="newActive">
-          </inbox-nav-list>
+  <div class="inbox-wrapper">
+    <div class="mobile-header d-flex align-items-center justify-content-start">
+      <back-button v-if="isInboxTaskOpened"
+                   @click="back"/>
+      <span v-if="!isInboxTaskOpened">Communication</span>
+      <span v-if="isInboxTaskOpened">Inbox</span>
+    </div>
+    <div class="inbox-side border-top-0 flex-shrink-0">
+      <div class="inbox-side__left"
+           :class="{'inbox-side__left--closed': isInboxTaskOpened }">
+        <div>
+          <div class="inbox-side__nav">
+            <inbox-nav-list :closed="closed"
+                            :openCount="taskCounts.open"
+                            :pendingCount="taskCounts.pending"
+                            :value.sync="active"
+                            v-model="active"
+                            @active="newActive">
+            </inbox-nav-list>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="inbox-side__right border-left d-flex align-items-start flex-column">
-      <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"
-                 :search-text="searchText"></inbox-tab>
-      <inbox-channels v-if="activeChannel && !['inbox'].includes(activeChannel.value)"
-                      class="h-100 w-100 flex-grow-1 scroll-y"
-                      :filter-type="activeChannel.type"
-                      :answer-status="activeChannel.answerStatus"
-                      :channel="activeChannel.value"
-                      :search-text="searchText"
-                      :sort="sort">
-      </inbox-channels>
+      <div class="inbox-side__right border-left d-flex align-items-start flex-column"
+           :class="{'inbox-side__right--opened': isInboxTaskOpened }">
+        <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"
+                   :search-text="searchText"></inbox-tab>
+        <inbox-channels v-if="activeChannel && !['inbox'].includes(activeChannel.value)"
+                        class="h-100 w-100 flex-grow-1 scroll-y"
+                        :filter-type="activeChannel.type"
+                        :answer-status="activeChannel.answerStatus"
+                        :channel="activeChannel.value"
+                        :search-text="searchText"
+                        :sort="sort">
+        </inbox-channels>
+      </div>
     </div>
   </div>
 </template>
@@ -34,11 +43,13 @@ import { mapActions, mapState } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
+import BackButton from 'components/back-button'
 
 export default {
   name: 'inbox-side',
 
   components: {
+    BackButton,
     InboxTab,
     InboxChannels,
     InboxNavList
@@ -47,7 +58,7 @@ export default {
   data () {
     return {
       active: 'inbox',
-      closed: window.innerWidth < 992,
+      closed: false,
       searchText: '',
       sort: '',
       searchFields: ['name', 'phone_number', 'email'],
@@ -64,15 +75,16 @@ export default {
 
     nextPage () {
       return this.currentPage + 1
+    },
+
+    isInboxTaskOpened () {
+      return !this.$q.screen.lt.md || (this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('inbox') && this.$q.screen.lt.md)
     }
   },
 
   created () {
     this.resetInboxVuex()
-  },
-
-  mounted () {
-    window.addEventListener('resize', this.toggleOnResize)
+    this.closed = this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('Inbox') && this.$q.screen.lt.md
   },
 
   activated () {
@@ -88,10 +100,6 @@ export default {
       this.closed = !this.closed
     },
 
-    toggleOnResize () {
-      this.closed = window.innerWidth < 992
-    },
-
     search (value) {
       this.searchText = value
     },
@@ -100,11 +108,11 @@ export default {
       this.setActiveChannel(active)
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
-  },
+    back () {
+      this.$router.push('/')
+    },
 
-  beforeDestroy () {
-    window.removeEventListener('resize', this.toggleOnResize)
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
   }
 }
 </script>

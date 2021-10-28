@@ -9,13 +9,14 @@
       <template v-if="!isInbox">
         <contact-list-sidebar></contact-list-sidebar>
       </template>
-      <div class="contact-activity-wrapper flex-grow-1">
+      <div class="contact-activity-wrapper flex-grow-1"
+           :class="{ 'contact-activity--closed': detailsOpen }">
         <contact-activities ref="contactActivities"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
-                            @showDetails="showDetails">
+                            @toggleDetails="toggleDetails">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -36,8 +37,9 @@
           </template>
         </contact-activities>
       </div>
-      <div class="contact-details-container">
-        <contact-details></contact-details>
+      <div class="contact-details-container"
+           :class="{ 'contact-details--opened': detailsOpen }">
+        <contact-details @back="toggleDetails"></contact-details>
       </div>
       <q-drawer
         overlay
@@ -105,7 +107,8 @@ export default {
     return {
       title: 'Contact',
       totalContacts: 0,
-      drawer: false
+      drawer: false,
+      detailsOpen: false
     }
   },
 
@@ -124,8 +127,8 @@ export default {
     toggleDrawer () {
       this.drawer = !this.drawer
     },
-    showDetails () {
-      // test
+    toggleDetails () {
+      this.detailsOpen = !this.detailsOpen
     }
   },
 

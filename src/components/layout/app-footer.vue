@@ -7,11 +7,13 @@
             :breakpoint="600"
             class="light text-grey footer-tabs"
             content-class="q-tabs__content--align-justify"
-            dense>
+            dense
+            @update="updateTab">
       <q-route-tab name="inbox"
                    to="/"
                    :content-class="isActive('inbox') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
                    :ripple="false"
+                   :active="isActive('inbox')"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -24,6 +26,7 @@
                    to="/contacts"
                    :content-class="isActive('contacts') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
                    :ripple="false"
+                   :active="isActive('contacts')"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -32,20 +35,11 @@
         </span>
         Contacts
       </q-route-tab>
-      <q-route-tab to="/#"
+      <q-route-tab name="power-dialer"
+                   to="/power-dialer"
+                   :content-class="isActive('power-dialer') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
                    :ripple="false"
-                   :content-class="isActive('#') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <keypad-mobile-icon/>
-        </span>
-        Keypad
-      </q-route-tab>
-      <q-route-tab name="stats"
-                   to="/stats"
-                   :content-class="isActive('stats') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
-                   :ripple="false"
+                   :active="isActive('power-dialer')"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -58,6 +52,7 @@
                    to="/stats"
                    :content-class="isActive('stats') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
                    :ripple="false"
+                   :active="isActive('stats')"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -66,10 +61,12 @@
         </span>
         Stats
       </q-route-tab>
-      <q-route-tab name="settings"
-                   to="/settings"
-                   :content-class="isActive('settings') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+      <q-route-tab name="more"
+                   to=""
+                   :id="'mobile-menu-item-more'"
+                   :content-class="moreContentClass"
                    :ripple="false"
+                   :active="isMoreActive"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -78,19 +75,66 @@
         More
       </q-route-tab>
     </q-tabs>
+    <b-popover
+      target="mobile-menu-item-more"
+      triggers="click blur"
+      placement="bottomright"
+      boundary="window"
+      custom-class="contact-popover mobile-more-dropdown"
+      @hidden="onCloseDropdown"
+    >
+      <contact-menu class="list-actions">
+        <contact-menu-item @click="$emit('rename')">
+          <!--template slot="icon">
+            <pencil-icon></pencil-icon>
+          </template-->
+          <template slot="title">
+            <span>Test 1</span>
+          </template>
+        </contact-menu-item>
+      </contact-menu>
+      <contact-menu class="list-actions">
+        <contact-menu-item @click="$emit('rename')">
+          <!--template slot="icon">
+            <pencil-icon></pencil-icon>
+          </template-->
+          <template slot="title">
+            <span>Test 2</span>
+          </template>
+        </contact-menu-item>
+      </contact-menu>
+    </b-popover>
   </div>
 </template>
 
 <script>
 import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
-import KeypadMobileIcon from 'components/icons/mobile-menu/keypad-mobile-icon'
 import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'
 import MoreMobileIcon from 'components/icons/mobile-menu/more-mobile-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import ContactMenu from 'components/contacts/contact-menu.vue'
+import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 export default {
   name: 'app-footer',
-  components: { PowerDialerMobileIcon, MoreMobileIcon, StatsMobileIcon, KeypadMobileIcon, ContactsMobileIcon, InboxMobileIcon },
+  components: {
+    PowerDialerMobileIcon,
+    MoreMobileIcon,
+    StatsMobileIcon,
+    ContactsMobileIcon,
+    InboxMobileIcon,
+    ContactMenu,
+    ContactMenuItem
+  },
+
+  computed: {
+    isMoreActive () {
+      return this.tab === 'more'
+    },
+    moreContentClass () {
+      return !this.isMoreActive ? 'tab-inactive tab-icons xs-text' : 'tab-icons xs-text'
+    }
+  },
   data () {
     return {
       tab: 'inbox'
@@ -99,22 +143,17 @@ export default {
 
   created () {
     this.tab = 'inbox'
-    console.log('test')
   },
 
   methods: {
     isActive (tab) {
       return this.tab === tab
-    }
-  },
-
-  watch: {
-    'tab': function () {
-      if (!this.tab) {
-        this.tab = 'inbox'
-      }
     },
-    '$route.name': function () {
+    onCloseDropdown () {
+      this.updateTab()
+    },
+    updateTab () {
+      console.log('test')
       switch (this.$route.name) {
         case 'Inbox':
         case 'Inbox Channel':
@@ -131,6 +170,20 @@ export default {
           this.tab = 'stats'
           break
       }
+    }
+  },
+
+  watch: {
+    'tab': function () {
+      if (!this.tab) {
+        this.tab = 'inbox'
+      }
+      if (this.tab === 'more' && this.$route.name) {
+        this.updateTab()
+      }
+    },
+    '$route.name': function () {
+      this.updateTab()
     }
   }
 }

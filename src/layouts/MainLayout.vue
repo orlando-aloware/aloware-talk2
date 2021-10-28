@@ -1,7 +1,7 @@
 <template>
   <div class="h-100"
        :class="[
-          authenticated ? 'dashboard' : 'guest',
+          authenticated ? `dashboard ${pageClass}` : 'guest',
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
@@ -221,6 +221,10 @@ export default {
     ...mapState('stats', ['availableMetrics']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
+    },
+    pageClass () {
+      let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
+      return pageSlug.replace(/ /g, '_') + '-page'
     }
   },
 

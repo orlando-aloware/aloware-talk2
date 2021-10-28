@@ -7,7 +7,7 @@
       :contact="contact"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
-      @showDetails="$emit('showDetails')"/>
+      @toggleDetails="$emit('toggleDetails')"/>
     <div class="contact-activities">
       <div class="inner-1">
         <div class="inner-2 scrollbar-white"

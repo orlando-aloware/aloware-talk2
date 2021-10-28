@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
@@ -31,8 +30,7 @@ export default {
     ...mapState('inbox', ['items', 'activeChannel']),
 
     isMobileContactActive () {
-      const selectedContact = _.get(this.contact, 'id', null)
-      return selectedContact !== null
+      return this.$route.name === 'Inbox Contact Task'
     }
   },
 
