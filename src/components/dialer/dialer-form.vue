@@ -54,7 +54,7 @@
           <b-form-group :invalid-feedback="invalidCampaign"
                         :state="validCampaign"
                         class="mb-1">
-            <line-selector :disable="this.defaultOutboundCampaignId && mode === 'call'"
+            <line-selector :disable="defaultOutboundCampaignId && mode === 'call'"
                            :generic-multiselect="false"
                            prepend="From:"
                            v-model="campaignId"
@@ -302,32 +302,27 @@ export default {
       this.campaignId = null
       this.defaultOutboundCampaignId = null
 
-      // force outbound line on all users
-      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.currentCompany.force_outbound_line) {
+      // 1. [Account level] force outbound line on all users
+      if (this.currentCompany && this.currentCompany.force_outbound_line) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
         return
       }
 
-      // outbound line is set to use account default and account has a default
-      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
+      // 2. [User level] Outbound line is set to follow account default
+      if (this.currentCompany && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
         return
       }
 
-      // user has a default outbound line
+      // 3. [User level] user has a default outbound line
       if (this.profile && this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
         this.defaultOutboundCampaignId = this.profile.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
-        return
       }
 
-      // user has to choose outbound line every time
-      if (this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
-        this.defaultOutboundCampaignId = null
-        this.campaignId = null
-      }
+      // 4. We couldn't find anything
     },
 
     setMode (mode) {

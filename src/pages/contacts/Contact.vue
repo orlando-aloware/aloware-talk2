@@ -1,19 +1,22 @@
 <template>
   <b-overlay :show="changingSelectedContact"
              :opacity="0.85"
-             class="h-100"
+             class="h-100 w-100"
              variant="white"
              rounded="sm"
              v-if="authenticated">
-    <div class="row mx-0 content-row contact-view-wrapper d-flex">
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
       <template v-if="!isInbox">
         <contact-list-sidebar></contact-list-sidebar>
       </template>
-      <div :class="`contact-activity-wrapper ${widthClass}`">
+      <div class="contact-activity-wrapper flex-grow-1"
+           :class="{ 'contact-activity--closed': detailsOpen }">
         <contact-activities ref="contactActivities"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
-                            @markAllAsRead="markAllAsRead">
+                            @markAllAsRead="markAllAsRead"
+                            @toggleDrawer="toggleDrawer"
+                            @toggleDetails="toggleDetails">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -34,9 +37,30 @@
           </template>
         </contact-activities>
       </div>
-      <div class="px-0 width-330 pt-2">
-        <contact-details></contact-details>
+      <div class="contact-details-container"
+           :class="{ 'contact-details--opened': detailsOpen }">
+        <contact-details @back="toggleDetails"></contact-details>
       </div>
+      <q-drawer
+        overlay
+        bordered
+        class="contact-details-container-drawer position-relative"
+        side="right"
+        :breakpoint="0"
+        :width="300"
+        v-model="drawer">
+        <compact-btn borderless
+                     customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
+                     variant="outlined-light"
+                     @clicked="toggleDrawer">
+          <!--i class="fa fa-times"></i-->
+          <close-icon width="18px"
+                      height="18px"
+                      icon-color="white">
+          </close-icon>
+        </compact-btn>
+        <contact-details></contact-details>
+      </q-drawer>
     </div>
     <template #overlay>
       <div class="text-center">
@@ -56,28 +80,24 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
+import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters } from 'vuex'
+import CloseIcon from 'components/icons/close-icon'
 
 export default {
   mixins: [contactsMixins, contactMixins],
 
   components: {
+    CloseIcon,
     ContactDetails,
     ContactActivities,
-    ContactListSidebar
+    ContactListSidebar,
+    CompactBtn
   },
 
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
     ...mapGetters('auth', ['authenticated']),
-
-    widthClass () {
-      if (this.isInbox) {
-        return 'w-less-330px'
-      }
-
-      return !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
-    },
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     }
@@ -86,7 +106,9 @@ export default {
   data () {
     return {
       title: 'Contact',
-      totalContacts: 0
+      totalContacts: 0,
+      drawer: false,
+      detailsOpen: false
     }
   },
 
@@ -101,6 +123,12 @@ export default {
         _this.resetChangedContactProperties([])
         _this.selectedContactChanging(false)
       })
+    },
+    toggleDrawer () {
+      this.drawer = !this.drawer
+    },
+    toggleDetails () {
+      this.detailsOpen = !this.detailsOpen
     }
   },
 

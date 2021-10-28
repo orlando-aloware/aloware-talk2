@@ -1,5 +1,5 @@
 <template>
-  <div class="header flex- w-100">
+  <div class="header w-100">
     <search :placeholder="searchPlaceholder"
             :border="false"
             v-if="isSearch"
