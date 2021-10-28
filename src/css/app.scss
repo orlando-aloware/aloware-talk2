@@ -7785,7 +7785,7 @@ button.grey-90 {
     margin-left: -15px;
     margin-top: -15px;
     width: calc(100% + 15px);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     background: white;
   }
 }
@@ -7830,6 +7830,11 @@ button.grey-90 {
 .contact-activities-actions__mobile_btn {
   display: none !important;
 }
+
+.mobile-header {
+  display: none;
+}
+
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .inbox {
@@ -8112,6 +8117,9 @@ screen and (max-width: 956px) {
 */
 
 @media screen and (max-width: 600px) {
+  .mobile-header {
+    display: flex !important;
+  }
   .inbox-page {
     .page-header {
       display: none;

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mobile-header d-flex align-items-center justify-content-start"
+    <div class="mobile-header align-items-center justify-content-start"
          v-if="$q.screen.lt.md">
       <back-button @click="$emit('back')"/>
       <span>{{ contactName }} Details</span>
