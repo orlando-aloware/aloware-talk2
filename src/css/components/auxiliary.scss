@@ -380,3 +380,10 @@
 .bg-btn-red {
   background-color: $light-red2 !important;
 }
+
+.scrollable-dropdown-list {
+  .dropdown-menu {
+    max-height: 500px;
+    overflow-y: auto;
+  }  
+}
