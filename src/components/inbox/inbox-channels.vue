@@ -1,11 +1,15 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column">
-      <div class="header w-100" v-if="$route.params.channel !== 'mentions'">
+      <div class="header w-100" v-if="$route.params.channel !== 'mentions'"
+           :class="{ 'border-bottom-0': isSearch }">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
-            <inbox-searcher @search="onSearch"
+            <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
+                            :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
+                            @search="onSearch"
                             @closed="onSearchClosed"
-                            @opened="onSearchOpened"></inbox-searcher>
+                            @opened="onSearchOpened">
+            </inbox-searcher>
             <div class="filter-wrapper">
               <compact-btn v-if="hasChannelFilterChanges"
                            borderless
@@ -50,9 +54,12 @@
       <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="inbox-filter-actions-wrapper inbox-tab--filter pr-1 ml-2">
-            <inbox-searcher @search="onSearch"
+            <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
+                            :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
+                            @search="onSearch"
                             @closed="onSearchClosed"
-                            @opened="onSearchOpened"></inbox-searcher>
+                            @opened="onSearchOpened">
+            </inbox-searcher>
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
                 <filter-icon></filter-icon>
@@ -111,8 +118,12 @@
           </template>
         </q-btn-toggle>
       </div>
+      <search-toggle ref="searchToggle"
+                     v-if="isSearch"
+                     @searching="searching"
+                     @closed="onSearchClosed">
+      </search-toggle>
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
-           :class="[$route.params.channel !== 'mentions' ? scrollerTopClass : '']"
            @scroll="handleScroll">
         <task-list :communications="communications"
                    :answer-status="answerStatus"
@@ -158,6 +169,7 @@ import TaskMentionList from 'components/inbox/channel-tasks/task-mention-list'
 import UserSelector from 'components/generic-selectors/user-selector'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
+import SearchToggle from 'components/search-toggle'
 
 let scrollTimeout
 export default {
@@ -165,7 +177,7 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { InboxSearcher, FilterIcon, UserSelector, TaskMentionList, FilterDialog, CompactBtn, TaskList },
+  components: { InboxSearcher, FilterIcon, UserSelector, TaskMentionList, FilterDialog, CompactBtn, TaskList, SearchToggle },
 
   props: {
     filterType: {
@@ -267,7 +279,7 @@ export default {
       scrollContainerEl: null,
       activeItemEl: null,
       searchText: '',
-      scrollerTopClass: 'mt-0'
+      isSearch: false
     }
   },
 
@@ -781,16 +793,29 @@ export default {
       this.searchText = value
     },
     onSearchOpened () {
-      this.scrollerTopClass = 'mt-37'
       this.setHasMoreCommunications(null)
       this.setCommunications([])
+      this.isSearch = true
+      this.$nextTick(function () {
+        this.$refs.searchToggle.inputFocus()
+      }.bind(this))
     },
     onSearchClosed () {
       this.searchText = null
-      this.scrollerTopClass = 'mt-0'
       this.filter.page = 1
       this.filter.search_text = null
+      this.isSearch = false
       this.getCommunications(this.filter)
+    },
+
+    searching (value) {
+      if ((value && value.length >= 3) || value === '') {
+        if (value === '') {
+          this.setCommunications([])
+        } else {
+          this.searchText = value
+        }
+      }
     },
 
     ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])

@@ -4,7 +4,8 @@
     <!--div class="call-active">
     </div-->
     <div class="inbox animate__animated animate__fadeIn position-relative">
-      <inbox-side :class="{ 'mobile-contact-active' : isMobileContactActive }"></inbox-side>
+      <inbox-side :class="{ 'mobile-contact-active' : isMobileContactActive, 'inbox-wrapper': $q.screen.lt.md, 'inbox-side border-top-0 flex-shrink-0 h-100': $route.name === 'Inbox Channel' }">
+      </inbox-side>
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
            v-if="['Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes($route.name)">

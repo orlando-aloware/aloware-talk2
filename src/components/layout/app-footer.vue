@@ -153,7 +153,6 @@ export default {
       this.updateTab()
     },
     updateTab () {
-      console.log('test')
       switch (this.$route.name) {
         case 'Inbox':
         case 'Inbox Channel':

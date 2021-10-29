@@ -8096,39 +8096,6 @@ screen and (max-width: 956px) {
   }
 }
 
-/*
-@media screen and (max-width: 575px) {
-  .inbox-side {
-    max-width: 300px;
-    border-left: 0 !important;
-    &__left {
-      border-left: 0 !important;
-    }
-    &__right {
-      border-left: 0 !important;
-    }
-  }
-  .sidebar-active {
-    .q-header {
-      .page-header {
-        div:not(:first-child) {
-          display: none !important;
-        }
-      }
-    }
-  }
-  .page-footer, {
-    height: 49px;
-    .tab-icon {
-      height: 28px;
-    }
-  }
-  .page-layout {
-    padding-bottom: 49px;
-  }
-}
-*/
-
 @media screen and (max-width: 600px) {
   .mobile-header {
     display: flex !important;
@@ -8215,6 +8182,38 @@ screen and (max-width: 956px) {
         z-index: 2;
         &.inbox-side__right--opened {
           width: 100% !important;
+        }
+        .calls-header__label {
+          padding-right: 0 !important;
+          .channel-filter-actions-wrapper {
+            margin-left: 17px !important;
+          }
+          .q-select {
+            margin-right: 17px !important;
+            .q-field__append {
+              padding-right: 0;
+            }
+          }
+        }
+        .inbox-search {
+          padding: 0 17px;
+          border-bottom: 1px solid $grey-60;
+          .q-item {
+            height: 38px;
+            min-height: unset;
+            label.q-field {
+              height: 38px;
+            }
+          }
+          input {
+            padding-left: 0 !important;
+          }
+          .q-field__append {
+            padding-right: 0;
+          }
+        }
+        .task-list .task-item {
+          padding-right: 14px !important;
         }
       }
     }
@@ -8396,4 +8395,7 @@ screen and (max-width: 956px) {
       }
     }
   }
+}
+.border-bottom-0 {
+  border-bottom: 0 !important;
 }

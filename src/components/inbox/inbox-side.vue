@@ -3,10 +3,10 @@
     <div class="mobile-header align-items-center justify-content-start">
       <back-button v-if="isInboxTaskOpened"
                    @click="back"/>
-      <span v-if="!isInboxTaskOpened">Communication</span>
+      <span v-if="!isInboxTaskOpened">Communications</span>
       <span v-if="isInboxTaskOpened">Inbox</span>
     </div>
-    <div class="inbox-side border-top-0 flex-shrink-0">
+    <div class="inbox-side border-top-0 flex-shrink-0 h-100">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div>
