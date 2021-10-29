@@ -22,7 +22,7 @@ import ListIcon from 'components/icons/list-icon'
 export default {
   name: 'Breadcrumbs',
   props: {
-    listObjects: {
+    directoryList: {
       type: Array,
       default: () => {}
     }
@@ -30,15 +30,9 @@ export default {
   components: {
     ListIcon
   },
-  computed: {
-    myObj2 () {
-      return this.listObjects
-    }
-  },
   mounted () {
-    console.log('404 :>> ', this.$route.params)
     let id = this.$route.params.id
-    this.findParents(this.listObjects, id)
+    this.findParents(this.directoryList, id)
   },
   data () {
     return {
@@ -86,15 +80,22 @@ export default {
           }
         }
       }
+    },
+    resetBreabcrumbs () {
+      this.crumbs = ''
+      this.name = ''
     }
-
   },
   watch: {
     '$route.params.id': function (id) {
-      this.findParents(this.listObjects, id)
+      if (id === 'in-queue') {
+        this.resetBreabcrumbs()
+      } else {
+        this.findParents(this.directoryList, id)
+      }
     },
-    '$route.params.filter': function (id) {
-      this.findParents(this.listObjects, id)
+    '$route.params.filter': function (filter) {
+      this.findParents(this.directoryList, filter)
     }
   }
 }

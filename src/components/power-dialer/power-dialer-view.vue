@@ -3,7 +3,7 @@
     :loading="datatableLoader">
 
     <template slot="title">
-      <Breadcrumbs :list-objects="powerDialerListOfObjects" />
+      <Breadcrumbs :directory-list="powerDialerListOfObjects" />
     </template>
 
     <template slot="options">
