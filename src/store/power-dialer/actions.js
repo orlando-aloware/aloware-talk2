@@ -20,6 +20,12 @@ export default {
       commit('SET_POWER_DIALER_LIST', res.data)
     }
   },
+  getContact: async ({ commit }, params = {}) => {
+    let res = await window.axios.get(`api/v2/contacts/${params.id}`)
+    if (res.status === 200) {
+      commit('NEXT_CONTACT_IN_PROGRESS', res.data)
+    }
+  },
   getContactResources: async ({ commit }, params = {}) => {
     let res = await window.axios.get('api/v2/contacts', {
       params: params,

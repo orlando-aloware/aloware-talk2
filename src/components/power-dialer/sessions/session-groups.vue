@@ -124,7 +124,7 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
@@ -139,13 +139,15 @@ export default {
     PhoneIcon,
     RedialIcon
   },
-  mounted () {
-    this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
+  async mounted () {
+    // this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
+    await this.getContact({ id: this.activeList.id })
   },
   computed: {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
-      'currentList'
+      'currentList',
+      'contactInProgress'
     ]),
     listObject () {
       return this.powerDialerListItems[this.currentList?.id]
@@ -161,6 +163,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'getContact'
+    ]),
     ...mapMutations('powerDialer', [
       'NEXT_CONTACT_IN_PROGRESS'
     ]),
@@ -175,6 +180,11 @@ export default {
     },
     onLeave () {
       this.$refs.dropdown.visible = false
+    }
+  },
+  watch: {
+    async list () {
+      await this.getContact({ id: this.activeList.id })
     }
   },
   data () {

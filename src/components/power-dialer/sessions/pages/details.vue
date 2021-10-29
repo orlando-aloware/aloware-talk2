@@ -32,7 +32,8 @@
         </q-card>
 
         <DetailsForm
-          :resources="form" />
+          v-if="contactInProgress"
+          :resources="contactInProgress" />
 
       </div>
       <div class="col-4 p-1" style="height:63vh;">
@@ -48,8 +49,9 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
 import DetailsLeads from './details-scripts'
-import DetailsForm from './details-form'
+import DetailsForm from './details-contact-information'
 import DetailsTools from './details-tools'
 import HubSpotIcon from 'components/icons/hubspot-icon'
 
@@ -60,6 +62,11 @@ export default {
     DetailsForm,
     DetailsTools,
     HubSpotIcon
+  },
+  computed: {
+    ...mapGetters('powerDialer', [
+      'contactInProgress'
+    ])
   },
   data () {
     return {
@@ -72,19 +79,6 @@ export default {
           { value: 3, label: 'Sample Leads' }
         ],
         message: 'Hi, my name’s Natasha. I saw that you recently purchased a home. Are you by chance looking for car insurance?<br/><br/>Great. Let me tell you about some products we offer.<br/><br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<br/><br/>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Hi, my name’s Natasha. I saw that you recently purchased a home. Are you by chance looking for car insurance?<br/><br/>Great. Let me tell you about some products we offer.'
-      },
-      form: {
-        first_name: 'Jimmy',
-        last_name: 'Peterson',
-        email: 'kimmy@ailearning.io',
-        company: 'AI Learning',
-        website: 'www.ai.io',
-        city: 'San Francisco',
-        state: 'California, CA',
-        country: 'United States',
-        zip_code: '987756',
-        tcpa_approved: 'Yes',
-        created_at: 'A day ago'
       }
     }
   }
