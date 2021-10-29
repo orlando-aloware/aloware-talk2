@@ -27,8 +27,7 @@
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
-              class="generic-selector"
-              :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
+              :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '', isGenericSelectorStyle ? 'generic-selector': '']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="ringGroupId"
 
@@ -110,6 +109,10 @@ export default {
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
+    },
+    isGenericSelectorStyle: {
+      type: Boolean,
+      default: false
     }
   },
 
