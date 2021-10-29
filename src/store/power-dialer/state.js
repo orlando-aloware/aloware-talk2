@@ -136,6 +136,7 @@ export default function () {
     currentListFilters: [],
     currentList: null,
     datatableLoader: false,
-    search: ''
+    search: '',
+    contactInProgress: null
   }
 }

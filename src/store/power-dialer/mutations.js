@@ -156,5 +156,12 @@ export default {
         headers
       }
     }
+  },
+
+  /**
+   * SESSIONS
+   */
+  NEXT_CONTACT_IN_PROGRESS: (state, data) => {
+    state.contactInProgress = data
   }
 }

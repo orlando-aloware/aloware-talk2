@@ -1,6 +1,6 @@
 <template>
   <div class="t-menu">
-    <div class="t-menu__header d-flex align-items-center pr-3">
+    <div class="t-menu__header no-border d-flex align-items-center pr-3">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
         SESSION
       </div>
@@ -16,7 +16,12 @@
           class="text-capitalize text-body2" href="#">Item 1</b-dropdown-item>
         <b-dropdown-item class="text-capitalize text-body2" href="#">Item 2</b-dropdown-item>
       </b-dropdown>
-      <SettingIcon width="15px" height="15px" class="mr-2" />
+
+      <SettingIcon
+        width="15px"
+        height="15px"
+        class="mr-2" />
+
     </div>
     <div class="t-menu__header d-flex align-items-center">
       <div class="header__header__title font-weight-bold pl-3 flex-grow-1">

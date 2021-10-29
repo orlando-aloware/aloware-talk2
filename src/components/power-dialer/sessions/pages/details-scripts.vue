@@ -3,7 +3,7 @@
     <q-card-section class="px-0" style="overflow:auto;">
 
       <ScriptSelector
-        :communication="communication"
+        :communication="contactInProgress"
         v-model="scriptId"
         class="px-3 w-100"
         @change="changeScript" />
@@ -24,10 +24,11 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/script-selector'
 
 export default {
-  name: 'DetailsLeads',
+  name: 'DetailsScripts',
   components: {
     ScriptSelector
   },
@@ -36,6 +37,11 @@ export default {
       type: Object,
       default: () => {}
     }
+  },
+  computed: {
+    ...mapGetters('powerDialer', [
+      'contactInProgress'
+    ])
   },
   data () {
     return {
