@@ -46,20 +46,22 @@
     </div>
     <div class="d-flex align-items-center p-0">
       <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-        {{ stats.first_name }} {{ stats.last_name }}
-        <span class="text-15 text-subtitle1">{{ stats.phone_number }}</span>
+        {{ contact.first_name }} {{ contact.last_name }}
+        <span class="text-15 text-subtitle1">
+          {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+        </span>
       </div>
     </div>
     <div class="d-flex align-items-center p-0">
       <div class="text-14 pl-3 text-subtitle1 text-capitalize">
-        {{ stats.position }}
-        <span class="text-13 text-subtitle2 text-grey"> | {{ stats.company }}</span>
+        {{ contact.company.name }}
+        <span class="text-13 text-subtitle2 text-grey"> | {{ contact.company_name }}</span>
       </div>
     </div>
     <div class="d-flex align-items-center p-0">
       <div class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
         <DropIcon width="18px" height="18px" class="mr-0 py-0" style="position:relative;top:-2px;" />
-        {{ stats.address }} - {{ stats.time }}
+        {{ address }} - {{ contact.created_at | fixTime }}
       </div>
       <q-btn
         @click="toggleMute = !toggleMute"
@@ -110,6 +112,7 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -134,6 +137,12 @@ export default {
     MuteIcon
   },
   computed: {
+    ...mapGetters('powerDialer', [
+      'contact'
+    ]),
+    address () {
+      return `${this.contact.cnam_city}, ${this.contact.cnam_state}`
+    },
     togglePause: {
       get () {
         return this.statuses.pause

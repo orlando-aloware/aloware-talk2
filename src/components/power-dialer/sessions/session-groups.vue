@@ -147,7 +147,7 @@ export default {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
       'currentList',
-      'contactInProgress'
+      'contact'
     ]),
     listObject () {
       return this.powerDialerListItems[this.currentList?.id]

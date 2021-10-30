@@ -136,7 +136,6 @@ export default {
     },
     async initialize () {
       let route = this.$route.params
-      console.log('Route : ', this.$route.name)
       if (this.$route.name !== 'Power Dialer Session') {
         this.START_DIAL_TOGGLE(false)
       }

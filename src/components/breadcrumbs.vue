@@ -3,21 +3,23 @@
     <div class="breadcrumbs__directory d-flex flex-column">
       <!-- <div class="pr-2">LOL</div> -->
       <div class="small text-muted pt-1">
-        {{ crumbs }}
+        {{ breadcrumbs.crumbs }}
       </div>
     </div>
     <div class="breadcrumbs__icon px-2 py-0">
       <ListIcon />
     </div>
     <div class="breadcrumbs__name">
-      {{ name }}
+      {{ breadcrumbs.name }}
     </div>
   </div>
 </template>
 
 <script>
 
+import { mapGetters, mapMutations } from 'vuex'
 import ListIcon from 'components/icons/list-icon'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'Breadcrumbs',
@@ -30,6 +32,11 @@ export default {
   components: {
     ListIcon
   },
+  computed: {
+    ...mapGetters([
+      'breadcrumbs'
+    ])
+  },
   mounted () {
     let id = this.$route.params.id
     this.findParents(this.directoryList, id)
@@ -41,7 +48,11 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([
+      'SET_BREADCRUMBS'
+    ]),
     findParents (node, searchForId) {
+      var breadcrumbs = {}
       let vNode = null
       if (Array.isArray(node)) {
         vNode = node[0]
@@ -59,8 +70,10 @@ export default {
         if (vNode.name === 'Root') {
           let rootItem = vNode.lists.find(i => i.id.toString() === searchForId.toString())
           if (rootItem) {
-            this.crumbs = ''
-            this.name = rootItem.name
+            breadcrumbs = {
+              crumbs: '',
+              name: rootItem.name
+            }
           }
         }
         for (var treeNode of vNode.child_folders) {
@@ -74,16 +87,23 @@ export default {
           } else {
             let foundItem = treeNode.lists.find(i => i.id.toString() === searchForId.toString())
             if (foundItem) {
-              this.crumbs = `${name === 'Root' ? '' : name + ' / '}${treeNode.name} / `
-              this.name = foundItem.name
+              breadcrumbs = {
+                crumbs: `${name === 'Root' ? '' : name + ' / '}${treeNode.name} / `,
+                name: foundItem.name
+              }
             }
           }
         }
       }
+      if (!isEmpty(breadcrumbs)) {
+        this.SET_BREADCRUMBS(breadcrumbs)
+      }
     },
     resetBreabcrumbs () {
-      this.crumbs = ''
-      this.name = ''
+      this.SET_BREADCRUMBS({
+        crumbs: '',
+        name: ''
+      })
     }
   },
   watch: {

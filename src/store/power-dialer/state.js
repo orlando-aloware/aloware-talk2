@@ -137,6 +137,6 @@ export default function () {
     currentList: null,
     datatableLoader: false,
     search: '',
-    contactInProgress: null
+    contact: null
   }
 }

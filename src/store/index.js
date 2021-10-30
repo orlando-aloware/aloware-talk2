@@ -142,11 +142,15 @@ export default function (/* { ssrContext } */) {
       tagsFullyLoaded: false,
       prevRoute: null,
       currentRoute: null,
-      breadcrumbs: ''
+      breadcrumbs: {
+        crumbs: '',
+        name: ''
+      }
     },
 
     getters: {
-      notifications: (state) => state.notifications
+      notifications: (state) => state.notifications,
+      breadcrumbs: (state) => state.breadcrumbs
     },
 
     actions: {
@@ -911,6 +915,12 @@ export default function (/* { ssrContext } */) {
       },
       SET_CURRENT_ROUTE (state, data) {
         state.currentRoute = data
+      },
+      SET_BREADCRUMBS: (state, data) => {
+        state.breadcrumbs = {
+          crumbs: data.crumbs,
+          name: data.name
+        }
       }
     },
     plugins: [

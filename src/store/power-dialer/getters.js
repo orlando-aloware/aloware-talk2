@@ -26,7 +26,7 @@ export default {
   contactResources: (state) => {
     return []
   },
-  contactInProgress: (state) => state.contactInProgress,
+  contact: (state) => state.contact,
   contactResources2: (state) => state.contactResources,
   contacts: (state) => state.contacts,
   searchedListItem: (state) => state.searchedListItem,

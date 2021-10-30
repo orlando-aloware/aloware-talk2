@@ -162,6 +162,6 @@ export default {
    * SESSIONS
    */
   NEXT_CONTACT_IN_PROGRESS: (state, data) => {
-    state.contactInProgress = data
+    state.contact = data
   }
 }

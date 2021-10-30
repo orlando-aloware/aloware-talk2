@@ -3,7 +3,7 @@
     <q-card-section class="px-0" style="overflow:auto;">
 
       <ScriptSelector
-        :communication="contactInProgress"
+        :communication="contact"
         v-model="scriptId"
         class="px-3 w-100"
         @change="changeScript" />
@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'contactInProgress'
+      'contact'
     ])
   },
   data () {

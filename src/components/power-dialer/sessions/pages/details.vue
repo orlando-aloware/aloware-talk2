@@ -32,8 +32,8 @@
         </q-card>
 
         <DetailsForm
-          v-if="contactInProgress"
-          :resources="contactInProgress" />
+          v-if="contact"
+          :resources="contact" />
 
       </div>
       <div class="col-4 p-1" style="height:63vh;">
@@ -65,7 +65,7 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'contactInProgress'
+      'contact'
     ])
   },
   data () {
