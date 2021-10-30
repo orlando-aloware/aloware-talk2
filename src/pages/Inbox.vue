@@ -31,7 +31,7 @@ export default {
     ...mapState('inbox', ['items', 'activeChannel']),
 
     isMobileContactActive () {
-      return this.$route.name === 'Inbox Contact Task'
+      return ['Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name)
     }
   },
 

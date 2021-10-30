@@ -225,6 +225,12 @@ export default {
       let path = this.$route.path.split('/')
       path.pop()
       path.pop()
+
+      if (!isNaN(path[(path.length - 1)] / 1)) {
+        path.pop()
+        path.pop()
+      }
+
       this.$router.push(path.join('/'))
     }
   }

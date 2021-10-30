@@ -7831,8 +7831,21 @@ button.grey-90 {
   display: none !important;
 }
 
+.contact-details-container-drawer {
+  .q-drawer__content {
+    overflow: unset;
+  }
+}
+
 .mobile-header {
   display: none;
+}
+
+.inbox-wrapper {
+  display: flex;
+  max-width: 508px;
+  width: 100%;
+  flex: 0 0 100%;
 }
 
 @media screen and (max-width: 1425px) and (min-width: 1085px),
@@ -7870,11 +7883,11 @@ screen and (max-width: 956px) {
   }
 }
 
-@media screen and (max-width: 1327px) {
+@media screen and (min-width: 1319px) and (max-width: 1364px) {
   .contact-activity-container {
     .calls-header {
       &__label {
-        max-width: 170px !important;
+        max-width: 151px !important;
       }
     }
   }
@@ -7883,6 +7896,16 @@ screen and (max-width: 956px) {
 @media screen and (min-width: 1319px) {
   .contact-details-container {
     max-width: 330px;
+  }
+}
+
+@media screen and (max-width: 1318px) {
+  .contact-activity-container {
+    .calls-header {
+      &__label {
+        max-width: 170px !important;
+      }
+    }
   }
 }
 
@@ -7897,8 +7920,11 @@ screen and (max-width: 956px) {
 }
 
 @media screen and (max-width: 1261px) {
+  .inbox-wrapper,
   .inbox-side {
     max-width: 430px;
+  }
+  .inbox-side {
     &__left {
       max-width: 160px;
       .count-label {
@@ -7934,8 +7960,11 @@ screen and (max-width: 956px) {
 }
 
 @media screen and (min-width: 601px) and (max-width: 1159px) {
+  .inbox-wrapper,
   .inbox-side {
     max-width: 305px;
+  }
+  .inbox-side {
     &__nav {
       padding-top: 2.92px;
     }
@@ -8155,6 +8184,14 @@ screen and (max-width: 956px) {
   }
   .inbox {
     overflow-x: hidden;
+    &-wrapper {
+      display: initial;
+      flex: initial;
+      max-width: unset;
+      &.mobile-contact-active {
+        width: 0 !important;
+      }
+    }
     &-side,
     &-details {
       border-left: unset;
@@ -8268,11 +8305,6 @@ screen and (max-width: 956px) {
     .contact-activities-actions-dropdown {
       height: 24px;
       width: auto;
-    }
-  }
-  .inbox {
-    &-wrapper.mobile-contact-active {
-      width: 0 !important;
     }
   }
   .mobile-more-dropdown {
