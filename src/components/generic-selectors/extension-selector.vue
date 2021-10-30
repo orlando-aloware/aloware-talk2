@@ -78,6 +78,7 @@ export default {
 
   computed: {
     ...mapState(['users']),
+
     placeholder () {
       switch (true) {
         case this.multiple && this.model.length < 1:
