@@ -7,7 +7,7 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-card>
-    <q-card flat class="t-scroll-y1 mt-1 p-0 py-3">
+    <q-card flat :disabled="sessionLoader" class="t-scroll-y1 mt-1 p-0 py-3">
       <q-card-section
         v-for="(f, i) in form"
         :key="`f.name-${i}`"
@@ -49,6 +49,7 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
 import InputField from 'components/contacts/contact-input-field'
 import SelectField from 'components/generic-selectors/user-selector'
 import SelectStateField from 'src/components/contacts/location-state-selector'
@@ -69,6 +70,9 @@ export default {
     SelectCountryField
   },
   computed: {
+    ...mapGetters('powerDialer', [
+      'sessionLoader'
+    ]),
     localResource () {
       let res = { ...this.resources }
       return res

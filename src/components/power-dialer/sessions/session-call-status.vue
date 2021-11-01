@@ -1,5 +1,5 @@
 <template>
-  <q-card flat :disabled="loading">
+  <q-card flat :disabled="sessionLoader">
     <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-3 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
@@ -118,7 +118,7 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -146,7 +146,8 @@ export default {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
       'currentList',
-      'contact'
+      'contact',
+      'sessionLoader'
     ]),
     address () {
       return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`
@@ -209,10 +210,13 @@ export default {
     ...mapActions('powerDialer', [
       'getContact'
     ]),
+    ...mapMutations('powerDialer', [
+      'TOGGLE_SESSION_LOADER'
+    ]),
     async nextContact () {
-      this.loading = true
+      this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: this.list[this.keyIndex].id })
-      this.loading = false
+      this.TOGGLE_SESSION_LOADER(false)
     }
   },
   data () {

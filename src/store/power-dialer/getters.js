@@ -31,5 +31,6 @@ export default {
   contacts: (state) => state.contacts,
   searchedListItem: (state) => state.searchedListItem,
   datatableLoader: (state) => state.datatableLoader,
-  search: (state) => state.search
+  search: (state) => state.search,
+  sessionLoader: (state) => state.sessionLoader
 }

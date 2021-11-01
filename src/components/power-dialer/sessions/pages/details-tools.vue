@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <q-card flat :disabled="sessionLoader">
     <div class="pb-2">
       <ContactPhones />
     </div>
@@ -9,7 +9,7 @@
     <div class="pb-2">
       <ContactNotes :contact="contact" />
     </div>
-  </div>
+  </q-card>
 </template>
 
 <script>
@@ -22,7 +22,11 @@ import ContactNotes from 'components/contacts/contact-notes'
 export default {
   name: 'DetailsTools',
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactClone'])
+    ...mapGetters('powerDialer', [
+      'sessionLoader',
+      'contact',
+      'sessionLoader'
+    ])
   },
   components: {
     ContactPhones,

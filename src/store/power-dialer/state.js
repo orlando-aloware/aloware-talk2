@@ -137,6 +137,7 @@ export default function () {
     currentList: null,
     datatableLoader: false,
     search: '',
-    contact: null
+    contact: null,
+    sessionLoader: false
   }
 }

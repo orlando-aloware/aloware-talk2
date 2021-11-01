@@ -163,5 +163,8 @@ export default {
    */
   NEXT_CONTACT_IN_PROGRESS: (state, data) => {
     state.contact = data
+  },
+  TOGGLE_SESSION_LOADER: (state, value) => {
+    state.sessionLoader = value
   }
 }
