@@ -156,7 +156,11 @@ export default {
       return this.listObject.data || []
     },
     activeList () {
-      return this.list[0]
+      if (!this.flagged) {
+        return this.list[0]
+      } else {
+        return this.contact
+      }
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
@@ -184,11 +188,17 @@ export default {
   },
   watch: {
     async list () {
+      this.flagged = false
       await this.getContact({ id: this.activeList.id })
+    },
+    contact () {
+      this.flagged = true
     }
   },
   data () {
-    return {}
+    return {
+      flagged: false
+    }
   }
 }
 </script>
