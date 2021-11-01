@@ -31,7 +31,7 @@
           </q-card-section>
         </q-card>
 
-        <DetailsForm
+        <DetailsContactInfo
           v-if="contact"
           :resources="contact" />
 
@@ -51,7 +51,7 @@
 
 import { mapGetters } from 'vuex'
 import DetailsLeads from './details-scripts'
-import DetailsForm from './details-contact-information'
+import DetailsContactInfo from './details-contact-information'
 import DetailsTools from './details-tools'
 import HubSpotIcon from 'components/icons/hubspot-icon'
 
@@ -59,7 +59,7 @@ export default {
   name: 'SessionPageDetails',
   components: {
     DetailsLeads,
-    DetailsForm,
+    DetailsContactInfo,
     DetailsTools,
     HubSpotIcon
   },

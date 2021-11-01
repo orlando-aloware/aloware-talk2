@@ -7,7 +7,7 @@
         class="link px-1" style="display:contents;">
         <div
           @click="clicked(filter)"
-          :class="`t-grouped-buttons__btn ml-1 ${id === filter.id ? 'active' : ''}`">
+          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${id === filter.id ? 'active' : ''}`">
           <div class="t-badge-name">
             {{ filter.name }}
           </div>
