@@ -46,7 +46,7 @@
     </div>
     <div class="d-flex align-items-center p-0">
       <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-        {{ contact.first_name }} {{ contact.last_name }}
+        {{ contact.name || '' }}
         <span class="text-15 text-subtitle1">
           {{ contact.phone_number | fixPhone('NATIONAL', true) }}
         </span>
