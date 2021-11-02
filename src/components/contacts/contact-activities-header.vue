@@ -4,7 +4,7 @@
       <back-button class="p-0"
                    v-if="$q.screen.lt.md"
                    @click="back"/>
-      {{ label }}
+      <span class="contact-name">{{ label }}</span>
       <b-badge :variant="resolveVariant" class="font-weight-light badge-task-status ml-1">{{ contact.task_status | fixTaskStatusName }}</b-badge>
     </div>
     <div class="contact-activities-actions">
