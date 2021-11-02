@@ -19,7 +19,7 @@
 
           <b-form-group label="" class="w-50">
             <extension-selector v-model="user.extension"
-                                :disable="true"
+                                :disable="false"
                                 @select="(eventPayload) => onUpdateFields(eventPayload, 'extension')">
             </extension-selector>
           </b-form-group>
@@ -614,7 +614,7 @@ export default {
   },
 
   mounted () {
-    if (this.user.operating_states_limit.us.length || this.user.operating_states_limit.ca.length) {
+    if ((this.user.operating_states_limit.us && this.user.operating_states_limit.us.length) || (this.user.operating_states_limit && this.user.operating_states_limit.ca.length)) {
       this.disableGeoRouting = false
     }
 

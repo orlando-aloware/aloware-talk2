@@ -161,7 +161,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'users']),
+    ...mapState(['users']),
 
     placeholder () {
       if (!this.showPlaceholder) {
@@ -208,10 +208,12 @@ export default {
     formattedOptions () {
       let normalUsers = [...this.normalUsers]
 
-      normalUsers.unshift({
-        group: 'Users',
-        disable: true
-      })
+      if (normalUsers.length > 0) {
+        normalUsers.unshift({
+          group: 'Users',
+          disable: true
+        })
+      }
 
       let usersArray = normalUsers
 

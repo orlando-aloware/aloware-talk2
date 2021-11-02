@@ -87,7 +87,6 @@ import {
   aclMixin,
   formValidationMixin
 } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
 import * as TagCategory from 'src/constants/tag-categories'
 export default {
   name: 'tag-creator',
@@ -166,12 +165,11 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany']),
-
     isLargeEnough () {
       return true
     }
   },
+
   methods: {
     addTag () {
       if (this.validateForm('add_tag')) {

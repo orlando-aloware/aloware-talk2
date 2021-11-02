@@ -333,7 +333,7 @@ export default {
       this.appointment.smsReminder.body = body + ' ' + variable
     },
     setSmsReminderBody () {
-      this.appointment.smsReminder.body = this.currentCompany.sms_reminder_default_text
+      this.appointment.smsReminder.body = this.currentCompany ? this.currentCompany.sms_reminder_default_text : ''
     }
 
   },

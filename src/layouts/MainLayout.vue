@@ -34,7 +34,7 @@
                   <div v-if="!onlineStatus">
                     <span>Network is <b>offline</b></span>
                   </div>
-                  <div v-else-if="!authCheckStatus">
+                  <div v-else-if="!authCheckStatus && !loading">
                     <span>Checking authentication</span>
                     <div class="container"
                          v-if="showRefreshButton">
@@ -186,7 +186,6 @@ export default {
       loadingScripts: false,
       loadingTemplates: false,
       loadingBroadcasts: false,
-      loadingFilters: false,
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       isWidget: false,
@@ -543,11 +542,7 @@ export default {
 
     updateOnlineStatus (event) {
       this.onlineStatus = navigator.onLine
-      if (!this.onlineStatus) {
-        this.loading = true
-      } else {
-        this.loading = false
-      }
+      this.loading = !this.onlineStatus
     },
 
     call (phoneNumber) {
@@ -644,6 +639,22 @@ export default {
         }
 
         broadcast.init()
+      }).finally(() => {
+        this.getRingGroups()
+        this.getBroadcasts()
+        this.getTemplates()
+
+        if (['Stats'].includes(this.$route.name)) {
+          this.getAvailableMetrics()
+          this.getMetricGroups()
+        }
+
+        this.getCampaigns()
+        this.getTags()
+        this.getWorkflows()
+
+        this.getDispositionStatuses()
+        this.getCallDispositions()
       })
     },
 
@@ -784,6 +795,7 @@ export default {
           if (res.data.to !== res.data.total) {
             this.getTags(page + 1)
           } else {
+            this.setTagsFullyLoaded(true)
             this.$VueEvent.fire('tags_loaded')
             this.loadingTags = false
             return Promise.resolve()
@@ -889,31 +901,13 @@ export default {
       }
     },
 
-    getFilters: function () {
-      if (this.hasPermissionTo('list filter')) {
-        this.loadingFilters = true
-        this.$axios
-          .get('/api/v2/contacts/filters')
-          .then(response => {
-            this.loadingFilters = false
-            this.setFilters(response.data.filters)
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.error(err)
-            this.loadingFilters = false
-            return Promise.reject()
-          })
-      }
-    },
-
     getAvailableMetrics: function () {
       if (!this.profile) {
         return
       }
 
       this.loadingAvailableMetrics = true
-      this.$axios
+      return this.$axios
         .get('/api/v2/agents/metrics', {
           params: {
             group_by_category: true
@@ -969,7 +963,7 @@ export default {
       }
 
       this.loadingMetricGroups = true
-      this.$axios
+      return this.$axios
         .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
           params: {
             include_metrics: true
@@ -1001,32 +995,11 @@ export default {
           })
         }
         let getCurrentCompany = this.getCurrentCompany()
-        let getCampaigns = this.getCampaigns()
-        let getRingGroups = this.getRingGroups()
         let getUsers = this.getUsers()
-        let getTags = this.getTags()
-        let getWorkflows = this.getWorkflows()
-        let getDispositionStatuses = this.getDispositionStatuses()
-        let getCallDispositions = this.getCallDispositions()
-        let getTemplates = this.getTemplates()
-        let getBroadcasts = this.getBroadcasts()
-        let getFilters = this.getFilters()
-        let getAvailableMetrics = this.getAvailableMetrics()
-        let getMetricGroups = this.getMetricGroups()
+
         await Promise.all([
           getCurrentCompany,
-          getCampaigns,
-          getRingGroups,
-          getUsers,
-          getTags,
-          getWorkflows,
-          getDispositionStatuses,
-          getCallDispositions,
-          getTemplates,
-          getBroadcasts,
-          getFilters,
-          getAvailableMetrics,
-          getMetricGroups
+          getUsers
         ])
       }
     },

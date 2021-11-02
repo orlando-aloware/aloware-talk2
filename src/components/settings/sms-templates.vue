@@ -37,7 +37,7 @@
                 <td
                   :key="column.name"
                   class="datatable-row__name"
-                  v-else-if="column.name === 'name'"
+                  v-else-if="column.name === 'template_name'"
                 >
                   <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
@@ -122,10 +122,8 @@ export default {
           sortable: false
         },
         {
-          name: 'name',
+          name: 'template_name',
           label: 'Name',
-          default: true,
-          sticky: true,
           resizable: false,
           sortable: false,
           minWidth: 225

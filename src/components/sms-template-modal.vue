@@ -161,6 +161,12 @@ export default {
       let request = null
 
       if (this.smsTemplateModal.template && this.smsTemplateModal.template.id) {
+        if (!this.currentCompany) {
+          this.$generalNotification(`Missing company information.`, 'error')
+          this.isSaving = false
+          return
+        }
+
         params.company_id = this.currentCompany.id
 
         request = talk2Api.V1.smsTemplate.update(this.smsTemplateModal.template.id, params)
@@ -177,7 +183,7 @@ export default {
         this.$emit('templateSaved', response.data)
       }).catch(error => {
         console.log(error)
-        this.$generalNotification(`Error while ${presentActionText.toLowerCase()} event.`, 'error')
+        this.$generalNotification(`Error while ${presentActionText.toLowerCase()} sms template.`, 'error')
       }).finally(() => {
         this.isSaving = false
       })

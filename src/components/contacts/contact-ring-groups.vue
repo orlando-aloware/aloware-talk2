@@ -30,7 +30,6 @@ export default {
 
   methods: {
     submit (ringGroupIds) {
-      console.log(ringGroupIds)
       talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: ringGroupIds })
         .catch(err => {
           console.log(err)

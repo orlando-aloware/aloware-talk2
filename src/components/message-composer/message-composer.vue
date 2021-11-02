@@ -37,7 +37,7 @@
       <div class="w-35">
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
-          <line-selector></line-selector>
+          <line-selector @change="onLineChange"></line-selector>
         </div>
       </div>
     </div>
@@ -61,11 +61,11 @@ export default {
   components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, ContactPhoneNumberSelector, MessageComposerSms },
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
-    ...mapState(['currentCompany'])
+    ...mapState(['currentCompany', 'templates'])
   },
   methods: {
     ...mapActions(
-      'contacts', ['setMessageComposerSmsPhoneNumber', 'setMessageComposerAttachments', 'setMessageComposerMode']
+      'contacts', ['setMessageComposerSmsPhoneNumber', 'setMessageComposerAttachments', 'setMessageComposerMode', 'setSelectedLine']
     ),
     setMode (mode) {
       this.setMessageComposerMode(mode)
@@ -80,11 +80,18 @@ export default {
         .then(response => {
           this.setSmsTemplates(response.data)
         })
+    },
+    onLineChange (line) {
+      this.setSelectedLine(line)
     }
   },
   mounted () {
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
-    this.getSmsTemplates()
+    if (!this.templates || this.templates.length < 1) {
+      this.getSmsTemplates()
+    } else {
+      this.setSmsTemplates(this.templates)
+    }
   },
   watch: {
     'contact': function () {

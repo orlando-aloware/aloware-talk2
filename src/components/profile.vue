@@ -185,6 +185,8 @@ export default {
 
   methods: {
     ...mapActions('auth', ['logout', 'setProfile']),
+    ...mapActions('stats', ['resetStatVuex']),
+    ...mapActions(['resetVuex']),
     changeStatus (status) {
       this.changeAgentStatus(status)
     },
@@ -208,6 +210,8 @@ export default {
         const response = this.logout()
         response.then(() => {
           this.response = response?.data
+          this.resetVuex()
+          this.resetStatVuex()
           this.$router.push({ name: 'Login' })
         })
       } catch (err) {

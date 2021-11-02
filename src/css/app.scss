@@ -4218,9 +4218,9 @@ span.mention {
   color: $white !important;
 }
 
-.q-manual-focusable--focused{
+.q-manual-focusable--focused:not(.q-item--active) {
   background: $grey-50 !important;
-  color: $grey-90 !important;
+  color: $grey-100 !important;
 }
 
 .table-header {
@@ -7309,6 +7309,10 @@ button.grey-90 {
   .scrollableArea {
     overflow-y: auto !important;
     overflow-x: hidden !important;
+
+    .datatable {
+      margin-left: 0 !important;
+    }
   }
 
   .form-label {
@@ -7812,5 +7816,19 @@ button.grey-90 {
         }
       }
     }
+  }
+}
+
+.hours {
+  position: relative;
+}
+
+.fw-500 {
+  font-weight: 500 !important;
+}
+
+.q-item--active.text-primary {
+  .q-item__label {
+    color: $white !important;
   }
 }

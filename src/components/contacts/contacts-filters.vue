@@ -159,8 +159,14 @@ import Search from 'src/components/search.vue'
 import ContactsFilterTypes from 'src/components/contacts/contacts-filter-types.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import { GROUP_CONTACT_COMM_METADATA, GROUP_CONTACT_LOCATION, GROUP_CONTACT_RELEVANCE, GROUP_PRIMARY_INFO } from 'src/constants/contact-filter-groups'
+import talk2Api from 'src/plugins/api/api'
+
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
+
+  mixins: [aclMixin],
+
   components: {
     Search,
     CompactBtn,
@@ -169,6 +175,7 @@ export default {
 
   data () {
     return {
+      loadingFilters: false,
       items: Array.from(new Array(10)),
       show: false,
       filterSearch: '',
@@ -251,7 +258,11 @@ export default {
   },
 
   created () {
-    this.visibleListFilters = this.generateListFilters()
+    if (this.filters.length < 1) {
+      this.getFilters()
+    } else {
+      this.visibleListFilters = this.generateListFilters()
+    }
   },
 
   mounted () {
@@ -263,6 +274,24 @@ export default {
   },
 
   methods: {
+    getFilters () {
+      if (this.hasPermissionTo('list filter')) {
+        this.loadingFilters = true
+        return talk2Api.V2.filters.get()
+          .then(response => {
+            this.loadingFilters = false
+            this.setFilters(response.data.filters)
+            this.visibleListFilters = this.generateListFilters()
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.error(err)
+            this.loadingFilters = false
+            return Promise.reject()
+          })
+      }
+    },
+
     searchFilter (filterName) {
       this.filterSearch = filterName
     },
@@ -457,7 +486,8 @@ export default {
       this.$emit('filtersUpdated')
     },
 
-    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters'])
+    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
+    ...mapActions(['setFilters'])
   },
 
   watch: {

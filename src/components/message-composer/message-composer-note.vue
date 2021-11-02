@@ -105,9 +105,11 @@ export default {
         })
     },
     getMentionableItems () {
-      return talk2Api.V1.users.withAccessToContact(this.contact.id).then(response => {
-        this.items = response.data
-      })
+      if (this.contact && this.contact.id) {
+        return talk2Api.V1.users.withAccessToContact(this.contact.id).then(response => {
+          this.items = response.data
+        })
+      }
     },
     focusInput () {
       let el = document.getElementById('noteContentEditable')

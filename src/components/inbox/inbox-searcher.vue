@@ -3,14 +3,15 @@
     <compact-btn borderless
                  customClass="fs-14 _500 position-relative primary not-focusable filter-toggle-button"
                  variant="outlined-light"
-                 @click="onButtonClick">
+                 @clicked="onButtonClick">
       <search-icon :color="searchIconColor"></search-icon>
       <q-menu :offset="[271, 0]"
               content-class="inbox-search"
               ref="inboxSearch"
-              separate-close-popup
               anchor="bottom end"
               self="top right"
+              separate-close-popup
+              no-parent-event
               no-focus
               persistent
               @hide="onHideMenu"
@@ -41,8 +42,8 @@
 <script>
 import CompactBtn from 'components/compact-btn'
 import SearchIcon from 'components/icons/search-icon'
-import { mapActions } from 'vuex'
 import CloseOIcon from 'components/icons/close-o-icon'
+
 export default {
   name: 'inbox-searcher',
 
@@ -62,25 +63,23 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setSearcherOpen']),
     onButtonClick () {
       this.$refs.inboxSearch.show()
     },
     onSearchClose () {
       this.searchText = null
       this.$refs.inboxSearch.hide()
+      this.$emit('closed', true)
     },
     onShowMenu () {
       this.isOpen = true
-      this.setSearcherOpen(true)
+      this.searchText = ''
       this.$emit('opened')
       this.$refs.inboxSearchInput.$refs.input.focus()
     },
     onHideMenu () {
       this.isOpen = false
-      this.setSearcherOpen()
       this.searchText = null
-      this.$emit('closed')
     },
     reset () {
       this.searchText = null

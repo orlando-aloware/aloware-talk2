@@ -10,12 +10,12 @@
                 label="Lines"
                 class="form-label"
               >
-                <line-selector :multiple="true"
+                <line-selector v-model="filter.campaigns"
+                               :multiple="true"
                                :use-chips="true"
                                :generic-styling="false"
                                :generic-multiselect="false"
                                :highlighted="isChanged('campaigns')"
-                               v-model="filter.campaigns"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')">
                 </line-selector>
               </b-form-group>

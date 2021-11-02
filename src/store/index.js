@@ -901,6 +901,7 @@ export default function (/* { ssrContext } */) {
         state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
       }
     },
+
     plugins: [
       createPersistedState({
         key: 'AloWare_vuex'
