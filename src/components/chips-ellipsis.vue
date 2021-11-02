@@ -14,7 +14,7 @@
           square
           :style="`border:${chip.color} solid 1px;`"
           :class="`p-0 mx-2`">
-          <div :class="`text-capitalize ${identity === 'contact-disposition' ? 'text-grey' : 'text-black'}`">
+          <div :class="`text-capitalize ${identity === 'contact-disposition' ? 'text-grey-7' : 'text-black'}`">
             {{ chip.name }}
           </div>
         </q-chip>

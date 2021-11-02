@@ -1,7 +1,7 @@
 <template>
   <q-card flat :disabled="sessionLoader">
     <div class="t-menu-2 no-border">
-      <div class="d-flex align-items-center pt-3 pb-0">
+      <div class="d-flex align-items-center pt-2 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
             <div class="text-15 text-lowercase text-capitalize px-2">
@@ -87,7 +87,7 @@
           </div>
         </q-btn>
       </div>
-      <div class="d-flex align-items-center p-0 pt-2">
+      <div class="d-flex align-items-center p-0 pt-2 pb-2">
         <div class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
           {{ stats.group }}
           <span class="text-subtitle2 text-grey"></span>
