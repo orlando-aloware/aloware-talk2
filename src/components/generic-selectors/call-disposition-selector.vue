@@ -103,7 +103,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'callDispositions']),
+    ...mapState(['callDispositions']),
 
     placeholder () {
       switch (true) {

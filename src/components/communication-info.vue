@@ -135,7 +135,7 @@
                     <div class="d-flex align-items-center"
                          v-else>
                       {{ getCommunicationCampaignName() }}
-                      <br>
+                      <br v-if="getCommunicationCampaignName()">
                       {{ communication.incoming_number | fixPhone }}
                     </div>
                   </div>
@@ -149,7 +149,7 @@
                     <div class="d-flex align-items-center"
                          v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                       {{ getCommunicationCampaignName() }}
-                      <br>
+                      <br v-if="getCommunicationCampaignName()">
                       {{ communication.incoming_number | fixPhone }}
                     </div>
                     <div class="d-flex align-items-center"
@@ -509,7 +509,7 @@
                 </div>
 
                 <template
-                  v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions.length > 0 && !dialerMode">
+                  v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode">
                   <div class="d-flex align-items-center co-12">
                     <label class="form-control-label mb-1">Call Disposition:</label>
                     <label class="ml-1 d-flex align-items-center"
@@ -748,7 +748,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'callDispositions', 'ringGroups', 'currentCompany']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions']),
 
     hasSMSReminder () {
       if (this.$refs['sms-reminder']) {
@@ -819,6 +819,8 @@ export default {
       if (found) {
         return found.name
       }
+
+      return null
     },
 
     getRingGroup (id, getName = false) {

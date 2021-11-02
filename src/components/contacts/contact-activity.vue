@@ -188,7 +188,7 @@
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            {{ currentCompany.name }}
+            {{ currentCompany ? currentCompany.name : 'No Name' }}
         </span>
 
         <span class="text-muted"
@@ -400,7 +400,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'callDispositions', 'currentCompany']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'currentCompany']),
 
     getCommunicationClass () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
@@ -428,7 +428,7 @@ export default {
         if (this.communication.user_id) {
           return this.getUser(this.communication.user_id).name
         }
-        return this.currentCompany.name
+        return this.currentCompany ? this.currentCompany.name : 'No Name'
       }
 
       return this.contact.name || 'No Name'

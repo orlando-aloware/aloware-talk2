@@ -152,7 +152,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'users', 'campaigns', 'ringGroups']),
+    ...mapState(['campaigns', 'ringGroups']),
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {
@@ -187,17 +187,23 @@ export default {
     formattedOptions () {
       let campaignOptions = [...this.sortToAlphabeticalOrder(this.campaigns.map(function (item) { return { ...item, model: 'lines' } }))]
 
-      campaignOptions.unshift({
-        group: 'Filter by Line',
-        disable: true
-      })
+      if (campaignOptions && campaignOptions.length > 0) {
+        campaignOptions.unshift({
+          group: 'Filter by Line',
+          disable: true
+        })
+      }
 
       let campaignAndRingGroupArray = campaignOptions
       let ringGroupOptions = [...this.sortToAlphabeticalOrder(this.ringGroups.map(function (item) { return { ...item, model: 'ring_groups' } }))]
-      ringGroupOptions.unshift({
-        group: 'Filter by Ring Group',
-        disable: true
-      })
+
+      if (ringGroupOptions && ringGroupOptions.length > 0) {
+        ringGroupOptions.unshift({
+          group: 'Filter by Ring Group',
+          disable: true
+        })
+      }
+
       campaignAndRingGroupArray = [...campaignOptions, ...ringGroupOptions]
 
       return campaignAndRingGroupArray

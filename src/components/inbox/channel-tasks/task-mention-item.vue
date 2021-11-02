@@ -94,7 +94,13 @@ export default {
     },
 
     directionSummaryText () {
-      return this.direction === 'received' ? `@${this.mentioner.name} mentioned you` : `Sent to @${this.mentioned.name}`
+      if (this.direction === 'received') {
+        let mentionerName = (this.mentioner) ? `@${this.mentioner.name}` : 'Someone'
+        return `${mentionerName} mentioned you`
+      }
+
+      let mentionedName = (this.mentioned) ? `@${this.mentioned.name}` : 'someone'
+      return `Sent to ${mentionedName}`
     },
 
     activeClass () {
@@ -102,11 +108,11 @@ export default {
     },
 
     mentioner () {
-      return this.users.find(user => user.id === this.mention.mentioner_user_id)
+      return this.users.length > 0 ? this.users.find(user => user.id === this.mention.mentioner_user_id) : null
     },
 
     mentioned () {
-      return this.users.find(user => user.id === this.mention.mentioned_user_id)
+      return this.users.length > 0 ? this.users.find(user => user.id === this.mention.mentioned_user_id) : null
     },
     parseBody () {
       return this.$options.filters.parseMentionToView(this.mention.preview_text)

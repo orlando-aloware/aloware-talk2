@@ -4,7 +4,7 @@
       <back-button v-if="isInboxTaskOpened"
                    @click="back"/>
       <span v-if="!isInboxTaskOpened">Communications</span>
-      <span v-if="isInboxTaskOpened">Inbox</span>
+      <span v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
     </div>
     <div class="inbox-side border-top-0 flex-shrink-0 h-100">
       <div class="inbox-side__left"
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
@@ -70,7 +71,6 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'ringGroups']),
     ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts']),
 
     nextPage () {
@@ -79,6 +79,11 @@ export default {
 
     isInboxTaskOpened () {
       return !this.$q.screen.lt.md || (this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('inbox') && this.$q.screen.lt.md)
+    },
+
+    channelName () {
+      const path = this.$route.path.split('/')
+      return _.get(path, '[2]', 'Inbox')
     }
   },
 

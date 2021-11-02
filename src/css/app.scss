@@ -3355,6 +3355,7 @@ span.mention {
     align-items: center;
     flex-grow: 1;
     border-bottom: solid 1px $grey-light3;
+    padding-left: 6px;
 
     &__label {
       padding-left: 20px;
@@ -4236,9 +4237,9 @@ span.mention {
   color: $white !important;
 }
 
-.q-manual-focusable--focused{
+.q-manual-focusable--focused:not(.q-item--active) {
   background: $grey-50 !important;
-  color: $grey-90 !important;
+  color: $grey-100 !important;
 }
 
 .table-header {
@@ -6592,6 +6593,7 @@ table.datatable {
 }
 
 .contact-task-item {
+  padding-right: 14px !important;
   .contact-unread-badge {
     left: 38px;
     position: absolute;
@@ -7331,6 +7333,10 @@ button.grey-90 {
   .scrollableArea {
     overflow-y: auto !important;
     overflow-x: hidden !important;
+
+    .datatable {
+      margin-left: 0 !important;
+    }
   }
 
   .form-label {
@@ -7697,36 +7703,37 @@ button.grey-90 {
   }
 }
 
-
-
 .custom-control-input:disabled {
   opacity: 0 !important;
 }
-
 
 .inbox-search {
   border-radius: 0 !important;
   box-shadow: none !important;
   z-index: 1;
+  padding: 0 15px;
+  margin-top: -9px;
+  border-bottom: 1px solid $grey-60;
+  background: rgba(249, 249, 251, 0.5);
 
   .q-item {
     padding: 0 !important;
+    height: 38px;
+    min-height: unset;
 
     label.q-field {
-      height: 48px;
+      height: 38px;
       margin-bottom: 0;
-      background: rgb(255 255 255);
     }
 
     .q-field--filled .q-field__control {
       padding: 0;
-      background: rgb(255 255 255);
       border-radius: 4px 4px 0 0;
+      background: transparent;
     }
 
-    .q-field--filled.q-field--highlighted .q-field__control:before {
-      opacity: 1;
-      background: rgb(241 241 241 / 12%);
+    .q-field--filled .q-field__control:before {
+      background: transparent;
     }
 
     .q-field--filled .q-field__control:after {
@@ -7745,6 +7752,15 @@ button.grey-90 {
       opacity: 0 !important;
     }
 
+    input {
+      padding-left: 0 !important;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .q-field__append {
+      padding-right: 0;
+    }
   }
 }
 
@@ -8240,23 +8256,6 @@ screen and (max-width: 956px) {
             }
           }
         }
-        .inbox-search {
-          padding: 0 17px;
-          border-bottom: 1px solid $grey-60;
-          .q-item {
-            height: 38px;
-            min-height: unset;
-            label.q-field {
-              height: 38px;
-            }
-          }
-          input {
-            padding-left: 0 !important;
-          }
-          .q-field__append {
-            padding-right: 0;
-          }
-        }
         .task-list .task-item {
           padding-right: 14px !important;
         }
@@ -8464,6 +8463,25 @@ screen and (max-width: 956px) {
     }
   }
 }
+
+.hours {
+  position: relative;
+}
+
+.fw-500 {
+  font-weight: 500 !important;
+}
+
+.q-item--active.text-primary {
+  .q-item__label {
+    color: $white !important;
+  }
+}
+
 .border-bottom-0 {
   border-bottom: 0 !important;
+}
+
+.border-bottom-transparent {
+  border-bottom: 1px solid transparent !important;
 }

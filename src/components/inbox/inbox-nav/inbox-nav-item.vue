@@ -110,7 +110,7 @@ export default {
   },
 
   methods: {
-    onClick () {
+    onClick (e) {
       if (this.disabled) {
         return
       }

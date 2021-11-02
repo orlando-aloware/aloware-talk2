@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import _ from 'lodash'
 
 export default {
@@ -79,7 +78,6 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany']),
 
     placeholder () {
       if (this.scriptId) {

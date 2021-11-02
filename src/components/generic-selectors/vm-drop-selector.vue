@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import _ from 'lodash'
 
 export default {
@@ -114,7 +114,6 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState(['currentCompany']),
 
     placeholderText () {
       if (this.vmDropId) {

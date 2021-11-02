@@ -1,14 +1,7 @@
 <template>
-  <div class="header w-100">
-    <search :placeholder="searchPlaceholder"
-            :border="false"
-            v-if="isSearch"
-            @focus="onFocus"
-            @blur="onBlur"
-            @search="search">
-    </search>
-    <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2"
-         v-else>
+  <div class="header w-100"
+       :class="{'border-bottom-transparent': isSearch}">
+    <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
       <slot name="customLeftContent" v-if="hasCustomLeftContent"></slot>
       <q-select class="m-0"
                 ref="select"
@@ -62,12 +55,8 @@
 </template>
 
 <script>
-import Search from 'components/search'
-
 export default {
   name: 'calls-header',
-
-  components: { Search },
 
   props: {
     isSearch: {

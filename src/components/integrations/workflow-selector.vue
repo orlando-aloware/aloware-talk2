@@ -8,6 +8,7 @@
               option-value="id"
               option-label="name"
               style="width: 100%"
+              placeholder="Select workflow"
               v-model="selectedWorkflow"
               :options="options"
               @filter="filterFn">

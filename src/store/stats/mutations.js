@@ -217,5 +217,11 @@ export default {
   SET_AVAILABLE_METRICS: (state, data) => {
     state.availableMetrics = data
   },
-  updateField
+  updateField,
+  RESET_STAT_VUEX: (state) => {
+    state.availableMetrics = []
+    state.metricGroups = []
+    state.metricLoader = false
+    state.groupMetricLoader = false
+  }
 }

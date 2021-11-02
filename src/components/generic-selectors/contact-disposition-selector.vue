@@ -119,7 +119,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dispositionStatuses']),
+    ...mapState(['dispositionStatuses']),
 
     placeholder () {
       if (!this.showPlaceholder) {

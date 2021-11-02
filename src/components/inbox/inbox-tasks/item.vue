@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <div class="overlay position-absolute opacity-1 text-center pt-2" v-if="isReopened">
+    <div class="overlay position-absolute opacity-1 text-center pt-2" v-if="isReopened && !isSearch">
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"
@@ -97,6 +97,11 @@ export default {
     },
     loadingContact: {
       type: Boolean,
+      default: false
+    },
+    isSearch: {
+      type: Boolean,
+      required: false,
       default: false
     }
   },

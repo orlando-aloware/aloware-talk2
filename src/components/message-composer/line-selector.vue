@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
 import talk2Api from 'src/plugins/api/api'
 
@@ -96,7 +96,6 @@ export default {
   mounted () {
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
-      // this.setDefaultLine(this.contact.id)
       this.showPlaceholder()
     }
   },
@@ -132,8 +131,10 @@ export default {
       }
     },
 
-    onInput () {
+    onInput (value) {
       this.$el.querySelector('.inline-select .q-field__input').blur()
+      this.getIncomingNumber()
+      this.$emit('change', value)
     },
 
     filterLineFn (val, update) {
@@ -173,19 +174,10 @@ export default {
       if (this.selectedLine && this.contact.id) {
         this.getIncomingNumber()
       }
-    },
-
-    ...mapActions('contacts', ['setSelectedLine'])
+    }
   },
 
   watch: {
-    selectedLine (value) {
-      this.setSelectedLine(value)
-      // if (value && this.contact && this.contact.id) {
-      //   this.getIncomingNumber()
-      // }
-    },
-
     'contact.id': function (value) {
       if (this.contact && this.contact.id) {
         this.setDefaultLine(value)

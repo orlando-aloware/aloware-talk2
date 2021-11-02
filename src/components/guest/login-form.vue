@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'login-form',
@@ -97,9 +97,6 @@ export default {
       deviceInfo: null,
       isPwd: true
     }
-  },
-  computed: {
-    ...mapState(['currentCompany'])
   },
   methods: {
     getLoginParams () {

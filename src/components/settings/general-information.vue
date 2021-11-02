@@ -25,7 +25,9 @@
         </b-form-row>
       </div>
 
-      <b-alert show variant="warning" v-if="currentCompany && !currentCompany.default_outbound_campaign_id && profile.answer_by === AnswerTypes.BY_IP_PHONE">
+      <b-alert show
+               variant="warning"
+               v-if="currentCompany && !currentCompany.default_outbound_campaign_id && profile.answer_by === AnswerTypes.BY_IP_PHONE">
         This user will not send outbound calls unless you select a default outbound line for your company.
       </b-alert>
 
@@ -43,9 +45,7 @@
                   :key="ringGroupId"
                   class="pb-0">
                   <span class="text-grey-90 _400 fs-12">
-                      {{
-                      getRingGroup(ringGroupId).name | fixName
-                    }}
+                      {{ (getRingGroupName(ringGroupId) || fixName) || 'Ring group data not available' }}
                   </span>
               </li>
             </ul>
@@ -194,6 +194,11 @@ export default {
 
     getRingGroup (id) {
       return this.ringGroups.find(item => item.id === id)
+    },
+    getRingGroupName (id) {
+      let ringGroup = this.getRingGroup(id)
+
+      return ringGroup ? ringGroup.name : null
     }
   }
 }

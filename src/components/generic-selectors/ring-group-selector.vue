@@ -125,7 +125,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'ringGroups']),
+    ...mapState(['ringGroups']),
 
     placeholder () {
       switch (true) {

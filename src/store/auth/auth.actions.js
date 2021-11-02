@@ -86,7 +86,6 @@ const logout = async ({ commit }) => {
     commit('SET_LOADING', false)
     commit('SET_AUTHENTICATED', false)
     commit('SET_PROFILE', null)
-
     return response
   } catch (err) {
     commit('SET_LOADING', false)
