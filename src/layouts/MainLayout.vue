@@ -1,11 +1,11 @@
 <template>
   <div class="h-100"
        :class="[
-          authenticated ? 'dashboard' : 'guest',
+          authenticated ? `dashboard ${pageClass}` : 'guest',
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
-    <q-layout class="page-layout h-100 pb-sm-0"
+    <q-layout class="page-layout h-100"
               view="lHh Lpr lff"
               :height="'100%'">
       <div class="h-100"
@@ -58,7 +58,7 @@
       <q-drawer v-model="sidebarVisible"
                 v-if="authenticated"
                 :breakpoint="0"
-                class="h-100 sidebar-wrapper d-none d-sm-block"
+                class="h-100 sidebar-wrapper d-block"
                 :width="64"
                 content-class="sidebar">
         <q-list>
@@ -68,7 +68,7 @@
           </app-sidebar>
         </q-list>
       </q-drawer>
-      <app-footer class="page-footer row d-block d-md-none w-100 m-0 px-3 pt-2"
+      <app-footer class="page-footer row d-block w-100 m-0 px-1"
                   ref="appFooter"
                   v-if="authenticated && !isWidget && !loading">
       </app-footer>
@@ -220,6 +220,10 @@ export default {
     ...mapState('stats', ['availableMetrics']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
+    },
+    pageClass () {
+      let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
+      return pageSlug.replace(/ /g, '_') + '-page'
     }
   },
 

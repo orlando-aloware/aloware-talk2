@@ -1,96 +1,145 @@
 <template>
   <div class="calls-header d-flex justify-content-between">
     <div class="calls-header__label">
+      <back-button class="p-0"
+                   v-if="$q.screen.lt.md"
+                   @click="back"/>
       {{ label }}
       <b-badge :variant="resolveVariant" class="font-weight-light badge-task-status ml-1">{{ contact.task_status | fixTaskStatusName }}</b-badge>
     </div>
-   <div class="mr-1">
-     <q-btn
-       borderless
-       flat
-       no-caps
-       type="a"
-       color="primary"
-       class="text-decoration-none mr-2"
-       v-if="hasUnreads"
-       @click="$emit('markAllAsRead')">
-      <span class="mx-2">
-        Mark All as Read ({{ unreadCount }})
-      </span>
-     </q-btn>
-     <q-btn
-       v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
-       borderless
-       flat
-       no-caps
-       type="a"
-       color="primary"
-       class="text-decoration-none"
-       :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
-       <q-tooltip anchor="top middle"
-                  self="center middle">
-         Move to Pending
-       </q-tooltip>
-      <span v-if="!isUpdatingStatus"
-            class="mx-2">
-        <timer-o-icon></timer-o-icon>
-      </span>
-       <q-spinner-bars v-if="isUpdatingStatus"
-                       class="pl-1 pr-1"
-                       color="primary"
-                       size="20px"
-       />
-     </q-btn>
-     <q-btn
-       v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
-       borderless
-       flat
-       no-caps
-       type="a"
-       color="primary"
-       class="text-decoration-none"
-       :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
-       <q-tooltip anchor="top middle"
-                  self="center middle">
-         Reopen
-       </q-tooltip>
-       <span v-if="!isUpdatingStatus"
-             class="mx-2">
-        <inbox-o-icon></inbox-o-icon>
-      </span>
-       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_OPEN"
-                       class="pl-1 pr-1"
-                       color="primary"
-                       size="20px"
-       />
-     </q-btn>
-     <q-btn
-       v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
-       borderless
-       flat
-       no-caps
-       type="a"
-       color="primary"
-       class="text-decoration-none"
-       :disable="isUpdatingStatus"
-       @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
-       <q-tooltip anchor="top middle"
-                  self="center middle">
-         Close
-       </q-tooltip>
-      <span v-if="!isUpdatingStatus"
-            class="mx-2">
-        <check-o-icon></check-o-icon>
-      </span>
-       <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
-                       class="pl-1 pr-1"
-                       color="primary"
-                       size="20px"
-       />
-     </q-btn>
-   </div>
+    <div class="contact-activities-actions">
+      <div class="contact-activities-actions__mobile align-items-center">
+        <b-dropdown no-caret
+                    right
+                    variant="light"
+                    toggle-class="bg-white d-flex align-items-center"
+                    class="m-2 b-compact-dropdown-button text-bold contact-activities-actions-dropdown d-flex align-items-center">
+          <template #button-content>
+            <ellipsis-icon/>
+          </template>
+          <b-dropdown-item href=""
+                           :disabled="!hasUnreads"
+                           @click="$emit('markAllAsRead')">
+            <mail-open-icon class="mark-all-as-read-icon dropdown-icon"/>
+            Mark All as Read ({{ unreadCount }})
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN">
+            <timer-o-icon class="dropdown-icon"></timer-o-icon>
+            Move to Pending
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)">
+            <check-o-icon class="dropdown-icon"></check-o-icon>
+            Close
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)">
+            <inbox-o-icon class="dropdown-icon"></inbox-o-icon>
+            Reopen
+          </b-dropdown-item>
+        </b-dropdown>
+        <q-btn borderless
+               flat
+               class="contact-activities-actions__drawer_btn"
+               @click="$emit('toggleDrawer')">
+          <information-circle-icon/>
+        </q-btn>
+        <q-btn borderless
+               flat
+               class="contact-activities-actions__mobile_btn"
+               @click="$emit('toggleDetails')">
+          <information-circle-icon/>
+        </q-btn>
+      </div>
+      <div class="contact-activities-actions__desktop">
+        <q-btn
+          borderless
+          flat
+          no-caps
+          type="a"
+          color="primary"
+          class="text-decoration-none mr-2"
+          v-if="hasUnreads"
+          @click="$emit('markAllAsRead')">
+          <span class="mx-2">
+            Mark All as Read ({{ unreadCount }})
+          </span>
+        </q-btn>
+        <q-btn
+          v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
+          borderless
+          flat
+          no-caps
+          type="a"
+          color="primary"
+          class="text-decoration-none"
+          :disable="isUpdatingStatus"
+          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
+          <q-tooltip anchor="top middle"
+                     self="center middle">
+            Move to Pending
+          </q-tooltip>
+          <span v-if="!isUpdatingStatus"
+                class="mx-2">
+            <timer-o-icon></timer-o-icon>
+          </span>
+          <q-spinner-bars v-if="isUpdatingStatus"
+                          class="pl-1 pr-1"
+                          color="primary"
+                          size="20px"
+          />
+        </q-btn>
+        <q-btn
+          v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+          borderless
+          flat
+          no-caps
+          type="a"
+          color="primary"
+          class="text-decoration-none"
+          :disable="isUpdatingStatus"
+          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
+          <q-tooltip anchor="top middle"
+                     self="center middle">
+            Reopen
+          </q-tooltip>
+          <span v-if="!isUpdatingStatus"
+                class="mx-2">
+            <inbox-o-icon></inbox-o-icon>
+          </span>
+          <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_OPEN"
+                          class="pl-1 pr-1"
+                          color="primary"
+                          size="20px"
+          />
+        </q-btn>
+        <q-btn
+          v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+          borderless
+          flat
+          no-caps
+          type="a"
+          color="primary"
+          class="text-decoration-none"
+          :disable="isUpdatingStatus"
+          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
+          <q-tooltip anchor="top middle"
+                     self="center middle">
+            Close
+          </q-tooltip>
+          <span v-if="!isUpdatingStatus"
+                class="mx-2">
+            <check-o-icon></check-o-icon>
+          </span>
+          <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_CLOSED"
+                          class="pl-1 pr-1"
+                          color="primary"
+                          size="20px"
+          />
+        </q-btn>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -100,11 +149,23 @@ import CheckOIcon from 'components/icons/check-o-icon'
 import * as ContactTaskStatus from 'src/constants/contact-task-status.js'
 import InboxOIcon from 'components/icons/inbox-o-icon'
 import talk2Api from 'src/plugins/api/api'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
+import MailOpenIcon from 'components/icons/mail-open-icon'
+import EllipsisIcon from 'components/icons/ellipsis-icon'
+import BackButton from 'components/back-button'
 
 export default {
   name: 'contact-activities-header',
 
-  components: { InboxOIcon, CheckOIcon, TimerOIcon },
+  components: {
+    InboxOIcon,
+    CheckOIcon,
+    TimerOIcon,
+    InformationCircleIcon,
+    MailOpenIcon,
+    EllipsisIcon,
+    BackButton
+  },
 
   props: {
     contact: {
@@ -159,6 +220,18 @@ export default {
         this.isUpdatingStatus = false
         this.nextStat = null
       })
+    },
+    back () {
+      let path = this.$route.path.split('/')
+      path.pop()
+      path.pop()
+
+      if (!isNaN(path[(path.length - 1)] / 1)) {
+        path.pop()
+        path.pop()
+      }
+
+      this.$router.push(path.join('/'))
     }
   }
 }

@@ -144,13 +144,25 @@
           <template #button-content>
             <ellipse-icon></ellipse-icon>
           </template>
-          <b-dropdown-item href="" @click="onEditColumnsClicked"><i class="fa fa-bars"></i> Edit Columns</b-dropdown-item>
-          <b-dropdown-item href="#" :disabled="true"><i class="fa fa-crosshairs"></i> Power Dialer</b-dropdown-item>
-          <b-dropdown-item href="#" :disabled="true"><i class="fa fa-file-csv"></i> Export as CSV</b-dropdown-item>
+          <b-dropdown-item href="" @click="onEditColumnsClicked">
+            <edit-hamburger-icon></edit-hamburger-icon>
+            Edit Columns
+          </b-dropdown-item>
+          <b-dropdown-item href="#" :disabled="true">
+            <power-dialer-mobile-icon width="14" height="14" color="#62666E"></power-dialer-mobile-icon>
+            Power Dialer
+          </b-dropdown-item>
+          <b-dropdown-item href="#" :disabled="true">
+            <export-icon></export-icon>
+            Export as CSV
+          </b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
                            @click="onRemoveList">
-            <i class="fa fa-trash-alt"></i> Delete
+            <delete-red-icon></delete-red-icon>
+            <span class="text-danger">
+              Delete
+            </span>
           </b-dropdown-item>
         </b-dropdown>
       </div>
@@ -241,9 +253,17 @@ import EllipseIcon from 'components/icons/ellipse-icon'
 import SearchIcon from 'components/icons/search-icon'
 import PlusIcon from 'components/icons/plus-icon'
 import Search from 'components/search'
+import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
+import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import ExportIcon from 'components/icons/export-icon'
+import DeleteRedIcon from 'components/icons/delete-red-icon'
 
 export default {
   components: {
+    DeleteRedIcon,
+    ExportIcon,
+    PowerDialerMobileIcon,
+    EditHamburgerIcon,
     Search,
     PlusIcon,
     SearchIcon,

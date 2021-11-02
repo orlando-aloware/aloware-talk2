@@ -8,10 +8,11 @@
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
           <div class="inbox-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
-            <inbox-searcher
-              @search="onSearch"
-              @closed="onSearchClosed"
-              @opened="onSearchOpened">
+            <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
+                            :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
+                            @search="onSearch"
+                            @closed="onSearchClosed"
+                            @opened="onSearchOpened">
             </inbox-searcher>
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
@@ -30,7 +31,8 @@
           </div>
         </template>
       </calls-header>
-      <div class="w-100">
+      <div class="w-100"
+           v-if="!isSearch">
         <q-btn-toggle
           class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
@@ -81,29 +83,35 @@
           </template>
         </q-btn-toggle>
       </div>
-        <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
-             ref="taskListScroller"
-             @scroll="handleScroll">
-          <inbox-task-list :contacts="contacts"
-                           :loading-contacts="isFetchingContacts"
-                           :search-text="searchText"
-                           @onItemSelected="onItemSelected">
-          </inbox-task-list>
-          <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
-            <b-overlay :show="isLoadingMore || isFetchingContacts"
-                       rounded="sm"
-                       variant="white">
-              <template #overlay>
-                <div class="text-center">
-                  <q-spinner-bars
-                    color="primary"
-                    size="2em"
-                  />
-                </div>
-              </template>
-            </b-overlay>
-          </div>
+      <search-toggle ref="searchToggle"
+                     v-if="isSearch"
+                     @searching="searching"
+                     @closed="onSearchClosed">
+      </search-toggle>
+      <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+           ref="taskListScroller"
+           @scroll="handleScroll">
+        <inbox-task-list :contacts="contacts"
+                         :loading-contacts="isFetchingContacts"
+                         :search-text="searchText"
+                         :is-search="isSearch"
+                         @onItemSelected="onItemSelected">
+        </inbox-task-list>
+        <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
+          <b-overlay :show="isLoadingMore || isFetchingContacts"
+                     rounded="sm"
+                     variant="white">
+            <template #overlay>
+              <div class="text-center">
+                <q-spinner-bars
+                  color="primary"
+                  size="2em"
+                />
+              </div>
+            </template>
+          </b-overlay>
         </div>
+      </div>
     </div>
 </template>
 
@@ -119,6 +127,7 @@ import LineAndRingGroupSelector from 'components/generic-selectors/line-and-ring
 import { inboxMixin } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
+import SearchToggle from 'components/search-toggle'
 
 let scrollTimeout
 export default {
@@ -126,7 +135,7 @@ export default {
 
   mixins: [inboxMixin],
 
-  components: { InboxSearcher, FilterIcon, LineAndRingGroupSelector, InboxTaskList, CallsHeader },
+  components: { SearchToggle, InboxSearcher, FilterIcon, LineAndRingGroupSelector, InboxTaskList, CallsHeader },
 
   computed: {
     ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts']),
@@ -148,7 +157,8 @@ export default {
 
   data () {
     return {
-      searchText: ''
+      searchText: '',
+      isSearch: false
     }
   },
 
@@ -172,7 +182,6 @@ export default {
         }
       }, 66)
     },
-
     updateContacts (updatedContact) {
       let index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
@@ -255,13 +264,29 @@ export default {
     onSearchOpened () {
       this.setHasMoreContacts(null)
       this.setContacts([])
+      this.isSearch = true
+      this.$nextTick(function () {
+        this.$refs.searchToggle.inputFocus()
+      }.bind(this))
     },
     onSearchClosed () {
       this.searchText = ''
       this.setContacts([])
+      this.isSearch = false
 
       if (this.$route.params.status === this.statusText || this.$route.name === 'Inbox') {
         this.loadContactTasks()
+      }
+    },
+
+    searching (value) {
+      if ((value && value.length >= 3) || value === '') {
+        if (value === '') {
+          this.setContacts([])
+        } else {
+          this.searchText = value
+          this.loadContactTasks()
+        }
       }
     }
   },
@@ -377,15 +402,6 @@ export default {
       this.setContacts([])
       this.loadContactTasks()
     },
-    'searchText': function (value) {
-      if ((value && value.length >= 3) || value === '') {
-        if (value === '') {
-          this.setContacts([])
-        } else {
-          this.loadContactTasks()
-        }
-      }
-    },
     'lineOrRingGroupFilter': function () {
       this.loadContactTasks()
     },
@@ -405,6 +421,11 @@ export default {
     '$route.params.id': function (value) {
       if (!value) {
         this.setSelectedContact({})
+      }
+    },
+    '$route.params.channel': function () {
+      if (this.$route.name === 'Inbox Channel') {
+        this.isSearch = false
       }
     }
   }
