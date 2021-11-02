@@ -10,7 +10,8 @@
         @on-selected-item="onSelectedCallDisposition"
         :list-items="callDispositions"
         :display-count="4"
-        identity="call-disposition" />
+        identity="call-disposition"
+        default-label="No Call Dispositions" />
     </div>
 
     <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
@@ -23,7 +24,8 @@
         @on-selected-item="onSelectedContactDisposition"
         :list-items="dispositionStatuses"
         :display-count="6"
-        identity="contact-disposition" />
+        identity="contact-disposition"
+        default-label="No Contact Dispositions" />
     </div>
 
     <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
@@ -32,8 +34,14 @@
       </div>
     </div>
     <div class="d-flex t-menu__content over-flow px-3 pb-0">
-      <VmDropSelector />
-      <q-chip
+      <!-- <VmDropSelector /> -->
+      <ChipsEllipsis
+        @on-selected-item="onSelectedContactDisposition"
+        :list-items="[]"
+        :display-count="6"
+        identity="contact-disposition"
+        default-label="No Voicemail" />
+      <!-- <q-chip
         v-for="chip in voicemail"
         :key="chip.name"
         color="grey-7"
@@ -57,7 +65,7 @@
         <b-dropdown-item href="#">
           Option 201
         </b-dropdown-item>
-      </b-dropdown>
+      </b-dropdown> -->
     </div>
 
   </div>
@@ -67,13 +75,13 @@
 
 import { mapState } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
-import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
+// import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 
 export default {
   name: 'SessionCallDisposition',
   components: {
-    ChipsEllipsis,
-    VmDropSelector
+    ChipsEllipsis
+    // VmDropSelector
   },
   computed: {
     ...mapState([
