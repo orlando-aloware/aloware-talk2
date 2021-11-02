@@ -1,7 +1,7 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column">
       <div class="header w-100" v-if="$route.params.channel !== 'mentions'"
-           :class="{ 'border-bottom-0': isSearch }">
+           :class="{ 'border-bottom-transparent': isSearch }">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
