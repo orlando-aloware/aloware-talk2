@@ -40,7 +40,7 @@
         outline
         square
         :class="`p-0 mx-2 ${chip.outlined ? '' : 'text-blue'}`">
-        {{ chip.label }}
+        -{{ chip.label }}
       </q-chip>
       <b-dropdown
         text="..."
@@ -92,60 +92,8 @@ export default {
   data () {
     return {
       voicemail: [
-        { label: 'Default Voicemail' },
-        { label: 'Follw Up VM' }
-      ],
-      contactDisposition: [
-        {
-          name: 'interested',
-          label: 'Interested',
-          outlined: false,
-          color: ''
-        },
-        {
-          name: 'waiting',
-          label: 'Waiting',
-          outlined: true,
-          color: ''
-        },
-        {
-          name: 'no-answer',
-          label: 'No Answer',
-          outlined: true,
-          color: ''
-        },
-        {
-          name: 'need-research',
-          label: 'Need Research',
-          outlined: true,
-          color: ''
-        }
-      ],
-      callDisposition: [
-        {
-          name: 'busy',
-          label: 'Busy',
-          outlined: true,
-          color: 'warning'
-        },
-        {
-          name: 'connected',
-          label: 'Connected',
-          outlined: true,
-          color: 'success'
-        },
-        {
-          name: 'inbound-call-to-uk',
-          label: 'Inbound Call to UK',
-          outlined: true,
-          color: 'violet'
-        },
-        {
-          name: 'dropped',
-          label: 'Dropped',
-          outlined: false,
-          color: 'primary'
-        }
+        // { label: 'Default Voicemail' },
+        // { label: 'Follw Up VM' }
       ]
     }
   }

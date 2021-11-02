@@ -3,12 +3,16 @@
     <q-card flat class="mt-0 p-0">
       <q-toolbar class="mt-2 shadow-2">
         <q-toolbar-title>
-          <div class="text-subtitle1 text-weight-medium">About</div>
+          <div class="text-subtitle1 text-weight-medium px-2">About</div>
         </q-toolbar-title>
       </q-toolbar>
     </q-card>
-    <q-card flat :disabled="sessionLoader" class="t-scroll-y1 mt-1 p-0 py-3">
-      <q-card-section
+    <q-card flat :disabled="sessionLoader" class="t-scroll-y1 mt-1 p-0 py-0">
+      <q-card-section class="p-0">
+        <ContactInfo
+          :is-contact-type="false" />
+      </q-card-section>
+      <!-- <q-card-section
         v-for="(f, i) in form"
         :key="`f.name-${i}`"
         class="py-0">
@@ -39,7 +43,7 @@
               :disabled="f.disabled" />
           </template>
         </div>
-      </q-card-section>
+      </q-card-section> -->
       <q-card-section>
 
       </q-card-section>
@@ -50,10 +54,11 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import InputField from 'components/contacts/contact-input-field'
-import SelectField from 'components/generic-selectors/user-selector'
-import SelectStateField from 'src/components/contacts/location-state-selector'
-import SelectCountryField from 'src/components/contacts/location-country-selector'
+// import InputField from 'components/contacts/contact-input-field'
+// import SelectField from 'components/generic-selectors/user-selector'
+// import SelectStateField from 'src/components/contacts/location-state-selector'
+// import SelectCountryField from 'src/components/contacts/location-country-selector'
+import ContactInfo from 'components/contacts/contact-information'
 
 export default {
   name: 'DetailsForm',
@@ -64,10 +69,11 @@ export default {
     }
   },
   components: {
-    InputField,
-    SelectField,
-    SelectStateField,
-    SelectCountryField
+    // InputField,
+    // SelectField,
+    // SelectStateField,
+    // SelectCountryField,
+    ContactInfo
   },
   computed: {
     ...mapGetters('powerDialer', [

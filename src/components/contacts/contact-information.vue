@@ -1,12 +1,12 @@
 <template>
   <b-card class="border-0 position-relative contact-about-wrapper">
-    <h4>About this contact</h4>
+    <h4 v-if="isContactType">About this contact</h4>
 
     <div :class="`information-container ${autoHeightClass}`">
       <div class="d-block mt-2"
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-0">Owner</p>
-        <user-selector v-model="contact.user_id"
+        <user-selector v-model="resources.user_id"
                        :disable="!hasPermissionTo('change contact ownership')"
                        :generic-styling="false"
                        :multiple="false"
@@ -28,14 +28,14 @@
                                       :outlined="false"
                                       :show-placeholder="false"
                                       custom-class="inline-select"
-                                      v-model="contact.disposition_status_id"
+                                      v-model="resources.disposition_status_id"
                                       @change="(eventPayload) => onUpdateFields(eventPayload, 'disposition_status_id')">
         </contact-disposition-selector>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Email</p>
-        <contact-input-field v-model="contact.email"
+        <contact-input-field v-model="resources.email"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'email')">
         </contact-input-field>
@@ -43,7 +43,7 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Company</p>
-        <contact-input-field v-model="contact.company_name"
+        <contact-input-field v-model="resources.company_name"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'company_name')">
         </contact-input-field>
@@ -51,7 +51,7 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Website</p>
-        <contact-input-field v-model="contact.website"
+        <contact-input-field v-model="resources.website"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'website')">
         </contact-input-field>
@@ -59,15 +59,15 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">City</p>
-        <contact-input-field v-model="contact.cnam_city"
+        <contact-input-field v-model="resources.cnam_city"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_city')">
         </contact-input-field>
       </div>
 
-      <div class="d-block" v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
+      <div class="d-block" v-if="resources.cnam_country && ['US', 'CA'].includes(resources.cnam_country)">
         <p class="text-muted custom-input-label mb-0">State</p>
-        <location-state-selector v-model="contact.cnam_state"
+        <location-state-selector v-model="resources.cnam_state"
                                  :contact="contact"
                                  :disabled="!hasPermissionTo('update contact')"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_state')">
@@ -76,7 +76,7 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Country</p>
-        <location-country-selector v-model="contact.cnam_country"
+        <location-country-selector v-model="resources.cnam_country"
                                    :contact="contact"
                                    :disabled="!hasPermissionTo('update contact')"
                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_country')">
@@ -85,7 +85,7 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Zip Code</p>
-        <contact-input-field v-model="contact.cnam_zipcode"
+        <contact-input-field v-model="resources.cnam_zipcode"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_zipcode')">
         </contact-input-field>
@@ -93,12 +93,12 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
-        <p>{{ contact.text_authorized | fixBooleanType }}</p>
+        <p>{{ resources.text_authorized | fixBooleanType }}</p>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Created At</p>
-        <p>{{ contact.created_at | fixFullDateUTCRelative }}</p>
+        <p>{{ resources.created_at | fixFullDateUTCRelative }}</p>
       </div>
 
       <div class="d-block">
@@ -113,19 +113,19 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Intake Source</p>
-        <p>{{ contact.intake_source | toUpperCase }}</p>
+        <p>{{ resources.intake_source | toUpperCase }}</p>
       </div>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
-        <contact-input-field v-model="contact.csf1"
+        <contact-input-field v-model="resources.csf1"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
         </contact-input-field>
       </div>
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
-        <contact-input-field v-model="contact.csf2"
+        <contact-input-field v-model="resources.csf2"
                              :disabled="!hasPermissionTo('update contact')"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
         </contact-input-field>
@@ -135,8 +135,9 @@
               variant="light"
               size="sm"
               class="contact-information-toggle"
+              v-if="isContactType"
               @click="onExpanded">
-      <i class="material-icons">{{ is_expanded ? 'expand_less' : 'expand_more' }}</i>
+      <i class="material-icons">{{ isExpanded ? 'expand_less' : 'expand_more' }}</i>
     </b-button>
   </b-card>
 </template>
@@ -157,7 +158,11 @@ export default {
   mixins: [aclMixin],
 
   props: {
-    firstOutboundCall: {}
+    firstOutboundCall: {},
+    isContactType: {
+      type: Boolean,
+      default: true
+    }
   },
 
   components: {
@@ -169,10 +174,25 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactAttributes']),
+    ...mapGetters('contacts', {
+      contact: 'contact',
+      contactAttributes: 'contactAttributes'
+    }),
+    ...mapGetters('powerDialer', {
+      pdContact: 'contact',
+      pdContactAttributes: 'contactAttributes'
+    }),
+
+    resources () {
+      if (this.isContactType) {
+        return this.contact
+      } else {
+        return this.pdContact
+      }
+    },
 
     autoHeightClass () {
-      return this.is_expanded ? 'auto-height' : ''
+      return this.isExpanded ? 'auto-height' : ''
     },
 
     timeOfFirstOutboundCall () {
@@ -185,7 +205,7 @@ export default {
 
     timeToFirstOutboundCall () {
       if (this.contact && this.firstOutboundCall) {
-        let contactCreated = window.moment(this.contact.created_at)
+        let contactCreated = window.moment(this.resources.created_at)
         let callCreated = window.moment(this.firstOutboundCall.created_at)
 
         let formatted = this.formatHumanized(callCreated.diff(contactCreated))
@@ -194,6 +214,13 @@ export default {
       }
 
       return '--:--'
+    },
+    isExpanded () {
+      if (this.isContactType) {
+        return this.is_expanded
+      } else {
+        return true
+      }
     }
   },
 
@@ -212,14 +239,19 @@ export default {
     },
 
     getAttributes () {
-      talk2Api.V1.contact.getAttributes(this.contact.id)
+      talk2Api.V1.resources.getAttributes(this.resources.id)
         .then(response => {
           this.setContactAttributes(response.data)
         })
     },
 
     onUpdateFields (value, prop) {
-      this.contact[prop] = value
+      if (this.isContactType) {
+        this.contact[prop] = value
+      } else {
+        this.pdContact[prop] = value
+      }
+
       this.updateChangedContactProperties({
         name: prop,
         value: value
