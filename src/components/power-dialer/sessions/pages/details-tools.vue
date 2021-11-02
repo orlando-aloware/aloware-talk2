@@ -24,8 +24,7 @@ export default {
   computed: {
     ...mapGetters('powerDialer', [
       'sessionLoader',
-      'contact',
-      'sessionLoader'
+      'contact'
     ])
   },
   components: {

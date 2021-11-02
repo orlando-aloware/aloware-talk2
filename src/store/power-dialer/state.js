@@ -138,6 +138,7 @@ export default function () {
     datatableLoader: false,
     search: '',
     contact: null,
-    sessionLoader: false
+    sessionLoader: false,
+    changingSelectedContact: false
   }
 }

@@ -166,5 +166,14 @@ export default {
   },
   TOGGLE_SESSION_LOADER: (state, value) => {
     state.sessionLoader = value
+  },
+  CHANGING_SELECTED_CONTACT: (state, isChanging) => {
+    state.changingSelectedContact = isChanging
+  },
+  SET_CONTACT: (state, contact) => {
+    state.contact = contact
+  },
+  SET_CONTACTS: (state, payload) => {
+    state.listItems[state.selectedList.id].data = payload
   }
 }

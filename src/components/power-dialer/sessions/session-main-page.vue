@@ -45,7 +45,6 @@ export default {
   },
   methods: {
     selectTab (val) {
-      console.log('val :>> ', val)
       this.panel = val.name
     }
   },

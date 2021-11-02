@@ -184,6 +184,18 @@ export default {
         this.selectedLine &&
         this.messageComposer.sms.phone_number &&
         this.messageComposer.sms.phone_number.length > 0
+    },
+    messageBody () {
+      return this.messageComposer.sms.body
+    },
+    messageAttachments () {
+      return this.messageComposer.sms.attachments
+    },
+    messageGifUrl () {
+      return this.messageComposer.sms.gif_url
+    },
+    test () {
+      return (this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
     }
   },
   data () {

@@ -45,6 +45,15 @@ export default {
   setSearch: ({ commit }, value) => {
     commit('SET_SEARCH', value)
   },
+  selectedContactChanging: ({ commit }, isChanging) => {
+    commit('CHANGING_SELECTED_CONTACT', isChanging)
+  },
+  setContact: ({ commit }, contact) => {
+    commit('SET_CONTACT', contact)
+  },
+  setContacts: ({ commit }, payload) => {
+    commit('SET_CONTACTS', payload)
+  },
 
   /**
    * DIRECTORIES
