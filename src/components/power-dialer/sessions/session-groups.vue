@@ -67,7 +67,7 @@
 
                     <q-item-section class="pl-2">
                       <q-item-label>{{ item.first_name }} {{ item.last_name }}</q-item-label>
-                      <q-item-label caption lines="2">{{ item.phone_number }}</q-item-label>
+                      <q-item-label caption lines="2">--{{ item.phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
                       <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
                     </q-item-section>
 
