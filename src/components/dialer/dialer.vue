@@ -832,7 +832,7 @@ export default {
 
     startWrapUpTimer () {
       this.setDialerCurrentStatus('WRAP_UP')
-      let wrapUpTimer = this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
+      let wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
       if (wrapUpTimer < 0) {
         this.backToDial()

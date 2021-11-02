@@ -72,7 +72,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'templates']),
+    ...mapState(['templates']),
 
     placeholder () {
       if (this.templateId) {

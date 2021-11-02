@@ -282,6 +282,11 @@ export default {
         return window.axios.get(`${suffixV2}contacts-list/public`)
       }
     },
+    filters: {
+      get () {
+        return window.axios.get(`${suffixV2}contacts/filters`)
+      }
+    },
     mentions: {
       get (params) {
         return window.axios.get(`${suffixV2}mentions`, params)

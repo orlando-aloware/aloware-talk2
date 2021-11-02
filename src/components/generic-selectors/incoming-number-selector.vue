@@ -115,7 +115,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'users', 'campaigns']),
+    ...mapState(['users', 'campaigns']),
     placeholder () {
       switch (true) {
         case this.multiple && this.phoneNumber.length < 1:

@@ -134,7 +134,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'campaigns']),
+    ...mapState(['campaigns']),
 
     placeholder () {
       switch (true) {

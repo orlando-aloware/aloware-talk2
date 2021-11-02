@@ -16,6 +16,7 @@
     <inbox-task-item v-for="(contact, index) in contacts" :key="`contact-item-${index}`"
                      :contact="contact"
                      :loading-contact="loadingContacts"
+                     :is-search="isSearch"
                      @onItemSelected="onItemSelected">
     </inbox-task-item>
   </div>
@@ -39,6 +40,11 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    isSearch: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   methods: {

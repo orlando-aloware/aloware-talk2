@@ -18,7 +18,6 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
-import { mapGetters, mapState } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
 
 export default {
@@ -26,8 +25,6 @@ export default {
   mixins: [contactMixin],
   components: { VueMultiselect },
   computed: {
-    ...mapGetters({}),
-    ...mapState({ currentCompany: 'currentCompany' }),
     formattedLineOptions () {
       let contactLines = []
       if (this.contactCampaignsFromCommunications.length > 0) {

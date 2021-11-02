@@ -207,7 +207,7 @@ export default {
     },
 
     isPushContactToCrmEnabled () {
-      return this.resellerIdToPushContactToCrm.includes(this.currentCompany.reseller_id)
+      return this.currentCompany ? this.resellerIdToPushContactToCrm.includes(this.currentCompany.reseller_id) : false
     }
   },
 
@@ -784,8 +784,12 @@ export default {
         return
       }
 
-      if (commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
+      if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
+        setTimeout(() => {
+          const containerEl = document.querySelector('.contact-activities .scrollbar-white')
+          containerEl.scrollTop = element.offsetTop
+        }, 500)
       }
 
       let highlighted = document.querySelector('.shine')
@@ -812,7 +816,7 @@ export default {
     }, 200),
 
     checkEmailCapability () {
-      if (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled) {
+      if (this.currentCompany && (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled)) {
         this.canEmail = true
       } else {
         this.canEmail = false
@@ -832,7 +836,6 @@ export default {
 
     updateMessageComposer () {
       if (this.selectedCampaign && this.selectedCampaign.id && this.contact && this.contact.id) {
-        this.fetchIncomingNumber()
         this.checkEmailCapability()
       }
     },

@@ -22,7 +22,7 @@
               menu-shrink
               outlined
               dense
-              v-model="tags"
+              v-model="selectedTags"
               :options="tagsOptions"
               :placeholder="placeholder"
               :disable="disable"
@@ -78,6 +78,7 @@ import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import { mapState } from 'vuex'
 
 export default {
   name: 'tags-selector',
@@ -135,6 +136,7 @@ export default {
   },
 
   computed: {
+    ...mapState(['tags']),
     getLabel () {
       return tag => {
         return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
@@ -147,12 +149,12 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && this.tags.length < 1:
+        case this.multiple && this.selectedTags.length < 1:
           return 'Select Tags'
-        case !this.multiple && !this.tags:
+        case !this.multiple && !this.selectedTags:
           return 'Select Tag'
-        case this.multiple && this.tags.length > 0:
-        case !this.multiple && this.tags:
+        case this.multiple && this.selectedTags.length > 0:
+        case !this.multiple && this.selectedTags:
         default:
           return ''
       }
@@ -164,7 +166,7 @@ export default {
       isEdit: false,
       tagsArray: [],
       tagsOptions: [],
-      tags: this.value,
+      selectedTags: this.value,
       selectWidth: 0
     }
   },
@@ -205,6 +207,11 @@ export default {
         return
       }
 
+      if (this.tags && this.tags.length > 0) {
+        this.tagsArray = this.tags
+        return
+      }
+
       return talk2Api.V1.tags.get({
         params: { full_load: true }
       }).then(res => {
@@ -221,10 +228,10 @@ export default {
 
   watch: {
     value () {
-      this.tags = this.value
+      this.selectedTags = this.value
     },
     tags (val) {
-      if (this.tags !== this.value) {
+      if (this.selectedTags !== this.value) {
         this.$emit('change', val)
       }
     }

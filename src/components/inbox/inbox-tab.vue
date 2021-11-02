@@ -94,6 +94,7 @@
         <inbox-task-list :contacts="contacts"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
+                         :is-search="isSearch"
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
         <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
@@ -181,7 +182,6 @@ export default {
         }
       }, 66)
     },
-
     updateContacts (updatedContact) {
       let index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
@@ -285,6 +285,7 @@ export default {
         if (value === '') {
           this.setContacts([])
         } else {
+          this.searchText = value
           this.loadContactTasks()
         }
       }

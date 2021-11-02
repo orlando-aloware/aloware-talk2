@@ -16,23 +16,30 @@
 
 import StatsAndMetrics from 'components/stats/stats-and-metrics'
 import AddMetricGroup from 'components/stats/metric-group/add-metric-group'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'Stats',
+
   components: {
     StatsAndMetrics,
     AddMetricGroup
   },
+
   data () {
     return {
-      metricGroupId: null
+      metricGroupId: null,
+      loadingMetricGroups: false
     }
   },
+
   computed: {
-    ...mapState('stats', ['metricGroups'])
+    ...mapState('stats', ['metricGroups']),
+    ...mapState('auth', ['profile'])
   },
+
   methods: {
+    ...mapActions('stats', ['setMetricGroups']),
     focusToNewMetricGroup (metricGroupId) {
       let clearFocusInterval = setInterval(() => {
         const metricGroup = this.metricGroups.find(metricGroup => metricGroup.id === metricGroupId)
@@ -45,6 +52,36 @@ export default {
     },
     updated () {
       this.metricGroupId = null
+    },
+
+    getMetricGroups () {
+      if (!this.profile) {
+        return
+      }
+
+      this.loadingMetricGroups = true
+      return this.$axios
+        .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
+          params: {
+            include_metrics: true
+          }
+        })
+        .then(response => {
+          this.loadingMetricGroups = false
+          this.setMetricGroups(response.data)
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.error(err)
+          this.loadingMetricGroups = false
+          return Promise.reject()
+        })
+    }
+  },
+
+  mounted () {
+    if (this.metricGroups && this.metricGroups.length < 1) {
+      this.getMetricGroups()
     }
   }
 }

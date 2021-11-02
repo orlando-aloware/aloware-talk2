@@ -254,7 +254,7 @@ export default {
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
     ...mapState(['currentCompany']),
     defaultContactDateFilter () {
-      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+      if (this.currentCompany && this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
       }
       return 'last_engagement_at'

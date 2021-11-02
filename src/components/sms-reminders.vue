@@ -1,7 +1,7 @@
 <template>
   <div class="sms-reminders-wrapper border-0 p-0">
     <div>
-      <div v-if="!campaignId">
+      <div v-if="campaignId">
         <q-select class="p-1"
                   use-input
                   clearable
@@ -12,6 +12,13 @@
                   :options="campaigns"
                   @filter="filterFn"
                   v-model="selectedCampaign">
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="no-results text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
         </q-select>
       </div>
       <div class="pb-2">
@@ -20,7 +27,7 @@
                size="md"
                color="primary"
                :loading="loading"
-               v-if="recentshowSendSmsReminderButton"
+               v-if="recentShowSendSmsReminderButton"
                @click="sendDefaultSmsReminder">
           <div class="mx-2 px-1">
             Send SMS Reminder
@@ -54,8 +61,8 @@ export default {
     return {
       auth: auth,
       loading: false,
-      selectedCampaign: this.campaign_id,
-      recentshowSendSmsReminderButton: false,
+      selectedCampaign: this.campaignId,
+      recentShowSendSmsReminderButton: false,
       filteredCampaigns: null
     }
   },
@@ -71,9 +78,9 @@ export default {
 
   methods: {
     showSendSmsReminderButton () {
-      let appointmentDate = this.$moment(new Date(this.appointmentDatetime)).tz('UTC')
-      this.recentshowSendSmsReminderButton = appointmentDate.isAfter()
-      return this.recentshowSendSmsReminderButton
+      // let appointmentDate = this.$moment(new Date(this.appointmentDatetime)).tz('UTC')
+      this.recentShowSendSmsReminderButton = true // appointmentDate.isAfter()
+      return this.recentShowSendSmsReminderButton
     },
 
     sendDefaultSmsReminder () {

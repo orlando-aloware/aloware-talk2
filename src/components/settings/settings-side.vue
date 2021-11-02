@@ -93,7 +93,6 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'ringGroups']),
     ...mapState('settings', ['userClone', 'changedUserProperties', 'user']),
     searchResult () {
       let query = this.searchText.trim().toLocaleLowerCase()

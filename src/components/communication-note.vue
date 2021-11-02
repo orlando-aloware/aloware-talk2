@@ -30,7 +30,6 @@
 <script>
 import _ from 'lodash'
 import { aclMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
 export default {
   name: 'communication-note',
 
@@ -63,7 +62,6 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany']),
 
     hasUnsavedChanges () {
       return this.communication && this.note !== this.communication.notes

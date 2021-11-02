@@ -70,7 +70,6 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'ringGroups']),
     ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts']),
 
     nextPage () {

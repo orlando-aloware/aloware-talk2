@@ -86,7 +86,7 @@
           </q-select>
         </div>
       </div>
-      <div class="w-100" v-if="$route.params.channel === 'mentions'">
+      <div class="w-100" v-if="$route.params.channel === 'mentions' && !isSearch">
         <q-btn-toggle
           class="custom-toggle-button mx-2 mt-2 mb-1"
           no-caps
@@ -221,7 +221,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter', 'hasMoreCommunications', 'isSearcherOpen']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter', 'hasMoreCommunications']),
 
     nextPage () {
       return this.currentPage + 1
@@ -244,6 +244,7 @@ export default {
       currentPage: 0,
       isLoadingMore: false,
       isLoaded: false,
+      isScrolled: false,
       pagination: {
         type: Object,
         required: true
@@ -283,140 +284,6 @@ export default {
     }
   },
 
-  created () {
-    this.resetFilters()
-    this.setMentionType()
-    this.$VueEvent.listen('new_communication', (data) => {
-      // disable live dashboard for end clients
-      if (this.hasRole('Company Reporter Access')) {
-        return
-      }
-      // check data loaded
-      if (this.pagination.current_page && this.pagination.current_page === 1) {
-        // check new communication exists in the old list
-        let found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (!found.length) {
-          if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.checkCommunicationMatchesRingGroup(data)) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
-
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
-          }
-        }
-      }
-    })
-
-    this.$VueEvent.listen('update_communication', (data) => {
-      // disable live dashboard for end clients
-      if (this.hasRole('Company Reporter Access')) {
-        return
-      }
-      // check data loaded
-      if (this.pagination.current_page) {
-        // check new communication exists in the old list
-        let found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (found.length) {
-          // update communication
-          data = _.extend({}, found[0], data)
-          if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.checkCommunicationMatchesRingGroup(data)) {
-            this.$set(this.communications, this.communications.indexOf(found[0]), data)
-          } else {
-            this.communications = this.communications.filter(communication => {
-              return communication.id !== data.id
-            })
-            this.pagination.total -= 1
-          }
-        } else {
-          // add the communication if it's not already there and if it matches the criteria
-          if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.pagination.current_page === 1 &&
-            this.communications.length > 0 &&
-            data.id > this.communications[0].id) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
-
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
-          }
-        }
-      }
-    })
-
-    this.$VueEvent.listen('delete_communication', (data) => {
-      // check data loaded
-      if (this.pagination.current_page) {
-        // try to find the communication
-        let found = this.communications.find(communication => communication.id === data.id)
-        if (found) {
-          // remove it from the list
-          this.communications.splice(this.communications.indexOf(found), 1)
-          this.pagination.total -= 1
-        }
-      }
-    })
-
-    this.$VueEvent.listen('mark_contact_communications_all_as_read', (data) => {
-      // get current contact's communications
-      let contactCommunications = this.communications.filter(communication => communication.contact.id === data.id)
-
-      // iterate through and update is_read value
-      contactCommunications.forEach((communication) => {
-        let index = this.communications.findIndex(item => item.id === communication.id)
-        this.communications[index].is_read = true
-      })
-
-      // set updated communications
-      this.setCommunications(this.communications)
-    })
-
-    let _this = this
-    if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-      this.getCommunications(this.filter).then(function () {
-        if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(_this.$route.name)) {
-          let communication
-
-          if (_this.$route.name === 'Inbox Contact Mention Communication') {
-            communication = _this.communications.find(item => item.mention_subject_id.toString() === _this.$route.params.communicationId.toString())
-          } else {
-            communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
-          }
-
-          if (communication) {
-            _this.setSelectedCommunication(communication)
-          }
-        }
-      })
-    }
-  },
-
   methods: {
     ...mapActions('inbox', [
       'gettingTasksList',
@@ -425,8 +292,7 @@ export default {
       'setChannelClonedFilter',
       'resetChannelChangedFilterFields',
       'setSelectedFilter',
-      'setHasMoreCommunications',
-      'setSearcherOpen']),
+      'setHasMoreCommunications']),
 
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
@@ -686,12 +552,14 @@ export default {
           this.isLoadingMore = false
           this.isLoaded = true
           this.pagination = _.clone(response.data)
+          this.isScrolled = false
           delete this.pagination.data
         })
     },
 
     handleScroll (el) {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
+        this.isScrolled = true
         this.onTaskListBottomScroll()
       }
     },
@@ -793,6 +661,7 @@ export default {
       this.searchText = value
     },
     onSearchOpened () {
+      this.filter.search_text = ''
       this.setHasMoreCommunications(null)
       this.setCommunications([])
       this.isSearch = true
@@ -803,7 +672,7 @@ export default {
     onSearchClosed () {
       this.searchText = null
       this.filter.page = 1
-      this.filter.search_text = null
+      this.filter.search_text = this.searchText
       this.isSearch = false
       this.getCommunications(this.filter)
     },
@@ -825,8 +694,8 @@ export default {
     'activeChannel': function (value) {
       if (this.$route.name === 'Inbox Channel') {
         this.resetFilters()
-        this.getCommunications(this.filter)
       }
+      this.scrollerTopClass = 'mt-0'
     },
     'searchText': function (value) {
       if ((value && value.length >= 3) || value === '') {
@@ -858,16 +727,132 @@ export default {
     filter: {
       deep: true,
       handler () {
-        if (this.isLoaded) {
+        if (['Inbox Channel', 'Inbox Contact Mention Communication', 'Inbox Contact', 'Inbox Channel Task Status'].includes(this.$route.name) && !this.isScrolled) {
           this.getCommunications(this.filter)
         }
       }
     }
   },
 
+  created () {
+    this.resetFilters()
+
+    this.setMentionType()
+
+    this.$VueEvent.listen('new_communication', (data) => {
+      // disable live dashboard for end clients
+      if (this.hasRole('Company Reporter Access')) {
+        return
+      }
+      // check data loaded
+      if (this.pagination.current_page && this.pagination.current_page === 1) {
+        // check new communication exists in the old list
+        let found = this.communications.filter(communication => {
+          return communication.id === data.id
+        })
+        if (!found.length) {
+          if (this.checkCommunicationMatchesSearch(data) &&
+            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesUserAccessibility(data) &&
+            this.checkCommunicationMatchesCampaign(data) &&
+            this.checkCommunicationMatchesWorkflow(data) &&
+            this.checkCommunicationMatchesUser(data) &&
+            this.checkCommunicationMatchesRingGroup(data)) {
+            this.pagination.total += 1
+            // push new data to top of array
+            this.communications.unshift(data)
+
+            if (this.communications.length > this.filter.per_page) {
+              // push out last data from bottom of array
+              this.communications.pop()
+            }
+          }
+        }
+      }
+    })
+
+    this.$VueEvent.listen('update_communication', (data) => {
+      // disable live dashboard for end clients
+      if (this.hasRole('Company Reporter Access')) {
+        return
+      }
+      // check data loaded
+      if (this.pagination.current_page) {
+        // check new communication exists in the old list
+        let found = this.communications.filter(communication => {
+          return communication.id === data.id
+        })
+        if (found.length) {
+          // update communication
+          data = _.extend({}, found[0], data)
+          if (this.checkCommunicationMatchesSearch(data) &&
+            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesUserAccessibility(data) &&
+            this.checkCommunicationMatchesCampaign(data) &&
+            this.checkCommunicationMatchesWorkflow(data) &&
+            this.checkCommunicationMatchesUser(data) &&
+            this.checkCommunicationMatchesRingGroup(data)) {
+            this.$set(this.communications, this.communications.indexOf(found[0]), data)
+          } else {
+            this.communications = this.communications.filter(communication => {
+              return communication.id !== data.id
+            })
+            this.pagination.total -= 1
+          }
+        } else {
+          // add the communication if it's not already there and if it matches the criteria
+          if (this.checkCommunicationMatchesSearch(data) &&
+            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesUserAccessibility(data) &&
+            this.checkCommunicationMatchesCampaign(data) &&
+            this.checkCommunicationMatchesWorkflow(data) &&
+            this.checkCommunicationMatchesUser(data) &&
+            this.pagination.current_page === 1 &&
+            this.communications.length > 0 &&
+            data.id > this.communications[0].id) {
+            this.pagination.total += 1
+            // push new data to top of array
+            this.communications.unshift(data)
+
+            if (this.communications.length > this.filter.per_page) {
+              // push out last data from bottom of array
+              this.communications.pop()
+            }
+          }
+        }
+      }
+    })
+
+    this.$VueEvent.listen('delete_communication', (data) => {
+      // check data loaded
+      if (this.pagination.current_page) {
+        // try to find the communication
+        let found = this.communications.find(communication => communication.id === data.id)
+        if (found) {
+          // remove it from the list
+          this.communications.splice(this.communications.indexOf(found), 1)
+          this.pagination.total -= 1
+        }
+      }
+    })
+
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', (data) => {
+      // get current contact's communications
+      let contactCommunications = this.communications.filter(communication => communication.contact.id === data.id)
+
+      // iterate through and update is_read value
+      contactCommunications.forEach((communication) => {
+        let index = this.communications.findIndex(item => item.id === communication.id)
+        this.communications[index].is_read = true
+      })
+
+      // set updated communications
+      this.setCommunications(this.communications)
+    })
+  },
+
   mounted () {
     let _this = this
-    this.setSearcherOpen(false)
 
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
       _this.filter.page = _this.nextPage
@@ -900,6 +885,22 @@ export default {
 
       this.makeSelectedItemVisible()
     })
+
+    if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
+      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(_this.$route.name)) {
+        let communication
+
+        if (_this.$route.name === 'Inbox Contact Mention Communication') {
+          communication = _this.communications.find(item => item.mention_subject_id.toString() === _this.$route.params.communicationId.toString())
+        } else {
+          communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
+        }
+
+        if (communication) {
+          _this.setSelectedCommunication(communication)
+        }
+      }
+    }
   }
 }
 </script>

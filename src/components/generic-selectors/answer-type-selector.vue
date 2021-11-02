@@ -16,7 +16,7 @@
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
-              :class="[ highlighted ? highlightedClass : '', customClass]"
+              :class="[ highlighted ? highlightedClass : '', customClass, 'text-grey-100']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMenu"
               @filter="filterFn">
@@ -33,8 +33,8 @@
         <q-item v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
           <q-item-section>
-            <q-item-label v-html="scope.opt.label"/>
-            <q-item-label caption>
+            <q-item-label class="fw-500 text-grey-100" v-html="scope.opt.label"/>
+            <q-item-label class="text-grey-100" caption>
               <div class="break-all">{{ scope.opt.description }}</div>
             </q-item-label>
           </q-item-section>

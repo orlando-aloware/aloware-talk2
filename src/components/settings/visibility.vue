@@ -76,6 +76,9 @@
       </b-form-row>
       <b-form-row v-if="user.line_access_limit">
         <b-col sm="12" md="12">
+          <b-alert :show="sortedCampaigns && sortedCampaigns.length < 1">Lines data not available</b-alert>
+        </b-col>
+        <b-col sm="12" md="12">
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-checkbox-group
               stacked

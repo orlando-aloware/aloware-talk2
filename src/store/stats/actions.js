@@ -47,5 +47,8 @@ export default {
   },
   deleteMetric: async ({ commit }, data) => {
     commit('REMOVE_METRICS', data)
+  },
+  resetStatVuex: ({ commit }) => {
+    commit('RESET_STAT_VUEX')
   }
 }

@@ -923,6 +923,7 @@ export default function (/* { ssrContext } */) {
         }
       }
     },
+
     plugins: [
       createPersistedState({
         key: 'AloWare_vuex'

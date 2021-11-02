@@ -45,7 +45,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'tagsFullyLoaded', 'tags']),
+    ...mapState(['tagsFullyLoaded', 'tags']),
     availableTags () {
       if (this.options) {
         return this.options.filter((tag) => {
