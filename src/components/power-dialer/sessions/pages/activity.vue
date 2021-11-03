@@ -1,10 +1,11 @@
 <template>
-  <b-overlay :show="changingSelectedContact"
+  <b-overlay :show="changingSelectedContact || sessionLoader"
              :opacity="0.85"
              class="h-100"
              variant="white"
              rounded="sm"
              v-if="authenticated">
+             {{ changingSelectedContact }} - {{sessionLoader}}
   <div class="row">
     <div class="col-12 p-1">
       <!-- <q-card flat class="p-3">
@@ -20,6 +21,8 @@
           :communications="filteredCommunications"
           :campaign-id="selectedCampaignId"
           @mark-all-as-read="markAllAsRead"
+          @toggleDrawer="toggleDrawer"
+          @toggleDetails="toggleDetails"
           :is-contact-type="false">
           <template v-slot:moreActivities>
             <q-btn outline
@@ -61,7 +64,6 @@ export default {
     contactMixins
   ],
   mounted () {
-    console.log('144 :>> ', 144)
     this.setContact(this.contact)
     this.setSelectedContact(this.contact)
     if (this.authenticated) {
@@ -95,7 +97,6 @@ export default {
       // 'setContactClone'
     ]),
     fetchContact () {
-      console.log('505 :>> ', 505)
       this.selectedContactChanging(true)
       let _this = this
       if (this.contact?.id) {
@@ -107,13 +108,20 @@ export default {
         })
       }
     },
-    markAllAsRead2 () {
-      console.log('900 :>> ', 900)
+    toggleDrawer () {
+      console.log('Toggle drawer...')
+      this.drawer = !this.drawer
+    },
+    toggleDetails () {
+      console.log('Toggle details...')
+      this.detailsOpen = !this.detailsOpen
+    },
+    markAllAsRead () {
+      console.log('Marking all as read...')
     }
   },
   watch: {
     contact (val) {
-      console.log('val.id :>> ', val.id)
       if (val?.id) {
         this.setContact(this.contact)
       }
