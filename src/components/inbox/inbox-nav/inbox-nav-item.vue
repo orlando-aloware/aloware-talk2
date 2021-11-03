@@ -29,10 +29,10 @@
         >
           <icon :icon="icon" :isActive="isActive"/>
         </div>
-        <div class="inbox-nav-item__label">
+        <div class="inbox-nav-item__label h-100">
           {{ label }}
         </div>
-        <span class="count-label"
+        <span class="count-label h-100"
               v-if="value === 'inbox'">
         <span class="open-count border-right pr-1">{{ openCount | numberPlusFormatter(99) }}</span>
         <span class="pending-count ml-1">{{ pendingCount | numberPlusFormatter(99) }}</span>

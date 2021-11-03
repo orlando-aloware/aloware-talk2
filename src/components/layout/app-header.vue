@@ -6,7 +6,6 @@
               @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
       </b-link>
-
       <h1 v-if="!['Contact'].includes($route.name)">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name)"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name)" />
@@ -165,6 +164,20 @@ export default {
       }
       e.preventDefault()
     },
+
+    mobileNavigateback () {
+      let path = this.$route.path.split('/')
+      path.pop()
+      path.pop()
+
+      if (!isNaN(path[(path.length - 1)] / 1)) {
+        path.pop()
+        path.pop()
+      }
+
+      this.$router.push(path.join('/'))
+    },
+
     refreshMetricGroup () {
       this.setMetricLoader(true)
       this.$axios

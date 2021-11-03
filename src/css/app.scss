@@ -3490,6 +3490,19 @@ span.mention {
       position: relative;
     }
   }
+
+  .custom-toggle-button {
+    &.q-btn-group--spread {
+      & > .q-btn-item {
+        flex: inherit;
+        flex-grow: 1;
+      }
+      & > .q-btn-item:nth-child(2) {
+        flex-grow: 1;
+        min-width: 105px;
+      }
+    }
+  }
 }
 
 .opacity-1 {
@@ -6518,6 +6531,15 @@ table.datatable {
     padding-right: 5px;
   }
 
+  &__icon,
+  &__label,
+  .count-label {
+    height: 21px !important;
+    display: flex;
+    align-items: center;
+    line-height: 20px !important;
+  }
+
   &__icon {
     padding-right: 10px;
   }
@@ -7188,7 +7210,6 @@ button.grey-90 {
     }
   }
 }
-
 
 .custom-toggle-button {
   background: $grey-60;
@@ -7869,6 +7890,24 @@ button.grey-90 {
   height: 0;
 }
 
+.mobile-back-btn {
+  display: none;
+  border-radius: 50%;
+  height: 27px;
+  width: 24px;
+  min-height: 27px;
+  align-items: center;
+  margin-right: 14px;
+  .q-btn__wrapper {
+    padding: 0 0 !important;
+  }
+  .q-btn__wrapper,
+  .q-btn__content {
+    height: 24px;
+    min-height: 24px;
+  }
+}
+
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .inbox {
@@ -7940,10 +7979,21 @@ screen and (max-width: 956px) {
   }
 }
 
+@media screen and (min-width: 1160px) and (max-width: 1261px) {
+  .inbox-side {
+    &__right {
+      .custom-toggle-button {
+        margin-left: 1px !important;
+        margin-right: 1px !important;
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 1261px) {
   .inbox-wrapper,
   .inbox-side {
-    max-width: 430px;
+    max-width: 433px;
   }
   .inbox-side {
     &__left {
@@ -7983,7 +8033,7 @@ screen and (max-width: 956px) {
 @media screen and (min-width: 601px) and (max-width: 1159px) {
   .inbox-wrapper,
   .inbox-side {
-    max-width: 305px;
+    max-width: 313px;
   }
   .inbox-side {
     &__nav {
@@ -8003,29 +8053,46 @@ screen and (max-width: 956px) {
   .contact-activity-wrapper {
     width: 100%;
   }
+  .inbox-wrapper {
+    &:not(.inbox-side-mobile-full-width) {
+      .inbox-side {
+        &__left {
+          max-width: 35px;
+
+          .header,
+          .inbox-nav-item__label,
+          .count-label {
+            display: none;
+          }
+
+          .inbox-nav-list div:nth-child(2) {
+            height: 30px;
+          }
+
+          .inbox-nav-item {
+            margin: 0 0 !important;
+
+            &__icon {
+              padding: 0 0 !important;
+            }
+          }
+
+          .inbox-nav-item-group-header {
+            opacity: 0;
+          }
+        }
+      }
+    }
+    &.inbox-side-mobile-full-width {
+      max-width: unset;
+      .inbox-side {
+        max-width: unset;
+      }
+    }
+  }
   .inbox-side {
     &__right {
       width: 270px;
-    }
-    &__left {
-      max-width: 35px;
-      .header,
-      .inbox-nav-item__label,
-      .count-label {
-        display: none;
-      }
-      .inbox-nav-list div:nth-child(2) {
-        height: 30px;
-      }
-      .inbox-nav-item {
-        margin: 0 0 !important;
-        &__icon {
-          padding: 0 0 !important;
-        }
-      }
-      .inbox-nav-item-group-header {
-        opacity: 0;
-      }
     }
   }
 }
@@ -8094,6 +8161,20 @@ screen and (max-width: 956px) {
 }
 
 @media screen and (max-width: 784px) {
+  .page-header {
+    height: 58px;
+    & > div > h1 {
+      font-size: 18px;
+      font-family: 'Roboto', sans-serif;
+    }
+    &.q-toolbar {
+      height: 58px;
+      padding-left: 18.5px !important;
+    }
+  }
+  .mobile-back-btn {
+    display: flex !important;
+  }
   .page-footer {
     border-top: solid 1px #e4e4e4;
   }
@@ -8120,7 +8201,7 @@ screen and (max-width: 956px) {
     .q-header {
       left: 0 !important;
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       .page-header {
         div:not(:first-child) {
           display: none !important;
@@ -8146,7 +8227,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media screen and (max-width: 620px) {
+@media screen and (max-width: 605px) {
   .mobile-header {
     display: flex !important;
   }
@@ -8159,23 +8240,6 @@ screen and (max-width: 956px) {
     display: block;
     width: 100%;
     overflow: hidden;
-  }
-  .mobile-back-btn {
-    border-radius: 50%;
-    height: 27px;
-    width: 24px;
-    min-height: 27px;
-    display: flex;
-    align-items: center;
-    margin-right: 14px;
-    .q-btn__wrapper {
-      padding: 0 0 !important;
-    }
-    .q-btn__wrapper,
-    .q-btn__content {
-      height: 24px;
-      min-height: 24px;
-    }
   }
   .mobile-header {
     height: 58px;
