@@ -60,7 +60,9 @@
       <div class="d-flex align-items-center p-0">
         <div class="text-14 pl-3 text-subtitle1 text-capitalize">
           {{ companyName }}
-          <span class="text-13 text-subtitle2 text-grey"> | {{ contact.company_name }}</span>
+          <span
+            v-if="contact.company_name"
+            class="text-13 text-subtitle2 text-grey"> | {{ contact.company_name }}</span>
         </div>
       </div>
       <div class="d-flex align-items-center p-0">
