@@ -39,7 +39,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('powerDialer', [
+    ...mapGetters('contacts', [
       'contact'
     ])
   },

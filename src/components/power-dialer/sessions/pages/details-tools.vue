@@ -23,7 +23,9 @@ export default {
   name: 'DetailsTools',
   computed: {
     ...mapGetters('powerDialer', [
-      'sessionLoader',
+      'sessionLoader'
+    ]),
+    ...mapGetters('contacts', [
       'contact'
     ])
   },

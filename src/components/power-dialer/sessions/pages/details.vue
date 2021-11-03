@@ -64,7 +64,7 @@ export default {
     HubSpotIcon
   },
   computed: {
-    ...mapGetters('powerDialer', [
+    ...mapGetters('contacts', [
       'contact'
     ])
   },

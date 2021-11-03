@@ -154,8 +154,10 @@ export default {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
       'currentList',
-      'contact',
       'sessionLoader'
+    ]),
+    ...mapGetters('contacts', [
+      'contact'
     ]),
     listObject () {
       return this.powerDialerListItems[this.currentList?.id]
@@ -178,8 +180,8 @@ export default {
     ...mapActions('powerDialer', [
       'getContact'
     ]),
-    ...mapMutations('powerDialer', [
-      'NEXT_CONTACT_IN_PROGRESS'
+    ...mapMutations('contacts', [
+      'SET_CONTACT'
     ]),
     chipped (data) {
       return data.length || 0

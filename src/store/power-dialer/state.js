@@ -129,7 +129,7 @@ export default function () {
     },
     // powerDialerList: null,
     contactResources: [],
-    contacts: [],
+    // contacts: [],
     selectedContacts: {},
     isStartingDial: false,
     searchedListItem: '',
@@ -137,7 +137,7 @@ export default function () {
     currentList: null,
     datatableLoader: false,
     search: '',
-    contact: null,
+    // contact: null,
     sessionLoader: false,
     changingSelectedContact: false
   }

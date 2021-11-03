@@ -148,8 +148,10 @@ export default {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
       'currentList',
-      'contact',
       'sessionLoader'
+    ]),
+    ...mapGetters('contacts', [
+      'contact'
     ]),
     address () {
       return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`

@@ -10,7 +10,7 @@
     <q-card flat :disabled="sessionLoader" class="t-scroll-y1 mt-1 p-0 py-0">
       <q-card-section class="p-0">
         <ContactInfo
-          :is-contact-type="false" />
+          :has-expanded="false" />
       </q-card-section>
       <!-- <q-card-section
         v-for="(f, i) in form"

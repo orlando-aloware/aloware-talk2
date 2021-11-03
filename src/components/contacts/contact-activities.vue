@@ -4,7 +4,7 @@
       :label="contactName"
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
-      :contact="resources"
+      :contact="contact"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
@@ -20,7 +20,7 @@
                             :key="communication.id + '-comm-' + index"
                             :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
                             :communication="communication"
-                            :contact="resources"
+                            :contact="contact"
                             :campaignId="campaignId">
           </contact-activity>
         </div>
@@ -38,77 +38,48 @@ import { mapGetters } from 'vuex'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
-
 export default {
   name: 'contact-activities',
-
   components: {
     MessageComposer,
     ContactActivitiesHeader,
     ContactActivity
   },
-
   props: {
     communications: {
       required: true,
       type: Array,
       default: () => []
     },
-
     campaignId: {
       required: false
-    },
-
-    isContactType: {
-      type: Boolean,
-      default: true
     }
   },
-
   data () {
     return {
       isLoadingPreviousActivities: false
     }
   },
-
   computed: {
-    ...mapGetters('contacts', {
-      contact: 'contact'
-    }),
-    ...mapGetters('powerDialer', {
-      pdContact: 'contact'
-    }),
-
+    ...mapGetters('contacts', ['contact']),
     contactName () {
-      if (this.resources && this.resources.name) {
-        return _.get(this.resources, 'name', '')
+      if (this.contact && this.contact.name) {
+        return _.get(this.contact, 'name', '')
       }
-
-      if (this.resources && this.resources.first_name && this.resources.last_name) {
-        return `${this.resources.first_name} ${this.resources.last_name}`
+      if (this.contact && this.contact.first_name && this.contact.last_name) {
+        return `${this.contact.first_name} ${this.contact.last_name}`
       }
-
       return 'No Name'
     },
-
-    resources () {
-      if (this.isContactType) {
-        return this.contact
-      } else {
-        return this.pdContact
-      }
-    },
-
     hasUnreads () {
-      return this.resources.unread_texts_count > 0 ||
-        this.resources.unread_missed_calls_count > 0 ||
-        this.resources.unread_voicemails_count > 0
+      return this.contact.unread_texts_count > 0 ||
+        this.contact.unread_missed_calls_count > 0 ||
+        this.contact.unread_voicemails_count > 0
     },
     unreadCount () {
-      return this.resources.unread_texts_count + this.resources.unread_missed_calls_count + this.contact.unread_voicemails_count
+      return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
-
   methods: {
     scrollMessages () {
       let activitiesWrap = this.$refs.activitiesWrap

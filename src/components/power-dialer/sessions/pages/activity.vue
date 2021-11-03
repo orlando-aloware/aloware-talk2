@@ -1,51 +1,51 @@
 <template>
-  <b-overlay :show="changingSelectedContact || sessionLoader"
-             :opacity="0.85"
-             class="h-100"
-             variant="white"
-             rounded="sm"
-             v-if="authenticated">
-             {{ changingSelectedContact }} - {{sessionLoader}}
-  <div class="row">
-    <div class="col-12 p-1">
-      <!-- <q-card flat class="p-3">
-        <q-card-section class="p-0">
-          <div class="text-subtitle1 text-weight-medium">Juan Dela Cruz</div>
-        </q-card-section>
-      </q-card> -->
-      <div
-        :class="`contact-activity-wrapper ${widthClass}`"
-        style="height:calc(100vh - 362px);">
-        <ContactActivities
-          ref="contactActivities"
-          :communications="filteredCommunications"
-          :campaign-id="selectedCampaignId"
-          @mark-all-as-read="markAllAsRead"
-          @toggleDrawer="toggleDrawer"
-          @toggleDetails="toggleDetails"
-          :is-contact-type="false">
-          <template v-slot:moreActivities>
-            <q-btn outline
-                   dense
-                   rounded
-                   no-caps
-                   class="prev-activities mx-2"
-                   color="primary"
-                   size="md"
-                   :isLoadingMore="sessionLoader"
-                   :loading="isLoadingPreviousActivities"
-                   :disable="isLoadingPreviousActivities"
-                   v-if="hasMoreCommunications"
-                   @click="loadMorePreviousActivities">
-              <div class="px-2">
-                Previous Activities
-              </div>
-            </q-btn>
-          </template>
-        </ContactActivities>
+  <b-overlay
+    :show="changingSelectedContact || sessionLoader"
+    :opacity="0.85"
+    class="h-100"
+    variant="white"
+    rounded="sm"
+    v-if="authenticated">
+    <div class="row">
+      <div class="col-12 p-1">
+
+        <div
+          :class="`contact-activity-wrapper ${widthClass}`"
+          style="height:calc(100vh - 362px);">
+
+          <ContactActivities
+            ref="contactActivities"
+            :communications="filteredCommunications"
+            :campaign-id="selectedCampaignId"
+            @mark-all-as-read="markAllAsRead"
+            @toggleDrawer="toggleDrawer"
+            @toggleDetails="toggleDetails">
+
+            <template v-slot:moreActivities>
+              <q-btn
+                v-if="hasMoreCommunications"
+                @click="loadMorePreviousActivities"
+                outline
+                dense
+                rounded
+                no-caps
+                class="prev-activities mx-2"
+                color="primary"
+                size="md"
+                :isLoadingMore="sessionLoader"
+                :loading="isLoadingPreviousActivities"
+                :disable="isLoadingPreviousActivities">
+                <div class="px-2">
+                  Previous Activities
+                </div>
+              </q-btn>
+            </template>
+
+          </ContactActivities>
+
+        </div>
       </div>
     </div>
-  </div>
   </b-overlay>
 </template>
 
@@ -64,16 +64,20 @@ export default {
     contactMixins
   ],
   mounted () {
-    this.setContact(this.contact)
+    // this.setContact(this.contact)
     this.setSelectedContact(this.contact)
     if (this.authenticated) {
       this.fetchContact()
     }
   },
   computed: {
-    ...mapGetters('auth', ['authenticated']),
+    ...mapGetters('auth', [
+      'authenticated'
+    ]),
     ...mapGetters('powerDialer', [
-      'sessionLoader',
+      'sessionLoader'
+    ]),
+    ...mapGetters('contacts', [
       'contact',
       'changingSelectedContact'
     ]),
@@ -86,27 +90,31 @@ export default {
     }
   },
   methods: {
-    ...mapActions('inbox', [
-      'setContacts',
-      'setSelectedContact'
-    ]),
-    ...mapActions('powerDialer', [
-      // 'resetChangedContactProperties',
+    // ...mapActions('inbox', [
+    //   'setContacts',
+    //   'setSelectedContact'
+    // ]),
+    // ...mapActions('powerDialer', [
+    //   // 'resetChangedContactProperties',
+    //   'selectedContactChanging',
+    //   'setContact'
+    //   // 'setContactClone'
+    // ]),
+    ...mapActions('contacts', [
+      'resetChangedContactProperties',
       'selectedContactChanging',
-      'setContact'
-      // 'setContactClone'
+      'setContact',
+      'setContactClone'
     ]),
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
-      if (this.contact?.id) {
-        this.processFetchContactInfo(function (contact) {
-          _this.setContact(contact)
-          // _this.setContactClone(contact)
-          // _this.resetChangedContactProperties([])
-          _this.selectedContactChanging(false)
-        })
-      }
+      this.processFetchContactInfo(function (selectedContact) {
+        _this.setContact(selectedContact)
+        _this.setContactClone(selectedContact)
+        _this.resetChangedContactProperties([])
+        _this.selectedContactChanging(false)
+      })
     },
     toggleDrawer () {
       console.log('Toggle drawer...')

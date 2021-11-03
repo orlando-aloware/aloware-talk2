@@ -23,7 +23,7 @@ export default {
   getContact: async ({ commit }, params = {}) => {
     let res = await window.axios.get(`api/v2/contacts/${params.id}`)
     if (res.status === 200) {
-      commit('NEXT_CONTACT_IN_PROGRESS', res.data)
+      commit('contacts/SET_CONTACT', res.data, { root: true })
     }
   },
   getContactResources: async ({ commit }, params = {}) => {
@@ -48,9 +48,9 @@ export default {
   selectedContactChanging: ({ commit }, isChanging) => {
     commit('CHANGING_SELECTED_CONTACT', isChanging)
   },
-  setContact: ({ commit }, contact) => {
-    commit('SET_CONTACT', contact)
-  },
+  // setContact: ({ commit }, contact) => {
+  //   commit('SET_CONTACT', contact)
+  // },
   setContacts: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
   },
