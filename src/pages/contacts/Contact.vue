@@ -133,6 +133,7 @@ export default {
   },
 
   mounted () {
+    console.log('mounted')
     if (this.authenticated) {
       this.fetchContact()
     }

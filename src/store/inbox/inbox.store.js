@@ -82,6 +82,7 @@ export default function () {
     channelClonedFilter: {},
     channelChangedFilterFields: [],
     isFilterModelFormShown: false,
+    isFilterDialogShown: false,
     selectedFilter: null
   }
 }
