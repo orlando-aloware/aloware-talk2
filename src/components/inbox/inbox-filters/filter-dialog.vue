@@ -75,7 +75,7 @@
               </compact-btn>
             <compact-btn class="ml-3 btn-secondary"
                          :disabled="!(selectedFilter && selectedFilterHasChanges)"
-                         v-b-modal:create-filter-modal>
+                         @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
           </div>
@@ -216,6 +216,10 @@ export default {
           this.isUpdatingFilter = false
         })
       }
+    },
+
+    onSaveNewFilter () {
+      this.toggleFilterModelForm(true)
     },
 
     onSelectFilter (item) {
