@@ -1990,6 +1990,12 @@ span.mention {
     margin-top: -5px;
     right: 0;
 
+    .contact-primary-phone {
+      position: relative;
+      top: 0.5px;
+      margin-right: 2px;
+    }
+
     .copy-phone-number {
       text-decoration: none;
       color: $grey-90;
@@ -6853,7 +6859,7 @@ button.grey-90 {
   margin-top: 14px;
 
   .filter-toggle-button {
-    max-width: 133px;
+    max-width: 100px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -7309,6 +7315,10 @@ button.grey-90 {
 
   div.search-icon {
     margin-top: -2px;
+  }
+
+  .q-user-selector {
+    width: 130px;
   }
 
   .generic-selector {

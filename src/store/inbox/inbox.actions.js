@@ -56,6 +56,9 @@ export default {
   toggleFilterModelForm: ({ commit }, isShown = false) => {
     commit('TOGGLE_FILTER_MODEL_FORM', isShown)
   },
+  toggleFilterDialog: ({ commit }, isShown = false) => {
+    commit('TOGGLE_FILTER_DIALOG', isShown)
+  },
   setSelectedFilter: ({ commit }, selectedFilter) => {
     commit('SET_SELECTED_FILTER', selectedFilter)
   },
