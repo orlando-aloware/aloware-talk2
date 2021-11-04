@@ -22,7 +22,7 @@
           </h2>
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
-              {{ contact.phone_number | fixPhone }}
+              <span class="contact-primary-phone">{{ contact.phone_number | fixPhone }}</span>
               <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
                        :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
                        class="badge-phone-info">
