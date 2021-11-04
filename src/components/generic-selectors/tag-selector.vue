@@ -2,8 +2,8 @@
   <div>
     <generic-multi-select :label="label"
                           :buttonText="buttonText"
-                          :values="tags"
-                          :options="tagsOptions"
+                          :values="selectedTags"
+                          :options="tags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           v-if="genericMultiselect"
                           @valuesUpdated="select">
@@ -209,6 +209,7 @@ export default {
 
       if (this.tags && this.tags.length > 0) {
         this.tagsArray = this.tags
+        this.selectedTags = this.value
         return
       }
 
@@ -216,6 +217,7 @@ export default {
         params: { full_load: true }
       }).then(res => {
         this.tagsArray = res.data
+        this.selectedTags = this.value
       }).catch(err => {
         console.log(err)
       })
@@ -228,9 +230,15 @@ export default {
 
   watch: {
     value () {
+      let _this = this
       this.selectedTags = this.value
+      this.$refs.tagSelect.focus()
+      setTimeout(function () {
+        _this.$refs.tagSelect.blur()
+        _this.$refs.tagSelect.hidePopup()
+      }, 200)
     },
-    tags (val) {
+    selectedTags (val) {
       if (this.selectedTags !== this.value) {
         this.$emit('change', val)
       }

@@ -95,6 +95,9 @@ export default {
   TOGGLE_FILTER_MODEL_FORM: (state, isShown = false) => {
     state.isFilterModelFormShown = isShown
   },
+  TOGGLE_FILTER_DIALOG: (state, isShown = false) => {
+    state.isFilterDialogShown = isShown
+  },
   SET_SELECTED_FILTER: (state, selectedFilter) => {
     state.selectedFilter = selectedFilter
   },

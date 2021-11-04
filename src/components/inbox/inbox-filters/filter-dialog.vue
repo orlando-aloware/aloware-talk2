@@ -6,9 +6,11 @@
     hide-header-close
     hide-header
     hide-footer
-    ref="inbox-channel-filter-modal"
+    ref="inboxChannelFilterModal"
+    v-model="isOpen"
     @hidden="onHidden"
-    @show="onShow">
+    @show="onShow"
+    @shown="onShown">
 
     <div class="modal-body-wrapper d-flex">
       <div class="w-50 left-column-wrapper">
@@ -66,7 +68,9 @@
             <compact-btn variant="primary"
                          :disabled="!(!selectedFilter || selectedFilterHasChanges) || isUpdatingFilter"
                          @clicked="onSaveFilter">
-              <q-spinner-bars v-if="isUpdatingFilter" color="white" />
+              <q-spinner-bars v-if="isUpdatingFilter"
+                              color="white"
+                              class="mr-1" />
               {{ isUpdatingFilter ? ' Saving...' : ' Save' }}
               </compact-btn>
             <compact-btn class="ml-3 btn-secondary"
@@ -76,10 +80,8 @@
             </compact-btn>
           </div>
         </div>
-        <filter-form :filter="filter"></filter-form>
-        <create-filter-dialog :filter-model="filterModel"
-                              @created="filterCreated">
-        </create-filter-dialog>
+        <filter-form ref="inboxChannelFilterForm"
+                     :filter="filter"></filter-form>
       </div>
     </div>
     <template #modal-footer="{ hide }">
@@ -98,7 +100,6 @@
 import FilterForm from 'components/inbox/inbox-filters/filter-form'
 import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
-import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
 
@@ -107,18 +108,29 @@ let inputTimeout
 export default {
   name: 'filter-dialog',
 
-  components: { FilterListItems, CreateFilterDialog, CompactBtn, FilterForm },
+  components: { FilterListItems, CompactBtn, FilterForm },
 
   props: {
     filter: {
       type: Object,
       required: true
+    },
+    filterModel: {
+      type: Object,
+      required: true
     }
-
   },
 
   computed: {
-    ...mapState('inbox', ['channelChangedFilterFields', 'selectedFilter']),
+    ...mapState('inbox', ['channelChangedFilterFields', 'selectedFilter', 'isFilterDialogShown']),
+    isOpen: {
+      get () {
+        return this.isFilterDialogShown
+      },
+      set (isOpen) {
+        return isOpen
+      }
+    },
     channelFilterName () {
       switch (true) {
         case ['messages'].includes(this.$route.params.channel):
@@ -131,89 +143,6 @@ export default {
         default:
           return 'Calls & Recordings'
       }
-    },
-    filterModel () {
-      let filterModel = {
-        name: '',
-        type: 2,
-        filter: [],
-        scope: 'user'
-      }
-      switch (true) {
-        case ['voicemails'].includes(this.$route.params.channel):
-          filterModel.type = 3
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            ring_groups: this.filter.ring_groups,
-            direction: this.filter.direction,
-            tags: this.filter.tags,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows
-          }
-          break
-        case ['calls'].includes(this.$route.params.channel):
-          filterModel.type = 1
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            ring_groups: this.filter.ring_groups,
-            direction: this.filter.direction,
-            answer_status: this.filter.answer_status,
-            min_talk_time: this.filter.min_talk_time,
-            transfer_type: this.filter.transfer_type,
-            callback_status: this.filter.callback_status,
-            tags: this.filter.tags,
-            call_dispositions: this.filter.call_dispositions,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows
-          }
-          break
-        case ['recordings'].includes(this.$route.params.channel):
-          filterModel.type = 4
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            ring_groups: this.filter.ring_groups,
-            direction: this.filter.direction,
-            answer_status: this.filter.answer_status,
-            min_talk_time: this.filter.min_talk_time,
-            transfer_type: this.filter.transfer_type,
-            callback_status: this.filter.callback_status,
-            tags: this.filter.tags,
-            call_dispositions: this.filter.call_dispositions,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows
-          }
-          break
-        case ['messages'].includes(this.$route.params.channel):
-        default:
-          filterModel.type = 2
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            direction: this.filter.direction,
-            answer_status: this.filter.answer_status,
-            tags: this.filter.tags,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows,
-            broadcasts: this.filter.broadcasts
-          }
-      }
-
-      return filterModel
     },
     selectedFilterHasChanges () {
       if (!this.selectedFilter || !this.selectedFilterClone) {
@@ -238,17 +167,28 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterModelForm', 'setSelectedFilter', 'updateChannelChangedFilterFields', 'resetChannelChangedFilterFields']),
+    ...mapActions('inbox', ['toggleFilterModelForm', 'setSelectedFilter', 'updateChannelChangedFilterFields', 'resetChannelChangedFilterFields', 'toggleFilterDialog']),
     hideModal () {
-      this.$refs['inbox-channel-filter-modal'].hide()
+      this.$refs.inboxChannelFilterModal.hide()
     },
 
     onHidden () {
-      // this.setSelectedFilter(null)
+      this.toggleFilterDialog()
     },
 
     onShow () {
+      this.personalFilters = []
+      this.companyFilters = []
       this.getFilters()
+    },
+
+    onShown () {
+      let _this = this
+      this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
+      setTimeout(function () {
+        _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
+        _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
+      }, 200)
     },
 
     onResetFilter: function () {
@@ -373,9 +313,17 @@ export default {
   created () {
     this.setSelectedFilter(null)
   },
-
   beforeDestroy () {
     clearTimeout(inputTimeout)
+  },
+  mounted () {
+    this.$VueEvent.listen('channel_filter_created', filter => {
+      if (filter.is_on_company) {
+        this.companyFilters.push(filter)
+      } else {
+        this.personalFilters.push(filter)
+      }
+    })
   }
 }
 </script>

@@ -163,6 +163,9 @@ export default {
   },
 
   watch: {
+    value () {
+      this.broadcast = this.value
+    },
     broadcast: function (value) {
       this.$emit('change', value)
     }

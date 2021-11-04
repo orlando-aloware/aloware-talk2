@@ -42,13 +42,16 @@
 </template>
 
 <script>
+
+import * as CommunicationDirection from 'src/constants/communication-direction'
+
 export default {
   name: 'communication-direction-selector',
 
   props: {
     value: {
       type: [String, Number],
-      default: 'all'
+      default: 0
     },
     multiple: {
       type: Boolean,
@@ -100,7 +103,8 @@ export default {
         { value: 'outbound', label: 'Outbound' }
       ],
       options: [],
-      selectWidth: 0
+      selectWidth: 0,
+      CommunicationDirection
     }
   },
 

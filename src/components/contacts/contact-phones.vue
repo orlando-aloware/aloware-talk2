@@ -83,6 +83,7 @@ export default {
   },
 
   mounted () {
+    console.log('phone mounted')
     if (this.contact && this.contact.id) {
       this.getPhoneNumbers()
     }
@@ -91,6 +92,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['setContactPhoneNumbers', 'setContactSelectedPhone', 'setMessageComposerMode', 'setMessageComposerSmsPhoneNumber']),
     getPhoneNumbers () {
+      console.trace()
       return talk2Api.V1.contact.getPhoneNumbers(this.contact.id).then(response => {
         this.setContactPhoneNumbers(response.data)
       })
