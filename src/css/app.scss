@@ -8339,11 +8339,7 @@ screen and (max-width: 956px) {
     width: 0 !important;
     height: 0;
     * {
-      padding: 0 !important;
-      width: 0 !important;
-      position: relative !important;
-      min-width: unset !important;
-      border: 0 !important;
+      display: none;
     }
   }
   .contact-details-container.contact-details--opened {

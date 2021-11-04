@@ -12,6 +12,7 @@
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen }">
         <contact-activities ref="contactActivities"
+                            :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
@@ -59,7 +60,7 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details></contact-details>
+        <contact-details v-if="drawer"></contact-details>
       </q-drawer>
     </div>
     <template #overlay>
@@ -129,6 +130,12 @@ export default {
     },
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
+    },
+    resizeHandler () {
+      const width = document.documentElement.clientWidth
+      if (width > 1084 || width < 606) {
+        this.drawer = false
+      }
     }
   },
 
@@ -139,6 +146,7 @@ export default {
   },
 
   created () {
+    window.addEventListener('resize', this.resizeHandler)
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
@@ -158,11 +166,20 @@ export default {
       }
     },
 
+    '$q.screen.lt.md': function () {
+      if (this.$q.screen.lt.md) {
+        this.drawer = false
+      }
+    },
+
     '$route.params.communicationId': function (value) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
     }
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.resizeHandler)
   }
 }
 </script>
