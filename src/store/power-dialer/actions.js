@@ -47,7 +47,9 @@ export default {
       'call_disposition_id': params.params.call_disposition_id,
       paramsSerializer: qs.stringify
     })
-    console.log('res :>> ', res)
+    if (res.status === 200) {
+      return res.data
+    }
   },
   async updateContactDisposition ({ commit }, params = {}) {
     let res = await window.axios.post(`api/v1/contact/${params.id}/dispose`, {

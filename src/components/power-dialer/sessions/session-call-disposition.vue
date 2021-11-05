@@ -10,7 +10,7 @@
         <ChipsEllipsis
           @on-selected-item="onSelectedCallDisposition"
           :list-items="callDispositions"
-          :selected-item="{}"
+          :selected-item="callDisposition"
           :display-count="4"
           identity="call-disposition"
           default-label="No Call Dispositions" />
@@ -41,7 +41,7 @@
         <ChipsEllipsis
           @on-selected-item="onSelectedContactDisposition"
           :list-items="[]"
-          :selected-item="{}"
+          :selected-item="''"
           :display-count="6"
           identity="contact-disposition"
           default-label="No Voicemail" />
@@ -100,10 +100,10 @@ export default {
       'sessionLoader'
     ]),
     contactDisposition () {
-      return this.contact_disposition || this.contact.disposition_status
+      return this.contact_disposition || this.contact?.disposition_status_id
     },
     callDisposition () {
-      return null
+      return this.call_disposition || this.contact?.last_communication?.call_disposition_id
     }
   },
   methods: {
@@ -112,14 +112,15 @@ export default {
       'updateCallDisposition'
     ]),
     async onSelectedCallDisposition (data) {
-      console.log('Selected Call Dispostion : ', data)
       let response = await this.updateCallDisposition({
         id: this.contact.last_communication.id,
         params: {
           call_disposition_id: data.id
         }
       })
-      console.log('response :>> ', response)
+      if (response?.id) {
+        this.call_disposition = response.call_disposition_id
+      }
     },
     async onSelectedContactDisposition (data) {
       let response = await this.updateContactDisposition({
@@ -129,15 +130,17 @@ export default {
         }
       })
       if (response?.id) {
-        this.contact_disposition = this.dispositionStatuses.find(ds => {
+        let status = this.dispositionStatuses.find(ds => {
           return ds.id === response.disposition_status_id
         })
+        this.contact_disposition = status.id
       }
     }
   },
   data () {
     return {
       contact_disposition: null,
+      call_disposition: null,
       voicemail: [
         // { label: 'Default Voicemail' },
         // { label: 'Follw Up VM' }

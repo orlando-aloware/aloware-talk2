@@ -65,8 +65,8 @@ export default {
       default: () => []
     },
     selectedItem: {
-      type: Object,
-      default: () => {}
+      type: [Number, String],
+      default: null
     },
     displayCount: {
       type: Number,
@@ -81,9 +81,9 @@ export default {
     filteredListItems () {
       let listItems = [ ...this.listItems ]
       let flag = null
-      if (this.selectedItem?.id) {
+      if (this.selectedItem) {
         listItems.forEach((list, key) => {
-          if (list.id === this.selectedItem.id) {
+          if (list.id === this.selectedItem) {
             listItems.splice()
             flag = list
             // listItems.splice(key, 1)
@@ -103,7 +103,7 @@ export default {
       return false
     },
     selectedItemId () {
-      return this.selectedItem?.id || ''
+      return this.selectedItem || ''
     }
   },
   watch: {
