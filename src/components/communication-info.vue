@@ -91,22 +91,22 @@
               <div class="form-group row mb-0 pt-2 pb-2">
                 <div class="d-flex align-items-center w-100"
                      v-if="communication.type === CommunicationTypes.APPOINTMENT">
-                  <div class="w-50">
+                  <div class="w-75">
                     <label class="form-control-label w-100 mb-1">Date</label>
                     {{ communication.engagement_data.appointment_datetime | fixScheduleDate }}
                   </div>
-                  <div class="w-50">
+                  <div class="w-35">
                     <label class="form-control-label w-100 mb-1">Time</label>
                     {{ communication.engagement_data.appointment_datetime | fixScheduleTime }}
                   </div>
                 </div>
                 <div class="d-flex align-items-center w-100"
                      v-if="communication.type === CommunicationTypes.REMINDER">
-                  <div class="w-50">
+                  <div class="w-75">
                     <label class="form-control-label w-100 mb-1">Date</label>
                     {{ communication.engagement_data.reminder_datetime | fixScheduleDate }}
                   </div>
-                  <div class="w-50">
+                  <div class="w-35">
                     <label class="form-control-label w-100 mb-1">Time</label>
                     {{ communication.engagement_data.reminder_datetime | fixScheduleTime }}
                   </div>
