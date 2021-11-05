@@ -165,19 +165,6 @@ export default {
       e.preventDefault()
     },
 
-    mobileNavigateback () {
-      let path = this.$route.path.split('/')
-      path.pop()
-      path.pop()
-
-      if (!isNaN(path[(path.length - 1)] / 1)) {
-        path.pop()
-        path.pop()
-      }
-
-      this.$router.push(path.join('/'))
-    },
-
     refreshMetricGroup () {
       this.setMetricLoader(true)
       this.$axios

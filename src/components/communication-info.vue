@@ -169,9 +169,9 @@
               </div>
             </div>
 
-            <div class="mb-2 pb-2 border-bottom d-flex flex-row"
+            <div class="mb-2 pb-2 border-bottom d-flex"
                  v-if="communication.type === CommunicationTypes.CALL">
-              <div class="w-50"
+              <div class="w-100"
                    v-if="communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id)">
                 <label class="form-control-label mb-1">Ring Group</label>
                 <router-link
@@ -189,7 +189,10 @@
                                    :communication="communication"
                                    :is-form="true"/>
               </div>
-              <div :class="[communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id) ? 'w-50' : 'w-100']">
+            </div>
+            <div class="mb-2 pb-2 border-bottom d-flex"
+                 v-if="communication.type === CommunicationTypes.CALL">
+              <div class="w-100">
                 <label class="form-control-label w-100">
                   {{ communication.direction === CommunicationDirections.INBOUND ? 'Answered By' : 'Initiated By' }}
                 </label>

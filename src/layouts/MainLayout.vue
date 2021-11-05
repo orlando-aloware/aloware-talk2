@@ -72,9 +72,20 @@
             </app-sidebar>
           </q-list>
         </q-drawer>
+        <q-drawer
+          overlay
+          bordered
+          class="mobile-phone-drawer position-relative"
+          side="right"
+          :breakpoint="0"
+          v-model="mobilePhoneDrawer">
+          <div class="phone-header">Phone</div>
+          <dialer-form v-if="mobilePhoneDrawer"></dialer-form>
+        </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading">
+                    v-if="authenticated && !isWidget && !loading"
+                    @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
       <q-dialog v-model="showNewVersionDialog"
@@ -166,11 +177,13 @@ import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import _ from 'lodash'
+import DialerForm from 'components/dialer/dialer-form'
 
 export default {
   name: 'MyLayout',
 
   components: {
+    DialerForm,
     AppHeader,
     AppFooter,
     AppSidebar,
@@ -214,6 +227,7 @@ export default {
       reminderNotifiedDesktop: [],
       sidebarVisible: false,
       lightMode: true,
+      mobilePhoneDrawer: false,
       CommunicationTypes,
       MetricOptionGroups
     }
@@ -533,6 +547,10 @@ export default {
   },
 
   methods: {
+    toggleMobilePhone (value) {
+      this.mobilePhoneDrawer = value
+    },
+
     toggleMode () {
       this.lightMode = !this.lightMode
     },
