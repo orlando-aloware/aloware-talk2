@@ -115,7 +115,6 @@ export default {
 
       if (this.isFilterKey) {
         await this.getPowerDialerListItem(this.id)
-        console.log(' ---> this.powerDialerListItems :>> ', this.powerDialerListItems)
       }
 
       if (this.powerDialerListItems[this.id] === undefined) {

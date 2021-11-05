@@ -161,3 +161,34 @@
     }
   }
 }
+
+.chip-ellipsis {
+  .q-chip {
+    &.active {
+      background-color: $primary !important;
+      color: $white;
+      .q-chip__content {
+        .chip-label {
+          color: $white !important;
+        }
+      }
+    }
+  }
+  .dropdown {
+    ul {
+      li {
+        &.active {
+          background-color: $primary;
+          border-radius: 8px;
+          a {
+            color: $white;
+            &:hover {
+              color: black;
+            }
+          }
+          
+        }
+      }
+    }
+  }
+}

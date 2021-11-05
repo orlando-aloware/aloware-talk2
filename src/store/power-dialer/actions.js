@@ -40,6 +40,26 @@ export default {
   },
 
   /**
+   * Disposition API calls
+   */
+  async updateCallDisposition ({ commit }, params = {}) {
+    let res = await window.axios.post(`api/v1/communication/${params.id}/dispose-call`, {
+      'call_disposition_id': params.params.call_disposition_id,
+      paramsSerializer: qs.stringify
+    })
+    console.log('res :>> ', res)
+  },
+  async updateContactDisposition ({ commit }, params = {}) {
+    let res = await window.axios.post(`api/v1/contact/${params.id}/dispose`, {
+      'disposition_status': params.params.disposition_status,
+      paramsSerializer: qs.stringify
+    })
+    if (res.status === 200) {
+      return res.data
+    }
+  },
+
+  /**
    * General Actions
    */
   setSearch: ({ commit }, value) => {
@@ -51,7 +71,7 @@ export default {
   // setContact: ({ commit }, contact) => {
   //   commit('SET_CONTACT', contact)
   // },
-  setContacts: ({ commit }, payload) => {
+  setContacts2: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
   },
 

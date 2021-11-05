@@ -131,7 +131,7 @@
 
 <script>
 
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
@@ -180,9 +180,6 @@ export default {
     ...mapActions('powerDialer', [
       'getContact'
     ]),
-    ...mapMutations('contacts', [
-      'SET_CONTACT'
-    ]),
     chipped (data) {
       return data.length || 0
     },
@@ -200,9 +197,14 @@ export default {
     async list () {
       this.flagged = false
       await this.getContact({ id: this.activeList.id })
-    },
-    contact () {
       this.flagged = true
+    },
+    contact (obj) {
+      if (obj.id) {
+        this.flagged = true
+      } else {
+        this.flagged = false
+      }
     }
   },
   data () {

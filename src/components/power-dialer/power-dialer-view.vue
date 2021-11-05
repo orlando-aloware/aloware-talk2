@@ -379,10 +379,15 @@ export default {
     ...mapActions('inbox', [
       'setSelectedContact'
     ]),
+    ...mapActions('contacts', [
+      'setContact'
+    ]),
 
     beginDial () {
+      let contact = Object.assign({}, this.currentContacts)
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
+      this.setContact(contact[0])
       this.$router.push({ name: 'Power Dialer Session' })
     },
     onColumnsReordered (nextColumns) {

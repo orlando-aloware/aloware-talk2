@@ -1,6 +1,6 @@
 <template>
-  <q-card flat :disabled="sessionLoader">
-    <div class="t-menu-2 no-border">
+  <q-card flat :disabled="sessionLoader || hasDefaultContact">
+    <div v-show="!hasDefaultContact" class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-2 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
@@ -176,6 +176,12 @@ export default {
         return ++keyCtr
       }
       return keyCtr
+    },
+    hasDefaultContact () {
+      if (this.contact?.id) {
+        return false
+      }
+      return true
     },
     togglePause: {
       get () {
