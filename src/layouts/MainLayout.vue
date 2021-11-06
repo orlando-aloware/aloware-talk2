@@ -73,12 +73,15 @@
           </q-list>
         </q-drawer>
         <q-drawer
+          ref="mobilePhone"
           overlay
           bordered
           class="mobile-phone-drawer position-relative"
+          :class="{ 'hidden': !mobilePhoneDrawer }"
           side="right"
-          :breakpoint="0"
-          v-model="mobilePhoneDrawer">
+          :breakpoint="605"
+          v-model="mobilePhoneDrawer"
+          @hide="onCloseMobilePhone">
           <div class="phone-header">Phone</div>
           <dialer-form v-if="mobilePhoneDrawer"></dialer-form>
         </q-drawer>
@@ -1399,6 +1402,12 @@ export default {
       }
     },
 
+    onCloseMobilePhone () {
+      if (typeof this.$refs.appFooter !== 'undefined') {
+        this.$refs.appFooter.updateTab()
+      }
+    },
+
     logout () {
       this.logoutUser().then((res) => {
         this.response = res.data
@@ -1449,6 +1458,24 @@ export default {
   },
 
   watch: {
+    '$q.screen.lt.md': function () {
+      if (typeof this.$refs.mobilePhone === 'undefined') {
+        return
+      }
+
+      if (this.$q.screen.lt.md) {
+        this.$refs.mobilePhone.$el.classList.remove('hidden')
+      }
+
+      if (!this.$q.screen.lt.md && !this.$refs.mobilePhone.$el.classList.contains('hidden')) {
+        this.$refs.mobilePhone.$el.classList.add('hidden')
+      }
+
+      if (!this.$q.screen.lt.md) {
+        this.mobilePhoneDrawer = false
+        this.onCloseMobilePhone()
+      }
+    },
     $route (to, from) {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
