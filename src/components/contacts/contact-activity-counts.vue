@@ -5,31 +5,31 @@
       <b-col cols="6"
              class="p-0 mb-2"
              col>
-        <p class="mb-0 data-text">{{ contact.inbound_calls_count}}</p>
+        <p class="mb-0 data-text">{{ summary.inbound_calls_count || 0 }}</p>
         <p class="mb-0 data-label">Inbound Call</p>
       </b-col>
       <b-col cols="6"
              class="p-0 mb-2"
              col>
-        <p class="mb-0 data-text">{{ contact.outbound_calls_count}}</p>
+        <p class="mb-0 data-text">{{ summary.outbound_calls_count || 0 }}</p>
         <p class="mb-0 data-label">Outbound Calls</p>
       </b-col>
       <b-col cols="6"
              class="p-0 mb-2"
              col>
-        <p class="mb-0 data-text">{{ contact.inbound_texts_count}}</p>
+        <p class="mb-0 data-text">{{ summary.inbound_texts_count || 0 }}</p>
         <p class="mb-0 data-label">Inbound Texts</p>
       </b-col>
       <b-col cols="6"
              class="p-0 mb-2"
              col>
-        <p class="mb-0 data-text">{{ contact.outbound_texts_count}}</p>
+        <p class="mb-0 data-text">{{ summary.outbound_texts_count || 0 }}</p>
         <p class="mb-0 data-label">Outbound Texts</p>
       </b-col>
       <b-col cols="12"
              class="p-0 mb-2"
              col>
-        <p class="mb-0 data-text">{{ contact.communications_count || 0 }}</p>
+        <p class="mb-0 data-text">{{ summary.total_count || 0 }}</p>
         <p class="mb-0 data-label">All Communications</p>
       </b-col>
     </b-row>
@@ -41,6 +41,12 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-activity-counts',
+  props: {
+    summary: {
+      type: Object,
+      required: true
+    }
+  },
   computed: {
     ...mapGetters('contacts', ['contact'])
   }

@@ -5,12 +5,18 @@
               map-options
               emit-value
               use-input
+              ref="workflowSelector"
               option-value="id"
               option-label="name"
-              style="width: 100%"
-              placeholder="Select workflow"
+              :placeholder="placeholder"
+              class="q-selector workflow-selector"
               v-model="selectedWorkflow"
               :options="options"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
               @filter="filterFn">
       <template v-slot:append>
         <b-button size="sm" variant="light" @click.stop="getWorkflows">
@@ -29,17 +35,60 @@ export default {
   computed: {
     workflowOptions () {
       return this.workflows
+    },
+    selectedWorkflowObject () {
+      if (!this.selectedWorkflow) {
+        return null
+      }
+
+      return this.workflowOptions.find(item => item.id === this.selectedWorkflow)
     }
   },
   data () {
     return {
       selectedWorkflow: '',
       isLoadingWorkflow: false,
+      isFocused: false,
       workflows: [],
-      options: this.workflowOptions
+      options: this.workflowOptions,
+      selectWidth: 0,
+      placeholder: 'Select workflow'
     }
   },
   methods: {
+    onFocus () {
+      this.isFocused = true
+      this.$el.querySelector('.q-selector .q-field__input').placeholder = this.selectedWorkflowObject ? this.selectedWorkflowObject.name : this.placeholder
+      this.$el.querySelector('.q-selector .q-field__input').style.display = 'block'
+      if (this.selectedWorkflowObject) {
+        this.$el.querySelector('.q-selector .q-field__native span').style.display = 'none'
+      }
+    },
+
+    onBlur () {
+      this.isFocused = false
+      this.$el.querySelector('.q-selector .q-field__input').placeholder = ''
+      this.showInputPlaceholder()
+      if (this.selectedWorkflowObject) {
+        this.$el.querySelector('.q-selector .q-field__native span').style.display = ''
+      }
+    },
+    showInputPlaceholder () {
+      if (!this.selectedWorkflowObject) {
+        this.$el.querySelector('.q-selector .q-field__input').placeholder = this.placeholder
+        this.$el.querySelector('.q-selector .q-field__input').style.display = 'block'
+      } else {
+        this.$el.querySelector('.q-selector .q-field__input').style.display = 'none'
+      }
+    },
+
+    onInput () {
+      this.$el.querySelector('.q-selector .q-field__input').blur()
+    },
+    onShowMenu () {
+      this.selectWidth = this.$refs.workflowSelector.$el.offsetWidth
+    },
+
     filterFn (val, update) {
       if (val === '') {
         update(() => {
@@ -69,7 +118,7 @@ export default {
     }
   },
   mounted () {
-    // this.getWorkflows()
+    this.getWorkflows()
   },
   watch: {
     'selectedWorkflow': function (value) {

@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="{ name: 'Contacts List Public', params: { id : item.id }}"
+  <router-link :to="{ path: '/contacts/list/' + item.id, query : { type: 'public' }, meta : { type: 'public' }}"
                :key="item.id"
                v-slot="{ href, route, navigate, isActive, isExactActive }">
     <a :href="href"

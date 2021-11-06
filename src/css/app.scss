@@ -2052,7 +2052,7 @@ span.mention {
     }
 
     .checkbox-wrapper .custom-control-label {
-      padding-top: 3px;
+      padding-top: 0;
     }
 
     span.sms-reminder-label {
@@ -4988,11 +4988,14 @@ span.mention {
   color: $grey-90 !important;
 }
 
+button#bs-folder-options {
+  margin-top: -4px;
+}
+
 .folders {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  height: calc(100vh - 410px);
   padding-bottom: 5px;
   &.border-top {
     .folders__header {
@@ -5124,11 +5127,11 @@ span.mention {
       font-size: $f-size-12 !important;
     }
 
-    .q-btn:nth-child(2) {
+    > .q-btn:nth-child(2) {
       margin-right: 10px;
     }
 
-    .q-btn:nth-child(4) {
+    > .q-btn:nth-child(4) {
       margin-left: 10px;
     }
 
@@ -6414,7 +6417,7 @@ table.datatable {
 .pinned {
   display: flex;
   flex-direction: column;
-  height: 20rem;
+  //height: 20rem;
   padding-top: 16px;
   padding-bottom: 24px;
 
@@ -6431,8 +6434,8 @@ table.datatable {
   }
 
   &__content {
-    height: calc(100% - 32px);
-    overflow: auto;
+    ///height: calc(100% - 32px);
+    //overflow: auto;
     .counts {
       padding-right: 17px;
       .badge-pill {
@@ -6497,6 +6500,10 @@ table.datatable {
   .item.router-link-exact-active {
     background: $grey-50;
   }
+}
+
+.shared__header {
+  padding-bottom: 0 !important;
 }
 
 .inbox-nav-item-group-header {
@@ -7737,6 +7744,25 @@ button.grey-90 {
       margin-right: 15.5px;
     }
   }
+
+  .contacts-left-sidebar {
+    max-width: 309px;
+
+    .contacts-sidebar-card {
+      overflow-y: auto !important;
+
+      .q-item.q-item-type {
+        padding: 0 17px;
+
+        .q-item__label {
+          text-transform: uppercase;
+          font-weight: 700 !important;
+          font-size: 13px !important;
+          color: #62666E !important;
+        }
+      }
+    }
+  }
 }
 
 .custom-control-input:disabled {
@@ -8448,6 +8474,10 @@ screen and (max-width: 956px) {
 
 .border-bottom-transparent {
   border-bottom: 1px solid transparent !important;
+}
+
+.workflow-selector {
+  max-width: 310px !important;
 }
 
 .mobile-phone-drawer {

@@ -95,33 +95,37 @@
       <q-card-section
         v-if="integration_data.properties.email">
         <b-row>
-          <b-button id="btn-workflow-enroll"
-                    class="text-white btn-block"
+          <b-button class="text-white btn-block"
                     size="sm"
                     variant="primary"
-                    tabindex="0">
+                    tabindex="0"
+                    @click="onEnrollToWorkflow">
             <i class="fa fa-user-plus"></i>
             Enroll to Workflow
           </b-button>
         </b-row>
       </q-card-section>
     </q-card>
-    <b-popover custom-class="workflow-enroll-popover"
-               id="hubspot-workflow-popover"
-               target="btn-workflow-enroll"
-               triggers="click">
-      <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
-      <b-button class="btn-block"
-                size="sm"
-                variant="primary"
-                :disabled="isEnrolling || !isWorkflowValid"
-                @click.prevent="enrollToWorkflow">
-        <q-spinner-bars v-if="isEnrolling"
-                        color="white">
-        </q-spinner-bars>
-        {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
-      </b-button>
-    </b-popover>
+    <q-menu content-class="mx-height-300"
+            ref="templatesMenu"
+            no-parent-event
+            no-focus
+            :offset="[366, -105]"
+            v-model="showWorkflowSelectorForm">
+      <div class="no-wrap q-pa-md">
+        <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
+        <b-button class="btn-block"
+                  size="sm"
+                  variant="primary"
+                  :disabled="isEnrolling || !isWorkflowValid"
+                  @click.prevent="enrollToWorkflow">
+          <q-spinner-bars v-if="isEnrolling"
+                          color="white">
+          </q-spinner-bars>
+          {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
+        </b-button>
+      </div>
+    </q-menu>
   </div>
 </template>
 
@@ -180,7 +184,7 @@ export default {
     return {
       isEnrolling: false,
       integration_name: 'hubspot',
-      showWorkflowEnrollForm: true,
+      showWorkflowSelectorForm: false,
       workflow: {
         email: null,
         id: null
@@ -229,7 +233,12 @@ export default {
         this.$generalNotification('Error while enrolling contact to the workflow.', 'error')
       }).finally(() => {
         this.isEnrolling = false
+        this.showWorkflowSelectorForm = false
       })
+    },
+
+    onEnrollToWorkflow () {
+      this.showWorkflowSelectorForm = true
     }
   },
 
