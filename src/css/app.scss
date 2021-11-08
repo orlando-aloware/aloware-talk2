@@ -3509,6 +3509,11 @@ span.mention {
       }
     }
   }
+  .task-list {
+    .task-item {
+      padding-right: 14px;
+    }
+  }
 }
 
 .opacity-1 {
@@ -8529,5 +8534,15 @@ screen and (max-width: 956px) {
         }
       }
     }
+  }
+}
+
+.badge-wrapper {
+  width: 6.86px;
+  i {
+    font-size: 50%;
+    color: rgb(64, 158, 255);
+    position: absolute;
+    left: -5px;
   }
 }
