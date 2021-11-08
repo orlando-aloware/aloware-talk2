@@ -74,7 +74,7 @@
         </q-drawer>
         <q-drawer
           ref="mobilePhone"
-          overlay
+          :overlay="false"
           bordered
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer }"

@@ -8492,6 +8492,9 @@ screen and (max-width: 956px) {
     font-size: 34px;
     font-weight: 600;
   }
+  .q-drawer__backdrop {
+    display: none;
+  }
   aside {
     max-width: 605px !important;
     width: 100% !important;
@@ -8501,9 +8504,49 @@ screen and (max-width: 956px) {
         width: 100% !important;
         .dialer-tabs {
           flex-direction: column !important;
-          & > div ul {
-            display: flex;
-            flex-direction: row !important;
+          & > div {
+            padding-right: 0 !important;
+            border: unset;
+            ul[role='tablist'] {
+              background: $grey-60;
+              border: 2px solid $grey-60;
+              border-radius: 6px;
+              display: flex;
+              flex-direction: row !important;
+              margin-bottom: 15px;
+              li {
+                flex: 1;
+                .nav-link {
+                  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+                  font-size: $f-size-h5;
+                  &.active {
+                    background-color: #FFFFFF !important;
+                    color: $grey-100;
+                    border-radius: 5px;
+                  }
+                  &:not(.active) {
+                    color: #62666E;
+                    border-radius: unset;
+                  }
+                }
+              }
+            }
+          }
+        }
+        .tab-content {
+          .tab-pane {
+            .dialer {
+              justify-content: flex-start !important;
+              & > .form-group {
+                flex: 1;
+                .search-form {
+                  width: 100% !important;
+                }
+              }
+              .q-btn {
+                margin-right: 17px;
+              }
+            }
           }
         }
       }
