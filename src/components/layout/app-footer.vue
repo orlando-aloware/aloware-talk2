@@ -194,7 +194,6 @@ export default {
 
   watch: {
     'tab': function (newValue, oldValue) {
-      console.log('newValue: ', newValue)
       if (!newValue) {
         this.tab = 'inbox'
       }
