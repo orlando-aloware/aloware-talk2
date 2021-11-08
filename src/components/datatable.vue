@@ -81,7 +81,7 @@
       <template v-if="hasEmptySlot && isEmpty">
         <slot name="empty" />
       </template>
-      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty">
+      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty && !isLoading">
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
@@ -164,6 +164,10 @@ export default {
     lastPage: {
       type: Number,
       default: 1
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   },
 

@@ -2,11 +2,11 @@
   <div :class="`task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
        v-if="communication.contact_id"
        @click="onItemClick(communication)">
-    <div class="avatar d-flex justify-content-center pb-1"
+    <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
       <i v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read"
-         class="fa fa-circle position-relative"
-         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;">
+         class="fa fa-circle"
+         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;">
       </i>
       <avatar width="34"
               height="34"
@@ -145,7 +145,7 @@ export default {
 
     contactName () {
       if (this.communication && this.communication.contact) {
-        return this.communication.contact.name || (this.$options.filters.fixPhone(this.communication.lead_number) || 'No Name')
+        return this.communication.contact.name || 'No Name'
       }
 
       if (this.communication) {
