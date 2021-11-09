@@ -67,7 +67,12 @@
       </div>
       <div class="d-flex align-items-center p-0">
         <div class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
-          <DropIcon width="18px" height="18px" class="mr-0 py-0" style="position:relative;top:-2px;" />
+          <DropIcon
+            v-if="address"
+            width="18px"
+            height="18px"
+            class="mr-0 py-0"
+            style="position:relative;top:-2px;" />
           {{ address }} - {{ contact.created_at || '' | fixTime }}
         </div>
         <q-btn
@@ -154,7 +159,13 @@ export default {
       'contact'
     ]),
     address () {
-      return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`
+      if (this.contact?.cnam_city && !this.contact?.cnam_state) {
+        return `${this.contact?.cnam_city}`
+      } else if (!this.contact?.cnam_city && this.contact?.cnam_state) {
+        return `${this.contact?.cnam_state}`
+      } else {
+        return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`
+      }
     },
     listObject () {
       return this.powerDialerListItems[this.currentList?.id]

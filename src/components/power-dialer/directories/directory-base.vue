@@ -1,7 +1,7 @@
 <template>
   <div class="folders">
     <div class="t-menu__header d-flex align-items-center">
-      <div class="header__header__title pl-3 py-3 flex-grow-1">
+      <div class="header__header__title text-13 pl-0 py-3 flex-grow-1">
         {{ title }}
       </div>
 
