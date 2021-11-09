@@ -162,9 +162,9 @@ export default {
 
   data () {
     return {
+      sequence: this.value,
       auth: auth,
       isLoading: false,
-      sequence: this.value,
       sequencesOptions: [],
       selectWidth: 0
     }
@@ -194,6 +194,9 @@ export default {
   },
 
   watch: {
+    value () {
+      this.sequence = this.value
+    },
     sequence: function (value) {
       this.$emit('change', value)
     }

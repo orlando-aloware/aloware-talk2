@@ -147,7 +147,7 @@ export default {
             order = ''
           }
           data.push({
-            label: order + '- ' + this.getUserName(user)
+            label: order + this.getUserName(user)
           })
         }
       }

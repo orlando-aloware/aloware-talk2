@@ -332,6 +332,9 @@ export default {
       'powerDialerDirectoryList',
       'datatableLoader'
     ]),
+    ...mapGetters('contacts', [
+      'contact'
+    ]),
     checked () {
       return this.selectedContacts[this.id] || []
     },
@@ -384,10 +387,10 @@ export default {
     ]),
 
     beginDial () {
-      let contact = Object.assign({}, this.currentContacts)
+      // let contact = Object.assign({}, this.currentContacts)
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
-      this.setContact(contact[0])
+      this.setContact(this.contact)
       this.$router.push({ name: 'Power Dialer Session' })
     },
     onColumnsReordered (nextColumns) {

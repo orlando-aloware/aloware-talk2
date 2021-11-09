@@ -9,6 +9,8 @@
     ref="create-filter-modal"
     v-model="isOpen"
     @show="onShow"
+    @shown="onShown"
+    @hide="onHide"
     @hidden="onHidden">
   <b-form @submit.prevent="onSubmit">
     <b-form-row>
@@ -21,11 +23,12 @@
           class="form-label"
         >
           <b-form-input
-            v-model.trim="$v.filter.name.$model"
-            :state = "validateState('name')"
+            ref="filterNameInput"
             size="md"
             type="text"
             placeholder="Name"
+            v-model.trim="$v.filter.name.$model"
+            :state = "validateState('name')"
           ></b-form-input>
           <b-form-invalid-feedback v-if="!$v.filter.name.required">Enter filter name</b-form-invalid-feedback>
         </b-form-group>
@@ -134,7 +137,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterModelForm']),
+    ...mapActions('inbox', ['toggleFilterModelForm', 'toggleFilterDialog']),
     validateState (input) {
       const { $dirty, $error } = this.$v.filter[input]
       return $dirty ? !$error : null
@@ -142,13 +145,16 @@ export default {
     onHidden () {
       this.$v.filter.$reset()
       this.toggleFilterModelForm()
-      // this.$root.$emit('bv::show::modal', 'inbox-channel-filter-modal')
     },
     onHide () {
-      this.$refs['create-filter-modal'].hide()
+      this.toggleFilterModelForm()
+      this.toggleFilterDialog(true)
     },
     onShow () {
-      // this.$root.$emit('bv::hide::modal', 'inbox-channel-filter-modal')
+      this.toggleFilterDialog()
+    },
+    onShown () {
+      this.$refs.filterNameInput.focus()
     },
     onFilterTypeShowMenu () {
       this.selectWidth = this.$refs.filterTypeSelect.$el.offsetWidth
@@ -162,12 +168,26 @@ export default {
       this.filter = { ...this.filter, type: this.filterModel.type, filter: this.filterModel.filter }
       return talk2Api.V2.inbox.filters.save(this.filter).then(response => {
         this.isCreating = false
+        this.$VueEvent.fire('channel_filter_created', response.data.filter)
         this.$emit('created', response.data.filter)
         this.$nextTick(function () {
           this.onHide()
         })
+      }).catch(error => {
+        let errors = error.response.data.errors
+        let keys = Object.keys(errors)
+
+        if (keys && keys.length > 0) {
+          this.$generalNotification(errors[keys[0]], 'error')
+        }
+
+        this.isCreating = false
       })
     }
+  },
+
+  mounted () {
+    this.toggleFilterModelForm()
   },
 
   watch: {

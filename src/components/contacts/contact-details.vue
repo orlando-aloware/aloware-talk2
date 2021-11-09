@@ -19,7 +19,7 @@
         </contact-notes>
         <contact-integrations :contact="contact"></contact-integrations>
         <contact-scheduled-messages></contact-scheduled-messages>
-        <contact-activity-counts></contact-activity-counts>
+        <contact-activity-counts :summary="communicationsSummary.summaries"></contact-activity-counts>
         <contact-lines></contact-lines>
         <contact-ring-groups></contact-ring-groups>
         <contact-broadcast></contact-broadcast>

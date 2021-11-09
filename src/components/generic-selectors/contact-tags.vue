@@ -3,7 +3,7 @@
           v-if="hasPermissionTo('tag contact')">
     <generic-multi-select label="Tags"
                           button-text="Modify Tags"
-                          :values="contact.tag_ids"
+                          :values="tagIds"
                           :options="combinedTags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           :optionsIsGrouped="true"
@@ -110,6 +110,16 @@ export default {
         })
       }
       return tags
+    },
+    tagIds () {
+      if (this.contact?.tag_ids) {
+        return this.contact.tag_ids
+      }
+      let ids = []
+      this.contact.tags.forEach(tag => {
+        ids.push(tag.id)
+      })
+      return ids
     }
   },
 

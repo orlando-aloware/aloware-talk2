@@ -5,6 +5,7 @@
                     :commCampaigns="[]"
                     :commRingGroups="[]"
                     :has-custom-left-content="true"
+                    :is-search="isSearch"
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
           <div class="inbox-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">

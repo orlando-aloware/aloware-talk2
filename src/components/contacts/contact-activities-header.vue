@@ -4,11 +4,15 @@
       <back-button class="p-0"
                    v-if="$q.screen.lt.md"
                    @click="back"/>
-      <span class="contact-name">{{ label }}</span>
-      <b-badge :variant="resolveVariant" class="font-weight-light badge-task-status ml-1">{{ contact.task_status | fixTaskStatusName }}</b-badge>
+      <div class="contact-name">{{ label }}</div>
+      <b-badge class="d-flex align-items-center font-weight-light badge-task-status ml-1"
+               :variant="resolveVariant"
+               v-if="contact.task_status">
+        {{ contact.task_status | fixTaskStatusName }}
+      </b-badge>
     </div>
-    <div class="contact-activities-actions">
-      <div class="contact-activities-actions__mobile align-items-center">
+    <div class="contact-activities-actions text-nowrap">
+      <div class="contact-activities-actions__mobile align-items-center flex-grow-1 justify-content-end">
         <b-dropdown no-caret
                     right
                     variant="light"
@@ -52,7 +56,7 @@
           <information-circle-icon/>
         </q-btn>
       </div>
-      <div class="contact-activities-actions__desktop">
+      <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">
         <q-btn
           borderless
           flat

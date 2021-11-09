@@ -178,6 +178,7 @@
         :hasMore="hasMore"
         :isEmpty="isEmpty || isStartState"
         :isLoadingMore="isLoadingMore"
+        :is-loading="isLoading"
         :contact-list-id="id"
         :paginated="true"
         :total-rows="listItems[id].total"

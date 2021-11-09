@@ -18,7 +18,7 @@
                    exact>
         <span class="tab-icon">
           <inbox-mobile-icon
-            :color="isActive('inbox') ? '#2F80ED' : '#A3A3A3'"/>
+            :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'"/>
         </span>
         Inbox
       </q-route-tab>
@@ -31,10 +31,22 @@
                    exact>
         <span class="tab-icon">
           <contacts-mobile-icon
-            :color="tab === 'contacts' ? '#2F80ED' : '#A3A3A3'"/>
+            :color="tab === 'contacts' ? '#256EFF' : '#A3A3A3'"/>
         </span>
         Contacts
       </q-route-tab>
+      <q-tab name="phone"
+             :content-class="phoneContentClass"
+             :ripple="false"
+             :active="isPhoneActive"
+             no-caps
+             exact>
+        <span class="tab-icon">
+          <mobile-phone-icon
+            :color="tab === 'phone' ? 'primary' : 'grey-30'"/>
+        </span>
+        Phone
+      </q-tab>
       <q-route-tab name="power-dialer"
                    to="/power-dialer"
                    :content-class="isActive('power-dialer') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
@@ -44,7 +56,7 @@
                    exact>
         <span class="tab-icon">
           <power-dialer-mobile-icon
-            :color="tab === 'stats' ? '#2F80ED' : '#A3A3A3'"/>
+            :color="tab === 'power-dialer' ? '#256EFF' : '#A3A3A3'"/>
         </span>
         Power Dialer
       </q-route-tab>
@@ -57,23 +69,22 @@
                    exact>
         <span class="tab-icon">
           <stats-mobile-icon
-            :color="tab === 'stats' ? '#2F80ED' : '#A3A3A3'"/>
+            :color="tab === 'stats' ? '#256EFF' : '#A3A3A3'"/>
         </span>
         Stats
       </q-route-tab>
-      <q-route-tab name="more"
-                   to=""
-                   :id="'mobile-menu-item-more'"
-                   :content-class="moreContentClass"
-                   :ripple="false"
-                   :active="isMoreActive"
-                   no-caps
-                   exact>
+      <q-tab name="more"
+             :id="'mobile-menu-item-more'"
+             :content-class="moreContentClass"
+             :ripple="false"
+             :active="isMoreActive"
+             no-caps
+             exact>
         <span class="tab-icon">
           <more-mobile-icon/>
         </span>
         More
-      </q-route-tab>
+      </q-tab>
     </q-tabs>
     <b-popover
       target="mobile-menu-item-more"
@@ -115,9 +126,11 @@ import MoreMobileIcon from 'components/icons/mobile-menu/more-mobile-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
+import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 export default {
   name: 'app-footer',
   components: {
+    MobilePhoneIcon,
     PowerDialerMobileIcon,
     MoreMobileIcon,
     StatsMobileIcon,
@@ -132,7 +145,13 @@ export default {
       return this.tab === 'more'
     },
     moreContentClass () {
-      return !this.isMoreActive ? 'tab-inactive tab-icons xs-text' : 'tab-icons xs-text'
+      return !this.isMoreActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'
+    },
+    isPhoneActive () {
+      return this.tab === 'phone'
+    },
+    phoneContentClass () {
+      return !this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'
     }
   },
   data () {
@@ -152,7 +171,7 @@ export default {
     onCloseDropdown () {
       this.updateTab()
     },
-    updateTab () {
+    getTab () {
       switch (this.$route.name) {
         case 'Inbox':
         case 'Inbox Channel':
@@ -160,25 +179,34 @@ export default {
         case 'Inbox Contact Task':
         case 'Inbox Channel Task Status':
         case 'Inbox Contact Mention Communication':
-          this.tab = 'inbox'
-          break
+          return 'inbox'
         case 'Contacts':
-          this.tab = 'contacts'
-          break
+          return 'contacts'
         case 'Stats':
-          this.tab = 'stats'
-          break
+          return 'stats'
       }
+    },
+    updateTab () {
+      this.tab = this.getTab()
     }
   },
 
   watch: {
-    'tab': function () {
-      if (!this.tab) {
+    'tab': function (newValue, oldValue) {
+      if (!newValue) {
         this.tab = 'inbox'
       }
+      // if (newValue !== this.getTab()) {
+      //   this.updateTab()
+      // }
       if (this.tab === 'more' && this.$route.name) {
         this.updateTab()
+      }
+      if (newValue === 'phone') {
+        this.$emit('toggleMobilePhone', true)
+      }
+      if (oldValue === 'phone') {
+        this.$emit('toggleMobilePhone', false)
       }
     },
     '$route.name': function () {

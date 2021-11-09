@@ -1,49 +1,58 @@
 <template>
-  <div class="folders border-top">
-    <div class="folders__header d-flex align-items-center list--header">
-      <div class="header__header__title font-weight-bold flex-grow-1">
-        My Lists
+  <q-expansion-item
+    default-opened
+    expand-icon-toggle
+    label="My Lists"
+    class="contact-sidebar-list-wrapper"
+  >
+    <template v-slot:header>
+      <q-item-section>
+        <div class="folders__header d-flex align-items-center list--header pb-0">
+        <div class="header__header__title font-weight-bold flex-grow-1">
+          My Lists
+          <button
+            class="btn btn-link btn-sm tooltip-target mr-1"
+            id="bs-folder-options">
+            <plus-icon color="#256EFF"
+                       width="14"
+                       height="14"
+                       firstD="M7 1.5V12.5"
+                       secondD="M12.5 7H1.5"
+                       strokeWidth="1.5"/>
+          </button>
+
+          <b-popover
+            target="bs-folder-options"
+            triggers="click blur"
+            placement="bottomright"
+            boundary="window"
+            custom-class="contact-popover">
+            <contact-menu>
+              <contact-menu-item @click="onCreateFolderToggle">
+                <template slot="icon">
+                  <folder-icon color="#62666E"></folder-icon>
+                </template>
+                <template slot="title">
+                  <span>Folder</span>
+                </template>
+              </contact-menu-item>
+
+              <contact-menu-item @click="onCreateList">
+                <template slot="icon">
+                  <people-icon></people-icon>
+                </template>
+                <template slot="title">
+                  <span>List</span>
+                </template>
+              </contact-menu-item>
+            </contact-menu>
+          </b-popover>
+
+        </div>
       </div>
-
-      <b-popover
-        target="bs-folder-options"
-        triggers="click blur"
-        placement="bottomright"
-        boundary="window"
-        custom-class="contact-popover">
-        <contact-menu>
-          <contact-menu-item @click="onCreateFolderToggle">
-            <template slot="icon">
-              <folder-icon color="#62666E"></folder-icon>
-            </template>
-            <template slot="title">
-              <span>Folder</span>
-            </template>
-          </contact-menu-item>
-
-          <contact-menu-item @click="onCreateList">
-            <template slot="icon">
-              <people-icon></people-icon>
-            </template>
-            <template slot="title">
-              <span>List</span>
-            </template>
-          </contact-menu-item>
-        </contact-menu>
-      </b-popover>
-
-      <button
-        class="btn btn-link btn-sm tooltip-target mr-1"
-        id="bs-folder-options">
-        <plus-icon color="#256EFF"
-                   width="14"
-                   height="14"
-                   firstD="M7 1.5V12.5"
-                   secondD="M12.5 7H1.5"
-                   strokeWidth="1.5"/>
-      </button>
-    </div>
-
+      </q-item-section>
+    </template>
+  <div class="folders border-top">
     <div class="folders__content">
       <tree-folder-create
         v-if="isCreatingFolder"
@@ -79,24 +88,26 @@
       </template>
     </div>
   </div>
+  </q-expansion-item>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
+import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import ContactMenu from './contact-menu.vue'
 import ContactMenuItem from './contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-icon.vue'
-import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+
 export default {
   components: {
     TreeFolder,
+    TreeFolderCreate,
     ContactMenu,
     ContactMenuItem,
     FolderIcon,
-    TreeFolderCreate,
     PeopleIcon,
     PlusIcon
   },

@@ -5,146 +5,170 @@
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
-    <q-layout class="page-layout h-100"
-              view="lHh Lpr lff"
-              :height="'100%'">
-      <div class="h-100"
-           :class="[ sidebarVisible ? 'sidebar-active' : '']">
-        <q-header class="page-header bg-white text-black no-box-shadow"
-                  v-if="authenticated && !isWidget && !loading">
-          <app-header @toggleSidebar="toggleSidebar"/>
-        </q-header>
-        <q-page-container class="page-container h-100">
-          <section class="main-content section h-100">
-            <template v-if="!loading">
-              <transition :name="transitionName"
-                          mode="out-in">
-                <keep-alive>
-                  <router-view></router-view>
-                </keep-alive>
-              </transition>
-            </template>
-            <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
-                 v-else-if="loading">
-              <div class="container">
-                <q-spinner-bars color="primary"
-                                size="40px">
-                </q-spinner-bars>
-                <div>
-                  <div v-if="!onlineStatus">
-                    <span>Network is <b>offline</b></span>
-                  </div>
-                  <div v-else-if="!authCheckStatus && !loading">
-                    <span>Checking authentication</span>
-                    <div class="container"
-                         v-if="showRefreshButton">
-                      <b-button type="is-link"
-                                expanded
-                                @click="refreshPage">
-                        Refresh
-                      </b-button>
+    <div class="unsupported h-100 w-100 d-flex align-items-center justify-content-center text-center">
+      <span>This screen size is not supported.</span>
+    </div>
+    <div class="page h-100">
+      <q-layout class="page-layout h-100"
+                view="lHh Lpr lff"
+                :height="'100%'">
+        <div class="h-100"
+             :class="[ sidebarVisible ? 'sidebar-active' : '']">
+          <q-header class="page-header bg-white text-black no-box-shadow"
+                    v-if="authenticated && !isWidget && !loading">
+            <app-header @toggleSidebar="toggleSidebar"/>
+          </q-header>
+          <q-page-container class="page-container h-100">
+            <section class="main-content section h-100">
+              <template v-if="!loading">
+                <transition :name="transitionName"
+                            mode="out-in">
+                  <keep-alive>
+                    <router-view></router-view>
+                  </keep-alive>
+                </transition>
+              </template>
+              <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
+                   v-else-if="loading">
+                <div class="container">
+                  <q-spinner-bars color="primary"
+                                  size="40px">
+                  </q-spinner-bars>
+                  <div>
+                    <div v-if="!onlineStatus">
+                      <span>Network is <b>offline</b></span>
                     </div>
-                  </div>
-                  <div v-else>
-                    <span>Loading</span>
+                    <div v-else-if="!authCheckStatus && !loading">
+                      <span>Checking authentication</span>
+                      <div class="container"
+                           v-if="showRefreshButton">
+                        <b-button type="is-link"
+                                  expanded
+                                  @click="refreshPage">
+                          Refresh
+                        </b-button>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <span>Loading</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-          <dialer v-if="authenticated"></dialer>
-        </q-page-container>
+            </section>
+            <dialer v-if="authenticated"></dialer>
+          </q-page-container>
+        </div>
+        <q-drawer v-model="sidebarVisible"
+                  v-if="authenticated"
+                  :breakpoint="0"
+                  class="h-100 sidebar-wrapper d-block"
+                  :width="64"
+                  content-class="sidebar">
+          <q-list>
+            <app-sidebar class="page-sidebar"
+                         :lightMode="lightMode"
+                         @toggleMode="toggleMode">
+            </app-sidebar>
+          </q-list>
+        </q-drawer>
+        <q-drawer
+          ref="mobilePhone"
+          :overlay="false"
+          bordered
+          class="mobile-phone-drawer position-relative"
+          :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
+          side="right"
+          :breakpoint="605"
+          v-model="mobilePhoneDrawer"
+          @hide="onCloseMobilePhone">
+          <div class="phone-header"
+               v-show="!isPhoneVisible">Phone</div>
+          <phone @onPhoneVisible="onPhoneVisible"></phone>
+          <dialer-form v-if="mobilePhoneDrawer"
+                       v-show="!isPhoneVisible"
+                       :isMobile="true">
+          </dialer-form>
+        </q-drawer>
+        <app-footer class="page-footer row d-block w-100 m-0 px-1"
+                    ref="appFooter"
+                    v-if="authenticated && !isWidget && !loading"
+                    @toggleMobilePhone="toggleMobilePhone">
+        </app-footer>
+      </q-layout>
+      <q-dialog v-model="showNewVersionDialog"
+                transition-show="scale"
+                transition-hide="scale"
+                persistent>
+        <q-card class="bg-blue text-white"
+                style="width: 300px">
+          <q-card-section>
+            <div class="text-h6">Update Available</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none"
+                          v-html="updateDialogText">
+          </q-card-section>
+
+          <q-card-actions align="right"
+                          class="bg-white text-blue">
+            <q-btn label="Close"
+                   v-close-popup flat>
+            </q-btn>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <q-dialog v-model="showUpdateErrorDialog"
+                transition-show="scale"
+                transition-hide="scale"
+                persistent>
+        <q-card class="bg-red text-white width-300">
+          <q-card-section>
+            <div class="text-h6">Download Failed</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none"
+                          v-html="updateDialogText">
+          </q-card-section>
+
+          <q-card-actions align="right"
+                          class="bg-white">
+            <q-btn label="Close"
+                   text-color="red"
+                   v-close-popup flat>
+            </q-btn>
+            <q-btn label="Quit"
+                   text-color="red"
+                   @click="quitApp"
+                   flat>
+            </q-btn>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <q-dialog v-model="showUpdateDownloadedDialog"
+                transition-show="scale"
+                transition-hide="scale"
+                persistent>
+        <q-card class="bg-greenish text-white"
+                style="width: 300px">
+          <q-card-section>
+            <div class="text-h6">Update Downloaded</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none"
+                          v-html="updateDialogText">
+          </q-card-section>
+
+          <q-card-actions align="right"
+                          class="bg-white text-greenish">
+            <q-btn label="Restart"
+                   @click="restartApp"
+                   flat>
+            </q-btn>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
       </div>
-      <q-drawer v-model="sidebarVisible"
-                v-if="authenticated"
-                :breakpoint="0"
-                class="h-100 sidebar-wrapper d-block"
-                :width="64"
-                content-class="sidebar">
-        <q-list>
-          <app-sidebar class="page-sidebar"
-                       :lightMode="lightMode"
-                       @toggleMode="toggleMode">
-          </app-sidebar>
-        </q-list>
-      </q-drawer>
-      <app-footer class="page-footer row d-block w-100 m-0 px-1"
-                  ref="appFooter"
-                  v-if="authenticated && !isWidget && !loading">
-      </app-footer>
-    </q-layout>
-    <q-dialog v-model="showNewVersionDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-blue text-white"
-              style="width: 300px">
-        <q-card-section>
-          <div class="text-h6">Update Available</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none"
-                        v-html="updateDialogText">
-        </q-card-section>
-
-        <q-card-actions align="right"
-                        class="bg-white text-blue">
-          <q-btn label="Close"
-                 v-close-popup flat>
-          </q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-dialog v-model="showUpdateErrorDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-red text-white width-300">
-        <q-card-section>
-          <div class="text-h6">Download Failed</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none"
-                        v-html="updateDialogText">
-        </q-card-section>
-
-        <q-card-actions align="right"
-                        class="bg-white">
-          <q-btn label="Close"
-                 text-color="red"
-                 v-close-popup flat>
-          </q-btn>
-          <q-btn label="Quit"
-                 text-color="red"
-                 @click="quitApp"
-                 flat>
-          </q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-dialog v-model="showUpdateDownloadedDialog"
-              transition-show="scale"
-              transition-hide="scale"
-              persistent>
-      <q-card class="bg-greenish text-white"
-              style="width: 300px">
-        <q-card-section>
-          <div class="text-h6">Update Downloaded</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none"
-                        v-html="updateDialogText">
-        </q-card-section>
-
-        <q-card-actions align="right"
-                        class="bg-white text-greenish">
-          <q-btn label="Restart"
-                 @click="restartApp"
-                 flat>
-          </q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -161,15 +185,19 @@ import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import _ from 'lodash'
+import DialerForm from 'components/dialer/dialer-form'
+import Phone from 'components/dialer/phone'
 
 export default {
   name: 'MyLayout',
 
   components: {
+    DialerForm,
     AppHeader,
     AppFooter,
     AppSidebar,
-    Dialer
+    Dialer,
+    Phone
   },
 
   mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
@@ -209,6 +237,8 @@ export default {
       reminderNotifiedDesktop: [],
       sidebarVisible: false,
       lightMode: true,
+      mobilePhoneDrawer: false,
+      isPhoneVisible: false,
       CommunicationTypes,
       MetricOptionGroups
     }
@@ -528,6 +558,13 @@ export default {
   },
 
   methods: {
+    onPhoneVisible (value) {
+      this.isPhoneVisible = value
+    },
+    toggleMobilePhone (value) {
+      this.mobilePhoneDrawer = value
+    },
+
     toggleMode () {
       this.lightMode = !this.lightMode
     },
@@ -1376,6 +1413,12 @@ export default {
       }
     },
 
+    onCloseMobilePhone () {
+      if (typeof this.$refs.appFooter !== 'undefined') {
+        this.$refs.appFooter.updateTab()
+      }
+    },
+
     logout () {
       this.logoutUser().then((res) => {
         this.response = res.data
@@ -1426,6 +1469,24 @@ export default {
   },
 
   watch: {
+    '$q.screen.lt.md': function () {
+      if (typeof this.$refs.mobilePhone === 'undefined') {
+        return
+      }
+
+      if (this.$q.screen.lt.md) {
+        this.$refs.mobilePhone.$el.classList.remove('hidden')
+      }
+
+      if (!this.$q.screen.lt.md && !this.$refs.mobilePhone.$el.classList.contains('hidden')) {
+        this.$refs.mobilePhone.$el.classList.add('hidden')
+      }
+
+      if (!this.$q.screen.lt.md) {
+        this.mobilePhoneDrawer = false
+        this.onCloseMobilePhone()
+      }
+    },
     $route (to, from) {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length

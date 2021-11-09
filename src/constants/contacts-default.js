@@ -42,7 +42,7 @@ export const DEFAULT_STATE = {
         }
       },
       type: 2,
-      name: 'Unassigned'
+      name: 'Unassigned Contacts'
     },
     unanswered: {
       id: 'unanswered',
@@ -53,7 +53,7 @@ export const DEFAULT_STATE = {
         }
       },
       type: 2,
-      name: 'Unanswered'
+      name: 'Unanswered Contacts'
     },
     'new-leads': {
       id: 'new-leads',

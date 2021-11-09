@@ -7,6 +7,17 @@
         <b-tab :active="mode === 'call'"
                title="Call"
                @click="setMode('call')">
+          <b-form-group :invalid-feedback="invalidCampaign"
+                        :state="validCampaign"
+                        class="mb-1">
+            <line-selector class="line-selector"
+                           :disable="defaultOutboundCampaignId && mode === 'call'"
+                           :generic-multiselect="false"
+                           prepend="From:"
+                           v-model="campaignId"
+                           @change="changeCampaignId">
+            </line-selector>
+          </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
@@ -50,21 +61,20 @@
               <span class="text-size-sm text-grey-80 _400">New number</span>
             </div>
           </div>
-
-          <b-form-group :invalid-feedback="invalidCampaign"
-                        :state="validCampaign"
-                        class="mb-1">
-            <line-selector :disable="defaultOutboundCampaignId && mode === 'call'"
-                           :generic-multiselect="false"
-                           prepend="From:"
-                           v-model="campaignId"
-                           @change="changeCampaignId">
-            </line-selector>
-          </b-form-group>
         </b-tab>
         <b-tab :active="mode === 'text'"
                title="Message"
                @click="setMode('text')">
+          <b-form-group :invalid-feedback="invalidCampaign"
+                        :state="validCampaign"
+                        class="mb-1">
+            <line-selector class="line-selector"
+                           v-model="campaignId"
+                           prepend="From:"
+                           :generic-multiselect="false"
+                           @change="changeCampaignId">
+            </line-selector>
+          </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
@@ -96,43 +106,44 @@
             </div>
           </div>
 
-          <b-input-group class="mb-2">
-            <template #append>
-              <b-input-group-text class="bg-white border-left-0 align-items-end">
-                <q-btn :disable="sendDisabled"
-                       :ripple="false"
-                       class="height-16 no-q-btn-focus"
-                       padding="none"
-                       flat
-                       @click="sendText">
-                  <send-text-icon width="16"
-                                  height="16"
-                                  :color="sendTextColor">
-                  </send-text-icon>
-                </q-btn>
-              </b-input-group-text>
-            </template>
-            <b-form-textarea class="textarea-no-auto-shrink text-size-sm _400 border-right-0 overflow-hidden pl-2 pr-2 border-half-rounded"
-                             placeholder="Text Message..."
-                             rows="2"
-                             max-rows="3"
-                             no-auto-shrink
-                             no-resize
-                             v-model="textMessage">
-            </b-form-textarea>
-          </b-input-group>
-
-          <b-form-group :invalid-feedback="invalidCampaign"
-                        :state="validCampaign"
-                        class="mb-1">
-            <line-selector v-model="campaignId"
-                           prepend="From:"
-                           :generic-multiselect="false"
-                           @change="changeCampaignId">
-            </line-selector>
-          </b-form-group>
+          <div class="mobile-message-composer mb-2">
+            <b-input-group>
+              <template #append>
+                <b-input-group-text class="bg-white border-left-0 align-items-end">
+                  <q-btn :disable="sendDisabled"
+                         :ripple="false"
+                         class="height-16 no-q-btn-focus"
+                         padding="none"
+                         flat
+                         @click="sendText">
+                    <send-text-icon width="16"
+                                    height="16"
+                                    :color="sendTextColor">
+                    </send-text-icon>
+                  </q-btn>
+                </b-input-group-text>
+              </template>
+              <b-form-textarea class="textarea-no-auto-shrink text-size-sm _400 border-right-0 overflow-hidden pl-2 pr-2 border-half-rounded"
+                               placeholder="Text Message..."
+                               rows="2"
+                               max-rows="3"
+                               no-auto-shrink
+                               no-resize
+                               v-model="textMessage">
+              </b-form-textarea>
+            </b-input-group>
+          </div>
         </b-tab>
       </b-tabs>
+    </div>
+    <div class="mobile-dialer-button"
+         v-if="contactName && campaignId && mode === 'call' && isMobile">
+      <compact-btn borderless
+                   customClass="ml-2 pr-2 pl-0 fs-14 _500 position-relative primary not-focusable bg-success"
+                   @clicked="makeCall">
+        <call-white-icon></call-white-icon>
+        Call {{ contactName }}
+      </compact-btn>
     </div>
   </div>
 </template>
@@ -143,7 +154,9 @@ import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-sea
 import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
+import CompactBtn from 'src/components/compact-btn.vue'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import CallWhiteIcon from 'components/icons/call-white-icon'
 
 export default {
   name: 'dialer-form',
@@ -151,15 +164,22 @@ export default {
   mixins: [contactMixins],
 
   components: {
+    CallWhiteIcon,
     ContactPhoneNumberSearch,
     LineSelector,
-    SendTextIcon
+    SendTextIcon,
+    CompactBtn
   },
 
   props: {
     value: {
       type: Boolean,
       required: false
+    },
+    isMobile: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 

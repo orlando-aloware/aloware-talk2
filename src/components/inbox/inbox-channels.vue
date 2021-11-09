@@ -1,7 +1,7 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column">
       <div class="header w-100" v-if="$route.params.channel !== 'mentions'"
-           :class="{ 'border-bottom-0': isSearch }">
+           :class="{ 'border-bottom-transparent': isSearch }">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
@@ -20,7 +20,7 @@
               </compact-btn>
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
-                           v-b-modal:inbox-channel-filter-modal>
+                           @clicked="toggleFilterDialog(true)">
                 <q-tooltip v-if="selectedFilter"
                            anchor="top middle"
                            self="center middle">
@@ -147,8 +147,11 @@
         </div>
       </div>
       <filter-dialog :filter="filter"
+                     :filter-model="filterModel"
                      @onResetFilter="resetFilters">
       </filter-dialog>
+      <create-filter-dialog :filter-model="filterModel">
+      </create-filter-dialog>
     </div>
 </template>
 
@@ -170,6 +173,7 @@ import UserSelector from 'components/generic-selectors/user-selector'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
+import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 
 let scrollTimeout
 export default {
@@ -177,7 +181,17 @@ export default {
 
   mixins: [ aclMixin, communicationMixin ],
 
-  components: { InboxSearcher, FilterIcon, UserSelector, TaskMentionList, FilterDialog, CompactBtn, TaskList, SearchToggle },
+  components: {
+    CreateFilterDialog,
+    InboxSearcher,
+    FilterIcon,
+    UserSelector,
+    TaskMentionList,
+    FilterDialog,
+    CompactBtn,
+    TaskList,
+    SearchToggle
+  },
 
   props: {
     filterType: {
@@ -233,6 +247,90 @@ export default {
 
     hasChannelFilterChanges () {
       return this.channelChangedFilterFields.length > 0
+    },
+
+    filterModel () {
+      let filterModel = {
+        name: '',
+        type: 2,
+        filter: [],
+        scope: 'user'
+      }
+      switch (true) {
+        case ['voicemails'].includes(this.$route.params.channel):
+          filterModel.type = 3
+          filterModel.filter = {
+            campaigns: this.filter.campaigns,
+            ring_groups: this.filter.ring_groups,
+            direction: this.filter.direction,
+            tags: this.filter.tags,
+            first_time_only: this.filter.first_time_only,
+            untagged_only: this.filter.untagged_only,
+            exclude_automated_communications: this.filter.exclude_automated_communications,
+            incoming_numbers: this.filter.incoming_numbers,
+            users: this.filter.users,
+            workflows: this.filter.workflows
+          }
+          break
+        case ['calls'].includes(this.$route.params.channel):
+          filterModel.type = 1
+          filterModel.filter = {
+            campaigns: this.filter.campaigns,
+            ring_groups: this.filter.ring_groups,
+            direction: this.filter.direction,
+            answer_status: this.filter.answer_status,
+            min_talk_time: this.filter.min_talk_time,
+            transfer_type: this.filter.transfer_type,
+            callback_status: this.filter.callback_status,
+            tags: this.filter.tags,
+            call_dispositions: this.filter.call_dispositions,
+            first_time_only: this.filter.first_time_only,
+            untagged_only: this.filter.untagged_only,
+            exclude_automated_communications: this.filter.exclude_automated_communications,
+            incoming_numbers: this.filter.incoming_numbers,
+            users: this.filter.users,
+            workflows: this.filter.workflows
+          }
+          break
+        case ['recordings'].includes(this.$route.params.channel):
+          filterModel.type = 4
+          filterModel.filter = {
+            campaigns: this.filter.campaigns,
+            ring_groups: this.filter.ring_groups,
+            direction: this.filter.direction,
+            answer_status: this.filter.answer_status,
+            min_talk_time: this.filter.min_talk_time,
+            transfer_type: this.filter.transfer_type,
+            callback_status: this.filter.callback_status,
+            tags: this.filter.tags,
+            call_dispositions: this.filter.call_dispositions,
+            first_time_only: this.filter.first_time_only,
+            untagged_only: this.filter.untagged_only,
+            exclude_automated_communications: this.filter.exclude_automated_communications,
+            incoming_numbers: this.filter.incoming_numbers,
+            users: this.filter.users,
+            workflows: this.filter.workflows
+          }
+          break
+        case ['messages'].includes(this.$route.params.channel):
+        default:
+          filterModel.type = 2
+          filterModel.filter = {
+            campaigns: this.filter.campaigns,
+            direction: this.filter.direction,
+            answer_status: this.filter.answer_status,
+            tags: this.filter.tags,
+            first_time_only: this.filter.first_time_only,
+            untagged_only: this.filter.untagged_only,
+            exclude_automated_communications: this.filter.exclude_automated_communications,
+            incoming_numbers: this.filter.incoming_numbers,
+            users: this.filter.users,
+            workflows: this.filter.workflows,
+            broadcasts: this.filter.broadcasts
+          }
+      }
+
+      return filterModel
     }
   },
 
@@ -292,7 +390,8 @@ export default {
       'setChannelClonedFilter',
       'resetChannelChangedFilterFields',
       'setSelectedFilter',
-      'setHasMoreCommunications']),
+      'setHasMoreCommunications',
+      'toggleFilterDialog']),
 
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
@@ -693,9 +792,10 @@ export default {
   watch: {
     'activeChannel': function (value) {
       if (this.$route.name === 'Inbox Channel') {
+        this.searchText = null
         this.resetFilters()
+        this.isSearch = false
       }
-      this.scrollerTopClass = 'mt-0'
     },
     'searchText': function (value) {
       if ((value && value.length >= 3) || value === '') {

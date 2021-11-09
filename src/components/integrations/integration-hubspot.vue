@@ -45,7 +45,7 @@
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0">
-        <q-card class="deals"
+        <q-card class="deals mb-1"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
                 flat bordered>
@@ -95,33 +95,37 @@
       <q-card-section
         v-if="integration_data.properties.email">
         <b-row>
-          <b-button id="btn-workflow-enroll"
-                    class="text-white btn-block"
+          <b-button class="text-white btn-block"
                     size="sm"
                     variant="primary"
-                    tabindex="0">
+                    tabindex="0"
+                    @click="onEnrollToWorkflow">
             <i class="fa fa-user-plus"></i>
             Enroll to Workflow
           </b-button>
         </b-row>
       </q-card-section>
     </q-card>
-    <b-popover custom-class="workflow-enroll-popover"
-               id="hubspot-workflow-popover"
-               target="btn-workflow-enroll"
-               triggers="click">
-      <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
-      <b-button class="btn-block"
-                size="sm"
-                variant="primary"
-                :disabled="isEnrolling || !isWorkflowValid"
-                @click.prevent="enrollToWorkflow">
-        <q-spinner-bars v-if="isEnrolling"
-                        color="white">
-        </q-spinner-bars>
-        {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
-      </b-button>
-    </b-popover>
+    <q-menu content-class="mx-height-300"
+            ref="templatesMenu"
+            no-parent-event
+            no-focus
+            :offset="[366, -105]"
+            v-model="showWorkflowSelectorForm">
+      <div class="no-wrap q-pa-md">
+        <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
+        <b-button class="btn-block"
+                  size="sm"
+                  variant="primary"
+                  :disabled="isEnrolling || !isWorkflowValid"
+                  @click.prevent="enrollToWorkflow">
+          <q-spinner-bars v-if="isEnrolling"
+                          color="white">
+          </q-spinner-bars>
+          {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
+        </b-button>
+      </div>
+    </q-menu>
   </div>
 </template>
 
@@ -129,6 +133,7 @@
 import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
+import _ from 'lodash'
 
 export default {
   name: 'integration-hubspot',
@@ -158,8 +163,11 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
         this.contact &&
-        this.contact.integrations &&
-        this.contact.integrations.hubspot &&
+        ((this.contact.integrations &&
+            this.contact.integrations.hubspot) ||
+          (this.contact.integration_data &&
+            this.contact.integration_data.hubspot)
+        ) &&
         this.currentCompany.hubspot_marketing_portal_id) {
         return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
@@ -169,7 +177,8 @@ export default {
 
     hubspotLink () {
       if (this.hubspotContactBaseLink) {
-        return `${this.hubspotContactBaseLink}contact/${this.contact.integrations.hubspot.contact_id}`
+        let contactId = this.getContactId()
+        return contactId ? `${this.hubspotContactBaseLink}contact/${contactId}` : false
       }
 
       return false
@@ -180,7 +189,7 @@ export default {
     return {
       isEnrolling: false,
       integration_name: 'hubspot',
-      showWorkflowEnrollForm: true,
+      showWorkflowSelectorForm: false,
       workflow: {
         email: null,
         id: null
@@ -207,6 +216,22 @@ export default {
       })
     },
 
+    getContactId () {
+      let contactId
+      switch (true) {
+        case this.contact.integration_data && !_.isEmpty(this.contact.integration_data):
+          contactId = this.contact.integration_data.hubspot.contact_id
+          break
+        case this.contact.integrations && !_.isEmpty(this.contact.integrations):
+          contactId = this.contact.integrations.hubspot.contact_id
+          break
+        default:
+          contactId = null
+      }
+
+      return contactId
+    },
+
     onWorkflowSelected (workflowId) {
       this.workflow.id = workflowId
     },
@@ -229,7 +254,12 @@ export default {
         this.$generalNotification('Error while enrolling contact to the workflow.', 'error')
       }).finally(() => {
         this.isEnrolling = false
+        this.showWorkflowSelectorForm = false
       })
+    },
+
+    onEnrollToWorkflow () {
+      this.showWorkflowSelectorForm = true
     }
   },
 
