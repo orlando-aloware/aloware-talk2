@@ -7392,6 +7392,12 @@ button.grey-90 {
 .dropdown-white {
   height: 28px;
 
+  &.dropdown-active {
+    button {
+      border: 1px solid $primary !important;
+    }
+  }
+
   button {
     background: $white !important;
     color: $grey-100 !important;
@@ -7400,7 +7406,8 @@ button.grey-90 {
 
 .dropdown-white:not(.border-0) {
   button {
-    border: 1px solid $grey-70 !important;
+    // border: 1px solid $grey-70 !important;
+    border: 1px solid $grey-70;
   }
 }
 

@@ -25,9 +25,9 @@
         no-caret
         right size="sm"
         variant="white"
-        class="scrollable-dropdown-list m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+        :class="`scrollable-dropdown-list m-1 b-compact-dropdown-button text-bold dropdown-white ${hasSelectedObject ? 'dropdown-active' : ''} contacts-options-dropdown`">
         <template #button-content>
-          <i class="fa fa-ellipsis-h"></i>
+          <i :class="`fa fa-ellipsis-h ${hasSelectedObject ? 'text-primary' : ''}`"></i>
         </template>
         <template
           v-for="(chip, key) in filteredListItems">
@@ -104,6 +104,19 @@ export default {
     },
     selectedItemId () {
       return this.selectedItem || ''
+    },
+    selectedItemObject () {
+      return this.filteredListItems.find((list, index) => {
+        if (index > this.displayCount) {
+          return list.id === this.selectedItemId
+        }
+      })
+    },
+    hasSelectedObject () {
+      if (this.selectedItemObject?.id) {
+        return true
+      }
+      return false
     }
   },
   watch: {
