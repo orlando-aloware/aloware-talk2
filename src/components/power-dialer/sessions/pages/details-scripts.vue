@@ -1,5 +1,8 @@
 <template>
-  <q-card flat class="p-0">
+  <q-card
+    :disabled="sessionLoader"
+    flat
+    class="p-0">
     <q-card-section class="px-0" style="overflow:auto;">
 
       <ScriptSelector
@@ -40,7 +43,8 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', [
-      'contact'
+      'contact',
+      'sessionLoader'
     ])
   },
   data () {
