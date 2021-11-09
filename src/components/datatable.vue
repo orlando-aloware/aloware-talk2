@@ -81,7 +81,7 @@
       <template v-if="hasEmptySlot && isEmpty">
         <slot name="empty" />
       </template>
-      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty && !isLoaderVisible">
+      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty && !isLoading">
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
@@ -303,7 +303,6 @@ export default {
 
   mounted () {
     if (this.$refs.scrollableArea) {
-      // this.$refs.scrollableArea.style.height = `${this.$refs.scrollableArea.parentNode.offsetHeight}px`
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
     this.sorts.orderBy = this.defaultContactDateFilter

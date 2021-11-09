@@ -49,8 +49,7 @@ export default {
 
   data () {
     return {
-      isExpanded: true,
-      isLoaderVisible: false
+      isExpanded: true
     }
   },
 
