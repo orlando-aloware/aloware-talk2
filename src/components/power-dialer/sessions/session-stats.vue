@@ -28,11 +28,11 @@
         STATS
       </div>
     </div>
-    <div class="d-flex t-menu__content flex-column pb-3 pl-2">
+    <div class="d-flex t-menu__content flex-column pb-0 pl-2">
       <q-card class="py-0 my-0 pl-1" flat>
         <div class="row">
           <div
-            class="col col-4 p-0 px-1"
+            class="col col-4 p-0 px-1 pb-3"
             v-for="stat in stats"
             :key="stat.name">
             <q-card-section
