@@ -43,7 +43,9 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', [
-      'contact',
+      'contact'
+    ]),
+    ...mapGetters('powerDialer', [
       'sessionLoader'
     ])
   },
