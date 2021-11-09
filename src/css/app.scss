@@ -8486,9 +8486,12 @@ screen and (max-width: 956px) {
 }
 
 .mobile-phone-drawer {
+  &:not(.mobile-phone-visible) {
+    .q-drawer__content {
+      padding: 55px 16px 0;
+    }
+  }
   .phone-header {
-    margin-top: 55px;
-    margin-left: 15px;
     font-size: 34px;
     font-weight: 600;
   }
@@ -8502,10 +8505,17 @@ screen and (max-width: 956px) {
     .q-drawer__content {
       & > div {
         width: 100% !important;
+        &.row {
+          display: flex;
+          flex-direction: column;
+          height: calc(100% - 51px);
+          padding-bottom: 0 !important;
+        }
         .dialer-tabs {
           flex-direction: column !important;
+          height: 100%;
           & > div {
-            padding-right: 0 !important;
+            padding: 0 0 !important;
             border: unset;
             ul[role='tablist'] {
               background: $grey-60;
@@ -8523,6 +8533,7 @@ screen and (max-width: 956px) {
                     background-color: #FFFFFF !important;
                     color: $grey-100;
                     border-radius: 5px;
+                    font-weight: 600;
                   }
                   &:not(.active) {
                     color: #62666E;
@@ -8531,6 +8542,20 @@ screen and (max-width: 956px) {
                 }
               }
             }
+          }
+          .tab-content {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            .tab-pane {
+              width: 100%;
+            }
+          }
+          .mobile-message-composer {
+            display: flex;
+            flex: 1;
+            align-items: flex-end;
+            height: calc(100% - 135px);
           }
         }
         .tab-content {
@@ -8544,9 +8569,78 @@ screen and (max-width: 956px) {
                 }
               }
               .q-btn {
-                margin-right: 17px;
+               /*margin-left: 17px;*/
+                display: none;
               }
             }
+          }
+        }
+      }
+      .line-selector {
+        label,
+        .generic-selector .q-field__control,
+        .generic-selector .q-field__control:after,
+        .generic-selector .q-field__prepend,
+        .generic-selector .q-field__append,
+        .generic-selector .q-field__append,
+        .generic-selector .q-field__control-container,
+        .generic-selector .q-field__native {
+          min-height: 40px !important;
+        }
+        label {
+          height: unset !important;
+          padding-bottom: 0 !important;
+        }
+        .q-field__prepend span,
+        .q-field__native span,
+        .q-field__control-container input {
+          font-size: $f-size-h3;
+        }
+      }
+      .search-form {
+        .input-group *,
+        input::-webkit-input-placeholder {
+          font-size: $f-size-h3 !important;
+        }
+        .form-control {
+          min-height: 40px !important;
+        }
+      }
+      .dialer-contact-info {
+        width: 100% !important;
+        div {
+          font-size: $f-size-body-sm;
+        }
+      }
+      .invalid-feedback {
+        font-size: $f-size-body-sm;
+      }
+      .phone {
+        position: unset;
+        height: 100%;
+        overflow-y: scroll;
+        border-radius: unset;
+        .phone-body {
+          .phone-wrap-up {
+            max-height: unset;
+          }
+        }
+        .actions-block {
+          padding: 0 21px !important;
+        }
+        .phone-footer-buttons {
+          border-radius: unset !important;
+          padding: 18px 16px !important;
+          height: unset !important;
+          button:first-child {
+            background: $success;
+            color: #FFFFFF;
+            margin-right: 10px;
+          }
+          button {
+            height: 40px;
+            max-width: 166px;
+            width: 100%;
           }
         }
       }
@@ -8580,12 +8674,29 @@ screen and (max-width: 956px) {
   }
 }
 
-.badge-wrapper {
-  width: 6.86px;
-  i {
-    font-size: 50%;
-    color: rgb(64, 158, 255);
-    position: absolute;
-    left: -5px;
+.mobile-dialer-button {
+  display: flex;
+  justify-content: center;
+  button {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    color: white;
+    border-radius: 6px;
+    font-size: $f-size-h3;
+    font-weight: 500;
+    height: 48px;
+    margin: 0 0 13px 0 !important;
+    &:hover {
+      background: $success !important;
+      color: white;
+    }
+    svg {
+      margin-right: 8px;
+    }
   }
+}
+
+.b-toaster {
+  z-index: 9999;
 }
