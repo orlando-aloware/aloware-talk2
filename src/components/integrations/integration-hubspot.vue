@@ -45,7 +45,7 @@
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0">
-        <q-card class="deals"
+        <q-card class="deals mb-1"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
                 flat bordered>
@@ -133,6 +133,7 @@
 import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
+import _ from 'lodash'
 
 export default {
   name: 'integration-hubspot',
@@ -162,8 +163,11 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
         this.contact &&
-        this.contact.integrations &&
-        this.contact.integrations.hubspot &&
+        ((this.contact.integrations &&
+            this.contact.integrations.hubspot) ||
+          (this.contact.integration_data &&
+            this.contact.integration_data.hubspot)
+        ) &&
         this.currentCompany.hubspot_marketing_portal_id) {
         return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
@@ -173,7 +177,8 @@ export default {
 
     hubspotLink () {
       if (this.hubspotContactBaseLink) {
-        return `${this.hubspotContactBaseLink}contact/${this.contact.integrations.hubspot.contact_id}`
+        let contactId = this.getContactId()
+        return contactId ? `${this.hubspotContactBaseLink}contact/${contactId}` : false
       }
 
       return false
@@ -209,6 +214,22 @@ export default {
       }).then(response => {
         this.integration_data = response.data
       })
+    },
+
+    getContactId () {
+      let contactId
+      switch (true) {
+        case this.contact.integration_data && !_.isEmpty(this.contact.integration_data):
+          contactId = this.contact.integration_data.hubspot.contact_id
+          break
+        case this.contact.integrations && !_.isEmpty(this.contact.integrations):
+          contactId = this.contact.integrations.hubspot.contact_id
+          break
+        default:
+          contactId = null
+      }
+
+      return contactId
     },
 
     onWorkflowSelected (workflowId) {
