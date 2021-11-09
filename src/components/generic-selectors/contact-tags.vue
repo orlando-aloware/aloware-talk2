@@ -111,15 +111,18 @@ export default {
       }
       return tags
     },
+
     tagIds () {
       if (this.contact?.tag_ids) {
         return this.contact.tag_ids
+      } else if (this.contact?.tags) {
+        let ids = []
+        this.contact.tags.forEach(tag => {
+          ids.push(tag.id)
+        })
+        return ids
       }
-      let ids = []
-      this.contact.tags.forEach(tag => {
-        ids.push(tag.id)
-      })
-      return ids
+      return []
     }
   },
 

@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <q-card
+    flat
+    :disabled="sessionLoader"
+    class="bg-grey-1">
     <div class="pb-2">
       <ContactPhones />
     </div>
@@ -9,7 +12,7 @@
     <div class="pb-2">
       <ContactNotes :contact="contact" />
     </div>
-  </div>
+  </q-card>
 </template>
 
 <script>
