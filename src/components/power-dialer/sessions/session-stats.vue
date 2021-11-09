@@ -1,7 +1,7 @@
 <template>
   <div class="t-menu">
     <div class="t-menu__header no-border d-flex align-items-center pr-3">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
+      <div class="header__header__title font-weight-bold pl-3 text-13 flex-grow-1">
         SESSION
       </div>
       <b-dropdown size="xs" variant="link" toggle-class="text-decoration-none" no-caret>
@@ -24,7 +24,7 @@
 
     </div>
     <div class="t-menu__header d-flex align-items-center">
-      <div class="header__header__title font-weight-bold pl-3 flex-grow-1">
+      <div class="header__header__title font-weight-bold pl-3 text-13 flex-grow-1">
         STATS
       </div>
     </div>
@@ -41,7 +41,7 @@
                 {{ stat.values.primary }}
                 <div class="text-caption pt-1 pl-1 text-grey">{{stat.values.secondary}}</div>
               </div>
-              <div class="t-label text-caption text-grey">{{ stat.name }}</div>
+              <div class="t-label text-caption text-grey-90">{{ stat.name }}</div>
             </q-card-section>
             </div>
         </div>
