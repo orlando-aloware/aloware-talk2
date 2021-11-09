@@ -74,16 +74,21 @@
         </q-drawer>
         <q-drawer
           ref="mobilePhone"
-          overlay
+          :overlay="false"
           bordered
           class="mobile-phone-drawer position-relative"
-          :class="{ 'hidden': !mobilePhoneDrawer }"
+          :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
           :breakpoint="605"
           v-model="mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
-          <div class="phone-header">Phone</div>
-          <dialer-form v-if="mobilePhoneDrawer"></dialer-form>
+          <div class="phone-header"
+               v-show="!isPhoneVisible">Phone</div>
+          <phone @onPhoneVisible="onPhoneVisible"></phone>
+          <dialer-form v-if="mobilePhoneDrawer"
+                       v-show="!isPhoneVisible"
+                       :isMobile="true">
+          </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
@@ -181,6 +186,7 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
+import Phone from 'components/dialer/phone'
 
 export default {
   name: 'MyLayout',
@@ -190,7 +196,8 @@ export default {
     AppHeader,
     AppFooter,
     AppSidebar,
-    Dialer
+    Dialer,
+    Phone
   },
 
   mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
@@ -231,6 +238,7 @@ export default {
       sidebarVisible: false,
       lightMode: true,
       mobilePhoneDrawer: false,
+      isPhoneVisible: false,
       CommunicationTypes,
       MetricOptionGroups
     }
@@ -550,6 +558,9 @@ export default {
   },
 
   methods: {
+    onPhoneVisible (value) {
+      this.isPhoneVisible = value
+    },
     toggleMobilePhone (value) {
       this.mobilePhoneDrawer = value
     },

@@ -332,7 +332,7 @@
             </div>
           </div>
 
-          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
+          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
             <button :disabled="isMuteDisabled"
                     class="phone-buttons btn"
                     @click="toggleMute">
@@ -380,7 +380,7 @@
               <span>{{ recordingText }}</span>
             </button>
           </div>
-          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3">
+          <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
             <button class="phone-buttons elevated btn"
                     @click="openNotes">
               <notes-icon width="16"
@@ -404,7 +404,7 @@
               <span>VM Drop</span>
             </button>
           </div>
-          <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3">
+          <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3 actions-block">
             <button :disabled="isHangupDisabled"
                     class="phone-buttons btn"
                     @click="endCall">
@@ -1754,18 +1754,22 @@ export default {
 
     togglePhone () {
       this.isVisible = !this.isVisible
+      this.$emit('onPhoneVisible', true)
     },
 
     openPhone () {
       this.isVisible = true
+      this.$emit('onPhoneVisible', true)
     },
 
     closePhone () {
       this.isVisible = false
+      this.$emit('onPhoneVisible', false)
     },
 
     endWrapUp () {
       this.$VueEvent.fire('endWrapUp')
+      this.$emit('onPhoneVisible', false)
     },
 
     makeCall () {
@@ -2089,6 +2093,9 @@ export default {
       this.resetBottomExpansion()
       this.changeScreen('call')
       this.digits = ''
+      if (!this.shouldShow) {
+        this.$emit('onPhoneVisible', false)
+      }
     },
 
     screen () {

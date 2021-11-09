@@ -309,6 +309,7 @@ export default {
     state.currentListFilters = {}
     state.contact = {}
     state.lists = Object.assign({}, ContactsListDefaultList.DEFAULT_STATE.lists)
+    console.log(state.lists)
     for (let index in state.listItems) {
       state.listItems[index] = DEFAULT_CONTACT_LIST_ITEMS
     }

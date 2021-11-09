@@ -43,7 +43,7 @@
              exact>
         <span class="tab-icon">
           <mobile-phone-icon
-            :iconColor="tab === 'phone' ? 'primary' : 'grey-30'"/>
+            :color="tab === 'phone' ? 'primary' : 'grey-30'"/>
         </span>
         Phone
       </q-tab>
@@ -73,19 +73,18 @@
         </span>
         Stats
       </q-route-tab>
-      <q-route-tab name="more"
-                   to=""
-                   :id="'mobile-menu-item-more'"
-                   :content-class="moreContentClass"
-                   :ripple="false"
-                   :active="isMoreActive"
-                   no-caps
-                   exact>
+      <q-tab name="more"
+             :id="'mobile-menu-item-more'"
+             :content-class="moreContentClass"
+             :ripple="false"
+             :active="isMoreActive"
+             no-caps
+             exact>
         <span class="tab-icon">
           <more-mobile-icon/>
         </span>
         More
-      </q-route-tab>
+      </q-tab>
     </q-tabs>
     <b-popover
       target="mobile-menu-item-more"
@@ -146,13 +145,13 @@ export default {
       return this.tab === 'more'
     },
     moreContentClass () {
-      return !this.isMoreActive ? 'tab-inactive tab-icons xs-text' : 'tab-icons xs-text'
+      return !this.isMoreActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'
     },
     isPhoneActive () {
       return this.tab === 'phone'
     },
     phoneContentClass () {
-      return !this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-icons xs-text'
+      return !this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'
     }
   },
   data () {

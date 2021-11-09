@@ -1,5 +1,5 @@
 <template>
-  <div :class="`task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
+  <div :class="`task-item w-100 d-flex flex-row py-2 align-items-center border-bottom ${activeClass}`"
        v-if="communication.contact_id"
        @click="onItemClick(communication)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
