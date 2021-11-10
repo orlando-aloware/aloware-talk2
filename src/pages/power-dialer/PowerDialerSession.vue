@@ -1,10 +1,11 @@
 <template>
   <div class="mx-0 content-row d-flex overflow-hidden h-100">
-    <div class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
+    <div :class="`${sessionSidebarExpanded ? 'col-0' : 'col-2'} width-0 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right`">
       <SessionSidebar />
     </div>
     <div
-      class="col-10 bg-grey-1 px-0 pr-1 mb-0">
+      :class="`${sessionSidebarExpanded ? 'col-12' : 'col-10'} bg-grey-1 px-0 pr-1 mb-0`"
+      :style="`${sessionSidebarExpanded ? 'padding-left:15px !important;' : ''}`">
       <div class="t-flex-group">
 
         <!-- Session Header -->
@@ -42,7 +43,8 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'isStartingDial'
+      'isStartingDial',
+      'sessionSidebarExpanded'
     ])
   },
   created () {

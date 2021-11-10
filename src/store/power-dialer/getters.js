@@ -33,5 +33,6 @@ export default {
   datatableLoader: (state) => state.datatableLoader,
   search: (state) => state.search,
   sessionLoader: (state) => state.sessionLoader,
+  sessionSidebarExpanded: (state) => state.sessionSidebarExpanded,
   changingSelectedContact: (state) => state.changingSelectedContact
 }

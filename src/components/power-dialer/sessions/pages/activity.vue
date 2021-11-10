@@ -11,7 +11,7 @@
 
         <div
           :class="`contact-activity-wrapper ${widthClass}`"
-          style="height:calc(100vh - 362px);">
+          style="height:calc(100vh - 340px);">
 
           <ContactActivities
             ref="contactActivities"
@@ -52,6 +52,7 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import ContactActivities from 'src/components/contacts/contact-activities'
 
@@ -61,10 +62,12 @@ export default {
     ContactActivities
   },
   mixins: [
+    contactsMixins,
     contactMixins
   ],
   mounted () {
     // this.setContact(this.contact)
+    console.log('MOunted...')
     this.setSelectedContact(this.contact)
     if (this.authenticated) {
       this.fetchContact()
@@ -110,6 +113,7 @@ export default {
       this.selectedContactChanging(true)
       let _this = this
       this.processFetchContactInfo(function (selectedContact) {
+        console.log('selectedContact :>> ', selectedContact)
         _this.setContact(selectedContact)
         _this.setContactClone(selectedContact)
         _this.resetChangedContactProperties([])
@@ -131,12 +135,18 @@ export default {
   watch: {
     contact (val) {
       if (val?.id) {
+        // if ()
         this.setContact(this.contact)
+        console.log('...fetching contacts', val)
+        this.flagged = true
+        // this.fetchContact()
       }
     }
   },
   data () {
-    return {}
+    return {
+      flagged: false
+    }
   }
 }
 </script>

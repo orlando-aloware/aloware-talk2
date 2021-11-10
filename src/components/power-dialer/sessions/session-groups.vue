@@ -59,6 +59,7 @@
                     :key="`acc-item-${i}`"
                     :class="{ active: item.id === activeList.id && group.name === 'In Progress' }"
                     class="t-expansion-panel px-2">
+
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
                         {{ avatarName(item.first_name) }}

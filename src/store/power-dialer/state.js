@@ -139,6 +139,7 @@ export default function () {
     search: '',
     // contact: null,
     sessionLoader: false,
+    sessionSidebarExpanded: false,
     changingSelectedContact: false
   }
 }

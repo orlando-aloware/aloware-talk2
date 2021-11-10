@@ -167,6 +167,9 @@ export default {
   TOGGLE_SESSION_LOADER: (state, value) => {
     state.sessionLoader = value
   },
+  TOGGLE_SESSION_SIDEBAR: (state) => {
+    state.sessionSidebarExpanded = !state.sessionSidebarExpanded
+  },
   CHANGING_SELECTED_CONTACT: (state, isChanging) => {
     state.changingSelectedContact = isChanging
   },
