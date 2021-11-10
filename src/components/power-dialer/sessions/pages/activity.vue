@@ -68,7 +68,7 @@ export default {
   mounted () {
     // this.setContact(this.contact)
     console.log('MOunted...')
-    this.setSelectedContact(this.contact)
+    // this.setSelectedContact(this.contact)
     if (this.authenticated) {
       this.fetchContact()
     }
@@ -112,10 +112,10 @@ export default {
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
+      _this.setContact(this.contact)
       this.processFetchContactInfo(function (selectedContact) {
         console.log('selectedContact :>> ', selectedContact)
-        _this.setContact(selectedContact)
-        _this.setContactClone(selectedContact)
+        _this.setContactClone(this.contact)
         _this.resetChangedContactProperties([])
         _this.selectedContactChanging(false)
       })
@@ -136,11 +136,15 @@ export default {
     contact (val) {
       if (val?.id) {
         // if ()
+        console.log('this.contact :>> ', this.contact)
         this.setContact(this.contact)
         console.log('...fetching contacts', val)
         this.flagged = true
         // this.fetchContact()
       }
+    },
+    sessionLoader (val) {
+      console.log('val session loader :>> ', val)
     }
   },
   data () {
