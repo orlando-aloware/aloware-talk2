@@ -1,4 +1,5 @@
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import _ from 'lodash'
 
 export default {
   opened: (state) => new Set(state.opened),
@@ -36,7 +37,8 @@ export default {
       })
       .concat(state.pinned.map((item) => {
         const list = state.lists[item] || {}
-        return { ...list, to: `/contacts/list/${list.id}` }
+        const id = !_.isEmpty(list) ? list.id : item
+        return { ...list, to: `/contacts/list/${id}` }
       }))
       .map((item) => {
         return {
