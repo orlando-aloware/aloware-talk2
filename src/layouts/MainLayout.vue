@@ -1496,7 +1496,6 @@ export default {
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
         (to.name !== from.name)) {
         if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
-          console.log('333 :>> ', to.name)
           this.resetContactsVuex()
         }
       }
