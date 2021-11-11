@@ -270,7 +270,6 @@ export default {
         const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
         if (!found) {
           // push new data to top of array
-          console.log('-----------data 1010 :>> ', data)
           this.communicationsAndAudits.push(data)
           this.scrollMessages()
         }
@@ -290,7 +289,6 @@ export default {
         if (found) {
           // update communication
           data = _.merge(found[0], data)
-          console.log('================data :>> ', data)
           this.$set(this.communicationsAndAudits, this.communicationsAndAudits.indexOf(found), data)
         }
       }
@@ -319,13 +317,10 @@ export default {
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
-      console.log('fetching comms', this.contactId)
       if (this.contactId) {
         return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
           this.fetchContactCommunications(this.contactId, false).then(() => {
             this.loadingContact = false
-            console.log('fetched comms')
-
             // if route has communication id
             // until id is found
             if (this.hasCommunication()) {
@@ -409,7 +404,6 @@ export default {
       if (_.isEmpty(audit) || _.isEmpty(this.contact)) {
         return
       }
-      console.log('-----------audit :>> ', audit)
 
       this.communicationsAndAudits.push(audit)
     },
@@ -844,7 +838,6 @@ export default {
     },
 
     processFetchContactInfo (callback) {
-      console.log('8888 :>> ', 8888)
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
         this.processFetchedContactInfo(res.data, callback)

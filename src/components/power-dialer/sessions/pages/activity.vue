@@ -66,12 +66,17 @@ export default {
     contactMixins
   ],
   mounted () {
-    // this.setContact(this.contact)
-    console.log('MOunted...')
-    // this.setSelectedContact(this.contact)
-    if (this.authenticated) {
-      this.fetchContact()
-    }
+    this.flagged = false
+    this.prepareActivities()
+    this.flagged = true
+  },
+  created () {
+    window.addEventListener('resize', this.resizeHandler)
+    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+      if (this.contact.id === contact.id) {
+        this.setContact(this.contact)
+      }
+    })
   },
   computed: {
     ...mapGetters('auth', [
@@ -82,6 +87,7 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'contact',
+      'isSidebarCollapsed',
       'changingSelectedContact'
     ]),
     widthClass () {
@@ -112,13 +118,19 @@ export default {
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
-      _this.setContact(this.contact)
-      this.processFetchContactInfo(function (selectedContact) {
-        console.log('selectedContact :>> ', selectedContact)
-        _this.setContactClone(this.contact)
+      this.processFetchContactInfo(function (contact) {
+        _this.setContact(_this.contact)
+        _this.setContactClone(_this.contact)
         _this.resetChangedContactProperties([])
         _this.selectedContactChanging(false)
       })
+    },
+    prepareActivities () {
+      this.contactId = this.contact.id
+      this.setSelectedContact(this.contact)
+      if (this.authenticated) {
+        this.fetchContact()
+      }
     },
     toggleDrawer () {
       console.log('Toggle drawer...')
@@ -135,16 +147,13 @@ export default {
   watch: {
     contact (val) {
       if (val?.id) {
-        // if ()
-        console.log('this.contact :>> ', this.contact)
-        this.setContact(this.contact)
-        console.log('...fetching contacts', val)
-        this.flagged = true
+        if (this.flagged) {
+          this.prepareActivities()
+        }
+        // this.setContact(this.contact)
+        // this.flagged = true
         // this.fetchContact()
       }
-    },
-    sessionLoader (val) {
-      console.log('val session loader :>> ', val)
     }
   },
   data () {
