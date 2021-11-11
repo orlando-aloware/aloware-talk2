@@ -1,5 +1,5 @@
 <template>
-  <div class="row w-100 h-100 d-flex">
+  <div class="row w-100 h-100 d-flex px-2">
 
     <b-overlay
       :show="loading"
@@ -9,7 +9,7 @@
         <q-spinner-bars color="primary" size="40px" />
       </template>
 
-      <div class="col-4 p-1" style="height:63vh;">
+      <div class="col-4 p-1 px-2" style="height:63vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div class="text-18 text-weight-medium">Scripts</div>
@@ -21,7 +21,7 @@
 
       </div>
 
-      <div class="col-4 p-1" style="height:63vh;">
+      <div class="col-4 p-1 px-2" style="height:63vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div class="text-18 text-weight-medium">
@@ -36,7 +36,7 @@
           :resources="contact" />
 
       </div>
-      <div class="col-4 p-1" style="height:63vh;">
+      <div class="col-4 p-1 px-2" style="height:63vh;">
 
         <DetailsTools />
 
