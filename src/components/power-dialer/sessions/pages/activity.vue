@@ -133,15 +133,10 @@ export default {
       }
     },
     toggleDrawer () {
-      console.log('Toggle drawer...')
       this.drawer = !this.drawer
     },
     toggleDetails () {
-      console.log('Toggle details...')
       this.detailsOpen = !this.detailsOpen
-    },
-    markAllAsRead () {
-      console.log('Marking all as read...')
     }
   },
   watch: {
