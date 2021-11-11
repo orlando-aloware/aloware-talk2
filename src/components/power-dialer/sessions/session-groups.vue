@@ -30,6 +30,7 @@
               :in-progress-contact="activeList" />
 
           </q-expansion-item>
+          <q-separator />
         </div>
 
         <div v-for="(group, key) in listFilters"
@@ -119,7 +120,7 @@
                 </template>
               </q-list>
             </q-card>
-            <q-separator />
+            <!-- <q-separator /> -->
 
           </q-expansion-item>
 
