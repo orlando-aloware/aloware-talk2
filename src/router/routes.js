@@ -131,25 +131,25 @@ const routes = [
         children: [
           {
             name: 'Power Dialer',
-            meta: 'Power Dialer',
+            meta: { title: 'Power Dialer' },
             path: '',
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {
             name: 'Power Dialer',
-            meta: 'Power Dialer Base Filter',
+            meta: { title: 'Power Dialer Base Filter' },
             path: 'list/:id(in-queue|called|failed|scheduled|all)+',
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {
             name: 'Power Dialer',
-            meta: 'Power Dialer Individual',
+            meta: { title: 'Power Dialer Individual' },
             path: 'list/:id(\\d+)+',
             component: () => import('src/pages/power-dialer/PowerDialerBase'),
             children: [
               {
                 name: 'Power Dialer',
-                meta: 'Power Dialer Individual Advance',
+                meta: { title: 'Power Dialer Individual Advance' },
                 path: ':filter(in-queue|called|failed|scheduled|all)+',
                 component: () => import('src/pages/power-dialer/PowerDialerBase')
               }
@@ -157,7 +157,7 @@ const routes = [
           },
           {
             name: 'Power Dialer',
-            meta: 'Power Dialer Add-list',
+            meta: { title: 'Power Dialer Add-list' },
             path: 'list/:id(\\d+)+/add',
             component: () => import('src/pages/power-dialer/PowerDialerAddView')
           }
@@ -165,7 +165,7 @@ const routes = [
       },
       {
         name: 'Power Dialer Session',
-        meta: 'Power Dialer Session',
+        meta: { title: 'Power Dialer Session' },
         path: 'power-dialer/session',
         component: () => import('src/pages/power-dialer/PowerDialerSession')
       },
