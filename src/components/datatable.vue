@@ -5,7 +5,7 @@
       :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
       @scroll="handleScroll"
     >
-      <table :class="[computedClass, 'ml-3']" ref="table">
+      <table :class="[computedClass, 'pl-3']" ref="table">
         <thead>
           <draggable
             :list="fixedColumns"

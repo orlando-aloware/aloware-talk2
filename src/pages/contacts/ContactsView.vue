@@ -113,8 +113,7 @@
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
           <template #button-content class="filter-toggle-button">
-            <div class="filter-toggle-button d-flex align-items-center"
-                 style="margin-top: -2px;">
+            <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
             </div>
             <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
