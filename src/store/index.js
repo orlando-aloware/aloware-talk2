@@ -137,7 +137,9 @@ export default function (/* { ssrContext } */) {
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
-      tagsFullyLoaded: false
+      tagsFullyLoaded: false,
+      isMobile: false,
+      contactDetailsDrawer: false
     },
 
     getters: {
@@ -439,6 +441,14 @@ export default function (/* { ssrContext } */) {
 
       setShowIncomingCallNotification ({ commit }, value) {
         commit('SET_SHOW_INCOMING_CALL_NOTIFICATION', value)
+      },
+
+      setIsMobile ({ commit }, value) {
+        commit('SET_IS_MOBILE', value)
+      },
+
+      setContactDetailsDrawer ({ commit }, value) {
+        commit('SET_CONTACT_DETAILS_DRAWER', value)
       }
     },
 
@@ -899,6 +909,14 @@ export default function (/* { ssrContext } */) {
 
       RESET_NOTIFICATIONS (state) {
         state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
+      },
+
+      SET_IS_MOBILE (state, value) {
+        state.isMobile = value
+      },
+
+      SET_CONTACT_DETAILS_DRAWER (state, value) {
+        state.contactDetailsDrawer = value
       }
     },
 

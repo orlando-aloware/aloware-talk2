@@ -47,7 +47,7 @@
           <div class="dialer-contact-info width-190">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
-              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
+              <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
                    v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
@@ -91,7 +91,7 @@
           <div class="dialer-contact-info w-100">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
-              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
+              <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
                    v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
@@ -116,8 +116,8 @@
                          padding="none"
                          flat
                          @click="sendText">
-                    <send-text-icon width="16"
-                                    height="16"
+                    <send-text-icon :width="isMobile ? 18 : 16"
+                                    :height="isMobile ? 18: 16"
                                     :color="sendTextColor">
                     </send-text-icon>
                   </q-btn>
@@ -139,10 +139,10 @@
     <div class="mobile-dialer-button"
          v-if="contactName && campaignId && mode === 'call' && isMobile">
       <compact-btn borderless
-                   customClass="ml-2 pr-2 pl-0 fs-14 _500 position-relative primary not-focusable bg-success"
+                   customClass="fs-14 _500 position-relative primary not-focusable bg-success"
                    @clicked="makeCall">
         <call-white-icon></call-white-icon>
-        Call {{ contactName }}
+        <div class="contact-name">Call {{ contactName }}</div>
       </compact-btn>
     </div>
   </div>
@@ -267,8 +267,10 @@ export default {
       this.companyName = ''
       this.contactId = null
       this.contactTimezone = null
-      this.defaultOutboundCampaignId = null
-      this.campaignId = null
+      if (!this.isMobile) {
+        this.defaultOutboundCampaignId = null
+        this.campaignId = null
+      }
       this.mode = 'call'
       this.textMessage = ''
     },
@@ -362,7 +364,9 @@ export default {
         contactId: this.contactId
       }
       this.$VueEvent.fire('makeCall', data)
-      this.hideDialer()
+      if (!this.isMobile) {
+        this.hideDialer()
+      }
     },
 
     sendText () {

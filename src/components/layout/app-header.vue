@@ -113,7 +113,7 @@ export default {
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('contacts', ['selectedList']),
     ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
-    ...mapState(['dialer']),
+    ...mapState(['dialer', 'isMobile']),
 
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
@@ -190,6 +190,11 @@ export default {
     authenticated () {
       if (!this.authenticated) {
         this.hideDialer()
+      }
+    },
+    'isMobile': function () {
+      if (this.isMobile) {
+        this.dialerStatus = false
       }
     },
     metricLoader () {

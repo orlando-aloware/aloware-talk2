@@ -6488,7 +6488,7 @@ table.datatable {
     }
 
     .icon {
-      padding-right: 6px;
+      padding-right: 5px;
     }
   }
 
@@ -8491,9 +8491,13 @@ screen and (max-width: 956px) {
       padding: 55px 16px 0;
     }
   }
-  .phone-header {
+  .phone-header-title {
     font-size: 34px;
-    font-weight: 600;
+    font-weight: 600
+  }
+  .phone-header {
+    position: fixed;
+    z-index: 9;
   }
   .q-drawer__backdrop {
     display: none;
@@ -8549,13 +8553,17 @@ screen and (max-width: 956px) {
             width: 100%;
             .tab-pane {
               width: 100%;
+              display: flex;
+              flex-direction: column;
             }
           }
           .mobile-message-composer {
             display: flex;
             flex: 1;
             align-items: flex-end;
-            height: calc(100% - 135px);
+            textarea {
+              font-size: 16px !important;
+            }
           }
         }
         .tab-content {
@@ -8623,6 +8631,8 @@ screen and (max-width: 956px) {
         .phone-body {
           .phone-wrap-up {
             max-height: unset;
+            padding-top: 36px;
+            padding-bottom: 76px;
           }
         }
         .actions-block {
@@ -8632,6 +8642,10 @@ screen and (max-width: 956px) {
           border-radius: unset !important;
           padding: 18px 16px !important;
           height: unset !important;
+          position: fixed;
+          bottom: 0;
+          width: 100%;
+          box-shadow: 0px -5px 10px 0px rgb(4 4 4 / 20%) !important;
           button:first-child {
             background: $success;
             color: #FFFFFF;
@@ -8677,6 +8691,7 @@ screen and (max-width: 956px) {
 .mobile-dialer-button {
   display: flex;
   justify-content: center;
+  width: 100%;
   button {
     display: flex;
     justify-content: center;
@@ -8687,12 +8702,20 @@ screen and (max-width: 956px) {
     font-weight: 500;
     height: 48px;
     margin: 0 0 13px 0 !important;
+    padding: 0 10px;
+    min-width: 0;
+    flex: 1;
     &:hover {
       background: $success !important;
       color: white;
     }
     svg {
       margin-right: 8px;
+    }
+    .contact-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
 }

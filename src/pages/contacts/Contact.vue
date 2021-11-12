@@ -54,7 +54,6 @@
                      customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
                      @clicked="toggleDrawer">
-          <!--i class="fa fa-times"></i-->
           <close-icon width="18px"
                       height="18px"
                       icon-color="white">
@@ -82,7 +81,7 @@ import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import CompactBtn from 'src/components/compact-btn'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
 
 export default {
@@ -99,6 +98,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
     ...mapGetters('auth', ['authenticated']),
+    ...mapState(['contactDetailsDrawer']),
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     }
@@ -115,6 +115,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['resetChangedContactProperties', 'selectedContactChanging', 'setContact', 'setContactClone']),
+    ...mapActions(['setContactDetailsDrawer']),
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
@@ -127,15 +128,10 @@ export default {
     },
     toggleDrawer () {
       this.drawer = !this.drawer
+      this.setContactDetailsDrawer(this.drawer)
     },
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
-    },
-    resizeHandler () {
-      const width = document.documentElement.clientWidth
-      if (width > 1084 || width < 606) {
-        this.drawer = false
-      }
     }
   },
 
@@ -146,7 +142,6 @@ export default {
   },
 
   created () {
-    window.addEventListener('resize', this.resizeHandler)
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
@@ -166,20 +161,17 @@ export default {
       }
     },
 
-    '$q.screen.lt.md': function () {
-      if (this.$q.screen.lt.md) {
-        this.drawer = false
-      }
-    },
-
     '$route.params.communicationId': function (value) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
+    },
+
+    contactDetailsDrawer () {
+      if (!this.contactDetailsDrawer) {
+        this.drawer = false
+      }
     }
-  },
-  beforeDestroy () {
-    window.removeEventListener('resize', this.resizeHandler)
   }
 }
 </script>

@@ -82,10 +82,13 @@
           :breakpoint="605"
           v-model="mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
-          <div class="phone-header"
+          <div class="phone-header-title"
                v-show="!isPhoneVisible">Phone</div>
-          <phone @onPhoneVisible="onPhoneVisible"></phone>
-          <dialer-form v-if="mobilePhoneDrawer"
+          <phone :isMobile="isMobile"
+                 @onPhoneVisible="onPhoneVisible"></phone>
+          <dialer-form ref="dialerForm"
+                       v-model="mobilePhoneDrawer"
+                       v-if="mobilePhoneDrawer"
                        v-show="!isPhoneVisible"
                        :isMobile="true">
           </dialer-form>
@@ -516,6 +519,7 @@ export default {
         this.authCheckStatus = false
       })
     }
+    window.addEventListener('resize', this.resizeHandler)
   },
 
   mounted () {
@@ -560,6 +564,9 @@ export default {
   methods: {
     onPhoneVisible (value) {
       this.isPhoneVisible = value
+      if (typeof this.$refs.dialerForm !== 'undefined') {
+        this.$refs.dialerForm.hideDialer()
+      }
     },
     toggleMobilePhone (value) {
       this.mobilePhoneDrawer = value
@@ -1430,11 +1437,29 @@ export default {
       })
     },
 
+    resizeHandler () {
+      const width = document.documentElement.clientWidth
+      // less than 785 pixels screen width is mobile
+      if (width < 785) {
+        this.setIsMobile(true)
+      }
+      // greater than or equal to 785 pixels screen width is not mobile
+      if (width >= 785) {
+        this.setIsMobile(false)
+      }
+      // close contact details drawer when screen width reaches
+      // more than 1084 or less than 606 pixels
+      if (width > 1084 || width < 606) {
+        this.setContactDetailsDrawer(false)
+      }
+    },
+
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
+      window.removeEventListener('resize', this.resizeHandler)
     },
 
     ...mapActions([
@@ -1457,7 +1482,9 @@ export default {
       'setDialerIsMuted',
       'setFilters',
       'setTagsFullyLoaded',
-      'resetNotifications'
+      'resetNotifications',
+      'setIsMobile',
+      'setContactDetailsDrawer'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
     ...mapActions('inbox', ['resetInboxVuex']),
