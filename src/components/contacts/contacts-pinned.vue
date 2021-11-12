@@ -10,6 +10,10 @@
                             :item="item"
                             :key="item.id">
       </contacts-pinned-item>
+      <q-skeleton type="rect"
+                  class="ml-3 mr-3"
+                  height="30px"
+                  v-if="loading" />
     </div>
   </div>
 </template>
@@ -126,6 +130,15 @@ export default {
       })
     },
 
+    loadDynamicListPinnedCount (data) {
+      return this.$axios.get(`api/v2/contacts`, { params: this.buildQueryString(JSON.parse(data.filters)), paramsSerializer: qs.stringify }).then((response) => {
+        this.pinnedCountLoaded({
+          id: data.contact_list_id,
+          count: response.data.total
+        })
+      })
+    },
+
     loadPinned () {
       this.loading = true
       return this.$axios.get('api/v2/contact-list-bookmark').then((response) => response.data).then(async (data) => {
@@ -145,13 +158,36 @@ export default {
             order: data[i].order
           })
 
-          await this.loadPinnedCount(contactListId)
+          if (data[i].type === STATIC) {
+            this.loadPinnedCount(contactListId)
+          }
+
+          if (data[i].type === DYNAMIC) {
+            this.loadDynamicListPinnedCount(data[i])
+          }
         }
 
         this.pinnedLoaded(pinnedIds)
 
         this.loading = false
       })
+    },
+
+    buildQueryString (filters) {
+      const query = {
+        page: 1
+      }
+
+      if (filters.length > 0) {
+        query.filter_groups = []
+
+        query.filter_groups.push({
+          is_conjunction: true,
+          filters: filters[0].filters
+        })
+      }
+
+      return query
     }
   },
   watch: {
