@@ -153,6 +153,13 @@ export default {
         this.loading = false
       })
     }
+  },
+  watch: {
+    '$route.name': function (value) {
+      if (value === 'Contacts') {
+        this.loadPinned()
+      }
+    }
   }
 }
 </script>
