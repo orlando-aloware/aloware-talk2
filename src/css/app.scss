@@ -2796,6 +2796,8 @@ span.mention {
 
   [contenteditable=true] {
     font-size: 14px;
+    display: block;
+    word-wrap: break-word;
   }
 
   [contenteditable=true]:empty:before {
@@ -7718,6 +7720,11 @@ button.grey-90 {
     margin-right: 10px !important;
     display: flex;
     align-items: center;
+  }
+
+  .item-empty {
+    padding-top: 20px;
+    padding-left: 18px;
   }
 }
 

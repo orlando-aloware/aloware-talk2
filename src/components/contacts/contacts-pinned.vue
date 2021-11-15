@@ -6,14 +6,13 @@
       </div>
     </div>
     <div class="d-flex pinned__content flex-column">
-      <contacts-pinned-item v-for="item in pinnedLists"
-                            :item="item"
-                            :key="item.id">
-      </contacts-pinned-item>
-      <q-skeleton type="rect"
-                  class="ml-3 mr-3"
-                  height="30px"
-                  v-if="loading" />
+      <div v-if="!loading">
+        <contacts-pinned-item v-for="item in pinnedLists"
+                              :item="item"
+                              :key="item.id">
+        </contacts-pinned-item>
+      </div>
+      <contacts-sidebar-loader v-if="loading"></contacts-sidebar-loader>
     </div>
   </div>
 </template>
@@ -25,9 +24,11 @@ import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import ContactsPinnedItem from 'components/contacts/contacts-pinned-item'
+import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 
 export default {
   components: {
+    ContactsSidebarLoader,
     ContactsPinnedItem
   },
 

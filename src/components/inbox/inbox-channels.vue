@@ -649,8 +649,6 @@ export default {
         if (this.mentionType === 'received' && this.filter.mentioner_user_id) {
           params = { ...params, ...{ mentioner_user_id: this.filter.mentioner_user_id } }
         }
-
-        console.log(params)
       }
 
       return api.get({ params: params })
