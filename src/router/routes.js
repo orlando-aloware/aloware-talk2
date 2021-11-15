@@ -143,13 +143,13 @@ const routes = [
           },
           {
             name: 'Power Dialer',
-            meta: { title: 'Power Dialer Individual' },
+            meta: { title: 'Power Dialer List' },
             path: 'list/:id(\\d+)+',
             component: () => import('src/pages/power-dialer/PowerDialerBase'),
             children: [
               {
                 name: 'Power Dialer',
-                meta: { title: 'Power Dialer Individual Advance' },
+                meta: { title: 'Power Dialer List Advance' },
                 path: ':filter(in-queue|called|failed|scheduled|all)+',
                 component: () => import('src/pages/power-dialer/PowerDialerBase')
               }

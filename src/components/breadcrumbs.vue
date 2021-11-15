@@ -1,16 +1,46 @@
 <template>
-  <div class="row breadcrumbs d-flex py-2">
-    <div class="breadcrumbs__directory d-flex flex-column">
-      <!-- <div class="pr-2">LOL</div> -->
-      <div class="small text-muted pt-1">
-        {{ breadcrumbs.crumbs }}
+  <div class="pt-2">
+    <div
+      v-if="historyMode"
+      class="d-flex flex-column">
+      <div class="d-flex align-items-center">
+        <router-link
+          :to="'/power-dialer/list/' + $route.params.id"
+          v-slot="{ href, navigate }">
+          <a
+            class="btn btn-link p-0 text-muted pr-2"
+            :href="href"
+            @click="navigate">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+        </router-link>
+        Add contacts to
+        <div class="text-grey-90">
+          <span class="title-icon">
+            <!-- <folder-static-icon/> -->
+          </span>
+          {{ breadcrumbs.name }}
+        </div>
+      </div>
+      <div class="text-muted small action-desc">
+        Manually select contacts or create a filter
       </div>
     </div>
-    <div class="breadcrumbs__icon px-2 py-0">
-      <ListIcon />
-    </div>
-    <div class="breadcrumbs__name">
-      {{ breadcrumbs.name }}
+    <div
+      v-else
+      class="row breadcrumbs d-flex py-2">
+      <div class="breadcrumbs__directory d-flex flex-column">
+        <!-- <div class="pr-2">LOL</div> -->
+        <div class="small text-muted pt-1">
+          {{ breadcrumbs.crumbs }}
+        </div>
+      </div>
+      <div class="breadcrumbs__icon px-2 py-0">
+        <ListIcon />
+      </div>
+      <div class="breadcrumbs__name">
+        {{ breadcrumbs.name }}
+      </div>
     </div>
   </div>
 </template>
@@ -24,9 +54,17 @@ import { isEmpty } from 'lodash'
 export default {
   name: 'Breadcrumbs',
   props: {
+    powerDialerList: {
+      type: Object,
+      default: () => {}
+    },
     directoryList: {
       type: Array,
       default: () => {}
+    },
+    historyMode: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

@@ -172,7 +172,7 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'actions',
-    label: 'Phone Number',
+    label: 'Actions',
     category: 0,
     order: 5,
     sortable: false,

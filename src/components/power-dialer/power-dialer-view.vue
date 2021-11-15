@@ -66,7 +66,7 @@
                   </template>
                   <b-dropdown-item
                     href="#"
-                    @click="{}">
+                    @click="onAddContactsToList">
                     <i class="fa fa-search mr-1"></i>
                     Select Contacts
                   </b-dropdown-item>
@@ -77,6 +77,10 @@
                     Create Contact
                   </b-dropdown-item>
                 </b-dropdown>
+
+                <ContactCreateModal
+                  @created="onContactCreated">
+                </ContactCreateModal>
 
                 <b-dropdown
                   text="..."
@@ -109,7 +113,9 @@
     </template>
 
     <template slot="actions">
-      <BulkActionMenu :id="id" v-if="checked.length > 0" />
+      <BulkActionMenu
+        v-if="checked.length > 0"
+        :id="id" />
     </template>
 
     <template slot="table">
@@ -221,6 +227,7 @@
 
         </div>
       </div>
+
       <ConfirmDialog
         v-model="isOpen"
         @close="closeModal"
@@ -263,6 +270,7 @@
           </div>
         </div>
       </ConfirmDialog>
+
     </template>
   </PowerDialerViewScreen>
 </template>
@@ -286,7 +294,7 @@ import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu-2'
-import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
+import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
 // import { get } from 'lodash'
 
@@ -319,6 +327,7 @@ export default {
     TrashOIcon,
     ConfirmDialog,
     Breadcrumbs,
+    ContactCreateModal,
     BulkActionMenu
   },
   computed: {
@@ -335,21 +344,6 @@ export default {
     ...mapGetters('contacts', [
       'contact'
     ]),
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
-    totalList () {
-      return this.powerDialerListItems[this.id]?.total || 0
-    },
-    currentContacts () {
-      return this.powerDialerListItems?.[this.id]?.data || []
-    },
-    powerDialerListOfObjects () {
-      return this.powerDialerDirectoryList || []
-    },
-    columns2 () {
-      return ALL_COLUMNS
-    },
     activeRoute () {
       if (this.$route.meta === 'Power Dialer Individual') {
         return this.$route.fullPath
@@ -357,19 +351,10 @@ export default {
         return `/power-dialer/list/${this.$route.params.id}`
       }
       return '/power-dialer/list'
-    },
-    dialogName () {
-      return `remove-power-dialer-item-dialog`
-    },
-    hasContacts () {
-      return this.currentContacts.length > 0
     }
   },
   data () {
-    return {
-      isOpen: false,
-      selectedItem: { id: '' }
-    }
+    return {}
   },
   methods: {
     ...mapMutations('powerDialer', [
@@ -393,6 +378,9 @@ export default {
       this.setContact(this.contact)
       this.$router.push({ name: 'Power Dialer Session' })
     },
+    onAddContactsToList () {
+      this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
+    },
     onColumnsReordered (nextColumns) {
       console.log('Re-ordered columns...', nextColumns)
     },
@@ -411,9 +399,6 @@ export default {
     },
     onCheckedRows (data) {
       console.log('data from table 999 : ', data)
-    },
-    closeModal () {
-      this.isOpen = false
     }
   }
 }

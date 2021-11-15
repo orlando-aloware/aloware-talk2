@@ -1,11 +1,14 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import qs from 'qs'
 import { isEmpty, get } from 'lodash'
+import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   data () {
     return {
+      isOpen: false,
       isLoading: false,
+      selectedItem: { id: '' },
       filterParams: {
         'page': 1,
         'per_page': 25,
@@ -38,6 +41,27 @@ export default {
         return 'in-queue'
       }
       return this.id
+    },
+    checked () {
+      return this.selectedContacts[this.id] || []
+    },
+    totalList () {
+      return this.powerDialerListItems[this.id]?.total || 0
+    },
+    columns2 () {
+      return ALL_COLUMNS
+    },
+    powerDialerListOfObjects () {
+      return this.powerDialerDirectoryList || []
+    },
+    currentContacts () {
+      return this.powerDialerListItems?.[this.id]?.data || []
+    },
+    hasContacts () {
+      return this.currentContacts.length > 0
+    },
+    dialogName () {
+      return `remove-power-dialer-item-dialog`
     }
   },
   methods: {
@@ -155,6 +179,9 @@ export default {
     },
     onLoadMore () {
       console.log('...on load more...')
+    },
+    closeModal () {
+      this.isOpen = false
     }
   }
 }
