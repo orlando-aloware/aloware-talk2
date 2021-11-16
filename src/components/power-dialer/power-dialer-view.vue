@@ -8,7 +8,7 @@
 
     <template slot="options">
       <div class="text-13 pr-3 border-right right-spacing-2">
-        99 Contacts
+        {{ numberOfContacts }}
       </div>
       <StartDialing
         @start="beginDial" />
@@ -91,7 +91,9 @@
                   <template #button-content>
                     <i class="fa fa-ellipsis-h"></i>
                   </template>
-                  <b-dropdown-item href="#">
+                  <b-dropdown-item
+                    @click="onEditColumnsClicked"
+                    href="#">
                     <i class="fa fa-bars mr-1"></i>
                     Edit Columns
                   </b-dropdown-item>
@@ -296,16 +298,13 @@ import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
+import talk2Api from 'src/plugins/api/api'
 // import { get } from 'lodash'
 
 export default {
   name: 'PowerDialerView',
   props: {
     id: {
-      type: String,
-      required: true
-    },
-    filter: {
       type: String,
       required: true
     }
@@ -334,7 +333,6 @@ export default {
     ...mapState(['prevRoute']),
     ...mapGetters('powerDialer', [
       'contactResources',
-      'contacts',
       'selectedContacts',
       'powerDialerLists',
       'powerDialerListItems',
@@ -344,13 +342,28 @@ export default {
     ...mapGetters('contacts', [
       'contact'
     ]),
+    ...mapGetters('powerDialer', [
+      'activeFilter',
+      'currentList'
+    ]),
+    filter () {
+      return this.activeFilter
+    },
     activeRoute () {
-      if (this.$route.meta === 'Power Dialer Individual') {
+      if (this.$route.meta.title === 'Power Dialer Individual') {
         return this.$route.fullPath
-      } else if (this.$route.meta === 'Power Dialer Individual Advance') {
+      } else if (this.$route.meta.title === '"Power Dialer List Advance"') {
+        return this.$route.path
+      } else if (this.$route.meta.title === 'Power Dialer List') {
         return `/power-dialer/list/${this.$route.params.id}`
       }
       return '/power-dialer/list'
+    },
+    list () {
+      return this.currentList
+    },
+    numberOfContacts () {
+      return `${this.currentContacts.length} Contacts`
     }
   },
   data () {
@@ -368,7 +381,8 @@ export default {
       'setSelectedContact'
     ]),
     ...mapActions('contacts', [
-      'setContact'
+      'setContact',
+      'columnsOpen'
     ]),
 
     beginDial () {
@@ -399,6 +413,25 @@ export default {
     },
     onCheckedRows (data) {
       console.log('data from table 999 : ', data)
+    },
+    onEditColumnsClicked () {
+      this.columnsOpen({
+        id: this.id,
+        headers: this.columns2,
+        name: this.list.name
+      })
+    },
+    onContactCreated (contact) {
+      if (this.list.type === this.ContactListType.STATIC) {
+        talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
+          this.setShouldUpdateSelectedListContactCount(true)
+          this.fetch()
+        })
+      } else {
+        this.fetch({
+          page: this.listItems[this.id].current_page
+        })
+      }
     }
   }
 }
