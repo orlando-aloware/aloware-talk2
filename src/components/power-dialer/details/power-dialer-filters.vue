@@ -23,6 +23,7 @@
 <script>
 
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PowerDialerFilters',
@@ -37,6 +38,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('powerDialer', [
+      'activeFilter'
+    ]),
     listFilters () {
       return DEFAULT_FILTER_LIST
     },

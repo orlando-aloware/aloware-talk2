@@ -178,5 +178,8 @@ export default {
   // },
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedList.id].data = payload
+  },
+  SET_ACTIVE_FILTER: (state, filter) => {
+    state.activeFilter = filter
   }
 }

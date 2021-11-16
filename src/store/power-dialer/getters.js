@@ -34,5 +34,11 @@ export default {
   search: (state) => state.search,
   sessionLoader: (state) => state.sessionLoader,
   sessionSidebarExpanded: (state) => state.sessionSidebarExpanded,
-  changingSelectedContact: (state) => state.changingSelectedContact
+  changingSelectedContact: (state) => state.changingSelectedContact,
+  activeFilter: (state) => {
+    if (state.activeFilter) {
+      return state.activeFilter
+    }
+    return 'in-queue'
+  }
 }

@@ -140,6 +140,7 @@ export default function () {
     // contact: null,
     sessionLoader: false,
     sessionSidebarExpanded: false,
-    changingSelectedContact: false
+    changingSelectedContact: false,
+    activeFilter: ''
   }
 }

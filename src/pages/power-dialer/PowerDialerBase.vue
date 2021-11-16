@@ -1,6 +1,5 @@
 <template>
   <PowerDialerView
-    :filter="filter"
     :id="id"
     :name="name" />
 </template>
@@ -8,6 +7,7 @@
 <script>
 
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'PowerDialerBase',
@@ -15,29 +15,40 @@ export default {
     PowerDialerView
   },
   computed: {
+    ...mapGetters('powerDialer', [
+      'activeFilter'
+    ]),
     objId () {
       return this.$route
     },
     id () {
       return this.$route.params.id || 'all'
-    },
-    filter () {
-      if (this.$route.params.id) {
-        if (this.$route.meta === 'Power Dialer' || (this.$route.meta === 'Power Dialer Base Filter' || this.$route.meta === 'Power Dialer Individual Advance')) {
-          return this.$route.params.id
-        } else {
-          if (this.$route.params.filter) {
-            return this.$route.params.filter
-          }
-          return 'in-queue'
-        }
-      }
-      return 'in-queue'
     }
   },
   data () {
     return {
       name: 'Power Dialer X'
+    }
+  },
+  methods: {
+    ...mapMutations('powerDialer', [
+      'SET_ACTIVE_FILTER'
+    ])
+  },
+  watch: {
+    '$route.params.id': function (id) {
+      if (id) {
+        if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Base Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
+          this.SET_ACTIVE_FILTER(this.$route.params.id)
+        } else {
+          if (this.$route.params.filter) {
+            this.SET_ACTIVE_FILTER(this.$route.params.filter)
+          } else {
+            this.SET_ACTIVE_FILTER('in-queue')
+          }
+        }
+      }
+      // this.SET_ACTIVE_FILTER(this.$route.params.id)
     }
   }
 }
