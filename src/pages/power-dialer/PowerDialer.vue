@@ -48,8 +48,11 @@ export default {
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
       'isStartingDial',
-      'powerDialerListItems',
       'currentList'
+    ]),
+    ...mapGetters('contacts', [
+      'listItems',
+      'lists'
     ]),
     ...mapState(['currentRoute']),
     filterKeys () {
@@ -117,7 +120,7 @@ export default {
         await this.getPowerDialerListItem(this.id)
       }
 
-      if (this.powerDialerListItems[this.id] === undefined) {
+      if (this.listItems[this.id] === undefined) {
         if (isEmpty(this.id)) {
           await this.processFetch(params)
         } else {
