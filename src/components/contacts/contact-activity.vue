@@ -151,7 +151,8 @@
         </div>
       </div>
 
-      <div class="item max-width-380"
+      <div class="item"
+           :class="[communication.type !== CommunicationTypes.NOTE ? 'max-width-380' : '']"
            v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
         <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
@@ -175,19 +176,34 @@
            :class="[ communication.direction === CommunicationDirection.INBOUND ? 'justify-content-start' : 'justify-content-end' ]"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id && getWorkflow(communication.workflow_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              communication.workflow_id && getWorkflow(communication.workflow_id) &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ getWorkflow(communication.workflow_id).name }} sequence
         </span>
         <span class="text-muted"
-              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.broadcast_id && getBroadcast(communication.broadcast_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              communication.broadcast_id && getBroadcast(communication.broadcast_id) &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ getBroadcast(communication.broadcast_id).name }} broadcast
         </span>
         <span class="text-muted"
-              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.user_id && getUser(communication.user_id).name.length && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
+               communication.user_id && getUser(communication.user_id).name.length &&
+               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
+               && communication.type !== CommunicationTypes.NOTE">
             {{ !communication.campaign_id ? 'By ' : '' }}{{ getUser(communication.user_id).name }}
         </span>
         <span class="text-muted"
-              v-else-if="communication.direction === CommunicationDirection.OUTBOUND && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
+               communication.user_id && getUser(communication.user_id).name.length &&
+               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
+               && communication.type === CommunicationTypes.NOTE">
+          {{ getNotesBottomLabel() }}
+        </span>
+        <span class="text-muted"
+              v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             {{ currentCompany ? currentCompany.name : 'No Name' }}
         </span>
 
@@ -197,11 +213,14 @@
         </span>
 
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.campaign_id && getCampaign(communication.campaign_id) && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              communication.campaign_id && getCampaign(communication.campaign_id) &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             &nbsp;used {{ getCampaign(communication.campaign_id).name }} to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }}
         </span>
         <span class="text-muted"
-              v-if="communication.direction === CommunicationDirection.INBOUND && communication.campaign_id && getCampaign(communication.campaign_id)">
+              v-if="communication.direction === CommunicationDirection.INBOUND &&
+              communication.campaign_id && getCampaign(communication.campaign_id)">
             &nbsp;to {{ getCampaign(communication.campaign_id).name }}
         </span>
 
@@ -730,6 +749,11 @@ export default {
       }).finally(() => {
         this.isRetryingSendSms = false
       })
+    },
+    getNotesBottomLabel () {
+      let name = this.getUser(this.communication.user_id).name
+
+      return name + (name.charAt(name.length - 1) === 's' ? `'` : `'s`) + ' note'
     }
   }
 }

@@ -2795,6 +2795,7 @@ span.mention {
 
   [contenteditable=true] {
     font-size: 14px;
+    display: block;
   }
 
   [contenteditable=true]:empty:before {
@@ -7211,8 +7212,14 @@ button.grey-90 {
 }
 
 .mention-tag {
-  color: $primary;
+  //color: $primary;
+  //font-weight: 500;
+
+  color: #040404;
   font-weight: 500;
+  background: #CDDCFF;
+  border-radius: 4px;
+  padding: 2px 5px;
 }
 
 .notes-body {
@@ -8699,4 +8706,16 @@ screen and (max-width: 956px) {
 
 .b-toaster {
   z-index: 9999;
+}
+
+.notes-wrapper {
+  border-radius: 12px;
+  padding: 14px;
+  background: linear-gradient(0deg, $blue-70, $blue-70);
+  border: 1px solid rgba(47, 128, 237, 0.25);
+
+  .q-item {
+    padding: 0 !important;
+    min-height: 10px !important;
+  }
 }
