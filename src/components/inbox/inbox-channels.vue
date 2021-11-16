@@ -640,7 +640,15 @@ export default {
 
       if (this.$route.params.channel === 'mentions') {
         api = talk2Api.V2.mentions
-        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page } }
+        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, order_by: this.sorting.order } }
+
+        if (this.mentionType === 'sent' && this.filter.mentioned_user_id) {
+          params = { ...params, ...{ mentioned_user_id: this.filter.mentioned_user_id } }
+        }
+
+        if (this.mentionType === 'received' && this.filter.mentioner_user_id) {
+          params = { ...params, ...{ mentioner_user_id: this.filter.mentioner_user_id } }
+        }
       }
 
       return api.get({ params: params })
@@ -658,7 +666,6 @@ export default {
 
     handleScroll (el) {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
-        this.isScrolled = true
         this.onTaskListBottomScroll()
       }
     },
@@ -669,6 +676,7 @@ export default {
       scrollTimeout = setTimeout(() => {
         // Run the callback
         if (this.hasMoreCommunications && this.isLoaded) {
+          this.isScrolled = true
           this.filter.page = this.nextPage
           this.loadMoreCommunications(this.filter)
         }
@@ -821,6 +829,7 @@ export default {
     '$route.params.status': function (value) {
       if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value)) {
         this.resetFilters()
+        this.isScrolled = false
         this.getCommunications(this.filter)
       }
     },

@@ -244,7 +244,7 @@ export default {
           defaultFilters[0].filters.contact_owner.value = [profileId]
         }
       }
-      return defaultFilters
+      return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     }
   },
 
