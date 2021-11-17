@@ -12,7 +12,7 @@ export default {
     }
   },
   getPowerDialerLists: async ({ commit }, params = {}) => {
-    let res = await window.axios.get('api/v2/contact-folders', {
+    let res = await window.axios.get('api/v2/power-dialer-folders', {
       params: params,
       paramsSerializer: qs.stringify
     })

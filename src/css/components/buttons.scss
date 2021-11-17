@@ -192,3 +192,19 @@
     }
   }
 }
+
+.contact-sidebar-list-wrapper {
+  &.hide-toggle {
+    .q-expansion-item__toggle-focus,
+    .q-focusable {
+      display: none;
+    }
+
+    #bs-folder-options {
+      margin-top: -8px;
+      right: 0;
+      display: inline;
+      position: absolute;
+    }
+  }
+}
