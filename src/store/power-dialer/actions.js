@@ -6,7 +6,6 @@ export default {
    */
   getMyQueueList: async ({ commit }) => {
     let res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
-    console.log('res :>> ', res)
     if (res.status === 200) {
       commit('SET_MY_QUEUE_LIST', res.data)
     }

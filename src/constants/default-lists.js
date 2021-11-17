@@ -2,6 +2,9 @@ import {
   DEFAULT_COLUMNS,
   STATIC_COLUMNS
 } from 'src/constants/contacts-columns'
+import {
+  PD_DEFAULT_COLUMNS
+} from 'src/constants/power-dialer/power-dialer-list'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export const DEFAULT_STATE = {
@@ -82,6 +85,13 @@ export const DEFAULT_STATE = {
       id: 'static',
       headers: STATIC_COLUMNS,
       filters: {}
+    },
+    'my-queue': {
+      id: 'my-queue',
+      headers: PD_DEFAULT_COLUMNS,
+      filters: {},
+      type: 2,
+      name: 'My Queue'
     }
   }
 }

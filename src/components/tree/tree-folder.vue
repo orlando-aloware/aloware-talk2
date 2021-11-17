@@ -161,6 +161,11 @@ export default {
 
     order: {
       type: Number
+    },
+
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
     }
   },
 
@@ -285,8 +290,9 @@ export default {
     },
 
     updateFolderRequest (id, params) {
+      console.log('params :>> ', params)
       return this.$axios
-        .patch('/api/v2/contact-folders/' + id, params)
+        .patch(`${this.endpoint}/${id}`, params)
         .catch((error) => {
           const {
             message,
@@ -299,7 +305,7 @@ export default {
 
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.endpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

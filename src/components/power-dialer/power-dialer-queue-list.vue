@@ -6,7 +6,6 @@
       </div>
     </div>
     <div
-      v-if="my_queue"
       class="d-flex t-menu__content flex-column pb-3">
       <!-- Queue List Here -->
       <QueueListItem
@@ -14,9 +13,6 @@
         :key="key"
         :item="item" />
     </div>
-    <div
-      v-else
-      class="p-3 text-grey-6">No lists found</div>
   </div>
 </template>
 

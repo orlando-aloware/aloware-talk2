@@ -50,6 +50,46 @@
                     <span>List</span>
                   </template>
                 </contact-menu-item>
+                <contact-menu-item
+                  v-else
+                  @mouseover="createSubmenu"
+                  @mouseleave="destroySubmenu">
+                  <template slot="icon">
+                    <plus-icon color="#62666E"></plus-icon>
+                  </template>
+                  <template slot="title">
+                    <span>List</span>
+                  </template>
+                  <template slot="suffix">
+                    <span
+                      :id="'folder-submenu-' + rootFolder.id"
+                      class="submenu-icon"
+                      @click="createSubmenu">
+                      <FolderArrowCloseIcon color="#62666E" />
+                    </span>
+                  </template>
+                </contact-menu-item>
+
+                <div
+                  :id="'folder-submenu-items-' + rootFolder.id"
+                  class="folder-submenu-items extended"
+                  :class="{ 'd-flex': isMenuOpen }"
+                  @mouseleave="destroySubmenu"
+                  @mouseover="createSubmenu"
+                >
+                  <contact-menu-item @click="$emit('create')">
+                    <template slot="title">
+                      <span>Create from Existing Contacts List</span>
+                    </template>
+                  </contact-menu-item>
+
+                  <contact-menu-item @click="$emit('createlist')">
+                    <template slot="title">
+                      <span>Create by Manually Selecting Contacts</span>
+                    </template>
+                  </contact-menu-item>
+                </div>
+
               </contact-menu>
             </b-popover>
 
@@ -57,56 +97,59 @@
         </div>
       </q-item-section>
     </template>
-  <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
-    <div class="folders__content">
-      <tree-folder-create
-        v-if="isCreatingFolder"
-        :layer="0"
-        :parent_id="null"
-        @blur="onCreateFolderToggle"
-        @cancel="onCreateFolderCancel"
-      />
-      <template v-if="folders.length && !isLoading">
-        <tree-folder
-          v-for="folder in folders[0].child_folders"
-          :name="folder.name"
-          :key="folder.id"
-          :id="folder.id"
-          :order="folder.order"
-          :hasEdit="folders[0].has_edit"
-          :hasDelete="folders[0].has_delete"
-          :folders="folder.child_folders"
-          :lists="folder.lists"
-          :layer="0"
-        />
-        <tree-folder
-          :name="folders[0].name"
-          :id="folders[0].id"
-          :order="folders[0].order"
-          :hasEdit="folders[0].has_edit"
-          :hasDelete="folders[0].has_delete"
-          :isRootList="true"
-          :folders="[]"
-          :lists="folders[0].lists"
+    <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
+      <div class="folders__content">
+        <tree-folder-create
+          v-if="isCreatingFolder"
           :layer="0"
           :parent_id="null"
           @blur="onCreateFolderToggle"
           @cancel="onCreateFolderCancel"
         />
-      </template>
-      <div v-if="!folders[0].child_folders.length && !isLoading"
-           class="item-empty">
-        <span class="fs-12 text-muted">
-          You don't have any contact list
-        </span>
+        <template v-if="folders.length && !isLoading">
+          <tree-folder
+            v-for="folder in folders[0].child_folders"
+            :name="folder.name"
+            :key="folder.id"
+            :id="folder.id"
+            :order="folder.order"
+            :endpoint="foldersEndpoint"
+            :hasEdit="folders[0].has_edit"
+            :hasDelete="folders[0].has_delete"
+            :folders="folder.child_folders"
+            :lists="folder.lists"
+            :layer="0"
+          />
+          <tree-folder
+            :name="folders[0].name"
+            :id="folders[0].id"
+            :order="folders[0].order"
+            :hasEdit="folders[0].has_edit"
+            :endpoint="foldersEndpoint"
+            :hasDelete="folders[0].has_delete"
+            :isRootList="true"
+            :folders="[]"
+            :lists="folders[0].lists"
+            :layer="0"
+            :parent_id="null"
+            @blur="onCreateFolderToggle"
+            @cancel="onCreateFolderCancel"
+          />
+        </template>
+        <div v-if="!folders[0].child_folders.length && !isLoading"
+            class="item-empty">
+          <span class="fs-12 text-muted">
+            You don't have any contact list
+          </span>
+        </div>
+        <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
       </div>
-      <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
     </div>
-  </div>
   </q-expansion-item>
 </template>
 
 <script>
+
 import { mapActions, mapState } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
@@ -116,6 +159,11 @@ import FolderIcon from 'components/icons/folder-icon.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
+import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
+
+import { createPopper } from '@popperjs/core'
+
+let popperInstance
 
 export default {
   props: {
@@ -132,6 +180,7 @@ export default {
     ContactMenuItem,
     FolderIcon,
     PeopleIcon,
+    FolderArrowCloseIcon,
     PlusIcon
   },
   computed: {
@@ -161,7 +210,8 @@ export default {
   data () {
     return {
       isCreatingFolder: false,
-      isLoading: false
+      isLoading: false,
+      isMenuOpen: false
     }
   },
   methods: {
@@ -190,6 +240,25 @@ export default {
           console.error(err)
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
+    },
+    createSubmenu () {
+      this.isMenuOpen = true
+      this.$nextTick(() => {
+        popperInstance = createPopper(
+          document.getElementById('folder-submenu-' + this.rootFolder.id),
+          document.getElementById('folder-submenu-items-' + this.rootFolder.id),
+          {
+            placement: 'right-start'
+          }
+        )
+      })
+    },
+    destroySubmenu (evt) {
+      this.isMenuOpen = false
+      if (popperInstance) {
+        popperInstance.destroy()
+        popperInstance = null
+      }
     }
   }
 }

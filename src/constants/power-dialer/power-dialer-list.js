@@ -134,18 +134,18 @@ export const ALL_COLUMNS = [
     sortable: true,
     draggable: true,
     resizable: true,
-    default: false,
+    default: true,
     minWidth: 150
   },
   {
     name: 'created_at',
-    label: 'Created At',
+    label: 'Date Added',
     category: 0,
     order: 2,
     sortable: true,
     draggable: true,
     resizable: true,
-    default: false,
+    default: true,
     minWidth: 150
   },
   {
@@ -156,7 +156,7 @@ export const ALL_COLUMNS = [
     sortable: true,
     draggable: true,
     resizable: true,
-    default: false,
+    default: true,
     minWidth: 150
   },
   {
@@ -167,7 +167,7 @@ export const ALL_COLUMNS = [
     sortable: true,
     draggable: true,
     resizable: true,
-    default: false,
+    default: true,
     minWidth: 150
   },
   {
@@ -178,10 +178,16 @@ export const ALL_COLUMNS = [
     sortable: false,
     draggable: false,
     resizable: false,
-    default: false,
+    default: true,
     minWidth: 50
   }
 ]
+
+export const PD_DEFAULT_COLUMNS = ALL_COLUMNS.filter((c) => c.default)
+
+export const PD_STATIC_COLUMNS = ALL_COLUMNS.filter(
+  (c) => c.default && c.name !== 'actions'
+)
 
 export const WARM_UP_PERIOD_LIST = [
   'No Warm Up'
