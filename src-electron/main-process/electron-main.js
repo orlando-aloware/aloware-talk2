@@ -8,9 +8,19 @@ if (process.platform === 'win32') {
   (async () => {
     await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities', 'ApplicationName', 'Aloware Talk')
     await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities', 'ApplicationDescription', 'Aloware Talk')
+    // aloware
+    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities\\URLAssociations', 'aloware', 'Aloware Talk.aloware')
+    await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.aloware\\DefaultIcon', '', process.execPath)
+    await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.aloware\\shell\\open\\command', '', `"${process.execPath}" "%1"`)
+    // callto
+    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities\\URLAssociations', 'callto', 'Aloware Talk.callto')
+    await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.callto\\DefaultIcon', '', process.execPath)
+    await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.callto\\shell\\open\\command', '', `"${process.execPath}" "%1"`)
+    // tel
     await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities\\URLAssociations', 'tel', 'Aloware Talk.tel')
     await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.tel\\DefaultIcon', '', process.execPath)
     await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.tel\\shell\\open\\command', '', `"${process.execPath}" "%1"`)
+    // more registry
     await Registry.set('HKCU\\Software\\RegisteredApplications', 'Aloware Talk', 'Software\\Aloware Talk\\Capabilities')
   })()
 }
@@ -54,9 +64,8 @@ function createWindow () {
     height: 680,
     minHeight: 630,
     minWidth: 360,
-    maxWidth: 700,
     resizable: true,
-    fullscreen: true,
+    fullscreen: false,
     center: true,
     useContentSize: true,
     webPreferences: {
@@ -263,7 +272,7 @@ function clearBadge () {
 }
 
 function setTray () {
-  const iconPath = path.join(__statics, '/trayTemplate.png')
+  const iconPath = path.join(__statics, '/electron-app-icon.png')
   tray = new Tray(iconPath)
   try {
     tray.setContextMenu(Menu.buildFromTemplate([

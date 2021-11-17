@@ -28,7 +28,7 @@ export default {
   isFiltersOpen: (state) => state.isFiltersOpen,
   isBulkDelete: (state) => state.isBulkDelete,
   pinnedLists: (state) => {
-    const pinnedLists = Object.values(DEFAULT_PINNED_LIST)
+    return Object.values(DEFAULT_PINNED_LIST)
       .map((item) => {
         return {
           ...item,
@@ -46,8 +46,6 @@ export default {
           count: state.pinnedCounts[item.id] || 0
         }
       })
-
-    return pinnedLists
   },
   currentListFilters: (state) => state.currentListFilters,
   contact: (state) => state.contact,

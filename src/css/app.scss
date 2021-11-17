@@ -122,6 +122,7 @@ body,
 .btn-inbox-list-navigation {
   position: absolute;
   left: 197px;
+  outline: none !important;
 }
 
 .q-separator--horizontal-inset {
@@ -2795,6 +2796,8 @@ span.mention {
 
   [contenteditable=true] {
     font-size: 14px;
+    display: block;
+    word-wrap: break-word;
   }
 
   [contenteditable=true]:empty:before {
@@ -5016,7 +5019,8 @@ span.mention {
 }
 
 button#bs-folder-options {
-  margin-top: -4px;
+  margin-top: -9.2px;
+  position: absolute;
 }
 
 .folders {
@@ -6566,15 +6570,14 @@ table.datatable {
     display: flex;
     align-items: center;
     width: 100%;
-    padding-left: 0;
-    padding-right: 0;
     justify-content: center;
     padding-left: 5px;
     padding-right: 5px;
   }
 
   &__icon {
-    padding-right: 10px;
+    padding-right: 7px;
+    width: 23px;
   }
 
   &__label {
@@ -6836,8 +6839,7 @@ table.datatable {
   padding-right: 14px !important;
   .contact-unread-badge {
     left: 38px;
-    position: absolute;
-    margin-top: -25px;
+    top: -8px;
     height: 18px;
     width: 18px;
   }
@@ -7551,7 +7553,11 @@ button.grey-90 {
   }
 
   .q-user-selector {
-    width: 130px;
+    width: 8vw;
+  }
+
+  .q-line-and-ring-group-selector {
+    width: 8vw;
   }
 
   .generic-selector {
@@ -7570,7 +7576,7 @@ button.grey-90 {
         color: $grey-100;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 6.5vw;
+        width: 5.5vw;
         overflow: hidden;
       }
     }
@@ -7930,6 +7936,11 @@ button.grey-90 {
     margin-right: 10px !important;
     display: flex;
     align-items: center;
+  }
+
+  .item-empty {
+    padding-top: 20px;
+    padding-left: 18px;
   }
 }
 
@@ -8915,4 +8926,13 @@ screen and (max-width: 956px) {
 
 .b-toaster {
   z-index: 9999;
+}
+
+.contact-sidebar-list-wrapper {
+  .folders__header {
+    .header__header__title {
+      margin-top: -1px;
+      position: relative;
+    }
+  }
 }

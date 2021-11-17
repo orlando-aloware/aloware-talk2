@@ -1,7 +1,7 @@
 <template>
-  <div class="t-menu">
+  <div class="t-menu border-top">
     <DirectoryBase
-      v-if="true"
+      v-if="false"
       @create-folder="{}"
       title="Power Dialer Lists"
       :directory="list" />
@@ -11,7 +11,7 @@
       No Lists found
     </div>
     <ContactsFolders
-      v-if="false"
+      v-if="true"
       :is-contact-module-type="false" />
   </div>
 </template>

@@ -57,44 +57,52 @@
         </div>
       </q-item-section>
     </template>
-
-    <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
-      <div class="folders__content">
-        <tree-folder-create
-          v-if="isCreatingFolder"
-          :endpoint="foldersEndpoint"
+  <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
+    <div class="folders__content">
+      <tree-folder-create
+        v-if="isCreatingFolder"
+        :layer="0"
+        :parent_id="null"
+        @blur="onCreateFolderToggle"
+        @cancel="onCreateFolderCancel"
+      />
+      <template v-if="folders.length && !isLoading">
+        <tree-folder
+          v-for="folder in folders[0].child_folders"
+          :name="folder.name"
+          :key="folder.id"
+          :id="folder.id"
+          :order="folder.order"
+          :hasEdit="folders[0].has_edit"
+          :hasDelete="folders[0].has_delete"
+          :folders="folder.child_folders"
+          :lists="folder.lists"
+          :layer="0"
+        />
+        <tree-folder
+          :name="folders[0].name"
+          :id="folders[0].id"
+          :order="folders[0].order"
+          :hasEdit="folders[0].has_edit"
+          :hasDelete="folders[0].has_delete"
+          :isRootList="true"
+          :folders="[]"
+          :lists="folders[0].lists"
           :layer="0"
           :parent_id="null"
           @blur="onCreateFolderToggle"
           @cancel="onCreateFolderCancel"
         />
-        <template v-if="folders.length">
-          <tree-folder
-            v-for="folder in folders[0].child_folders"
-            :name="folder.name"
-            :key="folder.id"
-            :id="folder.id"
-            :order="folder.order"
-            :hasEdit="folders[0].has_edit"
-            :hasDelete="folders[0].has_delete"
-            :folders="folder.child_folders"
-            :lists="folder.lists"
-            :layer="0"
-          />
-          <tree-folder
-            :name="folders[0].name"
-            :id="folders[0].id"
-            :order="folders[0].order"
-            :hasEdit="folders[0].has_edit"
-            :hasDelete="folders[0].has_delete"
-            :isRootList="true"
-            :folders="[]"
-            :lists="folders[0].lists"
-            :layer="0"
-          />
-        </template>
+      </template>
+      <div v-if="!folders[0].child_folders.length && !isLoading"
+           class="item-empty">
+        <span class="fs-12 text-muted">
+          You don't have any contact list
+        </span>
       </div>
+      <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
     </div>
+  </div>
   </q-expansion-item>
 </template>
 
@@ -107,6 +115,7 @@ import ContactMenuItem from './contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-icon.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 
 export default {
   props: {
@@ -116,6 +125,7 @@ export default {
     }
   },
   components: {
+    ContactsSidebarLoader,
     TreeFolder,
     TreeFolderCreate,
     ContactMenu,
@@ -169,7 +179,6 @@ export default {
     },
     loadFolders () {
       this.isLoading = false
-
       this.$axios
         .get(this.foldersEndpoint)
         .then((response) => response.data)

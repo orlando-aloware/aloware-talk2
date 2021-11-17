@@ -183,6 +183,9 @@ export default {
         this.setDefaultLine(value)
         this.showPlaceholder()
       }
+    },
+    'selectedLine': function (value) {
+      this.$emit('change', value)
     }
   }
 }

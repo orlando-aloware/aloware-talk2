@@ -16,7 +16,7 @@
     </div>
     <div
       v-else
-      class="px-3 py-2 text-grey-6">No lists found</div>
+      class="p-3 text-grey-6">No lists found</div>
   </div>
 </template>
 

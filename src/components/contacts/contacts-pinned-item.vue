@@ -1,6 +1,7 @@
 <template>
   <router-link :to="item.to"
                :key="item.id"
+               v-if="item.name"
                v-slot="{ href, route, navigate, isActive, isExactActive }">
     <a :href="href"
        :class="[
@@ -11,7 +12,7 @@
        @click="navigate">
       <div class="icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
-        <!-- <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon> -->
+        <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC"></folder-dynamic-icon>
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">{{ item.name }}</div>
       <div class="counts d-flex align-items-center">
