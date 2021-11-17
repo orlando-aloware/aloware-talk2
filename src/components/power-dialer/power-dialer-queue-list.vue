@@ -5,24 +5,35 @@
         QUEUE
       </div>
     </div>
-    <div class="d-flex t-menu__content flex-column pb-3">
+    <div
+      v-if="my_queue"
+      class="d-flex t-menu__content flex-column pb-3">
       <!-- Queue List Here -->
       <QueueListItem
         v-for="(item, key) in listItems"
         :key="key"
         :item="item" />
     </div>
+    <div
+      v-else
+      class="px-3 py-2 text-grey-6">No lists found</div>
   </div>
 </template>
 
 <script>
 
-import QueueListItem from './power-dialer-queue-list-item.vue'
+import QueueListItem from './power-dialer-queue-list-item'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PowerDialerQueueList',
   components: {
     QueueListItem
+  },
+  computed: {
+    ...mapGetters('powerDialer', [
+      'my_queue'
+    ])
   },
   data () {
     return {

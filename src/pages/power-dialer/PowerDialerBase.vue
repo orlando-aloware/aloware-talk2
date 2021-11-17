@@ -7,7 +7,7 @@
 <script>
 
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
   name: 'PowerDialerBase',
@@ -25,12 +25,18 @@ export default {
       return this.$route.params.id || 'all'
     }
   },
+  async mounted () {
+    await this.getMyQueueList()
+  },
   data () {
     return {
       name: 'Power Dialer X'
     }
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'getMyQueueList'
+    ]),
     ...mapMutations('powerDialer', [
       'SET_ACTIVE_FILTER'
     ])

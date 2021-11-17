@@ -1,14 +1,21 @@
 <template>
   <div :data-layer="layer">
     <div class="folder-create d-flex align-items-center">
-      <div class="folder-create__indent" :style="indentStyle"></div>
+      <div
+        :style="indentStyle"
+        class="folder-create__indent">
+      </div>
+
       <div class="folder-create__arrow">
-        <folder-arrow-close-icon></folder-arrow-close-icon>
+        <folder-arrow-close-icon />
       </div>
+
       <div class="folder-create__icon">
-        <folder-icon color="#62666E"></folder-icon>
+        <folder-icon color="#62666E" />
       </div>
+
       <div class="folder-create__name flex-grow-1 d-flex align-items-center">
+
         <input
           :disabled="isCreating"
           type="text"
@@ -17,8 +24,8 @@
           ref="input"
           @blur="onInputBlur"
           @keydown="onKeyDown"
-          autofocus
-        />
+          autofocus />
+
       </div>
     </div>
   </div>
@@ -51,6 +58,10 @@ export default {
       type: Number,
       required: false,
       default: 1
+    },
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
     }
   },
   data () {
@@ -92,7 +103,7 @@ export default {
     },
     createFolderRequest (params) {
       return this.$axios
-        .post('/api/v2/contact-folders', params)
+        .post(this.endpoint, params)
         .then(() => this.reloadFolders())
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -116,7 +127,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.endpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

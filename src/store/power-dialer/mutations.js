@@ -1,4 +1,7 @@
 export default {
+  SET_MY_QUEUE_LIST: (state, data) => {
+    state.my_queue = data
+  },
   SET_POWER_DIALER_LIST: (state, data) => {
     state.lists = data
   },

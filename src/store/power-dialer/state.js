@@ -8,6 +8,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default function () {
   return {
+    my_queue: null,
     filters: [],
     opened: [],
     folders: [],

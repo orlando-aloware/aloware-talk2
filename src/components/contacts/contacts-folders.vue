@@ -40,7 +40,9 @@
                   </template>
                 </contact-menu-item>
 
-                <contact-menu-item @click="onCreateList">
+                <contact-menu-item
+                  v-if="isContactModuleType"
+                  @click="onCreateList">
                   <template slot="icon">
                     <people-icon></people-icon>
                   </template>
@@ -60,6 +62,7 @@
       <div class="folders__content">
         <tree-folder-create
           v-if="isCreatingFolder"
+          :endpoint="foldersEndpoint"
           :layer="0"
           :parent_id="null"
           @blur="onCreateFolderToggle"
@@ -134,6 +137,12 @@ export default {
         return true
       }
       return false
+    },
+    foldersEndpoint () {
+      if (this.isContactModuleType) {
+        return '/api/v2/contact-folders'
+      }
+      return '/api/v2/power-dialer-folders'
     }
   },
   mounted () {
@@ -160,8 +169,9 @@ export default {
     },
     loadFolders () {
       this.isLoading = false
+
       this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.foldersEndpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .finally(() => {

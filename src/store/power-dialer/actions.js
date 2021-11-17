@@ -4,6 +4,13 @@ export default {
    * Actual API Calls for
    * POWER-DIALER
    */
+  getMyQueueList: async ({ commit }) => {
+    let res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
+    console.log('res :>> ', res)
+    if (res.status === 200) {
+      commit('SET_MY_QUEUE_LIST', res.data)
+    }
+  },
   getPowerDialerListItem: async ({ commit }, id = '') => {
     console.log(`api/v2/contacts-list/${id}`, id)
     let res = await window.axios.get(`api/v2/contacts-list/${id}`)
