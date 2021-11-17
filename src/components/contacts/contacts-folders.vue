@@ -61,7 +61,7 @@
         @blur="onCreateFolderToggle"
         @cancel="onCreateFolderCancel"
       />
-      <template v-if="folders.length">
+      <template v-if="folders.length && !isLoading">
         <tree-folder
           v-for="folder in folders[0].child_folders"
           :name="folder.name"
@@ -86,6 +86,13 @@
           :layer="0"
         />
       </template>
+      <div v-if="!folders[0].child_folders.length && !isLoading"
+           class="item-empty">
+        <span class="fs-12 text-muted">
+          You don't have any contact list
+        </span>
+      </div>
+      <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
     </div>
   </div>
   </q-expansion-item>
@@ -100,9 +107,11 @@ import ContactMenuItem from './contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-icon.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 
 export default {
   components: {
+    ContactsSidebarLoader,
     TreeFolder,
     TreeFolderCreate,
     ContactMenu,
@@ -131,7 +140,7 @@ export default {
       this.isCreatingFolder = false
     },
     loadFolders () {
-      this.isLoading = false
+      this.isLoading = true
       this.$axios
         .get('/api/v2/contact-folders')
         .then((response) => response.data)

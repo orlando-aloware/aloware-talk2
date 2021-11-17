@@ -29,7 +29,7 @@
             </span>
           </template>
           <div ref="noteContentEditable"
-                id="noteContentEditable"
+               id="noteContentEditable"
                placeholder="Type @ to mention someone"
                contenteditable>
           </div>
@@ -133,7 +133,7 @@ export default {
       this.getMentionableItems()
     },
     'messageComposer.note.body': function (value) {
-      if (this.$refs.noteContentEditable.lastElementChild) {
+      if (this.$refs.noteContentEditable.lastElementChild && navigator.userAgent.indexOf('Firefox') !== -1) {
         if (this.$refs.noteContentEditable.lastElementChild.tagName !== 'BR') {
           let brNode = document.createElement('BR')
           this.$refs.noteContentEditable.appendChild(brNode)
