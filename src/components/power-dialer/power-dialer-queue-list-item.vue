@@ -1,49 +1,28 @@
 <template>
-  <div class="item item__no-cursor d-flex py-2">
-    <div class="pl-3 pr-2 py-2 icon">
-      <ListIcon />
-    </div>
-    <div
-      @click="goto()"
-      class="py-1 flex-grow-1 item-name cursor-pointer">
-      {{ item.name }}
-    </div>
-    <div class="pr-2">
-      <div
-        class="d-inline align-items-center">
-        <!-- <b-popover
-          target="bs-folder-options"
-          triggers="click blur"
-          placement="bottomright"
-          boundary="window"
-          custom-class="contact-popover">
-          <contact-menu>
-            <contact-menu-item @click="{}">
-              <template slot="icon">
-                <folder-icon></folder-icon>
-              </template>
-              <template slot="title">
-                <span>Folder</span>
-              </template>
-            </contact-menu-item>
-
-            <contact-menu-item @click="{}">
-              <template slot="icon">
-                <AddUserIcon />
-              </template>
-              <template slot="title">
-                <span>List</span>
-              </template>
-            </contact-menu-item>
-          </contact-menu>
-        </b-popover> -->
-        <AddUserIcon class="cursor-pointer" />
+  <router-link
+    :to="'/power-dialer'"
+    :key="item.id"
+    v-if="item.name"
+    v-slot="{ href, route, navigate, isActive, isExactActive }">
+    <a
+      :href="href"
+      :class="[isActive && 'router-link-active', isExactActive && 'router-link-exact-active']"
+      class="d-flex align-items-center item"
+      @click="navigate">
+      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
+        <ListIcon />
+        <span class="pl-2">{{ item.name }}</span>
       </div>
-      <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
-        {{ item.count }}
-      </b-badge>
-    </div>
-  </div>
+      <div class="counts d-flex align-items-center">
+        <div class="icon d-flex align-items-center">
+          <AddUserIcon class="cursor-pointer" />
+        </div>
+        <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
+          {{ item.count | fixCount }}
+        </b-badge>
+      </div>
+    </a>
+  </router-link>
 </template>
 
 <script>
@@ -61,11 +40,6 @@ export default {
   components: {
     ListIcon,
     AddUserIcon
-  },
-  methods: {
-    goto () {
-      this.$router.push('my-queue')
-    }
   }
 }
 </script>

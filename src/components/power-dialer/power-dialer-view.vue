@@ -130,6 +130,8 @@
             :has-more="true"
             :is-empty="!hasContacts"
             :is-loading-more="true"
+            :is-loading="isLoading"
+            :contact-list-id="id"
             :paginated="true"
             scroll-area-class="none"
             :total-rows="totalList"
@@ -350,9 +352,11 @@ export default {
       return this.activeFilter
     },
     activeRoute () {
-      if (this.$route.meta.title === 'Power Dialer Individual') {
-        return this.$route.fullPath
-      } else if (this.$route.meta.title === '"Power Dialer List Advance"') {
+      if (this.$route.meta.title === 'Power Dialer') {
+        return '/power-dialer'
+      } else if (this.$route.meta.title === 'Power Dialer Filter') {
+        return '/power-dialer'
+      } else if (this.$route.meta.title === 'Power Dialer List Advance') {
         return this.$route.path
       } else if (this.$route.meta.title === 'Power Dialer List') {
         return `/power-dialer/list/${this.$route.params.id}`
@@ -374,15 +378,25 @@ export default {
       'SET_LIST_SELECTED_CONTACTS',
       'START_DIAL_TOGGLE'
     ]),
-    ...mapActions('powerDialer', [
-      'columnsReordered'
-    ]),
     ...mapActions('inbox', [
       'setSelectedContact'
     ]),
     ...mapActions('contacts', [
       'setContact',
-      'columnsOpen'
+      'columnsOpen',
+      'openFilters',
+      'closeFilters',
+      'contactsLoaded',
+      'columnsReordered',
+      'setListSelectedContacts',
+      'setSelectedList',
+      'createListOpen',
+      'setCurrentListFilters',
+      'removeListOpen',
+      'resetSearch',
+      'setShouldUpdateSelectedListContactCount',
+      'setSelectedListContactCount',
+      'pinnedCountLoaded'
     ]),
 
     beginDial () {

@@ -14,6 +14,7 @@ export const DEFAULT_STATE = {
       headers: DEFAULT_COLUMNS,
       filters: {},
       type: 2,
+      module_type: 0,
       name: 'All Contacts'
     },
     'my-contacts': {
@@ -31,6 +32,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'My Contacts'
     },
     unassigned: {
@@ -47,6 +49,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'Unassigned Contacts'
     },
     unanswered: {
@@ -63,6 +66,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'Unanswered Contacts'
     },
     'new-leads': {
@@ -79,6 +83,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'New Leads'
     },
     static: {
@@ -91,6 +96,7 @@ export const DEFAULT_STATE = {
       headers: PD_DEFAULT_COLUMNS,
       filters: {},
       type: 2,
+      module_type: 1,
       name: 'My Queue'
     }
   }

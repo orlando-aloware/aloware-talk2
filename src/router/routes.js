@@ -137,14 +137,8 @@ const routes = [
           },
           {
             name: 'Power Dialer',
-            meta: { title: 'Power Dialer' },
-            path: 'my-queue',
-            component: () => import('src/pages/power-dialer/PowerDialerBase')
-          },
-          {
-            name: 'Power Dialer',
-            meta: { title: 'Power Dialer Base Filter' },
-            path: 'list/:id(in-queue|called|failed|scheduled|all)+',
+            meta: { title: 'Power Dialer Filter' },
+            path: ':id(in-queue|called|failed|scheduled|all)+',
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {

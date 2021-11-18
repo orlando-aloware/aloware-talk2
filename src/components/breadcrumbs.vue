@@ -104,7 +104,7 @@ export default {
       }
       // Otherwise, if this node has a tree field/value, recursively
       // process the nodes in this tree array
-      if (Array.isArray(vNode.child_folders)) {
+      if (Array.isArray(vNode?.child_folders)) {
         if (vNode.name === 'Root') {
           let rootItem = vNode.lists.find(i => i.id.toString() === searchForId.toString())
           if (rootItem) {

@@ -25,7 +25,7 @@ export default {
     },
     filter () {
       if (this.$route.params.id) {
-        if (this.$route.meta === 'Power Dialer' || (this.$route.meta === 'Power Dialer Base Filter' || this.$route.meta === 'Power Dialer Individual Advance')) {
+        if (this.$route.meta === 'Power Dialer' || (this.$route.meta === 'Power Dialer Filter' || this.$route.meta === 'Power Dialer Individual Advance')) {
           return this.$route.params.id
         } else {
           if (this.$route.params.filter) {

@@ -44,7 +44,7 @@ export default {
   watch: {
     '$route.params.id': function (id) {
       if (id) {
-        if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Base Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
+        if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
           this.SET_ACTIVE_FILTER(this.$route.params.id)
         } else {
           if (this.$route.params.filter) {
