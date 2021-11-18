@@ -16,7 +16,8 @@
     <MoveDialog />
     <CreateListDialog />
     <RemoveListModal />
-    <RemoveFolderDialog />
+    <RemoveFolderDialog
+      :is-contact-module-type="false" />
 
   </div>
 </template>
@@ -28,7 +29,7 @@ import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar
 import MoveDialog from 'components/power-dialer/custom/move-dialog'
 import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
-import RemoveFolderDialog from 'components/power-dialer/custom/remove-folder'
+import RemoveFolderDialog from 'components/remove-folder.vue'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'

@@ -48,7 +48,10 @@ export default {
         width: `${this.layer * 10}px`
       }
     },
-    ...mapGetters('contacts', ['opened'])
+    ...mapGetters('contacts', ['opened']),
+    orderKey () {
+      return 0 - Math.abs(new Date().getTime() / 1000).toFixed(0)
+    }
   },
   props: {
     parent_id: {
@@ -117,7 +120,7 @@ export default {
       return Promise.all([
         this.createFolderRequest({
           name: this.text,
-          order: 0 - Math.abs(new Date().getTime() / 1000).toFixed(0),
+          order: this.orderKey,
           parent_id: this.parent_id
         })
       ]).finally(() => {

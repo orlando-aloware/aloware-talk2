@@ -22,11 +22,14 @@
       </div>
 
       <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
-        <div v-if="!isEditing"
-             class="folder__name"
-             @click="onToggleFolder">
+        <div
+          v-if="!isEditing"
+          class="folder__name"
+          @click="onToggleFolder">
           {{ name }}
         </div>
+
+        <!-- Renaming Folders -->
         <input
           :id="'folder-input-' + id"
           v-if="isEditing"
@@ -36,8 +39,7 @@
           class="folder__input d-inline"
           @blur="onInputBlur"
           @keydown="onKeyDown"
-          autofocus
-        />
+          autofocus />
       </div>
 
       <button
@@ -50,8 +52,10 @@
       </button>
     </div>
 
+    <!-- Creating Folders -->
     <tree-folder-create
       v-if="isCreatingFolder"
+      :endpoint="endpoint"
       :layer="layer + 1"
       :parent_id="id"
       @blur="onCloseFolder"
@@ -242,6 +246,10 @@ export default {
       this.onCloseFolder()
     },
 
+    onCloseFolder () {
+      this.isCreatingFolder = false
+    },
+
     onKeyDown (evt) {
       if (evt.keyCode === 13 && evt.target.value.length > 60) {
         this.$generalNotification('Folder name should have up to 60 characters.', 'error')
@@ -290,7 +298,6 @@ export default {
     },
 
     updateFolderRequest (id, params) {
-      console.log('params :>> ', params)
       return this.$axios
         .patch(`${this.endpoint}/${id}`, params)
         .catch((error) => {
@@ -336,10 +343,6 @@ export default {
 
     onToggleFolder () {
       this.toggleFolder(this.id)
-    },
-
-    onCloseFolder () {
-      this.isCreatingFolder = false
     }
   },
 

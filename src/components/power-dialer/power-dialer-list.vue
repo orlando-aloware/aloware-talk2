@@ -1,6 +1,6 @@
 <template>
   <div class="t-menu border-top">
-    <DirectoryBase
+    <!-- <DirectoryBase
       v-if="false"
       @create-folder="{}"
       title="Power Dialer Lists"
@@ -9,9 +9,8 @@
       v-if="hasEmptyList"
       class="no-list-found px-3 text-grey-7">
       No Lists found
-    </div>
+    </div> -->
     <ContactsFolders
-      v-if="true"
       :is-contact-module-type="false" />
   </div>
 </template>
@@ -19,14 +18,14 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import DirectoryBase from './directories/directory-base'
+// import DirectoryBase from './directories/directory-base'
 import ContactsFolders from '../contacts/contacts-folders'
 import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerList',
   components: {
-    DirectoryBase,
+    // DirectoryBase,
     ContactsFolders
   },
   computed: {
