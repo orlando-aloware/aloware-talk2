@@ -1,6 +1,6 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import qs from 'qs'
-import { isEmpty, get } from 'lodash'
+import { isEmpty, get, debounce } from 'lodash'
 import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
@@ -72,7 +72,7 @@ export default {
     ...mapMutations('powerDialer', [
       'TOGGLE_TABLE_LOADER'
     ]),
-    async processFetch (params) {
+    processFetch2: debounce(function (params = {}) {
       // console.log('100 :>> ', this.powerDialerListItems[this.tempId])
       // console.log('101 :>> ', this.powerDialerListItems)
       // console.log('102 :>> ', this.tempId)
@@ -84,7 +84,7 @@ export default {
         .then((response) => response.data)
         .then((data) => {
           // console.log('params :>> ', params)
-          // console.log('data from api : ', data)
+          console.log('data from api : ', data)
           this.contactsLoaded({
             id: this.tempId || '',
             append: false,
@@ -92,7 +92,7 @@ export default {
           })
           this.TOGGLE_TABLE_LOADER(false)
         })
-    },
+    }, 1000),
     buildQueryString (params) {
       const query = {
         page: 1
@@ -159,7 +159,7 @@ export default {
       params.sort = sort
       params.order = order
       this.isLoading = true
-      this.processFetch(params)
+      this.processFetch2(params)
     },
     onSearch (searchText) {
       this.isLoaded = false

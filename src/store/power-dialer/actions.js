@@ -11,7 +11,6 @@ export default {
     }
   },
   getPowerDialerListItem: async ({ commit }, id = '') => {
-    console.log(`api/v2/contacts-list/${id}`, id)
     let res = await window.axios.get(`api/v2/contacts-list/${id}`)
     if (res.status === 200) {
       commit('SET_CURRENT_LIST', res.data)
@@ -120,7 +119,6 @@ export default {
     commit('REMOVE_LIST_OPEN', list)
   },
   openCreateListDialog: ({ commit }, payload) => {
-    console.log('payload :>> ', payload)
     commit('CREATE_DIALOG_OPEN', payload)
   },
   closeCreateListDialog: ({ commit }) => {

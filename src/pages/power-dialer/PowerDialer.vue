@@ -31,6 +31,7 @@ import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/remove-folder.vue'
 import powermixin from 'src/plugins/mixins/power-dialer'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
@@ -44,7 +45,7 @@ export default {
     RemoveListModal,
     RemoveFolderDialog
   },
-  mixins: [powermixin],
+  mixins: [powermixin, contactsMixins],
   computed: {
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
@@ -116,26 +117,34 @@ export default {
         'order': 'desc',
         'sort': 'last_engagement_at'
       }
-
+      console.log('this.isFilterKey :>> ', this.filterKeys)
       if (this.isFilterKey) {
+        console.log('Getting data...')
         await this.getPowerDialerListItem(this.id)
       }
-
+      console.log('Getting data...', this.$route)
       if (this.listItems[this.id] === undefined) {
         if (isEmpty(this.id)) {
-          await this.processFetch(params)
+          this.fetchApi(params)
         } else {
           this.contactsLoaded({
             id: this.tempId,
             ...DEFAULT_LIST_ITEMS
           })
-          await this.processFetch(params)
+          this.fetchApi(params)
         }
       } else {
-        await this.processFetch(params)
+        this.fetchApi(params)
       }
 
       this.TOGGLE_TABLE_LOADER(false)
+    },
+    fetchApi (params) {
+      if (this.$route.meta.title === 'Power Dialer') {
+        this.processFetch(params, true, true)
+      } else {
+        this.processFetch(params, false, false)
+      }
     },
     async initialize () {
       let route = this.$route.params

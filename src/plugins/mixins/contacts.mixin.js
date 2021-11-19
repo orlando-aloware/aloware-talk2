@@ -104,7 +104,18 @@ export default {
 
       this.fetch(params)
     },
-    processFetch: _.debounce(function (params = {}) {
+    apiEndpoint (isContactModule, queued) {
+      if (isContactModule) {
+        return 'api/v2/contacts'
+      } else {
+        if (queued) {
+          return 'api/v2/power-dialer-lists/my-queue'
+        } else {
+          return 'api/v2/power-dialer-lists'
+        }
+      }
+    },
+    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
       params.search = this.search
 
       if (this.$route.name === 'Contacts') {
@@ -114,7 +125,7 @@ export default {
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
       return this.$axios
-        .get('api/v2/contacts', {
+        .get(this.apiEndpoint(isContactModule, queued), {
           params: this.buildQueryString(params),
           paramsSerializer: qs.stringify
         })

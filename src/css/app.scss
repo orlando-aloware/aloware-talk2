@@ -5158,6 +5158,10 @@ button#bs-folder-options {
   .scrollableArea {
     max-height: calc(100vh - 229px);
     min-height: calc(100vh - 229px);
+    &.pd-datatable {
+      max-height: calc(100vh - 300px);
+      min-height: calc(100vh - 300px);
+    }
   }
   .table-pagination {
     .q-btn__wrapper {

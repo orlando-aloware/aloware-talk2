@@ -121,116 +121,111 @@
     </template>
 
     <template slot="table">
-      <div>
-        <div class="pr-2">
 
-          <Datatable
-            :stickyHeaders="true"
+      <Datatable
+        :stickyHeaders="true"
+        :columns="columns2"
+        :has-more="true"
+        :is-empty="!hasContacts"
+        :is-loading-more="true"
+        :is-loading="isLoading"
+        :contact-list-id="id"
+        :paginated="true"
+        scroll-area-class="pd-datatable"
+        :total-rows="totalList"
+        @reordered="onColumnsReordered"
+        @sort="onSortByField"
+        @more="onLoadMore">
+        <template slot="tbody">
+          <TableRow
+            v-for="(contact, nkey) in currentContacts"
+            :key="`power-dialer-${contact.id}-${nkey}`"
+            :contact="contact"
             :columns="columns2"
-            :has-more="true"
-            :is-empty="!hasContacts"
-            :is-loading-more="true"
-            :is-loading="isLoading"
-            :contact-list-id="id"
-            :paginated="true"
-            scroll-area-class="none"
-            :total-rows="totalList"
-            @reordered="onColumnsReordered"
-            @sort="onSortByField"
-            @more="onLoadMore">
-            <template slot="tbody">
-              <TableRow
-                v-for="(contact, nkey) in currentContacts"
-                :key="`power-dialer-${contact.id}-${nkey}`"
-                :contact="contact"
-                :columns="columns2"
-                :checked="checked"
-                :contactListId="id"
-                :custom-row-content="true"
-                @checked="onCheckedRows">
-                <template slot="custom-content">
-                  <template v-for="(column, key) in columns2">
-                    <!-- change date added to date created -->
-                    <!-- COLUMN: Checkboxes -->
-                    <td
-                      v-if="column.name === 'checkbox'"
-                      :key="key"
-                      class="p-0">
-                      <CheckBox
-                        :resource="contact"
-                        :checked-items="checked"
-                        @checked="onCheckboxCheck" />
-                    </td>
-                    <!-- COLUMN: Name  -->
-                    <td
-                      v-else-if="column.name === 'name'"
-                      :key="column.name"
-                      class="datatable-row__name">
-                      <NameWrapper
-                        :resource="contact"
-                        link-path="/power-dialer/" />
-                    </td>
-                    <!-- COLUMN: Phone Number -->
-                    <td
-                      v-else-if="column.name === 'phone_number'"
-                      :key="column.name"
-                      class="datatable-row__phone">
-                      <div
-                        v-if="contact.phone_number"
-                        :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-                        {{ contact.phone_number | fixPhone('NATIONAL', true) }}
-                      </div>
-                      <span v-else class="ml-1 text-grey-7 text-center">--</span>
-                    </td>
-                    <!-- COLUMN: Date Added/Created At -->
-                    <td
-                      class="text-left"
-                      :key="column.name"
-                      v-else-if="column.name === 'created_at'">
-                      <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-                        {{ contact.created_at | fixDate }}
-                      </div>
-                    </td>
-                    <!-- COLUMN: Tags -->
-                    <td
-                      v-else-if="column.name === 'tags'"
-                      :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
-                      :key="column.name">
-                      <TagPopover
-                        :resource="contact" />
-                    </td>
-                    <!-- COLUMN: Status -->
-                    <td
-                      v-else-if="column.name === 'status'"
-                      :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
-                      :key="key">
-                      <StatusChip
-                        :status="contact.status"
-                        size="12px"
-                        :outline="true" />
-                    </td>
-                    <td
-                      v-else-if="column.name === 'actions'"
-                      :key="key">
-                      <button
-                        @click="onRemove(contact)"
-                        class="btn btn-sm btn-link datatable-row__actions__action--trash">
-                        <TrashOIcon />
-                      </button>
-                    </td>
-                    <!-- <td
-                      v-else
-                      :key="key">
-                      -> {{ column.name }}
-                    </td> -->
-                  </template>
-                </template>
-              </TableRow>
+            :checked="checked"
+            :contactListId="id"
+            :custom-row-content="true"
+            @checked="onCheckedRows">
+            <template slot="custom-content">
+              <template v-for="(column, key) in columns2">
+                <!-- change date added to date created -->
+                <!-- COLUMN: Checkboxes -->
+                <td
+                  v-if="column.name === 'checkbox'"
+                  :key="key"
+                  class="p-0">
+                  <CheckBox
+                    :resource="contact"
+                    :checked-items="checked"
+                    @checked="onCheckboxCheck" />
+                </td>
+                <!-- COLUMN: Name  -->
+                <td
+                  v-else-if="column.name === 'name'"
+                  :key="column.name"
+                  class="datatable-row__name">
+                  <NameWrapper
+                    :resource="contact"
+                    link-path="/power-dialer/" />
+                </td>
+                <!-- COLUMN: Phone Number -->
+                <td
+                  v-else-if="column.name === 'phone_number'"
+                  :key="column.name"
+                  class="datatable-row__phone">
+                  <div
+                    v-if="contact.phone_number"
+                    :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                    {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+                  </div>
+                  <span v-else class="ml-1 text-grey-7 text-center">--</span>
+                </td>
+                <!-- COLUMN: Date Added/Created At -->
+                <td
+                  class="text-left"
+                  :key="column.name"
+                  v-else-if="column.name === 'created_at'">
+                  <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                    {{ contact.created_at | fixDate }}
+                  </div>
+                </td>
+                <!-- COLUMN: Tags -->
+                <td
+                  v-else-if="column.name === 'tags'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="column.name">
+                  <TagPopover
+                    :resource="contact" />
+                </td>
+                <!-- COLUMN: Status -->
+                <td
+                  v-else-if="column.name === 'status'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="key">
+                  <StatusChip
+                    :status="contact.status"
+                    size="12px"
+                    :outline="true" />
+                </td>
+                <td
+                  v-else-if="column.name === 'actions'"
+                  :key="key">
+                  <button
+                    @click="onRemove(contact)"
+                    class="btn btn-sm btn-link datatable-row__actions__action--trash">
+                    <TrashOIcon />
+                  </button>
+                </td>
+                <!-- <td
+                  v-else
+                  :key="key">
+                  -> {{ column.name }}
+                </td> -->
+              </template>
             </template>
-          </Datatable>
-
-        </div>
-      </div>
+          </TableRow>
+        </template>
+      </Datatable>
 
       <ConfirmDialog
         v-model="isOpen"
@@ -300,6 +295,7 @@ import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import talk2Api from 'src/plugins/api/api'
 // import { get } from 'lodash'
 
@@ -311,7 +307,7 @@ export default {
       required: true
     }
   },
-  mixins: [powermixin],
+  mixins: [powermixin, contactsMixins],
   components: {
     PowerDialerViewScreen,
     PowerDialerFilter,
