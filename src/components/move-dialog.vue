@@ -9,7 +9,7 @@
         ></search>
       </div>
     </div>
-    <div class="move-dialog-lists">
+    <div class="move-dialog-lists px-4 pb-2">
       <move-folder-item
         v-for="folder in searchedItemsList"
         :name="folder.name"

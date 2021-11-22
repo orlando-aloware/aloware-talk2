@@ -1,37 +1,45 @@
 <template>
-  <div :data-layer="layer" :class="`layer-indent-${layer}`">
+  <div
+    :data-layer="layer"
+    :class="`layer-indent-${layer} px-2`">
+
     <div
       v-if="name"
       class="folder d-flex align-items-center"
-      :class="{ 'folder--target': isTarget }"
-    >
+      :class="{ 'folder--target': isTarget }">
+
       <div
         class="folder__indent"
         :style="indentStyle"
         @click="onToggleFolder">
       </div>
-      <div class="folder__arrow pd-arrow-create" @click="onToggleFolder" >
-        <folder-arrow-open-icon v-if="isOpen"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-if="!isOpen"></folder-arrow-close-icon>
+
+      <div
+        @click="onToggleFolder"
+        class="folder__arrow pd-arrow-create">
+        <FolderArrowOpenIcon v-if="isOpen" />
+        <FolderArrowCloseIcon v-if="!isOpen" />
       </div>
-      <div class="folder__icon pd-icon-create" @click="onToggleFolder">
-        <folder-icon></folder-icon>
+
+      <div
+        @click="onToggleFolder"
+        class="folder__icon pd-icon-create">
+        <FolderIcon />
       </div>
 
       <div  class="flex-grow-1 d-flex align-items-center">
-        <div @click="onToggleFolder" class="folder__name pd-name-create">
+        <div
+          @click="onToggleFolder"
+          class="folder__name pd-name-create">
           {{ name }}
         </div>
       </div>
 
-      <!-- <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
-        <i class="fa fa-circle small" v-if="!isTarget"></i>
-        <i class="fa fa-check-circle text-success small" v-if="isTarget"></i>
-      </button> -->
     </div>
 
     <template
       v-if="listOfItems.length > 0">
+
       <template
         v-for="(item, key) in listOfItems">
         <div
@@ -42,15 +50,25 @@
 
           <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
             <div class="folder__name pd-name-create">
-              <DialIcon color="grey" class="mr-1" />
+              <DialIcon
+                color="grey"
+                class="mr-1" />
               {{ item.name }}
             </div>
           </div>
 
-          <button class="folder__option btn btn-link p-0" @click="onTarget" v-if="isTargetable">
-            <i class="fa fa-circle small" v-if="!isTarget"></i>
-            <i class="fa fa-check-circle text-success small" v-if="isTarget"></i>
+          <button
+            v-if="isTargetable"
+            @click="onTarget"
+            class="folder__option btn btn-link p-0">
+            <i v-if="!isTarget"
+              class="fa fa-circle small">
+            </i>
+            <i v-if="isTarget"
+              class="fa fa-check-circle text-success small">
+            </i>
           </button>
+
         </div>
       </template>
     </template>
@@ -64,8 +82,8 @@
         :layer="layer + 1"
         :item-folders="listOfChildFolders"
         :item-lists="itemLists"
-        action="create"
-      ></MoveFolderLists>
+        action="create">
+      </MoveFolderLists>
     </div>
   </div>
 </template>
