@@ -16,7 +16,7 @@
     <MoveDialog
       :is-contact-module-type="false" />
     <CreateListDialog />
-    <RemoveListModal />
+    <!-- <RemoveListModal /> -->
     <RemoveFolderDialog
       :is-contact-module-type="false" />
 

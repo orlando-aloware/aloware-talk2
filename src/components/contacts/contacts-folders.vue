@@ -103,6 +103,7 @@
           v-if="isCreatingFolder"
           :layer="0"
           :parent_id="null"
+          :endpoint="foldersEndpoint"
           @blur="onCreateFolderToggle"
           @cancel="onCreateFolderCancel"
         />
