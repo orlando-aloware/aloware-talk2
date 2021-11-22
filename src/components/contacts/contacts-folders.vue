@@ -77,15 +77,15 @@
                   @mouseleave="destroySubmenu"
                   @mouseover="createSubmenu"
                 >
-                  <contact-menu-item @click="$emit('create')">
+                  <contact-menu-item @click="onCreateFromExistingList">
                     <template slot="title">
-                      <span>Create from Existing Contacts List</span>
+                      <span class="create-item">Create from Existing Contacts List</span>
                     </template>
                   </contact-menu-item>
 
                   <contact-menu-item @click="$emit('createlist')">
                     <template slot="title">
-                      <span>Create by Manually Selecting Contacts</span>
+                      <span class="create-item">Create by Manually Selecting Contacts</span>
                     </template>
                   </contact-menu-item>
                 </div>
@@ -215,13 +215,24 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['foldersLoaded', 'createListOpen']),
+    ...mapActions('contacts', [
+      'foldersLoaded',
+      'createListOpen',
+      'createPdListOpen'
+    ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
     },
     onCreateList () {
       this.createListOpen({
         contact_folder_id: null
+      })
+    },
+    onCreateFromExistingList () {
+      this.$root.$emit('bv::hide::popover')
+      this.createPdListOpen({
+        id: '',
+        type: 'list'
       })
     },
     onCreateFolderCancel () {

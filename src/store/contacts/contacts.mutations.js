@@ -159,6 +159,12 @@ export default {
   CREATE_LIST_OPEN: (state, payload) => {
     state.createList = { ...state.createList, ...payload, open: true }
   },
+  CREATE_DIALOG_OPEN: (state, { id, type }) => {
+    state.createDialog = { open: true, id, type }
+  },
+  CREATE_DIALOG_CLOSE: (state) => {
+    state.createDialog = { open: false }
+  },
   CREATE_LIST_CLOSE: (state) => {
     state.createList = { folderId: null, open: false, mode: '', type: 1, contact_folder_id: null, name: '', filters: [] }
   },
@@ -344,5 +350,8 @@ export default {
   },
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedList.id].data = payload
+  },
+  ON_SEARCH_PD_ITEM: (state, value) => {
+    state.searchedPdItem = value
   }
 }

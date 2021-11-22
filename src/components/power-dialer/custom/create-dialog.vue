@@ -48,6 +48,7 @@
 import { createPopper } from '@popperjs/core'
 import { mapActions, mapMutations, mapGetters } from 'vuex'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
+// import CreateListItem from 'src/components/move-folder-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -79,11 +80,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('powerDialer', [
+    ...mapGetters('contacts', [
       'createDialog',
       'folders',
-      'powerDialerDirectoryList',
-      'searchedListItem'
+      'lists',
+      'searchedPdItem'
     ]),
     searchedItemsList () {
       if (this.searchValue) {
@@ -94,7 +95,7 @@ export default {
       return this.filterByActiveId(this.itemsList)
     },
     rootItems () {
-      return this.powerDialerDirectoryList.find(item => item.name === 'Root')
+      return this.folders.find(item => item.name === 'Root')
     },
     hasSelected () {
       return (
@@ -104,15 +105,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions('powerDialer', [
-      'closeCreateListDialog',
+    ...mapActions('contacts', [
+      'createPdListClose',
       'foldersLoaded'
     ]),
-    ...mapMutations('powerDialer', [
-      'ON_SEARCH_LIST_ITEM'
+    ...mapMutations('contacts', [
+      'ON_SEARCH_PD_ITEM'
     ]),
     onConfirmMove () {
-      console.log('this.moveDialog :>> ', this.createDialog)
+      console.log('this.createDialog :>> ', this.createDialog)
       if (this.createDialog.type === 'list') {
         return this.moveListRequest()
       }
@@ -122,14 +123,14 @@ export default {
       this.isMoving = true
       return this.$axios
         .patch('/api/v2/power-dialer-folders/move/' + this.createDialog.id, {
-          parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
+          parent_id: this.createDialog.target < 1 ? null : this.createDialog.target
         })
         .then(() => {
           this.reloadFolders()
           this.isMoving = false
         })
         .catch(this.handleRequestError)
-        .finally(this.closeCreateListDialog)
+        .finally(this.createPdListClose)
     },
     moveListRequest () {
       this.isMoving = true
@@ -142,7 +143,7 @@ export default {
           this.isMoving = false
         })
         .catch(this.handleRequestError)
-        .finally(this.closeCreateListDialog)
+        .finally(this.createPdListClose)
     },
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
@@ -184,7 +185,7 @@ export default {
     },
     onSearch (searchValue) {
       // this.searchValue = searchValue
-      this.ON_SEARCH_LIST_ITEM(searchValue)
+      this.ON_SEARCH_PD_ITEM(searchValue)
     },
     createFolders (names = '', newFolders = []) {
       return newFolders.map((i) => {
@@ -241,12 +242,12 @@ export default {
     handleClick (evt) {
       if (
         evt.target &&
-        !this.$refs.createDialog.contains(evt.target) &&
+        !(this.$refs.createDialog && this.$refs.createDialog.constructor.name === 'Object' && this.$refs.createDialog.contains(evt.target)) &&
+        !evt.path.find(path => path.className && typeof path.className === 'string' && path.className.split(' ').includes('move-dialog')) &&
         !evt.target.classList.contains('contact-menu-item') &&
-        !evt.target.classList.contains('move-item')
+        !evt.target.classList.contains('create-item')
       ) {
-        console.log('Closing dialog...')
-        this.closeCreateListDialog()
+        this.createPdListClose()
         document.body.removeEventListener('click', this.handleClick)
       }
     }
