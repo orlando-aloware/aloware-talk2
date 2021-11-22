@@ -28,7 +28,7 @@
                 </span>
             </span>
           </template>
-          <div id="noteContentEditable" placeholder="Type @ to mention someone" contenteditable></div>
+          <span id="noteContentEditable" placeholder="Type @ to mention someone" contenteditable></span>
         </at>
       </form>
     </div>
@@ -122,6 +122,10 @@ export default {
     this.getMentionableItems()
     if (this.messageComposer.mode === 'note') {
       this.focusInput()
+    }
+    let el = document.querySelector('span[contenteditable="false"]')
+    el.onkeydown = function (e) {
+      e.preventDefault()
     }
   },
   watch: {

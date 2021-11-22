@@ -103,7 +103,8 @@
            v-show="!isActive('Settings')"
            flat>
     </q-btn>
-    <div class="mt-auto w-100">
+    <div class="mt-auto w-100"
+         v-show="false">
       <div class="width-40 margin-auto position-relative">
         <q-separator class="separator-blur mt-1"
                      color="white"/>

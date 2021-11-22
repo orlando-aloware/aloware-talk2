@@ -28,6 +28,7 @@
       <compact-btn
         variant="primary"
         v-if="list.type === ContactListType.DYNAMIC && isEditable"
+        :disabled="isFiltersOpen"
         @clicked="onFiltersClicked"
       >
         <i class="fa fa-plus mr-2"></i> Add Filters
@@ -281,13 +282,16 @@ export default {
     ImportContactsModal,
     TableRow
   },
+
   mixins: [contactsMixins],
+
   props: {
     id: {
       type: [String, Number],
       required: true
     }
   },
+
   data () {
     return {
       filterHasChanges: false,
@@ -296,6 +300,7 @@ export default {
       folderPath: []
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'columnsOpen',
@@ -310,7 +315,8 @@ export default {
       'removeListOpen',
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
-      'setSelectedListContactCount'
+      'setSelectedListContactCount',
+      'pinnedCountLoaded'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -380,6 +386,11 @@ export default {
           this.updateFilterHasChanges()
           this.isUpdatingList = false
           this.$generalNotification('Changes to contact list has been saved.')
+
+          this.pinnedCountLoaded({
+            id: this.selectedList.id,
+            count: this.listItems[this.selectedList.id].total
+          })
         })
         .catch((_err) => {
           this.$generalNotification('Unable to update contact list.', 'error')
@@ -480,6 +491,7 @@ export default {
       return []
     }
   },
+
   computed: {
     ...mapGetters('auth', ['profile']),
     ...mapState('contacts', ['folders']),
@@ -535,6 +547,7 @@ export default {
       return this.filtersCount > 0
     }
   },
+
   mounted () {
     this.setShouldUpdateSelectedListContactCount(true)
     this.fetch()
@@ -542,6 +555,7 @@ export default {
     this.closeFilters()
     this.folderPath = this.generateFolderPath(this.folders)
   },
+
   watch: {
     '$route.params.id': function () {
       this.resetFilters()
