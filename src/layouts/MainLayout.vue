@@ -15,7 +15,7 @@
         <div class="h-100"
              :class="[ sidebarVisible ? 'sidebar-active' : '']">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading">
+                    v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
           <q-page-container class="page-container h-100">
@@ -56,7 +56,8 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated"></dialer>
+            <dialer v-if="authenticated">
+            </dialer>
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
@@ -79,23 +80,27 @@
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
-          :breakpoint="605"
+          :breakpoint="789"
           v-model="mobilePhoneDrawer"
+          v-if="isMobile && mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
           <div class="phone-header-title"
                v-show="!isPhoneVisible">Phone</div>
           <phone :isMobile="isMobile"
-                 @onPhoneVisible="onPhoneVisible"></phone>
+                 v-if="mobilePhoneDrawer"
+                 @onPhoneVisible="onPhoneVisible">
+          </phone>
           <dialer-form ref="dialerForm"
+                       :isMobile="true"
                        v-model="mobilePhoneDrawer"
                        v-if="mobilePhoneDrawer"
                        v-show="!isPhoneVisible"
-                       :isMobile="true">
+                       @hide="onDialerFormHide">
           </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading"
+                    v-if="authenticated && !isWidget && !loading && isMobile"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -248,9 +253,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
+    ...mapState('contacts', ['showContactsHeader']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -520,6 +526,10 @@ export default {
       })
     }
     window.addEventListener('resize', this.resizeHandler)
+
+    if (!this.isMobile) {
+      this.setShowContactsHeader(true)
+    }
   },
 
   mounted () {
@@ -552,6 +562,8 @@ export default {
       }
     }
 
+    this.resizeHandler()
+
     // event for listening before tab/browser close
 
     window.addEventListener('beforeunload', this.beforeUnload)
@@ -562,12 +574,19 @@ export default {
   },
 
   methods: {
+    onDialerFormHide () {
+      if (typeof this.$refs.appFooter !== 'undefined') {
+        this.$refs.appFooter.toggleContacts()
+      }
+    },
+
     onPhoneVisible (value) {
       this.isPhoneVisible = value
       if (typeof this.$refs.dialerForm !== 'undefined') {
         this.$refs.dialerForm.hideDialer()
       }
     },
+
     toggleMobilePhone (value) {
       this.mobilePhoneDrawer = value
     },
@@ -1486,7 +1505,7 @@ export default {
       'setIsMobile',
       'setContactDetailsDrawer'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
+    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
@@ -1533,6 +1552,10 @@ export default {
         !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
         (to.name !== from.name)) {
         this.resetInboxVuex()
+      }
+
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
       }
     },
 

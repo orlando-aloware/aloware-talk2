@@ -81,7 +81,8 @@
              no-caps
              exact>
         <span class="tab-icon">
-          <more-mobile-icon/>
+          <more-mobile-icon
+            :color="tab === 'more' ? '#256EFF' : '#A3A3A3'"/>
         </span>
         More
       </q-tab>
@@ -93,6 +94,7 @@
       boundary="window"
       custom-class="contact-popover mobile-more-dropdown"
       @hidden="onCloseDropdown"
+      @show="tab='more'"
     >
       <contact-menu class="list-actions">
         <contact-menu-item @click="$emit('rename')">
@@ -127,6 +129,7 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
+import { mapState } from 'vuex'
 export default {
   name: 'app-footer',
   components: {
@@ -141,6 +144,8 @@ export default {
   },
 
   computed: {
+    ...mapState(['isMobile', 'dialer']),
+
     isMoreActive () {
       return this.tab === 'more'
     },
@@ -160,8 +165,9 @@ export default {
     }
   },
 
-  created () {
-    this.tab = 'inbox'
+  mounted () {
+    this.updateTab()
+    this.tab = !this.dialer.currentStatus || this.dialer.currentStatus !== 'READY' ? 'phone' : this.tab
   },
 
   methods: {
@@ -181,6 +187,7 @@ export default {
         case 'Inbox Contact Mention Communication':
           return 'inbox'
         case 'Contacts':
+        case 'Contact':
           return 'contacts'
         case 'Stats':
           return 'stats'
@@ -188,6 +195,10 @@ export default {
     },
     updateTab () {
       this.tab = this.getTab()
+    },
+
+    toggleContacts () {
+      this.tab = 'contacts'
     }
   },
 
@@ -196,21 +207,38 @@ export default {
       if (!newValue) {
         this.tab = 'inbox'
       }
-      // if (newValue !== this.getTab()) {
-      //   this.updateTab()
-      // }
-      if (this.tab === 'more' && this.$route.name) {
-        this.updateTab()
+
+      if (this.dialer.currentStatus && this.dialer.currentStatus !== 'READY') {
+        this.$emit('toggleMobilePhone', true)
+        return
       }
+
+      if (this.tab === 'more') {
+        return
+      }
+
       if (newValue === 'phone') {
         this.$emit('toggleMobilePhone', true)
+        return
       }
+
       if (oldValue === 'phone') {
         this.$emit('toggleMobilePhone', false)
       }
+
+      if (this.tab !== this.getTab()) {
+        this.updateTab()
+      }
     },
+
     '$route.name': function () {
       this.updateTab()
+    },
+
+    'isMobile': function () {
+      if (this.isMobile && (this.dialer.currentStatus && this.dialer.currentStatus !== 'READY')) {
+        this.tab = 'phone'
+      }
     }
   }
 }

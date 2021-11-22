@@ -4,6 +4,7 @@
        ref="phone"
        v-if="shouldShow">
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
+         :class="{ 'call-ended': isCallCompleted }"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-65">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
@@ -161,7 +162,7 @@
               <b-link href="#"
                       class="copy-phone-number text-white d-inline-flex ml-1"
                       @click.prevent="copyPhoneNumber">
-                <i class="material-icons">content_copy</i>
+                <copy-icon />
               </b-link>
               <input :value="dialer.communication.lead_number"
                      type="hidden"
@@ -254,7 +255,7 @@
                 <b-link href="#"
                         class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                         @click.prevent="copyPhoneNumber">
-                  <i class="material-icons">content_copy</i>
+                  <copy-icon />
                 </b-link>
                 <input :value="dialer.communication.lead_number"
                        type="hidden"
@@ -336,12 +337,12 @@
             <button :disabled="isMuteDisabled"
                     class="phone-buttons btn"
                     @click="toggleMute">
-              <mute-icon width="16"
-                         height="16"
+              <mute-icon :width="iconSizes.mute.width"
+                         :height="iconSizes.mute.height"
                          v-show="!dialer.isMuted">
               </mute-icon>
-              <unmute-icon width="16"
-                           height="16"
+              <unmute-icon :width="iconSizes.mute.width"
+                           :height="iconSizes.mute.height"
                            v-show="dialer.isMuted">
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
@@ -349,32 +350,32 @@
             <button :disabled="isHoldDisabled || loadingHold || loadingUnhold"
                     class="phone-buttons btn"
                     @click="toggleHold">
-              <hold-icon width="16"
-                         height="16"
+              <hold-icon :width="iconSizes.hold.width"
+                         :height="iconSizes.hold.height"
                          v-show="!dialer.isHeld">
               </hold-icon>
-              <unhold-icon width="16"
-                           height="16"
+              <unhold-icon :width="iconSizes.hold.width"
+                           :height="iconSizes.hold.height"
                            v-show="dialer.isHeld">
               </unhold-icon>
               <span>{{ dialer.isHeld ? 'Unhold' : 'Hold' }}</span>
             </button>
             <button class="phone-buttons btn"
                     @click="openDialpad">
-              <dialpad-icon width="16"
-                            height="16">
+              <dialpad-icon :width="iconSizes.keypad.width"
+                            :height="iconSizes.keypad.height">
               </dialpad-icon>
-              <span>Dial pad</span>
+              <span>Keypad</span>
             </button>
             <button :disabled="isRecordingDisabled || loadingToggleRecordingStatus || dialer.communication.should_record === false"
                     class="phone-buttons btn"
                     @click="toggleRecordingStatus">
-              <record-icon width="16"
-                           height="16"
+              <record-icon :width="iconSizes.recording.width"
+                           :height="iconSizes.recording.height"
                            v-show="dialer.recordingStatus === 'paused' && dialer.communication.should_record === true">
               </record-icon>
-              <pause-record-icon width="16"
-                                 height="16"
+              <pause-record-icon :width="iconSizes.recording.width"
+                                 :height="iconSizes.recording.height"
                                  v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
               </pause-record-icon>
               <span>{{ recordingText }}</span>
@@ -383,23 +384,23 @@
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
             <button class="phone-buttons elevated btn"
                     @click="openNotes">
-              <notes-icon width="16"
-                          height="16">
+              <notes-icon :width="iconSizes.notes.width"
+                          :height="iconSizes.notes.height">
               </notes-icon>
               <span>Notes</span>
             </button>
             <button class="phone-buttons elevated btn"
                     @click="openTags">
-              <tags-icon width="16"
-                         height="16">
+              <tags-icon :width="iconSizes.tags.width"
+                         :height="iconSizes.tags.height">
               </tags-icon>
               <span>Tags</span>
             </button>
             <button :disabled="isVmDropDisabled"
                     class="phone-buttons elevated btn"
                     @click="openVmDrop">
-              <vm-drop-icon width="18"
-                            height="18">
+              <vm-drop-icon :width="iconSizes.vmdrop.width"
+                            :height="iconSizes.vmdrop.height">
               </vm-drop-icon>
               <span>VM Drop</span>
             </button>
@@ -408,31 +409,31 @@
             <button :disabled="isHangupDisabled"
                     class="phone-buttons btn"
                     @click="endCall">
-              <cancel-call-icon width="40"
-                                height="40">
+              <cancel-call-icon :width="iconSizes.call.width"
+                                :height="iconSizes.call.height">
               </cancel-call-icon>
             </button>
             <button :disabled="isAddDisabled"
                     class="phone-buttons btn"
                     @click="openAdd">
-              <add-icon width="16"
-                        height="16">
+              <add-icon :width="iconSizes.add.width"
+                        :height="iconSizes.add.height">
               </add-icon>
               <span>Add</span>
             </button>
             <button :disabled="isTransferDisabled"
                     class="phone-buttons btn"
                     @click="openTransfer">
-              <transfer-icon width="16"
-                             height="16">
+              <transfer-icon :width="iconSizes.transfer.width"
+                             :height="iconSizes.transfer.height">
               </transfer-icon>
               <span>Transfer</span>
             </button>
             <button :disabled="isMoreDisabled"
                     class="phone-buttons btn"
                     @click="openMore">
-              <more-icon width="16"
-                         height="16">
+              <more-icon :width="iconSizes.more.width"
+                         :height="iconSizes.more.height">
               </more-icon>
               <span>More</span>
             </button>
@@ -465,7 +466,7 @@
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                             @click.prevent="copyPhoneNumber">
-                      <i class="material-icons">content_copy</i>
+                      <copy-icon/>
                     </b-link>
                     <input :value="dialer.contact.phone_number"
                            type="hidden"
@@ -1120,30 +1121,30 @@
               <div class="d-flex justify-content-start w-100 pt-3 pl-3 pr-3">
                 <button class="phone-buttons btn"
                         @click="openScripts">
-                  <scripts-icon width="18"
-                                height="18">
+                  <scripts-icon :width="iconSizes.scripts.width"
+                                :height="iconSizes.scripts.height">
                   </scripts-icon>
                   <span>Scripts</span>
                 </button>
                 <button :disabled="isParkDisabled"
                         class="phone-buttons btn"
                         @click="parkCall">
-                  <park-call-icon width="18"
-                                  height="18">
+                  <park-call-icon :width="iconSizes.parkCall.width"
+                                  :height="iconSizes.parkCall.height">
                   </park-call-icon>
                   <span>Park Call</span>
                 </button>
                 <button class="phone-buttons btn"
                         @click="openContact">
-                  <contact-icon width="18"
-                                height="18">
+                  <contact-icon :width="iconSizes.contact.width"
+                                :height="iconSizes.contact.height">
                   </contact-icon>
                   <span>Contact</span>
                 </button>
                 <button class="phone-buttons btn"
                         @click="openIntegrations">
-                  <integrations-icon width="18"
-                                     height="18">
+                  <integrations-icon :width="iconSizes.integrations.width"
+                                     :height="iconSizes.integrations.height">
                   </integrations-icon>
                   <span>Integrations</span>
                 </button>
@@ -1203,11 +1204,13 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
+import CopyIcon from 'components/icons/copy-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    CopyIcon,
     MergeIcon,
     WaitingIcon,
     DropParticipantIcon,
@@ -1505,6 +1508,70 @@ export default {
       }
 
       return this.dialer && this.dialer.communication
+    },
+    iconSizes () {
+      return {
+        mute: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        hold: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        keypad: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        recording: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        notes: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        tags: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        vmdrop: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        call: {
+          width: this.isMobile ? 60 : 40,
+          height: this.isMobile ? 60 : 40
+        },
+        add: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        transfer: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        more: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        scripts: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        parkCall: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        contact: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        integrations: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        }
+      }
     }
   },
 

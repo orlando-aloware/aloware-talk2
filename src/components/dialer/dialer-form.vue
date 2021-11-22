@@ -1,6 +1,17 @@
 <template>
-  <div class="row no-wrap pt-3 pb-3 width-380">
-    <div class="col no-padding">
+  <div class="row no-wrap pt-3 pb-3 width-380"
+       :class="{ 'loading-cover-screen': isMakingCall }">
+    <div class="loading-container"
+         v-if="isMakingCall">
+      <div class="mobile-call-loader">
+        <q-spinner-bars
+          color="white"
+          size="5em"
+        />
+      </div>
+    </div>
+    <div v-if="!isMakingCall"
+         class="col no-padding">
       <b-tabs class="dialer-tabs"
               pills
               vertical>
@@ -136,15 +147,6 @@
         </b-tab>
       </b-tabs>
     </div>
-    <div class="mobile-dialer-button"
-         v-if="contactName && campaignId && mode === 'call' && isMobile">
-      <compact-btn borderless
-                   customClass="fs-14 _500 position-relative primary not-focusable bg-success"
-                   @clicked="makeCall">
-        <call-white-icon></call-white-icon>
-        <div class="contact-name">Call {{ contactName }}</div>
-      </compact-btn>
-    </div>
   </div>
 </template>
 
@@ -154,9 +156,7 @@ import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-sea
 import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
-import CompactBtn from 'src/components/compact-btn.vue'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import CallWhiteIcon from 'components/icons/call-white-icon'
 
 export default {
   name: 'dialer-form',
@@ -164,11 +164,9 @@ export default {
   mixins: [contactMixins],
 
   components: {
-    CallWhiteIcon,
     ContactPhoneNumberSearch,
     LineSelector,
-    SendTextIcon,
-    CompactBtn
+    SendTextIcon
   },
 
   props: {
@@ -195,12 +193,13 @@ export default {
       contactTimezone: null,
       currentLocalTime: null,
       loadingContact: false,
-      textMessage: ''
+      textMessage: '',
+      isMakingCall: false
     }
   },
 
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState(['currentCompany', 'dialer']),
     ...mapGetters('auth', ['profile']),
 
     sendTextColor () {
@@ -367,6 +366,9 @@ export default {
       if (!this.isMobile) {
         this.hideDialer()
       }
+      if (this.isMobile) {
+        this.isMakingCall = true
+      }
     },
 
     sendText () {
@@ -381,14 +383,16 @@ export default {
       }).then(res => {
         this.loading_btn = false
         this.hideDialer()
-        this.$router.push({
-          name: 'Contact',
-          params: {
-            id: res.data.id
-          }
-        }).catch(err => {
-          console.log(err)
-        })
+        if (!this.isMobile) {
+          this.$router.push({
+            name: 'Contact',
+            params: {
+              id: res.data.id
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        }
       }).catch(err => {
         this.loading_btn = false
         this.$handleErrors(err.response)
@@ -415,6 +419,12 @@ export default {
 
     selected () {
       this.resetSelectorId()
+    },
+
+    'dialer.currentStatus': function () {
+      if (!this.dialer.currentStatus || (this.dialer.currentStatus && this.dialer.currentStatus === 'READY')) {
+        this.isMakingCall = false
+      }
     }
   },
 

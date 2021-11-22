@@ -196,6 +196,7 @@ export default function () {
       scope: 'user',
       template: null
     },
-    search: ''
+    search: '',
+    showContactsHeader: true
   }
 }

@@ -29,12 +29,12 @@
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1">
-      <div class="w-40 d-inline-flex">
+      <div class="phone-lines-left d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
         <contact-phone-number-selector @setSelectedPhone="setSelectedPhone"></contact-phone-number-selector>
       </div>
 
-      <div class="w-35">
+      <div class="phone-lines-right">
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
           <line-selector @change="onLineChange"></line-selector>

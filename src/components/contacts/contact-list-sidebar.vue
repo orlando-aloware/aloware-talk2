@@ -1,10 +1,11 @@
 <template>
-  <div :class="`px-0 contact-list-sidebar-container ${widthClass}`">
+  <div :class="`${widthClass}`">
     <div class="contact-list-sidebar-wrapper">
       <b-button
         variant="light"
         size="sm"
         class="sidebar-toggle"
+        v-if="!$q.screen.lt.md"
         @click="onSidebarToggle">
         <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
@@ -15,6 +16,7 @@
           <b-list-group-item v-for="(contact, index) in contacts"
                              :key="contact.id"
                              :to="`/contacts/${contact.id}`"
+                             @click="onSidebarToggleMobile"
                              class="d-flex align-items-center border-0">
             <contact-list-sidebar-item v-model="contacts[index]" :key="contact.id"></contact-list-sidebar-item>
           </b-list-group-item>
@@ -49,12 +51,14 @@ export default {
 
   data () {
     return {
-      isExpanded: true
+      isExpanded: true,
+      desktopisExpanded: true
     }
   },
 
   computed: {
-    ...mapState('contacts', ['selectedList', 'listItems', 'contact']),
+    ...mapState('contacts', ['selectedList', 'listItems', 'contact', 'isSidebarCollapsed']),
+    ...mapState(['isMobile']),
 
     id () {
       return this.selectedList.id
@@ -65,7 +69,9 @@ export default {
     },
 
     widthClass () {
-      return this.isExpanded ? 'width-300' : 'width-0'
+      let widthClass = this.$q.screen.lt.md ? 'contact-list-sidebar-open' : 'width-300'
+      widthClass = this.isExpanded ? widthClass : 'width-0'
+      return `px-0 contact-list-sidebar-container ${widthClass}${this.$q.screen.lt.md ? ' mx-0' : ''}`
     }
   },
 
@@ -84,14 +90,34 @@ export default {
 
     onSidebarToggle () {
       this.isExpanded = !this.isExpanded
+      this.desktopisExpanded = this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
+    },
+
+    onSidebarToggleMobile () {
+      if (!this.isMobile) {
+        return
+      }
+      this.isExpanded = false
+      this.$emit('toggleContactActivities', false)
     },
 
     handScroll (el) {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
         this.onBottomScroll()
       }
+    },
+
+    ...mapActions('contacts', ['setShowContactsHeader'])
+  },
+
+  created () {
+    if (this.isMobile && this.$q.screen.lt.md) {
+      this.isExpanded = false
+      this.setSidebarCollapsed(!this.isExpanded)
     }
+
+    this.setShowContactsHeader(this.isExpanded)
   },
 
   mounted () {
@@ -109,6 +135,57 @@ export default {
       let index = this.listItems[this.selectedList.id].data.findIndex(item => item.id === value.id)
       if (index) {
         this.listItems[this.selectedList.id].data[index] = value
+      }
+    },
+
+    '$route': {
+      deep: true,
+      handler: function () {
+        if (this.isMobile) {
+          this.desktopisExpanded = this.isExpanded
+          this.isExpanded = false
+          this.setSidebarCollapsed(!this.isExpanded)
+        }
+      }
+    },
+
+    isMobile () {
+      if (!this.isMobile) {
+        this.isExpanded = this.desktopisExpanded
+      }
+
+      if (!this.$q.screen.lt.md) {
+        this.isExpanded = true
+      }
+
+      if (this.$q.screen.lt.md) {
+        this.isExpanded = false
+        this.$emit('toggleContactActivities', false)
+      }
+    },
+
+    '$q.screen.lt.md': function () {
+      if (this.$q.screen.lt.md) {
+        this.isExpanded = false
+        this.setShowContactsHeader(false)
+        this.$emit('toggleContactActivities', false)
+      }
+      if (!this.$q.screen.lt.md) {
+        this.isExpanded = true
+      }
+    },
+
+    isExpanded () {
+      if (this.$q.screen.lt.md) {
+        this.setShowContactsHeader(this.isExpanded)
+        return
+      }
+      this.setShowContactsHeader(true)
+    },
+
+    isSidebarCollapsed () {
+      if (this.isSidebarCollapsed !== !this.isExpanded) {
+        this.isExpanded = !this.isExpanded
       }
     }
   }

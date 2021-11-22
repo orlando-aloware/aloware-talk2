@@ -226,16 +226,22 @@ export default {
       })
     },
     back () {
-      let path = this.$route.path.split('/')
-      path.pop()
-      path.pop()
+      if (this.$route.path.includes('inbox')) {
+        let path = this.$route.path.split('/')
+        path.pop()
+        path.pop()
 
-      if (!isNaN(path[(path.length - 1)] / 1)) {
-        path.pop()
-        path.pop()
+        if (!isNaN(path[(path.length - 1)] / 1)) {
+          path.pop()
+          path.pop()
+        }
+
+        this.$router.push(path.join('/'))
       }
 
-      this.$router.push(path.join('/'))
+      if (this.$route.path.includes('contact')) {
+        this.$emit('toggleContactSidebar', true)
+      }
     }
   }
 }

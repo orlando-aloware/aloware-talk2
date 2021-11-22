@@ -1,7 +1,8 @@
 <template>
   <q-toolbar class="page-header pl-3 pr-3">
     <div class="d-flex h-100 align-items-center">
-      <b-link v-if="['Contact'].includes($route.name)" class="btn-header-nav-back mr-3"
+      <b-link v-if="['Contact'].includes($route.name)"
+              class="btn-header-nav-back mr-3"
               href="#"
               @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
@@ -25,15 +26,15 @@
       <div class="d-flex h-100 align-items-center">
         <profile></profile>
 
-        <phone></phone>
+        <phone v-if="!isMobile"></phone>
 
         <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
                      vertical>
         </q-separator>
 
-        <parked-call></parked-call>
+        <parked-call v-if="!isMobile"></parked-call>
 
-        <active-call></active-call>
+        <active-call v-if="!isMobile"></active-call>
 
         <q-item>
           <q-btn :ripple="false"
@@ -51,6 +52,7 @@
                     @before-show="showDialer"
                     @before-hide="hideDialer">
               <dialer-form v-model="dialerStatus"
+                           v-if="!isMobile"
                            @hide="hideDialer">
               </dialer-form>
             </q-menu>

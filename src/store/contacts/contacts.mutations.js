@@ -344,5 +344,8 @@ export default {
   },
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedList.id].data = payload
+  },
+  SET_SHOW_CONTACTS_HEADER: (state, value) => {
+    state.showContactsHeader = value
   }
 }

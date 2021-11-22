@@ -1859,9 +1859,21 @@ span.mention {
     width: 300px;
 
     .list-group-item {
-      padding: 0.75rem 0.5rem;
+      padding: 0 0.5rem;
       height: 65px;
       margin-bottom: 13px;
+      > div {
+        > div:nth-child(2),
+        > div:nth-child(3) {
+          height: 65px !important;
+        }
+        div:nth-child(3) {
+          border-bottom: 1px solid $grey-60;
+          .badge {
+            padding: 7px 5px 5px;
+          }
+        }
+      }
     }
 
     .list-group-item.active,
@@ -1872,9 +1884,10 @@ span.mention {
     }
 
     .contact-details {
-      border-bottom: 1px solid $grey-50;
-      height: 65px;
+      border-bottom: 1px solid $grey-60;
       padding-top: 13px;
+      min-width: 0;
+      flex: 1;
 
       .contact-name {
         font-size: $f-size-14;
@@ -1891,7 +1904,6 @@ span.mention {
         font-size: $f-size-body-sm;
         font-weight: 400;
         color: $grey-80;
-        margin-top: -6px;
       }
 
       .contact-badge {
@@ -1904,7 +1916,6 @@ span.mention {
   }
 
   .contact-avatar {
-    margin-top: 8px !important;
     background-color: $grey-80 !important;
     color: $white !important;
     font-weight: 600;
@@ -2552,6 +2563,9 @@ span.mention {
         color: #B5B7BB;;
       }
     }
+  }
+  textarea {
+    height: auto !important;
   }
 }
 
@@ -5826,8 +5840,6 @@ table.datatable {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 10px;
-    padding-right: 10px;
     min-height: 50px;
 
     input {
@@ -5840,6 +5852,8 @@ table.datatable {
     overflow-y: auto;
     min-height: calc(300px - 120px);
     max-height: calc(100vh - 200px);
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -7751,7 +7765,7 @@ button.grey-90 {
   }
 
   .contacts-left-sidebar {
-    max-width: 309px;
+    min-width: 309px;
 
     .contacts-sidebar-card {
       overflow-y: auto !important;
@@ -7954,8 +7968,7 @@ button.grey-90 {
   }
 }
 
-@media screen and (max-width: 1425px) and (min-width: 1085px),
-screen and (max-width: 956px) {
+@media screen and (max-width: 1485px) and (min-width: 1085px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
@@ -7979,6 +7992,58 @@ screen and (max-width: 956px) {
             flex-direction: column;
           }
         }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1220px) and (min-width: 1085px) {
+  .contact-page {
+    .contact-activity-container {
+      .composer-footer {
+        flex-direction: column;
+        .inline-select.q-select--with-input {
+          min-width: unset;
+        }
+        & > div {
+          width: auto !important;
+          height: 24px;
+          > div {
+            float: none !important;
+            .q-field__append {
+              align-items: center;
+              height: 29px !important;
+            }
+          }
+        }
+        .q-field__control {
+          flex-direction: column;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 956px) {
+  .contact-activity-container {
+    .composer-footer {
+      flex-direction: column;
+      .inline-select.q-select--with-input {
+        min-width: unset;
+      }
+      & > div {
+        width: auto !important;
+        height: 24px;
+        > div {
+          float: none !important;
+          .q-field__append {
+            align-items: center;
+            height: 29px !important;
+          }
+        }
+      }
+      .q-field__control {
+        flex-direction: column;
       }
     }
   }
@@ -8142,6 +8207,8 @@ screen and (max-width: 956px) {
     &.q-toolbar {
       height: 58px;
       padding-left: 18.5px !important;
+      justify-content: space-between;
+      flex: 1 0 100%;
     }
   }
   .mobile-back-btn {
@@ -8175,8 +8242,18 @@ screen and (max-width: 956px) {
       display: flex;
       justify-content: flex-start;
       .page-header {
-        div:not(:first-child) {
+        div:nth-child(2),
+        div:nth-child(3) {
           display: none !important;
+        }
+      }
+    }
+  }
+  .contact-list-sidebar-wrapper {
+    .card {
+      .list-group-item {
+        > div {
+          flex: 1 0 100%;
         }
       }
     }
@@ -8337,12 +8414,24 @@ screen and (max-width: 956px) {
     transform: unset !important;
     bottom: 49px;
   }
-  .inbox-details {
-    .calls-header {
-      height: 58px;
+  .calls-header {
+    height: 58px;
+  }
+  .contact-name {
+    font-size: 18px;
+  }
+  .contact-list-sidebar-container {
+    &.contact-list-sidebar-open {
+      flex: 1 0 100%;
     }
-    .contact-name {
-      font-size: 18px;
+    .contact-list-sidebar-wrapper {
+      .card {
+        width: 100%;
+        padding-bottom: 50px;
+        .list-group {
+          padding-right: 0.5rem !important;
+        }
+      }
     }
   }
 }
@@ -8503,7 +8592,7 @@ screen and (max-width: 956px) {
     display: none;
   }
   aside {
-    max-width: 605px !important;
+    max-width: 784px !important;
     width: 100% !important;
     height: calc(100% - 49px);
     .q-drawer__content {
@@ -8514,6 +8603,21 @@ screen and (max-width: 956px) {
           flex-direction: column;
           height: calc(100% - 51px);
           padding-bottom: 0 !important;
+          &.loading-cover-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: $blue-80;
+            padding-top: 0 !important;
+            .loading-container {
+              display: flex;
+              justify-content: center;
+            }
+          }
         }
         .dialer-tabs {
           flex-direction: column !important;
@@ -8553,14 +8657,9 @@ screen and (max-width: 956px) {
             width: 100%;
             .tab-pane {
               width: 100%;
-              display: flex;
-              flex-direction: column;
             }
           }
           .mobile-message-composer {
-            display: flex;
-            flex: 1;
-            align-items: flex-end;
             textarea {
               font-size: 16px !important;
             }
@@ -8577,8 +8676,7 @@ screen and (max-width: 956px) {
                 }
               }
               .q-btn {
-               /*margin-left: 17px;*/
-                display: none;
+                margin-left: 17px;
               }
             }
           }
@@ -8628,17 +8726,157 @@ screen and (max-width: 956px) {
         height: 100%;
         overflow-y: scroll;
         border-radius: unset;
-        .phone-body {
+        #signal-strength {
+          height: 20px;
+          li {
+            width: 4px;
+            &:not(:last-child) {
+              margin-right: 2px;
+            }
+            &.very-weak {
+              padding-top: 17px;
+            }
+            &.weak {
+              padding-top: 12px;
+            }
+            &.strong {
+              padding-top: 6px;
+            }
+          }
+        }
+        &-header {
+          &:not(.call-ended) {
+            height: 142px;
+          }
+          &.call-ended {
+            height: 88px;
+          }
+          &.call-ended + .phone-body {
+            margin-top: 88px;
+            .phone-wrap-up {
+              padding-top: 0;
+            }
+          }
+          padding-bottom: 10px;
+          div:last-child {
+            button:last-child {
+              display: none;
+            }
+          }
+          div:first-child {
+            span {
+              font-size: 20px;
+            }
+          }
+          div:nth-child(2) {
+            span {
+              font-size: 17px;
+            }
+          }
+          div:nth-child(3) {
+            width: 80px;
+            svg {
+              width: 22px !important;
+              height: 22px !important;
+            }
+            button {
+              .height-12 {
+                height: 20px;
+                width: 19px;
+                img {
+                  width: 19px;
+                  height: 20px;
+                }
+              }
+            }
+          }
+        }
+        &-body {
           .phone-wrap-up {
             max-height: unset;
             padding-top: 36px;
             padding-bottom: 76px;
           }
+          .phone-info {
+            width: 100%;
+            .q-item__label:first-child {
+              margin-top: 25px !important;
+              > span {
+                font-size: 24px;
+                font-weight: 600;
+              }
+              button {
+                display: block;
+                font-size: 18px;
+              }
+            }
+            .q-item__label:nth-child(2) {
+              margin-top: 10px !important;
+              span {
+                font-size: 16px;
+              }
+            }
+            .q-item__label:nth-child(3) {
+              margin-top: 10px !important;
+              span {
+                font-size: 14px;
+                color: $grey-90;
+              }
+            }
+          }
+        }
+        &-main {
+          .dummy {
+            height: 92px;
+          }
+          .phone-avatar {
+            margin-top: 25px;
+            z-index: 9
+          }
         }
         .actions-block {
           padding: 0 21px !important;
+          max-width: 400px;
+          margin-top: 50px !important;
         }
-        .phone-footer-buttons {
+        &-expansion {
+          .q-expansion-item {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border-bottom-left-radius: unset;
+            border-bottom-right-radius: unset;
+            .q-item {
+              height: 44px;
+              .q-item__label {
+                font-size: 16px;
+                font-weight: 600 !important;
+                color: $grey-90;
+              }
+            }
+            &__toggle-icon {
+              font-size: 25px;
+              color: $grey-90;
+            }
+            &__content {
+              .q-card__section {
+                & > div {
+                  justify-content: space-between !important;
+                  max-width: 400px;
+                  margin: auto;
+                }
+              }
+            }
+          }
+        }
+        &-buttons.elevated {
+          max-width: 98px;
+          width: 100%;
+          height: 98px;
+          &:not(:last-child) {
+            margin-right: 10px;
+          }
+        }
+        &-footer-buttons {
           border-radius: unset !important;
           padding: 18px 16px !important;
           height: unset !important;

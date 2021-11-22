@@ -42,7 +42,7 @@ export default function (/* { store, ssrContext } */) {
     if (record) {
       documentTitle = (record.meta.title || '')
     }
-    document.title = documentTitle + ' | Aloware Talk'
+    document.title = documentTitle + ' - Aloware Talk'
   })
 
   return Router

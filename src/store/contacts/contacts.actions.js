@@ -260,5 +260,8 @@ export default {
   },
   setContacts: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
+  },
+  setShowContactsHeader: ({ commit }, value) => {
+    commit('SET_SHOW_CONTACTS_HEADER', value)
   }
 }

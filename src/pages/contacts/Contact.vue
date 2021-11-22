@@ -7,17 +7,19 @@
              v-if="authenticated">
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
       <template v-if="!isInbox">
-        <contact-list-sidebar></contact-list-sidebar>
+        <contact-list-sidebar ref="contactListSidebar"
+                              @toggleContactActivities="toggleContactListSidebar"></contact-list-sidebar>
       </template>
       <div class="contact-activity-wrapper flex-grow-1"
-           :class="{ 'contact-activity--closed': detailsOpen }">
+           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }">
         <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
-                            @toggleDetails="toggleDetails">
+                            @toggleDetails="toggleDetails"
+                            @toggleContactSidebar="toggleContactListSidebar">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -109,7 +111,8 @@ export default {
       title: 'Contact',
       totalContacts: 0,
       drawer: false,
-      detailsOpen: false
+      detailsOpen: false,
+      contactListSidebarOpen: false
     }
   },
 
@@ -132,6 +135,12 @@ export default {
     },
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
+    },
+    toggleContactListSidebar (isOpen) {
+      this.contactListSidebarOpen = isOpen
+      if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
+        this.$refs.contactListSidebar.onSidebarToggle()
+      }
     }
   },
 
@@ -159,6 +168,7 @@ export default {
         this.setContact(this.selectedContact)
         this.resetSelectedContact()
       }
+      this.contactListSidebarOpen = false
     },
 
     '$route.params.communicationId': function (value) {
