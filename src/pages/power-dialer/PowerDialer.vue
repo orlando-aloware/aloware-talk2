@@ -30,7 +30,6 @@ import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar
 // import MoveDialog from 'components/power-dialer/custom/move-dialog'
 import MoveDialog from 'components/move-dialog.vue'
 import CreateListDialog from 'components/power-dialer/custom/create-dialog'
-import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/remove-folder.vue'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
@@ -44,7 +43,6 @@ export default {
     PowerDialerSidebar,
     MoveDialog,
     CreateListDialog,
-    RemoveListModal,
     RemoveFolderDialog
   },
   mixins: [powermixin, contactsMixins],
