@@ -72,12 +72,14 @@
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
         :layer="layer + 1"
+        :endpoint="endpoint"
       ></tree-folder-contents>
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
+        :endpoint="endpoint"
       ></tree-list-contents>
     </div>
 
@@ -88,6 +90,7 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
       :isRootList="isRootList"
+      :endpoint="endpoint"
     ></tree-list-contents>
 
     <b-popover
@@ -298,6 +301,7 @@ export default {
     },
 
     updateFolderRequest (id, params) {
+      console.log('616 :>> ', `${this.endpoint}/${id}`)
       return this.$axios
         .patch(`${this.endpoint}/${id}`, params)
         .catch((error) => {

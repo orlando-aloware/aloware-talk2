@@ -13,7 +13,8 @@
       <router-view></router-view>
     </div>
 
-    <MoveDialog />
+    <MoveDialog
+      :is-contact-module-type="false" />
     <CreateListDialog />
     <RemoveListModal />
     <RemoveFolderDialog
@@ -26,7 +27,8 @@
 
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
-import MoveDialog from 'components/power-dialer/custom/move-dialog'
+// import MoveDialog from 'components/power-dialer/custom/move-dialog'
+import MoveDialog from 'components/move-dialog.vue'
 import CreateListDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveListModal from 'components/power-dialer/custom/remove-list'
 import RemoveFolderDialog from 'components/remove-folder.vue'
@@ -117,31 +119,29 @@ export default {
         'order': 'desc',
         'sort': 'last_engagement_at'
       }
-      console.log('this.isFilterKey :>> ', this.filterKeys)
       if (this.isFilterKey) {
-        console.log('Getting data...')
         await this.getPowerDialerListItem(this.id)
       }
-      console.log('Getting data...', this.$route)
       if (this.listItems[this.id] === undefined) {
         if (isEmpty(this.id)) {
-          this.fetchApi(params)
+          await this.fetchApi(params)
         } else {
           this.contactsLoaded({
             id: this.tempId,
             ...DEFAULT_LIST_ITEMS
           })
-          this.fetchApi(params)
+          await this.fetchApi(params)
         }
       } else {
-        this.fetchApi(params)
+        await this.fetchApi(params)
       }
 
       this.TOGGLE_TABLE_LOADER(false)
     },
-    fetchApi (params) {
+    async fetchApi (params) {
       if (this.$route.meta.title === 'Power Dialer') {
-        this.processFetch(params, true, true)
+        // dsad
+        this.processFetch(params, false, true)
       } else {
         this.processFetch(params, false, false)
       }
