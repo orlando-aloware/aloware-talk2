@@ -11,7 +11,7 @@
         :style="indentStyle"
         @click="onToggleFolder"
       ></div>
-      <div class="folder__arrow d-flex align-items-center" @click="onToggleFolder">
+      <div class="folder__arrow d-flex align-items-center" @click="onToggleFolder" v-if="lists.length > 0 || folders.length > 0">
         <folder-arrow-open-icon v-if="isOpen"
                                 color="#62666E"></folder-arrow-open-icon>
         <folder-arrow-close-icon v-else

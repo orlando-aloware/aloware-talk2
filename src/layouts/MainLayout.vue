@@ -691,7 +691,8 @@ export default {
         }
 
         this.getCampaigns()
-        this.getTags()
+        this.getFullTags()
+        // this.getTags()
         this.getWorkflows()
 
         this.getDispositionStatuses()
@@ -815,6 +816,25 @@ export default {
             return Promise.reject()
           })
       }
+    },
+
+    getFullTags () {
+      this.loadingTags = true
+      return this.$axios
+        .get('/api/v1/tag', { params: { full_load: true } })
+        .then((res) => {
+          this.setTags(res.data)
+          this.setTagsFullyLoaded(true)
+          this.$VueEvent.fire('tags_loaded')
+          this.loadingTags = false
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          this.setTagsFullyLoaded(false)
+          console.log(err)
+          this.loadingTags = false
+          return Promise.reject()
+        })
     },
 
     getTags (page = 1) {
@@ -1457,7 +1477,8 @@ export default {
       'setDialerIsMuted',
       'setFilters',
       'setTagsFullyLoaded',
-      'resetNotifications'
+      'resetNotifications',
+      'setTags'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
     ...mapActions('inbox', ['resetInboxVuex']),

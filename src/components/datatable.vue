@@ -85,7 +85,7 @@
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
-    <div class="d-flex justify-content-center" v-if="paginated">
+    <div class="d-flex justify-content-center" v-if="paginated && showPagination">
       <q-pagination
         boundary-links
         direction-links
@@ -152,6 +152,10 @@ export default {
     paginated: {
       type: Boolean,
       default: false
+    },
+    showPagination: {
+      type: Boolean,
+      default: true
     },
     totalRows: {
       type: Number,

@@ -5137,6 +5137,10 @@ button#bs-folder-options {
       font-size: $f-size-12 !important;
     }
 
+    .q-btn-item {
+      min-width: 2em !important;
+    }
+
     > .q-btn:nth-child(2) {
       margin-right: 10px;
     }
@@ -6204,11 +6208,13 @@ table.datatable {
     &__arrow {
       margin-top: -5px;
       margin-right: 5px;
+      position: absolute;
     }
 
     &__icon {
       min-height: 34px;
       margin-right: 5px;
+      margin-left: 10px;
     }
 
     &--selected {

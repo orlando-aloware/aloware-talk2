@@ -24,7 +24,7 @@
         </div>
       </div>
     </template>
-    <template slot="options">
+    <template slot="options" v-if="!isStartState">
       <compact-btn
         variant="primary"
         v-if="list.type === ContactListType.DYNAMIC && isEditable"
@@ -82,16 +82,16 @@
           <compact-btn borderless
                        variant="outlined-light"
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       :disabled="isStartState"
                        @clicked="onFiltersClicked">
             <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
             <b-badge v-if="hasAppliedFilters"
-                     style="top: 0; padding-top: 3px;"
+                     style="top: 0; padding-top: 6px;"
                      class="d-flex align-items-center"
                      pill
                      variant="primary">
               {{ filtersCount }}
             </b-badge>
-
           </compact-btn>
         </div>
 
@@ -182,6 +182,7 @@
         :is-loading="isLoading"
         :contact-list-id="id"
         :paginated="true"
+        :show-pagination="!isStartState"
         :total-rows="listItems[id].total"
         :current-page="listItems[id].current_page"
         :last-page="listItems[id].last_page"
@@ -310,7 +311,6 @@ export default {
       'contactsLoaded',
       'columnsReordered',
       'setListSelectedContacts',
-      'setSelectedList',
       'createListOpen',
       'setCurrentListFilters',
       'removeListOpen',
@@ -559,18 +559,21 @@ export default {
 
   watch: {
     '$route.params.id': function () {
-      this.resetFilters()
-      this.initialListFilters = this.currentListFilters
-      this.myContacts = false
-      this.setShouldUpdateSelectedListContactCount(true)
+      if (this.$route.name === 'Contacts') {
+        this.resetFilters()
+        this.initialListFilters = this.currentListFilters
+        this.myContacts = false
+        this.setShouldUpdateSelectedListContactCount(true)
+      }
     },
     currentListFilters: {
       deep: true,
       handler: function () {
-        // this.setSelectedListContactCount(this.listItemsTotalContacts)
-        let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-        this.fetch(params)
-        this.filtersCount = this.getFiltersCount(this.currentListFilters)
+        if (this.$route.name === 'Contacts') {
+          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          this.fetch(params)
+          this.filtersCount = this.getFiltersCount(this.currentListFilters)
+        }
       }
     },
     selectedList: function (value) {
