@@ -2,6 +2,14 @@ import qs from 'qs'
 export default {
   /**
    * Actual API Calls for
+   * Contact Folders (mimicking Contacts)
+   */
+  getContactFolders: async ({ commit }) => {
+    let res = await window.axios.get('api/v2/contact-folders')
+    return res.data
+  },
+  /**
+   * Actual API Calls for
    * POWER-DIALER
    */
   getMyQueueList: async ({ commit }) => {

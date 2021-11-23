@@ -83,7 +83,7 @@
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item @click="$emit('createlist')">
+                  <contact-menu-item @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">Create by Manually Selecting Contacts</span>
                     </template>
@@ -151,7 +151,7 @@
 
 <script>
 
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import ContactMenu from './contact-menu.vue'
@@ -185,7 +185,12 @@ export default {
     PlusIcon
   },
   computed: {
-    ...mapState('contacts', ['folders']),
+    ...mapState('contacts', [
+      'folders'
+    ]),
+    ...mapGetters('powerDialer', [
+      'datatableLoader'
+    ]),
     foldersWithoutRoot () {
       return this.folders.filter(folder => folder.name !== 'Root')
     },
@@ -221,6 +226,9 @@ export default {
       'createListOpen',
       'createPdListOpen'
     ]),
+    ...mapMutations('powerDialer', [
+      'TOGGLE_CREATE_FROM_EXISTING_LIST'
+    ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
     },
@@ -230,11 +238,19 @@ export default {
       })
     },
     onCreateFromExistingList () {
+      this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.$root.$emit('bv::hide::popover')
       this.createPdListOpen({
         id: '',
         type: 'list'
       })
+    },
+    onCreateByManualSelection () {
+      this.$axios
+        .post('/api/v2/power-dialer-lists', {
+          type: 1,
+          name: 'Untitled'
+        })
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false

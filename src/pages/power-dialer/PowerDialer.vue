@@ -15,7 +15,7 @@
 
     <MoveDialog
       :is-contact-module-type="false" />
-    <CreateListDialog />
+    <CreateDialog />
     <!-- <RemoveListModal /> -->
     <RemoveFolderDialog
       :is-contact-module-type="false" />
@@ -29,7 +29,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 // import MoveDialog from 'components/power-dialer/custom/move-dialog'
 import MoveDialog from 'components/move-dialog.vue'
-import CreateListDialog from 'components/power-dialer/custom/create-dialog'
+import CreateDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveFolderDialog from 'components/remove-folder.vue'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
@@ -42,7 +42,7 @@ export default {
   components: {
     PowerDialerSidebar,
     MoveDialog,
-    CreateListDialog,
+    CreateDialog,
     RemoveFolderDialog
   },
   mixins: [powermixin, contactsMixins],
@@ -50,7 +50,8 @@ export default {
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
       'isStartingDial',
-      'currentList'
+      'currentList',
+      'flaggedCreateExisting'
     ]),
     ...mapGetters('contacts', [
       'listItems',
@@ -73,12 +74,8 @@ export default {
     }
   },
   async mounted () {
-    this.RESET_LIST()
     this.START_DIAL_TOGGLE(false)
-    // this.SET_POWER_DIALER_LIST([])
-    await this.getPowerDialerLists()
     await this.initialize()
-    // await this.fetchContacts()
   },
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Session') {
@@ -106,7 +103,6 @@ export default {
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
       'SET_POWER_DIALER_LIST',
-      'RESET_LIST',
       'TOGGLE_TABLE_LOADER'
     ]),
     async fetchContacts () {

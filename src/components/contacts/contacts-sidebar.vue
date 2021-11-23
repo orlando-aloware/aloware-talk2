@@ -28,7 +28,7 @@
       <contacts-shared></contacts-shared>
     </q-expansion-item>
 
-    <contacts-folders></contacts-folders>
+    <contacts-folders v-if="toggleFolders"></contacts-folders>
   </card>
 </template>
 
@@ -46,7 +46,20 @@ export default {
   },
   data () {
     return {
-      expanded: true
+      expanded: true,
+      toggleFolders: true
+    }
+  },
+  watch: {
+    '$route': {
+      handler (routeObj) {
+        if (routeObj.name === 'Contacts') {
+          this.toggleFolders = true
+        } else {
+          this.toggleFolders = false
+        }
+      },
+      deep: true
     }
   }
 }

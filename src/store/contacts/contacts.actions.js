@@ -266,5 +266,8 @@ export default {
   },
   setContacts: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
+  },
+  setCreateDialogTarget: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_TARGET', payload)
   }
 }

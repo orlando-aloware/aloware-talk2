@@ -1,16 +1,7 @@
 <template>
   <div class="t-menu border-top">
-    <!-- <DirectoryBase
-      v-if="false"
-      @create-folder="{}"
-      title="Power Dialer Lists"
-      :directory="list" />
-    <div
-      v-if="hasEmptyList"
-      class="no-list-found px-3 text-grey-7">
-      No Lists found
-    </div> -->
     <ContactsFolders
+      v-if="toggleFolders"
       :is-contact-module-type="false" />
   </div>
 </template>
@@ -18,14 +9,12 @@
 <script>
 
 import { mapGetters } from 'vuex'
-// import DirectoryBase from './directories/directory-base'
 import ContactsFolders from '../contacts/contacts-folders'
 import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerList',
   components: {
-    // DirectoryBase,
     ContactsFolders
   },
   computed: {
@@ -48,30 +37,21 @@ export default {
   data () {
     return {
       isCreatingFolder: false,
-      active: ''
-      // listItems: [
-      //   {
-      //     count: 99,
-      //     id: 'all',
-      //     link: '/power-dialer/',
-      //     name: 'My Queue',
-      //     to: '/power-dialer'
-      //   }
-      // ]
+      active: '',
+      toggleFolders: true
     }
   },
-  methods: {
-    goTo (path) {
-      let p1 = this.$route.params?.id
-      let p2 = path.id
-      if (p1 && p2) {
-        if (p1.toString() !== p2.toString()) {
-          this.$router.push({ path: `/power-dialer/list/${path.id}` })
+  methods: {},
+  watch: {
+    '$route': {
+      handler (routeObj) {
+        if (routeObj.name === 'Power Dialer') {
+          this.toggleFolders = true
+        } else {
+          this.toggleFolders = false
         }
-      }
-    },
-    onCreateFolderToggle () {
-      this.isCreatingFolder = !this.isCreatingFolder
+      },
+      deep: true
     }
   }
 }

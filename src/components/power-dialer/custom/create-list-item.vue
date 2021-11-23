@@ -1,12 +1,10 @@
 <template>
-  <div
-    :data-layer="layer"
-    :class="`layer-indent-${layer} px-2`">
+  <div :data-layer="layer">
 
     <div
-      v-if="name"
       class="folder d-flex align-items-center"
-      :class="{ 'folder--target': isTarget }">
+      :class="{ 'folder--target1': isTarget }"
+    >
 
       <div
         class="folder__indent"
@@ -37,22 +35,35 @@
 
     </div>
 
-    <template
-      v-if="listOfItems.length > 0">
+    <div
+      v-if="isOpen"
+      class="animated"
+      v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }">
+      <MoveFolderLists
+        :folders="folders"
+        :layer="layer + 1"
+        :item-folders="listOfChildFolders"
+        :item-lists="items"
+        action="create">
+      </MoveFolderLists>
+    </div>
+
+    <!-- <template
+      v-if="items">
 
       <template
-        v-for="(item, key) in listOfItems">
+        v-for="(item, key) in items">
         <div
-          v-if="filteredSearchList(item.name)"
           :key="key"
           class="folder d-flex align-items-center"
+          :class="{ 'folder--target1': isTarget }"
           @clicked="{}">
 
           <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
             <div class="folder__name pd-name-create">
               <DialIcon
                 color="grey"
-                class="mr-1" />
+                class="mr-1 pl-3" />
               {{ item.name }}
             </div>
           </div>
@@ -71,20 +82,8 @@
 
         </div>
       </template>
-    </template>
+    </template> -->
 
-    <div
-      v-if="isOpen"
-      class="animated"
-      v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }">
-      <MoveFolderLists
-        :folders="folders"
-        :layer="layer + 1"
-        :item-folders="listOfChildFolders"
-        :item-lists="itemLists"
-        action="create">
-      </MoveFolderLists>
-    </div>
   </div>
 </template>
 
@@ -93,7 +92,7 @@ import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'components/icons/folder-icon'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
-import DialIcon from 'components/icons/dial-icon'
+// import DialIcon from 'components/icons/dial-icon'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -102,7 +101,7 @@ export default {
     FolderIcon,
     FolderArrowOpenIcon,
     FolderArrowCloseIcon,
-    DialIcon,
+    // DialIcon,
     MoveFolderLists: () => import('./move-folder-list')
   },
   props: {
@@ -143,16 +142,13 @@ export default {
       if (this.layer === 0) {
         return []
       }
-      return this.items || []
+      return this.items.child_folders || []
     },
     itemLists () {
       return this.items.lists || []
     },
     listOfChildFolders () {
       return this.items.child_folders || []
-    },
-    isTarget () {
-      return this.createDialog.target === this.id
     },
     isTargetable () {
       if (this.createDialog.type === 'list') {
@@ -183,6 +179,9 @@ export default {
         return isValid
       }
       return true
+    },
+    isTarget (id) {
+      return this.createDialog.target === id
     }
   }
 }

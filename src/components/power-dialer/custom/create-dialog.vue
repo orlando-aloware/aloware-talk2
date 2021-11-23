@@ -1,5 +1,7 @@
 <template>
-  <div class="move-dialog move-dialog__create shadow-sm" ref="createDialog">
+  <div
+    class="move-dialog move-dialog__create shadow-sm"
+    ref="createDialog">
     <div class="move-dialog-input mdi_input_2">
       <div>
         <Search
@@ -9,16 +11,16 @@
         ></Search>
       </div>
     </div>
-    <div class="move-dialog-lists">
+    <div class="move-dialog-lists px-2">
       <CreateListItem
-        v-for="folder in searchedItemsList"
+        v-for="folder in contactFolders"
         :name="folder.name"
         :key="folder.id"
         :id="folder.id"
         :order="folder.order"
         :folders="folder.child_folders"
         :layer="0"
-        :items="rootItems" />
+        :items="folder.lists" />
     </div>
     <div class="move-dialog-footer" v-if="hasSelected">
       <div class="text-muted small pr-2">
@@ -29,7 +31,7 @@
         class="mr-2"
         v-if="hasSelected"
         :disabled="isMoving"
-        @clicked="onConfirmMove">
+        @clicked="onConfirmCreate">
         <q-spinner-bars v-if="isMoving" color="white" />
         {{ isMoving ? '' : 'Create' }}
       </CompactBtn>
@@ -76,7 +78,8 @@ export default {
     return {
       searchValue: '',
       itemsList: [],
-      isMoving: false
+      isMoving: false,
+      contactFolders: null
     }
   },
   computed: {
@@ -104,46 +107,54 @@ export default {
       )
     }
   },
+  async mounted () {
+    let response = await this.getContactFolders()
+    this.contactFolders = response
+  },
   methods: {
     ...mapActions('contacts', [
       'createPdListClose',
       'foldersLoaded'
     ]),
+    ...mapActions('powerDialer', [
+      'getContactFolders'
+    ]),
     ...mapMutations('contacts', [
       'ON_SEARCH_PD_ITEM'
     ]),
-    onConfirmMove () {
-      console.log('this.createDialog :>> ', this.createDialog)
+    onConfirmCreate () {
       if (this.createDialog.type === 'list') {
-        return this.moveListRequest()
+        return this.createListRequest()
       }
-      return this.moveFolderRequest()
+      return this.createFolderRequest()
     },
-    moveFolderRequest () {
+    createFolderRequest () {
       this.isMoving = true
-      return this.$axios
-        .patch('/api/v2/power-dialer-folders/move/' + this.createDialog.id, {
-          parent_id: this.createDialog.target < 1 ? null : this.createDialog.target
-        })
-        .then(() => {
-          this.reloadFolders()
-          this.isMoving = false
-        })
-        .catch(this.handleRequestError)
-        .finally(this.createPdListClose)
+      console.log('Creating a folder...')
+      // return this.$axios
+      //   .patch('/api/v2/power-dialer-folders/move/' + this.createDialog.id, {
+      //     parent_id: this.createDialog.target < 1 ? null : this.createDialog.target
+      //   })
+      //   .then(() => {
+      //     this.reloadFolders()
+      //     this.isMoving = false
+      //   })
+      //   .catch(this.handleRequestError)
+      //   .finally(this.createPdListClose)
     },
-    moveListRequest () {
+    createListRequest () {
       this.isMoving = true
-      return this.$axios
-        .patch('/api/v2/power-dialer-list/' + this.createDialog.id, {
-          contact_folder_id: this.createDialog.target
-        })
-        .then(() => {
-          this.reloadFolders()
-          this.isMoving = false
-        })
-        .catch(this.handleRequestError)
-        .finally(this.createPdListClose)
+      console.log('Creating a list...')
+      // return this.$axios
+      //   .patch('/api/v2/power-dialer-list/' + this.createDialog.id, {
+      //     contact_folder_id: this.createDialog.target
+      //   })
+      //   .then(() => {
+      //     this.reloadFolders()
+      //     this.isMoving = false
+      //   })
+      //   .catch(this.handleRequestError)
+      //   .finally(this.createPdListClose)
     },
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
@@ -266,7 +277,7 @@ export default {
         this.destroyDialogInstance(state)
       }
     },
-    folders: function (value) {
+    contactFolders: function (value) {
       let itemsList = []
       if (value.length) {
         value = value[0].child_folders

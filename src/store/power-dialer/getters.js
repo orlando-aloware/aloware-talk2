@@ -1,5 +1,6 @@
 export default {
   my_queue: (state) => state.my_queue,
+  flaggedCreateExisting: (state) => state.flaggedCreateExisting,
   opened: (state) => new Set(state.opened),
   filters: (state) => state.filters,
   moveDialog: (state) => state.moveDialog,

@@ -129,6 +129,12 @@ export default {
       target: target === state.moveDialog.target ? null : target
     }
   },
+  CREATE_DIALOG_TARGET: (state, { target }) => {
+    state.createDialog = {
+      ...state.createDialog,
+      target: target === state.createDialog.target ? null : target
+    }
+  },
   SET_CONTACT_REMOVE_ACTION_TYPE: (state, type) => {
     state.removeContactActionType = type
   },

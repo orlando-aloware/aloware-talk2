@@ -147,6 +147,9 @@ export default {
   TOGGLE_TABLE_LOADER: (state, value) => {
     state.datatableLoader = value
   },
+  TOGGLE_CREATE_FROM_EXISTING_LIST: (state, value) => {
+    state.flaggedCreateExisting = value
+  },
 
   /**
    * DATATABLE ACTIONS
