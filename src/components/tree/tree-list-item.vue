@@ -7,7 +7,7 @@
     </div>
     <router-link
       class="tree-list-item flex-grow-1 d-flex-shrink-0"
-      :to="'/contacts/list/' + id"
+      :to="`${viewListPath}${id}`"
       v-slot="{ navigate, isExactActive }"
     >
       <div :data-layer="layer">
@@ -119,6 +119,19 @@ export default {
     },
     itemName () {
       return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
+    },
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      } else {
+        return false
+      }
+    },
+    viewListPath () {
+      if (this.isContactsRoute) {
+        return '/contacts/list/'
+      }
+      return '/power-dialer/list/'
     }
   },
   props: {
@@ -293,7 +306,7 @@ export default {
     },
     getContactList (id) {
       return this.$axios
-        .get('/api/v2/contacts-list/' + id)
+        .get(`${this.viewListPath}${id}`)
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)

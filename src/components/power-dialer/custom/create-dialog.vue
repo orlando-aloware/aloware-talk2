@@ -123,14 +123,20 @@ export default {
       'ON_SEARCH_PD_ITEM'
     ]),
     onConfirmCreate () {
-      if (this.createDialog.type === 'list') {
-        return this.createListRequest()
-      }
-      return this.createFolderRequest()
+      return this.createListRequest()
+      // if (this.createDialog.type === 'list') {
+      //   return this.createListRequest()
+      // }
+      // return this.createFolderRequest()
     },
     createFolderRequest () {
       this.isMoving = true
       console.log('Creating a folder...')
+      // this.$axios
+      //   .post('/api/v2/power-dialer-lists', {
+      //     type: 1,
+      //     name: 'Untitled'
+      //   })
       // return this.$axios
       //   .patch('/api/v2/power-dialer-folders/move/' + this.createDialog.id, {
       //     parent_id: this.createDialog.target < 1 ? null : this.createDialog.target
@@ -145,8 +151,19 @@ export default {
     createListRequest () {
       this.isMoving = true
       console.log('Creating a list...')
+      this.$axios
+        .post('/api/v2/power-dialer-lists', {
+          type: 1,
+          name: this.createDialog.name
+        })
+        .then(() => {
+          this.reloadFolders()
+          this.isMoving = false
+        })
+        .catch(this.handleRequestError)
+        .finally(this.createPdListClose)
       // return this.$axios
-      //   .patch('/api/v2/power-dialer-list/' + this.createDialog.id, {
+      //   .post('/api/v2/power-dialer-list', {
       //     contact_folder_id: this.createDialog.target
       //   })
       //   .then(() => {

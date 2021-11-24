@@ -88,20 +88,19 @@
         <div class="pr-2">
 
           <Datatable
+            scroll-area-class="static-list-add-item"
             :stickyHeaders="true"
             :columns="validColumns"
-            :has-more="true"
-            :is-empty="!hasContacts"
-            :is-loading-more="true"
-            :paginated="true"
-            scroll-area-class="static-list-add-item"
-            :total-rows="totalList"
+            :hasMore="hasMore"
+            :isEmpty="isEmpty"
+            :isLoadingMore="isLoadingMore"
             @reordered="onColumnsReordered"
+            @checked="onCheckAllItems"
             @sort="onSortByField"
             @more="onLoadMore">
             <template slot="tbody">
               <TableRow
-                v-for="(contact, nkey) in currentContacts"
+                v-for="(contact, nkey) in items"
                 :key="`power-dialer-${contact.id}-${nkey}`"
                 :contact="contact"
                 :columns="validColumns"
@@ -281,6 +280,11 @@ export default {
     CompactBtn,
     ConfirmDialog
   },
+  async mounted () {
+    // let response = await this.getContacts()
+    console.log(`this.id : ${this.id}`, this.listItems[this.id])
+    this.id = 'all'
+  },
   computed: {
     ...mapGetters('powerDialer', [
       'datatableLoader',
@@ -288,6 +292,7 @@ export default {
       'powerDialerDirectoryList',
       'powerDialerListItems'
     ]),
+    ...mapGetters('contacts', ['lists', 'listItems', 'isFiltersOpen']),
     totalCount () {
       if (this.listItems[this.id]) {
         return this.listItems[this.id].total
@@ -299,6 +304,12 @@ export default {
     },
     validColumns () {
       return this.columns2.filter(column => column.label !== 'Actions')
+    },
+    items () {
+      if (this.listItems[this.id]) {
+        return this.listItems[this.id].data
+      }
+      return []
     }
   },
   data () {
@@ -311,9 +322,12 @@ export default {
       'columnsOpen',
       'openFilters',
       'closeFilters',
-      'contactsLoaded',
+      // 'contactsLoaded',
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount'
+    ]),
+    ...mapActions('powerDialer', [
+      'getContacts'
     ]),
     addSelectedContacts () {
       this.isLoading = true
@@ -350,6 +364,27 @@ export default {
     },
     onColumnsReordered (nextColumns) {
       console.log('Re-ordered columns...', nextColumns)
+    },
+    onCheckedRows (checked) {
+      this.checked = checked
+    },
+    onCheckboxCheck (data) {
+      this.SET_LIST_SELECTED_CONTACTS({
+        id: this.id,
+        contacts: data
+      })
+    },
+    onCheckAllItems (checked) {
+      let _this = this
+      document
+        .querySelectorAll('.checker')
+        .forEach(function (checkbox) {
+          if (checked) {
+            _this.checked.push(_this.listItems['all'].data.find(item => item.id === Number(checkbox.value)))
+          } else {
+            _this.checked = _this.checked.filter(item => item.id !== Number(checkbox.value))
+          }
+        })
     }
   }
 }

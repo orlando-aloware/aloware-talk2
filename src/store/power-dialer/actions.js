@@ -8,6 +8,7 @@ export default {
     let res = await window.axios.get('api/v2/contact-folders')
     return res.data
   },
+
   /**
    * Actual API Calls for
    * POWER-DIALER
@@ -19,7 +20,7 @@ export default {
     }
   },
   getPowerDialerListItem: async ({ commit }, id = '') => {
-    let res = await window.axios.get(`api/v2/contacts-list/${id}`)
+    let res = await window.axios.get(`api/v2/power-dialer-lists/${id}`)
     if (res.status === 200) {
       commit('SET_CURRENT_LIST', res.data)
     }
@@ -39,6 +40,10 @@ export default {
       commit('contacts/SET_CONTACT', res.data, { root: true })
     }
   },
+  getContacts: async ({ commit }) => {
+    let res = await window.axios.get(`api/v2/contacts`)
+    return res.data
+  },
   getContactResources: async ({ commit }, params = {}) => {
     let res = await window.axios.get('api/v2/contacts', {
       params: params,
@@ -48,7 +53,7 @@ export default {
       commit('SET_CONTACT_RESOURCES', res.data.data)
     }
   },
-  contactsLoaded: ({ commit }, payload) => {
+  contactsLoaded2: ({ commit }, payload) => {
     commit('CONTACTS_LOADED', payload)
   },
 

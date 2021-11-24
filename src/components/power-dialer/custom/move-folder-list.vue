@@ -54,7 +54,7 @@
           </div>
 
           <button
-            @click="onTarget(item.id)"
+            @click="onTarget(item)"
             class="folder__option btn btn-link p-0">
             <i v-if="activeId === item.id"
               class="fa fa-check-circle text-success small">
@@ -127,10 +127,11 @@ export default {
   },
   methods: {
     ...mapActions('contacts', ['setCreateDialogTarget']),
-    onTarget (id) {
-      this.isTarget = id
+    onTarget (item) {
+      this.isTarget = item.id
       this.setCreateDialogTarget({
-        target: id
+        target: item.id,
+        name: item.name
       })
     },
     foldersHasLists (obj) {

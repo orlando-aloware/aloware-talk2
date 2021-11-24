@@ -49,6 +49,7 @@ import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
 
 export default {
+  name: 'FolderItem',
   components: {
     FolderIcon,
     FolderArrowOpenIcon,

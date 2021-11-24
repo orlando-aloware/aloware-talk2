@@ -247,16 +247,7 @@ export default {
         },
         {
           name: 'List',
-          children: [
-            {
-              name: 'Create from Existing Contacts List',
-              meta: 'create-existing'
-            },
-            {
-              name: 'Create by Manually Selecting Contacts',
-              meta: 'create-manual'
-            }
-          ]
+          children: []
         }
       ],
       createSubItems: [],

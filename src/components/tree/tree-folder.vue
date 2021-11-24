@@ -301,7 +301,6 @@ export default {
     },
 
     updateFolderRequest (id, params) {
-      console.log('616 :>> ', `${this.endpoint}/${id}`)
       return this.$axios
         .patch(`${this.endpoint}/${id}`, params)
         .catch((error) => {

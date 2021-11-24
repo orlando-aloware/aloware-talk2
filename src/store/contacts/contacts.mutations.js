@@ -129,9 +129,10 @@ export default {
       target: target === state.moveDialog.target ? null : target
     }
   },
-  CREATE_DIALOG_TARGET: (state, { target }) => {
+  CREATE_DIALOG_TARGET: (state, { target, name }) => {
     state.createDialog = {
       ...state.createDialog,
+      name: name || '',
       target: target === state.createDialog.target ? null : target
     }
   },

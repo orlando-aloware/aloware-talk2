@@ -87,16 +87,19 @@ const routes = [
           {
             name: 'Contacts',
             path: '',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
             name: 'Contacts',
             path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
             name: 'Contacts',
             path: 'list/:id(\\d+)+',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
@@ -110,6 +113,7 @@ const routes = [
           {
             name: 'Contacts',
             path: 'list/:id(\\d+)+/add',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsAddView.vue')
           }
         ]

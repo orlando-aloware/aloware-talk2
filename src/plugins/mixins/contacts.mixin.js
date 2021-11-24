@@ -109,19 +109,20 @@ export default {
         return 'api/v2/contacts'
       } else {
         if (queued) {
-          return 'api/v2/power-dialer-lists/my-queue'
+          return `api/v2/power-dialer-lists/my-queue`
         } else {
-          return 'api/v2/power-dialer-lists'
+          if (this.$route.meta.title === 'Power Dialer Add-list') {
+            return `api/v2/contacts`
+          }
+          return `api/v2/power-dialer-lists/${this.id}/items`
         }
       }
     },
-    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
+    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
       params.search = this.search
-
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
       }
-
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
       return this.$axios
@@ -131,12 +132,21 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          console.log('data :>> ', data)
-          this.contactsLoaded({
-            id: this.id || 'all',
-            append: false,
-            ...data
-          })
+          if (tempId) {
+            this.contactsLoaded({
+              id: 'all',
+              append: false,
+              ...data
+            })
+            console.log('With ID', data)
+          } else {
+            this.contactsLoaded({
+              id: this.id || 'all',
+              append: false,
+              ...data
+            })
+            console.log('With NO ID', data)
+          }
 
           if (this.shouldUpdateSelectedListContactCount) {
             this.setSelectedListContactCount(data.total)
