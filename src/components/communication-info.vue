@@ -12,7 +12,8 @@
         </q-item-section>
       </q-item>
     </q-list>
-    <q-list class="rounded-contact-activity" v-else>
+    <q-list class="rounded-contact-activity"
+            v-else>
       <q-expansion-item class="contact-activity"
                         ref="communicationInfoExpansionItem"
                         :class="activityExpansionClass"

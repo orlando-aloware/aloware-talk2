@@ -1,12 +1,15 @@
 <template>
   <div class="message p-3 pb-1 d-flex flex-row align-items-start"
-       v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) || (communication.property === undefined)"
+       v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) ||
+       (communication.property === undefined)"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
          v-if="communication.property === undefined">
       <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
                rounded
-               v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read">
+               v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS ||
+               (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) &&
+               (communication.body || communication.attachments)) && !communication.is_read">
       </q-badge>
       <avatar class="contact-avatar"
               width="34"
@@ -49,7 +52,8 @@
     </div>
 
     <div class="w-100"
-         v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) && (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
+         v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) &&
+         (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
       <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span v-if="hasAuditNotes(communication)">
@@ -75,7 +79,8 @@
                 v-if="communication.property">
             {{ datetimePassed }}
             <q-tooltip content-class="bg-grey-light11"
-                       anchor="top middle" self="center middle">
+                       anchor="top middle"
+                       self="center middle">
               {{ relativeDatetime }}
             </q-tooltip>
           </span>
@@ -88,7 +93,8 @@
          v-if="communication.property === undefined">
       <div class="item d-flex flex-column"
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
-           v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)">
+           v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND))
+           && (communication.body || communication.attachments)">
         <div class=""
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
@@ -153,7 +159,9 @@
 
       <div class="item"
            :class="[communication.type !== CommunicationTypes.NOTE ? 'max-width-380' : '']"
-           v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) && ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) || communication.direction !== CommunicationDirection.INBOUND)">
+           v-if="communication.type !== undefined && ![CommunicationTypes.SMS, CommunicationTypes.SYSNOTE].includes(communication.type) &&
+           ((communication.direction === CommunicationDirection.INBOUND && communication.type !== CommunicationTypes.NOTE) ||
+           communication.direction !== CommunicationDirection.INBOUND)">
         <div class="inline r-2x message-body text-xs effect7"
              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'white' : 'white text-left' ]">
           <span class="arrow pull-top"
@@ -189,22 +197,22 @@
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
-               communication.user_id && getUser(communication.user_id).name.length &&
-               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
-               && communication.type !== CommunicationTypes.NOTE">
+              communication.user_id && getUser(communication.user_id).name.length &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW &&
+              communication.type !== CommunicationTypes.NOTE">
             {{ !communication.campaign_id ? 'By ' : '' }}{{ getUser(communication.user_id).name }}
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
-               communication.user_id && getUser(communication.user_id).name.length &&
-               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
-               && communication.type === CommunicationTypes.NOTE">
+              communication.user_id && getUser(communication.user_id).name.length &&
+              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW &&
+              communication.type === CommunicationTypes.NOTE">
           {{ getNotesBottomLabel() }}
         </span>
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            {{ currentCompany ? currentCompany.name : 'No Name' }}
+          {{ currentCompany ? currentCompany.name : 'No Name' }}
         </span>
 
         <span class="text-muted"
@@ -216,12 +224,12 @@
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
               communication.campaign_id && getCampaign(communication.campaign_id) &&
               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-            &nbsp;used {{ getCampaign(communication.campaign_id).name }} to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }}
+            &nbsp; used {{ getCampaign(communication.campaign_id).name }} to {{ communication.type === CommunicationTypes.CALL ? 'call' : 'send' }}
         </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND &&
               communication.campaign_id && getCampaign(communication.campaign_id)">
-            &nbsp;to {{ getCampaign(communication.campaign_id).name }}
+            &nbsp; to {{ getCampaign(communication.campaign_id).name }}
         </span>
 
         <span class="text-muted"

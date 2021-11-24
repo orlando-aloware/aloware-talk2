@@ -1,19 +1,21 @@
 <template>
-  <div class="d-flex flex-column" :class="[paginated ? 'paginated' : '']">
+  <div class="d-flex flex-column"
+       :class="[paginated ? 'paginated' : '']">
     <div
       ref="scrollableArea"
       :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
       @scroll="handleScroll"
     >
-      <table :class="[computedClass, 'ml-3']" ref="table">
+      <table ref="table"
+             :class="[computedClass, 'ml-3']">
         <thead>
           <draggable
-            :list="fixedColumns"
             tag="tr"
             ghost-class="ghost"
             handle=".handle"
-            @change="onOrderChanged"
+            :list="fixedColumns"
             :move="onCheckMove"
+            @change="onOrderChanged"
           >
             <th
               v-for="column in fixedColumns"
@@ -28,7 +30,8 @@
                 minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
               }"
             >
-              <label class="custom-checkbox-container check-all" v-if="column.name === 'checkbox'">
+              <label v-if="column.name === 'checkbox'"
+                     class="custom-checkbox-container check-all">
                 <input type="checkbox"
                        class="data-table-check-all"
                        ref="dataTableCheckAll"
@@ -74,18 +77,21 @@
         v-if="!paginated"
       >
         <template #overlay>
-          <q-spinner-bars color="primary" size="20px" />
+          <q-spinner-bars color="primary"
+                          size="20px" />
         </template>
       </b-overlay>
 
       <template v-if="hasEmptySlot && isEmpty">
         <slot name="empty" />
       </template>
-      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty && !isLoading">
+      <div class="empty-state"
+           v-else-if="!hasEmptySlot && isEmpty && !isLoading">
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
-    <div class="d-flex justify-content-center" v-if="paginated && showPagination">
+    <div v-if="paginated && showPagination"
+         class="d-flex justify-content-center">
       <q-pagination
         boundary-links
         direction-links

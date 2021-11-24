@@ -1,6 +1,7 @@
 <template>
   <div class="composer-container">
-    <div class="composer-wrapper p-2" :class="[messageComposer.mode === 'note' ? 'bg-blue-70' : '']">
+    <div class="composer-wrapper p-2"
+         :class="[messageComposer.mode === 'note' ? 'bg-blue-70' : '']">
       <div class="tab-links d-inline-flex">
         <b-link href="#"
                 :class="{ active : messageComposer.mode === 'sms' }"

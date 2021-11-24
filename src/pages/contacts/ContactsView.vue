@@ -86,8 +86,7 @@
                        @clicked="onFiltersClicked">
             <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
             <b-badge v-if="hasAppliedFilters"
-                     style="top: 0; padding-top: 6px;"
-                     class="d-flex align-items-center"
+                     class="d-flex align-items-center contact-filter-count"
                      pill
                      variant="primary">
               {{ filtersCount }}
