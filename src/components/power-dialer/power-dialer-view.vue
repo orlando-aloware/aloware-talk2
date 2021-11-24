@@ -3,7 +3,7 @@
     :loading="datatableLoader">
 
     <template slot="title">
-      <Breadcrumbs :directory-list="powerDialerListOfObjects" />
+      <Breadcrumbs :directory-list="folders" />
     </template>
 
     <template slot="options">
@@ -338,7 +338,8 @@ export default {
       'datatableLoader'
     ]),
     ...mapGetters('contacts', [
-      'contact'
+      'contact',
+      'folders'
     ]),
     ...mapGetters('powerDialer', [
       'activeFilter',
