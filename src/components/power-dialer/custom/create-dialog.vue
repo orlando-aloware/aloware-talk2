@@ -151,11 +151,15 @@ export default {
     createListRequest () {
       this.isMoving = true
       console.log('Creating a list...')
+      let params = {
+        type: 1,
+        name: this.createDialog.name
+      }
+      if (this.createDialog?.id) {
+        params.contact_folder_id = this.createDialog.id
+      }
       this.$axios
-        .post('/api/v2/power-dialer-lists', {
-          type: 1,
-          name: this.createDialog.name
-        })
+        .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`, params)
         .then(() => {
           this.reloadFolders()
           this.isMoving = false

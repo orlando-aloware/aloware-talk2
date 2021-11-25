@@ -55,7 +55,7 @@
                   @mouseover="createSubmenu"
                   @mouseleave="destroySubmenu">
                   <template slot="icon">
-                    <plus-icon color="#62666E"></plus-icon>
+                    <people-icon></people-icon>
                   </template>
                   <template slot="title">
                     <span>List</span>

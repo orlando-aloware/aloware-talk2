@@ -57,9 +57,6 @@ export default {
     currentContacts () {
       return this.powerDialerListItems?.[this.id]?.data || []
     },
-    hasContacts () {
-      return this.currentContacts.length > 0
-    },
     dialogName () {
       return `remove-power-dialer-item-dialog`
     }

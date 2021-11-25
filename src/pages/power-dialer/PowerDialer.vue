@@ -17,6 +17,7 @@
       :is-contact-module-type="false" />
     <CreateDialog />
     <RemoveListModal />
+    <RemoveListConfirmation/>
     <RemoveFolderDialog
       :is-contact-module-type="false" />
 
@@ -32,6 +33,7 @@ import MoveDialog from 'components/move-dialog'
 import CreateDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveFolderDialog from 'components/remove-folder'
 import RemoveListModal from 'components/remove-list'
+import RemoveListConfirmation from 'components/remove-list-confirmation'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { isEmpty } from 'lodash'
@@ -45,6 +47,7 @@ export default {
     MoveDialog,
     CreateDialog,
     RemoveListModal,
+    RemoveListConfirmation,
     RemoveFolderDialog
   },
   mixins: [powermixin, contactsMixins],

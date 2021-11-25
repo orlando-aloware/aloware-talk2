@@ -22,7 +22,6 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="isContactsRoute"
       @click="$emit('duplicate')">
       <template slot="icon">
         <duplicate-icon></duplicate-icon>
