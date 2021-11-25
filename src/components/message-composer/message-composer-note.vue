@@ -28,7 +28,11 @@
                 </span>
             </span>
           </template>
-          <span id="noteContentEditable" placeholder="Type @ to mention someone" contenteditable></span>
+          <div ref="noteContentEditable"
+               id="noteContentEditable"
+               placeholder="Type @ to mention someone"
+               contenteditable>
+          </div>
         </at>
       </form>
     </div>
@@ -112,9 +116,9 @@ export default {
       }
     },
     focusInput () {
-      let el = document.getElementById('noteContentEditable')
+      let _this = this
       setTimeout(function () {
-        el.focus()
+        _this.$refs.noteContentEditable.focus()
       }, 10)
     }
   },
@@ -123,14 +127,19 @@ export default {
     if (this.messageComposer.mode === 'note') {
       this.focusInput()
     }
-    let el = document.querySelector('span[contenteditable="false"]')
-    el.onkeydown = function (e) {
-      e.preventDefault()
-    }
   },
   watch: {
     'contact.id': function () {
       this.getMentionableItems()
+    },
+    'messageComposer.note.body': function (value) {
+      if (this.$refs.noteContentEditable.lastElementChild && navigator.userAgent.indexOf('Firefox') !== -1) {
+        if (this.$refs.noteContentEditable.lastElementChild.tagName !== 'BR') {
+          let brNode = document.createElement('BR')
+          this.$refs.noteContentEditable.appendChild(brNode)
+          this.setMessageComposerNoteBody(this.$refs.noteContentEditable.innerHTML)
+        }
+      }
     }
   }
 }

@@ -47,7 +47,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['removeListActionType', 'selectedList', 'listToRemove', 'isRemoveListOpen', 'folders', 'pinnedLists', 'pinned']),
     title () {
-      return `Delete ${this.listToRemove.name} ?`
+      return `Delete ${this.listToRemove.name} list?`
     }
   },
   data () {

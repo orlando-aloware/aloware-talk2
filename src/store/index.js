@@ -305,6 +305,10 @@ export default function (/* { ssrContext } */) {
         commit('NEW_TAG', tag)
       },
 
+      setTags ({ commit }, tags) {
+        commit('SET_TAGS', tags)
+      },
+
       newRingGroup ({ commit }, ringGroup) {
         commit('NEW_RING_GROUP', ringGroup)
       },
