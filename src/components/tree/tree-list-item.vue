@@ -205,7 +205,7 @@ export default {
     },
     createList (params) {
       this.$axios
-        .post('/api/v2/contacts-list/' + this.id + '/duplicate', params)
+        .post(this.listPath + this.id + '/duplicate', params)
         .then((response) => {
           const data = response.data.data
           const message = response.data.message

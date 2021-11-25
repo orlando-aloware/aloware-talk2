@@ -21,7 +21,9 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item @click="$emit('duplicate')">
+    <contact-menu-item
+      v-if="isContactsRoute"
+      @click="$emit('duplicate')">
       <template slot="icon">
         <duplicate-icon></duplicate-icon>
       </template>
@@ -39,7 +41,9 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item @click="$emit('pin')">
+    <contact-menu-item
+      v-if="isContactsRoute"
+      @click="$emit('pin')">
       <template slot="icon">
         <pin-icon></pin-icon>
       </template>
@@ -102,6 +106,15 @@ export default {
     },
     isPinned: {
       type: Boolean
+    }
+  },
+  computed: {
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      } else {
+        return false
+      }
     }
   }
 }
