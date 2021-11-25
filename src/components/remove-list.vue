@@ -85,7 +85,7 @@ export default {
       'setRemoveListActionType'
     ]),
     confirmClose () {
-      // this.removeListClose()
+      this.removeListClose()
     },
     onRemoveList () {
       return this.$axios
