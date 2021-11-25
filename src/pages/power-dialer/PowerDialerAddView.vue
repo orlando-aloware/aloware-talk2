@@ -52,6 +52,9 @@ export default {
     },
     id () {
       return this.$route.params.id || 'all'
+    },
+    filteredName () {
+      return this.contactList?.name || ''
     }
     // filter () {
     //   if (this.$route.params.id) {

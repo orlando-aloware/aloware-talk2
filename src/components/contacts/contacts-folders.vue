@@ -161,7 +161,7 @@ import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
-
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { createPopper } from '@popperjs/core'
 
 let popperInstance
@@ -250,6 +250,14 @@ export default {
         .post('/api/v2/power-dialer-lists', {
           type: 1,
           name: 'Untitled'
+        })
+        .then(() => {
+          console.log('LOG: Successfully created a list...')
+        })
+        .catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
     onCreateFolderCancel () {
