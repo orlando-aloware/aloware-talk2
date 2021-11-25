@@ -3,7 +3,6 @@
     title="Remove List"
     :isOpen="isRemoveListOpen"
     id="remove-list-dialog"
-    @close="removeListClose"
   >
     <div slot="content">
       <div class="text-left">

@@ -211,7 +211,7 @@ export default {
     },
     getFiltersCount (filters) {
       let filtersCount = 0
-      if (filters.constructor.name === 'Object' && Object.keys(filters).length) {
+      if (filters && filters.constructor.name === 'Object' && Object.keys(filters).length) {
         for (let index of Object.keys(filters)) {
           const filter = _.get(filters[index], 'filters', null)
           filtersCount += filter ? Object.keys(filter).length : 0

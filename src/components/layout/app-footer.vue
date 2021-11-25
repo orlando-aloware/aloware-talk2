@@ -73,16 +73,31 @@
         </span>
         Stats
       </q-route-tab>
+      <q-route-tab name="settings"
+                   to="/settings"
+                   :content-class="isActive('settings') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :ripple="false"
+                   :active="isActive('settings')"
+                   no-caps
+                   exact>
+        <span class="tab-icon">
+          <settings-mobile-icon
+            width="22"
+            height="22"
+            :color="tab === 'settings' ? '#256EFF' : '#A3A3A3'"/>
+        </span>
+        Settings
+      </q-route-tab>
       <q-tab name="more"
              :id="'mobile-menu-item-more'"
              :content-class="moreContentClass"
              :ripple="false"
              :active="isMoreActive"
+             v-show="false"
              no-caps
              exact>
         <span class="tab-icon">
-          <more-mobile-icon
-            :color="tab === 'more' ? '#256EFF' : '#A3A3A3'"/>
+          <more-mobile-icon/>
         </span>
         More
       </q-tab>
@@ -129,10 +144,12 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
+import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
 import { mapState } from 'vuex'
 export default {
   name: 'app-footer',
   components: {
+    SettingsMobileIcon,
     MobilePhoneIcon,
     PowerDialerMobileIcon,
     MoreMobileIcon,

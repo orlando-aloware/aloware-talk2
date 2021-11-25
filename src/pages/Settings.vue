@@ -6,7 +6,7 @@
     <div class="d-flex w-100 h-100 animate__animated animate__fadeIn position-relative">
       <settings-side></settings-side>
       <div class="d-flex flex-grow-1 overflow-y-scroll settings-content-wrapper" v-if="user">
-        <b-row class="w-50">
+        <b-row>
           <b-col md="12" class="settings-form-wrapper">
             <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'"></general-information>
             <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading"></profile>

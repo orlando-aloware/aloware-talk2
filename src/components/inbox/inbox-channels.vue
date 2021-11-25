@@ -827,7 +827,7 @@ export default {
       }
     },
     '$route.params.status': function (value) {
-      if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value)) {
+      if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value) && !this.$route.params.id) {
         this.resetFilters()
         this.isScrolled = false
         this.getCommunications(this.filter)

@@ -12,7 +12,7 @@
        @click="navigate">
       <div class="icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
-        <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC"></folder-dynamic-icon>
+        <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon>
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <span>{{ item.name }}</span>
