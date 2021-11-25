@@ -138,7 +138,7 @@
         @more="onLoadMore">
         <template slot="tbody">
           <TableRow
-            v-for="(contact, nkey) in currentContacts"
+            v-for="(contact, nkey) in activeList"
             :key="`power-dialer-${contact.id}-${nkey}`"
             :contact="contact"
             :columns="columns2"
@@ -150,6 +150,7 @@
               <template v-for="(column, key) in columns2">
                 <!-- change date added to date created -->
                 <!-- COLUMN: Checkboxes -->
+                <!-- <div :key="`key-${key}`">{{contact}}</div> -->
                 <td
                   v-if="column.name === 'checkbox'"
                   :key="key"
@@ -203,7 +204,7 @@
                   :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
                   :key="key">
                   <StatusChip
-                    :status="contact.status"
+                    :status="contact.task_status"
                     size="12px"
                     :outline="true" />
                 </td>
@@ -339,7 +340,8 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'contact',
-      'folders'
+      'folders',
+      'listItems'
     ]),
     ...mapGetters('powerDialer', [
       'activeFilter',
@@ -364,7 +366,13 @@ export default {
       return this.currentList
     },
     numberOfContacts () {
-      return `${this.currentContacts.length} Contacts`
+      return `${this.activeList.length} Contacts`
+    },
+    activeList () {
+      return this.listItems[this.id].data
+    },
+    hasContacts () {
+      return this.activeList.length > 0
     }
   },
   data () {
