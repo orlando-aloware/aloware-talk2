@@ -4,7 +4,7 @@
       <div class="d-flex flex-column">
         <div class="d-flex align-items-center">
           <router-link
-            :to="'/contacts/list/' + $route.params.id"
+            :to="`${urlRoutePath}${$route.params.id}`"
             v-slot="{ href, navigate }"
           >
             <a
@@ -172,6 +172,10 @@ export default {
     contactList: {
       type: Object,
       required: true
+    },
+    isContactModule: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -210,6 +214,12 @@ export default {
     },
     validColumns () {
       return this.columns.filter(column => column.label !== 'Actions')
+    },
+    urlRoutePath () {
+      if (this.isContactModule) {
+        return '/contacts/list/'
+      }
+      return '/power-dialer/list/'
     }
   },
   methods: {
@@ -231,7 +241,7 @@ export default {
         })
         .then(() => {
           this.setShouldUpdateSelectedListContactCount(true)
-          this.$router.push('/contacts/list/' + this.contactList.id)
+          this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           this.$generalNotification('Selected contacts were successfully added')
         })
         .catch((err) => {
@@ -250,7 +260,7 @@ export default {
     },
     onCancel () {
       this.closeFilters()
-      this.$router.push('/contacts/list/' + this.contactList.id)
+      this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
     },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
