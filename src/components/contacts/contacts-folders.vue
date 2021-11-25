@@ -3,7 +3,7 @@
     default-opened
     expand-icon-toggle
     label="My Lists"
-    class="contact-sidebar-list-wrapper"
+    class="contact-sidebar-list-wrapper my-lists"
   >
     <template v-slot:header>
       <q-item-section>

@@ -93,9 +93,10 @@
         class="table-pagination"
         v-model="paginationPage"
         :max="lastPage"
-        :max-pages="11"
+        :max-pages="5"
         :ellipses="false"
         :boundary-numbers="false"
+        padding="0 15px"
       ></q-pagination>
 
       <q-select outlined

@@ -248,6 +248,22 @@ body,
   }
 }
 
+@media (min-width: 785px) and (max-width: 991px) {
+  .paginated {
+    .table-pagination {
+      button {
+        min-width: 2em !important;
+      }
+      .q-btn__wrapper {
+        padding: 0 0 !important;
+      }
+    }
+    .scrollableArea {
+      min-height: calc(100vh - 229px);
+    }
+  }
+}
+
 @media (min-width: 992px) {
   .dashboard {
     header {
@@ -1824,6 +1840,11 @@ span.mention {
  */
 .main-content {
   background: $white;
+  .contacts {
+    .main {
+      width: calc(100vw - 324px);
+    }
+  }
 }
 
 /*
@@ -4526,7 +4547,6 @@ span.mention {
     }
 
     &__name {
-      width: calc(100% - 61px);
       display: flex;
       align-items: center;
 
@@ -4573,9 +4593,6 @@ span.mention {
   &.is-root {
     .folder__indent {
       display: none;
-    }
-    .folder {
-      padding-right: 0;
     }
   }
 }
@@ -5135,7 +5152,6 @@ button#bs-folder-options {
 .paginated {
   .scrollableArea {
     max-height: calc(100vh - 229px);
-    min-height: calc(100vh - 229px);
   }
   .table-pagination {
     .q-btn__wrapper {
@@ -6021,7 +6037,6 @@ table.datatable {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: calc(100% - 30px);
     }
 
     &__sub {
@@ -6080,7 +6095,6 @@ table.datatable {
       background-color: $light-blue3;
     }
     &__name {
-      width: calc(100% - 54px);
       display: flex;
       align-items: center;
       span {
@@ -6117,7 +6131,6 @@ table.datatable {
 }
 
 .folder {
-  padding-right: 10px;
   min-height: 34px;
   cursor: pointer;
   user-select: none;
@@ -6208,7 +6221,6 @@ table.datatable {
     }
   }
   .folder {
-    padding-right: 17px;
     min-height: 34px;
     cursor: pointer;
     user-select: none;
@@ -6238,7 +6250,6 @@ table.datatable {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: calc(100% - 30px);
       &__name {
         font-size: $f-size-h5;
         line-height: 17px;
@@ -6502,6 +6513,11 @@ table.datatable {
       color: $grey-100;
       overflow: hidden;
       text-overflow: ellipsis;
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .icon {
@@ -7776,7 +7792,8 @@ button.grey-90 {
   }
 
   .contacts-left-sidebar {
-    min-width: 309px;
+    min-width: 260px;
+    max-width: 260px;
 
     .contacts-sidebar-card {
       overflow-y: auto !important;
@@ -8158,6 +8175,13 @@ button.grey-90 {
       width: 270px;
     }
   }
+  .contact-page {
+    .contact-view-wrapper {
+      .contact-list-sidebar-container {
+        width: 270px;
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 1084px) {
@@ -8266,6 +8290,13 @@ button.grey-90 {
         > div {
           flex: 1 0 100%;
         }
+      }
+    }
+  }
+  .main-content {
+    .contacts {
+      .main {
+        width: calc(100vw - 260px);
       }
     }
   }
@@ -8428,8 +8459,12 @@ button.grey-90 {
   .calls-header {
     height: 58px;
   }
-  .contact-name {
-    font-size: 18px;
+  .calls-header {
+    &__label {
+      .contact-name {
+        font-size: 18px;
+      }
+    }
   }
   .contact-list-sidebar-container {
     &.contact-list-sidebar-open {
@@ -8979,5 +9014,29 @@ button.grey-90 {
       margin-top: -1px;
       position: relative;
     }
+  }
+}
+
+.my-lists {
+  .q-expansion-item__content {
+    > .folders {
+      .folders__content {
+        overflow-x: hidden;
+        .tree-folder {
+          > .folder,
+          .tree-list-item {
+            min-width: 0;
+            padding-right: 17px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.public-lists {
+  .item {
+    min-width: 0;
+    padding-right: 17px;
   }
 }

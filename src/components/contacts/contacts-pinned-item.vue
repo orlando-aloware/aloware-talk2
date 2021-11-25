@@ -14,7 +14,9 @@
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
         <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC"></folder-dynamic-icon>
       </div>
-      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">{{ item.name }}</div>
+      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
+        <span>{{ item.name }}</span>
+      </div>
       <div class="counts d-flex align-items-center">
         <b-badge pill variant="light text-muted">{{ item.count | fixCount }}</b-badge>
       </div>

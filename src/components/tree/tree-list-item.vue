@@ -6,7 +6,7 @@
       </folder-arrow-close-icon>
     </div>
     <router-link
-      class="tree-list-item flex-grow-1 d-flex-shrink-0"
+      class="tree-list-item flex-grow-1 d-flex-shrink-0 w-100"
       :to="'/contacts/list/' + id"
       v-slot="{ navigate, isExactActive }"
     >
@@ -38,7 +38,7 @@
               autofocus
             />
             <span @click="navigate" v-if="!isEditing">
-              {{ itemName }}
+              {{ name }}
             </span>
           </div>
 
