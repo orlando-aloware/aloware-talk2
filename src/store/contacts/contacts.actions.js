@@ -33,7 +33,6 @@ export default {
     commit('FILTERS_CLOSE')
   },
   contactsLoaded: ({ commit }, payload) => {
-    console.log('----------------------payload :>> ', payload)
     commit('CONTACTS_LOADED', payload)
   },
   pinnedCountLoaded: ({ commit }, payload) => {

@@ -3,7 +3,7 @@
     title="Remove List"
     :isOpen="isRemoveListOpen"
     id="remove-list-dialog"
-    @close="removeListClose"
+    @close="confirmClose"
   >
     <div slot="content">
       <div class="text-left">
@@ -46,7 +46,10 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['isRemoveListOpen', 'listToRemove']),
+    ...mapGetters('contacts', [
+      'isRemoveListOpen',
+      'listToRemove'
+    ]),
     isContactsRoute () {
       if (this.$route.meta.title === 'Contacts') {
         return true
@@ -75,7 +78,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeListClose', 'removeListOpen', 'foldersLoaded', 'setRemoveListActionType']),
+    ...mapActions('contacts', [
+      'removeListClose',
+      'removeListOpen',
+      'foldersLoaded',
+      'setRemoveListActionType'
+    ]),
+    confirmClose () {
+      // this.removeListClose()
+    },
     onRemoveList () {
       return this.$axios
         .delete(`${this.listPath}${this.listToRemove.id}`)
@@ -85,7 +96,9 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to remove list.', 'error')
         })
-        .finally(() => this.removeListClose())
+        .finally(() => {
+          // this.removeListClose()
+        })
     },
     reloadFolders () {
       return this.$axios

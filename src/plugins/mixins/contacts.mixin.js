@@ -138,14 +138,12 @@ export default {
               append: false,
               ...data
             })
-            console.log('With ID', data)
           } else {
             this.contactsLoaded({
               id: this.id || 'all',
               append: false,
               ...data
             })
-            console.log('With NO ID', data)
           }
 
           if (this.shouldUpdateSelectedListContactCount) {

@@ -369,7 +369,7 @@ export default {
       return `${this.activeList.length} Contacts`
     },
     activeList () {
-      return this.listItems[this.id].data
+      return this.listItems[this.id]?.data || []
     },
     hasContacts () {
       return this.activeList.length > 0

@@ -60,7 +60,7 @@ export default {
     CompactBtn
   },
   mounted () {
-    console.log('77777777')
+    // console.log('77777777')
   },
   data () {
     return {
