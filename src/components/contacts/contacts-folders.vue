@@ -257,7 +257,7 @@ export default {
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)
           console.log(html)
-          this.$generalNotification(message, 'error')
+          this.$generalNotification(`Error in creating a list. ${message}`, 'error')
         })
     },
     onCreateFolderCancel () {

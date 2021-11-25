@@ -13,18 +13,23 @@
         </div>
       </div>
     </div>
+
     <div slot="footer" class="w-100">
       <div class="d-flex w-100">
         <div class="flex-grow-1"></div>
+
         <button
-          class="btn btn-sm btn-outline-dark mr-2"
           @click="onRemoveListOnly"
-        >
+          class="btn btn-sm btn-outline-dark mr-2">
           Delete List, But Save Contacts
         </button>
-        <button class="btn btn-sm btn-danger mr-2" @click="onRemoveListAndContact">
+
+        <button
+          @click="onRemoveListAndContact"
+          class="btn btn-sm btn-danger mr-2">
           Delete List and Contacts
         </button>
+
       </div>
     </div>
   </confirm-dialog>
@@ -41,7 +46,19 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['isRemoveListOpen', 'listToRemove'])
+    ...mapGetters('contacts', ['isRemoveListOpen', 'listToRemove']),
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      }
+      return false
+    },
+    listPath () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contacts-list/'
+      }
+      return '/api/v2/power-dialer-lists/'
+    }
   },
   data () {
     return {
@@ -61,7 +78,7 @@ export default {
     ...mapActions('contacts', ['removeListClose', 'removeListOpen', 'foldersLoaded', 'setRemoveListActionType']),
     onRemoveList () {
       return this.$axios
-        .delete('/api/v2/contacts-list/' + this.listToRemove.id)
+        .delete(`${this.listPath}${this.listToRemove.id}`)
         .then(() => {
           this.reloadFolders()
         })

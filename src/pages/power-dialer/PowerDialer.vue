@@ -16,7 +16,7 @@
     <MoveDialog
       :is-contact-module-type="false" />
     <CreateDialog />
-    <!-- <RemoveListModal /> -->
+    <RemoveListModal />
     <RemoveFolderDialog
       :is-contact-module-type="false" />
 
@@ -28,9 +28,10 @@
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 // import MoveDialog from 'components/power-dialer/custom/move-dialog'
-import MoveDialog from 'components/move-dialog.vue'
+import MoveDialog from 'components/move-dialog'
 import CreateDialog from 'components/power-dialer/custom/create-dialog'
-import RemoveFolderDialog from 'components/remove-folder.vue'
+import RemoveFolderDialog from 'components/remove-folder'
+import RemoveListModal from 'components/remove-list'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { isEmpty } from 'lodash'
@@ -43,6 +44,7 @@ export default {
     PowerDialerSidebar,
     MoveDialog,
     CreateDialog,
+    RemoveListModal,
     RemoveFolderDialog
   },
   mixins: [powermixin, contactsMixins],

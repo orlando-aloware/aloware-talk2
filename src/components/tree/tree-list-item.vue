@@ -132,6 +132,18 @@ export default {
         return '/contacts/list/'
       }
       return '/power-dialer/list/'
+    },
+    listPath () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contacts-list/'
+      }
+      return '/api/v2/power-dialer-lists/'
+    },
+    foldersPath () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contact-folders'
+      }
+      return '/api/v2/power-dialer-folders'
     }
   },
   props: {
@@ -297,7 +309,7 @@ export default {
     },
     updateListRequest (id, params) {
       return this.$axios
-        .patch('/api/v2/contacts-list/' + id, params)
+        .patch(this.listPath + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           console.log(html)
@@ -306,7 +318,7 @@ export default {
     },
     getContactList (id) {
       return this.$axios
-        .get(`${this.viewListPath}${id}`)
+        .get(`${this.listPath}${id}`)
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -320,7 +332,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.foldersPath)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
