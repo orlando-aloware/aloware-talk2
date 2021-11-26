@@ -125,7 +125,7 @@
 
 <script>
 import { createPopper } from '@popperjs/core'
-import { mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 import ContactMenu from './contacts/contact-menu.vue'
 import ContactMenuItem from './contacts/contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-2-icon'
@@ -136,6 +136,7 @@ import PlusIcon from 'components/icons/plus-icon.vue'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import pdList from 'src/plugins/mixins/power-dialer-list'
 
 let popperInstance
 
@@ -151,6 +152,7 @@ export default {
     FolderArrowCloseIcon,
     PeopleIcon
   },
+  mixins: [pdList],
   props: {
     id: {
       type: Number
@@ -169,17 +171,27 @@ export default {
     }
   },
   computed: {
+    ...mapState('contacts', [
+      'folders'
+    ]),
     isContactsRoute () {
       if (this.$route.meta.title === 'Contacts') {
         return true
       }
       return false
+    },
+    foldersEndpoint () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contact-folders'
+      }
+      return '/api/v2/power-dialer-folders'
     }
   },
   methods: {
     ...mapActions('contacts', [
       'toggleFolder',
-      'createPdListOpen'
+      'createPdListOpen',
+      'foldersLoaded'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_CREATE_FROM_EXISTING_LIST'
@@ -232,14 +244,17 @@ export default {
       })
     },
     onCreateByManualSelection () {
-      console.log('Should create list by manually selecting contacts...')
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
-          name: 'Untitled'
+          name: this.fetchedNameList
         })
-        .then(() => {
-          console.log('LOG: Successfully created a list...')
+        .then((response) => response.data)
+        .then((response) => {
+          console.log('LOG: Successfully created a list...', response)
+          this.reloadFolders()
+          // this.foldersLoaded()
+          this.$generalNotification(response.message, 'success')
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)

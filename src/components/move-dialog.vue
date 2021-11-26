@@ -261,7 +261,7 @@ export default {
     },
     folders: function (value) {
       let itemsList = []
-      if (value.length) {
+      if (value?.length) {
         value = value[0].child_folders
         itemsList = this.createFolders('', [
           {

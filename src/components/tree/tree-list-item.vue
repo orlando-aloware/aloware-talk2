@@ -99,7 +99,7 @@ export default {
     ListActions
   },
   computed: {
-    ...mapGetters('contacts', ['pinned', 'moveDialog']),
+    ...mapGetters('contacts', ['pinned', 'moveDialog', 'listToRemove']),
     indentStyle () {
       return {
         flex: `0 0 ${this.layer * 10}px`
@@ -183,6 +183,7 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'removeListOpen',
+      'removeListClose',
       'foldersLoaded',
       'listLoaded',
       'listPinToggled',
@@ -343,7 +344,10 @@ export default {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
     onRemoveList () {
-      this.removeListOpen({ id: this.id, name: this.name })
+      this.removeListClose()
+      setTimeout(() => {
+        this.removeListOpen({ id: this.id, name: this.name })
+      }, 10)
     }
   }
 }

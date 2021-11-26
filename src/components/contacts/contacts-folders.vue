@@ -62,7 +62,7 @@
                   </template>
                   <template slot="suffix">
                     <span
-                      :id="'folder-submenu-' + rootFolder.id"
+                      :id="'folder-submenu-' + rootFolderId"
                       class="submenu-icon"
                       @click="createSubmenu">
                       <FolderArrowCloseIcon color="#62666E" />
@@ -71,7 +71,7 @@
                 </contact-menu-item>
 
                 <div
-                  :id="'folder-submenu-items-' + rootFolder.id"
+                  :id="'folder-submenu-items-' + rootFolderId"
                   class="folder-submenu-items extended"
                   :class="{ 'd-flex': isMenuOpen }"
                   @mouseleave="destroySubmenu"
@@ -107,7 +107,7 @@
           @blur="onCreateFolderToggle"
           @cancel="onCreateFolderCancel"
         />
-        <template v-if="folders.length && !isLoading">
+        <template v-if="foldersLength && !isLoading">
           <tree-folder
             v-for="folder in folders[0].child_folders"
             :name="folder.name"
@@ -137,7 +137,7 @@
             @cancel="onCreateFolderCancel"
           />
         </template>
-        <div v-if="!folders[0].child_folders.length && !isLoading"
+        <div v-if="isFolderEmpty && !isLoading"
             class="item-empty">
           <span class="fs-12 text-muted">
             You don't have any contact list
@@ -162,6 +162,7 @@ import PlusIcon from 'components/icons/plus-icon.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import pdList from 'src/plugins/mixins/power-dialer-list'
 import { createPopper } from '@popperjs/core'
 
 let popperInstance
@@ -173,6 +174,7 @@ export default {
       default: true
     }
   },
+  mixins: [pdList],
   components: {
     ContactsSidebarLoader,
     TreeFolder,
@@ -192,10 +194,10 @@ export default {
       'datatableLoader'
     ]),
     foldersWithoutRoot () {
-      return this.folders.filter(folder => folder.name !== 'Root')
+      return this.folders?.filter(folder => folder.name !== 'Root')
     },
     rootFolder () {
-      return this.folders.find(folder => folder.name === 'Root')
+      return this.folders?.find(folder => folder.name === 'Root')
     },
     rootFolderIsContactModuleType () {
       if (this.rootFolder.module_type === 0) {
@@ -208,6 +210,15 @@ export default {
         return '/api/v2/contact-folders'
       }
       return '/api/v2/power-dialer-folders'
+    },
+    isFolderEmpty () {
+      return !this.folders?.[0].child_folders.length
+    },
+    foldersLength () {
+      return this.folders?.length
+    },
+    rootFolderId () {
+      return this.rootFolder?.id
     }
   },
   mounted () {
@@ -249,10 +260,13 @@ export default {
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
-          name: 'Untitled'
+          name: this.fetchedNameList
         })
-        .then(() => {
-          console.log('LOG: Successfully created a list...')
+        .then((response) => response.data)
+        .then((response) => {
+          console.log('LOG: Successfully created a list...', response)
+          this.reloadFolders()
+          this.$generalNotification(response.message, 'success')
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)
@@ -281,8 +295,8 @@ export default {
       this.isMenuOpen = true
       this.$nextTick(() => {
         popperInstance = createPopper(
-          document.getElementById('folder-submenu-' + this.rootFolder.id),
-          document.getElementById('folder-submenu-items-' + this.rootFolder.id),
+          document.getElementById('folder-submenu-' + this.rootFolder?.id),
+          document.getElementById('folder-submenu-items-' + this.rootFolder?.id),
           {
             placement: 'right-start'
           }
