@@ -11,13 +11,16 @@
         :style="indentStyle"
         @click="onToggleFolder"
       ></div>
-      <div class="folder__arrow d-flex align-items-center" @click="onToggleFolder">
+      <div class="folder__arrow d-flex align-items-center"
+           v-if="lists.length > 0 || folders.length > 0"
+           @click="onToggleFolder">
         <folder-arrow-open-icon v-if="isOpen"
                                 color="#62666E"></folder-arrow-open-icon>
         <folder-arrow-close-icon v-else
                                  color="#62666E"></folder-arrow-close-icon>
       </div>
-      <div class="folder__icon d-flex align-items-center" @click="onToggleFolder">
+      <div class="folder__icon d-flex align-items-center"
+           @click="onToggleFolder">
         <folder-icon color="#62666E"></folder-icon>
       </div>
 
@@ -31,22 +34,23 @@
 
         <!-- Renaming Folders -->
         <input
-          :id="'folder-input-' + id"
           v-if="isEditing"
+          autofocus
+          class="folder__input d-inline"
           type="text"
+          :id="'folder-input-' + id"
           :value="name"
           :disabled="isRenaming"
-          class="folder__input d-inline"
           @blur="onInputBlur"
           @keydown="onKeyDown"
           autofocus />
       </div>
 
       <button
-        :data-popper-target="'folder-' + id"
-        :id="'folder-option-' + id"
         class="folder__option btn btn-link p-0 shadow-0"
         :class="{ 'folder__option--hide': isEditing }"
+        :data-popper-target="'folder-' + id"
+        :id="'folder-option-' + id"
       >
         <folder-option></folder-option>
       </button>
@@ -94,21 +98,21 @@
     ></tree-list-contents>
 
     <b-popover
-      :target="'folder-option-' + id"
       triggers="click blur"
       placement="bottomright"
       boundary="window"
       custom-class="contact-popover"
+      :target="'folder-option-' + id"
     >
       <folder-actions
         :id="id"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
         @create="onCreateFolder"
         @edit="onEditFolder"
         @remove="onRemoveFolder"
         @move="onMove"
         @createlist="onCreateList"
-        :hasEdit="hasEdit"
-        :hasDelete="hasDelete"
       />
     </b-popover>
   </div>

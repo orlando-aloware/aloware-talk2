@@ -79,6 +79,7 @@ $green-3: #6FCF97;
 // blues
 $blue-90: #2F80ED;
 $blue-80: #15163F;
+$blue-70: #EEF3FF;
 $blue-10: #D3E2FF;
 $blue-3: #56CCF2;
 
@@ -157,6 +158,7 @@ $primary-hover: #054CDB;
 @include bg-color('red-100', $red-100, true);
 @include bg-color('blue-80', $blue-80, true);
 @include bg-color('blue-10', $blue-10, true);
+@include bg-color('blue-70', $blue-70, true);
 @include bg-color('blue', $primary, true);
 @include bg-color('green-90', $green-10, true);
 @include bg-color('green-10', $green-10, true);

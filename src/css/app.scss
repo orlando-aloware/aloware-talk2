@@ -2797,6 +2797,7 @@ span.mention {
   [contenteditable=true] {
     font-size: 14px;
     display: block;
+    outline: none;
     word-wrap: break-word;
   }
 
@@ -5176,6 +5177,10 @@ button#bs-folder-options {
       font-size: $f-size-12 !important;
     }
 
+    .q-btn-item {
+      min-width: 2em !important;
+    }
+
     > .q-btn:nth-child(2) {
       margin-right: 10px;
     }
@@ -6405,11 +6410,13 @@ table.datatable {
     &__arrow {
       margin-top: -5px;
       margin-right: 5px;
+      position: absolute;
     }
 
     &__icon {
       min-height: 34px;
       margin-right: 5px;
+      margin-left: 10px;
     }
 
     &--selected {
@@ -7436,8 +7443,11 @@ button.grey-90 {
 }
 
 .mention-tag {
-  color: $primary;
+  color: $grey-100;
   font-weight: 500;
+  background: #CDDCFF;
+  border-radius: 4px;
+  padding: 2px 5px;
 }
 
 .notes-body {
@@ -8935,6 +8945,18 @@ screen and (max-width: 956px) {
   z-index: 9999;
 }
 
+.notes-wrapper {
+  border-radius: 12px;
+  padding: 14px;
+  background: linear-gradient(0deg, $blue-70, $blue-70);
+  border: 1px solid rgba(47, 128, 237, 0.25);
+
+  .q-item {
+    padding: 0 !important;
+    min-height: 10px !important;
+  }
+}
+
 .contact-sidebar-list-wrapper {
   .folders__header {
     .header__header__title {
@@ -8942,4 +8964,10 @@ screen and (max-width: 956px) {
       position: relative;
     }
   }
+}
+
+
+.contact-filter-count {
+  top: 0 !important;
+  padding-top: 6px !important;
 }

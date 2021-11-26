@@ -26,7 +26,8 @@
           {{ contactName }}
         </q-tooltip>
       </div>
-      <div class="d-flex flex-row" v-if="contact.last_communication">
+      <div v-if="contact.last_communication"
+           class="d-flex flex-row">
         <div class="pr-2">
           <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction)"
                      height="18px"
@@ -40,15 +41,19 @@
 
         </div>
       </div>
-      <div class="campaign-name text-grey-10" v-if="contact.last_communication">
+      <div v-if="contact.last_communication"
+           class="campaign-name text-grey-10">
         {{ campaignName }}
       </div>
     </div>
-    <div class="actions text-right pb-1" v-if="contact.last_communication">
+    <div v-if="contact.last_communication"
+         class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="(contact.last_communication.type === CommunicationTypes.CALL && contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || contact.last_communication.type !== CommunicationTypes.CALL">
-        <task-item-time :from-time="contact.last_engagement_at" :update-interval="6000"></task-item-time>
+        <task-item-time :from-time="contact.last_communication.created_at"
+                        :update-interval="6000">
+        </task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
            v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND && contact.last_communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(contact.last_communication.current_status2)">
@@ -61,7 +66,8 @@
       </div>
     </div>
 
-    <div class="overlay position-absolute opacity-1 text-center pt-2" v-if="isReopened && !isSearch">
+    <div v-if="isReopened && !isSearch"
+         class="overlay position-absolute opacity-1 text-center pt-2">
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"

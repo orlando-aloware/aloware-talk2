@@ -239,7 +239,7 @@ export default {
         isPinned
       })
 
-      if (isPinned) {
+      if (isPinned && this.type === ContactListTypes.STATIC) {
         this.$axios
           .get(`api/v2/contacts-list/${this.id}/items?per_page=1`)
           .then((response) => {
@@ -259,7 +259,7 @@ export default {
       this.pinRequest(this.id, isPinned).finally(() => {
         this.getContactList(this.id).then((response) => {
           this.listLoaded(response)
-          this.$generalNotification((isPinned ? 'Successfully pinned' : 'Successfully unpinned'))
+          this.$generalNotification((isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.'))
         })
       })
     },

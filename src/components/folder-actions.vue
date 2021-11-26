@@ -96,7 +96,7 @@
 
           <contact-menu-item @click="onCreateByManualSelection">
             <template slot="title">
-              <span class="create-item">Create by Manually Selecting Contacts</span>
+              <span class="create-item">2Create by Manually Selecting Contacts</span>
             </template>
           </contact-menu-item>
         </div>

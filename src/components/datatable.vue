@@ -13,13 +13,13 @@
 
         <thead>
           <draggable
-            :list="fixedColumns"
             tag="tr"
             ghost-class="ghost"
             handle=".handle"
+            :list="fixedColumns"
+            :move="onCheckMove"
             @change="onOrderChanged"
-            :move="onCheckMove">
-
+          >
             <th
               v-for="(column, key) in fixedColumns"
               :key="column.name"
@@ -98,14 +98,16 @@
         rounded="sm"
         v-if="!paginated">
         <template #overlay>
-          <q-spinner-bars color="primary" size="20px" />
+          <q-spinner-bars color="primary"
+                          size="20px" />
         </template>
       </b-overlay>
 
       <template v-if="hasEmptySlot && isEmpty">
         <slot name="empty" />
       </template>
-      <div class="empty-state" v-else-if="!hasEmptySlot && isEmpty && !isLoading">
+      <div class="empty-state"
+           v-else-if="!hasEmptySlot && isEmpty && !isLoading">
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
@@ -185,6 +187,10 @@ export default {
     paginated: {
       type: Boolean,
       default: false
+    },
+    showPagination: {
+      type: Boolean,
+      default: true
     },
     totalRows: {
       type: Number,

@@ -55,7 +55,7 @@ export default {
       'pinned'
     ]),
     title () {
-      return `Delete ${this.listToRemove.name} ?`
+      return `Delete ${this.listToRemove.name} list?`
     },
     isContactModule () {
       if (this.$route.name === 'Contacts') {
