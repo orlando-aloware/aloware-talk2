@@ -76,9 +76,6 @@ export default {
         return false
       }
       return true
-    },
-    isPowerDialer () {
-      return true
     }
   },
   async mounted () {

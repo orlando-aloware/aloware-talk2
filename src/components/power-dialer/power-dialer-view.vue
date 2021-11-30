@@ -373,6 +373,9 @@ export default {
     },
     hasContacts () {
       return this.activeList.length > 0
+    },
+    isPowerDialer () {
+      return true
     }
   },
   data () {
