@@ -139,6 +139,7 @@ export default function (/* { ssrContext } */) {
       smsTemplates: [],
       tagsFullyLoaded: false,
       isMobile: false,
+      isTabletOrMobile: false,
       contactDetailsDrawer: false
     },
 
@@ -449,6 +450,10 @@ export default function (/* { ssrContext } */) {
 
       setIsMobile ({ commit }, value) {
         commit('SET_IS_MOBILE', value)
+      },
+
+      setIsTabletOrMobile ({ commit }, value) {
+        commit('SET_IS_TABLET_OR_MOBILE', value)
       },
 
       setContactDetailsDrawer ({ commit }, value) {
@@ -917,6 +922,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_MOBILE (state, value) {
         state.isMobile = value
+      },
+
+      SET_IS_TABLET_OR_MOBILE (state, value) {
+        state.isTabletOrMobile = value
       },
 
       SET_CONTACT_DETAILS_DRAWER (state, value) {

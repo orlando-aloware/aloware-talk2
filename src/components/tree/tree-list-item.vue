@@ -162,7 +162,8 @@ export default {
       'listLoaded',
       'listPinToggled',
       'openMoveDialog',
-      'pinnedCountLoaded'
+      'pinnedCountLoaded',
+      'setShowContactsListSidebar'
     ]),
     onDuplicate () {
       this.$root.$emit('bv::hide::popover')

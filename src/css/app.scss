@@ -248,18 +248,25 @@ body,
   }
 }
 
-@media (min-width: 785px) and (max-width: 991px) {
+@media (min-width: 606px) and (max-width: 991px) {
   .paginated {
     .table-pagination {
       button {
         min-width: 2em !important;
       }
+
       .q-btn__wrapper {
         padding: 0 0 !important;
       }
     }
+  }
+}
+
+@media (min-width: 785px) and (max-width: 991px) {
+  .paginated {
     .scrollableArea {
-      min-height: calc(100vh - 229px);
+      max-height: calc(100vh - 260px) !important;
+      min-height: calc(100vh - 260px) !important;
     }
   }
 }
@@ -4362,6 +4369,7 @@ span.mention {
     .card-header {
       border-top-right-radius: 10px;
       border-top-left-radius: 10px;
+      border-radius: unset;
 
       .header-buttons {
         color: $grey-90;
@@ -7820,6 +7828,9 @@ button.grey-90 {
       }
     }
   }
+  &-header-separator {
+    margin: 0 15px;
+  }
 }
 
 .custom-control-input:disabled {
@@ -8006,7 +8017,7 @@ button.grey-90 {
   }
 }
 
-@media screen and (max-width: 1485px) and (min-width: 1085px) {
+@media (max-width: 1485px) and (min-width: 1085px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
@@ -8035,7 +8046,7 @@ button.grey-90 {
   }
 }
 
-@media screen and (max-width: 1220px) and (min-width: 1085px) {
+@media (max-width: 1220px) and (min-width: 1085px) {
   .contact-page {
     .contact-activity-container {
       .composer-footer {
@@ -8062,7 +8073,7 @@ button.grey-90 {
   }
 }
 
-@media screen and (max-width: 956px) {
+@media (max-width: 956px) {
   .contact-activity-container {
     .composer-footer {
       flex-direction: column;
@@ -8087,13 +8098,13 @@ button.grey-90 {
   }
 }
 
-@media screen and (min-width: 1319px) {
+@media (min-width: 1319px) {
   .contact-details-container {
     max-width: 330px;
   }
 }
 
-@media screen and (min-width: 1160px) and (max-width: 1261px) {
+@media (min-width: 1160px) and (max-width: 1261px) {
   .inbox-side {
     &__right {
       .custom-toggle-button {
@@ -8104,7 +8115,7 @@ button.grey-90 {
   }
 }
 
-@media screen and (max-width: 1261px) {
+@media (max-width: 1261px) {
   .inbox-wrapper,
   .inbox-side {
     max-width: 433px;
@@ -8127,7 +8138,15 @@ button.grey-90 {
   }
 }
 
-@media screen and (min-width: 606px) and (max-width: 1159px) {
+@media (max-width: 1159px) {
+  .contacts-filter-sidebar {
+    position: fixed;
+    right: 0;
+    z-index: 999;
+  }
+}
+
+@media (min-width: 606px) and (max-width: 1159px) {
   .inbox-wrapper,
   .inbox-side {
     max-width: 313px;
@@ -8192,9 +8211,12 @@ button.grey-90 {
       }
     }
   }
+  .contacts-filter-sidebar {
+    width: 300px;
+  }
 }
 
-@media screen and (max-width: 1084px) {
+@media (max-width: 1084px) {
   .contact-activities-actions-dropdown {
     height: 24px;
     width: auto;
@@ -8236,13 +8258,52 @@ button.grey-90 {
   }
 }
 
-@media screen and (min-width: 601px) and (max-width: 1084px) {
+@media (max-width: 991px) {
+  .main-content {
+    .contacts {
+      > .main .mycard > div:first-child,
+      .table-header > div {
+        padding: 0 16px !important;
+      }
+      .table-header {
+        > div {
+          > .row {
+            flex-flow: column-reverse;
+            > div {
+              justify-content: space-between;
+              width: 100%;
+              padding: 0 0 !important;
+              .contacts-options-dropdown {
+                margin-right: 0 !important;
+              }
+            }
+            > div:first-child {
+              > div:first-child {
+                width: 100%;
+              }
+            }
+            > div:nth-child(2) {
+              > div:first-child {
+                display: none;
+              }
+              > div:nth-child(2) {
+                padding-left: 0 !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1084px) {
   .inbox-side {
     height: 100%;
   }
 }
 
-@media screen and (max-width: 784px) {
+@media (max-width: 784px) {
   .page-header {
     height: 58px;
     & > div > h1 {
@@ -8308,17 +8369,81 @@ button.grey-90 {
       .main {
         width: calc(100vw - 260px);
       }
+      .table-header {
+        > div {
+          > .row {
+            flex-flow: column-reverse;
+            > div {
+              justify-content: space-between;
+              width: 100%;
+              padding: 0 0 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+  .paginated {
+    .scrollableArea {
+      max-height: calc(100vh - 307px) !important;
+      min-height: calc(100vh - 307px) !important;
     }
   }
 }
 
-@media screen and (max-width: 667px) {
+@media (min-width: 606px) and (max-width: 780px),
+(max-width: 500px) {
+  .main-content {
+    .contacts {
+      .table-header {
+        > div {
+          > .row {
+            > div:nth-child(2) {
+              > div:nth-child(3) {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 721px) {
+  .main-content {
+    .contacts {
+      .table-header {
+        > div {
+          > .row {
+            flex-flow: column-reverse;
+            > div {
+              justify-content: space-between;
+              width: 100%;
+              padding: 0 0 !important;
+              .contacts-header-separator {
+                margin: 0 13px;
+              }
+            }
+            > div:nth-child(2) {
+              > div:nth-child(2) {
+                flex-grow: 1;
+                padding-right: 0px !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media (max-width: 667px) {
   .contact-activity-container .calls-header__label {
     padding-left: 15px;
   }
 }
 
-@media screen and (max-width: 605px) {
+@media (max-width: 605px) {
   .mobile-header {
     display: flex !important;
   }
@@ -8412,7 +8537,7 @@ button.grey-90 {
       }
     }
   }
-  .inbox-side__left,
+  /*.inbox-side__left,
   .inbox-side__right,
   .inbox-details,
   .contact-activity-wrapper {
@@ -8420,7 +8545,7 @@ button.grey-90 {
     -moz-transition: width 0.3s ease-in-out;
     -o-transition: width 0.3s ease-in-out;
     transition: width 0.3s ease-in-out;
-  }
+  }*/
   .contact-activity-wrapper.contact-activity--closed, {
     width: 0 !important;
     height: 0;
@@ -8490,9 +8615,46 @@ button.grey-90 {
       }
     }
   }
+  .contacts {
+    .contacts__title,
+    .mobile-back-btn .q-btn__content {
+      height: 27px
+    }
+    .main {
+      .mycard {
+        padding-top: 15px !important;
+      }
+    }
+  }
+  .contacts-filter-sidebar {
+    width: 260px;
+  }
 }
 
-@media screen and (max-width: 300px) {
+@media (max-width: 470px) {
+  .paginated {
+    .table-pagination {
+      .q-btn__wrapper {
+        padding: 0 0 !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 325px) {
+  .paginated {
+    .table-pagination {
+      button {
+        margin: 0 0 !important;
+      }
+      .q-btn__wrapper {
+        padding: 0 0 !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 300px) {
   .unsupported {
     display: flex !important;
     height: 100%;
@@ -8502,7 +8664,7 @@ button.grey-90 {
   }
 }
 
-@media screen and (max-height: 600px) {
+@media (max-height: 600px) {
   .unsupported {
     display: flex !important;
     height: 100%;
@@ -9066,5 +9228,24 @@ button.grey-90 {
   .item {
     min-width: 0;
     padding-right: 17px;
+  }
+}
+
+.w-0 {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+}
+
+.no-min-max-width {
+  min-width: unset !important;
+  max-width: unset !important;
+}
+
+.textual-filters {
+  .filter-item {
+    .card-body {
+      padding-right: 26px;
+    }
   }
 }

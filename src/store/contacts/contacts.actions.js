@@ -263,5 +263,8 @@ export default {
   },
   setShowContactsHeader: ({ commit }, value) => {
     commit('SET_SHOW_CONTACTS_HEADER', value)
+  },
+  setShowContactsListSidebar: ({ commit }, value) => {
+    commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
   }
 }

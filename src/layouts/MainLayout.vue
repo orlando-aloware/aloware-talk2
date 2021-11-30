@@ -1478,11 +1478,19 @@ export default {
 
     resizeHandler () {
       const width = document.documentElement.clientWidth
-      // less than 785 pixels screen width is mobile
+      // less than 991 pixels, screen width is tablet or mobile
+      if (width <= 991) {
+        this.setIsTabletOrMobile(true)
+      }
+      // greater than 991 pixels, screen width is not tablet or mobile
+      if (width > 991) {
+        this.setIsTabletOrMobile(false)
+      }
+      // less than 785 pixels, screen width is mobile
       if (width < 785) {
         this.setIsMobile(true)
       }
-      // greater than or equal to 785 pixels screen width is not mobile
+      // greater than or equal to 785 pixels, screen width is not mobile
       if (width >= 785) {
         this.setIsMobile(false)
       }
@@ -1524,6 +1532,7 @@ export default {
       'resetNotifications',
       'setTags',
       'setIsMobile',
+      'setIsTabletOrMobile',
       'setContactDetailsDrawer'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),

@@ -197,6 +197,7 @@ export default function () {
       template: null
     },
     search: '',
-    showContactsHeader: true
+    showContactsHeader: true,
+    showContactsListSidebar: false
   }
 }

@@ -99,7 +99,7 @@
         class="table-pagination"
         v-model="paginationPage"
         :max="lastPage"
-        :max-pages="5"
+        :max-pages="maxPaginationPages"
         :ellipses="false"
         :boundary-numbers="false"
         padding="0 15px"
@@ -218,6 +218,15 @@ export default {
         }
       }
       return newItems
+    },
+    maxPaginationPages () {
+      if (this.$q.screen.xl) {
+        return 11
+      }
+      if (this.$q.screen.lg) {
+        return 7
+      }
+      return 3
     }
   },
 

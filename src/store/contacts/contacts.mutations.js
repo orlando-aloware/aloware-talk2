@@ -347,5 +347,8 @@ export default {
   },
   SET_SHOW_CONTACTS_HEADER: (state, value) => {
     state.showContactsHeader = value
+  },
+  SET_SHOW_CONTACTS_LIST_SIDEBAR: (state, value) => {
+    state.showContactsListSidebar = value
   }
 }

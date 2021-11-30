@@ -1,10 +1,12 @@
 <template>
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100"
        v-if="authenticated">
-    <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
+    <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar"
+         :class="sidebarClass">
       <contacts-sidebar></contacts-sidebar>
     </div>
-    <div class="px-0 mb-0 main flex-1">
+    <div class="px-0 mb-0 main flex-1"
+         :class="mainClass">
       <router-view></router-view>
     </div>
     <remove-folder-dialog />
@@ -30,7 +32,7 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'Contacts',
@@ -49,7 +51,36 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated'])
+    ...mapGetters('auth', ['authenticated']),
+    ...mapState('contacts', ['showContactsListSidebar']),
+    ...mapState(['isMobile']),
+    mainClass () {
+      if (!this.$q.screen.lt.md) {
+        return ''
+      }
+      return !this.showContactsListSidebar ? 'w-100 no-min-max-width' : 'w-0'
+    },
+    sidebarClass () {
+      if (!this.$q.screen.lt.md) {
+        return ''
+      }
+      return !this.showContactsListSidebar ? 'w-0' : 'w-100 no-min-max-width'
+    }
+  },
+  methods: {
+    ...mapActions(['setShowContactsListSidebar']),
+    toggleSidebar () {
+      this.setShowContactsListSidebar(false)
+    }
+  },
+  watch: {
+    '$route': {
+      deep: true,
+      handler: function () {
+        console.log('test!')
+        this.toggleSidebar()
+      }
+    }
   }
 }
 </script>

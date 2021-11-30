@@ -4,6 +4,9 @@
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="pr-2 contacts__title d-flex align-items-center">
+          <back-button class="p-0"
+                       v-if="$q.screen.lt.md"
+                       @click="toggleSidebar"/>
           <div class="d-flex align-items-center">
             <div v-for="folderName in folderPath"
                  :key="folderName"
@@ -43,7 +46,8 @@
           @search="onSearch"
           :disabled="isLoadingDisabled">
         </search>
-        <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
+        <div class="px-3 d-inline-flex"
+             v-if="!isMyContactsView && !isTabletOrMobile">
           <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
@@ -60,12 +64,27 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
         <div class="flex-grow-1"></div>
-        <div class="mr-3">
-          <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
-          <span class="small text-muted fs-13" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</span>
+        <div class="px-3 d-inline-flex"
+             v-if="!isMyContactsView && isTabletOrMobile">
+          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+          <b-form-checkbox
+            id="my-contacts"
+            class="mt-2 cursor-pointer"
+            name="check-button"
+            size="sm"
+            switch
+            :disabled="isLoading"
+            v-model="myContacts"
+            @change="onFetchMyContacts"
+          >
+          </b-form-checkbox>
         </div>
-        <hr role="separator" aria-orientation="vertical" class="q-separator height-28 ml-3 mr-3 margin-auto position-relative q-separator q-separator--vertical">
-        <div class="d-flex align-items-center px-2"
+        <div>
+          <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
+          <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+        </div>
+        <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
+        <div class="d-flex align-items-center pr-2"
              :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
           <compact-btn borderless
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
@@ -73,7 +92,6 @@
                        v-if="hasAppliedFilters"
                        :disabled="isResetDisabled"
                        @clicked="resetFilters">
-            <!--i class="fa fa-times"></i-->
             <close-icon width="14px"
                         height="14px"
                         icon-color="#62666E">
@@ -258,9 +276,11 @@ import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
+import BackButton from 'components/back-button'
 
 export default {
   components: {
+    BackButton,
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
@@ -315,7 +335,8 @@ export default {
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
-      'pinnedCountLoaded'
+      'pinnedCountLoaded',
+      'setShowContactsListSidebar'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -488,13 +509,18 @@ export default {
       }
 
       return []
+    },
+
+    toggleSidebar () {
+      this.setShowContactsListSidebar(!this.showContactsListSidebar)
     }
   },
 
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState('contacts', ['folders']),
+    ...mapState('contacts', ['folders', 'showContactsListSidebar']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
+    ...mapState(['isTabletOrMobile']),
     checked () {
       return this.selectedContacts[this.id] || []
     },

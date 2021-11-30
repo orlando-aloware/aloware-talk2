@@ -24,6 +24,7 @@
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'contacts-shared-item',
@@ -44,6 +45,9 @@ export default {
     item: {
       type: Object
     }
+  },
+  methods: {
+    ...mapActions('contacts', ['setShowContactsListSidebar'])
   }
 }
 </script>
