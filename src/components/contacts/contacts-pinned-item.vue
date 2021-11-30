@@ -24,13 +24,13 @@
 
 <script>
 import FolderStaticIcon from 'components/icons/folder-static-icon'
-// import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
 
 export default {
   name: 'contacts-pinned-item',
   components: {
-    // FolderDynamicIcon,
+    FolderDynamicIcon,
     FolderStaticIcon
   },
   data () {
