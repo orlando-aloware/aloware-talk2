@@ -158,11 +158,11 @@ export default {
       this.isLoading = true
       this.processFetch2(params)
     },
-    onSearch (searchText) {
-      this.isLoaded = false
-      this.setSearch(searchText)
-      this.fetch({ search: this.search })
-    },
+    // onSearch (searchText) {
+    //   this.isLoaded = false
+    //   this.setSearch(searchText)
+    //   this.fetch({ search: this.search })
+    // },
     onSortByField (sorts) {
       console.log('sorts :>> ', sorts)
       // this.isLoaded = false

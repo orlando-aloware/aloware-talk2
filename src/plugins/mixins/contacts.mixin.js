@@ -168,7 +168,18 @@ export default {
       params.order = order
 
       this.isLoading = true
-      this.processFetch(params)
+      if (typeof this.isPowerDialer !== 'undefined') {
+        // the variable is defined
+        if (this.$route.meta.title === 'Power Dialer') {
+          this.processFetch(params, false, true)
+        } else if (this.$route.meta.title === 'Power Dialer List') {
+          this.processFetch(params, false, false)
+        } else {
+          this.processFetch(params, false, false, this.id)
+        }
+      } else {
+        this.processFetch(params)
+      }
     },
     buildQueryString (params) {
       const query = {
