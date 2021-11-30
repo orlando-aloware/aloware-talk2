@@ -42,8 +42,7 @@
           :value="name"
           :disabled="isRenaming"
           @blur="onInputBlur"
-          @keydown="onKeyDown"
-          autofocus />
+          @keydown="onKeyDown" />
       </div>
 
       <button

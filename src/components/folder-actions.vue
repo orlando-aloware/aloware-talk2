@@ -96,7 +96,7 @@
 
           <contact-menu-item @click="onCreateByManualSelection">
             <template slot="title">
-              <span class="create-item">2Create by Manually Selecting Contacts</span>
+              <span class="create-item">Create by Manually Selecting Contacts</span>
             </template>
           </contact-menu-item>
         </div>
@@ -244,8 +244,10 @@ export default {
       })
     },
     onCreateByManualSelection () {
+      let { id } = this
       this.$axios
         .post('/api/v2/power-dialer-lists', {
+          contact_folder_id: id,
           type: 1,
           name: this.fetchedNameList
         })
