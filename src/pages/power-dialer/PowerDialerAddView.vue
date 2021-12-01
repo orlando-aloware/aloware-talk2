@@ -8,7 +8,8 @@
     v-else
     :id="id"
     :contactList="contactList"
-    :name="contactList.name" />
+    :name="contactList.name"
+    :open-edit="true" />
 </template>
 
 <script>

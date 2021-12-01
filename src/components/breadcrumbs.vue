@@ -154,6 +154,10 @@ export default {
     },
     '$route.params.filter': function (filter) {
       this.findParents(this.directoryList, filter)
+    },
+    directoryList (data) {
+      let id = this.$route.params.id
+      this.findParents(data, id)
     }
   }
 }
