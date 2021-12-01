@@ -16,7 +16,7 @@
       style="height: 32px;"
       v-show="!active"
       class="pr-0 d-flex align-items-center">
-      {{ modelValue }}
+      -{{ modelValue }}
     </div>
     <div
       class="cursor-pointer"

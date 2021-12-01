@@ -15,15 +15,22 @@
               <i class="fa fa-chevron-left"></i>
             </a>
           </router-link>
-          Add contacts to
-          <div class="text-grey-90">
+          <span v-if="!openEdit">Add contacts to</span>
+          <div
+            v-if="!openEdit"
+            class="text-grey-90">
             <span class="title-icon">
               <folder-static-icon/>
             </span>
             {{ contactList.name }}
           </div>
+          <TextPopover
+            v-else
+            v-model="contactList.name"
+            :id="contactList.id" />
         </div>
         <div class="text-muted small action-desc">
+          {{ openEdit ? 'Add contacts by creating a filter or manually selecting' : 'Manually select contacts or create a filter'}}
           Manually select contacts or create a filter
         </div>
       </div>
@@ -151,6 +158,7 @@ import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/components/table-row.vue'
+import TextPopover from 'components/popover/text-popover'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
@@ -166,6 +174,7 @@ export default {
     Datatable,
     ImportContactsModal,
     TableRow,
+    TextPopover,
     FolderStaticIcon
   },
   props: {
@@ -176,6 +185,10 @@ export default {
     isContactModule: {
       type: Boolean,
       default: true
+    },
+    openEdit: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -311,6 +324,7 @@ export default {
   },
   mounted () {
     this.fetch()
+    console.log('Add items are triggered')
   },
   watch: {
     '$route.params.id': function () {
