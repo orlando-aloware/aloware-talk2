@@ -603,6 +603,13 @@
         </div>
       </q-expansion-item>
     </q-list>
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
+         v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE">
+      <label class="form-control-label mb-1 text-left">Note</label>
+      <p class="text-left"
+         v-html="$options.filters.nl2br(communication.notes)">
+      </p>
+    </div>
   </div>
 </template>
 
