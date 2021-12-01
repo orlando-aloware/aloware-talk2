@@ -40,12 +40,18 @@
 
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
-        <search
-          class="width-250"
-          :search="search"
-          @search="onSearch"
-          :disabled="isLoadingDisabled">
-        </search>
+        <div class="d-flex justify-content-between align-items-center">
+          <search
+            class="width-250"
+            :search="search"
+            @search="onSearch"
+            :disabled="isLoadingDisabled">
+          </search>
+          <div class="contacts-total mobile">
+            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
+            <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+          </div>
+        </div>
         <div class="px-3 d-inline-flex"
              v-if="!isMyContactsView && !isTabletOrMobile">
           <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
@@ -79,7 +85,7 @@
           >
           </b-form-checkbox>
         </div>
-        <div>
+        <div class="contacts-total desktop">
           <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
           <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
         </div>

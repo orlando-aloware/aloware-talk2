@@ -1495,8 +1495,8 @@ export default {
         this.setIsMobile(false)
       }
       // close contact details drawer when screen width reaches
-      // more than 1084 or less than 606 pixels
-      if (width > 1084 || width < 606) {
+      // more than 1084 or less than 605 pixels
+      if (width > 1084 || width < 605) {
         this.setContactDetailsDrawer(false)
       }
     },

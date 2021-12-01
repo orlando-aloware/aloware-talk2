@@ -8,7 +8,7 @@
             isExactActive && 'router-link-exact-active'
           ]"
        class="d-flex align-items-center item"
-       @click="navigate">
+       @click="toggleSidebar(navigate, $event)">
       <div class="icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
         <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon>
@@ -47,7 +47,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setShowContactsListSidebar'])
+    ...mapActions('contacts', ['setShowContactsListSidebar']),
+    toggleSidebar (callback, event) {
+      callback(event)
+      this.setShowContactsListSidebar(false)
+    }
   }
 }
 </script>

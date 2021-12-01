@@ -248,7 +248,7 @@ body,
   }
 }
 
-@media (min-width: 606px) and (max-width: 991px) {
+@media (min-width: 605px) and (max-width: 991px) {
   .paginated {
     .table-pagination {
       button {
@@ -8017,6 +8017,14 @@ button.grey-90 {
   }
 }
 
+.contacts-total {
+  white-space: nowrap;
+  margin-left: 15px;
+  &.mobile {
+    display: none;
+  }
+}
+
 @media (max-width: 1485px) and (min-width: 1085px) {
   .inbox {
     .inbox-details {
@@ -8146,7 +8154,7 @@ button.grey-90 {
   }
 }
 
-@media (min-width: 606px) and (max-width: 1159px) {
+@media (min-width: 605px) and (max-width: 1159px) {
   .inbox-wrapper,
   .inbox-side {
     max-width: 313px;
@@ -8214,6 +8222,31 @@ button.grey-90 {
   .contacts-filter-sidebar {
     width: 300px;
   }
+  .main-content {
+    .contacts {
+      > .main .mycard > div:first-child,
+      .table-header > div {
+        padding: 0 16px !important;
+      }
+      .table-header {
+        > div {
+          > .row {
+            justify-content: space-between;
+            > div {
+              width: auto !important;
+              flex: unset;
+              max-width: unset;
+            }
+            > div:first-child {
+              > div:nth-child(2) {
+                display: none !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (max-width: 1084px) {
@@ -8278,11 +8311,12 @@ button.grey-90 {
               }
             }
             > div:first-child {
-              > div:first-child {
+              .width-250 {
                 width: 100%;
               }
             }
             > div:nth-child(2) {
+              justify-content: flex-end;
               > div:first-child {
                 display: none;
               }
@@ -8291,6 +8325,14 @@ button.grey-90 {
               }
             }
           }
+        }
+      }
+      .contacts-total {
+        &.mobile {
+          display: block !important;
+        }
+        &.desktop {
+          display: none;
         }
       }
     }
@@ -8304,6 +8346,14 @@ button.grey-90 {
 }
 
 @media (max-width: 784px) {
+  .contacts-total {
+    &.desktop {
+      display: none;
+    }
+    &.mobile {
+      display: block !important;
+    }
+  }
   .page-header {
     height: 58px;
     & > div > h1 {
@@ -8391,7 +8441,7 @@ button.grey-90 {
   }
 }
 
-@media (min-width: 606px) and (max-width: 780px),
+@media (min-width: 605px) and (max-width: 780px),
 (max-width: 500px) {
   .main-content {
     .contacts {
@@ -8443,7 +8493,7 @@ button.grey-90 {
   }
 }
 
-@media (max-width: 605px) {
+@media (max-width: 604px) {
   .mobile-header {
     display: flex !important;
   }
@@ -8631,6 +8681,16 @@ button.grey-90 {
   }
 }
 
+@media (max-height: 600px) {
+  .unsupported {
+    display: flex !important;
+    height: 100%;
+  }
+  .page {
+    display: none;
+  }
+}
+
 @media (max-width: 470px) {
   .paginated {
     .table-pagination {
@@ -8654,17 +8714,21 @@ button.grey-90 {
   }
 }
 
-@media (max-width: 300px) {
-  .unsupported {
-    display: flex !important;
-    height: 100%;
-  }
-  .page {
-    display: none;
+@media (max-width: 306px) {
+  .contacts {
+    .main {
+      .mycard {
+        .datatable-wrapper {
+          .q-select-pager {
+            margin-left: 18px !important;
+          }
+        }
+      }
+    }
   }
 }
 
-@media (max-height: 600px) {
+@media (max-width: 300px) {
   .unsupported {
     display: flex !important;
     height: 100%;

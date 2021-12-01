@@ -37,7 +37,7 @@
               @keydown="onKeyDown"
               autofocus
             />
-            <span @click="navigate" v-if="!isEditing">
+            <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
               {{ name }}
             </span>
           </div>
@@ -320,6 +320,10 @@ export default {
     },
     onRemoveList () {
       this.removeListOpen({ id: this.id, name: this.name })
+    },
+    toggleSidebar (callback, event) {
+      callback(event)
+      this.setShowContactsListSidebar(false)
     }
   }
 }

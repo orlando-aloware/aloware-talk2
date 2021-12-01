@@ -67,19 +67,17 @@ export default {
       return !this.showContactsListSidebar ? 'w-0' : 'w-100 no-min-max-width'
     }
   },
-  methods: {
-    ...mapActions(['setShowContactsListSidebar']),
-    toggleSidebar () {
-      this.setShowContactsListSidebar(false)
+
+  mounted () {
+    if (this.isMobile) {
+      this.toggleSidebar()
     }
   },
-  watch: {
-    '$route': {
-      deep: true,
-      handler: function () {
-        console.log('test!')
-        this.toggleSidebar()
-      }
+
+  methods: {
+    ...mapActions('contacts', ['setShowContactsListSidebar']),
+    toggleSidebar () {
+      this.setShowContactsListSidebar(false)
     }
   }
 }
