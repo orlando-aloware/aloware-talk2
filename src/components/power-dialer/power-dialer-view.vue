@@ -18,7 +18,8 @@
       <div>
         <PowerDialerFilter
           v-if="activeRoute"
-          :id="filter"
+          :id="id"
+          :filter="filter"
           :active-route="activeRoute" />
         <b-container fluid class="bv-example-row m-0 p-0 pl-3 pb-0 border-bottom">
           <b-row class="pr-2">

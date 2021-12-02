@@ -123,6 +123,7 @@ export default {
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
       }
+
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
       return this.$axios
@@ -203,6 +204,12 @@ export default {
 
       query.filter_groups = []
 
+      const powerQuery = {
+        page: query.page,
+        per_page: query.per_page,
+        keyword: params.search
+      }
+
       if (typeof this.lists[this.id] !== 'undefined' && this.lists[this.id].type === ContactListTypes.STATIC) {
         query.filter_groups = [
           {
@@ -236,9 +243,18 @@ export default {
       if (params.sort) {
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
+        powerQuery.sort = params.sort
       }
 
-      return query
+      if (params.task_status) {
+        powerQuery.task_status = params.task_status
+      }
+
+      if (typeof this.isPowerDialer !== 'undefined') {
+        return powerQuery
+      } else {
+        return query
+      }
     },
     getFiltersCount (filters) {
       let filtersCount = 0
@@ -286,6 +302,9 @@ export default {
     ...mapState(['currentCompany']),
     defaultContactDateFilter () {
       if (this.currentCompany && this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+        return 'created_at'
+      }
+      if (typeof this.isPowerDialer !== 'undefined') {
         return 'created_at'
       }
       return 'last_engagement_at'

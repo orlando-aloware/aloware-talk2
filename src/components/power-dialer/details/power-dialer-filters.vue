@@ -2,15 +2,15 @@
   <b-card class="border-0 text-center">
     <div class="t-grouped-buttons">
       <router-link
-        v-for="(filter, key) in listFilters"
+        v-for="(lsFilter, key) in listFilters"
         :key="key"
-        :to="`${activeRoute}/${filter.id}`"
+        :to="`/power-dialer/list/${id}/${lsFilter.id}`"
         class="link px-1">
-        <div :class="`t-grouped-buttons__btn ${id === filter.id ? 'active' : ''}`">
+        <div :class="`t-grouped-buttons__btn ${filter === lsFilter.id ? 'active' : ''}`">
           <div class="t-badge-name">
-            {{ filter.name }}
+            {{ lsFilter.name }}
           </div>
-          <div :class="`t__badge ${id === filter.id ? 'active' : ''}`">
+          <div :class="`t__badge ${id === lsFilter.id ? 'active' : ''}`">
             99+
           </div>
         </div>
@@ -23,7 +23,7 @@
 <script>
 
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'PowerDialerFilters',
@@ -35,6 +35,10 @@ export default {
     id: {
       type: String,
       default: ''
+    },
+    filter: {
+      type: String,
+      default: 'in-queue'
     }
   },
   computed: {
@@ -44,8 +48,33 @@ export default {
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
-    test () {
-      return true
+    currentRoute () {
+      return this.$route
+    }
+  },
+  methods: {
+    ...mapMutations('powerDialer', [
+      'SET_ACTIVE_FILTER'
+    ])
+  },
+  watch: {
+    '$route.params.filter': function (id) {
+      console.log('id :>> ', id)
+      if (id) {
+        if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
+          console.log('501 :>> ', 501)
+          this.SET_ACTIVE_FILTER(this.$route.params.id)
+        } else {
+          if (this.$route.params.filter) {
+            console.log('502 :>> ', 502)
+            this.SET_ACTIVE_FILTER(this.$route.params.filter)
+          } else {
+            console.log('503 :>> ', 503)
+            this.SET_ACTIVE_FILTER('in-queue')
+          }
+        }
+      }
+      // this.SET_ACTIVE_FILTER(this.$route.params.id)
     }
   },
   data () {

@@ -43,13 +43,17 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
+      console.log('id :>> ', id)
       if (id) {
         if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
+          console.log('401 :>> ', 401)
           this.SET_ACTIVE_FILTER(this.$route.params.id)
         } else {
           if (this.$route.params.filter) {
+            console.log('402 :>> ', 402)
             this.SET_ACTIVE_FILTER(this.$route.params.filter)
           } else {
+            console.log('403 :>> ', 403)
             this.SET_ACTIVE_FILTER('in-queue')
           }
         }
