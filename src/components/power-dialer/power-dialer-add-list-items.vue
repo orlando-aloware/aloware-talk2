@@ -310,6 +310,9 @@ export default {
         return this.listItems[this.id].data
       }
       return []
+    },
+    isPowerDialer () {
+      return true
     }
   },
   data () {

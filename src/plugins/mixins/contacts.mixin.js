@@ -126,6 +126,7 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
+      console.log('params: ', this.buildQueryString(params))
       return this.$axios
         .get(this.apiEndpoint(isContactModule, queued), {
           params: this.buildQueryString(params),
@@ -187,11 +188,17 @@ export default {
         page: 1
       }
 
+      const powerQuery = {
+        page: query.page,
+        per_page: params.per_page || 25
+      }
+
       let filters = {}
 
       if (params.search) {
         filters.search = {}
         filters.search.value = params.search
+        powerQuery.keyword = params.search
       }
 
       if (params.page) {
@@ -203,12 +210,6 @@ export default {
       query.per_page = params.per_page || 25
 
       query.filter_groups = []
-
-      const powerQuery = {
-        page: query.page,
-        per_page: query.per_page,
-        keyword: params.search
-      }
 
       if (typeof this.lists[this.id] !== 'undefined' && this.lists[this.id].type === ContactListTypes.STATIC) {
         query.filter_groups = [
