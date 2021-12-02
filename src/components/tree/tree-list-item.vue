@@ -18,12 +18,21 @@
         >
           <div class="folder__indent" :style="indentStyle"></div>
           <div class="folder__icon d-flex align-items-center">
-            <folder-static-icon color="#62666E"
-              v-if="type === ContactListTypes.STATIC"
-            ></folder-static-icon>
-            <folder-dynamic-icon color="#62666E"
-              v-if="type === ContactListTypes.DYNAMIC"
-            ></folder-dynamic-icon>
+            <template
+              v-if="isContactsRoute">
+              <folder-static-icon color="#62666E"
+                v-if="type === ContactListTypes.STATIC"
+              ></folder-static-icon>
+              <folder-dynamic-icon color="#62666E"
+                v-if="type === ContactListTypes.DYNAMIC"
+              ></folder-dynamic-icon>
+            </template>
+            <template
+              v-else>
+              <DialIcon
+                color="grey"
+                class="mr-1" />
+            </template>
           </div>
           <div class="folder__name d-flex align-items-center">
             <input
@@ -85,6 +94,7 @@ import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
+import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
@@ -96,6 +106,7 @@ export default {
     FolderOption,
     FolderStaticIcon,
     FolderDynamicIcon,
+    DialIcon,
     ListActions
   },
   computed: {
