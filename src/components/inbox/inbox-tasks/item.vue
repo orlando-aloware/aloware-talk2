@@ -143,6 +143,25 @@ export default {
         this.$route.params.status !== 'open' &&
         this.$options.filters.fixTaskStatusName(this.contact.task_status).toLowerCase() === 'open' &&
         !this.loadingContact
+    },
+    smsEmptyBodyAlternativeText () {
+      let directionText = (this.contact.last_communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      let lastAttachment = this.contact.last_communication.attachments.pop()
+
+      switch (true) {
+        case ['text'].includes(lastAttachment.mime_type):
+          return directionText + ' a text file'
+        case ['audio'].includes(lastAttachment.mime_type):
+          return directionText + ' an audio file'
+        case ['image'].includes(lastAttachment.mime_type):
+          return directionText + ' an image'
+        case ['video'].includes(lastAttachment.mime_type):
+          return directionText + ' a video file'
+        case ['application'].includes(lastAttachment.mime_type):
+        default:
+          return directionText + ' a file'
+      }
     }
   },
 

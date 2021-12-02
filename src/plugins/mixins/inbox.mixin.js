@@ -93,9 +93,12 @@ export default {
         this.filters.contact_task_status.value = [this.currentTask]
       }
 
-      if (this.lineOrRingGroupFilter) {
-        this.lineOrRingGroupFilteredId = this.lineOrRingGroupFilter.id
-        this.filters = { ...this.filters, [this.lineOrRingGroupFilter.model]: { value: [this.lineOrRingGroupFilter.id], operator: 1 } }
+      if (this.filter.campaigns.length) {
+        this.filters = { ...this.filters, 'lines': { value: this.filter.campaigns, operator: 1 } }
+      }
+
+      if (this.filter.ring_groups.length) {
+        this.filters = { ...this.filters, 'ring_groups': { value: this.filter.ring_groups, operator: 1 } }
       }
 
       query.filters = this.filters

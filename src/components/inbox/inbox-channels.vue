@@ -3,17 +3,18 @@
       <div class="header w-100" v-if="$route.params.channel !== 'mentions'"
            :class="{ 'border-bottom-transparent': isSearch }">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
+          <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
                             :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
-            <div class="filter-wrapper">
+            <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
+            <div class="filter-wrapper" :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
               <compact-btn v-if="hasChannelFilterChanges"
                            borderless
-                           customClass="ml-2 pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
+                           customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"
                            @clicked="resetFilters">
                 <i class="fa fa-times"></i>
@@ -21,15 +22,16 @@
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            @clicked="toggleFilterDialog(true)">
-                <q-tooltip v-if="selectedFilter"
+                <q-tooltip v-if="appliedFilter"
                            anchor="top middle"
                            self="center middle">
-                  {{ selectedFilter.name }}
+                  {{ appliedFilter.name }}
                 </q-tooltip>
-                <filter-icon v-if="!selectedFilter"
+                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
                              color="#62666E"
                              class="filter-icon">
-                </filter-icon> {{ !selectedFilter ? 'Filters' : selectedFilter.name }}
+                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
+                {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
               </compact-btn>
               <b-badge v-if="hasChannelFilterChanges"
                        class="ml-1 fs-12"
@@ -53,25 +55,42 @@
       </div>
       <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <div class="inbox-filter-actions-wrapper inbox-tab--filter pr-1 ml-2">
+          <div class="channel-filter-actions-wrapper inbox-tab--filter pr-1 ml-2 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
                             :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
-            <div class="filter-wrapper">
-              <div class="position-absolute filter-icon">
-                <filter-icon></filter-icon>
-              </div>
-              <user-selector custom-placeholder="Filter by User"
-                             :clearable="true"
-                             :hide-dropdown-icon="true"
-                             :outlined="false"
-                             :borderless="true"
-                             :value="mentionUserId"
-                             @change="userMentionSelected">
-              </user-selector>
+            <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
+            <div class="filter-wrapper" :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
+              <compact-btn v-if="hasChannelFilterChanges"
+                           borderless
+                           customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
+                           :variant="filterButtonVariant"
+                           @clicked="resetFilters">
+                <i class="fa fa-times"></i>
+              </compact-btn>
+              <compact-btn borderless
+                           customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
+                           @clicked="toggleFilterDialog(true)">
+                <q-tooltip v-if="appliedFilter"
+                           anchor="top middle"
+                           self="center middle">
+                  {{ appliedFilter.name }}
+                </q-tooltip>
+                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
+                             color="#62666E"
+                             class="filter-icon">
+                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
+                {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
+              </compact-btn>
+              <b-badge v-if="hasChannelFilterChanges"
+                       class="ml-1 fs-12"
+                       variant="primary"
+                       v-b-modal:inbox-channel-filter-modal>
+                {{ channelChangedFilterFields.length }}
+              </b-badge>
             </div>
           </div>
 
@@ -146,11 +165,13 @@
           </b-overlay>
         </div>
       </div>
-      <filter-dialog :filter="filter"
-                     :filter-model="filterModel"
+      <filter-dialog v-model="filter"
+                     :default-filter-model="channelDefaultFilterModel"
+                     @createNewFilter="onCreateNewFilter"
+                     @applyFilter="onApplyFilter"
                      @onResetFilter="resetFilters">
       </filter-dialog>
-      <create-filter-dialog :filter-model="filterModel">
+      <create-filter-dialog :filter-model="newFilterModel">
       </create-filter-dialog>
     </div>
 </template>
@@ -169,7 +190,6 @@ import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import * as MentionType from 'src/constants/mention-type'
 import TaskMentionList from 'components/inbox/channel-tasks/task-mention-list'
-import UserSelector from 'components/generic-selectors/user-selector'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
@@ -185,7 +205,6 @@ export default {
     CreateFilterDialog,
     InboxSearcher,
     FilterIcon,
-    UserSelector,
     TaskMentionList,
     FilterDialog,
     CompactBtn,
@@ -235,7 +254,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'selectedFilter', 'hasMoreCommunications']),
+    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'appliedFilter', 'hasMoreCommunications']),
 
     nextPage () {
       return this.currentPage + 1
@@ -249,8 +268,8 @@ export default {
       return this.channelChangedFilterFields.length > 0
     },
 
-    filterModel () {
-      let filterModel = {
+    channelDefaultFilterModel () {
+      let defaultFilterModel = {
         name: '',
         type: 2,
         filter: [],
@@ -258,79 +277,85 @@ export default {
       }
       switch (true) {
         case ['voicemails'].includes(this.$route.params.channel):
-          filterModel.type = 3
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            ring_groups: this.filter.ring_groups,
-            direction: this.filter.direction,
-            tags: this.filter.tags,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows
+          defaultFilterModel.type = 3
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows
           }
           break
         case ['calls'].includes(this.$route.params.channel):
-          filterModel.type = 1
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            ring_groups: this.filter.ring_groups,
-            direction: this.filter.direction,
-            answer_status: this.filter.answer_status,
-            min_talk_time: this.filter.min_talk_time,
-            transfer_type: this.filter.transfer_type,
-            callback_status: this.filter.callback_status,
-            tags: this.filter.tags,
-            call_dispositions: this.filter.call_dispositions,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows
+          defaultFilterModel.type = 1
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows
           }
           break
         case ['recordings'].includes(this.$route.params.channel):
-          filterModel.type = 4
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            ring_groups: this.filter.ring_groups,
-            direction: this.filter.direction,
-            answer_status: this.filter.answer_status,
-            min_talk_time: this.filter.min_talk_time,
-            transfer_type: this.filter.transfer_type,
-            callback_status: this.filter.callback_status,
-            tags: this.filter.tags,
-            call_dispositions: this.filter.call_dispositions,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows
+          defaultFilterModel.type = 4
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows
+          }
+          break
+        case ['mentions'].includes(this.$route.params.channel):
+          defaultFilterModel.type = 5
+          defaultFilterModel.filter = {
+            users: Filters.DEFAULT_STATE.filter.users
           }
           break
         case ['messages'].includes(this.$route.params.channel):
         default:
-          filterModel.type = 2
-          filterModel.filter = {
-            campaigns: this.filter.campaigns,
-            direction: this.filter.direction,
-            answer_status: this.filter.answer_status,
-            tags: this.filter.tags,
-            first_time_only: this.filter.first_time_only,
-            untagged_only: this.filter.untagged_only,
-            exclude_automated_communications: this.filter.exclude_automated_communications,
-            incoming_numbers: this.filter.incoming_numbers,
-            users: this.filter.users,
-            workflows: this.filter.workflows,
-            broadcasts: this.filter.broadcasts
+          defaultFilterModel.type = 2
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts
           }
       }
 
-      return filterModel
+      return defaultFilterModel
     }
   },
 
@@ -377,8 +402,14 @@ export default {
       mentionUserId: null,
       scrollContainerEl: null,
       activeItemEl: null,
-      searchText: '',
-      isSearch: false
+      searchText: null,
+      isSearch: false,
+      newFilterModel: {
+        name: '',
+        type: 2,
+        filter: [],
+        scope: 'user'
+      }
     }
   },
 
@@ -390,7 +421,9 @@ export default {
       'setChannelClonedFilter',
       'resetChannelChangedFilterFields',
       'setSelectedFilter',
+      'setAppliedFilter',
       'setHasMoreCommunications',
+      'toggleFilterModelForm',
       'toggleFilterDialog']),
 
     resetFilters () {
@@ -420,7 +453,26 @@ export default {
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setCommunications([])
-      this.setSelectedFilter(null)
+      this.setAppliedFilter(null)
+    },
+
+    onApplyFilter (filter) {
+      this.filter = filter
+
+      if (this.$route.params.channel === 'mentions') {
+        if (this.mentionType === MentionType.TYPE_RECEIVED) {
+          this.filter.mentioner_user_id = filter.users
+        }
+
+        if (this.mentionType === MentionType.TYPE_SENT) {
+          this.filter.mentioned_user_id = filter.users
+        }
+      }
+    },
+
+    onCreateNewFilter (filter) {
+      this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.channelDefaultFilterModel.type }
+      this.toggleFilterModelForm(true)
     },
 
     checkCommunicationMatchesFilters (communication) {
@@ -611,7 +663,17 @@ export default {
 
       if (this.$route.params.channel === 'mentions') {
         api = talk2Api.V2.mentions
-        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, mentioner_user_id: params.mentioner_user_id, mentioned_user_id: params.mentioned_user_id } }
+        params = {
+          ...{
+            direction: this.mentionType,
+            page: params.page || 1,
+            per_page: params.per_page || 20,
+            mentioner_user_id: params.mentioner_user_id,
+            mentioned_user_id: params.mentioned_user_id,
+            search_fields: params.search_fields,
+            search_text: params.search_text
+          }
+        }
       }
 
       if (this.$route.params.channel !== 'mentions') {
@@ -764,11 +826,13 @@ export default {
         this.scrollContainerEl.scrollTop = this.activeItemEl.offsetTop - 757
       }
     },
+
     onSearch (value) {
       this.searchText = value
     },
+
     onSearchOpened () {
-      this.filter.search_text = ''
+      this.filter.search_text = null
       this.setHasMoreCommunications(null)
       this.setCommunications([])
       this.isSearch = true
@@ -776,6 +840,7 @@ export default {
         this.$refs.searchToggle.inputFocus()
       }.bind(this))
     },
+
     onSearchClosed () {
       this.searchText = null
       this.filter.page = 1

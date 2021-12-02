@@ -37,7 +37,7 @@ export const DEFAULT_STATE = {
     call_dispositions: [],
     callback_status: null,
     broadcasts: [],
-    mentioner_user_id: null,
-    mentioned_user_id: null
+    mentioner_user_id: [],
+    mentioned_user_id: []
   }
 }

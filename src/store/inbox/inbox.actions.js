@@ -62,6 +62,9 @@ export default {
   setSelectedFilter: ({ commit }, selectedFilter) => {
     commit('SET_SELECTED_FILTER', selectedFilter)
   },
+  setAppliedFilter: ({ commit }, filter) => {
+    commit('SET_APPLIED_FILTER', filter)
+  },
   setHasMoreContacts: ({ commit }, hasMore = false) => {
     commit('SET_HAS_MORE_CONTACTS', hasMore)
   },
