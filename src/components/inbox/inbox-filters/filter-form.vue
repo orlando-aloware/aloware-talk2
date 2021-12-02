@@ -147,8 +147,8 @@
                   <b-form-checkbox switch
                                    class="cursor-pointer switch-success"
                                    size="lg"
-                                   :value="true"
-                                   :unchecked-value="false"
+                                   :value="1"
+                                   :unchecked-value="0"
                                    v-model="filter.first_time_only">
                   </b-form-checkbox>
                 </div>
@@ -163,8 +163,8 @@
                   <b-form-checkbox switch
                                    class="switch-success"
                                    size="lg"
-                                   :value="true"
-                                   :unchecked-value="false"
+                                   :value="1"
+                                   :unchecked-value="0"
                                    v-model="filter.untagged_only">
                   </b-form-checkbox>
                 </div>
@@ -179,8 +179,8 @@
                   <b-form-checkbox switch
                                    class="switch-success"
                                    size="lg"
-                                   :value="true"
-                                   :unchecked-value="false"
+                                   :value="1"
+                                   :unchecked-value="0"
                                    v-model="filter.exclude_automated_communications">
                   </b-form-checkbox>
                 </div>
