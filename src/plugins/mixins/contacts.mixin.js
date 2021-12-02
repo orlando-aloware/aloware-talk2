@@ -126,7 +126,7 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
-      console.log('params: ', this.buildQueryString(params))
+
       return this.$axios
         .get(this.apiEndpoint(isContactModule, queued), {
           params: this.buildQueryString(params),
@@ -341,6 +341,9 @@ export default {
     columns () {
       try {
         let headers = []
+        console.log('this.id :>> ', this.id)
+        console.log('this.lists :>> ', this.lists)
+        console.log('this.lists[this.id] :>> ', this.lists[this.id])
         if (this.lists[this.id] && this.lists[this.id].headers) {
           headers = this.lists[this.id].headers
           if (typeof headers === 'string') {
@@ -351,6 +354,8 @@ export default {
         if (!Array.isArray(headers)) {
           throw new Error('Headers field is broken')
         }
+
+        console.log('headers :>> ', headers)
 
         for (let key in headers) {
           const found = ALL_COLUMNS.find(column => column.name === headers[key].name)

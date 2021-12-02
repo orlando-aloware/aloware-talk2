@@ -159,7 +159,7 @@ export default {
         params.contact_folder_id = this.createDialog.id
       }
       this.$axios
-        .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`, params)
+        .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`)
         .then(() => {
           this.reloadFolders()
           this.isMoving = false
