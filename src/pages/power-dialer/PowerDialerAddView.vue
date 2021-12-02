@@ -9,7 +9,8 @@
     :id="id"
     :contactList="contactList"
     :name="contactList.name"
-    :open-edit="true" />
+    :open-edit="true"
+    :is-contact-module="false" />
 </template>
 
 <script>

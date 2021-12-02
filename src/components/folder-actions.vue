@@ -235,7 +235,7 @@ export default {
       }
     },
     onCreateFromExistingList () {
-      console.log('Should create list from existing contacts...')
+      // console.log('Should create list from existing contacts...')
       this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.$root.$emit('bv::hide::popover')
       this.createPdListOpen({
@@ -253,7 +253,7 @@ export default {
         })
         .then((response) => response.data)
         .then((response) => {
-          console.log('LOG: Successfully created a list...', response)
+          // console.log('LOG: Successfully created a list...', response)
           this.reloadFolders()
           // this.foldersLoaded()
           this.$generalNotification(response.message, 'success')

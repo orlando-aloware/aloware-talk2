@@ -233,6 +233,22 @@ export default {
         return '/contacts/list/'
       }
       return '/power-dialer/list/'
+    },
+    addItemEndpoint () {
+      if (this.isContactModule) {
+        return 'api/v2/contact-list-items'
+      } else {
+        // return 'api/v2/contact-list-items'
+        return 'api/v2/power-dialer-list-items'
+      }
+    },
+    checkedItemIds () {
+      let ids = []
+      this.checked.forEach(check => {
+        console.log('check :>> ', check)
+        ids.push(check.id)
+      })
+      return ids
     }
   },
   methods: {
@@ -247,11 +263,9 @@ export default {
     addSelectedContacts () {
       this.isLoading = true
       this.closeFilters()
+      console.log('this.addItemEndpoint :>> ', this.addItemEndpoint)
       return this.$axios
-        .post('api/v2/contact-list-items', {
-          contact_list_id: this.contactList.id,
-          contacts: this.checked
-        })
+        .post(this.addItemEndpoint, this.attachedParams())
         .then(() => {
           this.setShouldUpdateSelectedListContactCount(true)
           this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
@@ -265,6 +279,19 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
+    },
+    attachedParams () {
+      if (this.isContactModule) {
+        return {
+          contact_list_id: this.contactList.id,
+          contacts: this.checked
+        }
+      } else {
+        return {
+          contact_list_id: this.contactList.id,
+          contact_ids: this.checkedItemIds
+        }
+      }
     },
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>

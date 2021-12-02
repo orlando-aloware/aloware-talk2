@@ -158,24 +158,28 @@ export default {
       if (this.createDialog?.id) {
         params.contact_folder_id = this.createDialog.id
       }
-      this.$axios
-        .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`)
-        .then(() => {
-          this.reloadFolders()
-          this.isMoving = false
-        })
-        .catch(this.handleRequestError)
-        .finally(this.createPdListClose)
-      // return this.$axios
-      //   .post('/api/v2/power-dialer-list', {
-      //     contact_folder_id: this.createDialog.target
-      //   })
-      //   .then(() => {
-      //     this.reloadFolders()
-      //     this.isMoving = false
-      //   })
-      //   .catch(this.handleRequestError)
-      //   .finally(this.createPdListClose)
+
+      if (this.createDialog.id) {
+        return this.$axios
+          .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`, {
+            contact_folder_id: this.createDialog.id
+          })
+          .then(() => {
+            this.reloadFolders()
+            this.isMoving = false
+          })
+          .catch(this.handleRequestError)
+          .finally(this.createPdListClose)
+      } else {
+        this.$axios
+          .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`)
+          .then(() => {
+            this.reloadFolders()
+            this.isMoving = false
+          })
+          .catch(this.handleRequestError)
+          .finally(this.createPdListClose)
+      }
     },
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
