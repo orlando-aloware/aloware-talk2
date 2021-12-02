@@ -620,6 +620,26 @@ export default {
         params = { ...params, order_by: this.sorting.order }
       }
 
+      // TODO check other way of doing this in inbox filter improvements
+      if (this.$route.params.channel === 'messages') {
+        delete params.report_type
+        delete params.chart_period
+        delete params.min_talk_time
+        delete params.changed
+      }
+
+      if (['calls', 'recordings', 'voicemails'].includes(this.$route.params.channel)) {
+        delete params.report_type
+        delete params.chart_period
+        delete params.has_unread
+        delete params.text_authorized
+        delete params.changed
+      }
+
+      if (this.$route.params.channel === 'voicemails') {
+        delete params.min_talk_time
+      }
+
       return api.get({ params: params })
         .then(response => {
           this.gettingTasksList(false)
