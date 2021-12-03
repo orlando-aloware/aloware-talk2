@@ -1850,6 +1850,16 @@ span.mention {
   .contacts {
     .main {
       width: calc(100vw - 324px);
+      .table-header {
+        > div {
+          > .row {
+            > div:first-child > div:nth-child(2) label.disabled,
+            > div:nth-child(2) > div:nth-child(2) label.disabled {
+              color: inherit !important;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -3609,7 +3619,6 @@ span.mention {
 
 .dialer {
   & .invalid-feedback {
-    position: absolute;
     width: inherit;
     margin-top: 0;
   }
@@ -3630,8 +3639,8 @@ span.mention {
 .dialer-contact-info {
   padding-left: 11px;
   padding-right: 11px;
-  margin-top: 2px;
   margin-bottom: 9px;
+  margin-top: 0 !important;
 }
 
 .search-form {
@@ -8291,6 +8300,41 @@ button.grey-90 {
   }
 }
 
+@media (max-width: 1019px) {
+  .main-content {
+    .contacts {
+      .table-header {
+        > div {
+          > .row {
+            .contacts-header-separator {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1019px) {
+  .contacts-total.desktop {
+    padding-left: 10px;
+  }
+  .main-content {
+    .contacts {
+      .table-header {
+        > div {
+          > .row {
+            > div:nth-child(2) {
+              padding-right: 0 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 @media (max-width: 991px) {
   .main-content {
     .contacts {
@@ -8475,9 +8519,21 @@ button.grey-90 {
                 margin: 0 13px;
               }
             }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 605px) and (max-width: 721px) {
+  .main-content {
+    .contacts {
+      .table-header {
+        > div {
+          > .row {
             > div:nth-child(2) {
               > div:nth-child(2) {
-                flex-grow: 1;
                 padding-right: 0px !important;
               }
             }
@@ -8487,6 +8543,26 @@ button.grey-90 {
     }
   }
 }
+
+@media (min-width: 605px) and (max-width: 670px),
+(max-width: 425px) {
+  .main-content {
+    .contacts {
+      .table-header {
+        > div {
+          > .row {
+            > div:nth-child(2) {
+              > div:nth-child(2) {
+                display: none !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 @media (max-width: 667px) {
   .contact-activity-container .calls-header__label {
     padding-left: 15px;
@@ -8678,6 +8754,12 @@ button.grey-90 {
   }
   .contacts-filter-sidebar {
     width: 260px;
+  }
+  .paginated {
+    .scrollableArea {
+      max-height: calc(100vh - 238px) !important;
+      min-height: calc(100vh - 238px) !important;
+    }
   }
 }
 
@@ -9311,5 +9393,22 @@ button.grey-90 {
     .card-body {
       padding-right: 26px;
     }
+  }
+}
+
+.q-tooltip.b-tooltip {
+  padding: 0 0 !important;
+  max-width: 180px;
+  width: auto;
+  .tooltip-inner {
+    background-color: unset;
+    font-size: 10px;
+    font-family: Inter, sans-serif;
+    font-weight: 400;
+    color: $grey-100;
+    text-align: left;
+  }
+  .arrow:before {
+    display: none;
   }
 }

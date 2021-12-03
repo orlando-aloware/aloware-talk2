@@ -32,14 +32,15 @@
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumber"
+                          :state="validPhoneNumberSearch"
                           class="mb-0">
               <contact-phone-number-search :no_prepend="true"
                                            class="width-190"
                                            v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
-                                           @keyup.enter.native="makeCall">
+                                           @keyup.enter.native="makeCall"
+                                           @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
             <q-btn :ripple="true"
@@ -55,7 +56,8 @@
             </q-btn>
           </div>
 
-          <div class="dialer-contact-info width-190">
+          <div class="dialer-contact-info width-190"
+               v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
               <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
@@ -89,17 +91,19 @@
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumber"
+                          :state="validPhoneNumberSearch"
                           class="mb-0 w-100">
               <contact-phone-number-search v-model="phoneNumber"
                                            ref="textContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
-                                           @keyup.enter.native="sendText">
+                                           @keyup.enter.native="sendText"
+                                           @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
           </div>
 
-          <div class="dialer-contact-info w-100">
+          <div class="dialer-contact-info w-100"
+               v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
               <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
@@ -138,8 +142,6 @@
                                placeholder="Text Message..."
                                rows="2"
                                max-rows="3"
-                               no-auto-shrink
-                               no-resize
                                v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
@@ -194,7 +196,8 @@ export default {
       currentLocalTime: null,
       loadingContact: false,
       textMessage: '',
-      isMakingCall: false
+      isMakingCall: false,
+      hasPhoneNumberSearchResults: false
     }
   },
 
@@ -208,6 +211,10 @@ export default {
 
     validPhoneNumber () {
       return this.$options.filters.fixPhone(this.phoneNumber) !== false
+    },
+
+    validPhoneNumberSearch () {
+      return this.hasPhoneNumberSearchResults || this.$options.filters.fixPhone(this.phoneNumber) !== false
     },
 
     invalidPhoneNumber () {
@@ -405,6 +412,10 @@ export default {
         phone_number: null,
         message: null
       }
+    },
+
+    onPhoneNumberSearch (value) {
+      this.hasPhoneNumberSearchResults = value
     }
   },
 

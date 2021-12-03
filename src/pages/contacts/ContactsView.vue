@@ -54,14 +54,24 @@
         </div>
         <div class="px-3 d-inline-flex"
              v-if="!isMyContactsView && !isTabletOrMobile">
-          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+          <q-tooltip
+            class="text-center"
+            anchor="top middle"
+            self="bottom middle"
+            max-width="185px"
+            v-if="$route.params.id === 'unassigned'">
+            Unable to modify Filters. Duplicate this list if you want to modify
+          </q-tooltip>
+          <label class="text-primary mr-2 mt-2 cursor-pointer"
+                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
-            :disabled="isLoading"
+            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
+            :disabled="isLoading || $route.params.id === 'unassigned'"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -72,14 +82,24 @@
         <div class="flex-grow-1"></div>
         <div class="px-3 d-inline-flex"
              v-if="!isMyContactsView && isTabletOrMobile">
-          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+          <q-tooltip
+            class="text-center"
+            anchor="top middle"
+            self="bottom middle"
+            max-width="185px"
+            v-if="$route.params.id === 'unassigned'">
+            Unable to modify Filters. Duplicate this list if you want to modify
+          </q-tooltip>
+          <label class="text-primary mr-2 mt-2 cursor-pointer"
+                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
-            :disabled="isLoading"
+            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
+            :disabled="isLoading || $route.params.id === 'unassigned'"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -145,15 +165,15 @@
           </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
+                           v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListType.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onAddContactsToList">
-
             <search-icon color="#62666E">
             </search-icon>
-            Select Contacts
+            Select Existing Contacts & Add to List
           </b-dropdown-item>
           <b-dropdown-item href="#" v-b-modal:create-contact-modal>
             <plus-icon color="#62666E"></plus-icon>
-            Create Contact
+            Create New Contact & Add to List
           </b-dropdown-item>
         </b-dropdown>
 
@@ -181,6 +201,7 @@
           </b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
+                           v-b-tooltip.hover="{ placement: 'top', title: (isListDeletable ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onRemoveList">
             <delete-red-icon></delete-red-icon>
             <span class="text-danger">

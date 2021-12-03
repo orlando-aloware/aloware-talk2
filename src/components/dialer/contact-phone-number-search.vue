@@ -100,12 +100,14 @@ export default {
 
     getPhoneNumbers (search) {
       this.phoneNumbers = []
+      this.$emit('searchResults', true)
       this.$axios.get('api/v2/contacts/quick-search', {
         params: {
           search: search
         }
       }).then((res) => {
         this.phoneNumbers = res.data.data
+        this.$emit('searchResults', !!this.phoneNumbers.length)
       })
     },
 
@@ -156,6 +158,10 @@ export default {
 
       if (this.query.length >= 3) {
         this.getPhoneNumbers(this.query)
+      }
+
+      if (this.query.length < 3) {
+        this.$emit('searchResults', false)
       }
     }, 1000)
   }
