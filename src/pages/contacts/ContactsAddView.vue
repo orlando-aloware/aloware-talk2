@@ -52,6 +52,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'openFilters']),
     loadList (id) {
+      console.log('this.$route.params.id :>> ', this.$route.params.id)
       if (!id) {
         id = 'all'
       }

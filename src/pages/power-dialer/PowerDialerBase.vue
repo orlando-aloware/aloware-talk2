@@ -6,8 +6,11 @@
 
 <script>
 
+import { mapGetters, mapActions } from 'vuex'
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+// import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'PowerDialerBase',
@@ -18,6 +21,10 @@ export default {
     ...mapGetters('powerDialer', [
       'activeFilter'
     ]),
+    ...mapGetters('contacts', [
+      'listItems',
+      'lists'
+    ]),
     objId () {
       return this.$route
     },
@@ -26,7 +33,10 @@ export default {
     }
   },
   async mounted () {
-    await this.getMyQueueList()
+    if (this.$route.meta.title === 'Power Dialer List') {
+      await this.getMyQueueList()
+    }
+    await this.loadList(this.id)
   },
   data () {
     return {
@@ -34,26 +44,69 @@ export default {
     }
   },
   methods: {
+    ...mapActions('contacts', [
+      'listLoaded',
+      'contactsLoaded',
+      'setCurrentListFilters',
+      'setSelectedList'
+    ]),
     ...mapActions('powerDialer', [
       'getMyQueueList'
     ]),
-    ...mapMutations('powerDialer', [
-      'SET_ACTIVE_FILTER'
-    ])
+    // ...mapMutations('powerDialer', [
+    //   'SET_ACTIVE_FILTER'
+    // ]),
+    async loadList (id) {
+      if (!id) {
+        id = 'all'
+      }
+
+      const stringId = String(id)
+
+      if (!this.listItems[stringId]) {
+        this.contactsLoaded({
+          id: stringId,
+          ...DEFAULT_LIST_ITEMS
+        })
+      }
+
+      this.$axios
+        .get('/api/v2/power-dialer-lists/' + stringId)
+        .then((response) => response.data)
+        .then((response) => {
+          this.listLoaded({ ...response, id: stringId })
+          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          let filters = {
+            contact_lists: {
+              operator: 1,
+              value: [stringId]
+            }
+          }
+
+          this.setCurrentListFilters(filters)
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+          this.$router.replace('/contacts/')
+        })
+    }
   },
   watch: {
-    '$route.params.id': function (id) {
-      if (id) {
-        if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
-          this.SET_ACTIVE_FILTER(this.$route.params.id)
-        } else {
-          if (this.$route.params.filter) {
-            this.SET_ACTIVE_FILTER(this.$route.params.filter)
-          } else {
-            this.SET_ACTIVE_FILTER('in-queue')
-          }
-        }
-      }
+    'id': function (id) {
+      this.loadList(id)
+      // if (id) {
+      //   if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
+      //     this.SET_ACTIVE_FILTER(this.$route.params.id)
+      //   } else {
+      //     if (this.$route.params.filter) {
+      //       this.SET_ACTIVE_FILTER(this.$route.params.filter)
+      //     } else {
+      //       this.SET_ACTIVE_FILTER('in-queue')
+      //     }
+      //   }
+      // }
       // this.SET_ACTIVE_FILTER(this.$route.params.id)
     }
   }

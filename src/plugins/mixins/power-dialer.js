@@ -46,7 +46,7 @@ export default {
       return this.selectedContacts[this.id] || []
     },
     totalList () {
-      return this.powerDialerListItems[this.id]?.total || 0
+      return this.listItems[this.id]?.total || 0
     },
     columns2 () {
       return ALL_COLUMNS

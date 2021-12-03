@@ -124,6 +124,8 @@ export default {
         params.relations = this.contactsRelations
       }
 
+      console.log('params :>> ', this.buildQueryString(params))
+
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
 
@@ -203,6 +205,7 @@ export default {
 
       if (params.page) {
         query.page = params.page
+        powerQuery.page = params.page
       }
 
       query.relations = _.get(params, 'relations', [])
@@ -341,9 +344,9 @@ export default {
     columns () {
       try {
         let headers = []
-        console.log('this.id :>> ', this.id)
-        console.log('this.lists :>> ', this.lists)
-        console.log('this.lists[this.id] :>> ', this.lists[this.id])
+        // console.log('this.id :>> ', this.id)
+        // console.log('this.lists :>> ', this.lists)
+        // console.log('this.lists[this.id] :>> ', this.lists[this.id])
         if (this.lists[this.id] && this.lists[this.id].headers) {
           headers = this.lists[this.id].headers
           if (typeof headers === 'string') {
@@ -355,7 +358,7 @@ export default {
           throw new Error('Headers field is broken')
         }
 
-        console.log('headers :>> ', headers)
+        // console.log('headers :>> ', headers)
 
         for (let key in headers) {
           const found = ALL_COLUMNS.find(column => column.name === headers[key].name)

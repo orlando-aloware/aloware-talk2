@@ -22,10 +22,17 @@
       </div>
       <div class="items">
         <div
-          @click="onDelete">
+          @click="onDelete"
+          class="cursor-pointer">
           <i class="fa fa-trash"></i>
           Delete
         </div>
+      </div>
+      <div class="items">
+        <a href="" @click="onDelete">
+          <i class="fa fa-trash"></i>
+          Delete
+        </a>
       </div>
     </div>
   </div>
@@ -45,18 +52,24 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('powerDialer', ['selectedContacts']),
+    ...mapGetters('contacts', ['selectedContacts']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
     }
   },
   methods: {
-    ...mapActions('powerDialer', ['removeContactOpen', 'setBulkDelete', 'createListOpen', 'selectListOpen', 'setSelectedStaticList']),
+    ...mapActions('contacts', [
+      'removeContactOpen',
+      'setBulkDelete',
+      'createListOpen',
+      'selectListOpen',
+      'setSelectedStaticList'
+    ]),
     onDelete (e) {
       console.log('Deleting items...')
-      // this.setBulkDelete(true)
-      // this.$bvModal.show('remove-contact-dialog')
-      // e.preventDefault()
+      this.setBulkDelete(true)
+      this.$bvModal.show('remove-contact-dialog')
+      e.preventDefault()
     },
     onMoveToTop () {
       console.log('Moving to top...')

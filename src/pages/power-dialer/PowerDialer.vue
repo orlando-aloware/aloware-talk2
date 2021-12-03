@@ -18,6 +18,8 @@
     <CreateDialog />
     <RemoveListModal />
     <RemoveListConfirmation/>
+    <RemoveContact />
+    <RemoveContactConfirmation />
     <RemoveFolderDialog
       :is-contact-module-type="false" />
 
@@ -34,6 +36,8 @@ import CreateDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveFolderDialog from 'components/remove-folder'
 import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
+import RemoveContact from 'components/remove-contact.vue'
+import RemoveContactConfirmation from 'components/remove-contact-confirmation.vue'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { isEmpty } from 'lodash'
@@ -48,6 +52,8 @@ export default {
     CreateDialog,
     RemoveListModal,
     RemoveListConfirmation,
+    RemoveContact,
+    RemoveContactConfirmation,
     RemoveFolderDialog
   },
   mixins: [powermixin, contactsMixins],
@@ -125,7 +131,7 @@ export default {
         // 'sort': 'last_engagement_at'
       }
       if (this.isFilterKey) {
-        await this.getPowerDialerListItem(this.id)
+        // await this.getPowerDialerListItem(this.id)
       }
       if (this.listItems[this.id] === undefined) {
         if (isEmpty(this.id)) {

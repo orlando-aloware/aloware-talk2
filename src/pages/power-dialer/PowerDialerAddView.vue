@@ -1,14 +1,14 @@
 <template>
-  <PowerDialerAddList
-    v-if="false"
+  <!-- <PowerDialerAddList
+    v-if="true"
     :id="id"
     :name="name"
-    :power-dialer-list="powerDialerList" />
+    :power-dialer-list="powerDialerList" /> -->
   <PowerDialerAddItems
-    v-else
+    v-if="isLoaded && contactListName"
     :id="id"
     :contactList="contactList"
-    :name="contactList.name"
+    :name="contactListName"
     :open-edit="true"
     :is-contact-module="false" />
 </template>
@@ -16,7 +16,7 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
-import PowerDialerAddList from 'src/components/power-dialer/power-dialer-add-list-items'
+// import PowerDialerAddList from 'src/components/power-dialer/power-dialer-add-list-items'
 import PowerDialerAddItems from 'src/pages/contacts/ContactsAddItemsStatic.vue'
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -28,20 +28,20 @@ import {
 export default {
   name: 'PowerDialerAddView',
   components: {
-    PowerDialerAddList,
+    // PowerDialerAddList,
     PowerDialerAddItems
   },
   mounted () {
     this.loadList(this.$route.params.id)
-    if (this.contactList && this.contactList.type === this.ContactListType.DYNAMIC) {
-      this.openFilters()
-    }
   },
   computed: {
     ...mapGetters('powerDialer', ['powerDialerListItems']),
     ...mapGetters('contacts', ['lists', 'listItems']),
     contactList () {
       return this.lists[this.id]
+    },
+    contactListName () {
+      return this.contactList?.name || ''
     },
     isLoaded () {
       if (this.lists[String(this.id)]) {
@@ -88,7 +88,7 @@ export default {
       'openFilters'
     ]),
     loadList (id) {
-      console.log('666 :>> ', 666)
+      console.log('this.$route.params.id :>> ', this.$route.params.id)
       if (!id) {
         id = 'all'
       }

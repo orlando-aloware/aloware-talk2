@@ -1,6 +1,6 @@
 <template>
   <PowerDialerViewScreen
-    :loading="datatableLoader">
+    :loading="isLoading">
 
     <template slot="title">
       <Breadcrumbs :directory-list="folders" />
@@ -122,33 +122,37 @@
     </template>
 
     <template slot="table">
-
       <Datatable
         :stickyHeaders="true"
-        :columns="columns2"
-        :has-more="true"
-        :is-empty="!hasContacts"
-        :is-loading-more="true"
+        :columns="columns"
+        :has-more="hasMore"
+        :is-empty="isEmpty || isStartState"
+        :is-loading-more="isLoadingMore"
         :is-loading="isLoading"
         :contact-list-id="id"
         :paginated="true"
+        :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
-        :total-rows="totalList"
+        :total-rows="listItems[id].total"
+        :current-page="listItems[id].current_page"
+        :last-page="listItems[id].last_page"
         @reordered="onColumnsReordered"
+        @checked="onCheckAllItems"
         @sort="onSortByField"
+        @paginated="onPaginate"
         @more="onLoadMore">
         <template slot="tbody">
           <TableRow
             v-for="(contact, nkey) in activeList"
-            :key="`power-dialer-${contact.id}-${nkey}`"
+            :key="contact.id + nkey + Math.random()"
             :contact="contact"
-            :columns="columns2"
+            :columns="columns"
             :checked="checked"
             :contactListId="id"
             :custom-row-content="true"
             @checked="onCheckedRows">
             <template slot="custom-content">
-              <template v-for="(column, key) in columns2">
+              <template v-for="(column, key) in columns">
                 <!-- change date added to date created -->
                 <!-- COLUMN: Checkboxes -->
                 <!-- <div :key="`key-${key}`">{{contact}}</div> -->
@@ -201,7 +205,7 @@
                 </td>
                 <!-- COLUMN: Status -->
                 <td
-                  v-else-if="column.name === 'status'"
+                  v-else-if="column.name === 'task_status'"
                   :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
                   :key="key">
                   <StatusChip
@@ -333,7 +337,6 @@ export default {
     ...mapState(['prevRoute']),
     ...mapGetters('powerDialer', [
       'contactResources',
-      'selectedContacts',
       'powerDialerLists',
       'powerDialerListItems',
       'powerDialerDirectoryList',
@@ -342,7 +345,12 @@ export default {
     ...mapGetters('contacts', [
       'contact',
       'folders',
-      'listItems'
+      'lists',
+      'listItems',
+      'selectedContacts',
+      'isFiltersOpen',
+      'selectedList',
+      'currentListFilters'
     ]),
     ...mapGetters('powerDialer', [
       'activeFilter',
@@ -419,7 +427,10 @@ export default {
       this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
     },
     onColumnsReordered (nextColumns) {
-      console.log('Re-ordered columns...', nextColumns)
+      this.columnsReordered({
+        id: this.id,
+        headers: nextColumns
+      })
     },
     onRemove (obj) {
       this.selectedItem = obj
@@ -429,13 +440,31 @@ export default {
       return `${this.activeRoute.fullPath}/${id}`
     },
     onCheckboxCheck (data) {
-      this.SET_LIST_SELECTED_CONTACTS({
-        id: this.id,
-        contacts: data
-      })
+      console.log('data from table 901 : ', data)
+      this.setListSelectedContacts({ id: this.id, contacts: data })
+      // this.SET_LIST_SELECTED_CONTACTS({
+      //   id: this.id,
+      //   contacts: data
+      // })
     },
-    onCheckedRows (data) {
-      console.log('data from table 999 : ', data)
+    onCheckAllItems (checked) {
+      let items = []
+      let _this = this
+      document
+        .querySelectorAll('.checker')
+        .forEach(function (checkbox) {
+          if (checked) {
+            items.push(_this.listItems[_this.id].data.find(item => item.id === Number(checkbox.value)))
+          } else {
+            items = items.filter(item => item.id !== Number(checkbox.value))
+          }
+        })
+
+      this.setListSelectedContacts({ id: this.id, contacts: items })
+    },
+    onCheckedRows (checked) {
+      console.log('data from table 902 : ', checked)
+      this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {
       this.columnsOpen({
@@ -454,6 +483,22 @@ export default {
         this.fetch({
           page: this.listItems[this.id].current_page
         })
+      }
+    },
+    saveFilterButtonCustomClass () {
+      return !this.filterHasChanges ? 'button-disabled' : ''
+    }
+  },
+  watch: {
+    currentListFilters: {
+      deep: true,
+      handler: function () {
+        console.log('this.$route.name :>> ', this.$route.name)
+        if (this.$route.name === 'Power Dialer') {
+          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          this.fetch(params)
+          this.filtersCount = this.getFiltersCount(this.currentListFilters)
+        }
       }
     }
   }

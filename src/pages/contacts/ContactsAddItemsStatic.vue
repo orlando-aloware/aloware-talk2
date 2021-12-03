@@ -350,8 +350,8 @@ export default {
     }
   },
   mounted () {
+    console.log('Add items are triggered...')
     this.fetch()
-    console.log('Add items are triggered')
   },
   watch: {
     '$route.params.id': function () {
