@@ -7082,7 +7082,9 @@ button.grey-90 {
           text-overflow: ellipsis;
           .mention-tag {
             color: $grey-81 !important;
-            font-weight: normal;
+            background: unset;
+            padding: 0 0 !important;
+            font-weight: 600;
           }
         }
         .attachment {
