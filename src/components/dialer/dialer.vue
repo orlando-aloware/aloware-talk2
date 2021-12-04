@@ -37,7 +37,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer']),
+    ...mapState(['currentCompany', 'dialer', 'dialerFormStatus']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -188,6 +188,11 @@ export default {
           console.log(err)
         })
       this.$closeActionNotification('incomingCall')
+
+      // close the dialer form when it's open and incoming call is answered
+      if (this.dialerFormStatus) {
+        this.setDialerFormStatus(false)
+      }
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
@@ -995,7 +1000,8 @@ export default {
       'setInputDevices',
       'setCurrentOutputDevice',
       'setOutputDevices',
-      'setShowIncomingCallNotification'
+      'setShowIncomingCallNotification',
+      'setDialerFormStatus'
     ])
   },
 

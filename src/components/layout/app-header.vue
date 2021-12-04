@@ -113,7 +113,7 @@ export default {
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('contacts', ['selectedList']),
     ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
-    ...mapState(['dialer']),
+    ...mapState(['dialer', 'dialerFormStatus']),
 
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
@@ -183,7 +183,8 @@ export default {
           this.$generalNotification('Failed to fetch metric groups.', 'error')
         })
     },
-    ...mapActions('stats', ['setMetricGroups', 'setMetricLoader'])
+    ...mapActions('stats', ['setMetricGroups', 'setMetricLoader']),
+    ...mapActions(['setDialerFormStatus'])
   },
 
   watch: {
@@ -197,6 +198,14 @@ export default {
     },
     groupMetricLoader () {
       this.loading = this.groupMetricLoader
+    },
+    dialerStatus () {
+      console.log('IN status!')
+      this.setDialerFormStatus(this.dialerStatus)
+    },
+    dialerFormStatus () {
+      console.log('IN form status!')
+      this.dialerStatus = this.dialerFormStatus
     }
   }
 }
