@@ -10,7 +10,7 @@
       :style="{ 'background-image': `url(${src})` }"
     >
       <sequence-icon v-if="sequenceIcon" />
-      <span v-else-if="!name || name.length < 1">
+      <span v-else-if="!name || !name.length">
         <i class="fa fa-user"></i>
       </span>
       <span v-else>
