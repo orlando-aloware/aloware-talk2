@@ -620,25 +620,7 @@ export default {
         params = { ...params, order_by: this.sorting.order }
       }
 
-      // TODO check other way of doing this in inbox filter improvements
-      if (this.$route.params.channel === 'messages') {
-        delete params.report_type
-        delete params.chart_period
-        delete params.min_talk_time
-        delete params.changed
-      }
-
-      if (['calls', 'recordings', 'voicemails'].includes(this.$route.params.channel)) {
-        delete params.report_type
-        delete params.chart_period
-        delete params.has_unread
-        delete params.text_authorized
-        delete params.changed
-      }
-
-      if (this.$route.params.channel === 'voicemails') {
-        delete params.min_talk_time
-      }
+      params = this.removeUnnecessaryParameters(params)
 
       return api.get({ params: params })
         .then(response => {
@@ -671,6 +653,14 @@ export default {
         }
       }
 
+      if (this.$route.params.channel !== 'mentions') {
+        params = { ...params, order: this.sorting.order }
+      } else {
+        params = { ...params, order_by: this.sorting.order }
+      }
+
+      params = this.removeUnnecessaryParameters(params)
+
       return api.get({ params: params })
         .then(response => {
           this.setCommunications([...this.communications, ...response.data.data])
@@ -682,6 +672,30 @@ export default {
           this.isScrolled = false
           delete this.pagination.data
         })
+    },
+
+    removeUnnecessaryParameters (params) {
+      // TODO check other way of doing this in inbox filter improvements
+      if (this.$route.params.channel === 'messages') {
+        delete params.report_type
+        delete params.chart_period
+        delete params.min_talk_time
+        delete params.changed
+      }
+
+      if (['calls', 'recordings', 'voicemails'].includes(this.$route.params.channel)) {
+        delete params.report_type
+        delete params.chart_period
+        delete params.has_unread
+        delete params.text_authorized
+        delete params.changed
+      }
+
+      if (this.$route.params.channel === 'voicemails') {
+        delete params.min_talk_time
+      }
+
+      return params
     },
 
     handleScroll (el) {
@@ -831,7 +845,7 @@ export default {
           this.setCommunications([])
         } else {
           this.filter.search_text = value
-          this.getCommunications(this.filter)
+          this.filter.page = 1
         }
       }
     },
@@ -850,7 +864,6 @@ export default {
       if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value) && !this.$route.params.id) {
         this.resetFilters()
         this.isScrolled = false
-        this.getCommunications(this.filter)
       }
     },
     filter: {
