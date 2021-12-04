@@ -200,11 +200,9 @@ export default {
       this.loading = this.groupMetricLoader
     },
     dialerStatus () {
-      console.log('IN status!')
       this.setDialerFormStatus(this.dialerStatus)
     },
     dialerFormStatus () {
-      console.log('IN form status!')
       this.dialerStatus = this.dialerFormStatus
     }
   }
