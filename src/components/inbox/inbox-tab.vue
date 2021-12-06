@@ -340,14 +340,16 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      talk2Api.V2.contacts.get(data.id).then(response => {
-        let contact = response.data
-        // check data loaded
-        if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(contact.id)) {
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
+        talk2Api.V2.contacts.get(data.id).then(response => {
+          let contact = response.data
+          // check data loaded
           this.setSelectedContact(contact)
           this.updateContacts(contact)
-        }
-      })
+        })
+      }
     })
 
     this.$VueEvent.listen('new_communication', communication => {

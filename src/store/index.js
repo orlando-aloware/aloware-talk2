@@ -145,7 +145,8 @@ export default function (/* { ssrContext } */) {
       breadcrumbs: {
         crumbs: '',
         name: ''
-      }
+      },
+      dialerFormStatus: false
     },
 
     getters: {
@@ -452,6 +453,10 @@ export default function (/* { ssrContext } */) {
 
       setShowIncomingCallNotification ({ commit }, value) {
         commit('SET_SHOW_INCOMING_CALL_NOTIFICATION', value)
+      },
+
+      setDialerFormStatus ({ commit }, value) {
+        commit('SET_DIALER_FORM_STATUS', value)
       }
     },
 
@@ -925,6 +930,9 @@ export default function (/* { ssrContext } */) {
           crumbs: data.crumbs,
           name: data.name
         }
+      },
+      SET_DIALER_FORM_STATUS (state, value) {
+        state.dialerFormStatus = value
       }
     },
 

@@ -58,6 +58,8 @@ export default {
     ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
     loadContactTasks () {
       this.gettingContactsList(true)
+      // always reset page when fresh loading contacts
+      this.page = 1
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts(response.data.data)
         this.gettingContactsList(false)

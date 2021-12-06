@@ -7298,7 +7298,9 @@ button.grey-90 {
           text-overflow: ellipsis;
           .mention-tag {
             color: $grey-81 !important;
-            font-weight: normal;
+            background: unset;
+            padding: 0 0 !important;
+            font-weight: 600;
           }
         }
         .attachment {
@@ -8025,7 +8027,7 @@ button.grey-90 {
   padding: 0 15px;
   margin-top: -9px;
   border-bottom: 1px solid $grey-60;
-  background: rgba(249, 249, 251, 0.5);
+  background: rgba(249, 249, 251);
 
   .q-item {
     padding: 0 !important;

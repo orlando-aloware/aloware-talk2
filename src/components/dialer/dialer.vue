@@ -27,8 +27,6 @@ export default {
       loadingUnhold: false,
       loadingPark: false,
       loadingUnpark: false,
-      callNotification: null,
-      desktopNotification: null,
       device: new TwilioDevice(),
       connection: null,
       warnings: [],
@@ -39,7 +37,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer']),
+    ...mapState(['currentCompany', 'dialer', 'dialerFormStatus']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -136,7 +134,8 @@ export default {
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
-        this.$actionNotification(this.dialer.communication.contact.name, this.dialer.communication.contact.company_name, null, null, 'incomingCall', null, null, true)
+        let name = this.dialer.communication.contact.name ? this.dialer.communication.contact.name : this.$options.filters.fixPhone(this.dialer.communication.contact.phone_number)
+        this.$actionNotification(name, this.dialer.communication.contact.company_name, null, null, 'incomingCall', null, null, true)
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)
         // })
@@ -155,9 +154,6 @@ export default {
       //     console.log(err)
       //   })
       // }
-      if (this.callNotification) {
-        this.callNotification()
-      }
     })
 
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
@@ -176,20 +172,26 @@ export default {
         customParameters: customParameters,
         direction: call._connection._direction
       })
-      this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber).finally(() => {
-        // this.$router.push({ name: 'Call' }).catch(err => {
-        //   console.log(err)
+      this.startCallTimer()
+      this.setDialerCurrentStatus('CALL_CONNECTED')
+      this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        // .finally(() => {
+        //   this.$router.push({ name: 'Call' }).catch(err => {
+        //     console.log(err)
+        //   })
+        //   setTimeout(() => {
+        //    this.startCallTimer()
+        //    this.setDialerCurrentStatus('CALL_CONNECTED')
+        //   }, 3000)
         // })
-        setTimeout(() => {
-          this.startCallTimer()
-          this.setDialerCurrentStatus('CALL_CONNECTED')
-        }, 3000)
-      }).catch((err) => {
-        console.log(err)
-      })
+        .catch((err) => {
+          console.log(err)
+        })
       this.$closeActionNotification('incomingCall')
-      if (this.callNotification) {
-        this.callNotification()
+
+      // close the dialer form when it's open and incoming call is answered
+      if (this.dialerFormStatus) {
+        this.setDialerFormStatus(false)
       }
     })
 
@@ -785,10 +787,6 @@ export default {
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(true)
       this.$closeActionNotification('incomingCall')
-
-      if (this.callNotification) {
-        this.callNotification()
-      }
     },
 
     countCallDuration () {
@@ -1002,7 +1000,8 @@ export default {
       'setInputDevices',
       'setCurrentOutputDevice',
       'setOutputDevices',
-      'setShowIncomingCallNotification'
+      'setShowIncomingCallNotification',
+      'setDialerFormStatus'
     ])
   },
 

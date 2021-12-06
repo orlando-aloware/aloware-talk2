@@ -12,7 +12,7 @@
               height="34"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
               :style="avatarStyle(false)"
-              :name="contactName">
+              :name="contactAvatar">
       </avatar>
     </div>
     <div class="task-details flex-grow-1 pb-1"
@@ -144,8 +144,8 @@ export default {
     ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
 
     contactName () {
-      if (this.communication && this.communication.contact) {
-        return this.communication.contact.name || 'No Name'
+      if (this.communication && this.communication.contact.name) {
+        return this.communication.contact.name
       }
 
       if (this.communication) {
@@ -153,6 +153,14 @@ export default {
       }
 
       return 'No Name'
+    },
+
+    contactAvatar () {
+      if (this.communication && this.communication.contact.name) {
+        return this.communication.contact.name
+      }
+
+      return ''
     },
 
     campaignName () {
