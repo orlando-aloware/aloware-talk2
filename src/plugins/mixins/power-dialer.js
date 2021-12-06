@@ -30,12 +30,6 @@ export default {
     columns () {
       return this.currentList?.headers || []
     },
-    list () {
-      if (!this.$route.params.id) {
-        return this.listItems['all']
-      }
-      return this.listItems[this.$route.params.id]
-    },
     tempId () {
       if (this.filter === 'in-queue') {
         return 'in-queue'

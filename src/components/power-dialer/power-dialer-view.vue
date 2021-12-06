@@ -467,9 +467,12 @@ export default {
       this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {
+      console.log('this.id :>> ', this.id)
+      console.log('this.columns :>> ', this.columns)
+      console.log('this.list.name :>> ', this.list)
       this.columnsOpen({
         id: this.id,
-        headers: this.columns2,
+        headers: this.columns,
         name: this.list.name
       })
     },

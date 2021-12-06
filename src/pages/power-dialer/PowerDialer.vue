@@ -16,6 +16,7 @@
     <MoveDialog
       :is-contact-module-type="false" />
     <CreateDialog />
+    <ColumnHeaders />
     <RemoveListModal />
     <RemoveListConfirmation/>
     <RemoveContact />
@@ -36,8 +37,9 @@ import CreateDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveFolderDialog from 'components/remove-folder'
 import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import RemoveContact from 'components/remove-contact.vue'
-import RemoveContactConfirmation from 'components/remove-contact-confirmation.vue'
+import RemoveContact from 'components/remove-contact'
+import RemoveContactConfirmation from 'components/remove-contact-confirmation'
+import ColumnHeaders from 'components/column-headers'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { isEmpty } from 'lodash'
@@ -51,6 +53,7 @@ export default {
     MoveDialog,
     CreateDialog,
     RemoveListModal,
+    ColumnHeaders,
     RemoveListConfirmation,
     RemoveContact,
     RemoveContactConfirmation,
