@@ -1,9 +1,4 @@
 <template>
-  <!-- <PowerDialerAddList
-    v-if="true"
-    :id="id"
-    :name="name"
-    :power-dialer-list="powerDialerList" /> -->
   <PowerDialerAddItems
     v-if="isLoaded && contactListName"
     :id="id"
@@ -16,7 +11,6 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
-// import PowerDialerAddList from 'src/components/power-dialer/power-dialer-add-list-items'
 import PowerDialerAddItems from 'src/pages/contacts/ContactsAddItemsStatic.vue'
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -28,7 +22,6 @@ import {
 export default {
   name: 'PowerDialerAddView',
   components: {
-    // PowerDialerAddList,
     PowerDialerAddItems
   },
   mounted () {

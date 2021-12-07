@@ -31,7 +31,6 @@
 
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
-// import MoveDialog from 'components/power-dialer/custom/move-dialog'
 import MoveDialog from 'components/move-dialog'
 import CreateDialog from 'components/power-dialer/custom/create-dialog'
 import RemoveFolderDialog from 'components/remove-folder'
