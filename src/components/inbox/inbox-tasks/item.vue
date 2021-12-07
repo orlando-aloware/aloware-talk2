@@ -35,8 +35,18 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span>
+          <span v-if="contact.last_communication.type !== CommunicationTypes.SMS">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
+          </span>
+
+          <span v-if="contact.last_communication.type === CommunicationTypes.SMS &&
+          (contact.last_communication.body === null ||
+          !contact.last_communication.body ||
+          contact.last_communication.body.length < 1)">
+            {{ smsEmptyBodyAlternativeText }}
+          </span>
+          <span v-if="contact.last_communication.body !== null">
+            {{ contact.last_communication.body | truncate(22) }}
           </span>
 
         </div>
