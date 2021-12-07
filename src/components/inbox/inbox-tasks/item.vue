@@ -12,7 +12,7 @@
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"
-              :name="contactName">
+              :name="contactAvatar">
       </avatar>
     </div>
     <div class="task-details flex-grow-1 pb-1"
@@ -120,7 +120,14 @@ export default {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
 
-      return 'No Name'
+      return this.$options.filters.fixPhone(this.contact.phone_number)
+    },
+    contactAvatar () {
+      if (this.contact && this.contact.first_name && this.contact.last_name) {
+        return `${this.contact.first_name} ${this.contact.last_name}`
+      }
+
+      return ''
     },
     activeClass () {
       return this.selectedContact && this.selectedContact.id === this.contact.id ? 'active' : ''

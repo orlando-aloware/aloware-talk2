@@ -137,7 +137,8 @@ export default function (/* { ssrContext } */) {
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
-      tagsFullyLoaded: false
+      tagsFullyLoaded: false,
+      dialerFormStatus: false
     },
 
     getters: {
@@ -443,6 +444,10 @@ export default function (/* { ssrContext } */) {
 
       setShowIncomingCallNotification ({ commit }, value) {
         commit('SET_SHOW_INCOMING_CALL_NOTIFICATION', value)
+      },
+
+      setDialerFormStatus ({ commit }, value) {
+        commit('SET_DIALER_FORM_STATUS', value)
       }
     },
 
@@ -903,6 +908,10 @@ export default function (/* { ssrContext } */) {
 
       RESET_NOTIFICATIONS (state) {
         state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
+      },
+
+      SET_DIALER_FORM_STATUS (state, value) {
+        state.dialerFormStatus = value
       }
     },
 

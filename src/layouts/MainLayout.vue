@@ -239,6 +239,7 @@ export default {
       lightMode: true,
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
+      metricsDataLoaded: false,
       CommunicationTypes,
       MetricOptionGroups
     }
@@ -445,7 +446,8 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        this.$actionNotification(communication.contact.name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id)
+        let name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
+        this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id)
         // this.handleDesktopVoicemailNotification(communication)
       }
     })
@@ -462,7 +464,8 @@ export default {
     // missed call notification
     this.$VueEvent.listen('update_communication', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication) && communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-        this.$actionNotification(communication.contact.name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+        let name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
+        this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
       }
     })
 
@@ -688,6 +691,7 @@ export default {
         if (['Stats'].includes(this.$route.name)) {
           this.getAvailableMetrics()
           this.getMetricGroups()
+          this.metricsDataLoaded = true
         }
 
         this.getCampaigns()
@@ -1527,6 +1531,12 @@ export default {
         !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
         (to.name !== from.name)) {
         this.resetInboxVuex()
+      }
+
+      if (to.name === 'Stats' && !this.metricsDataLoaded) {
+        this.getAvailableMetrics()
+        this.getMetricGroups()
+        this.metricsDataLoaded = true
       }
     },
 
