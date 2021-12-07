@@ -371,9 +371,9 @@ export default {
       }
       return '/power-dialer/list'
     },
-    list () {
-      return this.currentList
-    },
+    // list () {
+    //   return this.currentList
+    // },
     numberOfContacts () {
       return `${this.activeList.length} Contacts`
     },
@@ -467,9 +467,6 @@ export default {
       this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {
-      console.log('this.id :>> ', this.id)
-      console.log('this.columns :>> ', this.columns)
-      console.log('this.list.name :>> ', this.list)
       this.columnsOpen({
         id: this.id,
         headers: this.columns,
@@ -496,13 +493,15 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function () {
-        console.log('this.$route.name :>> ', this.$route.name)
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.fetch(params)
           this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
       }
+    },
+    selectedList (value) {
+      this.setListSelectedContacts({ id: value.id, contacts: [] })
     }
   }
 }

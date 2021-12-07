@@ -221,7 +221,7 @@ export default {
       }
       this.loading = true
       this.$axios
-        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
+        .patch(`/api/v2/${this.endpointUrl}/${this.columns.id}`, {
           ...this.columns,
           headers: this.currentColumns,
           filters: [] // TODO: use a
@@ -250,7 +250,7 @@ export default {
 
       this.loading = true
       this.$axios
-        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
+        .patch(`/api/v2/${this.endpointUrl}/${this.columns.id}`, {
           ...this.columns,
           headers: DEFAULT_COLUMNS,
           filters: [] // TODO: use actual values
@@ -314,6 +314,18 @@ export default {
       } else {
         return new Set()
       }
+    },
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      }
+      return false
+    },
+    endpointUrl () {
+      if (this.isContactsRoute) {
+        return 'contacts-list'
+      }
+      return 'power-dialer-lists'
     }
   },
   watch: {
