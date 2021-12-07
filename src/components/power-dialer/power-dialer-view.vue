@@ -195,14 +195,6 @@
                     {{ contact.created_at | fixDate }}
                   </div>
                 </td>
-                <!-- <td
-                  class="text-left"
-                  :key="column.name"
-                  v-else-if="column.name === 'cnam_city'">
-                  <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-                    =={{ column.name }}
-                  </div>
-                </td> -->
                 <!-- COLUMN: Tags -->
                 <td
                   v-else-if="column.name === 'tags'"
@@ -447,10 +439,6 @@ export default {
     onCheckboxCheck (data) {
       console.log('data from table 901 : ', data)
       this.setListSelectedContacts({ id: this.id, contacts: data })
-      // this.SET_LIST_SELECTED_CONTACTS({
-      //   id: this.id,
-      //   contacts: data
-      // })
     },
     onCheckAllItems (checked) {
       let items = []
