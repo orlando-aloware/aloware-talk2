@@ -28,8 +28,8 @@
                 {{ categories[index] }}
               </div>
               <div class="column-headers-modal__item d-flex align-items-center no-select"
-                   v-for="column in items"
-                   :key="column.name"
+                   v-for="(column, key) in items"
+                   :key="`${column.name}-${key}`"
                    :class="{
                   'column-headers-modal__item--hidden': isHidden(column)
                 }">
