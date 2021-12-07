@@ -480,12 +480,10 @@ export default {
     },
     '$route.params.status': function () {
       this.setStatus()
-      if (this.$route.name === 'Inbox Channel Task Status') {
+      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
         this.lineOrRingGroupFilter = null
         this.resetList()
       }
-
-      this.loadContactTasks()
     },
     '$route.name': function (value) {
       if (['Inbox'].includes(value)) {
