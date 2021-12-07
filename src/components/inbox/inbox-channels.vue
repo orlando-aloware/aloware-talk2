@@ -911,6 +911,7 @@ export default {
         } else {
           this.filter.search_text = value
           this.filter.page = 1
+          this.getCommunications(this.filter)
         }
       }
     },
