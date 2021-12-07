@@ -838,6 +838,36 @@ export default {
     processFetchContactInfo (callback) {
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
+        let contact = res.data
+
+        // if contact status changes then redirect to the right url
+        if (this.$route.name === 'Inbox Contact Task' && this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() !== this.$route.params.status) {
+          this.$router.push({
+            name: 'Inbox Contact Task',
+            params: {
+              id: contact.id,
+              channel: 'inbox',
+              status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        }
+
+        // if contact has no task status, then fallback to all status
+        if (this.$route.name === 'Inbox Contact Task' && !contact.task_status) {
+          this.$router.push({
+            name: 'Inbox Contact Task',
+            params: {
+              id: contact.id,
+              channel: 'inbox',
+              status: 'all'
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        }
+
         this.processFetchedContactInfo(res.data, callback)
 
         if (['Inbox Contact Task'].includes(this.$route.name)) {

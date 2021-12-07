@@ -137,7 +137,7 @@
                      @onResetFilter="onResetFilter">
       </filter-dialog>
       <create-filter-dialog :filter-model="newFilterModel">
-      </create-filter-dialog>s
+      </create-filter-dialog>
     </div>
 </template>
 
@@ -294,7 +294,7 @@ export default {
           params: {
             id: contactId.toString(),
             channel: 'inbox',
-            status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
+            status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }
         }).catch(err => {
           console.log(err)
@@ -482,6 +482,8 @@ export default {
         this.lineOrRingGroupFilter = null
         this.resetList()
       }
+
+      this.loadContactTasks()
     },
     '$route.name': function (value) {
       if (['Inbox'].includes(value)) {
