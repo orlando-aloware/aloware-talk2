@@ -1093,6 +1093,16 @@ export default {
       this.makeSelectedItemVisible()
     })
 
+    this.$VueEvent.listen('contact_updated', (data) => {
+      let communications = [...this.communications]
+
+      communications.filter(item => item.contact.id === data.id).forEach((value) => {
+        value.contact = data
+      })
+
+      this.setCommunications(communications)
+    })
+
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(_this.$route.name)) {
         let communication
