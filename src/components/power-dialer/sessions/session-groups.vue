@@ -155,15 +155,15 @@ export default {
   computed: {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
-      'currentList',
+      // 'currentList',
       'sessionLoader'
     ]),
     ...mapGetters('contacts', [
       'contact'
     ]),
-    listObject () {
-      return this.powerDialerListItems[this.currentList?.id]
-    },
+    // listObject () {
+    //   return this.powerDialerListItems[this.currentList?.id]
+    // },
     list () {
       return this.listObject.data || []
     },

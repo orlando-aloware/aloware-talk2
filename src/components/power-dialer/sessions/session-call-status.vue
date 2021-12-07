@@ -152,7 +152,6 @@ export default {
   computed: {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
-      'currentList',
       'sessionLoader'
     ]),
     ...mapGetters('contacts', [
@@ -167,9 +166,9 @@ export default {
         return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`
       }
     },
-    listObject () {
-      return this.powerDialerListItems[this.currentList?.id]
-    },
+    // listObject () {
+    //   return this.powerDialerListItems[this.currentList?.id]
+    // },
     list () {
       return this.listObject.data || []
     },

@@ -2,9 +2,6 @@ export default {
   SET_MY_QUEUE_LIST: (state, data) => {
     state.my_queue = data
   },
-  SET_POWER_DIALER_LIST: (state, data) => {
-    state.lists = data
-  },
   SET_CONTACT_RESOURCES: (state, data) => {
     state.contacts = data
   },
@@ -49,13 +46,6 @@ export default {
   },
   RESET_SEARCH: (state) => {
     state.search = ''
-  },
-
-  /**
-   * POWER DIALER LISTS
-   */
-  SET_CURRENT_LIST: (state, data) => {
-    state.currentList = data
   },
 
   /**
@@ -167,9 +157,6 @@ export default {
   /**
    * SESSIONS
    */
-  // NEXT_CONTACT_IN_PROGRESS: (state, data) => {
-  //   state.contact = data
-  // },
   TOGGLE_SESSION_LOADER: (state, value) => {
     state.sessionLoader = value
   },
@@ -179,9 +166,6 @@ export default {
   CHANGING_SELECTED_CONTACT: (state, isChanging) => {
     state.changingSelectedContact = isChanging
   },
-  // SET_CONTACT: (state, contact) => {
-  //   state.contact = contact
-  // },
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedList.id].data = payload
   },

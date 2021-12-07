@@ -58,19 +58,6 @@ export default {
     filteredName () {
       return this.contactList?.name || ''
     }
-    // filter () {
-    //   if (this.$route.params.id) {
-    //     if (this.$route.meta === 'Power Dialer' || (this.$route.meta === 'Power Dialer Filter' || this.$route.meta === 'Power Dialer Individual Advance')) {
-    //       return this.$route.params.id
-    //     } else {
-    //       if (this.$route.params.filter) {
-    //         return this.$route.params.filter
-    //       }
-    //       return 'in-queue'
-    //     }
-    //   }
-    //   return 'in-queue'
-    // }
   },
   data () {
     return {
@@ -88,7 +75,6 @@ export default {
       'openFilters'
     ]),
     loadList (id) {
-      console.log('this.$route.params.id :>> ', this.$route.params.id)
       if (!id) {
         id = 'my-queue'
       }

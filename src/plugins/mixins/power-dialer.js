@@ -1,7 +1,7 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import qs from 'qs'
 import { isEmpty, get, debounce } from 'lodash'
-import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
+// import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   data () {
@@ -24,12 +24,8 @@ export default {
       'listItems',
       'currentListFilters',
       'powerDialerListItems',
-      'currentList',
       'search'
     ]),
-    columns () {
-      return this.currentList?.headers || []
-    },
     tempId () {
       if (this.filter === 'in-queue') {
         return 'in-queue'
@@ -41,9 +37,6 @@ export default {
     },
     totalList () {
       return this.listItems[this.id]?.total || 0
-    },
-    columns2 () {
-      return ALL_COLUMNS
     },
     powerDialerListOfObjects () {
       return this.powerDialerDirectoryList || []
@@ -64,9 +57,6 @@ export default {
       'TOGGLE_TABLE_LOADER'
     ]),
     processFetch2: debounce(function (params = {}) {
-      // console.log('100 :>> ', this.powerDialerListItems[this.tempId])
-      // console.log('101 :>> ', this.powerDialerListItems)
-      // console.log('102 :>> ', this.tempId)
       return this.$axios
         .get('api/v2/contacts', {
           params: this.buildQueryString(params),
@@ -74,8 +64,6 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          // console.log('params :>> ', params)
-          console.log('data from api : ', data)
           this.contactsLoaded({
             id: this.tempId || '',
             append: false,
@@ -119,7 +107,6 @@ export default {
       }
 
       if (!isEmpty(filters)) {
-        // console.log('200 :>> ', 200)
         query.filter_groups.push({
           is_conjunction: true,
           filters: filters
@@ -127,7 +114,6 @@ export default {
       }
 
       if (!isEmpty(this.currentListFilters)) {
-        // console.log('300 :>> ', 300)
         for (let filterIndex of Object.keys(this.currentListFilters)) {
           // check if filter index is a number
           if (!isNaN(filterIndex / 1)) {
@@ -137,7 +123,6 @@ export default {
       }
 
       if (params.sort) {
-        // console.log('400 :>> ', 400)
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
       }
@@ -152,14 +137,8 @@ export default {
       this.isLoading = true
       this.processFetch2(params)
     },
-    // onSearch (searchText) {
-    //   this.isLoaded = false
-    //   this.setSearch(searchText)
-    //   this.fetch({ search: this.search })
-    // },
     onSortByField (sorts) {
       console.log('sorts :>> ', sorts)
-      // this.isLoaded = false
       this.TOGGLE_TABLE_LOADER(true)
       this.fetch({
         search: this.search,

@@ -64,7 +64,6 @@ export default {
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
       'isStartingDial',
-      'currentList',
       'flaggedCreateExisting'
     ]),
     ...mapGetters('contacts', [
@@ -116,13 +115,8 @@ export default {
     ...mapActions('contacts', [
       'contactsLoaded'
     ]),
-    ...mapActions('powerDialer', [
-      'getPowerDialerLists',
-      'getPowerDialerListItem'
-    ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
-      'SET_POWER_DIALER_LIST',
       'TOGGLE_TABLE_LOADER'
     ]),
     async fetchContacts () {
@@ -132,9 +126,6 @@ export default {
         // 'per_page': 25,
         // 'order': 'desc',
         // 'sort': 'last_engagement_at'
-      }
-      if (this.isFilterKey) {
-        // await this.getPowerDialerListItem(this.id)
       }
       if (this.listItems[this.id] === undefined) {
         if (isEmpty(this.id)) {
@@ -173,9 +164,6 @@ export default {
       } else if (route.id && this.$route.name === 'Power Dialer') {
         this.id = route.id
         await this.fetchContacts()
-        // if (this.$route.meta.title !== 'Power Dialer Add-list') {
-        //   await this.fetchContacts()
-        // }
       }
     },
     resetValues () {

@@ -16,7 +16,6 @@ export default {
   folders: (state) => state.folders,
   listItems: (state) => state.listItems,
   currentListFilters: (state) => state.currentListFilters,
-  currentList: (state) => state.currentList,
   powerDialerLists: (state) => state.powerDialerLists,
   powerDialerListItems: (state) => state.powerDialerListItems,
   powerDialerDirectoryList: (state) => {

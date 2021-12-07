@@ -362,8 +362,7 @@ export default {
       'currentListFilters'
     ]),
     ...mapGetters('powerDialer', [
-      'activeFilter',
-      'currentList'
+      'activeFilter'
     ]),
     filter () {
       return this.activeFilter
@@ -380,9 +379,6 @@ export default {
       }
       return '/power-dialer/list'
     },
-    // list () {
-    //   return this.currentList
-    // },
     numberOfContacts () {
       return `${this.activeList.length} Contacts`
     },

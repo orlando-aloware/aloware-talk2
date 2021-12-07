@@ -19,21 +19,6 @@ export default {
       commit('SET_MY_QUEUE_LIST', res.data)
     }
   },
-  getPowerDialerListItem: async ({ commit }, id = '') => {
-    let res = await window.axios.get(`api/v2/power-dialer-lists/${id}`)
-    if (res.status === 200) {
-      commit('SET_CURRENT_LIST', res.data)
-    }
-  },
-  getPowerDialerLists: async ({ commit }, params = {}) => {
-    let res = await window.axios.get('api/v2/power-dialer-folders', {
-      params: params,
-      paramsSerializer: qs.stringify
-    })
-    if (res.status === 200) {
-      commit('SET_POWER_DIALER_LIST', res.data)
-    }
-  },
   getContact: async ({ commit }, params = {}) => {
     let res = await window.axios.get(`api/v2/contacts/${params.id}`)
     if (res.status === 200) {
@@ -88,9 +73,6 @@ export default {
   selectedContactChanging: ({ commit }, isChanging) => {
     commit('CHANGING_SELECTED_CONTACT', isChanging)
   },
-  // setContact: ({ commit }, contact) => {
-  //   commit('SET_CONTACT', contact)
-  // },
   setContacts2: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
   },

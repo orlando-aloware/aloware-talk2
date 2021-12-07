@@ -136,7 +136,6 @@ export default function () {
     isStartingDial: false,
     searchedListItem: '',
     currentListFilters: [],
-    currentList: null,
     datatableLoader: false,
     search: '',
     // contact: null,
