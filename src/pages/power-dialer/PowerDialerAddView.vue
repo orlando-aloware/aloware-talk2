@@ -90,7 +90,7 @@ export default {
     loadList (id) {
       console.log('this.$route.params.id :>> ', this.$route.params.id)
       if (!id) {
-        id = 'all'
+        id = 'my-queue'
       }
 
       const stringId = String(id)

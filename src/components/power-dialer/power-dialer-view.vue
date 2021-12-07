@@ -172,7 +172,7 @@
                   class="datatable-row__name">
                   <NameWrapper
                     :resource="contact"
-                    link-path="/power-dialer/" />
+                    link-path="/contacts/" />
                 </td>
                 <!-- COLUMN: Phone Number -->
                 <td
@@ -195,6 +195,14 @@
                     {{ contact.created_at | fixDate }}
                   </div>
                 </td>
+                <!-- <td
+                  class="text-left"
+                  :key="column.name"
+                  v-else-if="column.name === 'cnam_city'">
+                  <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                    =={{ column.name }}
+                  </div>
+                </td> -->
                 <!-- COLUMN: Tags -->
                 <td
                   v-else-if="column.name === 'tags'"
@@ -222,11 +230,12 @@
                     <TrashOIcon />
                   </button>
                 </td>
-                <!-- <td
+                <td
                   v-else
-                  :key="key">
-                  -> {{ column.name }}
-                </td> -->
+                  :key="key"
+                  class="col-indented-2">
+                  {{ contact[column.name] }}
+                </td>
               </template>
             </template>
           </TableRow>

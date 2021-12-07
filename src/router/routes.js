@@ -173,14 +173,14 @@ const routes = [
         path: 'power-dialer/session',
         component: () => import('src/pages/power-dialer/PowerDialerSession')
       },
-      {
-        path: 'power-dialer/:id',
-        name: 'Power Dialer',
-        component: () => import('src/pages/power-dialer/PowerDialerIndividual.vue'),
-        meta: {
-          title: 'Power Dialer'
-        }
-      },
+      // {
+      //   path: 'power-dialer/:id',
+      //   name: 'Power Dialer',
+      //   component: () => import('src/pages/power-dialer/PowerDialerIndividual2.vue'),
+      //   meta: {
+      //     title: 'Power Dialer'
+      //   }
+      // },
       {
         path: 'stats',
         name: 'Stats',

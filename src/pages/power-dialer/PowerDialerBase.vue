@@ -29,7 +29,7 @@ export default {
       return this.$route
     },
     id () {
-      return this.$route.params.id || 'all'
+      return this.$route.params.id || 'my-queue'
     }
   },
   async mounted () {
@@ -58,7 +58,7 @@ export default {
     // ]),
     async loadList (id) {
       if (!id) {
-        id = 'all'
+        id = 'my-queue'
       }
 
       const stringId = String(id)
@@ -69,7 +69,7 @@ export default {
           ...DEFAULT_LIST_ITEMS
         })
       }
-
+      console.log('stringId :>> ', stringId)
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
         .then((response) => response.data)
@@ -89,7 +89,7 @@ export default {
           const { message, html } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
-          this.$router.replace('/contacts/')
+          this.$router.replace('/power-dialer/')
         })
     }
   },
