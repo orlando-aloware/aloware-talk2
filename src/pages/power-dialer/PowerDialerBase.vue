@@ -8,7 +8,6 @@
 
 import { mapGetters, mapActions } from 'vuex'
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
-// import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
@@ -53,9 +52,6 @@ export default {
     ...mapActions('powerDialer', [
       'getMyQueueList'
     ]),
-    // ...mapMutations('powerDialer', [
-    //   'SET_ACTIVE_FILTER'
-    // ]),
     async loadList (id) {
       if (!id) {
         id = 'my-queue'
@@ -69,7 +65,7 @@ export default {
           ...DEFAULT_LIST_ITEMS
         })
       }
-      console.log('stringId :>> ', stringId)
+
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
         .then((response) => response.data)
@@ -96,18 +92,6 @@ export default {
   watch: {
     'id': function (id) {
       this.loadList(id)
-      // if (id) {
-      //   if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
-      //     this.SET_ACTIVE_FILTER(this.$route.params.id)
-      //   } else {
-      //     if (this.$route.params.filter) {
-      //       this.SET_ACTIVE_FILTER(this.$route.params.filter)
-      //     } else {
-      //       this.SET_ACTIVE_FILTER('in-queue')
-      //     }
-      //   }
-      // }
-      // this.SET_ACTIVE_FILTER(this.$route.params.id)
     }
   }
 }
