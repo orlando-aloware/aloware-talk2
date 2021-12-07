@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-center mt-5" v-if="contacts.length < 1 && !loadingContacts && (['open', 'pending', 'closed'].includes($route.params.status) || $route.name === 'Inbox')">{{ emptyPlaceholder }}</p>
-    <div class="text-left mt-5 not-in-inbox-label" v-if="contacts.length < 1 && !loadingContacts && $route.params.id && !['open', 'pending', 'closed'].includes($route.params.status)">
+    <div class="text-left mt-5 not-in-inbox-label" v-if="contacts.length < 1 && !loadingContacts && $route.params.id && ['new'].includes($route.params.status)">
         This selected contact is <b-badge variant="primary" class="font-weight-light ml-1 mr-1">New</b-badge>. To make it appear in Inbox:
       <br>
       <br>
