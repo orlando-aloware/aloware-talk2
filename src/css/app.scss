@@ -8745,8 +8745,29 @@ screen and (max-width: 956px) {
   }
 }
 
-
 .contact-filter-count {
   top: 0 !important;
   padding-top: 6px !important;
+}
+
+.call-fishing-actions {
+  margin-top: 16px;
+  button {
+    padding: 0 14px;
+    &:not(:nth-child(3)) {
+      margin-right: 5px;
+    }
+    .q-btn__wrapper {
+      margin: 0 0;
+      padding: 0 0;
+      min-height: 32px !important;
+      &:before {
+        box-shadow: unset;
+      }
+    }
+    span {
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
 }
