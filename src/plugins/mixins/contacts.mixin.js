@@ -2,6 +2,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import qs from 'qs'
 import _ from 'lodash'
 
@@ -105,11 +106,10 @@ export default {
       this.fetch(params)
     },
     apiEndpoint (isContactModule, queued) {
-      if (isContactModule) {
+      if (!this.isPowerDialer) {
         return 'api/v2/contacts'
       } else {
         if (queued) {
-          console.log('this.selectedList :>> ', this.selectedList)
           return `api/v2/power-dialer-lists/my-queue/items`
         } else {
           if (this.$route.meta.title === 'Power Dialer Add-list') {
@@ -125,22 +125,19 @@ export default {
         params.relations = this.contactsRelations
       }
 
-      console.log('params here :>> ', this.buildQueryString(params))
-      console.log('endpoint :>> ', this.apiEndpoint(isContactModule, queued))
-
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
 
       return this.$axios
         .get(this.apiEndpoint(isContactModule, queued), {
-          params: this.buildQueryString(params),
+          params: this.buildQueryString(params, isContactModule),
           paramsSerializer: qs.stringify
         })
         .then((response) => response.data)
         .then((data) => {
           if (tempId) {
             this.contactsLoaded({
-              id: 'all',
+              id: this.id || 'all',
               append: false,
               ...data
             })
@@ -187,7 +184,7 @@ export default {
         this.processFetch(params)
       }
     },
-    buildQueryString (params) {
+    buildQueryString (params, isContactModule = true) {
       const query = {
         page: 1
       }
@@ -254,6 +251,8 @@ export default {
 
       if (params.task_status) {
         powerQuery.task_status = params.task_status
+      } else if (this.$route.params.filter) {
+        powerQuery.task_status = this.pdFilters[this.$route.params.filter] // this.$route.params.filter
       }
 
       if (typeof this.isPowerDialer !== 'undefined') {
@@ -322,6 +321,12 @@ export default {
         !this.isLoading
       )
     },
+    isPowerDialer () {
+      if (this.$route.name !== 'Power Dialer') {
+        return false
+      }
+      return true
+    },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
     },
@@ -346,9 +351,6 @@ export default {
     columns () {
       try {
         let headers = []
-        // console.log('this.id :>> ', this.id)
-        // console.log('this.lists :>> ', this.lists)
-        // console.log('this.lists[this.id] :>> ', this.lists[this.id])
         if (this.lists[this.id] && this.lists[this.id].headers) {
           headers = this.lists[this.id].headers
           if (typeof headers === 'string') {
@@ -410,6 +412,9 @@ export default {
         }
       }
       return relations
+    },
+    pdFilters () {
+      return POWER_DIALER_FILTERS
     }
   },
   watch: {

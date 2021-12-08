@@ -59,17 +59,13 @@ export default {
   },
   watch: {
     '$route.params.filter': function (id) {
-      console.log('id :>> ', id)
       if (id) {
         if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
-          console.log('501 :>> ', this.$route.params.id)
           this.SET_ACTIVE_FILTER(this.$route.params.id)
         } else {
           if (this.$route.params.filter) {
-            console.log('502 :>> ', this.$route.params.filter)
             this.SET_ACTIVE_FILTER(this.$route.params.filter)
           } else {
-            console.log('503 :>> ', 'in-queue')
             this.SET_ACTIVE_FILTER('in-queue')
           }
         }

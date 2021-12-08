@@ -36,7 +36,7 @@ export default {
     if (this.$route.meta.title === 'Power Dialer List') {
       await this.getMyQueueList()
     }
-    await this.loadList(this.id)
+    // await this.loadList(this.id)
   },
   data () {
     return {
@@ -66,7 +66,6 @@ export default {
           ...DEFAULT_LIST_ITEMS
         })
       }
-      console.log('stringId :>> ', stringId)
 
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
@@ -87,13 +86,19 @@ export default {
           const { message, html } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
-          this.$router.replace('/power-dialer/')
+          if (this.$route.name === 'Power Dialer') {
+            this.$router.replace('/power-dialer/')
+          } else {
+            // this.$router.replace('/contacts/')
+          }
         })
     }
   },
   watch: {
     'id': function (id) {
-      this.loadList(id)
+      if (this.$route.name === 'Power Dialer') {
+        this.loadList(id)
+      }
     }
   }
 }

@@ -381,9 +381,6 @@ export default {
     hasContacts () {
       return this.activeList.length > 0
     },
-    isPowerDialer () {
-      return true
-    },
     pdColumns () {
       return POWER_DIALER_DEFAULT_COLUMNS
     },
