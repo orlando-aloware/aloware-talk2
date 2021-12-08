@@ -454,3 +454,7 @@ export const DEFAULT_COLUMNS = ALL_COLUMNS.filter((c) => c.default)
 export const STATIC_COLUMNS = ALL_COLUMNS.filter(
   (c) => c.default && c.name !== 'actions'
 )
+
+export const POWER_DIALER_DEFAULT_COLUMNS = ALL_COLUMNS.filter(
+  (c) => c.default && (c.name === 'checkbox' || c.name === 'name' || c.name === 'phone_number' || c.name === 'created_at' || c.name === 'tags' || c.name === 'task_status' || c.name === 'actions')
+)

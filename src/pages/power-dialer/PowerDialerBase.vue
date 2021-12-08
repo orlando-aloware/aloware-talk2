@@ -22,7 +22,8 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'listItems',
-      'lists'
+      'lists',
+      'selectedList'
     ]),
     objId () {
       return this.$route
@@ -65,6 +66,7 @@ export default {
           ...DEFAULT_LIST_ITEMS
         })
       }
+      console.log('stringId :>> ', stringId)
 
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)

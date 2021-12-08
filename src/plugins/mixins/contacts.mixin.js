@@ -109,7 +109,8 @@ export default {
         return 'api/v2/contacts'
       } else {
         if (queued) {
-          return `api/v2/power-dialer-lists/my-queue`
+          console.log('this.selectedList :>> ', this.selectedList)
+          return `api/v2/power-dialer-lists/my-queue/items`
         } else {
           if (this.$route.meta.title === 'Power Dialer Add-list') {
             return `api/v2/contacts`
@@ -124,7 +125,8 @@ export default {
         params.relations = this.contactsRelations
       }
 
-      console.log('params :>> ', this.buildQueryString(params))
+      console.log('params here :>> ', this.buildQueryString(params))
+      console.log('endpoint :>> ', this.apiEndpoint(isContactModule, queued))
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })

@@ -124,7 +124,7 @@
     <template slot="table">
       <Datatable
         :stickyHeaders="true"
-        :columns="columns"
+        :columns="filteredColumns"
         :has-more="hasMore"
         :is-empty="isEmpty || isStartState"
         :is-loading-more="isLoadingMore"
@@ -146,13 +146,13 @@
             v-for="(contact, nkey) in activeList"
             :key="contact.id + nkey + Math.random()"
             :contact="contact"
-            :columns="columns"
+            :columns="filteredColumns"
             :checked="checked"
             :contactListId="id"
             :custom-row-content="true"
             @checked="onCheckedRows">
             <template slot="custom-content">
-              <template v-for="(column, key) in columns">
+              <template v-for="(column, key) in filteredColumns">
                 <!-- change date added to date created -->
                 <!-- COLUMN: Checkboxes -->
                 <!-- <div :key="`key-${key}`">{{contact}}</div> -->
@@ -304,7 +304,8 @@ import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import talk2Api from 'src/plugins/api/api'
-// import { get } from 'lodash'
+import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerView',
@@ -382,6 +383,15 @@ export default {
     },
     isPowerDialer () {
       return true
+    },
+    pdColumns () {
+      return POWER_DIALER_DEFAULT_COLUMNS
+    },
+    filteredColumns () {
+      if (!isEmpty(this.columns)) {
+        return this.columns
+      }
+      return this.pdColumns
     }
   },
   data () {
