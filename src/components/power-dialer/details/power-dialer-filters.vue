@@ -77,7 +77,6 @@ export default {
   },
   watch: {
     '$route.params.filter': function (id) {
-      console.log('888 :>> ', id)
       if (id) {
         if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
           this.SET_ACTIVE_FILTER(this.$route.params.id)
@@ -94,7 +93,6 @@ export default {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         this.SET_ACTIVE_FILTER(this.id)
       } else {
-        console.log('99s9 :>> ', params)
         if (params.filter) {
           this.SET_ACTIVE_FILTER(params.filter)
         } else {

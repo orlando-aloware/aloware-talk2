@@ -170,7 +170,6 @@ export default {
     state.listItems[state.selectedList.id].data = payload
   },
   SET_ACTIVE_FILTER: (state, filter) => {
-    console.log('filter :>> ', filter)
     state.activeFilter = filter
   }
 }
