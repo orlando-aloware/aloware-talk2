@@ -11,12 +11,12 @@
       :ref="referenceName"
       @keyup.enter="handleInput"
       @keyup.esc="closeInput"
-      @blur="handleInput" />
+      @blur="closeInput" />
     <div
       style="height: 32px;"
-      v-show="!active"
+      v-if="!active"
       class="pr-0 d-flex align-items-center">
-      -{{ modelValue }}
+      {{ modelValue }}
     </div>
     <div
       class="cursor-pointer"

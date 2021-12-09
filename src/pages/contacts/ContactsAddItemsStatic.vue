@@ -26,7 +26,8 @@
           </div>
           <TextPopover
             v-else
-            v-model="contactList.name"
+            @input="updateListName"
+            v-model="contactListName"
             :id="contactList.id" />
         </div>
         <div class="text-muted small action-desc">
@@ -195,7 +196,8 @@ export default {
     return {
       checked: [],
       id: 'all',
-      filterHasChanges: false
+      filterHasChanges: false,
+      listName: ''
     }
   },
   computed: {
@@ -248,6 +250,9 @@ export default {
         ids.push(check.id)
       })
       return ids
+    },
+    contactListName () {
+      return this.listName || this.contactList.name
     }
   },
   methods: {
@@ -256,9 +261,36 @@ export default {
       'openFilters',
       'closeFilters',
       'contactsLoaded',
+      'foldersLoaded',
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount'
     ]),
+    updateListName (data) {
+      this.$axios
+        .patch(`/api/v2/power-dialer-lists/${this.selectedList.id}`, {
+          name: data
+        })
+        .then((response) => response.data)
+        .then((response) => {
+          this.reloadFolders()
+          this.$generalNotification(response.message, 'success')
+          this.listName = data
+        })
+        .catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(`Error in renaming a list. ${message}`, 'error')
+        })
+    },
+    reloadFolders () {
+      return this.$axios
+        .get('/api/v2/power-dialer-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+    },
     addSelectedContacts () {
       this.isLoading = true
       this.closeFilters()
@@ -357,6 +389,7 @@ export default {
     }
   },
   mounted () {
+    this.listName = ''
     this.fetch()
   },
   watch: {
