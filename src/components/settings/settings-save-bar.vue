@@ -77,10 +77,28 @@ export default {
     saveChanges () {
       let parameters = this.getParameters()
       if (Object.entries(parameters).length > 0) {
-        return talk2Api.V1.user.update(this.user.id, this.user).then(response => {
+        let passwordIndex = this.changedUserProperties.findIndex(item => item.property === 'password')
+
+        let user = _.cloneDeep(this.user)
+
+        // Check if password is one of changed field
+        // If not changed, we need to remove it to prevent unintentional change of password
+        if (passwordIndex < 0) {
+          delete user.password
+          delete user.password_confirmation
+        }
+
+        return talk2Api.V1.user.update(this.user.id, user).then(response => {
           let data = { ...response.data, operating_hours: JSON.parse(response.data.operating_hours) }
-          this.setUser(data)
-          this.setUserClone(data)
+          data.password = ''
+          data.password_confirmation = ''
+          this.setUserClone(_.cloneDeep(data))
+          this.setUser(_.cloneDeep(this.userClone))
+
+          this.resetChangedUserProperties()
+          this.setFormValidity(true)
+
+          this.$VueEvent.fire('resetSettingsForm')
         })
       }
     },

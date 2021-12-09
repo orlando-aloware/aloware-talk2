@@ -166,8 +166,8 @@ export default {
       this.localUser.password = ''
       this.localUser.password_confirmation = ''
 
-      this.setUser(this.localUser)
       this.setUserClone(_.cloneDeep(this.localUser))
+      this.setUser(_.cloneDeep(this.userClone))
     },
     fixOperatingHours () {
       this.loadingOperatingHours = true
