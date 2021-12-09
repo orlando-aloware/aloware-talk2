@@ -589,7 +589,7 @@ export default {
 
     checkCommunicationMatchesSearch (communication) {
       // checks if communication matches search
-      if (this.searchText !== '') {
+      if (this.searchText && this.searchText.trim() !== '') {
         for (let searchField of this.searchFields) {
           if (communication[searchField]) {
             if (communication[searchField].toString().indexOf(this.searchText) > -1) {
@@ -882,32 +882,34 @@ export default {
     this.setMentionType()
 
     this.$VueEvent.listen('new_communication', (data) => {
-      // disable live dashboard for end clients
-      if (this.hasRole('Company Reporter Access')) {
-        return
-      }
-      // check data loaded
-      if (this.pagination.current_page && this.pagination.current_page === 1) {
-        // check new communication exists in the old list
-        let found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (!found.length) {
-          if (this.checkCommunicationMatchesSearch(data) &&
+      // check new communication exists in the old list
+      let found = this.communications.filter(communication => {
+        return communication.id === data.id
+      })
+
+      console.log(this.checkCommunicationMatchesSearch(data))
+      console.log(this.checkCommunicationMatchesFilters(data))
+      console.log(this.checkCommunicationMatchesUserAccessibility(data))
+      console.log(this.checkCommunicationMatchesCampaign(data))
+      console.log(this.checkCommunicationMatchesWorkflow(data))
+      console.log(this.checkCommunicationMatchesUser(data))
+      console.log(this.checkCommunicationMatchesRingGroup(data))
+
+      if (!found.length) {
+        if (this.checkCommunicationMatchesSearch(data) &&
             this.checkCommunicationMatchesFilters(data) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(data) &&
             this.checkCommunicationMatchesWorkflow(data) &&
             this.checkCommunicationMatchesUser(data) &&
             this.checkCommunicationMatchesRingGroup(data)) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
+          this.pagination.total += 1
+          // push new data to top of array
+          this.communications.unshift(data)
 
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
+          if (this.communications.length > this.filter.per_page) {
+            // push out last data from bottom of array
+            this.communications.pop()
           }
         }
       }

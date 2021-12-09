@@ -10,7 +10,7 @@
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"
-              :name="contactName">
+              :name="contactAvatar">
       </avatar>
     </div>
     <div class="task-details flex-grow-1 pb-1"
@@ -90,7 +90,19 @@ export default {
     ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
 
     contactName () {
-      return this.mention.mention_subject.contact ? this.mention.mention_subject.contact.name : 'No Name'
+      if (this.mention.mention_subject.contact && this.mention.mention_subject.contact.first_name && this.mention.mention_subject.contact.last_name) {
+        return `${this.mention.mention_subject.contact.first_name} ${this.mention.mention_subject.contact.last_name}`
+      }
+
+      return this.$options.filters.fixPhone(this.mention.mention_subject.contact.phone_number)
+    },
+
+    contactAvatar () {
+      if (this.mention.mention_subject.contact && this.mention.mention_subject.contact.first_name && this.mention.mention_subject.contact.last_name) {
+        return `${this.mention.mention_subject.contact.first_name} ${this.mention.mention_subject.contact.last_name}`
+      }
+
+      return ''
     },
 
     directionSummaryText () {
