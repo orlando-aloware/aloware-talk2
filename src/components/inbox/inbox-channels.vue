@@ -423,12 +423,25 @@ export default {
       this.setSelectedFilter(null)
     },
 
+    checkCommunicationChannels (communication) {
+      switch (communication.type) {
+        case CommunicationTypes.CALL:
+          return ['calls', 'voicemails', 'recordings'].includes(this.activeChannel.value)
+        case CommunicationTypes.SMS:
+          return ['messages'].includes(this.activeChannel.value)
+        case CommunicationTypes.NOTE:
+          return ['mentions'].includes(this.activeChannel.value)
+        default:
+          return true
+      }
+    },
+
     checkCommunicationMatchesFilters (communication) {
       // if answer status filter is other than all
       if (this.filter.answer_status !== 'all') {
         // handle live & hold as a special case
         if (['live', 'hold', 'queued'].includes(this.filter.answer_status) &&
-          communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+            communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
           return false
         }
         // check the communication disposition status matches the answer status filter
@@ -436,8 +449,8 @@ export default {
           return false
         }
         if (this.filter.answer_status === 'unanswered' &&
-          ![CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW,
-            CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(communication.disposition_status2)) {
+            ![CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW,
+              CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(communication.disposition_status2)) {
           return false
         }
         if (this.filter.answer_status === 'missed' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
@@ -536,6 +549,7 @@ export default {
       if (this.filter.untagged_only && communication.tags.length > 0) {
         return false
       }
+
       return true
     },
 
@@ -589,7 +603,7 @@ export default {
 
     checkCommunicationMatchesSearch (communication) {
       // checks if communication matches search
-      if (this.searchText && this.searchText.trim() !== '') {
+      if (this.searchText && this.searchText.trim().length > 0) {
         for (let searchField of this.searchFields) {
           if (communication[searchField]) {
             if (communication[searchField].toString().indexOf(this.searchText) > -1) {
@@ -828,7 +842,33 @@ export default {
       }
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields'])
+    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields']),
+
+    handleNewMention (communication) {
+      let api = talk2Api.V2.mentions
+
+      let params = _.cloneDeep(this.filter)
+
+      params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, mentioner_user_id: params.mentioner_user_id, mentioned_user_id: params.mentioned_user_id } }
+      params = { ...params, order_by: this.sorting.order }
+
+      api.get({ params: params })
+        .then(response => {
+          let results = response.data.data
+
+          let mention = results.find(item => item.mention_subject_id === communication.id)
+          if (mention) {
+            this.pagination.total += 1
+            // push new data to top of array
+            this.communications.unshift(mention)
+
+            if (this.communications.length > this.filter.per_page) {
+              // push out last data from bottom of array
+              this.communications.pop()
+            }
+          }
+        })
+    }
   },
 
   watch: {
@@ -887,22 +927,20 @@ export default {
         return communication.id === data.id
       })
 
-      console.log(this.checkCommunicationMatchesSearch(data))
-      console.log(this.checkCommunicationMatchesFilters(data))
-      console.log(this.checkCommunicationMatchesUserAccessibility(data))
-      console.log(this.checkCommunicationMatchesCampaign(data))
-      console.log(this.checkCommunicationMatchesWorkflow(data))
-      console.log(this.checkCommunicationMatchesUser(data))
-      console.log(this.checkCommunicationMatchesRingGroup(data))
-
       if (!found.length) {
-        if (this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.checkCommunicationMatchesRingGroup(data)) {
+        if (data.type === CommunicationTypes.NOTE) {
+          this.handleNewMention(data)
+          return
+        }
+
+        if (this.checkCommunicationChannels(data) &&
+          this.checkCommunicationMatchesSearch(data) &&
+          this.checkCommunicationMatchesFilters(data) &&
+          this.checkCommunicationMatchesUserAccessibility(data) &&
+          this.checkCommunicationMatchesCampaign(data) &&
+          this.checkCommunicationMatchesWorkflow(data) &&
+          this.checkCommunicationMatchesUser(data) &&
+          this.checkCommunicationMatchesRingGroup(data)) {
           this.pagination.total += 1
           // push new data to top of array
           this.communications.unshift(data)
@@ -917,9 +955,6 @@ export default {
 
     this.$VueEvent.listen('update_communication', (data) => {
       // disable live dashboard for end clients
-      if (this.hasRole('Company Reporter Access')) {
-        return
-      }
       // check data loaded
       if (this.pagination.current_page) {
         // check new communication exists in the old list
@@ -929,7 +964,8 @@ export default {
         if (found.length) {
           // update communication
           data = _.extend({}, found[0], data)
-          if (this.checkCommunicationMatchesSearch(data) &&
+          if (this.checkCommunicationChannels(data) &&
+            this.checkCommunicationMatchesSearch(data) &&
             this.checkCommunicationMatchesFilters(data) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(data) &&
@@ -945,7 +981,8 @@ export default {
           }
         } else {
           // add the communication if it's not already there and if it matches the criteria
-          if (this.checkCommunicationMatchesSearch(data) &&
+          if (this.checkCommunicationChannels(data) &&
+            this.checkCommunicationMatchesSearch(data) &&
             this.checkCommunicationMatchesFilters(data) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(data) &&
