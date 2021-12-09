@@ -32,7 +32,7 @@ const routes = [
         name: 'Inbox',
         component: () => import('pages/Inbox.vue'),
         meta: {
-          title: 'Inbox'
+          title: 'Communications'
         },
         children: [
           {
@@ -40,7 +40,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -48,7 +48,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -56,7 +56,7 @@ const routes = [
             name: 'Inbox Contact',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -64,7 +64,7 @@ const routes = [
             name: 'Inbox Contact Mention Communication',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -72,7 +72,7 @@ const routes = [
             name: 'Inbox Channel',
             component: () => import('src/pages/Inbox.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           }
         ]
