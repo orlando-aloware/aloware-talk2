@@ -67,6 +67,7 @@ export default {
       }).then(response => {
         this.setContact(response.data)
         this.$emit('close')
+        this.$VueEvent.fire('contact_updated', response.data)
       }).catch(err => {
         this.$root.handleErrors(err.response)
       }).finally(() => {

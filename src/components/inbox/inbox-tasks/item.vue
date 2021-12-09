@@ -35,8 +35,18 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span>
+          <span v-if="contact.last_communication.type !== CommunicationTypes.SMS">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
+          </span>
+
+          <span v-if="contact.last_communication.type === CommunicationTypes.SMS &&
+          (contact.last_communication.body === null ||
+          !contact.last_communication.body ||
+          contact.last_communication.body.length < 1)">
+            {{ smsEmptyBodyAlternativeText }}
+          </span>
+          <span v-if="contact.last_communication.body !== null">
+            {{ contact.last_communication.body | truncate(22) }}
           </span>
 
         </div>
@@ -150,6 +160,25 @@ export default {
         this.$route.params.status !== 'open' &&
         this.$options.filters.fixTaskStatusName(this.contact.task_status).toLowerCase() === 'open' &&
         !this.loadingContact
+    },
+    smsEmptyBodyAlternativeText () {
+      let directionText = (this.contact.last_communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      let lastAttachment = this.contact.last_communication.attachments.pop()
+
+      switch (true) {
+        case ['text'].includes(lastAttachment.mime_type):
+          return directionText + ' a text file'
+        case ['audio'].includes(lastAttachment.mime_type):
+          return directionText + ' an audio file'
+        case ['image'].includes(lastAttachment.mime_type):
+          return directionText + ' an image'
+        case ['video'].includes(lastAttachment.mime_type):
+          return directionText + ' a video file'
+        case ['application'].includes(lastAttachment.mime_type):
+        default:
+          return directionText + ' a file'
+      }
     }
   },
 

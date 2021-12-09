@@ -70,7 +70,7 @@ export default {
     state.selectedContact = contact
   },
   SET_CHANNEL_CLONED_FILTER: (state, filter) => {
-    state.channelClonedFilter = { ...filter }
+    state.channelClonedFilter = _.cloneDeep(filter)
   },
   UPDATE_CHANNEL_CHANGED_FILTER_FIELDS: (state, { name, value }) => {
     // compensate comparing of array/object values
@@ -98,8 +98,11 @@ export default {
   TOGGLE_FILTER_DIALOG: (state, isShown = false) => {
     state.isFilterDialogShown = isShown
   },
-  SET_SELECTED_FILTER: (state, selectedFilter) => {
-    state.selectedFilter = selectedFilter
+  SET_SELECTED_FILTER: (state, filter) => {
+    state.selectedFilter = filter
+  },
+  SET_APPLIED_FILTER: (state, filter) => {
+    state.appliedFilter = filter
   },
   SET_HAS_MORE_CONTACTS: (state, hasMore) => {
     state.hasMoreContacts = hasMore

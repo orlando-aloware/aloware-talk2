@@ -1,5 +1,5 @@
 <template>
-  <div class="position-absolute search-icon search-wrapper">
+  <div class="search-icon search-wrapper">
     <compact-btn borderless
                  customClass="fs-14 _500 position-relative primary not-focusable filter-toggle-button"
                  variant="outlined-light"
