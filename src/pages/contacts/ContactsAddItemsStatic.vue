@@ -245,7 +245,6 @@ export default {
     checkedItemIds () {
       let ids = []
       this.checked.forEach(check => {
-        console.log('check :>> ', check)
         ids.push(check.id)
       })
       return ids
@@ -263,12 +262,15 @@ export default {
     addSelectedContacts () {
       this.isLoading = true
       this.closeFilters()
-      console.log('this.addItemEndpoint :>> ', this.addItemEndpoint)
       return this.$axios
         .post(this.addItemEndpoint, this.attachedParams())
         .then(() => {
           this.setShouldUpdateSelectedListContactCount(true)
-          this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+          if (this.contactList.id === 'my-queue') {
+            this.$router.push(`/power-dialer`)
+          } else {
+            this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+          }
           this.$generalNotification('Selected contacts were successfully added')
         })
         .catch((err) => {
@@ -287,6 +289,11 @@ export default {
           contacts: this.checked
         }
       } else {
+        if (this.contactList.id === 'my-queue') {
+          return {
+            contact_ids: this.checkedItemIds
+          }
+        }
         return {
           contact_list_id: this.contactList.id,
           contact_ids: this.checkedItemIds
@@ -350,7 +357,6 @@ export default {
     }
   },
   mounted () {
-    console.log('Add items are triggered...')
     this.fetch()
   },
   watch: {

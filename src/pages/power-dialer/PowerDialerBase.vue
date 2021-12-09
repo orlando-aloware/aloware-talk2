@@ -58,7 +58,11 @@ export default {
         id = 'my-queue'
       }
 
-      const stringId = String(id)
+      let stringId = String(id)
+
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+        stringId = 'my-queue'
+      }
 
       if (!this.listItems[stringId]) {
         this.contactsLoaded({

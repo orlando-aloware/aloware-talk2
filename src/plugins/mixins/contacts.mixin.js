@@ -105,7 +105,7 @@ export default {
 
       this.fetch(params)
     },
-    apiEndpoint (isContactModule, queued) {
+    apiEndpoint (queued) {
       if (!this.isPowerDialer) {
         return 'api/v2/contacts'
       } else {
@@ -114,8 +114,13 @@ export default {
         } else {
           if (this.$route.meta.title === 'Power Dialer Add-list') {
             return `api/v2/contacts`
+          } else {
+            if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+              return `api/v2/power-dialer-lists/my-queue/items`
+            } else {
+              return `api/v2/power-dialer-lists/${this.id}/items`
+            }
           }
-          return `api/v2/power-dialer-lists/${this.id}/items`
         }
       }
     },
@@ -129,7 +134,7 @@ export default {
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
 
       return this.$axios
-        .get(this.apiEndpoint(isContactModule, queued), {
+        .get(this.apiEndpoint(queued), {
           params: this.buildQueryString(params, isContactModule),
           paramsSerializer: qs.stringify
         })
@@ -255,6 +260,10 @@ export default {
         powerQuery.task_status = this.pdFilters[this.$route.params.filter] // this.$route.params.filter
       }
 
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+        powerQuery.task_status = this.pdFilters[this.activeFilter]
+      }
+
       if (typeof this.isPowerDialer !== 'undefined') {
         return powerQuery
       } else {
@@ -305,6 +314,9 @@ export default {
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
     ...mapState(['currentCompany']),
+    ...mapGetters('powerDialer', [
+      'activeFilter'
+    ]),
     defaultContactDateFilter () {
       if (this.currentCompany && this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
@@ -381,7 +393,7 @@ export default {
 
         return _.uniqBy(headers, 'name')
       } catch (err) {
-        console.log(err)
+        console.log('Error', err)
         return []
       }
     },

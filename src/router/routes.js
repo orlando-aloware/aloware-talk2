@@ -130,30 +130,43 @@ const routes = [
         path: 'power-dialer',
         component: () => import('pages/power-dialer/PowerDialer.vue'),
         meta: {
-          title: 'Power Dialer'
+          title: 'Power Dialer',
+          id: 'power-dialer'
         },
         children: [
           {
             name: 'Power Dialer',
-            meta: { title: 'Power Dialer' },
+            meta: {
+              title: 'Power Dialer',
+              id: 'power-dialer'
+            },
             path: '',
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {
             name: 'Power Dialer',
-            meta: { title: 'Power Dialer Filter' },
+            meta: {
+              title: 'Power Dialer Filter',
+              id: 'power-dialer-queue-filter'
+            },
             path: ':id(in-queue|called|failed|scheduled|all)+',
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {
             name: 'Power Dialer',
-            meta: { title: 'Power Dialer List' },
+            meta: {
+              title: 'Power Dialer List',
+              id: 'power-dialer-list'
+            },
             path: 'list/:id(\\d+)+',
             component: () => import('src/pages/power-dialer/PowerDialerBase'),
             children: [
               {
                 name: 'Power Dialer',
-                meta: { title: 'Power Dialer List Advance' },
+                meta: {
+                  title: 'Power Dialer List Advance',
+                  id: 'power-dialer-list-filter'
+                },
                 path: ':filter(in-queue|called|failed|scheduled|all)+',
                 component: () => import('src/pages/power-dialer/PowerDialerBase')
               }
@@ -161,8 +174,20 @@ const routes = [
           },
           {
             name: 'Power Dialer',
-            meta: { title: 'Power Dialer Add-list' },
+            meta: {
+              title: 'Power Dialer Add-list',
+              id: 'power-dialer-add-list'
+            },
             path: 'list/:id(\\d+)+/add',
+            component: () => import('src/pages/power-dialer/PowerDialerAddView')
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Add-list',
+              id: 'power-dialer-add-queue-list'
+            },
+            path: 'list/add',
             component: () => import('src/pages/power-dialer/PowerDialerAddView')
           }
         ]

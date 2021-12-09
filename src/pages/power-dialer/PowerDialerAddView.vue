@@ -46,6 +46,9 @@ export default {
       return this.powerDialerListItems[String(this.$route.params.id)]
     },
     id () {
+      if (this.$route.meta.id === 'power-dialer-add-queue-list') {
+        return 'my-queue'
+      }
       return this.$route.params.id || 'all'
     },
     filteredName () {
@@ -72,7 +75,11 @@ export default {
         id = 'my-queue'
       }
 
-      const stringId = String(id)
+      let stringId = String(id)
+
+      if (this.$route.meta.id === 'power-dialer-add-queue-list') {
+        stringId = 'my-queue'
+      }
 
       if (!this.listItems[stringId]) {
         this.contactsLoaded({

@@ -268,7 +268,7 @@ export default {
           this.reloadFolders()
           this.$generalNotification(response.message, 'success')
           setTimeout(() => {
-            this.$router.push(`/power-dialer/list/${response.data.id}`)
+            this.$router.push(`/power-dialer/list/${response.data.id}/add`)
           }, 500)
         })
         .catch((err) => {

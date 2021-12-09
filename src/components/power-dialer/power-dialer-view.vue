@@ -428,7 +428,11 @@ export default {
       this.$router.push({ name: 'Power Dialer Session' })
     },
     onAddContactsToList () {
-      this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
+      if (this.$route.meta.id === 'power-dialer') {
+        this.$router.push(`/power-dialer/list/add`)
+      } else {
+        this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
+      }
     },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
