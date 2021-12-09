@@ -2416,6 +2416,14 @@ span.mention {
 
 // MESSAGE COMPOSER TEXT
 .message-composer-text-wrapper {
+  .file-dropper.position-absolute {
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 0;
+  }
+
   .b-textarea, .b-textarea:focus {
     border: none !important;
     box-shadow: none !important;
@@ -2425,6 +2433,7 @@ span.mention {
 
   .message-options {
     padding-top: 6px;
+    z-index: 1;
   }
 
   .message-options a:focus,
@@ -2468,12 +2477,41 @@ span.mention {
         padding: 2px;
       }
 
-      .btn-remove-attachments {
+      .btn-remove-attachments,
+      .btn-remove-file {
         position: absolute;
         top: 6px;
         right: 6px;
-        padding: 0.015rem 0.2rem;
-        font-size: 50%;
+        font-size: 12px;
+        height: 20px;
+        width: 20.5px;
+        padding: 0;
+      }
+
+      .btn-remove-attachments:hover {
+        background: #62666e;
+        color: white;
+      }
+
+      .btn-remove-file {
+
+        &:hover {
+          background: white;
+        }
+
+        i {
+          color: $grey-90;
+          //font-size: 12px;
+        }
+      }
+
+      .btn-remove-file:focus {
+        outline: none;
+        border-color: transparent !important;
+        box-shadow: none !important;
+      }
+
+      .btn-remove-attachments {
         opacity: 0;
       }
 
@@ -6838,7 +6876,8 @@ table.datatable {
   position: relative;
   overflow: auto;
   height: auto;
-  max-height: 83vh;
+  max-height: 78vh;
+  min-height: 78vh;
 
 
   .section-header {
@@ -6885,7 +6924,7 @@ button.grey-90 {
   margin-top: 14px;
 
   .filter-toggle-button {
-    max-width: 100px;
+    max-width: 87px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -7314,19 +7353,34 @@ button.grey-90 {
 .channel-filter-actions-wrapper.inbox-tab--filter {
   .filter-wrapper {
 
+    &.--highlighted {
+      background: rgba(37, 110, 255, 0.12);
+      padding: 0 11px;
+      border-radius: 6px;
+      height: 29px;
+    }
+
+
     .filter-icon {
       margin-top: -4px;
     }
   }
 
   .search-icon {
-    top: 6px;
+    margin-top: -2px;
+    height: 28px;
+  }
+
+  .q-separator {
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 2px;
   }
 }
 
 .inbox-tab--filter {
   .filter-wrapper {
-    margin-left: 30px;
+    //margin-left: 30px;
 
     .filter-icon {
       margin-top: 1px;
@@ -7336,6 +7390,7 @@ button.grey-90 {
   .search-wrapper {
     .compact-button {
       padding-left: 0 !important;
+      padding-right: 0 !important;
     }
   }
 }
@@ -7804,7 +7859,7 @@ button.grey-90 {
   padding: 0 15px;
   margin-top: -9px;
   border-bottom: 1px solid $grey-60;
-  background: rgba(249, 249, 251);
+  background: rgb(255 255 255);
 
   .q-item {
     padding: 0 !important;
@@ -8749,4 +8804,15 @@ screen and (max-width: 956px) {
 .contact-filter-count {
   top: 0 !important;
   padding-top: 6px !important;
+}
+
+.q-select-auto-width{
+  .q-field__control-container {
+    width: auto !important;
+    max-width: fit-content;
+
+    .q-field__native {
+      padding-right: 6px !important;
+    }
+  }
 }
