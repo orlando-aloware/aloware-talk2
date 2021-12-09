@@ -28,7 +28,6 @@ Add links and screenshots here
 - [ ] No values have been hard-coded where they should be drawn from constant files (frontend) or Models (backend).
 - [ ] Comments are present where appropriate and provide useful information, not just stating what the code is obviously doing.
 - [ ] Error handling is performed appropriately where things might fail.
-- [ ] Logging is present, useful, and uses log levels appropriately.
 - [ ] If component modifications are present, check all the instances that this component is used and make sure everything looks good and works as expected.
 - [ ] If a generally used method is changed, check and make sure it doesn't break other apps and clients.
 - [ ] Don't assume the code works - ask for a demo and test it yourself!
