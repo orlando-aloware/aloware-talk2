@@ -264,7 +264,7 @@ export default {
         powerQuery.task_status = this.pdFilters[this.activeFilter]
       }
 
-      if (this.powerQuery) {
+      if (this.isPowerDialer) {
         return powerQuery
       } else {
         return query
