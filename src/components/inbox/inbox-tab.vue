@@ -482,8 +482,15 @@ export default {
     '$route.params.status': function () {
       this.setStatus()
       if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        }
+
         this.lineOrRingGroupFilter = null
-        this.resetList()
+        // prevent reset of filters if coming from the root
+        if (!this.$route.params.id) {
+          this.resetList()
+        }
       }
     },
     '$route.name': function (value) {
