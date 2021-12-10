@@ -19,25 +19,41 @@
         <call-icon v-if="id === 'call'"/>
         <voicemail-icon v-if="id === 'voicemail'"/>
         <mention-icon v-if="id === 'mention'"/>
-        <call-incoming-icon v-if="id === 'incomingCall'"/>
+        <call-incoming-icon v-if="['incomingCall', 'callFishing'].includes(id)"/>
       </div>
-      <div :class="[this.id !== 'incomingCall' ? 'w-100' : 'flex-grow-1']">
+      <div :class="[!['incomingCall', 'callFishing'].includes(this.id) ? 'w-100' : 'flex-grow-1']">
         <div class="d-flex flex-grow-1 align-items-baseline w-100">
           <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
-          <strong class="mr-auto text-white title pr-1">{{ title }}</strong>
+          <strong class="mr-auto text-white title pr-1">
+            {{ title }}
+          </strong>
           <small class="mr-2 text-grey-82 time text-nowrap"
-                 v-if="id !== 'incomingCall'">
+                 v-if="!['incomingCall', 'callFishing'].includes(this.id)">
             {{ runningDateTime }}
           </small>
         </div>
-        <div class="text-grey-81 pt-2 message-body text-break d-flex">
-          <div class="flex-grow-1 d-flex align-items-center">
+        <div class="text-grey-81 pt-2 message-body text-break d-flex w-100">
+          <div class="flex-grow-1 d-flex align-items-center w-100">
             <component class="message-icon mr-1"
                        :is="messageIcon"
                        v-if="messageIcon"/>
-            <span v-if="message"
+            <span v-if="!['incomingCall', 'callFishing'].includes(id) && message"
                   class="message-text"
                   v-html="$options.filters.nl2br(message, false)">
+            </span>
+            <div class="message-text row has-ring-group"
+                 v-else-if="['incomingCall', 'callFishing'].includes(id) && campaignName && ringGroupName">
+              <div class="campaign-wrapper col-5">
+                <div class="campaign-name">{{ campaignName }}</div>
+              </div>
+              <div class="flex-grow-1 col-1">></div>
+              <div class="ring-group-wrapper col-5">
+                <div class="ring-group-name">{{ ringGroupName }}</div>
+              </div>
+            </div>
+            <span class="message-text d-flex"
+                 v-else-if="['incomingCall', 'callFishing'].includes(id) && campaignName && !ringGroupName">
+              {{ campaignName }}
             </span>
           </div>
           <template v-if="id === 'sms' && attachment">
@@ -50,7 +66,7 @@
         </div>
       </div>
       <div class="d-flex justify-content-center align-items-center"
-           v-if="id === 'incomingCall'">
+           v-if="id === 'incomingCall' || (id === 'callFishing' && this.dialer && !this.dialer.communication)">
         <q-btn class="height-32"
                ripple
                round
@@ -66,6 +82,30 @@
           <accept-call-icon width="32" height="32"/>
         </q-btn>
       </div>
+    </div>
+    <div class="d-flex flex-row align-items-start call-fishing-actions"
+         v-if="id === 'callFishing' && this.dialer && this.dialer.communication">
+      <q-btn class="height-32 text-grey-100"
+             color="white"
+             ripple
+             no-caps
+             @click="ignoreFishing">
+        <span class="text-grey-100">Ignore</span>
+      </q-btn>
+      <q-btn class="height-32 text-grey-100"
+             color="grey-light"
+             ripple
+             no-caps
+             @click="answerCommunication(false, true)">
+        <span class="text-grey-100">Hang up & Answer</span>
+      </q-btn>
+      <q-btn class="height-32 text-white"
+             color="primary"
+             ripple
+             no-caps
+             @click="answerCommunication(true, true)">
+        Park & Answer
+      </q-btn>
     </div>
   </b-toast>
 </template>
@@ -93,25 +133,40 @@ export default {
   },
   data () {
     return {
-      toastClass: '',
-      headerClass: '',
       runningDateTime: null,
       runningDateTimeInterval: null
     }
   },
-  mounted () {
-    this.toastClass = 'action-notification notification-border-round'
-    this.headerClass = 'border-0 p-0'
-    if (this.id !== 'incomingCall') {
-      this.toastClass += ' bg-grey-80'
-      this.headerClass += ' bg-grey-80'
-    } else {
-      this.toastClass += ' bg-blue-80 incoming-call-notification'
-      this.headerClass += ' bg-blue-80'
-    }
-  },
   computed: {
     ...mapState(['notifications', 'dialer']),
+    toastClass () {
+      let toastClass = 'action-notification notification-border-round'
+
+      if (!['incomingCall', 'callFishing'].includes(this.id)) {
+        toastClass += ' bg-grey-80'
+      }
+
+      if (['incomingCall', 'callFishing'].includes(this.id)) {
+        toastClass += ` bg-blue-60 incoming-call-notification${this.dialer && this.dialer.communication ? ' in-progress' : ''}`
+      }
+
+      return toastClass
+    },
+
+    headerClass () {
+      let headerClass = 'border-0 p-0'
+
+      if (!['incomingCall', 'callFishing'].includes(this.id)) {
+        headerClass += ' bg-grey-80'
+      }
+
+      if (['incomingCall', 'callFishing'].includes(this.id)) {
+        headerClass += ' bg-blue-60'
+      }
+
+      return headerClass
+    },
+
     message () {
       const message = _.get(this.notifications[this.id], 'message', '')
       return this.$options.filters.parseMentionToView(message)
@@ -139,7 +194,7 @@ export default {
       return _.get(this.notifications[this.id], 'communicationId', '')
     },
     link () {
-      if (['system', 'incomingCall'].includes(this.id)) {
+      if (['system', 'incomingCall', 'callFishing'].includes(this.id)) {
         return null
       }
       return {
@@ -150,7 +205,13 @@ export default {
       return _.get(this.notifications[this.id], 'attachment', '')
     },
     noAutoHide () {
-      return ['system', 'incomingCall'].includes(this.id)
+      return ['system', 'incomingCall', 'callFishing'].includes(this.id)
+    },
+    campaignName () {
+      return _.get(this.notifications[this.id], 'campaignName', null)
+    },
+    ringGroupName () {
+      return _.get(this.notifications[this.id], 'ringGroupName', null)
     }
   },
   methods: {
@@ -201,7 +262,10 @@ export default {
           attachment: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         }
       })
     },
@@ -220,7 +284,34 @@ export default {
       return 'sms'
     },
     answerCall () {
+      if (this.id === 'callFishing') {
+        this.answerCommunication()
+        return
+      }
+
       this.$VueEvent.fire('answerCall')
+    },
+    ignoreFishing () {
+      this.$closeActionNotification('callFishing')
+    },
+    hangupAndAnswer () {
+      this.$closeActionNotification('callFishing')
+      this.$VueEvent.fire('hangupAndAnswerCall')
+    },
+    parkAndAnswer () {
+      this.$closeActionNotification('callFishing')
+      this.$VueEvent.fire('parkAndAnswerCall')
+    },
+    answerCommunication (shouldPark = false, shouldHangup = false) {
+      const data = {
+        communication: {
+          id: this.notifications[this.id].communicationId,
+          campaign_id: this.notifications[this.id].campaignId
+        },
+        shouldPark: shouldPark,
+        shouldHangup: shouldHangup
+      }
+      this.$VueEvent.fire('answerCallFishing', data)
     },
     rejectCall () {
       this.$VueEvent.fire('rejectCall')

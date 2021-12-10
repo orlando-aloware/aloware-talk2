@@ -81,7 +81,10 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         },
         sms: {
           title: '',
@@ -89,7 +92,10 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         },
         call: {
           title: '',
@@ -97,7 +103,10 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         },
         callVoicemail: {
           title: '',
@@ -105,7 +114,10 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         },
         voicemail: {
           title: '',
@@ -113,7 +125,10 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         },
         mention: {
           title: '',
@@ -121,7 +136,10 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         },
         incomingCall: {
           title: '',
@@ -129,7 +147,21 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
+        },
+        callFishing: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: ''
         }
       },
       showIncomingCallNotification: true,

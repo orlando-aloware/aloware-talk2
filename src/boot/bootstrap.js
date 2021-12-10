@@ -245,14 +245,14 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   })
 }
 
-Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, attachment = null, type, contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
+Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, attachment = null, type, contactId = null, communicationId = null, campaignId = null, campaignName = null, ringGroupName = null, noDelay = false, dateTime = this.$moment()) {
   // skip if same notification
   if (type === 'call' && this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
     return
   }
 
   if (!title ||
-    (!['sms', 'incomingCall'].includes(type) && !message) ||
+    (!['sms', 'incomingCall', 'callFishing'].includes(type) && !message) ||
     (type === 'sms' && !message && !attachment)) {
     return
   }
@@ -266,7 +266,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
       attachment: attachment,
       dateTime: dateTime,
       contactId: contactId,
-      communicationId: communicationId
+      communicationId: communicationId,
+      campaignId: campaignId,
+      campaignName: campaignName,
+      ringGroupName: ringGroupName
     }
   }
 

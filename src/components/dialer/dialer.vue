@@ -93,6 +93,7 @@ export default {
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
@@ -134,10 +135,8 @@ export default {
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
-        let name = this.dialer.communication.contact.name ? this.dialer.communication.contact.name : this.$options.filters.fixPhone(this.dialer.communication.contact.phone_number)
-        this.$actionNotification(name, this.dialer.communication.contact.company_name, null, null, 'incomingCall', null, null, true)
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
-        //   console.log(err)
+        //   console.log(err)s
         // })
       }).catch((err) => {
         console.log(err)
@@ -148,6 +147,7 @@ export default {
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
       this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
@@ -188,6 +188,7 @@ export default {
           console.log(err)
         })
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
 
       // close the dialer form when it's open and incoming call is answered
       if (this.dialerFormStatus) {
@@ -251,11 +252,13 @@ export default {
     this.$VueEvent.listen('answerCall', () => {
       this.answerCall()
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
     })
 
     this.$VueEvent.listen('rejectCall', () => {
       this.rejectCall()
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {
@@ -282,6 +285,20 @@ export default {
       this.parkCall()
     })
 
+    this.$VueEvent.listen('hangupAndAnswerCall', () => {
+      this.answerCall()
+      this.$nextTick(() => {
+        this.parkCall()
+      })
+    })
+
+    this.$VueEvent.listen('parkAndAnswerCall', () => {
+      this.answerCall()
+      this.$nextTick(() => {
+        this.parkCall()
+      })
+    })
+
     this.$VueEvent.listen('unparkCall', () => {
       this.unparkCall()
     })
@@ -292,6 +309,10 @@ export default {
 
     this.$VueEvent.listen('dropThirdParty', () => {
       this.dropThirdParty()
+    })
+
+    this.$VueEvent.listen('answerCallFishing', (data) => {
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
     })
 
     this.$VueEvent.listen('setInputDevice', (inputDevice) => {
@@ -787,6 +808,7 @@ export default {
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(true)
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
     },
 
     countCallDuration () {
@@ -973,6 +995,38 @@ export default {
         this.setDialerIsReady(true)
         this.setDialerCurrentStatus('READY')
       }
+    },
+
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      if (shouldPark) {
+        this.parkCall(this.dialer.communication).then(() => {
+          let data = {
+            currentNumber: 'call:' + communication.id,
+            outboundCampaignId: communication.campaign_id
+          }
+          this.$VueEvent.fire('makeCall', data)
+        })
+        return
+      }
+
+      if (shouldHangup) {
+        this.$VueEvent.fire('forceHangupCall')
+
+        setTimeout(() => {
+          let data = {
+            currentNumber: 'call:' + communication.id,
+            outboundCampaignId: communication.campaign_id
+          }
+          this.$VueEvent.fire('makeCall', data)
+        }, 1000)
+        return
+      }
+
+      let data = {
+        currentNumber: 'call:' + communication.id,
+        outboundCampaignId: communication.campaign_id
+      }
+      this.$VueEvent.fire('makeCall', data)
     },
 
     ...mapActions([

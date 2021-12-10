@@ -7061,7 +7061,8 @@ button.grey-90 {
 #b-toaster-bottom-right,
 #b-toaster-top-center {
   .b-toaster-slot {
-    max-width: 300px !important;
+    display: flex;
+    justify-content: center;
   }
 }
 
@@ -8032,6 +8033,11 @@ button.grey-90 {
   }
 }
 
+.b-toaster-slot {
+  max-width: 399px !important;
+  width: 100%;
+}
+
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .inbox {
@@ -8421,6 +8427,140 @@ screen and (max-width: 956px) {
     }
     .contact-name {
       font-size: 18px;
+    }
+  }
+}
+
+@media screen and (min-width: 400px) {
+  #callFishing__toast_outer {
+    &.b-toast,
+    .action-notification.in-progress {
+      max-width: 399px !important;
+      width: 100% !important;
+    }
+    .action-notification {
+      margin: 0 auto;
+      &.in-progress {
+        button {
+          padding: 0 17px;
+        }
+      }
+      .toast-body {
+        > div {
+          > div:nth-child(3) {
+            > button:first-child {
+              svg {
+                margin-right: 2px !important;
+              }
+            }
+          }
+        }
+      }
+      &:not(.in-progress) {
+        .toast-body {
+          > div {
+            .notification-icon {
+              max-width: 32px;
+              width: 100%;
+            }
+            > div:nth-child(2) {
+              max-width: 150px;
+              width: 100%;
+              flex-grow: unset !important;
+            }
+            > div:nth-child(3) {
+              max-width: 84px;
+              width: 100%;
+            }
+          }
+        }
+      }
+      &.in-progress {
+        .toast-body {
+          .call-fishing-actions {
+            justify-content: center;
+          }
+          > div {
+            .notification-icon {
+              max-width: 32px;
+              width: 100%;
+            }
+            > div:nth-child(2) {
+              max-width: 333px;
+              width: 100%;
+              flex-grow: unset !important;
+              .message-text {
+                .col-5 {
+                  flex: 0 0 47.3% !important;
+                }
+              }
+            }
+          }
+        }
+      }
+      .message-text {
+        &.has-ring-group {
+          .campaign-wrapper,
+          .ring-group-wrapper {
+            padding: 0 0;
+          }
+        }
+        div:nth-child(2) {
+          padding: 0 5px;
+          max-width: 17px;
+          min-width: 17px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 399px) {
+  #callFishing__toast_outer {
+    .action-notification.in-progress {
+      max-width: 210px !important;
+      width: 100% !important;
+    }
+    .action-notification {
+      margin: 0 auto;
+      &.in-progress {
+        .call-fishing-actions {
+          margin-top: 13px !important;
+          flex-direction: column !important;
+          button {
+            padding: 0 20px;
+            width: 100%;
+          }
+          button:not(:nth-child(3)) {
+            margin-bottom: 5px;
+          }
+        }
+        .toast-body {
+          > div {
+            > div:nth-child(2) {
+              max-width: 144px;
+              .message-text {
+                .col-5 {
+                  flex: 0 0 44.1% !important;
+                }
+              }
+            }
+          }
+        }
+      }
+      .message-text {
+        &.has-ring-group {
+          .campaign-wrapper,
+          .ring-group-wrapper {
+            padding: 0 0;
+          }
+        }
+        div:nth-child(2) {
+          padding: 0 5px;
+          max-width: 17px;
+          min-width: 17px;
+        }
+      }
     }
   }
 }
@@ -8835,6 +8975,32 @@ screen and (max-width: 956px) {
     span {
       font-size: 13px;
       font-weight: 500;
+    }
+  }
+}
+
+.incoming-call-notification {
+  .message-text {
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: unset !important;
+    &.has-ring-group {
+      overflow: auto !important;
+      text-overflow: unset !important;
+      .campaign-wrapper,
+      .ring-group-wrapper {
+        min-width: 0;
+      }
+
+      .campaign-wrapper .campaign-name,
+      .ring-group-wrapper .ring-group-name {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+    &:not(.has-ring-group) {
+      display: block !important;
+      white-space: nowrap;
     }
   }
 }

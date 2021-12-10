@@ -6,7 +6,10 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   },
   sms: {
     title: '',
@@ -15,7 +18,10 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   },
   call: {
     title: '',
@@ -24,7 +30,10 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   },
   callVoicemail: {
     title: '',
@@ -33,7 +42,10 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   },
   voicemail: {
     title: '',
@@ -42,7 +54,10 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   },
   mention: {
     title: '',
@@ -51,7 +66,10 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   },
   incomingCall: {
     title: '',
@@ -60,6 +78,21 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
+  },
+  callFishing: {
+    title: '',
+    message: '',
+    messageIcon: null,
+    attachment: null,
+    dateTime: null,
+    contactId: '',
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: ''
   }
 }
