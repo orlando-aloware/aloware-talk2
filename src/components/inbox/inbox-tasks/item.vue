@@ -167,15 +167,15 @@ export default {
       let lastAttachment = this.contact.last_communication.attachments.pop()
 
       switch (true) {
-        case ['text'].includes(lastAttachment.mime_type):
+        case lastAttachment && ['text'].includes(lastAttachment.mime_type):
           return directionText + ' a text file'
-        case ['audio'].includes(lastAttachment.mime_type):
+        case lastAttachment && ['audio'].includes(lastAttachment.mime_type):
           return directionText + ' an audio file'
-        case ['image'].includes(lastAttachment.mime_type):
+        case lastAttachment && ['image'].includes(lastAttachment.mime_type):
           return directionText + ' an image'
-        case ['video'].includes(lastAttachment.mime_type):
+        case lastAttachment && ['video'].includes(lastAttachment.mime_type):
           return directionText + ' a video file'
-        case ['application'].includes(lastAttachment.mime_type):
+        case lastAttachment && ['application'].includes(lastAttachment.mime_type):
         default:
           return directionText + ' a file'
       }
