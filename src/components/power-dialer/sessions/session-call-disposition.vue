@@ -45,31 +45,6 @@
           :display-count="6"
           identity="contact-disposition"
           default-label="No Voicemail" />
-        <!-- <q-chip
-          v-for="chip in voicemail"
-          :key="chip.name"
-          color="grey-7"
-          outline
-          square
-          :class="`p-0 mx-2 ${chip.outlined ? '' : 'text-blue'}`">
-          -{{ chip.label }}
-        </q-chip>
-        <b-dropdown
-          text="..."
-          no-caret
-          right size="sm"
-          variant="white"
-          class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
-          <template #button-content>
-            <i class="fa fa-ellipsis-h"></i>
-          </template>
-          <b-dropdown-item href="#">
-            Option 101
-          </b-dropdown-item>
-          <b-dropdown-item href="#">
-            Option 201
-          </b-dropdown-item>
-        </b-dropdown> -->
       </div>
 
     </div>
@@ -80,13 +55,11 @@
 
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
-// import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 
 export default {
   name: 'SessionCallDisposition',
   components: {
     ChipsEllipsis
-    // VmDropSelector
   },
   computed: {
     ...mapState([

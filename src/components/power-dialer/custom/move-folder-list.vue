@@ -23,20 +23,13 @@
           :items="folder.lists"
         />
       </template>
-      <!-- <CreateListItem
-        v-for="(item, key) in itemLists"
-        :id="item.id"
-        :key="key"
-        :folders="[]"
-        :layer="layer"
-        :items="[item]"
-      /> -->
+
       <template
         v-for="(item, key) in itemLists">
         <div
-          :key="key"
           class="folder d-flex align-items-center folder--target1"
           :class="{ 'folder--target': activeId === item.id }"
+          :key="key"
           @clicked="{}">
 
           <div
@@ -54,8 +47,8 @@
           </div>
 
           <button
-            @click="onTarget(item)"
-            class="folder__option btn btn-link p-0">
+            class="folder__option btn btn-link p-0"
+            @click="onTarget(item)">
             <i v-if="activeId === item.id"
               class="fa fa-check-circle text-success small">
             </i>
@@ -135,10 +128,7 @@ export default {
       })
     },
     foldersHasLists (obj) {
-      if (obj?.lists.length > 0) {
-        return true
-      }
-      return false
+      return obj?.lists.length > 0
     }
   }
 }

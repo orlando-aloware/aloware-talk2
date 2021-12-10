@@ -36,7 +36,6 @@ export default {
     if (this.$route.meta.title === 'Power Dialer List') {
       await this.getMyQueueList()
     }
-    // await this.loadList(this.id)
   },
   data () {
     return {

@@ -59,9 +59,6 @@ export default {
     Search,
     CompactBtn
   },
-  mounted () {
-    // console.log('77777777')
-  },
   data () {
     return {
       searchValue: '',
@@ -86,22 +83,13 @@ export default {
       )
     },
     moveFoldersEndpoint () {
-      if (this.isContactModuleType) {
-        return '/api/v2/contact-folders/move'
-      }
-      return '/api/v2/power-dialer-folders/move'
+      return this.isContactModuleType ? '/api/v2/contact-folders/move' : '/api/v2/power-dialer-folders/move'
     },
     fetchFoldersEndpoint () {
-      if (this.isContactModuleType) {
-        return '/api/v2/contact-folders'
-      }
-      return '/api/v2/power-dialer-folders'
+      return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     fetchFoldersListEndpoint () {
-      if (this.isContactModuleType) {
-        return '/api/v2/contacts-list'
-      }
-      return '/api/v2/power-dialer-lists'
+      return this.isContactModuleType ? '/api/v2/contacts-list' : '/api/v2/power-dialer-lists'
     }
   },
   methods: {
@@ -113,7 +101,6 @@ export default {
       return this.moveFolderRequest()
     },
     moveFolderRequest () {
-      console.log('Moving a folder...')
       this.isMoving = true
       return this.$axios
         .patch(`${this.moveFoldersEndpoint}/${this.moveDialog.id}`, {
@@ -127,7 +114,6 @@ export default {
         .finally(this.closeMoveDialog)
     },
     moveListRequest () {
-      console.log('Moving a list...')
       this.isMoving = true
       return this.$axios
         .patch(`${this.fetchFoldersListEndpoint}/${this.moveDialog.id}`, {

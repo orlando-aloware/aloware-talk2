@@ -48,42 +48,6 @@
       </MoveFolderLists>
     </div>
 
-    <!-- <template
-      v-if="items">
-
-      <template
-        v-for="(item, key) in items">
-        <div
-          :key="key"
-          class="folder d-flex align-items-center"
-          :class="{ 'folder--target1': isTarget }"
-          @clicked="{}">
-
-          <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
-            <div class="folder__name pd-name-create">
-              <DialIcon
-                color="grey"
-                class="mr-1 pl-3" />
-              {{ item.name }}
-            </div>
-          </div>
-
-          <button
-            v-if="isTargetable"
-            @click="onTarget"
-            class="folder__option btn btn-link p-0">
-            <i v-if="!isTarget"
-              class="fa fa-circle small">
-            </i>
-            <i v-if="isTarget"
-              class="fa fa-check-circle text-success small">
-            </i>
-          </button>
-
-        </div>
-      </template>
-    </template> -->
-
   </div>
 </template>
 
@@ -92,7 +56,6 @@ import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'components/icons/folder-icon'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon'
-// import DialIcon from 'components/icons/dial-icon'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -101,7 +64,6 @@ export default {
     FolderIcon,
     FolderArrowOpenIcon,
     FolderArrowCloseIcon,
-    // DialIcon,
     MoveFolderLists: () => import('./move-folder-list')
   },
   props: {

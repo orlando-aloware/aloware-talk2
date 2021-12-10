@@ -23,18 +23,18 @@
 
             <template v-slot:moreActivities>
               <q-btn
-                v-if="hasMoreCommunications"
-                @click="loadMorePreviousActivities"
+                class="prev-activities mx-2"
+                color="primary"
+                size="md"
                 outline
                 dense
                 rounded
                 no-caps
-                class="prev-activities mx-2"
-                color="primary"
-                size="md"
                 :isLoadingMore="sessionLoader"
                 :loading="isLoadingPreviousActivities"
-                :disable="isLoadingPreviousActivities">
+                :disable="isLoadingPreviousActivities"
+                v-if="hasMoreCommunications"
+                @click="loadMorePreviousActivities">
                 <div class="px-2">
                   Previous Activities
                 </div>

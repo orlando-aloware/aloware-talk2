@@ -109,11 +109,7 @@ export default {
   },
   computed: {
     isContactsRoute () {
-      if (this.$route.meta.title === 'Contacts') {
-        return true
-      } else {
-        return false
-      }
+      return this.$route.meta.title === 'Contacts'
     }
   }
 }

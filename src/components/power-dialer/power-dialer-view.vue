@@ -37,16 +37,6 @@
             <b-col col lg="4" class="p-0 m-0">
               <div class="px-0 d-flex align-items-center float-right">
 
-                <!-- <q-btn
-                  no-caps
-                  unelevated
-                  size="sm"
-                  color="primary"
-                  class="px-2"
-                  v-b-modal:create-contact-modal>
-                  Add Contacts
-                </q-btn> -->
-
                 <b-dropdown text="Add Contacts"
                   right
                   no-caret
@@ -286,7 +276,6 @@
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerViewScreen from './power-dialer-view-screen'
 import PowerDialerFilter from './details/power-dialer-filters'
-// import StartDialOptions from './activities/start-dial-options'
 import SummaryInfoLabels from './details/summary-info-labels'
 import Datatable from 'src/components/datatable'
 import TableRow from 'src/components/table-row'
@@ -305,6 +294,7 @@ import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
+import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -319,7 +309,6 @@ export default {
   components: {
     PowerDialerViewScreen,
     PowerDialerFilter,
-    // StartDialOptions,
     Datatable,
     SearchList,
     SummaryInfoLabels,
@@ -360,17 +349,21 @@ export default {
     filter () {
       return this.activeFilter
     },
+    routeId () {
+      return POWER_DIALER_ROUTE_META_ID
+    },
     activeRoute () {
-      if (this.$route.meta.title === 'Power Dialer') {
-        return '/power-dialer'
-      } else if (this.$route.meta.title === 'Power Dialer Filter') {
-        return '/power-dialer'
-      } else if (this.$route.meta.title === 'Power Dialer List Advance') {
-        return this.$route.path
-      } else if (this.$route.meta.title === 'Power Dialer List') {
-        return `/power-dialer/list/${this.$route.params.id}`
+      switch (this.$route.meta.title) {
+        case this.routeId['power-dialer']:
+        case this.routeId['queue-filter']:
+          return '/power-dialer'
+        case this.routeId['list-filter']:
+          return this.$route.path
+        case this.routeId['list']:
+          return `/power-dialer/list/${this.$route.params.id}`
+        default:
+          return '/power-dialer/list'
       }
-      return '/power-dialer/list'
     },
     numberOfContacts () {
       return `${this.activeList.length} Contacts`
@@ -421,7 +414,6 @@ export default {
     ]),
 
     beginDial () {
-      // let contact = Object.assign({}, this.currentContacts)
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.setContact(this.contact)

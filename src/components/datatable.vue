@@ -342,11 +342,7 @@ export default {
       }, 66)
     },
     onInitReorder (value, key) {
-      if (value) {
-        this.moveColor = '#256eff'
-      } else {
-        this.moveColor = '#4F4F4F'
-      }
+      this.moveColor = value ? '#256eff' : '#4F4F4F'
       this.isHovering = value
       this.hoverKey = key
     }

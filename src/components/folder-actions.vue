@@ -175,16 +175,10 @@ export default {
       'folders'
     ]),
     isContactsRoute () {
-      if (this.$route.meta.title === 'Contacts') {
-        return true
-      }
-      return false
+      return this.$route.meta.title === 'Contacts'
     },
     foldersEndpoint () {
-      if (this.isContactsRoute) {
-        return '/api/v2/contact-folders'
-      }
-      return '/api/v2/power-dialer-folders'
+      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     }
   },
   methods: {

@@ -4,8 +4,15 @@
       <div class="header__header__title font-weight-bold pl-3 text-13 flex-grow-1">
         SESSION
       </div>
-      <b-dropdown size="xs" variant="link" toggle-class="text-decoration-none" no-caret>
-        <template class="p-0 m-0 text-black" style="color:black; font-size:10px;" #button-content>
+      <b-dropdown
+        size="xs"
+        variant="link"
+        toggle-class="text-decoration-none"
+        no-caret>
+        <template
+          class="p-0 m-0 text-black"
+          style="color:black; font-size:10px;"
+          #button-content>
           <div class="text-caption text-black">
             Power Sort
             <i class="fa fa-chevron-down fa-xs text-black"></i>
@@ -13,8 +20,15 @@
         </template>
         <b-dropdown-item
           @click="{}"
-          class="text-capitalize text-body2" href="#">Item 1</b-dropdown-item>
-        <b-dropdown-item class="text-capitalize text-body2" href="#">Item 2</b-dropdown-item>
+          class="text-capitalize text-body2"
+          href="#">
+          Item 1
+        </b-dropdown-item>
+        <b-dropdown-item
+          class="text-capitalize text-body2"
+          href="#">
+          Item 2
+        </b-dropdown-item>
       </b-dropdown>
 
       <SettingIcon
@@ -39,9 +53,13 @@
               class="p-0">
               <div class="t-value text-subtitle1 text-weight-medium d-flex">
                 {{ stat.values.primary }}
-                <div class="text-caption pt-1 pl-1 text-grey">{{stat.values.secondary}}</div>
+                <div class="text-caption pt-1 pl-1 text-grey">
+                  {{stat.values.secondary}}
+                </div>
               </div>
-              <div class="t-label text-caption text-grey-90">{{ stat.name }}</div>
+              <div class="t-label text-caption text-grey-90">
+                {{ stat.name }}
+              </div>
             </q-card-section>
             </div>
         </div>

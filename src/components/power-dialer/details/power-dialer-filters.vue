@@ -2,10 +2,10 @@
   <b-card class="border-0 text-center">
     <div class="t-grouped-buttons">
       <router-link
+        class="link px-1"
         v-for="(lsFilter, key) in listFilters"
         :key="key"
-        :to="currentRoute(lsFilter)"
-        class="link px-1">
+        :to="currentRoute(lsFilter)">
         <div :class="`t-grouped-buttons__btn ${filter === lsFilter.id ? 'active' : ''}`">
           <div class="t-badge-name">
             {{ lsFilter.name }}
@@ -78,7 +78,12 @@ export default {
   watch: {
     '$route.params.filter': function (id) {
       if (id) {
-        if (this.$route.meta.title === 'Power Dialer' || (this.$route.meta.title === 'Power Dialer Filter' || this.$route.meta.title === 'Power Dialer Individual Advance')) {
+        if (this.$route.meta.title === 'Power Dialer' ||
+          (
+            this.$route.meta.title === 'Power Dialer Filter' ||
+            this.$route.meta.title === 'Power Dialer Individual Advance'
+          )
+        ) {
           this.SET_ACTIVE_FILTER(this.$route.params.id)
         } else {
           if (this.$route.params.filter) {

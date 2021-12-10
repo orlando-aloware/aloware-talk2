@@ -251,9 +251,6 @@ export default {
     },
     messageGifUrl () {
       return this.messageComposer.sms.gif_url
-    },
-    test () {
-      return (this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
     }
   },
 

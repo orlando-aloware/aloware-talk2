@@ -11,15 +11,11 @@
         class="px-3 w-100"
         @change="changeScript" />
 
-      <!-- <q-select
-        v-model="resources.leads"
-        :options="resources.options"
-        outlined
-        class="px-3" /> -->
       <div
         v-html="resources.message"
         class="t-scroll-y2 py-3 px-3"
-        style="overflow:auto;"></div>
+        style="overflow:auto;">
+      </div>
 
     </q-card-section>
   </q-card>

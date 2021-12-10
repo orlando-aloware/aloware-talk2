@@ -1,14 +1,14 @@
 <template>
   <q-select
-    @popup-show="onShowMetricsMenu"
-    outlined dense emit-value
-    v-model="localValue"
-    :options="options"
+    :class="`${customClass}`"
     option-value="text"
     option-label="text"
     ref="sessionMetrics"
-    :class="`${customClass}`"
-    :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
+    outlined dense emit-value
+    v-model="localValue"
+    :options="options"
+    :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+    @popup-show="onShowMetricsMenu">
     <template v-slot:selected>
       <template v-if="modelValue">
         {{ modelValue }}
@@ -71,9 +71,6 @@ export default {
   methods: {
     onShowMetricsMenu () {
       this.selectWidth = this.$refs.sessionMetrics.$el.offsetWidth
-    },
-    test (val) {
-      console.log('val :>> ', val)
     }
   }
 }

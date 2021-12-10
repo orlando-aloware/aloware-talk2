@@ -1,9 +1,9 @@
 <template>
   <div class="row">
     <div
+      class="col-12 px-0"
       v-for="form in forms"
-      :key="form.name"
-      class="col-12 px-0">
+      :key="form.name" >
       <label
         class="label mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
         {{ form.label }}
@@ -77,16 +77,6 @@
             v-else-if="cform.name === 'warmupPeriod'"
             v-model="resources[cform.name]" />
 
-          <!-- <q-select
-            v-else-if="cform.name === 'warmupPeriod'"
-            v-model="resources[cform.name]"
-            @popup-show="onShowWarmUpMenu"
-            ref="warmupPeriod"
-            :options="warmUpPeriods"
-            outlined dense
-            class="generic-selector"
-            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"></q-select> -->
-
           <q-select
             v-else
             v-model="resources[cform.name]"
@@ -157,8 +147,6 @@ export default {
   },
   methods: {
     onLineFilterChange (value, prop) {
-      console.log('value :>> ', value)
-      console.log('prop :>> ', prop)
       this.resources.line = value
       // this.filter[prop] = value
       // this.updateChannelChangedFilterFields({

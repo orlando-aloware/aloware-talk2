@@ -20,8 +20,6 @@
           <q-avatar color="red" size="md">
             <PhoneIcon color="white" />
           </q-avatar>
-          <!-- <q-item-label class="text-red" color="red" caption>...</q-item-label> -->
-          <!-- <q-icon name="dots" color="yellow" /> -->
         </q-item-section>
 
       </q-item>

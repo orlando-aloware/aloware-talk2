@@ -1,12 +1,16 @@
 <template>
   <div class="t-session-settings">
     <q-btn
-      @click="dialog = true"
+      class="start-dial-button p-0"
+      color="success"
       no-caps
       unelevated
-      color="success"
-      class="start-dial-button p-0">
-      <PhoneIcon color="white" height="12" width="12" class="mr-2" />
+      @click="dialog = true">
+      <PhoneIcon
+        class="mr-2"
+        color="white"
+        height="12"
+        width="12" />
       <div class="button-label">
         Start Dialing
       </div>
@@ -19,8 +23,11 @@
         style="width: 800px; max-width: 80vw;"
         class="my-card py-2 px-2">
 
-        <q-card-section class="p-0" horizontal>
-          <q-card-section style="width: 26% !important">
+        <q-card-section
+          class="p-0"
+          horizontal>
+          <q-card-section
+            style="width: 26% !important">
             <q-list
               dense
               bordered

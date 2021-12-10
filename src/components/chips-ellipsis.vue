@@ -6,17 +6,20 @@
       <template
         v-for="(chip, key) in filteredListItems">
         <q-chip
-          v-if="key < displayCount"
+          :class="`${chip.id === selectedItemId ? 'active' : ''} p-0 mx-2`"
+          :style="`border:${chip.id === selectedItemId ? '#256eff' : chip.color || '#ebebeb'} solid 1px;`"
           :key="`${identity}-${chip.name}-${key}`"
-          @click="$emit('on-selected-item', chip)"
           :color="`grey-5`"
           outline clickable
           square
-          :style="`border:${chip.id === selectedItemId ? '#256eff' : chip.color || '#ebebeb'} solid 1px;`"
-          :class="`${chip.id === selectedItemId ? 'active' : ''} p-0 mx-2`">
-          <div :class="`chip-label text-capitalize ${identity === 'contact-disposition' ? 'text-grey-7' : 'text-black'}`">
+          v-if="key < displayCount"
+          @click="$emit('on-selected-item', chip)">
+
+          <div
+            :class="`chip-label text-capitalize ${identity === 'contact-disposition' ? 'text-grey-7' : 'text-black'}`">
             {{ chip.name }}
           </div>
+
         </q-chip>
       </template>
 
@@ -97,10 +100,7 @@ export default {
       return this.listItems
     },
     hasContent () {
-      if (this.listItems?.length > 0) {
-        return true
-      }
-      return false
+      return this.listItems?.length > 0
     },
     selectedItemId () {
       return this.selectedItem || ''
@@ -117,14 +117,6 @@ export default {
         return true
       }
       return false
-    }
-  },
-  watch: {
-    contact: {
-      async handler (data) {
-        console.log('Contact has changed! ', data.id)
-      },
-      deep: true
     }
   }
 }

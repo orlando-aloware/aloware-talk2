@@ -10,7 +10,6 @@
 
 import { mapGetters } from 'vuex'
 import ContactsFolders from '../contacts/contacts-folders'
-import { DIRECTORY_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerList',
@@ -24,14 +23,8 @@ export default {
     list () {
       return this.powerDialerDirectoryList || this.directoryList
     },
-    directoryList () {
-      return DIRECTORY_LIST
-    },
     hasEmptyList () {
-      if (this.list[0].child_folders.length < 1 && this.list[0].lists.length < 1) {
-        return true
-      }
-      return false
+      return (this.list[0].child_folders.length < 1 && this.list[0].lists.length < 1)
     }
   },
   data () {
@@ -45,11 +38,7 @@ export default {
   watch: {
     '$route': {
       handler (routeObj) {
-        if (routeObj.name === 'Power Dialer') {
-          this.toggleFolders = true
-        } else {
-          this.toggleFolders = false
-        }
+        this.toggleFolders = routeObj.name === 'Power Dialer'
       },
       deep: true
     }

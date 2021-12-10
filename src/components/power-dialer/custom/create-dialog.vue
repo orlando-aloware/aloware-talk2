@@ -35,13 +35,6 @@
         <q-spinner-bars v-if="isMoving" color="white" />
         {{ isMoving ? '' : 'Create' }}
       </CompactBtn>
-      <!-- <CompactBtn
-        variant="outlined-light"
-        v-if="hasSelected"
-        :disabled="isMoving"
-        @clicked="closeCreateListDialog">
-        No
-      </CompactBtn> -->
     </div>
   </div>
 </template>
@@ -50,7 +43,6 @@
 import { createPopper } from '@popperjs/core'
 import { mapActions, mapMutations, mapGetters } from 'vuex'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
-// import CreateListItem from 'src/components/move-folder-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -124,33 +116,12 @@ export default {
     ]),
     onConfirmCreate () {
       return this.createListRequest()
-      // if (this.createDialog.type === 'list') {
-      //   return this.createListRequest()
-      // }
-      // return this.createFolderRequest()
     },
     createFolderRequest () {
       this.isMoving = true
-      console.log('Creating a folder...')
-      // this.$axios
-      //   .post('/api/v2/power-dialer-lists', {
-      //     type: 1,
-      //     name: 'Untitled'
-      //   })
-      // return this.$axios
-      //   .patch('/api/v2/power-dialer-folders/move/' + this.createDialog.id, {
-      //     parent_id: this.createDialog.target < 1 ? null : this.createDialog.target
-      //   })
-      //   .then(() => {
-      //     this.reloadFolders()
-      //     this.isMoving = false
-      //   })
-      //   .catch(this.handleRequestError)
-      //   .finally(this.createPdListClose)
     },
     createListRequest () {
       this.isMoving = true
-      console.log('Creating a list...')
       let params = {
         type: 1,
         name: this.createDialog.name

@@ -53,11 +53,7 @@ export default {
   watch: {
     '$route': {
       handler (routeObj) {
-        if (routeObj.name === 'Contacts') {
-          this.toggleFolders = true
-        } else {
-          this.toggleFolders = false
-        }
+        this.toggleFolders = routeObj.name === 'Contacts'
       },
       deep: true
     }

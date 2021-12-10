@@ -47,7 +47,6 @@
                   {{ group.name }}
                   <q-chip size="xs" square class="p-0">
                     99
-                    <!-- {{ chipped(group.children) }} -->
                   </q-chip> </div>
               </q-item-section>
             </template>
@@ -80,8 +79,6 @@
                       <q-avatar color="red" size="md">
                         <PhoneIcon color="white" />
                       </q-avatar>
-                      <!-- <q-item-label class="text-red" color="red" caption>...</q-item-label> -->
-                      <!-- <q-icon name="dots" color="yellow" /> -->
                     </q-item-section>
                     <b-dropdown
                       @mouseover="onOver"
@@ -107,7 +104,6 @@
                       </b-dropdown-item>
                     </b-dropdown>
                     <div class="dropdown t-btn-floater t-btn-floater__bottom">
-                      <!-- <RedialIcon v-show="true" height="15px" width="15px" /> -->
                       <q-btn size="xs" flat round>
                         <q-avatar size="15px">
                           <img src="icons/refresh-call.png">
@@ -137,7 +133,6 @@ import { mapGetters, mapActions } from 'vuex'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
-// import RedialIcon from 'components/icons/refresh-icon-2'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
@@ -146,7 +141,6 @@ export default {
     InProgressContact,
     SearchList,
     PhoneIcon
-    // RedialIcon
   },
   async mounted () {
     // this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
@@ -161,9 +155,6 @@ export default {
     ...mapGetters('contacts', [
       'contact'
     ]),
-    // listObject () {
-    //   return this.powerDialerListItems[this.currentList?.id]
-    // },
     list () {
       return this.listObject.data || []
     },

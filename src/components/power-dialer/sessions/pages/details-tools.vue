@@ -1,8 +1,8 @@
 <template>
   <q-card
-    flat
+    class="bg-grey-1"
     :disabled="sessionLoader"
-    class="bg-grey-1">
+    flat>
     <div class="pb-2">
       <ContactPhones />
     </div>

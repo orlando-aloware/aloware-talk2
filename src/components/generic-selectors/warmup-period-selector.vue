@@ -1,12 +1,12 @@
 <template>
   <q-select
-    v-model="localValue"
-    @popup-show="onShowWarmUpMenu"
+    class="generic-selector"
     ref="warmupPeriod"
     :options="warmUpPeriods"
+    :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+    v-model="localValue"
     outlined dense
-    class="generic-selector"
-    :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`">
+    @popup-show="onShowWarmUpMenu">
   </q-select>
 </template>
 

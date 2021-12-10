@@ -1,7 +1,6 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import qs from 'qs'
 import { isEmpty, get, debounce } from 'lodash'
-// import { ALL_COLUMNS } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   data () {

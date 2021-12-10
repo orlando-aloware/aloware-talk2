@@ -2,17 +2,24 @@
   <div class="row w-100 h-100 d-flex px-2">
 
     <b-overlay
+      class="d-flex"
       :show="loading"
-      rounded="sm"
-      class="d-flex">
+      rounded="sm">
       <template #overlay>
-        <q-spinner-bars color="primary" size="40px" />
+        <q-spinner-bars
+          color="primary"
+          size="40px" />
       </template>
 
-      <div class="col-4 p-1 px-2" style="height:63vh;">
+      <div
+        class="col-4 p-1 px-2"
+        style="height:63vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
-            <div class="text-18 text-weight-medium">Scripts</div>
+            <div
+              class="text-18 text-weight-medium">
+              Scripts
+            </div>
           </q-card-section>
         </q-card>
 
@@ -21,7 +28,9 @@
 
       </div>
 
-      <div class="col-4 p-1 px-2" style="height:63vh;">
+      <div
+        class="col-4 p-1 px-2"
+        style="height:63vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div class="text-18 text-weight-medium">
@@ -36,7 +45,9 @@
           :resources="contact" />
 
       </div>
-      <div class="col-4 p-1 px-2" style="height:63vh;">
+      <div
+        class="col-4 p-1 px-2"
+        style="height:63vh;">
 
         <DetailsTools />
 
