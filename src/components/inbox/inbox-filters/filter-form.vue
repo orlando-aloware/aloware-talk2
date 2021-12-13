@@ -6,6 +6,37 @@
           <h5 class="section-header">Quick Access</h5>
           <b-form-row class="mt-2">
             <b-col sm="12" md="6">
+
+              <b-form-group
+                label="Last Engagement Date"
+                class="form-label"
+              >
+                <div class="last-engagement-tooltip-wrapper">
+                  <information-circle-icon color="#2F80ED">
+                  </information-circle-icon>
+                  <q-tooltip  anchor="top middle"
+                              self="center middle">
+                    Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)
+                  </q-tooltip>
+                </div>
+
+                <date-range-picker
+                  v-model="last_engagement_date_range"
+                  ref="picker"
+                  :opens="opens"
+                  :ranges="ranges"
+                  :always-show-calendars="true"
+                  :auto-apply="true"
+                >
+                  <template v-slot:input="picker" style="min-width: 350px;">
+                    {{ getLastEngagementDateLabel(picker) }}
+                  </template>
+                </date-range-picker>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+          <b-form-row class="mt-2">
+            <b-col sm="12" md="6">
               <b-form-group
                 label="Lines"
                 class="form-label"
@@ -251,6 +282,23 @@
             </b-col>
           </b-form-row>
         </div>
+        <b-form-row class="mt-2">
+          <b-col sm="12"
+                 md="6">
+            <b-form-group class="form-label"
+                          label="Contact Owner">
+              <user-selector v-model="filter.owner_id"
+                             :generic-styling="false"
+                             :multiple="false"
+                             :use-chips="false"
+                             :highlighted="isChanged('owner_id')"
+                             :clearable="true"
+                             custom-placeholder="Contact owner"
+                             @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
+              </user-selector>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
       </b-container>
     </b-form>
   </div>
@@ -271,10 +319,16 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import { mapActions, mapState } from 'vuex'
+
+import DateRangePicker from 'vue2-daterange-picker'
+import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
+
 export default {
   name: 'filter-form',
 
   components: {
+    InformationCircleIcon,
     SequenceSelector,
     IncomingNumberSelector,
     UserSelector,
@@ -287,11 +341,8 @@ export default {
     CallDispositionSelector,
     TagSelector,
     CallbackStatusSelector,
-    BroadcastSelector
-  },
-
-  computed: {
-    ...mapState('inbox', ['channelChangedFilterFields'])
+    BroadcastSelector,
+    DateRangePicker
   },
 
   props: {
@@ -305,6 +356,38 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('inbox', ['channelChangedFilterFields'])
+  },
+
+  data () {
+    return {
+      startDate: new Date(),
+      endDate: new Date(),
+      last_engagement_date_range: {
+        startDate: null,
+        endDate: null
+      },
+      opens: 'right',
+      ranges: { // default value for ranges object (if you set this to false ranges will no be rendered)
+        'Recent (Last 30 Days + Today)': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
+        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
+        'Today': [window.moment()._d, window.moment()._d],
+        'Yesterday': [window.moment().subtract(1, 'days')._d, window.moment().subtract(1, 'days')._d],
+        'Last 30 Days': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
+        'This month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
+        'Last month': [window.moment().subtract(1, 'month').startOf('month')._d, window.moment().subtract(1, 'month').endOf('month')._d],
+        'All Time': [null, null]
+      }
+    }
+  },
+
+  filters: {
+    date (date) {
+      return new Intl.DateTimeFormat('en-US').format(date)
+    }
+  },
+
   methods: {
     ...mapActions('inbox', ['updateChannelChangedFilterFields']),
     onFilterChange (value, prop) {
@@ -312,6 +395,23 @@ export default {
     },
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
+    },
+    getLastEngagementDateLabel (data) {
+      if (data.startDate && data.endDate) {
+        return this.$options.filters.date(data.startDate) + ' - ' + this.$options.filters.date(data.endDate)
+      }
+      return 'All Time'
+    }
+  },
+  watch: {
+    last_engagement_date_range: {
+      deep: true,
+      handler () {
+        this.filter.last_engagement_date = {
+          start: this.last_engagement_date_range.startDate ? window.moment(this.last_engagement_date_range.startDate).format('YYYY-MM-DD') : null,
+          end: this.last_engagement_date_range.endDate ? window.moment(this.last_engagement_date_range.endDate).format('YYYY-MM-DD') : null
+        }
+      }
     }
   }
 }

@@ -169,11 +169,11 @@ export default {
       }
 
       switch (true) {
-        case this.multiple && this.userId.length < 1:
+        case this.multiple && this.userId && this.userId.length < 1:
           return this.customPlaceholder || 'Select Users'
         case !this.multiple && !this.userId:
           return this.customPlaceholder || 'Select User'
-        case this.multiple && this.userId.length > 0:
+        case this.multiple && this.userId && this.userId.length > 0:
         case !this.multiple && this.userId:
         default:
           return ''

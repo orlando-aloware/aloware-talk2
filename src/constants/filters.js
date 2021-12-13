@@ -38,6 +38,11 @@ export const DEFAULT_STATE = {
     callback_status: null,
     broadcasts: [],
     mentioner_user_id: [],
-    mentioned_user_id: []
+    mentioned_user_id: [],
+    last_engagement_date: {
+      start: null,
+      end: null
+    },
+    owner_id: null
   }
 }

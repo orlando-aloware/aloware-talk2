@@ -232,7 +232,8 @@ export default {
         'exclude_automated_communications',
         'incoming_numbers',
         'users',
-        'workflows'
+        'workflows',
+        'owner_id'
       ]
     }
   },
@@ -438,6 +439,7 @@ export default {
     clearTimeout(inputTimeout)
   },
   mounted () {
+    this.toggleFilterDialog()
     this.$VueEvent.listen('channel_filter_created', filter => {
       if (filter.is_on_company) {
         this.companyFilters.push(filter)

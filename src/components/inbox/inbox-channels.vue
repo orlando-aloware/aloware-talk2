@@ -288,7 +288,8 @@ export default {
             exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            owner_id: Filters.DEFAULT_STATE.filter.owner_id
           }
           break
         case ['calls'].includes(this.$route.params.channel):
@@ -308,7 +309,8 @@ export default {
             exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            owner_id: Filters.DEFAULT_STATE.filter.owner_id
           }
           break
         case ['recordings'].includes(this.$route.params.channel):
@@ -328,13 +330,15 @@ export default {
             exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            owner_id: Filters.DEFAULT_STATE.filter.owner_id
           }
           break
         case ['mentions'].includes(this.$route.params.channel):
           defaultFilterModel.type = 5
           defaultFilterModel.filter = {
-            users: Filters.DEFAULT_STATE.filter.users
+            users: Filters.DEFAULT_STATE.filter.users,
+            owner_id: Filters.DEFAULT_STATE.filter.owner_id
           }
           break
         case ['messages'].includes(this.$route.params.channel):
@@ -351,7 +355,8 @@ export default {
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
             workflows: Filters.DEFAULT_STATE.filter.workflows,
-            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts
+            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+            owner_id: Filters.DEFAULT_STATE.filter.owner_id
           }
       }
 

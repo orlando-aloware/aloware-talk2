@@ -194,7 +194,12 @@ export default {
     return {
       filter: {
         campaigns: [],
-        ring_groups: []
+        ring_groups: [],
+        last_engagement_date: {
+          start: null,
+          end: null
+        },
+        owner_id: null
       },
       searchText: '',
       isSearch: false,
@@ -209,7 +214,9 @@ export default {
         type: 5,
         filter: {
           campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups
+          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+          last_engagement_date: Filters.DEFAULT_STATE.filter.last_engagement_date,
+          owner_id: Filters.DEFAULT_STATE.filter.owner_id
         },
         scope: 'user'
       }
