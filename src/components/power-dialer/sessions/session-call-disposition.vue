@@ -114,10 +114,7 @@ export default {
     return {
       contact_disposition: null,
       call_disposition: null,
-      voicemail: [
-        // { label: 'Default Voicemail' },
-        // { label: 'Follw Up VM' }
-      ]
+      voicemail: []
     }
   }
 }
