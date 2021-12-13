@@ -174,6 +174,25 @@ const fixTaskStatusName = (taskStatusId) => {
   }
 }
 
+/**
+ * Get task status id, returns id
+ * @param {string} taskStatusName
+ * @returns {number}
+ */
+const getTaskStatusIdByName = (taskStatusName) => {
+  switch (taskStatusName) {
+    case 'pending':
+      return ContactTaskStatus.STATUS_PENDING
+    case 'closed':
+      return ContactTaskStatus.STATUS_CLOSED
+    case 'new':
+      return ContactTaskStatus.STATUS_NEW
+    case 'open':
+    default:
+      return ContactTaskStatus.STATUS_OPEN
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixDateOfBirth,
@@ -188,7 +207,8 @@ export default ({ Vue }) => {
     fixLrnType,
     fixCount,
     validLrnType,
-    fixTaskStatusName
+    fixTaskStatusName,
+    getTaskStatusIdByName
   }
   Object.keys(filters).map((k) => Vue.filter(k, filters[k]))
 }

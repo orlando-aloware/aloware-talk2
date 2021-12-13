@@ -3,14 +3,14 @@
        @click="onItemClick(mention)">
     <div class="avatar d-flex justify-content-center pb-1"
          role="button">
-      <i v-if="!mention.mention_subject.is_read && mention.mention_subject.direction === CommunicationDirection.INBOUND"
+      <i v-if="mention.mention_subject && !mention.mention_subject.is_read && mention.mention_subject.direction === CommunicationDirection.INBOUND"
          class="fa fa-circle position-relative"
          style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;">
       </i>
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"
-              :name="contactName">
+              :name="contactAvatar">
       </avatar>
     </div>
     <div class="task-details flex-grow-1 pb-1"
@@ -90,7 +90,19 @@ export default {
     ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
 
     contactName () {
-      return this.mention.mention_subject.contact ? this.mention.mention_subject.contact.name : 'No Name'
+      if (this.mention.mention_subject.contact && this.mention.mention_subject.contact.first_name && this.mention.mention_subject.contact.last_name) {
+        return `${this.mention.mention_subject.contact.first_name} ${this.mention.mention_subject.contact.last_name}`
+      }
+
+      return this.$options.filters.fixPhone(this.mention.mention_subject.contact.phone_number)
+    },
+
+    contactAvatar () {
+      if (this.mention.mention_subject.contact && this.mention.mention_subject.contact.first_name && this.mention.mention_subject.contact.last_name) {
+        return `${this.mention.mention_subject.contact.first_name} ${this.mention.mention_subject.contact.last_name}`
+      }
+
+      return ''
     },
 
     directionSummaryText () {

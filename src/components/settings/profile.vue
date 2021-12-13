@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <b-form>
+    <b-form autocomplete="off">
       <b-form-row>
         <b-col sm="12" md="12">
           <div class="d-inline-flex">
@@ -120,11 +120,11 @@
             <b-form-input
               type="password"
               placeholder="New Password"
-              v-model.trim="$v.user.password.$model"
+              autocomplete="off"
               :state="validateState('password')"
+              v-model.trim="$v.user.password.$model"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.password.required">Enter your new password.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.password.minLength">Password must be at least 6 character length.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
@@ -138,9 +138,9 @@
             <b-form-input
               type="password"
               placeholder="Password Confirmation"
-              required
-              v-model.trim="$v.user.password_confirmation.$model"
+              autocomplete="off"
               :state="validateState('password_confirmation')"
+              v-model.trim="$v.user.password_confirmation.$model"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">Password did not match.</b-form-invalid-feedback>
@@ -438,9 +438,19 @@ export default {
     },
     requirePassword () {
       return this.showPasswordFields
-    },
-    rules () {
-      let rulesObject = {
+    }
+  },
+
+  props: {
+    user: {
+      type: Object,
+      required: true
+    }
+  },
+
+  validations () {
+    return {
+      user: {
         first_name: {
           required,
           maxLength: maxLength(191)
@@ -455,35 +465,14 @@ export default {
         },
         phone_number: {
           validPhone: (value) => this.$options.filters.fixPhone(value) !== false
+        },
+        password: {
+          minLength: minLength(6)
+        },
+        password_confirmation: {
+          sameAsPassword: sameAs('password')
         }
       }
-
-      if (this.showPasswordFields) {
-        rulesObject = { ...rulesObject,
-          password: {
-            required,
-            minLength: minLength(6)
-          },
-          password_confirmation: {
-            sameAsPassword: sameAs('password')
-          }
-        }
-      }
-
-      return rulesObject
-    }
-  },
-
-  props: {
-    user: {
-      type: Object,
-      required: true
-    }
-  },
-
-  validations () {
-    return {
-      user: this.rules
     }
   },
 
@@ -551,6 +540,8 @@ export default {
 
   watch: {
     'showPasswordFields': function () {
+      this.user.password = ''
+      this.user.password_confirmation = ''
       this.updateFormValidity()
     }
   }
