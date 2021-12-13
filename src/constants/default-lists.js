@@ -3,7 +3,7 @@ import {
   STATIC_COLUMNS
 } from 'src/constants/contacts-columns'
 import {
-  PD_DEFAULT_COLUMNS
+  POWER_DIALER_DEFAULT_COLUMNS
 } from 'src/constants/power-dialer/power-dialer-list'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
@@ -93,7 +93,7 @@ export const DEFAULT_STATE = {
     },
     'my-queue': {
       id: 'my-queue',
-      headers: PD_DEFAULT_COLUMNS,
+      headers: POWER_DIALER_DEFAULT_COLUMNS,
       filters: {},
       type: 2,
       module_type: 1,
