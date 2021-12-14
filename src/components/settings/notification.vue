@@ -184,7 +184,7 @@
         <b-form-row class="mt-4"
                     v-if="shouldObserve">
           <b-col sm="12"
-                 md="6">
+                 md="12">
             <b-form-group
               label="Select the lines to get notified from"
               class="form-label"
