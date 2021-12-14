@@ -123,9 +123,9 @@
         :paginated="true"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
-        :total-rows="listItems[id].total"
-        :current-page="listItems[id].current_page"
-        :last-page="listItems[id].last_page"
+        :total-rows="totalRows"
+        :current-page="currentPage"
+        :last-page="lastPage"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
@@ -382,6 +382,15 @@ export default {
         return this.columns
       }
       return this.pdColumns
+    },
+    totalRows () {
+      return this.listItems?.[this.id]?.total || 0
+    },
+    currentPage () {
+      return this.listItems?.[this.id]?.current_page || 1
+    },
+    lastPage () {
+      return this.listItems?.[this.id]?.last_page || 0
     }
   },
   data () {

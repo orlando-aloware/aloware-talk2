@@ -212,7 +212,7 @@ export default {
       return '/api/v2/power-dialer-folders'
     },
     isFolderEmpty () {
-      return !this.folders?.[0].child_folders.length
+      return !this.folders?.[0]?.child_folders.length
     },
     foldersLength () {
       return this.folders?.length

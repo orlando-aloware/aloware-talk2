@@ -319,7 +319,7 @@ export default {
     },
     hasMore () {
       return (
-        this.listItems[this.id].next_page_url &&
+        this.listItems[this.id]?.next_page_url &&
         !this.isLoadingMore &&
         !this.isLoading
       )
