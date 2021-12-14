@@ -92,9 +92,11 @@
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
                   </b-dropdown-item>
-                  <b-dropdown-item href="#">
-                    <i class="fa fa-trash-alt mr-1"></i>
-                    Delete
+                  <b-dropdown-item
+                    href="#"
+                    @click="onRemoveList">
+                    <i class="fa fa-trash-alt mr-1 text-red"></i>
+                    <span class="text-red">Delete</span>
                   </b-dropdown-item>
                 </b-dropdown>
 
@@ -414,6 +416,7 @@ export default {
       'setListSelectedContacts',
       'setSelectedList',
       'createListOpen',
+      'removeListClose',
       'setCurrentListFilters',
       'removeListOpen',
       'resetSearch',
@@ -467,6 +470,13 @@ export default {
 
       this.setListSelectedContacts({ id: this.id, contacts: items })
     },
+    onRemoveList () {
+      this.removeListClose()
+      setTimeout(() => {
+        // this.removeListOpen({ id: this.id, name: this.name })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
+      }, 10)
+    },
     onCheckedRows (checked) {
       console.log('data from table 902 : ', checked)
       this.setListSelectedContacts({ id: this.id, contacts: checked })
@@ -475,7 +485,7 @@ export default {
       this.columnsOpen({
         id: this.id,
         headers: this.columns,
-        name: this.list.name
+        name: this.list?.name
       })
     },
     onContactCreated (contact) {
