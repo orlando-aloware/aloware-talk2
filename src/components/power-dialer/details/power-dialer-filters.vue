@@ -64,7 +64,7 @@ export default {
       return this.listItems?.[this.id]?.data || []
     },
     getAll () {
-      return this.list.total
+      return this.list?.total
     }
   },
   methods: {
