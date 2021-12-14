@@ -140,12 +140,15 @@ export default {
       this.TOGGLE_TABLE_LOADER(false)
     },
     async fetchApi (params) {
-      if (this.$route.meta.title === 'Power Dialer') {
-        this.processFetch(params, false, true)
-      } else if (this.$route.meta.title === 'Power Dialer List') {
-        this.processFetch(params, false, false)
-      } else {
-        this.processFetch(params, false, false, this.id)
+      switch (this.$route.meta.id) {
+        case 'power-dialer':
+          this.processFetch(params, false, true)
+          break
+        case 'power-dialer-list':
+          this.processFetch(params, false, false)
+          break
+        default:
+          this.processFetch(params, false, false, this.id)
       }
     },
     async initialize () {
@@ -156,11 +159,10 @@ export default {
       if (!route.id && this.$route.name === 'Power Dialer') {
         route.id = 'in-queue'
         this.id = 'in-queue'
-        await this.fetchContacts()
       } else if (route.id && this.$route.name === 'Power Dialer') {
         this.id = route.id
-        await this.fetchContacts()
       }
+      await this.fetchContacts()
     },
     resetValues () {
       // this.RESET_LIST()

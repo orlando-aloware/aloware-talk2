@@ -25,10 +25,10 @@
             {{ contactList.name }}
           </div>
           <TextPopover
+            :id="contactList.id"
             v-else
-            @input="updateListName"
             v-model="contactListName"
-            :id="contactList.id" />
+            @input="updateListName" />
         </div>
         <div class="text-muted small action-desc">
           {{ openEdit ? 'Add contacts by creating a filter or manually selecting' : 'Manually select contacts or create a filter'}}

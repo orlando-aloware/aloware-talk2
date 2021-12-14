@@ -137,7 +137,6 @@ export default {
       this.processFetch2(params)
     },
     onSortByField (sorts) {
-      console.log('sorts :>> ', sorts)
       this.TOGGLE_TABLE_LOADER(true)
       this.fetch({
         search: this.search,
@@ -145,9 +144,6 @@ export default {
         sort: sorts.orderBy,
         order: sorts.order
       })
-    },
-    onLoadMore () {
-      console.log('...on load more...')
     },
     closeModal () {
       this.isOpen = false

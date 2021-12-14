@@ -35,8 +35,5 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     }
-  },
-  data () {
-    return {}
   }
 }

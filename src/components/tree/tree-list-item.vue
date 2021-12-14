@@ -16,7 +16,10 @@
           :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
           class="folder d-flex align-items-center p-0"
         >
-          <div class="folder__indent" :style="indentStyle"></div>
+          <div
+            class="folder__indent"
+            :style="indentStyle">
+          </div>
           <div class="folder__icon d-flex align-items-center">
             <template
               v-if="isContactsRoute">
@@ -132,11 +135,7 @@ export default {
       return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
     },
     isContactsRoute () {
-      if (this.$route.meta.title === 'Contacts') {
-        return true
-      } else {
-        return false
-      }
+      return this.$route.meta.title === 'Contacts'
     },
     viewListPath () {
       if (this.isContactsRoute) {

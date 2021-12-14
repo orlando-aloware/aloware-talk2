@@ -108,20 +108,18 @@ export default {
     apiEndpoint (queued) {
       if (!this.isPowerDialer) {
         return 'api/v2/contacts'
-      } else {
-        if (queued) {
+      }
+      if (queued) {
+        return `api/v2/power-dialer-lists/my-queue/items`
+      }
+      switch (this.$route.meta.id) {
+        case 'power-dialer-add-list':
+          return `api/v2/contacts`
+        case 'power-dialer':
+        case 'power-dialer-queue-filter':
           return `api/v2/power-dialer-lists/my-queue/items`
-        } else {
-          if (this.$route.meta.title === 'Power Dialer Add-list') {
-            return `api/v2/contacts`
-          } else {
-            if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-              return `api/v2/power-dialer-lists/my-queue/items`
-            } else {
-              return `api/v2/power-dialer-lists/${this.id}/items`
-            }
-          }
-        }
+        default:
+          return `api/v2/power-dialer-lists/${this.id}/items`
       }
     },
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
@@ -140,19 +138,11 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          if (tempId) {
-            this.contactsLoaded({
-              id: this.id || 'all',
-              append: false,
-              ...data
-            })
-          } else {
-            this.contactsLoaded({
-              id: this.id || 'all',
-              append: false,
-              ...data
-            })
-          }
+          this.contactsLoaded({
+            id: this.id || 'all',
+            append: false,
+            ...data
+          })
 
           if (this.shouldUpdateSelectedListContactCount) {
             this.setSelectedListContactCount(data.total)
@@ -178,12 +168,15 @@ export default {
       this.isLoading = true
       if (typeof this.isPowerDialer !== 'undefined') {
         // the variable is defined
-        if (this.$route.meta.title === 'Power Dialer') {
-          this.processFetch(params, false, true)
-        } else if (this.$route.meta.title === 'Power Dialer List') {
-          this.processFetch(params, false, false)
-        } else {
-          this.processFetch(params, false, false, this.id)
+        switch (this.$route.meta.id) {
+          case 'power-dialer':
+            this.processFetch(params, false, true)
+            break
+          case 'power-dialer-list':
+            this.processFetch(params, false, false)
+            break
+          default:
+            this.processFetch(params, false, false, this.id)
         }
       } else {
         this.processFetch(params)
@@ -256,7 +249,9 @@ export default {
 
       if (params.task_status) {
         powerQuery.task_status = params.task_status
-      } else if (this.$route.params.filter) {
+      }
+
+      if (this.$route.params.filter) {
         powerQuery.task_status = this.pdFilters[this.$route.params.filter] // this.$route.params.filter
       }
 
@@ -264,11 +259,7 @@ export default {
         powerQuery.task_status = this.pdFilters[this.activeFilter]
       }
 
-      if (this.isPowerDialer) {
-        return powerQuery
-      } else {
-        return query
-      }
+      return this.isPowerDialer ? powerQuery : query
     },
     getFiltersCount (filters) {
       let filtersCount = 0

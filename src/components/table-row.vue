@@ -93,11 +93,13 @@
         <template
           v-if="Array.isArray(contact.tags) && contact.tags.length">
           <div
-            v-if="contact.id"
+            class="d-flex align-items-center contact-tags-item"
             :id="`popover-tags-${contact.id}`"
-            class="d-flex align-items-center contact-tags-item">
+            v-if="contact.id">
             <span :style="`color: ${contact.tags[0].color};`">
-              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
+              <i
+                class="fa fa-circle"
+                :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
               <span v-if="contact.tags.length > 1">
                 {{ contact.tags[0].name | truncate(17) }}
               </span>

@@ -91,8 +91,6 @@ export default {
           this.$generalNotification(message, 'error')
           if (this.$route.name === 'Power Dialer') {
             this.$router.replace('/power-dialer/')
-          } else {
-            // this.$router.replace('/contacts/')
           }
         })
     }

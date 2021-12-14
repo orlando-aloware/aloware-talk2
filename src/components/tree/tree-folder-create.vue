@@ -17,14 +17,14 @@
       <div class="folder-create__name flex-grow-1 d-flex align-items-center">
 
         <input
+          class="folder-create__input d-inline"
+          ref="input"
           :disabled="isCreating"
           type="text"
           v-model="text"
-          class="folder-create__input d-inline"
-          ref="input"
+          autofocus
           @blur="onInputBlur"
-          @keydown="onKeyDown"
-          autofocus />
+          @keydown="onKeyDown" />
 
       </div>
     </div>
