@@ -56,7 +56,7 @@ export default {
       return DEFAULT_FILTER_LIST
     },
     currentList () {
-      return this.listItems[this.id].data
+      return this.listItems?.[this.id]?.data || []
     }
   },
   methods: {
