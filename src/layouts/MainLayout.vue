@@ -1520,7 +1520,9 @@ export default {
       if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
         (to.name !== from.name)) {
-        this.resetContactsVuex()
+        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
+          this.resetContactsVuex()
+        }
       }
 
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {

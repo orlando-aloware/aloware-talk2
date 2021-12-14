@@ -100,6 +100,12 @@ export default {
   createListOpen: ({ commit }, payload) => {
     commit('CREATE_LIST_OPEN', payload)
   },
+  createPdListOpen: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_OPEN', payload)
+  },
+  createPdListClose: ({ commit }) => {
+    commit('CREATE_DIALOG_CLOSE')
+  },
   createListClose: ({ commit }) => {
     commit('CREATE_LIST_CLOSE')
   },
@@ -260,5 +266,8 @@ export default {
   },
   setContacts: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
+  },
+  setCreateDialogTarget: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_TARGET', payload)
   }
 }

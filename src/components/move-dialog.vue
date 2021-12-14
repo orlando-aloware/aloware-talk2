@@ -9,7 +9,7 @@
         ></search>
       </div>
     </div>
-    <div class="move-dialog-lists">
+    <div class="move-dialog-lists px-4 pb-2">
       <move-folder-item
         v-for="folder in searchedItemsList"
         :name="folder.name"
@@ -48,6 +48,12 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 let popperInstance
 
 export default {
+  props: {
+    isContactModuleType: {
+      type: Boolean,
+      default: true
+    }
+  },
   components: {
     MoveFolderItem,
     Search,
@@ -75,6 +81,15 @@ export default {
         typeof this.moveDialog.target === 'number' &&
         this.moveDialog.target >= 0
       )
+    },
+    moveFoldersEndpoint () {
+      return this.isContactModuleType ? '/api/v2/contact-folders/move' : '/api/v2/power-dialer-folders/move'
+    },
+    fetchFoldersEndpoint () {
+      return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+    },
+    fetchFoldersListEndpoint () {
+      return this.isContactModuleType ? '/api/v2/contacts-list' : '/api/v2/power-dialer-lists'
     }
   },
   methods: {
@@ -88,7 +103,7 @@ export default {
     moveFolderRequest () {
       this.isMoving = true
       return this.$axios
-        .patch('/api/v2/contact-folders/move/' + this.moveDialog.id, {
+        .patch(`${this.moveFoldersEndpoint}/${this.moveDialog.id}`, {
           parent_id: this.moveDialog.target < 1 ? null : this.moveDialog.target
         })
         .then(() => {
@@ -101,7 +116,7 @@ export default {
     moveListRequest () {
       this.isMoving = true
       return this.$axios
-        .patch('/api/v2/contacts-list/' + this.moveDialog.id, {
+        .patch(`${this.fetchFoldersListEndpoint}/${this.moveDialog.id}`, {
           contact_folder_id: this.moveDialog.target
         })
         .then(() => {
@@ -118,7 +133,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.fetchFoldersEndpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -232,7 +247,7 @@ export default {
     },
     folders: function (value) {
       let itemsList = []
-      if (value.length) {
+      if (value?.length) {
         value = value[0].child_folders
         itemsList = this.createFolders('', [
           {
