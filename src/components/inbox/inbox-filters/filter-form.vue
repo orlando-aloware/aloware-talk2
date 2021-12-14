@@ -25,7 +25,7 @@
                   ref="picker"
                   :opens="opens"
                   :ranges="ranges"
-                  :always-show-calendars="true"
+                  :always-show-calendars="false"
                   :auto-apply="true"
                 >
                   <template v-slot:input="picker" style="min-width: 350px;">
@@ -365,19 +365,19 @@ export default {
       startDate: new Date(),
       endDate: new Date(),
       last_engagement_date_range: {
-        startDate: null,
-        endDate: null
+        startDate: window.moment('2015-01-01')._d,
+        endDate: window.moment()._d
       },
       opens: 'right',
       ranges: { // default value for ranges object (if you set this to false ranges will no be rendered)
-        'Recent (Last 30 Days + Today)': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
-        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
-        'Today': [window.moment()._d, window.moment()._d],
-        'Yesterday': [window.moment().subtract(1, 'days')._d, window.moment().subtract(1, 'days')._d],
-        'Last 30 Days': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
-        'This month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
-        'Last month': [window.moment().subtract(1, 'month').startOf('month')._d, window.moment().subtract(1, 'month').endOf('month')._d],
-        'All Time': [null, null]
+        // 'Recent (Last 30 Days + Today)': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
+        // 'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
+        // 'Today': [window.moment()._d, window.moment()._d],
+        // 'Yesterday': [window.moment().subtract(1, 'days')._d, window.moment().subtract(1, 'days')._d],
+        // 'Last 30 Days': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
+        // 'This month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
+        // 'Last month': [window.moment().subtract(1, 'month').startOf('month')._d, window.moment().subtract(1, 'month').endOf('month')._d],
+        'All Time': [window.moment('2015-01-01')._d, window.moment()._d]
       }
     }
   },

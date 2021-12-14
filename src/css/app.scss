@@ -7390,7 +7390,7 @@ button.grey-90 {
     //margin-left: 30px;
 
     .filter-icon {
-      margin-top: 1px;
+      margin-top: -2px;
     }
   }
 
@@ -7405,6 +7405,58 @@ button.grey-90 {
 .inbox-filter-actions-wrapper {
   width: 50%;
   margin-top: 15px;
+
+  div.search-icon {
+    margin-top: -2px;
+  }
+
+  .q-user-selector {
+    width: 8vw;
+  }
+
+  .q-line-and-ring-group-selector {
+    width: 8vw;
+  }
+
+  .generic-selector {
+
+    margin-top: -3px;
+
+    .q-field__control:before {
+      border: none !important;
+    }
+
+    .q-field__native {
+      padding-left: 20px !important;
+
+      span {
+        font-size: 14px;
+        color: $grey-100;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 5.5vw;
+        overflow: hidden;
+      }
+    }
+
+    .q-field__input {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .q-field__marginal {
+      font-size: 14px;
+    }
+  }
+}
+
+.mentions-filter-actions-wrapper {
+  width: 50%;
+  margin-top: 15px;
+
+  .filter-wrapper {
+    margin-left: 15px;
+  }
 
   div.search-icon {
     margin-top: -2px;
