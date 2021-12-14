@@ -41,5 +41,6 @@ export default {
       return state.activeFilter
     }
     return 'in-queue'
-  }
+  },
+  filteredEndpoint: (state) => state.filteredEndpoint
 }

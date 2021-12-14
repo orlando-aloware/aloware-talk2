@@ -66,5 +66,8 @@ export default {
   },
   SET_ACTIVE_FILTER: (state, filter) => {
     state.activeFilter = filter
+  },
+  SET_FILTERED_ENDPOINT: (state, endpoint) => {
+    state.filteredEndpoint = endpoint
   }
 }

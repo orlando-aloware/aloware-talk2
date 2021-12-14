@@ -24,6 +24,7 @@ export default function () {
       'failed': DEFAULT_CONTACT_LIST_ITEMS,
       'scheduled': DEFAULT_CONTACT_LIST_ITEMS
     },
+    filteredEndpoint: '',
     powerDialerLists: {
       'all': {
         id: 'all',

@@ -24,7 +24,8 @@
 
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
+// import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerFilters',
@@ -42,9 +43,13 @@ export default {
       default: 'in-queue'
     }
   },
+  async mounted () {
+    this.list = await this.getList(this.filteredEndpoint)
+  },
   computed: {
     ...mapGetters('powerDialer', [
-      'activeFilter'
+      'activeFilter',
+      'filteredEndpoint'
     ]),
     ...mapGetters('contacts', [
       'listItems'
@@ -57,9 +62,15 @@ export default {
     },
     currentList () {
       return this.listItems?.[this.id]?.data || []
+    },
+    getAll () {
+      return this.list.total
     }
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'getList'
+    ]),
     ...mapMutations('powerDialer', [
       'SET_ACTIVE_FILTER'
     ]),
@@ -67,12 +78,16 @@ export default {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         return `/power-dialer/${listFilter.id}`
       }
-      return `/power-dialer/list/${this.id}/${listFilter.id}` // this.$route
+      return `/power-dialer/list/${this.id}/${listFilter.id}`
     },
     contactListCount (filterId) {
-      let filter = this.activeFilters[filterId]
-      let collection = this.currentList.filter(ls => ls?.task_status === filter)
-      return collection.length
+      return this.getListWithFilter(filterId)
+    },
+    getListWithFilter (filter) {
+      if (filter === 'all') {
+        return this.getAll
+      }
+      return this.list?.data?.filter(list => list.task_status === this.activeFilters[filter]).length
     }
   },
   watch: {
@@ -104,11 +119,18 @@ export default {
           this.SET_ACTIVE_FILTER('in-queue')
         }
       }
+    },
+    'filteredEndpoint': {
+      async handler (data) {
+        this.list = await this.getList(data)
+      },
+      deep: true
     }
   },
   data () {
     return {
-      valid: true
+      valid: true,
+      list: null
     }
   }
 }
