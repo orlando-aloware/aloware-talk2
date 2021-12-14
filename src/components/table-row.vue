@@ -1,69 +1,78 @@
 <template>
   <tr class="datatable-row">
-    <template v-for="column in fixedColumns">
+    <template
+      v-if="customRowContent">
+      <slot name="custom-content" />
+    </template>
+
+    <template
+      v-else
+      v-for="column in fixedColumns">
       <td
-        :key="column.name"
-        class="text-left pull-left datatable-row__checkbox"
         v-if="column.name === 'checkbox'"
-      >
+        :key="column.name"
+        class="text-left pull-left datatable-row__checkbox">
 
         <label class="custom-checkbox-container">
-          <input type="checkbox"
-                 class="checker"
-                 :value="contact.id"
-                 :checked="checked.find(item => item.id === contact.id)"
-                 @change="onCheckerClicked"/>
+          <input
+            type="checkbox"
+            class="checker"
+            :value="contact.id"
+            :checked="checked.find(item => item.id === contact.id)"
+            @change="onCheckerClicked" />
           <span class="checkmark"></span>
         </label>
       </td>
 
       <td
-        :key="column.name"
-        class="datatable-row__name"
         v-else-if="column.name === 'name'"
-      >
+        :key="column.name"
+        class="datatable-row__name">
         <div class="d-flex align-items-center">
           <div class="pr-2">
             <avatar :name="contact.name"/>
           </div>
           <div class="flex-grow-1">
+
             <router-link
               :to="generateRoute(contact.id)"
-              v-slot="{ href, route, navigate }"
-            >
+              v-slot="{ href, route, navigate }">
               <a :href="href"
-                 @click="navigate"
-                 class="d-flex align-items-center item contact-name"
-              >
+                @click="navigate"
+                class="d-flex align-items-center item contact-name">
                 <template v-if="contact.name">
-                  <div class="ellipse">
+                  <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                     {{ contact.name | ucwords }}
                   </div>
                 </template>
                 <template v-if="!contact.name"> No Name</template>
               </a>
             </router-link>
+
           </div>
         </div>
       </td>
 
       <td
-        :key="column.name"
         v-else-if="column.name === 'phone_number'"
-        class="datatable-row__phone"
-      >
-        <div class="ellipse"
-             v-if="contact.phone_number">
+        :key="column.name"
+        class="datatable-row__phone">
+        <div
+          v-if="contact.phone_number"
+          :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
           {{ contact.phone_number | fixPhone('NATIONAL', true) }}
         </div>
-        <span class="ml-1 text-grey-7 text-center"
-              v-else>
+        <span
+          v-else
+          class="ml-1 text-grey-7 text-center">
           -
         </span>
       </td>
 
-      <td :key="column.name" v-else-if="column.name === 'last_engagement_text'">
-        <div class="ellipse">
+      <td
+        v-else-if="column.name === 'last_engagement_text'"
+        :key="column.name">
+        <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
           <div>{{ contact.last_engagement_text }}</div>
           <div class="small text-muted">
             {{ moment(contact.last_engagement_at).format('LLL') }}
@@ -72,48 +81,52 @@
       </td>
 
       <td
-        class="tags-cell"
-        :key="column.name"
         v-else-if="column.name === 'tags'"
-      >
-        <template v-if="!contact.tags || (contact.tags && !contact.tags.length)">
+        :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+        :key="column.name">
+
+        <template
+          v-if="!contact.tags || (contact.tags && !contact.tags.length)">
           <span>-</span>
         </template>
-        <template v-if="Array.isArray(contact.tags) && contact.tags.length">
+
+        <template
+          v-if="Array.isArray(contact.tags) && contact.tags.length">
           <div
-            :id="`popover-tags-${contact.id}`"
             class="d-flex align-items-center contact-tags-item"
-            v-if="contact.id"
-          >
+            :id="`popover-tags-${contact.id}`"
+            v-if="contact.id">
             <span :style="`color: ${contact.tags[0].color};`">
-              <i class="fa fa-circle" :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
+              <i
+                class="fa fa-circle"
+                :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
               <span v-if="contact.tags.length > 1">
                 {{ contact.tags[0].name | truncate(17) }}
               </span>
-              <span v-else>
+              <span
+                v-else>
                 {{ contact.tags[0].name | truncate(27) }}
               </span>
             </span>
-            <span class="ml-1 text-grey-7"
-                  v-if="contact.tags.length > 1">
+            <span
+              v-if="contact.tags.length > 1"
+              class="ml-1 text-grey-7">
               +{{ (contact.tags.length - 1) }} more
             </span>
           </div>
           <b-popover
+            v-if="contact.id && hasTargetTags"
             triggers="hover"
             placement="topright"
             boundary="window"
-            :target="`popover-tags-${contact.id}`"
-            v-if="contact.id && hasTargetTags"
-          >
+            :target="`popover-tags-${contact.id}`">
             <template #title>
               <div class="contact-tags-title">Tags</div>
             </template>
             <span
-              class="d-flex align-items-center contact-tags-item"
               v-for="tag in contact.tags"
               :key="tag.id"
-            >
+              class="d-flex align-items-center contact-tags-item">
               <span :style="`color: ${tag.color};`">
                 <i class="fa fa-circle" :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`"></i>
                 {{ tag.name }}
@@ -124,7 +137,7 @@
       </td>
 
       <td
-        class="text-left"
+        :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
         :key="column.name"
         v-else-if="column.name === 'unread_texts_count'"
       >
@@ -136,7 +149,7 @@
       </td>
 
       <td
-        class="text-left"
+        :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
         :key="column.name"
         v-else-if="column.name === 'unread_missed_calls_count'"
       >
@@ -148,7 +161,7 @@
       </td>
 
       <td
-        class="text-left"
+        :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
         :key="column.name"
         v-else-if="column.name === 'unread_voicemails_count'"
       >
@@ -160,91 +173,93 @@
       </td>
 
       <td
-        class="text-left"
-        :key="column.name"
         v-else-if="column.name === 'text_authorized_at'"
-      >
-        <div class="ellipse">
+        class="text-left"
+        :key="column.name">
+        <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
           {{ contact.text_authorized_at ? 'Yes' : 'No' }}
         </div>
       </td>
 
       <td
-        class="text-left"
-        :key="column.name"
         v-else-if="column.name === 'initial_campaign_id'"
-      >
-        <div class="ellipse">
+        class="text-left"
+        :key="column.name">
+        <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
           {{ getLineName(contact.initial_campaign_id) }}
         </div>
       </td>
 
       <td
-        class="text-left"
-        :key="column.name"
         v-else-if="column.name === 'created_at'"
-      >
-        <div class="ellipse">
+        class="text-left"
+        :key="column.name">
+        <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
           {{ contact.created_at | fixDate }}
         </div>
       </td>
 
       <td
-        class="text-left datatable-row__actions"
-        :key="column.name"
         v-else-if="column.name === 'actions'"
-      >
+        class="text-left datatable-row__actions"
+        :key="column.name">
         <div>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--call pl-0"
-            @click="onCall"
-          >
+            @click="onCall">
             <call-o-icon color="#62666E"></call-o-icon>
           </button>
           <button
             class="btn btn-sm btn-link datatable-row__actions__action--chat"
-            @click="onMessage"
-          >
+            @click="onMessage">
             <message-o-icon></message-o-icon>
           </button>
           <button
             @click="onRemove"
-            class="btn btn-sm btn-link datatable-row__actions__action--trash"
-          >
+            class="btn btn-sm btn-link datatable-row__actions__action--trash">
             <trash-o-icon></trash-o-icon>
           </button>
         </div>
       </td>
 
-      <td :key="column.name" v-else>
-        <div class="text-left"
-             v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)">
+      <td
+        v-else
+        :key="column.name">
+
+        <div
+          v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)"
+          class="text-left">
           -
         </div>
-        <div class="text-left"
-             v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
-          <div :id="`${column.name}-${contact.id}`"
-                v-if="contact[column.name].length > 0">
-            <div class="ellipse"
-                  v-if="typeof contact[column.name][0].phone_number !== 'undefined'">
+
+        <div
+          v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length"
+          class="text-left">
+          <div
+            v-if="contact[column.name].length > 0"
+            :id="`${column.name}-${contact.id}`">
+            <div
+              v-if="`${typeof contact[column.name][0].phone_number !== 'undefined'}`"
+              :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
               {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
             </div>
-            <div  class="ellipse"
-                   v-else>
+            <div
+              v-else
+              :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
               {{ contact[column.name][0].name }}
             </div>
-            <span class="ml-1 text-grey-7"
-                  v-if="contact[column.name].length > 1">
+            <span
+              v-if="contact[column.name].length > 1"
+              class="ml-1 text-grey-7">
               +{{ (contact[column.name].length - 1) }} more
             </span>
           </div>
           <b-popover
+            v-if="contact[column.name].length > 0 && hasTargetArrays(column.name)"
             :target="`${column.name}-${contact.id}`"
             triggers="hover"
             placement="topright"
-            boundary="window"
-            v-if="contact[column.name].length > 0 && hasTargetArrays(column.name)"
-          >
+            boundary="window">
             <template #title>
               <div class="contact-tags-title">{{ column.label }}</div>
             </template>
@@ -252,9 +267,8 @@
               class="ml-1"
               v-for="(item, index) in contact[column.name]"
               :id="`${column.name}-${contact.id}`"
-              :key="`${column.name}-${index}`"
-            >
-              <span v-if="typeof item.phone_number !== 'undefined'">
+              :key="`${column.name}-${index}`">
+              <span v-if="`${typeof item.phone_number !== 'undefined'}`">
                 {{ item.phone_number | fixPhone('NATIONAL', true) }}
               </span>
               <span v-else>
@@ -262,23 +276,28 @@
               </span>
             </span>
           </b-popover>
-          <span v-if="contact[column.name].length === 0">
+          <span
+            v-if="contact[column.name].length === 0">
             -
           </span>
         </div>
-        <div class="text-left"
-             v-else-if="contact[column.name] && contact[column.name] instanceof Object">
-          <div class="ellipse">
-            {{ contact[column.name].name }}
+        <div
+          v-else-if="`${contact[column.name] && contact[column.name] instanceof Object}`"
+          class="text-left">
+          <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+            <!-- {{ contact[column.name].name }} -->
+            {{ contact[column.name] }}
           </div>
         </div>
-        <div class="text-left ellipse"
-             v-else-if="column.name.includes('_at') || column.name.includes('date')">
+        <div
+          v-else-if="column.name.includes('_at') || column.name.includes('date')"
+          class="text-left ellipse">
           {{ contact[column.name] | fixFullDateTime }}
         </div>
-        <div class="ellipse"
-             :class="[isCountField(column.name) ? 'text-center' : 'text-left']"
-             v-else>
+        <div
+          v-else
+          class="ellipse"
+          :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`">
           {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
             (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : contact[column.name]) }}
         </div>
@@ -288,6 +307,7 @@
 </template>
 
 <script>
+
 import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
@@ -317,6 +337,10 @@ export default {
     },
     contactListId: {
       type: [Number, String]
+    },
+    customRowContent: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -364,7 +388,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
+    ...mapActions('powerDialer', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
     isCountField (columnName) {
       return this.countFields.includes(columnName)
     },
@@ -398,7 +422,7 @@ export default {
 
     onMessage () {
       this.setMessageComposerMode('sms')
-      this.$router.push(`/contacts/${this.contact.id}`)
+      this.$router.push(`/powerDialer/${this.contact.id}`)
     },
 
     onCall () {
@@ -467,7 +491,7 @@ export default {
 
     makeTwoLeggedCall () {
       this.$axios
-        .post('/api/v1/contact/' + this.contact.id + '/make-two-legged-call', {
+        .post('/api/v1/contacts/' + this.contact.id + '/make-two-legged-call', {
           phone_number: this.contact.phone_number
         })
         .then((res) => {
@@ -482,7 +506,7 @@ export default {
         path: `/contacts/${contactId}`
       }
 
-      if (this.$route.name !== 'Contacts') {
+      if (this.$route.name !== 'Power Dialer') {
         routeData.query = {
           previousPage: this.$route.name
         }

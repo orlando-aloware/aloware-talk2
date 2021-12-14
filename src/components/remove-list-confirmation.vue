@@ -45,9 +45,35 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['removeListActionType', 'selectedList', 'listToRemove', 'isRemoveListOpen', 'folders', 'pinnedLists', 'pinned']),
+    ...mapGetters('contacts', [
+      'removeListActionType',
+      'selectedList',
+      'listToRemove',
+      'isRemoveListOpen',
+      'folders',
+      'pinnedLists',
+      'pinned'
+    ]),
     title () {
       return `Delete ${this.listToRemove.name} list?`
+    },
+    isContactModule () {
+      if (this.$route.name === 'Contacts') {
+        return true
+      }
+      return false
+    },
+    listEndpoint () {
+      if (this.isContactModule) {
+        return '/api/v2/contacts-list'
+      }
+      return '/api/v2/power-dialer-lists'
+    },
+    foldersEndpoint () {
+      if (this.isContactModule) {
+        return '/api/v2/contact-folders'
+      }
+      return '/api/v2/power-dialer-folders'
     }
   },
   data () {
@@ -68,7 +94,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeListClose', 'foldersLoaded', 'listPinToggled']),
+    ...mapActions('contacts', [
+      'removeListClose',
+      'foldersLoaded',
+      'listPinToggled'
+    ]),
     onCancel () {
       this.removeListClose()
       this.$bvModal.hide('remove-list-confirmation-dialog')
@@ -76,7 +106,7 @@ export default {
     handleDeletion (params) {
       this.isBusy = true
       return this.$axios
-        .delete(`/api/v2/contacts-list/${this.listToRemove.id}`, { params })
+        .delete(`${this.listEndpoint}/${this.listToRemove.id}`, { params })
         .then(() => {
           this.$generalNotification('Contact list was successfully removed.')
           this.removeListFromFolders(this.listToRemove.id, this.folders)
@@ -121,7 +151,7 @@ export default {
     },
     refreshFoldersList () {
       this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.foldersEndpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((err) => {

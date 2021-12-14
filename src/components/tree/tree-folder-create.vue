@@ -1,24 +1,31 @@
 <template>
   <div :data-layer="layer">
     <div class="folder-create d-flex align-items-center">
-      <div class="folder-create__indent" :style="indentStyle"></div>
+      <div
+        :style="indentStyle"
+        class="folder-create__indent">
+      </div>
+
       <div class="folder-create__arrow">
-        <folder-arrow-close-icon></folder-arrow-close-icon>
+        <folder-arrow-close-icon />
       </div>
+
       <div class="folder-create__icon">
-        <folder-icon color="#62666E"></folder-icon>
+        <folder-icon color="#62666E" />
       </div>
+
       <div class="folder-create__name flex-grow-1 d-flex align-items-center">
+
         <input
+          class="folder-create__input d-inline"
+          ref="input"
           :disabled="isCreating"
           type="text"
           v-model="text"
-          class="folder-create__input d-inline"
-          ref="input"
-          @blur="onInputBlur"
-          @keydown="onKeyDown"
           autofocus
-        />
+          @blur="onInputBlur"
+          @keydown="onKeyDown" />
+
       </div>
     </div>
   </div>
@@ -41,7 +48,10 @@ export default {
         width: `${this.layer * 10}px`
       }
     },
-    ...mapGetters('contacts', ['opened'])
+    ...mapGetters('contacts', ['opened']),
+    orderKey () {
+      return 0 - Math.abs(new Date().getTime() / 1000).toFixed(0)
+    }
   },
   props: {
     parent_id: {
@@ -51,6 +61,10 @@ export default {
       type: Number,
       required: false,
       default: 1
+    },
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
     }
   },
   data () {
@@ -92,7 +106,7 @@ export default {
     },
     createFolderRequest (params) {
       return this.$axios
-        .post('/api/v2/contact-folders', params)
+        .post(this.endpoint, params)
         .then(() => this.reloadFolders())
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -106,7 +120,7 @@ export default {
       return Promise.all([
         this.createFolderRequest({
           name: this.text,
-          order: 0 - Math.abs(new Date().getTime() / 1000).toFixed(0),
+          order: this.orderKey,
           parent_id: this.parent_id
         })
       ]).finally(() => {
@@ -116,7 +130,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.endpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

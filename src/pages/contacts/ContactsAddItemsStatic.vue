@@ -4,7 +4,7 @@
       <div class="d-flex flex-column">
         <div class="d-flex align-items-center">
           <router-link
-            :to="'/contacts/list/' + $route.params.id"
+            :to="`${urlRoutePath}${$route.params.id}`"
             v-slot="{ href, navigate }"
           >
             <a
@@ -15,15 +15,23 @@
               <i class="fa fa-chevron-left"></i>
             </a>
           </router-link>
-          Add contacts to
-          <div class="text-grey-90">
+          <span v-if="!openEdit">Add contacts to</span>
+          <div
+            v-if="!openEdit"
+            class="text-grey-90">
             <span class="title-icon">
               <folder-static-icon/>
             </span>
             {{ contactList.name }}
           </div>
+          <TextPopover
+            :id="contactList.id"
+            v-else
+            v-model="contactListName"
+            @input="updateListName" />
         </div>
         <div class="text-muted small action-desc">
+          {{ openEdit ? 'Add contacts by creating a filter or manually selecting' : 'Manually select contacts or create a filter'}}
           Manually select contacts or create a filter
         </div>
       </div>
@@ -151,6 +159,7 @@ import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/components/table-row.vue'
+import TextPopover from 'components/popover/text-popover'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
@@ -166,19 +175,29 @@ export default {
     Datatable,
     ImportContactsModal,
     TableRow,
+    TextPopover,
     FolderStaticIcon
   },
   props: {
     contactList: {
       type: Object,
       required: true
+    },
+    isContactModule: {
+      type: Boolean,
+      default: true
+    },
+    openEdit: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
       checked: [],
       id: 'all',
-      filterHasChanges: false
+      filterHasChanges: false,
+      listName: ''
     }
   },
   computed: {
@@ -210,6 +229,30 @@ export default {
     },
     validColumns () {
       return this.columns.filter(column => column.label !== 'Actions')
+    },
+    urlRoutePath () {
+      if (this.isContactModule) {
+        return '/contacts/list/'
+      }
+      return '/power-dialer/list/'
+    },
+    addItemEndpoint () {
+      if (this.isContactModule) {
+        return 'api/v2/contact-list-items'
+      } else {
+        // return 'api/v2/contact-list-items'
+        return 'api/v2/power-dialer-list-items'
+      }
+    },
+    checkedItemIds () {
+      let ids = []
+      this.checked.forEach(check => {
+        ids.push(check.id)
+      })
+      return ids
+    },
+    contactListName () {
+      return this.listName || this.contactList.name
     }
   },
   methods: {
@@ -218,20 +261,48 @@ export default {
       'openFilters',
       'closeFilters',
       'contactsLoaded',
+      'foldersLoaded',
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount'
     ]),
+    updateListName (data) {
+      this.$axios
+        .patch(`/api/v2/power-dialer-lists/${this.selectedList.id}`, {
+          name: data
+        })
+        .then((response) => response.data)
+        .then((response) => {
+          this.reloadFolders()
+          this.$generalNotification(response.message, 'success')
+          this.listName = data
+        })
+        .catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(`Error in renaming a list. ${message}`, 'error')
+        })
+    },
+    reloadFolders () {
+      return this.$axios
+        .get('/api/v2/power-dialer-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+    },
     addSelectedContacts () {
       this.isLoading = true
       this.closeFilters()
       return this.$axios
-        .post('api/v2/contact-list-items', {
-          contact_list_id: this.contactList.id,
-          contacts: this.checked
-        })
+        .post(this.addItemEndpoint, this.attachedParams())
         .then(() => {
           this.setShouldUpdateSelectedListContactCount(true)
-          this.$router.push('/contacts/list/' + this.contactList.id)
+          if (this.contactList.id === 'my-queue') {
+            this.$router.push(`/power-dialer`)
+          } else {
+            this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+          }
           this.$generalNotification('Selected contacts were successfully added')
         })
         .catch((err) => {
@@ -243,6 +314,24 @@ export default {
           this.isLoading = false
         })
     },
+    attachedParams () {
+      if (this.isContactModule) {
+        return {
+          contact_list_id: this.contactList.id,
+          contacts: this.checked
+        }
+      } else {
+        if (this.contactList.id === 'my-queue') {
+          return {
+            contact_ids: this.checkedItemIds
+          }
+        }
+        return {
+          contact_list_id: this.contactList.id,
+          contact_ids: this.checkedItemIds
+        }
+      }
+    },
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>
         this.checked.includes(i.id)
@@ -250,7 +339,7 @@ export default {
     },
     onCancel () {
       this.closeFilters()
-      this.$router.push('/contacts/list/' + this.contactList.id)
+      this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
     },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -300,6 +389,7 @@ export default {
     }
   },
   mounted () {
+    this.listName = ''
     this.fetch()
   },
   watch: {

@@ -157,10 +157,8 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import MailOpenIcon from 'components/icons/mail-open-icon'
 import EllipsisIcon from 'components/icons/ellipsis-icon'
 import BackButton from 'components/back-button'
-
 export default {
   name: 'contact-activities-header',
-
   components: {
     InboxOIcon,
     CheckOIcon,
@@ -170,7 +168,6 @@ export default {
     EllipsisIcon,
     BackButton
   },
-
   props: {
     contact: {
       type: Object,
@@ -191,7 +188,6 @@ export default {
       default: 0
     }
   },
-
   computed: {
     resolveVariant () {
       switch (this.contact.task_status) {
@@ -204,7 +200,6 @@ export default {
       }
     }
   },
-
   data () {
     return {
       ContactTaskStatus,
@@ -212,7 +207,6 @@ export default {
       nextStat: null
     }
   },
-
   methods: {
     onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
@@ -229,12 +223,10 @@ export default {
       let path = this.$route.path.split('/')
       path.pop()
       path.pop()
-
       if (!isNaN(path[(path.length - 1)] / 1)) {
         path.pop()
         path.pop()
       }
-
       this.$router.push(path.join('/'))
     }
   }
