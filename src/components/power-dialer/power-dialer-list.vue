@@ -8,24 +8,12 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
 import ContactsFolders from '../contacts/contacts-folders'
 
 export default {
   name: 'PowerDialerList',
   components: {
     ContactsFolders
-  },
-  computed: {
-    ...mapGetters('powerDialer', [
-      'powerDialerDirectoryList'
-    ]),
-    list () {
-      return this.powerDialerDirectoryList || this.directoryList
-    },
-    hasEmptyList () {
-      return (this.list[0].child_folders.length < 1 && this.list[0].lists.length < 1)
-    }
   },
   data () {
     return {
@@ -34,7 +22,6 @@ export default {
       toggleFolders: true
     }
   },
-  methods: {},
   watch: {
     '$route': {
       handler (routeObj) {
