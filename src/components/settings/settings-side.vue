@@ -64,12 +64,15 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import SettingsNavList from 'components/settings/settings-nav/settings-nav-list'
 import settingsMap from './settings-map'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'settings-side',
+
+  mixins: [aclMixin],
 
   components: {
     SettingsNavList
@@ -94,6 +97,7 @@ export default {
 
   computed: {
     ...mapState('settings', ['userClone', 'changedUserProperties', 'user']),
+    ...mapGetters('auth', ['authenticated', 'profile']),
     searchResult () {
       let query = this.searchText.trim().toLocaleLowerCase()
 
