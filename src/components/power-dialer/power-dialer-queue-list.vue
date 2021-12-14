@@ -5,7 +5,9 @@
         QUEUE
       </div>
     </div>
-     <div class="d-flex pinned__content flex-column">
+     <div
+      class="d-flex pinned__content flex-column"
+      v-if="hasListData">
       <!-- Queue List Here -->
       <QueueListItem
         v-for="(item, key) in filteredList"
@@ -37,19 +39,9 @@ export default {
         name: 'My Queue',
         to: '/power-dialer/list/'
       }]
-    }
-  },
-  data () {
-    return {
-      listItems: [
-        {
-          count: 0,
-          id: 'my-queue',
-          link: '/power-dialer/list/',
-          name: 'My Queue',
-          to: '/power-dialer/list/'
-        }
-      ]
+    },
+    hasListData () {
+      return this.my_queue?.id
     }
   }
 }
