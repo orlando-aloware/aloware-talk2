@@ -75,7 +75,7 @@ export default {
       return `/power-dialer/list/${this.id}/${listFilter.id}`
     },
     contactListCount (filterId) {
-      return filterId === 'all' ? this.getListWithFilter() : this.listResources[this.filters[filterId]]
+      return filterId === 'all' ? this.getListWithFilter() || 0 : this.listResources[this.filters[filterId]] || 0
     },
     getListWithFilter () {
       let ctr = 0
