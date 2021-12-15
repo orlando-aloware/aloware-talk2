@@ -1,6 +1,7 @@
 <template>
   <b-card class="border-0 text-center">
     <div class="t-grouped-buttons">
+
       <router-link
         class="link px-1"
         v-for="(lsFilter, key) in listFilters"
@@ -44,7 +45,8 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'activeFilter'
+      'activeFilter',
+      'filteredEndpoint'
     ]),
     ...mapGetters('contacts', [
       'listItems'
@@ -57,6 +59,9 @@ export default {
     },
     currentList () {
       return this.listItems?.[this.id]?.data || []
+    },
+    listResources () {
+      return this.listItems?.[this.id]
     }
   },
   methods: {
@@ -67,12 +72,17 @@ export default {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         return `/power-dialer/${listFilter.id}`
       }
-      return `/power-dialer/list/${this.id}/${listFilter.id}` // this.$route
+      return `/power-dialer/list/${this.id}/${listFilter.id}`
     },
     contactListCount (filterId) {
-      let filter = this.activeFilters[filterId]
-      let collection = this.currentList.filter(ls => ls?.task_status === filter)
-      return collection.length
+      return filterId === 'all' ? this.getListWithFilter() || 0 : this.listResources[this.filters[filterId]] || 0
+    },
+    getListWithFilter () {
+      let ctr = 0
+      Object.keys(this.filters).forEach(f => {
+        ctr += f !== 'all' ? this.listResources[this.filters[f]] : 0
+      })
+      return ctr
     }
   },
   watch: {
@@ -108,7 +118,14 @@ export default {
   },
   data () {
     return {
-      valid: true
+      valid: true,
+      filters: {
+        'in-queue': 'total_queued',
+        'called': 'total_called',
+        'failed': 'total_failed',
+        'scheduled': 'total_scheduled',
+        'all': 'total'
+      }
     }
   }
 }

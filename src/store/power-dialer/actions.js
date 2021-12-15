@@ -41,6 +41,10 @@ export default {
   contactsLoaded2: ({ commit }, payload) => {
     commit('CONTACTS_LOADED', payload)
   },
+  getList: async ({ commit }, endpoint = '') => {
+    let res = await window.axios.get(endpoint)
+    return res.data
+  },
 
   /**
    * Disposition API calls

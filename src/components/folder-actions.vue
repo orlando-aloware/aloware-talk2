@@ -249,8 +249,10 @@ export default {
         .then((response) => {
           // console.log('LOG: Successfully created a list...', response)
           this.reloadFolders()
-          // this.foldersLoaded()
           this.$generalNotification(response.message, 'success')
+          setTimeout(() => {
+            this.$router.push(`/power-dialer/list/${response.data.id}/add`)
+          }, 500)
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)

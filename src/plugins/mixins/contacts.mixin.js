@@ -1,4 +1,4 @@
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
@@ -36,6 +36,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts', 'setShouldUpdateSelectedListContactCount', 'setSelectedListContactCount']),
+    ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
@@ -126,6 +127,9 @@ export default {
       params.search = this.search
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
+      }
+      if (this.$route.name === 'Power Dialer') {
+        this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
 
       // clear out selections every contact fetch request

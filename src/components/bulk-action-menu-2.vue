@@ -21,16 +21,10 @@
         </div>
       </div>
       <div class="items">
-        <div
-          @click="onDelete"
-          class="cursor-pointer">
-          <i class="fa fa-trash"></i>
-          Delete
-        </div>
-      </div>
-      <div class="items">
-        <a href="" @click="onDelete">
-          <i class="fa fa-trash"></i>
+        <a
+          href=""
+          @click="onDelete">
+          <i class="fa fa-trash text-primary"></i>
           Delete
         </a>
       </div>
