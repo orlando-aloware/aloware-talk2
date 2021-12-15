@@ -1,6 +1,7 @@
 <template>
   <b-card class="border-0 text-center">
     <div class="t-grouped-buttons">
+
       <router-link
         class="link px-1"
         v-for="(lsFilter, key) in listFilters"
@@ -25,7 +26,6 @@
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import { mapGetters, mapMutations } from 'vuex'
-// import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerFilters',
