@@ -234,7 +234,8 @@
         :hide-header="true"
         :hide-footer="true"
         title="Are you really really sure?"
-        size="sm">
+        size="sm"
+        v-if="selectedItem">
         <div slot="content">
           <div class="text-center text-h6 pb-4">
             <TrashOIcon height="20" width="20" />
@@ -261,7 +262,7 @@
                 variant="danger"
                 size="sm"
                 block
-                @click="{}">
+                @click="onDeleteContact">
                 Remove
               </b-button>
             </div>
@@ -325,6 +326,9 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     BulkActionMenu
+  },
+  mounted () {
+    this.removeListClose()
   },
   computed: {
     ...mapState(['prevRoute']),
@@ -396,7 +400,9 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      selectedItem: null
+    }
   },
   methods: {
     ...mapMutations('powerDialer', [
@@ -499,6 +505,9 @@ export default {
           page: this.listItems[this.id].current_page
         })
       }
+    },
+    onDeleteContact (data) {
+      console.log('data :>> ', data)
     },
     saveFilterButtonCustomClass () {
       return !this.filterHasChanges ? 'button-disabled' : ''

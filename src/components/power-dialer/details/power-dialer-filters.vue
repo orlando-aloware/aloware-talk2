@@ -24,7 +24,7 @@
 
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 // import { isEmpty } from 'lodash'
 
 export default {
@@ -43,9 +43,6 @@ export default {
       default: 'in-queue'
     }
   },
-  async mounted () {
-    this.list = await this.getList(this.filteredEndpoint)
-  },
   computed: {
     ...mapGetters('powerDialer', [
       'activeFilter',
@@ -63,14 +60,11 @@ export default {
     currentList () {
       return this.listItems?.[this.id]?.data || []
     },
-    getAll () {
-      return this.list?.total
+    listResources () {
+      return this.listItems?.[this.id]
     }
   },
   methods: {
-    ...mapActions('powerDialer', [
-      'getList'
-    ]),
     ...mapMutations('powerDialer', [
       'SET_ACTIVE_FILTER'
     ]),
@@ -81,13 +75,14 @@ export default {
       return `/power-dialer/list/${this.id}/${listFilter.id}`
     },
     contactListCount (filterId) {
-      return this.getListWithFilter(filterId)
+      return filterId === 'all' ? this.getListWithFilter() : this.listResources[this.filters[filterId]]
     },
-    getListWithFilter (filter) {
-      if (filter === 'all') {
-        return this.getAll
-      }
-      return this.list?.data?.filter(list => list.task_status === this.activeFilters[filter]).length
+    getListWithFilter () {
+      let ctr = 0
+      Object.keys(this.filters).forEach(f => {
+        ctr += f !== 'all' ? this.listResources[this.filters[f]] : 0
+      })
+      return ctr
     }
   },
   watch: {
@@ -119,18 +114,18 @@ export default {
           this.SET_ACTIVE_FILTER('in-queue')
         }
       }
-    },
-    'filteredEndpoint': {
-      async handler (data) {
-        this.list = await this.getList(data)
-      },
-      deep: true
     }
   },
   data () {
     return {
       valid: true,
-      list: null
+      filters: {
+        'in-queue': 'total_queued',
+        'called': 'total_called',
+        'failed': 'total_failed',
+        'scheduled': 'total_scheduled',
+        'all': 'total'
+      }
     }
   }
 }
