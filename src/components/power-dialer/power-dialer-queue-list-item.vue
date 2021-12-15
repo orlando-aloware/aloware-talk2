@@ -51,7 +51,7 @@ export default {
       }
     },
     addQueueItem () {
-      this.$router.push('power-dialer/list/add')
+      this.$router.push('/power-dialer/list/add')
     }
   },
   watch: {
