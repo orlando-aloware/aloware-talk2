@@ -5107,7 +5107,7 @@ button#bs-folder-options {
   .item:hover {
     background: $light-blue3;
   }
-  
+
   .sublists {
     .folder {
       &--active:not(:hover) {
@@ -5115,7 +5115,7 @@ button#bs-folder-options {
       }
     }
   }
-  
+
 }
 
 .contact-popover {
@@ -5428,7 +5428,7 @@ table.datatable {
             opacity: 1;
 
             &.has-sorting {
-  
+
               a.sorter.sorter-desc {
                 &:before {
                   opacity: 1 !important;
@@ -5439,7 +5439,7 @@ table.datatable {
                   opacity: 1 !important;
                 }
               }
-  
+
               a.sorter.sorter-asc {
                 &:before {
                   opacity: 1 !important;
@@ -5450,7 +5450,7 @@ table.datatable {
                   top: 0px;
                 }
               }
-  
+
             }
           }
         }
@@ -9037,5 +9037,87 @@ screen and (max-width: 956px) {
     .q-field__native {
       padding-right: 6px !important;
     }
+  }
+}
+
+.q-shared-login-menu-dropdown {
+  box-shadow: none !important;
+  margin-right: 20px;
+
+  button:first-child {
+
+    text-transform: none;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+
+    .q-btn__content {
+      i {
+
+      }
+
+      span {
+        margin-left: 10px;
+        color: $grey-100 !important;
+      }
+    }
+  }
+
+  button:nth-child(2) {
+    border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+
+  button {
+    border: 1px solid $grey-60;
+    color: $grey-90;
+    background: transparent !important;
+
+    &:hover,
+    &:active {
+      background-color: transparent !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+
+    .q-btn__wrapper {
+      color: $grey-90 !important;
+    }
+  }
+}
+
+
+.shared-login-menu-dropdown {
+  button {
+    border: 1px solid $grey-60;
+    color: $grey-90;
+
+    &:hover,
+    &:active {
+      background-color: transparent !important;
+      border-color: $grey-60 !important;
+      color: $grey-90 !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+
+  button:not(.dropdown-toggle) {
+    color: $grey-100 !important;
+
+    i {
+      color: $grey-90 !important;
+    }
+  }
+}
+
+.shared-login-menu-dropdown.dropdown.show {
+  .dropdown-toggle {
+    border: 1px solid $grey-60 !important;
+    background-color: transparent !important;
+    color: $grey-90 !important;
   }
 }

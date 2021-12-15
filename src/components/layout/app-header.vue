@@ -23,6 +23,7 @@
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center">
+       <shared-login-menu></shared-login-menu>
         <profile></profile>
 
         <phone></phone>
@@ -81,6 +82,7 @@ import ParkedCall from 'components/dialer/parked-call'
 import InboxListNavigation from 'components/inbox/inbox-list-navigation'
 import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
 import RefreshIcon from 'components/icons/refresh-icon'
+import SharedLoginMenu from 'components/shared-login-menu'
 
 export default {
   name: 'app-header',
@@ -88,6 +90,7 @@ export default {
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
   components: {
+    SharedLoginMenu,
     InboxChannelNavigation,
     InboxListNavigation,
     ParkedCall,
