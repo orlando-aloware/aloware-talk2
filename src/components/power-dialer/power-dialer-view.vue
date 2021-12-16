@@ -92,9 +92,11 @@
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
                   </b-dropdown-item>
-                  <b-dropdown-item href="#">
-                    <i class="fa fa-trash-alt mr-1"></i>
-                    Delete
+                  <b-dropdown-item
+                    href="#"
+                    @click="onRemoveList">
+                    <i class="fa fa-trash-alt mr-1 text-red"></i>
+                    <span class="text-red">Delete</span>
                   </b-dropdown-item>
                 </b-dropdown>
 
@@ -232,7 +234,8 @@
         :hide-header="true"
         :hide-footer="true"
         title="Are you really really sure?"
-        size="sm">
+        size="sm"
+        v-if="selectedItem">
         <div slot="content">
           <div class="text-center text-h6 pb-4">
             <TrashOIcon height="20" width="20" />
@@ -259,7 +262,7 @@
                 variant="danger"
                 size="sm"
                 block
-                @click="{}">
+                @click="onDeleteContact">
                 Remove
               </b-button>
             </div>
@@ -323,6 +326,9 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     BulkActionMenu
+  },
+  mounted () {
+    this.removeListClose()
   },
   computed: {
     ...mapState(['prevRoute']),
@@ -394,7 +400,9 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      selectedItem: null
+    }
   },
   methods: {
     ...mapMutations('powerDialer', [
@@ -414,6 +422,7 @@ export default {
       'setListSelectedContacts',
       'setSelectedList',
       'createListOpen',
+      'removeListClose',
       'setCurrentListFilters',
       'removeListOpen',
       'resetSearch',
@@ -467,6 +476,13 @@ export default {
 
       this.setListSelectedContacts({ id: this.id, contacts: items })
     },
+    onRemoveList () {
+      this.removeListClose()
+      setTimeout(() => {
+        // this.removeListOpen({ id: this.id, name: this.name })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
+      }, 10)
+    },
     onCheckedRows (checked) {
       console.log('data from table 902 : ', checked)
       this.setListSelectedContacts({ id: this.id, contacts: checked })
@@ -475,7 +491,7 @@ export default {
       this.columnsOpen({
         id: this.id,
         headers: this.columns,
-        name: this.list.name
+        name: this.list?.name
       })
     },
     onContactCreated (contact) {
@@ -489,6 +505,9 @@ export default {
           page: this.listItems[this.id].current_page
         })
       }
+    },
+    onDeleteContact (data) {
+      console.log('data :>> ', data)
     },
     saveFilterButtonCustomClass () {
       return !this.filterHasChanges ? 'button-disabled' : ''

@@ -10,9 +10,7 @@
       v-if="hasListData">
       <!-- Queue List Here -->
       <QueueListItem
-        v-for="(item, key) in filteredList"
-        :key="key"
-        :item="item" />
+        :item="filteredList" />
     </div>
   </div>
 </template>
@@ -32,13 +30,13 @@ export default {
       'my_queue'
     ]),
     filteredList () {
-      return [{
+      return {
         count: this.my_queue.items.length,
         id: this.my_queue.id,
         link: '/power-dialer/list/',
         name: 'My Queue',
         to: '/power-dialer/list/'
-      }]
+      }
     },
     hasListData () {
       return this.my_queue?.id

@@ -1,28 +1,26 @@
 <template>
-  <router-link
-    :to="'/power-dialer'"
-    :key="item.id"
-    v-if="item.name"
-    v-slot="{ href, route, navigate, isActive, isExactActive }">
+  <div>
     <a
-      :href="href"
-      :class="[isActive && 'router-link-active', isExactActive && 'router-link-exact-active']"
+      :class="`${isActive ? 'router-link-active router-link-exact-active' : ''}`"
       class="d-flex align-items-center item"
-      @click="navigate">
+      @click.stop="gotoBase">
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <ListIcon />
         <span class="pl-2">{{ item.name }}</span>
       </div>
       <div class="counts d-flex align-items-center">
-        <div class="icon d-flex align-items-center">
-          <AddUserIcon class="cursor-pointer" />
+        <div
+          class="icon d-flex align-items-center"
+          @click.stop="addQueueItem">
+          <AddUserIcon
+            class="cursor-pointer" />
         </div>
         <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
           {{ item.count | fixCount }}
         </b-badge>
       </div>
     </a>
-  </router-link>
+  </div>
 </template>
 
 <script>
@@ -40,6 +38,29 @@ export default {
   components: {
     ListIcon,
     AddUserIcon
+  },
+  data () {
+    return {
+      isActive: true
+    }
+  },
+  methods: {
+    gotoBase () {
+      if (this.$route.path !== '/power-dialer') {
+        this.$router.push('/power-dialer')
+      }
+    },
+    addQueueItem () {
+      this.$router.push('/power-dialer/list/add')
+    }
+  },
+  watch: {
+    '$route': {
+      handler (val) {
+        this.isActive = val.path === '/power-dialer' || val.path === '/power-dialer/list/add'
+      },
+      deep: true
+    }
   }
 }
 </script>

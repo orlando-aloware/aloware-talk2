@@ -33,7 +33,6 @@ export default {
     }
   },
   async mounted () {
-    console.log('this.$route.meta.id :>> ', this.$route.meta.id)
     if (this.$route.meta.id === 'power-dialer') {
       await this.getMyQueueList()
     }
