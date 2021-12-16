@@ -11,7 +11,7 @@
     >
 
       <template slot="label">
-        <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
+        <i class="fas fa-arrow-right"></i>  <span>Aloware (Classic)</span>
       </template>
 
       <q-list class="q-shared-login-menu-dropdown-list pl-4 pr-4">
@@ -35,7 +35,7 @@
             <b-form-radio inline
                           value="1"
                           v-model="defaultLogin">
-              Aloware Classic
+              Aloware (Classic)
             </b-form-radio>
           </q-item-section>
         </q-item>
@@ -45,6 +45,9 @@
 </template>
 
 <script>
+
+import electron from 'electron'
+
 export default {
   name: 'shared-login-menu',
   data () {
@@ -53,12 +56,15 @@ export default {
     }
   },
   methods: {
-    onMainClick () {},
+    onMainClick () {
+      let userAgent = navigator.userAgent.toLowerCase()
+      if (userAgent.indexOf(' electron/') > -1) {
+        electron.shell.openExternal(process.env.API_URL)
+      } else {
+        window.location.href = process.env.API_URL
+      }
+    },
     onItemClick () {}
   }
 }
 </script>
-
-<style scoped>
-
-</style>
