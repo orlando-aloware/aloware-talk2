@@ -52,6 +52,9 @@ export default {
     },
     selectedContactIds () {
       return this.selectedContacts[this.id].map(contact => contact.id)
+    },
+    isMyQueue () {
+      return this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter'
     }
   },
   methods: {
@@ -81,7 +84,7 @@ export default {
     },
     async onMoveContacts (direction = 'top') {
       let res = await this.moveContactItems({
-        id: this.id,
+        id: this.isMyQueue ? 'my-queue' : this.id,
         params: {
           contact_ids: this.selectedContactIds,
           direction: direction === 'top' ? 1 : 2
