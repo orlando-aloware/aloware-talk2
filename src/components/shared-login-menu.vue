@@ -4,10 +4,9 @@
       split
       class="q-shared-login-menu-dropdown "
       color="primary"
-      label=""
       padding="0px 10px"
       :menu-offset="[4, 16]"
-      @click="onMainClick"
+      @click="onGoToClassic"
     >
 
       <template slot="label">
@@ -24,7 +23,7 @@
         <q-item>
           <q-item-section avatar>
             <b-form-radio inline
-                          value="0"
+                          :value="AppDefaultLogin.APP_ALOWARE_TALK"
                           v-model="defaultLogin">
               Aloware Talk
             </b-form-radio>
@@ -33,7 +32,7 @@
         <q-item>
           <q-item-section avatar>
             <b-form-radio inline
-                          value="1"
+                          :value="AppDefaultLogin.APP_ALOWARE_CLASSIC"
                           v-model="defaultLogin">
               Aloware (Classic)
             </b-form-radio>
@@ -45,26 +44,36 @@
 </template>
 
 <script>
-
-import electron from 'electron'
-
+import talk2Api from 'src/plugins/api/api'
+import { mapGetters } from 'vuex'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 export default {
   name: 'shared-login-menu',
+
+  computed: {
+    ...mapGetters('auth', ['profile'])
+  },
+
   data () {
     return {
-      defaultLogin: 0
+      defaultLogin: 1,
+      AppDefaultLogin
     }
   },
+
   methods: {
-    onMainClick () {
-      let userAgent = navigator.userAgent.toLowerCase()
-      if (userAgent.indexOf(' electron/') > -1) {
-        electron.shell.openExternal(process.env.API_URL)
-      } else {
-        window.location.href = process.env.API_URL
-      }
+    onGoToClassic () {
+      window.location.href = process.env.API_URL
     },
-    onItemClick () {}
+    updateDefaultLogin () {
+      talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.defaultLogin })
+    }
+  },
+
+  watch: {
+    defaultLogin: function () {
+      this.updateDefaultLogin()
+    }
   }
 }
 </script>

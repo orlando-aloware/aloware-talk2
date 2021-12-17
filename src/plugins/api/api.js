@@ -182,6 +182,9 @@ export default {
     users: {
       withAccessToContact (contactId) {
         return window.axios.get(`${suffixV1}user/get-users-with-access-to-contact?contact_id=${contactId}`)
+      },
+      setDefaultLogin (userId, params) {
+        return window.axios.put(`${suffixV1}user/${userId}/set-default-app`, params)
       }
     },
     reports: {

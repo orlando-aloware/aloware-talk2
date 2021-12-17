@@ -23,7 +23,9 @@
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center">
-       <shared-login-menu></shared-login-menu>
+
+        <shared-login-menu v-if="!isElectron"></shared-login-menu>
+
         <profile></profile>
 
         <phone></phone>
@@ -69,6 +71,7 @@
 
 <script>
 import _ from 'lodash'
+import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
@@ -120,6 +123,9 @@ export default {
 
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
+    },
+    isElectron () {
+      return Platform.is.electron
     }
   },
 

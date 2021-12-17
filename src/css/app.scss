@@ -9087,6 +9087,20 @@ screen and (max-width: 956px) {
   }
 }
 
+.q-shared-login-menu-dropdown-list {
+  padding: 15px;
+  .q-item {
+    min-height: 16px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+
+    &:not(:last-child) {
+      margin-bottom: 13px;
+    }
+  }
+
+}
+
 
 .shared-login-menu-dropdown {
   button {
