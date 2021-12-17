@@ -141,7 +141,7 @@ export default {
       if (this.isContactsRoute) {
         return `/contacts/list/${this.id}`
       }
-      return `/power-dialer/list/${this.id}/in-queue`
+      return `/power-dialer/list/${this.id}`
     },
     listPath () {
       if (this.isContactsRoute) {

@@ -77,7 +77,6 @@ export default {
     breadcrumbName () {
       let { crumbs, name } = this.breadcrumbs
       return isEmpty(crumbs) && isEmpty(name) ? 'My Queue' : name
-      // return `${crumbs} -- ${name}`
     }
   },
   mounted () {
