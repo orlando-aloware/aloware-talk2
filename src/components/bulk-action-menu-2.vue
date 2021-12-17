@@ -84,12 +84,14 @@ export default {
         id: this.id,
         params: {
           contact_ids: this.selectedContactIds,
-          direction: direction
+          direction: direction === 'top' ? 1 : 2
         }
       })
-      console.log('RESPONSE PAYLOAD :>> ', res)
-      // this.$generalNotification(`Successfully moved contacts to ${direction}.`, 'success')
-      // this.$generalNotification('Unable to move contact items!', 'error')
+
+      this.$generalNotification(
+        res?.data ? `Successfully moved contacts to ${direction}.` : 'Unable to move contact items!',
+        res?.data ? 'success' : 'error'
+      )
     },
     onCreateStaticList (e) {
       this.createListOpen({
