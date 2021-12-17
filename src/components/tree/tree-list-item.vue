@@ -7,7 +7,7 @@
     </div>
     <router-link
       class="tree-list-item flex-grow-1 d-flex-shrink-0"
-      :to="`${viewListPath}${id}`"
+      :to="viewListPath"
       v-slot="{ navigate, isExactActive }"
     >
       <div :data-layer="layer">
@@ -139,9 +139,9 @@ export default {
     },
     viewListPath () {
       if (this.isContactsRoute) {
-        return '/contacts/list/'
+        return `/contacts/list/${this.id}`
       }
-      return '/power-dialer/list/'
+      return `/power-dialer/list/${this.id}/in-queue`
     },
     listPath () {
       if (this.isContactsRoute) {
