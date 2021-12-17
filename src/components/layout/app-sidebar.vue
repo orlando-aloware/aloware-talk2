@@ -54,7 +54,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Power Dialer')"
-           v-if="isProdEnv"
+           v-if="!isProd"
            flat>
     </q-btn>
     <q-btn :to="{ name: 'Power Dialer' }"
@@ -64,7 +64,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer')"
-           v-if="isProdEnv"
+           v-if="!isProd"
            flat>
     </q-btn>
 
@@ -136,8 +136,8 @@ export default {
   },
 
   computed: {
-    isProdEnv () {
-      return process.env.NODE_ENV === 'development'
+    isProd () {
+      return process.env.PROD
     }
   },
 
