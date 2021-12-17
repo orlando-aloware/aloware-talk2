@@ -13,6 +13,7 @@
           class="icon d-flex align-items-center"
           @click.stop="addQueueItem">
           <AddUserIcon
+            v-if="false"
             class="cursor-pointer" />
         </div>
         <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
