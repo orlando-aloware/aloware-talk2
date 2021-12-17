@@ -458,7 +458,6 @@ export default {
       return `${this.activeRoute.fullPath}/${id}`
     },
     onCheckboxCheck (data) {
-      console.log('data from table 901 : ', data)
       this.setListSelectedContacts({ id: this.id, contacts: data })
     },
     onCheckAllItems (checked) {

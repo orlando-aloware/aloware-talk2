@@ -49,6 +49,9 @@ export default {
     ...mapGetters('contacts', ['selectedContacts']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
+    },
+    selectedContactIds () {
+      return this.selectedContacts[this.id].map(contact => contact.id)
     }
   },
   methods: {
@@ -59,17 +62,34 @@ export default {
       'selectListOpen',
       'setSelectedStaticList'
     ]),
+    ...mapActions('powerDialer', [
+      'moveContactItems'
+    ]),
     onDelete (e) {
       console.log('Deleting items...')
       this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()
     },
-    onMoveToTop () {
+    async onMoveToTop () {
       console.log('Moving to top...')
+      await this.onMoveContacts('top')
     },
-    onMoveToBottom () {
+    async onMoveToBottom () {
       console.log('Moving to bottom...')
+      await this.onMoveContacts('bottom')
+    },
+    async onMoveContacts (direction = 'top') {
+      let res = await this.moveContactItems({
+        id: this.id,
+        params: {
+          contact_ids: this.selectedContactIds,
+          direction: direction
+        }
+      })
+      console.log('RESPONSE PAYLOAD :>> ', res)
+      // this.$generalNotification(`Successfully moved contacts to ${direction}.`, 'success')
+      // this.$generalNotification('Unable to move contact items!', 'error')
     },
     onCreateStaticList (e) {
       this.createListOpen({
