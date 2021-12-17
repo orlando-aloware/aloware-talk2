@@ -137,7 +137,7 @@ export default {
 
   computed: {
     isProd () {
-      return process.env.PROD
+      return localStorage.env === 'production'
     }
   },
 
