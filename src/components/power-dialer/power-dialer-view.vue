@@ -15,7 +15,6 @@
     </template>
 
     <template slot="actions">
-      -- {{ $q.screen.name }}
       <div>
         <SummaryInfoLabels />
         <b-container fluid class="bv-example-row m-0 p-0 pb-0 border-bottom">
