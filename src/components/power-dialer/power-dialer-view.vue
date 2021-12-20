@@ -457,7 +457,7 @@ export default {
       this.$router.push({ name: 'Power Dialer Session' })
     },
     onAddContactsToList () {
-      if (this.$route.meta.id === 'power-dialer') {
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         this.$router.push(`/power-dialer/list/add`)
       } else {
         this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
