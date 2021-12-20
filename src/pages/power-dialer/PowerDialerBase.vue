@@ -33,8 +33,7 @@ export default {
     }
   },
   async mounted () {
-    if (this.$route.meta.id === 'power-dialer') {
-      console.log('7777 :>> ', 7777)
+    if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
       await this.getMyQueueList()
     }
   },
@@ -97,7 +96,7 @@ export default {
     }
   },
   watch: {
-    'id': function (id) {
+    'id': async function (id) {
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
       }

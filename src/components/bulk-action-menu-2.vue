@@ -47,6 +47,7 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['selectedContacts']),
+    ...mapGetters('powerDialer', ['myQueue']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
     },
@@ -84,7 +85,7 @@ export default {
     },
     async onMoveContacts (direction = 'top') {
       let res = await this.moveContactItems({
-        id: this.isMyQueue ? 'my-queue' : this.id,
+        id: this.isMyQueue ? this.myQueue.id : this.id,
         params: {
           contact_ids: this.selectedContactIds,
           direction: direction === 'top' ? 1 : 2

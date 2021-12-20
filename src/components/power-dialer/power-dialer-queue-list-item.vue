@@ -58,7 +58,6 @@ export default {
   watch: {
     '$route': {
       handler (val) {
-        console.log('val :>> ', val.meta.id)
         this.isActive = val.meta.id === 'power-dialer-queue-filter' || val.meta.id === 'power-dialer-add-queue-list'
       },
       deep: true

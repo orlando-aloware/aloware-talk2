@@ -248,7 +248,8 @@ export default {
       if (params.sort) {
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
-        powerQuery.sort = params.sort
+        powerQuery.sort_by = params.sort
+        powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
       if (params.task_status) {
