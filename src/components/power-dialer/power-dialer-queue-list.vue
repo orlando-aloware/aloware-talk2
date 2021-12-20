@@ -8,9 +8,10 @@
      <div
       class="d-flex pinned__content flex-column"
       v-if="hasListData">
-      <!-- Queue List Here -->
+
       <QueueListItem
         :item="filteredList" />
+
     </div>
   </div>
 </template>
