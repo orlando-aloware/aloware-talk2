@@ -71,31 +71,29 @@ export default {
         })
       }
 
-      if (stringId !== 'my-queue') {
-        this.$axios
-          .get('/api/v2/power-dialer-lists/' + stringId)
-          .then((response) => response.data)
-          .then((response) => {
-            this.listLoaded({ ...response, id: stringId })
-            this.setSelectedList({ id: response.id, name: response.name, type: response.type })
-            let filters = {
-              contact_lists: {
-                operator: 1,
-                value: [stringId]
-              }
+      this.$axios
+        .get('/api/v2/power-dialer-lists/' + stringId)
+        .then((response) => response.data)
+        .then((response) => {
+          this.listLoaded({ ...response, id: stringId })
+          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          let filters = {
+            contact_lists: {
+              operator: 1,
+              value: [stringId]
             }
+          }
 
-            this.setCurrentListFilters(filters)
-          })
-          .catch((error) => {
-            const { message, html } = extractErrorMessage(error)
-            console.log(html)
-            this.$generalNotification(message, 'error')
-            if (this.$route.name === 'Power Dialer') {
-              this.$router.replace('/power-dialer/')
-            }
-          })
-      }
+          this.setCurrentListFilters(filters)
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+          if (this.$route.name === 'Power Dialer') {
+            this.$router.replace('/power-dialer/')
+          }
+        })
     }
   },
   watch: {
