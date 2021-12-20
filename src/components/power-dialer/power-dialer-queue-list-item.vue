@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     gotoBase () {
-      if (this.$route.path !== '/power-dialer') {
+      if (this.$route.meta.id !== 'power-dialer-queue-filter') {
         this.$router.push('/power-dialer')
       }
     },
@@ -58,7 +58,8 @@ export default {
   watch: {
     '$route': {
       handler (val) {
-        this.isActive = val.path === '/power-dialer' || val.path === '/power-dialer/list/add'
+        console.log('val :>> ', val.meta.id)
+        this.isActive = val.meta.id === 'power-dialer-queue-filter' || val.meta.id === 'power-dialer-add-queue-list'
       },
       deep: true
     }
