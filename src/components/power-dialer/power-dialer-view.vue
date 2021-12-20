@@ -38,7 +38,7 @@
                   :active-route="activeRoute" />
               </div>
             </b-col>
-            <b-col col>
+            <b-col class="p-0">
               <div class="d-flex float-right">
 
                 <b-dropdown text="Add Contacts"
@@ -82,7 +82,7 @@
                   no-caret
                   right size="sm"
                   variant="white"
-                  class="m-0 mb-3 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+                  class="m-0 mb-3 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
                   <template #button-content>
                     <i class="fa fa-ellipsis-h"></i>
                   </template>
