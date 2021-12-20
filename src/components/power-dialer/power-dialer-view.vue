@@ -16,13 +16,22 @@
 
     <template slot="actions">
       <div>
-        <PowerDialerFilter
-          v-if="activeRoute"
-          :id="id"
-          :filter="filter"
-          :active-route="activeRoute" />
-        <b-container fluid class="bv-example-row m-0 p-0 pl-3 pb-0 border-bottom">
-          <b-row class="pr-2">
+        <SummaryInfoLabels />
+        <b-container fluid class="bv-example-row m-0 p-0 pb-0 border-bottom">
+          <b-row
+            class="pr-2 pt-4 pb-3"
+            v-if="$q.screen.name !== 'lg'">
+            <b-col cols="12">
+              <div class="d-flex">
+                <PowerDialerFilter
+                  v-if="activeRoute"
+                  :id="id"
+                  :filter="filter"
+                  :active-route="activeRoute" />
+              </div>
+            </b-col>
+          </b-row>
+          <b-row class="pr-2 pt-4">
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
 
@@ -30,18 +39,28 @@
                   @search="onSearch"
                   :search="search"
                   class="width-250" />
-                <SummaryInfoLabels />
 
               </div>
             </b-col>
-            <b-col col lg="4" class="p-0 m-0">
-              <div class="px-0 d-flex align-items-center float-right">
+            <b-col
+              cols="8"
+              v-if="$q.screen.name === 'lg'">
+              <div class="d-flex">
+                <PowerDialerFilter
+                  v-if="activeRoute"
+                  :id="id"
+                  :filter="filter"
+                  :active-route="activeRoute" />
+              </div>
+            </b-col>
+            <b-col class="p-0">
+              <div class="d-flex float-right">
 
                 <b-dropdown text="Add Contacts"
                   right
                   no-caret
                   variant="light"
-                  class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                  class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                   toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center">
                   <template
                     #button-content class="filter-toggle-button">
@@ -78,7 +97,7 @@
                   no-caret
                   right size="sm"
                   variant="white"
-                  class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+                  class="m-0 mb-3 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
                   <template #button-content>
                     <i class="fa fa-ellipsis-h"></i>
                   </template>
@@ -438,7 +457,7 @@ export default {
       this.$router.push({ name: 'Power Dialer Session' })
     },
     onAddContactsToList () {
-      if (this.$route.meta.id === 'power-dialer') {
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         this.$router.push(`/power-dialer/list/add`)
       } else {
         this.$router.push(`/power-dialer/list/${this.$route.params.id}/add`)
@@ -458,7 +477,6 @@ export default {
       return `${this.activeRoute.fullPath}/${id}`
     },
     onCheckboxCheck (data) {
-      console.log('data from table 901 : ', data)
       this.setListSelectedContacts({ id: this.id, contacts: data })
     },
     onCheckAllItems (checked) {

@@ -9,7 +9,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 export default function () {
   return {
     flaggedCreateExisting: false,
-    my_queue: null,
+    myQueue: null,
     filters: [],
     opened: [],
     folders: [],

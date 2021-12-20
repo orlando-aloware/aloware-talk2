@@ -15,7 +15,7 @@
 }
 
 .t-badge-name {
-  padding: 3px;
+  padding: 0px;
 }
 
 .t-grouped-buttons {
@@ -29,11 +29,11 @@
   }
   &__btn {
     background-color: $grey-60;
-    padding: 1px 10px;
+    padding: 4px 10px;
     color: $grey-90;
     display: inline-flex;
     margin: 1px 0;
-    height: 24px;
+    height: 26px;
     border-radius: 5px;
     
     .t__badge {
@@ -44,7 +44,7 @@
       border-radius: 5px;
       color: $grey-90;
       height: 16px;
-      top: 2px;
+      top: 0px;
       position: relative;
     }
 

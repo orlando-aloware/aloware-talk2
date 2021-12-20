@@ -141,12 +141,15 @@ const routes = [
               id: 'power-dialer'
             },
             path: '',
+            redirect: {
+              path: 'in-queue'
+            },
             component: () => import('src/pages/power-dialer/PowerDialerBase')
           },
           {
             name: 'Power Dialer',
             meta: {
-              title: 'Power Dialer Filter',
+              title: 'Power Dialer',
               id: 'power-dialer-queue-filter'
             },
             path: ':id(in-queue|called|failed|scheduled|all)+',
@@ -159,12 +162,15 @@ const routes = [
               id: 'power-dialer-list'
             },
             path: 'list/:id(\\d+)+',
+            redirect: {
+              path: 'list/:id(\\d+)+/in-queue'
+            },
             component: () => import('src/pages/power-dialer/PowerDialerBase'),
             children: [
               {
                 name: 'Power Dialer',
                 meta: {
-                  title: 'Power Dialer List Advance',
+                  title: 'Power Dialer',
                   id: 'power-dialer-list-filter'
                 },
                 path: ':filter(in-queue|called|failed|scheduled|all)+',

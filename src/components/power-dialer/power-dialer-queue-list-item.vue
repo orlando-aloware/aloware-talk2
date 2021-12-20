@@ -13,6 +13,7 @@
           class="icon d-flex align-items-center"
           @click.stop="addQueueItem">
           <AddUserIcon
+            v-if="false"
             class="cursor-pointer" />
         </div>
         <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
@@ -46,7 +47,7 @@ export default {
   },
   methods: {
     gotoBase () {
-      if (this.$route.path !== '/power-dialer') {
+      if (this.$route.meta.id !== 'power-dialer-queue-filter') {
         this.$router.push('/power-dialer')
       }
     },
@@ -57,7 +58,7 @@ export default {
   watch: {
     '$route': {
       handler (val) {
-        this.isActive = val.path === '/power-dialer' || val.path === '/power-dialer/list/add'
+        this.isActive = val.meta.id === 'power-dialer-queue-filter' || val.meta.id === 'power-dialer-add-queue-list'
       },
       deep: true
     }

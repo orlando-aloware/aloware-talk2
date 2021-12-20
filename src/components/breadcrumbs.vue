@@ -39,7 +39,7 @@
         <ListIcon />
       </div>
       <div class="breadcrumbs__name">
-        {{ breadcrumbs.name }}
+        {{ breadcrumbName }}
       </div>
     </div>
   </div>
@@ -73,17 +73,15 @@ export default {
   computed: {
     ...mapGetters([
       'breadcrumbs'
-    ])
+    ]),
+    breadcrumbName () {
+      let { crumbs, name } = this.breadcrumbs
+      return isEmpty(crumbs) && isEmpty(name) ? 'My Queue' : name
+    }
   },
   mounted () {
     let id = this.$route.params.id
     this.findParents(this.directoryList, id)
-  },
-  data () {
-    return {
-      crumbs: '',
-      name: ''
-    }
   },
   methods: {
     ...mapMutations([

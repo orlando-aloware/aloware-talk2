@@ -27,19 +27,19 @@ export default {
   },
   computed: {
     ...mapGetters('powerDialer', [
-      'my_queue'
+      'myQueue'
     ]),
     filteredList () {
       return {
-        count: this.my_queue.items.length,
-        id: this.my_queue.id,
+        count: this.myQueue.items.length,
+        id: this.myQueue.id,
         link: '/power-dialer/list/',
         name: 'My Queue',
         to: '/power-dialer/list/'
       }
     },
     hasListData () {
-      return this.my_queue?.id
+      return this.myQueue?.id
     }
   }
 }

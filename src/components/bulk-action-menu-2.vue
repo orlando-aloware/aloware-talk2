@@ -47,8 +47,15 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['selectedContacts']),
+    ...mapGetters('powerDialer', ['myQueue']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
+    },
+    selectedContactIds () {
+      return this.selectedContacts[this.id].map(contact => contact.id)
+    },
+    isMyQueue () {
+      return this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter'
     }
   },
   methods: {
@@ -59,17 +66,36 @@ export default {
       'selectListOpen',
       'setSelectedStaticList'
     ]),
+    ...mapActions('powerDialer', [
+      'moveContactItems'
+    ]),
     onDelete (e) {
       console.log('Deleting items...')
       this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()
     },
-    onMoveToTop () {
+    async onMoveToTop () {
       console.log('Moving to top...')
+      await this.onMoveContacts('top')
     },
-    onMoveToBottom () {
+    async onMoveToBottom () {
       console.log('Moving to bottom...')
+      await this.onMoveContacts('bottom')
+    },
+    async onMoveContacts (direction = 'top') {
+      let res = await this.moveContactItems({
+        id: this.isMyQueue ? this.myQueue.id : this.id,
+        params: {
+          contact_ids: this.selectedContactIds,
+          direction: direction === 'top' ? 1 : 2
+        }
+      })
+
+      this.$generalNotification(
+        res?.data ? `Successfully moved contacts to ${direction}.` : 'Unable to move contact items!',
+        res?.data ? 'success' : 'error'
+      )
     },
     onCreateStaticList (e) {
       this.createListOpen({

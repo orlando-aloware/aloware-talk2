@@ -79,5 +79,14 @@ export default {
   },
   setContacts2: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
+  },
+  moveContactItems: async ({ commit }, payload = {}) => {
+    return window.axios.patch(`api/v2/power-dialer-list-items/move/${payload.id}`,
+      payload.params
+    ).then((res) => {
+      return res
+    }).catch((err) => {
+      return err
+    })
   }
 }

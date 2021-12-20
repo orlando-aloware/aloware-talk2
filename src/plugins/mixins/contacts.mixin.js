@@ -120,7 +120,7 @@ export default {
         case 'power-dialer-queue-filter':
           return `api/v2/power-dialer-lists/my-queue/items`
         default:
-          return `api/v2/power-dialer-lists/${this.id}/items`
+          return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
@@ -248,7 +248,8 @@ export default {
       if (params.sort) {
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
-        powerQuery.sort = params.sort
+        powerQuery.sort_by = params.sort
+        powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
       if (params.task_status) {
@@ -328,11 +329,19 @@ export default {
         !this.isLoading
       )
     },
+    test () {
+      return this.$route.meta.id
+    },
     isPowerDialer () {
-      if (this.$route.name !== 'Power Dialer') {
-        return false
+      if (this.$route.name === 'Power Dialer' &&
+        (
+          this.$route.meta.id !== 'power-dialer-add-list' &&
+          this.$route.meta.id !== 'power-dialer-add-queue-list'
+        )
+      ) {
+        return true
       }
-      return true
+      return false
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
@@ -368,8 +377,6 @@ export default {
         if (!Array.isArray(headers)) {
           throw new Error('Headers field is broken')
         }
-
-        // console.log('headers :>> ', headers)
 
         for (let key in headers) {
           const found = ALL_COLUMNS.find(column => column.name === headers[key].name)
