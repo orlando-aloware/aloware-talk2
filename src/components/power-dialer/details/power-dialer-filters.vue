@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0 text-center">
+  <b-card class="filter-chips border-0 text-center px-2" no-body>
     <div class="t-grouped-buttons">
 
       <router-link
