@@ -15,9 +15,23 @@
     </template>
 
     <template slot="actions">
+      -- {{ $q.screen.name }}
       <div>
         <SummaryInfoLabels />
         <b-container fluid class="bv-example-row m-0 p-0 pb-0 border-bottom">
+          <b-row
+            class="pr-2 pt-4 pb-3"
+            v-if="$q.screen.name !== 'lg'">
+            <b-col cols="12">
+              <div class="d-flex">
+                <PowerDialerFilter
+                  v-if="activeRoute"
+                  :id="id"
+                  :filter="filter"
+                  :active-route="activeRoute" />
+              </div>
+            </b-col>
+          </b-row>
           <b-row class="pr-2 pt-4">
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
@@ -29,7 +43,9 @@
 
               </div>
             </b-col>
-            <b-col cols="6">
+            <b-col
+              cols="8"
+              v-if="$q.screen.name === 'lg'">
               <div class="d-flex">
                 <PowerDialerFilter
                   v-if="activeRoute"
