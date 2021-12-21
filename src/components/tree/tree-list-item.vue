@@ -7,7 +7,7 @@
     </div>
     <router-link
       class="tree-list-item flex-grow-1 d-flex-shrink-0"
-      :to="'/contacts/list/' + id"
+      :to="viewListPath"
       v-slot="{ navigate, isExactActive }"
     >
       <div :data-layer="layer">
@@ -16,14 +16,26 @@
           :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
           class="folder d-flex align-items-center p-0"
         >
-          <div class="folder__indent" :style="indentStyle"></div>
+          <div
+            class="folder__indent"
+            :style="indentStyle">
+          </div>
           <div class="folder__icon d-flex align-items-center">
-            <folder-static-icon color="#62666E"
-              v-if="type === ContactListTypes.STATIC"
-            ></folder-static-icon>
-            <folder-dynamic-icon color="#62666E"
-              v-if="type === ContactListTypes.DYNAMIC"
-            ></folder-dynamic-icon>
+            <template
+              v-if="isContactsRoute">
+              <folder-static-icon color="#62666E"
+                v-if="type === ContactListTypes.STATIC"
+              ></folder-static-icon>
+              <folder-dynamic-icon color="#62666E"
+                v-if="type === ContactListTypes.DYNAMIC"
+              ></folder-dynamic-icon>
+            </template>
+            <template
+              v-else>
+              <DialIcon
+                color="grey"
+                class="mr-1" />
+            </template>
           </div>
           <div class="folder__name d-flex align-items-center">
             <input
@@ -45,7 +57,7 @@
           <button
             :tabindex="id"
             :data-popper-target="'list-' + id"
-            :id="'folder-option-' + id + '-' + layer"
+            :id="'folder-option-' + id"
             class="folder__option btn btn-link p-0 shadow-0"
           >
             <folder-option></folder-option>
@@ -53,7 +65,7 @@
         </div>
 
         <b-popover
-          :target="'folder-option-' + id + '-' + layer"
+          :target="'folder-option-' + id"
           triggers="click blur"
           placement="bottomright"
           boundary="window"
@@ -85,6 +97,7 @@ import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
+import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
@@ -96,10 +109,11 @@ export default {
     FolderOption,
     FolderStaticIcon,
     FolderDynamicIcon,
+    DialIcon,
     ListActions
   },
   computed: {
-    ...mapGetters('contacts', ['pinned', 'moveDialog']),
+    ...mapGetters('contacts', ['pinned', 'moveDialog', 'listToRemove']),
     indentStyle () {
       return {
         flex: `0 0 ${this.layer * 10}px`
@@ -119,6 +133,27 @@ export default {
     },
     itemName () {
       return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
+    },
+    isContactsRoute () {
+      return this.$route.meta.title === 'Contacts'
+    },
+    viewListPath () {
+      if (this.isContactsRoute) {
+        return `/contacts/list/${this.id}`
+      }
+      return `/power-dialer/list/${this.id}`
+    },
+    listPath () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contacts-list/'
+      }
+      return '/api/v2/power-dialer-lists/'
+    },
+    foldersPath () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contact-folders'
+      }
+      return '/api/v2/power-dialer-folders'
     }
   },
   props: {
@@ -158,6 +193,7 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'removeListOpen',
+      'removeListClose',
       'foldersLoaded',
       'listLoaded',
       'listPinToggled',
@@ -180,7 +216,7 @@ export default {
     },
     createList (params) {
       this.$axios
-        .post('/api/v2/contacts-list/' + this.id + '/duplicate', params)
+        .post(this.listPath + this.id + '/duplicate', params)
         .then((response) => {
           const data = response.data.data
           const message = response.data.message
@@ -284,7 +320,7 @@ export default {
     },
     updateListRequest (id, params) {
       return this.$axios
-        .patch('/api/v2/contacts-list/' + id, params)
+        .patch(this.listPath + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           console.log(html)
@@ -293,7 +329,7 @@ export default {
     },
     getContactList (id) {
       return this.$axios
-        .get('/api/v2/contacts-list/' + id)
+        .get(`${this.listPath}${id}`)
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -307,7 +343,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.foldersPath)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -318,7 +354,10 @@ export default {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
     onRemoveList () {
-      this.removeListOpen({ id: this.id, name: this.name })
+      this.removeListClose()
+      setTimeout(() => {
+        this.removeListOpen({ id: this.id, name: this.name })
+      }, 10)
     }
   }
 }

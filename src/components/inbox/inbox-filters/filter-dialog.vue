@@ -145,6 +145,7 @@ export default {
     },
     channelFilterName () {
       switch (true) {
+        case !this.$route.params.channel && this.$route.name === 'Inbox':
         case ['inbox'].includes(this.$route.params.channel):
           return 'Communications'
         case ['messages'].includes(this.$route.params.channel):
@@ -438,6 +439,7 @@ export default {
     clearTimeout(inputTimeout)
   },
   mounted () {
+    this.toggleFilterDialog()
     this.$VueEvent.listen('channel_filter_created', filter => {
       if (filter.is_on_company) {
         this.companyFilters.push(filter)

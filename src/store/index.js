@@ -9,8 +9,9 @@ import createPersistedState from 'vuex-persistedstate'
 import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
-import settings from './settings'
 import stats from './stats'
+import powerDialer from './power-dialer'
+import settings from './settings'
 
 Vue.use(Vuex)
 
@@ -29,8 +30,9 @@ export default function (/* { ssrContext } */) {
       auth,
       contacts,
       inbox,
-      settings,
-      stats
+      stats,
+      powerDialer,
+      settings
     },
     state: {
       filter: {},
@@ -183,11 +185,18 @@ export default function (/* { ssrContext } */) {
       currentCompany: null,
       smsTemplates: [],
       tagsFullyLoaded: false,
+      prevRoute: null,
+      currentRoute: null,
+      breadcrumbs: {
+        crumbs: '',
+        name: ''
+      },
       dialerFormStatus: false
     },
 
     getters: {
-      notifications: (state) => state.notifications
+      notifications: (state) => state.notifications,
+      breadcrumbs: (state) => state.breadcrumbs
     },
 
     actions: {
@@ -959,6 +968,18 @@ export default function (/* { ssrContext } */) {
         state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
       },
 
+      SET_PREV_ROUTE (state, data) {
+        state.prevRoute = data
+      },
+      SET_CURRENT_ROUTE (state, data) {
+        state.currentRoute = data
+      },
+      SET_BREADCRUMBS: (state, data) => {
+        state.breadcrumbs = {
+          crumbs: data.crumbs,
+          name: data.name
+        }
+      },
       SET_DIALER_FORM_STATUS (state, value) {
         state.dialerFormStatus = value
       },

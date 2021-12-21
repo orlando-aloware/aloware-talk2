@@ -25,11 +25,14 @@
       </div>
 
       <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
-        <div class="folder__name"
-             v-if="!isEditing"
-             @click="onToggleFolder">
+        <div
+          v-if="!isEditing"
+          class="folder__name"
+          @click="onToggleFolder">
           {{ name }}
         </div>
+
+        <!-- Renaming Folders -->
         <input
           v-if="isEditing"
           autofocus
@@ -39,8 +42,7 @@
           :value="name"
           :disabled="isRenaming"
           @blur="onInputBlur"
-          @keydown="onKeyDown"
-        />
+          @keydown="onKeyDown" />
       </div>
 
       <button
@@ -53,8 +55,10 @@
       </button>
     </div>
 
+    <!-- Creating Folders -->
     <tree-folder-create
       v-if="isCreatingFolder"
+      :endpoint="endpoint"
       :layer="layer + 1"
       :parent_id="id"
       @blur="onCloseFolder"
@@ -71,12 +75,14 @@
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
         :layer="layer + 1"
+        :endpoint="endpoint"
       ></tree-folder-contents>
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
+        :endpoint="endpoint"
       ></tree-list-contents>
     </div>
 
@@ -87,6 +93,7 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
       :isRootList="isRootList"
+      :endpoint="endpoint"
     ></tree-list-contents>
 
     <b-popover
@@ -164,6 +171,11 @@ export default {
 
     order: {
       type: Number
+    },
+
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
     }
   },
 
@@ -240,6 +252,10 @@ export default {
       this.onCloseFolder()
     },
 
+    onCloseFolder () {
+      this.isCreatingFolder = false
+    },
+
     onKeyDown (evt) {
       if (evt.keyCode === 13 && evt.target.value.length > 60) {
         this.$generalNotification('Folder name should have up to 60 characters.', 'error')
@@ -289,7 +305,7 @@ export default {
 
     updateFolderRequest (id, params) {
       return this.$axios
-        .patch('/api/v2/contact-folders/' + id, params)
+        .patch(`${this.endpoint}/${id}`, params)
         .catch((error) => {
           const {
             message,
@@ -302,7 +318,7 @@ export default {
 
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.endpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -333,10 +349,6 @@ export default {
 
     onToggleFolder () {
       this.toggleFolder(this.id)
-    },
-
-    onCloseFolder () {
-      this.isCreatingFolder = false
     }
   },
 

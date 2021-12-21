@@ -268,6 +268,14 @@ export default {
         return window.axios.delete(`${suffixV2}contact-folders/${id}`)
       }
     },
+    powerDialerFolders: {
+      list () {
+        return window.axios.get(`${suffixV2}power-dialer-folders`)
+      },
+      delete (id) {
+        return window.axios.delete(`${suffixV2}power-dialer-folders/${id}`)
+      }
+    },
     contactListItem: {
       addContact (contactListId, contacts = []) {
         return window.axios.post(`${suffixV2}contact-list-items`, {
