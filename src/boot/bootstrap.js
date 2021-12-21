@@ -259,18 +259,43 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
 
   let data = {
     type: type,
-    data: {
-      title: title,
-      message: message,
-      messageIcon: messageIcon,
-      attachment: attachment,
-      dateTime: dateTime,
-      contactId: contactId,
+    data: null
+  }
+
+  // if call is still on-going and fishing mode active, we queue the notification
+  if (type === 'callFishing' && this.$store.state.notifications[type].communicationId) {
+    let queue = JSON.parse(JSON.stringify(this.$store.state.notifications[type].queue))
+    const found = queue.find(item => item.contactId === contactId)
+    if (found) {
+      return
+    }
+
+    queue.push({
       communicationId: communicationId,
+      contactId: contactId,
       campaignId: campaignId,
       campaignName: campaignName,
       ringGroupName: ringGroupName
+    })
+
+    data.data = {
+      queue: queue
     }
+    this.$store.commit('SET_NOTIFICATIONS', data)
+    return
+  }
+
+  data.data = {
+    title: title,
+    message: message,
+    messageIcon: messageIcon,
+    attachment: attachment,
+    dateTime: dateTime,
+    contactId: contactId,
+    communicationId: communicationId,
+    campaignId: campaignId,
+    campaignName: campaignName,
+    ringGroupName: ringGroupName
   }
 
   this.$bvToast.hide(type)

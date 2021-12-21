@@ -81,6 +81,7 @@ $blue-90: #2F80ED;
 $blue-80: #15163F;
 $blue-70: #EEF3FF;
 $blue-60: #434464;
+$blue-60-opaque: rgba(21, 22, 63, 0.8);
 $blue-10: #D3E2FF;
 $blue-3: #56CCF2;
 
@@ -181,6 +182,7 @@ $primary-hover: #054CDB;
 @include bg-color('blue-80', $blue-80, true);
 @include bg-color('blue-70', $blue-70, true);
 @include bg-color('blue-60', $blue-60, true);
+@include bg-color('blue-60-opaque', $blue-60-opaque, true);
 @include bg-color('blue-10', $blue-10, true);
 @include bg-color('blue', $primary, true);
 @include bg-color('green-90', $green-10, true);

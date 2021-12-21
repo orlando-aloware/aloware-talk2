@@ -17,6 +17,12 @@
            class="nav-icons w-100"
            v-show="isActive('Inbox')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Inbox</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
@@ -26,6 +32,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Inbox')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Inbox</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Contacts' }"
@@ -36,6 +48,12 @@
            class="nav-icons w-100"
            v-show="isActive('Contacts')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Contacts</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Contacts' }"
            :ripple="false"
@@ -45,6 +63,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Contacts')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Contacts</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Power Dialer' }"
@@ -55,6 +79,12 @@
            class="nav-icons w-100"
            v-show="isActive('Power Dialer')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Power Dialer</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Power Dialer' }"
            :ripple="false"
@@ -64,6 +94,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Power Dialer</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Stats' }"
@@ -74,6 +110,12 @@
            class="nav-icons w-100"
            v-show="isActive('Stats')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Stats</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Stats' }"
            :ripple="false"
@@ -83,6 +125,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Stats')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Stats</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Settings' }"
@@ -93,6 +141,12 @@
            class="nav-icons w-100"
            v-show="isActive('Settings')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Settings</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
@@ -102,6 +156,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Settings')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Settings</span>
+      </q-tooltip>
     </q-btn>
     <div class="mt-auto w-100"
          v-show="false">

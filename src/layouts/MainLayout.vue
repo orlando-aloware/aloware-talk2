@@ -481,11 +481,11 @@ export default {
     })
 
     this.$VueEvent.listen('new_version', () => {
-      if (this.isWidget) {
-        return
-      }
+      // if (this.isWidget) {
+      //  return
+      // }
 
-      this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
+      // this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
     })
 
     if (this.$q.platform.is.electron) {
@@ -1515,7 +1515,7 @@ export default {
           const ringGroupName = _.get(communication, 'rin_group.name', null)
 
           if (ringGroup && ringGroup.fishing_mode) {
-            this.$actionNotification(name, companyName, null, null, 'callFishing', null, communication.id, campaignId, campaignName, ringGroupName, true)
+            this.$actionNotification(name, companyName, null, null, 'callFishing', communication.contact.id, communication.id, campaignId, campaignName, ringGroupName, true)
             break
           }
 

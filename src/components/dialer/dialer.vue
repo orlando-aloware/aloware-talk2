@@ -643,7 +643,7 @@ export default {
       }
     },
 
-    parkCall () {
+    parkCall (communication, isFishingMode = false) {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
         return
       }
@@ -658,6 +658,13 @@ export default {
         this.setDialerParkedCall()
         console.log(err)
       }).finally(_ => {
+        if (isFishingMode) {
+          let data = {
+            currentNumber: 'call:' + communication.id,
+            outboundCampaignId: communication.campaign_id
+          }
+          this.$VueEvent.fire('makeCall', data)
+        }
         this.loadingPark = false
       })
     },
@@ -999,25 +1006,15 @@ export default {
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
       if (shouldPark) {
-        this.parkCall(this.dialer.communication).then(() => {
-          let data = {
-            currentNumber: 'call:' + communication.id,
-            outboundCampaignId: communication.campaign_id
-          }
-          this.$VueEvent.fire('makeCall', data)
-        })
+        this.parkCall(communication, true)
         return
       }
 
       if (shouldHangup) {
-        this.$VueEvent.fire('forceHangupCall')
+        this.hangupCall()
 
         setTimeout(() => {
-          let data = {
-            currentNumber: 'call:' + communication.id,
-            outboundCampaignId: communication.campaign_id
-          }
-          this.$VueEvent.fire('makeCall', data)
+          this.makeCall('call:' + communication.id, communication.campaign_id, communication.contactName, communication.companyName, communication.contactId)
         }, 1000)
         return
       }

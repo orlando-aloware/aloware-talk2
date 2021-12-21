@@ -87,14 +87,14 @@ export default {
       }
 
       // jon's agents has limited access to messages and contacts
-      if (this.auth.user.profile.company_id === 11 && this.hasRole('Company Reporter Access')) {
+      if (this.auth.profile.company_id === 11 && this.hasRole('Company Reporter Access')) {
         // checks if communication matches contact's user visibility
-        if (communication.contact.user_id && communication.contact.user_id !== this.auth.user.profile.id) {
+        if (communication.contact.user_id && communication.contact.user_id !== this.auth.profile.id) {
           return false
         }
 
         // checks if communication matches user visibility
-        if (communication.owner_id && communication.owner_id !== this.auth.user.profile.id) {
+        if (communication.owner_id && communication.owner_id !== this.auth.profile.id) {
           return false
         }
       }
