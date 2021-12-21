@@ -1,7 +1,8 @@
 <template>
   <PowerDialerView
     :id="id"
-    :name="name" />
+    :name="name"
+    @on-list-update="updateList" />
 </template>
 
 <script>
@@ -52,6 +53,9 @@ export default {
     ...mapActions('powerDialer', [
       'getMyQueueList'
     ]),
+    async updateList (data) {
+      await this.loadList(data.id)
+    },
     async loadList (id) {
       if (!id) {
         id = 'my-queue'
