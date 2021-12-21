@@ -8,7 +8,7 @@
                 @click="setMode('sms')">Text
         </b-link>
         <b-link href="#"
-                v-if="currentCompany && currentCompany.reseller_id != 357"
+                v-if="currentCompany && currentCompany.reseller_id !== 357"
                 :class="{ active : messageComposer.mode === 'fax' }"
                 @click="setMode('fax')">Fax
         </b-link>
@@ -23,7 +23,7 @@
         </b-link>
       </div>
       <div>
-        <message-composer-sms v-if="messageComposer.mode === 'sms'" />
+        <message-composer-sms v-if="messageComposer.mode === 'sms'"/>
         <message-composer-fax v-if="messageComposer.mode === 'fax'" />
         <message-composer-email v-if="messageComposer.mode === 'email' && contact.email" />
         <message-composer-note v-if="messageComposer.mode === 'note'" />
@@ -58,12 +58,16 @@ import MessageComposerNote from 'components/message-composer/message-composer-no
 
 export default {
   name: 'message-composer',
+
   mixins: [contactMixin],
+
   components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, ContactPhoneNumberSelector, MessageComposerSms },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
     ...mapState(['currentCompany', 'templates'])
   },
+
   methods: {
     ...mapActions(
       'contacts', ['setMessageComposerSmsPhoneNumber', 'setMessageComposerAttachments', 'setMessageComposerMode', 'setSelectedLine']
@@ -86,6 +90,7 @@ export default {
       this.setSelectedLine(line)
     }
   },
+
   mounted () {
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
     if (!this.templates || this.templates.length < 1) {
@@ -94,6 +99,7 @@ export default {
       this.setSmsTemplates(this.templates)
     }
   },
+
   watch: {
     'contact': function () {
       this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)

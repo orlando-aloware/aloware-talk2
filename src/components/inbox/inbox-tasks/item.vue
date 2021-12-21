@@ -12,7 +12,7 @@
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"
-              :name="contactName">
+              :name="contactAvatar">
       </avatar>
     </div>
     <div class="task-details flex-grow-1 pb-1"
@@ -35,8 +35,18 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span>
+          <span v-if="contact.last_communication.type !== CommunicationTypes.SMS">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
+          </span>
+
+          <span v-if="contact.last_communication.type === CommunicationTypes.SMS &&
+          (contact.last_communication.body === null ||
+          !contact.last_communication.body ||
+          contact.last_communication.body.length < 1)">
+            {{ smsEmptyBodyAlternativeText }}
+          </span>
+          <span v-if="contact.last_communication.body !== null">
+            {{ contact.last_communication.body | truncate(22) }}
           </span>
 
         </div>
@@ -120,7 +130,14 @@ export default {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
 
-      return 'No Name'
+      return this.$options.filters.fixPhone(this.contact.phone_number)
+    },
+    contactAvatar () {
+      if (this.contact && this.contact.first_name && this.contact.last_name) {
+        return `${this.contact.first_name} ${this.contact.last_name}`
+      }
+
+      return ''
     },
     activeClass () {
       return this.selectedContact && this.selectedContact.id === this.contact.id ? 'active' : ''
@@ -143,6 +160,25 @@ export default {
         this.$route.params.status !== 'open' &&
         this.$options.filters.fixTaskStatusName(this.contact.task_status).toLowerCase() === 'open' &&
         !this.loadingContact
+    },
+    smsEmptyBodyAlternativeText () {
+      let directionText = (this.contact.last_communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      let lastAttachment = this.contact.last_communication.attachments.pop()
+
+      switch (true) {
+        case lastAttachment && ['text'].includes(lastAttachment.mime_type):
+          return directionText + ' a text file'
+        case lastAttachment && ['audio'].includes(lastAttachment.mime_type):
+          return directionText + ' an audio file'
+        case lastAttachment && ['image'].includes(lastAttachment.mime_type):
+          return directionText + ' an image'
+        case lastAttachment && ['video'].includes(lastAttachment.mime_type):
+          return directionText + ' a video file'
+        case lastAttachment && ['application'].includes(lastAttachment.mime_type):
+        default:
+          return directionText + ' a file'
+      }
     }
   },
 

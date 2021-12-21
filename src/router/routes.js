@@ -32,7 +32,7 @@ const routes = [
         name: 'Inbox',
         component: () => import('pages/Inbox.vue'),
         meta: {
-          title: 'Inbox'
+          title: 'Communications'
         },
         children: [
           {
@@ -40,7 +40,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -48,7 +48,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -56,7 +56,7 @@ const routes = [
             name: 'Inbox Contact',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -64,7 +64,7 @@ const routes = [
             name: 'Inbox Contact Mention Communication',
             component: () => import('src/pages/contacts/Contact.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           },
           {
@@ -72,7 +72,7 @@ const routes = [
             name: 'Inbox Channel',
             component: () => import('src/pages/Inbox.vue'),
             meta: {
-              title: 'Inbox'
+              title: 'Communications'
             }
           }
         ]
@@ -87,16 +87,19 @@ const routes = [
           {
             name: 'Contacts',
             path: '',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
             name: 'Contacts',
             path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsViewAll.vue')
           },
           {
             name: 'Contacts',
             path: 'list/:id(\\d+)+',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
@@ -110,6 +113,7 @@ const routes = [
           {
             name: 'Contacts',
             path: 'list/:id(\\d+)+/add',
+            meta: { title: 'Contacts' },
             component: () => import('src/pages/contacts/ContactsAddView.vue')
           }
         ]
@@ -124,12 +128,93 @@ const routes = [
       },
       {
         path: 'power-dialer',
-        name: 'Power Dialer',
-        component: () => import('pages/PowerDialer.vue'),
+        component: () => import('pages/power-dialer/PowerDialer.vue'),
         meta: {
-          title: 'Power Dialer'
-        }
+          title: 'Power Dialer',
+          id: 'power-dialer'
+        },
+        children: [
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer',
+              id: 'power-dialer'
+            },
+            path: '',
+            redirect: {
+              path: 'in-queue'
+            },
+            component: () => import('src/pages/power-dialer/PowerDialerBase')
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer',
+              id: 'power-dialer-queue-filter'
+            },
+            path: ':id(in-queue|called|failed|scheduled|all)+',
+            component: () => import('src/pages/power-dialer/PowerDialerBase')
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer List',
+              id: 'power-dialer-list'
+            },
+            path: 'list/:id(\\d+)+',
+            redirect: {
+              path: 'list/:id(\\d+)+/in-queue'
+            },
+            component: () => import('src/pages/power-dialer/PowerDialerBase'),
+            children: [
+              {
+                name: 'Power Dialer',
+                meta: {
+                  title: 'Power Dialer',
+                  id: 'power-dialer-list-filter'
+                },
+                path: ':filter(in-queue|called|failed|scheduled|all)+',
+                component: () => import('src/pages/power-dialer/PowerDialerBase')
+              }
+            ]
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Add-list',
+              id: 'power-dialer-add-list'
+            },
+            path: 'list/:id(\\d+)+/add',
+            component: () => import('src/pages/power-dialer/PowerDialerAddView')
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Add-list',
+              id: 'power-dialer-add-queue-list'
+            },
+            path: 'list/add',
+            component: () => import('src/pages/power-dialer/PowerDialerAddView')
+          }
+        ]
       },
+      {
+        name: 'Power Dialer Session',
+        meta: {
+          title: 'Power Dialer Session',
+          id: 'power-dialer-session'
+        },
+        path: 'power-dialer/session',
+        component: () => import('src/pages/power-dialer/PowerDialerSession')
+      },
+      // {
+      //   path: 'power-dialer/:id',
+      //   name: 'Power Dialer',
+      //   component: () => import('src/pages/power-dialer/PowerDialerIndividual2.vue'),
+      //   meta: {
+      //     title: 'Power Dialer'
+      //   }
+      // },
       {
         path: 'stats',
         name: 'Stats',

@@ -1,7 +1,8 @@
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import qs from 'qs'
 import _ from 'lodash'
 
@@ -35,6 +36,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts', 'setShouldUpdateSelectedListContactCount', 'setSelectedListContactCount']),
+    ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
@@ -104,18 +106,38 @@ export default {
 
       this.fetch(params)
     },
-    processFetch: _.debounce(function (params = {}) {
+    apiEndpoint (queued) {
+      if (!this.isPowerDialer) {
+        return 'api/v2/contacts'
+      }
+      if (queued) {
+        return `api/v2/power-dialer-lists/my-queue/items`
+      }
+      switch (this.$route.meta.id) {
+        case 'power-dialer-add-list':
+          return `api/v2/contacts`
+        case 'power-dialer':
+        case 'power-dialer-queue-filter':
+          return `api/v2/power-dialer-lists/my-queue/items`
+        default:
+          return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
+      }
+    },
+    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
       params.search = this.search
-
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
+      }
+      if (this.$route.name === 'Power Dialer') {
+        this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
+
       return this.$axios
-        .get('api/v2/contacts', {
-          params: this.buildQueryString(params),
+        .get(this.apiEndpoint(queued), {
+          params: this.buildQueryString(params, isContactModule),
           paramsSerializer: qs.stringify
         })
         .then((response) => response.data)
@@ -148,11 +170,30 @@ export default {
       params.order = order
 
       this.isLoading = true
-      this.processFetch(params)
+      if (typeof this.isPowerDialer !== 'undefined') {
+        // the variable is defined
+        switch (this.$route.meta.id) {
+          case 'power-dialer':
+            this.processFetch(params, false, true)
+            break
+          case 'power-dialer-list':
+            this.processFetch(params, false, false)
+            break
+          default:
+            this.processFetch(params, false, false, this.id)
+        }
+      } else {
+        this.processFetch(params)
+      }
     },
-    buildQueryString (params) {
+    buildQueryString (params, isContactModule = true) {
       const query = {
         page: 1
+      }
+
+      const powerQuery = {
+        page: query.page,
+        per_page: params.per_page || 25
       }
 
       let filters = {}
@@ -160,10 +201,12 @@ export default {
       if (params.search) {
         filters.search = {}
         filters.search.value = params.search
+        powerQuery.keyword = params.search
       }
 
       if (params.page) {
         query.page = params.page
+        powerQuery.page = params.page
       }
 
       query.relations = _.get(params, 'relations', [])
@@ -205,9 +248,23 @@ export default {
       if (params.sort) {
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
+        powerQuery.sort_by = params.sort
+        powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
-      return query
+      if (params.task_status) {
+        powerQuery.task_status = params.task_status
+      }
+
+      if (this.$route.params.filter) {
+        powerQuery.task_status = this.pdFilters[this.$route.params.filter] // this.$route.params.filter
+      }
+
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+        powerQuery.task_status = this.pdFilters[this.activeFilter]
+      }
+
+      return this.isPowerDialer ? powerQuery : query
     },
     getFiltersCount (filters) {
       let filtersCount = 0
@@ -253,18 +310,38 @@ export default {
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
     ...mapState(['currentCompany']),
+    ...mapGetters('powerDialer', [
+      'activeFilter'
+    ]),
     defaultContactDateFilter () {
       if (this.currentCompany && this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+        return 'created_at'
+      }
+      if (typeof this.isPowerDialer !== 'undefined') {
         return 'created_at'
       }
       return 'last_engagement_at'
     },
     hasMore () {
       return (
-        this.listItems[this.id].next_page_url &&
+        this.listItems[this.id]?.next_page_url &&
         !this.isLoadingMore &&
         !this.isLoading
       )
+    },
+    test () {
+      return this.$route.meta.id
+    },
+    isPowerDialer () {
+      if (this.$route.name === 'Power Dialer' &&
+        (
+          this.$route.meta.id !== 'power-dialer-add-list' &&
+          this.$route.meta.id !== 'power-dialer-add-queue-list'
+        )
+      ) {
+        return true
+      }
+      return false
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
@@ -318,7 +395,7 @@ export default {
 
         return _.uniqBy(headers, 'name')
       } catch (err) {
-        console.log(err)
+        console.log('Error', err)
         return []
       }
     },
@@ -349,6 +426,9 @@ export default {
         }
       }
       return relations
+    },
+    pdFilters () {
+      return POWER_DIALER_FILTERS
     }
   },
   watch: {

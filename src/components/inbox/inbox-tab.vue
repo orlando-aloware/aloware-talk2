@@ -8,26 +8,43 @@
                     :is-search="isSearch"
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
-          <div class="inbox-filter-actions-wrapper inbox-tab--filter ml-2 pr-1">
+          <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
                             :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
-            <div class="filter-wrapper">
-              <div class="position-absolute filter-icon">
-                <filter-icon>
-                </filter-icon>
-              </div>
-              <line-and-ring-group-selector custom-placeholder="Filter"
-                                            v-model="lineOrRingGroupFilter"
-                                            :clearable="true"
-                                            :hide-dropdown-icon="true"
-                                            :outlined="false"
-                                            :borderless="true"
-                                            @change="onFilterItemSelected">
-              </line-and-ring-group-selector>
+            <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
+            <div class="filter-wrapper"
+                 :class="[hasChannelFilterChanges || selectedFilter ? '--highlighted' : '']">
+              <compact-btn v-if="hasChannelFilterChanges"
+                           borderless
+                           customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
+                           :variant="filterButtonVariant"
+                           @clicked="onResetFilter">
+                <i class="fa fa-times"></i>
+              </compact-btn>
+              <compact-btn borderless
+                           customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
+                           @clicked="toggleFilterDialog(true)">
+                <q-tooltip v-if="selectedFilter"
+                           anchor="top middle"
+                           self="center middle">
+                  {{ selectedFilter.name }}
+                </q-tooltip>
+                <filter-icon v-if="!selectedFilter && channelChangedFilterFields.length < 1"
+                             color="#62666E"
+                             class="filter-icon">
+                </filter-icon> {{ !selectedFilter ? '' : selectedFilter.name }}
+                {{ !selectedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
+              </compact-btn>
+              <b-badge v-if="hasChannelFilterChanges"
+                       class="ml-1 fs-12"
+                       variant="primary"
+                       v-b-modal:inbox-channel-filter-modal>
+                {{ channelChangedFilterFields.length }}
+              </b-badge>
             </div>
           </div>
         </template>
@@ -35,6 +52,9 @@
       <div class="w-100"
            v-if="!isSearch">
         <q-btn-toggle
+          v-model="currentTask"
+          @click="onToggleStatus"
+          :options="options"
           class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
           spread
@@ -42,10 +62,7 @@
           unelevated
           :toggle-color="statusToggleColor"
           color="transparent"
-          text-color="primary"
-          :options="options"
-          v-model="currentTask"
-          @click="onToggleStatus">
+          text-color="primary">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
@@ -113,22 +130,33 @@
           </b-overlay>
         </div>
       </div>
+      <filter-dialog v-model="filter"
+                     :default-filter-model="defaultFilterModel"
+                     @createNewFilter="onCreateNewFilter"
+                     @applyFilter="onApplyFilter"
+                     @onResetFilter="onResetFilter">
+      </filter-dialog>
+      <create-filter-dialog :filter-model="newFilterModel">
+      </create-filter-dialog>
     </div>
 </template>
 
 <script>
 import _ from 'lodash'
+import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
-import LineAndRingGroupSelector from 'components/generic-selectors/line-and-ring-group-selector'
 import { inboxMixin } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
+import CompactBtn from 'components/compact-btn'
+import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
+import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 
 let scrollTimeout
 export default {
@@ -136,10 +164,10 @@ export default {
 
   mixins: [inboxMixin],
 
-  components: { SearchToggle, InboxSearcher, FilterIcon, LineAndRingGroupSelector, InboxTaskList, CallsHeader },
+  components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
   computed: {
-    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts']),
+    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts', 'channelChangedFilterFields', 'selectedFilter']),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -153,17 +181,43 @@ export default {
     },
     statusToggleColor () {
       return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
+    },
+    hasChannelFilterChanges () {
+      return this.channelChangedFilterFields.length > 0
+    },
+    filterButtonVariant () {
+      return 'outlined-light'
     }
   },
 
   data () {
     return {
+      filter: {
+        campaigns: [],
+        ring_groups: []
+      },
       searchText: '',
-      isSearch: false
+      isSearch: false,
+      newFilterModel: {
+        name: '',
+        type: 5,
+        filter: [],
+        scope: 'user'
+      },
+      defaultFilterModel: {
+        name: '',
+        type: 5,
+        filter: {
+          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups
+        },
+        scope: 'user'
+      }
     }
   },
 
   methods: {
+    ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm']),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -228,6 +282,7 @@ export default {
       })
     },
     onItemSelected (contact) {
+      console.log('contact :> ---> ', contact)
       this.setSelectedContact(contact)
       const contactId = _.get(contact, 'id', null)
       if (contactId) {
@@ -240,7 +295,7 @@ export default {
           params: {
             id: contactId.toString(),
             channel: 'inbox',
-            status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
+            status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }
         }).catch(err => {
           console.log(err)
@@ -289,6 +344,19 @@ export default {
           this.loadContactTasks()
         }
       }
+    },
+    onResetFilter () {
+      this.filter = { ...this.defaultFilterModel.filter }
+      this.resetChannelChangedFilterFields()
+    },
+
+    onApplyFilter (filter) {
+      this.filter = filter
+    },
+
+    onCreateNewFilter (filter) {
+      this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
+      this.toggleFilterModelForm(true)
     }
   },
 
@@ -339,14 +407,16 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      talk2Api.V2.contacts.get(data.id).then(response => {
-        let contact = response.data
-        // check data loaded
-        if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(contact.id)) {
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
+        talk2Api.V2.contacts.get(data.id).then(response => {
+          let contact = response.data
+          // check data loaded
           this.setSelectedContact(contact)
           this.updateContacts(contact)
-        }
-      })
+        })
+      }
     })
 
     this.$VueEvent.listen('new_communication', communication => {
@@ -403,14 +473,24 @@ export default {
       this.setContacts([])
       this.loadContactTasks()
     },
-    'lineOrRingGroupFilter': function () {
-      this.loadContactTasks()
+    filter: {
+      deep: true,
+      handler () {
+        this.loadContactTasks()
+      }
     },
     '$route.params.status': function () {
       this.setStatus()
-      if (this.$route.name === 'Inbox Channel Task Status') {
+      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        }
+
         this.lineOrRingGroupFilter = null
-        this.resetList()
+        // prevent reset of filters if coming from the root
+        if (!this.$route.params.id) {
+          this.resetList()
+        }
       }
     },
     '$route.name': function (value) {

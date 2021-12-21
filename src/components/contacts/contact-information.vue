@@ -1,6 +1,6 @@
 <template>
   <b-card class="border-0 position-relative contact-about-wrapper">
-    <h4>About this contact</h4>
+    <h4 v-if="hasExpanded">About this contact</h4>
 
     <div :class="`information-container ${autoHeightClass}`">
       <div class="d-block mt-2"
@@ -135,8 +135,9 @@
               variant="light"
               size="sm"
               class="contact-information-toggle"
+              v-if="hasExpanded"
               @click="onExpanded">
-      <i class="material-icons">{{ is_expanded ? 'expand_less' : 'expand_more' }}</i>
+      <i class="material-icons">{{ expanded ? 'expand_less' : 'expand_more' }}</i>
     </b-button>
   </b-card>
 </template>
@@ -150,16 +151,16 @@ import LocationCountrySelector from 'src/components/contacts/location-country-se
 import ContactInputField from 'src/components/contacts/contact-input-field'
 import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
-
 export default {
   name: 'contact-information',
-
   mixins: [aclMixin],
-
   props: {
-    firstOutboundCall: {}
+    firstOutboundCall: {},
+    hasExpanded: {
+      type: Boolean,
+      default: true
+    }
   },
-
   components: {
     ContactDispositionSelector,
     UserSelector,
@@ -167,57 +168,50 @@ export default {
     LocationCountrySelector,
     LocationStateSelector
   },
-
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),
-
     autoHeightClass () {
-      return this.is_expanded ? 'auto-height' : ''
+      return this.expanded ? 'auto-height' : ''
     },
-
     timeOfFirstOutboundCall () {
       if (this.firstOutboundCall) {
         return this.$options.filters.fixFullDateUTCRelative(this.firstOutboundCall.created_at)
       }
-
       return '--:--'
     },
-
     timeToFirstOutboundCall () {
       if (this.contact && this.firstOutboundCall) {
         let contactCreated = window.moment(this.contact.created_at)
         let callCreated = window.moment(this.firstOutboundCall.created_at)
-
         let formatted = this.formatHumanized(callCreated.diff(contactCreated))
-
         return !formatted ? '--:--' : `After ${formatted}`
       }
-
       return '--:--'
+    },
+    expanded () {
+      if (this.hasExpanded) {
+        return this.is_expanded
+      }
+      return true
     }
   },
-
   data () {
     return {
       is_expanded: false,
       attributes: []
     }
   },
-
   methods: {
     ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties']),
-
     onExpanded () {
       this.is_expanded = !this.is_expanded
     },
-
     getAttributes () {
       talk2Api.V1.contact.getAttributes(this.contact.id)
         .then(response => {
           this.setContactAttributes(response.data)
         })
     },
-
     onUpdateFields (value, prop) {
       this.contact[prop] = value
       this.updateChangedContactProperties({
@@ -225,7 +219,6 @@ export default {
         value: value
       })
     },
-
     /**
      * Formats provided period(moment.diff) into human readable format
      *
@@ -237,53 +230,42 @@ export default {
       if (period === 0) {
         return '0 second'
       }
-
       let segments = []
       const duration = window.moment.duration(period)
-
       // return nothing when the duration is falsy or not correctly parsed (P0D)
       if (duration.toISOString() === 'P0D' || !duration.isValid()) return ''
-
       // for duration's year value
       if (duration.years() >= 1) {
         segments.push(this.computeAndHumanize(duration, 'years', 'year'))
       }
-
       // for duration's month value
       if (duration.months() >= 1) {
         segments.push(this.computeAndHumanize(duration, 'months', 'month'))
       }
-
       // for duration's days value
       if (duration.days() >= 1) {
         segments.push(this.computeAndHumanize(duration, 'days', 'day'))
       }
-
       // for duration's hours value
       if (duration.hours() >= 1) {
         segments.push(this.computeAndHumanize(duration, 'hours', 'hour'))
       }
-
       // for duration's minutes value
       if (duration.minutes() >= 1) {
         segments.push(this.computeAndHumanize(duration, 'minutes', 'minute'))
       }
-
       // for duration's seconds value, this will only pass if segments is empty
       if (duration.seconds() >= 1 && !segments.length) {
         segments.push(this.computeAndHumanize(duration, 'seconds', 'second'))
       }
-
       // sanity test, if there are items added to the segment
       if (!segments.length) {
         return ''
       }
-
       // do formatting
       // eslint-disable-next-line no-return-assign
       return segments.reduce((acc, cur, index) => acc += acc ? `${index === segments.length - 1 ? ' and' : ','} ${cur}` : cur, '')
     },
-
     /**
      * Converts the duration value and humanize result
      *

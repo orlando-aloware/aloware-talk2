@@ -129,6 +129,13 @@ export default {
       target: target === state.moveDialog.target ? null : target
     }
   },
+  CREATE_DIALOG_TARGET: (state, { target, name }) => {
+    state.createDialog = {
+      ...state.createDialog,
+      name: name || '',
+      target: target === state.createDialog.target ? null : target
+    }
+  },
   SET_CONTACT_REMOVE_ACTION_TYPE: (state, type) => {
     state.removeContactActionType = type
   },
@@ -158,6 +165,12 @@ export default {
   },
   CREATE_LIST_OPEN: (state, payload) => {
     state.createList = { ...state.createList, ...payload, open: true }
+  },
+  CREATE_DIALOG_OPEN: (state, { id, type }) => {
+    state.createDialog = { open: true, id, type }
+  },
+  CREATE_DIALOG_CLOSE: (state) => {
+    state.createDialog = { open: false }
   },
   CREATE_LIST_CLOSE: (state) => {
     state.createList = { folderId: null, open: false, mode: '', type: 1, contact_folder_id: null, name: '', filters: [] }
@@ -344,6 +357,9 @@ export default {
   },
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedList.id].data = payload
+  },
+  ON_SEARCH_PD_ITEM: (state, value) => {
+    state.searchedPdItem = value
   },
   SET_SHOW_CONTACTS_HEADER: (state, value) => {
     state.showContactsHeader = value

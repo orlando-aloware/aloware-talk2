@@ -13,7 +13,7 @@
     @shown="onShown">
 
     <div class="modal-body-wrapper d-flex">
-      <div class="w-50 left-column-wrapper">
+      <div class="left-column-wrapper">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-5">
@@ -59,29 +59,41 @@
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
           <div>
-            <span class="filter-name">(Unsaved) Filter</span>
+            <span class="filter-name">{{ selectedFilter ? selectedFilter.name : '(Unsaved) Filter' }}</span>
           </div>
+          <compact-btn class="border-0"
+                       @clicked="onHide">
+            <i class="fa fa-times"></i>
+          </compact-btn>
+        </div>
+        <filter-form ref="inboxChannelFilterForm"
+                     :default-filter-model="defaultFilterModel"
+                     :filter="filter">
+        </filter-form>
+        <div class="container d-flex justify-content-between mb-3 mt-3 action-option-container">
+          <div></div>
           <div>
             <compact-btn class="mr-3 btn-tertiary"
-                         :disabled="channelChangedFilterFields.length < 1"
-                         @clicked="onResetFilter">Reset</compact-btn>
-            <compact-btn variant="primary"
-                         :disabled="!(!selectedFilter || selectedFilterHasChanges) || isUpdatingFilter"
-                         @clicked="onSaveFilter">
-              <q-spinner-bars v-if="isUpdatingFilter"
-                              color="white"
-                              class="mr-1" />
-              {{ isUpdatingFilter ? ' Saving...' : ' Save' }}
-              </compact-btn>
-            <compact-btn class="ml-3 btn-secondary"
-                         :disabled="!(selectedFilter && selectedFilterHasChanges)"
+                         :disabled="!filterHasChanges"
+                         @clicked="onResetFilter">
+              Reset
+            </compact-btn>
+            <compact-btn class="btn-secondary"
+                         :disabled="!(filterHasChanges) || ![1,2,3,4].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
+            <compact-btn variant="primary"
+                         class="ml-3"
+                         :disabled="false"
+                         @clicked="onApply">
+              <q-spinner-bars v-if="isUpdatingFilter"
+                              color="white"
+                              class="mr-1" />
+              {{ applyButtonText }}
+            </compact-btn>
           </div>
         </div>
-        <filter-form ref="inboxChannelFilterForm"
-                     :filter="filter"></filter-form>
       </div>
     </div>
     <template #modal-footer="{ hide }">
@@ -111,18 +123,18 @@ export default {
   components: { FilterListItems, CompactBtn, FilterForm },
 
   props: {
-    filter: {
+    value: {
       type: Object,
-      required: true
+      default: () => {}
     },
-    filterModel: {
+    defaultFilterModel: {
       type: Object,
       required: true
     }
   },
 
   computed: {
-    ...mapState('inbox', ['channelChangedFilterFields', 'selectedFilter', 'isFilterDialogShown']),
+    ...mapState('inbox', ['channelChangedFilterFields', 'selectedFilter', 'isFilterDialogShown', 'channelClonedFilter', 'isFilterModelFormShown']),
     isOpen: {
       get () {
         return this.isFilterDialogShown
@@ -133,6 +145,9 @@ export default {
     },
     channelFilterName () {
       switch (true) {
+        case !this.$route.params.channel && this.$route.name === 'Inbox':
+        case ['inbox'].includes(this.$route.params.channel):
+          return 'Communications'
         case ['messages'].includes(this.$route.params.channel):
           return 'Messages'
         case ['voicemails'].includes(this.$route.params.channel):
@@ -149,7 +164,45 @@ export default {
         return false
       }
 
-      return JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilter.filter)) !== JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilterClone.filter))
+      return JSON.stringify(this.$options.filters.sortObjectByKey(this.filter)) !== JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilterClone.filter))
+    },
+    filterHasChanges () {
+      let hasChanges = false
+
+      let filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
+
+      for (const field of this.filterFields) {
+        if (this.filter[field] !== filterIdentifier[field]) {
+          hasChanges = true
+          break
+        }
+      }
+
+      return hasChanges
+    },
+
+    toggleApplyButtonEnabled () {
+      if (this.isUpdatingFilter) {
+        return false
+      }
+
+      if (this.selectedFilter) {
+        return false
+      }
+
+      return !this.filterHasChanges
+    },
+
+    applyButtonText () {
+      if (this.isUpdatingFilter) {
+        return 'Saving changes..'
+      }
+
+      if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
+        return 'Apply & Save'
+      }
+
+      return 'Apply'
     }
   },
 
@@ -162,12 +215,39 @@ export default {
       selectedFilterClone: null,
       personalFilters: [],
       companyFilters: [],
-      filterToEdit: null
+      filterToEdit: null,
+      filter: {},
+      clonedFilter: {},
+      filterFields: [
+        'campaigns',
+        'ring_groups',
+        'direction',
+        'answer_status',
+        'min_talk_time',
+        'transfer_type',
+        'callback_status',
+        'tags',
+        'call_dispositions',
+        'first_time_only',
+        'untagged_only',
+        'exclude_automated_communications',
+        'incoming_numbers',
+        'users',
+        'workflows'
+      ]
     }
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterModelForm', 'setSelectedFilter', 'updateChannelChangedFilterFields', 'resetChannelChangedFilterFields', 'toggleFilterDialog']),
+    ...mapActions('inbox', [
+      'toggleFilterModelForm',
+      'setSelectedFilter',
+      'setAppliedFilter',
+      'updateChannelChangedFilterFields',
+      'resetChannelChangedFilterFields',
+      'toggleFilterDialog',
+      'setChannelClonedFilter'
+    ]),
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
     },
@@ -176,35 +256,72 @@ export default {
       this.toggleFilterDialog()
     },
 
+    onHide () {
+      this.hideModal()
+    },
+
     onShow () {
       this.personalFilters = []
       this.companyFilters = []
       this.getFilters()
+      if (this.selectedFilter) {
+        this.filter = { ...this.selectedFilter.filter, ...this.filter }
+        this.setChannelClonedFilter(this.selectedFilter.filter)
+      } else {
+        this.filter = { ...this.filter, ...this.value }
+        this.setChannelClonedFilter(this.filter)
+      }
     },
 
     onShown () {
+      this.refreshTagSelector()
+    },
+
+    refreshTagSelector () {
       let _this = this
-      this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
-      setTimeout(function () {
-        _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
-        _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
-      }, 200)
+      if (this.$refs.inboxChannelFilterForm.$refs.tagSelector) {
+        this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
+        setTimeout(function () {
+          _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
+          _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
+        }, 200)
+      }
     },
 
     onResetFilter: function () {
-      if (!this.selectedFilterClone) {
-        this.$emit('onResetFilter')
-      } else {
-        this.resetChannelChangedFilterFields()
-        const filterIdentifier = this.selectedFilterHasChanges ? this.selectedFilterClone.filter : this.selectedFilter.filter
-        for (const prop in filterIdentifier) {
-          this.filter[prop] = filterIdentifier[prop]
+      // if has selected filter, then use selected filter saved values, otherwise use channel's default filter
+      let useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
+
+      for (const item in useFilter) {
+        this.filter[item] = useFilter[item]
+      }
+    },
+
+    onApply () {
+      this.resetChannelChangedFilterFields()
+      for (const item in this.filter) {
+        if (JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
           this.updateChannelChangedFilterFields({
-            name: prop,
-            value: filterIdentifier[prop]
+            name: item,
+            value: this.filter[item]
           })
         }
       }
+
+      if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
+        this.isUpdatingFilter = true
+        this.updateFilter(this.selectedFilter, {
+          filter: this.filter,
+          type: this.defaultFilterModel.type,
+          name: this.selectedFilter.name,
+          scope: this.selectedFilter.scope }).then(res => {
+          this.isUpdatingFilter = false
+        })
+      }
+
+      this.setAppliedFilter(this.selectedFilter || null)
+
+      this.$emit('applyFilter', { ...this.filter })
     },
 
     onSaveFilter () {
@@ -212,25 +329,32 @@ export default {
         this.toggleFilterModelForm(true)
       } else {
         this.isUpdatingFilter = true
-        this.updateFilter(this.selectedFilter, { ...this.filterModel, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
+        this.updateFilter(this.selectedFilter, { ...this.filter, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
           this.isUpdatingFilter = false
         })
       }
     },
 
     onSaveNewFilter () {
-      this.toggleFilterModelForm(true)
+      this.$emit('createNewFilter', this.filter)
     },
 
-    onSelectFilter (item) {
-      this.setSelectedFilter(item)
-      this.selectedFilterClone = item
+    onSelectFilter (filterObject) {
+      this.setSelectedFilter(filterObject)
+
+      if (!filterObject) {
+        this.filter = { ...this.defaultFilterModel.filter }
+      }
       this.applyFilter()
     },
 
     getFilters () {
+      if (![1, 2, 3, 4].includes(this.defaultFilterModel.type)) {
+        return
+      }
+
       this.isGettingFilters = true
-      return talk2Api.V2.inbox.filters.get({ type: this.filterModel.type }).then(response => {
+      return talk2Api.V2.inbox.filters.get({ type: this.defaultFilterModel.type }).then(response => {
         this.personalFilters = response.data.data.user || []
         this.companyFilters = response.data.data.company || []
         this.isGettingFilters = false
@@ -246,8 +370,9 @@ export default {
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {
         let updatedFilter = res.data.filter
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
-          this.setSelectedFilter(updatedFilter)
-          this.selectedFilterClone = { ...this.selectedFilter }
+          let filter = { ...this.selectedFilter }
+          filter.filter = { ...this.filter }
+          this.setSelectedFilter(filter)
         }
 
         if (!updatedFilter.is_on_company) {
@@ -287,29 +412,22 @@ export default {
     },
 
     applyFilter () {
+      let _this = this
       if (!this.selectedFilter) {
         return
       }
 
       for (const prop in this.selectedFilter.filter) {
         this.filter[prop] = this.selectedFilter.filter[prop]
-        this.updateChannelChangedFilterFields({
-          name: prop,
-          value: this.selectedFilter.filter[prop]
-        })
       }
+
+      setTimeout(function () {
+        _this.refreshTagSelector()
+      }, 1000)
     }
   },
 
   watch: {
-    filter: {
-      deep: true,
-      handler () {
-        if (this.selectedFilter) {
-          this.setSelectedFilter({ ...this.selectedFilter, filter: this.filterModel.filter })
-        }
-      }
-    },
     '$route.params.channel': function () {
       this.setSelectedFilter(null)
     }
@@ -321,6 +439,7 @@ export default {
     clearTimeout(inputTimeout)
   },
   mounted () {
+    this.toggleFilterDialog()
     this.$VueEvent.listen('channel_filter_created', filter => {
       if (filter.is_on_company) {
         this.companyFilters.push(filter)

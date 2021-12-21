@@ -116,7 +116,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="screen === 'call'">
+      <template v-if="screen === 'call' && dialer.call.direction === 'OUTGOING'">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="dialer.contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"

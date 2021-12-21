@@ -64,6 +64,18 @@ export default {
       }
 
       return 0
+    },
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      }
+      return false
+    },
+    endpointForList () {
+      if (this.isContactsRoute) {
+        return 'contact-list-item'
+      }
+      return 'power-dialer-list-items'
     }
   },
   data () {
@@ -92,7 +104,7 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url = '/api/v2/contact-list-item/' +
+          url = `/api/v2/${this.endpointForList}/` +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
@@ -121,7 +133,7 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url = `/api/v2/contact-list-item/bulk/${this.selectedList.id}`
+          url = `/api/v2/${this.endpointForList}/bulk/${this.selectedList.id}`
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v2/contacts/bulk-delete`

@@ -39,49 +39,39 @@ import { mapGetters } from 'vuex'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
-
 export default {
   name: 'contact-activities',
-
   components: {
     MessageComposer,
     ContactActivitiesHeader,
     ContactActivity
   },
-
   props: {
     communications: {
       required: true,
       type: Array,
       default: () => []
     },
-
     campaignId: {
       required: false
     }
   },
-
   data () {
     return {
       isLoadingPreviousActivities: false
     }
   },
-
   computed: {
     ...mapGetters('contacts', ['contact']),
-
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
       }
-
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
-
       return 'No Name'
     },
-
     hasUnreads () {
       return this.contact.unread_texts_count > 0 ||
         this.contact.unread_missed_calls_count > 0 ||
@@ -91,7 +81,6 @@ export default {
       return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
-
   methods: {
     scrollMessages () {
       let activitiesWrap = this.$refs.activitiesWrap

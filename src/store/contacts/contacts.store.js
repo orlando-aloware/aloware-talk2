@@ -117,6 +117,12 @@ export default function () {
       type: 'folder',
       target: null
     },
+    createDialog: {
+      open: false,
+      id: null,
+      type: 'list',
+      target: null
+    },
     selectedContacts: {},
     selectedList: {
       id: 'all',
@@ -197,6 +203,7 @@ export default function () {
       template: null
     },
     search: '',
+    searchedPdItem: '',
     showContactsHeader: true,
     showContactsListSidebar: false
   }
