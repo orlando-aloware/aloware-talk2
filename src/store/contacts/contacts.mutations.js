@@ -137,6 +137,7 @@ export default {
     }
   },
   SET_CONTACT_REMOVE_ACTION_TYPE: (state, type) => {
+    console.log('type :>> ', type)
     state.removeContactActionType = type
   },
   SET_BULK_DELETE: (state, payload) => {
