@@ -185,11 +185,15 @@ export default {
     },
     dialogName () {
       return `remove-group-dialog-${this.resources.id}`
+    },
+    arrangedMetricList () {
+      let list = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      return list.sort((a, b) => (a.order > b.order) ? 1 : -1)
     }
   },
   mounted () {
     this.timeline = this.resources.date_range_type || 1
-    this.metricsList = this.resources.agent_metrics ? JSON.parse(JSON.stringify(this.resources.agent_metrics)) : []
+    this.metricsList = this.arrangedMetricList ? JSON.parse(JSON.stringify(this.arrangedMetricList)) : []
   },
   data () {
     return {
@@ -277,8 +281,8 @@ export default {
     },
     toggleLoad (val) {
       this.loader = val
-      if (!this.loader && this.metricsList.length !== this.resources.agent_metrics.length) {
-        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      if (!this.loader && this.metricsList.length !== this.arrangedMetricList.length) {
+        this.metricsList = JSON.parse(JSON.stringify(this.arrangedMetricList))
       }
     },
     async updateSortedMetric (val) {
@@ -287,15 +291,15 @@ export default {
       }
 
       let { newIndex, oldIndex, element } = val.moved
-      const metric = this.resources.agent_metrics.find(metric => metric.id === element.id)
+      const metric = this.arrangedMetricList.find(metric => metric.id === element.id)
 
       if (!metric) {
         return
       }
 
-      const previousMetrics = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      const previousMetrics = JSON.parse(JSON.stringify(this.arrangedMetricList))
 
-      let order = this.resources.agent_metrics[newIndex].order
+      let order = this.arrangedMetricList[newIndex].order
       let step = 0
 
       if (newIndex > oldIndex) {
@@ -347,13 +351,6 @@ export default {
     },
     resources () {
       this.timeline = this.resources.date_range_type
-    },
-    'resources.agent_metrics': {
-      deep: true,
-      handler: function () {
-        const metrics = _.get(this.resources, 'agent_metrics', [])
-        this.metricsList = JSON.parse(JSON.stringify(metrics))
-      }
     }
   }
 }

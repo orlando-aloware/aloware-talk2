@@ -9002,6 +9002,35 @@ button.grey-90 {
     -o-transition: width 0.3s ease-in-out;
     transition: width 0.3s ease-in-out;
   }*/
+  .settings {
+    &-form-wrapper,
+    &-form-wrapper .container {
+      padding-left: 0 !important;
+    }
+    &-side {
+      max-width: unset;
+      overflow-x: inherit;
+      &__left {
+        max-width: unset;
+        min-width: unset;
+        z-index: 1;
+        &.settings-side__left--closed {
+          width: 0 !important;
+          height: 0;
+        }
+      }
+      &__right {
+        width: 0;
+        z-index: 2;
+        &.settings-side__right--opened {
+          width: 100% !important;
+        }
+        &:not(.settings-side__right--opened) {
+          display: none !important;
+        }
+      }
+    }
+  }
   .contact-activity-wrapper.contact-activity--closed {
     width: 0 !important;
     height: 0;

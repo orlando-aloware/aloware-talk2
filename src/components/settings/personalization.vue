@@ -4,6 +4,8 @@
       <b-form-row>
         <b-col sm="12" md="12">
           <div class="d-inline-flex">
+            <template slot="header">
+            </template>
             <h1 class="mt-2"> Personalization </h1>
           </div>
         </b-col>
