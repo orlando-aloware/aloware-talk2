@@ -9049,6 +9049,11 @@ screen and (max-width: 956px) {
     text-transform: none;
     border-bottom-left-radius: 6px;
     border-top-left-radius: 6px;
+    border-right: none !important;
+
+    .q-btn__wrapper {
+      padding-right: 0 !important;
+    }
 
     .q-btn__content {
       i {
@@ -9065,10 +9070,15 @@ screen and (max-width: 956px) {
   button:nth-child(2) {
     border-bottom-right-radius: 6px;
     border-top-right-radius: 6px;
+
+    .q-btn__wrapper {
+      padding-left: 0 !important;
+      padding-right: 6px !important;
+    }
   }
 
   button {
-    border: 1px solid $grey-60;
+    border: 1px solid $grey-70;
     color: $grey-90;
     background: transparent !important;
 
@@ -9085,6 +9095,11 @@ screen and (max-width: 956px) {
       color: $grey-90 !important;
     }
   }
+
+  .q-separator {
+    background: $grey-70 !important;
+    height: 19px;
+  }
 }
 
 .q-shared-login-menu-dropdown-list {
@@ -9096,6 +9111,10 @@ screen and (max-width: 956px) {
 
     &:not(:last-child) {
       margin-bottom: 13px;
+    }
+
+    .custom-control-label {
+      color: $grey-100 !important;
     }
   }
 

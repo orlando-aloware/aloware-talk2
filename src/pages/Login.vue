@@ -9,10 +9,66 @@
 import { guestMixin } from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
+import { mapActions } from 'vuex'
 export default {
   name: 'login',
+
   mixins: [guestMixin],
-  components: { LoginForm, LoginLargeScreensInfo }
+
+  components: { LoginForm, LoginLargeScreensInfo },
+
+  methods: {
+    ...mapActions('auth', ['getCookieUser']),
+    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
+    getSharedCookie () {
+      let name = process.env.SHARED_AUTH_TOKEN + '='
+      let ca = document.cookie.split(';')
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i]
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1)
+        }
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length)
+        }
+      }
+      return ''
+    },
+    async validateCookieUser () {
+      document.cookie = process.env.SHARED_AUTH_TOKEN + '=helloWorld;domain=aloware.test;expires=Thu, 01 Jan 1970 00:00:00 UTC'
+      let sharedCookie = this.getSharedCookie()
+
+      if (sharedCookie) {
+        const response = await this.getCookieUser()
+        console.log(response)
+      }
+    },
+    async cookieUserValidated ({ data: { data } }) {
+      const { usage, company } = data
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+      localStorage.setItem('talk_cookie', this.getSharedCookie())
+      localStorage.setItem('company_id', company.id)
+
+      const redirectPath = this.$route.query.redirect || '/'
+
+      await this.$router.push(String(redirectPath))
+      await this.redirectTimeout()
+    },
+
+    redirectTimeout () {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve()
+        }, 2000)
+      })
+    }
+  },
+
+  created () {
+    this.validateCookieUser()
+  }
 }
 </script>
 

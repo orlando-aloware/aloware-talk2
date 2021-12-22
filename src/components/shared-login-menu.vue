@@ -11,6 +11,7 @@
 
       <template slot="label">
         <i class="fas fa-arrow-right"></i>  <span>Aloware (Classic)</span>
+        <hr role="separator" aria-orientation="vertical" class="q-separator ml-2 margin-auto position-relative q-separator q-separator--vertical">
       </template>
 
       <q-list class="q-shared-login-menu-dropdown-list pl-4 pr-4">
@@ -21,7 +22,7 @@
         </q-item>
 
         <q-item>
-          <q-item-section avatar>
+          <q-item-section>
             <b-form-radio inline
                           :value="AppDefaultLogin.APP_ALOWARE_TALK"
                           v-model="defaultLogin">
@@ -30,7 +31,7 @@
           </q-item-section>
         </q-item>
         <q-item>
-          <q-item-section avatar>
+          <q-item-section>
             <b-form-radio inline
                           :value="AppDefaultLogin.APP_ALOWARE_CLASSIC"
                           v-model="defaultLogin">

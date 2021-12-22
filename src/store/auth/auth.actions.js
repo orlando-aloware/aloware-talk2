@@ -70,6 +70,29 @@ const login = async ({ commit }, {
   }
 }
 
+const getCookieUser = async ({ commit }) => {
+  try {
+    commit('SET_LOADING', true)
+
+    const response = await window.axios.post('/get-cookie-user')
+
+    const { meta, data } = response.data
+
+    localStorage.setItem('api_token', meta.token)
+
+    commit('SET_FIRST_LOGIN', data.first_login, { root: true })
+
+    commit('SET_LOADING', false)
+
+    await check({ commit }, {})
+
+    return response
+  } catch (err) {
+    commit('SET_LOADING', false)
+    return Promise.reject(err)
+  }
+}
+
 const logout = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
@@ -193,5 +216,5 @@ const setProfile = async ({ commit }, user) => {
 }
 
 export default {
-  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile
+  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile, getCookieUser
 }
