@@ -10,7 +10,6 @@
            v-show="title.length > 0"
            @hide="clearDateTimeInterval"
            @hidden="onHidden"
-           @show="onShow"
            @shown="autoClose">
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
