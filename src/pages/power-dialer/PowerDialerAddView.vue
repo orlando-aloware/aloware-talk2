@@ -87,6 +87,7 @@ export default {
           ...DEFAULT_CONTACT_LIST_ITEMS
         })
       }
+      console.log(`/api/v2/power-dialer-lists/${stringId}--lol`, stringId)
 
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
@@ -104,7 +105,9 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.loadList(id)
+      if (this.$route.name === 'Power Dialer') {
+        this.loadList(id)
+      }
     }
   }
 }
