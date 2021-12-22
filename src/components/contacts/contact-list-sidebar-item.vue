@@ -20,7 +20,7 @@
     </div>
     <div class="d-flex justify-center align-items-center">
       <b-badge v-if="totalUnread > 0"
-               class="contact-badge d-flex justify-center align-items-center"
+               class="contact-badge d-flex justify-center align-items-center bg-red-80"
                variant="danger"
                pill>
         {{ totalUnread }}

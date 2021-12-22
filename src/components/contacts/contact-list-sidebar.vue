@@ -12,7 +12,7 @@
       <b-card no-body
               class="no-border position-relative"
               @scroll="handScroll">
-        <b-list-group class="p-2 pr-3">
+        <b-list-group class="p-2 pr-2">
           <b-list-group-item v-for="(contact, index) in contacts"
                              :key="contact.id"
                              :to="`/contacts/${contact.id}`"
