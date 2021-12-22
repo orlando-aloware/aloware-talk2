@@ -164,6 +164,7 @@ export default {
         })
     }, 1000),
     fetch (params = {}) {
+      console.log('777 :>> ', 777)
       const sort = (this.sorts) ? this.sorts.orderBy : _.get(params, 'sort', this.defaultContactDateFilter)
       const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
       params.sort = sort
