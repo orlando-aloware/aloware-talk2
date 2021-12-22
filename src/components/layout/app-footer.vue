@@ -185,6 +185,12 @@ export default {
   mounted () {
     this.updateTab()
     this.tab = !this.dialer.currentStatus || this.dialer.currentStatus !== 'READY' ? 'phone' : this.tab
+
+    this.$VueEvent.listen('answerCall', () => {
+      if (this.isMobile) {
+        this.tab = 'phone'
+      }
+    })
   },
 
   methods: {
@@ -257,6 +263,10 @@ export default {
         this.tab = 'phone'
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('answerCall')
   }
 }
 </script>

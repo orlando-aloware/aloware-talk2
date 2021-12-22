@@ -42,7 +42,7 @@
           name="fa fa-times"
           class="cursor-pointer text-grey"/>
       </b-badge>
-      <div class="no-border bg-white p-2 pr-5 rowd d-flex group-wrapper">
+      <div class="no-border bg-white p-2 rowd d-flex group-wrapper">
         <template>
           <Draggable
             class="list-group"

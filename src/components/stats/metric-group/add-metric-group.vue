@@ -1,5 +1,5 @@
 <template>
-  <q-card-actions class="px-0 pt-3 pb-0">
+  <q-card-actions class="px-0 pt-3 pb-2 pb-0">
     <q-space />
     <q-btn
       @click="createMetricGroup"

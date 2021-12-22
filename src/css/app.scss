@@ -3221,6 +3221,10 @@ span.mention {
   height: 445px;
 }
 
+.width-32 {
+  width: 32px;
+}
+
 .width-40 {
   width: 40px;
 }
@@ -8314,6 +8318,11 @@ button.grey-90 {
   }
 }
 
+.stats-container {
+  height: 100vh;
+  max-width: 100wh;
+}
+
 @media (max-width: 1485px) and (min-width: 1085px) {
   .inbox {
     .inbox-details {
@@ -8670,6 +8679,18 @@ button.grey-90 {
 }
 
 @media (max-width: 784px) {
+  .stats-container {
+    padding-bottom: 0 !important;
+    height: calc(100vh - 107px);
+    .stats-header {
+      .q-card__actions {
+        padding-bottom: 1rem !important;
+      }
+    }
+    .stats-metrics-container {
+      padding-bottom: 0 !important;
+    }
+  }
   .contacts-total {
     &.desktop {
       display: none;
@@ -8846,6 +8867,14 @@ button.grey-90 {
 @media (max-width: 667px) {
   .contact-activity-container .calls-header__label {
     padding-left: 15px;
+  }
+}
+
+@media (max-width: 605px) {
+  .communications-page {
+    .page-header {
+      display: none !important;
+    }
   }
 }
 

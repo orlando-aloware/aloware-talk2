@@ -13,20 +13,20 @@
       @keyup.esc="closeInput"
       @blur="closeInput" />
     <div
-      style="height: 32px;"
       v-if="!active"
-      class="pr-0 d-flex align-items-center">
+      class="pr-0 d-flex align-items-center height-32">
       {{ modelValue }}
     </div>
     <div
-      class="cursor-pointer"
+      class="cursor-pointer height-32"
       transtion-show="fade">
       <div
+        class="height-32 d-flex align-items-center justify-content-center width-32"
         ref="editGroup"
         @click="active = true">
         <PencilIcon
           color="grey"
-          :class="`${isVisible ? '' : 'make-invisible'} mx-2 my-1 mb-2`" />
+          :class="`${isVisible ? '' : 'make-invisible'}`" />
       </div>
     </div>
   </div>

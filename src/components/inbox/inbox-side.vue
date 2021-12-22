@@ -66,7 +66,8 @@ export default {
       currentPage: 0,
       hasMore: false,
       isLoadingMore: false,
-      isLoaded: true
+      isLoaded: true,
+      onLoadShowTasks: true
     }
   },
 
@@ -78,7 +79,7 @@ export default {
     },
 
     isInboxTaskOpened () {
-      return !this.$q.screen.lt.md || (this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('inbox') && this.$q.screen.lt.md)
+      return !this.$q.screen.lt.md || this.onLoadShowTasks || (this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('inbox') && this.$q.screen.lt.md)
     },
 
     channelName () {
@@ -114,10 +115,22 @@ export default {
     },
 
     back () {
+      if (this.$route.name === 'Inbox' && this.isInboxTaskOpened) {
+        this.onLoadShowTasks = false
+      }
+
       this.$router.push('/')
     },
 
     ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
+  },
+
+  watch: {
+    $route (to, from) {
+      if (to.name.includes('Inbox')) {
+        this.onLoadShowTasks = false
+      }
+    }
   }
 }
 </script>
