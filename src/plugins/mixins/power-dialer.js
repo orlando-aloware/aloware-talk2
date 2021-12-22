@@ -146,6 +146,7 @@ export default {
       })
     },
     closeModal () {
+      this.selectedItem = null
       this.isOpen = false
     }
   }

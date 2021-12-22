@@ -413,7 +413,6 @@ export default {
     },
 
     onRemove () {
-      console.log('7878 :>> ', 7878)
       this.setBulkDelete(false)
       this.removeContactOpen({
         ...this.contact,
