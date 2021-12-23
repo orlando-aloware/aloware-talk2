@@ -71,7 +71,7 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :to="{ name: 'Power Dialer' }"
+    <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
@@ -87,7 +87,7 @@
         <span class="font-weight-bold text-sm">Power Dialer</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ name: 'Power Dialer' }"
+    <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_gray.svg"
            align="center"

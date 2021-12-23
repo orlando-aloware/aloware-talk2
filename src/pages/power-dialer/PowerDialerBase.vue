@@ -1,8 +1,10 @@
 <template>
-  <PowerDialerView
-    :id="id"
-    :name="name"
-    @on-list-update="updateList" />
+  <div>
+    <PowerDialerView
+      :id="id"
+      :name="name"
+      @on-list-update="updateList" />
+  </div>
 </template>
 
 <script>
