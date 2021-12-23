@@ -57,7 +57,7 @@
           <button
             :tabindex="id"
             :data-popper-target="'list-' + id"
-            :id="'folder-option-' + id"
+            :id="folderId"
             class="folder__option btn btn-link p-0 shadow-0"
           >
             <folder-option></folder-option>
@@ -65,7 +65,7 @@
         </div>
 
         <b-popover
-          :target="'folder-option-' + id"
+          :target="folderId"
           triggers="click blur"
           placement="bottomright"
           boundary="window"
@@ -154,6 +154,10 @@ export default {
         return '/api/v2/contact-folders'
       }
       return '/api/v2/power-dialer-folders'
+    },
+    folderId () {
+      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-item-option-${module}-${this.id}`
     }
   },
   props: {
