@@ -104,7 +104,7 @@ export default {
 
     checkContactMatchesUserAccessibility (contact) {
       // check auth exists to prevent js errors
-      if (!this.auth || !this.auth.user || !this.auth.profile) {
+      if (!this.auth || !this.auth.profile) {
         return false
       }
 

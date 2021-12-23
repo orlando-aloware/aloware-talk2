@@ -6,7 +6,11 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   },
   sms: {
     title: '',
@@ -15,7 +19,11 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   },
   call: {
     title: '',
@@ -24,7 +32,11 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   },
   callVoicemail: {
     title: '',
@@ -33,7 +45,11 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   },
   voicemail: {
     title: '',
@@ -42,7 +58,11 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   },
   mention: {
     title: '',
@@ -51,7 +71,11 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   },
   incomingCall: {
     title: '',
@@ -60,6 +84,23 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
+  },
+  callFishing: {
+    title: '',
+    message: '',
+    messageIcon: null,
+    attachment: null,
+    dateTime: null,
+    contactId: '',
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    queue: null
   }
 }

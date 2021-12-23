@@ -174,16 +174,18 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
-import broadcast from '../boot/broadcast'
-import AppHeader from '../components/layout/app-header'
-import AppFooter from '../components/layout/app-footer'
-import AppSidebar from '../components/layout/app-sidebar'
-import Dialer from '../components/dialer/dialer'
-import * as AgentStatus from '../constants/agent-status'
-import * as CommunicationTypes from '../constants/communication-types'
+import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from 'src/boot/mixins'
+import broadcast from 'src/boot/broadcast'
+import AppHeader from 'src/components/layout/app-header'
+import AppFooter from 'src/components/layout/app-footer'
+import AppSidebar from 'src/components/layout/app-sidebar'
+import Dialer from 'src/components/dialer/dialer'
+import * as AgentStatus from 'src/constants/agent-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
+import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
@@ -249,6 +251,7 @@ export default {
     ...mapState(['currentCompany', 'dialer', 'campaigns']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
+    ...mapState(['ringGroups']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -416,7 +419,8 @@ export default {
     // new desktop call notification
     this.$VueEvent.listen('new_desktop_call', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        this.handleDesktopCommunicationNotification(communication)
+        // this.handleDesktopCommunicationNotification(communication)
+        this.handleInAppCommunicationNotification(communication, 'call')
       }
     })
 
@@ -431,8 +435,7 @@ export default {
     this.$VueEvent.listen('new_desktop_sms', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // this.handleDesktopCommunicationNotification(communication)
-        const firstAttachment = _.get(communication.attachments, '0.url', null)
-        this.$actionNotification(communication.contact.phone_number, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id)
+        this.handleInAppCommunicationNotification(communication, 'sms')
       }
     })
 
@@ -446,35 +449,43 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        let name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
-        this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id)
         // this.handleDesktopVoicemailNotification(communication)
+        this.handleInAppCommunicationNotification(communication, 'missed voicemail')
       }
     })
 
     // user mention notification
     this.$VueEvent.listen('mention', (data) => {
-      const name = _.get(data, 'mentioner_user.name', '')
-      const contactId = _.get(data, 'contact_id', null)
-      const communicationId = _.get(data, 'mention_subject_id', null)
-      const message = _.get(data, 'preview_text', '')
-      this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
+      this.handleInAppCommunicationNotification(data, 'mention')
     })
 
     // missed call notification
     this.$VueEvent.listen('update_communication', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication) && communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-        let name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
-        this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+        return
+      }
+
+      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+        this.handleInAppCommunicationNotification(communication, 'missed call')
+      }
+
+      // if disposition status is not in-progress, close call notification
+      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+        this.$closeActionNotification('callFishing')
+      }
+
+      // if current status is not queued / ring all, close call notification
+      if (![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
+        this.$closeActionNotification('callFishing')
       }
     })
 
     this.$VueEvent.listen('new_version', () => {
-      if (this.isWidget) {
-        return
-      }
+      // if (this.isWidget) {
+      //  return
+      // }
 
-      this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
+      // this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
     })
 
     if (this.$q.platform.is.electron) {
@@ -1120,7 +1131,7 @@ export default {
         window.Push.Permission.has() &&
         !this.communicationNotifiedDesktop.includes(communication.id)
       ) {
-        this.communicationNotifiedDesktop.push(communication.id)
+        // this.communicationNotifiedDesktop.push(communication.id)
         let self = this
         let title = ''
         let icon = ''
@@ -1144,6 +1155,11 @@ export default {
           communication.type === CommunicationTypes.CALL &&
           communication.user_id
         ) {
+          title = 'Answered Incoming Call'
+        }
+
+        // handling answered calls
+        if (communication.type === CommunicationTypes.CALL && communication.user_id) {
           title = 'Answered Incoming Call'
         }
 
@@ -1211,6 +1227,29 @@ export default {
           }
         }
         window.Push.create(title, options)
+
+        // for fishing mode calls
+        if (communication.type === CommunicationTypes.CALL && communication.ring_group_id) {
+          const ringGroup = this.getRingGroup(communication.ring_group_id)
+
+          // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
+          if (ringGroup && ringGroup.fishing_mode && ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT && this.user && this.user.profile && this.user.profile.id !== communication.contact.user_id) {
+            return
+          }
+
+          this.$actionNotification(communication.contact.name, communication.contact.company_name, null, null, 'callFishing', null, null, null, null, null, true)
+
+          // let dismiss = this.showFishingModeNotification(communication)
+
+          // push the notification obj to call notifications list
+          // this.communicationNotifiedDesktop.push({
+          //   communication_id: communication.id,
+          //   dismiss: dismiss
+          // })
+
+          return
+        }
+
         if (communication.type !== CommunicationTypes.CALL) {
           this.bounceDock()
           this.increaseAppBadge()
@@ -1421,6 +1460,78 @@ export default {
       }
     },
 
+    handleInAppCommunicationNotification (communication, type) {
+      // if (this.is_widget) {
+      //   return
+      // }
+
+      // if (this.communication_notified_in_app.includes(communication.id)) {
+      //   return
+      // }
+
+      let name = ''
+      let companyName = ''
+      let firstAttachment = null
+      let contactId = null
+      let communicationId = null
+      let campaignId = _.get(communication, 'campaign_id', null)
+      let message = ''
+      let ringGroup = this.getRingGroup(communication.ring_group_id)
+
+      if (type !== 'mention') {
+        name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
+        companyName = communication.contact.company_name
+        firstAttachment = _.get(communication.attachments, '0.url', null)
+      }
+
+      switch (type) {
+        case 'sms':
+          this.$actionNotification(name, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id, campaignId, null, null)
+          break
+        case 'missed voicemail':
+          this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id, campaignId, null, null)
+          break
+        case 'mention':
+          name = _.get(communication, 'mentioner_user.name', '')
+          contactId = _.get(communication, 'contact_id', null)
+          communicationId = _.get(communication, 'mention_subject_id', null)
+          message = _.get(communication, 'preview_text', '')
+          this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
+          break
+        case 'missed call':
+          this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+          break
+        case 'call':
+          // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
+          if (ringGroup && ringGroup.fishing_mode && ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT && this.user && this.user.profile && this.user.profile.id !== communication.contact.user_id) {
+            break
+          }
+
+          if (this.dialer && this.dialer.communication && ringGroup && !ringGroup.fishing_mode) {
+            break
+          }
+
+          const campaignName = _.get(communication, 'campaign.name', null)
+          const ringGroupName = _.get(communication, 'rin_group.name', null)
+
+          if (ringGroup && ringGroup.fishing_mode) {
+            this.$actionNotification(name, companyName, null, null, 'callFishing', communication.contact.id, communication.id, campaignId, campaignName, ringGroupName, true)
+            break
+          }
+
+          this.$actionNotification(name, companyName, null, null, 'incomingCall', null, communication.id, campaignId, campaignName, ringGroupName, true)
+          break
+      }
+
+      // push the notification obj to call notifications list
+      // this.notifications.push({
+      //   communication_id: communication.id,
+      //   notification: notification
+      // })
+
+      // this.playAudio()
+    },
+
     refreshPage () {
       window.location.reload()
     },
@@ -1452,6 +1563,20 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+    },
+
+    getRingGroup (id) {
+      if (!id) {
+        return null
+      }
+
+      let found = this.ringGroups.find(ringGroup => ringGroup.id === id)
+
+      if (found) {
+        return found
+      }
+
+      return null
     },
 
     beforeUnload () {

@@ -80,10 +80,26 @@ $green-3: #6FCF97;
 $blue-90: #2F80ED;
 $blue-80: #15163F;
 $blue-70: #EEF3FF;
+$blue-60: #434464;
+$blue-60-opaque: rgba(21, 22, 63, 0.8);
 $blue-10: #D3E2FF;
 $blue-3: #56CCF2;
 
 // Greys
+$grey-dark: #666666;
+$grey-2: #989899;
+$grey-light: #d8d8d8;
+$grey-light2: #F4F4F6;
+$grey-light3: #e4e4e4;
+$grey-light4: #d2d2d2;
+$grey-light5: #202125;
+$grey-light6: #f6f6f6;
+$grey-light7: #DFDFDF;
+$grey-light8: #F6F6F6;
+$grey-light9: #202125;
+$grey-light10: #cccccc;
+$grey-light11: #e0e0e0;
+$grey-mid: #999999;
 $grey-100: #040404;
 $grey-92: #333333;
 $grey-91: #E5E5E5;
@@ -107,6 +123,11 @@ $red-50: #EB5757;
 $red-80: #EB5757;
 $red-10: #FECCD9;
 
+// purple
+$purple-100: #9B51E0;
+
+// black
+$black: $grey-100;
 
 // Primary colors
 $primary: #256eff;
@@ -119,6 +140,7 @@ $info: #17a2b8;
 $dark: #15163f;
 $light-grey: #f8f9fa;
 $dark-grey: #343a40;
+$green: $success;
 
 //Hover Colors
 $primary-hover: #054CDB;
@@ -148,6 +170,8 @@ $primary-hover: #054CDB;
 @include text-color('red-80', $red-80);
 
 // Background Colors
+@include bg-color('grey-light', $grey-light, true);
+@include bg-color('grey-light11', $grey-light11, true);
 @include bg-color('grey-91', $grey-91, true);
 @include bg-color('grey-90', $grey-90, true);
 @include bg-color('grey-80', $grey-80, true);
@@ -157,8 +181,10 @@ $primary-hover: #054CDB;
 @include bg-color('grey-9', $grey-9, true);
 @include bg-color('red-100', $red-100, true);
 @include bg-color('blue-80', $blue-80, true);
-@include bg-color('blue-10', $blue-10, true);
 @include bg-color('blue-70', $blue-70, true);
+@include bg-color('blue-60', $blue-60, true);
+@include bg-color('blue-60-opaque', $blue-60-opaque, true);
+@include bg-color('blue-10', $blue-10, true);
 @include bg-color('blue', $primary, true);
 @include bg-color('green-90', $green-10, true);
 @include bg-color('green-10', $green-10, true);
@@ -167,6 +193,7 @@ $primary-hover: #054CDB;
 @include bg-color('grey-80', $grey-80, true);
 @include bg-color('grey-70', $grey-70, true);
 @include bg-color('primary', $primary, true);
+@include bg-color('purple-100', $purple-100, true);
 
 
 .bg-primary {
@@ -356,22 +383,6 @@ body {
  */
 
 // Colors
-$green: $success;
-$black: $grey-100;
-$grey-dark: #666666;
-$grey-2: #989899;
-$grey-light: #d8d8d8;
-$grey-light2: #F4F4F6;
-$grey-light3: #e4e4e4;
-$grey-light4: #d2d2d2;
-$grey-light5: #202125;
-$grey-light6: #f6f6f6;
-$grey-light7: #DFDFDF;
-$grey-light8: #F6F6F6;
-$grey-light9: #202125;
-$grey-light10: #cccccc;
-$grey-light11: #e0e0e0;
-$grey-mid: #999999;
 $orange-light: #FFF9F7;
 
 // System Colors
@@ -399,4 +410,3 @@ $f-size-12: 12px;
 $f-size-13: 13px;
 $f-size-14: 14px;
 
-@include bg-color('grey-light11', $grey-light11, true);
