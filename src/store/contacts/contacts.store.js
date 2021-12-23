@@ -152,7 +152,6 @@ export default function () {
     },
     filters: [],
     currentListFilters: {},
-
     contact: {},
     contactClone: {},
     changedContactProperties: [],

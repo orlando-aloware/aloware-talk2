@@ -262,7 +262,7 @@
           </div>
           <div class="text-center py-3">
             <div class="text-dark">
-              <div v-html="`Do you want to remove the contact: ${selectedItem.name}?`"></div>
+              <div v-html="`Do you want to remove the contact: ${fullname}?`"></div>
             </div>
           </div>
           <div class="row text-center pt-3 pb-0">
@@ -416,6 +416,12 @@ export default {
     },
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
+    },
+    fullname () {
+      return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
+    },
+    deleteEndpoint () {
+      return `/api/v2/power-dialer-list-items/${this.selectedList.id}/items/${this.selectedItem.id}`
     }
   },
   data () {
@@ -525,7 +531,20 @@ export default {
       }
     },
     onDeleteContact (data) {
-      console.log('data :>> ', data)
+      return this.$axios
+        .delete(
+          this.deleteEndpoint
+        )
+        .then((res) => {
+          this.$generalNotification(res.data.message)
+          this.$emit('on-list-update', this.selectedList)
+        })
+        .catch(() => {
+          this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
+        })
+        .finally(() => {
+          this.isOpen = false
+        })
     },
     saveFilterButtonCustomClass () {
       return !this.filterHasChanges ? 'button-disabled' : ''
