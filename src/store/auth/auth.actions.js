@@ -74,7 +74,7 @@ const getCookieUser = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
-    const response = await window.axios.post('/get-cookie-user')
+    const response = await window.axios.post('/get-cookie-user', {}, { withCredentials: true })
 
     const { meta, data } = response.data
 
