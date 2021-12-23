@@ -25,7 +25,8 @@
           <q-item-section>
             <b-form-radio inline
                           :value="AppDefaultLogin.APP_ALOWARE_TALK"
-                          v-model="user.default_app">
+                          v-model="user.default_app"
+                          @change="onInput">
               Aloware Talk
             </b-form-radio>
           </q-item-section>
@@ -34,7 +35,8 @@
           <q-item-section>
             <b-form-radio inline
                           :value="AppDefaultLogin.APP_ALOWARE_CLASSIC"
-                          v-model="user.default_app">
+                          v-model="user.default_app"
+                          @change="onInput">
               Aloware (Classic)
             </b-form-radio>
           </q-item-section>
@@ -74,14 +76,12 @@ export default {
         this.user = response.data
         this.setProfile(response.data)
       })
-    }
-  },
-
-  watch: {
-    'user.default_app': function () {
+    },
+    onInput () {
       this.updateDefaultLogin()
     }
   },
+
   created () {
     this.user = _.cloneDeep(this.profile)
   }
