@@ -1,6 +1,7 @@
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
 
@@ -56,12 +57,27 @@ export default {
 
   methods: {
     ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
+    pinLiveCalls (contacts) {
+      let liveCallStatus = [
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW
+      ]
+
+      contacts.sort(function (x, y) {
+        return x.last_communication && liveCallStatus.includes(x.last_communication.current_status2) ? -1 : y.last_communication && liveCallStatus.includes(y.last_communication.current_status2) ? 1 : 0
+      })
+
+      return contacts
+    },
     loadContactTasks () {
       this.gettingContactsList(true)
       // always reset page when fresh loading contacts
       this.page = 1
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts(response.data.data)
+        this.setContacts(this.pinLiveCalls(response.data.data))
         this.gettingContactsList(false)
         this.setContactsCurrentPage(response.data.current_page)
         this.setHasMoreContacts(response.data.next_page_url)

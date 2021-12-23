@@ -145,6 +145,7 @@
 import _ from 'lodash'
 import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
@@ -212,7 +213,8 @@ export default {
           ring_groups: Filters.DEFAULT_STATE.filter.ring_groups
         },
         scope: 'user'
-      }
+      },
+      CommunicationCurrentStatus
     }
   },
 
@@ -334,7 +336,6 @@ export default {
         this.loadContactTasks()
       }
     },
-
     searching (value) {
       if ((value && value.length >= 3) || value === '') {
         if (value === '') {
@@ -349,11 +350,9 @@ export default {
       this.filter = { ...this.defaultFilterModel.filter }
       this.resetChannelChangedFilterFields()
     },
-
     onApplyFilter (filter) {
       this.filter = filter
     },
-
     onCreateNewFilter (filter) {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
       this.toggleFilterModelForm(true)
@@ -451,6 +450,8 @@ export default {
       if (!communication.contact_id) {
         return
       }
+
+      this.setContacts(this.pinLiveCalls(_.cloneDeep(this.contacts)))
 
       this.setContact(communication)
     })
