@@ -21,7 +21,7 @@ export default {
     ...mapActions('auth', ['getCookieUser']),
     ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
     getSharedCookie () {
-      let name = process.env.SHARED_AUTH_TOKEN + '='
+      let name = 'aloware_shared_auth_token='
       let ca = document.cookie.split(';')
       for (let i = 0; i < ca.length; i++) {
         let c = ca[i]
@@ -35,7 +35,7 @@ export default {
       return ''
     },
     async validateCookieUser () {
-      document.cookie = process.env.SHARED_AUTH_TOKEN + '=helloWorld;domain=aloware.test;expires=Thu, 01 Jan 1970 00:00:00 UTC'
+      // document.cookie = process.env.SHARED_AUTH_TOKEN + '=helloWorld;domain=aloware.test;' // expires=Thu, 01 Jan 1970 00:00:00 UTC
       let sharedCookie = this.getSharedCookie()
 
       if (sharedCookie) {
