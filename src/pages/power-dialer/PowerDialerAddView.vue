@@ -77,7 +77,7 @@ export default {
 
       let stringId = String(id)
 
-      if (this.$route.meta.id === 'power-dialer-add-queue-list') {
+      if (this.$route.meta.id === 'power-dialer-add-queue-list' || this.$route.meta.id === 'power-dialer-queue-filter') {
         stringId = 'my-queue'
       }
 
@@ -87,7 +87,6 @@ export default {
           ...DEFAULT_CONTACT_LIST_ITEMS
         })
       }
-      console.log(`/api/v2/power-dialer-lists/${stringId}--lol`, stringId)
 
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
