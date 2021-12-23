@@ -26,7 +26,7 @@ export default {
 
       if (sharedCookie) {
         const response = await this.getCookieUser()
-        console.log(response)
+        await this.cookieUserValidated(response)
       }
     },
     async cookieUserValidated ({ data: { data } }) {
