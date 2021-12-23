@@ -21,7 +21,6 @@ export default {
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
     async validateCookieUser () {
-      // document.cookie = process.env.SHARED_AUTH_TOKEN + '=helloWorld;domain=aloware.test;' // expires=Thu, 01 Jan 1970 00:00:00 UTC
       let sharedCookie = this.getSharedCookie()
 
       if (sharedCookie) {
@@ -34,7 +33,7 @@ export default {
       this.setCurrentCompany(company)
       this.resetVuex()
       this.setUsage(usage)
-      localStorage.setItem('talk_cookie', this.getSharedCookie())
+      localStorage.setItem('talk_cookie', await this.getSharedCookie())
       localStorage.setItem('company_id', company.id)
 
       const redirectPath = this.$route.query.redirect || '/'

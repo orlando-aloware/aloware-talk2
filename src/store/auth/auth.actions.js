@@ -70,7 +70,7 @@ const login = async ({ commit }, {
   }
 }
 
-const getSharedCookie = async () => {
+const getSharedCookie = () => {
   let name = 'aloware_shared_auth_token='
   let ca = document.cookie.split(';')
   for (let i = 0; i < ca.length; i++) {

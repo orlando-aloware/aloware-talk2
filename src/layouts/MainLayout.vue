@@ -522,6 +522,10 @@ export default {
   },
 
   mounted () {
+    if (localStorage.getItem('talk_cookie') !== this.getSharedToken()) {
+      this.validateCookieUser()
+    }
+
     if (this.authenticated) {
       this.sidebarVisible = true
     }
@@ -561,6 +565,44 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
+    async validateCookieUser () {
+      let sharedCookie = this.getSharedCookie()
+
+      if (sharedCookie) {
+        const response = await this.getCookieUser()
+        await this.cookieUserValidated(response)
+      }
+    },
+    async cookieUserValidated ({ data: { data } }) {
+      const { usage, company } = data
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+      localStorage.setItem('talk_cookie', await this.getSharedCookie())
+      localStorage.setItem('company_id', company.id)
+
+      const redirectPath = this.$route.query.redirect || '/'
+
+      await this.$router.push(String(redirectPath))
+      await this.redirectTimeout()
+    },
+    getSharedToken () {
+      document.cookie = 'aloware_shared_auth_token=helloWorld;domain=aloware.test;' // expires=Thu, 01 Jan 1970 00:00:00 UTC
+      let name = 'aloware_shared_auth_token='
+      let ca = document.cookie.split(';')
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i]
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1)
+        }
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length)
+        }
+      }
+      return ''
+    },
+
     onPhoneVisible (value) {
       this.isPhoneVisible = value
     },
