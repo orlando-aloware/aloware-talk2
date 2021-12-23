@@ -588,7 +588,6 @@ export default {
       await this.redirectTimeout()
     },
     getSharedToken () {
-      document.cookie = 'aloware_shared_auth_token=helloWorld;domain=aloware.test;' // expires=Thu, 01 Jan 1970 00:00:00 UTC
       let name = 'aloware_shared_auth_token='
       let ca = document.cookie.split(';')
       for (let i = 0; i < ca.length; i++) {
