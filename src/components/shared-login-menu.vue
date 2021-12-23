@@ -60,7 +60,6 @@ export default {
   data () {
     return {
       user: null,
-      defaultLogin: 1,
       AppDefaultLogin
     }
   },
@@ -77,7 +76,7 @@ export default {
   },
 
   watch: {
-    defaultLogin: function () {
+    'user.default_app': function () {
       this.updateDefaultLogin()
     }
   },
