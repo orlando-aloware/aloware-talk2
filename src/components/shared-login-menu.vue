@@ -46,7 +46,7 @@
 
 <script>
 import talk2Api from 'src/plugins/api/api'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import _ from 'lodash'
 
@@ -65,12 +65,14 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['setProfile']),
     onGoToClassic () {
       window.location.href = process.env.API_URL
     },
     updateDefaultLogin () {
       talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.user.default_app }).then(response => {
         this.user = response.data
+        this.setProfile(response.data)
       })
     }
   },
