@@ -130,7 +130,7 @@
       <BulkActionMenu
         v-if="checked.length > 0"
         :id="id"
-        @moved-contacts="fetch()" />
+        @moved-contacts="fetch({}, false)" />
     </template>
 
     <template slot="table">
