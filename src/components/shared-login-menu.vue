@@ -69,7 +69,7 @@ export default {
       window.location.href = process.env.API_URL
     },
     updateDefaultLogin () {
-      talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.defaultLogin }).then(response => {
+      talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.user.default_app }).then(response => {
         this.user = response.data
       })
     }
