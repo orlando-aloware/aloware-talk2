@@ -60,18 +60,38 @@
          class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="(contact.last_communication.type === CommunicationTypes.CALL && contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || contact.last_communication.type !== CommunicationTypes.CALL">
+            v-if="(contact.last_communication.type === CommunicationTypes.CALL &&
+            contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
+            contact.last_communication.type !== CommunicationTypes.CALL">
         <task-item-time :from-time="contact.last_communication.created_at"
                         :update-interval="6000">
         </task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND && contact.last_communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(contact.last_communication.current_status2)">
+           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+           contact.last_communication.type === CommunicationTypes.CALL &&
+           [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2)">
         <div class="pl-0">
           <cancel-call-icon role="button"/>
         </div>
         <div class="pl-2 pr-0">
           <accept-call-icon role="button"/>
+        </div>
+      </div>
+      <div class="time-passed text-grey-90 d-flex flex-row justify-center"
+           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+           contact.last_communication.type === CommunicationTypes.CALL &&
+           [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2)">
+        <div class="pl-0">
+          <cancel-call-icon role="button"/>
+        </div>
+      </div>
+      <div class="time-passed text-grey-90 d-flex flex-row justify-center"
+           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+           contact.last_communication.type === CommunicationTypes.CALL &&
+           [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2)">
+        <div class="pl-0">
+          <parked-call-icon/>
         </div>
       </div>
     </div>
@@ -100,12 +120,13 @@ import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
 export default {
   name: 'inbox-task-item',
 
   mixins: [avatarMixin, communicationInfoMixin],
 
-  components: { AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
+  components: { ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
 
   props: {
     contact: {
