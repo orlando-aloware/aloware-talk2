@@ -81,7 +81,7 @@ export default {
       this.updateDefaultLogin()
     }
   },
-  mounted () {
+  created () {
     this.user = _.cloneDeep(this.profile)
   }
 }
