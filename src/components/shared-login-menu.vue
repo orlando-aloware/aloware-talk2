@@ -25,7 +25,7 @@
           <q-item-section>
             <b-form-radio inline
                           :value="AppDefaultLogin.APP_ALOWARE_TALK"
-                          v-model="defaultLogin">
+                          v-model="user.default_app">
               Aloware Talk
             </b-form-radio>
           </q-item-section>
@@ -34,7 +34,7 @@
           <q-item-section>
             <b-form-radio inline
                           :value="AppDefaultLogin.APP_ALOWARE_CLASSIC"
-                          v-model="defaultLogin">
+                          v-model="user.default_app">
               Aloware (Classic)
             </b-form-radio>
           </q-item-section>
@@ -48,6 +48,8 @@
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
+import _ from 'lodash'
+
 export default {
   name: 'shared-login-menu',
 
@@ -57,6 +59,7 @@ export default {
 
   data () {
     return {
+      user: null,
       defaultLogin: 1,
       AppDefaultLogin
     }
@@ -67,7 +70,9 @@ export default {
       window.location.href = process.env.API_URL
     },
     updateDefaultLogin () {
-      talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.defaultLogin })
+      talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.defaultLogin }).then(response => {
+        this.user = response.data
+      })
     }
   },
 
@@ -75,6 +80,9 @@ export default {
     defaultLogin: function () {
       this.updateDefaultLogin()
     }
+  },
+  mounted () {
+    this.user = _.cloneDeep(this.profile)
   }
 }
 </script>
