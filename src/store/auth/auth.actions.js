@@ -70,11 +70,41 @@ const login = async ({ commit }, {
   }
 }
 
+const getSharedCookie = async () => {
+  let name = 'aloware_shared_auth_token='
+  let ca = document.cookie.split(';')
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i]
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1)
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length)
+    }
+  }
+  return ''
+}
+
 const getCookieUser = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
-    const response = await window.axios.post('/get-cookie-user', null, { withCredentials: true })
+    let name = 'aloware_shared_auth_token='
+    let sharedToken = ''
+    let ca = document.cookie.split(';')
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i]
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) === 0) {
+        sharedToken = c.substring(name.length, c.length)
+      }
+    }
+
+    let cookieParams = { shared_token: sharedToken }
+
+    const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
 
     const { meta, data } = response.data
 
@@ -216,5 +246,5 @@ const setProfile = async ({ commit }, user) => {
 }
 
 export default {
-  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile, getCookieUser
+  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile, getCookieUser, getSharedCookie
 }

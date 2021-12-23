@@ -18,22 +18,8 @@ export default {
   components: { LoginForm, LoginLargeScreensInfo },
 
   methods: {
-    ...mapActions('auth', ['getCookieUser']),
+    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
-    getSharedCookie () {
-      let name = 'aloware_shared_auth_token='
-      let ca = document.cookie.split(';')
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i]
-        while (c.charAt(0) === ' ') {
-          c = c.substring(1)
-        }
-        if (c.indexOf(name) === 0) {
-          return c.substring(name.length, c.length)
-        }
-      }
-      return ''
-    },
     async validateCookieUser () {
       // document.cookie = process.env.SHARED_AUTH_TOKEN + '=helloWorld;domain=aloware.test;' // expires=Thu, 01 Jan 1970 00:00:00 UTC
       let sharedCookie = this.getSharedCookie()
