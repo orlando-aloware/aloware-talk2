@@ -35,7 +35,17 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts', 'setShouldUpdateSelectedListContactCount', 'setSelectedListContactCount']),
+    ...mapActions('contacts', [
+      'selectedContactChanging',
+      'setSearch',
+      'setCurrentListFilters',
+      'setListSelectedContacts',
+      'setShouldUpdateSelectedListContactCount',
+      'setSelectedListContactCount'
+    ]),
+    ...mapActions('powerDialer', [
+      'updateMyQueueListData'
+    ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init () {
       const defaultFilters = this.fixDefaultFilters()
@@ -151,6 +161,10 @@ export default {
           if (this.shouldUpdateSelectedListContactCount) {
             this.setSelectedListContactCount(data.total)
             this.setShouldUpdateSelectedListContactCount(false)
+          }
+
+          if (this.apiEndpoint(queued).includes('my-queue')) {
+            this.updateMyQueueListData(data.data)
           }
 
           this.markCheckedAll()
