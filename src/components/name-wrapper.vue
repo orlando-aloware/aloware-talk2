@@ -5,7 +5,7 @@
     </div>
     <div class="flex-grow-1">
       <router-link
-        :to="`${linkPath}${computedResource.id}`"
+        :to="`${linkPath}${computedResource.id}?previousPage=PowerDialer`"
         v-slot="{ href, route, navigate }">
         <a :href="href"
           @click="navigate"
