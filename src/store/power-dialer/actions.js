@@ -20,7 +20,6 @@ export default {
     }
   },
   updateMyQueueListData: ({ commit }, data = []) => {
-    console.log('data here... :>> ', data)
     commit('SET_MY_QUEUE_LIST_DATA', data)
   },
   getContact: async ({ commit }, params = {}) => {
