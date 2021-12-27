@@ -184,6 +184,7 @@ import * as AgentStatus from '../constants/agent-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
@@ -240,8 +241,10 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
+      sharedCookie: null,
       CommunicationTypes,
-      MetricOptionGroups
+      MetricOptionGroups,
+      AppDefaultLogin
     }
   },
 
@@ -522,8 +525,17 @@ export default {
   },
 
   mounted () {
-    if (localStorage.getItem('talk_cookie') !== this.getSharedToken()) {
-      this.validateCookieUser()
+    this.getSharedCookie().then(sharedCookie => {
+      this.sharedCookie = sharedCookie
+
+      if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+        this.validateCookieUser()
+      }
+    })
+
+    // redirect to Alo classic
+    if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC) {
+      location.href = process.env.API_URL
     }
 
     if (this.authenticated) {
@@ -567,9 +579,7 @@ export default {
   methods: {
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     async validateCookieUser () {
-      let sharedCookie = this.getSharedCookie()
-
-      if (sharedCookie) {
+      if (this.sharedCookie) {
         const response = await this.getCookieUser()
         await this.cookieUserValidated(response)
       }
@@ -579,27 +589,14 @@ export default {
       this.setCurrentCompany(company)
       this.resetVuex()
       this.setUsage(usage)
-      localStorage.setItem('talk_cookie', await this.getSharedCookie())
+
+      localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
 
       const redirectPath = this.$route.query.redirect || '/'
 
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
-    },
-    getSharedToken () {
-      let name = 'aloware_shared_auth_token='
-      let ca = document.cookie.split(';')
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i]
-        while (c.charAt(0) === ' ') {
-          c = c.substring(1)
-        }
-        if (c.indexOf(name) === 0) {
-          return c.substring(name.length, c.length)
-        }
-      }
-      return ''
     },
 
     onPhoneVisible (value) {

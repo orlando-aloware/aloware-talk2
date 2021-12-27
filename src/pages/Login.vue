@@ -20,34 +20,24 @@ export default {
   methods: {
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
-    getSharedToken () {
-      let name = 'aloware_shared_auth_token='
-      let ca = document.cookie.split(';')
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i]
-        while (c.charAt(0) === ' ') {
-          c = c.substring(1)
-        }
-        if (c.indexOf(name) === 0) {
-          return c.substring(name.length, c.length)
-        }
-      }
-      return ''
-    },
     async validateCookieUser () {
-      let sharedCookie = this.getSharedCookie()
-
-      if (sharedCookie) {
-        const response = await this.getCookieUser()
-        await this.cookieUserValidated(response)
-      }
+      this.getSharedCookie().then(sharedCookie => {
+        if (sharedCookie) {
+          const response = this.getCookieUser()
+          this.cookieUserValidated(response)
+        }
+      })
     },
     async cookieUserValidated ({ data: { data } }) {
       const { usage, company } = data
       this.setCurrentCompany(company)
       this.resetVuex()
       this.setUsage(usage)
-      localStorage.setItem('talk_cookie', this.getSharedToken())
+
+      this.getSharedCookie().then(sharedCookie => {
+        localStorage.setItem('shared_cookie', sharedCookie)
+      })
+
       localStorage.setItem('company_id', company.id)
 
       const redirectPath = this.$route.query.redirect || '/'
