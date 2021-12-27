@@ -344,7 +344,11 @@ export default {
     },
     onCancel () {
       this.closeFilters()
-      this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+      if (this.contactList.name === 'My Queue') {
+        this.$router.push(this.$router.history._startLocation)
+      } else {
+        this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+      }
     },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
