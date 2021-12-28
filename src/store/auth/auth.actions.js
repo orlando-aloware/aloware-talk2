@@ -55,7 +55,7 @@ const login = async ({ commit }, {
 
     const { meta, data } = response.data
 
-    localStorage.setItem('shared_cookie', getSharedCookie())
+    localStorage.setItem('shared_cookie', meta.hashed_token)
 
     localStorage.setItem('api_token', meta.token)
 
