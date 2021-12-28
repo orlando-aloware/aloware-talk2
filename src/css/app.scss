@@ -9107,7 +9107,8 @@ screen and (max-width: 956px) {
 }
 
 .q-shared-login-menu-dropdown-list {
-  padding: 15px;
+  padding: 15px !important;
+  width: 180px !important;
   .q-item {
     min-height: 16px;
     padding-top: 0 !important;

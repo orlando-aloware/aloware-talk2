@@ -1,6 +1,6 @@
 <template>
   <div class="bridge-menu-wrapper">
-    <q-btn v-if="isAdmin"
+    <q-btn v-if="!isAdmin"
            outline
            class="q-btn-standard"
            @click="onGoToClassic">
@@ -13,7 +13,7 @@
       class="q-shared-login-menu-dropdown "
       color="primary"
       padding="0px 10px"
-      :menu-offset="[4, 16]"
+      :menu-offset="[0, 1]"
       @click="onGoToClassic"
     >
 
