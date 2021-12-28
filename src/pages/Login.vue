@@ -25,7 +25,9 @@ export default {
       this.getSharedCookie().then(sharedCookie => {
         if (sharedCookie) {
           const response = this.getCookieUser()
-          this.cookieUserValidated(response)
+          if (response) {
+            this.cookieUserValidated(response)
+          }
         }
       })
     },
