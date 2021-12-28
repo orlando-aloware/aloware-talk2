@@ -4,7 +4,7 @@
       <div class="d-flex flex-column">
         <div class="d-flex align-items-center">
           <router-link
-            :to="`${urlRoutePath}${$route.params.id}`"
+            :to="linkToRoute"
             v-slot="{ href, navigate }"
           >
             <a
@@ -26,6 +26,7 @@
           </div>
           <TextPopover
             :id="contactList.id"
+            :editable="!isMyQueue"
             v-else
             v-model="contactListName"
             @input="updateListName" />
@@ -237,12 +238,7 @@ export default {
       return '/power-dialer/list/'
     },
     addItemEndpoint () {
-      if (this.isContactModule) {
-        return 'api/v2/contact-list-items'
-      } else {
-        // return 'api/v2/contact-list-items'
-        return 'api/v2/power-dialer-list-items'
-      }
+      return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
     },
     checkedItemIds () {
       let ids = []
@@ -253,6 +249,12 @@ export default {
     },
     contactListName () {
       return this.listName || this.contactList.name
+    },
+    linkToRoute () {
+      return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
+    },
+    isMyQueue () {
+      return this.$attrs?.id === 'my-queue'
     }
   },
   methods: {
@@ -263,11 +265,13 @@ export default {
       'contactsLoaded',
       'foldersLoaded',
       'columnsReordered',
-      'setShouldUpdateSelectedListContactCount'
+      'setShouldUpdateSelectedListContactCount',
+      'setSearch'
     ]),
     updateListName (data) {
+      let id = this.$attrs.id === 'my-queue' ? this.selectedList.id : this.$attrs.id
       this.$axios
-        .patch(`/api/v2/power-dialer-lists/${this.selectedList.id}`, {
+        .patch(`/api/v2/power-dialer-lists/${id}`, {
           name: data
         })
         .then((response) => response.data)
@@ -303,6 +307,7 @@ export default {
           } else {
             this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           }
+          this.setSearch('')
           this.$generalNotification('Selected contacts were successfully added')
         })
         .catch((err) => {
@@ -339,7 +344,11 @@ export default {
     },
     onCancel () {
       this.closeFilters()
-      this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+      if (this.contactList.name === 'My Queue') {
+        this.$router.push(this.$router.history._startLocation)
+      } else {
+        this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+      }
     },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({

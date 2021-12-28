@@ -49,7 +49,7 @@
         class="folder__option btn btn-link p-0 shadow-0"
         :class="{ 'folder__option--hide': isEditing }"
         :data-popper-target="'folder-' + id"
-        :id="'folder-option-' + id"
+        :id="folderId"
       >
         <folder-option></folder-option>
       </button>
@@ -101,7 +101,7 @@
       placement="bottomright"
       boundary="window"
       custom-class="contact-popover"
-      :target="'folder-option-' + id"
+      :target="folderId"
     >
       <folder-actions
         :id="id"
@@ -216,6 +216,11 @@ export default {
         (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
         (this.createList.open && this.createList.folderId === this.id)
       )
+    },
+
+    folderId () {
+      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-option-${module}-${this.id}`
     }
   },
 

@@ -129,7 +129,8 @@
     <template slot="actions">
       <BulkActionMenu
         v-if="checked.length > 0"
-        :id="id" />
+        :id="id"
+        @moved-contacts="fetch({}, false)" />
     </template>
 
     <template slot="table">
@@ -508,7 +509,6 @@ export default {
       }, 10)
     },
     onCheckedRows (checked) {
-      console.log('data from table 902 : ', checked)
       this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {

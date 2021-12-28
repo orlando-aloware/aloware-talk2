@@ -2,6 +2,9 @@ export default {
   SET_MY_QUEUE_LIST: (state, data) => {
     state.myQueue = data
   },
+  SET_MY_QUEUE_LIST_DATA: (state, data) => {
+    state.myQueue.items = data
+  },
   SET_CONTACT_RESOURCES: (state, data) => {
     state.contacts = data
   },

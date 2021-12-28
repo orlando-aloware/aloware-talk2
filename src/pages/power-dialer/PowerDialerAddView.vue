@@ -77,7 +77,7 @@ export default {
 
       let stringId = String(id)
 
-      if (this.$route.meta.id === 'power-dialer-add-queue-list') {
+      if (this.$route.meta.id === 'power-dialer-add-queue-list' || this.$route.meta.id === 'power-dialer-queue-filter') {
         stringId = 'my-queue'
       }
 
@@ -104,7 +104,9 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.loadList(id)
+      if (this.$route.name === 'Power Dialer') {
+        this.loadList(id)
+      }
     }
   }
 }

@@ -35,7 +35,17 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['selectedContactChanging', 'setSearch', 'setCurrentListFilters', 'setListSelectedContacts', 'setShouldUpdateSelectedListContactCount', 'setSelectedListContactCount']),
+    ...mapActions('contacts', [
+      'selectedContactChanging',
+      'setSearch',
+      'setCurrentListFilters',
+      'setListSelectedContacts',
+      'setShouldUpdateSelectedListContactCount',
+      'setSelectedListContactCount'
+    ]),
+    ...mapActions('powerDialer', [
+      'updateMyQueueListData'
+    ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init () {
       const defaultFilters = this.fixDefaultFilters()
@@ -153,6 +163,10 @@ export default {
             this.setShouldUpdateSelectedListContactCount(false)
           }
 
+          if (this.apiEndpoint(queued).includes('my-queue')) {
+            this.updateMyQueueListData(data.data)
+          }
+
           this.markCheckedAll()
         })
         .finally(() => {
@@ -163,11 +177,13 @@ export default {
           console.log(err)
         })
     }, 1000),
-    fetch (params = {}) {
+    fetch (params = {}, hasOrder = true) {
       const sort = (this.sorts) ? this.sorts.orderBy : _.get(params, 'sort', this.defaultContactDateFilter)
       const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
-      params.sort = sort
-      params.order = order
+      if (hasOrder) {
+        params.sort = sort
+        params.order = order
+      }
 
       this.isLoading = true
       if (typeof this.isPowerDialer !== 'undefined') {
