@@ -122,6 +122,7 @@ const logout = async ({ commit }) => {
     localStorage.removeItem('impersonate')
     localStorage.removeItem('portal_session')
     localStorage.removeItem('company_id')
+    localStorage.removeItem('shared_cookie')
 
     window.axios.defaults.headers.common['Authorization'] = null
 
