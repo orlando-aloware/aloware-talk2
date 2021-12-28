@@ -533,11 +533,6 @@ export default {
       }
     })
 
-    // redirect to Alo classic
-    if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC) {
-      location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
-    }
-
     if (this.authenticated) {
       this.sidebarVisible = true
     }
