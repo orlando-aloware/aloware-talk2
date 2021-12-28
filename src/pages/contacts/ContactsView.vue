@@ -128,13 +128,15 @@
             </search-icon>
             Select Contacts
           </b-dropdown-item>
-          <b-dropdown-item href="#" v-b-modal:create-contact-modal>
+          <b-dropdown-item href="#"
+                           @click="onShowCreateContact">
             <plus-icon color="#62666E"></plus-icon>
             Create Contact
           </b-dropdown-item>
         </b-dropdown>
 
-        <contact-create-modal @created="onContactCreated"></contact-create-modal>
+        <contact-create-modal :id="createContactModalId"
+                              @created="onContactCreated"></contact-create-modal>
 
         <b-dropdown text="..."
                     no-caret
@@ -298,7 +300,8 @@ export default {
       filterHasChanges: false,
       defaultContactLists: DEFAULT_PINNED_LIST,
       isUpdatingList: false,
-      folderPath: []
+      folderPath: [],
+      createContactModalId: 'contacts-list-create-contact-modal'
     }
   },
 
@@ -395,6 +398,10 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to update contact list.', 'error')
         })
+    },
+    onShowCreateContact (e) {
+      this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
+      e.stopImmediatePropagation()
     },
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)

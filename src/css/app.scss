@@ -5107,7 +5107,7 @@ button#bs-folder-options {
   .item:hover {
     background: $light-blue3;
   }
-  
+
   .sublists {
     .folder {
       &--active:not(:hover) {
@@ -5115,7 +5115,7 @@ button#bs-folder-options {
       }
     }
   }
-  
+
 }
 
 .contact-popover {
@@ -5428,7 +5428,7 @@ table.datatable {
             opacity: 1;
 
             &.has-sorting {
-  
+
               a.sorter.sorter-desc {
                 &:before {
                   opacity: 1 !important;
@@ -5439,7 +5439,7 @@ table.datatable {
                   opacity: 1 !important;
                 }
               }
-  
+
               a.sorter.sorter-asc {
                 &:before {
                   opacity: 1 !important;
@@ -5450,7 +5450,7 @@ table.datatable {
                   top: 0px;
                 }
               }
-  
+
             }
           }
         }
@@ -6448,13 +6448,11 @@ table.datatable {
     &__arrow {
       margin-top: -5px;
       margin-right: 5px;
-      position: absolute;
     }
 
     &__icon {
       min-height: 34px;
       margin-right: 5px;
-      margin-left: 10px;
     }
 
     &--selected {
