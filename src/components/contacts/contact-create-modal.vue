@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    id="create-contact-modal"
+    :id="id"
     size="lg"
     modal-class="confirm-dialog br-8"
     hide-header-close
@@ -155,6 +155,13 @@ export default {
   name: 'contact-create-modal',
 
   mixins: [ formValidationMixin ],
+
+  props: {
+    id: {
+      type: String,
+      default: 'create-contact-modal'
+    }
+  },
 
   components: { UserSelector, LineSelector, TagSelector },
 
