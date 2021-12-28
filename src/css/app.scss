@@ -6448,13 +6448,11 @@ table.datatable {
     &__arrow {
       margin-top: -5px;
       margin-right: 5px;
-      position: absolute;
     }
 
     &__icon {
       min-height: 34px;
       margin-right: 5px;
-      margin-left: 10px;
     }
 
     &--selected {
@@ -7277,14 +7275,14 @@ button.grey-90 {
 #b-toaster-bottom-right,
 #b-toaster-top-center {
   .b-toaster-slot {
-    max-width: 300px !important;
+    display: flex;
+    justify-content: center;
   }
 }
 
 .b-toast {
   max-width: 300px !important;
   .action-notification {
-    padding: 12px 12px 15px 12px;
     width: 300px !important;
     &.incoming-call-notification {
       .toast-header {
@@ -7314,9 +7312,13 @@ button.grey-90 {
     }
     .toast-body {
       text-decoration: none;
+      padding: 0 0 !important;
+      > div {
+        padding: 12px 12px 15px 12px;
+      }
       .title {
         @include font-size($f-size-h5, 600, true);
-        line-height: 17px;
+        line-height: 18px;
       }
       .time {
         @include font-size($f-size-h5, normal, true);
@@ -7324,11 +7326,12 @@ button.grey-90 {
         padding-top: 1px;
       }
       .notification-icon {
-        padding-top: 4px;
+        padding-top: 2px;
       }
       .message-body {
         @include font-size($f-size-body-xs, normal);
         line-height: 15px;
+        padding-top: 1.39px;
         .message-text {
           display: -webkit-box;
           -webkit-line-clamp: 4;
@@ -8255,6 +8258,11 @@ button.grey-90 {
   }
 }
 
+.b-toaster-slot {
+  max-width: 399px !important;
+  width: 100%;
+}
+
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .inbox {
@@ -8644,6 +8652,96 @@ screen and (max-width: 956px) {
     }
     .contact-name {
       font-size: 18px;
+    }
+  }
+}
+
+@media screen and (min-width: 400px) {
+  #callFishing__toast_outer {
+    &.b-toast,
+    .action-notification.in-progress {
+      max-width: 399px !important;
+      width: 100% !important;
+    }
+    .action-notification {
+      margin: 0 auto;
+      &.in-progress {
+        button {
+          padding: 0 17px;
+        }
+      }
+      .toast-body {
+        > .notification-body-wrapper {
+          > div {
+            > div:nth-child(3) {
+              > button:first-child {
+                svg {
+                  margin-right: 2px !important;
+                }
+              }
+            }
+          }
+        }
+      }
+      .toast-body {
+        > .notification-body-wrapper {
+          > div {
+            .notification-icon {
+              max-width: 32px;
+              width: 100%;
+            }
+
+            > div:nth-child(2) {
+              max-width: 150px;
+              width: 100%;
+              flex-grow: unset !important;
+            }
+
+            > div:nth-child(3) {
+              max-width: 84px;
+              width: 100%;
+            }
+          }
+        }
+      }
+      .message-text {
+        &.has-ring-group {
+          .campaign-wrapper,
+          .ring-group-wrapper {
+            padding: 0 0;
+          }
+        }
+        div:nth-child(2) {
+          padding: 0 5px;
+          max-width: 17px;
+          min-width: 17px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 399px) {
+  #callFishing__toast_outer {
+    .action-notification.in-progress {
+      max-width: 210px !important;
+      width: 100% !important;
+    }
+    .action-notification {
+      margin: 0 auto;
+      .message-text {
+        &.has-ring-group {
+          .campaign-wrapper,
+          .ring-group-wrapper {
+            padding: 0 0;
+          }
+        }
+        div:nth-child(2) {
+          padding: 0 5px;
+          max-width: 17px;
+          min-width: 17px;
+        }
+      }
     }
   }
 }
@@ -9125,7 +9223,6 @@ screen and (max-width: 956px) {
 
 }
 
-
 .shared-login-menu-dropdown {
   button {
     border: 1px solid $grey-60;
@@ -9148,6 +9245,93 @@ screen and (max-width: 956px) {
 
     i {
       color: $grey-90 !important;
+    }
+  }
+}
+.call-fishing-actions {
+  padding-top: 2px;
+  > button:first-child {
+    margin-right: 10px;
+  }
+  button {
+    .q-btn__wrapper {
+      margin: 0 0;
+      padding: 0 0;
+      min-height: 32px !important;
+      &:before {
+        box-shadow: unset;
+      }
+    }
+    span {
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+  .b-compact-dropdown-button {
+    margin: 0 0 !important;
+    button {
+      border: unset;
+      padding: 0 0 !important;
+    }
+    ul {
+      margin-top: 8px;
+      padding: 6px 6px;
+      background: rgba(21, 22, 63, 0.8) !important;
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 12px -2px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(15px);
+      border-radius: 8px;
+      li a {
+        color: white;
+        padding: 6px 12.65px;
+        .icon-margin {
+          margin-right: 8px;
+        }
+      }
+    }
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+      background: #585A6D;
+      border-radius: 8px;
+    }
+  }
+}
+
+.incoming-call-notification {
+  .message-text {
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: unset !important;
+    &.has-ring-group {
+      overflow: auto !important;
+      text-overflow: unset !important;
+      .campaign-wrapper,
+      .ring-group-wrapper {
+        min-width: 0;
+      }
+
+      .campaign-wrapper .campaign-name,
+      .ring-group-wrapper .ring-group-name {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+    &:not(.has-ring-group) {
+      display: block !important;
+      white-space: nowrap;
+    }
+  }
+}
+
+.notification-body-wrapper {
+  cursor: pointer;
+  .call-actions {
+    padding-top: 2px;
+    button:first-child {
+      margin-right: 10px;
+    }
+    .q-btn__wrapper {
+      min-width: unset;
+      min-height: unset;
     }
   }
 }
@@ -9174,10 +9358,16 @@ screen and (max-width: 956px) {
   .q-btn__wrapper {
     .q-btn__content {
       color: $grey-90;
+
       span {
         margin-left: 10px;
         color: $grey-100;
       }
     }
   }
+}
+
+.background-blur {
+  box-shadow: 0px 10px 20px -4px rgba(4, 4, 4, 0.2);
+  backdrop-filter: blur(15px);
 }

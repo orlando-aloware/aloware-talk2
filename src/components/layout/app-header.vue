@@ -111,8 +111,15 @@ export default {
     return {
       dialerIcon: 'img:app-icons/header/dialer_gray.svg',
       dialerStatus: false,
-      loading: false
+      loading: false,
+      prevRoute: null
     }
+  },
+
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
   },
 
   computed: {
@@ -154,11 +161,11 @@ export default {
     },
 
     navigateBack (e) {
-      let previousName = _.get(this.$route.query, 'previousName', null)
+      let previousPage = _.get(this.$route.query, 'previousPage', null)
 
-      if (previousName === 'Power Dialer') {
+      if (previousPage === 'PowerDialer') {
         this.$router.push({
-          name: previousName
+          path: this.$router.history._startLocation
         })
       }
 

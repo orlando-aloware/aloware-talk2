@@ -67,7 +67,12 @@ export default function (/* { ssrContext } */) {
         duration: 0,
         wrapUpDuration: '',
         parkedCall: null,
-        dealId: null
+        dealId: null,
+        callFishing: {
+          communication: null,
+          call: null,
+          contact: null
+        }
       },
       warnings: [],
       shouldIntroduce: false,
@@ -83,7 +88,11 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         },
         sms: {
           title: '',
@@ -91,7 +100,11 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         },
         call: {
           title: '',
@@ -99,7 +112,11 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         },
         callVoicemail: {
           title: '',
@@ -107,7 +124,11 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         },
         voicemail: {
           title: '',
@@ -115,7 +136,11 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         },
         mention: {
           title: '',
@@ -123,7 +148,11 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         },
         incomingCall: {
           title: '',
@@ -131,7 +160,23 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
+        },
+        callFishing: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          queue: null
         }
       },
       showIncomingCallNotification: true,
@@ -457,6 +502,10 @@ export default function (/* { ssrContext } */) {
 
       setDialerFormStatus ({ commit }, value) {
         commit('SET_DIALER_FORM_STATUS', value)
+      },
+
+      setDialerCallFishing ({ commit }, payload) {
+        commit('SET_DIALER_CALL_FISHING', payload)
       }
     },
 
@@ -933,6 +982,10 @@ export default function (/* { ssrContext } */) {
       },
       SET_DIALER_FORM_STATUS (state, value) {
         state.dialerFormStatus = value
+      },
+
+      SET_DIALER_CALL_FISHING (state, payload) {
+        state.dialer.callFishing = payload
       }
     },
 

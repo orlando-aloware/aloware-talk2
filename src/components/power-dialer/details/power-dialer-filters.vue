@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0 text-center">
+  <b-card class="filter-chips border-0 text-center px-2" no-body>
     <div class="t-grouped-buttons">
 
       <router-link
@@ -75,12 +75,12 @@ export default {
       return `/power-dialer/list/${this.id}/${listFilter.id}`
     },
     contactListCount (filterId) {
-      return filterId === 'all' ? this.getListWithFilter() || 0 : this.listResources[this.filters[filterId]] || 0
+      return filterId === 'all' ? this.getListWithFilter() || 0 : this.listResources?.[this.filters?.[filterId]] || 0
     },
     getListWithFilter () {
       let ctr = 0
       Object.keys(this.filters).forEach(f => {
-        ctr += f !== 'all' ? this.listResources[this.filters[f]] : 0
+        ctr += f !== 'all' ? this.listResources?.[this.filters?.[f]] : 0
       })
       return ctr
     }

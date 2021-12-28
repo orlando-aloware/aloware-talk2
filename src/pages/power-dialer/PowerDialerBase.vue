@@ -1,7 +1,10 @@
 <template>
-  <PowerDialerView
-    :id="id"
-    :name="name" />
+  <div>
+    <PowerDialerView
+      :id="id"
+      :name="name"
+      @on-list-update="updateList" />
+  </div>
 </template>
 
 <script>
@@ -33,7 +36,7 @@ export default {
     }
   },
   async mounted () {
-    if (this.$route.meta.id === 'power-dialer') {
+    if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
       await this.getMyQueueList()
     }
   },
@@ -52,6 +55,9 @@ export default {
     ...mapActions('powerDialer', [
       'getMyQueueList'
     ]),
+    async updateList (data) {
+      await this.loadList(data.id)
+    },
     async loadList (id) {
       if (!id) {
         id = 'my-queue'
@@ -96,7 +102,7 @@ export default {
     }
   },
   watch: {
-    'id': function (id) {
+    'id': async function (id) {
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
       }

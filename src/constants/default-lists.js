@@ -1,10 +1,8 @@
 import {
   DEFAULT_COLUMNS,
-  STATIC_COLUMNS
-} from 'src/constants/contacts-columns'
-import {
+  STATIC_COLUMNS,
   POWER_DIALER_DEFAULT_COLUMNS
-} from 'src/constants/power-dialer/power-dialer-list'
+} from 'src/constants/contacts-columns'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export const DEFAULT_STATE = {

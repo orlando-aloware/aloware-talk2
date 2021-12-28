@@ -23,3 +23,8 @@ export const POWER_DIALER_ROUTE_META_ID = {
   'add-queue-list': 'power-dialer-add-queue-list',
   'session': 'power-dialer-session'
 }
+
+export const MOVE_CONTACTS_DIRECTION = {
+  'top': 1,
+  'bottom': 2
+}

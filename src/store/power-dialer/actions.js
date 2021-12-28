@@ -19,6 +19,10 @@ export default {
       commit('SET_MY_QUEUE_LIST', res.data)
     }
   },
+  updateMyQueueListData: ({ commit }, data = []) => {
+    console.log('data here... :>> ', data)
+    commit('SET_MY_QUEUE_LIST_DATA', data)
+  },
   getContact: async ({ commit }, params = {}) => {
     let res = await window.axios.get(`api/v2/contacts/${params.id}`)
     if (res.status === 200) {
@@ -79,5 +83,14 @@ export default {
   },
   setContacts2: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
+  },
+  moveContactItems: async ({ commit }, payload = {}) => {
+    return window.axios.patch(`api/v2/power-dialer-list-items/move/${payload.id}`,
+      payload.params
+    ).then((res) => {
+      return res
+    }).catch((err) => {
+      return err
+    })
   }
 }

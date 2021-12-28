@@ -11,13 +11,14 @@
         :style="indentStyle"
         @click="onToggleFolder"
       ></div>
-      <div class="folder__arrow d-flex align-items-center"
-           v-if="lists.length > 0 || folders.length > 0"
-           @click="onToggleFolder">
-        <folder-arrow-open-icon v-if="isOpen"
-                                color="#62666E"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-else
-                                 color="#62666E"></folder-arrow-close-icon>
+      <div class="folder__arrow d-flex align-items-center">
+        <div v-if="lists.length > 0 || folders.length > 0"
+             @click="onToggleFolder">
+          <folder-arrow-open-icon v-if="isOpen"
+                                  color="#62666E"></folder-arrow-open-icon>
+          <folder-arrow-close-icon v-else
+                                   color="#62666E"></folder-arrow-close-icon>
+        </div>
       </div>
       <div class="folder__icon d-flex align-items-center"
            @click="onToggleFolder">
@@ -49,7 +50,7 @@
         class="folder__option btn btn-link p-0 shadow-0"
         :class="{ 'folder__option--hide': isEditing }"
         :data-popper-target="'folder-' + id"
-        :id="'folder-option-' + id"
+        :id="folderId"
       >
         <folder-option></folder-option>
       </button>
@@ -101,7 +102,7 @@
       placement="bottomright"
       boundary="window"
       custom-class="contact-popover"
-      :target="'folder-option-' + id"
+      :target="folderId"
     >
       <folder-actions
         :id="id"
@@ -216,6 +217,11 @@ export default {
         (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
         (this.createList.open && this.createList.folderId === this.id)
       )
+    },
+
+    folderId () {
+      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-option-${module}-${this.id}`
     }
   },
 

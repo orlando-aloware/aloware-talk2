@@ -35,7 +35,7 @@
 <script>
 
 import { mapActions, mapGetters } from 'vuex'
-import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
+import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 
 export default {
   name: 'bulk-action-menu',
@@ -47,17 +47,24 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['selectedContacts']),
+    ...mapGetters('powerDialer', ['myQueue']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
+    },
+    selectedContactIds () {
+      return this.selectedContacts[this.id].map(contact => contact.id)
+    },
+    isMyQueue () {
+      return this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter'
     }
   },
   methods: {
     ...mapActions('contacts', [
-      'removeContactOpen',
       'setBulkDelete',
-      'createListOpen',
-      'selectListOpen',
-      'setSelectedStaticList'
+      'setListSelectedContacts'
+    ]),
+    ...mapActions('powerDialer', [
+      'moveContactItems'
     ]),
     onDelete (e) {
       console.log('Deleting items...')
@@ -65,26 +72,29 @@ export default {
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()
     },
-    onMoveToTop () {
-      console.log('Moving to top...')
+    async onMoveToTop () {
+      await this.onMoveContacts(MOVE_CONTACTS_DIRECTION.top)
     },
-    onMoveToBottom () {
-      console.log('Moving to bottom...')
+    async onMoveToBottom () {
+      await this.onMoveContacts(MOVE_CONTACTS_DIRECTION.bottom)
     },
-    onCreateStaticList (e) {
-      this.createListOpen({
-        type: 1,
-        mode: FROM_BULK_MENU,
-        contact_folder_id: null
+    async onMoveContacts (direction = MOVE_CONTACTS_DIRECTION.top) {
+      let res = await this.moveContactItems({
+        id: this.isMyQueue ? this.myQueue.id : this.id,
+        params: {
+          contact_ids: this.selectedContactIds,
+          direction: direction
+        }
       })
-      e.preventDefault()
-    },
-    onAddToStaticList (e) {
-      this.selectListOpen({
-        contact_folder_id: null
-      })
-      this.setSelectedStaticList({ id: null, name: '', type: null })
-      e.preventDefault()
+      this.setListSelectedContacts({ id: this.id, contacts: [] })
+
+      if (res.data.message) {
+        this.$emit('moved-contacts', true)
+      }
+      this.$generalNotification(
+        res.data.message,
+        res?.data ? 'success' : 'error'
+      )
     }
   }
 }

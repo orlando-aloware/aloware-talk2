@@ -7,7 +7,7 @@
     </div>
     <router-link
       class="tree-list-item flex-grow-1 d-flex-shrink-0"
-      :to="`${viewListPath}${id}`"
+      :to="viewListPath"
       v-slot="{ navigate, isExactActive }"
     >
       <div :data-layer="layer">
@@ -57,7 +57,7 @@
           <button
             :tabindex="id"
             :data-popper-target="'list-' + id"
-            :id="'folder-option-' + id"
+            :id="folderId"
             class="folder__option btn btn-link p-0 shadow-0"
           >
             <folder-option></folder-option>
@@ -65,7 +65,7 @@
         </div>
 
         <b-popover
-          :target="'folder-option-' + id"
+          :target="folderId"
           triggers="click blur"
           placement="bottomright"
           boundary="window"
@@ -139,9 +139,9 @@ export default {
     },
     viewListPath () {
       if (this.isContactsRoute) {
-        return '/contacts/list/'
+        return `/contacts/list/${this.id}`
       }
-      return '/power-dialer/list/'
+      return `/power-dialer/list/${this.id}`
     },
     listPath () {
       if (this.isContactsRoute) {
@@ -154,6 +154,10 @@ export default {
         return '/api/v2/contact-folders'
       }
       return '/api/v2/power-dialer-folders'
+    },
+    folderId () {
+      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-item-option-${module}-${this.id}`
     }
   },
   props: {

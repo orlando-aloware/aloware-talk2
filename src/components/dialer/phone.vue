@@ -115,7 +115,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="screen === 'call' && dialer.call.direction === 'OUTGOING'">
+      <template v-if="screen === 'call' && (dialer.call.direction === 'OUTGOING' || (dialer.callFishing && dialer.callFishing.call.direction === 'INCOMING'))">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="dialer.contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
@@ -1157,6 +1157,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
@@ -1488,6 +1489,11 @@ export default {
     contactName () {
       if (this.dialer.contact) {
         return this.dialer.contact.name || 'No Name'
+      }
+
+      const callFishingContactName = _.get(this.dialer.callFishing, 'contact.name', 'No Name')
+      if (callFishingContactName) {
+        return callFishingContactName
       }
 
       return 'No Name'
