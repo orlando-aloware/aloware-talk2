@@ -573,6 +573,7 @@ export default {
 
   methods: {
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
+    ...mapActions(['resetVuex', 'setUsage']),
     async validateCookieUser () {
       if (this.sharedCookie) {
         const response = await this.getCookieUser()
