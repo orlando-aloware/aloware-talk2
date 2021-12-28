@@ -1,6 +1,14 @@
 <template>
-  <div>
+  <div class="bridge-menu-wrapper">
+    <q-btn v-if="isAdmin"
+           outline
+           class="q-btn-standard"
+           @click="onGoToClassic">
+
+        <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
+    </q-btn>
     <q-btn-dropdown
+      v-else
       split
       class="q-shared-login-menu-dropdown "
       color="primary"
@@ -10,7 +18,7 @@
     >
 
       <template slot="label">
-        <i class="fas fa-arrow-right"></i>  <span>Aloware (Classic)</span>
+        <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
         <hr role="separator" aria-orientation="vertical" class="q-separator ml-2 margin-auto position-relative q-separator q-separator--vertical">
       </template>
 
@@ -37,7 +45,7 @@
                           :value="AppDefaultLogin.APP_ALOWARE_CLASSIC"
                           v-model="user.default_app"
                           @change="onInput">
-              Aloware (Classic)
+              Aloware Classic
             </b-form-radio>
           </q-item-section>
         </q-item>
@@ -51,9 +59,12 @@ import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import _ from 'lodash'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'shared-login-menu',
+
+  mixins: [aclMixin],
 
   computed: {
     ...mapGetters('auth', ['profile'])

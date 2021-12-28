@@ -9040,9 +9040,13 @@ screen and (max-width: 956px) {
   }
 }
 
+.bridge-menu-wrapper {
+  margin-right: 20px;
+}
+
 .q-shared-login-menu-dropdown {
   box-shadow: none !important;
-  margin-right: 20px;
+  margin: 0 !important;
 
   button:first-child {
 
@@ -9152,5 +9156,27 @@ screen and (max-width: 956px) {
     border: 1px solid $grey-60 !important;
     background-color: transparent !important;
     color: $grey-90 !important;
+  }
+}
+
+.q-btn-standard {
+  border: 1px solid $grey-70;
+  color: $grey-90;
+  text-transform: none !important;
+  padding: 0 10px;
+  border-radius: 6px;
+
+  .q-btn__wrapper:before {
+    border: none !important;
+  }
+
+  .q-btn__wrapper {
+    .q-btn__content {
+      color: $grey-90;
+      span {
+        margin-left: 10px;
+        color: $grey-100;
+      }
+    }
   }
 }
