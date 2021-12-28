@@ -1,6 +1,6 @@
 <template>
   <div class="bridge-menu-wrapper">
-    <q-btn v-if="!isAdmin"
+    <q-btn v-if="isAdmin"
            outline
            class="q-btn-standard"
            @click="onGoToClassic">
