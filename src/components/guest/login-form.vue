@@ -81,10 +81,14 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 
 export default {
   name: 'login-form',
+  computed: {
+    ...mapState('auth', ['profile', 'authenticated'])
+  },
   data () {
     return {
       user: {
@@ -142,12 +146,17 @@ export default {
 
       localStorage.setItem('company_id', company.id)
 
-      const redirectPath = this.$route.query.redirect || '/'
+      // redirect to Alo classic
+      if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC) {
+        location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
+      } else {
+        const redirectPath = this.$route.query.redirect || '/'
 
-      await this.$router.push(String(redirectPath))
-      await this.redirectTimeout()
+        await this.$router.push(String(redirectPath))
+        await this.redirectTimeout()
 
-      this.resetUser()
+        this.resetUser()
+      }
     },
 
     redirectTimeout () {

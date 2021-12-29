@@ -9138,6 +9138,116 @@ screen and (max-width: 956px) {
   }
 }
 
+.bridge-menu-wrapper {
+  margin-right: 20px;
+}
+
+.q-shared-login-menu-dropdown {
+  box-shadow: none !important;
+  margin: 0 !important;
+
+  button:first-child {
+
+    text-transform: none;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    border-right: none !important;
+
+    .q-btn__wrapper {
+      padding-right: 0 !important;
+    }
+
+    .q-btn__content {
+      i {
+
+      }
+
+      span {
+        margin-left: 10px;
+        color: $grey-100 !important;
+      }
+    }
+  }
+
+  button:nth-child(2) {
+    border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+
+    .q-btn__wrapper {
+      padding-left: 0 !important;
+      padding-right: 6px !important;
+    }
+  }
+
+  button {
+    border: 1px solid $grey-70;
+    color: $grey-90;
+    background: transparent !important;
+
+    &:hover,
+    &:active {
+      background-color: transparent !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+
+    .q-btn__wrapper {
+      color: $grey-90 !important;
+    }
+  }
+
+  .q-separator {
+    background: $grey-70 !important;
+    height: 19px;
+  }
+}
+
+.q-shared-login-menu-dropdown-list {
+  padding: 15px !important;
+  width: 180px !important;
+  .q-item {
+    min-height: 16px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+
+    &:not(:last-child) {
+      margin-bottom: 13px;
+    }
+
+    .custom-control-label {
+      color: $grey-100 !important;
+    }
+  }
+
+}
+
+.shared-login-menu-dropdown {
+  button {
+    border: 1px solid $grey-60;
+    color: $grey-90;
+
+    &:hover,
+    &:active {
+      background-color: transparent !important;
+      border-color: $grey-60 !important;
+      color: $grey-90 !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+
+  button:not(.dropdown-toggle) {
+    color: $grey-100 !important;
+
+    i {
+      color: $grey-90 !important;
+    }
+  }
+}
 .call-fishing-actions {
   padding-top: 2px;
   > button:first-child {
@@ -9222,6 +9332,37 @@ screen and (max-width: 956px) {
     .q-btn__wrapper {
       min-width: unset;
       min-height: unset;
+    }
+  }
+}
+
+.shared-login-menu-dropdown.dropdown.show {
+  .dropdown-toggle {
+    border: 1px solid $grey-60 !important;
+    background-color: transparent !important;
+    color: $grey-90 !important;
+  }
+}
+
+.q-btn-standard {
+  border: 1px solid $grey-70;
+  color: $grey-90;
+  text-transform: none !important;
+  padding: 0 10px;
+  border-radius: 6px;
+
+  .q-btn__wrapper:before {
+    border: none !important;
+  }
+
+  .q-btn__wrapper {
+    .q-btn__content {
+      color: $grey-90;
+
+      span {
+        margin-left: 10px;
+        color: $grey-100;
+      }
     }
   }
 }

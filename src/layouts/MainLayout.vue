@@ -184,6 +184,7 @@ import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import _ from 'lodash'
@@ -242,8 +243,10 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
+      sharedCookie: null,
       CommunicationTypes,
-      MetricOptionGroups
+      MetricOptionGroups,
+      AppDefaultLogin
     }
   },
 
@@ -533,6 +536,14 @@ export default {
   },
 
   mounted () {
+    this.getSharedCookie().then(sharedCookie => {
+      this.sharedCookie = sharedCookie
+
+      if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+        this.validateCookieUser()
+      }
+    })
+
     if (this.authenticated) {
       this.sidebarVisible = true
     }
@@ -572,6 +583,29 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
+    ...mapActions(['resetVuex', 'setUsage']),
+    async validateCookieUser () {
+      if (this.sharedCookie) {
+        const response = await this.getCookieUser()
+        await this.cookieUserValidated(response)
+      }
+    },
+    async cookieUserValidated ({ data: { data } }) {
+      const { usage, company } = data
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+
+      localStorage.setItem('shared_cookie', this.sharedCookie)
+      localStorage.setItem('company_id', company.id)
+
+      const redirectPath = this.$route.query.redirect || '/'
+
+      await this.$router.push(String(redirectPath))
+      await this.redirectTimeout()
+    },
+
     onPhoneVisible (value) {
       this.isPhoneVisible = value
     },
