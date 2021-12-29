@@ -7,7 +7,7 @@
         v-for="(lsFilter, key) in listFilters"
         :key="key"
         :to="currentRoute(lsFilter)">
-        <div :class="`t-grouped-buttons__btn ${filter === lsFilter.id ? 'active' : ''}`">
+        <div :class="`t-grouped-buttons__btn ${id === lsFilter.id ? 'active' : ''}`">
           <div class="t-badge-name">
             {{ lsFilter.name }}
           </div>
@@ -25,7 +25,7 @@
 
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PowerDialerFilters',
@@ -65,9 +65,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('powerDialer', [
-      'SET_ACTIVE_FILTER'
-    ]),
+    // ...mapMutations('powerDialer', [
+    //   'SET_ACTIVE_FILTER'
+    // ]),
     currentRoute (listFilter) {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
         return `/power-dialer/${listFilter.id}`
@@ -85,37 +85,39 @@ export default {
       return ctr
     }
   },
-  watch: {
-    '$route.params.filter': function (id) {
-      if (id) {
-        if (this.$route.meta.title === 'Power Dialer' ||
-          (
-            this.$route.meta.title === 'Power Dialer Filter' ||
-            this.$route.meta.title === 'Power Dialer Individual Advance'
-          )
-        ) {
-          this.SET_ACTIVE_FILTER(this.$route.params.id)
-        } else {
-          if (this.$route.params.filter) {
-            this.SET_ACTIVE_FILTER(this.$route.params.filter)
-          } else {
-            this.SET_ACTIVE_FILTER('in-queue')
-          }
-        }
-      }
-    },
-    '$route.params': function (params) {
-      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-        this.SET_ACTIVE_FILTER(this.id)
-      } else {
-        if (params.filter) {
-          this.SET_ACTIVE_FILTER(params.filter)
-        } else {
-          this.SET_ACTIVE_FILTER('in-queue')
-        }
-      }
-    }
-  },
+  // watch: {
+  //   '$route.params.filter': function (id) {
+  //     console.log('id :>> ', id)
+  //     if (id) {
+  //       if (this.$route.meta.title === 'Power Dialer' ||
+  //         (
+  //           this.$route.meta.title === 'Power Dialer Filter' ||
+  //           this.$route.meta.title === 'Power Dialer Individual Advance'
+  //         )
+  //       ) {
+  //         this.SET_ACTIVE_FILTER(this.$route.params.id)
+  //       } else {
+  //         if (this.$route.params.filter) {
+  //           this.SET_ACTIVE_FILTER(this.$route.params.filter)
+  //         } else {
+  //           this.SET_ACTIVE_FILTER('in-queue')
+  //         }
+  //       }
+  //     }
+  //   },
+  //   '$route.params': function (params) {
+  //     console.log('params :>> ', params)
+  //     if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+  //       this.SET_ACTIVE_FILTER(this.id)
+  //     } else {
+  //       if (params.filter) {
+  //         this.SET_ACTIVE_FILTER(params.filter)
+  //       } else {
+  //         this.SET_ACTIVE_FILTER('in-queue')
+  //       }
+  //     }
+  //   }
+  // },
   data () {
     return {
       valid: true,

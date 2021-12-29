@@ -97,11 +97,6 @@ export default {
     }
     next()
   },
-  watch: {
-    '$route.params': async function (route) {
-      await this.initialize()
-    }
-  },
   data () {
     return {
       id: ''
@@ -113,7 +108,8 @@ export default {
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
-      'TOGGLE_TABLE_LOADER'
+      'TOGGLE_TABLE_LOADER',
+      'SET_ACTIVE_FILTER'
     ]),
     async fetchContacts () {
       this.TOGGLE_TABLE_LOADER(true)
@@ -168,6 +164,40 @@ export default {
       // this.RESET_LIST()
       this.START_DIAL_TOGGLE(false)
       // this.SET_POWER_DIALER_LIST([])
+    }
+  },
+  watch: {
+    '$route.params.filter': function (id) {
+      console.log('id :>> ', id)
+      if (id) {
+        if (this.$route.meta.title === 'Power Dialer' ||
+          (
+            this.$route.meta.title === 'Power Dialer Filter' ||
+            this.$route.meta.title === 'Power Dialer Individual Advance'
+          )
+        ) {
+          this.SET_ACTIVE_FILTER(this.$route.params.id)
+        } else {
+          if (this.$route.params.filter) {
+            this.SET_ACTIVE_FILTER(this.$route.params.filter)
+          } else {
+            this.SET_ACTIVE_FILTER('in-queue')
+          }
+        }
+      }
+    },
+    '$route.params': async function (params) {
+      console.log('params :>> ', params)
+      await this.initialize()
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+        this.SET_ACTIVE_FILTER(this.id)
+      } else {
+        if (params.filter) {
+          this.SET_ACTIVE_FILTER(params.filter)
+        } else {
+          this.SET_ACTIVE_FILTER('in-queue')
+        }
+      }
     }
   }
 }
