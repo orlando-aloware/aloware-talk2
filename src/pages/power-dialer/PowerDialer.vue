@@ -168,7 +168,6 @@ export default {
   },
   watch: {
     '$route.params.filter': function (id) {
-      console.log('id :>> ', id)
       if (id) {
         if (this.$route.meta.title === 'Power Dialer' ||
           (
@@ -187,15 +186,16 @@ export default {
       }
     },
     '$route.params': async function (params) {
-      console.log('params :>> ', params)
-      await this.initialize()
-      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-        this.SET_ACTIVE_FILTER(this.id)
-      } else {
-        if (params.filter) {
-          this.SET_ACTIVE_FILTER(params.filter)
+      if (this.$route.name === 'Power Dialer') {
+        await this.initialize()
+        if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+          this.SET_ACTIVE_FILTER(this.id)
         } else {
-          this.SET_ACTIVE_FILTER('in-queue')
+          if (params.filter) {
+            this.SET_ACTIVE_FILTER(params.filter)
+          } else {
+            this.SET_ACTIVE_FILTER('in-queue')
+          }
         }
       }
     }
