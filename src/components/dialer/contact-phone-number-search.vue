@@ -16,7 +16,6 @@
       <div class="contact-name">
         <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
       </div>
-      <br>
       <span class="text-xs">{{ getContactName(data) }}</span>
       <template v-if="data.company_name">
         <br>

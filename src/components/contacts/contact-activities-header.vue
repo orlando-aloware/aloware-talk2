@@ -28,17 +28,23 @@
             Mark All as Read ({{ unreadCount }})
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN">
+                           :disable="isUpdatingStatus"
+                           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
+                           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
             <timer-o-icon class="dropdown-icon"></timer-o-icon>
             Move to Pending
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)">
+                           :disable="isUpdatingStatus"
+                           v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+                           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
             <check-o-icon class="dropdown-icon"></check-o-icon>
             Close
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)">
+                           :disable="isUpdatingStatus"
+                           v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+                           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
             <inbox-o-icon class="dropdown-icon"></inbox-o-icon>
             Reopen
           </b-dropdown-item>
