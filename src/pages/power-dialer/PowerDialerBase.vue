@@ -36,6 +36,7 @@ export default {
     }
   },
   async mounted () {
+    this.resetSearch()
     if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
       await this.getMyQueueList()
     }
