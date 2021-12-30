@@ -50,7 +50,8 @@ export default {
       'listLoaded',
       'contactsLoaded',
       'setCurrentListFilters',
-      'setSelectedList'
+      'setSelectedList',
+      'resetSearch'
     ]),
     ...mapActions('powerDialer', [
       'getMyQueueList'
@@ -103,6 +104,7 @@ export default {
   },
   watch: {
     'id': async function (id) {
+      this.resetSearch()
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
       }
