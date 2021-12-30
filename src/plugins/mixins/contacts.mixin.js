@@ -345,9 +345,6 @@ export default {
         !this.isLoading
       )
     },
-    test () {
-      return this.$route.meta.id
-    },
     isPowerDialer () {
       if (this.$route.name === 'Power Dialer' &&
         (

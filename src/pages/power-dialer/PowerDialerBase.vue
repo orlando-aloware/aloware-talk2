@@ -39,6 +39,8 @@ export default {
     this.resetSearch()
     if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
       await this.getMyQueueList()
+    } else {
+      await this.loadList(this.id)
     }
   },
   data () {
