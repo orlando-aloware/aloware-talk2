@@ -87,7 +87,8 @@ export default {
   },
   async mounted () {
     this.START_DIAL_TOGGLE(false)
-    await this.initialize()
+    // await this.initialize()
+    await this.setFilterParams(this.$route.params)
   },
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Session') {
@@ -164,10 +165,8 @@ export default {
       // this.RESET_LIST()
       this.START_DIAL_TOGGLE(false)
       // this.SET_POWER_DIALER_LIST([])
-    }
-  },
-  watch: {
-    '$route.params.filter': function (id) {
+    },
+    setFilters (id) {
       if (id) {
         if (this.$route.meta.title === 'Power Dialer' ||
           (
@@ -185,7 +184,7 @@ export default {
         }
       }
     },
-    '$route.params': async function (params) {
+    async setFilterParams (params) {
       if (this.$route.name === 'Power Dialer') {
         await this.initialize()
         if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
@@ -198,6 +197,14 @@ export default {
           }
         }
       }
+    }
+  },
+  watch: {
+    '$route.params.filter': function (id) {
+      this.setFilters(id)
+    },
+    '$route.params': async function (params) {
+      await this.setFilterParams(params)
     }
   }
 }
