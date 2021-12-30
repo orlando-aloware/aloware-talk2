@@ -6,14 +6,16 @@
                            :class="[no_prepend ? 'no-prepend' : '']"
                            ref="searchField"
                            v-model="query"
-                           class="important search-form"
+                           class="important search-form contact-phone-number-search"
                            placeholder="Name or phone number"
                            @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
     <template slot="suggestion"
               slot-scope="{ data }">
-      <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
+      <div class="contact-name">
+        <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
+      </div>
       <br>
       <span class="text-xs">{{ getContactName(data) }}</span>
       <template v-if="data.company_name">

@@ -10285,3 +10285,11 @@ screen and (max-width: 956px) {
 .pt-58 {
   padding-top: 58px !important;
 }
+
+.contact-phone-number-search {
+  .vbt-autcomplete-list{
+    .list-group-item {
+      padding: 0.75rem;
+    }
+  }
+}
