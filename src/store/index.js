@@ -191,7 +191,11 @@ export default function (/* { ssrContext } */) {
         crumbs: '',
         name: ''
       },
-      dialerFormStatus: false
+      dialerFormStatus: false,
+      isMobile: false,
+      isTabletOrMobile: false,
+      contactDetailsDrawer: false,
+      showPhone: false
     },
 
     getters: {
@@ -506,6 +510,22 @@ export default function (/* { ssrContext } */) {
 
       setDialerCallFishing ({ commit }, payload) {
         commit('SET_DIALER_CALL_FISHING', payload)
+      },
+
+      setIsMobile ({ commit }, value) {
+        commit('SET_IS_MOBILE', value)
+      },
+
+      setIsTabletOrMobile ({ commit }, value) {
+        commit('SET_IS_TABLET_OR_MOBILE', value)
+      },
+
+      setContactDetailsDrawer ({ commit }, value) {
+        commit('SET_CONTACT_DETAILS_DRAWER', value)
+      },
+
+      setShowPhone ({ commit }, value) {
+        commit('SET_SHOW_PHONE', value)
       }
     },
 
@@ -986,6 +1006,22 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CALL_FISHING (state, payload) {
         state.dialer.callFishing = payload
+      },
+
+      SET_IS_MOBILE (state, value) {
+        state.isMobile = value
+      },
+
+      SET_IS_TABLET_OR_MOBILE (state, value) {
+        state.isTabletOrMobile = value
+      },
+
+      SET_CONTACT_DETAILS_DRAWER (state, value) {
+        state.contactDetailsDrawer = value
+      },
+
+      SET_SHOW_PHONE (state, value) {
+        state.showPhone = value
       }
     },
 

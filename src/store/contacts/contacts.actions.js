@@ -269,5 +269,11 @@ export default {
   },
   setCreateDialogTarget: ({ commit }, payload) => {
     commit('CREATE_DIALOG_TARGET', payload)
+  },
+  setShowContactsHeader: ({ commit }, value) => {
+    commit('SET_SHOW_CONTACTS_HEADER', value)
+  },
+  setShowContactsListSidebar: ({ commit }, value) => {
+    commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
   }
 }

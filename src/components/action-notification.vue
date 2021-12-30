@@ -238,6 +238,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['setNotifications', 'setNotificatioNQueue', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
@@ -314,6 +315,7 @@ export default {
       }
 
       this.$VueEvent.fire('answerCall')
+      this.setShowPhone(true)
     },
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
@@ -332,6 +334,7 @@ export default {
       }
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
+      this.setShowPhone(true)
     },
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
@@ -347,8 +350,7 @@ export default {
       if (!found && this.id === 'system') {
         window.location.reload()
       }
-    },
-    ...mapActions(['setNotifications', 'setNotificatioNQueue'])
+    }
   }
 }
 </script>

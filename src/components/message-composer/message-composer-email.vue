@@ -30,16 +30,17 @@
         </b-link>
       </div>
       <div>
-        <b-button-group>
-          <b-button variant="primary"
-                    class="fs-13 pl-3 pr-3"
-                    size="sm"
-                    :disabled="isSending || !validEmail"
-                    @click="onSend">
-            <q-spinner-bars v-if="isSending" color="white" />
-            {{ isSending ? 'Sending Email...' : 'Send Email' }}
-          </b-button>
-        </b-button-group>
+        <q-btn color="primary"
+               class="message-composer-send-button"
+               :disable="isSending || !validEmail"
+               @click="onSend">
+          <template slot="default">
+            <q-spinner-bars v-if="isSending"
+                            color="white" class="mr-1">
+            </q-spinner-bars>
+            {{ isSending ? ' Sending Email...' : 'Send Email' }}
+          </template>
+        </q-btn>
       </div>
     </div>
     <b-popover ref="popover"

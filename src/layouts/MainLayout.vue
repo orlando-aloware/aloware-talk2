@@ -15,10 +15,11 @@
         <div class="h-100"
              :class="[ sidebarVisible ? 'sidebar-active' : '']">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading">
+                    v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container class="page-container h-100">
+          <q-page-container class="page-container h-100"
+                            :class="{ 'pt-58': $route.name.includes('Contacts') }">
             <section class="main-content section h-100">
               <template v-if="!loading">
                 <transition :name="transitionName"
@@ -56,7 +57,8 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated"></dialer>
+            <dialer v-if="authenticated">
+            </dialer>
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
@@ -79,20 +81,32 @@
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
-          :breakpoint="605"
+          :breakpoint="789"
           v-model="mobilePhoneDrawer"
+          v-if="isMobile && mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
-          <div class="phone-header"
-               v-show="!isPhoneVisible">Phone</div>
-          <phone @onPhoneVisible="onPhoneVisible"></phone>
-          <dialer-form v-if="mobilePhoneDrawer"
+          <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
+                    v-show="!isPhoneVisible">
+            <app-header force-page-title="Phone"
+                        :no-padding="true"
+                        :title-only="true"/>
+          </q-header>
+          <phone :isMobile="isMobile"
+                 v-if="mobilePhoneDrawer"
+                 @onPhoneVisible="onPhoneVisible">
+          </phone>
+          <dialer-form ref="dialerForm"
+                       class="dialerForm"
+                       :isMobile="true"
+                       v-model="mobilePhoneDrawer"
+                       v-if="mobilePhoneDrawer"
                        v-show="!isPhoneVisible"
-                       :isMobile="true">
+                       @hide="onDialerFormHide">
           </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading"
+                    v-if="authenticated && !isWidget && !loading && isMobile"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -251,9 +265,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
+    ...mapState('contacts', ['showContactsHeader']),
     ...mapState(['ringGroups']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
@@ -265,6 +280,10 @@ export default {
   },
 
   created () {
+    if (!this.isMobile && this.$route.name === 'Phone') {
+      this.$router.replace({ path: '/' })
+    }
+
     this.resetCall()
     this.resetNotifications()
 
@@ -533,6 +552,11 @@ export default {
         this.authCheckStatus = false
       })
     }
+    window.addEventListener('resize', this.resizeHandler)
+
+    if (!this.isMobile) {
+      this.setShowContactsHeader(true)
+    }
   },
 
   mounted () {
@@ -573,6 +597,8 @@ export default {
       }
     }
 
+    this.resizeHandler()
+
     // event for listening before tab/browser close
 
     window.addEventListener('beforeunload', this.beforeUnload)
@@ -606,9 +632,19 @@ export default {
       await this.redirectTimeout()
     },
 
+    onDialerFormHide () {
+      // if (typeof this.$refs.appFooter !== 'undefined') {
+      //   this.$refs.appFooter.toggleContacts()
+      // }
+    },
+
     onPhoneVisible (value) {
       this.isPhoneVisible = value
+      if (typeof this.$refs.dialerForm !== 'undefined') {
+        this.$refs.dialerForm.hideDialer()
+      }
     },
+
     toggleMobilePhone (value) {
       this.mobilePhoneDrawer = value
     },
@@ -1613,11 +1649,37 @@ export default {
       return null
     },
 
+    resizeHandler () {
+      const width = document.documentElement.clientWidth
+      // less than 991 pixels, screen width is tablet or mobile
+      if (width <= 991) {
+        this.setIsTabletOrMobile(true)
+      }
+      // greater than 991 pixels, screen width is not tablet or mobile
+      if (width > 991) {
+        this.setIsTabletOrMobile(false)
+      }
+      // less than 785 pixels, screen width is mobile
+      if (width < 785) {
+        this.setIsMobile(true)
+      }
+      // greater than or equal to 785 pixels, screen width is not mobile
+      if (width >= 785) {
+        this.setIsMobile(false)
+      }
+      // close contact details drawer when screen width reaches
+      // more than 1084 or less than 605 pixels
+      if (width > 1084 || width < 605) {
+        this.setContactDetailsDrawer(false)
+      }
+    },
+
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
+      window.removeEventListener('resize', this.resizeHandler)
     },
 
     ...mapActions([
@@ -1641,9 +1703,12 @@ export default {
       'setFilters',
       'setTagsFullyLoaded',
       'resetNotifications',
-      'setTags'
+      'setTags',
+      'setIsMobile',
+      'setIsTabletOrMobile',
+      'setContactDetailsDrawer'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
+    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
@@ -1699,6 +1764,20 @@ export default {
         this.getMetricGroups()
         this.metricsDataLoaded = true
       }
+
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
+      }
+
+      const fromName = _.get(from, 'name', null)
+      if (!this.isMobile && to.name === 'Phone' && !fromName) {
+        this.$router.replace({ path: '/' })
+        return
+      }
+
+      if (!this.isMobile && to.name === 'Phone' && fromName) {
+        this.$router.back()
+      }
     },
 
     authenticated (newVal, oldVal) {
@@ -1712,6 +1791,12 @@ export default {
 
       if (this.authenticated) {
         this.sidebarVisible = true
+      }
+    },
+
+    isMobile () {
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
       }
     }
   }
