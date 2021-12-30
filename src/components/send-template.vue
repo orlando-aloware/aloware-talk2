@@ -68,7 +68,7 @@
 
 <script>
 export default {
-  name: 'send-template'
+  name: 'send-template',
   props: {
     contact_id: {
       required: true
@@ -83,7 +83,7 @@ export default {
     }
   },
 
-  data() {
+  data () {
     return {
       message: null,
       templates: [],
@@ -93,21 +93,21 @@ export default {
   },
 
   computed: {
-    agentTemplates() {
+    agentTemplates () {
       return this.templates.filter((template) => template.is_on_user)
     },
 
-    accountTemplates() {
+    accountTemplates () {
       return this.templates.filter((template) => template.is_on_company)
     }
   },
 
-  created() {
+  created () {
     this.fetchTemplates()
   },
 
   methods: {
-    fetchTemplates() {
+    fetchTemplates () {
       this.loading_templates = true
       axios.get('/api/v1/sms-template').then(res => {
         this.loading_templates = false
@@ -118,7 +118,7 @@ export default {
       })
     },
 
-    sendMessage() {
+    sendMessage () {
       this.loading_send_message = true
       axios.post('/api/v1/campaign/send-message/' + this.campaign_id + '/' + this.contact_id, {
         message: this.message,

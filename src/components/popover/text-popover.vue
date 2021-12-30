@@ -25,6 +25,7 @@
         ref="editGroup"
         @click="active = true">
         <PencilIcon
+          v-if="editable"
           color="grey"
           :class="`${isVisible ? '' : 'make-invisible'}`" />
       </div>
@@ -54,6 +55,10 @@ export default {
     editMetricGroupId: {
       default: null,
       required: false
+    },
+    editable: {
+      type: Boolean,
+      default: true
     }
   },
   components: {

@@ -27,6 +27,9 @@
     <div class="ml-auto d-block h-100"
          v-if="!titleOnly">
       <div class="d-flex h-100 align-items-center">
+
+        <shared-login-menu v-if="!isElectron"></shared-login-menu>
+
         <profile></profile>
 
         <phone v-if="!isMobile"></phone>
@@ -73,6 +76,7 @@
 
 <script>
 import _ from 'lodash'
+import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
@@ -86,6 +90,7 @@ import ParkedCall from 'components/dialer/parked-call'
 import InboxListNavigation from 'components/inbox/inbox-list-navigation'
 import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
 import RefreshIcon from 'components/icons/refresh-icon'
+import SharedLoginMenu from 'components/shared-login-menu'
 
 export default {
   name: 'app-header',
@@ -93,6 +98,7 @@ export default {
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
   components: {
+    SharedLoginMenu,
     InboxChannelNavigation,
     InboxListNavigation,
     ParkedCall,
@@ -125,8 +131,15 @@ export default {
     return {
       dialerIcon: 'img:app-icons/header/dialer_gray.svg',
       dialerStatus: false,
-      loading: false
+      loading: false,
+      prevRoute: null
     }
+  },
+
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
   },
 
   computed: {
@@ -137,6 +150,9 @@ export default {
 
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
+    },
+    isElectron () {
+      return Platform.is.electron
     }
   },
 
@@ -165,11 +181,11 @@ export default {
     },
 
     navigateBack (e) {
-      let previousName = _.get(this.$route.query, 'previousName', null)
+      let previousPage = _.get(this.$route.query, 'previousPage', null)
 
-      if (previousName === 'Power Dialer') {
+      if (previousPage === 'PowerDialer') {
         this.$router.push({
-          name: previousName
+          path: this.$router.history._startLocation
         })
       }
 

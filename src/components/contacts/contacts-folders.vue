@@ -14,7 +14,7 @@
             <span v-else class="px-3">Power Dialer Lists</span>
             <button
               class="btn btn-link btn-sm tooltip-target mr-1"
-              id="bs-folder-options">
+              :id="folderId">
               <plus-icon
                 color="#256EFF"
                 width="14"
@@ -25,7 +25,7 @@
             </button>
 
             <b-popover
-              target="bs-folder-options"
+              :target="folderId"
               triggers="click blur"
               placement="bottomright"
               boundary="window"
@@ -206,10 +206,7 @@ export default {
       return false
     },
     foldersEndpoint () {
-      if (this.isContactModuleType) {
-        return '/api/v2/contact-folders'
-      }
-      return '/api/v2/power-dialer-folders'
+      return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     isFolderEmpty () {
       return !this.folders?.[0]?.child_folders.length
@@ -219,6 +216,12 @@ export default {
     },
     rootFolderId () {
       return this.rootFolder?.id
+    },
+    isContacts () {
+      return this.$route.name === 'Contacts'
+    },
+    folderId () {
+      return this.isContacts ? 'bs-folder-options' : 'pd-folder-options'
     }
   },
   mounted () {
