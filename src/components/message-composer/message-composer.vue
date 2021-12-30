@@ -92,6 +92,7 @@ export default {
   },
 
   mounted () {
+    this.setMode('sms')
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
     if (!this.templates || this.templates.length < 1) {
       this.getSmsTemplates()
