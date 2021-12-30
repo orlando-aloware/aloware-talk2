@@ -209,7 +209,7 @@ export default {
       return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     isFolderEmpty () {
-      return !this.folders?.[0]?.child_folders.length
+      return !this.folders?.[0]?.child_folders.length && !this.folders?.[0]?.lists.length
     },
     foldersLength () {
       return this.folders?.length
