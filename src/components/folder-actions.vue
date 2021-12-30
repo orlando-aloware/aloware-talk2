@@ -69,7 +69,7 @@
             <people-icon color="#62666E"></people-icon>
           </template>
           <template slot="title">
-            <span>List 1</span>
+            <span>List</span>
           </template>
           <template slot="suffix">
             <span
