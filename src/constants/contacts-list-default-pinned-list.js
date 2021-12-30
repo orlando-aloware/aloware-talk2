@@ -2,7 +2,7 @@ export const DEFAULT_PINNED_LIST = {
   ALL_CONTACTS: {
     id: 'all',
     name: 'All Contacts',
-    link: '/contacts/'
+    link: '/contacts'
   },
   MY_CONTACTS: {
     id: 'my-contacts',

@@ -1,8 +1,8 @@
 <template>
   <contacts-view
-    :id="String(contactList.id)"
-    :name="contactList.name"
-    :type="String(contactList.type)"
+    :id="id"
+    :name="name"
+    :type="type"
     v-if="isLoaded"
   />
 </template>
@@ -18,21 +18,41 @@ export default {
   components: {
     ContactsView
   },
+
   computed: {
     ...mapGetters('contacts', ['lists', 'listItems']),
+    id () {
+      if (['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
+        let list = this.lists[String(this.$route.params.id)]
+        return list.id
+      }
+
+      if (['Default Contacts List'].includes(this.$route.meta.page)) {
+        return this.$route.params.id
+      }
+
+      return 'all'
+    },
     contactList () {
-      return this.lists[String(this.$route.params.id)]
+      return this.lists[this.$route.params.id]
     },
     isLoaded () {
-      if (
-        this.listItems[String(this.$route.params.id)] &&
-        this.lists[String(this.$route.params.id)]
-      ) {
+      if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return true
       }
-      return false
+
+      return !!(this.listItems[String(this.$route.params.id)] &&
+        this.lists[String(this.$route.params.id)])
     }
   },
+
+  data () {
+    return {
+      name: 'All Contacts',
+      type: 2
+    }
+  },
+
   methods: {
     ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'setCurrentListFilters', 'setSelectedList']),
     loadList (id) {
@@ -55,6 +75,8 @@ export default {
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })
           this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          this.name = response.name
+          this.type = response.type
           let filters = {
             contact_lists: {
               operator: 1,
@@ -66,6 +88,7 @@ export default {
             filters = response.filters
           }
           this.setCurrentListFilters(filters)
+          return response
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -73,16 +96,41 @@ export default {
           this.$generalNotification(message, 'error')
           this.$router.replace('/contacts/')
         })
+    },
+
+    setData (id) {
+      const list = this.lists[id] || {}
+      if (Object.values(list).length > 0) {
+        this.name = list.name
+        this.type = list.type
+        this.setSelectedList({ id: this.id, name: this.name, type: this.type })
+      }
     }
   },
+
   mounted () {
-    this.loadList(this.$route.params.id)
+    if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
+      this.loadList(this.$route.params.id)
+    }
+
+    if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+      this.setData(this.id)
+      this.setSelectedList({ id: this.id, name: this.name, type: this.type })
+    }
   },
+
   watch: {
-    '$route.params.id': function (id) {
-      if (this.$route.name === 'Contacts') {
+    '$route.params.id': async function (id) {
+      if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
         this.loadList(id)
         this.setCurrentListFilters({})
+      }
+      if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        if (!id) {
+          id = 'all'
+        } else {
+          this.setData(id)
+        }
       }
     }
   }
