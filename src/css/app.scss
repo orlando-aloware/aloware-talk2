@@ -9348,7 +9348,7 @@ screen and (max-width: 956px) {
   border: 1px solid $grey-70;
   color: $grey-90;
   text-transform: none !important;
-  padding: 0 10px;
+  padding: 0 14px 0 10px;
   border-radius: 6px;
 
   .q-btn__wrapper:before {
@@ -9360,7 +9360,7 @@ screen and (max-width: 956px) {
       color: $grey-90;
 
       span {
-        margin-left: 10px;
+        margin-left: 7px;
         color: $grey-100;
       }
     }
