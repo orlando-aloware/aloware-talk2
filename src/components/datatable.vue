@@ -4,7 +4,7 @@
     :class="[paginated ? 'paginated' : '']">
     <div
       ref="scrollableArea"
-      :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
+      :class="scrollableAreaClasses"
       @scroll="handleScroll">
 
       <table
@@ -185,6 +185,10 @@ export default {
       type: String,
       default: ''
     },
+    isScrollable: {
+      type: Boolean,
+      default: true
+    },
     paginated: {
       type: Boolean,
       default: false
@@ -256,6 +260,13 @@ export default {
         return 7
       }
       return 3
+    },
+    scrollableAreaClasses () {
+      return [
+        `${this.isScrollable ? 'scrollableArea position-relative ' : ''}d-flex flex-column h-100 w-100 flex-grow-1`,
+        this.scrollAreaClass,
+        `${this.isEmpty ? 'overflow-hidden' : ''}`
+      ]
     }
   },
 

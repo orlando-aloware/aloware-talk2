@@ -12,15 +12,60 @@
            v-if="user">
         <b-row>
           <b-col md="12" class="settings-form-wrapper">
-            <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'"></general-information>
-            <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading"></profile>
-            <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading"></notification-settings>
-            <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading"></personalization>
-            <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"></visibility>
-            <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading"></inbound-call>
-            <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading"></outbound-call>
-            <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading"></diagnosis>
-            <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading"></sms-templates>
+            <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </general-information>
+            <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </profile>
+            <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </notification-settings>
+            <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </personalization>
+            <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </visibility>
+            <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </inbound-call>
+            <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </outbound-call>
+            <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </diagnosis>
+            <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading">
+              <template slot="header">
+                <back-button v-if="isSettingsOpened"
+                             @click="back"/>
+              </template>
+            </sms-templates>
             <settings-save-bar  :user="user"></settings-save-bar>
           </b-col>
         </b-row>
@@ -47,20 +92,34 @@ import Diagnosis from 'components/settings/diagnosis'
 import SmsTemplates from 'components/settings/sms-templates'
 import talk2Api from 'src/plugins/api/api'
 import SettingsSaveBar from 'components/settings/settings-save-bar'
+import BackButton from 'components/back-button'
 
 export default {
   name: 'Settings',
 
   mixins: [aclMixin, settingsMixin],
 
-  components: { SettingsSaveBar, SmsTemplates, Diagnosis, OutboundCall, InboundCall, Visibility, Personalization, NotificationSettings, Profile, GeneralInformation, SettingsSide },
+  components: {
+    SettingsSaveBar,
+    SmsTemplates,
+    Diagnosis,
+    OutboundCall,
+    InboundCall,
+    Visibility,
+    Personalization,
+    NotificationSettings,
+    Profile,
+    GeneralInformation,
+    SettingsSide,
+    BackButton
+  },
 
   computed: {
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('settings', ['user', 'userClone']),
     ...mapGetters('settings', ['changedUserProperties']),
     isSettingsOpened () {
-      return !this.$q.screen.lt.md || this.onLoadShowSettings || (this.$route.name !== 'Settings' && this.$route.name.toLowerCase().includes('settings') && this.$q.screen.lt.md)
+      return !this.$q.screen.lt.md || this.onLoadShowSettings
     }
   },
 
@@ -81,7 +140,7 @@ export default {
         whitelabel: false,
         path: null
       },
-      onLoadShowSettings: true
+      onLoadShowSettings: false
     }
   },
 
@@ -232,6 +291,12 @@ export default {
         name: prop,
         value: value
       })
+    },
+    back () {
+      this.$router.push({
+        name: 'Settings'
+      })
+      this.onLoadShowSettings = false
     }
   },
 
@@ -244,6 +309,10 @@ export default {
   created () {
     if (!this.isAdmin && this.$route.path === '/settings/visibility') {
       this.$router.push(`/settings`)
+    }
+
+    if (this.$route.name !== 'Settings' && this.$route.name.toLowerCase().includes('settings')) {
+      this.onLoadShowSettings = true
     }
 
     this.getStatics()
@@ -311,8 +380,13 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (to.name.includes('Settings')) {
-        this.onLoadShowTasks = false
+      if (to.name === 'Settings') {
+        this.onLoadShowSettings = false
+        return
+      }
+
+      if (to.name !== 'Settings' && to.name.toLowerCase().includes('settings')) {
+        this.onLoadShowSettings = true
       }
     }
   }

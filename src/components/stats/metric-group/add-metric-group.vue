@@ -9,12 +9,12 @@
       class="px-4 border-half-rounded stats-page-btn"
       color="primary">
       <div class="row items-center no-wrap">
-        <div class="d-flex justify-content-center align-items-center">
+        <div class="d-flex justify-content-center align-items-center text-size-lg-2">
           <plus-icon style="margin-right: 6px;"
-                     width="10"
-                     height="10"
-                     firstD="M5 1V9"
-                     secondD="M9 5H1"
+                     width="14"
+                     height="14"
+                     firstD="M7 1V13"
+                     secondD="M13 7H1"
                      strokeWidth="1.5"
                      color="#FFFFFF"/>
           Add Metric Group

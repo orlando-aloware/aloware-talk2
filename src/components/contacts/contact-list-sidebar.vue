@@ -141,7 +141,7 @@ export default {
     '$route': {
       deep: true,
       handler: function () {
-        if (this.isMobile) {
+        if (this.isMobile && this.$route.name === 'Contact') {
           this.desktopisExpanded = this.isExpanded
           this.isExpanded = false
           this.setSidebarCollapsed(!this.isExpanded)

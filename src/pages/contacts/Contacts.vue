@@ -69,15 +69,24 @@ export default {
   },
 
   mounted () {
+    this.setShowContactsHeader(true)
     if (this.isMobile) {
       this.toggleSidebar()
     }
   },
 
   methods: {
-    ...mapActions('contacts', ['setShowContactsListSidebar']),
+    ...mapActions('contacts', ['setShowContactsListSidebar', 'setShowContactsHeader']),
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
+    }
+  },
+
+  watch: {
+    $route (to, from) {
+      if (to.name.includes('Contacts')) {
+        this.setShowContactsListSidebar(false)
+      }
     }
   }
 }

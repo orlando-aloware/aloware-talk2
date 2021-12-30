@@ -1,8 +1,10 @@
 <template>
   <div class="add-metrics p-0 d-inline-block position-relative m-2">
-    <div flat bordered
-      @click="openModal"
-      class="metric-box dashed-box h-100 w-100 q-hoverable cursor-pointer">
+    <div flat
+         bordered
+         @click="openModal"
+         class="metric-box dashed-box h-100 w-100"
+         :class="{ 'q-hoverable cursor-pointer': !disabled}">
       <span class="q-focus-helper"></span>
       <div class="h-100 w-100 align-middle position-absolute">
         <div class="h-100 w-100 text-lead text-center text-grey lighten-3">
@@ -39,6 +41,10 @@ export default {
     metricGroup: {
       type: Object,
       default: () => {}
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -82,7 +88,9 @@ export default {
       })
     },
     openModal () {
-      this.modal = true
+      if (!this.disabled) {
+        this.modal = true
+      }
     },
     closeModal () {
       this.modal = false

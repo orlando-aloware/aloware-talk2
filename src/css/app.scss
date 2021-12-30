@@ -8346,6 +8346,14 @@ button.grey-90 {
   max-width: 100wh;
 }
 
+.settings {
+  &-side__right {
+    .mobile-back-btn {
+      display: none !important;
+    }
+  }
+}
+
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .contacts-total {
@@ -8714,6 +8722,21 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 784px) {
+  /*.main-content {
+    padding-top: 62px;
+  }*/
+  .general-notification {
+    margin-left: 5px !important;
+    margin-bottom: 50px !important;
+  }
+  .b-toaster {
+    &.b-toaster-bottom-right {
+      bottom: 50px !important;
+      .b-toaster-slot {
+        max-width: 300px !important;
+      }
+    }
+  }
   .stats-container {
     padding-bottom: 0 !important;
     height: calc(100vh - 107px);
@@ -8736,13 +8759,16 @@ screen and (max-width: 956px) {
   }
   .page-header {
     height: 58px;
+    &.dialer-header {
+      left: 0 !important;
+    }
     & > div > h1 {
       font-size: 18px;
       font-family: 'Roboto', sans-serif;
     }
     &.q-toolbar {
       height: 58px;
-      padding-left: 18.5px !important;
+      padding: 0 18.5px !important;
       justify-content: space-between;
       flex: 1 0 100%;
     }
@@ -8906,9 +8932,11 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 605px) {
-  .communications-page {
-    .page-header {
-      display: none !important;
+  .stats-container {
+    .stats-header {
+      .q-btn {
+        width: 100%;
+      }
     }
   }
 }
@@ -8983,6 +9011,9 @@ screen and (max-width: 956px) {
       &__right {
         width: 0;
         z-index: 2;
+        .task-list-scroller {
+          padding-bottom: 60px;
+        }
         &.inbox-side__right--opened {
           width: 100% !important;
         }
@@ -9017,6 +9048,70 @@ screen and (max-width: 956px) {
     transition: width 0.3s ease-in-out;
   }*/
   .settings {
+    &.page-side-menubar__left {
+      max-width: unset;
+    }
+    &-content-wrapper {
+      padding-right: 0 !important;
+      & > .row {
+        width: 100%;
+        .settings-form-wrapper,
+        .settings-form-wrapper .container {
+          padding-right: 0 !important;
+          margin: 0 0 !important;
+        }
+        .settings-form-wrapper {
+          margin: 0 0 !important;
+          padding: 0 18.5px !important;
+          .container {
+            max-width: unset;
+            .form-row,
+            .form-row > div {
+              padding-left: 0 !important;
+              padding-right: 0 !important;
+            }
+            .form-row:first-child,
+            .row:first-child {
+              > div > div > button {
+                transform: translateX(-8px);
+                margin-top: 0.5rem !important;
+                height: 24px !important;
+                min-height: 24px !important;
+                max-height: 24px !important;
+                margin-right: 0;
+              }
+              h1 {
+                line-height: 1;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+              }
+            }
+            .row.row-no-padding {
+              & > div,
+              & > div table {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                th:nth-child(2),
+                th:nth-child(3) {
+                  min-width: 170px !important;
+                }
+              }
+            }
+            .business-hours-container {
+              .flex-row:first-child {
+                min-width: 86px;
+              }
+            }
+            #voicemail-drop-library-container {
+              table tbody tr td audio {
+                max-width: 250px;
+              }
+            }
+          }
+        }
+      }
+    }
     &-form-wrapper,
     &-form-wrapper .container {
       padding-left: 0 !important;
@@ -9027,10 +9122,14 @@ screen and (max-width: 956px) {
       &__left {
         max-width: unset;
         min-width: unset;
+        width: 100%;
         z-index: 1;
         &.settings-side__left--closed {
           width: 0 !important;
           height: 0;
+        }
+        .page-side-menubar-list-item {
+          background-color: unset !important;
         }
       }
       &__right {
@@ -9041,6 +9140,9 @@ screen and (max-width: 956px) {
         }
         &:not(.settings-side__right--opened) {
           display: none !important;
+        }
+        .mobile-back-btn {
+          display: flex !important;
         }
       }
     }
@@ -9394,7 +9496,7 @@ screen and (max-width: 956px) {
 .mobile-phone-drawer {
   &:not(.mobile-phone-visible) {
     .q-drawer__content {
-      padding: 55px 16px 0;
+      padding: 0 16px;
     }
   }
   .phone-header-title {
@@ -9405,13 +9507,16 @@ screen and (max-width: 956px) {
     position: fixed;
     z-index: 9;
   }
+  .dialerForm {
+    padding-top: 75px !important;
+  }
   .q-drawer__backdrop {
     display: none;
   }
   aside {
     max-width: 784px !important;
     width: 100% !important;
-    height: calc(100% - 49px);
+    height: calc(100% - 51px);
     .q-drawer__content {
       & > div {
         width: 100% !important;
@@ -10030,4 +10135,14 @@ screen and (max-width: 956px) {
 .background-blur {
   box-shadow: 0px 10px 20px -4px rgba(4, 4, 4, 0.2);
   backdrop-filter: blur(15px);
+}
+
+.menu-phone {
+  &:hover {
+    color: $blue-4;
+  }
+}
+
+.pt-58 {
+  padding-top: 58px !important;
 }

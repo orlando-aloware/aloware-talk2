@@ -145,7 +145,7 @@ import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
   name: 'app-footer',
   components: {
@@ -173,7 +173,7 @@ export default {
       return this.tab === 'phone'
     },
     phoneContentClass () {
-      return !this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'
+      return `menu-phone ${!this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'}`
     }
   },
   data () {
@@ -194,6 +194,7 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', ['setShowContactsHeader']),
     isActive (tab) {
       return this.tab === tab
     },
@@ -201,6 +202,14 @@ export default {
       this.updateTab()
     },
     getTab () {
+      if (['Contact', 'Inbox'].includes(this.$route.name)) {
+        this.setShowContactsHeader(false)
+      }
+
+      if (['Contacts', 'Stats', 'Power Dialer', 'Settings', 'Settings Tab'].includes(this.$route.name)) {
+        this.setShowContactsHeader(true)
+      }
+
       switch (this.$route.name) {
         case 'Inbox':
         case 'Inbox Channel':
@@ -212,8 +221,13 @@ export default {
         case 'Contacts':
         case 'Contact':
           return 'contacts'
+        case 'Power Dialer':
+          return 'power-dialer'
         case 'Stats':
           return 'stats'
+        case 'Settings':
+        case 'Settings Tab':
+          return 'settings'
       }
     },
     updateTab () {

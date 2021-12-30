@@ -18,7 +18,8 @@
                     v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container class="page-container h-100">
+          <q-page-container class="page-container h-100"
+                            :class="{ 'pt-58': $route.name.includes('Contacts') }">
             <section class="main-content section h-100">
               <template v-if="!loading">
                 <transition :name="transitionName"
@@ -84,13 +85,18 @@
           v-model="mobilePhoneDrawer"
           v-if="isMobile && mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
-          <div class="phone-header-title"
-               v-show="!isPhoneVisible">Phone</div>
+          <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
+                    v-show="!isPhoneVisible">
+            <app-header force-page-title="Phone"
+                        :no-padding="true"
+                        :title-only="true"/>
+          </q-header>
           <phone :isMobile="isMobile"
                  v-if="mobilePhoneDrawer"
                  @onPhoneVisible="onPhoneVisible">
           </phone>
           <dialer-form ref="dialerForm"
+                       class="dialerForm"
                        :isMobile="true"
                        v-model="mobilePhoneDrawer"
                        v-if="mobilePhoneDrawer"
@@ -602,6 +608,7 @@ export default {
     },
 
     toggleMobilePhone (value) {
+      console.log('toggleMobilePhone: ', value)
       this.mobilePhoneDrawer = value
     },
 
@@ -1737,6 +1744,12 @@ export default {
 
       if (this.authenticated) {
         this.sidebarVisible = true
+      }
+    },
+
+    isMobile () {
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
       }
     }
   }

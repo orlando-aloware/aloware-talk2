@@ -71,6 +71,7 @@
                 draggable="false"
                 :key="`add-metrics-` + metricGroupId"
                 :metric-group="{ id: metricGroupId, name: metricGroupName }"
+                :disabled="updateLoading"
                 @toggle-loader="toggleLoad"/>
             </transition-group>
           </Draggable>
@@ -161,6 +162,27 @@ export default {
     TrashIcon,
     TitlePopover
   },
+  data () {
+    return {
+      timeline: '',
+      hovered: false,
+      isOpen: false,
+      title: 'Untitled',
+      dense: true,
+      denseOpts: true,
+      loader: false,
+      dragOptions: {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
+      },
+      metricsList: [],
+      loaderToggled: false,
+      updateLoading: false,
+      DateRanges
+    }
+  },
   computed: {
     ...mapState('auth', ['profile']),
     metricGroupName: {
@@ -194,27 +216,6 @@ export default {
   mounted () {
     this.timeline = this.resources.date_range_type || 1
     this.metricsList = this.arrangedMetricList ? JSON.parse(JSON.stringify(this.arrangedMetricList)) : []
-  },
-  data () {
-    return {
-      timeline: '',
-      hovered: false,
-      isOpen: false,
-      title: 'Untitled',
-      dense: true,
-      denseOpts: true,
-      loader: false,
-      dragOptions: {
-        animation: 200,
-        group: 'description',
-        disabled: false,
-        ghostClass: 'ghost'
-      },
-      metricsList: [],
-      loaderToggled: false,
-      updateLoading: false,
-      DateRanges
-    }
   },
   methods: {
     ...mapActions('stats', [
@@ -300,32 +301,28 @@ export default {
       const previousMetrics = JSON.parse(JSON.stringify(this.arrangedMetricList))
 
       let order = this.arrangedMetricList[newIndex].order
-      let step = 0
-
-      if (newIndex > oldIndex) {
-        step = (newIndex - oldIndex)
-        order += (step + 1)
-      } else {
-        step = (oldIndex - newIndex)
-        order -= (step + 1)
-      }
+      let step = newIndex - oldIndex
 
       await this.updateMetricOrder({
         metricGroupId: this.metricGroupId,
         metricId: element.id,
         order: order,
-        step: oldIndex > newIndex ? (-1 * step) : step
+        step: step
       })
+
+      this.toggleLoader(true)
 
       await this.$axios.patch(`api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metricGroupId}/metrics/${element.id}/order`, {
         order: order
       }).then(res => {
         this.$generalNotification('Metric successfully updated.')
+        this.toggleLoader(false)
       }).catch(err => {
         this.setMetricGroupMetrics({
           metricGroupId: this.metricGroupId,
           data: previousMetrics
         })
+        this.toggleLoader(false)
         console.log(err)
         this.$generalNotification('Failed to update metric.', 'error')
       })
@@ -351,6 +348,13 @@ export default {
     },
     resources () {
       this.timeline = this.resources.date_range_type
+    },
+    arrangedMetricList () {
+      const list1 = JSON.stringify(this.metricsList)
+      const list2 = JSON.stringify(this.arrangedMetricList)
+      if (list1 !== list2) {
+        this.metricsList = JSON.parse(list2)
+      }
     }
   }
 }

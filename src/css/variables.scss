@@ -83,6 +83,7 @@ $blue-70: #EEF3FF;
 $blue-60: #434464;
 $blue-60-opaque: rgba(21, 22, 63, 0.8);
 $blue-10: #D3E2FF;
+$blue-4: #11508e;
 $blue-3: #56CCF2;
 
 // Greys
@@ -340,6 +341,10 @@ body {
 
 .text-size-lg {
   @include font-size($f-size-body-lg, 400);
+}
+
+.text-size-lg-2 {
+  @include font-size($f-size-body-lg, 500);
 }
 
 .text-rg {

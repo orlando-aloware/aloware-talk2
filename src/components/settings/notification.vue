@@ -4,8 +4,8 @@
       <b-form-row>
         <b-col sm="12" md="12">
           <div class="d-inline-flex">
-            <template slot="header">
-            </template>
+            <slot name="header">
+            </slot>
             <h1 class="mt-2"> Notification Settings </h1>
           </div>
         </b-col>

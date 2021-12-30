@@ -1,5 +1,6 @@
 <template>
-  <q-toolbar class="page-header pl-3 pr-3">
+  <q-toolbar class="page-header"
+             :class="{ 'pl-3 pr-3': !noPadding }">
     <div class="d-flex h-100 align-items-center">
       <b-link v-if="['Contact'].includes($route.name)"
               class="btn-header-nav-back mr-3"
@@ -7,14 +8,15 @@
               @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
       </b-link>
-      <h1 v-if="!['Contact'].includes($route.name)">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
-      <contact-app-header v-if="['Contact'].includes($route.name)"></contact-app-header>
-      <contact-list-navigation v-if="['Contact'].includes($route.name)" />
-      <inbox-list-navigation v-if="['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)" />
-      <inbox-channel-navigation v-if="['Inbox Contact', 'Inbox Contact Mention Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)" />
+      <h1 v-if="!['Contact'].includes($route.name) && !forcePageTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
+      <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
+      <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
+      <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
+      <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
+      <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Mention Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   v-if="$route.name === 'Stats'"
+                   v-if="$route.name === 'Stats' && !titleOnly"
                    :disabled="loading"
                    @clicked="refreshMetricGroup">
         <refresh-icon />
@@ -22,7 +24,8 @@
       </compact-btn>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
-    <div class="ml-auto d-block h-100">
+    <div class="ml-auto d-block h-100"
+         v-if="!titleOnly">
       <div class="d-flex h-100 align-items-center">
         <profile></profile>
 
@@ -101,6 +104,21 @@ export default {
     Profile,
     CompactBtn,
     RefreshIcon
+  },
+
+  props: {
+    forcePageTitle: {
+      type: String,
+      default: ''
+    },
+    noPadding: {
+      type: Boolean,
+      default: false
+    },
+    titleOnly: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data () {
