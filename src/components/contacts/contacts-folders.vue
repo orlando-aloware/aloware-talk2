@@ -14,7 +14,8 @@
             <span v-else class="px-3">Power Dialer Lists</span>
             <button
               class="btn btn-link btn-sm tooltip-target mr-1"
-              :id="folderId">
+              :id="folderId"
+              :ref="folderId">
               <plus-icon
                 color="#256EFF"
                 width="14"
@@ -25,11 +26,12 @@
             </button>
 
             <b-popover
-              :target="folderId"
               triggers="click blur"
               placement="bottomright"
               boundary="window"
-              custom-class="contact-popover">
+              custom-class="contact-popover"
+              :target="folderId"
+              v-if="$refs[folderId] !== undefined">
               <contact-menu>
                 <contact-menu-item @click="onCreateFolderToggle">
                   <template slot="icon">

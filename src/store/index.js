@@ -194,7 +194,8 @@ export default function (/* { ssrContext } */) {
       dialerFormStatus: false,
       isMobile: false,
       isTabletOrMobile: false,
-      contactDetailsDrawer: false
+      contactDetailsDrawer: false,
+      showPhone: false
     },
 
     getters: {
@@ -521,6 +522,10 @@ export default function (/* { ssrContext } */) {
 
       setContactDetailsDrawer ({ commit }, value) {
         commit('SET_CONTACT_DETAILS_DRAWER', value)
+      },
+
+      setShowPhone ({ commit }, value) {
+        commit('SET_SHOW_PHONE', value)
       }
     },
 
@@ -1013,6 +1018,10 @@ export default function (/* { ssrContext } */) {
 
       SET_CONTACT_DETAILS_DRAWER (state, value) {
         state.contactDetailsDrawer = value
+      },
+
+      SET_SHOW_PHONE (state, value) {
+        state.showPhone = value
       }
     },
 

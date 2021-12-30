@@ -280,6 +280,10 @@ export default {
   },
 
   created () {
+    if (!this.isMobile && this.$route.name === 'Phone') {
+      this.$router.replace({ path: '/' })
+    }
+
     this.resetCall()
     this.resetNotifications()
 
@@ -629,9 +633,9 @@ export default {
     },
 
     onDialerFormHide () {
-      if (typeof this.$refs.appFooter !== 'undefined') {
-        this.$refs.appFooter.toggleContacts()
-      }
+      // if (typeof this.$refs.appFooter !== 'undefined') {
+      //   this.$refs.appFooter.toggleContacts()
+      // }
     },
 
     onPhoneVisible (value) {
@@ -642,7 +646,6 @@ export default {
     },
 
     toggleMobilePhone (value) {
-      console.log('toggleMobilePhone: ', value)
       this.mobilePhoneDrawer = value
     },
 
@@ -1764,6 +1767,16 @@ export default {
 
       if (!this.isMobile) {
         this.setShowContactsHeader(true)
+      }
+
+      const fromName = _.get(from, 'name', null)
+      if (!this.isMobile && to.name === 'Phone' && !fromName) {
+        this.$router.replace({ path: '/' })
+        return
+      }
+
+      if (!this.isMobile && to.name === 'Phone' && fromName) {
+        this.$router.back()
       }
     },
 

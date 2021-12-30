@@ -7,8 +7,7 @@
             :breakpoint="600"
             class="light text-grey footer-tabs"
             content-class="q-tabs__content--align-justify"
-            dense
-            @update="updateTab">
+            dense>
       <q-route-tab name="inbox"
                    to="/"
                    :content-class="isActive('inbox') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
@@ -35,18 +34,19 @@
         </span>
         Contacts
       </q-route-tab>
-      <q-tab name="phone"
-             :content-class="phoneContentClass"
-             :ripple="false"
-             :active="isPhoneActive"
-             no-caps
-             exact>
+      <q-route-tab name="phone"
+                   to="/phone"
+                   :content-class="isActive('phone') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :ripple="false"
+                   :active="isActive('phone')"
+                   no-caps
+                   exact>
         <span class="tab-icon">
           <mobile-phone-icon
             :color="tab === 'phone' ? 'primary' : 'grey-30'"/>
         </span>
         Phone
-      </q-tab>
+      </q-route-tab>
       <q-route-tab name="power-dialer"
                    to="/power-dialer"
                    :content-class="isActive('power-dialer') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
@@ -161,8 +161,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['isMobile', 'dialer']),
-
+    ...mapState(['isMobile', 'dialer', 'showPhone']),
     isMoreActive () {
       return this.tab === 'more'
     },
@@ -185,28 +184,23 @@ export default {
   mounted () {
     this.updateTab()
     this.tab = !this.dialer.currentStatus || this.dialer.currentStatus !== 'READY' ? 'phone' : this.tab
-
-    this.$VueEvent.listen('answerCall', () => {
-      if (this.isMobile) {
-        this.tab = 'phone'
-      }
-    })
   },
 
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
+    ...mapActions(['setShowPhone']),
     isActive (tab) {
       return this.tab === tab
     },
     onCloseDropdown () {
-      this.updateTab()
+      // this.updateTab()
     },
     getTab () {
       if (['Contact', 'Inbox'].includes(this.$route.name)) {
         this.setShowContactsHeader(false)
       }
 
-      if (['Contacts', 'Stats', 'Power Dialer', 'Settings', 'Settings Tab'].includes(this.$route.name)) {
+      if (['Contacts', 'Phone', 'Stats', 'Power Dialer', 'Settings', 'Settings Tab'].includes(this.$route.name)) {
         this.setShowContactsHeader(true)
       }
 
@@ -221,6 +215,8 @@ export default {
         case 'Contacts':
         case 'Contact':
           return 'contacts'
+        case 'Phone':
+          return 'phone'
         case 'Power Dialer':
           return 'power-dialer'
         case 'Stats':
@@ -233,7 +229,6 @@ export default {
     updateTab () {
       this.tab = this.getTab()
     },
-
     toggleContacts () {
       this.tab = 'contacts'
     }
@@ -245,7 +240,8 @@ export default {
         this.tab = 'inbox'
       }
 
-      if (this.dialer.currentStatus && this.dialer.currentStatus !== 'READY') {
+      console.trace(this.tab)
+      if (this.tab === 'phone') {
         this.$emit('toggleMobilePhone', true)
         return
       }
@@ -254,31 +250,31 @@ export default {
         return
       }
 
-      if (newValue === 'phone') {
-        this.$emit('toggleMobilePhone', true)
-        return
-      }
-
       if (oldValue === 'phone') {
         this.$emit('toggleMobilePhone', false)
       }
 
-      if (this.tab !== this.getTab()) {
-        this.updateTab()
+      let tab = this.getTab()
+      if (this.tab !== tab) {
+        this.tab = tab
       }
     },
-
-    '$route.name': function () {
-      this.updateTab()
-    },
-
     'isMobile': function () {
       if (this.isMobile && (this.dialer.currentStatus && this.dialer.currentStatus !== 'READY')) {
         this.tab = 'phone'
       }
+    },
+    'showPhone': function () {
+      if (this.showPhone) {
+        this.tab = 'phone'
+      }
+    },
+    '$route.name': function () {
+      if (this.tab !== 'phone') {
+        this.setShowPhone(false)
+      }
     }
   },
-
   beforeDestroy () {
     this.$VueEvent.stop('answerCall')
   }

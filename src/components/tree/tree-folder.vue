@@ -51,6 +51,7 @@
         :class="{ 'folder__option--hide': isEditing }"
         :data-popper-target="'folder-' + id"
         :id="folderId"
+        :ref="folderId"
       >
         <folder-option></folder-option>
       </button>
@@ -103,7 +104,7 @@
       boundary="window"
       custom-class="contact-popover"
       :target="folderId"
-    >
+      v-if="$refs[folderId] !== undefined">
       <folder-actions
         :id="id"
         :hasEdit="hasEdit"

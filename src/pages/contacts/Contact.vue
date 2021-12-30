@@ -8,7 +8,7 @@
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
       <template v-if="!isInbox">
         <contact-list-sidebar ref="contactListSidebar"
-                              @toggleContactActivities="toggleContactListSidebar"></contact-list-sidebar>
+                              @toggleContactActivities="toggleContactListSidebar"/>
       </template>
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }">

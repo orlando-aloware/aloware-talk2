@@ -18,7 +18,8 @@
                              :to="`/contacts/${contact.id}`"
                              @click="onSidebarToggleMobile"
                              class="d-flex align-items-center border-0">
-            <contact-list-sidebar-item v-model="contacts[index]" :key="contact.id"></contact-list-sidebar-item>
+            <contact-list-sidebar-item v-model="contacts[index]"
+                                       :key="contact.id"/>
           </b-list-group-item>
         </b-list-group>
         <div class="relative py-4">
@@ -92,6 +93,7 @@ export default {
       this.isExpanded = !this.isExpanded
       this.desktopisExpanded = this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
+      this.setShowContactsHeader(this.isExpanded)
     },
 
     onSidebarToggleMobile () {
@@ -111,16 +113,16 @@ export default {
     ...mapActions('contacts', ['setShowContactsHeader'])
   },
 
-  created () {
+  mounted () {
     if (this.isMobile && this.$q.screen.lt.md) {
       this.isExpanded = false
       this.setSidebarCollapsed(!this.isExpanded)
     }
 
-    this.setShowContactsHeader(this.isExpanded)
-  },
+    if (this.isMobile && this.$q.screen.lt.md && this.$route.name !== 'Contacts') {
+      this.setShowContactsHeader(this.isExpanded)
+    }
 
-  mounted () {
     if (this.listItems[this.selectedList.id].data.length < 1) {
       this.fetch()
     }
@@ -167,20 +169,13 @@ export default {
     '$q.screen.lt.md': function () {
       if (this.$q.screen.lt.md) {
         this.isExpanded = false
-        this.setShowContactsHeader(false)
+        this.setShowContactsHeader(true)
         this.$emit('toggleContactActivities', false)
       }
+
       if (!this.$q.screen.lt.md) {
         this.isExpanded = true
       }
-    },
-
-    isExpanded () {
-      if (this.$q.screen.lt.md) {
-        this.setShowContactsHeader(this.isExpanded)
-        return
-      }
-      this.setShowContactsHeader(true)
     },
 
     isSidebarCollapsed () {

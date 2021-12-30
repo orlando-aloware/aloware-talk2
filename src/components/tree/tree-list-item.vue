@@ -55,22 +55,22 @@
           </div>
 
           <button
+            class="folder__option btn btn-link p-0 shadow-0"
             :tabindex="id"
             :data-popper-target="'list-' + id"
             :id="folderId"
-            class="folder__option btn btn-link p-0 shadow-0"
-          >
+            :ref="folderId">
             <folder-option></folder-option>
           </button>
         </div>
 
         <b-popover
-          :target="folderId"
           triggers="click blur"
           placement="bottomright"
           boundary="window"
           custom-class="contact-popover"
-        >
+          :target="folderId"
+          v-if="folderExists">
           <list-actions
             :type="type"
             @remove="onRemoveList"
@@ -81,8 +81,7 @@
             @clonestatic="onCloneStatic"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
-            :isPinned="isPinned"
-          ></list-actions>
+            :isPinned="isPinned"/>
         </b-popover>
       </div>
     </router-link>
@@ -91,7 +90,7 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
@@ -112,8 +111,41 @@ export default {
     DialIcon,
     ListActions
   },
+  props: {
+    id: {
+      type: Number
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: Number,
+      required: true
+    },
+    layer: {
+      type: Number,
+      required: false,
+      default: 1
+    },
+    hasEdit: {
+      type: Number
+    },
+    hasDelete: {
+      type: Number
+    }
+  },
+  data () {
+    return {
+      ContactListTypes,
+      isEditing: false,
+      isRenaming: false,
+      folderExists: false
+    }
+  },
   computed: {
     ...mapGetters('contacts', ['pinned', 'moveDialog', 'listToRemove']),
+    ...mapState(['isMobile']),
     indentStyle () {
       return {
         flex: `0 0 ${this.layer * 10}px`
@@ -160,39 +192,24 @@ export default {
       return `folder-item-option-${module}-${this.id}`
     }
   },
-  props: {
-    id: {
-      type: Number
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    type: {
-      type: Number,
-      required: true
-    },
-    layer: {
-      type: Number,
-      required: false,
-      default: 1
-    },
-    hasEdit: {
-      type: Number
-    },
-    hasDelete: {
-      type: Number
+  mounted () {
+    if (!this.isMobile) {
+      this.folderExists = true
     }
-  },
-  data () {
-    return {
-      ContactListTypes,
-      isEditing: false,
-      isRenaming: false
+
+    if (this.isMobile && this.$refs[this.folderId] !== undefined) {
+      let count = 0
+      let folderInterval = setInterval(() => {
+        if (document.getElementById(this.folderId)) {
+          this.folderExists = true
+          clearInterval(folderInterval)
+        }
+        count++
+        if (count === 60) {
+          clearInterval(folderInterval)
+        }
+      }, 500)
     }
-  },
-  beforeDestroy () {
-    clearTimeout(inputTimeout)
   },
   methods: {
     ...mapActions('contacts', [
@@ -369,6 +386,9 @@ export default {
       callback(event)
       this.setShowContactsListSidebar(false)
     }
+  },
+  beforeDestroy () {
+    clearTimeout(inputTimeout)
   }
 }
 </script>
