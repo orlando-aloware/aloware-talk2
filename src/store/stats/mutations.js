@@ -173,6 +173,13 @@ export default {
       return
     }
 
+    if (state.metricGroups[metricGroupIndex].agent_metrics.length) {
+      // arrange the metrics by order
+      let metricsLilst = JSON.parse(JSON.stringify(state.metricGroups[metricGroupIndex].agent_metrics))
+      metricsLilst.sort((a, b) => (a.order > b.order) ? 1 : -1)
+      Vue.set(state.metricGroups, `${metricGroupIndex}.agent_metrics`, metricsLilst)
+    }
+
     const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.id === data.metricId)
     const metricIndex = metric ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(metric) : null
 
@@ -180,16 +187,35 @@ export default {
       return
     }
 
+    let newIndex = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.order === data.order)
+    newIndex = newIndex ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(newIndex) : 0
+
+    // store the old order of the metric
+    const oldMetricOrder = metric.order
+    // assign the new order
     metric.order = data.order
+    // move the metric to its new index
     state.metricGroups[metricGroupIndex].agent_metrics.splice(metricIndex, 1)
-    const newIndex = (metricIndex + data.step)
     state.metricGroups[metricGroupIndex].agent_metrics.splice(newIndex, 0, metric)
 
-    for (let index in state.metricGroups[metricGroupIndex].agent_metrics) {
-      if (index > newIndex && state.metricGroups[metricGroupIndex].agent_metrics[index].order >= data.order) {
-        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index], 'order', (state.metricGroups[metricGroupIndex].agent_metrics[index].order + 1))
+    // if metric was moved more than 1 step up, update the order of the metrics below it
+    if (data.step > 1) {
+      for (let index = (newIndex - 1); index >= 0; index--) {
+        data.order -= 1
+        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index], 'order', data.order)
       }
+      return
     }
+    // if metric was moved more than 1 step down, update the order of the metrics above it
+    if (data.step < -1) {
+      for (let index = (newIndex + 1); index < state.metricGroups[metricGroupIndex].agent_metrics.length; index++) {
+        data.order += 1
+        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index], 'order', data.order)
+      }
+      return
+    }
+    // moved only 1 step up or down
+    Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[(newIndex - data.step)], 'order', oldMetricOrder)
   },
   REMOVE_METRICS: (state, data) => {
     const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.metricGroupId)

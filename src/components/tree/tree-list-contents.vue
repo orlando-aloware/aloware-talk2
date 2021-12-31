@@ -17,6 +17,7 @@
 </template>
 
 <script>
+
 export default {
   components: {
     treeListItem: () => import('./tree-list-item.vue')

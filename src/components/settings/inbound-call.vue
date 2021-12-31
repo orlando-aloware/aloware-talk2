@@ -4,6 +4,8 @@
       <b-form-row>
         <b-col sm="12" md="12">
           <div class="d-inline-flex">
+            <slot name="header">
+            </slot>
             <h1 class="mt-2"> Inbound Call Settings </h1>
           </div>
         </b-col>

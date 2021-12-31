@@ -52,18 +52,18 @@
     </div>
     <div class="pt-2 d-flex justify-between">
       <div></div>
-      <b-button-group>
-        <b-button variant="primary"
-                  class="fs-13 pl-3 pr-3"
-                  size="sm"
-                  :disabled="isSending || !validFax"
-                  @click="send">
+      <q-btn color="primary"
+               class="message-composer-send-button"
+               :disable="isSending || !validFax"
+               @click="send">
+        <template slot="default">
           <q-spinner-bars v-if="isSending"
+                          class="mr-1"
                           color="white">
           </q-spinner-bars>
-          {{ isSending ? 'Sending Fax...' : 'Send Fax' }}
-        </b-button>
-      </b-button-group>
+          {{ isSending ? ' Sending Fax...' : 'Send Fax' }}
+        </template>
+      </q-btn>
     </div>
   </div>
 

@@ -4,12 +4,12 @@
     :class="[paginated ? 'paginated' : '']">
     <div
       ref="scrollableArea"
-      :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
+      :class="scrollableAreaClasses"
       @scroll="handleScroll">
 
       <table
-        :class="[computedClass, 'ml-3']"
-        ref="table">
+        ref="table"
+        :class="[computedClass, 'pl-3']">
 
         <thead>
           <draggable
@@ -120,9 +120,10 @@
         class="table-pagination"
         v-model="paginationPage"
         :max="lastPage"
-        :max-pages="11"
+        :max-pages="maxPaginationPages"
         :ellipses="false"
-        :boundary-numbers="false">
+        :boundary-numbers="false"
+        padding="0 15px">
       </q-pagination>
 
       <q-select
@@ -183,6 +184,10 @@ export default {
     scrollAreaClass: {
       type: String,
       default: ''
+    },
+    isScrollable: {
+      type: Boolean,
+      default: true
     },
     paginated: {
       type: Boolean,
@@ -246,6 +251,22 @@ export default {
         }
       }
       return newItems
+    },
+    maxPaginationPages () {
+      if (this.$q.screen.xl) {
+        return 11
+      }
+      if (this.$q.screen.lg) {
+        return 7
+      }
+      return 3
+    },
+    scrollableAreaClasses () {
+      return [
+        `${this.isScrollable ? 'scrollableArea position-relative ' : ''}d-flex flex-column h-100 w-100 flex-grow-1`,
+        this.scrollAreaClass,
+        `${this.isEmpty ? 'overflow-hidden' : ''}`
+      ]
     }
   },
 

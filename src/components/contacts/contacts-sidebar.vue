@@ -25,7 +25,7 @@
           </div>
         </q-item-section>
       </template>
-      <contacts-shared></contacts-shared>
+      <contacts-shared class="public-lists"></contacts-shared>
     </q-expansion-item>
 
     <contacts-folders v-if="toggleFolders"></contacts-folders>

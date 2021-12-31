@@ -1,5 +1,5 @@
 <template>
-  <contacts-view :id="this.id" :name="name" :type="String(type)"/>
+  <contacts-view :id="id" :name="name" :type="String(type)"/>
 </template>
 
 <script>

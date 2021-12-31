@@ -1,11 +1,10 @@
 <template>
   <q-scroll-area
-    class="pb-4 bg-grey-40"
-    style="height: 100vh; max-width: 100wh;">
-    <div class="px-4 py-0">
+    class="pb-4 bg-grey-40 stats-container">
+    <div class="px-4 py-0 stats-header">
       <AddMetricGroup @focusToNewMetricGroup="focusToNewMetricGroup"/>
     </div>
-    <div class="px-4 pt-0 pb-5">
+    <div class="stats-metrics-container px-4 pt-0 pb-5">
       <StatsAndMetrics :editGroupId="metricGroupId"
                        @updated="updated"/>
     </div>

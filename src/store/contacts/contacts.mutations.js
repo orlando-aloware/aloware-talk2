@@ -360,5 +360,11 @@ export default {
   },
   ON_SEARCH_PD_ITEM: (state, value) => {
     state.searchedPdItem = value
+  },
+  SET_SHOW_CONTACTS_HEADER: (state, value) => {
+    state.showContactsHeader = value
+  },
+  SET_SHOW_CONTACTS_LIST_SIDEBAR: (state, value) => {
+    state.showContactsListSidebar = value
   }
 }

@@ -42,7 +42,7 @@
           name="fa fa-times"
           class="cursor-pointer text-grey"/>
       </b-badge>
-      <div class="no-border bg-white p-2 pr-5 rowd d-flex group-wrapper">
+      <div class="no-border bg-white p-2 rowd d-flex group-wrapper">
         <template>
           <Draggable
             class="list-group"
@@ -71,6 +71,7 @@
                 draggable="false"
                 :key="`add-metrics-` + metricGroupId"
                 :metric-group="{ id: metricGroupId, name: metricGroupName }"
+                :disabled="updateLoading"
                 @toggle-loader="toggleLoad"/>
             </transition-group>
           </Draggable>
@@ -161,6 +162,27 @@ export default {
     TrashIcon,
     TitlePopover
   },
+  data () {
+    return {
+      timeline: '',
+      hovered: false,
+      isOpen: false,
+      title: 'Untitled',
+      dense: true,
+      denseOpts: true,
+      loader: false,
+      dragOptions: {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
+      },
+      metricsList: [],
+      loaderToggled: false,
+      updateLoading: false,
+      DateRanges
+    }
+  },
   computed: {
     ...mapState('auth', ['profile']),
     metricGroupName: {
@@ -185,32 +207,15 @@ export default {
     },
     dialogName () {
       return `remove-group-dialog-${this.resources.id}`
+    },
+    arrangedMetricList () {
+      let list = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      return list.sort((a, b) => (a.order > b.order) ? 1 : -1)
     }
   },
   mounted () {
     this.timeline = this.resources.date_range_type || 1
-    this.metricsList = this.resources.agent_metrics ? JSON.parse(JSON.stringify(this.resources.agent_metrics)) : []
-  },
-  data () {
-    return {
-      timeline: '',
-      hovered: false,
-      isOpen: false,
-      title: 'Untitled',
-      dense: true,
-      denseOpts: true,
-      loader: false,
-      dragOptions: {
-        animation: 200,
-        group: 'description',
-        disabled: false,
-        ghostClass: 'ghost'
-      },
-      metricsList: [],
-      loaderToggled: false,
-      updateLoading: false,
-      DateRanges
-    }
+    this.metricsList = this.arrangedMetricList ? JSON.parse(JSON.stringify(this.arrangedMetricList)) : []
   },
   methods: {
     ...mapActions('stats', [
@@ -277,8 +282,8 @@ export default {
     },
     toggleLoad (val) {
       this.loader = val
-      if (!this.loader && this.metricsList.length !== this.resources.agent_metrics.length) {
-        this.metricsList = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      if (!this.loader && this.metricsList.length !== this.arrangedMetricList.length) {
+        this.metricsList = JSON.parse(JSON.stringify(this.arrangedMetricList))
       }
     },
     async updateSortedMetric (val) {
@@ -287,41 +292,37 @@ export default {
       }
 
       let { newIndex, oldIndex, element } = val.moved
-      const metric = this.resources.agent_metrics.find(metric => metric.id === element.id)
+      const metric = this.arrangedMetricList.find(metric => metric.id === element.id)
 
       if (!metric) {
         return
       }
 
-      const previousMetrics = JSON.parse(JSON.stringify(this.resources.agent_metrics))
+      const previousMetrics = JSON.parse(JSON.stringify(this.arrangedMetricList))
 
-      let order = this.resources.agent_metrics[newIndex].order
-      let step = 0
-
-      if (newIndex > oldIndex) {
-        step = (newIndex - oldIndex)
-        order += (step + 1)
-      } else {
-        step = (oldIndex - newIndex)
-        order -= (step + 1)
-      }
+      let order = this.arrangedMetricList[newIndex].order
+      let step = newIndex - oldIndex
 
       await this.updateMetricOrder({
         metricGroupId: this.metricGroupId,
         metricId: element.id,
         order: order,
-        step: oldIndex > newIndex ? (-1 * step) : step
+        step: step
       })
+
+      this.toggleLoader(true)
 
       await this.$axios.patch(`api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metricGroupId}/metrics/${element.id}/order`, {
         order: order
       }).then(res => {
         this.$generalNotification('Metric successfully updated.')
+        this.toggleLoader(false)
       }).catch(err => {
         this.setMetricGroupMetrics({
           metricGroupId: this.metricGroupId,
           data: previousMetrics
         })
+        this.toggleLoader(false)
         console.log(err)
         this.$generalNotification('Failed to update metric.', 'error')
       })
@@ -348,11 +349,11 @@ export default {
     resources () {
       this.timeline = this.resources.date_range_type
     },
-    'resources.agent_metrics': {
-      deep: true,
-      handler: function () {
-        const metrics = _.get(this.resources, 'agent_metrics', [])
-        this.metricsList = JSON.parse(JSON.stringify(metrics))
+    arrangedMetricList () {
+      const list1 = JSON.stringify(this.metricsList)
+      const list2 = JSON.stringify(this.arrangedMetricList)
+      if (list1 !== list2) {
+        this.metricsList = JSON.parse(list2)
       }
     }
   }

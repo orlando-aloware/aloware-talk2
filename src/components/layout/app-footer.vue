@@ -7,8 +7,7 @@
             :breakpoint="600"
             class="light text-grey footer-tabs"
             content-class="q-tabs__content--align-justify"
-            dense
-            @update="updateTab">
+            dense>
       <q-route-tab name="inbox"
                    to="/"
                    :content-class="isActive('inbox') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
@@ -35,18 +34,19 @@
         </span>
         Contacts
       </q-route-tab>
-      <q-tab name="phone"
-             :content-class="phoneContentClass"
-             :ripple="false"
-             :active="isPhoneActive"
-             no-caps
-             exact>
+      <q-route-tab name="phone"
+                   to="/phone"
+                   :content-class="isActive('phone') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :ripple="false"
+                   :active="isActive('phone')"
+                   no-caps
+                   exact>
         <span class="tab-icon">
           <mobile-phone-icon
             :color="tab === 'phone' ? 'primary' : 'grey-30'"/>
         </span>
         Phone
-      </q-tab>
+      </q-route-tab>
       <q-route-tab name="power-dialer"
                    to="/power-dialer"
                    :content-class="isActive('power-dialer') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
@@ -109,6 +109,7 @@
       boundary="window"
       custom-class="contact-popover mobile-more-dropdown"
       @hidden="onCloseDropdown"
+      @show="tab='more'"
     >
       <contact-menu class="list-actions">
         <contact-menu-item @click="$emit('rename')">
@@ -144,6 +145,7 @@ import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
+import { mapActions, mapState } from 'vuex'
 export default {
   name: 'app-footer',
   components: {
@@ -159,6 +161,7 @@ export default {
   },
 
   computed: {
+    ...mapState(['isMobile', 'dialer', 'showPhone']),
     isMoreActive () {
       return this.tab === 'more'
     },
@@ -169,7 +172,7 @@ export default {
       return this.tab === 'phone'
     },
     phoneContentClass () {
-      return !this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'
+      return `menu-phone ${!this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'}`
     }
   },
   data () {
@@ -178,18 +181,29 @@ export default {
     }
   },
 
-  created () {
-    this.tab = 'inbox'
+  mounted () {
+    this.updateTab()
+    this.tab = !this.dialer.currentStatus || this.dialer.currentStatus !== 'READY' ? 'phone' : this.tab
   },
 
   methods: {
+    ...mapActions('contacts', ['setShowContactsHeader']),
+    ...mapActions(['setShowPhone']),
     isActive (tab) {
       return this.tab === tab
     },
     onCloseDropdown () {
-      this.updateTab()
+      // this.updateTab()
     },
     getTab () {
+      if (['Contact', 'Inbox'].includes(this.$route.name)) {
+        this.setShowContactsHeader(false)
+      }
+
+      if (['Contacts', 'Phone', 'Stats', 'Power Dialer', 'Settings', 'Settings Tab'].includes(this.$route.name)) {
+        this.setShowContactsHeader(true)
+      }
+
       switch (this.$route.name) {
         case 'Inbox':
         case 'Inbox Channel':
@@ -199,13 +213,24 @@ export default {
         case 'Inbox Contact Mention Communication':
           return 'inbox'
         case 'Contacts':
+        case 'Contact':
           return 'contacts'
+        case 'Phone':
+          return 'phone'
+        case 'Power Dialer':
+          return 'power-dialer'
         case 'Stats':
           return 'stats'
+        case 'Settings':
+        case 'Settings Tab':
+          return 'settings'
       }
     },
     updateTab () {
       this.tab = this.getTab()
+    },
+    toggleContacts () {
+      this.tab = 'contacts'
     }
   },
 
@@ -214,22 +239,44 @@ export default {
       if (!newValue) {
         this.tab = 'inbox'
       }
-      // if (newValue !== this.getTab()) {
-      //   this.updateTab()
-      // }
-      if (this.tab === 'more' && this.$route.name) {
-        this.updateTab()
-      }
-      if (newValue === 'phone') {
+
+      console.trace(this.tab)
+      if (this.tab === 'phone') {
         this.$emit('toggleMobilePhone', true)
+        return
       }
+
+      if (this.tab === 'more') {
+        return
+      }
+
       if (oldValue === 'phone') {
         this.$emit('toggleMobilePhone', false)
       }
+
+      let tab = this.getTab()
+      if (this.tab !== tab) {
+        this.tab = tab
+      }
+    },
+    'isMobile': function () {
+      if (this.isMobile && (this.dialer.currentStatus && this.dialer.currentStatus !== 'READY')) {
+        this.tab = 'phone'
+      }
+    },
+    'showPhone': function () {
+      if (this.showPhone) {
+        this.tab = 'phone'
+      }
     },
     '$route.name': function () {
-      this.updateTab()
+      if (this.tab !== 'phone') {
+        this.setShowPhone(false)
+      }
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('answerCall')
   }
 }
 </script>

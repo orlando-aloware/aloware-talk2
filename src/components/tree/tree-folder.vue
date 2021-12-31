@@ -11,13 +11,14 @@
         :style="indentStyle"
         @click="onToggleFolder"
       ></div>
-      <div class="folder__arrow d-flex align-items-center"
-           v-if="lists.length > 0 || folders.length > 0"
-           @click="onToggleFolder">
-        <folder-arrow-open-icon v-if="isOpen"
-                                color="#62666E"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-else
-                                 color="#62666E"></folder-arrow-close-icon>
+      <div class="folder__arrow d-flex align-items-center">
+        <div v-if="lists.length > 0 || folders.length > 0"
+             @click="onToggleFolder">
+          <folder-arrow-open-icon v-if="isOpen"
+                                  color="#62666E"></folder-arrow-open-icon>
+          <folder-arrow-close-icon v-else
+                                   color="#62666E"></folder-arrow-close-icon>
+        </div>
       </div>
       <div class="folder__icon d-flex align-items-center"
            @click="onToggleFolder">
@@ -50,6 +51,7 @@
         :class="{ 'folder__option--hide': isEditing }"
         :data-popper-target="'folder-' + id"
         :id="folderId"
+        :ref="folderId"
       >
         <folder-option></folder-option>
       </button>
@@ -102,7 +104,7 @@
       boundary="window"
       custom-class="contact-popover"
       :target="folderId"
-    >
+      v-if="$refs[folderId] !== undefined">
       <folder-actions
         :id="id"
         :hasEdit="hasEdit"

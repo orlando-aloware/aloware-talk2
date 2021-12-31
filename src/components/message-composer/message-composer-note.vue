@@ -41,16 +41,18 @@
 
       </div>
       <div>
-        <b-button-group>
-          <b-button variant="primary"
-                    class="fs-13 pl-3 pr-3"
-                    size="sm"
-                    :disabled="isAdding || !validNote"
-                    @click="onAdd">
-            <q-spinner-bars v-if="isAdding" color="white" />
+        <q-btn color="primary"
+               class="message-composer-send-button"
+               :disable="isAdding || !validNote"
+               @click="onAdd">
+          <template slot="default">
+            <q-spinner-bars v-if="isAdding"
+                            class="mr-1"
+                            color="white">
+            </q-spinner-bars>
             {{ isAdding ? 'Adding Note...' : 'Add Note' }}
-          </b-button>
-        </b-button-group>
+          </template>
+        </q-btn>
       </div>
     </div>
   </div>
