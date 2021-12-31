@@ -79,8 +79,8 @@ module.exports = function (/* ctx */) {
         }
       },
 
-      https: false,
-      host: 'localhost', // 'talk2.test',
+      https: true,
+      host: 'talk2.test',
       disableHostCheck: true,
       open: true // opens browser window automatically
     },
