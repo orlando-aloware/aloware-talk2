@@ -8352,6 +8352,10 @@ button.grey-90 {
   }
 }
 
+.contacts-total.mobile {
+  display: none;
+}
+
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .contacts-total {
