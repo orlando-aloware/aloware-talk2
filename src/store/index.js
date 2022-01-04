@@ -6,6 +6,7 @@ import * as ContactsDefault from '../constants/contacts-default'
 import * as InboxDefault from '../constants/inbox-default'
 import * as ActionNotificationsDefault from '../constants/action-notifications-default'
 import createPersistedState from 'vuex-persistedstate'
+import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
@@ -35,6 +36,7 @@ export default function (/* { ssrContext } */) {
       settings
     },
     state: {
+      showMenu: false,
       filter: {},
       tags: [],
       campaigns: [],
@@ -208,7 +210,8 @@ export default function (/* { ssrContext } */) {
 
     getters: {
       notifications: (state) => state.notifications,
-      breadcrumbs: (state) => state.breadcrumbs
+      breadcrumbs: (state) => state.breadcrumbs,
+      getField
     },
 
     actions: {
@@ -1015,7 +1018,6 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_CALL_FISHING (state, payload) {
         state.dialer.callFishing = payload
       },
-
       SET_IS_MOBILE (state, value) {
         state.isMobile = value
       },
@@ -1030,7 +1032,8 @@ export default function (/* { ssrContext } */) {
 
       SET_SHOW_PHONE (state, value) {
         state.showPhone = value
-      }
+      },
+      updateField
     },
 
     plugins: [

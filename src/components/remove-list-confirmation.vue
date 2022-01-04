@@ -114,6 +114,8 @@ export default {
           // if current route is equals to list page being deleted then redirect to all contacts
           if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {
             this.$router.push('/contacts/')
+          } else {
+            this.$router.push('/power-dialer/')
           }
         })
         .catch((_err) => {

@@ -69,7 +69,7 @@
             <people-icon color="#62666E"></people-icon>
           </template>
           <template slot="title">
-            <span>List 1</span>
+            <span>List</span>
           </template>
           <template slot="suffix">
             <span
@@ -230,7 +230,7 @@ export default {
     },
     onCreateFromExistingList () {
       // console.log('Should create list from existing contacts...')
-      this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
+      // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.$root.$emit('bv::hide::popover')
       this.createPdListOpen({
         id: this.id,

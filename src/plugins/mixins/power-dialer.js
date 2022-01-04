@@ -49,8 +49,7 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'contactsLoaded',
-      'setSearch'
+      'contactsLoaded'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_TABLE_LOADER'
