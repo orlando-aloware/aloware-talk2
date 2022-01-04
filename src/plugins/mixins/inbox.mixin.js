@@ -56,11 +56,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
+    ...mapActions('inbox', ['setContact', 'setContacts', 'setLiveContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
     pinLiveCalls (contacts) {
       let liveCallStatus = [
-        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW

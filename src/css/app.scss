@@ -5107,7 +5107,7 @@ button#bs-folder-options {
   .item:hover {
     background: $light-blue3;
   }
-  
+
   .sublists {
     .folder {
       &--active:not(:hover) {
@@ -5115,7 +5115,7 @@ button#bs-folder-options {
       }
     }
   }
-  
+
 }
 
 .contact-popover {
@@ -5428,7 +5428,7 @@ table.datatable {
             opacity: 1;
 
             &.has-sorting {
-  
+
               a.sorter.sorter-desc {
                 &:before {
                   opacity: 1 !important;
@@ -5439,7 +5439,7 @@ table.datatable {
                   opacity: 1 !important;
                 }
               }
-  
+
               a.sorter.sorter-asc {
                 &:before {
                   opacity: 1 !important;
@@ -5450,7 +5450,7 @@ table.datatable {
                   top: 0px;
                 }
               }
-  
+
             }
           }
         }
@@ -9214,6 +9214,10 @@ screen and (max-width: 956px) {
   }
 }
 
+.b-radius-12 {
+  border-radius: 12px;
+}
+
 .notification-body-wrapper {
   cursor: pointer;
   .call-actions {
@@ -9231,4 +9235,25 @@ screen and (max-width: 956px) {
 .background-blur {
   box-shadow: 0px 10px 20px -4px rgba(4, 4, 4, 0.2);
   backdrop-filter: blur(15px);
+}
+
+.live-call-options {
+  padding: 6px;
+
+  .q-list {
+    .q-item {
+      padding: 5px 10px;
+      border-radius: 6px;
+      min-height: 28px !important;
+
+      .q-item__section {
+        display: block !important;
+        min-height: 0 !important;
+
+        svg {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
 }

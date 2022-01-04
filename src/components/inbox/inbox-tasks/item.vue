@@ -67,31 +67,52 @@
                         :update-interval="6000">
         </task-item-time>
       </span>
-      <div class="time-passed text-grey-90 d-flex flex-row justify-center"
+      <div class="text-grey-90 d-flex flex-row justify-center"
            v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
            contact.last_communication.type === CommunicationTypes.CALL &&
-           [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2)">
+           [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2)">
         <div class="pl-0">
-          <cancel-call-icon role="button"/>
+          <b-button variant="light"
+                    size="sm"
+                    class="bg-transparent no-border no-box-shadow p-0"
+                    @click="onRejectCall">
+            <cancel-call-icon/>
+          </b-button>
+
         </div>
-        <div class="pl-2 pr-0">
-          <accept-call-icon role="button"/>
+        <div class="pl-1 pr-0">
+          <b-button variant="light"
+                    size="sm"
+                    class="bg-transparent no-border no-box-shadow p-0"
+                    @click="onAcceptCall">
+            <accept-call-icon role="button"/>
+          </b-button>
         </div>
       </div>
-      <div class="time-passed text-grey-90 d-flex flex-row justify-center"
+      <div class="text-grey-90 d-flex flex-row justify-center"
            v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
            contact.last_communication.type === CommunicationTypes.CALL &&
            [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2)">
         <div class="pl-0">
-          <cancel-call-icon role="button"/>
+          <b-button variant="light"
+                    size="sm"
+                    class="bg-transparent no-border no-box-shadow p-0"
+                    @click="onHangUpCall">
+            <cancel-call-icon role="button"/>
+          </b-button>
         </div>
       </div>
-      <div class="time-passed text-grey-90 d-flex flex-row justify-center"
+      <div class="text-grey-90 d-flex flex-row justify-center"
            v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
            contact.last_communication.type === CommunicationTypes.CALL &&
            [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2)">
         <div class="pl-0">
-          <parked-call-icon/>
+          <b-button variant="light"
+                    size="sm"
+                    class="bg-transparent no-border no-box-shadow p-0"
+                    @click="onParkedCall">
+            <parked-call-icon/>
+          </b-button>
         </div>
       </div>
     </div>
@@ -218,6 +239,34 @@ export default {
         return
       }
       this.$emit('onItemSelected', contact)
+    },
+    onAcceptCall (e) {
+      const data = {
+        communication: {
+          id: this.contact.last_communication.id,
+          campaign_id: this.contact.last_communication.campaign_id,
+          contactName: this.contact.name,
+          companyName: this.contact.company_name,
+          contactId: this.contact.id
+        },
+        shouldPark: false,
+        shouldHangup: false
+      }
+      this.$VueEvent.fire('answerCallFishing', data)
+      e.stopImmediatePropagation()
+    },
+    onRejectCall (e) {
+      this.$VueEvent.fire('rejectCall')
+      console.log('hello')
+      e.stopImmediatePropagation()
+    },
+    onHangUpCall (e) {
+      this.$VueEvent.fire('hangupCall')
+      e.stopImmediatePropagation()
+    },
+    onParkedCall (e) {
+      console.log('hello')
+      e.stopImmediatePropagation()
     }
   }
 }

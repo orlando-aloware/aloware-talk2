@@ -1,6 +1,7 @@
 <template>
   <div class="communication-info"
        v-if="communication">
+
     <q-list bordered
             class="notes-wrapper float-right"
             v-if="communication.type === CommunicationTypes.NOTE">
@@ -12,6 +13,112 @@
         </q-item-section>
       </q-item>
     </q-list>
+
+    <q-list v-else-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall"
+            bordered
+            class="rounded-contact-activity b-radius-12">
+      <q-item class="communication-header flex-row">
+        <div class="ml-3 pr-2">
+          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+                     v-if="communication.disposition_status2">
+          </component>
+        </div>
+        <div class="text-lt p-x"
+             :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
+            <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isConnectedCall">
+              {{ communication.direction | fixCommDirection }}
+              {{ communication.type | fixCommType }}
+            </span>
+          <span v-else>Connected</span>
+        </div>
+        <q-item-section class="text-lt pl-2 text-left"
+                        v-if="communication.duration && isParkedCall">
+            <span v-if="communication.type === CommunicationTypes.CALL && activityMode">
+              {{ communication.duration | fixDuration }}
+            </span>
+        </q-item-section>
+        <q-item-section class="text-lt pl-2 pr-2 text-left">
+          <div class="text-grey-90 d-flex flex-row justify-center"
+               v-if="isIncomingCall">
+            <div class="pl-0">
+              <b-button variant="light"
+                        size="sm"
+                        class="bg-transparent no-border no-box-shadow p-0"
+                        @click="onRejectCall">
+                <cancel-call-icon/>
+              </b-button>
+            </div>
+            <div class="pl-1 pr-0">
+              <b-button variant="light"
+                        size="sm"
+                        class="bg-transparent no-border no-box-shadow p-0"
+                        @click="onAcceptCall">
+                <accept-call-icon/>
+              </b-button>
+            </div>
+          </div>
+          <div class="text-grey-90 d-flex flex-row justify-center"
+               v-else-if="isConnectedCall">
+            <div class="pl-0">
+              <cancel-call-icon role="button"/>
+            </div>
+          </div>
+          <div class="text-grey-90 d-flex flex-row justify-center" v-else-if="isParkedCall">
+            <div class="pl-0">
+              <parked-call-icon/>
+            </div>
+          </div>
+        </q-item-section>
+      </q-item>
+      <q-menu v-if="isParkedCall || (isIncomingCall && dialer.call)"
+              fit
+              content-class="live-call-options"
+              anchor="top right"
+              self="top left">
+        <q-list>
+          <q-item v-if="isParkedCall"
+                  clickable
+                  v-close-popup>
+            <q-item-section class="d-inline-flex">
+              <park-call-icon color="#9B51E0"
+                              width="11.7"
+                              height="12.35"></park-call-icon>
+              <span>Park Current Call &amp; Connect</span>
+            </q-item-section>
+          </q-item>
+          <q-item v-if="isParkedCall"
+                  clickable
+                  v-close-popup>
+            <q-item-section>
+              <hangup-icon  width="16"
+                            height="16"></hangup-icon>
+              Hang up Current Call &amp; Connect
+            </q-item-section>
+          </q-item>
+
+          <q-item v-if="isIncomingCall && dialer.call"
+                  clickable
+                  v-close-popup>
+            <q-item-section class="d-inline-flex">
+              <park-call-icon color="#9B51E0"
+                              width="11.7"
+                              height="12.35"></park-call-icon>
+              <span>Park Current Call &amp;amp; Answer</span>
+            </q-item-section>
+          </q-item>
+          <q-item v-if="isIncomingCall && dialer.call"
+                  clickable
+                  v-close-popup>
+            <q-item-section>
+              <hangup-icon  width="16"
+                            height="16"></hangup-icon>
+              Hang up Current Call &amp;amp; Answer
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </q-list>
+
     <q-list class="rounded-contact-activity"
             v-else>
       <q-expansion-item class="contact-activity"
@@ -558,23 +665,6 @@
             <div>
               <div class="d-flex flex-row w-100 align-items-start"
                    :class="[communication.type === CommunicationTypes.REMINDER ? 'text-left' : 'justify-center']">
-                <!--router-link class="pt-3"
-                             :class="[communication.type === CommunicationTypes.REMINDER ? 'w-100' : 'w-50']"
-                             :to="{ name: 'Calendar', query: { communicationId: communication.id, view: 'month' }}">
-                  <q-btn class="border"
-                         no-caps
-                         outlined
-                         unelevated
-                         size="md">
-                    <div class="h-100 d-flex flex-row align-items-center mx-1 text-black font-weight-light-bold px-1">
-                      <calendar-icon height="14"
-                                     width="14"
-                                     class="mr-1">
-                      </calendar-icon>
-                      Open in Calendar
-                    </div>
-                  </q-btn>
-                </router-link-->
                 <sms-reminders ref="sms-reminder"
                                v-if="communication.type === CommunicationTypes.APPOINTMENT"
                                class="d-flex flex-row justify-content-center w-100"
@@ -616,7 +706,7 @@
 <script>
 import _ from 'lodash'
 import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
 import ChevronRight from 'components/icons/contact-activity/chevron-right'
@@ -631,6 +721,11 @@ import * as CommunicationDispositionStatus from '../constants/communication-disp
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
+import AcceptCallIcon from 'components/icons/accept-call-icon'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import HangupIcon from 'components/icons/hangup-icon'
 
 export default {
   name: 'communication-info',
@@ -644,6 +739,11 @@ export default {
   ],
 
   components: {
+    HangupIcon,
+    ParkCallIcon,
+    ParkedCallIcon,
+    AcceptCallIcon,
+    CancelCallIcon,
     CalendarIcon,
     ChevronRight,
     CallDispositionSelector,
@@ -757,7 +857,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions', 'dialer']),
 
     hasSMSReminder () {
       if (this.$refs['sms-reminder']) {
@@ -777,6 +877,28 @@ export default {
       }
 
       return this.communication.body
+    },
+    // live calls includes incoming, parked and in-progress calls
+    isLiveCall () {
+      return this.communication.type === CommunicationTypes.CALL && this.communication.direction === CommunicationDirections.INBOUND &&
+        [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(this.communication.current_status2)
+    },
+    isParkedCall () {
+      return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.communication.current_status2)
+    },
+    isConnectedCall () {
+      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2)
+    },
+    isIncomingCall () {
+      return [
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW
+      ].includes(this.communication.current_status2)
     }
   },
 
@@ -912,7 +1034,43 @@ export default {
       } else {
         this.$emit('contactNotDisposed')
       }
-    }
+    },
+
+    onAcceptCall (e) {
+      if (this.dialer.call) {
+        return
+      }
+
+      const data = {
+        communication: {
+          id: this.communication.id,
+          campaign_id: this.communication.campaign_id,
+          contactName: this.contact.name,
+          companyName: this.contact.company_name,
+          contactId: this.contact.id
+        },
+        shouldPark: false,
+        shouldHangup: false
+      }
+      this.$VueEvent.fire('answerCallFishing', data)
+
+      // TODO Show dialer component
+      e.stopImmediatePropagation()
+    },
+    onRejectCall (e) {
+      this.$VueEvent.fire('rejectCall')
+      console.log('hello')
+      e.stopImmediatePropagation()
+    },
+    onHangUpCall (e) {
+      this.$VueEvent.fire('hangupCall')
+      e.stopImmediatePropagation()
+    },
+    onParkedCall (e) {
+      console.log('hello')
+      e.stopImmediatePropagation()
+    },
+    ...mapActions(['setDialerCommunication'])
   },
 
   watch: {

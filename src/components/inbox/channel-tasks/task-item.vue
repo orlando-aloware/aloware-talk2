@@ -68,12 +68,25 @@
         <task-item-time :from-time="communication.created_at" :update-interval="6000"></task-item-time>
       </span>
       <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-           v-else-if="communication.direction === CommunicationDirection.INBOUND && communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
-        <div class="px-2">
-          <cancel-call-icon role="button"/>
+           v-else-if="communication.direction === CommunicationDirection.INBOUND &&
+           communication.type === CommunicationTypes.CALL &&
+           [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(communication.current_status2)">
+        <div class="pl-0">
+          <b-button variant="light"
+                    size="sm"
+                    class="bg-transparent no-border no-box-shadow p-0"
+                    @click="onRejectCall">
+            <cancel-call-icon/>
+          </b-button>
+
         </div>
-        <div class="px-2">
-          <accept-call-icon role="button"/>
+        <div class="pl-1 pr-0">
+          <b-button variant="light"
+                    size="sm"
+                    class="bg-transparent no-border no-box-shadow p-0"
+                    @click="onAcceptCall">
+            <accept-call-icon role="button"/>
+          </b-button>
         </div>
       </div>
     </div>
@@ -233,6 +246,10 @@ export default {
         console.log(err)
       })
     },
+
+    onRejectCall () {},
+    onAcceptCall () {},
+    onHangUpCall () {},
 
     ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel'])
   }

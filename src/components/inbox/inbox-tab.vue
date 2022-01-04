@@ -109,7 +109,7 @@
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
-        <inbox-task-list :contacts="contacts"
+        <inbox-task-list :contacts="contactTasks"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
@@ -158,6 +158,8 @@ import SearchToggle from 'components/search-toggle'
 import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as CommunicationDirections from 'src/constants/communication-direction'
 
 let scrollTimeout
 export default {
@@ -168,7 +170,7 @@ export default {
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
   computed: {
-    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts', 'channelChangedFilterFields', 'selectedFilter']),
+    ...mapState('inbox', ['taskCounts', 'contacts', 'liveContacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts', 'channelChangedFilterFields', 'selectedFilter']),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -188,6 +190,9 @@ export default {
     },
     filterButtonVariant () {
       return 'outlined-light'
+    },
+    contactTasks () {
+      return [...this.liveContacts, ...this.contacts]
     }
   },
 
@@ -284,7 +289,6 @@ export default {
       })
     },
     onItemSelected (contact) {
-      console.log('contact :> ---> ', contact)
       this.setSelectedContact(contact)
       const contactId = _.get(contact, 'id', null)
       if (contactId) {
@@ -360,6 +364,7 @@ export default {
   },
 
   mounted () {
+    this.setLiveContacts([])
     this.setContacts([])
     this.setStatus()
 
@@ -421,27 +426,51 @@ export default {
     this.$VueEvent.listen('new_communication', communication => {
       talk2Api.V2.contacts.get(communication.contact_id).then(response => {
         let contact = response.data
+        let contacts = _.cloneDeep(this.contacts)
+
         // only modify order if new contact task === current task
         if (this.currentTask === contact.task_status) {
-          let foundContact = this.contacts.find(item => item.id === contact.id)
-          // if contact is not in the list, then automatically add it to the top
+          let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+          let isInContacts = this.contacts.find(item => item.id === contact.id)
+          // if communication is live call
+          if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
+            [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+            let liveContacts = _.cloneDeep(this.liveContacts)
 
-          let contacts = [...this.contacts]
-          if (!foundContact) {
-            if (this.contacts.length > this.perPage) {
-              contacts.pop()
+            if (!isInLiveContacts) {
+              liveContacts.push(contact)
             }
-          } else {
-            // get all contacts except the current one
-            contacts = [...this.contacts.filter(item => item.id !== contact.id)]
-          }
 
-          if (this.sorting.order === 'asc') {
-            contacts.push(contact)
-          } else {
-            contacts.unshift(contact)
+            if (isInContacts) {
+              let index = contacts.findIndex(item => item.id === contact.id)
+              console.log(index)
+              contacts.splice(index, 1)
+              this.setContacts(contacts)
+            }
+            this.setLiveContacts(liveContacts)
+          } else if (!isInLiveContacts) {
+            // if contact is not in the list, then automatically add it to the top
+            if (!isInContacts) {
+              if (this.contacts.length > this.perPage) {
+                contacts.pop()
+              }
+            } else {
+              // get all contacts except the current one
+              contacts = _.clone(contacts.filter(item => item.id !== contact.id))
+            }
+
+            if (this.sorting.order === 'asc') {
+              contacts.push(contact)
+            } else {
+              contacts.unshift(contact)
+            }
+            this.setContacts(contacts)
           }
-          this.setContacts(contacts)
         }
       })
     })
@@ -451,9 +480,25 @@ export default {
         return
       }
 
-      this.setContacts(this.pinLiveCalls(_.cloneDeep(this.contacts)))
-
-      this.setContact(communication)
+      // if live call is completed, we need to remove it from live calls
+      if (communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        // check if communication is in live calls
+        let isInLiveContacts = this.liveContacts.find(item => item.id === communication.contact_id)
+        if (isInLiveContacts) {
+          let liveContacts = _.cloneDeep(this.liveContacts)
+          // find index
+          let index = liveContacts.findIndex(item => item.id === communication.contact_id)
+          // remove the contact task from live calls
+          liveContacts.splice(index, 1)
+          // update live contacts
+          this.setLiveContacts(liveContacts)
+          // requery contact task to refresh contact task items
+          this.loadContactTasks()
+        }
+      } else {
+        this.setContacts(this.contacts)
+        this.setContact(communication)
+      }
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
