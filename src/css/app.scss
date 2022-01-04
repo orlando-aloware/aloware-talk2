@@ -9074,6 +9074,10 @@ screen and (max-width: 956px) {
             }
             .form-row:first-child,
             .row:first-child {
+              display: none !important;
+            }
+            .form-row:first-child,
+            .row:first-child {
               > div > div > button {
                 transform: translateX(-8px);
                 margin-top: 0.5rem !important;

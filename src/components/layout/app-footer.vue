@@ -240,7 +240,6 @@ export default {
         this.tab = 'inbox'
       }
 
-      console.trace(this.tab)
       if (this.tab === 'phone') {
         this.$emit('toggleMobilePhone', true)
         return

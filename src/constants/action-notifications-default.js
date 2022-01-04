@@ -10,6 +10,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   sms: {
@@ -23,6 +24,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   call: {
@@ -36,6 +38,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   callVoicemail: {
@@ -49,6 +52,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   voicemail: {
@@ -62,6 +66,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   mention: {
@@ -75,6 +80,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   incomingCall: {
@@ -88,6 +94,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   },
   callFishing: {
@@ -101,6 +108,7 @@ export const DEFAULT_STATE = {
     campaignId: '',
     campaignName: '',
     ringGroupName: '',
+    phoneNumber: '',
     queue: null
   }
 }

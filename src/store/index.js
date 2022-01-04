@@ -92,6 +92,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         sms: {
@@ -104,6 +105,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         call: {
@@ -116,6 +118,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         callVoicemail: {
@@ -128,6 +131,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         voicemail: {
@@ -140,6 +144,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         mention: {
@@ -152,6 +157,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         incomingCall: {
@@ -164,6 +170,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         callFishing: {
@@ -176,6 +183,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         }
       },

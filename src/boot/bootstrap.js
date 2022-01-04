@@ -245,37 +245,55 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   })
 }
 
-Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, attachment = null, type, contactId = null, communicationId = null, campaignId = null, campaignName = null, ringGroupName = null, noDelay = false, dateTime = this.$moment()) {
+Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {
+  let settings = {
+    title: window._.get(notificationData, 'title', null),
+    message: window._.get(notificationData, 'message', null),
+    messageIcon: window._.get(notificationData, 'messageIcon', null),
+    attachment: window._.get(notificationData, 'attachment', null),
+    type: window._.get(notificationData, 'type', null),
+    contactId: window._.get(notificationData, 'contactId', null),
+    communicationId: window._.get(notificationData, 'communicationId', null),
+    campaignId: window._.get(notificationData, 'campaignId', null),
+    campaignName: window._.get(notificationData, 'campaignName', null),
+    ringGroupName: window._.get(notificationData, 'ringGroupName', null),
+    phoneNumber: window._.get(notificationData, 'phoneNumber', null),
+    noDelay: window._.get(notificationData, 'noDelay', false),
+    dateTime: window._.get(notificationData, 'dateTime', this.$moment())
+  }
   // skip if same notification
-  if (type === 'call' && this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
+  if (settings.type === 'call' &&
+    this.$store.state.notifications[settings.type].communicationId === settings.communicationId &&
+    this.$store.state.notifications[settings.type].contactId === settings.contactId) {
     return
   }
 
-  if (!title ||
-    (!['sms', 'incomingCall', 'callFishing'].includes(type) && !message) ||
-    (type === 'sms' && !message && !attachment)) {
+  if (!settings.title ||
+    (!['sms', 'incomingCall', 'callFishing'].includes(settings.type) && !settings.message) ||
+    (settings.type === 'sms' && !settings.message && !settings.attachment)) {
     return
   }
 
   let data = {
-    type: type,
+    type: settings.type,
     data: null
   }
 
   // if call is still on-going and fishing mode active, we queue the notification
-  if (type === 'callFishing' && this.$store.state.notifications[type].communicationId) {
-    let queue = JSON.parse(JSON.stringify(this.$store.state.notifications[type].queue))
-    const found = queue.find(item => item.contactId === contactId)
+  if (settings.type === 'callFishing' && this.$store.state.notifications[settings.type].communicationId) {
+    let queue = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type].queue))
+    const found = queue.find(item => item.contactId === settings.contactId)
     if (found) {
       return
     }
 
     queue.push({
-      communicationId: communicationId,
-      contactId: contactId,
-      campaignId: campaignId,
-      campaignName: campaignName,
-      ringGroupName: ringGroupName
+      communicationId: settings.communicationId,
+      contactId: settings.contactId,
+      campaignId: settings.campaignId,
+      campaignName: settings.campaignName,
+      ringGroupName: settings.ringGroupName,
+      phoneNumber: settings.phoneNumber
     })
 
     data.data = {
@@ -286,29 +304,30 @@ Vue.prototype.$actionNotification = window._.debounce(function (title, message, 
   }
 
   data.data = {
-    title: title,
-    message: message,
-    messageIcon: messageIcon,
-    attachment: attachment,
-    dateTime: dateTime,
-    contactId: contactId,
-    communicationId: communicationId,
-    campaignId: campaignId,
-    campaignName: campaignName,
-    ringGroupName: ringGroupName
+    title: settings.title,
+    message: settings.message,
+    messageIcon: settings.messageIcon,
+    attachment: settings.attachment,
+    dateTime: settings.dateTime,
+    contactId: settings.contactId,
+    communicationId: settings.communicationId,
+    campaignId: settings.campaignId,
+    campaignName: settings.campaignName,
+    ringGroupName: settings.ringGroupName,
+    phoneNumber: settings.phoneNumber
   }
 
-  this.$bvToast.hide(type)
-  if (!document.getElementById(type) || noDelay) {
+  this.$bvToast.hide(settings.type)
+  if (!document.getElementById(settings.type) || settings.noDelay) {
     this.$store.commit('SET_NOTIFICATIONS', data)
-    this.$bvToast.show(type)
+    this.$bvToast.show(settings.type)
     return
   }
 
   let notificationInterval = setInterval(() => {
-    if (!document.getElementById(type)) {
+    if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
-      this.$bvToast.show(type)
+      this.$bvToast.show(settings.type)
       clearInterval(notificationInterval)
     }
   }, 500)

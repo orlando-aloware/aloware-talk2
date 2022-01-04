@@ -258,6 +258,7 @@ export default {
       isPhoneVisible: false,
       metricsDataLoaded: false,
       sharedCookie: null,
+      notificationAudio: new Audio('/notification/audio/default-communication-notification.mp3'),
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -265,11 +266,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
-    ...mapState(['ringGroups']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -507,7 +507,14 @@ export default {
       //  return
       // }
 
-      // this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
+      // let data = {
+      //   title: 'System Updates',
+      //   message: 'Refresh your screen',
+      //   messageIcon: null,
+      //   attachment: null,
+      //   type: 'system'
+      // }
+      // this.$actionNotification(data)
     })
 
     if (this.$q.platform.is.electron) {
@@ -1281,7 +1288,7 @@ export default {
 
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification-icons/' + icon + '.png',
+          icon: 'notification/icons/' + icon + '.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1307,7 +1314,14 @@ export default {
             return
           }
 
-          this.$actionNotification(communication.contact.name, communication.contact.company_name, null, null, 'callFishing', null, null, null, null, null, true)
+          let data = {
+            title: communication.contact.name,
+            message: communication.contact.company_name,
+            type: 'callFishing',
+            noDelay: true
+          }
+          this.$actionNotification(data)
+          this.playAudio()
 
           // let dismiss = this.showFishingModeNotification(communication)
 
@@ -1354,7 +1368,7 @@ export default {
         }
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification-icons/voicemail.png',
+          icon: 'notification/icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1400,7 +1414,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification-icons/contact.png',
+          icon: 'notification/icons/contact.png',
           body: `Name: ${this.$options.filters.fixName(
             this.sanitizeText(contact.name)
           )} Phone number: ${this.$options.filters.fixPhone(
@@ -1452,7 +1466,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification-icons/appointment.png',
+          icon: 'notification/icons/appointment.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1507,7 +1521,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification-icons/reminder.png',
+          icon: 'notification/icons/reminder.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1554,22 +1568,53 @@ export default {
         firstAttachment = _.get(communication.attachments, '0.url', null)
       }
 
+      let data = {}
       switch (type) {
         case 'sms':
-          this.$actionNotification(name, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id, campaignId, null, null)
+          data = {
+            title: name,
+            message: communication.body,
+            attachment: firstAttachment,
+            type: 'sms',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId
+          }
           break
         case 'missed voicemail':
-          this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id, campaignId, null, null)
+          data = {
+            title: name,
+            message: 'Missed Call with Voicemail',
+            messageIcon: 'call-voicemail-icon',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId
+          }
+          this.closeCallNotifications(communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
           contactId = _.get(communication, 'contact_id', null)
           communicationId = _.get(communication, 'mention_subject_id', null)
           message = _.get(communication, 'preview_text', '')
-          this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
+          data = {
+            title: name,
+            message: message,
+            type: 'mention',
+            contactId: contactId,
+            communicationId: communicationId
+          }
           break
         case 'missed call':
-          this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+          data = {
+            title: name,
+            message: 'Missed Call',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id
+          }
+          this.closeCallNotifications(communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
@@ -1583,15 +1628,30 @@ export default {
 
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'rin_group.name', null)
+          const phoneNumber = _.get(communication, 'contact.phone_number', null)
+
+          data = {
+            title: name,
+            message: companyName,
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId,
+            campaignName: campaignName,
+            ringGroupName: ringGroupName,
+            phoneNumber: phoneNumber,
+            noDelay: true
+          }
 
           if (ringGroup && ringGroup.fishing_mode) {
-            this.$actionNotification(name, companyName, null, null, 'callFishing', communication.contact.id, communication.id, campaignId, campaignName, ringGroupName, true)
+            data.type = 'callFishing'
             break
           }
 
-          this.$actionNotification(name, companyName, null, null, 'incomingCall', null, communication.id, campaignId, campaignName, ringGroupName, true)
+          data.type = 'incomingCall'
           break
       }
+
+      this.$actionNotification(data)
 
       // push the notification obj to call notifications list
       // this.notifications.push({
@@ -1599,7 +1659,7 @@ export default {
       //   notification: notification
       // })
 
-      // this.playAudio()
+      this.playAudio()
     },
 
     refreshPage () {
@@ -1671,6 +1731,36 @@ export default {
       // more than 1084 or less than 605 pixels
       if (width > 1084 || width < 605) {
         this.setContactDetailsDrawer(false)
+      }
+    },
+
+    playAudio () {
+      if (!this.enableAudio) {
+        return
+      }
+
+      let promise = this.notificationAudio.play()
+
+      if (promise !== undefined) {
+        promise.catch(err => {
+          // Auto-play was prevented
+          // Show a UI element to let the user manually start playback
+          console.log(err)
+        })
+      }
+    },
+
+    closeCallNotifications (communicationId) {
+      // for incoming call
+      let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
+      if (notificationCommId === communicationId) {
+        this.$closeActionNotification('incomingCall')
+      }
+
+      // for call fishing
+      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
+      if (notificationCommId === communicationId) {
+        this.$closeActionNotification('callFishing')
       }
     },
 
