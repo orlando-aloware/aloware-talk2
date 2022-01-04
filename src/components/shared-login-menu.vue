@@ -1,5 +1,6 @@
 <template>
-  <div class="bridge-menu-wrapper">
+  <div v-if="profile.company.talk_enabled"
+       class="bridge-menu-wrapper">
     <q-btn v-if="isAdmin"
            outline
            class="q-btn-standard"
@@ -13,7 +14,6 @@
       class="q-shared-login-menu-dropdown "
       color="primary"
       padding="0px 10px"
-      :menu-offset="[0, 1]"
       @click="onGoToClassic"
     >
 
@@ -84,8 +84,13 @@ export default {
     },
     updateDefaultLogin () {
       talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.user.default_app }).then(response => {
-        this.user = response.data
-        this.setProfile(response.data)
+        let message = this.user.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC ? 'Classic' : 'Talk'
+        let user = _.cloneDeep(this.user)
+        this.setProfile(user)
+
+        this.$generalNotification('Default application login has been set to Aloware ' + message + '.')
+      }).catch((err) => {
+        this.$handleErrors(err.response)
       })
     },
     onInput () {
