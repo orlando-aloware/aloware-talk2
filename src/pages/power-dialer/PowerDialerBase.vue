@@ -36,8 +36,11 @@ export default {
     }
   },
   async mounted () {
+    this.resetSearch()
     if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
       await this.getMyQueueList()
+    } else {
+      await this.loadList(this.id)
     }
   },
   data () {
@@ -50,7 +53,8 @@ export default {
       'listLoaded',
       'contactsLoaded',
       'setCurrentListFilters',
-      'setSelectedList'
+      'setSelectedList',
+      'resetSearch'
     ]),
     ...mapActions('powerDialer', [
       'getMyQueueList'
@@ -103,6 +107,7 @@ export default {
   },
   watch: {
     'id': async function (id) {
+      this.resetSearch()
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
       }

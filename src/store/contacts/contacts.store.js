@@ -203,6 +203,7 @@ export default function () {
     },
     search: '',
     searchedPdItem: '',
+    showMenu: false,
     showContactsHeader: true,
     showContactsListSidebar: false
   }

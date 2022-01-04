@@ -152,8 +152,7 @@
 </template>
 
 <script>
-
-import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import ContactMenu from './contact-menu.vue'
@@ -242,9 +241,6 @@ export default {
       'createListOpen',
       'createPdListOpen'
     ]),
-    ...mapMutations('powerDialer', [
-      'TOGGLE_CREATE_FROM_EXISTING_LIST'
-    ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
     },
@@ -254,7 +250,7 @@ export default {
       })
     },
     onCreateFromExistingList () {
-      this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
+      // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.$root.$emit('bv::hide::popover')
       this.createPdListOpen({
         id: '',
