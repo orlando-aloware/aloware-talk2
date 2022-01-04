@@ -18,8 +18,7 @@
                     v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container class="page-container h-100"
-                            :class="{ 'pt-58': $route.name.includes('Contacts') }">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading">
                 <transition :name="transitionName"
@@ -276,6 +275,12 @@ export default {
     pageClass () {
       let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
       return pageSlug.replace(/ /g, '_') + '-page'
+    },
+    pageContainerClasses () {
+      return {
+        'page-container h-100': true,
+        'pt-58': ['Contacts', 'Settings', 'Settings Tab'].includes(this.$route.name)
+      }
     }
   },
 

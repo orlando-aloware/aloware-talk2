@@ -412,7 +412,7 @@ export default {
     },
 
     makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
-      console.log('makeCall: ', currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
+      console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)

@@ -238,25 +238,25 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setNotifications', 'setNotificatioNQueue', 'setShowPhone']),
+    ...mapActions(['setNotifications', 'setNotificationQueue', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
-      // if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
-      //   this.onHidden()
-      //   this.$closeActionNotification(this.id)
-      //   return
-      // }
-      //
-      // if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
-      //   this.onHidden()
-      //   this.$closeActionNotification(this.id)
-      //   return
-      // }
-      //
-      // if (!this.title) {
-      //   this.onHidden()
-      //   this.$closeActionNotification(this.id)
-      // }
+      if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
+
+      if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
+
+      if (!this.title) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+      }
     },
     runDateTimeInterval () {
       if (this.dateTime) {
