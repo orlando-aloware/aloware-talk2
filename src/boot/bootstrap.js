@@ -296,9 +296,8 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       phoneNumber: settings.phoneNumber
     })
 
-    data.data = {
-      queue: queue
-    }
+    data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
+    data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
     return
   }

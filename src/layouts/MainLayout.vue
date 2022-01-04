@@ -233,7 +233,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       isWidget: false,
-      enableAudio: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -257,7 +256,6 @@ export default {
       isPhoneVisible: false,
       metricsDataLoaded: false,
       sharedCookie: null,
-      notificationAudio: new Audio('/notification/audio/default-communication-notification.mp3'),
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -596,7 +594,7 @@ export default {
       window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
       window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
     } else {
-      this.enableAudio = true
+      this.setEnableAudio(true)
     }
 
     if (this.$q.platform.is.electron) {
@@ -621,8 +619,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
-    ...mapActions(['resetVuex', 'setUsage']),
     async validateCookieUser () {
       if (this.sharedCookie) {
         const response = await this.getCookieUser()
@@ -734,7 +730,7 @@ export default {
         'touchstart',
         this.removeBehaviorsRestrictions()
       )
-      this.enableAudio = true
+      this.setEnableAudio(true)
     },
 
     mediaPlaybackRequiresUserGesture () {
@@ -1293,7 +1289,7 @@ export default {
 
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification/icons/' + icon + '.png',
+          icon: 'notification-icons/' + icon + '.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1320,13 +1316,18 @@ export default {
           }
 
           let data = {
-            title: communication.contact.name,
+            title: communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number),
             message: communication.contact.company_name,
-            type: 'callFishing',
-            noDelay: true
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: communication.campaign_id,
+            campaignName: lineName,
+            ringGroupName: _.get(communication, 'rin_group.name', null),
+            phoneNumber: _.get(communication, 'contact.phone_number', null),
+            noDelay: true,
+            type: 'callFishing'
           }
           this.$actionNotification(data)
-          this.playAudio()
 
           // let dismiss = this.showFishingModeNotification(communication)
 
@@ -1373,7 +1374,7 @@ export default {
         }
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification/icons/voicemail.png',
+          icon: 'notification-icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1419,7 +1420,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification/icons/contact.png',
+          icon: 'notification-icons/contact.png',
           body: `Name: ${this.$options.filters.fixName(
             this.sanitizeText(contact.name)
           )} Phone number: ${this.$options.filters.fixPhone(
@@ -1471,7 +1472,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification/icons/appointment.png',
+          icon: 'notification-icons/appointment.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1526,7 +1527,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification/icons/reminder.png',
+          icon: 'notification-icons/reminder.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1627,12 +1628,12 @@ export default {
             break
           }
 
-          if (this.dialer && this.dialer.communication && ringGroup && !ringGroup.fishing_mode) {
+          if (this.dialer && this.dialer.call && ringGroup && !ringGroup.fishing_mode) {
             break
           }
 
           const campaignName = _.get(communication, 'campaign.name', null)
-          const ringGroupName = _.get(communication, 'rin_group.name', null)
+          const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
 
           data = {
@@ -1663,8 +1664,6 @@ export default {
       //   communication_id: communication.id,
       //   notification: notification
       // })
-
-      this.playAudio()
     },
 
     refreshPage () {
@@ -1739,22 +1738,6 @@ export default {
       }
     },
 
-    playAudio () {
-      if (!this.enableAudio) {
-        return
-      }
-
-      let promise = this.notificationAudio.play()
-
-      if (promise !== undefined) {
-        promise.catch(err => {
-          // Auto-play was prevented
-          // Show a UI element to let the user manually start playback
-          console.log(err)
-        })
-      }
-    },
-
     closeCallNotifications (communicationId) {
       // for incoming call
       let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
@@ -1778,6 +1761,8 @@ export default {
     },
 
     ...mapActions([
+      'resetVuex',
+      'setUsage',
       'setCurrentCompany',
       'setCampaigns',
       'setRingGroups',
@@ -1801,13 +1786,16 @@ export default {
       'setTags',
       'setIsMobile',
       'setIsTabletOrMobile',
-      'setContactDetailsDrawer'
+      'setContactDetailsDrawer',
+      'setEnableAudio'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      getCookieUser: 'getCookieUser',
+      getSharedCookie: 'getSharedCookie'
     }),
     ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },

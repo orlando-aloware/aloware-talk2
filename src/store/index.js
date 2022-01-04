@@ -205,7 +205,8 @@ export default function (/* { ssrContext } */) {
       isMobile: false,
       isTabletOrMobile: false,
       contactDetailsDrawer: false,
-      showPhone: false
+      showPhone: false,
+      enableAudio: false
     },
 
     getters: {
@@ -537,6 +538,10 @@ export default function (/* { ssrContext } */) {
 
       setShowPhone ({ commit }, value) {
         commit('SET_SHOW_PHONE', value)
+      },
+
+      setEnableAudio ({ commit }, value) {
+        commit('SET_ENABLE_AUDIO', value)
       }
     },
 
@@ -1033,6 +1038,11 @@ export default function (/* { ssrContext } */) {
       SET_SHOW_PHONE (state, value) {
         state.showPhone = value
       },
+
+      SET_ENABLE_AUDIO (state, value) {
+        state.enableAudio = value
+      },
+
       updateField
     },
 
