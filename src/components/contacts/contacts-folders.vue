@@ -4,7 +4,7 @@
     expand-icon-toggle
     label="My Lists"
     icon="perm_identity"
-    :class="`contact-sidebar-list-wrapper ${isContactModuleType ? '' : 'hide-toggle'}`"
+    :class="`contact-sidebar-list-wrapper my-lists ${isContactModuleType ? '' : 'hide-toggle'}`"
   >
     <template v-slot:header>
       <q-item-section>
@@ -14,7 +14,8 @@
             <span v-else class="px-3">Power Dialer Lists</span>
             <button
               class="btn btn-link btn-sm tooltip-target mr-1"
-              :id="folderId">
+              :id="folderId"
+              :ref="folderId">
               <plus-icon
                 color="#256EFF"
                 width="14"
@@ -25,11 +26,12 @@
             </button>
 
             <b-popover
-              :target="folderId"
               triggers="click blur"
               placement="bottomright"
               boundary="window"
-              custom-class="contact-popover">
+              custom-class="contact-popover"
+              :target="folderId"
+              v-if="$refs[folderId] !== undefined">
               <contact-menu>
                 <contact-menu-item @click="onCreateFolderToggle">
                   <template slot="icon">
@@ -150,8 +152,7 @@
 </template>
 
 <script>
-
-import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import ContactMenu from './contact-menu.vue'
@@ -240,9 +241,6 @@ export default {
       'createListOpen',
       'createPdListOpen'
     ]),
-    ...mapMutations('powerDialer', [
-      'TOGGLE_CREATE_FROM_EXISTING_LIST'
-    ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
     },
@@ -252,7 +250,7 @@ export default {
       })
     },
     onCreateFromExistingList () {
-      this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
+      // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.$root.$emit('bv::hide::popover')
       this.createPdListOpen({
         id: '',

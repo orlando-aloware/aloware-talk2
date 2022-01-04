@@ -1,22 +1,35 @@
 <template>
   <div class="h-100"
        v-if="authenticated">
-    <div class="call-active">
-    </div>
+    <!--div class="call-active">
+    </div-->
     <div class="d-flex w-100 h-100 animate__animated animate__fadeIn position-relative">
-      <settings-side></settings-side>
-      <div class="d-flex flex-grow-1 overflow-y-scroll settings-content-wrapper" v-if="user">
+      <settings-side class="settings-side__left"
+                     :class="{ 'settings-side__left--closed': isSettingsOpened }">
+      </settings-side>
+      <div class="d-flex flex-grow-1 overflow-y-scroll settings-content-wrapper settings-side__right"
+           :class="{ 'settings-side__right--opened': isSettingsOpened }"
+           v-if="user">
         <b-row>
           <b-col md="12" class="settings-form-wrapper">
-            <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'"></general-information>
-            <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading"></profile>
-            <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading"></notification-settings>
-            <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading"></personalization>
-            <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"></visibility>
-            <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading"></inbound-call>
-            <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading"></outbound-call>
-            <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading"></diagnosis>
-            <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading"></sms-templates>
+            <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'">
+            </general-information>
+            <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading">
+            </profile>
+            <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading">
+            </notification-settings>
+            <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading">
+            </personalization>
+            <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading">
+            </visibility>
+            <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading">
+            </inbound-call>
+            <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading">
+            </outbound-call>
+            <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading">
+            </diagnosis>
+            <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading">
+            </sms-templates>
             <settings-save-bar  :user="user"></settings-save-bar>
           </b-col>
         </b-row>
@@ -49,12 +62,27 @@ export default {
 
   mixins: [aclMixin, settingsMixin],
 
-  components: { SettingsSaveBar, SmsTemplates, Diagnosis, OutboundCall, InboundCall, Visibility, Personalization, NotificationSettings, Profile, GeneralInformation, SettingsSide },
+  components: {
+    SettingsSaveBar,
+    SmsTemplates,
+    Diagnosis,
+    OutboundCall,
+    InboundCall,
+    Visibility,
+    Personalization,
+    NotificationSettings,
+    Profile,
+    GeneralInformation,
+    SettingsSide
+  },
 
   computed: {
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('settings', ['user', 'userClone']),
-    ...mapGetters('settings', ['changedUserProperties'])
+    ...mapGetters('settings', ['changedUserProperties']),
+    isSettingsOpened () {
+      return !this.$q.screen.lt.md || this.onLoadShowSettings
+    }
   },
 
   data () {
@@ -73,7 +101,8 @@ export default {
         domain: null,
         whitelabel: false,
         path: null
-      }
+      },
+      onLoadShowSettings: false
     }
   },
 
@@ -224,6 +253,12 @@ export default {
         name: prop,
         value: value
       })
+    },
+    back () {
+      this.$router.push({
+        name: 'Settings'
+      })
+      this.onLoadShowSettings = false
     }
   },
 
@@ -238,22 +273,26 @@ export default {
       this.$router.push(`/settings`)
     }
 
+    if (this.$route.name !== 'Settings' && this.$route.name.toLowerCase().includes('settings')) {
+      this.onLoadShowSettings = true
+    }
+
     this.getStatics()
     this.setItems([
       {
-        label: 'General Information',
+        label: 'General',
         value: 'general-information',
         icon: 'document',
         disabled: false
       },
       {
-        label: 'Profile Settings',
+        label: 'Profile',
         value: 'profile',
         icon: 'person',
         disabled: false
       },
       {
-        label: 'Visibility Settings',
+        label: 'Visibility',
         value: 'visibility',
         icon: 'eye',
         height: 16,
@@ -267,7 +306,7 @@ export default {
         disabled: false
       },
       {
-        label: 'Inbound Call Settings',
+        label: 'Inbound Call',
         value: 'inbound-call',
         icon: 'inbound',
         height: 14,
@@ -275,13 +314,13 @@ export default {
         disabled: false
       },
       {
-        label: 'Outbound Call Settings',
+        label: 'Outbound Call',
         value: 'outbound-call',
         icon: 'outbound',
         disabled: false
       },
       {
-        label: 'Notification Settings',
+        label: 'Notification',
         value: 'notification',
         icon: 'notification',
         disabled: false
@@ -299,6 +338,19 @@ export default {
         disabled: false
       }
     ])
+  },
+
+  watch: {
+    $route (to, from) {
+      if (to.name === 'Settings') {
+        this.onLoadShowSettings = false
+        return
+      }
+
+      if (to.name !== 'Settings' && to.name.toLowerCase().includes('settings')) {
+        this.onLoadShowSettings = true
+      }
+    }
   }
 }
 </script>

@@ -86,20 +86,29 @@ const routes = [
         children: [
           {
             name: 'Contacts',
-            path: '',
-            meta: { title: 'Contacts' },
-            component: () => import('src/pages/contacts/ContactsViewAll.vue')
+            path: '/contacts',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts'
+            },
+            component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
             name: 'Contacts',
             path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
-            meta: { title: 'Contacts' },
-            component: () => import('src/pages/contacts/ContactsViewAll.vue')
+            meta: {
+              title: 'Contacts',
+              page: 'Default Contacts List'
+            },
+            component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
             name: 'Contacts',
             path: 'list/:id(\\d+)+',
-            meta: { title: 'Contacts' },
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List'
+            },
             component: () => import('src/pages/contacts/ContactsViewList.vue')
           },
           {
@@ -107,7 +116,8 @@ const routes = [
             path: 'list/public/:id(\\d+)+',
             component: () => import('src/pages/contacts/ContactsViewList.vue'),
             meta: {
-              title: 'Contacts'
+              title: 'Contacts',
+              page: 'Public Contacts List'
             }
           },
           {
@@ -255,6 +265,11 @@ const routes = [
         path: 'communication/:communicationId',
         name: 'Communication',
         component: () => import('pages/Account.vue')
+      },
+      {
+        path: 'phone',
+        name: 'Phone',
+        component: () => import('pages/Phone.vue')
       }
     ]
   },

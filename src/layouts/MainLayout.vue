@@ -15,10 +15,10 @@
         <div class="h-100"
              :class="[ sidebarVisible ? 'sidebar-active' : '']">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading">
+                    v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container class="page-container h-100">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading">
                 <transition :name="transitionName"
@@ -56,7 +56,8 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated"></dialer>
+            <dialer v-if="authenticated">
+            </dialer>
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
@@ -79,20 +80,32 @@
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
-          :breakpoint="605"
+          :breakpoint="789"
           v-model="mobilePhoneDrawer"
+          v-if="isMobile && mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
-          <div class="phone-header"
-               v-show="!isPhoneVisible">Phone</div>
-          <phone @onPhoneVisible="onPhoneVisible"></phone>
-          <dialer-form v-if="mobilePhoneDrawer"
+          <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
+                    v-show="!isPhoneVisible">
+            <app-header force-page-title="Phone"
+                        :no-padding="true"
+                        :title-only="true"/>
+          </q-header>
+          <phone :isMobile="isMobile"
+                 v-if="mobilePhoneDrawer"
+                 @onPhoneVisible="onPhoneVisible">
+          </phone>
+          <dialer-form ref="dialerForm"
+                       class="dialerForm"
+                       :isMobile="true"
+                       v-model="mobilePhoneDrawer"
+                       v-if="mobilePhoneDrawer"
                        v-show="!isPhoneVisible"
-                       :isMobile="true">
+                       @hide="onDialerFormHide">
           </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading"
+                    v-if="authenticated && !isWidget && !loading && isMobile"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -184,6 +197,7 @@ import * as AgentStatus from 'src/constants/agent-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import _ from 'lodash'
@@ -242,26 +256,39 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
+      sharedCookie: null,
+      notificationAudio: new Audio('/notification/audio/default-communication-notification.mp3'),
       CommunicationTypes,
-      MetricOptionGroups
+      MetricOptionGroups,
+      AppDefaultLogin
     }
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
-    ...mapState(['ringGroups']),
+    ...mapState('contacts', ['showContactsHeader']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
     pageClass () {
       let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
       return pageSlug.replace(/ /g, '_') + '-page'
+    },
+    pageContainerClasses () {
+      return {
+        'page-container h-100': true,
+        'pt-58': ['Contacts', 'Settings', 'Settings Tab'].includes(this.$route.name)
+      }
     }
   },
 
   created () {
+    if (!this.isMobile && this.$route.name === 'Phone') {
+      this.$router.replace({ path: '/' })
+    }
+
     this.resetCall()
     this.resetNotifications()
 
@@ -485,7 +512,14 @@ export default {
       //  return
       // }
 
-      // this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
+      // let data = {
+      //   title: 'System Updates',
+      //   message: 'Refresh your screen',
+      //   messageIcon: null,
+      //   attachment: null,
+      //   type: 'system'
+      // }
+      // this.$actionNotification(data)
     })
 
     if (this.$q.platform.is.electron) {
@@ -530,9 +564,22 @@ export default {
         this.authCheckStatus = false
       })
     }
+    window.addEventListener('resize', this.resizeHandler)
+
+    if (!this.isMobile) {
+      this.setShowContactsHeader(true)
+    }
   },
 
   mounted () {
+    this.getSharedCookie().then(sharedCookie => {
+      this.sharedCookie = sharedCookie
+
+      if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+        this.validateCookieUser()
+      }
+    })
+
     if (this.authenticated) {
       this.sidebarVisible = true
     }
@@ -562,6 +609,8 @@ export default {
       }
     }
 
+    this.resizeHandler()
+
     // event for listening before tab/browser close
 
     window.addEventListener('beforeunload', this.beforeUnload)
@@ -572,9 +621,42 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
+    ...mapActions(['resetVuex', 'setUsage']),
+    async validateCookieUser () {
+      if (this.sharedCookie) {
+        const response = await this.getCookieUser()
+        await this.cookieUserValidated(response)
+      }
+    },
+    async cookieUserValidated ({ data: { data } }) {
+      const { usage, company } = data
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+
+      localStorage.setItem('shared_cookie', this.sharedCookie)
+      localStorage.setItem('company_id', company.id)
+
+      const redirectPath = this.$route.query.redirect || '/'
+
+      await this.$router.push(String(redirectPath))
+      await this.redirectTimeout()
+    },
+
+    onDialerFormHide () {
+      // if (typeof this.$refs.appFooter !== 'undefined') {
+      //   this.$refs.appFooter.toggleContacts()
+      // }
+    },
+
     onPhoneVisible (value) {
       this.isPhoneVisible = value
+      if (typeof this.$refs.dialerForm !== 'undefined') {
+        this.$refs.dialerForm.hideDialer()
+      }
     },
+
     toggleMobilePhone (value) {
       this.mobilePhoneDrawer = value
     },
@@ -1211,7 +1293,7 @@ export default {
 
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification-icons/' + icon + '.png',
+          icon: 'notification/icons/' + icon + '.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1237,7 +1319,14 @@ export default {
             return
           }
 
-          this.$actionNotification(communication.contact.name, communication.contact.company_name, null, null, 'callFishing', null, null, null, null, null, true)
+          let data = {
+            title: communication.contact.name,
+            message: communication.contact.company_name,
+            type: 'callFishing',
+            noDelay: true
+          }
+          this.$actionNotification(data)
+          this.playAudio()
 
           // let dismiss = this.showFishingModeNotification(communication)
 
@@ -1284,7 +1373,7 @@ export default {
         }
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification-icons/voicemail.png',
+          icon: 'notification/icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1330,7 +1419,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification-icons/contact.png',
+          icon: 'notification/icons/contact.png',
           body: `Name: ${this.$options.filters.fixName(
             this.sanitizeText(contact.name)
           )} Phone number: ${this.$options.filters.fixPhone(
@@ -1382,7 +1471,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification-icons/appointment.png',
+          icon: 'notification/icons/appointment.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1437,7 +1526,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification-icons/reminder.png',
+          icon: 'notification/icons/reminder.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1484,22 +1573,53 @@ export default {
         firstAttachment = _.get(communication.attachments, '0.url', null)
       }
 
+      let data = {}
       switch (type) {
         case 'sms':
-          this.$actionNotification(name, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id, campaignId, null, null)
+          data = {
+            title: name,
+            message: communication.body,
+            attachment: firstAttachment,
+            type: 'sms',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId
+          }
           break
         case 'missed voicemail':
-          this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id, campaignId, null, null)
+          data = {
+            title: name,
+            message: 'Missed Call with Voicemail',
+            messageIcon: 'call-voicemail-icon',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId
+          }
+          this.closeCallNotifications(communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
           contactId = _.get(communication, 'contact_id', null)
           communicationId = _.get(communication, 'mention_subject_id', null)
           message = _.get(communication, 'preview_text', '')
-          this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
+          data = {
+            title: name,
+            message: message,
+            type: 'mention',
+            contactId: contactId,
+            communicationId: communicationId
+          }
           break
         case 'missed call':
-          this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+          data = {
+            title: name,
+            message: 'Missed Call',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id
+          }
+          this.closeCallNotifications(communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
@@ -1513,15 +1633,30 @@ export default {
 
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'rin_group.name', null)
+          const phoneNumber = _.get(communication, 'contact.phone_number', null)
+
+          data = {
+            title: name,
+            message: companyName,
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId,
+            campaignName: campaignName,
+            ringGroupName: ringGroupName,
+            phoneNumber: phoneNumber,
+            noDelay: true
+          }
 
           if (ringGroup && ringGroup.fishing_mode) {
-            this.$actionNotification(name, companyName, null, null, 'callFishing', communication.contact.id, communication.id, campaignId, campaignName, ringGroupName, true)
+            data.type = 'callFishing'
             break
           }
 
-          this.$actionNotification(name, companyName, null, null, 'incomingCall', null, communication.id, campaignId, campaignName, ringGroupName, true)
+          data.type = 'incomingCall'
           break
       }
+
+      this.$actionNotification(data)
 
       // push the notification obj to call notifications list
       // this.notifications.push({
@@ -1529,7 +1664,7 @@ export default {
       //   notification: notification
       // })
 
-      // this.playAudio()
+      this.playAudio()
     },
 
     refreshPage () {
@@ -1579,11 +1714,67 @@ export default {
       return null
     },
 
+    resizeHandler () {
+      const width = document.documentElement.clientWidth
+      // less than 991 pixels, screen width is tablet or mobile
+      if (width <= 991) {
+        this.setIsTabletOrMobile(true)
+      }
+      // greater than 991 pixels, screen width is not tablet or mobile
+      if (width > 991) {
+        this.setIsTabletOrMobile(false)
+      }
+      // less than 785 pixels, screen width is mobile
+      if (width < 785) {
+        this.setIsMobile(true)
+      }
+      // greater than or equal to 785 pixels, screen width is not mobile
+      if (width >= 785) {
+        this.setIsMobile(false)
+      }
+      // close contact details drawer when screen width reaches
+      // more than 1084 or less than 605 pixels
+      if (width > 1084 || width < 605) {
+        this.setContactDetailsDrawer(false)
+      }
+    },
+
+    playAudio () {
+      if (!this.enableAudio) {
+        return
+      }
+
+      let promise = this.notificationAudio.play()
+
+      if (promise !== undefined) {
+        promise.catch(err => {
+          // Auto-play was prevented
+          // Show a UI element to let the user manually start playback
+          console.log(err)
+        })
+      }
+    },
+
+    closeCallNotifications (communicationId) {
+      // for incoming call
+      let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
+      if (notificationCommId === communicationId) {
+        this.$closeActionNotification('incomingCall')
+      }
+
+      // for call fishing
+      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
+      if (notificationCommId === communicationId) {
+        this.$closeActionNotification('callFishing')
+      }
+    },
+
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
+      window.removeEventListener('resize', this.resizeHandler)
     },
 
     ...mapActions([
@@ -1607,9 +1798,12 @@ export default {
       'setFilters',
       'setTagsFullyLoaded',
       'resetNotifications',
-      'setTags'
+      'setTags',
+      'setIsMobile',
+      'setIsTabletOrMobile',
+      'setContactDetailsDrawer'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
+    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
@@ -1665,6 +1859,20 @@ export default {
         this.getMetricGroups()
         this.metricsDataLoaded = true
       }
+
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
+      }
+
+      const fromName = _.get(from, 'name', null)
+      if (!this.isMobile && to.name === 'Phone' && !fromName) {
+        this.$router.replace({ path: '/' })
+        return
+      }
+
+      if (!this.isMobile && to.name === 'Phone' && fromName) {
+        this.$router.back()
+      }
     },
 
     authenticated (newVal, oldVal) {
@@ -1678,6 +1886,12 @@ export default {
 
       if (this.authenticated) {
         this.sidebarVisible = true
+      }
+    },
+
+    isMobile () {
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
       }
     }
   }

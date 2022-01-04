@@ -1,6 +1,6 @@
 <template>
   <div class="composer-container">
-    <div class="composer-wrapper p-2"
+    <div class="composer-wrapper"
          :class="[messageComposer.mode === 'note' ? 'bg-blue-70' : '']">
       <div class="tab-links d-inline-flex">
         <b-link href="#"
@@ -30,12 +30,12 @@
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1">
-      <div class="w-40 d-inline-flex">
+      <div class="phone-lines-left d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
         <contact-phone-number-selector @setSelectedPhone="setSelectedPhone"></contact-phone-number-selector>
       </div>
 
-      <div class="w-35">
+      <div class="phone-lines-right">
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
           <line-selector @change="onLineChange"></line-selector>
@@ -92,6 +92,7 @@ export default {
   },
 
   mounted () {
+    this.setMode('sms')
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
     if (!this.templates || this.templates.length < 1) {
       this.getSmsTemplates()

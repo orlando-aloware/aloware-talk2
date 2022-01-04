@@ -6,6 +6,7 @@ import * as ContactsDefault from '../constants/contacts-default'
 import * as InboxDefault from '../constants/inbox-default'
 import * as ActionNotificationsDefault from '../constants/action-notifications-default'
 import createPersistedState from 'vuex-persistedstate'
+import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
@@ -35,6 +36,7 @@ export default function (/* { ssrContext } */) {
       settings
     },
     state: {
+      showMenu: false,
       filter: {},
       tags: [],
       campaigns: [],
@@ -92,6 +94,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         sms: {
@@ -104,6 +107,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         call: {
@@ -116,6 +120,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         callVoicemail: {
@@ -128,6 +133,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         voicemail: {
@@ -140,6 +146,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         mention: {
@@ -152,6 +159,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         incomingCall: {
@@ -164,6 +172,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         callFishing: {
@@ -176,6 +185,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         }
       },
@@ -191,12 +201,17 @@ export default function (/* { ssrContext } */) {
         crumbs: '',
         name: ''
       },
-      dialerFormStatus: false
+      dialerFormStatus: false,
+      isMobile: false,
+      isTabletOrMobile: false,
+      contactDetailsDrawer: false,
+      showPhone: false
     },
 
     getters: {
       notifications: (state) => state.notifications,
-      breadcrumbs: (state) => state.breadcrumbs
+      breadcrumbs: (state) => state.breadcrumbs,
+      getField
     },
 
     actions: {
@@ -506,6 +521,22 @@ export default function (/* { ssrContext } */) {
 
       setDialerCallFishing ({ commit }, payload) {
         commit('SET_DIALER_CALL_FISHING', payload)
+      },
+
+      setIsMobile ({ commit }, value) {
+        commit('SET_IS_MOBILE', value)
+      },
+
+      setIsTabletOrMobile ({ commit }, value) {
+        commit('SET_IS_TABLET_OR_MOBILE', value)
+      },
+
+      setContactDetailsDrawer ({ commit }, value) {
+        commit('SET_CONTACT_DETAILS_DRAWER', value)
+      },
+
+      setShowPhone ({ commit }, value) {
+        commit('SET_SHOW_PHONE', value)
       }
     },
 
@@ -986,7 +1017,23 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CALL_FISHING (state, payload) {
         state.dialer.callFishing = payload
-      }
+      },
+      SET_IS_MOBILE (state, value) {
+        state.isMobile = value
+      },
+
+      SET_IS_TABLET_OR_MOBILE (state, value) {
+        state.isTabletOrMobile = value
+      },
+
+      SET_CONTACT_DETAILS_DRAWER (state, value) {
+        state.contactDetailsDrawer = value
+      },
+
+      SET_SHOW_PHONE (state, value) {
+        state.showPhone = value
+      },
+      updateField
     },
 
     plugins: [

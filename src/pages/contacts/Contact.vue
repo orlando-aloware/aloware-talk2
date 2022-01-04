@@ -7,17 +7,19 @@
              v-if="authenticated">
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
       <template v-if="!isInbox">
-        <contact-list-sidebar></contact-list-sidebar>
+        <contact-list-sidebar ref="contactListSidebar"
+                              @toggleContactActivities="toggleContactListSidebar"/>
       </template>
       <div class="contact-activity-wrapper flex-grow-1"
-           :class="{ 'contact-activity--closed': detailsOpen }">
+           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }">
         <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
-                            @toggleDetails="toggleDetails">
+                            @toggleDetails="toggleDetails"
+                            @toggleContactSidebar="toggleContactListSidebar">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -54,7 +56,6 @@
                      customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
                      @clicked="toggleDrawer">
-          <!--i class="fa fa-times"></i-->
           <close-icon width="18px"
                       height="18px"
                       icon-color="white">
@@ -82,7 +83,7 @@ import ContactDetails from 'src/components/contacts/contact-details'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import CompactBtn from 'src/components/compact-btn'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
 
 export default {
@@ -99,6 +100,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
     ...mapGetters('auth', ['authenticated']),
+    ...mapState(['contactDetailsDrawer']),
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     }
@@ -109,12 +111,14 @@ export default {
       title: 'Contact',
       totalContacts: 0,
       drawer: false,
-      detailsOpen: false
+      detailsOpen: false,
+      contactListSidebarOpen: false
     }
   },
 
   methods: {
     ...mapActions('contacts', ['resetChangedContactProperties', 'selectedContactChanging', 'setContact', 'setContactClone']),
+    ...mapActions(['setContactDetailsDrawer']),
     fetchContact () {
       this.selectedContactChanging(true)
       let _this = this
@@ -127,14 +131,15 @@ export default {
     },
     toggleDrawer () {
       this.drawer = !this.drawer
+      this.setContactDetailsDrawer(this.drawer)
     },
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
     },
-    resizeHandler () {
-      const width = document.documentElement.clientWidth
-      if (width > 1084 || width < 606) {
-        this.drawer = false
+    toggleContactListSidebar (isOpen) {
+      this.contactListSidebarOpen = isOpen
+      if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
+        this.$refs.contactListSidebar.onSidebarToggle()
       }
     }
   },
@@ -146,7 +151,6 @@ export default {
   },
 
   created () {
-    window.addEventListener('resize', this.resizeHandler)
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
@@ -164,22 +168,20 @@ export default {
         this.setContact(this.selectedContact)
         this.resetSelectedContact()
       }
-    },
-
-    '$q.screen.lt.md': function () {
-      if (this.$q.screen.lt.md) {
-        this.drawer = false
-      }
+      this.contactListSidebarOpen = false
     },
 
     '$route.params.communicationId': function (value) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
+    },
+
+    contactDetailsDrawer () {
+      if (!this.contactDetailsDrawer) {
+        this.drawer = false
+      }
     }
-  },
-  beforeDestroy () {
-    window.removeEventListener('resize', this.resizeHandler)
   }
 }
 </script>

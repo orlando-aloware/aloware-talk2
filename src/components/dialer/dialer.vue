@@ -660,7 +660,7 @@ export default {
       }).finally(_ => {
         if (isFishingMode) {
           let data = {
-            currentNumber: 'call:' + communication.id,
+            currentNumber: 'call:' + communication.phoneNumber,
             outboundCampaignId: communication.campaign_id
           }
           this.$VueEvent.fire('makeCall', data)
@@ -1014,13 +1014,13 @@ export default {
         this.hangupCall()
 
         setTimeout(() => {
-          this.makeCall('call:' + communication.id, communication.campaign_id, communication.contactName, communication.companyName, communication.contactId)
+          this.makeCall('call:' + communication.phoneNumber, communication.campaign_id, communication.contactName, communication.companyName, communication.contactId)
         }, 1000)
         return
       }
 
       let data = {
-        currentNumber: 'call:' + communication.id,
+        currentNumber: 'call:' + communication.phoneNumber,
         outboundCampaignId: communication.campaign_id
       }
       this.$VueEvent.fire('makeCall', data)

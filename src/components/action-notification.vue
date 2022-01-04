@@ -53,7 +53,7 @@
                 <div class="campaign-wrapper col-5">
                   <div class="campaign-name">{{ campaignName }}</div>
                 </div>
-                <div class="flex-grow-1 col-1">></div>
+                <div class="flex-grow-1">></div>
                 <div class="ring-group-wrapper col-5">
                   <div class="ring-group-name">{{ ringGroupName }}</div>
                 </div>
@@ -74,12 +74,12 @@
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
              v-if="id === 'incomingCall' || (id === 'callFishing' && this.dialer && !this.dialer.communication)">
-          <q-btn class="height-32"
+          <q-btn class="height-32 mr-2"
                  ripple
                  round
                  no-caps
                  @click="rejectCall">
-            <cancel-call-icon width="32" height="32" class="mr-2"/>
+            <cancel-call-icon width="32" height="32"/>
           </q-btn>
           <q-btn class="height-32"
                  ripple
@@ -238,6 +238,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['setNotifications', 'setNotificationQueue', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
@@ -289,6 +290,7 @@ export default {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: this.notifications[this.id].queue
         }
       })
@@ -314,6 +316,7 @@ export default {
       }
 
       this.$VueEvent.fire('answerCall')
+      this.setShowPhone(true)
     },
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
@@ -332,6 +335,7 @@ export default {
       }
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
+      this.setShowPhone(true)
     },
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
@@ -347,8 +351,7 @@ export default {
       if (!found && this.id === 'system') {
         window.location.reload()
       }
-    },
-    ...mapActions(['setNotifications', 'setNotificatioNQueue'])
+    }
   }
 }
 </script>

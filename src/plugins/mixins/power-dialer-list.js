@@ -3,7 +3,12 @@ import { isEmpty } from 'lodash'
 export default {
   computed: {
     fetchedNameList () {
-      return `Untitled ${this.nameCounter + 1}`
+      let text = ''
+      let chars = 'abcdefghijklmnopqrstuvwxyz1234567890'
+      for (let i = 0; i < 4; i++) {
+        text += chars.charAt(Math.floor(Math.random() * chars.length))
+      }
+      return `Untitled ${text.toUpperCase()}`
     },
     nameCounter () {
       let ctr = this.fetchList(this.folders[0], 0)

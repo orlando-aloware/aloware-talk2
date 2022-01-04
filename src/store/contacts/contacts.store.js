@@ -202,6 +202,9 @@ export default function () {
       template: null
     },
     search: '',
-    searchedPdItem: ''
+    searchedPdItem: '',
+    showMenu: false,
+    showContactsHeader: true,
+    showContactsListSidebar: false
   }
 }

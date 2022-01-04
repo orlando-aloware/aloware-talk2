@@ -1,13 +1,15 @@
 <template>
 <b-container class="mb-4">
-  <b-row>
+  <b-row class="row-no-padding">
     <b-col sm="12" md="12">
       <div class="d-inline-flex">
+        <slot name="header">
+        </slot>
         <h1 class="mt-2"> Diagnosis </h1>
       </div>
     </b-col>
   </b-row>
-  <b-row class="mb-2 mt-4">
+  <b-row class="mb-2 mt-4 row-no-padding">
     <b-col sm="12" md="12" class="text-center mb-2">
       <b-button variant="success"
                 size="sm"
@@ -21,7 +23,8 @@
       <i class="fa fa-phone-slash fs-20 mt-5"></i>
     </b-col>
   </b-row>
-  <b-row v-if="isDiagnosing || !diagnosis">
+  <b-row class="row-no-padding"
+         v-if="isDiagnosing || !diagnosis">
     <b-col sm="12" md="12" class="text-center mb-2 mt-4">
 
       <h5><q-skeleton type="rect"></q-skeleton></h5>
@@ -59,7 +62,8 @@
       </b-card>
     </b-col>
   </b-row>
-  <b-row v-if="!isDiagnosing && diagnosis">
+  <b-row class="row-no-padding"
+         v-if="!isDiagnosing && diagnosis">
     <b-col sm="12" md="12" class="text-center mb-2 mt-4">
 
       <h5>{{ diagnosis.model.full_name }}</h5>

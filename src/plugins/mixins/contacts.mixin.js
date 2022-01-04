@@ -345,9 +345,6 @@ export default {
         !this.isLoading
       )
     },
-    test () {
-      return this.$route.meta.id
-    },
     isPowerDialer () {
       if (this.$route.name === 'Power Dialer' &&
         (
@@ -367,7 +364,8 @@ export default {
       return start !== null
     },
     isEmpty () {
-      return this.isLoaded && !this.listItems[this.id].data.length
+      const data = _.get(this.listItems[this.id], 'data', null)
+      return this.isLoaded && !data
     },
     isMyContactsView () {
       return DEFAULT_PINNED_LIST.MY_CONTACTS.id === this.id

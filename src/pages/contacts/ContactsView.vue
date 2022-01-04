@@ -4,6 +4,9 @@
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="pr-2 contacts__title d-flex align-items-center">
+          <back-button class="p-0"
+                       v-if="$q.screen.lt.md"
+                       @click="toggleSidebar"/>
           <div class="d-flex align-items-center">
             <div v-for="folderName in folderPath"
                  :key="folderName"
@@ -37,21 +40,38 @@
 
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
-        <search
-          class="width-250"
-          :search="search"
-          @search="onSearch"
-          :disabled="isLoadingDisabled">
-        </search>
-        <div class="px-3 d-inline-flex" v-if="!isMyContactsView">
-          <label class="text-primary mr-2 mt-2 cursor-pointer">My Contacts</label>
+        <div class="d-flex justify-content-between align-items-center">
+          <search
+            class="width-250"
+            :search="search"
+            @search="onSearch"
+            :disabled="isLoadingDisabled">
+          </search>
+          <div class="contacts-total mobile">
+            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
+            <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+          </div>
+        </div>
+        <div class="px-3 d-inline-flex"
+             v-if="!isMyContactsView && !isTabletOrMobile">
+          <q-tooltip
+            class="text-center"
+            anchor="top middle"
+            self="bottom middle"
+            max-width="185px"
+            v-if="$route.params.id === 'unassigned'">
+            Unable to modify Filters. Duplicate this list if you want to modify
+          </q-tooltip>
+          <label class="text-primary mr-2 mt-2 cursor-pointer"
+                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
-            :disabled="isLoading"
+            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
+            :disabled="isLoading || $route.params.id === 'unassigned'"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -60,12 +80,37 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
         <div class="flex-grow-1"></div>
-        <div class="mr-3">
-          <span class="small text-muted fs-13" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</span>
-          <span class="small text-muted fs-13" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</span>
+        <div class="px-3 d-inline-flex"
+             v-if="!isMyContactsView && isTabletOrMobile">
+          <q-tooltip
+            class="text-center"
+            anchor="top middle"
+            self="bottom middle"
+            max-width="185px"
+            v-if="$route.params.id === 'unassigned'">
+            Unable to modify Filters. Duplicate this list if you want to modify
+          </q-tooltip>
+          <label class="text-primary mr-2 mt-2 cursor-pointer"
+                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
+          <b-form-checkbox
+            id="my-contacts"
+            class="mt-2 cursor-pointer"
+            name="check-button"
+            size="sm"
+            switch
+            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
+            :disabled="isLoading || $route.params.id === 'unassigned'"
+            v-model="myContacts"
+            @change="onFetchMyContacts"
+          >
+          </b-form-checkbox>
         </div>
-        <hr role="separator" aria-orientation="vertical" class="q-separator height-28 ml-3 mr-3 margin-auto position-relative q-separator q-separator--vertical">
-        <div class="d-flex align-items-center px-2"
+        <div class="contacts-total desktop">
+          <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
+          <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+        </div>
+        <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
+        <div class="d-flex align-items-center pr-2"
              :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
           <compact-btn borderless
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
@@ -73,7 +118,6 @@
                        v-if="hasAppliedFilters"
                        :disabled="isResetDisabled"
                        @clicked="resetFilters">
-            <!--i class="fa fa-times"></i-->
             <close-icon width="14px"
                         height="14px"
                         icon-color="#62666E">
@@ -113,8 +157,7 @@
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                     v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
           <template #button-content class="filter-toggle-button">
-            <div class="filter-toggle-button d-flex align-items-center"
-                 style="margin-top: -2px;">
+            <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
             </div>
             <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
@@ -122,19 +165,21 @@
           </template>
           <b-dropdown-item href="#"
                            :disabled="!(list.type === ContactListType.STATIC && isEditable)"
+                           v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListType.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onAddContactsToList">
-
             <search-icon color="#62666E">
             </search-icon>
-            Select Contacts
+            Select Existing Contacts & Add to List
           </b-dropdown-item>
-          <b-dropdown-item href="#" v-b-modal:create-contact-modal>
+          <b-dropdown-item href="#"
+                           @click="onShowCreateContact">
             <plus-icon color="#62666E"></plus-icon>
-            Create Contact
+            Create New Contact & Add to List
           </b-dropdown-item>
         </b-dropdown>
 
-        <contact-create-modal @created="onContactCreated"></contact-create-modal>
+        <contact-create-modal :id="createContactModalId"
+                              @created="onContactCreated"></contact-create-modal>
 
         <b-dropdown text="..."
                     no-caret
@@ -158,6 +203,7 @@
           </b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
+                           v-b-tooltip.hover="{ placement: 'top', title: (isListDeletable ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onRemoveList">
             <delete-red-icon></delete-red-icon>
             <span class="text-danger">
@@ -259,9 +305,11 @@ import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
+import BackButton from 'components/back-button'
 
 export default {
   components: {
+    BackButton,
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
@@ -298,7 +346,8 @@ export default {
       filterHasChanges: false,
       defaultContactLists: DEFAULT_PINNED_LIST,
       isUpdatingList: false,
-      folderPath: []
+      folderPath: [],
+      createContactModalId: 'contacts-list-create-contact-modal'
     }
   },
 
@@ -316,7 +365,8 @@ export default {
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
-      'pinnedCountLoaded'
+      'pinnedCountLoaded',
+      'setShowContactsListSidebar'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -395,6 +445,10 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to update contact list.', 'error')
         })
+    },
+    onShowCreateContact (e) {
+      this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
+      e.stopImmediatePropagation()
     },
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
@@ -489,13 +543,18 @@ export default {
       }
 
       return []
+    },
+
+    toggleSidebar () {
+      this.setShowContactsListSidebar(!this.showContactsListSidebar)
     }
   },
 
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState('contacts', ['folders']),
+    ...mapState('contacts', ['folders', 'showContactsListSidebar']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
+    ...mapState(['isTabletOrMobile']),
     checked () {
       return this.selectedContacts[this.id] || []
     },

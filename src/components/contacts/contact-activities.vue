@@ -7,7 +7,8 @@
       :contact="contact"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
-      @toggleDetails="$emit('toggleDetails')"/>
+      @toggleDetails="$emit('toggleDetails')"
+      @toggleContactSidebar="toggleContactSidebar"/>
     <div class="contact-activities">
       <div class="inner-1">
         <div class="inner-2 scrollbar-white"
@@ -89,6 +90,9 @@ export default {
     },
     markAllAsRead () {
       this.$emit('markAllAsRead')
+    },
+    toggleContactSidebar (value) {
+      this.$emit('toggleContactSidebar', value)
     }
   }
 }

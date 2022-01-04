@@ -1,13 +1,15 @@
 <template>
   <b-container>
-    <b-row>
+    <b-row class="row-no-padding">
       <b-col sm="12" md="12">
         <div class="d-inline-flex">
+          <slot name="header">
+          </slot>
           <h1 class="mt-2"> SMS Templates </h1>
         </div>
       </b-col>
     </b-row>
-    <b-row class="mt-4">
+    <b-row class="mt-4 row-no-padding">
       <b-col sm="12" md="12" class="no-gutters">
         <b-button variant="primary" size="sm" @click="onAdd('user')">
           <i class="fa fa-plus mr-1"></i> New Template
@@ -15,9 +17,11 @@
       </b-col>
     </b-row>
 
-    <b-row class="mt-3">
+    <b-row class="mt-3 row-no-padding">
       <b-col sm="12" md="12" class="no-gutters">
-        <datatable :columns="columns">
+        <datatable :columns="columns"
+                   :is-scrollable="false"
+                   :is-loading-more="isLoading">
           <template slot="tbody">
             <tr class="datatable-row" v-for="template in userTemplates" :key="template.id">
               <template v-for="column in columns">
@@ -93,6 +97,7 @@ import SmsTemplateModal from 'components/sms-template-modal'
 import talk2Api from 'src/plugins/api/api'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'sms-templates',
@@ -147,7 +152,8 @@ export default {
           sortable: false
         }
       ],
-      templates: []
+      templates: [],
+      isLoading: false
     }
   },
 
@@ -192,9 +198,19 @@ export default {
     },
 
     getTemplates () {
-      return talk2Api.V1.smsTemplate.get().then(response => {
-        this.templates = response.data
-      })
+      this.isLoading = true
+      return talk2Api.V1.smsTemplate.get()
+        .then(response => {
+          this.isLoading = false
+          this.templates = response.data
+        }).catch((error) => {
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+        })
     }
   },
 
