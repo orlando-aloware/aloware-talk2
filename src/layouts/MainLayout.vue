@@ -639,6 +639,7 @@ export default {
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
+      location.reload()
     },
 
     onDialerFormHide () {
