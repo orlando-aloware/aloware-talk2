@@ -261,7 +261,7 @@ export default {
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
-          name: this.fetchedNameList
+          name: this.fetchedNameList()
         })
         .then((response) => response.data)
         .then((response) => {
