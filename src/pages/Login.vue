@@ -86,7 +86,6 @@ export default {
   .login-slide-heading {
     height: 62px;
     color: #FFFFFF;
-    font-family: "Product Sans";
     font-size: 22px;
     font-weight: bold;
     letter-spacing: 0.29px;

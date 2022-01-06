@@ -14,7 +14,7 @@
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
       <div class="d-flex flex-row align-items-start">
-        <b-badge v-if="this.id === 'callFishing' && notifications[this.id].queue > 1 && this.dialer && this.dialer.communication"
+        <b-badge v-if="this.id === 'callFishing' && notifications[this.id].queue > 1 && this.dialer && this.dialer.call"
                  class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
                  variant="danger"
                  pill>
@@ -53,7 +53,7 @@
                 <div class="campaign-wrapper col-5">
                   <div class="campaign-name">{{ campaignName }}</div>
                 </div>
-                <div class="flex-grow-1 col-1">></div>
+                <div class="flex-grow-1">></div>
                 <div class="ring-group-wrapper col-5">
                   <div class="ring-group-name">{{ ringGroupName }}</div>
                 </div>
@@ -73,13 +73,13 @@
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="id === 'incomingCall' || (id === 'callFishing' && this.dialer && !this.dialer.communication)">
-          <q-btn class="height-32"
+             v-if="id === 'incomingCall' || (id === 'callFishing' && this.dialer && !this.dialer.call)">
+          <q-btn class="height-32 mr-2"
                  ripple
                  round
                  no-caps
                  @click="rejectCall">
-            <cancel-call-icon width="32" height="32" class="mr-2"/>
+            <cancel-call-icon width="32" height="32"/>
           </q-btn>
           <q-btn class="height-32"
                  ripple
@@ -90,7 +90,7 @@
           </q-btn>
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
-             v-if="id === 'callFishing' && this.dialer && this.dialer.communication">
+             v-if="id === 'callFishing' && this.dialer && this.dialer.call">
           <q-btn class="height-32"
                  ripple
                  round
@@ -129,6 +129,7 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { notificationMixin } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -136,6 +137,9 @@ import HangupIcon from 'components/icons/hangup-icon'
 
 export default {
   name: 'action-notification',
+  mixins: [
+    notificationMixin
+  ],
   components: {
     HangupIcon,
     AcceptCallIcon,
@@ -238,7 +242,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setNotifications', 'setNotificatioNQueue', 'setShowPhone']),
+    ...mapActions(['setNotifications', 'setNotificationQueue', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
@@ -256,7 +260,10 @@ export default {
       if (!this.title) {
         this.onHidden()
         this.$closeActionNotification(this.id)
+        return
       }
+
+      this.playAudio()
     },
     runDateTimeInterval () {
       if (this.dateTime) {
@@ -290,6 +297,7 @@ export default {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: this.notifications[this.id].queue
         }
       })
@@ -324,10 +332,11 @@ export default {
       const data = {
         communication: {
           id: this.notifications[this.id].communicationId,
-          campaign_id: this.notifications[this.id].campaignId,
+          campaignId: this.notifications[this.id].campaignId,
           contactName: this.title,
           companyName: this.message,
-          contactId: this.notifications[this.id].contactId
+          contactId: this.notifications[this.id].contactId,
+          phoneNumber: this.notifications[this.id].phoneNumber
         },
         shouldPark: shouldPark,
         shouldHangup: shouldHangup

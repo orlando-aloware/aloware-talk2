@@ -659,11 +659,7 @@ export default {
         console.log(err)
       }).finally(_ => {
         if (isFishingMode) {
-          let data = {
-            currentNumber: 'call:' + communication.id,
-            outboundCampaignId: communication.campaign_id
-          }
-          this.$VueEvent.fire('makeCall', data)
+          this.makeCall('call:' + communication.id, communication.campaignId)
         }
         this.loadingPark = false
       })
@@ -1010,20 +1006,15 @@ export default {
         return
       }
 
+      let timeout = 0
       if (shouldHangup) {
         this.hangupCall()
-
-        setTimeout(() => {
-          this.makeCall('call:' + communication.id, communication.campaign_id, communication.contactName, communication.companyName, communication.contactId)
-        }, 1000)
-        return
+        timeout = 1000
       }
 
-      let data = {
-        currentNumber: 'call:' + communication.id,
-        outboundCampaignId: communication.campaign_id
-      }
-      this.$VueEvent.fire('makeCall', data)
+      setTimeout(() => {
+        this.makeCall('call:' + communication.id, communication.campaignId)
+      }, timeout)
     },
 
     ...mapActions([

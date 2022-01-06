@@ -13,58 +13,22 @@
         <b-row>
           <b-col md="12" class="settings-form-wrapper">
             <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </general-information>
             <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </profile>
             <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </notification-settings>
             <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </personalization>
             <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </visibility>
             <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </inbound-call>
             <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </outbound-call>
             <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </diagnosis>
             <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading">
-              <template slot="header">
-                <back-button v-if="isSettingsOpened"
-                             @click="back"/>
-              </template>
             </sms-templates>
             <settings-save-bar  :user="user"></settings-save-bar>
           </b-col>
@@ -92,7 +56,6 @@ import Diagnosis from 'components/settings/diagnosis'
 import SmsTemplates from 'components/settings/sms-templates'
 import talk2Api from 'src/plugins/api/api'
 import SettingsSaveBar from 'components/settings/settings-save-bar'
-import BackButton from 'components/back-button'
 
 export default {
   name: 'Settings',
@@ -110,8 +73,7 @@ export default {
     NotificationSettings,
     Profile,
     GeneralInformation,
-    SettingsSide,
-    BackButton
+    SettingsSide
   },
 
   computed: {

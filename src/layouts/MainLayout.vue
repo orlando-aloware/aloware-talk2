@@ -18,8 +18,7 @@
                     v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container class="page-container h-100"
-                            :class="{ 'pt-58': $route.name.includes('Contacts') }">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading">
                 <transition :name="transitionName"
@@ -234,7 +233,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       isWidget: false,
-      enableAudio: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -265,17 +263,22 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
-    ...mapState(['ringGroups']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
     pageClass () {
       let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
       return pageSlug.replace(/ /g, '_') + '-page'
+    },
+    pageContainerClasses () {
+      return {
+        'page-container h-100': true,
+        'pt-58': ['Contacts', 'Settings', 'Settings Tab'].includes(this.$route.name)
+      }
     }
   },
 
@@ -507,7 +510,14 @@ export default {
       //  return
       // }
 
-      // this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
+      // let data = {
+      //   title: 'System Updates',
+      //   message: 'Refresh your screen',
+      //   messageIcon: null,
+      //   attachment: null,
+      //   type: 'system'
+      // }
+      // this.$actionNotification(data)
     })
 
     if (this.$q.platform.is.electron) {
@@ -584,7 +594,7 @@ export default {
       window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
       window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
     } else {
-      this.enableAudio = true
+      this.setEnableAudio(true)
     }
 
     if (this.$q.platform.is.electron) {
@@ -609,8 +619,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
-    ...mapActions(['resetVuex', 'setUsage']),
     async validateCookieUser () {
       if (this.sharedCookie) {
         const response = await this.getCookieUser()
@@ -722,7 +730,7 @@ export default {
         'touchstart',
         this.removeBehaviorsRestrictions()
       )
-      this.enableAudio = true
+      this.setEnableAudio(true)
     },
 
     mediaPlaybackRequiresUserGesture () {
@@ -1307,7 +1315,19 @@ export default {
             return
           }
 
-          this.$actionNotification(communication.contact.name, communication.contact.company_name, null, null, 'callFishing', null, null, null, null, null, true)
+          let data = {
+            title: communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number),
+            message: communication.contact.company_name,
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: communication.campaign_id,
+            campaignName: lineName,
+            ringGroupName: _.get(communication, 'rin_group.name', null),
+            phoneNumber: _.get(communication, 'contact.phone_number', null),
+            noDelay: true,
+            type: 'callFishing'
+          }
+          this.$actionNotification(data)
 
           // let dismiss = this.showFishingModeNotification(communication)
 
@@ -1554,22 +1574,53 @@ export default {
         firstAttachment = _.get(communication.attachments, '0.url', null)
       }
 
+      let data = {}
       switch (type) {
         case 'sms':
-          this.$actionNotification(name, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id, campaignId, null, null)
+          data = {
+            title: name,
+            message: communication.body,
+            attachment: firstAttachment,
+            type: 'sms',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId
+          }
           break
         case 'missed voicemail':
-          this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id, campaignId, null, null)
+          data = {
+            title: name,
+            message: 'Missed Call with Voicemail',
+            messageIcon: 'call-voicemail-icon',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId
+          }
+          this.closeCallNotifications(communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
           contactId = _.get(communication, 'contact_id', null)
           communicationId = _.get(communication, 'mention_subject_id', null)
           message = _.get(communication, 'preview_text', '')
-          this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
+          data = {
+            title: name,
+            message: message,
+            type: 'mention',
+            contactId: contactId,
+            communicationId: communicationId
+          }
           break
         case 'missed call':
-          this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+          data = {
+            title: name,
+            message: 'Missed Call',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id
+          }
+          this.closeCallNotifications(communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
@@ -1577,29 +1628,42 @@ export default {
             break
           }
 
-          if (this.dialer && this.dialer.communication && ringGroup && !ringGroup.fishing_mode) {
+          if (this.dialer && this.dialer.call && ringGroup && !ringGroup.fishing_mode) {
             break
           }
 
           const campaignName = _.get(communication, 'campaign.name', null)
-          const ringGroupName = _.get(communication, 'rin_group.name', null)
+          const ringGroupName = _.get(communication, 'ring_group.name', null)
+          const phoneNumber = _.get(communication, 'contact.phone_number', null)
+
+          data = {
+            title: name,
+            message: companyName,
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: campaignId,
+            campaignName: campaignName,
+            ringGroupName: ringGroupName,
+            phoneNumber: phoneNumber,
+            noDelay: true
+          }
 
           if (ringGroup && ringGroup.fishing_mode) {
-            this.$actionNotification(name, companyName, null, null, 'callFishing', communication.contact.id, communication.id, campaignId, campaignName, ringGroupName, true)
+            data.type = 'callFishing'
             break
           }
 
-          this.$actionNotification(name, companyName, null, null, 'incomingCall', null, communication.id, campaignId, campaignName, ringGroupName, true)
+          data.type = 'incomingCall'
           break
       }
+
+      this.$actionNotification(data)
 
       // push the notification obj to call notifications list
       // this.notifications.push({
       //   communication_id: communication.id,
       //   notification: notification
       // })
-
-      // this.playAudio()
     },
 
     refreshPage () {
@@ -1674,6 +1738,20 @@ export default {
       }
     },
 
+    closeCallNotifications (communicationId) {
+      // for incoming call
+      let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
+      if (notificationCommId === communicationId) {
+        this.$closeActionNotification('incomingCall')
+      }
+
+      // for call fishing
+      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
+      if (notificationCommId === communicationId) {
+        this.$closeActionNotification('callFishing')
+      }
+    },
+
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
@@ -1683,6 +1761,8 @@ export default {
     },
 
     ...mapActions([
+      'resetVuex',
+      'setUsage',
       'setCurrentCompany',
       'setCampaigns',
       'setRingGroups',
@@ -1706,13 +1786,16 @@ export default {
       'setTags',
       'setIsMobile',
       'setIsTabletOrMobile',
-      'setContactDetailsDrawer'
+      'setContactDetailsDrawer',
+      'setEnableAudio'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      getCookieUser: 'getCookieUser',
+      getSharedCookie: 'getSharedCookie'
     }),
     ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },

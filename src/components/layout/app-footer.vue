@@ -170,9 +170,6 @@ export default {
     },
     isPhoneActive () {
       return this.tab === 'phone'
-    },
-    phoneContentClass () {
-      return `menu-phone ${!this.isPhoneActive ? 'tab-inactive tab-icons xs-text' : 'tab-active tab-icons xs-text'}`
     }
   },
   data () {
@@ -228,6 +225,9 @@ export default {
     },
     updateTab () {
       this.tab = this.getTab()
+      if (this.tab !== 'phone' && this.showPhone) {
+        this.setShowPhone(false)
+      }
     },
     toggleContacts () {
       this.tab = 'contacts'
@@ -240,7 +240,6 @@ export default {
         this.tab = 'inbox'
       }
 
-      console.trace(this.tab)
       if (this.tab === 'phone') {
         this.$emit('toggleMobilePhone', true)
         return

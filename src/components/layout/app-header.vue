@@ -2,14 +2,15 @@
   <q-toolbar class="page-header"
              :class="{ 'pl-3 pr-3': !noPadding }">
     <div class="d-flex h-100 align-items-center">
-      <b-link v-if="['Contact'].includes($route.name)"
+      <b-link v-if="['Contact', 'Settings Tab'].includes($route.name)"
               class="btn-header-nav-back mr-3"
               href="#"
               @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
       </b-link>
-      <h1 v-if="!['Contact'].includes($route.name) && !forcePageTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
+      <h1 v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
+      <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ $route.params.tab.replace('-', ' ') | ucwords }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
       <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
@@ -153,6 +154,17 @@ export default {
     },
     isElectron () {
       return Platform.is.electron
+    },
+    isMainTitle () {
+      if (['Settings Tab'].includes(this.$route.name) && !this.$q.screen.lt.md) {
+        return true
+      }
+
+      if (['Settings Tab'].includes(this.$route.name) && this.$q.screen.lt.md) {
+        return false
+      }
+
+      return !['Contact'].includes(this.$route.name) && !this.forcePageTitle
     }
   },
 
@@ -187,6 +199,11 @@ export default {
         this.$router.push({
           path: this.$router.history._startLocation
         })
+      }
+
+      if (this.$route.name === 'Settings Tab') {
+        this.$router.back()
+        return
       }
 
       if (this.selectedList.id.toString() === 'all') {

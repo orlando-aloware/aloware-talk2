@@ -94,6 +94,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         sms: {
@@ -106,6 +107,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         call: {
@@ -118,6 +120,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         callVoicemail: {
@@ -130,6 +133,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         voicemail: {
@@ -142,6 +146,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         mention: {
@@ -154,6 +159,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         incomingCall: {
@@ -166,6 +172,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         },
         callFishing: {
@@ -178,6 +185,7 @@ export default function (/* { ssrContext } */) {
           campaignId: '',
           campaignName: '',
           ringGroupName: '',
+          phoneNumber: '',
           queue: null
         }
       },
@@ -197,7 +205,8 @@ export default function (/* { ssrContext } */) {
       isMobile: false,
       isTabletOrMobile: false,
       contactDetailsDrawer: false,
-      showPhone: false
+      showPhone: false,
+      enableAudio: false
     },
 
     getters: {
@@ -529,6 +538,10 @@ export default function (/* { ssrContext } */) {
 
       setShowPhone ({ commit }, value) {
         commit('SET_SHOW_PHONE', value)
+      },
+
+      setEnableAudio ({ commit }, value) {
+        commit('SET_ENABLE_AUDIO', value)
       }
     },
 
@@ -1025,6 +1038,11 @@ export default function (/* { ssrContext } */) {
       SET_SHOW_PHONE (state, value) {
         state.showPhone = value
       },
+
+      SET_ENABLE_AUDIO (state, value) {
+        state.enableAudio = value
+      },
+
       updateField
     },
 
