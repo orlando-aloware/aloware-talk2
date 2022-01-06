@@ -514,7 +514,7 @@ export default {
     onEditColumnsClicked () {
       this.columnsOpen({
         id: this.id,
-        headers: this.columns,
+        headers: this.pdColumns,
         name: this.list?.name
       })
     },
