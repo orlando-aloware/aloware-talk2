@@ -11,11 +11,11 @@
 
 import { mapGetters, mapActions } from 'vuex'
 import PowerDialerView from 'src/components/power-dialer/power-dialer-view'
-import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 
 export default {
   name: 'PowerDialerBase',
+  mixins: [pdMixin],
   components: {
     PowerDialerView
   },
@@ -32,7 +32,8 @@ export default {
       return this.$route
     },
     id () {
-      return this.$route.params.id || 'my-queue'
+      let id = this.$route.params.id
+      return !isNaN(id) ? id : 'my-queue'
     }
   },
   async mounted () {
@@ -50,10 +51,6 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'listLoaded',
-      'contactsLoaded',
-      'setCurrentListFilters',
-      'setSelectedList',
       'resetSearch'
     ]),
     ...mapActions('powerDialer', [
@@ -61,48 +58,6 @@ export default {
     ]),
     async updateList (data) {
       await this.loadList(data.id)
-    },
-    async loadList (id) {
-      if (!id) {
-        id = 'my-queue'
-      }
-
-      let stringId = String(id)
-
-      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-        stringId = 'my-queue'
-      }
-
-      if (!this.listItems[stringId]) {
-        this.contactsLoaded({
-          id: stringId,
-          ...DEFAULT_LIST_ITEMS
-        })
-      }
-
-      this.$axios
-        .get('/api/v2/power-dialer-lists/' + stringId)
-        .then((response) => response.data)
-        .then((response) => {
-          this.listLoaded({ ...response, id: stringId })
-          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
-          let filters = {
-            contact_lists: {
-              operator: 1,
-              value: [stringId]
-            }
-          }
-
-          this.setCurrentListFilters(filters)
-        })
-        .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-          if (this.$route.name === 'Power Dialer') {
-            this.$router.replace('/power-dialer/')
-          }
-        })
     }
   },
   watch: {

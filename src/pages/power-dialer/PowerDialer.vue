@@ -16,11 +16,13 @@
     <MoveDialog
       :is-contact-module-type="false" />
     <CreateDialog />
-    <ColumnHeaders />
-    <RemoveListModal />
-    <RemoveListConfirmation/>
-    <RemoveContact />
-    <RemoveContactConfirmation />
+    <ColumnHeaders v-if="isActive" />
+    <RemoveListModal v-if="isActive" />
+    <RemoveListConfirmation v-if="isActive" />
+    <RemoveContact
+      :is-contact-module-type="false" />
+    <RemoveContactConfirmation
+      @on-remove-contacts="updateList" />
     <RemoveFolderDialog
       :is-contact-module-type="false" />
 
@@ -41,6 +43,7 @@ import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import ColumnHeaders from 'components/column-headers'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
@@ -58,7 +61,7 @@ export default {
     RemoveContactConfirmation,
     RemoveFolderDialog
   },
-  mixins: [powermixin, contactsMixins],
+  mixins: [powermixin, contactsMixins, pdMixin],
   computed: {
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
@@ -83,6 +86,9 @@ export default {
         return false
       }
       return true
+    },
+    isActive () {
+      return this.$route.name === 'Power Dialer'
     }
   },
   async mounted () {
@@ -197,6 +203,9 @@ export default {
           }
         }
       }
+    },
+    async updateList (data) {
+      await this.loadList(data.id)
     }
   },
   watch: {

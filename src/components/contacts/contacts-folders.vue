@@ -210,7 +210,7 @@ export default {
       return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     isFolderEmpty () {
-      return !this.folders?.[0]?.child_folders.length
+      return !this.folders?.[0]?.child_folders.length && !this.folders?.[0]?.lists.length
     },
     foldersLength () {
       return this.folders?.length
@@ -261,7 +261,7 @@ export default {
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
-          name: this.fetchedNameList
+          name: this.fetchedNameList()
         })
         .then((response) => response.data)
         .then((response) => {
