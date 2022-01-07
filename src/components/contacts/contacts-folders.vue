@@ -283,7 +283,7 @@ export default {
       this.isCreatingFolder = false
     },
     loadFolders () {
-      this.isLoading = false
+      this.isLoading = true
       this.$axios
         .get(this.foldersEndpoint)
         .then((response) => response.data)
