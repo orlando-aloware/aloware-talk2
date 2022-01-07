@@ -19,6 +19,7 @@
             :list="fixedColumns"
             :move="onCheckMove"
             @change="onOrderChanged"
+            class="dragable-header"
           >
             <th
               v-for="(column, key) in fixedColumns"
@@ -30,6 +31,7 @@
                 hovering: hoverKey === key ? isHovering : false,
                 'th-name': column.name === 'name'
               }"
+              :id="`cols-${column.name}`"
               :style="{
                 maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
                 minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')

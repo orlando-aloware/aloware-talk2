@@ -258,6 +258,7 @@ export default {
       })
     },
     onCreateByManualSelection () {
+      this.$root.$emit('bv::hide::popover')
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
@@ -282,7 +283,7 @@ export default {
       this.isCreatingFolder = false
     },
     loadFolders () {
-      this.isLoading = false
+      this.isLoading = true
       this.$axios
         .get(this.foldersEndpoint)
         .then((response) => response.data)
