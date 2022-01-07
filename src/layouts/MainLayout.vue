@@ -570,13 +570,19 @@ export default {
   },
 
   mounted () {
-    this.getSharedCookie().then(sharedCookie => {
-      this.sharedCookie = sharedCookie
+    // if account is not allowed to access talk, we need to logout
+    if (this.profile && this.profile && !this.profile.company.talk_enabled) {
+      this.logout()
+    } else {
+      // proceed to cookie validation if account is talk allowed access
+      this.getSharedCookie().then(sharedCookie => {
+        this.sharedCookie = sharedCookie
 
-      if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
-        this.validateCookieUser()
-      }
-    })
+        if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+          this.validateCookieUser()
+        }
+      })
+    }
 
     if (this.authenticated) {
       this.sidebarVisible = true
@@ -633,11 +639,7 @@ export default {
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
-
-      const redirectPath = this.$route.query.redirect || '/'
-
-      await this.$router.push(String(redirectPath))
-      await this.redirectTimeout()
+      location.reload()
     },
 
     onDialerFormHide () {
