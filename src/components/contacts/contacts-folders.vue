@@ -258,6 +258,7 @@ export default {
       })
     },
     onCreateByManualSelection () {
+      this.$root.$emit('bv::hide::popover')
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
