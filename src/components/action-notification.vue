@@ -419,6 +419,15 @@ export default {
           }
         })
       }
+
+      // clear dialer's call fishing details
+      let dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+      if (this.id === 'callFishing' && dialerCallFishingCommunication) {
+        this.setDialerCallFishing({
+          communication: null,
+          contact: null
+        })
+      }
     },
     type () {
       switch (this.id) {
