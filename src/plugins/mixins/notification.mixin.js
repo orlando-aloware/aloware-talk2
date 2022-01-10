@@ -9,11 +9,11 @@ export default {
   },
 
   computed: {
-    ...mapState(['enableAudio', 'notifications', 'ringGroups'])
+    ...mapState(['enableAudio', 'notifications', 'ringGroups', 'dialer'])
   },
 
   methods: {
-    ...mapActions(['setNotifications', 'removeFromCallFishingQueue']),
+    ...mapActions(['setNotifications', 'removeFromCallFishingQueue', 'setDialerCallFishing']),
 
     playAudio () {
       if (!this.enableAudio) {
@@ -36,8 +36,7 @@ export default {
         return
       }
 
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const type = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
+      let type = this.getType(communication.ring_group_id)
       this.closeCallNotifications(type, communication.id, false)
     },
 
@@ -47,16 +46,20 @@ export default {
       }
 
       // for incoming call
-      let notificationCommId = !type ? _.get(this.notifications, 'incomingCall.communicationId', null) : null
+      let notificationCommId = !type ? _.get(this.notifications, 'incomingCall.communication.id', null) : null
       if (notificationCommId === communicationId && closeNotification) {
         this.$closeActionNotification(type)
         return
       }
 
       // for call fishing
-      notificationCommId = !type ? _.get(this.notifications, 'callFishing.communicationId', null) : null
+      notificationCommId = !type ? _.get(this.notifications, 'callFishing.communication.id', null) : null
 
-      if (notificationCommId === communicationId && closeNotification) {
+      if ((type && type === 'callFishing') || notificationCommId) {
+        this.clearDialerCallFishing()
+      }
+
+      if ((notificationCommId === communicationId || (type && type === 'callFishing')) && closeNotification) {
         this.$closeActionNotification(type)
         this.switchCallFishingFromQueue()
         return
@@ -67,8 +70,25 @@ export default {
       }
     },
 
+    clearDialerCallFishing () {
+      // clear dialer's call fishing details
+      let dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+      let hasInprogressCall = this.dialer.call || this.dialer.parkedCall
+      if (!hasInprogressCall && dialerCallFishingCommunication) {
+        this.setDialerCallFishing({
+          communication: null,
+          contact: null
+        })
+      }
+    },
+
+    getType (ringGroupId) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
+      return ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
+    },
+
     switchCallFishingFromQueue () {
-      const callFishingFirstQueue = _.first(this.notifications, 'callFishin.queue', null)
+      let callFishingFirstQueue = _.first(this.notifications, 'callFishin.queue', null)
 
       if (!callFishingFirstQueue) {
         return

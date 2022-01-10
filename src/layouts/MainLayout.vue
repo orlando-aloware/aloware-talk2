@@ -1338,6 +1338,8 @@ export default {
             campaignName: lineName,
             ringGroupName: _.get(communication, 'rin_group.name', null),
             phoneNumber: _.get(communication, 'contact.phone_number', null),
+            communication: communication,
+            contact: communication.contact,
             noDelay: true,
             type: 'callFishing'
           }
@@ -1662,6 +1664,8 @@ export default {
             campaignName: campaignName,
             ringGroupName: ringGroupName,
             phoneNumber: phoneNumber,
+            communication: communication,
+            contact: communication.contact,
             noDelay: true
           }
 
