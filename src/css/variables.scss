@@ -379,6 +379,10 @@ body {
   @extend .text-grey-100;
 }
 
+.text-xxs2 {
+  @include font-size($f-size-body-xxs, 500, true);
+}
+
 .text-size-xxs {
   @include font-size($f-size-body-xxs, 400);
 }

@@ -259,7 +259,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     ringGroupName: window._.get(notificationData, 'ringGroupName', null),
     phoneNumber: window._.get(notificationData, 'phoneNumber', null),
     noDelay: window._.get(notificationData, 'noDelay', false),
-    dateTime: window._.get(notificationData, 'dateTime', this.$moment())
+    dateTime: window._.get(notificationData, 'dateTime', this.$moment()),
+    communication: window._.get(notificationData, 'communication', null),
+    contact: window._.get(notificationData, 'contact', null)
   }
   // skip if same notification
   if (settings.type === 'call' &&
@@ -281,13 +283,18 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
   // if call is still on-going and fishing mode active, we queue the notification
   if (settings.type === 'callFishing' && this.$store.state.notifications[settings.type].communicationId) {
-    let queue = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type].queue))
-    const found = queue.find(item => item.contactId === settings.contactId)
+    let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
+    queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
+    const found = queue.find(item => item.contactId === settings.contactId && item.communicationId !== settings.communicationId)
+
     if (found) {
       return
     }
 
     queue.push({
+      title: settings.title,
+      message: settings.message,
+      dateTime: settings.dateTime,
       communicationId: settings.communicationId,
       contactId: settings.contactId,
       campaignId: settings.campaignId,
@@ -299,7 +306,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
     data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
-    return
+
+    if (queue.length > 1) {
+      return
+    }
   }
 
   data.data = {
@@ -313,20 +323,30 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     campaignId: settings.campaignId,
     campaignName: settings.campaignName,
     ringGroupName: settings.ringGroupName,
-    phoneNumber: settings.phoneNumber
+    phoneNumber: settings.phoneNumber,
+    communication: settings.communication,
+    contact: settings.contact
   }
 
-  this.$bvToast.hide(settings.type)
+  if (settings.type !== 'callFishing') {
+    this.$bvToast.hide(settings.type)
+  }
+
   if (!document.getElementById(settings.type) || settings.noDelay) {
     this.$store.commit('SET_NOTIFICATIONS', data)
     this.$bvToast.show(settings.type)
     return
   }
 
+  let counter = 0
   let notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
       this.$bvToast.show(settings.type)
+      clearInterval(notificationInterval)
+    }
+    counter++
+    if (counter > 120) {
       clearInterval(notificationInterval)
     }
   }, 500)

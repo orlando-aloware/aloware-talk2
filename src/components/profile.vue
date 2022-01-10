@@ -218,10 +218,6 @@ export default {
         console.error(err)
       }
     }
-  },
-
-  mounted () {
-    this.agentStatus = this.profile.agent_status
   }
 }
 </script>

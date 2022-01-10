@@ -187,7 +187,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from 'src/boot/mixins'
+import { aclMixin, communicationMixin, htmlMixin, webrtcMixin, notificationMixin } from 'src/boot/mixins'
 import broadcast from 'src/boot/broadcast'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -216,7 +216,7 @@ export default {
     Phone
   },
 
-  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
+  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin, notificationMixin],
   data () {
     return {
       loading: true,
@@ -283,6 +283,16 @@ export default {
   },
 
   created () {
+    // proceed to cookie validation if account is talk allowed access
+    this.getSharedCookie().then(sharedCookie => {
+      this.sharedCookie = sharedCookie
+
+      // localStorage.getItem('shared_cookie') !== this.sharedCookie &&
+      if (this.$route.name !== 'Login') {
+        this.validateCookieUser()
+      }
+    })
+
     if (!this.isMobile && this.$route.name === 'Phone') {
       this.$router.replace({ path: '/' })
     }
@@ -571,7 +581,7 @@ export default {
 
   mounted () {
     // if account is not allowed to access talk, we need to logout
-    if (this.profile && this.profile && !this.profile.company.talk_enabled) {
+    if (this.profile && !this.profile.company.talk_enabled) {
       this.logout()
     } else {
       // proceed to cookie validation if account is talk allowed access
@@ -627,8 +637,11 @@ export default {
   methods: {
     async validateCookieUser () {
       if (this.sharedCookie) {
-        const response = await this.getCookieUser()
-        await this.cookieUserValidated(response)
+        this.getCookieUser().then(response => {
+          this.cookieUserValidated(response)
+        }).catch(() => {
+          this.logout()
+        })
       }
     },
     async cookieUserValidated ({ data: { data } }) {
@@ -639,7 +652,14 @@ export default {
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
-      location.reload()
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const fromClassic = Number(urlParams.get('from_classic'))
+
+      // we need to redirect and reload if coming from classic instead of simply router push
+      if (fromClassic) {
+        location.href = '/'
+      }
     },
 
     onDialerFormHide () {
@@ -1326,6 +1346,8 @@ export default {
             campaignName: lineName,
             ringGroupName: _.get(communication, 'rin_group.name', null),
             phoneNumber: _.get(communication, 'contact.phone_number', null),
+            communication: communication,
+            contact: communication.contact,
             noDelay: true,
             type: 'callFishing'
           }
@@ -1569,6 +1591,7 @@ export default {
       let campaignId = _.get(communication, 'campaign_id', null)
       let message = ''
       let ringGroup = this.getRingGroup(communication.ring_group_id)
+      const notificationType = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
 
       if (type !== 'mention') {
         name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
@@ -1590,6 +1613,7 @@ export default {
           }
           break
         case 'missed voicemail':
+          console.log('missed voicemail')
           data = {
             title: name,
             message: 'Missed Call with Voicemail',
@@ -1599,7 +1623,7 @@ export default {
             communicationId: communication.id,
             campaignId: campaignId
           }
-          this.closeCallNotifications(communication.id)
+          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
@@ -1615,6 +1639,7 @@ export default {
           }
           break
         case 'missed call':
+          console.log('missed call')
           data = {
             title: name,
             message: 'Missed Call',
@@ -1622,7 +1647,7 @@ export default {
             contactId: communication.contact.id,
             communicationId: communication.id
           }
-          this.closeCallNotifications(communication.id)
+          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
@@ -1647,6 +1672,8 @@ export default {
             campaignName: campaignName,
             ringGroupName: ringGroupName,
             phoneNumber: phoneNumber,
+            communication: communication,
+            contact: communication.contact,
             noDelay: true
           }
 
@@ -1740,26 +1767,13 @@ export default {
       }
     },
 
-    closeCallNotifications (communicationId) {
-      // for incoming call
-      let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
-      if (notificationCommId === communicationId) {
-        this.$closeActionNotification('incomingCall')
-      }
-
-      // for call fishing
-      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
-      if (notificationCommId === communicationId) {
-        this.$closeActionNotification('callFishing')
-      }
-    },
-
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
+      clearInterval(window.sessionIntervalId)
     },
 
     ...mapActions([
@@ -1784,12 +1798,14 @@ export default {
       'setDialerIsMuted',
       'setFilters',
       'setTagsFullyLoaded',
+      'setNotifications',
       'resetNotifications',
       'setTags',
       'setIsMobile',
       'setIsTabletOrMobile',
       'setContactDetailsDrawer',
-      'setEnableAudio'
+      'setEnableAudio',
+      'removeFromCallFishingQueue'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),

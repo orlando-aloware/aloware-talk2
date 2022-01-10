@@ -26,16 +26,17 @@ export default {
   data: function () {
     return {
       dateTimePassed: null,
-      relativeDateTime: null
+      relativeDateTime: null,
+      getDateTimePassedInterval: null
     }
   },
   created () {
     this.getDateTimePassed()
-    setInterval(this.getDateTimePassed, this.updateInterval)
+    this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, this.updateInterval)
     this.relativeDateTime = this.$options.filters.fixRelativeDatetimeFormat(this.fromTime)
   },
-  destroyed () {
-    clearInterval(this.getDateTimePassed)
+  beforeDestroy () {
+    clearInterval(this.getDateTimePassedInterval)
   },
   methods: {
     getDateTimePassed () {
@@ -44,7 +45,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

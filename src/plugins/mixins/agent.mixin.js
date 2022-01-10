@@ -5,7 +5,6 @@ import * as AgentStatus from '../../constants/agent-status'
 export default {
   data () {
     return {
-      agentStatus: this.profile?.agent_status,
       loadingAgentStatus: false,
       AgentStatus
     }
@@ -13,7 +12,10 @@ export default {
 
   computed: {
     ...mapState(['oldAgentStatus']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    agentStatus () {
+      return _.get(this.profile, 'agent_status', null)
+    }
   },
 
   created () {
@@ -21,7 +23,6 @@ export default {
       if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
         console.log('user_updated', user)
         this.setAgentStatus(user.agent_status)
-        this.agentStatus = user.agent_status
         console.log('Changed agent status [event]: ' + user.agent_status)
       }
     })
@@ -72,7 +73,6 @@ export default {
         device_info: null
       }).then(res => {
         this.setAgentStatus(res.data.agent_status)
-        this.agentStatus = res.data.agent_status
         console.log('Changed agent status [pull]: ' + res.data.agent_status)
       }).catch((err) => {
         console.log(err)
@@ -130,7 +130,6 @@ export default {
         }).then(res => {
           this.loadingAgentStatus = false
           this.setAgentStatus(res.data.agent_status)
-          this.agentStatus = res.data.agent_status
           this.$VueEvent.fire('user_updated', res.data)
           console.log('Changed agent status [api]: ' + res.data.agent_status)
           if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
