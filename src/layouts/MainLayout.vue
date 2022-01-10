@@ -187,7 +187,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from 'src/boot/mixins'
+import { aclMixin, communicationMixin, htmlMixin, webrtcMixin, notificationMixin } from 'src/boot/mixins'
 import broadcast from 'src/boot/broadcast'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -216,7 +216,7 @@ export default {
     Phone
   },
 
-  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
+  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin, notificationMixin],
   data () {
     return {
       loading: true,
@@ -233,7 +233,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       isWidget: false,
-      enableAudio: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -257,7 +256,6 @@ export default {
       isPhoneVisible: false,
       metricsDataLoaded: false,
       sharedCookie: null,
-      notificationAudio: new Audio('/notification/audio/default-communication-notification.mp3'),
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -285,6 +283,16 @@ export default {
   },
 
   created () {
+    // proceed to cookie validation if account is talk allowed access
+    this.getSharedCookie().then(sharedCookie => {
+      this.sharedCookie = sharedCookie
+
+      // localStorage.getItem('shared_cookie') !== this.sharedCookie &&
+      if (this.$route.name !== 'Login') {
+        this.validateCookieUser()
+      }
+    })
+
     if (!this.isMobile && this.$route.name === 'Phone') {
       this.$router.replace({ path: '/' })
     }
@@ -572,13 +580,19 @@ export default {
   },
 
   mounted () {
-    this.getSharedCookie().then(sharedCookie => {
-      this.sharedCookie = sharedCookie
+    // if account is not allowed to access talk, we need to logout
+    if (this.profile && !this.profile.company.talk_enabled) {
+      this.logout()
+    } else {
+      // proceed to cookie validation if account is talk allowed access
+      this.getSharedCookie().then(sharedCookie => {
+        this.sharedCookie = sharedCookie
 
-      if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
-        this.validateCookieUser()
-      }
-    })
+        if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+          this.validateCookieUser()
+        }
+      })
+    }
 
     if (this.authenticated) {
       this.sidebarVisible = true
@@ -596,7 +610,7 @@ export default {
       window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
       window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
     } else {
-      this.enableAudio = true
+      this.setEnableAudio(true)
     }
 
     if (this.$q.platform.is.electron) {
@@ -621,12 +635,13 @@ export default {
   },
 
   methods: {
-    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
-    ...mapActions(['resetVuex', 'setUsage']),
     async validateCookieUser () {
       if (this.sharedCookie) {
-        const response = await this.getCookieUser()
-        await this.cookieUserValidated(response)
+        this.getCookieUser().then(response => {
+          this.cookieUserValidated(response)
+        }).catch(() => {
+          this.logout()
+        })
       }
     },
     async cookieUserValidated ({ data: { data } }) {
@@ -637,11 +652,6 @@ export default {
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
-
-      const redirectPath = this.$route.query.redirect || '/'
-
-      await this.$router.push(String(redirectPath))
-      await this.redirectTimeout()
     },
 
     onDialerFormHide () {
@@ -734,7 +744,7 @@ export default {
         'touchstart',
         this.removeBehaviorsRestrictions()
       )
-      this.enableAudio = true
+      this.setEnableAudio(true)
     },
 
     mediaPlaybackRequiresUserGesture () {
@@ -1293,7 +1303,7 @@ export default {
 
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification/icons/' + icon + '.png',
+          icon: 'notification-icons/' + icon + '.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1320,13 +1330,18 @@ export default {
           }
 
           let data = {
-            title: communication.contact.name,
+            title: communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number),
             message: communication.contact.company_name,
-            type: 'callFishing',
-            noDelay: true
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            campaignId: communication.campaign_id,
+            campaignName: lineName,
+            ringGroupName: _.get(communication, 'rin_group.name', null),
+            phoneNumber: _.get(communication, 'contact.phone_number', null),
+            noDelay: true,
+            type: 'callFishing'
           }
           this.$actionNotification(data)
-          this.playAudio()
 
           // let dismiss = this.showFishingModeNotification(communication)
 
@@ -1373,7 +1388,7 @@ export default {
         }
         let lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification/icons/voicemail.png',
+          icon: 'notification-icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1419,7 +1434,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification/icons/contact.png',
+          icon: 'notification-icons/contact.png',
           body: `Name: ${this.$options.filters.fixName(
             this.sanitizeText(contact.name)
           )} Phone number: ${this.$options.filters.fixPhone(
@@ -1471,7 +1486,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification/icons/appointment.png',
+          icon: 'notification-icons/appointment.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1526,7 +1541,7 @@ export default {
             })
         }
         const options = {
-          icon: 'notification/icons/reminder.png',
+          icon: 'notification-icons/reminder.png',
           body:
             engagement.body +
             '\n\r' +
@@ -1566,6 +1581,7 @@ export default {
       let campaignId = _.get(communication, 'campaign_id', null)
       let message = ''
       let ringGroup = this.getRingGroup(communication.ring_group_id)
+      const notificationType = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
 
       if (type !== 'mention') {
         name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
@@ -1587,6 +1603,7 @@ export default {
           }
           break
         case 'missed voicemail':
+          console.log('missed voicemail')
           data = {
             title: name,
             message: 'Missed Call with Voicemail',
@@ -1596,7 +1613,7 @@ export default {
             communicationId: communication.id,
             campaignId: campaignId
           }
-          this.closeCallNotifications(communication.id)
+          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
@@ -1612,6 +1629,7 @@ export default {
           }
           break
         case 'missed call':
+          console.log('missed call')
           data = {
             title: name,
             message: 'Missed Call',
@@ -1619,7 +1637,7 @@ export default {
             contactId: communication.contact.id,
             communicationId: communication.id
           }
-          this.closeCallNotifications(communication.id)
+          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
@@ -1627,12 +1645,12 @@ export default {
             break
           }
 
-          if (this.dialer && this.dialer.communication && ringGroup && !ringGroup.fishing_mode) {
+          if (this.dialer && this.dialer.call && ringGroup && !ringGroup.fishing_mode) {
             break
           }
 
           const campaignName = _.get(communication, 'campaign.name', null)
-          const ringGroupName = _.get(communication, 'rin_group.name', null)
+          const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
 
           data = {
@@ -1663,8 +1681,6 @@ export default {
       //   communication_id: communication.id,
       //   notification: notification
       // })
-
-      this.playAudio()
     },
 
     refreshPage () {
@@ -1739,45 +1755,18 @@ export default {
       }
     },
 
-    playAudio () {
-      if (!this.enableAudio) {
-        return
-      }
-
-      let promise = this.notificationAudio.play()
-
-      if (promise !== undefined) {
-        promise.catch(err => {
-          // Auto-play was prevented
-          // Show a UI element to let the user manually start playback
-          console.log(err)
-        })
-      }
-    },
-
-    closeCallNotifications (communicationId) {
-      // for incoming call
-      let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
-      if (notificationCommId === communicationId) {
-        this.$closeActionNotification('incomingCall')
-      }
-
-      // for call fishing
-      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
-      if (notificationCommId === communicationId) {
-        this.$closeActionNotification('callFishing')
-      }
-    },
-
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
+      clearInterval(window.sessionIntervalId)
     },
 
     ...mapActions([
+      'resetVuex',
+      'setUsage',
       'setCurrentCompany',
       'setCampaigns',
       'setRingGroups',
@@ -1797,17 +1786,22 @@ export default {
       'setDialerIsMuted',
       'setFilters',
       'setTagsFullyLoaded',
+      'setNotifications',
       'resetNotifications',
       'setTags',
       'setIsMobile',
       'setIsTabletOrMobile',
-      'setContactDetailsDrawer'
+      'setContactDetailsDrawer',
+      'setEnableAudio',
+      'removeFromCallFishingQueue'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      getCookieUser: 'getCookieUser',
+      getSharedCookie: 'getSharedCookie'
     }),
     ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },

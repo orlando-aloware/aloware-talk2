@@ -139,7 +139,7 @@ export default {
       this.resetRecordingTime()
       let timeStarted = new Date().getTime()
       let estimatedFileSize = 0
-      this.time_interval = setInterval(() => {
+      this.timeInterval = setInterval(() => {
         let currentTime = new Date().getTime()
         let timeElapsed = new Date(currentTime - timeStarted)
         this.hours = _.padStart(timeElapsed.getUTCHours(), 2, '0')

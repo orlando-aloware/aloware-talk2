@@ -10,14 +10,14 @@
       <router-view></router-view>
     </div>
     <remove-folder-dialog />
-    <column-headers />
+    <column-headers v-if="isActive" />
     <remove-contact />
     <remove-contact-confirmation />
     <move-dialog />
     <create-list-modal />
     <select-list-modal />
-    <remove-list-modal />
-    <remove-list-confirmation/>
+    <remove-list-modal v-if="isActive" />
+    <remove-list-confirmation  v-if="isActive" />
   </div>
 </template>
 
@@ -65,6 +65,9 @@ export default {
         return ''
       }
       return !this.showContactsListSidebar ? 'w-0' : 'w-100 no-min-max-width'
+    },
+    isActive () {
+      return this.$route.name === 'Contacts'
     }
   },
 

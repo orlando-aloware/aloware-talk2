@@ -64,6 +64,9 @@ export default {
       return this.listItems?.[this.id]
     },
     filterKey () {
+      if (this.id === 'my-queue') {
+        return this.filter
+      }
       return isNaN(this.id) ? this.id : this.filter
     }
   },

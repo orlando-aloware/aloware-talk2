@@ -65,12 +65,14 @@ export default {
   },
   data () {
     return {
-      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT }
+      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT },
+      flagged: false
     }
   },
   watch: {
     isRemoveListOpen (isOpen) {
       if (isOpen) {
+        this.flagged = false
         this.$bvModal.show('remove-list-dialog')
       } else {
         this.$bvModal.hide('remove-list-dialog')
@@ -85,8 +87,9 @@ export default {
       'setRemoveListActionType'
     ]),
     confirmClose () {
-      console.log('Confirming close action')
-      // this.removeListClose()
+      if (!this.flagged) {
+        this.removeListClose()
+      }
     },
     onRemoveList () {
       return this.$axios
@@ -98,7 +101,7 @@ export default {
           this.$generalNotification('Unable to remove list.', 'error')
         })
         .finally(() => {
-          // this.removeListClose()
+          this.removeListClose()
         })
     },
     reloadFolders () {
@@ -122,6 +125,7 @@ export default {
       this.showConfirmDialog(this.ActionTypes.LIST_AND_CONTACT)
     },
     showConfirmDialog (actionType) {
+      this.flagged = true
       this.setRemoveListActionType(actionType)
       this.$bvModal.show('remove-list-confirmation-dialog')
       this.$bvModal.hide('remove-list-dialog')

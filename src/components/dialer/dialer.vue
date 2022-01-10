@@ -6,7 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, agentMixin, userMixin } from '../../boot/mixins'
+import { aclMixin, agentMixin, userMixin, notificationMixin } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
@@ -15,7 +15,7 @@ import * as CommunicationCurrentStatus from '../../constants/communication-curre
 export default {
   name: 'dialer',
 
-  mixins: [aclMixin, agentMixin, userMixin],
+  mixins: [aclMixin, agentMixin, userMixin, notificationMixin],
 
   data () {
     return {
@@ -198,6 +198,7 @@ export default {
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+      this.processRemoveFromNotification(this.dialer.communication)
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
       if (!this.dialer.parkedCall && !this.dialer.call) {
@@ -257,8 +258,6 @@ export default {
 
     this.$VueEvent.listen('rejectCall', () => {
       this.rejectCall()
-      this.$closeActionNotification('incomingCall')
-      this.$closeActionNotification('callFishing')
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {
@@ -643,7 +642,7 @@ export default {
       }
     },
 
-    parkCall (communication, isFishingMode = false) {
+    parkCall () {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
         return
       }
@@ -658,13 +657,6 @@ export default {
         this.setDialerParkedCall()
         console.log(err)
       }).finally(_ => {
-        if (isFishingMode) {
-          let data = {
-            currentNumber: 'call:' + communication.phoneNumber,
-            outboundCampaignId: communication.campaign_id
-          }
-          this.$VueEvent.fire('makeCall', data)
-        }
         this.loadingPark = false
       })
     },
@@ -683,6 +675,20 @@ export default {
         contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
         companyName: (parkedCall.contact) ? parkedCall.contact.company_name : '',
         contactId: parkedCall.contact_id
+      }
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+      this.loadingUnpark = false
+      console.log('Unhold is in progress.')
+    },
+
+    unparkCommunication (parkedCallData) {
+      this.loadingUnpark = true
+      let data = {
+        currentNumber: 'unhold:' + parkedCallData.id,
+        outboundCampaignId: parkedCallData.campaign_id,
+        contactName: (parkedCallData.contact) ? parkedCallData.contact.name : '',
+        companyName: (parkedCallData.contact) ? parkedCallData.contact.company_name : '',
+        contactId: parkedCallData.contact_id
       }
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
@@ -1005,25 +1011,33 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      let parkedCall = null
+
+      // store temporarily the parked call
+      if (shouldPark && this.dialer.parkedCall) {
+        parkedCall = JSON.parse(JSON.stringify(this.dialer.parkedCall))
+      }
+
+      // park the in-progress call
       if (shouldPark) {
-        this.parkCall(communication, true)
+        this.parkCall()
+      }
+
+      // unpark the previosly parked call
+      if (parkedCall) {
+        this.unparkCommunication(parkedCall)
         return
       }
 
+      let timeout = 0
       if (shouldHangup) {
         this.hangupCall()
-
-        setTimeout(() => {
-          this.makeCall('call:' + communication.phoneNumber, communication.campaign_id, communication.contactName, communication.companyName, communication.contactId)
-        }, 1000)
-        return
+        timeout = 1000
       }
 
-      let data = {
-        currentNumber: 'call:' + communication.phoneNumber,
-        outboundCampaignId: communication.campaign_id
-      }
-      this.$VueEvent.fire('makeCall', data)
+      setTimeout(() => {
+        this.makeCall('call:' + communication.id, communication.campaignId)
+      }, timeout)
     },
 
     ...mapActions([
@@ -1073,6 +1087,7 @@ export default {
     this.$VueEvent.stop('forceRefreshCommunication')
     this.$VueEvent.stop('parkCall')
     this.$VueEvent.stop('unparkCall')
+    this.$VueEvent.stop('answerCallFishing')
     this.$VueEvent.stop('mergeCalls')
     this.$VueEvent.stop('dropThirdParty')
     this.$VueEvent.stop('setInputDevice')
@@ -1080,6 +1095,7 @@ export default {
     this.$VueEvent.stop('testOutputDevice')
     this.$VueEvent.stop('initializeSettings')
     clearInterval(this.$options.callDurationInterval)
+    clearInterval(this.$options.wrapUpDurationInterval)
   }
 }
 </script>

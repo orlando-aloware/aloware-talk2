@@ -210,7 +210,7 @@ export default {
       return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     isFolderEmpty () {
-      return !this.folders?.[0]?.child_folders.length
+      return !this.folders?.[0]?.child_folders.length && !this.folders?.[0]?.lists.length
     },
     foldersLength () {
       return this.folders?.length
@@ -258,10 +258,11 @@ export default {
       })
     },
     onCreateByManualSelection () {
+      this.$root.$emit('bv::hide::popover')
       this.$axios
         .post('/api/v2/power-dialer-lists', {
           type: 1,
-          name: this.fetchedNameList
+          name: this.fetchedNameList()
         })
         .then((response) => response.data)
         .then((response) => {
@@ -282,7 +283,7 @@ export default {
       this.isCreatingFolder = false
     },
     loadFolders () {
-      this.isLoading = false
+      this.isLoading = true
       this.$axios
         .get(this.foldersEndpoint)
         .then((response) => response.data)

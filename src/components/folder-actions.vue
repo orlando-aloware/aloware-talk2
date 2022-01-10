@@ -243,7 +243,7 @@ export default {
         .post('/api/v2/power-dialer-lists', {
           contact_folder_id: id,
           type: 1,
-          name: this.fetchedNameList
+          name: this.fetchedNameList()
         })
         .then((response) => response.data)
         .then((response) => {

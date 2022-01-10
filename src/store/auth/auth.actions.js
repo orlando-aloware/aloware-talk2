@@ -12,15 +12,13 @@ const check = async ({ commit }, preventLogout = false) => {
       device_info: null
     })
 
-    const { user } = response.data
-
     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
 
     commit('SET_AUTHENTICATED', true)
-    commit('SET_PROFILE', user)
+    commit('SET_PROFILE', response.data.user)
     commit('SET_LOADING', false)
-    commit('SET_USAGE', user.usage, { root: true })
-    commit('SET_USER_STATUS', user.enabled, { root: true })
+    commit('SET_USAGE', response.data.user.usage, { root: true })
+    commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
 
     return response
   } catch (err) {
@@ -96,6 +94,11 @@ const getCookieUser = async ({ commit }) => {
     const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
 
     const { meta, data } = response.data
+
+    if (!data.company.talk_enabled) {
+      commit('SET_LOADING', false)
+      return Promise.reject()
+    }
 
     localStorage.setItem('api_token', meta.token)
 
