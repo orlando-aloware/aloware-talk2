@@ -418,6 +418,8 @@ export default {
           'Live'
         ]
       },
+      getRelativeDateTimeInterval: null,
+      getDateTimePassedInterval: null,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
@@ -464,14 +466,14 @@ export default {
 
   created () {
     this.getRelativeDateTime()
-    setInterval(this.getRelativeDateTime, 10000)
+    this.getRelativeDateTimeInterval = setInterval(this.getRelativeDateTime, 10000)
     this.getDateTimePassed()
-    setInterval(this.getDateTimePassed, 10000)
+    this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, 10000)
   },
 
   beforeDestroy () {
-    clearInterval(this.getRelativeDateTime)
-    clearInterval(this.getDateTimePassed)
+    clearInterval(this.getRelativeDateTimeInterval)
+    clearInterval(this.getDateTimePassedInterval)
   },
 
   methods: {

@@ -40,11 +40,16 @@ export default {
   methods: {
     ...mapActions('stats', ['setMetricGroups']),
     focusToNewMetricGroup (metricGroupId) {
+      let counter = 0
       let clearFocusInterval = setInterval(() => {
         const metricGroup = this.metricGroups.find(metricGroup => metricGroup.id === metricGroupId)
         if (metricGroup) {
           // test this
           this.metricGroupId = metricGroup.id
+          clearInterval(clearFocusInterval)
+        }
+        counter++
+        if (counter > 60000) {
           clearInterval(clearFocusInterval)
         }
       }, 100)

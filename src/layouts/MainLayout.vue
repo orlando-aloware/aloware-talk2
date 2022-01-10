@@ -187,7 +187,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from 'src/boot/mixins'
+import { aclMixin, communicationMixin, htmlMixin, webrtcMixin, notificationMixin } from 'src/boot/mixins'
 import broadcast from 'src/boot/broadcast'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -216,7 +216,7 @@ export default {
     Phone
   },
 
-  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
+  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin, notificationMixin],
   data () {
     return {
       loading: true,
@@ -1567,6 +1567,7 @@ export default {
       let campaignId = _.get(communication, 'campaign_id', null)
       let message = ''
       let ringGroup = this.getRingGroup(communication.ring_group_id)
+      const notificationType = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
 
       if (type !== 'mention') {
         name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
@@ -1588,6 +1589,7 @@ export default {
           }
           break
         case 'missed voicemail':
+          console.log('missed voicemail')
           data = {
             title: name,
             message: 'Missed Call with Voicemail',
@@ -1597,7 +1599,7 @@ export default {
             communicationId: communication.id,
             campaignId: campaignId
           }
-          this.closeCallNotifications(communication.id)
+          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
@@ -1613,6 +1615,7 @@ export default {
           }
           break
         case 'missed call':
+          console.log('missed call')
           data = {
             title: name,
             message: 'Missed Call',
@@ -1620,7 +1623,7 @@ export default {
             contactId: communication.contact.id,
             communicationId: communication.id
           }
-          this.closeCallNotifications(communication.id)
+          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
@@ -1738,26 +1741,13 @@ export default {
       }
     },
 
-    closeCallNotifications (communicationId) {
-      // for incoming call
-      let notificationCommId = _.get(this.notifications, 'incomingCall.communicationId', null)
-      if (notificationCommId === communicationId) {
-        this.$closeActionNotification('incomingCall')
-      }
-
-      // for call fishing
-      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
-      if (notificationCommId === communicationId) {
-        this.$closeActionNotification('callFishing')
-      }
-    },
-
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
+      clearInterval(window.sessionIntervalId)
     },
 
     ...mapActions([
@@ -1782,12 +1772,14 @@ export default {
       'setDialerIsMuted',
       'setFilters',
       'setTagsFullyLoaded',
+      'setNotifications',
       'resetNotifications',
       'setTags',
       'setIsMobile',
       'setIsTabletOrMobile',
       'setContactDetailsDrawer',
-      'setEnableAudio'
+      'setEnableAudio',
+      'removeFromCallFishingQueue'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),

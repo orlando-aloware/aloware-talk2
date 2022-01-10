@@ -72,7 +72,6 @@ export default function (/* { ssrContext } */) {
         dealId: null,
         callFishing: {
           communication: null,
-          call: null,
           contact: null
         }
       },
@@ -95,6 +94,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         sms: {
@@ -108,6 +109,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         call: {
@@ -121,6 +124,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         callVoicemail: {
@@ -134,6 +139,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         voicemail: {
@@ -147,6 +154,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         mention: {
@@ -160,6 +169,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         incomingCall: {
@@ -173,6 +184,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         },
         callFishing: {
@@ -186,6 +199,8 @@ export default function (/* { ssrContext } */) {
           campaignName: '',
           ringGroupName: '',
           phoneNumber: '',
+          communication: null,
+          contact: null,
           queue: null
         }
       },
@@ -542,6 +557,10 @@ export default function (/* { ssrContext } */) {
 
       setEnableAudio ({ commit }, value) {
         commit('SET_ENABLE_AUDIO', value)
+      },
+
+      removeFromCallFishingQueue ({ commit }, value) {
+        commit('REMOVE_FROM_CALL_FISHING_QUEUE', value)
       }
     },
 
@@ -1041,6 +1060,18 @@ export default function (/* { ssrContext } */) {
 
       SET_ENABLE_AUDIO (state, value) {
         state.enableAudio = value
+      },
+
+      REMOVE_FROM_CALL_FISHING_QUEUE (state, value) {
+        if (!state.notifications.callFishing.queue) {
+          return
+        }
+
+        let found = state.notifications.callFishing.queue.find(queue => queue.communicationId === value)
+
+        if (found) {
+          state.notifications.callFishing.queue.splice(state.notifications.callFishing.queue.indexOf(found), 1)
+        }
       },
 
       updateField

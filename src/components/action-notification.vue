@@ -10,15 +10,22 @@
            v-show="title.length > 0"
            @hide="clearDateTimeInterval"
            @hidden="onHidden"
-           @shown="autoClose">
+           @shown="autoClose"
+           @show="onShow">
+    <button
+      class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-rounded position-absolute call-fishing-clear-queues"
+      v-if="queue && queue"
+      @click="clearNotificationQueue">
+      Clear All
+    </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
       <div class="d-flex flex-row align-items-start">
-        <b-badge v-if="this.id === 'callFishing' && notifications[this.id].queue > 1 && this.dialer && this.dialer.call"
-                 class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
+        <b-badge v-if="id === 'callFishing' && queue"
+                 class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
                  pill>
-          {{ notifications[this.id].queue }}
+          {{ queue.length }}
         </b-badge>
         <div class="mr-2 notification-icon">
           <system-update-icon v-if="id === 'system'"/>
@@ -28,14 +35,15 @@
           <mention-icon v-if="id === 'mention'"/>
           <call-incoming-icon v-if="['incomingCall', 'callFishing'].includes(id)"/>
         </div>
-        <div :class="[!['incomingCall', 'callFishing'].includes(this.id) ? 'w-100' : 'flex-grow-1']">
+        <div class="notification-details"
+             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]">
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
             <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
             <strong class="mr-auto text-white title pr-1">
               {{ title }}
             </strong>
             <small class="mr-2 text-grey-82 time text-nowrap"
-                   v-if="!['incomingCall', 'callFishing'].includes(this.id)">
+                   v-if="!['incomingCall', 'callFishing'].includes(id)">
               {{ runningDateTime }}
             </small>
           </div>
@@ -73,13 +81,21 @@
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="id === 'incomingCall' || (id === 'callFishing' && this.dialer && !this.dialer.call)">
+             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
                  no-caps
                  @click="rejectCall">
-            <cancel-call-icon width="32" height="32"/>
+            <cancel-call-icon width="32"
+                              height="32"
+                              v-if="id === 'incomingCall'"/>
+            <ignore-call-icon v-if="id === 'callFishing'">
+              <q-tooltip anchor="top middle"
+                         self="center middle">
+                Ignore
+              </q-tooltip>
+            </ignore-call-icon>
           </q-btn>
           <q-btn class="height-32"
                  ripple
@@ -90,13 +106,18 @@
           </q-btn>
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
-             v-if="id === 'callFishing' && this.dialer && this.dialer.call">
-          <q-btn class="height-32"
+             v-if="id === 'callFishing' && dialer && dialer.call">
+          <q-btn class="height-32 mr-2"
                  ripple
                  round
                  no-caps
                  @click="ignoreFishing">
-            <cancel-call-icon width="32" height="32" class="mr-2"/>
+            <ignore-call-icon>
+              <q-tooltip anchor="top middle"
+                         self="center middle">
+                Ignore
+              </q-tooltip>
+            </ignore-call-icon>
           </q-btn>
 
           <b-dropdown no-caret
@@ -134,6 +155,7 @@ import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 
 export default {
   name: 'action-notification',
@@ -141,6 +163,7 @@ export default {
     notificationMixin
   ],
   components: {
+    IgnoreCallIcon,
     HangupIcon,
     AcceptCallIcon,
     CancelCallIcon,
@@ -161,7 +184,8 @@ export default {
   data () {
     return {
       runningDateTime: null,
-      runningDateTimeInterval: null
+      runningDateTimeInterval: null,
+      isHidden: true
     }
   },
   computed: {
@@ -175,6 +199,10 @@ export default {
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
         toastClass += ' bg-blue-60-opaque background-blur incoming-call-notification'
+      }
+
+      if (this.queue) {
+        toastClass += ' has-clear-queues'
       }
 
       return toastClass
@@ -194,16 +222,34 @@ export default {
       return headerClass
     },
 
+    queue () {
+      return _.get(this.notifications, `${this.id}.queue`, null)
+    },
+
+    queueLastItem () {
+      return _.last(this.queue)
+    },
+
     message () {
-      const message = _.get(this.notifications[this.id], 'message', '')
+      let message = _.get(this.notifications[this.id], 'message', '')
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        message = _.get(this.queueLastItem, 'message', '')
+      }
+
       return this.$options.filters.parseMentionToView(message)
     },
     messageIcon () {
       return _.get(this.notifications[this.id], 'messageIcon', null)
     },
     title () {
-      const title = _.get(this.notifications[this.id], 'title', '')
-      const fixedTitle = this.$options.filters.fixPhone(title)
+      let title = _.get(this.notifications[this.id], 'title', '')
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        title = _.get(this.queueLastItem, 'title', '')
+      }
+
+      let fixedTitle = this.$options.filters.fixPhone(title)
 
       if (!['sms', 'call'].includes(this.id) || !fixedTitle) {
         return title
@@ -212,13 +258,31 @@ export default {
       return fixedTitle
     },
     dateTime () {
-      return _.get(this.notifications[this.id], 'dateTime', '')
+      let dateTime = _.get(this.notifications[this.id], 'dateTime', '')
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        dateTime = _.get(this.queueLastItem, 'dateTime', '')
+      }
+
+      return dateTime
     },
     contactId () {
-      return _.get(this.notifications[this.id], 'contactId', '')
+      let contactId = _.get(this.notifications[this.id], 'contactId', '')
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        contactId = _.get(this.queueLastItem, 'contactId', '')
+      }
+
+      return contactId
     },
     communicationId () {
-      return _.get(this.notifications[this.id], 'communicationId', '')
+      let communicationId = _.get(this.notifications[this.id], 'communicationId', '')
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        communicationId = _.get(this.queueLastItem, 'communicationId', '')
+      }
+
+      return communicationId
     },
     link () {
       if (['system', 'incomingCall', 'callFishing'].includes(this.id)) {
@@ -234,15 +298,60 @@ export default {
     noAutoHide () {
       return ['system', 'incomingCall', 'callFishing'].includes(this.id)
     },
+    campaignId () {
+      let campaignId = _.get(this.notifications[this.id], 'campaignId', null)
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        campaignId = _.get(this.queueLastItem, 'campaignId', '')
+      }
+
+      return campaignId
+    },
     campaignName () {
-      return _.get(this.notifications[this.id], 'campaignName', null)
+      let campaignName = _.get(this.notifications[this.id], 'campaignName', null)
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        campaignName = _.get(this.queueLastItem, 'campaignName', '')
+      }
+
+      return campaignName
+    },
+    ringGroupId () {
+      let ringGroupId = _.get(this.notifications[this.id], 'ringGroupId', null)
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        ringGroupId = _.get(this.queueLastItem, 'ringGroupId', '')
+      }
+
+      return ringGroupId
     },
     ringGroupName () {
-      return _.get(this.notifications[this.id], 'ringGroupName', null)
+      let ringGroupName = _.get(this.notifications[this.id], 'ringGroupName', null)
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        ringGroupName = _.get(this.queueLastItem, 'ringGroupName', '')
+      }
+
+      return ringGroupName
+    },
+    phoneNumber () {
+      let phoneNumber = _.get(this.notifications[this.id], 'phoneNumber', null)
+
+      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
+        phoneNumber = _.get(this.queueLastItem, 'phoneNumber', '')
+      }
+
+      return phoneNumber
+    },
+    communication () {
+      return _.get(this.notifications[this.id], 'communication', null)
+    },
+    contact () {
+      return _.get(this.notifications[this.id], 'contact', null)
     }
   },
   methods: {
-    ...mapActions(['setNotifications', 'setNotificationQueue', 'setShowPhone']),
+    ...mapActions(['setNotifications', 'setShowPhone', 'setDialerCallFishing']),
     autoClose () {
       this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
@@ -270,6 +379,9 @@ export default {
         this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
         this.runningDateTimeInterval = setInterval(() => {
           this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
+          if (this.isHidden) {
+            this.clearDateTimeInterval()
+          }
         }, 60000)
       }
     },
@@ -279,28 +391,34 @@ export default {
       }
     },
     onHidden () {
+      this.isHidden = true
       if (this.id === 'call') {
         return
       }
 
       this.clearDateTimeInterval()
-      this.setNotifications({
-        type: this.id,
-        data: {
-          title: '',
-          message: '',
-          messageIcon: null,
-          attachment: null,
-          dateTime: null,
-          contactId: '',
-          communicationId: '',
-          campaignId: '',
-          campaignName: '',
-          ringGroupName: '',
-          phoneNumber: '',
-          queue: this.notifications[this.id].queue
-        }
-      })
+
+      if (this.id !== 'callFishing') {
+        this.setNotifications({
+          type: this.id,
+          data: {
+            title: '',
+            message: '',
+            messageIcon: null,
+            attachment: null,
+            dateTime: null,
+            contactId: '',
+            communicationId: '',
+            campaignId: '',
+            campaignName: '',
+            ringGroupName: '',
+            phoneNumber: '',
+            communication: null,
+            contact: null,
+            queue: null
+          }
+        })
+      }
     },
     type () {
       switch (this.id) {
@@ -327,16 +445,17 @@ export default {
     },
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
+      this.closeCallNotifications(this.id, this.communicationId, false)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {
-      const data = {
+      let data = {
         communication: {
-          id: this.notifications[this.id].communicationId,
-          campaignId: this.notifications[this.id].campaignId,
+          id: this.communicationId,
+          campaignId: this.campaignId,
           contactName: this.title,
           companyName: this.message,
-          contactId: this.notifications[this.id].contactId,
-          phoneNumber: this.notifications[this.id].phoneNumber
+          contactId: this.contactId,
+          phoneNumber: this.phoneNumber
         },
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
@@ -347,18 +466,43 @@ export default {
     },
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
+
+      if (this.id === 'callFishing') {
+        this.closeCallNotifications(this.id, this.communicationId)
+      }
     },
     onNotificationClick (event) {
-      const found = event.path.find((item) => {
-        const className = _.get(item, 'className', null)
+      let found = event.path.find((item) => {
+        let className = _.get(item, 'className', null)
         return className && typeof className === 'string' && (className.includes('call-actions') || className.includes('call-fishing-actions'))
       })
-      if (!found && this.id === 'callFishing') {
-        console.log('IN!!')
+
+      if (!found && this.id === 'callFishing' && !this.dialer.call && !this.dialer.parkedCall) {
+        this.$VueEvent.fire('showPhone')
+        this.setDialerCallFishing({
+          communication: this.communication,
+          contact: this.contact
+        })
+        // this.$router.push({
+        //   path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        // })
       }
+
       if (!found && this.id === 'system') {
         window.location.reload()
       }
+    },
+    clearNotificationQueue () {
+      this.$closeActionNotification(this.id)
+      this.setNotifications({
+        type: this.id,
+        data: {
+          queue: null
+        }
+      })
+    },
+    onShow () {
+      this.isHidden = false
     }
   }
 }
