@@ -652,6 +652,14 @@ export default {
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const fromClassic = Number(urlParams.get('from_classic'))
+
+      // we need to redirect and reload if coming from classic instead of simply router push
+      if (fromClassic) {
+        location.href = '/'
+      }
     },
 
     onDialerFormHide () {
