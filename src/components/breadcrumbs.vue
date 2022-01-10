@@ -82,6 +82,9 @@ export default {
   mounted () {
     let id = this.$route.params.id
     this.findParents(this.directoryList, id)
+    if (isNaN(id)) {
+      this.resetBreabcrumbs()
+    }
   },
   methods: {
     ...mapMutations([

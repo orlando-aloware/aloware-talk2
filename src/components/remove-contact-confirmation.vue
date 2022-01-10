@@ -44,13 +44,20 @@
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
+import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 
 export default {
   components: {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['contactToRemove', 'selectedContacts', 'removeContactActionType', 'selectedList', 'isBulkDelete']),
+    ...mapGetters('contacts', [
+      'contactToRemove',
+      'selectedContacts',
+      'removeContactActionType',
+      'selectedList',
+      'isBulkDelete'
+    ]),
     title () {
       return `Delete ${this.contactToDeleteCount} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
     },
@@ -59,8 +66,8 @@ export default {
         return 1
       }
 
-      if (this.selectedContacts[this.selectedList.id]) {
-        return this.selectedContacts[this.selectedList.id].length
+      if (this.selectedContacts[this.listId]) {
+        return this.selectedContacts[this.listId].length
       }
 
       return 0
@@ -76,6 +83,12 @@ export default {
         return 'contact-list-item'
       }
       return 'power-dialer-list-items'
+    },
+    defaultListItems () {
+      return DEFAULT_LIST_ITEMS
+    },
+    listId () {
+      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
     }
   },
   data () {
@@ -95,7 +108,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactClose', 'setShouldUpdateSelectedListContactCount']),
+    ...mapActions('contacts', [
+      'removeContactClose',
+      'setShouldUpdateSelectedListContactCount'
+    ]),
     onCancel () {
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
@@ -140,9 +156,11 @@ export default {
           break
       }
       this.isBusy = true
+      let ids = this.selectedContacts[this.listId].map(contact => contact.id)
       return this.$axios
-        .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id].map(contact => contact.id) } })
+        .delete(url, { params: { contacts: ids } })
         .then(() => {
+          this.$emit('on-remove-contacts', this.selectedList)
           this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {

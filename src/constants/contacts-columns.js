@@ -446,6 +446,18 @@ export const ALL_COLUMNS = [
     default: true,
     maxWidth: 150,
     minWidth: 150
+  },
+  {
+    name: 'task_status',
+    relationName: 'taskStatus',
+    label: 'Task Status',
+    category: 2,
+    order: 40,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false,
+    minWidth: 170
   }
 ]
 

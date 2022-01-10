@@ -122,7 +122,12 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { ALL_COLUMNS, COLUMN_CATEGORIES, DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
+import {
+  ALL_COLUMNS,
+  COLUMN_CATEGORIES,
+  DEFAULT_COLUMNS,
+  POWER_DIALER_DEFAULT_COLUMNS
+} from 'src/constants/contacts-columns'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
@@ -252,7 +257,7 @@ export default {
       this.$axios
         .patch(`/api/v2/${this.endpointUrl}/${this.columns.id}`, {
           ...this.columns,
-          headers: DEFAULT_COLUMNS,
+          headers: this.activeColumns,
           filters: [] // TODO: use actual values
         })
         .then(() => {
@@ -316,16 +321,16 @@ export default {
       }
     },
     isContactsRoute () {
-      if (this.$route.meta.title === 'Contacts') {
-        return true
-      }
-      return false
+      return this.$route.meta.title === 'Contacts'
     },
     endpointUrl () {
       if (this.isContactsRoute) {
         return 'contacts-list'
       }
       return 'power-dialer-lists'
+    },
+    activeColumns () {
+      return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
     }
   },
   watch: {
