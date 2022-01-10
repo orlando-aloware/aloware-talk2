@@ -428,48 +428,63 @@ export default {
         let contact = response.data
         let contacts = _.cloneDeep(this.contacts)
 
-        // only modify order if new contact task === current task
-        if (this.currentTask === contact.task_status) {
-          let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-          let isInContacts = this.contacts.find(item => item.id === contact.id)
-          // if communication is live call
-          if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
-            [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
-            let liveContacts = _.cloneDeep(this.liveContacts)
+        let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+        let isInContacts = this.contacts.find(item => item.id === contact.id)
 
+        // check if communication is a live call
+        if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
+          [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+          let liveContacts = _.cloneDeep(this.liveContacts)
+
+          if (!isInLiveContacts) {
+            liveContacts.push(contact)
+          }
+
+          if (isInContacts) {
+            let index = contacts.findIndex(item => item.id === contact.id)
+            contacts.splice(index, 1)
+            this.setContacts(contacts)
+          }
+          this.setLiveContacts(
+            [
+              // connected calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.current_status2)),
+              // parked calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.current_status2)),
+              // incoming calls
+              ...liveContacts.filter(item => [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+              ].includes(communication.current_status2))
+            ]
+          )
+        } else {
+          // only modify order if new contact task === current task
+          if (this.currentTask === contact.task_status) {
             if (!isInLiveContacts) {
-              liveContacts.push(contact)
-            }
+              // if contact is not in the list, then automatically add it to the top
+              if (!isInContacts) {
+                if (this.contacts.length > this.perPage) {
+                  contacts.pop()
+                }
+              } else {
+                // get all contacts except the current one
+                contacts = _.clone(contacts.filter(item => item.id !== contact.id))
+              }
 
-            if (isInContacts) {
-              let index = contacts.findIndex(item => item.id === contact.id)
-              console.log(index)
-              contacts.splice(index, 1)
+              if (this.sorting.order === 'asc') {
+                contacts.push(contact)
+              } else {
+                contacts.unshift(contact)
+              }
               this.setContacts(contacts)
             }
-            this.setLiveContacts(liveContacts)
-          } else if (!isInLiveContacts) {
-            // if contact is not in the list, then automatically add it to the top
-            if (!isInContacts) {
-              if (this.contacts.length > this.perPage) {
-                contacts.pop()
-              }
-            } else {
-              // get all contacts except the current one
-              contacts = _.clone(contacts.filter(item => item.id !== contact.id))
-            }
-
-            if (this.sorting.order === 'asc') {
-              contacts.push(contact)
-            } else {
-              contacts.unshift(contact)
-            }
-            this.setContacts(contacts)
           }
         }
       })
@@ -480,24 +495,34 @@ export default {
         return
       }
 
-      // if live call is completed, we need to remove it from live calls
-      if (communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
-        // check if communication is in live calls
-        let isInLiveContacts = this.liveContacts.find(item => item.id === communication.contact_id)
-        if (isInLiveContacts) {
-          let liveContacts = _.cloneDeep(this.liveContacts)
-          // find index
-          let index = liveContacts.findIndex(item => item.id === communication.contact_id)
-          // remove the contact task from live calls
+      // if communication is in live contacts
+      let index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      if (index >= 0) {
+        let liveContacts = _.cloneDeep(this.liveContacts)
+        liveContacts[index].last_communication = communication
+        // if type is call and completed then remove from live calls
+        if (communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+          let contactTaskToRemove = liveContacts[index]
           liveContacts.splice(index, 1)
-          // update live contacts
-          this.setLiveContacts(liveContacts)
-          // requery contact task to refresh contact task items
-          this.loadContactTasks()
+
+          // we then add to contact tasks
+          let contacts = _.cloneDeep(this.contacts)
+          if (this.sorting.order === 'asc') {
+            contacts.push(contactTaskToRemove)
+          } else {
+            contacts.unshift(contactTaskToRemove)
+          }
+          this.setContacts(contacts)
         }
-      } else {
-        this.setContacts(this.contacts)
-        this.setContact(communication)
+        this.setLiveContacts(liveContacts)
+      }
+
+      let contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
+      if (contactIndex >= 0) {
+        let contacts = _.cloneDeep(this.contacts)
+        contacts[contactIndex].last_communication = communication
+        this.setContacts(contacts)
+        this.setContact(contacts[contactIndex])
       }
     })
 

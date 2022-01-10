@@ -16,7 +16,9 @@
 
     <q-list v-else-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall"
             bordered
-            class="rounded-contact-activity b-radius-12">
+            class="rounded-contact-activity b-radius-12"
+            :class="[isConnectedCall ? 'call-connected cursor-pointer' : '']"
+            @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
@@ -25,11 +27,12 @@
         </div>
         <div class="text-lt p-x"
              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
-            <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isConnectedCall">
+            <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isConnectedCall && !isParkedCall">
               {{ communication.direction | fixCommDirection }}
               {{ communication.type | fixCommType }}
             </span>
-          <span v-else>Connected</span>
+            <span v-else-if="isParkedCall">Parked Call</span>
+            <span v-else class="call-connected-text">Connected</span>
         </div>
         <q-item-section class="text-lt pl-2 text-left"
                         v-if="communication.duration && isParkedCall">
@@ -60,7 +63,12 @@
           <div class="text-grey-90 d-flex flex-row justify-center"
                v-else-if="isConnectedCall">
             <div class="pl-0">
-              <cancel-call-icon role="button"/>
+              <b-button variant="light"
+                        size="sm"
+                        class="bg-transparent no-border no-box-shadow p-0"
+                        @click="onHangUpCall">
+                <cancel-call-icon/>
+              </b-button>
             </div>
           </div>
           <div class="text-grey-90 d-flex flex-row justify-center" v-else-if="isParkedCall">
@@ -70,7 +78,7 @@
           </div>
         </q-item-section>
       </q-item>
-      <q-menu v-if="isParkedCall || (isIncomingCall && dialer.call)"
+      <q-menu v-if="(isParkedCall || isIncomingCall) && dialer.currentStatus === 'CALL_CONNECTED'"
               fit
               content-class="live-call-options"
               anchor="top right"
@@ -78,7 +86,8 @@
         <q-list>
           <q-item v-if="isParkedCall"
                   clickable
-                  v-close-popup>
+                  v-close-popup
+                  @click="onParkCurrentCallAndConnect">
             <q-item-section class="d-inline-flex">
               <park-call-icon color="#9B51E0"
                               width="11.7"
@@ -88,7 +97,8 @@
           </q-item>
           <q-item v-if="isParkedCall"
                   clickable
-                  v-close-popup>
+                  v-close-popup
+                  @click="onHangupCurrentCallAndConnect">
             <q-item-section>
               <hangup-icon  width="16"
                             height="16"></hangup-icon>
@@ -98,21 +108,23 @@
 
           <q-item v-if="isIncomingCall && dialer.call"
                   clickable
-                  v-close-popup>
+                  v-close-popup
+                  @click="onParkCurrentCallAndAnswer">
             <q-item-section class="d-inline-flex">
               <park-call-icon color="#9B51E0"
                               width="11.7"
                               height="12.35"></park-call-icon>
-              <span>Park Current Call &amp;amp; Answer</span>
+              <span>Park Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
           <q-item v-if="isIncomingCall && dialer.call"
                   clickable
-                  v-close-popup>
+                  v-close-popup
+                  @click="onHangUpCurrentCallAndAnswer">
             <q-item-section>
               <hangup-icon  width="16"
                             height="16"></hangup-icon>
-              Hang up Current Call &amp;amp; Answer
+              Hang up Current Call &amp; Answer
             </q-item-section>
           </q-item>
         </q-list>
@@ -694,7 +706,7 @@
       </q-expansion-item>
     </q-list>
     <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
-         v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE">
+         v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isConnectedCall">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
          v-html="$options.filters.nl2br(communication.notes)">
@@ -1037,10 +1049,75 @@ export default {
     },
 
     onAcceptCall (e) {
-      if (this.dialer.call) {
+      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+        return
+      }
+      if (this.communication.ring_group_id) {
+        const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+        if (ringGroup && ringGroup.fishing_mode) {
+          console.log('Accepting call on fishing mode from communication info..')
+          const data = {
+            communication: {
+              id: this.communication.id,
+              campaign_id: this.communication.campaign_id,
+              contactName: this.contact.name,
+              companyName: this.contact.company_name,
+              contactId: this.contact.id
+            },
+            shouldPark: false,
+            shouldHangup: false
+          }
+          this.$VueEvent.fire('answerCallFishing', data)
+          this.setShowPhone(true)
+          return
+        }
+      }
+
+      console.log('Accepting call from communication info..')
+      this.$VueEvent.fire('answerCall')
+      this.setShowPhone(true)
+      e.stopImmediatePropagation()
+    },
+    onRejectCall (e) {
+      this.$VueEvent.fire('rejectCall')
+      e.stopImmediatePropagation()
+    },
+    onHangUpCall (e) {
+      this.$VueEvent.fire('hangupCall')
+      e.stopImmediatePropagation()
+    },
+    onParkedCall (e) {
+      e.stopImmediatePropagation()
+    },
+    onShowPhone (e) {
+      if (!this.isConnectedCall) {
         return
       }
 
+      this.$VueEvent.fire('togglePhone')
+      e.stopImmediatePropagation()
+    },
+    onParkCurrentCallAndConnect () {
+      // park current call and unpark this call communication
+      this.$VueEvent.fire('parkCall')
+      this.$VueEvent.fire('unparkCall')
+    },
+    onHangupCurrentCallAndConnect () {
+      // hangup current call and unpark this call communication
+      this.$VueEvent.fire('hangupCall')
+      this.$VueEvent.fire('unparkCall')
+    },
+    onParkCurrentCallAndAnswer () {
+      this.answerCommunication(true, false)
+      // park current call and answer communication
+    },
+    onHangUpCurrentCallAndAnswer () {
+      this.answerCommunication(false, true)
+      // hangup current call and answer
+    },
+
+    answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communication.id,
@@ -1049,28 +1126,14 @@ export default {
           companyName: this.contact.company_name,
           contactId: this.contact.id
         },
-        shouldPark: false,
-        shouldHangup: false
+        shouldPark: shouldPark,
+        shouldHangup: shouldHangup
       }
       this.$VueEvent.fire('answerCallFishing', data)
+      this.setShowPhone(true)
+    },
 
-      // TODO Show dialer component
-      e.stopImmediatePropagation()
-    },
-    onRejectCall (e) {
-      this.$VueEvent.fire('rejectCall')
-      console.log('hello')
-      e.stopImmediatePropagation()
-    },
-    onHangUpCall (e) {
-      this.$VueEvent.fire('hangupCall')
-      e.stopImmediatePropagation()
-    },
-    onParkedCall (e) {
-      console.log('hello')
-      e.stopImmediatePropagation()
-    },
-    ...mapActions(['setDialerCommunication'])
+    ...mapActions(['setShowPhone'])
   },
 
   watch: {

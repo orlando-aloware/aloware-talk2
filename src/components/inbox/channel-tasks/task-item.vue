@@ -247,11 +247,19 @@ export default {
       })
     },
 
-    onRejectCall () {},
-    onAcceptCall () {},
+    onRejectCall (e) {
+      this.$VueEvent.fire('rejectCall')
+      e.stopImmediatePropagation()
+    },
+    onAcceptCall (e) {
+      this.$VueEvent.fire('answerCall')
+      this.setShowPhone(true)
+      e.stopImmediatePropagation()
+    },
     onHangUpCall () {},
 
-    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel'])
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel']),
+    ...mapActions(['setShowPhone'])
   }
 }
 </script>

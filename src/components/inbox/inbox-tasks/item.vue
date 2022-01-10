@@ -1,5 +1,6 @@
 <template>
-  <div :class="`contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative ${activeClass}`"
+  <div class="contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative"
+       :class="[activeClass, isParkedCall ? 'item-call-parked' : '', isConnectedCall ? 'item-call-connected' : '']"
        @click="onItemClick(contact)">
     <div class="avatar d-flex justify-content-center pb-1 position-relative"
          role="button">
@@ -7,7 +8,8 @@
                class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
                variant="danger"
                pill>
-        {{ totalUnreads }}
+        <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
+        <span v-else>99<sup>+</sup></span>
       </b-badge>
       <avatar width="34"
               height="34"
@@ -35,8 +37,15 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span v-if="contact.last_communication.type !== CommunicationTypes.SMS">
+          <span v-if="contact.last_communication.type !== CommunicationTypes.SMS && !isParkedCall && !isConnectedCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
+          </span>
+          <span v-if="isParkedCall" class="call-parked-label">
+            Parked Call
+          </span>
+
+          <span v-if="isConnectedCall" class="call-connected-label">
+            Connected
           </span>
 
           <span v-if="contact.last_communication.type === CommunicationTypes.SMS &&
@@ -68,9 +77,12 @@
         </task-item-time>
       </span>
       <div class="text-grey-90 d-flex flex-row justify-center"
-           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
-           contact.last_communication.type === CommunicationTypes.CALL &&
-           [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2)">
+           v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+             contact.last_communication.type === CommunicationTypes.CALL &&
+             [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+             CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+             CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+             CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2) && dialer.call">
         <div class="pl-0">
           <b-button variant="light"
                     size="sm"
@@ -80,38 +92,94 @@
           </b-button>
 
         </div>
-        <div class="pl-1 pr-0">
+        <div v-if="!isActiveCallOwner"
+             class="pl-1 pr-0" >
           <b-button variant="light"
                     size="sm"
                     class="bg-transparent no-border no-box-shadow p-0"
                     @click="onAcceptCall">
-            <accept-call-icon role="button"/>
+            <accept-call-icon/>
+            <q-menu
+                    fit
+                    content-class="live-call-options"
+                    anchor="top right"
+                    self="top left">
+              <q-list>
+                <q-item clickable
+                        v-close-popup
+                        @click="onParkCurrentCallAndConnect">
+                  <q-item-section class="d-inline-flex">
+                    <park-call-icon color="#9B51E0"
+                                      width="11.7"
+                                      height="12.35"></park-call-icon>
+                    <span>Park Current Call &amp; Answer</span>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable
+                        v-close-popup
+                        @click="onHangupCurrentCallAndConnect">
+                  <q-item-section>
+                    <hangup-icon  width="16"
+                                  height="16"></hangup-icon>
+                    <span>Hang up Current Call &amp; Answer</span>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
           </b-button>
         </div>
       </div>
       <div class="text-grey-90 d-flex flex-row justify-center"
-           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
-           contact.last_communication.type === CommunicationTypes.CALL &&
-           [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2)">
+           v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+             contact.last_communication.type === CommunicationTypes.CALL &&
+             [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2) && dialer.call">
         <div class="pl-0">
           <b-button variant="light"
                     size="sm"
                     class="bg-transparent no-border no-box-shadow p-0"
                     @click="onHangUpCall">
-            <cancel-call-icon role="button"/>
+            <cancel-call-icon/>
           </b-button>
         </div>
       </div>
       <div class="text-grey-90 d-flex flex-row justify-center"
-           v-else-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+           v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
            contact.last_communication.type === CommunicationTypes.CALL &&
-           [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2)">
+           [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2) && dialer.call || isParkedCall"
+          >
         <div class="pl-0">
           <b-button variant="light"
                     size="sm"
                     class="bg-transparent no-border no-box-shadow p-0"
-                    @click="onParkedCall">
+                    @click="onUnparkCall">
             <parked-call-icon/>
+            <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
+                    fit
+                    content-class="live-call-options"
+                    anchor="top right"
+                    self="top left">
+              <q-list>
+                <q-item clickable
+                        v-close-popup
+                        @click="onParkCurrentCallAndAnswer">
+                  <q-item-section class="d-inline-flex">
+                    <parked-call-icon color="#9B51E0"
+                                    width="11.7"
+                                    height="12.35"></parked-call-icon>
+                    <span>Park Current Call &amp; Connect</span>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable
+                        v-close-popup
+                        @click="onHangUpCurrentCallAndAnswer">
+                  <q-item-section>
+                    <hangup-icon  width="16"
+                                  height="16"></hangup-icon>
+                    Hang up Current Call &amp; Connect
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
           </b-button>
         </div>
       </div>
@@ -139,15 +207,17 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
+import HangupIcon from 'components/icons/hangup-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
 export default {
   name: 'inbox-task-item',
 
   mixins: [avatarMixin, communicationInfoMixin],
 
-  components: { ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
+  components: { ParkCallIcon, HangupIcon, ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
 
   props: {
     contact: {
@@ -165,7 +235,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'dialer', 'ringGroups']),
     ...mapState('inbox', ['selectedContact']),
     contactName () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
@@ -221,6 +291,24 @@ export default {
         default:
           return directionText + ' a file'
       }
+    },
+    isActiveCallOwner () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        this.dialer.communication &&
+        this.dialer.communication.id === this.contact.last_communication.id
+    },
+    isParkedCall () {
+      if (!this.contact.last_communication) {
+        return false
+      }
+      return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.contact.last_communication.current_status2)
+    },
+
+    isConnectedCall () {
+      if (!this.contact.last_communication) {
+        return false
+      }
+      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.contact.last_communication.current_status2)
     }
   },
 
@@ -234,6 +322,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setShowPhone']),
+    getRingGroup (id) {
+      return id ? this.ringGroups.find(item => item.id === id) : null
+    },
     onItemClick (contact) {
       if (this.selectedContact && this.selectedContact.id === contact.id && !this.isReopened) {
         return
@@ -241,6 +333,76 @@ export default {
       this.$emit('onItemSelected', contact)
     },
     onAcceptCall (e) {
+      let communication = this.contact.last_communication
+
+      if (communication.ring_group_id) {
+        const ringGroup = this.getRingGroup(communication.ring_group_id)
+
+        if (ringGroup && ringGroup.fishing_mode) {
+          console.log('Accepting call on fishing mode from task item..')
+          const data = {
+            communication: {
+              id: communication.id,
+              campaign_id: communication.campaign_id,
+              contactName: this.contact.name,
+              companyName: this.contact.company_name,
+              contactId: this.contact.id
+            },
+            shouldPark: false,
+            shouldHangup: false
+          }
+          this.$VueEvent.fire('answerCallFishing', data)
+          this.setShowPhone(true)
+          return
+        }
+      }
+
+      console.log('Accepting call from task item..')
+
+      this.$VueEvent.fire('answerCall')
+      this.setShowPhone(true)
+      e.stopImmediatePropagation()
+    },
+    onRejectCall (e) {
+      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+        console.log('Hangup call from task item..')
+        this.$VueEvent.fire('hangupCall')
+        return
+      }
+
+      console.log('Reject call from task item..')
+      this.$VueEvent.fire('rejectCall')
+      e.stopImmediatePropagation()
+    },
+    onHangUpCall (e) {
+      this.$VueEvent.fire('hangupCall')
+      e.stopImmediatePropagation()
+    },
+    onUnparkCall (e) {
+      this.$VueEvent.fire('unparkCall')
+      this.$VueEvent.fire('togglePhone')
+      e.stopImmediatePropagation()
+    },
+
+    onParkCurrentCallAndConnect () {
+      // park current call and unpark this call communication
+      this.$VueEvent.fire('parkCall')
+      this.$VueEvent.fire('unparkCall')
+    },
+    onHangupCurrentCallAndConnect () {
+      // hangup current call and unpark this call communication
+      this.$VueEvent.fire('hangupCall')
+      this.$VueEvent.fire('unparkCall')
+    },
+    onParkCurrentCallAndAnswer () {
+      this.answerCommunication(true, false)
+      // park current call and answer communication
+    },
+    onHangUpCurrentCallAndAnswer () {
+      this.answerCommunication(false, true)
+      // hangup current call and answer
+    },
+    answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.contact.last_communication.id,
@@ -249,24 +411,11 @@ export default {
           companyName: this.contact.company_name,
           contactId: this.contact.id
         },
-        shouldPark: false,
-        shouldHangup: false
+        shouldPark: shouldPark,
+        shouldHangup: shouldHangup
       }
       this.$VueEvent.fire('answerCallFishing', data)
-      e.stopImmediatePropagation()
-    },
-    onRejectCall (e) {
-      this.$VueEvent.fire('rejectCall')
-      console.log('hello')
-      e.stopImmediatePropagation()
-    },
-    onHangUpCall (e) {
-      this.$VueEvent.fire('hangupCall')
-      e.stopImmediatePropagation()
-    },
-    onParkedCall (e) {
-      console.log('hello')
-      e.stopImmediatePropagation()
+      this.setShowPhone(true)
     }
   }
 }
