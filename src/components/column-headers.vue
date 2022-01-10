@@ -260,8 +260,12 @@ export default {
           headers: this.activeColumns,
           filters: [] // TODO: use actual values
         })
-        .then(() => {
+        .then((res) => {
           this.$generalNotification('Columns were successfully saved!')
+          this.columnsUpdated({
+            id: res.data.data.id,
+            headers: res.data.data.headers
+          })
           this.columnsClose()
         })
         .catch((error) => {
@@ -331,9 +335,6 @@ export default {
     },
     activeColumns () {
       return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
-    },
-    test () {
-      return DEFAULT_COLUMNS
     }
   },
   watch: {
