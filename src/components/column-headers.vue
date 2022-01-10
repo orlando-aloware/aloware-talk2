@@ -149,7 +149,7 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
+      currentColumns: JSON.parse(JSON.stringify(this.activeColumns || DEFAULT_COLUMNS))
     }
   },
   methods: {
@@ -215,7 +215,7 @@ export default {
     closeAndReset () {
       this.columnsUpdated({
         id: this.columns.id,
-        headers: DEFAULT_COLUMNS
+        headers: this.currentColumns
       })
       this.columnsClose()
     },
@@ -331,6 +331,9 @@ export default {
     },
     activeColumns () {
       return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
+    },
+    test () {
+      return DEFAULT_COLUMNS
     }
   },
   watch: {
