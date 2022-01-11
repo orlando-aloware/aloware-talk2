@@ -42,13 +42,14 @@
         </q-item-section>
         <q-item-section class="text-lt pl-2 pr-2 text-left">
           <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="isIncomingCall">
+               v-if="isIncomingCall && dialer.call">
             <div class="pl-0">
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
                         @click="onRejectCall">
-                <cancel-call-icon/>
+                <ignore-call-icon v-if="isCallFishing" />
+                <cancel-call-icon v-else/>
               </b-button>
             </div>
             <div class="pl-1 pr-0">
@@ -738,6 +739,7 @@ import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 
 export default {
   name: 'communication-info',
@@ -751,6 +753,7 @@ export default {
   ],
 
   components: {
+    IgnoreCallIcon,
     HangupIcon,
     ParkCallIcon,
     ParkedCallIcon,
@@ -911,6 +914,15 @@ export default {
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW
       ].includes(this.communication.current_status2)
+    },
+    isCallFishing () {
+      if (!this.communication.ring_group_id) {
+        return false
+      }
+
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      return ringGroup && ringGroup.fishing_mode
     }
   },
 
@@ -1091,7 +1103,7 @@ export default {
       e.stopImmediatePropagation()
     },
     onShowPhone (e) {
-      if (!this.isConnectedCall) {
+      if (!this.isConnectedCall && !this.isIncomingCall) {
         return
       }
 

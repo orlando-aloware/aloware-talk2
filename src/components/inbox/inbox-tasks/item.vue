@@ -88,7 +88,8 @@
                     size="sm"
                     class="bg-transparent no-border no-box-shadow p-0"
                     @click="onRejectCall">
-            <cancel-call-icon/>
+            <ignore-call-icon v-if="isCallFishing" />
+            <cancel-call-icon v-else/>
           </b-button>
 
         </div>
@@ -212,12 +213,13 @@ import _ from 'lodash'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 export default {
   name: 'inbox-task-item',
 
   mixins: [avatarMixin, communicationInfoMixin],
 
-  components: { ParkCallIcon, HangupIcon, ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
+  components: { IgnoreCallIcon, ParkCallIcon, HangupIcon, ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
 
   props: {
     contact: {
@@ -309,6 +311,15 @@ export default {
         return false
       }
       return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.contact.last_communication.current_status2)
+    },
+    isCallFishing () {
+      if (!this.contact.last_communication.ring_group_id) {
+        return false
+      }
+
+      const ringGroup = this.getRingGroup(this.contact.last_communication.ring_group_id)
+
+      return ringGroup && ringGroup.fishing_mode
     }
   },
 
@@ -385,14 +396,18 @@ export default {
     },
 
     onParkCurrentCallAndConnect () {
+      this.answerCommunication(true, false)
+
       // park current call and unpark this call communication
-      this.$VueEvent.fire('parkCall')
-      this.$VueEvent.fire('unparkCall')
+      // this.$VueEvent.fire('parkCall')
+      // this.$VueEvent.fire('unparkCall')
     },
     onHangupCurrentCallAndConnect () {
+      this.answerCommunication(true, true)
+
       // hangup current call and unpark this call communication
-      this.$VueEvent.fire('hangupCall')
-      this.$VueEvent.fire('unparkCall')
+      // this.$VueEvent.fire('hangupCall')
+      // this.$VueEvent.fire('unparkCall')
     },
     onParkCurrentCallAndAnswer () {
       this.answerCommunication(true, false)

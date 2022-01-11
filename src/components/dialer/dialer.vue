@@ -1023,7 +1023,7 @@ export default {
         this.parkCall()
       }
 
-      // unpark the previosly parked call
+      // unpark the previously parked call
       if (parkedCall) {
         this.unparkCommunication(parkedCall)
         return
