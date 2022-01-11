@@ -312,6 +312,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     }
   }
 
+  if (settings.type !== 'callFishing') {
+    this.$bvToast.hide(settings.type)
+  }
+
   data.data = {
     title: settings.title,
     message: settings.message,
@@ -326,10 +330,6 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     phoneNumber: settings.phoneNumber,
     communication: settings.communication,
     contact: settings.contact
-  }
-
-  if (settings.type !== 'callFishing') {
-    this.$bvToast.hide(settings.type)
   }
 
   if (!document.getElementById(settings.type) || settings.noDelay) {
