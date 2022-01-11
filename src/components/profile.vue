@@ -95,7 +95,7 @@
                        self="center middle">
               <q-badge color="teal"
                        class="disabled-user-status">
-                Force at Account Level
+                Forced at Account Level
               </q-badge>
             </q-tooltip>
           </q-item>
@@ -122,7 +122,7 @@
                        self="center middle">
               <q-badge color="teal"
                        class="disabled-user-status">
-                Force at Account Level
+                Forced at Account Level
               </q-badge>
             </q-tooltip>
           </q-item>
