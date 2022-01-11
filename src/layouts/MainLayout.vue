@@ -1591,7 +1591,6 @@ export default {
       let campaignId = _.get(communication, 'campaign_id', null)
       let message = ''
       let ringGroup = this.getRingGroup(communication.ring_group_id)
-      const notificationType = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
 
       if (type !== 'mention') {
         name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
@@ -1623,7 +1622,6 @@ export default {
             communicationId: communication.id,
             campaignId: campaignId
           }
-          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'mention':
           name = _.get(communication, 'mentioner_user.name', '')
@@ -1647,7 +1645,6 @@ export default {
             contactId: communication.contact.id,
             communicationId: communication.id
           }
-          this.closeCallNotifications(notificationType, communication.id)
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
