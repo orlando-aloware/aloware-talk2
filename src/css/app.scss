@@ -8014,6 +8014,7 @@ button.grey-90 {
       .focus-mode-icon,
       .logout-icon {
         margin-right: 8px;
+        margin-top: -2px;
       }
     }
   }
@@ -10317,4 +10318,8 @@ screen and (max-width: 956px) {
 
 .call-fishing-clear-queues {
   top: -32px;
+}
+
+.disabled-user-status {
+  background: #747981 !important;
 }

@@ -33,9 +33,11 @@
         </template>
 
         <q-list class="tab-dropdown-list no-select">
-          <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)"
-                  dense
-                  clickable>
+          <q-item dense
+                  clickable
+                  v-close-popup
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'cursor-inherit' : '']"
+                  @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_OFFLINE)"
@@ -49,9 +51,11 @@
             </div>
           </q-item>
 
-          <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
-                  dense
-                  clickable>
+          <q-item dense
+                  clickable
+                  v-close-popup
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
+                  @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
@@ -65,9 +69,12 @@
             </div>
           </q-item>
 
-          <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
-                  dense
-                  clickable>
+          <q-item dense
+                  clickable
+                  v-close-popup
+                  :disable="profile.company.force_users_always_available"
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
+                  @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)"
@@ -79,11 +86,21 @@
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
               </div>
             </div>
+            <q-tooltip v-if="profile.company.force_users_always_available"
+                       anchor="top middle"
+                       self="center middle">
+              <q-badge color="teal" class="disabled-user-status">
+                Force at Account Level
+              </q-badge>
+            </q-tooltip>
           </q-item>
 
-          <q-item @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)"
-                  dense
-                  clickable>
+          <q-item dense
+                  clickable
+                  v-close-popup
+                  :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'cursor-inherit' : '']"
+                  :disable="profile.company.force_users_always_available"
+                  @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ON_BREAK)"
@@ -95,6 +112,13 @@
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary' : '']"></i>
               </div>
             </div>
+            <q-tooltip v-if="profile.company.force_users_always_available"
+                       anchor="top middle"
+                       self="center middle">
+              <q-badge color="teal" class="disabled-user-status">
+                Force at Account Level
+              </q-badge>
+            </q-tooltip>
           </q-item>
 
           <q-separator class="mt-1 mb-1"></q-separator>
@@ -102,20 +126,22 @@
                   clickable
                   @click="toggleSleepMode">
             <q-item-section>
-              <div>
+              <q-skeleton type="rect" v-if="togglingSleepMode" />
+              <div v-else>
                 <half-moon-icon :color="!profile.sleep_mode ? '#9B51E0' : '#040404'"
                                 class="focus-mode-icon"
                                 width="12"
                                 height="12">
                 </half-moon-icon>
                 <span>Turn Notifications</span>
-                <span class="user-notification-status _800"> {{ profile.sleep_mode ? 'Off' : 'Off' }}</span>
+                <span class="user-notification-status _800"> {{ profile.sleep_mode ? 'Off' : 'On' }}</span>
               </div>
             </q-item-section>
           </q-item>
           <q-item @click="logoutAction"
                   dense
-                  clickable>
+                  clickable
+                  v-close-popup>
             <q-item-section>
               <div class="text-red-80">
                 <logout-icon width="15"
@@ -146,7 +172,8 @@ export default {
 
   data () {
     return {
-      AgentStatus
+      AgentStatus,
+      togglingSleepMode: false
     }
   },
 
@@ -188,6 +215,9 @@ export default {
     ...mapActions('stats', ['resetStatVuex']),
     ...mapActions(['resetVuex']),
     changeStatus (status) {
+      if (this.agentStatus === status) {
+        return
+      }
       this.changeAgentStatus(status)
     },
 
@@ -198,10 +228,13 @@ export default {
     },
 
     toggleSleepMode () {
+      this.togglingSleepMode = true
       talk2Api.V1.profile.store({ sleep_mode: !this.profile.sleep_mode }).then(response => {
         this.setProfile({ ...this.profile, sleep_mode: response.data.sleep_mode })
+        this.togglingSleepMode = false
+      }).always(() => {
+        this.togglingSleepMode = false
       })
-      this.hideMenu()
     },
 
     logoutAction () {
