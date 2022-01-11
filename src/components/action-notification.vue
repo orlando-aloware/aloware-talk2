@@ -27,7 +27,8 @@
                  pill>
           {{ queue.length }}
         </b-badge>
-        <div class="mr-2 notification-icon">
+        <div class="mr-2 notification-icon"
+        @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
           <call-icon v-if="id === 'call'"/>
@@ -36,7 +37,8 @@
           <call-incoming-icon v-if="['incomingCall', 'callFishing'].includes(id)"/>
         </div>
         <div class="notification-details"
-             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]">
+             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
+             @click="toContact">
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
             <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
             <strong class="mr-auto text-white title pr-1">
@@ -184,8 +186,7 @@ export default {
   data () {
     return {
       runningDateTime: null,
-      runningDateTimeInterval: null,
-      isHidden: true
+      runningDateTimeInterval: null
     }
   },
   computed: {
@@ -379,19 +380,13 @@ export default {
         this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
         this.runningDateTimeInterval = setInterval(() => {
           this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
-          if (this.isHidden) {
-            this.clearDateTimeInterval()
-          }
         }, 60000)
       }
     },
     clearDateTimeInterval () {
-      if (!this.noAutoHide) {
-        clearInterval(this.runningDateTimeInterval)
-      }
+      clearInterval(this.runningDateTimeInterval)
     },
     onHidden () {
-      this.isHidden = true
       if (this.id === 'call') {
         return
       }
@@ -506,8 +501,24 @@ export default {
       if (this.id === 'callFishing') {
         this.$VueEvent.fire('hidePhone')
       }
+    },
+    toInbox () {
+      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+        return
+      }
 
-      this.isHidden = false
+      this.$router.push({
+        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+      })
+    },
+    toContact () {
+      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+        return
+      }
+
+      this.$router.push({
+        path: `/contacts/${this.contactId}`
+      })
     }
   }
 }
