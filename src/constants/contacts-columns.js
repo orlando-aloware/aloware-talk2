@@ -456,7 +456,7 @@ export const ALL_COLUMNS = [
     sortable: false,
     draggable: true,
     resizable: true,
-    default: false,
+    default: true,
     minWidth: 170
   }
 ]
