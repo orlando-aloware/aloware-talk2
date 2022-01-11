@@ -460,11 +460,11 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
+      this.closeCallNotifications(this.id, this.communicationId)
       this.$VueEvent.fire('rejectCall')
 
       if (this.id === 'callFishing') {
         this.$VueEvent.fire('hidePhone')
-        this.closeCallNotifications(this.id, this.communicationId)
       }
     },
     onNotificationClick (event) {

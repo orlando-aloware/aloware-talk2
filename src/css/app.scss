@@ -7395,6 +7395,10 @@ button.grey-90 {
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 18px;
+        max-width: 162px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .time {
         @include font-size($f-size-h5, normal, true);
@@ -10318,4 +10322,10 @@ screen and (max-width: 956px) {
 
 .call-fishing-clear-queues {
   top: -32px;
+}
+
+.incoming-call-notification {
+  .message-text:not(.has-ring-group) {
+    max-width: 162px;
+  }
 }
