@@ -1651,7 +1651,7 @@ export default {
 
     getContactLocalTime () {
       let contact = this.contact
-      contact = !contact ? this.dialer.callFishing.contact : contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
       if (contact && contact.timezone) {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
@@ -1659,7 +1659,7 @@ export default {
 
     goToContact () {
       let contact = this.contact
-      contact = !contact ? this.dialer.callFishing.contact : contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
       if (contact) {
         this.$router.push({
           name: 'Contact',
