@@ -1,14 +1,15 @@
 <template>
-  <q-item v-if="profile" class="menu-avatar-wrapper">
+  <q-item v-if="profile"
+          class="menu-avatar-wrapper">
     <q-item-section class="profile-menu"
                     avatar>
-      <q-btn-dropdown :ripple="false"
-                      :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
-                      :menu-offset="[4, 16]"
-                      content-class="tab-avatar-menu"
+      <q-btn-dropdown content-class="tab-avatar-menu"
                       class="tab-dropdown"
                       ref="menu"
-                      flat>
+                      flat
+                      :ripple="false"
+                      :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
+                      :menu-offset="[4, 16]">
         <template v-slot:label>
           <q-item-section class="contact-info-wrapper">
             <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
@@ -21,8 +22,8 @@
             </q-item-label>
             <q-item-label class="text-regular _500 user-company-name text-right">{{ profile.company_name }}</q-item-label>
           </q-item-section>
-          <q-avatar size="34px"
-                    v-if="profile"
+          <q-avatar v-if="profile"
+                    size="34px"
                     :style="avatarStyle(profile.name)">
             {{ profile.name | fixName | initials }}
             <q-badge :color="color(profile.agent_status)"
@@ -46,7 +47,8 @@
                 <span class="user-status-name">Offline</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_OFFLINE">
-                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary' : '']"></i>
+                <i class="fa fa-check fs-12"
+                   :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'text-primary' : '']"></i>
               </div>
             </div>
           </q-item>
@@ -64,7 +66,8 @@
                 <span class="user-status-name">Available</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS">
-                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
+                <i class="fa fa-check fs-12"
+                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
               </div>
             </div>
           </q-item>
@@ -83,13 +86,15 @@
                 <span class="user-status-name">Busy</span>
               </div>
               <div v-if="agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS">
-                <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
+                <i class="fa fa-check fs-12"
+                   :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
               </div>
             </div>
             <q-tooltip v-if="profile.company.force_users_always_available"
                        anchor="top middle"
                        self="center middle">
-              <q-badge color="teal" class="disabled-user-status">
+              <q-badge color="teal"
+                       class="disabled-user-status">
                 Force at Account Level
               </q-badge>
             </q-tooltip>
@@ -115,7 +120,8 @@
             <q-tooltip v-if="profile.company.force_users_always_available"
                        anchor="top middle"
                        self="center middle">
-              <q-badge color="teal" class="disabled-user-status">
+              <q-badge color="teal"
+                       class="disabled-user-status">
                 Force at Account Level
               </q-badge>
             </q-tooltip>
@@ -126,7 +132,8 @@
                   clickable
                   @click="toggleSleepMode">
             <q-item-section>
-              <q-skeleton type="rect" v-if="togglingSleepMode" />
+              <q-skeleton type="rect"
+                          v-if="togglingSleepMode" />
               <div v-else>
                 <half-moon-icon :color="!profile.sleep_mode ? '#9B51E0' : '#040404'"
                                 class="focus-mode-icon"
@@ -138,10 +145,10 @@
               </div>
             </q-item-section>
           </q-item>
-          <q-item @click="logoutAction"
-                  dense
+          <q-item dense
                   clickable
-                  v-close-popup>
+                  v-close-popup
+                  @click="logoutAction">
             <q-item-section>
               <div class="text-red-80">
                 <logout-icon width="15"
