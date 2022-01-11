@@ -7348,7 +7348,8 @@ button.grey-90 {
 #b-toaster-top-center {
   .b-toaster-slot {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 }
 

@@ -356,21 +356,18 @@ export default {
     autoClose () {
       this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
-        console.log('IN1')
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
       }
 
       if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
-        console.log('IN2')
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
       }
 
       if (!this.title) {
-        console.log('IN13')
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
