@@ -16,7 +16,9 @@
     <MoveDialog
       :is-contact-module-type="false" />
     <CreateDialog />
-    <ColumnHeaders v-if="isActive" />
+    <ColumnHeaders
+      :predefined-id="myQueueId"
+      v-if="isActive" />
     <RemoveListModal v-if="isActive" />
     <RemoveListConfirmation v-if="isActive" />
     <RemoveContact
@@ -89,6 +91,9 @@ export default {
     },
     isActive () {
       return this.$route.name === 'Power Dialer'
+    },
+    myQueueId () {
+      return this.selectedList.type === 0 ? this.selectedList.id : null
     }
   },
   async mounted () {
