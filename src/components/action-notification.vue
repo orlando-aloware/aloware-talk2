@@ -14,14 +14,14 @@
            @show="onShow">
     <button
       class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-rounded position-absolute call-fishing-clear-queues"
-      v-if="queue && queue"
+      v-if="queue && queue.length > 0"
       @click="clearNotificationQueue">
       Clear All
     </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
       <div class="d-flex flex-row align-items-start">
-        <b-badge v-if="id === 'callFishing' && queue"
+        <b-badge v-if="id === 'callFishing' && queue && queue.length > 0"
                  class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
                  pill>
@@ -419,15 +419,6 @@ export default {
           }
         })
       }
-
-      // clear dialer's call fishing details
-      let dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
-      if (this.id === 'callFishing' && dialerCallFishingCommunication) {
-        this.setDialerCallFishing({
-          communication: null,
-          contact: null
-        })
-      }
     },
     type () {
       switch (this.id) {
@@ -477,6 +468,7 @@ export default {
       this.$VueEvent.fire('rejectCall')
 
       if (this.id === 'callFishing') {
+        this.$VueEvent.fire('hidePhone')
         this.closeCallNotifications(this.id, this.communicationId)
       }
     },
@@ -511,6 +503,10 @@ export default {
       })
     },
     onShow () {
+      if (this.id === 'callFishing') {
+        this.$VueEvent.fire('hidePhone')
+      }
+
       this.isHidden = false
     }
   }

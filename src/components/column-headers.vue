@@ -149,7 +149,7 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
+      currentColumns: JSON.parse(JSON.stringify(this.activeColumns || DEFAULT_COLUMNS))
     }
   },
   methods: {
@@ -215,7 +215,7 @@ export default {
     closeAndReset () {
       this.columnsUpdated({
         id: this.columns.id,
-        headers: DEFAULT_COLUMNS
+        headers: this.currentColumns
       })
       this.columnsClose()
     },
@@ -260,8 +260,12 @@ export default {
           headers: this.activeColumns,
           filters: [] // TODO: use actual values
         })
-        .then(() => {
+        .then((res) => {
           this.$generalNotification('Columns were successfully saved!')
+          this.columnsUpdated({
+            id: res.data.data.id,
+            headers: res.data.data.headers
+          })
           this.columnsClose()
         })
         .catch((error) => {

@@ -652,6 +652,14 @@ export default {
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const fromClassic = Number(urlParams.get('from_classic'))
+
+      // we need to redirect and reload if coming from classic instead of simply router push
+      if (fromClassic) {
+        location.href = '/'
+      }
     },
 
     onDialerFormHide () {
@@ -1338,6 +1346,8 @@ export default {
             campaignName: lineName,
             ringGroupName: _.get(communication, 'rin_group.name', null),
             phoneNumber: _.get(communication, 'contact.phone_number', null),
+            communication: communication,
+            contact: communication.contact,
             noDelay: true,
             type: 'callFishing'
           }
@@ -1662,6 +1672,8 @@ export default {
             campaignName: campaignName,
             ringGroupName: ringGroupName,
             phoneNumber: phoneNumber,
+            communication: communication,
+            contact: communication.contact,
             noDelay: true
           }
 

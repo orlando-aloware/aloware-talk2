@@ -116,14 +116,20 @@
 
     <template slot="table">
       <datatable
-        scroll-area-class="static-list-add-item"
         :stickyHeaders="true"
         :columns="validColumns"
         :hasMore="hasMore"
+        :paginated="true"
+        :show-pagination="!isStartState"
+        scroll-area-class="pd-datatable"
         :isEmpty="isEmpty"
         :isLoadingMore="isLoadingMore"
+        :total-rows="totalRows"
+        :current-page="currentPage"
+        :last-page="lastPage"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
+        @paginated="onPaginate"
         @sort="onSortByField"
         @more="onLoadMore"
       >
@@ -255,6 +261,12 @@ export default {
     },
     isMyQueue () {
       return this.$attrs?.id === 'my-queue'
+    },
+    lastPage () {
+      return this.listItems?.[this.id]?.last_page || 0
+    },
+    totalRows () {
+      return this.listItems?.[this.id]?.total || 0
     }
   },
   methods: {
