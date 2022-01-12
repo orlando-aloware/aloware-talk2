@@ -1348,7 +1348,6 @@ export default {
             phoneNumber: _.get(communication, 'contact.phone_number', null),
             communication: communication,
             contact: communication.contact,
-            noDelay: true,
             type: 'callFishing'
           }
           this.$actionNotification(data)
@@ -1670,8 +1669,7 @@ export default {
             ringGroupName: ringGroupName,
             phoneNumber: phoneNumber,
             communication: communication,
-            contact: communication.contact,
-            noDelay: true
+            contact: communication.contact
           }
 
           if (ringGroup && ringGroup.fishing_mode) {

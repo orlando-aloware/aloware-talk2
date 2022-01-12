@@ -258,11 +258,11 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     campaignName: window._.get(notificationData, 'campaignName', null),
     ringGroupName: window._.get(notificationData, 'ringGroupName', null),
     phoneNumber: window._.get(notificationData, 'phoneNumber', null),
-    noDelay: window._.get(notificationData, 'noDelay', false),
     dateTime: window._.get(notificationData, 'dateTime', this.$moment()),
     communication: window._.get(notificationData, 'communication', null),
     contact: window._.get(notificationData, 'contact', null)
   }
+
   // skip if same notification
   if (settings.type === 'call' &&
     this.$store.state.notifications[settings.type].communicationId === settings.communicationId &&
@@ -332,7 +332,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     contact: settings.contact
   }
 
-  if (!document.getElementById(settings.type) || settings.noDelay) {
+  if (!document.getElementById(settings.type)) {
     this.$store.commit('SET_NOTIFICATIONS', data)
     this.$bvToast.show(settings.type)
     return
