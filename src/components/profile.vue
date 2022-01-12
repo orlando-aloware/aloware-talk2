@@ -141,7 +141,7 @@
                                 height="12">
                 </half-moon-icon>
                 <span>Turn Notifications</span>
-                <span class="user-notification-status _800"> {{ profile.sleep_mode ? 'Off' : 'On' }}</span>
+                <span class="user-notification-status _800"> {{ profile.sleep_mode ? 'On' : 'Off' }}</span>
               </div>
             </q-item-section>
           </q-item>
@@ -239,7 +239,7 @@ export default {
       talk2Api.V1.profile.store({ sleep_mode: !this.profile.sleep_mode }).then(response => {
         this.setProfile({ ...this.profile, sleep_mode: response.data.sleep_mode })
         this.togglingSleepMode = false
-      }).always(() => {
+      }).catch(() => {
         this.togglingSleepMode = false
       })
     },
