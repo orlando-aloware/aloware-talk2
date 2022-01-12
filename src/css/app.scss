@@ -8019,7 +8019,15 @@ button.grey-90 {
       .focus-mode-icon,
       .logout-icon {
         margin-right: 8px;
+        margin-top: -2px;
       }
+    }
+
+    .q-item:not(:first-child) {
+      margin-top: 8px;
+    }
+    .q-item:nth-child(6) {
+      margin-top: 0 !important;
     }
   }
 }
@@ -10378,6 +10386,10 @@ screen and (max-width: 956px) {
 
 .call-fishing-clear-queues {
   top: -32px;
+}
+
+.disabled-user-status {
+  background: #747981 !important;
 }
 
 .incoming-call-notification {
