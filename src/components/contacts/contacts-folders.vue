@@ -162,7 +162,7 @@ import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+// import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import pdList from 'src/plugins/mixins/power-dialer-list'
 import { createPopper } from '@popperjs/core'
 
@@ -261,7 +261,6 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
-      extractErrorMessage('err')
       // this.$root.$emit('bv::hide::popover')
       // this.$axios
       //   .post('/api/v2/power-dialer-lists', {

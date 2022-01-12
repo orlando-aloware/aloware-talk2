@@ -135,7 +135,7 @@ import TrashIcon from 'components/icons/trash-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import PeopleIcon from 'components/icons/people-icon.vue'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+// import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import pdList from 'src/plugins/mixins/power-dialer-list'
 
 let popperInstance
@@ -185,6 +185,7 @@ export default {
     ...mapActions('contacts', [
       'toggleFolder',
       'createPdListOpen',
+      'createListOpen',
       'foldersLoaded'
     ]),
     ...mapMutations('powerDialer', [
@@ -239,26 +240,29 @@ export default {
     },
     onCreateByManualSelection () {
       let { id } = this
-      this.$axios
-        .post('/api/v2/power-dialer-lists', {
-          contact_folder_id: id,
-          type: 1,
-          name: this.fetchedNameList()
-        })
-        .then((response) => response.data)
-        .then((response) => {
-          // console.log('LOG: Successfully created a list...', response)
-          this.reloadFolders()
-          this.$generalNotification(response.message, 'success')
-          setTimeout(() => {
-            this.$router.push(`/power-dialer/list/${response.data.id}/add`)
-          }, 500)
-        })
-        .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
-          console.log(html)
-          this.$generalNotification(`Error in creating a list. ${message}`, 'error')
-        })
+      this.createListOpen({
+        contact_folder_id: id
+      })
+      // this.$axios
+      //   .post('/api/v2/power-dialer-lists', {
+      //     contact_folder_id: id,
+      //     type: 1,
+      //     name: this.fetchedNameList()
+      //   })
+      //   .then((response) => response.data)
+      //   .then((response) => {
+      //     // console.log('LOG: Successfully created a list...', response)
+      //     this.reloadFolders()
+      //     this.$generalNotification(response.message, 'success')
+      //     setTimeout(() => {
+      //       this.$router.push(`/power-dialer/list/${response.data.id}/add`)
+      //     }, 500)
+      //   })
+      //   .catch((err) => {
+      //     const { message, html } = extractErrorMessage(err)
+      //     console.log(html)
+      //     this.$generalNotification(`Error in creating a list. ${message}`, 'error')
+      //   })
     }
   }
 }
