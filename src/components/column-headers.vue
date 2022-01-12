@@ -139,6 +139,11 @@ const DEFAULT_PINNED_LIST_IDS = Object.keys(DEFAULT_PINNED_LIST).map(
 )
 
 export default {
+  props: {
+    predefinedId: {
+      default: null
+    }
+  },
   components: {
     draggable,
     Search
@@ -149,7 +154,7 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
+      currentColumns: JSON.parse(JSON.stringify(this.activeColumns || DEFAULT_COLUMNS))
     }
   },
   methods: {
@@ -215,19 +220,20 @@ export default {
     closeAndReset () {
       this.columnsUpdated({
         id: this.columns.id,
-        headers: DEFAULT_COLUMNS
+        headers: this.currentColumns
       })
       this.columnsClose()
     },
     onApplyChanges () {
+      console.log('On apply changes...')
       if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
         this.closeAndMutate()
         return
       }
       this.loading = true
       this.$axios
-        .patch(`/api/v2/${this.endpointUrl}/${this.columns.id}`, {
-          ...this.columns,
+        .patch(`/api/v2/${this.endpointUrl}/${this.resourceId}`, {
+          id: this.resourceId,
           headers: this.currentColumns,
           filters: [] // TODO: use a
         })
@@ -248,6 +254,7 @@ export default {
         })
     },
     onResetAllColumns () {
+      console.log('On reset all columns...')
       if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
         this.closeAndReset()
         return
@@ -255,13 +262,17 @@ export default {
 
       this.loading = true
       this.$axios
-        .patch(`/api/v2/${this.endpointUrl}/${this.columns.id}`, {
-          ...this.columns,
+        .patch(`/api/v2/${this.endpointUrl}/${this.resourceId}`, {
+          id: this.resourceId,
           headers: this.activeColumns,
           filters: [] // TODO: use actual values
         })
-        .then(() => {
+        .then((res) => {
           this.$generalNotification('Columns were successfully saved!')
+          this.columnsUpdated({
+            id: res.data.data.id,
+            headers: res.data.data.headers
+          })
           this.columnsClose()
         })
         .catch((error) => {
@@ -284,8 +295,12 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['columns']),
+    resourceId () {
+      return this.columns.id === 'my-queue' ? this.predefinedId : this.columns.id
+    },
     title () {
-      return `Manage ${String(this.columns?.name).toLowerCase()} columns`
+      let title = this.columns?.name || 'My Queue'
+      return `Manage ${String(title).toLowerCase()} columns`
     },
     allColumns () {
       const columns = []

@@ -15,7 +15,7 @@
       </div>
       <div class="d-flex flex-row text-xs text-white">
         <span v-if="isCallCompleted">Call Ended</span>
-        <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
+        <span v-else-if="dialer.communication && getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
       <div class="d-flex flex-row justify-content-between align-items-center width-65">
         <pause-record-icon width="14"
@@ -116,7 +116,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="screen === 'call' && (dialer.call.direction === 'OUTGOING' || dialer.callFishing)">
+      <template v-if="screen === 'call' && ((dialer.call && dialer.call.direction === 'OUTGOING') || dialer.callFishing)">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
@@ -180,7 +180,7 @@
         </div>
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
-               v-if="dialer.call && (dialer.call.direction === 'INCOMING' || dialer.callFishing)">
+               v-if="(dialer.call && dialer.call.direction === 'INCOMING') || dialer.callFishing">
             <div class="d-flex flex-column align-items-center">
               <q-btn class="height-52"
                      ripple
@@ -1615,6 +1615,10 @@ export default {
       this.isVisible = true
     })
 
+    this.$VueEvent.listen('hidePhone', () => {
+      this.isVisible = false
+    })
+
     this.setupDraggable()
     this.setupContactLocalTime()
     this.isVisible = true
@@ -1647,7 +1651,7 @@ export default {
 
     getContactLocalTime () {
       let contact = this.contact
-      contact = !contact ? this.dialer.callFishing.contact : contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
       if (contact && contact.timezone) {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
@@ -1655,7 +1659,7 @@ export default {
 
     goToContact () {
       let contact = this.contact
-      contact = !contact ? this.dialer.callFishing.contact : contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
       if (contact) {
         this.$router.push({
           name: 'Contact',
@@ -2315,6 +2319,7 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('togglePhone')
+    this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
   }
 }

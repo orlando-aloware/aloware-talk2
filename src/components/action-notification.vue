@@ -14,20 +14,21 @@
            @show="onShow">
     <button
       class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-rounded position-absolute call-fishing-clear-queues"
-      v-if="queue && queue"
+      v-if="queue && queue.length > 0"
       @click="clearNotificationQueue">
       Clear All
     </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
       <div class="d-flex flex-row align-items-start">
-        <b-badge v-if="id === 'callFishing' && queue"
+        <b-badge v-if="id === 'callFishing' && queue && queue.length > 0"
                  class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
                  pill>
           {{ queue.length }}
         </b-badge>
-        <div class="mr-2 notification-icon">
+        <div class="mr-2 notification-icon"
+        @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
           <call-icon v-if="id === 'call'"/>
@@ -36,7 +37,8 @@
           <call-incoming-icon v-if="['incomingCall', 'callFishing'].includes(id)"/>
         </div>
         <div class="notification-details"
-             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]">
+             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
+             @click="toContact">
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
             <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
             <strong class="mr-auto text-white title pr-1">
@@ -184,8 +186,7 @@ export default {
   data () {
     return {
       runningDateTime: null,
-      runningDateTimeInterval: null,
-      isHidden: true
+      runningDateTimeInterval: null
     }
   },
   computed: {
@@ -379,19 +380,13 @@ export default {
         this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
         this.runningDateTimeInterval = setInterval(() => {
           this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
-          if (this.isHidden) {
-            this.clearDateTimeInterval()
-          }
         }, 60000)
       }
     },
     clearDateTimeInterval () {
-      if (!this.noAutoHide) {
-        clearInterval(this.runningDateTimeInterval)
-      }
+      clearInterval(this.runningDateTimeInterval)
     },
     onHidden () {
-      this.isHidden = true
       if (this.id === 'call') {
         return
       }
@@ -417,15 +412,6 @@ export default {
             contact: null,
             queue: null
           }
-        })
-      }
-
-      // clear dialer's call fishing details
-      let dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
-      if (this.id === 'callFishing' && dialerCallFishingCommunication) {
-        this.setDialerCallFishing({
-          communication: null,
-          contact: null
         })
       }
     },
@@ -474,10 +460,11 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
+      this.closeCallNotifications(this.id, this.communicationId)
       this.$VueEvent.fire('rejectCall')
 
       if (this.id === 'callFishing') {
-        this.closeCallNotifications(this.id, this.communicationId)
+        this.$VueEvent.fire('hidePhone')
       }
     },
     onNotificationClick (event) {
@@ -511,7 +498,27 @@ export default {
       })
     },
     onShow () {
-      this.isHidden = false
+      if (this.id === 'callFishing') {
+        this.$VueEvent.fire('hidePhone')
+      }
+    },
+    toInbox () {
+      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+        return
+      }
+
+      this.$router.push({
+        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+      })
+    },
+    toContact () {
+      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+        return
+      }
+
+      this.$router.push({
+        path: `/contacts/${this.contactId}`
+      })
     }
   }
 }
