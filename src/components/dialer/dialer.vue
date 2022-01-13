@@ -1090,7 +1090,7 @@ export default {
       }
 
       if (shouldHangup && parkedCall) {
-        this.hangupCallCombo(false, true)
+        this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
