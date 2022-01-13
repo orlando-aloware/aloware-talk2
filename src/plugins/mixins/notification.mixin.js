@@ -1,7 +1,6 @@
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
-import * as AgentStatus from 'src/constants/agent-status'
 
 export default {
   data () {
@@ -202,7 +201,8 @@ export default {
             type = 'callFishing'
           }
 
-          if (type === 'incomingCall' && this.profile.agent_status !== AgentStatus.AGENT_STATUS_RINGING) {
+          let callCommmunicationId = _.get(this.dialer, 'communication.id', null)
+          if (type === 'incomingCall' && callCommmunicationId !== communication.id) {
             break
           }
 
