@@ -772,7 +772,7 @@ export default {
       this.loading = true
       this.initAccount().then(() => {
         this.loading = false
-        if (this.profile.live_calls === 0 && this.dialer.call) {
+        if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
           if (!this.profile.go_to_available_after_login) {
             this.$VueEvent.fire(
               'change_agent_status',

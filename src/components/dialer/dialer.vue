@@ -690,7 +690,7 @@ export default {
       console.log('Unhold is in progress.')
     },
 
-    parkCallAndAnswer (communication) {
+    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
         return
       }
@@ -701,28 +701,14 @@ export default {
       }
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
-        this.makeCall('call:' + communication.id, communication.campaignId)
-        this.dialer.isMuted = false
-      }).catch(err => {
-        this.setDialerParkedCall()
-        console.log(err)
-      }).finally(_ => {
-        this.loadingPark = false
-      })
-    },
+        if (shouldAnswer) {
+          this.makeCall('call:' + data.id, data.campaignId)
+        }
 
-    parkCallAndUnparkCommunication (parkedCallData) {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
-        return
-      }
-      this.loadingPark = true
-      this.setDialerParkedCall(this.dialer.communication)
-      let params = {
-        communication_id: this.dialer.communication.id
-      }
-      this.$axios.post('/api/v1/dialer/park', params).then(() => {
-        console.log('Call parked')
-        this.unparkCommunication(parkedCallData)
+        if (shouldUnpark) {
+          this.unparkCommunication(data)
+        }
+
         this.setDialerIsMuted(false)
       }).catch(err => {
         this.setDialerParkedCall()
@@ -732,7 +718,7 @@ export default {
       })
     },
 
-    hangupCallAndAnswer (communication) {
+    hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
       if (!this.dialer.call) {
         return
       }
@@ -749,9 +735,20 @@ export default {
         let hangupInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.backToDial()
-            this.makeCall('call:' + communication.id, communication.campaignId)
+            counter = true
             clearInterval(hangupInterval)
           }
+
+          if (counter === true && shouldUnpark) {
+            this.unparkCall()
+            return
+          }
+
+          if (counter === true && shouldAnswer) {
+            this.makeCall('call:' + data.id, data.campaignId)
+            return
+          }
+
           counter++
           if (counter > 120) {
             clearInterval(hangupInterval)
@@ -1083,25 +1080,27 @@ export default {
 
       // park the in-progress call
       if (shouldPark && !parkedCall) {
-        this.parkCallAndAnswer(communication)
+        this.parkCallCombo(true, false, communication)
         return
       }
 
       // park the in-progress call (switch from already parked call)
       if (shouldPark && parkedCall) {
-        this.parkCallAndUnparkCommunication(parkedCall)
+        this.parkCallCombo(false, true, parkedCall)
         return
       }
 
-      let timeout = 0
-      if (shouldHangup) {
-        this.hangupCallAndAnswer(communication)
-        timeout = 1000
+      if (shouldHangup && parkedCall) {
+        this.hangupCallCombo(false, true)
+        return
       }
 
-      setTimeout(() => {
-        this.makeCall('call:' + communication.id, communication.campaignId)
-      }, timeout)
+      if (shouldHangup && !parkedCall) {
+        this.hangupCallCombo(true, false, communication)
+        return
+      }
+
+      this.makeCall('call:' + communication.id, communication.campaignId)
     },
 
     ...mapActions([
