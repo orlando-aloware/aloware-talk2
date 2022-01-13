@@ -205,6 +205,7 @@ export default function () {
     searchedPdItem: '',
     showMenu: false,
     showContactsHeader: true,
-    showContactsListSidebar: false
+    showContactsListSidebar: false,
+    unsavedList: null
   }
 }

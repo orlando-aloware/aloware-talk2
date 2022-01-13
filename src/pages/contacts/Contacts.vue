@@ -79,7 +79,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setShowContactsListSidebar', 'setShowContactsHeader']),
+    ...mapActions('contacts', [
+      'setShowContactsListSidebar',
+      'setShowContactsHeader',
+      'setUnsavedList'
+    ]),
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
     }
@@ -88,6 +92,7 @@ export default {
   watch: {
     $route (to, from) {
       if (to.name.includes('Contacts')) {
+        // this.setUnsavedList(null)
         this.setShowContactsListSidebar(false)
       }
     }

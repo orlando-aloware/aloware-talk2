@@ -22,7 +22,18 @@
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
           <div class="d-flex align-items-center">
-            <span class="list-name">{{ list.name }}</span>
+            <span class="list-name">
+              {{ list.name }}
+              <q-chip
+                class="m-0 p-0"
+                text-color="white"
+                color="grey-80"
+                style="margin-left:10px !important;"
+                size="sm"
+                v-if="id == unsavedListId">
+                Unsaved
+              </q-chip>
+            </span>
           </div>
         </div>
       </div>
@@ -553,7 +564,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['profile']),
     ...mapState('contacts', ['folders', 'showContactsListSidebar']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters', 'unsavedList']),
     ...mapState(['isTabletOrMobile']),
     checked () {
       return this.selectedContacts[this.id] || []
@@ -604,6 +615,9 @@ export default {
     },
     hasAppliedFilters () {
       return this.filtersCount > 0
+    },
+    unsavedListId () {
+      return this.unsavedList?.id || ''
     }
   },
 

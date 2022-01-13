@@ -52,6 +52,9 @@
             <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
               {{ name }}
             </span>
+            <UnsavedIcon
+              class="mr-1"
+              v-show="id == unsavedListId" />
           </div>
 
           <button
@@ -98,6 +101,7 @@ import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
+import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let inputTimeout
@@ -109,6 +113,7 @@ export default {
     FolderStaticIcon,
     FolderDynamicIcon,
     DialIcon,
+    UnsavedIcon,
     ListActions
   },
   props: {
@@ -144,7 +149,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['pinned', 'moveDialog', 'listToRemove']),
+    ...mapGetters('contacts', [
+      'pinned',
+      'moveDialog',
+      'listToRemove',
+      'unsavedList'
+    ]),
     ...mapState(['isMobile']),
     indentStyle () {
       return {
@@ -170,26 +180,20 @@ export default {
       return this.$route.meta.title === 'Contacts'
     },
     viewListPath () {
-      if (this.isContactsRoute) {
-        return `/contacts/list/${this.id}`
-      }
-      return `/power-dialer/list/${this.id}`
+      return this.isContactsRoute ? `/contacts/list/${this.id}` : `/power-dialer/list/${this.id}`
     },
     listPath () {
-      if (this.isContactsRoute) {
-        return '/api/v2/contacts-list/'
-      }
-      return '/api/v2/power-dialer-lists/'
+      return this.isContactsRoute ? '/api/v2/contacts-list/' : '/api/v2/power-dialer-lists/'
     },
     foldersPath () {
-      if (this.isContactsRoute) {
-        return '/api/v2/contact-folders'
-      }
-      return '/api/v2/power-dialer-folders'
+      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     folderId () {
       let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-item-option-${module}-${this.id}`
+    },
+    unsavedListId () {
+      return this.unsavedList?.id || ''
     }
   },
   mounted () {

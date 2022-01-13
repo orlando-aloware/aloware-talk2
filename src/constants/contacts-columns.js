@@ -456,7 +456,7 @@ export const ALL_COLUMNS = [
     sortable: false,
     draggable: true,
     resizable: true,
-    default: true,
+    default: false,
     minWidth: 170
   }
 ]
@@ -468,5 +468,5 @@ export const STATIC_COLUMNS = ALL_COLUMNS.filter(
 )
 
 export const POWER_DIALER_DEFAULT_COLUMNS = ALL_COLUMNS.filter(
-  (c) => c.default && ['checkbox', 'name', 'phone_number', 'created_at', 'tags', 'task_status', 'actions'].includes(c.name)
+  (c) => ['checkbox', 'name', 'phone_number', 'created_at', 'tags', 'task_status', 'actions'].includes(c.name)
 )

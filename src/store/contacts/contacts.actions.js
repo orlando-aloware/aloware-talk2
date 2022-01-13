@@ -39,6 +39,7 @@ export default {
     commit('PINNED_COUNT_LOADED', payload)
   },
   foldersLoaded: ({ commit }, payload) => {
+    console.log('payload :>> ', payload)
     commit('FOLDERS_LOADED', payload)
   },
   pinnedLoaded: ({ commit }, payload) => {
@@ -275,5 +276,8 @@ export default {
   },
   setShowContactsListSidebar: ({ commit }, value) => {
     commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
+  },
+  setUnsavedList: ({ commit }, data) => {
+    commit('SET_UNSAVED_LIST', data)
   }
 }

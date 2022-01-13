@@ -96,6 +96,37 @@ export const DEFAULT_STATE = {
       type: 2,
       module_type: 1,
       name: 'My Queue'
+    },
+    'unsaved': {
+      id: 'unsaved',
+      headers: DEFAULT_COLUMNS,
+      filters: [],
+      type: 2,
+      module_type: 1,
+      name: 'Unsaved'
     }
   }
+}
+
+export const DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST = {
+  contact_folder_id: null,
+  headers: DEFAULT_COLUMNS,
+  mode: '',
+  name: '',
+  order: 0,
+  type: 2
+}
+
+export const DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE = {
+  company_id: null,
+  contact_folder_id: null,
+  created_at: '',
+  filters: [],
+  headers: DEFAULT_COLUMNS,
+  id: null,
+  module_type: 1,
+  name: null,
+  order: null,
+  type: 2,
+  updated_at: ''
 }

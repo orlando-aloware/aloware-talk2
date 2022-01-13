@@ -366,5 +366,9 @@ export default {
   },
   SET_SHOW_CONTACTS_LIST_SIDEBAR: (state, value) => {
     state.showContactsListSidebar = value
+  },
+  SET_UNSAVED_LIST: (state, data) => {
+    console.log('SET_UNSAVED_LIST data  :>> ', data)
+    state.unsavedList = data
   }
 }

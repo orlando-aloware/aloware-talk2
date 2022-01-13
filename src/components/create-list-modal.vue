@@ -112,6 +112,10 @@ import {
 import {
   DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
+import {
+  DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST,
+  DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
+} from 'src/constants/default-lists'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
@@ -150,10 +154,20 @@ export default {
     },
     redirectPath () {
       return this.isDefault ? `/contacts/list` : `/power-dialer/list`
+    },
+    defaultTemplateRequest () {
+      return DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST
+    },
+    defaultTemplateResponse () {
+      return DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
     }
   },
   methods: {
-    ...mapActions('contacts', ['createListClose', 'foldersLoaded']),
+    ...mapActions('contacts', [
+      'createListClose',
+      'foldersLoaded',
+      'setUnsavedList'
+    ]),
     onClose () {
       if (!this.isLoading) {
         this.createListClose()
@@ -195,33 +209,48 @@ export default {
     },
     onSubmit () {
       this.isLoading = true
-      this.$axios
-        .post(this.listsEndpoint, this.getParams())
-        .then((response) => {
-          const data = response.data.data
-          const message = response.data.message
+      console.log('this.createList.type 1 :>> ', this.createList.type)
+      if (this.createList.type === STATIC) {
+        this.$axios
+          .post(this.listsEndpoint, this.getParams())
+          .then((response) => {
+            const data = response.data.data
+            const message = response.data.message
 
-          if (this.createList.mode === FROM_BULK_MENU) {
-            this.$router.push(`${this.redirectPath}/${data.id}`)
-          } else {
-            this.$router.push(`${this.redirectPath}/${data.id}?start=1`)
-          }
+            if (this.createList.mode === FROM_BULK_MENU) {
+              this.$router.push(`${this.redirectPath}/${data.id}`)
+            } else {
+              this.$router.push(`${this.redirectPath}/${data.id}?start=1`)
+            }
 
-          this.createListClose()
+            this.createListClose()
 
-          this.$generalNotification(message)
+            this.$generalNotification(message)
 
-          this.loadFolders()
-        })
-        .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.errorMsg = message
-          this.$generalNotification(message, 'error')
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
+            this.loadFolders()
+          })
+          .catch((error) => {
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.errorMsg = message
+            this.$generalNotification(message, 'error')
+          })
+          .finally(() => {
+            this.isLoading = false
+          })
+      } else {
+        let data = {
+          ...this.defaultTemplateResponse,
+          name: this.getParams().name,
+          contact_folder_id: this.getParams().contact_folder_id
+        }
+        console.log('Setting temporary list...', data)
+
+        this.setUnsavedList(data)
+        this.isLoading = false
+        this.createListClose()
+        this.$router.push(`${this.redirectPath}/unsaved`)
+      }
     },
     loadFolders () {
       this.$axios

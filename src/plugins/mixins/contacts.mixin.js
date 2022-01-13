@@ -339,7 +339,7 @@ export default {
       return 'last_engagement_at'
     },
     hasMore () {
-      let result = this.listItems[this.id].next_page_url &&
+      let result = this.listItems[this.id]?.next_page_url &&
         !this.isLoadingMore &&
         !this.isLoading
       return result || false
