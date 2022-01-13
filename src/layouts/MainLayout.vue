@@ -506,6 +506,7 @@ export default {
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
       if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW || ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
+        this.closeCallNotifications('incomingCall', communication.id)
         this.closeCallNotifications('callFishing', communication.id)
       }
     })
