@@ -579,7 +579,7 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CURRENT_STATUS (state, status) {
         state.dialer.currentStatus = status
-        console.log('Dialer current status: ' + this.state.dialer.currentStatus)
+        console.log('Dialer current status: ', this.state.dialer.currentStatus)
       },
 
       SET_DIALER_COMMUNICATION (state, communication) {
@@ -652,7 +652,7 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_PARKED_CALL (state, communication) {
         state.dialer.parkedCall = communication
-        if (communication) {
+        if (communication && state.dialer.communication && communication.id === state.dialer.communication.id) {
           state.dialer.call = null
         }
       },

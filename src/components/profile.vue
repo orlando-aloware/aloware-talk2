@@ -59,7 +59,7 @@
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)">
             <div class="d-flex align-items-center justify-content-between w-100">
-              <div>set
+              <div>
                 <q-badge :color="color(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)"
                          class="rounded-badge bordered q-mr-sm mt-1 ">
                 </q-badge>

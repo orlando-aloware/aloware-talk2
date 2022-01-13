@@ -82,7 +82,7 @@ export default {
     },
 
     channelName () {
-      const path = this.$route.path.split('/')
+      let path = this.$route.path.split('/')
       return _.get(path, '[2]', 'Inbox')
     }
   },

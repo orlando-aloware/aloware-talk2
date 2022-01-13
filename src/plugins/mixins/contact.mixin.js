@@ -783,9 +783,19 @@ export default {
 
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
-        setTimeout(() => {
-          const containerEl = document.querySelector('.contact-activities .scrollbar-white')
-          containerEl.scrollTop = element.offsetTop
+        let counter = 0
+        let containerElInterval = setInterval(() => {
+          let containerEl = document.querySelector('.contact-activities .scrollbar-white')
+
+          if (containerEl) {
+            containerEl.scrollTop = element.offsetTop
+            clearInterval(containerElInterval)
+          }
+
+          counter++
+          if (counter > 120) {
+            clearInterval(containerElInterval)
+          }
         }, 500)
       }
 

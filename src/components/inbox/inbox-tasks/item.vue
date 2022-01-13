@@ -77,18 +77,22 @@
         </task-item-time>
       </span>
       <div class="text-grey-90 d-flex flex-row justify-center"
-           v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
+           v-if="(contact.last_communication.direction === CommunicationDirection.INBOUND &&
              contact.last_communication.type === CommunicationTypes.CALL &&
              [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-             CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2) && dialer.call">
+             CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2) &&
+             dialer.call &&
+             dialer.currentStatus !== 'CALL_CONNECTED') || isCallFishingMode">
         <div class="pl-0">
           <b-button variant="light"
                     size="sm"
                     class="bg-transparent no-border no-box-shadow p-0"
                     @click="onRejectCall">
-            <ignore-call-icon v-if="isCallFishing" />
+            <ignore-call-icon v-if="isCallFishingMode"
+                              height="24"
+                              width="24" />
             <cancel-call-icon v-else/>
           </b-button>
 
@@ -100,11 +104,12 @@
                     class="bg-transparent no-border no-box-shadow p-0"
                     @click="onAcceptCall">
             <accept-call-icon/>
-            <q-menu
-                    fit
+            <q-menu fit
                     content-class="live-call-options"
                     anchor="top right"
-                    self="top left">
+                    self="top left"
+                    v-model="showIncomingCallMenu"
+                    @hide="showIncomingCallMenu = false">
               <q-list>
                 <q-item clickable
                         v-close-popup
@@ -112,7 +117,8 @@
                   <q-item-section class="d-inline-flex">
                     <park-call-icon color="#9B51E0"
                                       width="11.7"
-                                      height="12.35"></park-call-icon>
+                                      height="12.35">
+                    </park-call-icon>
                     <span>Park Current Call &amp; Answer</span>
                   </q-item-section>
                 </q-item>
@@ -158,21 +164,24 @@
                     fit
                     content-class="live-call-options"
                     anchor="top right"
-                    self="top left">
+                    self="top left"
+                    v-model="showParkedCallMenu"
+                    @hide="showParkedCallMenu = false">
               <q-list>
                 <q-item clickable
                         v-close-popup
-                        @click="onParkCurrentCallAndAnswer">
+                        @click="onParkCurrentCallAndConnect">
                   <q-item-section class="d-inline-flex">
-                    <parked-call-icon color="#9B51E0"
+                    <park-call-icon color="#9B51E0"
                                     width="11.7"
-                                    height="12.35"></parked-call-icon>
+                                    height="12.35">
+                    </park-call-icon>
                     <span>Park Current Call &amp; Connect</span>
                   </q-item-section>
                 </q-item>
                 <q-item clickable
                         v-close-popup
-                        @click="onHangUpCurrentCallAndAnswer">
+                        @click="onHangupCurrentCallAndConnect">
                   <q-item-section>
                     <hangup-icon  width="16"
                                   height="16"></hangup-icon>
@@ -237,7 +246,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'dialer', 'ringGroups']),
+    ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
     ...mapState('inbox', ['selectedContact']),
     contactName () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
@@ -320,6 +329,18 @@ export default {
       const ringGroup = this.getRingGroup(this.contact.last_communication.ring_group_id)
 
       return ringGroup && ringGroup.fishing_mode
+    },
+    isCallFishingMode () {
+      if (this.notifications.callFishing.communicationId === this.contact.last_communication.id) {
+        return true
+      }
+
+      if (this.notifications.callFishing.queue) {
+        let index = this.notifications.callFishing.queue.findIndex(item => item.communicationId === this.contact.last_communication.id)
+        return index >= 0
+      }
+
+      return false
     }
   },
 
@@ -328,7 +349,9 @@ export default {
       CommunicationTypes,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
-      CommunicationDirection
+      CommunicationDirection,
+      showIncomingCallMenu: false,
+      showParkedCallMenu: false
     }
   },
 
@@ -344,34 +367,41 @@ export default {
       this.$emit('onItemSelected', contact)
     },
     onAcceptCall (e) {
-      let communication = this.contact.last_communication
-
-      if (communication.ring_group_id) {
-        const ringGroup = this.getRingGroup(communication.ring_group_id)
-
-        if (ringGroup && ringGroup.fishing_mode) {
-          console.log('Accepting call on fishing mode from task item..')
-          const data = {
-            communication: {
-              id: communication.id,
-              campaign_id: communication.campaign_id,
-              contactName: this.contact.name,
-              companyName: this.contact.company_name,
-              contactId: this.contact.id
-            },
-            shouldPark: false,
-            shouldHangup: false
-          }
-          this.$VueEvent.fire('answerCallFishing', data)
-          this.setShowPhone(true)
-          return
-        }
+      console.log('hello', this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED')
+      if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.showIncomingCallMenu = true
+        e.stopImmediatePropagation()
+        return
       }
 
-      console.log('Accepting call from task item..')
-
-      this.$VueEvent.fire('answerCall')
-      this.setShowPhone(true)
+      // let communication = this.contact.last_communication
+      //
+      // if (communication.ring_group_id) {
+      //   const ringGroup = this.getRingGroup(communication.ring_group_id)
+      //
+      //   if (ringGroup && ringGroup.fishing_mode) {
+      //     console.log('Accepting call on fishing mode from task item..')
+      //     const data = {
+      //       communication: {
+      //         id: communication.id,
+      //         campaign_id: communication.campaign_id,
+      //         contactName: this.contact.name,
+      //         companyName: this.contact.company_name,
+      //         contactId: this.contact.id
+      //       },
+      //       shouldPark: false,
+      //       shouldHangup: false
+      //     }
+      //     this.$VueEvent.fire('answerCallFishing', data)
+      //     this.setShowPhone(true)
+      //     return
+      //   }
+      // }
+      //
+      // console.log('Accepting call from task item..')
+      //
+      // this.$VueEvent.fire('answerCall')
+      // this.setShowPhone(true)
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
@@ -390,12 +420,19 @@ export default {
       e.stopImmediatePropagation()
     },
     onUnparkCall (e) {
+      if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.showParkedCallMenu = true
+        e.stopImmediatePropagation()
+        return
+      }
+
       this.$VueEvent.fire('unparkCall')
       this.$VueEvent.fire('togglePhone')
       e.stopImmediatePropagation()
     },
 
     onParkCurrentCallAndConnect () {
+      this.showParkedCallMenu = false
       this.answerCommunication(true, false)
 
       // park current call and unpark this call communication
@@ -403,17 +440,20 @@ export default {
       // this.$VueEvent.fire('unparkCall')
     },
     onHangupCurrentCallAndConnect () {
-      this.answerCommunication(true, true)
+      this.showParkedCallMenu = false
+      this.answerCommunication(false, true)
 
       // hangup current call and unpark this call communication
       // this.$VueEvent.fire('hangupCall')
       // this.$VueEvent.fire('unparkCall')
     },
     onParkCurrentCallAndAnswer () {
+      this.showIncomingCallMenu = false
       this.answerCommunication(true, false)
       // park current call and answer communication
     },
     onHangUpCurrentCallAndAnswer () {
+      this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
       // hangup current call and answer
     },

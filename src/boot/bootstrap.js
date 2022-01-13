@@ -282,7 +282,11 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   }
 
   // if call is still on-going and fishing mode active, we queue the notification
-  if (settings.type === 'callFishing' && this.$store.state.notifications[settings.type].communicationId) {
+  if (settings.type === 'callFishing' &&
+    this.$store.state.notifications[settings.type].communicationId &&
+    this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
+    this.$store.state.notifications[settings.type].contactId !== settings.contactId
+  ) {
     let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
     queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
     const found = queue.find(item => item.contactId === settings.contactId && item.communicationId !== settings.communicationId)
