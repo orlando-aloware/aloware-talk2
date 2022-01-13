@@ -235,6 +235,22 @@ export default {
       //   communication_id: communication.id,
       //   notification: notification
       // })
+    },
+    showCallFishingDataInPhone (data) {
+      this.$VueEvent.fire('showPhone')
+      this.$closeActionNotification('callFishing')
+      let counter = 0
+      let dialerCallFishingInterval = setInterval(() => {
+        if (!document.getElementById('callFishing')) {
+          this.setDialerCallFishing(data)
+          clearInterval(dialerCallFishingInterval)
+        }
+        counter++
+
+        if (counter > 120) {
+          clearInterval(dialerCallFishingInterval)
+        }
+      }, 500)
     }
   }
 }

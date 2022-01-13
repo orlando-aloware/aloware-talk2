@@ -1703,6 +1703,13 @@ export default {
       this.$VueEvent.fire('answerCall')
 
       if (this.dialer.callFishing) {
+        this.$VueEvent.fire('makeCall', {
+          currentNumber: 'call:' + _.get(this.dialer, 'callFishing.communication.id', null),
+          outboundCampaignId: _.get(this.dialer, 'callFishing.communication.campaign_id', null),
+          contactName: _.get(this.dialer, 'callFishing.contact.name', null),
+          companyName: _.get(this.dialer, 'callFishing.contact.company_name', null),
+          contactId: _.get(this.dialer, 'callFishing.communication.contact_id', null)
+        })
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
 

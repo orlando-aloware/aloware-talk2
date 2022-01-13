@@ -487,24 +487,10 @@ export default {
       })
 
       if (!found && this.id === 'callFishing' && !this.dialer.call && !this.dialer.parkedCall) {
-        this.$VueEvent.fire('showPhone')
-        let data = {
+        this.showCallFishingDataInPhone({
           communication: this.communication,
           contact: this.contact
-        }
-        this.$closeActionNotification('callFishing')
-        let counter = 0
-        let dialerCallFishingInterval = setInterval(() => {
-          if (!document.getElementById('callFishing')) {
-            this.setDialerCallFishing(data)
-            clearInterval(dialerCallFishingInterval)
-          }
-          counter++
-
-          if (counter > 120) {
-            clearInterval(dialerCallFishingInterval)
-          }
-        }, 500)
+        })
         // this.$router.push({
         //   path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
         // })
