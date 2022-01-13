@@ -209,7 +209,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call && dialer.call.direction === 'OUTGOING'">
+               v-if="dialer.call && dialer.call.direction === 'OUTGOING' && !dialer.callFishing">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"

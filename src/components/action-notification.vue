@@ -10,8 +10,7 @@
            v-show="title.length > 0"
            @hide="clearDateTimeInterval"
            @hidden="onHidden"
-           @shown="autoClose"
-           @show="onShow">
+           @shown="autoClose">
     <button
       class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-rounded position-absolute call-fishing-clear-queues"
       v-if="queue && queue.length > 0"
@@ -122,10 +121,20 @@
             </ignore-call-icon>
           </q-btn>
 
+          <q-btn class="height-32"
+                 ripple
+                 round
+                 no-caps
+                 @click="answerCall"
+                 v-if="dialer.currentStatus === 'WRAP_UP'">
+            <accept-call-icon width="32" height="32"/>
+          </q-btn>
+
           <b-dropdown no-caret
                       right
                       variant="transparent"
-                      class="m-2 b-compact-dropdown-button text-bold height-32">
+                      class="m-2 b-compact-dropdown-button text-bold height-32"
+                      v-if="dialer.currentStatus !== 'WRAP_UP'">
             <template #button-content>
               <accept-call-icon width="32" height="32"/>
             </template>
@@ -393,7 +402,7 @@ export default {
 
       this.clearDateTimeInterval()
 
-      if (this.id !== 'callFishing') {
+      if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
         this.setNotifications({
           type: this.id,
           data: {
@@ -430,6 +439,10 @@ export default {
       return 'sms'
     },
     answerCall () {
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
       if (this.id === 'callFishing') {
         this.answerCommunication()
         return
@@ -440,7 +453,7 @@ export default {
     },
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
-      this.closeCallNotifications(this.id, this.communicationId, false)
+      this.closeCallNotifications(this.id, this.communicationId)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {
       let data = {
@@ -460,7 +473,7 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
-      this.closeCallNotifications(this.id, this.communicationId)
+      this.closeCallNotifications(this.id, this.communicationId, true)
       this.$VueEvent.fire('rejectCall')
 
       if (this.id === 'callFishing') {
@@ -479,6 +492,7 @@ export default {
           communication: this.communication,
           contact: this.contact
         })
+        this.$closeActionNotification('callFishing')
         // this.$router.push({
         //   path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
         // })
@@ -496,11 +510,6 @@ export default {
           queue: null
         }
       })
-    },
-    onShow () {
-      if (this.id === 'callFishing') {
-        this.$VueEvent.fire('hidePhone')
-      }
     },
     toInbox () {
       if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {

@@ -347,7 +347,7 @@ const readableArrayValue = (value) => {
     return ''
   }
   if (value.length >= 2) {
-    const last = value.pop()
+    let last = value.pop()
     return value.join(', ') + ', or ' + last
   } else {
     return value.pop()
@@ -389,9 +389,9 @@ const textTruncate = (text, lines, maxLength = 43) => {
     } else {
       texts = text
     }
-    const newMaxLength = maxLength * lines
+    let newMaxLength = maxLength * lines
     texts = texts.substring(0, (texts.length > newMaxLength ? newMaxLength : texts.length))
-    const hasEllipse = texts.length < text.length
+    let hasEllipse = texts.length < text.length
     texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
     return texts + (hasEllipse ? '…' : '')
   }

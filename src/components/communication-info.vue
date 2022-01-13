@@ -820,7 +820,7 @@ export default {
     },
 
     getCommunicationCampaignName () {
-      const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
+      let communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {
         return null
       }
@@ -881,7 +881,7 @@ export default {
     },
 
     changeEngagementStatus (event) {
-      const params = {
+      let params = {
         status: this.communication.disposition_status2
       }
 
