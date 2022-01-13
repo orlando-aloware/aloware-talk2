@@ -139,7 +139,7 @@
               <accept-call-icon width="32" height="32"/>
             </template>
             <b-dropdown-item href=""
-                             @click="answerCommunication(true, true)">
+                             @click="answerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
@@ -501,13 +501,13 @@ export default {
       }
     },
     clearNotificationQueue () {
-      this.$closeActionNotification(this.id)
       this.setNotifications({
         type: this.id,
         data: {
           queue: null
         }
       })
+      this.$closeActionNotification(this.id)
     },
     toInbox () {
       if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {

@@ -49,7 +49,7 @@ export default {
 
       // for incoming call
       let notificationCommId = _.get(this.notifications, 'incomingCall.communication.id', null)
-      if (type === 'incomingCall' || notificationCommId === communicationId) {
+      if (type === 'incomingCall' && notificationCommId === communicationId) {
         this.$closeActionNotification(type)
         return
       }
@@ -202,7 +202,7 @@ export default {
             type = 'callFishing'
           }
 
-          if (type === 'incomingCall' && this.profile.agentStatus !== AgentStatus.AGENT_STATUS_RINGING) {
+          if (type === 'incomingCall' && this.profile.agent_status !== AgentStatus.AGENT_STATUS_RINGING) {
             break
           }
 
