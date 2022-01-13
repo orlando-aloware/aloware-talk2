@@ -690,7 +690,7 @@ export default {
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
       this.loadingPark = true
@@ -739,7 +739,7 @@ export default {
           }
 
           if (counter === true && shouldUnpark) {
-            this.unparkCall()
+            this.unparkCommunication(data)
             return
           }
 
