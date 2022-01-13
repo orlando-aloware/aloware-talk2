@@ -104,7 +104,8 @@
                     class="bg-transparent no-border no-box-shadow p-0"
                     @click="onAcceptCall">
             <accept-call-icon/>
-            <q-menu fit
+            <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
+                    fit
                     content-class="live-call-options"
                     anchor="top right"
                     self="top left"
@@ -113,7 +114,7 @@
               <q-list>
                 <q-item clickable
                         v-close-popup
-                        @click="onParkCurrentCallAndConnect">
+                        @click="onParkCurrentCallAndAnswer">
                   <q-item-section class="d-inline-flex">
                     <park-call-icon color="#9B51E0"
                                       width="11.7"
@@ -124,7 +125,7 @@
                 </q-item>
                 <q-item clickable
                         v-close-popup
-                        @click="onHangupCurrentCallAndConnect">
+                        @click="onHangUpCurrentCallAndAnswer">
                   <q-item-section>
                     <hangup-icon  width="16"
                                   height="16"></hangup-icon>
@@ -209,7 +210,7 @@
 
 <script>
 import Avatar from 'components/avatar'
-import { avatarMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import { avatarMixin, communicationInfoMixin, notificationMixin } from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -226,7 +227,7 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 export default {
   name: 'inbox-task-item',
 
-  mixins: [avatarMixin, communicationInfoMixin],
+  mixins: [avatarMixin, communicationInfoMixin, notificationMixin],
 
   components: { IgnoreCallIcon, ParkCallIcon, HangupIcon, ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
 
@@ -367,44 +368,49 @@ export default {
       this.$emit('onItemSelected', contact)
     },
     onAcceptCall (e) {
-      console.log('hello', this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED')
       if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
         this.showIncomingCallMenu = true
         e.stopImmediatePropagation()
         return
       }
 
-      // let communication = this.contact.last_communication
-      //
-      // if (communication.ring_group_id) {
-      //   const ringGroup = this.getRingGroup(communication.ring_group_id)
-      //
-      //   if (ringGroup && ringGroup.fishing_mode) {
-      //     console.log('Accepting call on fishing mode from task item..')
-      //     const data = {
-      //       communication: {
-      //         id: communication.id,
-      //         campaign_id: communication.campaign_id,
-      //         contactName: this.contact.name,
-      //         companyName: this.contact.company_name,
-      //         contactId: this.contact.id
-      //       },
-      //       shouldPark: false,
-      //       shouldHangup: false
-      //     }
-      //     this.$VueEvent.fire('answerCallFishing', data)
-      //     this.setShowPhone(true)
-      //     return
-      //   }
-      // }
-      //
-      // console.log('Accepting call from task item..')
-      //
-      // this.$VueEvent.fire('answerCall')
-      // this.setShowPhone(true)
+      let communication = this.contact.last_communication
+
+      if (communication.ring_group_id) {
+        const ringGroup = this.getRingGroup(communication.ring_group_id)
+
+        if (ringGroup && ringGroup.fishing_mode) {
+          console.log('Accepting call on fishing mode from task item..')
+          const data = {
+            communication: {
+              id: communication.id,
+              campaignId: communication.campaign_id,
+              contactName: this.contact.name,
+              companyName: this.contact.company_name,
+              contactId: this.contact.id
+            },
+            shouldPark: false,
+            shouldHangup: false
+          }
+          this.$VueEvent.fire('answerCallFishing', data)
+          this.setShowPhone(true)
+          return
+        }
+      }
+
+      console.log('Accepting call from task item..')
+
+      this.$VueEvent.fire('answerCall')
+      this.setShowPhone(true)
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
+      if (this.isCallFishingMode) {
+        this.processRemoveFromNotification(this.contact.last_communication)
+        e.stopImmediatePropagation()
+        return
+      }
+
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
         console.log('Hangup call from task item..')
         this.$VueEvent.fire('hangupCall')
@@ -434,34 +440,24 @@ export default {
     onParkCurrentCallAndConnect () {
       this.showParkedCallMenu = false
       this.answerCommunication(true, false)
-
-      // park current call and unpark this call communication
-      // this.$VueEvent.fire('parkCall')
-      // this.$VueEvent.fire('unparkCall')
     },
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false
       this.answerCommunication(false, true)
-
-      // hangup current call and unpark this call communication
-      // this.$VueEvent.fire('hangupCall')
-      // this.$VueEvent.fire('unparkCall')
     },
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(true, false)
-      // park current call and answer communication
     },
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
-      // hangup current call and answer
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.contact.last_communication.id,
-          campaign_id: this.contact.last_communication.campaign_id,
+          campaignId: this.contact.last_communication.campaign_id,
           contactName: this.contact.name,
           companyName: this.contact.company_name,
           contactId: this.contact.id
