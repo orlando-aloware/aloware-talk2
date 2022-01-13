@@ -56,8 +56,9 @@ export default {
 
       // for call fishing
       notificationCommId = _.get(this.notifications, 'callFishing.communication.id', null)
+      let dialerCallFishingCommId = _.get(this.dialer, 'callFishing.communication.id', null)
 
-      if (type === 'callFishing' || notificationCommId) {
+      if (communicationId && dialerCallFishingCommId && communicationId === dialerCallFishingCommId) {
         this.clearDialerCallFishing()
       }
 

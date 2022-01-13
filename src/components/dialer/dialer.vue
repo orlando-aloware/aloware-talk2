@@ -498,6 +498,7 @@ export default {
 
       this.setDialerCurrentStatus('ANSWERING_CALL')
       this.setShowIncomingCallNotification(false)
+      this.clearDialerCallFishing()
 
       if (this.device.activeConnection()) {
         // accept the incoming connection and start two-way audio
