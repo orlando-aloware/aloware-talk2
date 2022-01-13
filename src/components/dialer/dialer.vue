@@ -92,8 +92,6 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
-      this.$closeActionNotification('incomingCall')
-      this.$closeActionNotification('callFishing')
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
@@ -146,8 +144,6 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.$closeActionNotification('incomingCall')
-      this.$closeActionNotification('callFishing')
       this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
@@ -187,8 +183,6 @@ export default {
         .catch((err) => {
           console.log(err)
         })
-      this.$closeActionNotification('incomingCall')
-      this.$closeActionNotification('callFishing')
 
       // close the dialer form when it's open and incoming call is answered
       if (this.dialerFormStatus) {
@@ -198,7 +192,6 @@ export default {
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-      this.processRemoveFromNotification(this.dialer.communication)
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
       if (!this.dialer.parkedCall && !this.dialer.call) {
@@ -504,6 +497,7 @@ export default {
 
       this.setDialerCurrentStatus('ANSWERING_CALL')
       this.setShowIncomingCallNotification(false)
+      this.clearDialerCallFishing()
 
       if (this.device.activeConnection()) {
         // accept the incoming connection and start two-way audio
@@ -695,6 +689,73 @@ export default {
       console.log('Unhold is in progress.')
     },
 
+    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || (!shouldUnpark && this.dialer.parkedCall)) {
+        return
+      }
+      this.loadingPark = true
+      this.setDialerParkedCall(this.dialer.communication)
+      let params = {
+        communication_id: this.dialer.communication.id
+      }
+      this.$axios.post('/api/v1/dialer/park', params).then(() => {
+        console.log('Call parked')
+        if (shouldAnswer) {
+          this.makeCall('call:' + data.id, data.campaignId)
+        }
+
+        if (shouldUnpark) {
+          this.unparkCommunication(data)
+        }
+
+        this.setDialerIsMuted(false)
+      }).catch(err => {
+        this.setDialerParkedCall()
+        console.log(err)
+      }).finally(_ => {
+        this.loadingPark = false
+      })
+    },
+
+    hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+      if (!this.dialer.call) {
+        return
+      }
+
+      console.log('Hanging up call')
+
+      this.setDialerCurrentStatus('HANGING_UP_CALL')
+
+      if (this.device.activeConnection()) {
+        // hangup an incoming call
+        this.device.activeConnection().hangup()
+
+        let counter = 0
+        let hangupInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.backToDial()
+            counter = true
+            clearInterval(hangupInterval)
+          }
+
+          if (counter === true && shouldUnpark) {
+            this.unparkCommunication(data)
+            return
+          }
+
+          if (counter === true && shouldAnswer) {
+            this.makeCall('call:' + data.id, data.campaignId)
+            return
+          }
+
+          counter++
+          if (counter > 120) {
+            clearInterval(hangupInterval)
+          }
+        }, 500)
+      }
+    },
+
     mergeCalls () {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
@@ -820,8 +881,6 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(true)
-      this.$closeActionNotification('incomingCall')
-      this.$closeActionNotification('callFishing')
     },
 
     countCallDuration () {
@@ -1019,25 +1078,28 @@ export default {
       }
 
       // park the in-progress call
-      if (shouldPark) {
-        this.parkCall()
-      }
-
-      // unpark the previosly parked call
-      if (parkedCall) {
-        this.unparkCommunication(parkedCall)
+      if (shouldPark && !parkedCall) {
+        this.parkCallCombo(true, false, communication)
         return
       }
 
-      let timeout = 0
-      if (shouldHangup) {
-        this.hangupCall()
-        timeout = 1000
+      // park the in-progress call (switch from already parked call)
+      if (shouldPark && parkedCall) {
+        this.parkCallCombo(false, true, parkedCall)
+        return
       }
 
-      setTimeout(() => {
-        this.makeCall('call:' + communication.id, communication.campaignId)
-      }, timeout)
+      if (shouldHangup && parkedCall) {
+        this.hangupCallCombo(false, true, parkedCall)
+        return
+      }
+
+      if (shouldHangup && !parkedCall) {
+        this.hangupCallCombo(true, false, communication)
+        return
+      }
+
+      this.makeCall('call:' + communication.id, communication.campaignId)
     },
 
     ...mapActions([

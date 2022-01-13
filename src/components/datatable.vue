@@ -327,7 +327,7 @@ export default {
       this.$emit('checked', evt.target.checked)
     },
     onOrderChanged ({ oldIndex, newIndex }) {
-      const columns = [...this.fixedColumns]
+      let columns = [...this.fixedColumns]
 
       columns[oldIndex] = this.fixedColumns[newIndex]
       columns[newIndex] = this.fixedColumns[oldIndex]

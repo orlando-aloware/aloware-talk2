@@ -7348,7 +7348,8 @@ button.grey-90 {
 #b-toaster-top-center {
   .b-toaster-slot {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -7394,6 +7395,10 @@ button.grey-90 {
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 18px;
+        max-width: 162px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .time {
         @include font-size($f-size-h5, normal, true);
@@ -8014,7 +8019,15 @@ button.grey-90 {
       .focus-mode-icon,
       .logout-icon {
         margin-right: 8px;
+        margin-top: -2px;
       }
+    }
+
+    .q-item:not(:first-child) {
+      margin-top: 8px;
+    }
+    .q-item:nth-child(6) {
+      margin-top: 0 !important;
     }
   }
 }
@@ -10317,4 +10330,14 @@ screen and (max-width: 956px) {
 
 .call-fishing-clear-queues {
   top: -32px;
+}
+
+.disabled-user-status {
+  background: #747981 !important;
+}
+
+.incoming-call-notification {
+  .message-text:not(.has-ring-group) {
+    max-width: 162px;
+  }
 }

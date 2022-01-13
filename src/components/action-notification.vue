@@ -10,8 +10,7 @@
            v-show="title.length > 0"
            @hide="clearDateTimeInterval"
            @hidden="onHidden"
-           @shown="autoClose"
-           @show="onShow">
+           @shown="autoClose">
     <button
       class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-rounded position-absolute call-fishing-clear-queues"
       v-if="queue && queue.length > 0"
@@ -27,7 +26,8 @@
                  pill>
           {{ queue.length }}
         </b-badge>
-        <div class="mr-2 notification-icon">
+        <div class="mr-2 notification-icon"
+        @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
           <call-icon v-if="id === 'call'"/>
@@ -36,7 +36,8 @@
           <call-incoming-icon v-if="['incomingCall', 'callFishing'].includes(id)"/>
         </div>
         <div class="notification-details"
-             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]">
+             :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
+             @click="toContact">
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
             <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
             <strong class="mr-auto text-white title pr-1">
@@ -120,15 +121,25 @@
             </ignore-call-icon>
           </q-btn>
 
+          <q-btn class="height-32"
+                 ripple
+                 round
+                 no-caps
+                 @click="answerCall"
+                 v-if="dialer.currentStatus === 'WRAP_UP'">
+            <accept-call-icon width="32" height="32"/>
+          </q-btn>
+
           <b-dropdown no-caret
                       right
                       variant="transparent"
-                      class="m-2 b-compact-dropdown-button text-bold height-32">
+                      class="m-2 b-compact-dropdown-button text-bold height-32"
+                      v-if="dialer.currentStatus !== 'WRAP_UP'">
             <template #button-content>
               <accept-call-icon width="32" height="32"/>
             </template>
             <b-dropdown-item href=""
-                             @click="answerCommunication(true, true)">
+                             @click="answerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
@@ -184,8 +195,7 @@ export default {
   data () {
     return {
       runningDateTime: null,
-      runningDateTimeInterval: null,
-      isHidden: true
+      runningDateTimeInterval: null
     }
   },
   computed: {
@@ -379,26 +389,20 @@ export default {
         this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
         this.runningDateTimeInterval = setInterval(() => {
           this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
-          if (this.isHidden) {
-            this.clearDateTimeInterval()
-          }
         }, 60000)
       }
     },
     clearDateTimeInterval () {
-      if (!this.noAutoHide) {
-        clearInterval(this.runningDateTimeInterval)
-      }
+      clearInterval(this.runningDateTimeInterval)
     },
     onHidden () {
-      this.isHidden = true
       if (this.id === 'call') {
         return
       }
 
       this.clearDateTimeInterval()
 
-      if (this.id !== 'callFishing') {
+      if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
         this.setNotifications({
           type: this.id,
           data: {
@@ -435,6 +439,10 @@ export default {
       return 'sms'
     },
     answerCall () {
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
       if (this.id === 'callFishing') {
         this.answerCommunication()
         return
@@ -445,7 +453,7 @@ export default {
     },
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
-      this.closeCallNotifications(this.id, this.communicationId, false)
+      this.closeCallNotifications(this.id, this.communicationId)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {
       let data = {
@@ -465,11 +473,11 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
+      this.closeCallNotifications(this.id, this.communicationId, true)
       this.$VueEvent.fire('rejectCall')
 
       if (this.id === 'callFishing') {
         this.$VueEvent.fire('hidePhone')
-        this.closeCallNotifications(this.id, this.communicationId)
       }
     },
     onNotificationClick (event) {
@@ -479,8 +487,7 @@ export default {
       })
 
       if (!found && this.id === 'callFishing' && !this.dialer.call && !this.dialer.parkedCall) {
-        this.$VueEvent.fire('showPhone')
-        this.setDialerCallFishing({
+        this.showCallFishingDataInPhone({
           communication: this.communication,
           contact: this.contact
         })
@@ -494,20 +501,31 @@ export default {
       }
     },
     clearNotificationQueue () {
-      this.$closeActionNotification(this.id)
       this.setNotifications({
         type: this.id,
         data: {
           queue: null
         }
       })
+      this.$closeActionNotification(this.id)
     },
-    onShow () {
-      if (this.id === 'callFishing') {
-        this.$VueEvent.fire('hidePhone')
+    toInbox () {
+      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+        return
       }
 
-      this.isHidden = false
+      this.$router.push({
+        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+      })
+    },
+    toContact () {
+      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+        return
+      }
+
+      this.$router.push({
+        path: `/contacts/${this.contactId}`
+      })
     }
   }
 }

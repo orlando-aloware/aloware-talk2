@@ -209,7 +209,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call && dialer.call.direction === 'OUTGOING'">
+               v-if="dialer.call && dialer.call.direction === 'OUTGOING' && !dialer.callFishing">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
@@ -1651,7 +1651,7 @@ export default {
 
     getContactLocalTime () {
       let contact = this.contact
-      contact = !contact ? this.dialer.callFishing.contact : contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
       if (contact && contact.timezone) {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
@@ -1659,7 +1659,7 @@ export default {
 
     goToContact () {
       let contact = this.contact
-      contact = !contact ? this.dialer.callFishing.contact : contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
       if (contact) {
         this.$router.push({
           name: 'Contact',
@@ -1703,6 +1703,13 @@ export default {
       this.$VueEvent.fire('answerCall')
 
       if (this.dialer.callFishing) {
+        this.$VueEvent.fire('makeCall', {
+          currentNumber: 'call:' + _.get(this.dialer, 'callFishing.communication.id', null),
+          outboundCampaignId: _.get(this.dialer, 'callFishing.communication.campaign_id', null),
+          contactName: _.get(this.dialer, 'callFishing.contact.name', null),
+          companyName: _.get(this.dialer, 'callFishing.contact.company_name', null),
+          contactId: _.get(this.dialer, 'callFishing.communication.contact_id', null)
+        })
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
 
