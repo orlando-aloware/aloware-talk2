@@ -394,6 +394,7 @@ export default {
           }
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
+          e.stopImmediatePropagation()
           return
         }
       }
@@ -439,7 +440,7 @@ export default {
 
     onParkCurrentCallAndConnect () {
       this.showParkedCallMenu = false
-      this.answerCommunication(true, false)
+      this.answerCommunication(true, true)
     },
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false

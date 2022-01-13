@@ -781,7 +781,7 @@ export default {
           }
         }
 
-        if (this.profile.go_to_available_after_login && !this.dialer.call) {
+        if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
           this.$VueEvent.fire(
             'change_agent_status',
             AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
