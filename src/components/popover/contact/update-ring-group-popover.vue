@@ -92,6 +92,7 @@ export default {
       }).then(response => {
         this.addContactPhoneNumber(response.data)
         this.is_busy = false
+        this.$generalNotification('Phone number added')
         this.onClose()
       }).catch(err => {
         this.$root.handleErrors(err.response)

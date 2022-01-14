@@ -56,7 +56,7 @@
                 </div>
               </div>
             </section>
-            <dialer :key="dialerKey"
+            <dialer ref="dialerComponent"
                     v-if="authenticated">
             </dialer>
           </q-page-container>
@@ -256,7 +256,6 @@ export default {
       isPhoneVisible: false,
       metricsDataLoaded: false,
       sharedCookie: null,
-      dialerKey: 0,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -646,7 +645,11 @@ export default {
       const { usage, company } = data
       this.setCurrentCompany(company)
       this.resetVuex()
-      this.dialerKey += 1
+
+      if (this.$refs.dialerComponent !== undefined) {
+        this.$refs.dialerComponent.rebootPhone()
+      }
+
       this.setUsage(usage)
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
