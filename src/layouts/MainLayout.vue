@@ -56,7 +56,8 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated">
+            <dialer :key="dialerKey"
+                    v-if="authenticated">
             </dialer>
           </q-page-container>
         </div>
@@ -255,6 +256,7 @@ export default {
       isPhoneVisible: false,
       metricsDataLoaded: false,
       sharedCookie: null,
+      dialerKey: 0,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -643,9 +645,8 @@ export default {
     async cookieUserValidated ({ data: { data } }) {
       const { usage, company } = data
       this.setCurrentCompany(company)
-      let dialerClone = JSON.parse(JSON.stringify(this.dialer))
       this.resetVuex()
-      this.setDialer(dialerClone)
+      this.dialerKey += 1
       this.setUsage(usage)
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
@@ -1630,7 +1631,6 @@ export default {
       'setCallDispositions',
       'setTemplates',
       'setBroadcasts',
-      'setDialer',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',
