@@ -82,10 +82,12 @@
              [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-             CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW].includes(contact.last_communication.current_status2) &&
+             CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+             CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2) &&
              dialer.call &&
              dialer.currentStatus !== 'CALL_CONNECTED') || isCallFishingMode">
-        <div class="pl-0">
+        <div
+             class="pl-0">
           <b-button variant="light"
                     size="sm"
                     class="bg-transparent no-border no-box-shadow p-0"
@@ -97,7 +99,7 @@
           </b-button>
 
         </div>
-        <div v-if="!isActiveCallOwner"
+        <div v-if="!isActiveCallOwner || !isParkedCall"
              class="pl-1 pr-0" >
           <b-button variant="light"
                     size="sm"
@@ -342,6 +344,17 @@ export default {
       }
 
       return false
+    },
+    shouldShowCallActionMenu () {
+      return (this.contact.last_communication.direction === CommunicationDirection.INBOUND &&
+        this.contact.last_communication.type === CommunicationTypes.CALL &&
+        [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.contact.last_communication.current_status2) &&
+        this.dialer.call &&
+        this.dialer.currentStatus !== 'CALL_CONNECTED')
     }
   },
 
@@ -387,7 +400,8 @@ export default {
               campaignId: communication.campaign_id,
               contactName: this.contact.name,
               companyName: this.contact.company_name,
-              contactId: this.contact.id
+              contactId: this.contact.id,
+              phoneNumber: this.contact.phone_number
             },
             shouldPark: false,
             shouldHangup: false

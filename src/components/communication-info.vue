@@ -14,10 +14,10 @@
       </q-item>
     </q-list>
 
-    <q-list v-else-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall"
+    <q-list v-else-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall || isCallFishingMode"
             bordered
             class="rounded-contact-activity b-radius-12"
-            :class="[isConnectedCall ? 'call-connected cursor-pointer' : '']"
+            :class="[isConnectedCall ? 'call-connected cursor-pointer' : '', this.isConnectedCall || this.isIncomingCall || this.isCallFishingMode ? 'cursor-pointer' : '']"
             @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
@@ -42,13 +42,15 @@
         </q-item-section>
         <q-item-section class="text-lt pl-2 pr-2 text-left">
           <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="isIncomingCall && dialer.call">
+               v-if="(isIncomingCall && dialer.call) || isCallFishingMode">
             <div class="pl-0">
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
                         @click="onRejectCall">
-                <ignore-call-icon v-if="isCallFishing" />
+                <ignore-call-icon v-if="isCallFishingMode"
+                                  height="24"
+                                  width="24"/>
                 <cancel-call-icon v-else/>
               </b-button>
             </div>
@@ -79,11 +81,13 @@
           </div>
         </q-item-section>
       </q-item>
-      <q-menu v-if="(isParkedCall || isIncomingCall) && dialer.currentStatus === 'CALL_CONNECTED'"
+      <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
               fit
               content-class="live-call-options"
               anchor="top right"
-              self="top left">
+              self="top left"
+              v-model="showCallMenu"
+              @hide="showCallMenu = false">
         <q-list>
           <q-item v-if="isParkedCall"
                   clickable
@@ -107,7 +111,7 @@
             </q-item-section>
           </q-item>
 
-          <q-item v-if="isIncomingCall && dialer.call"
+          <q-item v-if="(isCallFishingMode || isIncomingCall) && dialer.call"
                   clickable
                   v-close-popup
                   @click="onParkCurrentCallAndAnswer">
@@ -118,7 +122,7 @@
               <span>Park Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
-          <q-item v-if="isIncomingCall && dialer.call"
+          <q-item v-if="(isCallFishingMode || isIncomingCall) && dialer.call"
                   clickable
                   v-close-popup
                   @click="onHangUpCurrentCallAndAnswer">
@@ -718,7 +722,7 @@
 
 <script>
 import _ from 'lodash'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin, notificationMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
@@ -749,7 +753,8 @@ export default {
     avatarMixin,
     communicationInfoMixin,
     dateMixin,
-    userMixin
+    userMixin,
+    notificationMixin
   ],
 
   components: {
@@ -829,6 +834,7 @@ export default {
       REJECTION_REASON_FAILED: 5, // A call/SMS was failed
       activeName: false,
       loadingUpdateEngagement: false,
+      showCallMenu: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -872,7 +878,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions', 'dialer']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions', 'dialer', 'notifications']),
 
     hasSMSReminder () {
       if (this.$refs['sms-reminder']) {
@@ -923,6 +929,18 @@ export default {
       const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
       return ringGroup && ringGroup.fishing_mode
+    },
+    isCallFishingMode () {
+      if (this.notifications.callFishing.communicationId === this.communication.id) {
+        return true
+      }
+
+      if (this.notifications.callFishing.queue) {
+        let index = this.notifications.callFishing.queue.findIndex(item => item.communicationId === this.communication.id)
+        return index >= 0
+      }
+
+      return false
     }
   },
 
@@ -1061,7 +1079,9 @@ export default {
     },
 
     onAcceptCall (e) {
-      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+      if (this.isCallFishingMode && this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.showCallMenu = true
+        e.stopImmediatePropagation()
         return
       }
       if (this.communication.ring_group_id) {
@@ -1072,10 +1092,11 @@ export default {
           const data = {
             communication: {
               id: this.communication.id,
-              campaign_id: this.communication.campaign_id,
+              campaignId: this.communication.campaign_id,
               contactName: this.contact.name,
               companyName: this.contact.company_name,
-              contactId: this.contact.id
+              contactId: this.contact.id,
+              phoneNumber: this.contact.phone_number
             },
             shouldPark: false,
             shouldHangup: false
@@ -1103,40 +1124,43 @@ export default {
       e.stopImmediatePropagation()
     },
     onShowPhone (e) {
-      if (!this.isConnectedCall && !this.isIncomingCall) {
+      if (!this.isConnectedCall && !this.isIncomingCall && !this.isCallFishingMode) {
         return
       }
 
-      this.$VueEvent.fire('togglePhone')
+      this.showCallFishingDataInPhone({
+        communication: this.communication,
+        contact: this.contact
+      })
+
       e.stopImmediatePropagation()
     },
     onParkCurrentCallAndConnect () {
-      // park current call and unpark this call communication
-      this.$VueEvent.fire('parkCall')
-      this.$VueEvent.fire('unparkCall')
+      this.showCallMenu = false
+      this.answerCommunication(true, true)
     },
     onHangupCurrentCallAndConnect () {
-      // hangup current call and unpark this call communication
-      this.$VueEvent.fire('hangupCall')
-      this.$VueEvent.fire('unparkCall')
+      this.showCallMenu = false
+      this.answerCommunication(false, true)
     },
     onParkCurrentCallAndAnswer () {
+      this.showCallMenu = false
       this.answerCommunication(true, false)
-      // park current call and answer communication
     },
     onHangUpCurrentCallAndAnswer () {
+      this.showCallMenu = false
       this.answerCommunication(false, true)
-      // hangup current call and answer
     },
 
     answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communication.id,
-          campaign_id: this.communication.campaign_id,
+          campaignId: this.communication.campaign_id,
           contactName: this.contact.name,
           companyName: this.contact.company_name,
-          contactId: this.contact.id
+          contactId: this.contact.id,
+          phoneNumber: this.contact.phone_number
         },
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
