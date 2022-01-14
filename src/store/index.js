@@ -240,6 +240,7 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerIsReady ({ commit }, status) {
+        console.trace(status)
         commit('SET_DIALER_IS_READY', status)
       },
 
