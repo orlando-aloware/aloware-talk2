@@ -461,7 +461,8 @@ export default {
           campaignId: this.contact.last_communication.campaign_id,
           contactName: this.contact.name,
           companyName: this.contact.company_name,
-          contactId: this.contact.id
+          contactId: this.contact.id,
+          phoneNumber: this.contact.phone_number
         },
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
