@@ -78,6 +78,10 @@ export default function (/* { ssrContext } */) {
       warnings: [],
       shouldIntroduce: false,
       addedParty: null,
+      keyboard: {
+        scroll: null,
+        resizeMode: null
+      },
       currentInputDevice: 'default',
       inputDevices: [],
       currentOutputDevice: 'default',
@@ -209,6 +213,9 @@ export default function (/* { ssrContext } */) {
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
+      tagOptions: {
+        isReset: false
+      },
       tagsFullyLoaded: false,
       prevRoute: null,
       currentRoute: null,
@@ -240,7 +247,6 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerIsReady ({ commit }, status) {
-        console.trace(status)
         commit('SET_DIALER_IS_READY', status)
       },
 

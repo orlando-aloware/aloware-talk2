@@ -1157,6 +1157,12 @@ export default {
     this.$VueEvent.stop('initializeSettings')
     clearInterval(this.$options.callDurationInterval)
     clearInterval(this.$options.wrapUpDurationInterval)
+  },
+
+  watch: {
+    'dialer.isReady': function () {
+      console.trace('dialer.isReady: ', this.dialer.isReady)
+    }
   }
 }
 </script>
