@@ -422,7 +422,7 @@ export default {
 
     onMessage () {
       this.setMessageComposerMode('sms')
-      this.$router.push(`/powerDialer/${this.contact.id}`)
+      this.$router.push(`/contacts/${this.contact.id}`)
     },
 
     onCall () {
