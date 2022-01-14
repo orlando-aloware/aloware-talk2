@@ -677,6 +677,7 @@ export default {
 
     unparkCommunication (parkedCallData) {
       this.loadingUnpark = true
+      this.setDialerParkedCall()
       let data = {
         currentNumber: 'unhold:' + parkedCallData.id,
         outboundCampaignId: parkedCallData.campaign_id,
