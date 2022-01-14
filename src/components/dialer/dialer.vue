@@ -743,7 +743,7 @@ export default {
             return
           }
 
-          if (hangedUp === true && shouldAnswer) {
+          if (hangedUp && shouldAnswer) {
             this.makeCall('call:' + data.id, data.campaignId)
             return
           }
