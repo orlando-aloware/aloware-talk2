@@ -643,7 +643,9 @@ export default {
     async cookieUserValidated ({ data: { data } }) {
       const { usage, company } = data
       this.setCurrentCompany(company)
+      let dialerClone = JSON.parse(JSON.stringify(this.dialer))
       this.resetVuex()
+      this.setDialer(dialerClone)
       this.setUsage(usage)
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
@@ -1628,6 +1630,7 @@ export default {
       'setCallDispositions',
       'setTemplates',
       'setBroadcasts',
+      'setDialer',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',

@@ -238,6 +238,10 @@ export default function (/* { ssrContext } */) {
     },
 
     actions: {
+      setDialer ({ commit }, payload) {
+        commit('SET_DIALER', payload)
+      },
+
       setDialerToken ({ commit }, token) {
         commit('SET_DIALER_TOKEN', token)
       },
@@ -572,6 +576,10 @@ export default function (/* { ssrContext } */) {
     },
 
     mutations: {
+      SET_DIALER (state, payload) {
+        state.dialer = payload
+      },
+
       SET_DIALER_TOKEN (state, token) {
         state.dialer.token = token
       },
