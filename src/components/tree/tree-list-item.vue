@@ -1,6 +1,6 @@
 <template>
   <div class="folder d-flex align-items-center"
-       :class="{ 'folder--active': activeFolder }">
+       :class="{ 'folder--active': activeFolder && id !== undefined ? true : id === undefined ? true : false }">
     <div class="folder__arrow">
       <folder-arrow-close-icon class="transparent">
       </folder-arrow-close-icon>
@@ -13,7 +13,7 @@
       <div :data-layer="layer">
         <div
           :title="name"
-          :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
+          :class="{ 'folder--active': (isExactActive && id !== undefined) || id === undefined, 'folder--moving': isMoving }"
           class="folder d-flex align-items-center p-0"
         >
           <div
@@ -50,11 +50,11 @@
               autofocus
             />
             <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
-              {{ name }}
+              {{ name }}-{{activeFolder}}={{isExactActive}}
             </span>
             <UnsavedIcon
               class="mr-1"
-              v-show="id == unsavedListId" />
+              v-show="id == undefined" />
           </div>
 
           <button
@@ -387,7 +387,12 @@ export default {
       this.removeListOpen({ id: this.id, name: this.name })
     },
     toggleSidebar (callback, event) {
-      callback(event)
+      console.log('this.id :>> ', this.id)
+      if (this.id !== undefined) {
+        callback(event)
+      } else {
+        this.$router.push('/contacts/list/unsaved')
+      }
       this.setShowContactsListSidebar(false)
     }
   },
