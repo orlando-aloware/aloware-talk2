@@ -731,24 +731,18 @@ export default {
         this.device.activeConnection().hangup()
 
         let counter = 0
-        let hangedUp = false
         let hangupInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.backToDial()
-            hangedUp = true
-          }
 
-          if (hangedUp && shouldUnpark) {
-            this.unparkCommunication(data)
-            return
-          }
-
-          if (hangedUp && shouldAnswer) {
-            this.makeCall('call:' + data.id, data.campaignId)
-            return
-          }
-
-          if (hangedUp) {
+            switch (true) {
+              case shouldUnpark:
+                this.unparkCommunication(data)
+                break
+              case shouldAnswer:
+                this.makeCall('call:' + data.id, data.campaignId)
+                break
+            }
             clearInterval(hangupInterval)
           }
 
