@@ -1,6 +1,6 @@
 <template>
   <div id="q-app">
-    <router-view :key="routerKey" />
+    <router-view v-if="cookieValidated" />
     <portal-target name="app"
                    multiple>
     </portal-target>
@@ -23,7 +23,7 @@ export default {
   components: { ActionNotification },
   data () {
     return {
-      routerKey: 0,
+      cookieValidated: false,
       sharedCookie: null
     }
   },
@@ -41,7 +41,7 @@ export default {
       }
     })
   },
-  mounter () {
+  mounted () {
     // if account is not allowed to access talk, we need to logout
     if (this.profile && !this.profile.company.talk_enabled) {
       this.logout()
@@ -65,13 +65,16 @@ export default {
           this.logout()
         })
       }
+      if (!this.sharedCookie) {
+        this.cookieValidated = true
+      }
     },
     async cookieUserValidated ({ data: { data } }) {
       const { usage, company } = data
       this.resetVuex()
       this.setCurrentCompany(company)
       this.setUsage(usage)
-      this.routerKey += 1
+      this.cookieValidated = true
 
       localStorage.setItem('shared_cookie', this.sharedCookie)
       localStorage.setItem('company_id', company.id)
