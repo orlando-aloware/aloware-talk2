@@ -56,7 +56,8 @@ export default {
       'selectedContacts',
       'removeContactActionType',
       'selectedList',
-      'isBulkDelete'
+      'isBulkDelete',
+      'listItems'
     ]),
     title () {
       return `Delete ${this.contactToDeleteCount} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
@@ -89,6 +90,9 @@ export default {
     },
     listId () {
       return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+    },
+    currentList () {
+      return this.listItems[this.selectedList.id]
     }
   },
   data () {
@@ -110,7 +114,8 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'removeContactClose',
-      'setShouldUpdateSelectedListContactCount'
+      'setShouldUpdateSelectedListContactCount',
+      'contactsLoaded'
     ]),
     onCancel () {
       this.removeContactClose()
@@ -143,6 +148,11 @@ export default {
           this.isBusy = false
           this.contactsToDelete = null
           this.$bvModal.hide('remove-contact-confirmation-dialog')
+          this.contactsLoaded({
+            id: this.selectedList.id || 'all',
+            append: false,
+            ...this.currentList
+          })
         })
     },
     handleBulkDeletion () {

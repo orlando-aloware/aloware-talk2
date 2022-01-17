@@ -551,10 +551,25 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile']),
-    ...mapState('contacts', ['folders', 'showContactsListSidebar']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'isFiltersOpen', 'selectedList', 'currentListFilters']),
-    ...mapState(['isTabletOrMobile']),
+    ...mapGetters('auth', [
+      'profile'
+    ]),
+    ...mapState('contacts', [
+      'folders',
+      'showContactsListSidebar',
+      'shouldUpdateSelectedListContactCount'
+    ]),
+    ...mapGetters('contacts', [
+      'lists',
+      'listItems',
+      'selectedContacts',
+      'isFiltersOpen',
+      'selectedList',
+      'currentListFilters'
+    ]),
+    ...mapState([
+      'isTabletOrMobile'
+    ]),
     checked () {
       return this.selectedContacts[this.id] || []
     },
@@ -639,6 +654,12 @@ export default {
         this.setListSelectedContacts({ id: value.id, contacts: [] })
       }
       this.folderPath = this.generateFolderPath(this.folders)
+    },
+    shouldUpdateSelectedListContactCount (val) {
+      if (val) {
+        this.setShouldUpdateSelectedListContactCount(true)
+        this.fetch()
+      }
     }
   }
 }

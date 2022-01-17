@@ -91,6 +91,7 @@ export default {
         this.communication.notes = this.note
         this.loadingBtn = false
         this.loading = true
+        this.$generalNotification('Notes updated')
         setTimeout(() => {
           this.loading = false
         }, 1000)

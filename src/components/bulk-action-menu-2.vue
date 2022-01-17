@@ -67,7 +67,6 @@ export default {
       'moveContactItems'
     ]),
     onDelete (e) {
-      console.log('Deleting items...')
       this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()

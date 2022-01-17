@@ -3,7 +3,7 @@
     :title="title"
     :isOpen="isRemoveContactOpen"
     id="remove-contact-dialog"
-    @close="removeContactClose"
+    @close="onClose"
   >
     <div slot="content">
       <div class="text-left">
@@ -85,13 +85,15 @@ export default {
   },
   data () {
     return {
-      ContactListType
+      ContactListType,
+      flag: false
     }
   },
   watch: {
     isRemoveContactOpen (isOpen) {
       if (isOpen) {
         this.$bvModal.show('remove-contact-dialog')
+        this.flag = false
       } else {
         this.$bvModal.hide('remove-contact-dialog')
       }
@@ -100,14 +102,21 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeContactClose', 'setContactRemoveActionType']),
     onRemoveFromList () {
+      this.flag = true
       this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     },
     onRemoveFromContacts () {
+      this.flag = true
       this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
+    },
+    onClose () {
+      if (!this.flag) {
+        this.removeContactClose()
+      }
     }
   }
 }

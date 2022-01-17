@@ -1,8 +1,8 @@
 <template>
   <div class="t-menu border-top">
     <ContactsFolders
-      v-if="toggleFolders"
-      :is-contact-module-type="false" />
+      :is-contact-module-type="false"
+      ref="pdFolders" />
   </div>
 </template>
 

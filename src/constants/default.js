@@ -32,7 +32,11 @@ export const DEFAULT_STATE = {
     duration: 0,
     wrapUpDuration: '',
     parkedCall: null,
-    dealId: null
+    dealId: null,
+    callFishing: {
+      communication: null,
+      contact: null
+    }
   },
   warnings: [],
   shouldIntroduce: false,
@@ -41,11 +45,151 @@ export const DEFAULT_STATE = {
     scroll: null,
     resizeMode: null
   },
+  currentInputDevice: 'default',
+  inputDevices: [],
+  currentOutputDevice: 'default',
+  outputDevices: [],
+  notifications: {
+    system: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    sms: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    call: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    callVoicemail: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    voicemail: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    mention: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    incomingCall: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    },
+    callFishing: {
+      title: '',
+      message: '',
+      messageIcon: null,
+      dateTime: null,
+      contactId: '',
+      communicationId: '',
+      campaignId: '',
+      campaignName: '',
+      ringGroupName: '',
+      phoneNumber: '',
+      communication: null,
+      contact: null,
+      queue: null
+    }
+  },
+  showIncomingCallNotification: true,
   // cached states
   sidebarFolded: false,
   currentCompany: null,
   smsTemplates: [],
   tagOptions: {
     isReset: false
-  }
+  },
+  tagsFullyLoaded: false,
+  prevRoute: null,
+  currentRoute: null,
+  breadcrumbs: {
+    crumbs: '',
+    name: ''
+  },
+  dialerFormStatus: false,
+  isMobile: false,
+  isTabletOrMobile: false,
+  contactDetailsDrawer: false,
+  showPhone: false,
+  enableAudio: false
 }
