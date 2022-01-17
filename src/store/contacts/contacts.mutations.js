@@ -366,5 +366,8 @@ export default {
   },
   SET_SHOW_CONTACTS_LIST_SIDEBAR: (state, value) => {
     state.showContactsListSidebar = value
+  },
+  SET_ACTIVE_FOLDER: (state, value) => {
+    state.activeFolder = value
   }
 }

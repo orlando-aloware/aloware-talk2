@@ -388,7 +388,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'setMessageComposerMode']),
+    ...mapActions('contacts', [
+      'removeContactOpen',
+      'setBulkDelete',
+      'setMessageComposerMode',
+      'setShouldUpdateSelectedListContactCount'
+    ]),
     isCountField (columnName) {
       return this.countFields.includes(columnName)
     },
@@ -413,11 +418,13 @@ export default {
     },
 
     onRemove () {
+      this.setShouldUpdateSelectedListContactCount(false)
       this.setBulkDelete(false)
       this.removeContactOpen({
         ...this.contact,
         contactListId: this.contactListId
       })
+      // this.$emit('on-action-remove', true)
     },
 
     onMessage () {

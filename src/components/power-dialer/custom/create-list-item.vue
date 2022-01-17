@@ -137,7 +137,6 @@ export default {
     filteredSearchList (value = '') {
       if (!isEmpty(value) && !isEmpty(this.searchedListItem)) {
         let isValid = value.toLowerCase().includes(this.searchedListItem.toLowerCase())
-        console.log(`${this.searchedListItem} === ${value}`, isValid)
         return isValid
       }
       return true
