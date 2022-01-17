@@ -56,8 +56,7 @@
                 </div>
               </div>
             </section>
-            <dialer :key="dialerKey"
-                    v-if="authenticated">
+            <dialer v-if="authenticated">
             </dialer>
           </q-page-container>
         </div>
@@ -255,8 +254,6 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
-      sharedCookie: null,
-      dialerKey: 0,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -284,20 +281,6 @@ export default {
   },
 
   created () {
-    // proceed to cookie validation if account is talk allowed access
-    this.getSharedCookie().then(sharedCookie => {
-      this.sharedCookie = sharedCookie
-
-      // localStorage.getItem('shared_cookie') !== this.sharedCookie &&
-      if (this.$route.name !== 'Login') {
-        this.validateCookieUser()
-      }
-    })
-
-    if (!this.isMobile && this.$route.name === 'Phone') {
-      this.$router.replace({ path: '/' })
-    }
-
     this.resetCall()
     this.resetNotifications()
 
@@ -578,20 +561,6 @@ export default {
   },
 
   mounted () {
-    // if account is not allowed to access talk, we need to logout
-    if (this.profile && !this.profile.company.talk_enabled) {
-      this.logout()
-    } else {
-      // proceed to cookie validation if account is talk allowed access
-      this.getSharedCookie().then(sharedCookie => {
-        this.sharedCookie = sharedCookie
-
-        if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
-          this.validateCookieUser()
-        }
-      })
-    }
-
     if (this.authenticated) {
       this.sidebarVisible = true
     }
@@ -633,34 +602,6 @@ export default {
   },
 
   methods: {
-    async validateCookieUser () {
-      if (this.sharedCookie) {
-        this.getCookieUser().then(response => {
-          this.cookieUserValidated(response)
-        }).catch(() => {
-          this.logout()
-        })
-      }
-    },
-    async cookieUserValidated ({ data: { data } }) {
-      const { usage, company } = data
-      this.setCurrentCompany(company)
-      this.resetVuex()
-      this.dialerKey += 1
-      this.setUsage(usage)
-
-      localStorage.setItem('shared_cookie', this.sharedCookie)
-      localStorage.setItem('company_id', company.id)
-
-      const urlParams = new URLSearchParams(window.location.search)
-      const fromClassic = Number(urlParams.get('from_classic'))
-
-      // we need to redirect and reload if coming from classic instead of simply router push
-      if (fromClassic) {
-        location.href = '/'
-      }
-    },
-
     onDialerFormHide () {
       // if (typeof this.$refs.appFooter !== 'undefined') {
       //   this.$refs.appFooter.toggleContacts()
@@ -1653,9 +1594,7 @@ export default {
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check',
-      getCookieUser: 'getCookieUser',
-      getSharedCookie: 'getSharedCookie'
+      check: 'check'
     }),
     ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
   },

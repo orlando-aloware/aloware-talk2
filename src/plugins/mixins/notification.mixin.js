@@ -201,11 +201,6 @@ export default {
             type = 'callFishing'
           }
 
-          let callCommmunicationId = _.get(this.dialer, 'communication.id', null)
-          if (type === 'incomingCall' && callCommmunicationId !== communication.id) {
-            break
-          }
-
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
