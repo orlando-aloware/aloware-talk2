@@ -30,8 +30,8 @@
               placement="bottomright"
               boundary="window"
               custom-class="contact-popover"
-              :target="folderId"
-              v-if="$refs[folderId] !== undefined">
+              :target="folderId">
+              <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
                 <contact-menu-item @click="onCreateFolderToggle">
                   <template slot="icon">
@@ -189,7 +189,8 @@ export default {
   },
   computed: {
     ...mapState('contacts', [
-      'folders'
+      'folders',
+      'activeFolder'
     ]),
     ...mapGetters('powerDialer', [
       'datatableLoader'
@@ -207,7 +208,7 @@ export default {
       return false
     },
     foldersEndpoint () {
-      return this.isContactModuleType ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+      return this.isContacts ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     isFolderEmpty () {
       return !this.folders?.[0]?.child_folders.length && !this.folders?.[0]?.lists.length
@@ -219,14 +220,14 @@ export default {
       return this.rootFolder?.id
     },
     isContacts () {
-      return this.$route.name === 'Contacts'
+      return this.$route.name === 'Contacts' && this.isContactModuleType
     },
     folderId () {
       return this.isContacts ? 'bs-folder-options' : 'pd-folder-options'
     }
   },
   mounted () {
-    this.loadFolders()
+    this.initResources()
   },
   data () {
     return {
@@ -239,8 +240,13 @@ export default {
     ...mapActions('contacts', [
       'foldersLoaded',
       'createListOpen',
-      'createPdListOpen'
+      'createPdListOpen',
+      'setActiveFolder'
     ]),
+    initResources () {
+      this.loadFolders()
+      this.setActiveFolder(this.folderId)
+    },
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
     },
@@ -314,6 +320,11 @@ export default {
         popperInstance.destroy()
         popperInstance = null
       }
+    }
+  },
+  watch: {
+    folderId () {
+      this.initResources()
     }
   }
 }

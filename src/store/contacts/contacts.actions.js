@@ -275,5 +275,8 @@ export default {
   },
   setShowContactsListSidebar: ({ commit }, value) => {
     commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
+  },
+  setActiveFolder: ({ commit }, value) => {
+    commit('SET_ACTIVE_FOLDER', value)
   }
 }

@@ -28,7 +28,9 @@
       <contacts-shared class="public-lists"></contacts-shared>
     </q-expansion-item>
 
-    <contacts-folders v-if="toggleFolders"></contacts-folders>
+    <contacts-folders
+      ref="contactFolders">
+    </contacts-folders>
   </card>
 </template>
 

@@ -69,5 +69,6 @@ export default {
   isAddReminderOpen: (state) => state.isAddReminderOpen,
   changingSelectedContact: (state) => state.changingSelectedContact,
   smsTemplateModal: (state) => state.smsTemplateModal,
-  searchedPdItem: (state) => state.searchedPdItem
+  searchedPdItem: (state) => state.searchedPdItem,
+  activeFolder: (state) => state.activeFolder
 }

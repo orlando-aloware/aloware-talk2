@@ -9,15 +9,15 @@
          :class="mainClass">
       <router-view></router-view>
     </div>
-    <remove-folder-dialog />
+    <remove-folder-dialog v-if="isActive" />
     <column-headers v-if="isActive" />
-    <remove-contact />
-    <remove-contact-confirmation />
-    <move-dialog />
-    <create-list-modal />
-    <select-list-modal />
+    <remove-contact v-if="isActive" />
+    <remove-contact-confirmation v-if="isActive" />
+    <move-dialog v-if="isActive" />
+    <create-list-modal v-if="isActive" />
+    <select-list-modal v-if="isActive" />
     <remove-list-modal v-if="isActive" />
-    <remove-list-confirmation  v-if="isActive" />
+    <remove-list-confirmation v-if="isActive" />
   </div>
 </template>
 
