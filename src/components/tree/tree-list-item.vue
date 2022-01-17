@@ -50,7 +50,8 @@
               autofocus
             />
             <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
-              {{ name }}-{{activeFolder}}={{isExactActive}}
+              {{ name }}
+              <!-- -{{activeFolder}}={{isExactActive}} -->
             </span>
             <UnsavedIcon
               class="mr-1"

@@ -103,7 +103,7 @@ export const DEFAULT_STATE = {
       filters: [],
       type: 2,
       module_type: 1,
-      name: 'Unsaved'
+      name: ''
     }
   }
 }

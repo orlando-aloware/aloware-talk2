@@ -22,15 +22,16 @@
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
           <div class="d-flex align-items-center">
-            <span class="list-name">
-              {{ list.name }}
+            <span
+              :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
+              {{ list.name || unsavedList.name }}
               <q-chip
                 class="m-0 p-0"
                 text-color="white"
                 color="grey-80"
                 style="margin-left:10px !important;"
                 size="sm"
-                v-if="id == unsavedListId">
+                v-if="isUnsavedList">
                 Unsaved
               </q-chip>
             </span>
@@ -616,8 +617,8 @@ export default {
     hasAppliedFilters () {
       return this.filtersCount > 0
     },
-    unsavedListId () {
-      return this.unsavedList?.id || ''
+    isUnsavedList () {
+      return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     }
   },
 
