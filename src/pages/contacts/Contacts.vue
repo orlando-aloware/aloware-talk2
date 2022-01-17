@@ -92,7 +92,9 @@ export default {
   watch: {
     $route (to, from) {
       if (to.name.includes('Contacts')) {
-        // this.setUnsavedList(null)
+        if (from.name !== 'Contacts') {
+          this.setUnsavedList(null)
+        }
         this.setShowContactsListSidebar(false)
       }
     }

@@ -13,7 +13,7 @@
       <div :data-layer="layer">
         <div
           :title="name"
-          :class="{ 'folder--active': (isExactActive && id !== undefined) || id === undefined, 'folder--moving': isMoving }"
+          :class="{ 'folder--active': isExactActive && activeFolder, 'folder--moving': isMoving }"
           class="folder d-flex align-items-center p-0"
         >
           <div
@@ -51,7 +51,7 @@
             />
             <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
               {{ name }}
-              <!-- -{{activeFolder}}={{isExactActive}} -->
+              -{{activeFolder}}={{isExactActive}}
             </span>
             <UnsavedIcon
               class="mr-1"
@@ -172,6 +172,9 @@ export default {
     },
     activeFolder () {
       const id = _.get(this.$route.params, 'id', null)
+      if (this.id === undefined && id === 'unsaved') {
+        return true
+      }
       return id && parseInt(id) === this.id
     },
     itemName () {
@@ -225,6 +228,7 @@ export default {
       'listPinToggled',
       'openMoveDialog',
       'pinnedCountLoaded',
+      'setUnsavedList',
       'setShowContactsListSidebar'
     ]),
     onDuplicate () {
@@ -388,7 +392,7 @@ export default {
       this.removeListOpen({ id: this.id, name: this.name })
     },
     toggleSidebar (callback, event) {
-      console.log('this.id :>> ', this.id)
+      this.setUnsavedList(null)
       if (this.id !== undefined) {
         callback(event)
       } else {
