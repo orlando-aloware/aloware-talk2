@@ -85,6 +85,7 @@
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
         :endpoint="endpoint"
+        :folder-id="id"
       ></tree-list-contents>
     </div>
 
@@ -96,6 +97,7 @@
       :hasDelete="hasDelete"
       :isRootList="isRootList"
       :endpoint="endpoint"
+      :folder-id="id"
     ></tree-list-contents>
 
     <b-popover

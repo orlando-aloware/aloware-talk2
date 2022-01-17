@@ -1,6 +1,6 @@
 <template>
   <div class="folder d-flex align-items-center"
-       :class="{ 'folder--active': activeFolder }">
+       :class="{ 'folder--active': activeFolder && id !== undefined ? true : id === undefined ? true : false }">
     <div class="folder__arrow">
       <folder-arrow-close-icon class="transparent">
       </folder-arrow-close-icon>
@@ -13,7 +13,7 @@
       <div :data-layer="layer">
         <div
           :title="name"
-          :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
+          :class="{ 'folder--active': isExactActive && activeFolder, 'folder--moving': isMoving }"
           class="folder d-flex align-items-center p-0"
         >
           <div
@@ -52,6 +52,9 @@
             <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
               {{ name }}
             </span>
+            <UnsavedIcon
+              class="mr-1"
+              v-show="id == undefined" />
           </div>
 
           <button
@@ -98,6 +101,7 @@ import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
+import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let inputTimeout
@@ -109,6 +113,7 @@ export default {
     FolderStaticIcon,
     FolderDynamicIcon,
     DialIcon,
+    UnsavedIcon,
     ListActions
   },
   props: {
@@ -144,7 +149,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['pinned', 'moveDialog', 'listToRemove']),
+    ...mapGetters('contacts', [
+      'pinned',
+      'moveDialog',
+      'listToRemove',
+      'unsavedList'
+    ]),
     ...mapState(['isMobile']),
     indentStyle () {
       return {
@@ -161,6 +171,9 @@ export default {
     },
     activeFolder () {
       const id = _.get(this.$route.params, 'id', null)
+      if (this.id === undefined && id === 'unsaved') {
+        return true
+      }
       return id && parseInt(id) === this.id
     },
     itemName () {
@@ -170,26 +183,20 @@ export default {
       return this.$route.meta.title === 'Contacts'
     },
     viewListPath () {
-      if (this.isContactsRoute) {
-        return `/contacts/list/${this.id}`
-      }
-      return `/power-dialer/list/${this.id}`
+      return this.isContactsRoute ? `/contacts/list/${this.id}` : `/power-dialer/list/${this.id}`
     },
     listPath () {
-      if (this.isContactsRoute) {
-        return '/api/v2/contacts-list/'
-      }
-      return '/api/v2/power-dialer-lists/'
+      return this.isContactsRoute ? '/api/v2/contacts-list/' : '/api/v2/power-dialer-lists/'
     },
     foldersPath () {
-      if (this.isContactsRoute) {
-        return '/api/v2/contact-folders'
-      }
-      return '/api/v2/power-dialer-folders'
+      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     folderId () {
       let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-item-option-${module}-${this.id}`
+    },
+    unsavedListId () {
+      return this.unsavedList?.id || ''
     }
   },
   mounted () {
@@ -220,6 +227,7 @@ export default {
       'listPinToggled',
       'openMoveDialog',
       'pinnedCountLoaded',
+      'setUnsavedList',
       'setShowContactsListSidebar'
     ]),
     onDuplicate () {
@@ -383,7 +391,12 @@ export default {
       this.removeListOpen({ id: this.id, name: this.name })
     },
     toggleSidebar (callback, event) {
-      callback(event)
+      this.setUnsavedList(null)
+      if (this.id !== undefined) {
+        callback(event)
+      } else {
+        this.$router.push('/contacts/list/unsaved')
+      }
       this.setShowContactsListSidebar(false)
     }
   },

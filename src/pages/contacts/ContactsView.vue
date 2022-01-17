@@ -22,7 +22,19 @@
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
           <div class="d-flex align-items-center">
-            <span class="list-name">{{ list.name }}</span>
+            <span
+              :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
+              {{ list.name || unsavedList.name }}
+              <q-chip
+                class="m-0 p-0"
+                text-color="white"
+                color="grey-80"
+                style="margin-left:10px !important;"
+                size="sm"
+                v-if="isUnsavedList">
+                Unsaved
+              </q-chip>
+            </span>
           </div>
         </div>
       </div>
@@ -106,8 +118,16 @@
           </b-form-checkbox>
         </div>
         <div class="contacts-total desktop">
-          <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
-          <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+          <div
+            class="small text-muted fs-13 text-right"
+            v-if="selectedList.type === ContactListTypes.DYNAMIC">
+            {{ listItemsTotalContacts }} Contacts
+          </div>
+          <div
+            class="small text-muted fs-13 text-right"
+            v-else>
+            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts
+          </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
         <div class="d-flex align-items-center pr-2"
@@ -306,6 +326,7 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   components: {
@@ -366,7 +387,10 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
       'pinnedCountLoaded',
-      'setShowContactsListSidebar'
+      'setShowContactsListSidebar',
+      'createListClose',
+      'foldersLoaded',
+      'setUnsavedList'
     ]),
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
@@ -428,22 +452,60 @@ export default {
         return
       }
       this.isUpdatingList = true
-      return this.$axios
-        .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
-        .then(() => {
-          this.setSelectedListContactCount(this.listItemsTotalContacts)
-          this.initialListFilters = this.currentListFilters
-          this.updateFilterHasChanges()
-          this.isUpdatingList = false
-          this.$generalNotification('Changes to contact list has been saved.')
+      if (_.isEmpty(this.unsavedList)) {
+        console.log('Updating existing dynamic list...')
+        return this.$axios
+          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
+          .then(() => {
+            this.setSelectedListContactCount(this.listItemsTotalContacts)
+            this.initialListFilters = this.currentListFilters
+            this.updateFilterHasChanges()
+            this.isUpdatingList = false
+            this.$generalNotification('Changes to contact list has been saved.')
 
-          this.pinnedCountLoaded({
-            id: this.selectedList.id,
-            count: this.listItems[this.selectedList.id].total
+            this.pinnedCountLoaded({
+              id: this.selectedList.id,
+              count: this.listItems[this.selectedList.id].total
+            })
           })
-        })
+          .catch((_err) => {
+            this.$generalNotification('Unable to update contact list.', 'error')
+          })
+      } else {
+        console.log('Creating new dynamic list...')
+        // debugger
+        return this.$axios
+          .post('/api/v2/contacts-list', this.unsavedList.params)
+          .then((response) => {
+            const data = response.data.data
+            const message = response.data.message
+
+            this.createListClose()
+
+            this.$generalNotification(message)
+
+            this.loadFolders()
+            this.setUnsavedList(null)
+            this.$router.push(`/contacts/list/${data.id}`)
+          })
+          .catch((error) => {
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.errorMsg = message
+            this.$generalNotification(message, 'error')
+          })
+          .finally(() => {
+            this.isUpdatingList = false
+          })
+      }
+    },
+    loadFolders () {
+      this.$axios
+        .get('/api/v2/contact-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
         .catch((_err) => {
-          this.$generalNotification('Unable to update contact list.', 'error')
+          this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
     onShowCreateContact (e) {
@@ -565,7 +627,8 @@ export default {
       'selectedContacts',
       'isFiltersOpen',
       'selectedList',
-      'currentListFilters'
+      'currentListFilters',
+      'unsavedList'
     ]),
     ...mapState([
       'isTabletOrMobile'
@@ -619,6 +682,9 @@ export default {
     },
     hasAppliedFilters () {
       return this.filtersCount > 0
+    },
+    isUnsavedList () {
+      return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     }
   },
 

@@ -39,8 +39,12 @@
           />
         </div>
 
-        <div class="flex-grow-1 py-4" v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode)">
-          <div class="form-check mb-2" @click="createList.type = ContactListTypes.DYNAMIC">
+        <div
+          class="flex-grow-1 py-4"
+          v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode) && isDefault">
+          <div
+            class="form-check mb-2"
+            @click="createList.type = ContactListTypes.DYNAMIC">
             <input
               class="form-check-input"
               type="radio"
@@ -55,7 +59,9 @@
               </div>
             </label>
           </div>
-          <div class="form-check" @click="createList.type = ContactListTypes.STATIC">
+          <div
+            class="form-check"
+            @click="createList.type = ContactListTypes.STATIC">
             <input
               class="form-check-input"
               type="radio"
@@ -70,6 +76,10 @@
               </div>
             </label>
           </div>
+        </div>
+
+        <div class="text-red">
+          {{ errorMsg }}
         </div>
 
         <div class="d-flex align-items-center pt-3">
@@ -102,14 +112,29 @@ import {
 import {
   DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
+import {
+  DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST,
+  DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
+} from 'src/constants/default-lists'
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 
 const ContactListTypes = { STATIC, DYNAMIC }
 export default {
+  props: {
+    isDefault: {
+      type: Boolean,
+      default: true
+    }
+  },
   computed: {
-    ...mapGetters('contacts', ['createList', 'currentListFilters', 'selectedList', 'selectedContacts']),
+    ...mapGetters('contacts', [
+      'createList',
+      'currentListFilters',
+      'selectedList',
+      'selectedContacts'
+    ]),
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
         let typeText = (this.createList.type === STATIC) ? 'Static' : 'Dynamic'
@@ -120,10 +145,29 @@ export default {
     },
     isNameValid () {
       return this.createList.name && this.createList.name.length > 0
+    },
+    listsEndpoint () {
+      return this.isDefault ? '/api/v2/contacts-list' : '/api/v2/power-dialer-lists'
+    },
+    foldersEndpoint () {
+      return this.isDefault ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+    },
+    redirectPath () {
+      return this.isDefault ? `/contacts/list` : `/power-dialer/list`
+    },
+    defaultTemplateRequest () {
+      return DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST
+    },
+    defaultTemplateResponse () {
+      return DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
     }
   },
   methods: {
-    ...mapActions('contacts', ['createListClose', 'foldersLoaded']),
+    ...mapActions('contacts', [
+      'createListClose',
+      'foldersLoaded',
+      'setUnsavedList'
+    ]),
     onClose () {
       if (!this.isLoading) {
         this.createListClose()
@@ -165,36 +209,51 @@ export default {
     },
     onSubmit () {
       this.isLoading = true
-      this.$axios
-        .post('/api/v2/contacts-list', this.getParams())
-        .then((response) => {
-          const data = response.data.data
-          const message = response.data.message
+      if (this.createList.type === STATIC) {
+        this.$axios
+          .post(this.listsEndpoint, this.getParams())
+          .then((response) => {
+            const data = response.data.data
+            const message = response.data.message
 
-          if (this.createList.mode === FROM_BULK_MENU) {
-            this.$router.push(`/contacts/list/${data.id}`)
-          } else {
-            this.$router.push(`/contacts/list/${data.id}?start=1`)
-          }
+            if (this.createList.mode === FROM_BULK_MENU) {
+              this.$router.push(`${this.redirectPath}/${data.id}`)
+            } else {
+              this.$router.push(`${this.redirectPath}/${data.id}?start=1`)
+            }
 
-          this.createListClose()
+            this.createListClose()
 
-          this.$generalNotification(message)
+            this.$generalNotification(message)
 
-          this.loadFolders()
-        })
-        .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
+            this.loadFolders()
+          })
+          .catch((error) => {
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.errorMsg = message
+            this.$generalNotification(message, 'error')
+          })
+          .finally(() => {
+            this.isLoading = false
+          })
+      } else {
+        let data = {
+          ...this.defaultTemplateResponse,
+          name: this.getParams().name,
+          contact_folder_id: this.getParams().contact_folder_id,
+          params: this.getParams()
+        }
+
+        this.setUnsavedList(data)
+        this.isLoading = false
+        this.createListClose()
+        this.$router.push(`${this.redirectPath}/unsaved`)
+      }
     },
     loadFolders () {
       this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.foldersEndpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -209,7 +268,8 @@ export default {
       type: ContactListTypes.DYNAMIC,
       isLoading: false,
       ContactListTypes,
-      CreateListMode: { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU }
+      CreateListMode: { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU },
+      errorMsg: ''
     }
   },
   watch: {
