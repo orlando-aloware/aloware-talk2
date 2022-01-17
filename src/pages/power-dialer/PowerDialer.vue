@@ -22,9 +22,11 @@
     <RemoveListModal v-if="isActive" />
     <RemoveListConfirmation v-if="isActive" />
     <RemoveContact
-      :is-contact-module-type="false" />
+      :is-contact-module-type="false"
+      v-if="isActive" />
     <RemoveContactConfirmation
-      @on-remove-contacts="updateList" />
+      @on-remove-contacts="updateList"
+      v-if="isActive" />
     <RemoveFolderDialog
       :is-contact-module-type="false" />
     <CreateListModal :is-default="false" />

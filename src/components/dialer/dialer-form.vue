@@ -390,6 +390,7 @@ export default {
       }).then(res => {
         this.loading_btn = false
         this.hideDialer()
+        this.$generalNotification('Message sent')
         if (!this.isMobile) {
           this.$router.push({
             name: 'Contact',

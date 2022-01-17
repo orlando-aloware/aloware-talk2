@@ -225,7 +225,6 @@ export default {
       this.columnsClose()
     },
     onApplyChanges () {
-      console.log('On apply changes...')
       if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
         this.closeAndMutate()
         return
@@ -254,7 +253,6 @@ export default {
         })
     },
     onResetAllColumns () {
-      console.log('On reset all columns...')
       if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
         this.closeAndReset()
         return

@@ -551,6 +551,7 @@ export default {
       }).then(res => {
         this.reply_text = ''
         this.loadingSendMessage = false
+        this.$generalNotification('Message sent')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingSendMessage = false
@@ -566,6 +567,7 @@ export default {
         phone_number: this.selectedPhoneNumber
       }).then(res => {
         this.loadingSendMessage = false
+        this.$generalNotification('Message sent')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingSendMessage = false
@@ -654,6 +656,7 @@ export default {
           this.uploadPercentage.upload = 0
           this.uploadStatus.upload = 'success'
           this.uploadFileList.upload = []
+          this.$generalNotification('Message sent')
         })
         .catch(err => {
           console.log(err)

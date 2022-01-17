@@ -230,7 +230,6 @@ export default {
       }
     },
     onCreateFromExistingList () {
-      // console.log('Should create list from existing contacts...')
       // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.$root.$emit('bv::hide::popover')
       this.createPdListOpen({

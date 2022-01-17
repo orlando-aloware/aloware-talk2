@@ -206,6 +206,7 @@ export default function () {
     showMenu: false,
     showContactsHeader: true,
     showContactsListSidebar: false,
-    unsavedList: null
+    unsavedList: null,
+    activeFolder: ''
   }
 }

@@ -677,6 +677,7 @@ export default {
 
     unparkCommunication (parkedCallData) {
       this.loadingUnpark = true
+      this.setDialerParkedCall()
       let data = {
         currentNumber: 'unhold:' + parkedCallData.id,
         outboundCampaignId: parkedCallData.campaign_id,
@@ -734,18 +735,16 @@ export default {
         let hangupInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.backToDial()
-            counter = true
+
+            switch (true) {
+              case shouldUnpark:
+                this.unparkCommunication(data)
+                break
+              case shouldAnswer:
+                this.makeCall('call:' + data.id, data.campaignId)
+                break
+            }
             clearInterval(hangupInterval)
-          }
-
-          if (counter === true && shouldUnpark) {
-            this.unparkCommunication(data)
-            return
-          }
-
-          if (counter === true && shouldAnswer) {
-            this.makeCall('call:' + data.id, data.campaignId)
-            return
           }
 
           counter++
@@ -1073,7 +1072,7 @@ export default {
       let parkedCall = null
 
       // store temporarily the parked call
-      if (shouldPark && this.dialer.parkedCall) {
+      if (this.dialer.parkedCall) {
         parkedCall = JSON.parse(JSON.stringify(this.dialer.parkedCall))
       }
 

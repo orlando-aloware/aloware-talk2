@@ -70,5 +70,6 @@ export default {
   changingSelectedContact: (state) => state.changingSelectedContact,
   smsTemplateModal: (state) => state.smsTemplateModal,
   searchedPdItem: (state) => state.searchedPdItem,
-  unsavedList: (state) => state.unsavedList
+  unsavedList: (state) => state.unsavedList,
+  activeFolder: (state) => state.activeFolder
 }

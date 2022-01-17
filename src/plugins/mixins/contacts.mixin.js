@@ -134,6 +134,7 @@ export default {
       }
     },
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
+      console.log('--------------------------------')
       params.search = this.search
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations

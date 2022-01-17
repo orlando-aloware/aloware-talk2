@@ -370,5 +370,8 @@ export default {
   SET_UNSAVED_LIST: (state, data) => {
     console.log('SET_UNSAVED_LIST data  :>> ', data)
     state.unsavedList = data
+  },
+  SET_ACTIVE_FOLDER: (state, value) => {
+    state.activeFolder = value
   }
 }

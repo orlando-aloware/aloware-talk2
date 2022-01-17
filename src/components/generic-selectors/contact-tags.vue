@@ -167,6 +167,7 @@ export default {
         this.contact.tags = res.data
         this.contact.tag_ids = this.contact.tags.map((o) => o.id)
         this.loadingTag = false
+        this.$generalNotification('Tags successfully updated')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingTag = false

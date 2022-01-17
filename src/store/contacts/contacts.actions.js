@@ -279,5 +279,8 @@ export default {
   },
   setUnsavedList: ({ commit }, data) => {
     commit('SET_UNSAVED_LIST', data)
+  },
+  setActiveFolder: ({ commit }, value) => {
+    commit('SET_ACTIVE_FOLDER', value)
   }
 }

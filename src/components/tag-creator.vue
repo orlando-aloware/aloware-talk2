@@ -186,6 +186,7 @@ export default {
             this.loadingBtn = false
             this.hideAdd = false
             this.$emit('success', res.data)
+            this.$generalNotification('Tag created')
             this.resetTag()
           })
           .catch(err => {
