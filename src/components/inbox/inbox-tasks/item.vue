@@ -40,11 +40,11 @@
           <span v-if="contact.last_communication.type !== CommunicationTypes.SMS && !isParkedCall && !isConnectedCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </span>
-          <span v-if="isParkedCall" class="call-parked-label">
+          <span v-if="isParkedCall && !isConnectedCall" class="call-parked-label">
             Parked Call
           </span>
 
-          <span v-if="isConnectedCall" class="call-connected-label">
+          <span v-if="isConnectedCall && !isParkedCall" class="call-connected-label">
             Connected
           </span>
 
@@ -77,15 +77,7 @@
         </task-item-time>
       </span>
       <div class="text-grey-90 d-flex flex-row justify-center"
-           v-if="(contact.last_communication.direction === CommunicationDirection.INBOUND &&
-             contact.last_communication.type === CommunicationTypes.CALL &&
-             [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-             CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-             CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-             CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-             CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2) &&
-             dialer.call &&
-             dialer.currentStatus !== 'CALL_CONNECTED') || isCallFishingMode">
+           v-if="shouldShowCallActionMenu">
         <div
              class="pl-0">
           <b-button variant="light"
@@ -226,6 +218,7 @@ import ParkedCallIcon from 'components/icons/parked-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+
 export default {
   name: 'inbox-task-item',
 
@@ -250,7 +243,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
-    ...mapState('inbox', ['selectedContact']),
+    ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts']),
     contactName () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
@@ -315,7 +308,8 @@ export default {
       if (!this.contact.last_communication) {
         return false
       }
-      return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.contact.last_communication.current_status2)
+      return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.contact.last_communication.current_status2) ||
+        (this.dialer.parkedCall && this.dialer.parkedCall.id === this.contact.last_communication.id)
     },
 
     isConnectedCall () {
@@ -348,13 +342,17 @@ export default {
     shouldShowCallActionMenu () {
       return (this.contact.last_communication.direction === CommunicationDirection.INBOUND &&
         this.contact.last_communication.type === CommunicationTypes.CALL &&
-        [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        [
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.contact.last_communication.current_status2) &&
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW
+        ].includes(this.contact.last_communication.current_status2) &&
         this.dialer.call &&
-        this.dialer.currentStatus !== 'CALL_CONNECTED')
+        this.dialer.currentStatus === 'RECEIVED_CALL_INVITE') ||
+        (this.isCallFishingMode && (this.dialer && (!['CALL_CONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus) || (this.dialer && this.dialer.communication && this.dialer.communication.id !== this.contact.last_communication.id))))
     }
   },
 
@@ -371,6 +369,7 @@ export default {
 
   methods: {
     ...mapActions(['setShowPhone']),
+    ...mapActions('inbox', ['setLiveContacts', 'setContacts']),
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
@@ -422,6 +421,21 @@ export default {
     onRejectCall (e) {
       if (this.isCallFishingMode) {
         this.processRemoveFromNotification(this.contact.last_communication)
+        let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
+        let isInContacts = this.contacts.find(item => item.id === this.contact.id)
+        let liveContacts = _.cloneDeep(this.liveContacts)
+        let contact = _.cloneDeep(this.contact)
+        if (isInLiveContacts) {
+          let index = this.liveContacts.findIndex(item => item.id === this.contact.id)
+          liveContacts.splice(index, 1)
+          this.setLiveContacts(liveContacts)
+        }
+        let contacts = _.cloneDeep(this.contacts)
+        if (!isInContacts) {
+          contacts.unshift(contact)
+          this.setContacts(contacts)
+        }
+
         e.stopImmediatePropagation()
         return
       }

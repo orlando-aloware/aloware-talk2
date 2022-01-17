@@ -437,6 +437,7 @@ export default {
             CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
             CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
             CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
             CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
             CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
           let liveContacts = _.cloneDeep(this.liveContacts)
@@ -460,7 +461,8 @@ export default {
               ...liveContacts.filter(item => [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
               ].includes(communication.current_status2))
             ]
           )
@@ -514,7 +516,21 @@ export default {
           }
           this.setContacts(contacts)
         }
-        this.setLiveContacts(liveContacts)
+        this.setLiveContacts(
+          [
+            // connected calls
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.current_status2)),
+            // parked calls
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.current_status2)),
+            // incoming calls
+            ...liveContacts.filter(item => [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+            ].includes(communication.current_status2))
+          ]
+        )
       }
 
       let contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)

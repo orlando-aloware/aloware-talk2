@@ -75,9 +75,12 @@
             </div>
           </div>
           <div class="text-grey-90 d-flex flex-row justify-center" v-else-if="isParkedCall">
-            <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onUnparkCall">
               <parked-call-icon/>
-            </div>
+            </b-button>
           </div>
         </q-item-section>
       </q-item>
@@ -879,6 +882,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState('inbox', ['liveContacts', 'contacts']),
 
     hasSMSReminder () {
       if (this.$refs['sms-reminder']) {
@@ -1113,6 +1117,32 @@ export default {
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
+      if (this.isCallFishingMode) {
+        this.processRemoveFromNotification(this.contact.last_communication)
+        let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
+        let isInContacts = this.contacts.find(item => item.id === this.contact.id)
+        let liveContacts = _.cloneDeep(this.liveContacts)
+        let contact = _.cloneDeep(this.contact)
+        if (isInLiveContacts) {
+          let index = this.liveContacts.findIndex(item => item.id === this.contact.id)
+          liveContacts.splice(index, 1)
+          this.setLiveContacts(liveContacts)
+        }
+        let contacts = _.cloneDeep(this.contacts)
+        if (!isInContacts) {
+          contacts.unshift(contact)
+          this.setContacts(contacts)
+        }
+
+        e.stopImmediatePropagation()
+        return
+      }
+
+      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.$VueEvent.fire('hangupCall')
+        return
+      }
+
       this.$VueEvent.fire('rejectCall')
       e.stopImmediatePropagation()
     },
@@ -1120,11 +1150,21 @@ export default {
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },
-    onParkedCall (e) {
+    onUnparkCall (e) {
+      if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.showCallMenu = true
+        e.stopImmediatePropagation()
+        return
+      }
+
+      this.$VueEvent.fire('unparkCall')
+      this.$VueEvent.fire('togglePhone')
       e.stopImmediatePropagation()
     },
     onShowPhone (e) {
+      this.showCallMenu = false
       if (!this.isConnectedCall && !this.isIncomingCall && !this.isCallFishingMode) {
+        e.stopImmediatePropagation()
         return
       }
 
@@ -1169,7 +1209,8 @@ export default {
       this.setShowPhone(true)
     },
 
-    ...mapActions(['setShowPhone'])
+    ...mapActions(['setShowPhone']),
+    ...mapActions('inbox', ['setContacts', 'setLiveContacts'])
   },
 
   watch: {
