@@ -209,7 +209,6 @@ export default {
     },
     onSubmit () {
       this.isLoading = true
-      console.log('this.createList.type 1 :>> ', this.createList.type)
       if (this.createList.type === STATIC) {
         this.$axios
           .post(this.listsEndpoint, this.getParams())
@@ -242,9 +241,9 @@ export default {
         let data = {
           ...this.defaultTemplateResponse,
           name: this.getParams().name,
-          contact_folder_id: this.getParams().contact_folder_id
+          contact_folder_id: this.getParams().contact_folder_id,
+          params: this.getParams()
         }
-        console.log('Setting temporary list...', data)
 
         this.setUnsavedList(data)
         this.isLoading = false
