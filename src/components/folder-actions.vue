@@ -242,26 +242,6 @@ export default {
       this.createListOpen({
         contact_folder_id: id
       })
-      // this.$axios
-      //   .post('/api/v2/power-dialer-lists', {
-      //     contact_folder_id: id,
-      //     type: 1,
-      //     name: this.fetchedNameList()
-      //   })
-      //   .then((response) => response.data)
-      //   .then((response) => {
-      //     // console.log('LOG: Successfully created a list...', response)
-      //     this.reloadFolders()
-      //     this.$generalNotification(response.message, 'success')
-      //     setTimeout(() => {
-      //       this.$router.push(`/power-dialer/list/${response.data.id}/add`)
-      //     }, 500)
-      //   })
-      //   .catch((err) => {
-      //     const { message, html } = extractErrorMessage(err)
-      //     console.log(html)
-      //     this.$generalNotification(`Error in creating a list. ${message}`, 'error')
-      //   })
     }
   }
 }

@@ -267,26 +267,6 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
-      // this.$root.$emit('bv::hide::popover')
-      // this.$axios
-      //   .post('/api/v2/power-dialer-lists', {
-      //     type: 1,
-      //     name: this.fetchedNameList()
-      //   })
-      //   .then((response) => response.data)
-      //   .then((response) => {
-      //     console.log('LOG: Successfully created a list...', response)
-      //     this.reloadFolders()
-      //     this.$generalNotification(response.message, 'success')
-      //     setTimeout(() => {
-      //       this.$router.push(`/power-dialer/list/${response.data.id}/add`)
-      //     }, 500)
-      //   })
-      //   .catch((err) => {
-      //     const { message, html } = extractErrorMessage(err)
-      //     console.log(html)
-      //     this.$generalNotification(`Error in creating a list. ${message}`, 'error')
-      //   })
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false
