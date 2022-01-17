@@ -21,7 +21,7 @@
       :type="unsavedList.type"
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
-      v-if="hasUnsavedRootList || hasUnsavedList"
+      v-if="hasUnsavedRootList || (hasUnsavedList && isDirectChild)"
     />
     <!-- <tree-list-item
       class="flex-grow-1 w-100"
@@ -80,6 +80,9 @@ export default {
         return !this.isRootList && this.unsavedList.contact_folder_id !== null
       }
       return false
+    },
+    isDirectChild () {
+      return this.folderId === this.unsavedList.contact_folder_id
     }
   }
 }

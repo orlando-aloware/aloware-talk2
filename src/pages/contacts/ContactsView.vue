@@ -41,6 +41,7 @@
     </template>
     <template slot="options" v-if="!isStartState">
       <compact-btn
+        :class="`${isUnsavedList ? 'hidden' : ''}`"
         variant="primary"
         v-if="list.type === ContactListType.DYNAMIC && isEditable"
         :disabled="isFiltersOpen"
@@ -474,8 +475,10 @@ export default {
       } else {
         console.log('Creating new dynamic list...')
         // debugger
+        let params = this.unsavedList.params
+        params.filters = this.currentListFilters
         return this.$axios
-          .post('/api/v2/contacts-list', this.unsavedList.params)
+          .post('/api/v2/contacts-list', params)
           .then((response) => {
             const data = response.data.data
             const message = response.data.message
@@ -609,6 +612,12 @@ export default {
 
     toggleSidebar () {
       this.setShowContactsListSidebar(!this.showContactsListSidebar)
+    },
+
+    reRouteToBase () {
+      if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
+        this.$router.push(`/contacts`)
+      }
     }
   },
 
@@ -689,6 +698,7 @@ export default {
   },
 
   mounted () {
+    this.reRouteToBase()
     this.setShouldUpdateSelectedListContactCount(true)
     this.fetch()
     // force close filter
@@ -726,6 +736,9 @@ export default {
         this.setShouldUpdateSelectedListContactCount(true)
         this.fetch()
       }
+    },
+    id () {
+      this.reRouteToBase()
     }
   }
 }
