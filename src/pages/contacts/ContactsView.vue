@@ -612,6 +612,12 @@ export default {
 
     toggleSidebar () {
       this.setShowContactsListSidebar(!this.showContactsListSidebar)
+    },
+
+    reRouteToBase () {
+      if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
+        this.$router.push(`/contacts`)
+      }
     }
   },
 
@@ -692,6 +698,7 @@ export default {
   },
 
   mounted () {
+    this.reRouteToBase()
     this.setShouldUpdateSelectedListContactCount(true)
     this.fetch()
     // force close filter
@@ -729,6 +736,9 @@ export default {
         this.setShouldUpdateSelectedListContactCount(true)
         this.fetch()
       }
+    },
+    id () {
+      this.reRouteToBase()
     }
   }
 }
