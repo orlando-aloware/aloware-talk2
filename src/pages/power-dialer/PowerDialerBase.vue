@@ -39,7 +39,8 @@ export default {
   async mounted () {
     this.resetSearch()
     if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-      await this.getMyQueueList()
+      let response = await this.getMyQueueList()
+      this.listLoaded({ ...response.data, id: 'my-queue' })
     } else {
       await this.loadList(this.id)
     }
@@ -51,7 +52,8 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'resetSearch'
+      'resetSearch',
+      'listLoaded'
     ]),
     ...mapActions('powerDialer', [
       'getMyQueueList'
