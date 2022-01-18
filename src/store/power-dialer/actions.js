@@ -18,6 +18,7 @@ export default {
     if (res.status === 200) {
       commit('SET_MY_QUEUE_LIST', res.data)
     }
+    return res
   },
   updateMyQueueListData: ({ commit }, data = []) => {
     commit('SET_MY_QUEUE_LIST_DATA', data)
