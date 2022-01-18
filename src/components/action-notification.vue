@@ -139,6 +139,7 @@
               <accept-call-icon width="32" height="32"/>
             </template>
             <b-dropdown-item href=""
+                             :disabled="dialer.parkedCall"
                              @click="answerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
