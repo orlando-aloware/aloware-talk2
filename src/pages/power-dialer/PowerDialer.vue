@@ -29,6 +29,7 @@
       v-if="isActive" />
     <RemoveFolderDialog
       :is-contact-module-type="false" />
+    <CreateListModal :is-default="false" />
 
   </div>
 </template>
@@ -39,6 +40,7 @@ import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 import MoveDialog from 'components/move-dialog'
 import CreateDialog from 'components/power-dialer/custom/create-dialog'
+import CreateListModal from 'components/create-list-modal'
 import RemoveFolderDialog from 'components/remove-folder'
 import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
@@ -63,7 +65,8 @@ export default {
     RemoveListConfirmation,
     RemoveContact,
     RemoveContactConfirmation,
-    RemoveFolderDialog
+    RemoveFolderDialog,
+    CreateListModal
   },
   mixins: [powermixin, contactsMixins, pdMixin],
   computed: {

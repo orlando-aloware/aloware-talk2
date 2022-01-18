@@ -5265,6 +5265,7 @@ button#bs-folder-options {
   overflow-y: auto;
   overflow-x: auto;
   max-height: calc(100vh - 172px);
+  height: 100vh !important;
 }
 
 .paginated {

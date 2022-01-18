@@ -162,7 +162,7 @@ import PeopleIcon from 'components/icons/people-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+// import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import pdList from 'src/plugins/mixins/power-dialer-list'
 import { createPopper } from '@popperjs/core'
 
@@ -264,26 +264,9 @@ export default {
       })
     },
     onCreateByManualSelection () {
-      this.$root.$emit('bv::hide::popover')
-      this.$axios
-        .post('/api/v2/power-dialer-lists', {
-          type: 1,
-          name: this.fetchedNameList()
-        })
-        .then((response) => response.data)
-        .then((response) => {
-          console.log('LOG: Successfully created a list...', response)
-          this.reloadFolders()
-          this.$generalNotification(response.message, 'success')
-          setTimeout(() => {
-            this.$router.push(`/power-dialer/list/${response.data.id}/add`)
-          }, 500)
-        })
-        .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
-          console.log(html)
-          this.$generalNotification(`Error in creating a list. ${message}`, 'error')
-        })
+      this.createListOpen({
+        contact_folder_id: null
+      })
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false

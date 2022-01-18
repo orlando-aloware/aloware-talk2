@@ -74,6 +74,9 @@ export default {
         return '/api/v2/contact-folders'
       }
       return '/api/v2/power-dialer-folders'
+    },
+    test () {
+      return this.$route
     }
   },
   data () {
@@ -112,10 +115,18 @@ export default {
           this.removeListFromFolders(this.listToRemove.id, this.folders)
           this.removeListFromPinned(this.listToRemove.id)
           // if current route is equals to list page being deleted then redirect to all contacts
-          if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {
-            this.$router.push('/contacts/')
+          if (this.$route.name === 'Contacts') {
+            if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {
+              this.$router.push('/contacts/')
+            } else {
+              this.$router.push(this.$router.history.current.path)
+            }
           } else {
-            this.$router.push('/power-dialer/')
+            if (this.$router.history.current.path === `/power-dialer/list/${this.listToRemove.id}`) {
+              this.$router.push('/power-dialer/')
+            } else {
+              this.$router.push(this.$router.history.current.path)
+            }
           }
         })
         .catch((_err) => {

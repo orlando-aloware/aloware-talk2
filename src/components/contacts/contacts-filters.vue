@@ -97,6 +97,11 @@
                   OR
                 </compact-btn>
               </div>
+              <p
+                class="px-2 pt-2"
+                v-if="unsavedList && isEmptyListFilters">
+                To save list, add at least 1 filter
+              </p>
             </div>
             <div class="filter-contents step-2 p-2"
                  v-else-if="step === 2">
@@ -196,7 +201,10 @@ export default {
   computed: {
     ...mapState('contacts', ['isFiltersOpen']),
     ...mapState(['filters']),
-    ...mapGetters('contacts', ['currentListFilters']),
+    ...mapGetters('contacts', [
+      'currentListFilters',
+      'unsavedList'
+    ]),
 
     filtersFiltered () {
       if (_.isEmpty(this.visibleListFilters) &&

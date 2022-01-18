@@ -95,7 +95,7 @@ const routes = [
           },
           {
             name: 'Contacts',
-            path: 'list/:id(my-contacts|new-leads|unanswered|unassigned)+',
+            path: 'list/:id(my-contacts|new-leads|unanswered|unassigned|unsaved)+',
             meta: {
               title: 'Contacts',
               page: 'Default Contacts List'

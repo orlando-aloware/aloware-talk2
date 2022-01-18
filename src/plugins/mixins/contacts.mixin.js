@@ -134,7 +134,6 @@ export default {
       }
     },
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
-      console.log('--------------------------------')
       params.search = this.search
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
@@ -340,7 +339,7 @@ export default {
       return 'last_engagement_at'
     },
     hasMore () {
-      let result = this.listItems[this.id].next_page_url &&
+      let result = this.listItems[this.id]?.next_page_url &&
         !this.isLoadingMore &&
         !this.isLoading
       return result || false
