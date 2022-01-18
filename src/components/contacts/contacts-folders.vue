@@ -101,6 +101,7 @@
     </template>
     <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
       <div class="folders__content">
+        <!-- <p @click="isLoading = !isLoading">-- {{ isLoading }}</p> -->
         <tree-folder-create
           v-if="isCreatingFolder"
           :layer="0"
@@ -145,7 +146,9 @@
             You don't have any contact list
           </span>
         </div>
-        <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
+        <contacts-sidebar-loader
+          v-if="isLoading">
+        </contacts-sidebar-loader>
       </div>
     </div>
   </q-expansion-item>
@@ -224,6 +227,23 @@ export default {
     },
     folderId () {
       return this.isContacts ? 'bs-folder-options' : 'pd-folder-options'
+    },
+    routeName () {
+      return this.$route.name
+    },
+    routePath () {
+      if (this.isPD) {
+        return 'Power Dialer'
+      } else if (this.isContact) {
+        return 'Contacts'
+      }
+      return ''
+    },
+    isPD () {
+      return this.routeName === 'Power Dialer' && !this.isContactModuleType
+    },
+    isContact () {
+      return this.routeName === 'Contacts' && this.isContactModuleType
     }
   },
   mounted () {
@@ -271,18 +291,18 @@ export default {
     onCreateFolderCancel () {
       this.isCreatingFolder = false
     },
-    loadFolders () {
+    async loadFolders () {
       this.isLoading = true
-      this.$axios
+      await this.$axios
         .get(this.foldersEndpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
-        .finally(() => {
-          this.isLoading = false
-        })
         .catch((err) => {
           console.error(err)
           this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+        .finally(() => {
+          this.isLoading = false
         })
     },
     createSubmenu () {
@@ -306,8 +326,10 @@ export default {
     }
   },
   watch: {
-    folderId () {
-      this.initResources()
+    routeName (val) {
+      if (val === this.routePath) {
+        this.initResources()
+      }
     }
   }
 }

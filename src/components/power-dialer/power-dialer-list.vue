@@ -1,8 +1,8 @@
 <template>
   <div class="t-menu border-top">
-    <ContactsFolders
-      :is-contact-module-type="false"
-      ref="pdFolders" />
+    <contacts-folders
+      :is-contact-module-type="false">
+    </contacts-folders>
   </div>
 </template>
 

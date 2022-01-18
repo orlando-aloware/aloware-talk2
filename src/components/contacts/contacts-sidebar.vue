@@ -28,9 +28,7 @@
       <contacts-shared class="public-lists"></contacts-shared>
     </q-expansion-item>
 
-    <contacts-folders
-      ref="contactFolders">
-    </contacts-folders>
+    <contacts-folders></contacts-folders>
   </card>
 </template>
 
