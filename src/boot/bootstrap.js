@@ -311,9 +311,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
 
-    if (queue.length > 1) {
-      return
-    }
+    return
   }
 
   if (settings.type !== 'callFishing') {
