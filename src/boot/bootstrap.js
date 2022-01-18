@@ -289,7 +289,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   ) {
     let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
     queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
-    const found = queue.find(item => item.contactId === settings.contactId && item.communicationId !== settings.communicationId)
+    const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
       return
@@ -311,9 +311,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
 
-    if (queue.length > 1) {
-      return
-    }
+    return
   }
 
   if (settings.type !== 'callFishing') {
