@@ -41,7 +41,6 @@ export default {
               value: [stringId]
             }
           }
-
           this.setCurrentListFilters(filters)
         })
         .catch((error) => {
