@@ -411,9 +411,11 @@ export default {
         return
       }
 
-      if (this.dialer.call || !currentNumber || !outboundCampaignId) {
+      if ((this.dialer.call && this.dialer.call.state !== 'pending') || !currentNumber || !outboundCampaignId) {
         console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
+      } else {
+        this.rejectCall()
       }
 
       let params = {

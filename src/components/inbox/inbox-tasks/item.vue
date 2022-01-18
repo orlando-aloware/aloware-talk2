@@ -78,7 +78,7 @@
       </span>
       <div class="text-grey-90 d-flex flex-row justify-center"
            v-if="shouldShowCallActionMenu">
-        <div
+        <div v-if="!isParkedCall"
              class="pl-0">
           <b-button variant="light"
                     size="sm"
@@ -89,7 +89,6 @@
                               width="24" />
             <cancel-call-icon v-else/>
           </b-button>
-
         </div>
         <div v-if="!isActiveCallOwner || !isParkedCall"
              class="pl-1 pr-0" >
@@ -147,8 +146,7 @@
       <div class="text-grey-90 d-flex flex-row justify-center"
            v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
            contact.last_communication.type === CommunicationTypes.CALL &&
-           [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2) && dialer.call || isParkedCall"
-          >
+           [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2) && dialer.call || isParkedCall">
         <div class="pl-0">
           <b-button variant="light"
                     size="sm"
@@ -352,7 +350,8 @@ export default {
         ].includes(this.contact.last_communication.current_status2) &&
         this.dialer.call &&
         this.dialer.currentStatus === 'RECEIVED_CALL_INVITE') ||
-        (this.isCallFishingMode && (this.dialer && (!['CALL_CONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus) || (this.dialer && this.dialer.communication && this.dialer.communication.id !== this.contact.last_communication.id))))
+        ((this.isCallFishingMode && [CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(this.contact.last_communication.current_status2)) && (this.dialer && (!['CALL_CONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus) ||
+          (this.dialer && this.dialer.communication && this.dialer.communication.id !== this.contact.last_communication.id))))
     }
   },
 
@@ -419,7 +418,7 @@ export default {
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
-      if (this.isCallFishingMode) {
+      if (this.isCallFishingMode || this.isCallFishing) {
         this.processRemoveFromNotification(this.contact.last_communication)
         let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
         let isInContacts = this.contacts.find(item => item.id === this.contact.id)

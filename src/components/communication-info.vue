@@ -1118,7 +1118,7 @@ export default {
     },
     onRejectCall (e) {
       if (this.isCallFishingMode) {
-        this.processRemoveFromNotification(this.contact.last_communication)
+        this.processRemoveFromNotification(this.communication)
         let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
         let isInContacts = this.contacts.find(item => item.id === this.contact.id)
         let liveContacts = _.cloneDeep(this.liveContacts)

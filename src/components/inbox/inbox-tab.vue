@@ -424,10 +424,10 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
+      console.log(communication)
       talk2Api.V2.contacts.get(communication.contact_id).then(response => {
         let contact = response.data
         let contacts = _.cloneDeep(this.contacts)
-
         let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
         let isInContacts = this.contacts.find(item => item.id === contact.id)
 
@@ -451,19 +451,21 @@ export default {
             contacts.splice(index, 1)
             this.setContacts(contacts)
           }
+
           this.setLiveContacts(
             [
               // connected calls
-              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.current_status2)),
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
               // parked calls
-              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.current_status2)),
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
               // incoming calls
-              ...liveContacts.filter(item => [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              ...liveContacts.filter(item => [
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-              ].includes(communication.current_status2))
+              ].includes(item.last_communication.current_status2))
             ]
           )
         } else {
@@ -502,8 +504,10 @@ export default {
       if (index >= 0) {
         let liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
-        // if type is call and completed then remove from live calls
-        if (communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        // if type is call and completed/voicemail then remove from live calls
+        if (communication.direction === CommunicationDirections.INBOUND &&
+          communication.type === CommunicationTypes.CALL &&
+          [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
           let contactTaskToRemove = liveContacts[index]
           liveContacts.splice(index, 1)
 
@@ -519,16 +523,17 @@ export default {
         this.setLiveContacts(
           [
             // connected calls
-            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.current_status2)),
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
             // parked calls
-            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.current_status2)),
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
             // incoming calls
-            ...liveContacts.filter(item => [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+            ...liveContacts.filter(item => [
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-            ].includes(communication.current_status2))
+            ].includes(item.last_communication.current_status2))
           ]
         )
       }
