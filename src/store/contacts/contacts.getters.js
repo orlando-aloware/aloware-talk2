@@ -71,5 +71,6 @@ export default {
   smsTemplateModal: (state) => state.smsTemplateModal,
   searchedPdItem: (state) => state.searchedPdItem,
   unsavedList: (state) => state.unsavedList,
-  activeFolder: (state) => state.activeFolder
+  activeFolder: (state) => state.activeFolder,
+  removedFolder: (state) => state.removedFolder
 }

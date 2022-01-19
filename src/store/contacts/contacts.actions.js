@@ -41,6 +41,12 @@ export default {
   foldersLoaded: ({ commit }, payload) => {
     commit('FOLDERS_LOADED', payload)
   },
+  removeFolderItem: ({ commit }, folder) => {
+    commit('REMOVE_FOLDER_ITEM', folder)
+  },
+  resetRemovedFolders: ({ commit }) => {
+    commit('RESET_REMOVED_FOLDERS')
+  },
   pinnedLoaded: ({ commit }, payload) => {
     commit('PINNED_LOADED', payload)
   },
