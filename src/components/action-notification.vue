@@ -359,10 +359,17 @@ export default {
     },
     contact () {
       return _.get(this.notifications[this.id], 'contact', null)
+    },
+    isValidPhoneShowInfo () {
+      let dialerCommunicationId = _.get(this.dialer, 'communication.id', null)
+      return ((
+        (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
+          (this.id === 'callFishing' && !this.dialer.call)) &&
+        !this.dialer.parkedCall && !(this.queue && this.queue.length))
     }
   },
   methods: {
-    ...mapActions(['setNotifications', 'setShowPhone', 'setDialerCallFishing']),
+    ...mapActions(['setNotifications', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
@@ -487,14 +494,11 @@ export default {
         return className && typeof className === 'string' && (className.includes('call-actions') || className.includes('call-fishing-actions'))
       })
 
-      if (!found && this.id === 'callFishing' && !this.dialer.call && !this.dialer.parkedCall) {
+      if (!found && this.isValidPhoneShowInfo) {
         this.showCallFishingDataInPhone({
           communication: this.communication,
           contact: this.contact
-        })
-        // this.$router.push({
-        //   path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
-        // })
+        }, this.id)
       }
 
       if (!found && this.id === 'system') {
@@ -511,22 +515,26 @@ export default {
       this.$closeActionNotification(this.id)
     },
     toInbox () {
-      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+      if (this.isValidPhoneShowInfo) {
         return
       }
 
-      this.$router.push({
-        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
-      })
+      if (this.$route.path !== `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`) {
+        this.$router.push({
+          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        })
+      }
     },
     toContact () {
-      if (!this.dialer.call && !this.dialer.parkedCall && !(this.queue && this.queue.length)) {
+      if (this.isValidPhoneShowInfo) {
         return
       }
 
-      this.$router.push({
-        path: `/contacts/${this.contactId}`
-      })
+      if (this.$route.path !== `/contacts/${this.contactId}`) {
+        this.$router.push({
+          path: `/contacts/${this.contactId}`
+        })
+      }
     }
   }
 }

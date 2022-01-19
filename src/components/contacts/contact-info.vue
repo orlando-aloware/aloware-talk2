@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import ContactNameForm from 'src/components/forms/contact-name-form'
 import Avatar from 'src/components/avatar'
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon'
@@ -160,6 +160,7 @@ export default {
   },
 
   computed: {
+    ...mapState(['isMobile']),
     ...mapGetters('contacts', ['contact', 'isContactNameEditOpen', 'contactPhoneNumbers', 'changingSelectedContact']),
 
     contactName () {
@@ -184,6 +185,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'enrollSequenceOpen', 'addReminderOpen']),
+    ...mapActions(['setShowPhone']),
 
     openAddReminderModal () {
       this.addReminderOpen(true)
@@ -234,6 +236,15 @@ export default {
         contactId: this.contact.id,
         contactTimezone: this.contact.timezone
       }
+
+      if (this.isMobile) {
+        this.setShowPhone(true)
+        setTimeout(() => {
+          this.$VueEvent.fire('changePhoneNumber', data)
+        }, 100)
+        return
+      }
+
       this.$VueEvent.fire('callContact', data)
     }
   }

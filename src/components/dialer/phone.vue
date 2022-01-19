@@ -116,7 +116,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="screen === 'call' && ((dialer.call && dialer.call.direction === 'OUTGOING') || dialer.callFishing)">
+      <template v-if="screen === 'call' && ((dialer.call && dialer.call.direction === 'OUTGOING') || dialer.callFishing.communication)">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
@@ -180,7 +180,7 @@
         </div>
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
-               v-if="(dialer.call && dialer.call.direction === 'INCOMING') || dialer.callFishing">
+               v-if="(dialer.call && dialer.call.direction === 'INCOMING') || dialer.callFishing.communication">
             <div class="d-flex flex-column align-items-center">
               <q-btn class="height-52"
                      ripple
@@ -209,7 +209,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call && dialer.call.direction === 'OUTGOING' && !dialer.callFishing">
+               v-if="dialer.call && dialer.call.direction === 'OUTGOING' && !dialer.callFishing.communication">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
@@ -626,7 +626,7 @@
       </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
-         v-if="(devMode || !isCallCompleted) && (contact || dialer.callFishing) && expansionEnabled">
+         v-if="(devMode || !isCallCompleted) && (contact || dialer.callFishing.communication) && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         header-class="text-sm bg-white text-center"
@@ -1702,7 +1702,7 @@ export default {
     answerCall () {
       this.$VueEvent.fire('answerCall')
 
-      if (this.dialer.callFishing) {
+      if (this.dialer.callFishing.communication) {
         this.$VueEvent.fire('makeCall', {
           currentNumber: 'call:' + _.get(this.dialer, 'callFishing.communication.id', null),
           outboundCampaignId: _.get(this.dialer, 'callFishing.communication.campaign_id', null),
