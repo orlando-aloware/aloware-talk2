@@ -111,20 +111,23 @@
           @cancel="onCreateFolderCancel"
         />
         <template v-if="foldersLength && !isLoading">
+          <template v-for="folder in folders[0].child_folders">
+            <tree-folder
+              v-if="folder.id !== removedFolder"
+              :name="folder.name"
+              :key="folder.id"
+              :id="folder.id"
+              :order="folder.order"
+              :endpoint="foldersEndpoint"
+              :hasEdit="folders[0].has_edit"
+              :hasDelete="folders[0].has_delete"
+              :folders="folder.child_folders"
+              :lists="folder.lists"
+              :layer="0"
+            />
+          </template>
           <tree-folder
-            v-for="folder in folders[0].child_folders"
-            :name="folder.name"
-            :key="folder.id"
-            :id="folder.id"
-            :order="folder.order"
-            :endpoint="foldersEndpoint"
-            :hasEdit="folders[0].has_edit"
-            :hasDelete="folders[0].has_delete"
-            :folders="folder.child_folders"
-            :lists="folder.lists"
-            :layer="0"
-          />
-          <tree-folder
+            v-if="folders[0].id !== removedFolder"
             :name="folders[0].name"
             :id="folders[0].id"
             :order="folders[0].order"
@@ -193,6 +196,7 @@ export default {
   computed: {
     ...mapState('contacts', [
       'folders',
+      'removedFolder',
       'activeFolder'
     ]),
     ...mapGetters('powerDialer', [
