@@ -75,6 +75,12 @@ export default {
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
   },
+  REMOVE_FOLDER_ITEM: (state, folder) => {
+    state.removedFolder = folder
+  },
+  RESET_REMOVED_FOLDERS: (state) => {
+    state.removedFolder = null
+  },
   LIST_LOADED: (state, list) => {
     state.lists = {
       ...state.lists,
