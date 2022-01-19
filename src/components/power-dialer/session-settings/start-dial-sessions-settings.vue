@@ -1,5 +1,31 @@
 <template>
   <div class="t-session-settings">
+    <b-dropdown
+      text="..."
+      no-caret
+      right size="sm"
+      variant="white"
+      class="mr-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+      <template #button-content>
+        <i class="fa fa-ellipsis-h"></i>
+      </template>
+      <b-dropdown-item
+        @click="{}"
+        href="#">
+        <i class="fa fa-bars mr-1"></i>
+        Edit Columns
+      </b-dropdown-item>
+      <b-dropdown-item href="#">
+        <i class="fa fa-file-csv mr-1"></i>
+        Export as CSV
+      </b-dropdown-item>
+      <b-dropdown-item
+        href="#"
+        @click="{}">
+        <i class="fa fa-trash-alt mr-1 text-red"></i>
+        <span class="text-red">Delete</span>
+      </b-dropdown-item>
+    </b-dropdown>
     <q-btn
       class="start-dial-button p-0"
       color="success"

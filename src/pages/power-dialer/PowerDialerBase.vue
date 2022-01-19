@@ -37,7 +37,6 @@ export default {
     }
   },
   async mounted () {
-    console.log('555 :>> ', 555)
     this.resetSearch()
     await this.fetchResources()
   },
