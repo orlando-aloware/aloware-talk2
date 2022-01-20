@@ -237,16 +237,8 @@ export default {
       return _.get(this.notifications, `${this.id}.queue`, null)
     },
 
-    queueLastItem () {
-      return _.last(this.queue)
-    },
-
     message () {
       let message = _.get(this.notifications[this.id], 'message', '')
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        message = _.get(this.queueLastItem, 'message', '')
-      }
 
       return this.$options.filters.parseMentionToView(message)
     },
@@ -255,10 +247,6 @@ export default {
     },
     title () {
       let title = _.get(this.notifications[this.id], 'title', '')
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        title = _.get(this.queueLastItem, 'title', '')
-      }
 
       let fixedTitle = this.$options.filters.fixPhone(title)
 
@@ -269,31 +257,13 @@ export default {
       return fixedTitle
     },
     dateTime () {
-      let dateTime = _.get(this.notifications[this.id], 'dateTime', '')
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        dateTime = _.get(this.queueLastItem, 'dateTime', '')
-      }
-
-      return dateTime
+      return _.get(this.notifications[this.id], 'dateTime', '')
     },
     contactId () {
-      let contactId = _.get(this.notifications[this.id], 'contactId', '')
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        contactId = _.get(this.queueLastItem, 'contactId', '')
-      }
-
-      return contactId
+      return _.get(this.notifications[this.id], 'contactId', '')
     },
     communicationId () {
-      let communicationId = _.get(this.notifications[this.id], 'communicationId', '')
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        communicationId = _.get(this.queueLastItem, 'communicationId', '')
-      }
-
-      return communicationId
+      return _.get(this.notifications[this.id], 'communicationId', '')
     },
     link () {
       if (['system', 'incomingCall', 'callFishing'].includes(this.id)) {
@@ -310,49 +280,19 @@ export default {
       return ['system', 'incomingCall', 'callFishing'].includes(this.id)
     },
     campaignId () {
-      let campaignId = _.get(this.notifications[this.id], 'campaignId', null)
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        campaignId = _.get(this.queueLastItem, 'campaignId', '')
-      }
-
-      return campaignId
+      return _.get(this.notifications[this.id], 'campaignId', null)
     },
     campaignName () {
-      let campaignName = _.get(this.notifications[this.id], 'campaignName', null)
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        campaignName = _.get(this.queueLastItem, 'campaignName', '')
-      }
-
-      return campaignName
+      return _.get(this.notifications[this.id], 'campaignName', null)
     },
     ringGroupId () {
-      let ringGroupId = _.get(this.notifications[this.id], 'ringGroupId', null)
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        ringGroupId = _.get(this.queueLastItem, 'ringGroupId', '')
-      }
-
-      return ringGroupId
+      return _.get(this.notifications[this.id], 'ringGroupId', null)
     },
     ringGroupName () {
-      let ringGroupName = _.get(this.notifications[this.id], 'ringGroupName', null)
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        ringGroupName = _.get(this.queueLastItem, 'ringGroupName', '')
-      }
-
-      return ringGroupName
+      return _.get(this.notifications[this.id], 'ringGroupName', null)
     },
     phoneNumber () {
-      let phoneNumber = _.get(this.notifications[this.id], 'phoneNumber', null)
-
-      if (this.id === 'callFishing' && this.queueLastItem && this.queueLastItem) {
-        phoneNumber = _.get(this.queueLastItem, 'phoneNumber', '')
-      }
-
-      return phoneNumber
+      return _.get(this.notifications[this.id], 'phoneNumber', null)
     },
     communication () {
       return _.get(this.notifications[this.id], 'communication', null)
@@ -411,6 +351,7 @@ export default {
       this.clearDateTimeInterval()
 
       if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
+        this.removeFromCallFishingQueue(this.notifications[this.id].communicationId)
         this.setNotifications({
           type: this.id,
           data: {
@@ -481,11 +422,18 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
-      this.closeCallNotifications(this.id, this.communicationId, true)
+      if (this.id !== 'callFishing' || (this.id === 'callFishing' && !this.queue.length)) {
+        this.closeCallNotifications(this.id, this.communicationId, true)
+      }
+
       this.$VueEvent.fire('rejectCall')
 
       if (this.id === 'callFishing') {
         this.$VueEvent.fire('hidePhone')
+      }
+
+      if (this.id === 'callFishing' && this.queue.length) {
+        this.switchCallFishingFromQueue()
       }
     },
     onNotificationClick (event) {
