@@ -13,17 +13,13 @@
         @click="{}"
         href="#">
         <i class="fa fa-bars mr-1"></i>
-        Edit Columns
-      </b-dropdown-item>
-      <b-dropdown-item href="#">
-        <i class="fa fa-file-csv mr-1"></i>
-        Export as CSV
+        Option 1
       </b-dropdown-item>
       <b-dropdown-item
-        href="#"
-        @click="{}">
-        <i class="fa fa-trash-alt mr-1 text-red"></i>
-        <span class="text-red">Delete</span>
+        @click="{}"
+        href="#">
+        <i class="fa fa-bars mr-1"></i>
+        Option 2
       </b-dropdown-item>
     </b-dropdown>
     <q-btn
