@@ -435,7 +435,7 @@ export default {
 
       console.log(communication, isActiveInLiveContactsIndex)
 
-      if (isActiveInLiveContactsIndex < 0) {
+      if (isActiveInLiveContactsIndex >= 0) {
         return
       }
 

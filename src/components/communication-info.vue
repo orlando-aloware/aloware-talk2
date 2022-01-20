@@ -17,7 +17,7 @@
     <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall) || isCallFishingMode"
             bordered
             class="rounded-contact-activity b-radius-12"
-            :class="[isActiveCall ? 'call-connected cursor-pointer' : '', this.isActiveCall || this.isIncomingCall || this.isCallFishingMode ? 'cursor-pointer' : '']"
+            :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
             @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
@@ -122,7 +122,7 @@
             </q-item-section>
           </q-item>
 
-          <q-item v-if="(isCallFishingMode || isIncomingCall) && dialer.call"
+          <q-item v-if="(isCallFishingMode || isIncomingLiveCall) && dialer.call"
                   clickable
                   v-close-popup
                   @click="onParkCurrentCallAndAnswer">
@@ -133,7 +133,7 @@
               <span>Park Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
-          <q-item v-if="(isCallFishingMode || isIncomingCall) && dialer.call"
+          <q-item v-if="(isCallFishingMode || isIncomingLiveCall) && dialer.call"
                   clickable
                   v-close-popup
                   @click="onHangUpCurrentCallAndAnswer">
@@ -734,8 +734,8 @@
 
 <script>
 import _ from 'lodash'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin, notificationMixin } from 'src/plugins/mixins'
-import { mapActions, mapState } from 'vuex'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin, notificationMixin, liveCallsMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
 import ChevronRight from 'components/icons/contact-activity/chevron-right'
@@ -756,7 +756,6 @@ import ParkedCallIcon from 'components/icons/parked-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
   name: 'communication-info',
@@ -767,7 +766,8 @@ export default {
     communicationInfoMixin,
     dateMixin,
     userMixin,
-    notificationMixin
+    notificationMixin,
+    liveCallsMixin
   ],
 
   components: {
@@ -915,77 +915,6 @@ export default {
       }
 
       return this.communication.body
-    },
-    shouldShowIncomingCallMenu () {
-      return ((this.isIncomingLiveCall && this.isCallFishing && this.isCallFishingMode) || (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')) && !this.isParkedCall
-    },
-    shouldShowAnsweredCallMenu () {
-      return this.isActiveCall && !this.isParkedCall
-    },
-    shouldShowParkedCallMenu () {
-      return this.isParkedCall
-    },
-
-    incomingCallStatuses () {
-      return [
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, // call fishing
-        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW // parked
-      ]
-    },
-    isIncomingLiveCall () {
-      return this.communication.type === CommunicationTypes.CALL &&
-        this.communication.direction === CommunicationDirection.INBOUND &&
-        this.incomingCallStatuses.includes(this.communication.current_status2)
-    },
-    // live calls includes incoming, parked and in-progress calls
-    isLiveCall () {
-      return this.communication.type === CommunicationTypes.CALL && this.communication.direction === CommunicationDirections.INBOUND &&
-        [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(this.communication.current_status2)
-    },
-    isParkedCall () {
-      return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.communication.current_status2)
-    },
-    isActiveCall () {
-      return this.dialer.call && this.dialer.call.state === 'open' &&
-        this.dialer.communication && this.dialer.communication.id === this.communication.id
-    },
-    isIncomingCall () {
-      return [
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-      ].includes(this.communication.current_status2)
-    },
-    isCallFishing () {
-      if (!this.communication.ring_group_id) {
-        return false
-      }
-
-      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
-
-      return ringGroup && ringGroup.fishing_mode
-    },
-    isCallFishingMode () {
-      if (this.notifications.callFishing.communicationId === this.communication.id) {
-        return true
-      }
-
-      if (this.notifications.callFishing.queue) {
-        let index = this.notifications.callFishing.queue.findIndex(item => item.communicationId === this.communication.id)
-        return index >= 0
-      }
-
-      return false
     }
   },
 
@@ -1121,138 +1050,7 @@ export default {
       } else {
         this.$emit('contactNotDisposed')
       }
-    },
-
-    onAcceptCall (e) {
-      if (this.isCallFishingMode && this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.showCallMenu = true
-        e.stopImmediatePropagation()
-        return
-      }
-      if (this.communication.ring_group_id) {
-        const ringGroup = this.getRingGroup(this.communication.ring_group_id)
-
-        if (ringGroup && ringGroup.fishing_mode) {
-          const data = {
-            communication: {
-              id: this.communication.id,
-              campaignId: this.communication.campaign_id,
-              contactName: this.contact.name,
-              companyName: this.contact.company_name,
-              contactId: this.contact.id,
-              phoneNumber: this.contact.phone_number
-            },
-            shouldPark: false,
-            shouldHangup: false
-          }
-          this.$VueEvent.fire('answerCallFishing', data)
-          this.setShowPhone(true)
-          return
-        }
-      }
-
-      this.$VueEvent.fire('answerCall')
-      this.setShowPhone(true)
-      e.stopImmediatePropagation()
-    },
-    onRejectCall (e) {
-      this.isRejecting = true
-      if (this.isCallFishingMode) {
-        this.processRemoveFromNotification(this.communication)
-        let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
-        let isInContacts = this.contacts.find(item => item.id === this.contact.id)
-        let liveContacts = _.cloneDeep(this.liveContacts)
-        let contact = _.cloneDeep(this.contact)
-        if (isInLiveContacts) {
-          let index = this.liveContacts.findIndex(item => item.id === this.contact.id)
-          liveContacts.splice(index, 1)
-          this.setLiveContacts(liveContacts)
-        }
-        let contacts = _.cloneDeep(this.contacts)
-        if (!isInContacts) {
-          contacts.unshift(contact)
-          this.setContacts(contacts)
-        }
-        this.isRejecting = false
-        e.stopImmediatePropagation()
-        return
-      }
-
-      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.$VueEvent.fire('hangupCall')
-        this.isRejecting = false
-        return
-      }
-
-      this.$VueEvent.fire('rejectCall')
-      this.isRejecting = false
-      e.stopImmediatePropagation()
-    },
-    onHangUpCall (e) {
-      this.$VueEvent.fire('hangupCall')
-      e.stopImmediatePropagation()
-    },
-    onUnparkCall (e) {
-      if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.showCallMenu = true
-        e.stopImmediatePropagation()
-        return
-      }
-
-      this.$VueEvent.fire('unparkCall')
-      this.$VueEvent.fire('togglePhone')
-      e.stopImmediatePropagation()
-    },
-    onShowPhone (e) {
-      this.showCallMenu = false
-      if (!this.isActiveCall && !this.isIncomingCall && !this.isCallFishingMode) {
-        e.stopImmediatePropagation()
-        return
-      }
-
-      this.showCallFishingDataInPhone({
-        communication: this.communication,
-        contact: this.contact
-      })
-
-      e.stopImmediatePropagation()
-    },
-    onParkCurrentCallAndConnect () {
-      this.showCallMenu = false
-      this.answerCommunication(true, true)
-    },
-    onHangupCurrentCallAndConnect () {
-      this.showCallMenu = false
-      this.answerCommunication(false, true)
-    },
-    onParkCurrentCallAndAnswer () {
-      this.showCallMenu = false
-      this.answerCommunication(true, false)
-    },
-    onHangUpCurrentCallAndAnswer () {
-      this.showCallMenu = false
-      this.answerCommunication(false, true)
-    },
-
-    answerCommunication (shouldPark = false, shouldHangup = false) {
-      const data = {
-        communication: {
-          id: this.communication.id,
-          campaignId: this.communication.campaign_id,
-          contactName: this.contact.name,
-          companyName: this.contact.company_name,
-          contactId: this.contact.id,
-          phoneNumber: this.contact.phone_number
-        },
-        shouldPark: shouldPark,
-        shouldHangup: shouldHangup
-      }
-      this.$VueEvent.fire('answerCallFishing', data)
-      this.setShowPhone(true)
-    },
-
-    ...mapActions(['setShowPhone']),
-    ...mapActions('inbox', ['setContacts', 'setLiveContacts'])
+    }
   },
 
   watch: {
