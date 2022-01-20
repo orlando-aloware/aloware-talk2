@@ -76,114 +76,122 @@
                         :update-interval="6000">
         </task-item-time>
       </span>
-      <div class="text-grey-90 d-flex flex-row justify-center"
-           v-if="shouldShowCallActionMenu">
-        <div v-if="!isParkedCall"
-             class="pl-0">
-          <b-button variant="light"
-                    size="sm"
-                    class="bg-transparent no-border no-box-shadow p-0"
-                    @click="onRejectCall">
-            <ignore-call-icon v-if="isCallFishingMode"
-                              height="24"
-                              width="24" />
-            <cancel-call-icon v-else/>
-          </b-button>
+
+      <div v-if="isLiveCall">
+        <!-- Incoming Call-->
+        <!-- only show this if call is incoming and is not a parked call-->
+        <div class="text-grey-90 d-flex flex-row justify-center"
+             v-if="((isIncomingLiveCall && !isCallFishingMode && dialer.call) || (isIncomingLiveCall && isCallFishingMode)) && !isParkedCall && !isRejecting && !isAnsweringCall">
+
+          <!-- show reject button if call is not parked-->
+          <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onRejectCall">
+              <!-- show remove icon for call fishing mode -->
+              <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode"
+                                height="24"
+                                width="24" />
+              <!-- only show reject button if -->
+              <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishingMode"/>
+            </b-button>
+          </div>
+          <div v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)"
+               class="pl-1 pr-0" >
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onAcceptCall">
+              <accept-call-icon/>
+              <q-menu v-if="isDialerConnected"
+                      fit
+                      content-class="live-call-options"
+                      anchor="top right"
+                      self="top left"
+                      v-model="showIncomingCallMenu"
+                      @hide="showIncomingCallMenu = false">
+                <q-list>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onParkCurrentCallAndAnswer">
+                    <q-item-section class="d-inline-flex">
+                      <park-call-icon color="#9B51E0"
+                                        width="11.7"
+                                        height="12.35">
+                      </park-call-icon>
+                      <span>Park Current Call &amp; Answer</span>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onHangUpCurrentCallAndAnswer">
+                    <q-item-section>
+                      <hangup-icon  width="16"
+                                    height="16"></hangup-icon>
+                      <span>Hang up Current Call &amp; Answer</span>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </b-button>
+          </div>
         </div>
-        <div v-if="!isActiveCallOwner || !isParkedCall"
-             class="pl-1 pr-0" >
-          <b-button variant="light"
-                    size="sm"
-                    class="bg-transparent no-border no-box-shadow p-0"
-                    @click="onAcceptCall">
-            <accept-call-icon/>
-            <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
-                    fit
-                    content-class="live-call-options"
-                    anchor="top right"
-                    self="top left"
-                    v-model="showIncomingCallMenu"
-                    @hide="showIncomingCallMenu = false">
-              <q-list>
-                <q-item clickable
-                        v-close-popup
-                        @click="onParkCurrentCallAndAnswer">
-                  <q-item-section class="d-inline-flex">
-                    <park-call-icon color="#9B51E0"
+
+        <!-- Answered / In Progress Call-->
+        <div class="text-grey-90 d-flex flex-row justify-center"
+             v-if="isActiveCall && !isParkedCall">
+          <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onHangUpCall">
+              <cancel-call-icon/>
+            </b-button>
+          </div>
+        </div>
+
+        <!-- Parked Call-->
+        <div class="text-grey-90 d-flex flex-row justify-center"
+             v-if="isParkedCall">
+          <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onUnparkCall">
+              <parked-call-icon/>
+              <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
+                      fit
+                      content-class="live-call-options"
+                      anchor="top right"
+                      self="top left"
+                      v-model="showParkedCallMenu"
+                      @hide="showParkedCallMenu = false">
+                <q-list>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onParkCurrentCallAndConnect">
+                    <q-item-section class="d-inline-flex">
+                      <park-call-icon color="#9B51E0"
                                       width="11.7"
                                       height="12.35">
-                    </park-call-icon>
-                    <span>Park Current Call &amp; Answer</span>
-                  </q-item-section>
-                </q-item>
-                <q-item clickable
-                        v-close-popup
-                        @click="onHangUpCurrentCallAndAnswer">
-                  <q-item-section>
-                    <hangup-icon  width="16"
-                                  height="16"></hangup-icon>
-                    <span>Hang up Current Call &amp; Answer</span>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </b-button>
-        </div>
-      </div>
-      <div class="text-grey-90 d-flex flex-row justify-center"
-           v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
-             contact.last_communication.type === CommunicationTypes.CALL &&
-             [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(contact.last_communication.current_status2) && dialer.call">
-        <div class="pl-0">
-          <b-button variant="light"
-                    size="sm"
-                    class="bg-transparent no-border no-box-shadow p-0"
-                    @click="onHangUpCall">
-            <cancel-call-icon/>
-          </b-button>
-        </div>
-      </div>
-      <div class="text-grey-90 d-flex flex-row justify-center"
-           v-if="contact.last_communication.direction === CommunicationDirection.INBOUND &&
-           contact.last_communication.type === CommunicationTypes.CALL &&
-           [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(contact.last_communication.current_status2) && dialer.call || isParkedCall">
-        <div class="pl-0">
-          <b-button variant="light"
-                    size="sm"
-                    class="bg-transparent no-border no-box-shadow p-0"
-                    @click="onUnparkCall">
-            <parked-call-icon/>
-            <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
-                    fit
-                    content-class="live-call-options"
-                    anchor="top right"
-                    self="top left"
-                    v-model="showParkedCallMenu"
-                    @hide="showParkedCallMenu = false">
-              <q-list>
-                <q-item clickable
-                        v-close-popup
-                        @click="onParkCurrentCallAndConnect">
-                  <q-item-section class="d-inline-flex">
-                    <park-call-icon color="#9B51E0"
-                                    width="11.7"
-                                    height="12.35">
-                    </park-call-icon>
-                    <span>Park Current Call &amp; Connect</span>
-                  </q-item-section>
-                </q-item>
-                <q-item clickable
-                        v-close-popup
-                        @click="onHangupCurrentCallAndConnect">
-                  <q-item-section>
-                    <hangup-icon  width="16"
-                                  height="16"></hangup-icon>
-                    Hang up Current Call &amp; Connect
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </b-button>
+                      </park-call-icon>
+                      <span>Park Current Call &amp; Connect</span>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onHangupCurrentCallAndConnect">
+                    <q-item-section>
+                      <hangup-icon  width="16"
+                                    height="16"></hangup-icon>
+                      Hang up Current Call &amp; Connect
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </b-button>
+          </div>
         </div>
       </div>
     </div>
@@ -306,8 +314,16 @@ export default {
       if (!this.contact.last_communication) {
         return false
       }
-      return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.contact.last_communication.current_status2) ||
-        (this.dialer.parkedCall && this.dialer.parkedCall.id === this.contact.last_communication.id)
+      return this.dialer.parkedCall && this.dialer.parkedCall.id === this.contact.last_communication.id
+    },
+
+    isActiveCall () {
+      if (!this.contact.last_communication) {
+        return false
+      }
+
+      return this.dialer.call && this.dialer.call.state === 'open' &&
+        this.dialer.communication && this.dialer.communication.id === this.contact.last_communication.id
     },
 
     isConnectedCall () {
@@ -337,21 +353,55 @@ export default {
 
       return false
     },
-    shouldShowCallActionMenu () {
-      return (this.contact.last_communication.direction === CommunicationDirection.INBOUND &&
-        this.contact.last_communication.type === CommunicationTypes.CALL &&
+
+    isIncomingLiveCall () {
+      return this.contact.last_communication.type === CommunicationTypes.CALL &&
+        this.contact.last_communication.direction === CommunicationDirection.INBOUND &&
+        this.incomingCallStatuses.includes(this.contact.last_communication.current_status2)
+    },
+
+    isRealCall () {
+      return this.contact.last_communication.type === CommunicationTypes.CALL && this.contact.last_communication.direction === CommunicationDirection.INBOUND &&
         [
-          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW
-        ].includes(this.contact.last_communication.current_status2) &&
-        this.dialer.call &&
-        this.dialer.currentStatus === 'RECEIVED_CALL_INVITE') ||
-        ((this.isCallFishingMode && [CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(this.contact.last_communication.current_status2)) && (this.dialer && (!['CALL_CONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus) ||
-          (this.dialer && this.dialer.communication && this.dialer.communication.id !== this.contact.last_communication.id))))
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+        ].includes(this.contact.last_communication.current_status2)
+    },
+
+    isFishingModeCall () {
+      return this.isCallFishingMode &&
+        this.contact.last_communication.type === CommunicationTypes.CALL &&
+        this.contact.last_communication.direction === CommunicationDirection.INBOUND &&
+        [CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(this.contact.last_communication.current_status2)
+    },
+
+    isDialerAvailable () {
+      return !this.dialer.call
+    },
+
+    isDialerConnected () {
+      return this.dialer.call && this.dialer.call.state === 'open'
+    },
+
+    isLiveCall () {
+      return this.liveCallStatuses.includes(this.contact.last_communication.current_status2)
+    },
+
+    incomingCallStatuses () {
+      return [
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, // call fishing
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW // parked
+      ]
+    },
+
+    liveCallStatuses () {
+      return [...this.incomingCallStatuses, ...[CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW]]
     }
   },
 
@@ -362,7 +412,11 @@ export default {
       CommunicationCurrentStatus,
       CommunicationDirection,
       showIncomingCallMenu: false,
-      showParkedCallMenu: false
+      showParkedCallMenu: false,
+      isRejecting: false,
+      isHangingUp: false,
+      isParking: false,
+      isAnsweringCall: false
     }
   },
 
@@ -385,6 +439,8 @@ export default {
         return
       }
 
+      this.isAnsweringCall = true
+
       let communication = this.contact.last_communication
 
       if (communication.ring_group_id) {
@@ -406,6 +462,7 @@ export default {
           }
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
+          this.isAnsweringCall = false
           e.stopImmediatePropagation()
           return
         }
@@ -414,11 +471,13 @@ export default {
       console.log('Accepting call from task item..')
 
       this.$VueEvent.fire('answerCall')
+      this.isAnsweringCall = false
       this.setShowPhone(true)
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
-      if (this.isCallFishingMode || this.isCallFishing) {
+      this.isRejecting = true
+      if (this.isCallFishingMode) {
         this.processRemoveFromNotification(this.contact.last_communication)
         let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
         let isInContacts = this.contacts.find(item => item.id === this.contact.id)
@@ -435,21 +494,26 @@ export default {
           this.setContacts(contacts)
         }
 
+        this.isRejecting = false
         e.stopImmediatePropagation()
         return
       }
 
-      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+      // handle active call
+      if (this.dialer && this.dialer.state === 'open') {
         console.log('Hangup call from task item..')
         this.$VueEvent.fire('hangupCall')
+        this.isRejecting = false
         return
       }
 
       console.log('Reject call from task item..')
       this.$VueEvent.fire('rejectCall')
+      this.isRejecting = false
       e.stopImmediatePropagation()
     },
     onHangUpCall (e) {
+      console.log(';hangup')
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },

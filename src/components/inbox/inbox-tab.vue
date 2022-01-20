@@ -424,7 +424,21 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
-      console.log(communication)
+      // Do not alter live contacts of it in active mode
+      let isActiveInLiveContacts = this.liveContacts.find(item => item.id === communication.contact_id && [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2))
+
+      console.log(communication, isActiveInLiveContacts)
+
+      if (isActiveInLiveContacts) {
+        return
+      }
+
       talk2Api.V2.contacts.get(communication.contact_id).then(response => {
         let contact = response.data
         let contacts = _.cloneDeep(this.contacts)

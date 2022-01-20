@@ -14,10 +14,10 @@
       </q-item>
     </q-list>
 
-    <q-list v-else-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall || isCallFishingMode"
+    <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall) || isCallFishingMode"
             bordered
             class="rounded-contact-activity b-radius-12"
-            :class="[isConnectedCall ? 'call-connected cursor-pointer' : '', this.isConnectedCall || this.isIncomingCall || this.isCallFishingMode ? 'cursor-pointer' : '']"
+            :class="[isActiveCall ? 'call-connected cursor-pointer' : '', this.isActiveCall || this.isIncomingCall || this.isCallFishingMode ? 'cursor-pointer' : '']"
             @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
@@ -27,7 +27,7 @@
         </div>
         <div class="text-lt p-x"
              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
-            <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isConnectedCall && !isParkedCall">
+            <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isActiveCall && !isParkedCall">
               {{ communication.direction | fixCommDirection }}
               {{ communication.type | fixCommType }}
             </span>
@@ -41,20 +41,22 @@
             </span>
         </q-item-section>
         <q-item-section class="text-lt pl-2 pr-2 text-left">
+          <!-- Incoming Call-->
           <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="(isIncomingCall && dialer.call) || isCallFishingMode">
+               v-if="((isIncomingLiveCall && !isCallFishingMode && dialer.call) || (isIncomingLiveCall && isCallFishingMode)) && !isParkedCall && !isRejecting">
             <div class="pl-0">
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
                         @click="onRejectCall">
-                <ignore-call-icon v-if="isCallFishingMode"
+                <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode"
                                   height="24"
                                   width="24"/>
-                <cancel-call-icon v-else/>
+                <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishingMode"/>
               </b-button>
             </div>
-            <div class="pl-1 pr-0">
+            <div class="pl-1 pr-0"
+                 v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)">
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
@@ -63,8 +65,10 @@
               </b-button>
             </div>
           </div>
+
+          <!-- Answered / In Progress Call-->
           <div class="text-grey-90 d-flex flex-row justify-center"
-               v-else-if="isConnectedCall">
+               v-else-if="isActiveCall">
             <div class="pl-0">
               <b-button variant="light"
                         size="sm"
@@ -74,6 +78,8 @@
               </b-button>
             </div>
           </div>
+
+          <!-- Parked Call-->
           <div class="text-grey-90 d-flex flex-row justify-center" v-else-if="isParkedCall">
             <b-button variant="light"
                       size="sm"
@@ -714,7 +720,7 @@
       </q-expansion-item>
     </q-list>
     <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
-         v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isConnectedCall">
+         v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isActiveCall">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
          v-html="$options.filters.nl2br(communication.notes)">
@@ -747,6 +753,7 @@ import ParkedCallIcon from 'components/icons/parked-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
   name: 'communication-info',
@@ -838,6 +845,9 @@ export default {
       activeName: false,
       loadingUpdateEngagement: false,
       showCallMenu: false,
+      isRejecting: false,
+      isHangingUp: false,
+      isParking: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -903,6 +913,21 @@ export default {
 
       return this.communication.body
     },
+    incomingCallStatuses () {
+      return [
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, // call fishing
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW // parked
+      ]
+    },
+    isIncomingLiveCall () {
+      return this.communication.type === CommunicationTypes.CALL &&
+        this.communication.direction === CommunicationDirection.INBOUND &&
+        this.incomingCallStatuses.includes(this.communication.current_status2)
+    },
     // live calls includes incoming, parked and in-progress calls
     isLiveCall () {
       return this.communication.type === CommunicationTypes.CALL && this.communication.direction === CommunicationDirections.INBOUND &&
@@ -910,19 +935,22 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(this.communication.current_status2)
     },
     isParkedCall () {
       return [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(this.communication.current_status2)
     },
-    isConnectedCall () {
-      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2)
+    isActiveCall () {
+      return this.dialer.call && this.dialer.call.state === 'open' &&
+        this.dialer.communication && this.dialer.communication.id === this.communication.id
     },
     isIncomingCall () {
       return [
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
       ].includes(this.communication.current_status2)
     },
     isCallFishing () {
@@ -1117,6 +1145,7 @@ export default {
       e.stopImmediatePropagation()
     },
     onRejectCall (e) {
+      this.isRejecting = true
       if (this.isCallFishingMode) {
         this.processRemoveFromNotification(this.communication)
         let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
@@ -1133,17 +1162,19 @@ export default {
           contacts.unshift(contact)
           this.setContacts(contacts)
         }
-
+        this.isRejecting = false
         e.stopImmediatePropagation()
         return
       }
 
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
         this.$VueEvent.fire('hangupCall')
+        this.isRejecting = false
         return
       }
 
       this.$VueEvent.fire('rejectCall')
+      this.isRejecting = false
       e.stopImmediatePropagation()
     },
     onHangUpCall (e) {
@@ -1163,7 +1194,7 @@ export default {
     },
     onShowPhone (e) {
       this.showCallMenu = false
-      if (!this.isConnectedCall && !this.isIncomingCall && !this.isCallFishingMode) {
+      if (!this.isActiveCall && !this.isIncomingCall && !this.isCallFishingMode) {
         e.stopImmediatePropagation()
         return
       }
