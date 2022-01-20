@@ -422,7 +422,7 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
-      if (this.id !== 'callFishing' || (this.id === 'callFishing' && !this.queue.length)) {
+      if (this.id !== 'callFishing' || (this.id === 'callFishing' && (!this.queue || (this.queue && !this.queue.length)))) {
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
@@ -432,7 +432,7 @@ export default {
         this.$VueEvent.fire('hidePhone')
       }
 
-      if (this.id === 'callFishing' && this.queue.length) {
+      if (this.id === 'callFishing' && this.queue && this.queue.length) {
         this.switchCallFishingFromQueue()
       }
     },
