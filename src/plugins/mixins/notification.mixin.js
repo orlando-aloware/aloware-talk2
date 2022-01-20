@@ -79,8 +79,7 @@ export default {
     clearDialerCallFishing () {
       // clear dialer's call fishing details
       let dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
-      let hasInprogressCall = this.dialer.call || this.dialer.parkedCall
-      if (!hasInprogressCall && dialerCallFishingCommunication) {
+      if (dialerCallFishingCommunication) {
         this.setDialerCallFishing({
           communication: null,
           contact: null
@@ -231,12 +230,12 @@ export default {
       //   notification: notification
       // })
     },
-    showCallFishingDataInPhone (data) {
+    showCallFishingDataInPhone (data, type = 'callFishing') {
       this.$VueEvent.fire('showPhone')
-      this.$closeActionNotification('callFishing')
+      this.$closeActionNotification(type)
       let counter = 0
       let dialerCallFishingInterval = setInterval(() => {
-        if (!document.getElementById('callFishing')) {
+        if (!document.getElementById(type)) {
           this.setDialerCallFishing(data)
           clearInterval(dialerCallFishingInterval)
         }

@@ -677,9 +677,13 @@ export default {
       console.log('Unhold is in progress.')
     },
 
-    unparkCommunication (parkedCallData) {
+    unparkCommunication (parkedCallData, preventClear = false) {
       this.loadingUnpark = true
-      this.setDialerParkedCall()
+
+      if (!preventClear) {
+        this.setDialerParkedCall()
+      }
+
       let data = {
         currentNumber: 'unhold:' + parkedCallData.id,
         outboundCampaignId: parkedCallData.campaign_id,
@@ -707,10 +711,6 @@ export default {
           this.makeCall('call:' + data.id, data.campaignId)
         }
 
-        if (shouldUnpark) {
-          this.unparkCommunication(data)
-        }
-
         this.setDialerIsMuted(false)
       }).catch(err => {
         this.setDialerParkedCall()
@@ -718,6 +718,10 @@ export default {
       }).finally(_ => {
         this.loadingPark = false
       })
+
+      if (shouldUnpark) {
+        this.unparkCommunication(data, true)
+      }
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {

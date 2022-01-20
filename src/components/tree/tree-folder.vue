@@ -105,8 +105,8 @@
       placement="bottomright"
       boundary="window"
       custom-class="contact-popover"
-      :target="folderId"
-      v-if="$refs[folderId] !== undefined">
+      :target="folderId">
+      <!-- v-if="$refs[folderId] !== undefined"> -->
       <folder-actions
         :id="id"
         :hasEdit="hasEdit"

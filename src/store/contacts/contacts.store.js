@@ -111,6 +111,7 @@ export default function () {
     removeFolder: null,
     removeList: null,
     removeListActionType: null,
+    removedFolder: null,
     moveDialog: {
       open: false,
       id: null,

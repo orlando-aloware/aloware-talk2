@@ -12,6 +12,7 @@ export default {
       'resetSearch'
     ]),
     async loadList (id) {
+      console.log('Selecting list............')
       if (!id) {
         id = 'my-queue'
       }
@@ -41,7 +42,6 @@ export default {
               value: [stringId]
             }
           }
-
           this.setCurrentListFilters(filters)
         })
         .catch((error) => {

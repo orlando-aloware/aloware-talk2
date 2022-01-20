@@ -37,12 +37,9 @@ export default {
     }
   },
   async mounted () {
+    console.log('555 :>> ', 555)
     this.resetSearch()
-    if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-      await this.getMyQueueList()
-    } else {
-      await this.loadList(this.id)
-    }
+    await this.fetchResources()
   },
   data () {
     return {
@@ -51,13 +48,28 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'resetSearch'
+      'resetSearch',
+      'setSelectedList',
+      'listLoaded'
     ]),
     ...mapActions('powerDialer', [
       'getMyQueueList'
     ]),
     async updateList (data) {
       await this.loadList(data.id)
+    },
+    async fetchResources () {
+      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+        let response = await this.getMyQueueList()
+        this.listLoaded({ ...response.data, id: 'my-queue' })
+        this.setSelectedList({
+          id: response.data.id,
+          name: response.data.name,
+          type: response.data.type
+        })
+      } else {
+        await this.loadList(this.id)
+      }
     }
   },
   watch: {
@@ -65,6 +77,11 @@ export default {
       this.resetSearch()
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
+      }
+    },
+    'objId': async function (val) {
+      if (val.name === 'Power Dialer') {
+        await this.fetchResources()
       }
     }
   }

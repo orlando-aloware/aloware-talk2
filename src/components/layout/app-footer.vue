@@ -273,9 +273,6 @@ export default {
         this.setShowPhone(false)
       }
     }
-  },
-  beforeDestroy () {
-    this.$VueEvent.stop('answerCall')
   }
 }
 </script>
