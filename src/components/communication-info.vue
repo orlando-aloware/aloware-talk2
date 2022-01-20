@@ -43,7 +43,7 @@
         <q-item-section class="text-lt pl-2 pr-2 text-left">
           <!-- Incoming Call-->
           <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="((isIncomingLiveCall && !isCallFishingMode && dialer.call) || (isIncomingLiveCall && isCallFishingMode)) && !isParkedCall && !isRejecting">
+               v-if="shouldShowIncomingCallMenu">
             <div class="pl-0">
               <b-button variant="light"
                         size="sm"
@@ -68,7 +68,7 @@
 
           <!-- Answered / In Progress Call-->
           <div class="text-grey-90 d-flex flex-row justify-center"
-               v-else-if="isActiveCall">
+               v-if="shouldShowAnsweredCallMenu">
             <div class="pl-0">
               <b-button variant="light"
                         size="sm"
@@ -80,7 +80,8 @@
           </div>
 
           <!-- Parked Call-->
-          <div class="text-grey-90 d-flex flex-row justify-center" v-else-if="isParkedCall">
+          <div class="text-grey-90 d-flex flex-row justify-center"
+               v-if="shouldShowParkedCallMenu">
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
@@ -115,8 +116,9 @@
                   @click="onHangupCurrentCallAndConnect">
             <q-item-section>
               <hangup-icon  width="16"
-                            height="16"></hangup-icon>
-              Hang up Current Call &amp; Connect
+                            height="16"
+                            class="hangup-icon"></hangup-icon>
+              <span>Hang up Current Call &amp; Connect</span>
             </q-item-section>
           </q-item>
 
@@ -137,8 +139,9 @@
                   @click="onHangUpCurrentCallAndAnswer">
             <q-item-section>
               <hangup-icon  width="16"
-                            height="16"></hangup-icon>
-              Hang up Current Call &amp; Answer
+                            height="16"
+                            class="hangup-icon"></hangup-icon>
+              <span>Hang up Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
         </q-list>
@@ -913,6 +916,16 @@ export default {
 
       return this.communication.body
     },
+    shouldShowIncomingCallMenu () {
+      return ((this.isIncomingLiveCall && this.isCallFishing && this.isCallFishingMode) || (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')) && !this.isParkedCall
+    },
+    shouldShowAnsweredCallMenu () {
+      return this.isActiveCall && !this.isParkedCall
+    },
+    shouldShowParkedCallMenu () {
+      return this.isParkedCall
+    },
+
     incomingCallStatuses () {
       return [
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
@@ -1120,7 +1133,6 @@ export default {
         const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
         if (ringGroup && ringGroup.fishing_mode) {
-          console.log('Accepting call on fishing mode from communication info..')
           const data = {
             communication: {
               id: this.communication.id,
@@ -1139,7 +1151,6 @@ export default {
         }
       }
 
-      console.log('Accepting call from communication info..')
       this.$VueEvent.fire('answerCall')
       this.setShowPhone(true)
       e.stopImmediatePropagation()

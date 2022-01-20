@@ -81,7 +81,7 @@
         <!-- Incoming Call-->
         <!-- only show this if call is incoming and is not a parked call-->
         <div class="text-grey-90 d-flex flex-row justify-center"
-             v-if="((isIncomingLiveCall && !isCallFishingMode && dialer.call) || (isIncomingLiveCall && isCallFishingMode)) && !isParkedCall && !isRejecting && !isAnsweringCall">
+             v-if="shouldShowIncomingCallMenu">
 
           <!-- show reject button if call is not parked-->
           <div class="pl-0">
@@ -128,7 +128,8 @@
                           @click="onHangUpCurrentCallAndAnswer">
                     <q-item-section>
                       <hangup-icon  width="16"
-                                    height="16"></hangup-icon>
+                                    height="16"
+                                    class="hangup-icon"></hangup-icon>
                       <span>Hang up Current Call &amp; Answer</span>
                     </q-item-section>
                   </q-item>
@@ -140,7 +141,7 @@
 
         <!-- Answered / In Progress Call-->
         <div class="text-grey-90 d-flex flex-row justify-center"
-             v-if="isActiveCall && !isParkedCall">
+             v-if="shouldShowAnsweredCallMenu">
           <div class="pl-0">
             <b-button variant="light"
                       size="sm"
@@ -153,14 +154,14 @@
 
         <!-- Parked Call-->
         <div class="text-grey-90 d-flex flex-row justify-center"
-             v-if="isParkedCall">
+             v-if="shouldShowParkedCallMenu">
           <div class="pl-0">
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
                       @click="onUnparkCall">
               <parked-call-icon/>
-              <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
+              <q-menu v-if="dialer.call && dialer.call.state === 'open'"
                       fit
                       content-class="live-call-options"
                       anchor="top right"
@@ -184,8 +185,9 @@
                           @click="onHangupCurrentCallAndConnect">
                     <q-item-section>
                       <hangup-icon  width="16"
-                                    height="16"></hangup-icon>
-                      Hang up Current Call &amp; Connect
+                                    height="16"
+                                    class="hangup-icon"></hangup-icon>
+                      <span>Hang up Current Call &amp; Connect</span>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -304,6 +306,18 @@ export default {
         default:
           return directionText + ' a file'
       }
+    },
+    shouldShowIncomingCallMenu () {
+      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode) {
+        return false
+      }
+      return ((this.isIncomingLiveCall && this.isCallFishing && this.isCallFishingMode) || (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')) && !this.isParkedCall
+    },
+    shouldShowAnsweredCallMenu () {
+      return this.isActiveCall && !this.isParkedCall
+    },
+    shouldShowParkedCallMenu () {
+      return this.isParkedCall
     },
     isActiveCallOwner () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
@@ -447,7 +461,6 @@ export default {
         const ringGroup = this.getRingGroup(communication.ring_group_id)
 
         if (ringGroup && ringGroup.fishing_mode) {
-          console.log('Accepting call on fishing mode from task item..')
           const data = {
             communication: {
               id: communication.id,
@@ -463,12 +476,11 @@ export default {
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
           this.isAnsweringCall = false
+
           e.stopImmediatePropagation()
           return
         }
       }
-
-      console.log('Accepting call from task item..')
 
       this.$VueEvent.fire('answerCall')
       this.isAnsweringCall = false
