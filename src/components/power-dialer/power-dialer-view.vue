@@ -113,7 +113,7 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    @click="onRemoveList"
+                    @click="onClearList"
                     v-if="isMyQueue">
                     <i class="fa fa-trash-alt mr-1 text-red"></i>
                     <span class="text-red">Clear</span>
@@ -517,6 +517,13 @@ export default {
       setTimeout(() => {
         // this.removeListOpen({ id: this.id, name: this.name })
         this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
+      }, 10)
+    },
+    onClearList () {
+      this.removeListClose()
+      setTimeout(() => {
+        // this.removeListOpen({ id: this.id, name: this.name })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name, clear: true })
       }, 10)
     },
     onCheckedRows (checked) {
