@@ -228,7 +228,8 @@ export default function (/* { ssrContext } */) {
       isTabletOrMobile: false,
       contactDetailsDrawer: false,
       showPhone: false,
-      enableAudio: false
+      enableAudio: false,
+      callFishingQueue: []
     },
 
     getters: {
@@ -564,6 +565,14 @@ export default function (/* { ssrContext } */) {
 
       setEnableAudio ({ commit }, value) {
         commit('SET_ENABLE_AUDIO', value)
+      },
+
+      removeFromCallFishingNotificationQueue ({ commit }, value) {
+        commit('REMOVE_FROM_CALL_FISHING_NOTIFICATION_QUEUE', value)
+      },
+
+      addToCallFishingQueue ({ commit }, payload) {
+        commit('ADD_TO_CALL_FISHING_QUEUE', payload)
       },
 
       removeFromCallFishingQueue ({ commit }, value) {
@@ -1069,7 +1078,7 @@ export default function (/* { ssrContext } */) {
         state.enableAudio = value
       },
 
-      REMOVE_FROM_CALL_FISHING_QUEUE (state, value) {
+      REMOVE_FROM_CALL_FISHING_NOTIFICATION_QUEUE (state, value) {
         if (!state.notifications.callFishing.queue) {
           return
         }
@@ -1078,6 +1087,22 @@ export default function (/* { ssrContext } */) {
 
         if (found) {
           state.notifications.callFishing.queue.splice(state.notifications.callFishing.queue.indexOf(found), 1)
+        }
+      },
+
+      ADD_TO_CALL_FISHING_QUEUE (state, payload) {
+        state.callFishingQueue.push(payload)
+      },
+
+      REMOVE_FROM_CALL_FISHING_QUEUE (state, value) {
+        if (state.callFishingQueue.length === 0) {
+          return
+        }
+
+        let found = state.callFishingQueue.find(queue => queue.communicationId === value)
+
+        if (found) {
+          state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)
         }
       },
 

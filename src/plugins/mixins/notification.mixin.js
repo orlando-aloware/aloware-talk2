@@ -14,7 +14,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setNotifications', 'removeFromCallFishingQueue', 'setDialerCallFishing']),
+    ...mapActions(['setNotifications', 'removeFromCallFishingNotificationQueue', 'removeFromCallFishingQueue', 'setDialerCallFishing']),
 
     playAudio () {
       if (!this.enableAudio) {
@@ -37,7 +37,7 @@ export default {
         return
       }
 
-      let type = this.getType(communication.ring_group_id)
+      let type = this.getNotificationType(communication.ring_group_id)
       this.closeCallNotifications(type, communication.id)
     },
 
@@ -61,7 +61,10 @@ export default {
         this.clearDialerCallFishing()
       }
 
-      if ((notificationCommId === communicationId && type === 'callFishing') || forceClose) {
+      let callFishingQueue = _.get(this.notifications, 'callFishing.queue', null)
+      callFishingQueue = callFishingQueue && callFishingQueue.constructor === Array && callFishingQueue.length
+
+      if ((notificationCommId === communicationId && type === 'callFishing' && !callFishingQueue) || forceClose) {
         this.$closeActionNotification(type)
         return
       }
@@ -72,6 +75,7 @@ export default {
       }
 
       if (type === 'callFishing' && communicationId) {
+        this.removeFromCallFishingNotificationQueue(communicationId)
         this.removeFromCallFishingQueue(communicationId)
       }
     },
@@ -87,13 +91,14 @@ export default {
       }
     },
 
-    getType (ringGroupId) {
+    getNotificationType (ringGroupId) {
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
       return ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
     },
 
     switchCallFishingFromQueue () {
-      let callFishingFirstQueue = _.first(this.notifications, 'callFishing.queue', null)
+      let queue = _.get(this.notifications, 'callFishing.queue', [])
+      let callFishingFirstQueue = _.first(queue)
 
       if (!callFishingFirstQueue) {
         return
@@ -110,11 +115,11 @@ export default {
           campaignId: callFishingFirstQueue.campaignId,
           campaignName: callFishingFirstQueue.campaignName,
           ringGroupName: callFishingFirstQueue.ringGroupName,
-          phoneNumber: callFishingFirstQueue.phoneNumber,
-          queue: null
+          phoneNumber: callFishingFirstQueue.phoneNumber
         }
       })
 
+      this.removeFromCallFishingNotificationQueue(callFishingFirstQueue.communicationId)
       this.removeFromCallFishingQueue(callFishingFirstQueue.communicationId)
     },
 
@@ -230,6 +235,7 @@ export default {
       //   notification: notification
       // })
     },
+
     showCallFishingDataInPhone (data, type = 'callFishing') {
       this.$VueEvent.fire('showPhone')
       this.$closeActionNotification(type)

@@ -191,5 +191,6 @@ export const DEFAULT_STATE = {
   isTabletOrMobile: false,
   contactDetailsDrawer: false,
   showPhone: false,
-  enableAudio: false
+  enableAudio: false,
+  callFishingQueue: []
 }
