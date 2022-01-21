@@ -220,7 +220,7 @@ export default {
     closeAndReset () {
       this.columnsUpdated({
         id: this.columns.id,
-        headers: this.currentColumns
+        headers: this.activeColumns
       })
       this.columnsClose()
     },
@@ -271,6 +271,7 @@ export default {
             id: res.data.data.id,
             headers: res.data.data.headers
           })
+          this.closeAndReset()
           this.columnsClose()
         })
         .catch((error) => {
@@ -285,7 +286,7 @@ export default {
           this.loading = false
         })
 
-      this.closeAndReset()
+      // this.closeAndReset()
     },
     onModalShow () {
       this.searchText = ''
