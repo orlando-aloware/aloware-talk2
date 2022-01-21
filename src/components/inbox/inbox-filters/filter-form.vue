@@ -6,7 +6,6 @@
           <h5 class="section-header">Quick Access</h5>
           <b-form-row class="mt-2">
             <b-col sm="12" md="6">
-
               <b-form-group
                 label="Last Engagement Date"
                 class="form-label"
@@ -32,6 +31,20 @@
                     {{ getLastEngagementDateLabel(picker) }}
                   </template>
                 </date-range-picker>
+              </b-form-group>
+            </b-col>
+            <b-col sm="12" md="6">
+              <b-form-group label="My Contacts"
+                            class="form-label">
+                <b-form-checkbox
+                  class="mt-1"
+                  switch
+                  v-model="myContacts"
+                  :value="true"
+                  :unchecked-value="false"
+                  @change="onSetUser"
+                >
+                </b-form-checkbox>
               </b-form-group>
             </b-col>
           </b-form-row>
@@ -222,7 +235,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="$route.params.channel && !['inbox'].includes($route.params.channel)">
+        <div>
           <h5 class="mt-4 section-header">Attribution</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
@@ -238,7 +251,7 @@
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'messages', 'mentions'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'inbox'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -254,7 +267,7 @@
             </b-col>
             <b-col  sm="12"
                     md="6"
-                    v-if="!['mentions'].includes($route.params.channel)">
+                    v-if="!['mentions', 'inbox'].includes($route.params.channel)">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector v-model="filter.workflows"
@@ -264,6 +277,22 @@
                                    :highlighted="isChanged('workflows')"
                                    @change="(eventPayload) => onFilterChange(eventPayload, 'workflows')">
                 </sequence-selector>
+              </b-form-group>
+            </b-col>
+            <b-col v-if="!['voicemails'].includes($route.params.channel)"
+                   sm="12"
+                   md="6">
+              <b-form-group class="form-label"
+                            label="Contact Owner">
+                <user-selector v-model="filter.owner_id"
+                               :generic-styling="false"
+                               :multiple="false"
+                               :use-chips="false"
+                               :highlighted="isChanged('owner_id')"
+                               :clearable="true"
+                               custom-placeholder="Contact owner"
+                               @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
+                </user-selector>
               </b-form-group>
             </b-col>
             <b-col v-if="['messages'].includes($route.params.channel)"
@@ -282,23 +311,6 @@
             </b-col>
           </b-form-row>
         </div>
-        <b-form-row class="mt-2">
-          <b-col sm="12"
-                 md="6">
-            <b-form-group class="form-label"
-                          label="Contact Owner">
-              <user-selector v-model="filter.owner_id"
-                             :generic-styling="false"
-                             :multiple="false"
-                             :use-chips="false"
-                             :highlighted="isChanged('owner_id')"
-                             :clearable="true"
-                             custom-placeholder="Contact owner"
-                             @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
-              </user-selector>
-            </b-form-group>
-          </b-col>
-        </b-form-row>
       </b-container>
     </b-form>
   </div>
@@ -357,13 +369,15 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['channelChangedFilterFields'])
+    ...mapState('inbox', ['channelChangedFilterFields']),
+    ...mapState('auth', ['profile'])
   },
 
   data () {
     return {
       startDate: new Date(),
       endDate: new Date(),
+      myContacts: false,
       last_engagement_date_range: {
         startDate: window.moment('2015-01-01')._d,
         endDate: window.moment()._d
@@ -401,6 +415,12 @@ export default {
         return this.$options.filters.date(data.startDate) + ' - ' + this.$options.filters.date(data.endDate)
       }
       return 'All Time'
+    },
+    onSetUser () {
+      console.log(this.myContacts)
+      if (this.myContacts) {
+        this.filter.users = this.profile.id
+      }
     }
   },
   watch: {
@@ -411,6 +431,17 @@ export default {
           start: this.last_engagement_date_range.startDate ? window.moment(this.last_engagement_date_range.startDate).format('YYYY-MM-DD') : null,
           end: this.last_engagement_date_range.endDate ? window.moment(this.last_engagement_date_range.endDate).format('YYYY-MM-DD') : null
         }
+      }
+    },
+    myContacts: function (value) {
+      if (value) {
+        this.filter.users = this.profile.id
+      }
+    },
+    filter: {
+      deep: true,
+      handler (value) {
+        console.log(value.users)
       }
     }
   }
