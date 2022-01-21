@@ -289,13 +289,13 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   ) {
     let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
     queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
-    const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
+    let found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
       return
     }
 
-    queue.push({
+    let item = {
       title: settings.title,
       message: settings.message,
       dateTime: settings.dateTime,
@@ -305,11 +305,14 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       campaignName: settings.campaignName,
       ringGroupName: settings.ringGroupName,
       phoneNumber: settings.phoneNumber
-    })
+    }
+
+    queue.push(item)
 
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
     data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
+    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', item)
 
     return
   }
@@ -336,6 +339,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
   if (!document.getElementById(settings.type)) {
     this.$store.commit('SET_NOTIFICATIONS', data)
+    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
     this.$bvToast.show(settings.type)
     return
   }
@@ -344,6 +348,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   let notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
+      this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
       this.$bvToast.show(settings.type)
       clearInterval(notificationInterval)
     }
@@ -368,9 +373,9 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     icon = 'call-icon'
   }
   // Use a shorter name for this.$createElement
-  const h = this.$createElement
+  let h = this.$createElement
   // Create the message
-  const vNodesMsg = h(
+  let vNodesMsg = h(
     'div',
     { class: ['d-flex', 'flex-row', 'align-items-center'] },
     [

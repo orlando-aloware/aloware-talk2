@@ -303,6 +303,7 @@ export default {
       this.isRenaming = true
 
       return this.updateFolderRequest(this.id, { name, order: this.order }).then(response => {
+        this.$generalNotification('Folder updated.')
         this.reloadFolders()
       }).finally(() => {
         this.$nextTick(() => {
