@@ -8,14 +8,28 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Are you sure you want to remove
+          Are you sure you want to {{ clearable ? 'clear' : 'remove' }}
           <span class="font-weight-bold">{{ listToRemove.name }}</span>?
         </div>
       </div>
     </div>
 
     <div slot="footer" class="w-100">
-      <div class="d-flex w-100">
+      <div
+        class="d-flex w-100"
+        v-if="clearable">
+        <div class="flex-grow-1"></div>
+
+        <button
+          @click="onClearList"
+          class="btn btn-sm btn-danger mr-2">
+          Clear List
+        </button>
+
+      </div>
+      <div
+        class="d-flex w-100"
+        v-else>
         <div class="flex-grow-1"></div>
 
         <button
@@ -61,6 +75,9 @@ export default {
         return '/api/v2/contacts-list/'
       }
       return '/api/v2/power-dialer-lists/'
+    },
+    clearable () {
+      return this.listToRemove.clear === true
     }
   },
   data () {
@@ -117,6 +134,12 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
+    },
+    onClearList () {
+      console.log('Clearing up My Queue list...')
+      this.reloadFolders()
+      this.$generalNotification('My Queue list items has been cleared!', 'success')
+      this.removeListClose()
     },
     onRemoveListOnly () {
       this.showConfirmDialog(this.ActionTypes.LIST_ONLY)

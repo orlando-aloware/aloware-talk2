@@ -1,5 +1,27 @@
 <template>
   <div class="t-session-settings">
+    <b-dropdown
+      text="..."
+      no-caret
+      right size="sm"
+      variant="white"
+      class="mr-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+      <template #button-content>
+        <i class="fa fa-ellipsis-h"></i>
+      </template>
+      <b-dropdown-item
+        @click="{}"
+        href="#">
+        <i class="fa fa-bars mr-1"></i>
+        Option 1
+      </b-dropdown-item>
+      <b-dropdown-item
+        @click="{}"
+        href="#">
+        <i class="fa fa-bars mr-1"></i>
+        Option 2
+      </b-dropdown-item>
+    </b-dropdown>
     <q-btn
       class="start-dial-button p-0"
       color="success"

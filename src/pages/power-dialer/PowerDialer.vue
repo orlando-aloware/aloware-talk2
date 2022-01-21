@@ -4,32 +4,34 @@
     class="row mx-0 content-row d-flex overflow-hidden h-100">
 
     <div
-      v-show="!isStartingDial"
+      v-show="!hasSessions"
       class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
       <PowerDialerSidebar />
     </div>
-    <div :class="`${isStartingDial ? 'col-12' : 'col-10 main'} px-0 pr-1 mb-0`">
+    <div :class="`${hasSessions ? 'col-12' : 'col-10 main'} px-0 pr-1 mb-0`">
       <!-- Router Here -->
       <router-view></router-view>
     </div>
 
-    <MoveDialog
-      :is-contact-module-type="false" />
-    <CreateDialog />
-    <ColumnHeaders
-      :predefined-id="myQueueId"
-      v-if="isActive" />
-    <RemoveListModal v-if="isActive" />
-    <RemoveListConfirmation v-if="isActive" />
-    <RemoveContact
-      :is-contact-module-type="false"
-      v-if="isActive" />
-    <RemoveContactConfirmation
-      @on-remove-contacts="updateList"
-      v-if="isActive" />
-    <RemoveFolderDialog
-      :is-contact-module-type="false" />
-    <CreateListModal :is-default="false" />
+    <template v-if="!hasSessions">
+      <MoveDialog
+        :is-contact-module-type="false" />
+      <CreateDialog />
+      <ColumnHeaders
+        :predefined-id="myQueueId"
+        v-if="isActive" />
+      <RemoveListModal v-if="isActive" />
+      <RemoveListConfirmation v-if="isActive" />
+      <RemoveContact
+        :is-contact-module-type="false"
+        v-if="isActive" />
+      <RemoveContactConfirmation
+        @on-remove-contacts="updateList"
+        v-if="isActive" />
+      <RemoveFolderDialog
+        :is-contact-module-type="false" />
+      <CreateListModal :is-default="false" />
+    </template>
 
   </div>
 </template>
@@ -97,6 +99,9 @@ export default {
     isActive () {
       return this.$route.name === 'Power Dialer'
     },
+    hasSessions () {
+      return this.$route.meta.id === 'power-dialer-session'
+    },
     myQueueId () {
       return this.selectedList.type === 0 ? this.selectedList.id : null
     }
@@ -107,10 +112,10 @@ export default {
     await this.setFilterParams(this.$route.params)
   },
   beforeRouteUpdate (to, from, next) {
-    if (to.meta !== 'Power Dialer Session') {
-      this.START_DIAL_TOGGLE(false)
-    } else {
+    if (to.meta !== 'Power Dialer Sessions') {
       this.START_DIAL_TOGGLE(true)
+    } else {
+      this.START_DIAL_TOGGLE(false)
     }
     next()
   },
@@ -166,7 +171,7 @@ export default {
     },
     async initialize () {
       let route = this.$route.params
-      if (this.$route.name !== 'Power Dialer Session') {
+      if (this.$route.name !== 'Power Dialer Sessions') {
         this.START_DIAL_TOGGLE(false)
       }
       if (!route.id && this.$route.name === 'Power Dialer') {

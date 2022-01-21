@@ -113,7 +113,15 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    @click="onRemoveList">
+                    @click="onClearList"
+                    v-if="isMyQueue">
+                    <i class="fa fa-trash-alt mr-1 text-red"></i>
+                    <span class="text-red">Clear</span>
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    href="#"
+                    @click="onRemoveList"
+                    v-else>
                     <i class="fa fa-trash-alt mr-1 text-red"></i>
                     <span class="text-red">Delete</span>
                   </b-dropdown-item>
@@ -423,6 +431,9 @@ export default {
     },
     deleteEndpoint () {
       return `/api/v2/power-dialer-list-items/${this.selectedList.id}/items/${this.selectedItem.id}`
+    },
+    isMyQueue () {
+      return this.id === 'my-queue'
     }
   },
   data () {
@@ -458,10 +469,11 @@ export default {
     ]),
 
     beginDial () {
+      console.log('Begin dial...')
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.setContact(this.contact)
-      this.$router.push({ name: 'Power Dialer Session' })
+      this.$router.push(`/power-dialer/list/${this.selectedList.id}/sessions`)
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
@@ -506,6 +518,13 @@ export default {
       setTimeout(() => {
         // this.removeListOpen({ id: this.id, name: this.name })
         this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
+      }, 10)
+    },
+    onClearList () {
+      this.removeListClose()
+      setTimeout(() => {
+        // this.removeListOpen({ id: this.id, name: this.name })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name, clear: true })
       }, 10)
     },
     onCheckedRows (checked) {
