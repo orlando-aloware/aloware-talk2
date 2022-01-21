@@ -65,6 +65,7 @@ export default {
         first_name: this.selected_contact.first_name,
         last_name: this.selected_contact.last_name
       }).then(response => {
+        this.$generalNotification('Contact updated.')
         this.setContact(response.data)
         this.$emit('close')
         this.$VueEvent.fire('contact_updated', response.data)
