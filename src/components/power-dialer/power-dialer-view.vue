@@ -469,10 +469,11 @@ export default {
     ]),
 
     beginDial () {
+      console.log('Begin dial...')
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.setContact(this.contact)
-      this.$router.push({ name: 'Power Dialer Session' })
+      this.$router.push(`/power-dialer/list/${this.selectedList.id}/sessions`)
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {

@@ -43,6 +43,7 @@ export default {
     ]),
     toggleSidebar () {
       this.isExpanded = !this.isExpanded
+      console.log('78787 :>> ', 78787)
       this.TOGGLE_SESSION_SIDEBAR()
     }
   }

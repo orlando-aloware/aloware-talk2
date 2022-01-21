@@ -1626,7 +1626,7 @@ export default {
       if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
         (to.name !== from.name)) {
-        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
+        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Sessions') {
           this.resetContactsVuex()
         }
       }

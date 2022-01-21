@@ -107,10 +107,10 @@ export default {
     await this.setFilterParams(this.$route.params)
   },
   beforeRouteUpdate (to, from, next) {
-    if (to.meta !== 'Power Dialer Session') {
-      this.START_DIAL_TOGGLE(false)
-    } else {
+    if (to.meta !== 'Power Dialer Sessions') {
       this.START_DIAL_TOGGLE(true)
+    } else {
+      this.START_DIAL_TOGGLE(false)
     }
     next()
   },
@@ -166,7 +166,7 @@ export default {
     },
     async initialize () {
       let route = this.$route.params
-      if (this.$route.name !== 'Power Dialer Session') {
+      if (this.$route.name !== 'Power Dialer Sessions') {
         this.START_DIAL_TOGGLE(false)
       }
       if (!route.id && this.$route.name === 'Power Dialer') {

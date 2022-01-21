@@ -168,6 +168,15 @@ const routes = [
           {
             name: 'Power Dialer',
             meta: {
+              title: 'Power Dialer Sessions',
+              id: 'power-dialer-session'
+            },
+            path: 'list/:id(\\d+)+/sessions',
+            component: () => import('src/pages/power-dialer/PowerDialerSession')
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
               title: 'Power Dialer List',
               id: 'power-dialer-list'
             },

@@ -37,7 +37,7 @@
           <ScriptSelector
             v-else-if="cform.name === 'phoneScript'"
             v-model="resources[cform.name]"
-            :communication="true"
+            :communication="contact"
             class="w-100"></ScriptSelector>
 
           <CallDispositionSelector
@@ -92,7 +92,7 @@
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import MetricSelector from 'components/generic-selectors/session-metric-selector'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
@@ -126,6 +126,9 @@ export default {
   computed: {
     ...mapState('inbox', [
       'channelChangedFilterFields'
+    ]),
+    ...mapGetters('contacts', [
+      'contact'
     ]),
     metricOptions () {
       if (stats) {

@@ -49,7 +49,7 @@ export default {
   },
   created () {
     if (!this.isStartingDial) {
-      this.$router.push({ name: 'Power Dialer' })
+      // this.$router.push({ name: 'Power Dialer' })
     }
   }
 }
