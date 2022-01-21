@@ -47,7 +47,8 @@
                   {{ group.name }}
                   <q-chip size="xs" square class="p-0">
                     99
-                  </q-chip> </div>
+                  </q-chip>
+                </div>
               </q-item-section>
             </template>
 
@@ -153,17 +154,15 @@ export default {
       'sessionLoader'
     ]),
     ...mapGetters('contacts', [
-      'contact'
+      'contact',
+      'selectedList',
+      'listItems'
     ]),
     list () {
-      return this.listObject.data || []
+      return this.listItems[this.selectedList.id].data || []
     },
     activeList () {
-      if (!this.flagged) {
-        return this.list[0]
-      } else {
-        return this.contact
-      }
+      return this.list[0]
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
