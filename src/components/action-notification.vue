@@ -302,10 +302,10 @@ export default {
     },
     isValidPhoneShowInfo () {
       let dialerCommunicationId = _.get(this.dialer, 'communication.id', null)
-      return ((
+      return (
         (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
-          (this.id === 'callFishing' && !this.dialer.call)) &&
-        !this.dialer.parkedCall && !(this.queue && this.queue.length))
+          (this.id === 'callFishing' && !this.dialer.call && !this.dialer.callFishing.communication)) &&
+        !this.dialer.parkedCall
     }
   },
   methods: {
@@ -351,7 +351,7 @@ export default {
       this.clearDateTimeInterval()
 
       if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
-        this.removeFromCallFishingQueue(this.notifications[this.id].communicationId)
+        this.removeFromCallFishingNotificationQueue(this.notifications[this.id].communicationId)
         this.setNotifications({
           type: this.id,
           data: {
