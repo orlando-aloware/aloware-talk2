@@ -17,7 +17,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer', 'notifications', 'ringGroups']),
+    ...mapState(['dialer', 'notifications', 'ringGroups', 'callFishingQueue']),
 
     shouldShowIncomingCallMenu () {
       if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode) {
@@ -68,12 +68,8 @@ export default {
       return ringGroup && ringGroup.fishing_mode
     },
     isCallFishingMode () {
-      if (this.notifications.callFishing.communicationId === this.communication.id) {
-        return true
-      }
-
-      if (this.notifications.callFishing.queue) {
-        let index = this.notifications.callFishing.queue.findIndex(item => item.communicationId === this.communication.id)
+      if (this.callFishingQueue) {
+        let index = this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id)
         return index >= 0
       }
 
@@ -115,7 +111,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setShowPhone']),
+    ...mapActions(['setShowPhone', 'removeFromCallFishingQueue']),
     ...mapActions('inbox', ['setContacts', 'setLiveContacts']),
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
@@ -164,7 +160,7 @@ export default {
     onRejectCall (e) {
       this.isRejecting = true
       if (this.isCallFishingMode) {
-        this.processRemoveFromNotification(this.communication)
+        this.removeFromCallFishingQueue(this.communication.id)
         let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
         let isInContacts = this.contacts.find(item => item.id === this.contact.id)
         let liveContacts = _.cloneDeep(this.liveContacts)
@@ -187,19 +183,16 @@ export default {
 
       // handle active call
       if (this.dialer && this.dialer.state === 'open') {
-        console.log('Hangup call from task item..')
         this.$VueEvent.fire('hangupCall')
         this.isRejecting = false
         return
       }
 
-      console.log('Reject call from task item..')
       this.$VueEvent.fire('rejectCall')
       this.isRejecting = false
       e.stopImmediatePropagation()
     },
     onHangUpCall (e) {
-      console.log(';hangup')
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },

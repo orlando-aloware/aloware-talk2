@@ -91,39 +91,15 @@
           </div>
         </q-item-section>
       </q-item>
-      <q-menu v-if="dialer.currentStatus === 'CALL_CONNECTED'"
+      <q-menu v-if="isDialerConnected"
               fit
               content-class="live-call-options"
               anchor="top right"
               self="top left"
-              v-model="showCallMenu"
-              @hide="showCallMenu = false">
+              v-model="showIncomingCallMenu"
+              @hide="showIncomingCallMenu = false">
         <q-list>
-          <q-item v-if="isParkedCall"
-                  clickable
-                  v-close-popup
-                  @click="onParkCurrentCallAndConnect">
-            <q-item-section class="d-inline-flex">
-              <park-call-icon color="#9B51E0"
-                              width="11.7"
-                              height="12.35"></park-call-icon>
-              <span>Park Current Call &amp; Connect</span>
-            </q-item-section>
-          </q-item>
-          <q-item v-if="isParkedCall"
-                  clickable
-                  v-close-popup
-                  @click="onHangupCurrentCallAndConnect">
-            <q-item-section>
-              <hangup-icon  width="16"
-                            height="16"
-                            class="hangup-icon"></hangup-icon>
-              <span>Hang up Current Call &amp; Connect</span>
-            </q-item-section>
-          </q-item>
-
-          <q-item v-if="(isCallFishingMode || isIncomingLiveCall) && dialer.call"
-                  clickable
+          <q-item clickable
                   v-close-popup
                   @click="onParkCurrentCallAndAnswer">
             <q-item-section class="d-inline-flex">
@@ -133,8 +109,7 @@
               <span>Park Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
-          <q-item v-if="(isCallFishingMode || isIncomingLiveCall) && dialer.call"
-                  clickable
+          <q-item clickable
                   v-close-popup
                   @click="onHangUpCurrentCallAndAnswer">
             <q-item-section>
@@ -142,6 +117,36 @@
                             height="16"
                             class="hangup-icon"></hangup-icon>
               <span>Hang up Current Call &amp; Answer</span>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+      <q-menu v-if="isDialerConnected"
+              fit
+              content-class="live-call-options"
+              anchor="top right"
+              self="top left"
+              v-model="showParkedCallMenu"
+              @hide="showParkedCallMenu = false">
+        <q-list>
+          <q-item clickable
+                  v-close-popup
+                  @click="onParkCurrentCallAndConnect">
+            <q-item-section class="d-inline-flex">
+              <park-call-icon color="#9B51E0"
+                              width="11.7"
+                              height="12.35"></park-call-icon>
+              <span>Park Current Call &amp; Connect</span>
+            </q-item-section>
+          </q-item>
+          <q-item clickable
+                  v-close-popup
+                  @click="onHangupCurrentCallAndConnect">
+            <q-item-section>
+              <hangup-icon  width="16"
+                            height="16"
+                            class="hangup-icon"></hangup-icon>
+              <span>Hang up Current Call &amp; Connect</span>
             </q-item-section>
           </q-item>
         </q-list>

@@ -424,16 +424,17 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
-      // Do not alter live contacts of it in active mode
-      let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id && [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2))
-
-      console.log(communication, isActiveInLiveContactsIndex)
+      // Do not alter live contacts if it's in active mode
+      let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.last_communication.id === communication.id &&
+        [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+        ].includes(communication.current_status2))
 
       if (isActiveInLiveContactsIndex >= 0) {
         return

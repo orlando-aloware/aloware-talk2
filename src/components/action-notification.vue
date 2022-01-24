@@ -351,7 +351,6 @@ export default {
       this.clearDateTimeInterval()
 
       if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
-        this.removeFromCallFishingQueue(this.notifications[this.id].communicationId)
         this.setNotifications({
           type: this.id,
           data: {

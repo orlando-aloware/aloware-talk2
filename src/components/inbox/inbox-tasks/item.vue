@@ -90,11 +90,11 @@
                       class="bg-transparent no-border no-box-shadow p-0"
                       @click="onRejectCall">
               <!-- show remove icon for call fishing mode -->
-              <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode"
+              <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode && isCallFishing"
                                 height="24"
                                 width="24" />
               <!-- only show reject button if -->
-              <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishingMode"/>
+              <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishing"/>
             </b-button>
           </div>
           <div v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)"
@@ -161,7 +161,7 @@
                       class="bg-transparent no-border no-box-shadow p-0"
                       @click="onUnparkCall">
               <parked-call-icon/>
-              <q-menu v-if="dialer.call && dialer.call.state === 'open'"
+              <q-menu v-if="isDialerConnected"
                       fit
                       content-class="live-call-options"
                       anchor="top right"
