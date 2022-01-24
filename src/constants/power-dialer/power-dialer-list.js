@@ -6,31 +6,36 @@ export const DEFAULT_FILTER_LIST = {
     id: 'in-queue',
     name: 'In Queue',
     link: '/in-queue/',
-    order: 1
+    order: 1,
+    status: 'STATUS_QUEUED'
   },
   CALLED: {
     id: 'called',
     name: 'Called',
     link: '/called/',
-    order: 2
+    order: 2,
+    status: 'STATUS_COMPLETED'
   },
   FAILED: {
     id: 'failed',
     name: 'Failed',
     link: '/failed/',
-    order: 3
+    order: 3,
+    status: 'STATUS_FAILED'
   },
   SCHEDULED: {
     id: 'scheduled',
     name: 'Scheduled',
     link: '/scheduled/',
-    order: 4
+    order: 4,
+    status: 'STATUS_SCHEDULED'
   },
   All: {
     id: 'all',
     name: 'All',
     link: '/all/',
-    order: 5
+    order: 5,
+    status: ''
   }
 }
 
