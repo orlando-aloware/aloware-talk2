@@ -73,6 +73,10 @@
                   <span>
                     {{ taskCounts.open | numberPlusFormatter(99) }}
                   </span>
+                <b-badge v-if="hasLiveCall"
+                         variant="danger"
+                         class="live-call-badge d-flex justify-center align-items-center position-absolute"
+                         pill></b-badge>
               </div>
             </div>
           </template>
@@ -170,7 +174,19 @@ export default {
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
   computed: {
-    ...mapState('inbox', ['taskCounts', 'contacts', 'liveContacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts', 'channelChangedFilterFields', 'selectedFilter']),
+    ...mapState(['dialer']),
+    ...mapState('inbox',
+      [
+        'taskCounts',
+        'contacts',
+        'liveContacts',
+        'selectedContact',
+        'hasMoreContacts',
+        'isFetchingContacts',
+        'channelChangedFilterFields',
+        'selectedFilter'
+      ]
+    ),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -193,6 +209,10 @@ export default {
     },
     contactTasks () {
       return [...this.liveContacts, ...this.contacts]
+    },
+    hasLiveCall () {
+      return this.dialer.call &&
+        this.dialer.call.state === 'open'
     }
   },
 
@@ -424,8 +444,9 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
+      console.log(communication)
       // Do not alter live contacts if it's in active mode
-      let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.last_communication.id === communication.id &&
+      let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
         [
           CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
@@ -434,7 +455,7 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
-        ].includes(communication.current_status2))
+        ].includes(item.last_communication.current_status2))
 
       if (isActiveInLiveContactsIndex >= 0) {
         return
