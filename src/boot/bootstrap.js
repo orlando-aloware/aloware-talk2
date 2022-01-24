@@ -312,7 +312,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
     data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
-    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', item)
+    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings.type, item)
 
     return
   }
@@ -339,7 +339,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
   if (!document.getElementById(settings.type)) {
     this.$store.commit('SET_NOTIFICATIONS', data)
-    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
+    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings.type, data.data)
     this.$bvToast.show(settings.type)
     return
   }
@@ -348,7 +348,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   let notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
-      this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
+      this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings.type, data.data)
       this.$bvToast.show(settings.type)
       clearInterval(notificationInterval)
     }

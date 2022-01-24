@@ -41,8 +41,8 @@ export default {
       this.closeCallNotifications(type, communication.id)
     },
 
-    closeCallNotifications (type = null, communicationId = null, forceClose = false) {
-      if (!communicationId) {
+    closeCallNotifications (type = 'incomingCall', communicationId = null, forceClose = false) {
+      if (!communicationId || !['incomingCall', 'callFishing'].includes(type)) {
         return
       }
 
@@ -54,7 +54,7 @@ export default {
       }
 
       // for call fishing
-      notificationCommId = _.get(this.notifications, 'callFishing.communication.id', null)
+      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
       let dialerCallFishingCommId = _.get(this.dialer, 'callFishing.communication.id', null)
 
       if (communicationId && dialerCallFishingCommId && communicationId === dialerCallFishingCommId) {
@@ -98,7 +98,7 @@ export default {
 
     switchCallFishingFromQueue () {
       let queue = _.get(this.notifications, 'callFishing.queue', [])
-      let callFishingFirstQueue = _.first(queue)
+      let callFishingFirstQueue = queue && queue.length > 0 ? queue.shift() : queue
 
       if (!callFishingFirstQueue) {
         return
@@ -238,9 +238,20 @@ export default {
 
     showCallFishingDataInPhone (data, type = 'callFishing') {
       this.$VueEvent.fire('showPhone')
-      this.$closeActionNotification(type)
+      let queue = _.get(this.notifications, 'callFishing.queue', [])
+
+      if (!queue || (queue && queue.length === 0)) {
+        this.$closeActionNotification(type)
+      }
+
+      if (queue && queue.length > 0) {
+        this.setDialerCallFishing(data)
+        this.switchCallFishingFromQueue()
+        return
+      }
+
       let counter = 0
-      let dialerCallFishingInterval = setInterval(() => {
+      let dialerCallFishingInterval = (queue && queue.length === 0) ? setInterval(() => {
         if (!document.getElementById(type)) {
           this.setDialerCallFishing(data)
           clearInterval(dialerCallFishingInterval)
@@ -250,7 +261,7 @@ export default {
         if (counter > 120) {
           clearInterval(dialerCallFishingInterval)
         }
-      }, 500)
+      }, 500) : null
     }
   }
 }
