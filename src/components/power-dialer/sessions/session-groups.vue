@@ -46,7 +46,7 @@
                 <div class="text-13">
                   {{ group.name }}
                   <q-chip size="xs" square class="p-0">
-                    99
+                    {{ totalCount(key) }}
                   </q-chip>
                 </div>
               </q-item-section>
@@ -183,6 +183,22 @@ export default {
     },
     onLeave () {
       this.$refs.dropdown.visible = false
+    },
+    totalCount (key = '') {
+      if (!key) return ''
+      let detail = this.listItems[this.selectedList.id]
+      switch (key) {
+        case 'CALLED':
+          return detail.total_called
+        case 'FAILED':
+          return detail.total_failed
+        case 'IN_QUEUE':
+          return detail.total_queued
+        case 'SCHEDULED':
+          return detail.total_scheduled
+        default:
+          return detail.total
+      }
     }
   },
   watch: {

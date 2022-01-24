@@ -20,7 +20,9 @@
       <ColumnHeaders
         :predefined-id="myQueueId"
         v-if="isActive" />
-      <RemoveListModal v-if="isActive" />
+      <RemoveListModal
+        @on-clear-list="onClear"
+        v-if="isActive" />
       <RemoveListConfirmation v-if="isActive" />
       <RemoveContact
         :is-contact-module-type="false"
@@ -221,6 +223,10 @@ export default {
     },
     async updateList (data) {
       await this.loadList(data.id)
+    },
+    onClear () {
+      console.log('List should clear...')
+      this.fetchApi({})
     }
   },
   watch: {

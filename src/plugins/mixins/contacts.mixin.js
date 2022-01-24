@@ -134,6 +134,7 @@ export default {
       }
     },
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
+      console.log('999 :>> ', 999)
       params.search = this.search
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
@@ -164,6 +165,7 @@ export default {
           }
 
           if (this.apiEndpoint(queued).includes('my-queue')) {
+            console.log('1212 :>> ', 1212)
             this.updateMyQueueListData(data.data)
           }
 

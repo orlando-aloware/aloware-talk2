@@ -80,7 +80,7 @@ export default {
     },
     'objId': async function (val) {
       if (val.name === 'Power Dialer') {
-        await this.fetchResources()
+        // await this.fetchResources()
       }
     }
   }

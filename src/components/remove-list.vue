@@ -17,7 +17,7 @@
     <div slot="footer" class="w-100">
       <div
         class="d-flex w-100"
-        v-if="clearable">
+        v-if="!clearable">
         <div class="flex-grow-1"></div>
 
         <button
@@ -121,9 +121,9 @@ export default {
           this.removeListClose()
         })
     },
-    reloadFolders () {
+    reloadFolders (endpoint = '/api/v2/contact-folders') {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(endpoint)
         .then((response) => response.data)
         .then((response) => {
           this.foldersLoaded(response)
@@ -137,9 +137,20 @@ export default {
     },
     onClearList () {
       console.log('Clearing up My Queue list...')
-      this.reloadFolders()
-      this.$generalNotification('My Queue list items has been cleared!', 'success')
-      this.removeListClose()
+      return this.$axios
+        .post(`/api/v2/power-dialer-list-items/clear-tasks/${this.listToRemove.id}`)
+        .then((response) => response.data)
+        .then((response) => {
+          this.$generalNotification('My Queue list items has been cleared!', 'success')
+        })
+        .catch(() => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+        .finally(() => {
+          this.reloadFolders('/api/v2/power-dialer-folders')
+          this.removeListClose()
+          this.$emit('on-clear-list')
+        })
     },
     onRemoveListOnly () {
       this.showConfirmDialog(this.ActionTypes.LIST_ONLY)
