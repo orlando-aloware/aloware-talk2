@@ -17,7 +17,7 @@
     <div slot="footer" class="w-100">
       <div
         class="d-flex w-100"
-        v-if="!clearable">
+        v-if="clearable">
         <div class="flex-grow-1"></div>
 
         <button
