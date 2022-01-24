@@ -711,6 +711,10 @@ export default {
           this.makeCall('call:' + data.id, data.campaignId)
         }
 
+        if (shouldUnpark) {
+          this.unparkCommunication(data, true)
+        }
+
         this.setDialerIsMuted(false)
       }).catch(err => {
         this.setDialerParkedCall()
@@ -718,10 +722,6 @@ export default {
       }).finally(_ => {
         this.loadingPark = false
       })
-
-      if (shouldUnpark) {
-        this.unparkCommunication(data, true)
-      }
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {

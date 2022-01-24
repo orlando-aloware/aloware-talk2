@@ -243,6 +243,7 @@ export default {
       }
       this.isCreating = true
       return talk2Api.V1.contact.create(this.contact).then(res => {
+        this.$generalNotification('Contact created.')
         this.$emit('created', res.data)
         this.onReset()
         this.isCreating = false
