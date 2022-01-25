@@ -287,5 +287,8 @@ export default {
   },
   setActiveFolder: ({ commit }, value) => {
     commit('SET_ACTIVE_FOLDER', value)
+  },
+  clearList: ({ commit }) => {
+    commit('CLEAR_LIST')
   }
 }
