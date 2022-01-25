@@ -392,6 +392,55 @@ export default {
       })
     }
 
+    // new in-app contact assigned notification
+    // this.$VueEvent.listen('new_in_app_contact_assigned', (contact) => {
+    //   if (this.checkContactMatchesUserAccessibility(contact) && !this.profile.sleep_mode) {
+    //     this.handleInAppContactNotification(contact)
+    //   }
+    // })
+
+    // new in-app appointment notification
+    // this.$VueEvent.listen('new_in_app_appointment', ({engagement, contact, time_diff, unit}) => {
+    //   if (!this.profile.sleep_mode) {
+    //     this.handleInAppAppointmentNotification(engagement, contact, time_diff, unit)
+    //   }
+    // })
+
+    // new in-app reminder notification
+    // this.$VueEvent.listen('new_in_app_reminder', ({engagement, contact, time_diff, unit}) => {
+    //   if (!this.profile.sleep_mode) {
+    //     this.handleInAppReminderNotification(engagement, contact, time_diff, unit)
+    //   }
+    // })
+
+    // new in-app call notification
+    this.$VueEvent.listen('new_in_app_call', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'call')
+      }
+    })
+
+    // new in-app sms notification
+    this.$VueEvent.listen('new_in_app_sms', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'sms')
+      }
+    })
+
+    // new in-app voicemail notification
+    this.$VueEvent.listen('new_in_app_voicemail', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'missed voicemail')
+      }
+    })
+
+    // new in-app fax notification
+    // this.$VueEvent.listen('new_in_app_fax', (communication) => {
+    //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+    //     this.handleInAppCommunicationNotification(communication)
+    //   }
+    // })
+
     // new desktop contact assigned notification
     this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
       if (this.checkContactMatchesUserAccessibility(contact)) {
@@ -438,8 +487,7 @@ export default {
     // new desktop call notification
     this.$VueEvent.listen('new_desktop_call', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopCommunicationNotification(communication)
-        this.processActionNotification(communication, 'call')
+        this.handleDesktopCommunicationNotification(communication)
       }
     })
 
@@ -453,8 +501,7 @@ export default {
     // new desktop sms notification
     this.$VueEvent.listen('new_desktop_sms', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopCommunicationNotification(communication)
-        this.processActionNotification(communication, 'sms')
+        this.handleDesktopCommunicationNotification(communication)
       }
     })
 
@@ -468,8 +515,7 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopVoicemailNotification(communication)
-        this.processActionNotification(communication, 'missed voicemail')
+        this.handleDesktopVoicemailNotification(communication)
       }
     })
 

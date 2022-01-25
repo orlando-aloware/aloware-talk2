@@ -1090,11 +1090,7 @@ export default function (/* { ssrContext } */) {
         }
       },
 
-      ADD_TO_CALL_FISHING_QUEUE (state, type, payload) {
-        if (type !== 'callFishing') {
-          return
-        }
-
+      ADD_TO_CALL_FISHING_QUEUE (state, payload) {
         state.callFishingQueue.push(payload)
       },
 
