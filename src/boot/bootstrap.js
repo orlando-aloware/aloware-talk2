@@ -304,7 +304,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       campaignId: settings.campaignId,
       campaignName: settings.campaignName,
       ringGroupName: settings.ringGroupName,
-      phoneNumber: settings.phoneNumber
+      phoneNumber: settings.phoneNumber,
+      communication: settings.communication,
+      contact: settings.contact
     }
 
     queue.push(item)
@@ -312,7 +314,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
     data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
-    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings.type, item)
+    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', item)
 
     return
   }
@@ -339,7 +341,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
   if (!document.getElementById(settings.type)) {
     this.$store.commit('SET_NOTIFICATIONS', data)
-    this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings.type, data.data)
+    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
     this.$bvToast.show(settings.type)
     return
   }
@@ -348,11 +350,12 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   let notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
-      this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings.type, data.data)
+      settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
       this.$bvToast.show(settings.type)
       clearInterval(notificationInterval)
     }
     counter++
+
     if (counter > 120) {
       clearInterval(notificationInterval)
     }
