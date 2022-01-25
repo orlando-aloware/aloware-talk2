@@ -146,7 +146,7 @@ export default {
   },
   async mounted () {
     // this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
-    await this.getContact({ id: this.activeList.id })
+    await this.getContact({ id: this.activeList?.id })
   },
   computed: {
     ...mapGetters('powerDialer', [
@@ -163,6 +163,9 @@ export default {
       return this.listItems[this.selectedList.id].data || []
     },
     activeList () {
+      if (!this.list.length) {
+        return {}
+      }
       return this.list[0]
     },
     listFilters () {
@@ -213,7 +216,7 @@ export default {
   watch: {
     async list () {
       this.flagged = false
-      await this.getContact({ id: this.activeList.id })
+      await this.getContact({ id: this.activeList?.id })
       this.flagged = true
     },
     contact (obj) {

@@ -48,6 +48,7 @@ export default {
     ])
   },
   created () {
+    console.log('Starting sessions...')
     if (!this.isStartingDial) {
       // this.$router.push({ name: 'Power Dialer' })
     }
