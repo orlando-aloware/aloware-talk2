@@ -172,6 +172,7 @@
                         @click="beginDial"
                         unelevated
                         no-caps
+                        :disabled="disabled"
                         size="sm"
                         class="px-3 py-0"
                         color="success">Begin Dialing</q-btn>
@@ -190,7 +191,9 @@
                     :key="panel.name"
                     :name="panel.name"
                     class="p-0 m-0">
-                    <SessionsForm />
+                    <SessionsForm
+                      @valid-form="disabled = false"
+                      @invalid-form="disabled = true" />
                   </q-tab-panel>
                 </template>
               </q-tab-panels>
@@ -237,7 +240,8 @@ export default {
         { label: 'HVAC Sales', name: 'company-hvac-sales', disabled: false, hovered: false, type: 'link' },
         { label: 'Warm Leads', name: 'company-warm-leads', disabled: false, hovered: false, type: 'link' },
         { label: 'Cold Leads', name: 'company-cold-leads', disabled: false, hovered: false, type: 'link' }
-      ]
+      ],
+      disabled: true
     }
   },
   methods: {

@@ -103,6 +103,7 @@ import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { METRIC_OPTIONS_3 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import { isEmpty } from 'lodash'
 
 const stats = { METRIC_OPTIONS_3 }
 
@@ -166,6 +167,18 @@ export default {
     },
     onShowWarmUpMenu () {
       this.selectWidth = this.$refs.warmupPeriod[0].$el.offsetWidth
+    }
+  },
+  watch: {
+    resources: {
+      handler (val) {
+        if (!isEmpty(val.line) && !isEmpty(val.warmupPeriod)) {
+          this.$emit('valid-form', true)
+        } else {
+          this.$emit('invalid-form', true)
+        }
+      },
+      deep: true
     }
   },
   data () {
