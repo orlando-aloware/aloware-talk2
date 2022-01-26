@@ -4,7 +4,7 @@
             :loading="loadingScripts"
             :disable="disable || loadingScripts"
             :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
+            class="padded-container generic-selector"
             v-model="scriptId"
             options-selected-class="text-primary"
             color="primary"
