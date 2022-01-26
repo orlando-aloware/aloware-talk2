@@ -128,7 +128,8 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'contactsLoaded'
+      'contactsLoaded',
+      'clearList'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
@@ -225,8 +226,7 @@ export default {
       await this.loadList(data.id)
     },
     onClear () {
-      console.log('List should clear...')
-      this.fetchApi({})
+      this.clearList()
     }
   },
   watch: {
