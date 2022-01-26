@@ -752,10 +752,10 @@ export default {
           gif: ''
         }
       ).then(response => {
-        this.$generalNotification('Text has been sent.')
+        this.$generalNotification('Message sent.')
       }).catch(error => {
         console.log(error)
-        this.$generalNotification('Error while sending text.', 'error')
+        this.$generalNotification('Error while sending message.', 'error')
       }).finally(() => {
         this.isRetryingSendSms = false
       })
