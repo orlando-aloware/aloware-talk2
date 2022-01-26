@@ -380,10 +380,10 @@ export default {
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
           this.resetMessageComposerSms()
-          this.$generalNotification('Text has been sent.')
+          this.$generalNotification('Message sent.')
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while sending text.', 'error')
+          this.$generalNotification('Error while sending message.', 'error')
         }).finally(() => {
           this.isSending = false
         })

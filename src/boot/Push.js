@@ -1,6 +1,7 @@
-import Vue from 'vue'
 import Push from 'push.js'
 
 window.Push = Push
 
-Vue.prototype.$Push = window.Push
+export default async ({ Vue }) => {
+  Vue.prototype.$Push = window.Push
+}

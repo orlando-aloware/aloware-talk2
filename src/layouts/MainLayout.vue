@@ -538,6 +538,7 @@ export default {
       // or current status is not queued / ring all, close call notification
       if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW || ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeDesktopNotification(communication.id)
       }
     })
 
@@ -1188,13 +1189,13 @@ export default {
     },
 
     setBadge (text) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('set_badge', text)
       }
     },
 
     bounceDock () {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('bounce', 'informational')
       }
     },
@@ -1248,7 +1249,7 @@ export default {
           title = 'Answered Incoming Call'
         }
 
-        const onClickFunction = function (res) {
+        const onClickFunction = (res) => {
           window.focus()
           this.close()
           self.decreaseAppBadge()
@@ -1528,13 +1529,13 @@ export default {
     },
 
     increaseAppBadge (count = 1) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('increase_badge', count)
       }
     },
 
     decreaseAppBadge (count = 1) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('decrease_badge', count)
       }
     },
@@ -1592,6 +1593,14 @@ export default {
       // more than 1084 or less than 605 pixels
       if (width > 1084 || width < 605) {
         this.setContactDetailsDrawer(false)
+      }
+    },
+
+    closeDesktopNotification (communicationId) {
+      let notification = this.communicationNotifiedDesktop.find(notification => notification.communication_id === communicationId)
+      if (notification) {
+        notification.dismiss()
+        this.communicationNotifiedDesktop = this.communicationNotifiedDesktop.filter(notification => notification.communication_id !== communicationId)
       }
     },
 
