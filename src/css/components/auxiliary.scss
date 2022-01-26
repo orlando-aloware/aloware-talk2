@@ -398,3 +398,14 @@
 .hidden {
   display: none;
 }
+
+.padded-container {
+  .q-field__inner {
+    .q-field__control {
+      min-height: 40px !important;
+      .q-field__native {
+        min-height: 40px !important;
+      }
+    }
+  }
+}
