@@ -42,5 +42,6 @@ export default {
     }
     return 'in-queue'
   },
-  filteredEndpoint: (state) => state.filteredEndpoint
+  filteredEndpoint: (state) => state.filteredEndpoint,
+  sessionSettings: (state) => state.sessionSettings
 }

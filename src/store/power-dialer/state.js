@@ -142,6 +142,16 @@ export default function () {
     // contact: null,
     sessionLoader: false,
     sessionSidebarExpanded: false,
+    sessionSettings: {
+      line: [],
+      skipOutsideDaytimeHours: true,
+      warmupPeriod: 0,
+      phoneScript: '',
+      setSessionMetrics: '',
+      setCallDispostionShortcuts: [],
+      setContactDispostionShortcuts: '',
+      setVmDropShortcuts: ''
+    },
     changingSelectedContact: false,
     activeFilter: ''
   }

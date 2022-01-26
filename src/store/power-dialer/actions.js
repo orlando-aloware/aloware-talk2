@@ -92,5 +92,23 @@ export default {
     }).catch((err) => {
       return err
     })
+  },
+  async createSessionSettings ({ commit }, params = {}) {
+    return window.$axios.post(`api/v2/power-dialer-sessions`,
+      params
+    ).then((res) => {
+      return res
+    }).catch((err) => {
+      return err
+    })
+  },
+  async updateateSessionSettings ({ commit }, params = {}) {
+    return window.$axios.patch(`api/v2/power-dialer-sessions/${params.id}`,
+      params
+    ).then((res) => {
+      return res
+    }).catch((err) => {
+      return err
+    })
   }
 }
