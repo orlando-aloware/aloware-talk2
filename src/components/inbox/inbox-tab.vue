@@ -73,7 +73,7 @@
                   <span>
                     {{ taskCounts.open | numberPlusFormatter(99) }}
                   </span>
-                <b-badge v-if="hasLiveCall"
+                <b-badge v-if="hasIncomingLiveCall"
                          variant="danger"
                          class="live-call-badge d-flex justify-center align-items-center position-absolute"
                          pill></b-badge>
@@ -213,6 +213,14 @@ export default {
     hasLiveCall () {
       return this.dialer.call &&
         this.dialer.call.state === 'open'
+    },
+    hasIncomingLiveCall () {
+      let i = this.liveContacts.findIndex(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
+      return i >= 0
     }
   },
 
@@ -444,7 +452,6 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
-      console.log(communication)
       // Do not alter live contacts if it's in active mode
       let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
         [

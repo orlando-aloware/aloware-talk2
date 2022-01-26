@@ -10370,12 +10370,10 @@ screen and (max-width: 956px) {
 
 .contact-task-item {
 
-  &.item-call-parked {
-    background: $grey-50 !important;
-  }
-
+  &.item-call-parked,
   &.item-call-connected {
     background: $light-blue4 !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
   }
 
   .call-parked-label {
@@ -10408,4 +10406,8 @@ screen and (max-width: 956px) {
   right: 4px;
   height: 8px;
   width: 2px;
+}
+
+.item-live-call + .item-live-call {
+  border-bottom: 2px solid $grey-60 !important;
 }
