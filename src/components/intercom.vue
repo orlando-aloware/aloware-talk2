@@ -20,7 +20,10 @@ export default {
 
   computed: {
     ...mapState(['currentCompany']),
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', ['profile']),
+    isProduction () {
+      return process.env.APP_ENV === 'production'
+    }
   },
 
   methods: {
@@ -39,7 +42,7 @@ export default {
           window.Intercom('boot', {
             alignment: 'right',
             app_id: process.env.INTERCOM_APP_ID,
-            name: this.profile.name, // Current user name
+            name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
             user_hash: response.data, // Current user hash
@@ -48,45 +51,41 @@ export default {
           })
         }
       })
+    },
+    launch () {
+      if (this.profile && window.Intercom && this.isProduction) {
+        this.setup()
+      }
+    },
+    shutDown () {
+      if (!this.profile && window.Intercom && this.isProduction) {
+        window.Intercom('shutdown')
+      }
     }
-  },
-
-  beforeCreate () {
-
   },
 
   created () {
-    if (this.profile) {
-      this.setup()
-    }
-
-    // this.getStatics().then(() => {
-    //   if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.auth.user && this.auth.user.profile && process.env.APP_ENV === 'production') {
-    //     this.setup()
-    //   }
-    // })
+    this.getStatics().then(() => {
+      if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
+        this.setup()
+      }
+    })
   },
 
   mounted () {
-    if (!this.profile && window.Intercom) {
-      window.Intercom('shutdown')
-    }
-
-    if (this.profile && window.Intercom) {
-      this.setup()
-    }
+    this.shutDown()
+    this.launch()
   },
 
   watch: {
     profile: function () {
-      if (!this.profile && window.Intercom) {
-        window.Intercom('shutdown')
-      }
-
-      if (this.profile && window.Intercom) {
-        this.setup()
-      }
+      this.shutDown()
+      this.launch()
     }
+  },
+
+  beforeDestroy () {
+    this.shutDown()
   }
 }
 </script>

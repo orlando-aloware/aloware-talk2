@@ -57,6 +57,7 @@
     "vue-ctk-date-time-picker": "^2.5.0",
     "vue-custom-scrollbar": "^1.4.0",
     "vue-filter-number-format": "^3.0.1",
+    "vue-gtag": "^1.16.1",
     "vue-linkify": "^1.0.1",
     "vue-masonry-gallery": "^1.1.1",
     "vue-multiselect": "^2.1.6",
