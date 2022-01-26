@@ -39,6 +39,4 @@ export const DEFAULT_FILTER_LIST = {
   }
 }
 
-export const WARM_UP_PERIOD_LIST = [
-  'No Warm Up'
-]
+export const WARM_UP_PERIOD_LIST = { text: 'No Warm Up', value: 0 }
