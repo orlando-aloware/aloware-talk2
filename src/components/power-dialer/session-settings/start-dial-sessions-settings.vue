@@ -27,7 +27,7 @@
       color="success"
       no-caps
       unelevated
-      @click="dialog = true">
+      @click="dialPreparation">
       <PhoneIcon
         class="mr-2"
         color="white"
@@ -42,7 +42,7 @@
       transition-show="jump-down">
       <q-card
         flat
-        style="width: 800px; max-width: 80vw;"
+        style="width: 800px; max-width: 90vw; min-height: 500px;"
         class="my-card py-2 px-2">
 
         <q-card-section
@@ -50,57 +50,35 @@
           horizontal>
           <q-card-section
             style="width: 26% !important">
+            <p class="text-weight-bold px-2">Session Settings</p>
+            <q-btn
+              unelevated no-caps
+              class="px-2 mt-3 full-width"
+              color="grey-3"
+              text-color="black"
+              align="left">
+              Create New
+            </q-btn>
             <q-list
               dense
               bordered
               padding
-              style="display:contents;">
-              <template
-                v-for="t in tabHeaders">
-                <q-item
-                  v-if="t.type === 'title'"
-                  :key="t.value">
-                  <q-item-section class="p-0">
-                    <div class="text-weight-bold px-2">
-                      {{ t.label }}
-                    </div>
-                  </q-item-section>
-                </q-item>
-                <q-item
-                  v-else
-                  :key="t.value">
-                  <q-item-section class="p-0">
-                    <q-btn
-                      @click="tab = t.name"
-                      unelevated no-caps
-                      class="px-2 full-width"
-                      color="grey-3"
-                      text-color="black">
-                      {{ t.label }}
-                    </q-btn>
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-list>
-            <q-list
-              dense
-              bordered
-              padding
-              style="display:contents;">
+              style="display:contents;"
+              class="mt-3">
               <template
                 v-for="t in resources">
                 <q-item
                   v-if="t.type === 'label'"
                   :key="t.value">
                   <q-item-section class="p-0">
-                    <div class="text-grey px-2 text-uppercase text-caption">
+                    <div class="text-grey px-2 pt-3 text-uppercase text-caption">
                       {{ t.label }}
                     </div>
                   </q-item-section>
                 </q-item>
                 <q-item
                   v-else
-                  @click="tab = t.name"
+                  @click="loadSettings"
                   @mouseenter="t.hovered = true"
                   @mouseleave="t.hovered = false"
                   :key="t.value"
@@ -148,7 +126,8 @@
 
           <q-card-section
             class="px-0"
-            style="width: 72% !important">
+            style="width: 72% !important"
+            :disabled="loading">
             <q-card flat>
               <div class="row">
                 <div class="col-12">
@@ -180,7 +159,7 @@
                   </q-card>
                 </div>
               </div>
-              <q-tab-panels
+              <!-- <q-tab-panels
                 v-model="tab"
                 keep-alive
                 transition-next="fade"
@@ -196,7 +175,10 @@
                       @invalid-form="disabled = true" />
                   </q-tab-panel>
                 </template>
-              </q-tab-panels>
+              </q-tab-panels> -->
+              <SessionsForm
+                @valid-form="disabled = false"
+                @invalid-form="disabled = true" />
             </q-card>
           </q-card-section>
         </q-card-section>
@@ -232,22 +214,36 @@ export default {
         { label: 'Create New', name: 'create-new', disabled: false, type: 'button' }
       ],
       resources: [
-        { label: 'Personal', name: 'personal', disabled: true, hovered: false, type: 'label' },
+        { label: 'Saved', name: 'personal', disabled: true, hovered: false, type: 'label' },
         { label: 'HVAC Sales', name: 'personal-hvac-sales', disabled: false, hovered: false, type: 'link' },
         { label: 'Warm Leads', name: 'personal-warm-leads', disabled: false, hovered: false, type: 'link' },
-        { label: 'Cold Leads', name: 'personal-cold-leads', disabled: false, hovered: false, type: 'link' },
-        { label: 'Company', name: 'company', disabled: true, hovered: false, type: 'label' },
-        { label: 'HVAC Sales', name: 'company-hvac-sales', disabled: false, hovered: false, type: 'link' },
-        { label: 'Warm Leads', name: 'company-warm-leads', disabled: false, hovered: false, type: 'link' },
-        { label: 'Cold Leads', name: 'company-cold-leads', disabled: false, hovered: false, type: 'link' }
+        { label: 'Cold Leads', name: 'personal-cold-leads', disabled: false, hovered: false, type: 'link' }
+        // { label: 'Company', name: 'company', disabled: true, hovered: false, type: 'label' },
+        // { label: 'HVAC Sales', name: 'company-hvac-sales', disabled: false, hovered: false, type: 'link' },
+        // { label: 'Warm Leads', name: 'company-warm-leads', disabled: false, hovered: false, type: 'link' },
+        // { label: 'Cold Leads', name: 'company-cold-leads', disabled: false, hovered: false, type: 'link' }
       ],
-      disabled: true
+      disabled: true,
+      loading: false
     }
   },
+  // mounted () {
+  //   console.log('666 :>> ', 666)
+  // },
   methods: {
+    dialPreparation () {
+      this.dialog = true
+    },
     beginDial () {
       this.dialog = false
       this.$emit('start')
+    },
+    loadSettings (data) {
+      this.loading = true
+      console.log('Loading session settings from API call...')
+      setTimeout(() => {
+        this.loading = false
+      }, 1000)
     }
   }
 }
