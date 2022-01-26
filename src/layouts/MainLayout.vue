@@ -1215,7 +1215,7 @@ export default {
         window.Push.Permission.has() &&
         !this.communicationNotifiedDesktop.includes(communication.id)
       ) {
-        // this.communicationNotifiedDesktop.push(communication.id)
+        this.communicationNotifiedDesktop.push(communication.id)
         let self = this
         let title = ''
         let icon = ''
