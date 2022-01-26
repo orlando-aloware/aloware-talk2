@@ -1,6 +1,6 @@
 <template>
   <q-select
-    :class="`${customClass}`"
+    :class="`padded-container ${customClass}`"
     option-value="text"
     option-label="text"
     ref="sessionMetrics"
