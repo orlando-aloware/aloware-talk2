@@ -626,14 +626,12 @@ export default {
       this.setEnableAudio(true)
     }
 
-    if (this.$q.platform.is.electron) {
-      console.log('Push permission: ' + window.Push.Permission.get())
-      if (
-        !window.Push.Permission.has() &&
-        window.Push.Permission.get() !== window.Push.Permission.DENIED
-      ) {
-        window.Push.Permission.request()
-      }
+    console.log('Push permission: ' + window.Push.Permission.get())
+    if (
+      !window.Push.Permission.has() &&
+      window.Push.Permission.get() !== window.Push.Permission.DENIED
+    ) {
+      window.Push.Permission.request()
     }
 
     this.resizeHandler()
