@@ -9,7 +9,7 @@
         {{ form.label }}
       </label>
       <div
-        class="row">
+        class="row pb-4">
         <div
           v-for="cform in form.children"
           :key="cform.name"
@@ -28,8 +28,8 @@
           <LineSelector
             v-else-if="cform.name === 'line'"
             v-model="resources[cform.name]"
-            :multiple="true"
-            :use-chips="true"
+            :multiple="false"
+            :use-chips="false"
             :generic-styling="false"
             :generic-multiselect="false"
             @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
@@ -45,7 +45,9 @@
             v-model="resources[cform.name]"
             :multiple="false"
             :highlighted="isChanged('call_dispositions')"
-            @change="{}"></CallDispositionSelector>
+            @change="{}"
+            class="pb-3">
+          </CallDispositionSelector>
 
           <ContactDispositionSelector
             v-else-if="cform.name === 'setContactDispostionShortcuts'"
@@ -55,8 +57,9 @@
             :use-chips="false"
             :outlined="true"
             :show-placeholder="false"
-            custom-class="generic-selector"
-            @change="{}">
+            custom-class="padded-container generic-selector"
+            @change="{}"
+            class="pb-3">
           </ContactDispositionSelector>
 
           <VmDropSelector
@@ -149,6 +152,9 @@ export default {
       return SESSION_SETTINGS_ALL_FORMS
     }
   },
+  mounted () {
+    console.log('...Preparing sessions...')
+  },
   methods: {
     onLineFilterChange (value, prop) {
       this.resources.line = value
@@ -172,7 +178,7 @@ export default {
   watch: {
     resources: {
       handler (val) {
-        if (!isEmpty(val.line) && !isEmpty(val.warmupPeriod)) {
+        if (val?.line?.toString().length > 0 && !isEmpty(val.warmupPeriod)) {
           this.$emit('valid-form', true)
         } else {
           this.$emit('invalid-form', true)
@@ -185,8 +191,8 @@ export default {
     return {
       selectWidth: 0,
       resources: {
-        line: [],
-        skipOutsideDaytimeHours: '',
+        line: '',
+        skipOutsideDaytimeHours: true,
         warmupPeriod: '',
         phoneScript: '',
         setSessionMetrics: '',

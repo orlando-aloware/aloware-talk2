@@ -375,7 +375,8 @@ export default {
       'selectedContacts',
       'isFiltersOpen',
       'selectedList',
-      'currentListFilters'
+      'currentListFilters',
+      'clearList'
     ]),
     ...mapGetters('powerDialer', [
       'activeFilter'
@@ -469,7 +470,6 @@ export default {
     ]),
 
     beginDial () {
-      console.log('Begin dial...')
       this.START_DIAL_TOGGLE(true)
       this.setSelectedContact({})
       this.setContact(this.contact)
@@ -582,6 +582,9 @@ export default {
     },
     selectedList (value) {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
+    },
+    clearList (value) {
+      this.fetch()
     }
   }
 }
