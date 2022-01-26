@@ -142,6 +142,7 @@
                         class="px-3 py-0"
                         color="grey-5">Reset</q-btn>
                       <q-btn
+                        @click="newSetting = true"
                         unelevated
                         no-caps
                         size="sm"
@@ -185,6 +186,46 @@
 
       </q-card>
     </q-dialog>
+    <q-dialog
+      v-model="newSetting"
+      persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-subtitle1 text-bold text-grey-8">Save New Session Settings</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input outlined v-model="newSettingObj.name" placeholder="New Settings Name" />
+        </q-card-section>
+
+        <q-card-actions
+          class="px-3 pb-3"
+          align="right">
+          <q-btn
+            unelevated
+            no-caps
+            label="Cancel"
+            color="grey-80"
+            size="sm"
+            v-close-popup />
+          <q-btn
+            unelevated
+            no-caps
+            label="Save"
+            color="primary"
+            size="sm"
+            v-close-popup />
+          <!-- <q-btn
+            @click="beginDial"
+            unelevated
+            no-caps
+            :disabled="disabled"
+            size="sm"
+            class="px-3 py-0"
+            color="success">Begin Dialing</q-btn> -->
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -224,7 +265,11 @@ export default {
         // { label: 'Cold Leads', name: 'company-cold-leads', disabled: false, hovered: false, type: 'link' }
       ],
       disabled: true,
-      loading: false
+      loading: false,
+      newSetting: false,
+      newSettingObj: {
+        name: ''
+      }
     }
   },
   // mounted () {

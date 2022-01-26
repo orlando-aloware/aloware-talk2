@@ -29,7 +29,7 @@
             v-else-if="cform.name === 'line'"
             v-model="resources[cform.name]"
             :multiple="false"
-            :use-chips="false"
+            :use-chips="true"
             :generic-styling="false"
             :generic-multiselect="false"
             @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
