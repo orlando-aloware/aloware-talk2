@@ -55,7 +55,7 @@
     "vue-bootstrap-typeahead": "^0.2.6",
     "vue-business-hours": "git+https://github.com/aloware/vue-business-hours.git",
     "vue-ctk-date-time-picker": "^2.5.0",
-    "vue-custom-scrollbar": "^1.4.0",
+    "vue-custom-scrollbar": "^1.4.3",
     "vue-filter-number-format": "^3.0.1",
     "vue-gtag": "^1.16.1",
     "vue-linkify": "^1.0.1",
