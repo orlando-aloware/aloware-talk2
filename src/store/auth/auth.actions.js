@@ -12,15 +12,13 @@ const check = async ({ commit }, preventLogout = false) => {
       device_info: null
     })
 
-    const { user } = response.data
-
     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
 
     commit('SET_AUTHENTICATED', true)
-    commit('SET_PROFILE', user)
+    commit('SET_PROFILE', response.data.user)
     commit('SET_LOADING', false)
-    commit('SET_USAGE', user.usage, { root: true })
-    commit('SET_USER_STATUS', user.enabled, { root: true })
+    commit('SET_USAGE', response.data.user.usage, { root: true })
+    commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
 
     return response
   } catch (err) {
@@ -55,6 +53,53 @@ const login = async ({ commit }, {
 
     const { meta, data } = response.data
 
+    localStorage.setItem('shared_cookie', meta.hashed_token)
+
+    localStorage.setItem('api_token', meta.token)
+
+    commit('SET_FIRST_LOGIN', data.first_login, { root: true })
+
+    commit('SET_LOADING', false)
+
+    await check({ commit }, {})
+
+    return response
+  } catch (err) {
+    commit('SET_LOADING', false)
+    return Promise.reject(err)
+  }
+}
+
+const getSharedCookie = () => {
+  let name = 'aloware_shared_auth_token='
+  let ca = document.cookie.split(';')
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i]
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1)
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length)
+    }
+  }
+  return null
+}
+
+const getCookieUser = async ({ commit }) => {
+  try {
+    commit('SET_LOADING', true)
+
+    let cookieParams = { shared_token: getSharedCookie() }
+
+    const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
+
+    const { meta, data } = response.data
+
+    if (!data.company.talk_enabled) {
+      commit('SET_LOADING', false)
+      return Promise.reject()
+    }
+
     localStorage.setItem('api_token', meta.token)
 
     commit('SET_FIRST_LOGIN', data.first_login, { root: true })
@@ -80,6 +125,7 @@ const logout = async ({ commit }) => {
     localStorage.removeItem('impersonate')
     localStorage.removeItem('portal_session')
     localStorage.removeItem('company_id')
+    localStorage.removeItem('shared_cookie')
 
     window.axios.defaults.headers.common['Authorization'] = null
 
@@ -193,5 +239,5 @@ const setProfile = async ({ commit }, user) => {
 }
 
 export default {
-  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile
+  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile, getCookieUser, getSharedCookie
 }

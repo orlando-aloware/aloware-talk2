@@ -19,6 +19,7 @@ export default {
   listItems: (state) => state.listItems,
   columns: (state) => state.columns,
   moveDialog: (state) => state.moveDialog,
+  createDialog: (state) => state.createDialog,
   selectedContacts: (state) => state.selectedContacts,
   selectedList: (state) => state.selectedList,
   selectedStaticList: (state) => state.selectedStaticList,
@@ -67,5 +68,9 @@ export default {
   isEnrollSequenceOpen: (state) => state.isEnrollSequenceOpen,
   isAddReminderOpen: (state) => state.isAddReminderOpen,
   changingSelectedContact: (state) => state.changingSelectedContact,
-  smsTemplateModal: (state) => state.smsTemplateModal
+  smsTemplateModal: (state) => state.smsTemplateModal,
+  searchedPdItem: (state) => state.searchedPdItem,
+  unsavedList: (state) => state.unsavedList,
+  activeFolder: (state) => state.activeFolder,
+  removedFolder: (state) => state.removedFolder
 }

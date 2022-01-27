@@ -6,11 +6,13 @@ import * as ContactsDefault from '../constants/contacts-default'
 import * as InboxDefault from '../constants/inbox-default'
 import * as ActionNotificationsDefault from '../constants/action-notifications-default'
 import createPersistedState from 'vuex-persistedstate'
+import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
 import contacts from './contacts'
 import inbox from './inbox'
-import settings from './settings'
 import stats from './stats'
+import powerDialer from './power-dialer'
+import settings from './settings'
 
 Vue.use(Vuex)
 
@@ -29,10 +31,12 @@ export default function (/* { ssrContext } */) {
       auth,
       contacts,
       inbox,
-      settings,
-      stats
+      stats,
+      powerDialer,
+      settings
     },
     state: {
+      showMenu: false,
       filter: {},
       tags: [],
       campaigns: [],
@@ -65,11 +69,19 @@ export default function (/* { ssrContext } */) {
         duration: 0,
         wrapUpDuration: '',
         parkedCall: null,
-        dealId: null
+        dealId: null,
+        callFishing: {
+          communication: null,
+          contact: null
+        }
       },
       warnings: [],
       shouldIntroduce: false,
       addedParty: null,
+      keyboard: {
+        scroll: null,
+        resizeMode: null
+      },
       currentInputDevice: 'default',
       inputDevices: [],
       currentOutputDevice: 'default',
@@ -81,7 +93,14 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         },
         sms: {
           title: '',
@@ -89,7 +108,14 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         },
         call: {
           title: '',
@@ -97,7 +123,14 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         },
         callVoicemail: {
           title: '',
@@ -105,7 +138,14 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         },
         voicemail: {
           title: '',
@@ -113,7 +153,14 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         },
         mention: {
           title: '',
@@ -121,7 +168,14 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         },
         incomingCall: {
           title: '',
@@ -129,7 +183,29 @@ export default function (/* { ssrContext } */) {
           messageIcon: null,
           dateTime: null,
           contactId: '',
-          communicationId: ''
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
+        },
+        callFishing: {
+          title: '',
+          message: '',
+          messageIcon: null,
+          dateTime: null,
+          contactId: '',
+          communicationId: '',
+          campaignId: '',
+          campaignName: '',
+          ringGroupName: '',
+          phoneNumber: '',
+          communication: null,
+          contact: null,
+          queue: null
         }
       },
       showIncomingCallNotification: true,
@@ -137,12 +213,29 @@ export default function (/* { ssrContext } */) {
       sidebarFolded: false,
       currentCompany: null,
       smsTemplates: [],
+      tagOptions: {
+        isReset: false
+      },
       tagsFullyLoaded: false,
-      dialerFormStatus: false
+      prevRoute: null,
+      currentRoute: null,
+      breadcrumbs: {
+        crumbs: '',
+        name: ''
+      },
+      dialerFormStatus: false,
+      isMobile: false,
+      isTabletOrMobile: false,
+      contactDetailsDrawer: false,
+      showPhone: false,
+      enableAudio: false,
+      callFishingQueue: []
     },
 
     getters: {
-      notifications: (state) => state.notifications
+      notifications: (state) => state.notifications,
+      breadcrumbs: (state) => state.breadcrumbs,
+      getField
     },
 
     actions: {
@@ -448,6 +541,42 @@ export default function (/* { ssrContext } */) {
 
       setDialerFormStatus ({ commit }, value) {
         commit('SET_DIALER_FORM_STATUS', value)
+      },
+
+      setDialerCallFishing ({ commit }, payload) {
+        commit('SET_DIALER_CALL_FISHING', payload)
+      },
+
+      setIsMobile ({ commit }, value) {
+        commit('SET_IS_MOBILE', value)
+      },
+
+      setIsTabletOrMobile ({ commit }, value) {
+        commit('SET_IS_TABLET_OR_MOBILE', value)
+      },
+
+      setContactDetailsDrawer ({ commit }, value) {
+        commit('SET_CONTACT_DETAILS_DRAWER', value)
+      },
+
+      setShowPhone ({ commit }, value) {
+        commit('SET_SHOW_PHONE', value)
+      },
+
+      setEnableAudio ({ commit }, value) {
+        commit('SET_ENABLE_AUDIO', value)
+      },
+
+      removeFromCallFishingNotificationQueue ({ commit }, value) {
+        commit('REMOVE_FROM_CALL_FISHING_NOTIFICATION_QUEUE', value)
+      },
+
+      addToCallFishingQueue ({ commit }, payload) {
+        commit('ADD_TO_CALL_FISHING_QUEUE', payload)
+      },
+
+      removeFromCallFishingQueue ({ commit }, value) {
+        commit('REMOVE_FROM_CALL_FISHING_QUEUE', value)
       }
     },
 
@@ -466,7 +595,7 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CURRENT_STATUS (state, status) {
         state.dialer.currentStatus = status
-        console.log('Dialer current status: ' + this.state.dialer.currentStatus)
+        console.log('Dialer current status: ', this.state.dialer.currentStatus)
       },
 
       SET_DIALER_COMMUNICATION (state, communication) {
@@ -539,7 +668,7 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_PARKED_CALL (state, communication) {
         state.dialer.parkedCall = communication
-        if (communication) {
+        if (communication && state.dialer.communication && communication.id === state.dialer.communication.id) {
           state.dialer.call = null
         }
       },
@@ -910,9 +1039,74 @@ export default function (/* { ssrContext } */) {
         state.notifications = Object.assign(state.notifications, ActionNotificationsDefault.DEFAULT_STATE)
       },
 
+      SET_PREV_ROUTE (state, data) {
+        state.prevRoute = data
+      },
+      SET_CURRENT_ROUTE (state, data) {
+        state.currentRoute = data
+      },
+      SET_BREADCRUMBS: (state, data) => {
+        state.breadcrumbs = {
+          crumbs: data.crumbs,
+          name: data.name
+        }
+      },
       SET_DIALER_FORM_STATUS (state, value) {
         state.dialerFormStatus = value
-      }
+      },
+
+      SET_DIALER_CALL_FISHING (state, payload) {
+        state.dialer.callFishing = payload
+      },
+      SET_IS_MOBILE (state, value) {
+        state.isMobile = value
+      },
+
+      SET_IS_TABLET_OR_MOBILE (state, value) {
+        state.isTabletOrMobile = value
+      },
+
+      SET_CONTACT_DETAILS_DRAWER (state, value) {
+        state.contactDetailsDrawer = value
+      },
+
+      SET_SHOW_PHONE (state, value) {
+        state.showPhone = value
+      },
+
+      SET_ENABLE_AUDIO (state, value) {
+        state.enableAudio = value
+      },
+
+      REMOVE_FROM_CALL_FISHING_NOTIFICATION_QUEUE (state, value) {
+        if (!state.notifications.callFishing.queue) {
+          return
+        }
+
+        let found = state.notifications.callFishing.queue.find(queue => queue.communicationId === value)
+
+        if (found) {
+          state.notifications.callFishing.queue.splice(state.notifications.callFishing.queue.indexOf(found), 1)
+        }
+      },
+
+      ADD_TO_CALL_FISHING_QUEUE (state, payload) {
+        state.callFishingQueue.push(payload)
+      },
+
+      REMOVE_FROM_CALL_FISHING_QUEUE (state, value) {
+        if (state.callFishingQueue.length === 0) {
+          return
+        }
+
+        let found = state.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === value)
+
+        if (found) {
+          state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)
+        }
+      },
+
+      updateField
     },
 
     plugins: [

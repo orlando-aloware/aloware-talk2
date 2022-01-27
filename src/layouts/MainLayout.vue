@@ -15,10 +15,10 @@
         <div class="h-100"
              :class="[ sidebarVisible ? 'sidebar-active' : '']">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading">
+                    v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container class="page-container h-100">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading">
                 <transition :name="transitionName"
@@ -56,7 +56,8 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated"></dialer>
+            <dialer v-if="authenticated">
+            </dialer>
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
@@ -79,20 +80,32 @@
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
-          :breakpoint="605"
+          :breakpoint="789"
           v-model="mobilePhoneDrawer"
+          v-if="isMobile && mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
-          <div class="phone-header"
-               v-show="!isPhoneVisible">Phone</div>
-          <phone @onPhoneVisible="onPhoneVisible"></phone>
-          <dialer-form v-if="mobilePhoneDrawer"
+          <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
+                    v-show="!isPhoneVisible">
+            <app-header force-page-title="Phone"
+                        :no-padding="true"
+                        :title-only="true"/>
+          </q-header>
+          <phone :isMobile="isMobile"
+                 v-if="mobilePhoneDrawer"
+                 @onPhoneVisible="onPhoneVisible">
+          </phone>
+          <dialer-form ref="dialerForm"
+                       class="dialerForm"
+                       :isMobile="true"
+                       v-model="mobilePhoneDrawer"
+                       v-if="mobilePhoneDrawer"
                        v-show="!isPhoneVisible"
-                       :isMobile="true">
+                       @hide="onDialerFormHide">
           </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading"
+                    v-if="authenticated && !isWidget && !loading && isMobile"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -174,16 +187,18 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin } from '../boot/mixins'
-import broadcast from '../boot/broadcast'
-import AppHeader from '../components/layout/app-header'
-import AppFooter from '../components/layout/app-footer'
-import AppSidebar from '../components/layout/app-sidebar'
-import Dialer from '../components/dialer/dialer'
-import * as AgentStatus from '../constants/agent-status'
-import * as CommunicationTypes from '../constants/communication-types'
+import { aclMixin, communicationMixin, htmlMixin, webrtcMixin, notificationMixin } from 'src/boot/mixins'
+import broadcast from 'src/boot/broadcast'
+import AppHeader from 'src/components/layout/app-header'
+import AppFooter from 'src/components/layout/app-footer'
+import AppSidebar from 'src/components/layout/app-sidebar'
+import Dialer from 'src/components/dialer/dialer'
+import * as AgentStatus from 'src/constants/agent-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
@@ -200,7 +215,7 @@ export default {
     Phone
   },
 
-  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin],
+  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin, notificationMixin],
   data () {
     return {
       loading: true,
@@ -217,7 +232,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       isWidget: false,
-      enableAudio: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -241,20 +255,28 @@ export default {
       isPhoneVisible: false,
       metricsDataLoaded: false,
       CommunicationTypes,
-      MetricOptionGroups
+      MetricOptionGroups,
+      AppDefaultLogin
     }
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns']),
+    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
+    ...mapState('contacts', ['showContactsHeader']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
     pageClass () {
       let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
       return pageSlug.replace(/ /g, '_') + '-page'
+    },
+    pageContainerClasses () {
+      return {
+        'page-container h-100': true,
+        'pt-58': ['Contacts', 'Settings', 'Settings Tab'].includes(this.$route.name)
+      }
     }
   },
 
@@ -370,6 +392,55 @@ export default {
       })
     }
 
+    // new in-app contact assigned notification
+    // this.$VueEvent.listen('new_in_app_contact_assigned', (contact) => {
+    //   if (this.checkContactMatchesUserAccessibility(contact) && !this.profile.sleep_mode) {
+    //     this.handleInAppContactNotification(contact)
+    //   }
+    // })
+
+    // new in-app appointment notification
+    // this.$VueEvent.listen('new_in_app_appointment', ({engagement, contact, time_diff, unit}) => {
+    //   if (!this.profile.sleep_mode) {
+    //     this.handleInAppAppointmentNotification(engagement, contact, time_diff, unit)
+    //   }
+    // })
+
+    // new in-app reminder notification
+    // this.$VueEvent.listen('new_in_app_reminder', ({engagement, contact, time_diff, unit}) => {
+    //   if (!this.profile.sleep_mode) {
+    //     this.handleInAppReminderNotification(engagement, contact, time_diff, unit)
+    //   }
+    // })
+
+    // new in-app call notification
+    this.$VueEvent.listen('new_in_app_call', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'call')
+      }
+    })
+
+    // new in-app sms notification
+    this.$VueEvent.listen('new_in_app_sms', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'sms')
+      }
+    })
+
+    // new in-app voicemail notification
+    this.$VueEvent.listen('new_in_app_voicemail', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'missed voicemail')
+      }
+    })
+
+    // new in-app fax notification
+    // this.$VueEvent.listen('new_in_app_fax', (communication) => {
+    //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+    //     this.handleInAppCommunicationNotification(communication)
+    //   }
+    // })
+
     // new desktop contact assigned notification
     this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
       if (this.checkContactMatchesUserAccessibility(contact)) {
@@ -430,9 +501,7 @@ export default {
     // new desktop sms notification
     this.$VueEvent.listen('new_desktop_sms', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopCommunicationNotification(communication)
-        const firstAttachment = _.get(communication.attachments, '0.url', null)
-        this.$actionNotification(communication.contact.phone_number, communication.body, null, firstAttachment, 'sms', communication.contact.id, communication.id)
+        this.handleDesktopCommunicationNotification(communication)
       }
     })
 
@@ -446,35 +515,46 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        let name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
-        this.$actionNotification(name, 'Missed Call with Voicemail', 'call-voicemail-icon', null, 'call', communication.contact.id, communication.id)
-        // this.handleDesktopVoicemailNotification(communication)
+        this.handleDesktopVoicemailNotification(communication)
       }
     })
 
     // user mention notification
     this.$VueEvent.listen('mention', (data) => {
-      const name = _.get(data, 'mentioner_user.name', '')
-      const contactId = _.get(data, 'contact_id', null)
-      const communicationId = _.get(data, 'mention_subject_id', null)
-      const message = _.get(data, 'preview_text', '')
-      this.$actionNotification(name, message, null, null, 'mention', contactId, communicationId)
+      this.processActionNotification(data, 'mention')
     })
 
     // missed call notification
     this.$VueEvent.listen('update_communication', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication) && communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-        let name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
-        this.$actionNotification(name, 'Missed Call', null, null, 'call', communication.contact.id, communication.id)
+      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+        return
+      }
+
+      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+        this.processActionNotification(communication, 'missed call')
+      }
+
+      // if disposition status is not in-progress
+      // or current status is not queued / ring all, close call notification
+      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW || ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
+        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeDesktopNotification(communication.id)
       }
     })
 
     this.$VueEvent.listen('new_version', () => {
-      if (this.isWidget) {
-        return
-      }
+      // if (this.isWidget) {
+      //  return
+      // }
 
-      this.$actionNotification('System Updates', 'Refresh your screen', null, null, 'system')
+      // let data = {
+      //   title: 'System Updates',
+      //   message: 'Refresh your screen',
+      //   messageIcon: null,
+      //   attachment: null,
+      //   type: 'system'
+      // }
+      // this.$actionNotification(data)
     })
 
     if (this.$q.platform.is.electron) {
@@ -519,6 +599,11 @@ export default {
         this.authCheckStatus = false
       })
     }
+    window.addEventListener('resize', this.resizeHandler)
+
+    if (!this.isMobile) {
+      this.setShowContactsHeader(true)
+    }
   },
 
   mounted () {
@@ -538,18 +623,18 @@ export default {
       window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
       window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
     } else {
-      this.enableAudio = true
+      this.setEnableAudio(true)
     }
 
-    if (this.$q.platform.is.electron) {
-      console.log('Push permission: ' + window.Push.Permission.get())
-      if (
-        !window.Push.Permission.has() &&
-        window.Push.Permission.get() !== window.Push.Permission.DENIED
-      ) {
-        window.Push.Permission.request()
-      }
+    console.log('Push permission: ' + window.Push.Permission.get())
+    if (
+      !window.Push.Permission.has() &&
+      window.Push.Permission.get() !== window.Push.Permission.DENIED
+    ) {
+      window.Push.Permission.request()
     }
+
+    this.resizeHandler()
 
     // event for listening before tab/browser close
 
@@ -561,9 +646,19 @@ export default {
   },
 
   methods: {
+    onDialerFormHide () {
+      // if (typeof this.$refs.appFooter !== 'undefined') {
+      //   this.$refs.appFooter.toggleContacts()
+      // }
+    },
+
     onPhoneVisible (value) {
       this.isPhoneVisible = value
+      if (typeof this.$refs.dialerForm !== 'undefined') {
+        this.$refs.dialerForm.hideDialer()
+      }
     },
+
     toggleMobilePhone (value) {
       this.mobilePhoneDrawer = value
     },
@@ -641,7 +736,7 @@ export default {
         'touchstart',
         this.removeBehaviorsRestrictions()
       )
-      this.enableAudio = true
+      this.setEnableAudio(true)
     },
 
     mediaPlaybackRequiresUserGesture () {
@@ -666,7 +761,7 @@ export default {
       this.loading = true
       this.initAccount().then(() => {
         this.loading = false
-        if (this.profile.live_calls === 0 && this.dialer.call) {
+        if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
           if (!this.profile.go_to_available_after_login) {
             this.$VueEvent.fire(
               'change_agent_status',
@@ -1092,13 +1187,13 @@ export default {
     },
 
     setBadge (text) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('set_badge', text)
       }
     },
 
     bounceDock () {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('bounce', 'informational')
       }
     },
@@ -1147,7 +1242,12 @@ export default {
           title = 'Answered Incoming Call'
         }
 
-        const onClickFunction = function (res) {
+        // handling answered calls
+        if (communication.type === CommunicationTypes.CALL && communication.user_id) {
+          title = 'Answered Incoming Call'
+        }
+
+        const onClickFunction = (res) => {
           window.focus()
           this.close()
           self.decreaseAppBadge()
@@ -1211,6 +1311,7 @@ export default {
           }
         }
         window.Push.create(title, options)
+
         if (communication.type !== CommunicationTypes.CALL) {
           this.bounceDock()
           this.increaseAppBadge()
@@ -1426,13 +1527,13 @@ export default {
     },
 
     increaseAppBadge (count = 1) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('increase_badge', count)
       }
     },
 
     decreaseAppBadge (count = 1) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('decrease_badge', count)
       }
     },
@@ -1454,14 +1555,65 @@ export default {
       })
     },
 
+    getRingGroup (id) {
+      if (!id) {
+        return null
+      }
+
+      let found = this.ringGroups.find(ringGroup => ringGroup.id === id)
+
+      if (found) {
+        return found
+      }
+
+      return null
+    },
+
+    resizeHandler () {
+      const width = document.documentElement.clientWidth
+      // less than 991 pixels, screen width is tablet or mobile
+      if (width <= 991) {
+        this.setIsTabletOrMobile(true)
+      }
+      // greater than 991 pixels, screen width is not tablet or mobile
+      if (width > 991) {
+        this.setIsTabletOrMobile(false)
+      }
+      // less than 785 pixels, screen width is mobile
+      if (width < 785) {
+        this.setIsMobile(true)
+      }
+      // greater than or equal to 785 pixels, screen width is not mobile
+      if (width >= 785) {
+        this.setIsMobile(false)
+      }
+      // close contact details drawer when screen width reaches
+      // more than 1084 or less than 605 pixels
+      if (width > 1084 || width < 605) {
+        this.setContactDetailsDrawer(false)
+      }
+    },
+
+    closeDesktopNotification (communicationId) {
+      let notification = this.communicationNotifiedDesktop.find(notification => notification.communication_id === communicationId)
+      if (notification) {
+        notification.dismiss()
+        this.communicationNotifiedDesktop = this.communicationNotifiedDesktop.filter(notification => notification.communication_id !== communicationId)
+      }
+    },
+
     beforeUnload () {
       this.unsubscribeFromPusher()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
+      window.removeEventListener('resize', this.resizeHandler)
+      clearInterval(window.sessionIntervalId)
     },
 
     ...mapActions([
+      'resetVuex',
+      'setUsage',
       'setCurrentCompany',
       'setCampaigns',
       'setRingGroups',
@@ -1481,10 +1633,15 @@ export default {
       'setDialerIsMuted',
       'setFilters',
       'setTagsFullyLoaded',
+      'setNotifications',
       'resetNotifications',
-      'setTags'
+      'setTags',
+      'setIsMobile',
+      'setIsTabletOrMobile',
+      'setContactDetailsDrawer',
+      'setEnableAudio'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch']),
+    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),
     ...mapActions('auth', {
       logoutUser: 'logout',
@@ -1520,7 +1677,9 @@ export default {
       if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
         (to.name !== from.name)) {
-        this.resetContactsVuex()
+        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
+          this.resetContactsVuex()
+        }
       }
 
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {
@@ -1538,6 +1697,20 @@ export default {
         this.getMetricGroups()
         this.metricsDataLoaded = true
       }
+
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
+      }
+
+      const fromName = _.get(from, 'name', null)
+      if (!this.isMobile && to.name === 'Phone' && !fromName) {
+        this.$router.replace({ path: '/' })
+        return
+      }
+
+      if (!this.isMobile && to.name === 'Phone' && fromName) {
+        this.$router.back()
+      }
     },
 
     authenticated (newVal, oldVal) {
@@ -1551,6 +1724,12 @@ export default {
 
       if (this.authenticated) {
         this.sidebarVisible = true
+      }
+    },
+
+    isMobile () {
+      if (!this.isMobile) {
+        this.setShowContactsHeader(true)
       }
     }
   }

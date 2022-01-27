@@ -25,7 +25,7 @@
           </div>
         </q-item-section>
       </template>
-      <contacts-shared></contacts-shared>
+      <contacts-shared class="public-lists"></contacts-shared>
     </q-expansion-item>
 
     <contacts-folders></contacts-folders>
@@ -46,7 +46,16 @@ export default {
   },
   data () {
     return {
-      expanded: true
+      expanded: true,
+      toggleFolders: true
+    }
+  },
+  watch: {
+    '$route': {
+      handler (routeObj) {
+        this.toggleFolders = routeObj.name === 'Contacts'
+      },
+      deep: true
     }
   }
 }

@@ -1,6 +1,17 @@
 <template>
-  <div class="row no-wrap pt-3 pb-3 width-380">
-    <div class="col no-padding">
+  <div class="row no-wrap pt-3 pb-3 width-380"
+       :class="{ 'loading-cover-screen': isMakingCall }">
+    <div class="loading-container"
+         v-if="isMakingCall">
+      <div class="mobile-call-loader">
+        <q-spinner-bars
+          color="white"
+          size="5em"
+        />
+      </div>
+    </div>
+    <div v-if="!isMakingCall"
+         class="col no-padding">
       <b-tabs class="dialer-tabs"
               pills
               vertical>
@@ -21,14 +32,15 @@
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumber"
+                          :state="validPhoneNumberSearch"
                           class="mb-0">
               <contact-phone-number-search :no_prepend="true"
                                            class="width-190"
                                            v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
-                                           @keyup.enter.native="makeCall">
+                                           @keyup.enter.native="makeCall"
+                                           @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
             <q-btn :ripple="true"
@@ -44,10 +56,11 @@
             </q-btn>
           </div>
 
-          <div class="dialer-contact-info width-190">
+          <div class="dialer-contact-info width-190"
+               v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
-              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
+              <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
                    v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
@@ -78,20 +91,22 @@
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
             <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumber"
+                          :state="validPhoneNumberSearch"
                           class="mb-0 w-100">
               <contact-phone-number-search v-model="phoneNumber"
                                            ref="textContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
-                                           @keyup.enter.native="sendText">
+                                           @keyup.enter.native="sendText"
+                                           @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
           </div>
 
-          <div class="dialer-contact-info w-100">
+          <div class="dialer-contact-info w-100"
+               v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
                  v-if="contactId">
-              <div class="d-inline-flex text-left">{{ contactName | truncate(15) }}</div>
+              <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
                    v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
@@ -116,8 +131,8 @@
                          padding="none"
                          flat
                          @click="sendText">
-                    <send-text-icon width="16"
-                                    height="16"
+                    <send-text-icon :width="isMobile ? 18 : 16"
+                                    :height="isMobile ? 18: 16"
                                     :color="sendTextColor">
                     </send-text-icon>
                   </q-btn>
@@ -127,23 +142,12 @@
                                placeholder="Text Message..."
                                rows="2"
                                max-rows="3"
-                               no-auto-shrink
-                               no-resize
                                v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
           </div>
         </b-tab>
       </b-tabs>
-    </div>
-    <div class="mobile-dialer-button"
-         v-if="contactName && campaignId && mode === 'call' && isMobile">
-      <compact-btn borderless
-                   customClass="ml-2 pr-2 pl-0 fs-14 _500 position-relative primary not-focusable bg-success"
-                   @clicked="makeCall">
-        <call-white-icon></call-white-icon>
-        Call {{ contactName }}
-      </compact-btn>
     </div>
   </div>
 </template>
@@ -154,9 +158,7 @@ import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-sea
 import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
-import CompactBtn from 'src/components/compact-btn.vue'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import CallWhiteIcon from 'components/icons/call-white-icon'
 
 export default {
   name: 'dialer-form',
@@ -164,11 +166,9 @@ export default {
   mixins: [contactMixins],
 
   components: {
-    CallWhiteIcon,
     ContactPhoneNumberSearch,
     LineSelector,
-    SendTextIcon,
-    CompactBtn
+    SendTextIcon
   },
 
   props: {
@@ -195,12 +195,14 @@ export default {
       contactTimezone: null,
       currentLocalTime: null,
       loadingContact: false,
-      textMessage: ''
+      textMessage: '',
+      isMakingCall: false,
+      hasPhoneNumberSearchResults: false
     }
   },
 
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState(['currentCompany', 'dialer']),
     ...mapGetters('auth', ['profile']),
 
     sendTextColor () {
@@ -209,6 +211,10 @@ export default {
 
     validPhoneNumber () {
       return this.$options.filters.fixPhone(this.phoneNumber) !== false
+    },
+
+    validPhoneNumberSearch () {
+      return this.hasPhoneNumberSearchResults || this.$options.filters.fixPhone(this.phoneNumber) !== false
     },
 
     invalidPhoneNumber () {
@@ -267,8 +273,10 @@ export default {
       this.companyName = ''
       this.contactId = null
       this.contactTimezone = null
-      this.defaultOutboundCampaignId = null
-      this.campaignId = null
+      if (!this.isMobile) {
+        this.defaultOutboundCampaignId = null
+        this.campaignId = null
+      }
       this.mode = 'call'
       this.textMessage = ''
     },
@@ -362,7 +370,12 @@ export default {
         contactId: this.contactId
       }
       this.$VueEvent.fire('makeCall', data)
-      this.hideDialer()
+      if (!this.isMobile) {
+        this.hideDialer()
+      }
+      if (this.isMobile) {
+        this.isMakingCall = true
+      }
     },
 
     sendText () {
@@ -377,14 +390,17 @@ export default {
       }).then(res => {
         this.loading_btn = false
         this.hideDialer()
-        this.$router.push({
-          name: 'Contact',
-          params: {
-            id: res.data.id
-          }
-        }).catch(err => {
-          console.log(err)
-        })
+        this.$generalNotification('Message sent')
+        if (!this.isMobile) {
+          this.$router.push({
+            name: 'Contact',
+            params: {
+              id: res.data.id
+            }
+          }).catch(err => {
+            console.log(err)
+          })
+        }
       }).catch(err => {
         this.loading_btn = false
         this.$handleErrors(err.response)
@@ -397,6 +413,10 @@ export default {
         phone_number: null,
         message: null
       }
+    },
+
+    onPhoneNumberSearch (value) {
+      this.hasPhoneNumberSearchResults = value
     }
   },
 
@@ -411,6 +431,12 @@ export default {
 
     selected () {
       this.resetSelectorId()
+    },
+
+    'dialer.currentStatus': function () {
+      if (!this.dialer.currentStatus || (this.dialer.currentStatus && this.dialer.currentStatus === 'READY')) {
+        this.isMakingCall = false
+      }
     }
   },
 

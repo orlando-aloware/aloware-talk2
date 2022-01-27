@@ -52,6 +52,9 @@
       <div class="w-100"
            v-if="!isSearch">
         <q-btn-toggle
+          v-model="currentTask"
+          @click="onToggleStatus"
+          :options="options"
           class="mx-2 mt-2 mb-1 custom-toggle-button"
           no-caps
           spread
@@ -59,10 +62,7 @@
           unelevated
           :toggle-color="statusToggleColor"
           color="transparent"
-          text-color="primary"
-          :options="options"
-          v-model="currentTask"
-          @click="onToggleStatus">
+          text-color="primary">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
@@ -290,6 +290,7 @@ export default {
       })
     },
     onItemSelected (contact) {
+      console.log('contact :> ---> ', contact)
       this.setSelectedContact(contact)
       const contactId = _.get(contact, 'id', null)
       if (contactId) {

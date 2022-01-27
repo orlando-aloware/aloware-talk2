@@ -2,19 +2,19 @@ export default function () {
   return {
     items: [
       {
-        label: 'General Information',
+        label: 'General',
         value: 'general_information',
         icon: 'document',
         disabled: false
       },
       {
-        label: 'Profile Settings',
+        label: 'Profile',
         value: 'profile_settings',
         icon: 'person',
         disabled: false
       },
       {
-        label: 'Visibility Settings',
+        label: 'Visibility',
         value: 'visibility_settings',
         icon: 'eye',
         disabled: false
@@ -26,19 +26,19 @@ export default function () {
         disabled: false
       },
       {
-        label: 'Inbound Call Settings',
+        label: 'Inbound Call',
         value: 'inbound_call_settings',
         icon: 'inbound',
         disabled: false
       },
       {
-        label: 'Outbound Call Settings',
+        label: 'Outbound Call',
         value: 'outbound_call_settings',
         icon: 'outbound',
         disabled: false
       },
       {
-        label: 'Notification Settings',
+        label: 'Notification',
         value: 'notification_settings',
         icon: 'notification',
         disabled: false

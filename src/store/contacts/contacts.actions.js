@@ -41,6 +41,12 @@ export default {
   foldersLoaded: ({ commit }, payload) => {
     commit('FOLDERS_LOADED', payload)
   },
+  removeFolderItem: ({ commit }, folder) => {
+    commit('REMOVE_FOLDER_ITEM', folder)
+  },
+  resetRemovedFolders: ({ commit }) => {
+    commit('RESET_REMOVED_FOLDERS')
+  },
   pinnedLoaded: ({ commit }, payload) => {
     commit('PINNED_LOADED', payload)
   },
@@ -99,6 +105,12 @@ export default {
   },
   createListOpen: ({ commit }, payload) => {
     commit('CREATE_LIST_OPEN', payload)
+  },
+  createPdListOpen: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_OPEN', payload)
+  },
+  createPdListClose: ({ commit }) => {
+    commit('CREATE_DIALOG_CLOSE')
   },
   createListClose: ({ commit }) => {
     commit('CREATE_LIST_CLOSE')
@@ -260,5 +272,20 @@ export default {
   },
   setContacts: ({ commit }, payload) => {
     commit('SET_CONTACTS', payload)
+  },
+  setCreateDialogTarget: ({ commit }, payload) => {
+    commit('CREATE_DIALOG_TARGET', payload)
+  },
+  setShowContactsHeader: ({ commit }, value) => {
+    commit('SET_SHOW_CONTACTS_HEADER', value)
+  },
+  setShowContactsListSidebar: ({ commit }, value) => {
+    commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
+  },
+  setUnsavedList: ({ commit }, data) => {
+    commit('SET_UNSAVED_LIST', data)
+  },
+  setActiveFolder: ({ commit }, value) => {
+    commit('SET_ACTIVE_FOLDER', value)
   }
 }

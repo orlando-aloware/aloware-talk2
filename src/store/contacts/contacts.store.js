@@ -111,10 +111,17 @@ export default function () {
     removeFolder: null,
     removeList: null,
     removeListActionType: null,
+    removedFolder: null,
     moveDialog: {
       open: false,
       id: null,
       type: 'folder',
+      target: null
+    },
+    createDialog: {
+      open: false,
+      id: null,
+      type: 'list',
       target: null
     },
     selectedContacts: {},
@@ -146,7 +153,6 @@ export default function () {
     },
     filters: [],
     currentListFilters: {},
-
     contact: {},
     contactClone: {},
     changedContactProperties: [],
@@ -196,6 +202,12 @@ export default function () {
       scope: 'user',
       template: null
     },
-    search: ''
+    search: '',
+    searchedPdItem: '',
+    showMenu: false,
+    showContactsHeader: true,
+    showContactsListSidebar: false,
+    unsavedList: null,
+    activeFolder: ''
   }
 }

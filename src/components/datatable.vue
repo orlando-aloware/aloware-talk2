@@ -1,13 +1,16 @@
 <template>
-  <div class="d-flex flex-column"
-       :class="[paginated ? 'paginated' : '']">
+  <div
+    class="d-flex flex-column"
+    :class="[paginated ? 'paginated' : '']">
     <div
       ref="scrollableArea"
-      :class="['scrollableArea position-relative d-flex flex-column h-100 w-100 flex-grow-1', scrollAreaClass, isEmpty ? 'overflow-hidden' : '']"
-      @scroll="handleScroll"
-    >
-      <table ref="table"
-             :class="[computedClass, 'ml-3']">
+      :class="scrollableAreaClasses"
+      @scroll="handleScroll">
+
+      <table
+        ref="table"
+        :class="[computedClass, 'pl-3']">
+
         <thead>
           <draggable
             tag="tr"
@@ -16,32 +19,53 @@
             :list="fixedColumns"
             :move="onCheckMove"
             @change="onOrderChanged"
+            class="dragable-header"
           >
             <th
-              v-for="column in fixedColumns"
+              v-for="(column, key) in fixedColumns"
               :key="column.name"
               :data-column-id="column.name"
               :class="{
                 checkbox: column.name === 'checkbox',
-                sticky: column.sticky
+                sticky: column.sticky,
+                hovering: hoverKey === key ? isHovering : false,
+                'th-name': column.name === 'name'
               }"
+              :id="`cols-${column.name}`"
               :style="{
                 maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
                 minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
               }"
-            >
-              <label v-if="column.name === 'checkbox'"
-                     class="custom-checkbox-container check-all">
-                <input type="checkbox"
-                       class="data-table-check-all"
-                       ref="dataTableCheckAll"
-                       @change="onCheckboxClicked"/>
+              @mouseout="onInitReorder(false, null)">
+
+              <label
+                v-if="column.name === 'checkbox'"
+                class="custom-checkbox-container check-all">
+                <input
+                  type="checkbox"
+                  class="data-table-check-all"
+                  ref="dataTableCheckAll"
+                  @change="onCheckboxClicked" />
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
-                <span :class="{ handle: column.draggable }">
+                <div
+                  v-if="column.draggable"
+                  @mouseover="onInitReorder(true, key)"
+                  class="move-icon-drag-container"
+                  style="display:inline-block;">
+                  <MoveIcon
+                    v-if="column.draggable"
+                    class="move-icon-drag"
+                    :color="moveColor"
+                    :class="{ handle: column.draggable }" />
+                </div>
+                <span class="handle-label">
                   {{ column.label }}
                 </span>
+                <div
+                  class="sorter-container"
+                  :class="{ 'has-sorting': sorts.orderBy === column.name }">
                 <a
                   href="#"
                   class="sorter"
@@ -52,14 +76,14 @@
                       sorts.order === 'desc' && sorts.orderBy === column.name
                   }"
                   v-if="column.sortable"
-                  @click.prevent="onColumnSort(column)"
-                ></a>
+                  @click.prevent="onColumnSort(column)">
+                </a>
+                </div>
                 <div
                   class="tableResizer"
                   :data-resizer-id="column.name"
                   v-if="column.resizable"
-                  @mousedown="onResizerMouseDown"
-                >
+                  @mousedown="onResizerMouseDown">
                   {{ column.label }}
                 </div>
               </template>
@@ -74,8 +98,7 @@
         class="table-more-rows-spinner"
         :show="isLoadingMore"
         rounded="sm"
-        v-if="!paginated"
-      >
+        v-if="!paginated">
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="20px" />
@@ -90,8 +113,8 @@
         <div class="h5">No contacts found based on the current filters</div>
       </div>
     </div>
-    <div v-if="paginated && showPagination"
-         class="d-flex justify-content-center">
+
+    <div class="d-flex justify-content-center" v-if="paginated">
       <q-pagination
         boundary-links
         direction-links
@@ -99,21 +122,24 @@
         class="table-pagination"
         v-model="paginationPage"
         :max="lastPage"
-        :max-pages="11"
+        :max-pages="maxPaginationPages"
         :ellipses="false"
         :boundary-numbers="false"
-      ></q-pagination>
+        padding="0 15px">
+      </q-pagination>
 
-      <q-select outlined
-                dense
-                emit-value
-                class="mt-2 ml-4 q-select-pager"
-                option-value="value"
-                option-label="label"
-                v-model="perPage"
-                :options="perPageOptions"
-                :display-value="`${perPage} per page`">
+      <q-select
+        outlined
+        dense
+        emit-value
+        class="mt-2 q-select-pager"
+        option-value="value"
+        option-label="label"
+        v-model="perPage"
+        :options="perPageOptions"
+        :display-value="`${perPage} per page`">
       </q-select>
+
     </div>
   </div>
 </template>
@@ -121,6 +147,7 @@
 <script>
 import { mapState } from 'vuex'
 import draggable from 'vuedraggable'
+import MoveIcon from 'components/icons/move-icon-2'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 
@@ -129,7 +156,8 @@ let scrollTimeout
 
 export default {
   components: {
-    draggable
+    draggable,
+    MoveIcon
   },
 
   props: {
@@ -138,6 +166,10 @@ export default {
     },
     customClass: {
       type: String
+    },
+    customHeaders: {
+      type: Array,
+      default: () => []
     },
     stickyHeaders: {
       type: Boolean,
@@ -154,6 +186,10 @@ export default {
     scrollAreaClass: {
       type: String,
       default: ''
+    },
+    isScrollable: {
+      type: Boolean,
+      default: true
     },
     paginated: {
       type: Boolean,
@@ -217,6 +253,22 @@ export default {
         }
       }
       return newItems
+    },
+    maxPaginationPages () {
+      if (this.$q.screen.xl) {
+        return 11
+      }
+      if (this.$q.screen.lg) {
+        return 7
+      }
+      return 3
+    },
+    scrollableAreaClasses () {
+      return [
+        `${this.isScrollable ? 'scrollableArea position-relative ' : ''}d-flex flex-column h-100 w-100 flex-grow-1`,
+        this.scrollAreaClass,
+        `${this.isEmpty ? 'overflow-hidden' : ''}`
+      ]
     }
   },
 
@@ -234,7 +286,10 @@ export default {
         { value: 25, label: '25 Per Page' },
         { value: 50, label: '50 Per Page' },
         { value: 100, label: '100 Per Page' }
-      ]
+      ],
+      isHovering: false,
+      hoverKey: null,
+      moveColor: '#4F4F4F'
     }
   },
 
@@ -272,7 +327,7 @@ export default {
       this.$emit('checked', evt.target.checked)
     },
     onOrderChanged ({ oldIndex, newIndex }) {
-      const columns = [...this.fixedColumns]
+      let columns = [...this.fixedColumns]
 
       columns[oldIndex] = this.fixedColumns[newIndex]
       columns[newIndex] = this.fixedColumns[oldIndex]
@@ -308,6 +363,11 @@ export default {
           this.$emit('more')
         }
       }, 66)
+    },
+    onInitReorder (value, key) {
+      this.moveColor = value ? '#256eff' : '#4F4F4F'
+      this.isHovering = value
+      this.hoverKey = key
     }
   },
 

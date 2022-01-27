@@ -4,6 +4,7 @@
        ref="phone"
        v-if="shouldShow">
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
+         :class="{ 'call-ended': isCallCompleted }"
          ref="phoneHeader">
       <div class="d-flex flex-row text-size-rg _500 text-white width-65">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
@@ -14,7 +15,7 @@
       </div>
       <div class="d-flex flex-row text-xs text-white">
         <span v-if="isCallCompleted">Call Ended</span>
-        <span v-else-if="getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
+        <span v-else-if="dialer.communication && getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
       </div>
       <div class="d-flex flex-row justify-content-between align-items-center width-65">
         <pause-record-icon width="14"
@@ -115,9 +116,9 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="screen === 'call' && dialer.call.direction === 'OUTGOING'">
+      <template v-if="screen === 'call' && ((dialer.call && dialer.call.direction === 'OUTGOING') || dialer.callFishing.communication)">
         <div class="phone-notice d-flex flex-column align-items-center"
-             v-if="dialer.contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
+             v-if="contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
                     inline-actions
                     rounded
@@ -146,7 +147,7 @@
 
           <div class="text-white text-center">
             <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
-                          v-if="dialer.contact">
+                          v-if="contact || dialer.callFishing.contact">
               <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
               <q-btn color="white"
                      icon="o_info"
@@ -157,19 +158,19 @@
               </q-btn>
             </q-item-label>
             <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
-              <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
+              <span class="d-inline-flex">{{ leadNumber }}</span>
               <b-link href="#"
                       class="copy-phone-number text-white d-inline-flex ml-1"
                       @click.prevent="copyPhoneNumber">
-                <i class="material-icons">content_copy</i>
+                <copy-icon />
               </b-link>
-              <input :value="dialer.communication.lead_number"
+              <input :value="leadNumberRaw"
                      type="hidden"
                      id="phone-number-clone"/>
             </q-item-label>
             <q-item-label class="text-size-sm _400 mt-1"
-                          v-if="dialer.contact && dialer.contact.company_name">
-              {{ dialer.contact.company_name }}
+                          v-if="companyName">
+              {{ companyName }}
             </q-item-label>
           </div>
         </div>
@@ -179,8 +180,9 @@
         </div>
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
-               v-if="dialer.call && dialer.call.direction === 'INCOMING'">
-            <div class="d-flex flex-column align-items-center">
+               v-if="(dialer.call && dialer.call.direction === 'INCOMING') || dialer.callFishing.communication">
+            <div class="d-flex flex-column align-items-center"
+                 v-if="dialer.call !== undefined">
               <q-btn class="height-52"
                      ripple
                      round
@@ -191,6 +193,19 @@
                 </cancel-call-icon>
               </q-btn>
               <span class="text-size-xs mt-1">Decline</span>
+            </div>
+            <div class="d-flex flex-column align-items-center"
+                 v-if="dialer.callFishing.communication !== undefined">
+              <q-btn class="height-52"
+                     ripple
+                     round
+                     no-caps
+                     @click="rejectCall">
+                <ignore-call-icon width="52"
+                                  height="52">
+                </ignore-call-icon>
+              </q-btn>
+              <span class="text-size-xs mt-1">Ignore</span>
             </div>
 
             <div class="d-flex flex-column align-items-center">
@@ -208,7 +223,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call && dialer.call.direction === 'OUTGOING'">
+               v-if="dialer.call && dialer.call.direction === 'OUTGOING' && !dialer.callFishing.communication">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
@@ -239,7 +254,7 @@
                v-if="!isCallAdding && !isCallAdded">
             <div class="text-grey-100 text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
-                            v-if="dialer.contact">
+                            v-if="contact">
                 <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
                 <q-btn color="text-grey-100"
                        icon="o_info"
@@ -254,15 +269,15 @@
                 <b-link href="#"
                         class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                         @click.prevent="copyPhoneNumber">
-                  <i class="material-icons">content_copy</i>
+                  <copy-icon />
                 </b-link>
                 <input :value="dialer.communication.lead_number"
                        type="hidden"
                        id="phone-number-clone"/>
               </q-item-label>
               <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
-                            v-if="dialer.contact && dialer.contact.company_name">
-                <span>{{ dialer.contact.company_name }}</span>
+                            v-if="contact && contact.company_name">
+                <span>{{ contact.company_name }}</span>
                 <span class="ml-1 mr-1"
                       v-if="currentLocalTime">
                   ·
@@ -274,7 +289,7 @@
           <div class="phone-info w-100 mt-2 pl-2 pr-2 small d-flex flex-column align-items-start"
                v-else>
             <div class="d-flex justify-content-between align-items-center w-100 pr-2">
-              <q-item-label v-if="dialer.contact"
+              <q-item-label v-if="contact"
                             class="cursor-pointer"
                             @click="openMembers">
                 <div class="d-flex align-items-center">
@@ -336,12 +351,12 @@
             <button :disabled="isMuteDisabled"
                     class="phone-buttons btn"
                     @click="toggleMute">
-              <mute-icon width="16"
-                         height="16"
+              <mute-icon :width="iconSizes.mute.width"
+                         :height="iconSizes.mute.height"
                          v-show="!dialer.isMuted">
               </mute-icon>
-              <unmute-icon width="16"
-                           height="16"
+              <unmute-icon :width="iconSizes.mute.width"
+                           :height="iconSizes.mute.height"
                            v-show="dialer.isMuted">
               </unmute-icon>
               <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
@@ -349,32 +364,32 @@
             <button :disabled="isHoldDisabled || loadingHold || loadingUnhold"
                     class="phone-buttons btn"
                     @click="toggleHold">
-              <hold-icon width="16"
-                         height="16"
+              <hold-icon :width="iconSizes.hold.width"
+                         :height="iconSizes.hold.height"
                          v-show="!dialer.isHeld">
               </hold-icon>
-              <unhold-icon width="16"
-                           height="16"
+              <unhold-icon :width="iconSizes.hold.width"
+                           :height="iconSizes.hold.height"
                            v-show="dialer.isHeld">
               </unhold-icon>
               <span>{{ dialer.isHeld ? 'Unhold' : 'Hold' }}</span>
             </button>
             <button class="phone-buttons btn"
                     @click="openDialpad">
-              <dialpad-icon width="16"
-                            height="16">
+              <dialpad-icon :width="iconSizes.keypad.width"
+                            :height="iconSizes.keypad.height">
               </dialpad-icon>
-              <span>Dial pad</span>
+              <span>Keypad</span>
             </button>
             <button :disabled="isRecordingDisabled || loadingToggleRecordingStatus || dialer.communication.should_record === false"
                     class="phone-buttons btn"
                     @click="toggleRecordingStatus">
-              <record-icon width="16"
-                           height="16"
+              <record-icon :width="iconSizes.recording.width"
+                           :height="iconSizes.recording.height"
                            v-show="dialer.recordingStatus === 'paused' && dialer.communication.should_record === true">
               </record-icon>
-              <pause-record-icon width="16"
-                                 height="16"
+              <pause-record-icon :width="iconSizes.recording.width"
+                                 :height="iconSizes.recording.height"
                                  v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
               </pause-record-icon>
               <span>{{ recordingText }}</span>
@@ -383,23 +398,23 @@
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
             <button class="phone-buttons elevated btn"
                     @click="openNotes">
-              <notes-icon width="16"
-                          height="16">
+              <notes-icon :width="iconSizes.notes.width"
+                          :height="iconSizes.notes.height">
               </notes-icon>
               <span>Notes</span>
             </button>
             <button class="phone-buttons elevated btn"
                     @click="openTags">
-              <tags-icon width="16"
-                         height="16">
+              <tags-icon :width="iconSizes.tags.width"
+                         :height="iconSizes.tags.height">
               </tags-icon>
               <span>Tags</span>
             </button>
             <button :disabled="isVmDropDisabled"
                     class="phone-buttons elevated btn"
                     @click="openVmDrop">
-              <vm-drop-icon width="18"
-                            height="18">
+              <vm-drop-icon :width="iconSizes.vmdrop.width"
+                            :height="iconSizes.vmdrop.height">
               </vm-drop-icon>
               <span>VM Drop</span>
             </button>
@@ -408,31 +423,31 @@
             <button :disabled="isHangupDisabled"
                     class="phone-buttons btn"
                     @click="endCall">
-              <cancel-call-icon width="40"
-                                height="40">
+              <cancel-call-icon :width="iconSizes.call.width"
+                                :height="iconSizes.call.height">
               </cancel-call-icon>
             </button>
             <button :disabled="isAddDisabled"
                     class="phone-buttons btn"
                     @click="openAdd">
-              <add-icon width="16"
-                        height="16">
+              <add-icon :width="iconSizes.add.width"
+                        :height="iconSizes.add.height">
               </add-icon>
               <span>Add</span>
             </button>
             <button :disabled="isTransferDisabled"
                     class="phone-buttons btn"
                     @click="openTransfer">
-              <transfer-icon width="16"
-                             height="16">
+              <transfer-icon :width="iconSizes.transfer.width"
+                             :height="iconSizes.transfer.height">
               </transfer-icon>
               <span>Transfer</span>
             </button>
             <button :disabled="isMoreDisabled"
                     class="phone-buttons btn"
                     @click="openMore">
-              <more-icon width="16"
-                         height="16">
+              <more-icon :width="iconSizes.more.width"
+                         :height="iconSizes.more.height">
               </more-icon>
               <span>More</span>
             </button>
@@ -446,7 +461,7 @@
               <avatar class="contact-avatar"
                       width="40"
                       height="40"
-                      :name="dialer.contact.name">
+                      :name="contact.name">
               </avatar>
               <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
                 <div class="mr-auto">
@@ -461,13 +476,13 @@
                     </q-btn>
                   </p>
                   <p class="text-sm-left contact-phone mb-1">
-                    <span>{{ dialer.contact.phone_number | fixPhone }}</span>
+                    <span>{{ contact.phone_number | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
                             @click.prevent="copyPhoneNumber">
-                      <i class="material-icons">content_copy</i>
+                      <copy-icon/>
                     </b-link>
-                    <input :value="dialer.contact.phone_number"
+                    <input :value="contact.phone_number"
                            type="hidden"
                            id="phone-number-clone"/>
                   </p>
@@ -507,7 +522,7 @@
               Contact Disposition
             </label>
             <div class="d-flex flex-row align-items-center w-100">
-              <contact-disposition-wrapper :contact="dialer.contact"
+              <contact-disposition-wrapper :contact="contact"
                                            class="w-100">
               </contact-disposition-wrapper>
             </div>
@@ -625,7 +640,7 @@
       </b-button>
     </div>
     <div class="phone-expansion d-flex overlay"
-         v-if="(devMode || !isCallCompleted) && dialer.contact && expansionEnabled">
+         v-if="(devMode || !isCallCompleted) && (contact || dialer.callFishing.communication) && expansionEnabled">
       <q-expansion-item v-model="expanded"
                         class="shadow-1 overflow-hidden w-100"
                         header-class="text-sm bg-white text-center"
@@ -657,7 +672,7 @@
             <q-card-section class="height-240">
               <div class="text-grey-100">
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-start"
-                              v-if="dialer.contact">
+                              v-if="contact">
                   <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start">
@@ -672,8 +687,8 @@
                          id="phone-number-clone"/>
                 </q-item-label>
                 <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
-                              v-if="dialer.contact && dialer.contact.company_name">
-                  <span>{{ dialer.contact.company_name }}</span>
+                              v-if="contact && contact.company_name">
+                  <span>{{ contact.company_name }}</span>
                   <span class="ml-1 mr-1"
                         v-if="currentLocalTime">
                     ·
@@ -716,7 +731,7 @@
           </template>
           <template v-if="bottomExpansion === 'integrations'">
             <q-card-section class="height-240">
-              <contact-integrations :contact="dialer.contact"
+              <contact-integrations :contact="contact"
                                     :no_title="true"
                                     v-show="expanded">
               </contact-integrations>
@@ -1120,30 +1135,30 @@
               <div class="d-flex justify-content-start w-100 pt-3 pl-3 pr-3">
                 <button class="phone-buttons btn"
                         @click="openScripts">
-                  <scripts-icon width="18"
-                                height="18">
+                  <scripts-icon :width="iconSizes.scripts.width"
+                                :height="iconSizes.scripts.height">
                   </scripts-icon>
                   <span>Scripts</span>
                 </button>
                 <button :disabled="isParkDisabled"
                         class="phone-buttons btn"
                         @click="parkCall">
-                  <park-call-icon width="18"
-                                  height="18">
+                  <park-call-icon :width="iconSizes.parkCall.width"
+                                  :height="iconSizes.parkCall.height">
                   </park-call-icon>
                   <span>Park Call</span>
                 </button>
                 <button class="phone-buttons btn"
                         @click="openContact">
-                  <contact-icon width="18"
-                                height="18">
+                  <contact-icon :width="iconSizes.contact.width"
+                                :height="iconSizes.contact.height">
                   </contact-icon>
                   <span>Contact</span>
                 </button>
                 <button class="phone-buttons btn"
                         @click="openIntegrations">
-                  <integrations-icon width="18"
-                                     height="18">
+                  <integrations-icon :width="iconSizes.integrations.width"
+                                     :height="iconSizes.integrations.height">
                   </integrations-icon>
                   <span>Integrations</span>
                 </button>
@@ -1157,8 +1172,9 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { communicationInfoMixin } from 'src/plugins/mixins'
+import { communicationInfoMixin, notificationMixin } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'
@@ -1203,11 +1219,15 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
+import CopyIcon from 'components/icons/copy-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    IgnoreCallIcon,
+    CopyIcon,
     MergeIcon,
     WaitingIcon,
     DropParticipantIcon,
@@ -1248,7 +1268,8 @@ export default {
   },
 
   mixins: [
-    communicationInfoMixin
+    communicationInfoMixin,
+    notificationMixin
   ],
 
   props: {
@@ -1259,6 +1280,12 @@ export default {
     },
 
     ignore_calls: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isMobile: {
       type: Boolean,
       required: false,
       default: false
@@ -1486,25 +1513,126 @@ export default {
     },
 
     contactName () {
-      if (this.dialer.contact) {
-        return this.dialer.contact.name || 'No Name'
+      if (this.contact) {
+        return this.contact.name || 'No Name'
+      }
+
+      const callFishingContactName = _.get(this.dialer.callFishing, 'contact.name', 'No Name')
+      if (callFishingContactName) {
+        return callFishingContactName
       }
 
       return 'No Name'
     },
 
+    leadNumberRaw () {
+      let leadNumber = _.get(this.dialer, 'communication.lead_number', null)
+      return !leadNumber ? _.get(this.dialer, 'callFishing.communication.lead_number', null) : leadNumber
+    },
+
+    leadNumber () {
+      return this.$options.filters.fixPhone(this.leadNumberRaw)
+    },
+
+    companyName () {
+      let companyName = _.get(this.dialer, 'contact.company_name', '')
+      return !companyName ? _.get(this.dialer, 'callFishing.contact.company_name', '') : companyName
+    },
+
+    contact () {
+      let contact = this.dialer.contact
+      return !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+    },
+
     shouldShow () {
+      let callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+      if (callFishingCommunication) {
+        return true
+      }
+
       if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
         return false
       }
 
-      return this.dialer && this.dialer.communication
+      return this.dialer && !_.isEmpty(this.dialer.communication)
+    },
+    iconSizes () {
+      return {
+        mute: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        hold: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        keypad: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        recording: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        notes: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        tags: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        vmdrop: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        call: {
+          width: this.isMobile ? 60 : 40,
+          height: this.isMobile ? 60 : 40
+        },
+        add: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        transfer: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        more: {
+          width: this.isMobile ? 26 : 16,
+          height: this.isMobile ? 26 : 16
+        },
+        scripts: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        parkCall: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        contact: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        },
+        integrations: {
+          width: this.isMobile ? 26 : 18,
+          height: this.isMobile ? 26 : 18
+        }
+      }
     }
   },
 
   mounted () {
     this.$VueEvent.listen('togglePhone', () => {
       this.togglePhone()
+    })
+
+    this.$VueEvent.listen('showPhone', () => {
+      this.isVisible = true
+    })
+
+    this.$VueEvent.listen('hidePhone', () => {
+      this.isVisible = false
     })
 
     this.setupDraggable()
@@ -1525,7 +1653,9 @@ export default {
     },
 
     setupContactLocalTime () {
-      if (this.dialer.contact) {
+      let contact = this.contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+      if (contact) {
         this.getContactLocalTime()
         this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
       }
@@ -1536,17 +1666,21 @@ export default {
     },
 
     getContactLocalTime () {
-      if (this.dialer.contact && this.dialer.contact.timezone) {
-        this.currentLocalTime = this.$moment.utc().tz(this.dialer.contact.timezone).format('h:mm a')
+      let contact = this.contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+      if (contact && contact.timezone) {
+        this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
     },
 
     goToContact () {
-      if (this.dialer.contact) {
+      let contact = this.contact
+      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+      if (contact) {
         this.$router.push({
           name: 'Contact',
           params: {
-            id: this.dialer.contact.id
+            id: contact.id
           }
         }).catch(err => {
           console.log(err)
@@ -1583,11 +1717,28 @@ export default {
 
     answerCall () {
       this.$VueEvent.fire('answerCall')
+
+      if (this.dialer.callFishing.communication) {
+        this.$VueEvent.fire('makeCall', {
+          currentNumber: 'call:' + _.get(this.dialer, 'callFishing.communication.id', null),
+          outboundCampaignId: _.get(this.dialer, 'callFishing.communication.campaign_id', null),
+          contactName: _.get(this.dialer, 'callFishing.contact.name', null),
+          companyName: _.get(this.dialer, 'callFishing.contact.company_name', null),
+          contactId: _.get(this.dialer, 'callFishing.communication.contact_id', null)
+        })
+        this.processRemoveFromNotification(this.dialer.callFishing.communication)
+      }
+
       this.changeScreen('menu')
     },
 
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
+
+      if (this.dialer.callFishing) {
+        this.processRemoveFromNotification(this.dialer.callFishing.communication)
+      }
+
       this.closePhone()
     },
 
@@ -1781,7 +1932,7 @@ export default {
         currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
         outboundCampaignId: this.dialer.communication.campaign_id,
         contactName: this.contactName,
-        companyName: (this.dialer.contact) ? this.dialer.contact.company_name : '',
+        companyName: (this.contact) ? this.contact.company_name : '',
         contactId: this.dialer.communication.contact_id
       }
 
@@ -2191,6 +2342,7 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('togglePhone')
+    this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
   }
 }

@@ -1,29 +1,41 @@
 <template>
   <div class="folder d-flex align-items-center"
-       :class="{ 'folder--active': activeFolder }">
+       :class="{ 'folder--active': activeFolder && id !== undefined ? true : id === undefined ? true : false }">
     <div class="folder__arrow">
       <folder-arrow-close-icon class="transparent">
       </folder-arrow-close-icon>
     </div>
     <router-link
-      class="tree-list-item flex-grow-1 d-flex-shrink-0"
-      :to="'/contacts/list/' + id"
+      class="tree-list-item flex-grow-1 d-flex-shrink-0 w-100"
+      :to="viewListPath"
       v-slot="{ navigate, isExactActive }"
     >
       <div :data-layer="layer">
         <div
           :title="name"
-          :class="{ 'folder--active': isExactActive, 'folder--moving': isMoving }"
+          :class="{ 'folder--active': isExactActive && activeFolder, 'folder--moving': isMoving }"
           class="folder d-flex align-items-center p-0"
         >
-          <div class="folder__indent" :style="indentStyle"></div>
+          <div
+            class="folder__indent"
+            :style="indentStyle">
+          </div>
           <div class="folder__icon d-flex align-items-center">
-            <folder-static-icon color="#62666E"
-              v-if="type === ContactListTypes.STATIC"
-            ></folder-static-icon>
-            <folder-dynamic-icon color="#62666E"
-              v-if="type === ContactListTypes.DYNAMIC"
-            ></folder-dynamic-icon>
+            <template
+              v-if="isContactsRoute">
+              <folder-static-icon color="#62666E"
+                v-if="type === ContactListTypes.STATIC"
+              ></folder-static-icon>
+              <folder-dynamic-icon color="#62666E"
+                v-if="type === ContactListTypes.DYNAMIC"
+              ></folder-dynamic-icon>
+            </template>
+            <template
+              v-else>
+              <DialIcon
+                color="grey"
+                class="mr-1" />
+            </template>
           </div>
           <div class="folder__name d-flex align-items-center">
             <input
@@ -37,28 +49,31 @@
               @keydown="onKeyDown"
               autofocus
             />
-            <span @click="navigate" v-if="!isEditing">
-              {{ itemName }}
+            <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
+              {{ name }}
             </span>
+            <UnsavedIcon
+              class="mr-1"
+              v-show="id == undefined" />
           </div>
 
           <button
+            class="folder__option btn btn-link p-0 shadow-0"
             :tabindex="id"
             :data-popper-target="'list-' + id"
-            :id="'folder-option-' + id + '-' + layer"
-            class="folder__option btn btn-link p-0 shadow-0"
-          >
+            :id="folderId"
+            :ref="folderId">
             <folder-option></folder-option>
           </button>
         </div>
 
         <b-popover
-          :target="'folder-option-' + id + '-' + layer"
           triggers="click blur"
           placement="bottomright"
           boundary="window"
           custom-class="contact-popover"
-        >
+          :target="folderId"
+          v-if="folderExists">
           <list-actions
             :type="type"
             @remove="onRemoveList"
@@ -69,8 +84,7 @@
             @clonestatic="onCloneStatic"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
-            :isPinned="isPinned"
-          ></list-actions>
+            :isPinned="isPinned"/>
         </b-popover>
       </div>
     </router-link>
@@ -79,13 +93,15 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
+import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
+import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let inputTimeout
@@ -96,30 +112,9 @@ export default {
     FolderOption,
     FolderStaticIcon,
     FolderDynamicIcon,
+    DialIcon,
+    UnsavedIcon,
     ListActions
-  },
-  computed: {
-    ...mapGetters('contacts', ['pinned', 'moveDialog']),
-    indentStyle () {
-      return {
-        flex: `0 0 ${this.layer * 10}px`
-      }
-    },
-    isPinned () {
-      return Array.isArray(this.pinned)
-        ? this.pinned.includes(this.id)
-        : false
-    },
-    isMoving () {
-      return this.id === this.moveDialog.id && this.moveDialog.type === 'list'
-    },
-    activeFolder () {
-      const id = _.get(this.$route.params, 'id', null)
-      return id && parseInt(id) === this.id
-    },
-    itemName () {
-      return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
-    }
   },
   props: {
     id: {
@@ -149,20 +144,91 @@ export default {
     return {
       ContactListTypes,
       isEditing: false,
-      isRenaming: false
+      isRenaming: false,
+      folderExists: false
     }
   },
-  beforeDestroy () {
-    clearTimeout(inputTimeout)
+  computed: {
+    ...mapGetters('contacts', [
+      'pinned',
+      'moveDialog',
+      'listToRemove',
+      'unsavedList'
+    ]),
+    ...mapState(['isMobile']),
+    indentStyle () {
+      return {
+        flex: `0 0 ${this.layer * 10}px`
+      }
+    },
+    isPinned () {
+      return Array.isArray(this.pinned)
+        ? this.pinned.includes(this.id)
+        : false
+    },
+    isMoving () {
+      return this.id === this.moveDialog.id && this.moveDialog.type === 'list'
+    },
+    activeFolder () {
+      const id = _.get(this.$route.params, 'id', null)
+      if (this.id === undefined && id === 'unsaved') {
+        return true
+      }
+      return id && parseInt(id) === this.id
+    },
+    itemName () {
+      return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
+    },
+    isContactsRoute () {
+      return this.$route.meta.title === 'Contacts'
+    },
+    viewListPath () {
+      return this.isContactsRoute ? `/contacts/list/${this.id}` : `/power-dialer/list/${this.id}`
+    },
+    listPath () {
+      return this.isContactsRoute ? '/api/v2/contacts-list/' : '/api/v2/power-dialer-lists/'
+    },
+    foldersPath () {
+      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+    },
+    folderId () {
+      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-item-option-${module}-${this.id}`
+    },
+    unsavedListId () {
+      return this.unsavedList?.id || ''
+    }
+  },
+  mounted () {
+    if (!this.isMobile) {
+      this.folderExists = true
+    }
+
+    if (this.isMobile && this.$refs[this.folderId] !== undefined) {
+      let count = 0
+      let folderInterval = setInterval(() => {
+        if (document.getElementById(this.folderId)) {
+          this.folderExists = true
+          clearInterval(folderInterval)
+        }
+        count++
+        if (count === 60) {
+          clearInterval(folderInterval)
+        }
+      }, 500)
+    }
   },
   methods: {
     ...mapActions('contacts', [
       'removeListOpen',
+      'removeListClose',
       'foldersLoaded',
       'listLoaded',
       'listPinToggled',
       'openMoveDialog',
-      'pinnedCountLoaded'
+      'pinnedCountLoaded',
+      'setUnsavedList',
+      'setShowContactsListSidebar'
     ]),
     onDuplicate () {
       this.$root.$emit('bv::hide::popover')
@@ -180,7 +246,7 @@ export default {
     },
     createList (params) {
       this.$axios
-        .post('/api/v2/contacts-list/' + this.id + '/duplicate', params)
+        .post(this.listPath + this.id + '/duplicate', params)
         .then((response) => {
           const data = response.data.data
           const message = response.data.message
@@ -274,6 +340,7 @@ export default {
       this.updateListRequest(this.id, { name, order: this.order })
         .then(response => {
           this.listLoaded(response.data.data)
+          this.$generalNotification('List updated.')
           this.reloadFolders()
         }).finally(() => {
           this.$nextTick(() => {
@@ -284,7 +351,7 @@ export default {
     },
     updateListRequest (id, params) {
       return this.$axios
-        .patch('/api/v2/contacts-list/' + id, params)
+        .patch(this.listPath + id, params)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
           console.log(html)
@@ -293,7 +360,7 @@ export default {
     },
     getContactList (id) {
       return this.$axios
-        .get('/api/v2/contacts-list/' + id)
+        .get(`${this.listPath}${id}`)
         .then((response) => response.data)
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
@@ -307,7 +374,7 @@ export default {
     },
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.foldersPath)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -318,8 +385,24 @@ export default {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
     onRemoveList () {
+      this.removeListClose()
+      setTimeout(() => {
+        this.removeListOpen({ id: this.id, name: this.name })
+      }, 10)
       this.removeListOpen({ id: this.id, name: this.name })
+    },
+    toggleSidebar (callback, event) {
+      this.setUnsavedList(null)
+      if (this.id !== undefined) {
+        callback(event)
+      } else {
+        this.$router.push('/contacts/list/unsaved')
+      }
+      this.setShowContactsListSidebar(false)
     }
+  },
+  beforeDestroy () {
+    clearTimeout(inputTimeout)
   }
 }
 </script>

@@ -1,21 +1,23 @@
 <template>
-  <div class="contacts row mx-0 content-row d-flex overflow-hidden h-100"
+  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100"
        v-if="authenticated">
-    <div class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
+    <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar"
+         :class="sidebarClass">
       <contacts-sidebar></contacts-sidebar>
     </div>
-    <div class="col-10 px-0 mb-0 main">
+    <div class="px-0 mb-0 main flex-1"
+         :class="mainClass">
       <router-view></router-view>
     </div>
-    <remove-folder-dialog />
-    <column-headers />
-    <remove-contact />
-    <remove-contact-confirmation />
-    <move-dialog />
-    <create-list-modal />
-    <select-list-modal />
-    <remove-list-modal />
-    <remove-list-confirmation/>
+    <remove-folder-dialog v-if="isActive" />
+    <column-headers v-if="isActive" />
+    <remove-contact v-if="isActive" />
+    <remove-contact-confirmation v-if="isActive" />
+    <move-dialog v-if="isActive" />
+    <create-list-modal v-if="isActive" />
+    <select-list-modal v-if="isActive" />
+    <remove-list-modal v-if="isActive" />
+    <remove-list-confirmation v-if="isActive" />
   </div>
 </template>
 
@@ -30,7 +32,7 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'Contacts',
@@ -49,7 +51,53 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated'])
+    ...mapGetters('auth', ['authenticated']),
+    ...mapState('contacts', ['showContactsListSidebar']),
+    ...mapState(['isMobile']),
+    mainClass () {
+      if (!this.$q.screen.lt.md) {
+        return ''
+      }
+      return !this.showContactsListSidebar ? 'w-100 no-min-max-width' : 'w-0'
+    },
+    sidebarClass () {
+      if (!this.$q.screen.lt.md) {
+        return ''
+      }
+      return !this.showContactsListSidebar ? 'w-0' : 'w-100 no-min-max-width'
+    },
+    isActive () {
+      return this.$route.name === 'Contacts'
+    }
+  },
+
+  mounted () {
+    this.setShowContactsHeader(true)
+    if (this.isMobile) {
+      this.toggleSidebar()
+    }
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setShowContactsListSidebar',
+      'setShowContactsHeader',
+      'setUnsavedList'
+    ]),
+    toggleSidebar () {
+      this.setShowContactsListSidebar(false)
+    }
+  },
+
+  watch: {
+    $route (to, from) {
+      if (to.name.includes('Contacts')) {
+        if (from.name !== 'Contacts') {
+          this.setUnsavedList(null)
+        }
+        this.setShowContactsListSidebar(false)
+      }
+    }
   }
 }
 </script>

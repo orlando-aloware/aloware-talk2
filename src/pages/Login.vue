@@ -6,13 +6,73 @@
 </template>
 
 <script>
-import { guestMixin } from 'boot/mixins'
+import { guestMixin, aclMixin } from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
+import { mapActions, mapState } from 'vuex'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 export default {
   name: 'login',
-  mixins: [guestMixin],
-  components: { LoginForm, LoginLargeScreensInfo }
+
+  mixins: [guestMixin, aclMixin],
+
+  components: { LoginForm, LoginLargeScreensInfo },
+
+  computed: {
+    ...mapState('auth', ['profile'])
+  },
+
+  methods: {
+    ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
+    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
+    async validateCookieUser () {
+      this.getSharedCookie().then(sharedCookie => {
+        if (sharedCookie) {
+          const response = this.getCookieUser()
+          if (response) {
+            response.then(res => {
+              if (res.data.data.company.talk_enabled) {
+                this.cookieUserValidated(res)
+              }
+            })
+          }
+        }
+      })
+    },
+    async cookieUserValidated ({ data: { data } }) {
+      const { usage, company } = data
+      this.setCurrentCompany(company)
+      this.resetVuex()
+      this.setUsage(usage)
+
+      this.getSharedCookie().then(sharedCookie => {
+        localStorage.setItem('shared_cookie', sharedCookie)
+      })
+
+      localStorage.setItem('company_id', company.id)
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const fromClassic = Number(urlParams.get('from_classic'))
+
+      if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && fromClassic !== 1 && !this.isAdmin) {
+        location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
+      } else {
+        window.location.reload()
+      }
+    },
+
+    redirectTimeout () {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve()
+        }, 2000)
+      })
+    }
+  },
+
+  created () {
+    this.validateCookieUser()
+  }
 }
 </script>
 
@@ -32,7 +92,6 @@ export default {
   .login-slide-heading {
     height: 62px;
     color: #FFFFFF;
-    font-family: "Product Sans";
     font-size: 22px;
     font-weight: bold;
     letter-spacing: 0.29px;

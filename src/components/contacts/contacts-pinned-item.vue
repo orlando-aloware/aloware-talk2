@@ -9,12 +9,14 @@
             isExactActive && 'router-link-exact-active'
           ]"
        class="d-flex align-items-center item"
-       @click="navigate">
+       @click="toggleSidebar(navigate, $event)">
       <div class="icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
         <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon>
       </div>
-      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">{{ item.name }}</div>
+      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
+        <span>{{ item.name }}</span>
+      </div>
       <div class="counts d-flex align-items-center">
         <b-badge pill variant="light text-muted">{{ item.count | fixCount }}</b-badge>
       </div>
@@ -26,6 +28,7 @@
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'contacts-pinned-item',
@@ -45,6 +48,13 @@ export default {
   props: {
     item: {
       type: Object
+    }
+  },
+  methods: {
+    ...mapActions('contacts', ['setShowContactsListSidebar']),
+    toggleSidebar (callback, event) {
+      callback(event)
+      this.setShowContactsListSidebar(false)
     }
   }
 }

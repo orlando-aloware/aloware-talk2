@@ -13,7 +13,7 @@ import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 
 import { Screen } from 'quasar'
-Screen.setSizes({ sm: 300, md: 606, lg: 1000, xl: 2000 })
+Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
@@ -245,42 +245,118 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   })
 }
 
-Vue.prototype.$actionNotification = window._.debounce(function (title, message, messageIcon = null, attachment = null, type, contactId = null, communicationId = null, noDelay = false, dateTime = this.$moment()) {
+Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {
+  let settings = {
+    title: window._.get(notificationData, 'title', null),
+    message: window._.get(notificationData, 'message', null),
+    messageIcon: window._.get(notificationData, 'messageIcon', null),
+    attachment: window._.get(notificationData, 'attachment', null),
+    type: window._.get(notificationData, 'type', null),
+    contactId: window._.get(notificationData, 'contactId', null),
+    communicationId: window._.get(notificationData, 'communicationId', null),
+    campaignId: window._.get(notificationData, 'campaignId', null),
+    campaignName: window._.get(notificationData, 'campaignName', null),
+    ringGroupName: window._.get(notificationData, 'ringGroupName', null),
+    phoneNumber: window._.get(notificationData, 'phoneNumber', null),
+    dateTime: window._.get(notificationData, 'dateTime', this.$moment()),
+    communication: window._.get(notificationData, 'communication', null),
+    contact: window._.get(notificationData, 'contact', null)
+  }
+
   // skip if same notification
-  if (type === 'call' && this.$store.state.notifications[type].communicationId === communicationId && this.$store.state.notifications[type].contactId === contactId) {
+  if (settings.type === 'call' &&
+    this.$store.state.notifications[settings.type].communicationId === settings.communicationId &&
+    this.$store.state.notifications[settings.type].contactId === settings.contactId) {
     return
   }
 
-  if (!title ||
-    (!['sms', 'incomingCall'].includes(type) && !message) ||
-    (type === 'sms' && !message && !attachment)) {
+  if (!settings.title ||
+    (!['sms', 'incomingCall', 'callFishing'].includes(settings.type) && !settings.message) ||
+    (settings.type === 'sms' && !settings.message && !settings.attachment)) {
     return
   }
 
   let data = {
-    type: type,
-    data: {
-      title: title,
-      message: message,
-      messageIcon: messageIcon,
-      attachment: attachment,
-      dateTime: dateTime,
-      contactId: contactId,
-      communicationId: communicationId
-    }
+    type: settings.type,
+    data: null
   }
 
-  this.$bvToast.hide(type)
-  if (!document.getElementById(type) || noDelay) {
+  // if call is still on-going and fishing mode active, we queue the notification
+  if (settings.type === 'callFishing' &&
+    this.$store.state.notifications[settings.type].communicationId &&
+    this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
+    this.$store.state.notifications[settings.type].contactId !== settings.contactId
+  ) {
+    let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
+    queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
+    let found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
+
+    if (found) {
+      return
+    }
+
+    let item = {
+      title: settings.title,
+      message: settings.message,
+      dateTime: settings.dateTime,
+      communicationId: settings.communicationId,
+      contactId: settings.contactId,
+      campaignId: settings.campaignId,
+      campaignName: settings.campaignName,
+      ringGroupName: settings.ringGroupName,
+      phoneNumber: settings.phoneNumber,
+      communication: settings.communication,
+      contact: settings.contact
+    }
+
+    queue.push(item)
+
+    data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
+    data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
-    this.$bvToast.show(type)
+    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', item)
+
     return
   }
 
+  if (settings.type !== 'callFishing') {
+    this.$bvToast.hide(settings.type)
+  }
+
+  data.data = {
+    title: settings.title,
+    message: settings.message,
+    messageIcon: settings.messageIcon,
+    attachment: settings.attachment,
+    dateTime: settings.dateTime,
+    contactId: settings.contactId,
+    communicationId: settings.communicationId,
+    campaignId: settings.campaignId,
+    campaignName: settings.campaignName,
+    ringGroupName: settings.ringGroupName,
+    phoneNumber: settings.phoneNumber,
+    communication: settings.communication,
+    contact: settings.contact
+  }
+
+  if (!document.getElementById(settings.type)) {
+    this.$store.commit('SET_NOTIFICATIONS', data)
+    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
+    this.$bvToast.show(settings.type)
+    return
+  }
+
+  let counter = 0
   let notificationInterval = setInterval(() => {
-    if (!document.getElementById(type)) {
+    if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
-      this.$bvToast.show(type)
+      settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', data.data)
+      this.$bvToast.show(settings.type)
+      clearInterval(notificationInterval)
+    }
+    counter++
+
+    if (counter > 120) {
       clearInterval(notificationInterval)
     }
   }, 500)
@@ -300,9 +376,9 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     icon = 'call-icon'
   }
   // Use a shorter name for this.$createElement
-  const h = this.$createElement
+  let h = this.$createElement
   // Create the message
-  const vNodesMsg = h(
+  let vNodesMsg = h(
     'div',
     { class: ['d-flex', 'flex-row', 'align-items-center'] },
     [

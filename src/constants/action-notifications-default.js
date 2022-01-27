@@ -6,7 +6,14 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   },
   sms: {
     title: '',
@@ -15,7 +22,14 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   },
   call: {
     title: '',
@@ -24,7 +38,14 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   },
   callVoicemail: {
     title: '',
@@ -33,7 +54,14 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   },
   voicemail: {
     title: '',
@@ -42,7 +70,14 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   },
   mention: {
     title: '',
@@ -51,7 +86,14 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   },
   incomingCall: {
     title: '',
@@ -60,6 +102,29 @@ export const DEFAULT_STATE = {
     attachment: null,
     dateTime: null,
     contactId: '',
-    communicationId: ''
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
+  },
+  callFishing: {
+    title: '',
+    message: '',
+    messageIcon: null,
+    attachment: null,
+    dateTime: null,
+    contactId: '',
+    communicationId: '',
+    campaignId: '',
+    campaignName: '',
+    ringGroupName: '',
+    phoneNumber: '',
+    communication: null,
+    contact: null,
+    queue: null
   }
 }

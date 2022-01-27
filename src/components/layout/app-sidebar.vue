@@ -17,6 +17,12 @@
            class="nav-icons w-100"
            v-show="isActive('Inbox')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Inbox</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
@@ -26,6 +32,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Inbox')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Inbox</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Contacts' }"
@@ -36,6 +48,12 @@
            class="nav-icons w-100"
            v-show="isActive('Contacts')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Contacts</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Contacts' }"
            :ripple="false"
@@ -45,25 +63,45 @@
            class="nav-icons w-100"
            v-show="!isActive('Contacts')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Contacts</span>
+      </q-tooltip>
     </q-btn>
 
-    <q-btn :to="{ name: 'Power Dialer' }"
+    <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Power Dialer')"
+           v-if="!isProd"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Power Dialer</span>
+      </q-tooltip>
     </q-btn>
-    <q-btn :to="{ name: 'Power Dialer' }"
+    <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_gray.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer')"
+           v-if="!isProd"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Power Dialer</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Stats' }"
@@ -74,6 +112,12 @@
            class="nav-icons w-100"
            v-show="isActive('Stats')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Stats</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Stats' }"
            :ripple="false"
@@ -83,6 +127,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Stats')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Stats</span>
+      </q-tooltip>
     </q-btn>
 
     <q-btn :to="{ name: 'Settings' }"
@@ -93,6 +143,12 @@
            class="nav-icons w-100"
            v-show="isActive('Settings')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Settings</span>
+      </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
@@ -102,6 +158,12 @@
            class="nav-icons w-100"
            v-show="!isActive('Settings')"
            flat>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Settings</span>
+      </q-tooltip>
     </q-btn>
     <div class="mt-auto w-100"
          v-show="false">
@@ -133,6 +195,12 @@ export default {
     }
   },
 
+  computed: {
+    isProd () {
+      return localStorage.env === 'production'
+    }
+  },
+
   data () {
     return {
       modeIcon: 'img:app-icons/menu/mode_gray.svg'
@@ -158,7 +226,7 @@ export default {
 
     async logoutAction () {
       try {
-        const response = await this.logout()
+        let response = await this.logout()
 
         this.response = response?.data
 

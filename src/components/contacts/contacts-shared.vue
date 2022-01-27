@@ -27,7 +27,6 @@ export default {
   components: {
     ContactsSidebarLoader,
     ContactsSharedItem
-
   },
   data () {
     return {

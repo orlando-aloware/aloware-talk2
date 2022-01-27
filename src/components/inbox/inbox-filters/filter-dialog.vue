@@ -145,6 +145,7 @@ export default {
     },
     channelFilterName () {
       switch (true) {
+        case !this.$route.params.channel && this.$route.name === 'Inbox':
         case ['inbox'].includes(this.$route.params.channel):
           return 'Communications'
         case ['messages'].includes(this.$route.params.channel):

@@ -3,7 +3,7 @@
     :title="title"
     :isOpen="isRemoveContactOpen"
     id="remove-contact-dialog"
-    @close="removeContactClose"
+    @close="onClose"
   >
     <div slot="content">
       <div class="text-left">
@@ -13,7 +13,9 @@
       </div>
     </div>
     <div slot="footer" class="w-100">
-      <div class="d-flex w-100">
+      <div
+        class="d-flex w-100"
+        v-if="isContactModuleType">
         <div class="flex-grow-1"></div>
         <button
           class="btn btn-sm btn-outline-success mr-2"
@@ -24,6 +26,17 @@
         </button>
         <button class="btn btn-sm btn-danger mr-2" @click="onRemoveFromContacts">
           Remove Contact
+        </button>
+      </div>
+      <div
+        class="d-flex w-100"
+        v-else>
+        <div class="flex-grow-1"></div>
+        <button
+          class="btn btn-sm btn-danger mr-2"
+          @click="onRemoveFromList"
+        >
+          Remove Contact from List
         </button>
       </div>
     </div>
@@ -37,6 +50,12 @@ import * as ContactListType from 'src/constants/contacts-list-types'
 import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
+  props: {
+    isContactModuleType: {
+      type: Boolean,
+      default: true
+    }
+  },
   components: {
     ConfirmDialog
   },
@@ -47,7 +66,7 @@ export default {
         return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return 'Remove ' + this.selectedContacts[this.selectedList.id].length + ' contacts?'
+        return 'Remove ' + this.selectedContacts[this.listId].length + ' contacts?'
       }
       return ''
     },
@@ -56,20 +75,25 @@ export default {
         return 'Are you sure you want to remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return `Are you sure you want to remove <span>${this.selectedContacts[this.selectedList.id].length}</span> contacts?`
+        return `Are you sure you want to remove <span>${this.selectedContacts[this.listId].length}</span> contacts?`
       }
       return ''
+    },
+    listId () {
+      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
     }
   },
   data () {
     return {
-      ContactListType
+      ContactListType,
+      flag: false
     }
   },
   watch: {
     isRemoveContactOpen (isOpen) {
       if (isOpen) {
         this.$bvModal.show('remove-contact-dialog')
+        this.flag = false
       } else {
         this.$bvModal.hide('remove-contact-dialog')
       }
@@ -78,14 +102,21 @@ export default {
   methods: {
     ...mapActions('contacts', ['removeContactClose', 'setContactRemoveActionType']),
     onRemoveFromList () {
+      this.flag = true
       this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     },
     onRemoveFromContacts () {
+      this.flag = true
       this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
+    },
+    onClose () {
+      if (!this.flag) {
+        this.removeContactClose()
+      }
     }
   }
 }

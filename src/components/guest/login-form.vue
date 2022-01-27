@@ -81,10 +81,16 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
+  mixins: [aclMixin],
   name: 'login-form',
+  computed: {
+    ...mapState('auth', ['profile', 'authenticated'])
+  },
   data () {
     return {
       user: {
@@ -109,7 +115,7 @@ export default {
     async submit () {
       try {
         this.loading = true
-        const response = await this.login({
+        let response = await this.login({
           ...this.getLoginParams()
         })
 
@@ -134,7 +140,7 @@ export default {
     },
 
     async onLoginSuccess ({ data: { data } }) {
-      const { usage, company } = data
+      let { usage, company } = data
 
       this.setCurrentCompany(company)
       this.resetVuex()
@@ -142,12 +148,17 @@ export default {
 
       localStorage.setItem('company_id', company.id)
 
-      const redirectPath = this.$route.query.redirect || '/'
+      // redirect to Alo classic for agents
+      if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && !this.isAdmin) {
+        location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
+      } else {
+        let redirectPath = this.$route.query.redirect || '/'
 
-      await this.$router.push(String(redirectPath))
-      await this.redirectTimeout()
+        await this.$router.push(String(redirectPath))
+        await this.redirectTimeout()
 
-      this.resetUser()
+        this.resetUser()
+      }
     },
 
     redirectTimeout () {

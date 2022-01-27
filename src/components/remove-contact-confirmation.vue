@@ -44,13 +44,21 @@
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
+import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 
 export default {
   components: {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['contactToRemove', 'selectedContacts', 'removeContactActionType', 'selectedList', 'isBulkDelete']),
+    ...mapGetters('contacts', [
+      'contactToRemove',
+      'selectedContacts',
+      'removeContactActionType',
+      'selectedList',
+      'isBulkDelete',
+      'listItems'
+    ]),
     title () {
       return `Delete ${this.contactToDeleteCount} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
     },
@@ -59,11 +67,32 @@ export default {
         return 1
       }
 
-      if (this.selectedContacts[this.selectedList.id]) {
-        return this.selectedContacts[this.selectedList.id].length
+      if (this.selectedContacts[this.listId]) {
+        return this.selectedContacts[this.listId].length
       }
 
       return 0
+    },
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      }
+      return false
+    },
+    endpointForList () {
+      if (this.isContactsRoute) {
+        return 'contact-list-item'
+      }
+      return 'power-dialer-list-items'
+    },
+    defaultListItems () {
+      return DEFAULT_LIST_ITEMS
+    },
+    listId () {
+      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+    },
+    currentList () {
+      return this.listItems[this.selectedList.id]
     }
   },
   data () {
@@ -83,7 +112,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactClose', 'setShouldUpdateSelectedListContactCount']),
+    ...mapActions('contacts', [
+      'removeContactClose',
+      'setShouldUpdateSelectedListContactCount',
+      'contactsLoaded'
+    ]),
     onCancel () {
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
@@ -92,7 +125,7 @@ export default {
       let url = null
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url = '/api/v2/contact-list-item/' +
+          url = `/api/v2/${this.endpointForList}/` +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
@@ -115,22 +148,29 @@ export default {
           this.isBusy = false
           this.contactsToDelete = null
           this.$bvModal.hide('remove-contact-confirmation-dialog')
+          this.contactsLoaded({
+            id: this.selectedList.id || 'all',
+            append: false,
+            ...this.currentList
+          })
         })
     },
     handleBulkDeletion () {
       let url = null
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url = `/api/v2/contact-list-item/bulk/${this.selectedList.id}`
+          url = `/api/v2/${this.endpointForList}/bulk/${this.selectedList.id}`
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v2/contacts/bulk-delete`
           break
       }
       this.isBusy = true
+      let ids = this.selectedContacts[this.listId].map(contact => contact.id)
       return this.$axios
-        .delete(url, { params: { contacts: this.selectedContacts[this.selectedList.id].map(contact => contact.id) } })
+        .delete(url, { params: { contacts: ids } })
         .then(() => {
+          this.$emit('on-remove-contacts', this.selectedList)
           this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {

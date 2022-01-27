@@ -8,7 +8,7 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Are you sure you want to remove
+          !Are you sure you want to remove
           <span class="font-weight-bold">{{ folderToRemove.name }}</span
           >? Please be reminded that this will also delete its contents such as
           subfolders, lists and contacts.
@@ -40,11 +40,21 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
+  props: {
+    isContactModuleType: {
+      type: Boolean,
+      default: true
+    }
+  },
   components: {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['isRemoveFolderOpen', 'folderToRemove'])
+    ...mapGetters('contacts', [
+      'isRemoveFolderOpen',
+      'folderToRemove',
+      'removedFolder'
+    ])
   },
   watch: {
     isRemoveFolderOpen (isOpen) {
@@ -61,35 +71,59 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeFolderClose', 'foldersLoaded']),
+    ...mapActions('contacts', [
+      'removeFolderClose',
+      'removeFolderItem',
+      'resetRemovedFolders',
+      'foldersLoaded'
+    ]),
     onConfirmRemove () {
       if (this.isRemoving) return
       this.isRemoving = true
-      return Promise.all([
-        this.removeFolderRequest(this.folderToRemove.id)
-      ]).finally(() => {
-        this.reloadFoldersRequest()
-        this.removeFolderClose()
-        this.isRemoving = false
-      }).then(() => {
-        this.$generalNotification('Folder was successfully deleted')
-      })
+      return Promise.all([this.removeFolderRequest(this.folderToRemove.id)])
+        .then(() => {
+          this.removeFolderItem(this.folderToRemove.id)
+          this.$generalNotification('Folder was successfully deleted')
+        })
+        .finally(() => {
+          this.reloadFoldersRequest()
+          this.removeFolderClose()
+          this.isRemoving = false
+        })
     },
     removeFolderRequest (id) {
-      return talk2Api.V2.contactFolders.delete(id)
-        .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
+      if (this.isContactModuleType) {
+        return talk2Api.V2.contactFolders.delete(id)
+          .catch((error) => {
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+          })
+      } else {
+        return talk2Api.V2.powerDialerFolders.delete(id)
+          .catch((error) => {
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+          })
+      }
     },
     reloadFoldersRequest () {
-      return talk2Api.V2.contactFolders.list()
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch((_err) => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
+      if (this.isContactModuleType) {
+        return talk2Api.V2.contactFolders.list()
+          .then((response) => response.data)
+          .then(this.foldersLoaded)
+          .catch((_err) => {
+            this.$generalNotification('Unable to load folders please try again.', 'error')
+          })
+      } else {
+        return talk2Api.V2.powerDialerFolders.list()
+          .then((response) => response.data)
+          .then(this.foldersLoaded)
+          .catch((_err) => {
+            this.$generalNotification('Unable to load folders please try again.', 'error')
+          })
+      }
     }
   }
 }

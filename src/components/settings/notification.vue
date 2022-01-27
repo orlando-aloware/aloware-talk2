@@ -4,6 +4,8 @@
       <b-form-row>
         <b-col sm="12" md="12">
           <div class="d-inline-flex">
+            <slot name="header">
+            </slot>
             <h1 class="mt-2"> Notification Settings </h1>
           </div>
         </b-col>
@@ -184,7 +186,7 @@
         <b-form-row class="mt-4"
                     v-if="shouldObserve">
           <b-col sm="12"
-                 md="6">
+                 md="12">
             <b-form-group
               label="Select the lines to get notified from"
               class="form-label"

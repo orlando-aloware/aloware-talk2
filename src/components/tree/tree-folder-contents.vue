@@ -11,6 +11,7 @@
       :lists="folder.lists"
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
+      :endpoint="endpoint"
     />
   </div>
 </template>
@@ -32,6 +33,10 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
     }
   }
 }

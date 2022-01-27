@@ -3,6 +3,7 @@
     title="Remove List"
     :isOpen="isRemoveListOpen"
     id="remove-list-dialog"
+    @close="confirmClose"
   >
     <div slot="content">
       <div class="text-left">
@@ -12,18 +13,23 @@
         </div>
       </div>
     </div>
+
     <div slot="footer" class="w-100">
       <div class="d-flex w-100">
         <div class="flex-grow-1"></div>
+
         <button
-          class="btn btn-sm btn-outline-dark mr-2"
           @click="onRemoveListOnly"
-        >
+          class="btn btn-sm btn-outline-dark mr-2">
           Delete List, But Save Contacts
         </button>
-        <button class="btn btn-sm btn-danger mr-2" @click="onRemoveListAndContact">
+
+        <button
+          @click="onRemoveListAndContact"
+          class="btn btn-sm btn-danger mr-2">
           Delete List and Contacts
         </button>
+
       </div>
     </div>
   </confirm-dialog>
@@ -40,16 +46,33 @@ export default {
     ConfirmDialog
   },
   computed: {
-    ...mapGetters('contacts', ['isRemoveListOpen', 'listToRemove'])
+    ...mapGetters('contacts', [
+      'isRemoveListOpen',
+      'listToRemove'
+    ]),
+    isContactsRoute () {
+      if (this.$route.meta.title === 'Contacts') {
+        return true
+      }
+      return false
+    },
+    listPath () {
+      if (this.isContactsRoute) {
+        return '/api/v2/contacts-list/'
+      }
+      return '/api/v2/power-dialer-lists/'
+    }
   },
   data () {
     return {
-      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT }
+      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT },
+      flagged: false
     }
   },
   watch: {
     isRemoveListOpen (isOpen) {
       if (isOpen) {
+        this.flagged = false
         this.$bvModal.show('remove-list-dialog')
       } else {
         this.$bvModal.hide('remove-list-dialog')
@@ -57,17 +80,29 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeListClose', 'removeListOpen', 'foldersLoaded', 'setRemoveListActionType']),
+    ...mapActions('contacts', [
+      'removeListClose',
+      'removeListOpen',
+      'foldersLoaded',
+      'setRemoveListActionType'
+    ]),
+    confirmClose () {
+      if (!this.flagged) {
+        this.removeListClose()
+      }
+    },
     onRemoveList () {
       return this.$axios
-        .delete('/api/v2/contacts-list/' + this.listToRemove.id)
+        .delete(`${this.listPath}${this.listToRemove.id}`)
         .then(() => {
           this.reloadFolders()
         })
         .catch((_err) => {
           this.$generalNotification('Unable to remove list.', 'error')
         })
-        .finally(() => this.removeListClose())
+        .finally(() => {
+          this.removeListClose()
+        })
     },
     reloadFolders () {
       return this.$axios
@@ -90,6 +125,7 @@ export default {
       this.showConfirmDialog(this.ActionTypes.LIST_AND_CONTACT)
     },
     showConfirmDialog (actionType) {
+      this.flagged = true
       this.setRemoveListActionType(actionType)
       this.$bvModal.show('remove-list-confirmation-dialog')
       this.$bvModal.hide('remove-list-dialog')

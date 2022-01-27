@@ -28,8 +28,8 @@
                 {{ categories[index] }}
               </div>
               <div class="column-headers-modal__item d-flex align-items-center no-select"
-                   v-for="column in items"
-                   :key="column.name"
+                   v-for="(column, key) in items"
+                   :key="`${column.name}-${key}`"
                    :class="{
                   'column-headers-modal__item--hidden': isHidden(column)
                 }">
@@ -122,7 +122,12 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { ALL_COLUMNS, COLUMN_CATEGORIES, DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
+import {
+  ALL_COLUMNS,
+  COLUMN_CATEGORIES,
+  DEFAULT_COLUMNS,
+  POWER_DIALER_DEFAULT_COLUMNS
+} from 'src/constants/contacts-columns'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
@@ -134,6 +139,11 @@ const DEFAULT_PINNED_LIST_IDS = Object.keys(DEFAULT_PINNED_LIST).map(
 )
 
 export default {
+  props: {
+    predefinedId: {
+      default: null
+    }
+  },
   components: {
     draggable,
     Search
@@ -144,7 +154,7 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
+      currentColumns: JSON.parse(JSON.stringify(this.activeColumns || DEFAULT_COLUMNS))
     }
   },
   methods: {
@@ -210,7 +220,7 @@ export default {
     closeAndReset () {
       this.columnsUpdated({
         id: this.columns.id,
-        headers: DEFAULT_COLUMNS
+        headers: this.activeColumns
       })
       this.columnsClose()
     },
@@ -221,8 +231,8 @@ export default {
       }
       this.loading = true
       this.$axios
-        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
-          ...this.columns,
+        .patch(`/api/v2/${this.endpointUrl}/${this.resourceId}`, {
+          id: this.resourceId,
           headers: this.currentColumns,
           filters: [] // TODO: use a
         })
@@ -250,13 +260,18 @@ export default {
 
       this.loading = true
       this.$axios
-        .patch(`/api/v2/contacts-list/${this.columns.id}`, {
-          ...this.columns,
-          headers: DEFAULT_COLUMNS,
+        .patch(`/api/v2/${this.endpointUrl}/${this.resourceId}`, {
+          id: this.resourceId,
+          headers: this.activeColumns,
           filters: [] // TODO: use actual values
         })
-        .then(() => {
+        .then((res) => {
           this.$generalNotification('Columns were successfully saved!')
+          this.columnsUpdated({
+            id: res.data.data.id,
+            headers: res.data.data.headers
+          })
+          this.closeAndReset()
           this.columnsClose()
         })
         .catch((error) => {
@@ -271,7 +286,7 @@ export default {
           this.loading = false
         })
 
-      this.closeAndReset()
+      // this.closeAndReset()
     },
     onModalShow () {
       this.searchText = ''
@@ -279,8 +294,12 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['columns']),
+    resourceId () {
+      return this.columns.id === 'my-queue' ? this.predefinedId : this.columns.id
+    },
     title () {
-      return `Manage ${String(this.columns?.name).toLowerCase()} columns`
+      let title = this.columns?.name || 'My Queue'
+      return `Manage ${String(title).toLowerCase()} columns`
     },
     allColumns () {
       const columns = []
@@ -314,6 +333,18 @@ export default {
       } else {
         return new Set()
       }
+    },
+    isContactsRoute () {
+      return this.$route.meta.title === 'Contacts'
+    },
+    endpointUrl () {
+      if (this.isContactsRoute) {
+        return 'contacts-list'
+      }
+      return 'power-dialer-lists'
+    },
+    activeColumns () {
+      return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
     }
   },
   watch: {

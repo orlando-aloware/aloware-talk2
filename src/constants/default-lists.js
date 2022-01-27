@@ -1,6 +1,7 @@
 import {
   DEFAULT_COLUMNS,
-  STATIC_COLUMNS
+  STATIC_COLUMNS,
+  POWER_DIALER_DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
@@ -11,6 +12,7 @@ export const DEFAULT_STATE = {
       headers: DEFAULT_COLUMNS,
       filters: {},
       type: 2,
+      module_type: 0,
       name: 'All Contacts'
     },
     'my-contacts': {
@@ -28,6 +30,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'My Contacts'
     },
     unassigned: {
@@ -44,6 +47,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'Unassigned Contacts'
     },
     unanswered: {
@@ -60,6 +64,7 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'Unanswered Contacts'
     },
     'new-leads': {
@@ -76,12 +81,52 @@ export const DEFAULT_STATE = {
         }
       ],
       type: 2,
+      module_type: 0,
       name: 'New Leads'
     },
     static: {
       id: 'static',
       headers: STATIC_COLUMNS,
       filters: {}
+    },
+    'my-queue': {
+      id: 'my-queue',
+      headers: POWER_DIALER_DEFAULT_COLUMNS,
+      filters: {},
+      type: 2,
+      module_type: 1,
+      name: 'My Queue'
+    },
+    'unsaved': {
+      id: 'unsaved',
+      headers: DEFAULT_COLUMNS,
+      filters: [],
+      type: 2,
+      module_type: 1,
+      name: ''
     }
   }
+}
+
+export const DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST = {
+  contact_folder_id: null,
+  headers: DEFAULT_COLUMNS,
+  mode: '',
+  name: '',
+  order: 0,
+  type: 2
+}
+
+export const DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE = {
+  company_id: null,
+  contact_folder_id: null,
+  created_at: '',
+  filters: [],
+  headers: DEFAULT_COLUMNS,
+  id: null,
+  module_type: 1,
+  name: null,
+  order: null,
+  type: 2,
+  updated_at: ''
 }

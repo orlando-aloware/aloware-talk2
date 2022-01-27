@@ -120,6 +120,7 @@ export default {
   computed: {
     ...mapState(['campaigns', 'currentCompany']),
     ...mapState('contacts', ['contact']),
+    ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -211,7 +212,7 @@ export default {
   },
 
   created () {
-    this.contactId = _.get(this.$route, 'params.id', null)
+    this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })
@@ -316,29 +317,30 @@ export default {
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
-      console.log('fetching comms')
-      return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
-        this.fetchContactCommunications(this.contactId, false).then(() => {
+      if (this.contactId) {
+        return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
+          this.fetchContactCommunications(this.contactId, false).then(() => {
+            this.loadingContact = false
+            // if route has communication id
+            // until id is found
+            if (this.hasCommunication()) {
+              this.loadingContactCommunications = true
+              this.fetchContactCommunicationsUntilFound()
+            } else {
+              this.loadingContactCommunications = false
+            }
+            this.scrollMessages()
+          })
+          return res
+        }).catch(err => {
           this.loadingContact = false
-          console.log('fetched comms')
-
-          // if route has communication id
-          // until id is found
-          if (this.hasCommunication()) {
-            this.loadingContactCommunications = true
-            this.fetchContactCommunicationsUntilFound()
-          } else {
-            this.loadingContactCommunications = false
-          }
-          this.scrollMessages()
+          this.loadingContactCommunications = false
+          this.$handleErrors(err.response)
+          console.log(err)
         })
-        return res
-      }).catch(err => {
-        this.loadingContact = false
-        this.loadingContactCommunications = false
-        this.$handleErrors(err.response)
-        console.log(err)
-      })
+      }
+      this.loadingContact = false
+      this.loadingContactCommunications = false
     },
 
     showContactInfo (contactId, forceClearLoading = false) {
@@ -549,6 +551,7 @@ export default {
       }).then(res => {
         this.reply_text = ''
         this.loadingSendMessage = false
+        this.$generalNotification('Message sent')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingSendMessage = false
@@ -564,6 +567,7 @@ export default {
         phone_number: this.selectedPhoneNumber
       }).then(res => {
         this.loadingSendMessage = false
+        this.$generalNotification('Message sent')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingSendMessage = false
@@ -652,6 +656,7 @@ export default {
           this.uploadPercentage.upload = 0
           this.uploadStatus.upload = 'success'
           this.uploadFileList.upload = []
+          this.$generalNotification('Message sent')
         })
         .catch(err => {
           console.log(err)
@@ -781,9 +786,19 @@ export default {
 
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
-        setTimeout(() => {
-          const containerEl = document.querySelector('.contact-activities .scrollbar-white')
-          containerEl.scrollTop = element.offsetTop
+        let counter = 0
+        let containerElInterval = setInterval(() => {
+          let containerEl = document.querySelector('.contact-activities .scrollbar-white')
+
+          if (containerEl) {
+            containerEl.scrollTop = element.offsetTop
+            clearInterval(containerElInterval)
+          }
+
+          counter++
+          if (counter > 120) {
+            clearInterval(containerElInterval)
+          }
         }, 500)
       }
 

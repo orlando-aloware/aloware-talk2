@@ -1,5 +1,5 @@
 <template>
-  <contacts-view :id="this.id" :name="name" :type="String(type)"/>
+  <contacts-view :id="id" :name="name" :type="String(type)"/>
 </template>
 
 <script>
@@ -39,7 +39,7 @@ export default {
     ...mapActions('contacts', ['setSelectedList']),
 
     setData (id) {
-      const list = this.lists[id] || {}
+      let list = this.lists[id] || {}
       if (Object.values(list).length > 0) {
         this.name = list.name
         this.type = list.type

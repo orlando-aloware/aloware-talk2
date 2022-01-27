@@ -182,6 +182,9 @@ export default {
     users: {
       withAccessToContact (contactId) {
         return window.axios.get(`${suffixV1}user/get-users-with-access-to-contact?contact_id=${contactId}`)
+      },
+      setDefaultLogin (userId, params) {
+        return window.axios.patch(`${suffixV1}user/${userId}/set-default-app`, params)
       }
     },
     reports: {
@@ -266,6 +269,14 @@ export default {
       },
       delete (id) {
         return window.axios.delete(`${suffixV2}contact-folders/${id}`)
+      }
+    },
+    powerDialerFolders: {
+      list () {
+        return window.axios.get(`${suffixV2}power-dialer-folders`)
+      },
+      delete (id) {
+        return window.axios.delete(`${suffixV2}power-dialer-folders/${id}`)
       }
     },
     contactListItem: {

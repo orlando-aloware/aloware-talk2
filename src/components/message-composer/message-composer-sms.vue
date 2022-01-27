@@ -169,26 +169,32 @@
         </b-link>
       </div>
       <div>
-        <b-button-group>
-          <b-button variant="primary"
-                    class="fs-13 pl-3 pr-3"
-                    size="sm"
-                    :disabled="!validSms"
-                    @click="onSend">
-            <q-spinner-bars v-if="isSending" color="white" />
-            {{ isSending ? 'Sending Text...' : 'Send Text' }}
-          </b-button>
-          <b-dropdown class="message-composer-dropdown"
-                      variant="primary"
-                      size="sm"
-                      :disabled="!validSms"
-                      right>
-            <b-dropdown-item :disabled="!validSms"
-                             @click="showScheduleMessage">
-              Schedule Send
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-button-group>
+        <q-btn-dropdown
+          split
+          class="message-composer-send-dropdown-button"
+          color="primary"
+          size="sm"
+          padding="0px 12px"
+          :ripple="false"
+          :disable="!validSms"
+          :disable-dropdown="!validSms"
+          :menu-offset="[0, 6]"
+          @click="onSend"
+        >
+          <template slot="label">
+            <q-spinner-bars v-if="isSending"
+                            class="mr-1"
+                            color="white" />
+            {{ isSending ? ' Sending Text...' : 'Send Text' }}
+          </template>
+          <q-list class="message-composer-send-dropdown-button-list">
+            <q-item clickable v-close-popup @click="showScheduleMessage">
+              <q-item-section>
+                <q-item-label>Schedule Send</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </div>
     </div>
     <scheduled-message></scheduled-message>
@@ -242,6 +248,15 @@ export default {
         this.selectedLine &&
         this.messageComposer.sms.phone_number &&
         this.messageComposer.sms.phone_number.length > 0
+    },
+    messageBody () {
+      return this.messageComposer.sms.body
+    },
+    messageAttachments () {
+      return this.messageComposer.sms.attachments
+    },
+    messageGifUrl () {
+      return this.messageComposer.sms.gif_url
     }
   },
 
@@ -365,10 +380,10 @@ export default {
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
           this.resetMessageComposerSms()
-          this.$generalNotification('Text has been sent.')
+          this.$generalNotification('Message sent.')
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while sending text.', 'error')
+          this.$generalNotification('Error while sending message.', 'error')
         }).finally(() => {
           this.isSending = false
         })

@@ -11,13 +11,14 @@
         :style="indentStyle"
         @click="onToggleFolder"
       ></div>
-      <div class="folder__arrow d-flex align-items-center"
-           v-if="lists.length > 0 || folders.length > 0"
-           @click="onToggleFolder">
-        <folder-arrow-open-icon v-if="isOpen"
-                                color="#62666E"></folder-arrow-open-icon>
-        <folder-arrow-close-icon v-else
-                                 color="#62666E"></folder-arrow-close-icon>
+      <div class="folder__arrow d-flex align-items-center">
+        <div v-if="lists.length > 0 || folders.length > 0"
+             @click="onToggleFolder">
+          <folder-arrow-open-icon v-if="isOpen"
+                                  color="#62666E"></folder-arrow-open-icon>
+          <folder-arrow-close-icon v-else
+                                   color="#62666E"></folder-arrow-close-icon>
+        </div>
       </div>
       <div class="folder__icon d-flex align-items-center"
            @click="onToggleFolder">
@@ -25,11 +26,14 @@
       </div>
 
       <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
-        <div class="folder__name"
-             v-if="!isEditing"
-             @click="onToggleFolder">
+        <div
+          v-if="!isEditing"
+          class="folder__name"
+          @click="onToggleFolder">
           {{ name }}
         </div>
+
+        <!-- Renaming Folders -->
         <input
           v-if="isEditing"
           autofocus
@@ -39,22 +43,24 @@
           :value="name"
           :disabled="isRenaming"
           @blur="onInputBlur"
-          @keydown="onKeyDown"
-        />
+          @keydown="onKeyDown" />
       </div>
 
       <button
         class="folder__option btn btn-link p-0 shadow-0"
         :class="{ 'folder__option--hide': isEditing }"
         :data-popper-target="'folder-' + id"
-        :id="'folder-option-' + id"
+        :id="folderId"
+        :ref="folderId"
       >
         <folder-option></folder-option>
       </button>
     </div>
 
+    <!-- Creating Folders -->
     <tree-folder-create
       v-if="isCreatingFolder"
+      :endpoint="endpoint"
       :layer="layer + 1"
       :parent_id="id"
       @blur="onCloseFolder"
@@ -71,12 +77,15 @@
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
         :layer="layer + 1"
+        :endpoint="endpoint"
       ></tree-folder-contents>
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
+        :endpoint="endpoint"
+        :folder-id="id"
       ></tree-list-contents>
     </div>
 
@@ -87,6 +96,8 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
       :isRootList="isRootList"
+      :endpoint="endpoint"
+      :folder-id="id"
     ></tree-list-contents>
 
     <b-popover
@@ -94,8 +105,8 @@
       placement="bottomright"
       boundary="window"
       custom-class="contact-popover"
-      :target="'folder-option-' + id"
-    >
+      :target="folderId">
+      <!-- v-if="$refs[folderId] !== undefined"> -->
       <folder-actions
         :id="id"
         :hasEdit="hasEdit"
@@ -164,6 +175,11 @@ export default {
 
     order: {
       type: Number
+    },
+
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
     }
   },
 
@@ -204,6 +220,11 @@ export default {
         (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
         (this.createList.open && this.createList.folderId === this.id)
       )
+    },
+
+    folderId () {
+      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-option-${module}-${this.id}`
     }
   },
 
@@ -238,6 +259,10 @@ export default {
 
     onCreateFolderCancel () {
       this.onCloseFolder()
+    },
+
+    onCloseFolder () {
+      this.isCreatingFolder = false
     },
 
     onKeyDown (evt) {
@@ -278,6 +303,7 @@ export default {
       this.isRenaming = true
 
       return this.updateFolderRequest(this.id, { name, order: this.order }).then(response => {
+        this.$generalNotification('Folder updated.')
         this.reloadFolders()
       }).finally(() => {
         this.$nextTick(() => {
@@ -289,7 +315,7 @@ export default {
 
     updateFolderRequest (id, params) {
       return this.$axios
-        .patch('/api/v2/contact-folders/' + id, params)
+        .patch(`${this.endpoint}/${id}`, params)
         .catch((error) => {
           const {
             message,
@@ -302,7 +328,7 @@ export default {
 
     reloadFolders () {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(this.endpoint)
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -333,10 +359,6 @@ export default {
 
     onToggleFolder () {
       this.toggleFolder(this.id)
-    },
-
-    onCloseFolder () {
-      this.isCreatingFolder = false
     }
   },
 

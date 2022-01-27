@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    id="create-contact-modal"
+    :id="id"
     size="lg"
     modal-class="confirm-dialog br-8"
     hide-header-close
@@ -156,6 +156,13 @@ export default {
 
   mixins: [ formValidationMixin ],
 
+  props: {
+    id: {
+      type: String,
+      default: 'create-contact-modal'
+    }
+  },
+
   components: { UserSelector, LineSelector, TagSelector },
 
   computed: {
@@ -236,6 +243,7 @@ export default {
       }
       this.isCreating = true
       return talk2Api.V1.contact.create(this.contact).then(res => {
+        this.$generalNotification('Contact created.')
         this.$emit('created', res.data)
         this.onReset()
         this.isCreating = false

@@ -6,7 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, agentMixin, userMixin } from '../../boot/mixins'
+import { aclMixin, agentMixin, userMixin, notificationMixin } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
@@ -15,7 +15,7 @@ import * as CommunicationCurrentStatus from '../../constants/communication-curre
 export default {
   name: 'dialer',
 
-  mixins: [aclMixin, agentMixin, userMixin],
+  mixins: [aclMixin, agentMixin, userMixin, notificationMixin],
 
   data () {
     return {
@@ -92,7 +92,6 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
-      this.$closeActionNotification('incomingCall')
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
@@ -134,10 +133,8 @@ export default {
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
-        let name = this.dialer.communication.contact.name ? this.dialer.communication.contact.name : this.$options.filters.fixPhone(this.dialer.communication.contact.phone_number)
-        this.$actionNotification(name, this.dialer.communication.contact.company_name, null, null, 'incomingCall', null, null, true)
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
-        //   console.log(err)
+        //   console.log(err)s
         // })
       }).catch((err) => {
         console.log(err)
@@ -147,7 +144,6 @@ export default {
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.$closeActionNotification('incomingCall')
       this.backToDial()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
@@ -187,7 +183,6 @@ export default {
         .catch((err) => {
           console.log(err)
         })
-      this.$closeActionNotification('incomingCall')
 
       // close the dialer form when it's open and incoming call is answered
       if (this.dialerFormStatus) {
@@ -251,11 +246,11 @@ export default {
     this.$VueEvent.listen('answerCall', () => {
       this.answerCall()
       this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
     })
 
     this.$VueEvent.listen('rejectCall', () => {
       this.rejectCall()
-      this.$closeActionNotification('incomingCall')
     })
 
     this.$VueEvent.listen('sendDigit', (data) => {
@@ -282,6 +277,20 @@ export default {
       this.parkCall()
     })
 
+    this.$VueEvent.listen('hangupAndAnswerCall', () => {
+      this.answerCall()
+      this.$nextTick(() => {
+        this.parkCall()
+      })
+    })
+
+    this.$VueEvent.listen('parkAndAnswerCall', () => {
+      this.answerCall()
+      this.$nextTick(() => {
+        this.parkCall()
+      })
+    })
+
     this.$VueEvent.listen('unparkCall', () => {
       this.unparkCall()
     })
@@ -292,6 +301,10 @@ export default {
 
     this.$VueEvent.listen('dropThirdParty', () => {
       this.dropThirdParty()
+    })
+
+    this.$VueEvent.listen('answerCallFishing', (data) => {
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
     })
 
     this.$VueEvent.listen('setInputDevice', (inputDevice) => {
@@ -484,6 +497,7 @@ export default {
 
       this.setDialerCurrentStatus('ANSWERING_CALL')
       this.setShowIncomingCallNotification(false)
+      this.clearDialerCallFishing()
 
       if (this.device.activeConnection()) {
         // accept the incoming connection and start two-way audio
@@ -661,6 +675,90 @@ export default {
       console.log('Unhold is in progress.')
     },
 
+    unparkCommunication (parkedCallData, preventClear = false) {
+      this.loadingUnpark = true
+
+      if (!preventClear) {
+        this.setDialerParkedCall()
+      }
+
+      let data = {
+        currentNumber: 'unhold:' + parkedCallData.id,
+        outboundCampaignId: parkedCallData.campaign_id,
+        contactName: (parkedCallData.contact) ? parkedCallData.contact.name : '',
+        companyName: (parkedCallData.contact) ? parkedCallData.contact.company_name : '',
+        contactId: parkedCallData.contact_id
+      }
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+      this.loadingUnpark = false
+      console.log('Unhold is in progress.')
+    },
+
+    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || (!shouldUnpark && this.dialer.parkedCall)) {
+        return
+      }
+      this.loadingPark = true
+      this.setDialerParkedCall(this.dialer.communication)
+      let params = {
+        communication_id: this.dialer.communication.id
+      }
+      this.$axios.post('/api/v1/dialer/park', params).then(() => {
+        console.log('Call parked')
+        if (shouldAnswer) {
+          this.makeCall('call:' + data.id, data.campaignId)
+        }
+
+        if (shouldUnpark) {
+          this.unparkCommunication(data, true)
+        }
+
+        this.setDialerIsMuted(false)
+      }).catch(err => {
+        this.setDialerParkedCall()
+        console.log(err)
+      }).finally(_ => {
+        this.loadingPark = false
+      })
+    },
+
+    hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+      if (!this.dialer.call) {
+        return
+      }
+
+      console.log('Hanging up call')
+
+      this.setDialerCurrentStatus('HANGING_UP_CALL')
+
+      if (this.device.activeConnection()) {
+        // hangup an incoming call
+        this.device.activeConnection().hangup()
+
+        let counter = 0
+        let hangupInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.backToDial()
+
+            switch (true) {
+              case shouldUnpark:
+                this.unparkCommunication(data)
+                break
+              case shouldAnswer:
+                this.makeCall('call:' + data.id, data.campaignId)
+                break
+            }
+            clearInterval(hangupInterval)
+          }
+
+          counter++
+          if (counter > 120) {
+            clearInterval(hangupInterval)
+          }
+        }, 500)
+      }
+    },
+
     mergeCalls () {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
@@ -786,7 +884,6 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(true)
-      this.$closeActionNotification('incomingCall')
     },
 
     countCallDuration () {
@@ -975,6 +1072,39 @@ export default {
       }
     },
 
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      let parkedCall = null
+
+      // store temporarily the parked call
+      if (this.dialer.parkedCall) {
+        parkedCall = JSON.parse(JSON.stringify(this.dialer.parkedCall))
+      }
+
+      // park the in-progress call
+      if (shouldPark && !parkedCall) {
+        this.parkCallCombo(true, false, communication)
+        return
+      }
+
+      // park the in-progress call (switch from already parked call)
+      if (shouldPark && parkedCall) {
+        this.parkCallCombo(false, true, parkedCall)
+        return
+      }
+
+      if (shouldHangup && parkedCall) {
+        this.hangupCallCombo(false, true, parkedCall)
+        return
+      }
+
+      if (shouldHangup && !parkedCall) {
+        this.hangupCallCombo(true, false, communication)
+        return
+      }
+
+      this.makeCall('call:' + communication.id, communication.campaignId)
+    },
+
     ...mapActions([
       'setDialerToken',
       'setDialerCall',
@@ -1022,6 +1152,7 @@ export default {
     this.$VueEvent.stop('forceRefreshCommunication')
     this.$VueEvent.stop('parkCall')
     this.$VueEvent.stop('unparkCall')
+    this.$VueEvent.stop('answerCallFishing')
     this.$VueEvent.stop('mergeCalls')
     this.$VueEvent.stop('dropThirdParty')
     this.$VueEvent.stop('setInputDevice')
@@ -1029,6 +1160,7 @@ export default {
     this.$VueEvent.stop('testOutputDevice')
     this.$VueEvent.stop('initializeSettings')
     clearInterval(this.$options.callDurationInterval)
+    clearInterval(this.$options.wrapUpDurationInterval)
   }
 }
 </script>
