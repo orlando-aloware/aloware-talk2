@@ -1,9 +1,9 @@
 <template>
   <q-select
-    class="padded-container generic-selector"
+    class="padded-container"
     options-selected-class="text-primary"
     ref="warmupPeriod"
-    :options="warmUpPeriods"
+    :options="warmups"
     option-label="text"
     option-value="value"
     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
@@ -17,7 +17,7 @@
 
 <script>
 
-import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'WarmupPeriodSelector',
@@ -37,6 +37,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('powerDialer', [
+      'warmupDurations'
+    ]),
     localValue: {
       get () {
         return `${this.modelValue || 0}`
@@ -45,17 +48,21 @@ export default {
         this.$emit('change', val)
       }
     },
-    warmUpPeriods () {
+    warmups () {
       let values = []
-      values = [WARM_UP_PERIOD_LIST]
-      for (let i = 1; i <= 10; i++) {
+      this.warmupDurations.forEach(w => {
         values.push({
-          text: `${i * 5} seconds`,
-          value: i * 5
+          text: w === 0 ? 'No Warm Up' : `${w} seconds`,
+          value: w
         })
-      }
+      })
       return values
     }
+  },
+  async mounted () {
+    console.log('...Preparing sessions...')
+    let res = await this.getWarmupDurations()
+    console.log('666 :>> ', res)
   },
   data () {
     return {
@@ -63,6 +70,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'getWarmupDurations'
+    ]),
     onShowWarmUpMenu () {
       this.selectWidth = this.$refs.warmupPeriod.$el.offsetWidth
     }
