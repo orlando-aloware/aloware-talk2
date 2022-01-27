@@ -51,14 +51,31 @@
           <q-card-section
             style="width: 26% !important">
             <p class="text-weight-bold px-2">Session Settings</p>
-            <q-btn
+            <!-- <q-btn
               unelevated no-caps
               class="px-2 mt-3 full-width"
               color="grey-3"
               text-color="black"
               align="left">
               Create New
-            </q-btn>
+            </q-btn> -->
+
+            <q-list
+              dense
+              bordered
+              padding
+              style="display:contents;"
+              class="mt-3">
+              <q-item
+                class="px-2"
+                clickable>
+                <q-item-section>Create New</q-item-section>
+                <q-item-section side>
+                  <CheckIcon />
+                </q-item-section>
+              </q-item>
+            </q-list>
+
             <q-list
               dense
               bordered
@@ -239,12 +256,14 @@
 import { mapGetters, mapActions } from 'vuex'
 import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
+import CheckIcon from 'components/icons/check-o-icon'
 
 export default {
   name: 'StartDialsSessionsSettings',
   components: {
     SessionsForm,
-    PhoneIcon
+    PhoneIcon,
+    CheckIcon
   },
   computed: {
     ...mapGetters('powerDialer', [
@@ -258,7 +277,6 @@ export default {
     }
   },
   async mounted () {
-    console.log('8888 :>> ', 8888)
     await this.setSessionSettingGroup()
   },
   data () {
@@ -281,9 +299,6 @@ export default {
       }
     }
   },
-  // mounted () {
-  //   console.log('666 :>> ', 666)
-  // },
   methods: {
     ...mapActions('powerDialer', [
       'setSessionSettingGroup'
