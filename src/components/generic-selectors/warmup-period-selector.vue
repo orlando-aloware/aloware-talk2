@@ -9,7 +9,7 @@
     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
     v-model="localValue"
     :emit-value="true"
-    :display-value="`${localValue} seconds`"
+    :display-value="`${localValue === '0' || localValue === 0 ? 'No Warm Up' : localValue + ' seconds'}`"
     outlined
     @popup-show="onShowWarmUpMenu">
   </q-select>
@@ -39,7 +39,7 @@ export default {
   computed: {
     localValue: {
       get () {
-        return this.modelValue
+        return `${this.modelValue || 0}`
       },
       set (val) {
         this.$emit('change', val)

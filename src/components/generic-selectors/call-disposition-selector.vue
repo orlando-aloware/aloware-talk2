@@ -96,7 +96,7 @@ export default {
 
   data () {
     return {
-      callDispositionId: !_.isEmpty(this.value) ? this.value : null,
+      callDispositionId: !_.isEmpty(this.value) ? this.value : this.multiple ? [] : null,
       callDispositionsOptions: [],
       selectWidth: 0
     }

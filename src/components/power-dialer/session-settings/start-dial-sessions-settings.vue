@@ -66,9 +66,8 @@
               style="display:contents;"
               class="mt-3">
               <template
-                v-for="t in resources">
+                v-for="t in groupedSettings">
                 <q-item
-                  v-if="t.type === 'label'"
                   :key="t.value">
                   <q-item-section class="p-0">
                     <div class="text-grey px-2 pt-3 text-uppercase text-caption">
@@ -76,48 +75,54 @@
                     </div>
                   </q-item-section>
                 </q-item>
-                <q-item
-                  v-else
-                  @click="loadSettings"
-                  @mouseenter="t.hovered = true"
-                  @mouseleave="t.hovered = false"
-                  :key="t.value"
-                  clickable
-                  v-ripple>
-                  <q-item-section class="px-2 mr-2">
-                    {{ t.label }}
-                  </q-item-section>
-                  <q-item-section
-                    side>
-                    <q-btn :disable="!t.hovered" size="sm" class="m-1" round flat color="grey" :label="`${t.hovered ? '...' : ''}`">
-                      <q-menu
-                        @mouseenter="t.hovered = true"
-                        @mouseleave="t.hovered = false"
-                        anchor="top right"
-                        self="top left">
-                        <q-list style="min-width: 100px">
-                          <q-item dense clickable v-close-popup>
-                            <q-item-section class="px-3">
-                              <div>
-                                <i class="fa fa-pencil-alt mr-2"></i>
-                                Rename
-                              </div>
-                            </q-item-section>
-                          </q-item>
-                          <q-item dense clickable v-close-popup>
-                            <q-item-section class="px-3">
-                              <div class="text-red">
-                                <i class="fa fa-trash-alt mr-2"></i>
-                                Delete
-                              </div>
-                            </q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-btn>
-                    <!-- <q-btn v-else size="xs" class="m-1" round flat color="grey"></q-btn> -->
-                  </q-item-section>
-                </q-item>
+                <template
+                  v-if="fetchedGroupSettings(t.name).length > 0">
+                  <q-item
+                    v-for="(f, fk) in fetchedGroupSettings(t.name)"
+                    :key="fk"
+                    @click="loadSettings"
+                    @mouseenter="f.hovered = true"
+                    @mouseleave="f.hovered = false"
+                    clickable
+                    v-ripple>
+                    <q-item-section class="px-2 mr-2">
+                      {{ f.name }}
+                    </q-item-section>
+                    <q-item-section
+                      side>
+                      <q-btn :disable="!f.hovered" size="sm" class="m-1" round flat color="grey" :label="`${f.hovered ? '...' : ''}`">
+                        <q-menu
+                          @mouseenter="f.hovered = true"
+                          @mouseleave="f.hovered = false"
+                          anchor="top right"
+                          self="top left">
+                          <q-list style="min-width: 100px">
+                            <q-item dense clickable v-close-popup>
+                              <q-item-section class="px-3">
+                                <div>
+                                  <i class="fa fa-pencil-alt mr-2"></i>
+                                  Rename
+                                </div>
+                              </q-item-section>
+                            </q-item>
+                            <q-item dense clickable v-close-popup>
+                              <q-item-section class="px-3">
+                                <div class="text-red">
+                                  <i class="fa fa-trash-alt mr-2"></i>
+                                  Delete
+                                </div>
+                              </q-item-section>
+                            </q-item>
+                          </q-list>
+                        </q-menu>
+                      </q-btn>
+                      <!-- <q-btn v-else size="xs" class="m-1" round flat color="grey"></q-btn> -->
+                    </q-item-section>
+                  </q-item>
+                </template>
+                <div v-else :key="t.name">
+                  <span class="px-2 text-grey text-caption text-italic">No saved settings</span>
+                </div>
               </template>
             </q-list>
           </q-card-section>
@@ -194,7 +199,7 @@
           <div class="text-subtitle1 text-bold text-grey-8">Save New Session Settings</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
+        <q-card-section class="q-pt-none pt-3">
           <q-input outlined v-model="newSettingObj.name" placeholder="New Settings Name" />
         </q-card-section>
 
@@ -231,6 +236,7 @@
 
 <script>
 
+import { mapGetters, mapActions } from 'vuex'
 import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 
@@ -241,10 +247,19 @@ export default {
     PhoneIcon
   },
   computed: {
+    ...mapGetters('powerDialer', [
+      'personalSessionSettings',
+      'companySessionSettings',
+      'sessionSettingGroups'
+    ]),
     tabCollections () {
       let items = this.tabHeaders.filter(i => i.disabled === false)
-      return items.concat(this.resources)
+      return items.concat(this.groupedSettings)
     }
+  },
+  async mounted () {
+    console.log('8888 :>> ', 8888)
+    await this.setSessionSettingGroup()
   },
   data () {
     return {
@@ -254,15 +269,9 @@ export default {
         { label: 'Session Settings', name: 'session-settings', disabled: true, type: 'title' },
         { label: 'Create New', name: 'create-new', disabled: false, type: 'button' }
       ],
-      resources: [
-        { label: 'Saved', name: 'personal', disabled: true, hovered: false, type: 'label' },
-        { label: 'HVAC Sales', name: 'personal-hvac-sales', disabled: false, hovered: false, type: 'link' },
-        { label: 'Warm Leads', name: 'personal-warm-leads', disabled: false, hovered: false, type: 'link' },
-        { label: 'Cold Leads', name: 'personal-cold-leads', disabled: false, hovered: false, type: 'link' }
-        // { label: 'Company', name: 'company', disabled: true, hovered: false, type: 'label' },
-        // { label: 'HVAC Sales', name: 'company-hvac-sales', disabled: false, hovered: false, type: 'link' },
-        // { label: 'Warm Leads', name: 'company-warm-leads', disabled: false, hovered: false, type: 'link' },
-        // { label: 'Cold Leads', name: 'company-cold-leads', disabled: false, hovered: false, type: 'link' }
+      groupedSettings: [
+        { label: 'Personal', name: 'personal', disabled: true, hovered: false, type: 'label' },
+        { label: 'Company', name: 'company', disabled: true, hovered: false, type: 'label' }
       ],
       disabled: true,
       loading: false,
@@ -276,6 +285,9 @@ export default {
   //   console.log('666 :>> ', 666)
   // },
   methods: {
+    ...mapActions('powerDialer', [
+      'setSessionSettingGroup'
+    ]),
     dialPreparation () {
       this.dialog = true
     },
@@ -289,6 +301,9 @@ export default {
       setTimeout(() => {
         this.loading = false
       }, 1000)
+    },
+    fetchedGroupSettings (type) {
+      return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
     }
   }
 }

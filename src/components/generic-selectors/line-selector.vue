@@ -127,7 +127,7 @@ export default {
 
   data () {
     return {
-      campaignId: this.value,
+      campaignId: this.value || null,
       campaignOptions: [],
       selectWidth: 0
     }
