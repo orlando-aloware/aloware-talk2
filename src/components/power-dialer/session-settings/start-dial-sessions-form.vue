@@ -84,7 +84,7 @@
             v-else
             v-model="resources[cform.name]"
             :options="[]"
-            class="generic-selector"
+            class="generic-selector-2"
             outlined dense />
 
         </div>
@@ -95,7 +95,7 @@
 
 <script>
 
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import MetricSelector from 'components/generic-selectors/session-metric-selector'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
@@ -106,7 +106,7 @@ import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { METRIC_OPTIONS_3 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import { isEmpty } from 'lodash'
+// import { isEmpty } from 'lodash'
 
 const stats = { METRIC_OPTIONS_3 }
 
@@ -152,10 +152,10 @@ export default {
       return SESSION_SETTINGS_ALL_FORMS
     }
   },
-  mounted () {
-    console.log('...Preparing sessions...')
-  },
   methods: {
+    ...mapActions('powerDialer', [
+      'getWarmupDurations'
+    ]),
     onLineFilterChange (value, prop) {
       this.resources.line = value
       // this.filter[prop] = value
@@ -178,7 +178,7 @@ export default {
   watch: {
     resources: {
       handler (val) {
-        if (val?.line?.toString().length > 0 && !isEmpty(val.warmupPeriod)) {
+        if (val?.line?.toString().length > 0 && val?.warmupPeriod?.toString().length > 0) {
           this.$emit('valid-form', true)
         } else {
           this.$emit('invalid-form', true)
@@ -193,7 +193,7 @@ export default {
       resources: {
         line: '',
         skipOutsideDaytimeHours: true,
-        warmupPeriod: '',
+        warmupPeriod: 0,
         phoneScript: '',
         setSessionMetrics: '',
         setCallDispostionShortcuts: [],
