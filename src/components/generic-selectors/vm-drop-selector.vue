@@ -4,7 +4,7 @@
             :placeholder="placeholderText"
             :loading="loadingVmDrops"
             :disable="disable || loadingVmDrops"
-            :class="[ prepend ? 'with-prepend' : '', genericSelector ? 'padded-container generic-selector' : '', highlighted ? highlightedClass : '' ]"
+            :class="[ prepend ? 'with-prepend' : '', genericSelector ? 'padded-container' : '', highlighted ? highlightedClass : '' ]"
             :multiple="multiple"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
