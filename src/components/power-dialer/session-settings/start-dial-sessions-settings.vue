@@ -69,9 +69,10 @@
               <q-item
                 class="px-2"
                 clickable>
-                <q-item-section>Create New</q-item-section>
+                <q-item-section
+                  @click="selectedItem = 'Untitled'">Untitled</q-item-section>
                 <q-item-section side>
-                  <CheckIcon />
+                  <CheckIcon v-if="selectedItem === 'Untitled'" />
                 </q-item-section>
               </q-item>
             </q-list>
@@ -97,17 +98,24 @@
                   <q-item
                     v-for="(f, fk) in fetchedGroupSettings(t.name)"
                     :key="fk"
-                    @click="loadSettings"
+                    @click="loadSettings(f)"
                     @mouseenter="f.hovered = true"
                     @mouseleave="f.hovered = false"
                     clickable
-                    v-ripple>
-                    <q-item-section class="px-2 mr-2">
+                    v-ripple
+                    class="px-2">
+                    <q-item-section class="mr-2">
                       {{ f.name }}
                     </q-item-section>
                     <q-item-section
+                      v-if="!f.hovered"
                       side>
-                      <q-btn :disable="!f.hovered" size="sm" class="m-1" round flat color="grey" :label="`${f.hovered ? '...' : ''}`">
+                      <CheckIcon v-if="selectedItem === f.name" />
+                    </q-item-section>
+                    <q-item-section
+                      v-if="f.hovered"
+                      side>
+                      <q-btn :disable="!f.hovered" size="xs" class="m-0" round flat color="grey" :label="`${f.hovered ? '...' : ''}`">
                         <q-menu
                           @mouseenter="f.hovered = true"
                           @mouseleave="f.hovered = false"
@@ -155,7 +163,7 @@
                 <div class="col-12">
                   <q-card flat class="p-0">
                     <q-card-actions class="px-0">
-                      <div>Unsaved Settings</div>
+                      <div>{{ selectedItem }}</div>
                       <q-space />
                       <q-btn
                         unelevated
@@ -296,7 +304,8 @@ export default {
       newSetting: false,
       newSettingObj: {
         name: ''
-      }
+      },
+      selectedItem: 'Untitled'
     }
   },
   methods: {
@@ -312,6 +321,7 @@ export default {
     },
     loadSettings (data) {
       this.loading = true
+      this.selectedItem = data.name
       console.log('Loading session settings from API call...')
       setTimeout(() => {
         this.loading = false
