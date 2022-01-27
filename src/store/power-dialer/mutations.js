@@ -72,5 +72,10 @@ export default {
   },
   SET_FILTERED_ENDPOINT: (state, endpoint) => {
     state.filteredEndpoint = endpoint
+  },
+  SET_SESSION_SETTING_GROUPS: (state, data) => {
+    console.log('data to mutate :>> ', data)
+    state.sessionSettingGroups.personal = data.personal
+    state.sessionSettingGroups.company = data.company
   }
 }

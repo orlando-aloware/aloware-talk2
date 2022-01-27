@@ -153,6 +153,18 @@ export default function () {
       setVmDropShortcuts: ''
     },
     changingSelectedContact: false,
-    activeFilter: ''
+    activeFilter: '',
+    sessionSettingGroups: {
+      personal: [
+        { name: 'Personal Sales', id: 1 },
+        { name: 'Leads 101', id: 2 },
+        { name: 'Leads 203', id: 3 }
+      ],
+      company: [
+        { name: 'HVAC Sales', id: 4 },
+        { name: 'Warm Leads', id: 5 },
+        { name: 'Cold Leads', id: 6 }
+      ]
+    }
   }
 }
