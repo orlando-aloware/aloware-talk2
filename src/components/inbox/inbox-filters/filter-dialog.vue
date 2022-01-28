@@ -14,14 +14,14 @@
 
     <div class="modal-body-wrapper d-flex">
       <div class="left-column-wrapper">
-        <span class="filter-type-description">{{ channelFilterName }}</span>
+        <span class="filter-type-description">{{ channelFilterName }} Filters</span>
 
         <div class="mt-5">
           <div class="mb-4">
             <div class="filter-items cursor-pointer text-italic"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>Create New</span>
+              <span>Untitled</span>
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
@@ -58,8 +58,8 @@
       </div>
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <div>
-            <span class="filter-name">{{ selectedFilter ? selectedFilter.name : '(Unsaved) Filter' }}</span>
+          <div class="w-100 text-center">
+            <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
           </div>
           <compact-btn class="border-0"
                        @clicked="onHide">
@@ -147,7 +147,7 @@ export default {
       switch (true) {
         case !this.$route.params.channel && this.$route.name === 'Inbox':
         case ['inbox'].includes(this.$route.params.channel):
-          return 'Communications'
+          return 'Inbox'
         case ['messages'].includes(this.$route.params.channel):
           return 'Messages'
         case ['voicemails'].includes(this.$route.params.channel):

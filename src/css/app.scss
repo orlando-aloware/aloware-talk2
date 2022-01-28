@@ -7124,7 +7124,7 @@ table.datatable {
     .filter-group-title,
     .filter-type-description,
     .empty-filter-placeholder {
-      padding: 7px 12px;
+      //padding: 7px 12px;
     }
 
     .saved-filters {
@@ -7142,6 +7142,12 @@ table.datatable {
 
   .q-toggle {
     margin-left: -10px !important;
+  }
+
+  .comm-owner-filter-tooltip-wrapper {
+    position: absolute;
+    top: -1px;
+    right: 48%;
   }
 }
 

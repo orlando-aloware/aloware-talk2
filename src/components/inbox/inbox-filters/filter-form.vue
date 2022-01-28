@@ -240,7 +240,7 @@
           <b-form-row class="mt-2">
             <b-col sm="12"
                    md="6"
-                   v-if="!['mentions', 'inbox'].includes($route.params.channel)">
+                   v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
               <b-form-group class="form-label"
                             label="Phone Numbers">
                 <incoming-number-selector v-model="filter.incoming_numbers"
@@ -255,7 +255,25 @@
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
-                            label="Users">
+                            label="Communication Owners">
+                <div class="comm-owner-filter-tooltip-wrapper">
+                  <information-circle-icon color="#2F80ED">
+                  </information-circle-icon>
+                  <q-tooltip  anchor="top middle"
+                              self="center middle">
+                    <p class="font-weight-bold">Who is the communication owner?</p>
+                    <p class="font-weight-bold mb-0">For outbound communication:</p>
+                    <p class="mb-0">Calls, SMS, fax & emails:</p>
+                    <p><ul><li>The agent that sent the communication</li></ul></p>
+
+                    <p class="font-weight-bold mb-0">For inbound communication:</p>
+                    <p class="mb-0">Calls:</p>
+                    <p><ul><li>The agent that answered the call</li></ul></p>
+
+                    <p class="mb-0">SMS, fax & email:</p>
+                    <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
+                  </q-tooltip>
+                </div>
                 <user-selector v-model="filter.users"
                                :generic-styling="false"
                                :multiple="true"
@@ -267,7 +285,7 @@
             </b-col>
             <b-col  sm="12"
                     md="6"
-                    v-if="!['mentions', 'inbox'].includes($route.params.channel)">
+                    v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector v-model="filter.workflows"
@@ -379,8 +397,8 @@ export default {
       endDate: new Date(),
       myContacts: false,
       last_engagement_date_range: {
-        startDate: window.moment('2015-01-01')._d,
-        endDate: window.moment()._d
+        startDate: null, // window.moment('2015-01-01')._d,
+        endDate: null // window.moment()._d
       },
       opens: 'right',
       ranges: { // default value for ranges object (if you set this to false ranges will no be rendered)
@@ -391,7 +409,7 @@ export default {
         // 'Last 30 Days': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
         // 'This month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
         // 'Last month': [window.moment().subtract(1, 'month').startOf('month')._d, window.moment().subtract(1, 'month').endOf('month')._d],
-        'All Time': [window.moment('2015-01-01')._d, window.moment()._d]
+        'All Time': [null, null]
       }
     }
   },
@@ -427,10 +445,8 @@ export default {
     last_engagement_date_range: {
       deep: true,
       handler () {
-        this.filter.last_engagement_date = {
-          start: this.last_engagement_date_range.startDate ? window.moment(this.last_engagement_date_range.startDate).format('YYYY-MM-DD') : null,
-          end: this.last_engagement_date_range.endDate ? window.moment(this.last_engagement_date_range.endDate).format('YYYY-MM-DD') : null
-        }
+        this.filter.from_date = this.last_engagement_date_range.startDate ? window.moment(this.last_engagement_date_range.startDate).format('YYYY-MM-DD') : null
+        this.filter.to_date = this.last_engagement_date_range.endDate ? window.moment(this.last_engagement_date_range.endDate).format('YYYY-MM-DD') : null
       }
     },
     myContacts: function (value) {
