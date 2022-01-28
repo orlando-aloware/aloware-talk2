@@ -530,7 +530,7 @@ export default {
         return
       }
 
-      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW && !this.profile.sleep_mode) {
         this.processActionNotification(communication, 'missed call')
       }
 
