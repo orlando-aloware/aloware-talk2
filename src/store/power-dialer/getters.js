@@ -46,5 +46,6 @@ export default {
   sessionSettings: (state) => state.sessionSettings,
   personalSessionSettings: (state) => state.sessionSettingGroups.personal,
   companySessionSettings: (state) => state.sessionSettingGroups.company,
-  sessionSettingGroups: (state) => state.sessionSettingGroups
+  sessionSettingGroups: (state) => state.sessionSettingGroups,
+  warmupDurations: (state) => state.warmupDurations
 }

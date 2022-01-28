@@ -44,12 +44,18 @@
         flat
         style="width: 800px; max-width: 90vw; min-height: 500px;"
         class="my-card py-2 px-2">
-
+        <!-- <q-bar class="bg-white">
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar> -->
         <q-card-section
           class="p-0"
           horizontal>
           <q-card-section
-            style="width: 26% !important">
+            style="width: 26% !important"
+            class="p-0 pt-2 pr-2">
             <p class="text-weight-bold px-2">Session Settings</p>
             <!-- <q-btn
               unelevated no-caps
@@ -70,7 +76,7 @@
                 class="px-2"
                 clickable>
                 <q-item-section
-                  @click="selectedItem = 'Untitled'">Untitled</q-item-section>
+                  @click="loadSettings('Untitled')">Untitled</q-item-section>
                 <q-item-section side>
                   <CheckIcon v-if="selectedItem === 'Untitled'" />
                 </q-item-section>
@@ -103,19 +109,28 @@
                     @mouseleave="f.hovered = false"
                     clickable
                     v-ripple
-                    class="px-2">
+                    class="px-2 py-0"
+                    :disable="loading">
                     <q-item-section class="mr-2">
                       {{ f.name }}
                     </q-item-section>
                     <q-item-section
                       v-if="!f.hovered"
                       side>
-                      <CheckIcon v-if="selectedItem === f.name" />
+                      <CheckIcon
+                        v-if="selectedItem === f.name"
+                        class="mr-2" />
                     </q-item-section>
                     <q-item-section
                       v-if="f.hovered"
                       side>
-                      <q-btn :disable="!f.hovered" size="xs" class="m-0" round flat color="grey" :label="`${f.hovered ? '...' : ''}`">
+                      <q-btn
+                        :disable="!f.hovered"
+                        size="md"
+                        class="m-0"
+                        round flat outline dense
+                        color="grey">
+                        <i class="fa fa-ellipsis-h"></i>
                         <q-menu
                           @mouseenter="f.hovered = true"
                           @mouseleave="f.hovered = false"
@@ -155,7 +170,7 @@
           <q-separator vertical />
 
           <q-card-section
-            class="px-0"
+            class="px-0 py-0"
             style="width: 72% !important"
             :disabled="loading">
             <q-card flat>
@@ -186,6 +201,13 @@
                         size="sm"
                         class="px-3 py-0"
                         color="success">Begin Dialing</q-btn>
+                      <q-btn
+                        @click="test"
+                        unelevated
+                        no-caps
+                        size="sm"
+                        class="px-3 py-0"
+                        color="success">Test</q-btn>
                     </q-card-actions>
                   </q-card>
                 </div>
@@ -310,7 +332,9 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'setSessionSettingGroup'
+      'setSessionSettingGroup',
+      'getDialerSessionSettings',
+      'getSessionSetting'
     ]),
     dialPreparation () {
       this.dialog = true
@@ -319,16 +343,31 @@ export default {
       this.dialog = false
       this.$emit('start')
     },
-    loadSettings (data) {
+    async loadSettings (data) {
       this.loading = true
-      this.selectedItem = data.name
-      console.log('Loading session settings from API call...')
+      if (data?.id) {
+        this.selectedItem = data.name
+      } else {
+        this.selectedItem = data
+      }
+      await this.getSessionSetting(data.id)
       setTimeout(() => {
         this.loading = false
       }, 1000)
     },
     fetchedGroupSettings (type) {
       return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
+    },
+    async test () {
+      let res = await this.$axios.get('/api/v2/dialer-sessions')
+      console.log('res :>> ', res)
+    }
+  },
+  watch: {
+    async dialog (val) {
+      if (val) {
+        await this.getDialerSessionSettings()
+      }
     }
   }
 }

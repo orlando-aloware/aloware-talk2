@@ -60,9 +60,7 @@ export default {
     }
   },
   async mounted () {
-    console.log('...Preparing sessions...')
-    let res = await this.getWarmupDurations()
-    console.log('666 :>> ', res)
+    await this.getWarmupDurations()
   },
   data () {
     return {
