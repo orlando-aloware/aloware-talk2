@@ -142,7 +142,31 @@ export default function () {
     // contact: null,
     sessionLoader: false,
     sessionSidebarExpanded: false,
+    sessionSettings: {
+      line: [],
+      skipOutsideDaytimeHours: true,
+      warmupPeriod: 0,
+      phoneScript: '',
+      setSessionMetrics: '',
+      setCallDispostionShortcuts: [],
+      setContactDispostionShortcuts: '',
+      setVmDropShortcuts: ''
+    },
+    dialerSessionSettings: [],
     changingSelectedContact: false,
-    activeFilter: ''
+    activeFilter: '',
+    sessionSettingGroups: {
+      personal: [
+        { name: 'Personal Sales', id: 1 },
+        { name: 'Leads 101', id: 2 },
+        { name: 'Leads 203', id: 3 }
+      ],
+      company: [
+        { name: 'HVAC Sales', id: 4 },
+        { name: 'Warm Leads', id: 5 },
+        { name: 'Cold Leads', id: 6 }
+      ]
+    },
+    warmupDurations: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
   }
 }

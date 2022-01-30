@@ -3789,12 +3789,12 @@ span.mention {
 
 .generic-selector {
   margin-bottom: 0;
-  height: 32px !important;
+  height: 40px !important;
   font-size: $f-size-body-xs !important;
 
   .q-field__control {
-    min-height: 32px !important;
-    height: 32px !important;
+    min-height: 40px !important;
+    height: 40px !important;
     border-radius: 6px;
 
     &:before {
@@ -3805,7 +3805,7 @@ span.mention {
 
   .q-field__prepend {
     padding-left: 10px;
-    height: 32px !important;
+    height: 40px !important;
   }
 
   .q-field__native {
@@ -3828,12 +3828,12 @@ span.mention {
   }
 
   .q-field__control-container {
-    height: 32px !important;
+    height: 40px !important;
   }
 
   .q-field__native {
-    min-height: 32px !important;
-    height: 32px !important;
+    min-height: 40px !important;
+    height: 40px !important;
     line-height: 16px !important;
   }
 
@@ -3843,7 +3843,7 @@ span.mention {
   }
 
   .q-field__append {
-    height: 32px !important;
+    height: 40px !important;
   }
 }
 
@@ -10341,4 +10341,17 @@ screen and (max-width: 956px) {
   .message-text:not(.has-ring-group) {
     max-width: 162px;
   }
+}
+
+.border-radius-1 {
+  border-radius: 5px;
+}
+.border-radius-2 {
+  border-radius: 10px;
+}
+.border-radius-3 {
+  border-radius: 15px;
+}
+.border-radius-4 {
+  border-radius: 20px;
 }

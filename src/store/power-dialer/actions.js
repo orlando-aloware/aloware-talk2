@@ -92,5 +92,84 @@ export default {
     }).catch((err) => {
       return err
     })
+  },
+  async getWarmupDurations ({ commit }) {
+    return window.axios.get(
+      `/api/v2/dialer-sessions/warmup-durations`
+    ).then(res => {
+      return res.data
+    }).catch(err => {
+      return err
+    })
+  },
+  async createSessionSettings ({ commit }, params = {}) {
+    return window.$axios.post(`api/v2/power-dialer-sessions`,
+      params
+    ).then((res) => {
+      commit('SET_WARMUP_DURATIONS', res.data)
+    }).catch((err) => {
+      return err
+    })
+  },
+  async getDialerSessionSettings ({ commit }) {
+    return window.axios.get(
+      `/api/v2/dialer-sessions`
+    ).then(res => {
+      commit('SET_DIALER_SESSION_SETTINGS', res.data)
+    }).catch(err => {
+      return err
+    })
+  },
+  async getSessionSetting ({ commit }, id = '') {
+    return window.axios.get(
+      `/api/v2/dialer-sessions/${id}`
+    ).then(res => {
+      console.log('Individual Setting :>> ', res)
+      // commit('SET_DIALER_SESSION_SETTINGS', res.data)
+      return res.data
+    }).catch(err => {
+      return err
+    })
+  },
+  async updateateSessionSettings ({ commit }, params = {}) {
+    return window.$axios.patch(`api/v2/power-dialer-sessions/${params.id}`,
+      params
+    ).then((res) => {
+      return res
+    }).catch((err) => {
+      return err
+    })
+  },
+  async setSessionSettingGroup ({ commit }, params = {}) {
+    commit('SET_SESSION_SETTING_GROUPS', {
+      personal: [
+        // { name: 'Personal Sales', id: 1, disabled: true, hovered: false },
+        // { name: 'Leads 101', id: 2, disabled: true, hovered: false }
+      ],
+      company: [
+        // { name: 'HVAC Sales', id: 4 },
+        // { name: 'Warm Leads', id: 5 },
+        // { name: 'Cold Leads', id: 6 }
+      ]
+    })
+    // return window.$axios.get(`api/v2/power-dialer-session-settings`,
+    //   params
+    // ).then((res) => {
+    //   commit('SET_SESSION_SETTING_GROUPS', {
+    //     personal: [
+    //       { name: 'Personal Sales', id: 1 },
+    //       { name: 'Leads 101', id: 2 },
+    //       { name: 'Leads 203', id: 3 }
+    //     ],
+    //     company: [
+    //       { name: 'HVAC Sales', id: 4 },
+    //       { name: 'Warm Leads', id: 5 },
+    //       { name: 'Cold Leads', id: 6 }
+    //     ]
+    //   })
+    //   return res
+    // }).catch((err) => {
+    //   return err
+    // })
   }
 }

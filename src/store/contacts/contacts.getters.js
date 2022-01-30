@@ -72,5 +72,6 @@ export default {
   searchedPdItem: (state) => state.searchedPdItem,
   unsavedList: (state) => state.unsavedList,
   activeFolder: (state) => state.activeFolder,
-  removedFolder: (state) => state.removedFolder
+  removedFolder: (state) => state.removedFolder,
+  clearList: (state) => state.clearList
 }

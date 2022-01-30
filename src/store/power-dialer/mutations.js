@@ -72,5 +72,25 @@ export default {
   },
   SET_FILTERED_ENDPOINT: (state, endpoint) => {
     state.filteredEndpoint = endpoint
+  },
+  SET_SESSION_SETTING_GROUPS: (state, data) => {
+    state.sessionSettingGroups.personal = data.personal
+    state.sessionSettingGroups.company = data.company
+  },
+  SET_DIALER_SESSION_SETTINGS: (state, data) => {
+    let personal = []
+    let company = []
+    data.forEach(d => {
+      if (d.is_company_scope === 0) {
+        personal.push(d)
+      } else {
+        company.push(d)
+      }
+    })
+    state.sessionSettingGroups.personal = personal
+    state.sessionSettingGroups.company = company
+  },
+  SET_WARMUP_DURATIONS: (state, data) => {
+    state.warmupDurations = data
   }
 }

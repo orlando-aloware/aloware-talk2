@@ -42,5 +42,10 @@ export default {
     }
     return 'in-queue'
   },
-  filteredEndpoint: (state) => state.filteredEndpoint
+  filteredEndpoint: (state) => state.filteredEndpoint,
+  sessionSettings: (state) => state.sessionSettings,
+  personalSessionSettings: (state) => state.sessionSettingGroups.personal,
+  companySessionSettings: (state) => state.sessionSettingGroups.company,
+  sessionSettingGroups: (state) => state.sessionSettingGroups,
+  warmupDurations: (state) => state.warmupDurations
 }

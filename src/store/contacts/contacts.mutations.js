@@ -378,5 +378,8 @@ export default {
   },
   SET_ACTIVE_FOLDER: (state, value) => {
     state.activeFolder = value
+  },
+  CLEAR_LIST: (state) => {
+    state.clearList = !state.clearList
   }
 }

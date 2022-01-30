@@ -37,7 +37,6 @@ export default {
     }
   },
   async mounted () {
-    console.log('555 :>> ', 555)
     this.resetSearch()
     await this.fetchResources()
   },
@@ -81,7 +80,7 @@ export default {
     },
     'objId': async function (val) {
       if (val.name === 'Power Dialer') {
-        await this.fetchResources()
+        // await this.fetchResources()
       }
     }
   }

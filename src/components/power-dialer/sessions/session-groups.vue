@@ -46,15 +46,16 @@
                 <div class="text-13">
                   {{ group.name }}
                   <q-chip size="xs" square class="p-0">
-                    99
-                  </q-chip> </div>
+                    {{ totalCount(key) }}
+                  </q-chip>
+                </div>
               </q-item-section>
             </template>
 
             <q-card class="t-cards">
               <q-list class="px-2 pb-2">
                 <template
-                  v-for="(item, i) in list">
+                  v-for="(item, i) in filteredList(group.status)">
                   <q-item
                     :key="`acc-item-${i}`"
                     :class="{ active: item.id === activeList.id && group.name === 'In Progress' }"
@@ -134,6 +135,7 @@ import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 
 export default {
   name: 'SessionGroups',
@@ -144,7 +146,7 @@ export default {
   },
   async mounted () {
     // this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
-    await this.getContact({ id: this.activeList.id })
+    await this.getContact({ id: this.activeList?.id })
   },
   computed: {
     ...mapGetters('powerDialer', [
@@ -153,17 +155,18 @@ export default {
       'sessionLoader'
     ]),
     ...mapGetters('contacts', [
-      'contact'
+      'contact',
+      'selectedList',
+      'listItems'
     ]),
     list () {
-      return this.listObject.data || []
+      return this.listItems[this.selectedList.id].data || []
     },
     activeList () {
-      if (!this.flagged) {
-        return this.list[0]
-      } else {
-        return this.contact
+      if (!this.list.length) {
+        return {}
       }
+      return this.list[0]
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
@@ -184,12 +187,36 @@ export default {
     },
     onLeave () {
       this.$refs.dropdown.visible = false
+    },
+    filteredList (key = '') {
+      if (!key) {
+        return this.list
+      }
+      return this.list.filter(lst => {
+        return lst.task_status === AutoDialTaskStatus[key]
+      })
+    },
+    totalCount (key = '') {
+      if (!key) return ''
+      let detail = this.listItems[this.selectedList.id]
+      switch (key) {
+        case AutoDialTaskStatus.STATUSES.called:
+          return detail.total_called
+        case AutoDialTaskStatus.STATUSES.failed:
+          return detail.total_failed
+        case AutoDialTaskStatus.STATUSES.in_queue:
+          return detail.total_queued
+        case AutoDialTaskStatus.STATUSES.scheduled:
+          return detail.total_scheduled
+        default:
+          return detail.total
+      }
     }
   },
   watch: {
     async list () {
       this.flagged = false
-      await this.getContact({ id: this.activeList.id })
+      await this.getContact({ id: this.activeList?.id })
       this.flagged = true
     },
     contact (obj) {

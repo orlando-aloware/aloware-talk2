@@ -9,7 +9,7 @@
         {{ form.label }}
       </label>
       <div
-        class="row">
+        class="row pb-4">
         <div
           v-for="cform in form.children"
           :key="cform.name"
@@ -28,7 +28,7 @@
           <LineSelector
             v-else-if="cform.name === 'line'"
             v-model="resources[cform.name]"
-            :multiple="true"
+            :multiple="false"
             :use-chips="true"
             :generic-styling="false"
             :generic-multiselect="false"
@@ -37,7 +37,7 @@
           <ScriptSelector
             v-else-if="cform.name === 'phoneScript'"
             v-model="resources[cform.name]"
-            :communication="true"
+            :communication="contact"
             class="w-100"></ScriptSelector>
 
           <CallDispositionSelector
@@ -45,7 +45,9 @@
             v-model="resources[cform.name]"
             :multiple="false"
             :highlighted="isChanged('call_dispositions')"
-            @change="{}"></CallDispositionSelector>
+            @change="{}"
+            class="pb-3">
+          </CallDispositionSelector>
 
           <ContactDispositionSelector
             v-else-if="cform.name === 'setContactDispostionShortcuts'"
@@ -55,8 +57,9 @@
             :use-chips="false"
             :outlined="true"
             :show-placeholder="false"
-            custom-class="generic-selector"
-            @change="{}">
+            custom-class="padded-container generic-selector"
+            @change="{}"
+            class="pb-3">
           </ContactDispositionSelector>
 
           <VmDropSelector
@@ -81,7 +84,7 @@
             v-else
             v-model="resources[cform.name]"
             :options="[]"
-            class="generic-selector"
+            class="generic-selector-2"
             outlined dense />
 
         </div>
@@ -92,7 +95,7 @@
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import MetricSelector from 'components/generic-selectors/session-metric-selector'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
@@ -103,6 +106,7 @@ import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { METRIC_OPTIONS_3 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
+// import { isEmpty } from 'lodash'
 
 const stats = { METRIC_OPTIONS_3 }
 
@@ -127,6 +131,9 @@ export default {
     ...mapState('inbox', [
       'channelChangedFilterFields'
     ]),
+    ...mapGetters('contacts', [
+      'contact'
+    ]),
     metricOptions () {
       if (stats) {
         return stats.METRIC_OPTIONS_3
@@ -146,6 +153,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'getWarmupDurations'
+    ]),
     onLineFilterChange (value, prop) {
       this.resources.line = value
       // this.filter[prop] = value
@@ -165,13 +175,25 @@ export default {
       this.selectWidth = this.$refs.warmupPeriod[0].$el.offsetWidth
     }
   },
+  watch: {
+    resources: {
+      handler (val) {
+        if (val?.line?.toString().length > 0 && val?.warmupPeriod?.toString().length > 0) {
+          this.$emit('valid-form', true)
+        } else {
+          this.$emit('invalid-form', true)
+        }
+      },
+      deep: true
+    }
+  },
   data () {
     return {
       selectWidth: 0,
       resources: {
-        line: [],
-        skipOutsideDaytimeHours: '',
-        warmupPeriod: '',
+        line: '',
+        skipOutsideDaytimeHours: true,
+        warmupPeriod: 0,
         phoneScript: '',
         setSessionMetrics: '',
         setCallDispostionShortcuts: [],
