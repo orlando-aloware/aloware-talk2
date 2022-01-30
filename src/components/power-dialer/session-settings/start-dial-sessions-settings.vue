@@ -55,7 +55,7 @@
           horizontal>
           <q-card-section
             style="width: 26% !important"
-            class="p-0 pt-2 pr-2">
+            class="p-0 pt-2 pr-2 border-right">
             <p class="text-weight-bold px-2">Session Settings</p>
             <!-- <q-btn
               unelevated no-caps
@@ -73,10 +73,11 @@
               style="display:contents;"
               class="mt-3">
               <q-item
-                class="px-2"
+                :class="`px-2 border-radius-1 ${selectedItem === 'Untitled' ? 'bg-grey-70' : ''}`"
+                :disable="loading"
                 clickable>
                 <q-item-section
-                  @click="loadSettings('Untitled')">Untitled</q-item-section>
+                  @click="loadSettings('Untitled')">New Setting</q-item-section>
                 <q-item-section side>
                   <CheckIcon v-if="selectedItem === 'Untitled'" />
                 </q-item-section>
@@ -104,36 +105,33 @@
                   <q-item
                     v-for="(f, fk) in fetchedGroupSettings(t.name)"
                     :key="fk"
-                    @click="loadSettings(f)"
-                    @mouseenter="f.hovered = true"
-                    @mouseleave="f.hovered = false"
+                    @click.native.prevent="loadSettings(f)"
+                    @mouseenter="hovered = f.id"
                     clickable
                     v-ripple
-                    class="px-2 py-0"
+                    :class="`px-2 py-0 border-radius-1 ${selectedItem === f.name ? 'bg-grey-70' : ''}`"
                     :disable="loading">
                     <q-item-section class="mr-2">
                       {{ f.name }}
                     </q-item-section>
                     <q-item-section
-                      v-if="!f.hovered"
+                      v-if="!hovered"
                       side>
                       <CheckIcon
                         v-if="selectedItem === f.name"
                         class="mr-2" />
                     </q-item-section>
                     <q-item-section
-                      v-if="f.hovered"
+                      @click.native.stop="{}"
+                      v-if="hovered"
                       side>
                       <q-btn
-                        :disable="!f.hovered"
                         size="md"
                         class="m-0"
                         round flat outline dense
                         color="grey">
                         <i class="fa fa-ellipsis-h"></i>
                         <q-menu
-                          @mouseenter="f.hovered = true"
-                          @mouseleave="f.hovered = false"
                           anchor="top right"
                           self="top left">
                           <q-list style="min-width: 100px">
@@ -167,11 +165,11 @@
             </q-list>
           </q-card-section>
 
-          <q-separator vertical />
+          <!-- <q-separator vertical /> -->
 
           <q-card-section
             class="px-0 py-0"
-            style="width: 72% !important"
+            style="width: 74% !important"
             :disabled="loading">
             <q-card flat>
               <div class="row">
@@ -323,6 +321,8 @@ export default {
       ],
       disabled: true,
       loading: false,
+      hovered: '',
+      hoveredMenu: '',
       newSetting: false,
       newSettingObj: {
         name: ''

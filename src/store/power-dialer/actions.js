@@ -126,6 +126,7 @@ export default {
     ).then(res => {
       console.log('Individual Setting :>> ', res)
       // commit('SET_DIALER_SESSION_SETTINGS', res.data)
+      return res.data
     }).catch(err => {
       return err
     })
