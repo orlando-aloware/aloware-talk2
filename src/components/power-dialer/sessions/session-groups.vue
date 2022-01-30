@@ -63,7 +63,7 @@
 
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
-                        {{ avatarName(item.first_name) }}
+                        {{ avatarName(item.first_name, item.last_name) }}
                       </q-avatar>
                     </div>
 
@@ -179,8 +179,8 @@ export default {
     chipped (data) {
       return data.length || 0
     },
-    avatarName (name) {
-      return name[0]
+    avatarName (fname, lname) {
+      return `${fname?.[0]}${lname?.[0]}`
     },
     onOver () {
       this.$refs.dropdown.visible = true

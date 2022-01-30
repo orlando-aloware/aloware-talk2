@@ -4,7 +4,7 @@
       <q-item class="active t-expansion-panel px-2">
         <div class="py-2">
           <q-avatar size="30px" color="grey">
-            {{ avatarName(firstname) }}
+            {{ avatarName(firstname, lastname) }}
           </q-avatar>
         </div>
 
@@ -56,8 +56,8 @@ export default {
     }
   },
   methods: {
-    avatarName (name) {
-      return name
+    avatarName (fname, lname) {
+      return `${fname?.[0]}${lname?.[0]}`
     }
   }
 }
