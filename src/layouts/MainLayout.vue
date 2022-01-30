@@ -392,6 +392,55 @@ export default {
       })
     }
 
+    // new in-app contact assigned notification
+    // this.$VueEvent.listen('new_in_app_contact_assigned', (contact) => {
+    //   if (this.checkContactMatchesUserAccessibility(contact) && !this.profile.sleep_mode) {
+    //     this.handleInAppContactNotification(contact)
+    //   }
+    // })
+
+    // new in-app appointment notification
+    // this.$VueEvent.listen('new_in_app_appointment', ({engagement, contact, time_diff, unit}) => {
+    //   if (!this.profile.sleep_mode) {
+    //     this.handleInAppAppointmentNotification(engagement, contact, time_diff, unit)
+    //   }
+    // })
+
+    // new in-app reminder notification
+    // this.$VueEvent.listen('new_in_app_reminder', ({engagement, contact, time_diff, unit}) => {
+    //   if (!this.profile.sleep_mode) {
+    //     this.handleInAppReminderNotification(engagement, contact, time_diff, unit)
+    //   }
+    // })
+
+    // new in-app call notification
+    this.$VueEvent.listen('new_in_app_call', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'call')
+      }
+    })
+
+    // new in-app sms notification
+    this.$VueEvent.listen('new_in_app_sms', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'sms')
+      }
+    })
+
+    // new in-app voicemail notification
+    this.$VueEvent.listen('new_in_app_voicemail', (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        this.processActionNotification(communication, 'missed voicemail')
+      }
+    })
+
+    // new in-app fax notification
+    // this.$VueEvent.listen('new_in_app_fax', (communication) => {
+    //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+    //     this.handleInAppCommunicationNotification(communication)
+    //   }
+    // })
+
     // new desktop contact assigned notification
     this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
       if (this.checkContactMatchesUserAccessibility(contact)) {
@@ -438,8 +487,7 @@ export default {
     // new desktop call notification
     this.$VueEvent.listen('new_desktop_call', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopCommunicationNotification(communication)
-        this.processActionNotification(communication, 'call')
+        this.handleDesktopCommunicationNotification(communication)
       }
     })
 
@@ -453,8 +501,7 @@ export default {
     // new desktop sms notification
     this.$VueEvent.listen('new_desktop_sms', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopCommunicationNotification(communication)
-        this.processActionNotification(communication, 'sms')
+        this.handleDesktopCommunicationNotification(communication)
       }
     })
 
@@ -468,8 +515,7 @@ export default {
     // new desktop voicemail notification
     this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // this.handleDesktopVoicemailNotification(communication)
-        this.processActionNotification(communication, 'missed voicemail')
+        this.handleDesktopVoicemailNotification(communication)
       }
     })
 
@@ -484,7 +530,7 @@ export default {
         return
       }
 
-      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW && !this.profile.sleep_mode) {
         this.processActionNotification(communication, 'missed call')
       }
 
@@ -492,6 +538,7 @@ export default {
       // or current status is not queued / ring all, close call notification
       if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW || ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        this.closeDesktopNotification(communication.id)
       }
     })
 
@@ -579,14 +626,12 @@ export default {
       this.setEnableAudio(true)
     }
 
-    if (this.$q.platform.is.electron) {
-      console.log('Push permission: ' + window.Push.Permission.get())
-      if (
-        !window.Push.Permission.has() &&
-        window.Push.Permission.get() !== window.Push.Permission.DENIED
-      ) {
-        window.Push.Permission.request()
-      }
+    console.log('Push permission: ' + window.Push.Permission.get())
+    if (
+      !window.Push.Permission.has() &&
+      window.Push.Permission.get() !== window.Push.Permission.DENIED
+    ) {
+      window.Push.Permission.request()
     }
 
     this.resizeHandler()
@@ -1142,13 +1187,13 @@ export default {
     },
 
     setBadge (text) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('set_badge', text)
       }
     },
 
     bounceDock () {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('bounce', 'informational')
       }
     },
@@ -1170,7 +1215,7 @@ export default {
         window.Push.Permission.has() &&
         !this.communicationNotifiedDesktop.includes(communication.id)
       ) {
-        // this.communicationNotifiedDesktop.push(communication.id)
+        this.communicationNotifiedDesktop.push(communication.id)
         let self = this
         let title = ''
         let icon = ''
@@ -1202,7 +1247,7 @@ export default {
           title = 'Answered Incoming Call'
         }
 
-        const onClickFunction = function (res) {
+        const onClickFunction = (res) => {
           window.focus()
           this.close()
           self.decreaseAppBadge()
@@ -1482,13 +1527,13 @@ export default {
     },
 
     increaseAppBadge (count = 1) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('increase_badge', count)
       }
     },
 
     decreaseAppBadge (count = 1) {
-      if (this.$q.platform.is.electron) {
+      if (this.$q.platform.is.electron && !this.$q.platform.is.win) {
         this.$q.electron.ipcRenderer.send('decrease_badge', count)
       }
     },
@@ -1546,6 +1591,14 @@ export default {
       // more than 1084 or less than 605 pixels
       if (width > 1084 || width < 605) {
         this.setContactDetailsDrawer(false)
+      }
+    },
+
+    closeDesktopNotification (communicationId) {
+      let notification = this.communicationNotifiedDesktop.find(notification => notification.communication_id === communicationId)
+      if (notification) {
+        notification.dismiss()
+        this.communicationNotifiedDesktop = this.communicationNotifiedDesktop.filter(notification => notification.communication_id !== communicationId)
       }
     },
 

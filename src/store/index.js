@@ -1099,7 +1099,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.callFishingQueue.find(queue => queue.communicationId === value)
+        let found = state.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === value)
 
         if (found) {
           state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)

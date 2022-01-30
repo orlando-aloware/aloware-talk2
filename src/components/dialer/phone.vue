@@ -181,7 +181,8 @@
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
                v-if="(dialer.call && dialer.call.direction === 'INCOMING') || dialer.callFishing.communication">
-            <div class="d-flex flex-column align-items-center">
+            <div class="d-flex flex-column align-items-center"
+                 v-if="dialer.call !== undefined">
               <q-btn class="height-52"
                      ripple
                      round
@@ -192,6 +193,19 @@
                 </cancel-call-icon>
               </q-btn>
               <span class="text-size-xs mt-1">Decline</span>
+            </div>
+            <div class="d-flex flex-column align-items-center"
+                 v-if="dialer.callFishing.communication !== undefined">
+              <q-btn class="height-52"
+                     ripple
+                     round
+                     no-caps
+                     @click="rejectCall">
+                <ignore-call-icon width="52"
+                                  height="52">
+                </ignore-call-icon>
+              </q-btn>
+              <span class="text-size-xs mt-1">Ignore</span>
             </div>
 
             <div class="d-flex flex-column align-items-center">
@@ -1206,11 +1220,13 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
 import CopyIcon from 'components/icons/copy-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 
 export default {
   name: 'phone',
 
   components: {
+    IgnoreCallIcon,
     CopyIcon,
     MergeIcon,
     WaitingIcon,
@@ -1538,7 +1554,7 @@ export default {
         return false
       }
 
-      return this.dialer && this.dialer.communication
+      return this.dialer && !_.isEmpty(this.dialer.communication)
     },
     iconSizes () {
       return {

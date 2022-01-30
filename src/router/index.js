@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes'
-
+import VueGtagEsm from 'vue-gtag'
 Vue.use(VueRouter)
 
 // This listener will execute before router.beforeEach only if registered
@@ -57,6 +57,14 @@ export default function ({ store }) {
       path: to.path
     })
   })
+
+  if (process.env.APP_ENV === 'production') {
+    Vue.use(VueGtagEsm, {
+      config: {
+        id: process.env.GA_TRACKING_ID
+      }
+    }, Router)
+  }
 
   return Router
 }
