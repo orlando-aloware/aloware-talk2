@@ -155,7 +155,9 @@ export default {
       'sessionLoader'
     ]),
     ...mapGetters('contacts', [
-      'contact'
+      'contact',
+      'listItems',
+      'selectedList'
     ]),
     address () {
       if (this.contact?.cnam_city && !this.contact?.cnam_state) {
@@ -166,9 +168,9 @@ export default {
         return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`
       }
     },
-    // listObject () {
-    //   return this.powerDialerListItems[this.currentList?.id]
-    // },
+    listObject () {
+      return this.listItems[this.selectedList?.id]
+    },
     list () {
       return this.listObject.data || []
     },
@@ -225,6 +227,9 @@ export default {
         this.statuses.mute = val
       }
     }
+  },
+  mounted () {
+    this.TOGGLE_SESSION_LOADER(false)
   },
   methods: {
     ...mapActions('powerDialer', [

@@ -57,6 +57,7 @@
                 <template
                   v-for="(item, i) in filteredList(group.status)">
                   <q-item
+                    v-if="contact.id !== item.id"
                     :key="`acc-item-${i}`"
                     :class="{ active: item.id === activeList.id && group.name === 'In Progress' }"
                     class="t-expansion-panel px-2">
@@ -226,15 +227,8 @@ export default {
     }
   },
   watch: {
-    contact (obj) {
-      if (obj.id) {
-        this.flagged = true
-      } else {
-        this.flagged = false
-      }
-    },
     async activeList (val) {
-      this.flagged = false
+      this.flagged = true
       await this.getContact({ id: this.activeList?.id })
       this.makeACall()
       this.flagged = true

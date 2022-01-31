@@ -447,9 +447,9 @@ export default {
       'SET_LIST_SELECTED_CONTACTS',
       'START_DIAL_TOGGLE'
     ]),
-    ...mapActions('inbox', [
-      'setSelectedContact'
-    ]),
+    // ...mapActions('inbox', [
+    //   'setSelectedContact'
+    // ]),
     ...mapActions('contacts', [
       'setContact',
       'columnsOpen',
@@ -471,7 +471,7 @@ export default {
 
     beginDial () {
       this.START_DIAL_TOGGLE(true)
-      this.setSelectedContact({})
+      // this.setSelectedContact({})
       this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.selectedList.id}/sessions`)
     },
