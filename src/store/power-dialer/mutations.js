@@ -89,6 +89,9 @@ export default {
     })
     state.sessionSettingGroups.personal = personal
     state.sessionSettingGroups.company = company
+  }, // sessionSettings
+  SET_SESSION_SETTINGS: (state, data) => {
+    state.sessionSettings = data
   },
   SET_WARMUP_DURATIONS: (state, data) => {
     state.warmupDurations = data

@@ -124,8 +124,7 @@ export default {
     return window.axios.get(
       `/api/v2/dialer-sessions/${id}`
     ).then(res => {
-      console.log('Individual Setting :>> ', res)
-      // commit('SET_DIALER_SESSION_SETTINGS', res.data)
+      commit('SET_SESSION_SETTINGS', res.data)
       return res.data
     }).catch(err => {
       return err
