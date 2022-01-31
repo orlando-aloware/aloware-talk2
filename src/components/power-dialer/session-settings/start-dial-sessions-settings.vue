@@ -107,6 +107,7 @@
                     :key="fk"
                     @click.native.prevent="loadSettings(f)"
                     @mouseenter="hovered = f.id"
+                    @mouseleave="toggleSelected"
                     clickable
                     v-ripple
                     :class="`px-2 py-0 border-radius-1 ${selectedItem === f.name ? 'bg-grey-70' : ''}`"
@@ -129,32 +130,32 @@
                         size="md"
                         class="m-0"
                         round flat outline dense
-                        color="grey">
+                        color="grey"
+                        @click="hoveredMenu = f.id">
                         <i class="fa fa-ellipsis-h"></i>
-                        <q-menu
-                          anchor="top right"
-                          self="top left">
-                          <q-list style="min-width: 100px">
-                            <q-item dense clickable v-close-popup>
-                              <q-item-section class="px-3">
-                                <div>
-                                  <i class="fa fa-pencil-alt mr-2"></i>
-                                  Rename
-                                </div>
-                              </q-item-section>
-                            </q-item>
-                            <q-item dense clickable v-close-popup>
-                              <q-item-section class="px-3">
-                                <div class="text-red">
-                                  <i class="fa fa-trash-alt mr-2"></i>
-                                  Delete
-                                </div>
-                              </q-item-section>
-                            </q-item>
-                          </q-list>
-                        </q-menu>
                       </q-btn>
-                      <!-- <q-btn v-else size="xs" class="m-1" round flat color="grey"></q-btn> -->
+                      <q-menu
+                        anchor="top right"
+                        self="top left">
+                        <q-list style="min-width: 100px">
+                          <q-item dense clickable v-close-popup>
+                            <q-item-section class="px-3">
+                              <div>
+                                <i class="fa fa-pencil-alt mr-2"></i>
+                                Rename
+                              </div>
+                            </q-item-section>
+                          </q-item>
+                          <q-item dense clickable v-close-popup>
+                            <q-item-section class="px-3">
+                              <div class="text-red">
+                                <i class="fa fa-trash-alt mr-2"></i>
+                                Delete
+                              </div>
+                            </q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
                     </q-item-section>
                   </q-item>
                 </template>
@@ -297,6 +298,7 @@ export default {
     ...mapGetters('powerDialer', [
       'personalSessionSettings',
       'companySessionSettings',
+      'sessionSettings',
       'sessionSettingGroups'
     ]),
     tabCollections () {
@@ -305,7 +307,7 @@ export default {
     }
   },
   async mounted () {
-    await this.setSessionSettingGroup()
+    // await this.setSessionSettingGroup()
   },
   data () {
     return {
@@ -351,9 +353,7 @@ export default {
         this.selectedItem = data
       }
       await this.getSessionSetting(data.id)
-      setTimeout(() => {
-        this.loading = false
-      }, 1000)
+      this.loading = false
     },
     fetchedGroupSettings (type) {
       return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
@@ -361,6 +361,13 @@ export default {
     async test () {
       let res = await this.$axios.get('/api/v2/dialer-sessions')
       console.log('res :>> ', res)
+    },
+    toggleSelected () {
+      if (this.hoveredMenu) {
+        // console.log('201 :>> ', 201)
+      } else {
+        this.hovered = ''
+      }
     }
   },
   watch: {

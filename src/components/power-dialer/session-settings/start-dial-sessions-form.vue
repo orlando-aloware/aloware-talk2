@@ -127,6 +127,10 @@ export default {
     VmDropSelector,
     CallDispositionSelector
   },
+  mounted () {
+    // Temporary disabled
+    // this.resourceObj = this.sessionSettings
+  },
   computed: {
     ...mapState('inbox', [
       'channelChangedFilterFields'
@@ -134,6 +138,26 @@ export default {
     ...mapGetters('contacts', [
       'contact'
     ]),
+    ...mapGetters('powerDialer', [
+      'sessionSettings'
+    ]),
+    resourceObj: {
+      get () {
+        return this.resources
+      },
+      set (obj) {
+        let { resources } = this
+        resources.line = ''
+        resources.skipOutsideDaytimeHours = obj.skip_outside_daytime_hours === 1
+        resources.warmupPeriod = obj.warmup_period_in_seconds || 0
+        resources.phoneScript = obj.script_id || ''
+        resources.setSessionMetrics = ''
+        resources.setCallDispostionShortcuts = obj.call_disposition_ids || []
+        resources.setContactDispostionShortcuts = obj.contact_disposition_ids || []
+        resources.setVmDropShortcuts = ''
+        return resources
+      }
+    },
     metricOptions () {
       if (stats) {
         return stats.METRIC_OPTIONS_3
