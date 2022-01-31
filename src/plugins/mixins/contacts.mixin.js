@@ -152,7 +152,6 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          console.log('data :>> ', data)
           this.contactsLoaded({
             id: this.id || 'all',
             append: false,
