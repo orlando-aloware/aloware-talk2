@@ -146,7 +146,6 @@ export default {
   },
   async mounted () {
     // this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
-    await this.getContact({ id: this.activeList?.id })
   },
   computed: {
     ...mapGetters('powerDialer', [
@@ -163,13 +162,16 @@ export default {
       return this.listItems[this.selectedList.id].data || []
     },
     activeList () {
-      if (!this.list.length) {
-        return {}
+      if (this.list.length) {
+        return this.list[0]
       }
-      return this.list[0]
+      return {}
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
+    },
+    test () {
+      return this.$options.filters.fixPhone(`power_dialer_task:${this.activeList?.id}`)
     }
   },
   methods: {
@@ -211,20 +213,31 @@ export default {
         default:
           return detail.total
       }
+    },
+    makeACall () {
+      let data = {
+        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeList?.id}`), // we know this already based on the list (Required)
+        outboundCampaignId: '535', // this.session.campaignId, // ID of the line that you are calling from (Required)
+        contactName: `${this.activeList.first_name} ${this.activeList.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
+        companyName: this.activeList.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
+        contactId: this.activeList.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
+      }
+      this.$VueEvent.fire('makeCall', data)
     }
   },
   watch: {
-    async list () {
-      this.flagged = false
-      await this.getContact({ id: this.activeList?.id })
-      this.flagged = true
-    },
     contact (obj) {
       if (obj.id) {
         this.flagged = true
       } else {
         this.flagged = false
       }
+    },
+    async activeList (val) {
+      this.flagged = false
+      await this.getContact({ id: this.activeList?.id })
+      this.makeACall()
+      this.flagged = true
     }
   },
   data () {
