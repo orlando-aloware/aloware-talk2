@@ -103,12 +103,12 @@ export default {
         this.filters = { ...this.filters, 'ring_groups': { value: this.filter.ring_groups, operator: 1 } }
       }
 
-      if (this.filter.last_engagement_date.start && this.filter.last_engagement_date.end) {
-        this.filters = { ...this.filters, 'last_engagement_date': { value: this.filter.last_engagement_date, operator: 1 } }
-      }
-
       if (this.filter.owner_id) {
         this.filters = { ...this.filters, 'owner_id': { value: this.filter.owner_id, operator: 1 } }
+      }
+
+      if (this.filter.from_date && this.filter.to_date) {
+        this.filters = { ...this.filters, 'from_date': { value: this.filter.from_date, operator: 1 }, 'to_date': { value: this.filter.to_date, operator: 1 } }
       }
 
       query.filters = this.filters

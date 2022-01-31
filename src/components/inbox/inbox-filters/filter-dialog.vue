@@ -21,7 +21,7 @@
             <div class="filter-items cursor-pointer text-italic"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>Untitled</span>
+              <span>New</span>
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
@@ -234,7 +234,10 @@ export default {
         'incoming_numbers',
         'users',
         'workflows',
-        'owner_id'
+        'owner_id',
+        'my_contacts',
+        'from_date',
+        'to_date'
       ]
     }
   },
@@ -448,6 +451,8 @@ export default {
         this.personalFilters.push(filter)
       }
     })
+
+    console.log(this.$route)
   }
 }
 </script>

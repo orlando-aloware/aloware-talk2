@@ -7,10 +7,10 @@
           <b-form-row class="mt-2">
             <b-col sm="12" md="6">
               <b-form-group
-                label="Last Engagement Date"
+                :label="dateRangeLabel"
                 class="form-label"
               >
-                <div class="last-engagement-tooltip-wrapper">
+                <div class="last-engagement-tooltip-wrapper" v-if="['Inbox Channel Task Status', 'Inbox'].includes($route.name)">
                   <information-circle-icon color="#2F80ED">
                   </information-circle-icon>
                   <q-tooltip  anchor="top middle"
@@ -28,7 +28,7 @@
                   :auto-apply="true"
                 >
                   <template v-slot:input="picker" style="min-width: 350px;">
-                    {{ getLastEngagementDateLabel(picker) }}
+                    {{ getDateRangeInputLabel(picker) }}
                   </template>
                 </date-range-picker>
               </b-form-group>
@@ -39,10 +39,10 @@
                 <b-form-checkbox
                   class="mt-1"
                   switch
-                  v-model="myContacts"
+                  v-model="filter.my_contacts"
                   :value="true"
                   :unchecked-value="false"
-                  @change="onSetUser"
+                  @change="(eventPayload) => onFilterChange(eventPayload, 'my_contacts')"
                 >
                 </b-form-checkbox>
               </b-form-group>
@@ -251,7 +251,7 @@
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'inbox'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'messages', 'mentions'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -308,6 +308,7 @@
                                :use-chips="false"
                                :highlighted="isChanged('owner_id')"
                                :clearable="true"
+                               :disable="disableContactOwner"
                                custom-placeholder="Contact owner"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
                 </user-selector>
@@ -388,14 +389,17 @@ export default {
 
   computed: {
     ...mapState('inbox', ['channelChangedFilterFields']),
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', ['profile']),
+    dateRangeLabel () {
+      return ['Inbox Channel Task Status', 'Inbox'].includes(this.$route.name) ? 'Last Engagement Date' : 'Time'
+    }
   },
 
   data () {
     return {
       startDate: new Date(),
       endDate: new Date(),
-      myContacts: false,
+      disableContactOwner: false,
       last_engagement_date_range: {
         startDate: null, // window.moment('2015-01-01')._d,
         endDate: null // window.moment()._d
@@ -428,19 +432,14 @@ export default {
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
     },
-    getLastEngagementDateLabel (data) {
+    getDateRangeInputLabel (data) {
       if (data.startDate && data.endDate) {
         return this.$options.filters.date(data.startDate) + ' - ' + this.$options.filters.date(data.endDate)
       }
       return 'All Time'
-    },
-    onSetUser () {
-      console.log(this.myContacts)
-      if (this.myContacts) {
-        this.filter.users = this.profile.id
-      }
     }
   },
+
   watch: {
     last_engagement_date_range: {
       deep: true,
@@ -449,17 +448,16 @@ export default {
         this.filter.to_date = this.last_engagement_date_range.endDate ? window.moment(this.last_engagement_date_range.endDate).format('YYYY-MM-DD') : null
       }
     },
-    myContacts: function (value) {
-      if (value) {
-        this.filter.users = this.profile.id
-      }
-    },
     filter: {
       deep: true,
-      handler (value) {
-        console.log(value.users)
+      handler () {
+        if (this.filter.my_contacts) {
+          this.filter.owner_id = null
+        }
+        this.disableContactOwner = this.filter.my_contacts
       }
     }
+
   }
 }
 </script>

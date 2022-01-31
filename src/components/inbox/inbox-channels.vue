@@ -277,7 +277,8 @@ export default {
             workflows: Filters.DEFAULT_STATE.filter.workflows,
             owner_id: Filters.DEFAULT_STATE.filter.owner_id,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contacts: Filters.DEFAULT_STATE.filter.my_contacts
           }
           break
         case ['calls'].includes(this.$route.params.channel):
@@ -300,7 +301,8 @@ export default {
             workflows: Filters.DEFAULT_STATE.filter.workflows,
             owner_id: Filters.DEFAULT_STATE.filter.owner_id,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contacts: Filters.DEFAULT_STATE.filter.my_contacts
           }
           break
         case ['recordings'].includes(this.$route.params.channel):
@@ -323,7 +325,8 @@ export default {
             workflows: Filters.DEFAULT_STATE.filter.workflows,
             owner_id: Filters.DEFAULT_STATE.filter.owner_id,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contacts: Filters.DEFAULT_STATE.filter.my_contacts
           }
           break
         case ['mentions'].includes(this.$route.params.channel):
@@ -350,7 +353,8 @@ export default {
             broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
             owner_id: Filters.DEFAULT_STATE.filter.owner_id,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contacts: Filters.DEFAULT_STATE.filter.my_contacts
           }
       }
 
