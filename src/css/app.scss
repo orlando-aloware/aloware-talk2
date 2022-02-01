@@ -10417,3 +10417,8 @@ screen and (max-width: 956px) {
     max-width: 162px;
   }
 }
+
+
+.daterange-picker-highlighted .reportrange-text {
+  border: 2px solid $primary !important;
+}

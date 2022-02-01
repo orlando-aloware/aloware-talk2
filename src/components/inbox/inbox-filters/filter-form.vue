@@ -20,8 +20,9 @@
                 </div>
 
                 <date-range-picker
-                  v-model="last_engagement_date_range"
+                  v-model="date_range"
                   ref="picker"
+                  :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
                   :opens="opens"
                   :ranges="ranges"
                   :always-show-calendars="false"
@@ -392,6 +393,9 @@ export default {
     ...mapState('auth', ['profile']),
     dateRangeLabel () {
       return ['Inbox Channel Task Status', 'Inbox'].includes(this.$route.name) ? 'Last Engagement Date' : 'Time'
+    },
+    dateHasChanges () {
+      return this.filter.from_date !== this.defaultFilterModel.filter.from_date || this.filter.to_date !== this.defaultFilterModel.filter.to_date
     }
   },
 
@@ -400,19 +404,12 @@ export default {
       startDate: new Date(),
       endDate: new Date(),
       disableContactOwner: false,
-      last_engagement_date_range: {
+      date_range: {
         startDate: null, // window.moment('2015-01-01')._d,
         endDate: null // window.moment()._d
       },
       opens: 'right',
-      ranges: { // default value for ranges object (if you set this to false ranges will no be rendered)
-        // 'Recent (Last 30 Days + Today)': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
-        // 'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
-        // 'Today': [window.moment()._d, window.moment()._d],
-        // 'Yesterday': [window.moment().subtract(1, 'days')._d, window.moment().subtract(1, 'days')._d],
-        // 'Last 30 Days': [window.moment().subtract(29, 'days')._d, window.moment().subtract(1, 'days')._d],
-        // 'This month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
-        // 'Last month': [window.moment().subtract(1, 'month').startOf('month')._d, window.moment().subtract(1, 'month').endOf('month')._d],
+      ranges: {
         'All Time': [null, null]
       }
     }
@@ -440,12 +437,27 @@ export default {
     }
   },
 
+  created () {
+    this.$watch(
+
+      // Evaluate the value including the two properties
+
+      () => [this.filter.from_date, this.filter.to_date],
+
+      // The type of value or oldValue is the array returned above
+
+      (value, oldValue) => {
+        this.date_range.startDate = value[0]
+        this.date_range.endDate = value[1]
+      })
+  },
+
   watch: {
-    last_engagement_date_range: {
+    date_range: {
       deep: true,
       handler () {
-        this.filter.from_date = this.last_engagement_date_range.startDate ? window.moment(this.last_engagement_date_range.startDate).format('YYYY-MM-DD') : null
-        this.filter.to_date = this.last_engagement_date_range.endDate ? window.moment(this.last_engagement_date_range.endDate).format('YYYY-MM-DD') : null
+        this.filter.from_date = this.date_range.startDate ? window.moment(this.date_range.startDate).format('YYYY-MM-DD') : null
+        this.filter.to_date = this.date_range.endDate ? window.moment(this.date_range.endDate).format('YYYY-MM-DD') : null
       }
     },
     filter: {
@@ -457,7 +469,6 @@ export default {
         this.disableContactOwner = this.filter.my_contacts
       }
     }
-
   }
 }
 </script>

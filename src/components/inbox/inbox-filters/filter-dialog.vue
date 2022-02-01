@@ -451,8 +451,6 @@ export default {
         this.personalFilters.push(filter)
       }
     })
-
-    console.log(this.$route)
   }
 }
 </script>
