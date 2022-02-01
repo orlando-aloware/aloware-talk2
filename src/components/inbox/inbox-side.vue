@@ -72,6 +72,7 @@ export default {
 
   computed: {
     ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts']),
+    ...mapState(['isMobile']),
 
     nextPage () {
       return this.currentPage + 1
@@ -95,6 +96,10 @@ export default {
   mounted () {
     if (this.isInboxTaskOpened && this.$q.screen.lt.md) {
       this.setShowContactsHeader(false)
+    }
+
+    if (this.isMobile && !this.$q.screen.lt.md) {
+      this.setShowContactsHeader(true)
     }
   },
 
@@ -149,6 +154,11 @@ export default {
         return
       }
       this.setShowContactsHeader(true)
+    },
+    isMobile () {
+      if (this.isMobile && !this.$q.screen.lt.md) {
+        this.setShowContactsHeader(true)
+      }
     }
   }
 }

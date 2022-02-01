@@ -9528,9 +9528,13 @@ screen and (max-width: 956px) {
 
 .mobile-phone-drawer {
   &:not(.mobile-phone-visible) {
+    height: 100%;
     .q-drawer__content {
       padding: 0 16px;
     }
+  }
+  &.mobile-phone-visible {
+    height: calc(100vh - 50px);
   }
   .phone-header-title {
     font-size: 34px;
@@ -10321,6 +10325,10 @@ screen and (max-width: 956px) {
   padding-top: 58px !important;
 }
 
+.pt-60 {
+  padding-top: 60px !important;
+}
+
 .contact-phone-number-search {
   .vbt-autcomplete-list{
     .list-group-item {
@@ -10341,4 +10349,14 @@ screen and (max-width: 956px) {
   .message-text:not(.has-ring-group) {
     max-width: 162px;
   }
+}
+
+.h-1-livebar {
+  height: calc(100vh - 21px);
+  min-height: unset !important;
+}
+
+.h-2-livebar {
+  height: calc(100vh - 46px);
+  min-height: unset !important;
 }
