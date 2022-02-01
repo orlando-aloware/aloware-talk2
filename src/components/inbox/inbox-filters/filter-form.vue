@@ -40,10 +40,10 @@
                 <b-form-checkbox
                   class="mt-1"
                   switch
-                  v-model="filter.my_contacts"
+                  v-model="filter.my_contact"
                   :value="true"
                   :unchecked-value="false"
-                  @change="(eventPayload) => onFilterChange(eventPayload, 'my_contacts')"
+                  @change="(eventPayload) => onFilterChange(eventPayload, 'my_contact')"
                 >
                 </b-form-checkbox>
               </b-form-group>
@@ -460,13 +460,15 @@ export default {
         this.filter.to_date = this.date_range.endDate ? window.moment(this.date_range.endDate).format('YYYY-MM-DD') : null
       }
     },
-    filter: {
+
+    'filter.my_contact': {
       deep: true,
-      handler () {
-        if (this.filter.my_contacts) {
-          this.filter.owner_id = null
+      handler (value) {
+        if (value) {
+          this.filter.owner_id = []
         }
-        this.disableContactOwner = this.filter.my_contacts
+
+        this.disableContactOwner = value
       }
     }
   }

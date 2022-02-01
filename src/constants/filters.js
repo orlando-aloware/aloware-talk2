@@ -39,7 +39,7 @@ export const DEFAULT_STATE = {
     broadcasts: [],
     mentioner_user_id: [],
     mentioned_user_id: [],
-    owner_id: null,
-    my_contacts: false
+    owner_id: [],
+    my_contact: false
   }
 }
