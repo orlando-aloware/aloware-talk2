@@ -303,8 +303,18 @@ export default {
 
     onApply () {
       this.resetChannelChangedFilterFields()
+
       for (const item in this.filter) {
-        if (JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && +this.filter[item] !== +this.defaultFilterModel.filter[item] && this.filterFields.includes(item)) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: +this.filter[item]
+          })
+
+          continue
+        }
+
+        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: this.filter[item]
@@ -348,7 +358,10 @@ export default {
 
       if (!filterObject) {
         this.filter = { ...this.defaultFilterModel.filter }
+      } else {
+        this.filter = { ...this.defaultFilterModel.filter, ...filterObject.filter }
       }
+
       this.applyFilter()
     },
 
@@ -424,6 +437,8 @@ export default {
       for (const prop in this.selectedFilter.filter) {
         this.filter[prop] = this.selectedFilter.filter[prop]
       }
+
+      this.filter = { ...this.filter, untagged_only: +this.filter.untagged_only, first_time_only: +this.filter.first_time_only, exclude_automated_communications: +this.filter.exclude_automated_communications }
 
       setTimeout(function () {
         _this.refreshTagSelector()

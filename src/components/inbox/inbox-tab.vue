@@ -371,6 +371,7 @@ export default {
   mounted () {
     this.setContacts([])
     this.setStatus()
+    this.toggleFilterDialog(false)
 
     if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {

@@ -305,10 +305,10 @@
                             label="Contact Owner">
                 <user-selector v-model="filter.owner_id"
                                :generic-styling="false"
-                               :multiple="false"
-                               :use-chips="false"
+                               :multiple="true"
+                               :use-chips="true"
                                :highlighted="isChanged('owner_id')"
-                               :clearable="true"
+                               :clearable="false"
                                :disable="disableContactOwner"
                                custom-placeholder="Contact owner"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
@@ -417,7 +417,7 @@ export default {
 
   filters: {
     date (date) {
-      return new Intl.DateTimeFormat('en-US').format(date)
+      return window.moment(date).format('MM/DD/YYYY')
     }
   },
 
