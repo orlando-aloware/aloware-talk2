@@ -119,9 +119,9 @@ export default {
     placeholder () {
       switch (true) {
         case this.multiple && this.phoneNumber.length < 1:
-          return 'Select Numbers'
+          return 'Select Line Phone Numbers'
         case !this.multiple && !this.phoneNumber:
-          return 'Select Number'
+          return 'Select Line Phone Number'
         case this.multiple && this.phoneNumber.length > 0:
         case !this.multiple && this.phoneNumber:
         default:

@@ -151,7 +151,7 @@ export default {
         case ['messages'].includes(this.$route.params.channel):
           return 'Messages'
         case ['voicemails'].includes(this.$route.params.channel):
-          return 'Voicemails'
+          return 'Voice Messages'
         case ['mentions'].includes(this.$route.params.channel):
           return 'Mentions'
         case ['calls', 'recordings'].includes(this.$route.params.channel):

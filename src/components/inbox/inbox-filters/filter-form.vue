@@ -243,7 +243,7 @@
                    md="6"
                    v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
               <b-form-group class="form-label"
-                            label="Phone Numbers">
+                            label="Line Phone Numbers">
                 <incoming-number-selector v-model="filter.incoming_numbers"
                                           :multiple="true"
                                           :use-chips="true"
@@ -252,7 +252,7 @@
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'messages', 'mentions'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'voicemails'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -276,6 +276,7 @@
                   </q-tooltip>
                 </div>
                 <user-selector v-model="filter.users"
+                               custom-placeholder="Select Communication Owners"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
@@ -298,11 +299,10 @@
                 </sequence-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="!['voicemails'].includes($route.params.channel)"
-                   sm="12"
+            <b-col sm="12"
                    md="6">
               <b-form-group class="form-label"
-                            label="Contact Owner">
+                            label="Contact Owners">
                 <user-selector v-model="filter.owner_id"
                                :generic-styling="false"
                                :multiple="true"
@@ -310,7 +310,7 @@
                                :highlighted="isChanged('owner_id')"
                                :clearable="false"
                                :disable="disableContactOwner"
-                               custom-placeholder="Contact owner"
+                               custom-placeholder="Select Contact Owners"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
                 </user-selector>
               </b-form-group>

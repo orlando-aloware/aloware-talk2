@@ -199,7 +199,7 @@ export default {
           start: null,
           end: null
         },
-        owner_id: null
+        owner_id: []
       },
       searchText: '',
       isSearch: false,
