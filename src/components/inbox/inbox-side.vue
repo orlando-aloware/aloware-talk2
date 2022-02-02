@@ -131,12 +131,15 @@ export default {
     },
 
     back () {
-      if (this.$route.name === 'Inbox' && this.isInboxTaskOpened) {
+      this.setShowContactsHeader(true)
+
+      this.$router.push({
+        name: 'Inbox'
+      })
+
+      if (this.isInboxTaskOpened) {
         this.onLoadShowTasks = false
       }
-
-      this.$router.push('/')
-      this.setShowContactsHeader(true)
     },
 
     ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
@@ -144,7 +147,7 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (to.name.includes('Inbox')) {
+      if (to.name.includes('Inbox') && to.name !== 'Inbox') {
         this.onLoadShowTasks = true
       }
     },

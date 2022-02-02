@@ -2,12 +2,15 @@
   <q-toolbar class="page-header"
              :class="{ 'pl-3 pr-3': !noPadding }">
     <div class="d-flex h-100 align-items-center">
-      <b-link v-if="['Contact', 'Settings Tab'].includes($route.name)"
+      <back-button class="mobile-back-btn-global-header"
+                   v-if="['Contact', 'Settings Tab'].includes($route.name)"
+                   @click="navigateBack"/>
+      <!--b-link v-if="['Contact', 'Settings Tab'].includes($route.name)"
               class="btn-header-nav-back mr-3"
               href="#"
               @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
-      </b-link>
+      </b-link-->
       <h1 v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ $route.params.tab.replace('-', ' ') | ucwords }}</h1>
@@ -91,6 +94,7 @@ import InboxListNavigation from 'components/inbox/inbox-list-navigation'
 import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
 import RefreshIcon from 'components/icons/refresh-icon'
 import SharedLoginMenu from 'components/shared-login-menu'
+import BackButton from 'components/back-button'
 
 export default {
   name: 'app-header',
@@ -98,6 +102,7 @@ export default {
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
   components: {
+    BackButton,
     SharedLoginMenu,
     InboxChannelNavigation,
     InboxListNavigation,
@@ -214,7 +219,10 @@ export default {
           path: `list/${this.selectedList.id}`
         })
       }
-      e.preventDefault()
+
+      if (e) {
+        e.preventDefault()
+      }
     },
 
     refreshMetricGroup () {

@@ -150,7 +150,8 @@
         </q-btn>
       </div>
     </div>
-    <profile v-if="isMobile && $q.screen.lt.md"></profile>
+    <profile v-if="isMobile && $q.screen.lt.md"
+      :hideProfileInfo="true"></profile>
   </div>
 </template>
 
@@ -231,22 +232,21 @@ export default {
       })
     },
     back () {
-      if (this.$route.path.includes('inbox')) {
-        let path = this.$route.path.split('/')
-        path.pop()
-        path.pop()
-
-        if (!isNaN(path[(path.length - 1)] / 1)) {
-          path.pop()
-          path.pop()
-        }
-
-        this.$router.push(path.join('/'))
-      }
-
-      if (this.$route.path.includes('contact')) {
+      if (!this.$route.path.includes('channels') && this.$route.path.includes('contact')) {
         this.$emit('toggleContactSidebar', true)
+        return
       }
+
+      let path = this.$route.path.split('/')
+      path.pop()
+      path.pop()
+
+      if (!isNaN(path[(path.length - 1)] / 1)) {
+        path.pop()
+        path.pop()
+      }
+
+      this.$router.push(path.join('/'))
     }
   }
 }
