@@ -65,7 +65,7 @@ export default {
   props: {
     value: {
       required: false,
-      default: () => { return [] }
+      default: null
     },
 
     multiple: {
@@ -94,9 +94,14 @@ export default {
     }
   },
 
+  model: {
+    prop: 'value',
+    event: 'change'
+  },
+
   data () {
     return {
-      callDispositionId: !_.isEmpty(this.value) ? this.value : this.multiple ? [] : null,
+      callDispositionId: this.value,
       callDispositionsOptions: [],
       selectWidth: 0
     }

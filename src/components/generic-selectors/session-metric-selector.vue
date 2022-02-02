@@ -1,12 +1,14 @@
 <template>
   <q-select
     :class="`padded-container`"
-    option-value="text"
-    option-label="text"
+    option-value="id"
+    option-label="name"
     ref="sessionMetrics"
     outlined dense emit-value
     v-model="localValue"
     :options="options"
+    :use-chips="useChips"
+    :multiple="multiple"
     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
     @popup-show="onShowMetricsMenu">
     <template v-slot:selected>
@@ -51,6 +53,14 @@ export default {
     customClass: {
       type: String,
       default: ''
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    useChips: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {

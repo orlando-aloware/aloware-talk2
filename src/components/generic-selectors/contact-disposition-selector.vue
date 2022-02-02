@@ -111,6 +111,11 @@ export default {
     }
   },
 
+  model: {
+    prop: 'value',
+    event: 'change'
+  },
+
   data () {
     return {
       contactDispositionId: this.value,

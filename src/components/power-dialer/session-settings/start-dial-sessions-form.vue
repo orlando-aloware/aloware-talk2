@@ -23,6 +23,8 @@
             v-if="cform.name === 'metrics'"
             v-model="resources[cform.name]"
             :options="metricOptions"
+            :multiple="true"
+            :use-chips="true"
             custom-class="generic-selector" />
 
           <LineSelector
@@ -159,6 +161,7 @@ export default {
         resources.skip_outside_daytime_hours = true
         resources.warmup_period_in_seconds = 0
         resources.script_id = null
+        resources.metric_options = []
         resources.metrics = []
         resources.call_disposition_ids = []
         resources.contact_disposition_ids = []
