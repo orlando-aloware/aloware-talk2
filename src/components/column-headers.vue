@@ -318,7 +318,15 @@ export default {
       })
 
       for (let i = 0; i < COLUMN_CATEGORIES.length; i++) {
-        columns[i] = matches.filter((c) => c.category === i)
+        if (this.endpointUrl === 'contacts-list') {
+          columns[i] = matches.filter((c) => {
+            return c.category === i && c.name !== 'task_status'
+          })
+        } else {
+          columns[i] = matches.filter((c) => {
+            return c.category === i
+          })
+        }
         results = results + columns[i].length
       }
 
