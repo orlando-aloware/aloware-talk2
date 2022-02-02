@@ -197,7 +197,8 @@ export default {
         ring_groups: [],
         from_date: null,
         to_date: null,
-        contact_owner: []
+        contact_owner: [],
+        my_contact: 0
       },
       searchText: '',
       isSearch: false,

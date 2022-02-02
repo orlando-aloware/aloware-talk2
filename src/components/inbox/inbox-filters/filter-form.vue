@@ -41,8 +41,8 @@
                   class="mt-1"
                   switch
                   v-model="filter.my_contact"
-                  :value="true"
-                  :unchecked-value="false"
+                  :value="1"
+                  :unchecked-value="0"
                   @change="(eventPayload) => onFilterChange(eventPayload, 'my_contact')"
                 >
                 </b-form-checkbox>
@@ -472,8 +472,14 @@ export default {
         if (value) {
           this.filter.contact_owner = []
         }
-
-        this.disableContactOwner = value
+      }
+    },
+    'filter.contact_owner': {
+      deep: true,
+      handler (value) {
+        if (value.length) {
+          this.filter.my_contact = 0
+        }
       }
     }
   }

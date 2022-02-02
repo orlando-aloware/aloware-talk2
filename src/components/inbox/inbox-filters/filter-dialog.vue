@@ -314,6 +314,8 @@ export default {
           continue
         }
 
+        console.log(item, !['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item))
+
         if (!['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
           this.updateChannelChangedFilterFields({
             name: item,

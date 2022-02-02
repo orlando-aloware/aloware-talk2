@@ -108,7 +108,7 @@ export default {
       }
 
       if (this.filter.my_contact) {
-        this.filters = { ...this.filters, 'my_contact': { value: this.filter.my_contact, operator: 1 } }
+        query.my_contact = this.filter.my_contact
       }
 
       if (this.filter.from_date && this.filter.to_date) {
