@@ -111,6 +111,16 @@ export default {
       return err
     })
   },
+  async createDialerSessionSetting ({ commit }, params = {}) {
+    return window.axios.post(
+      `/api/v2/dialer-sessions`,
+      params
+    ).then(res => {
+      return res.data
+    }).catch(err => {
+      return err
+    })
+  },
   async getDialerSessionSettings ({ commit }) {
     return window.axios.get(
       `/api/v2/dialer-sessions`
@@ -120,15 +130,29 @@ export default {
       return err
     })
   },
+  deleteDialerSessionSetting ({ commit }, id = '') {
+    return window.axios.delete(
+      `/api/v2/dialer-sessions/${id}`
+    ).then(res => {
+      return res
+    }).catch(err => {
+      return err
+    })
+  },
   async getSessionSetting ({ commit }, id = '') {
     return window.axios.get(
       `/api/v2/dialer-sessions/${id}`
     ).then(res => {
       commit('SET_SESSION_SETTINGS', res.data)
-      return res.data
     }).catch(err => {
       return err
     })
+  },
+  setDefaultSettings ({ commit }, data = {}) {
+    commit('SET_DEFAULT_SETTING', data)
+  },
+  clearSessionSetting ({ commit }) {
+    commit('CLEAR_SESSION_SETTING')
   },
   async updateateSessionSettings ({ commit }, params = {}) {
     return window.$axios.patch(`api/v2/power-dialer-sessions/${params.id}`,

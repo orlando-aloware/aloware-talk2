@@ -1,3 +1,5 @@
+// import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
+
 export default {
   SET_MY_QUEUE_LIST: (state, data) => {
     state.myQueue = data
@@ -92,6 +94,16 @@ export default {
   }, // sessionSettings
   SET_SESSION_SETTINGS: (state, data) => {
     state.sessionSettings = data
+  },
+  ADD_NEW_SESSION_SETTING: (state, data) => {
+    state.sessionSettings.push(data)
+  },
+  SET_DEFAULT_SETTING: (state, data) => {
+    state.defaultSettings = data
+    // state.sessionSettings = {}
+  },
+  CLEAR_SESSION_SETTING: (state) => {
+    state.sessionSettings = {}
   },
   SET_WARMUP_DURATIONS: (state, data) => {
     state.warmupDurations = data

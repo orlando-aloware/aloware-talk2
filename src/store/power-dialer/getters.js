@@ -44,6 +44,7 @@ export default {
   },
   filteredEndpoint: (state) => state.filteredEndpoint,
   sessionSettings: (state) => state.sessionSettings,
+  defaultSettings: (state) => state.defaultSettings,
   personalSessionSettings: (state) => state.sessionSettingGroups.personal,
   companySessionSettings: (state) => state.sessionSettingGroups.company,
   sessionSettingGroups: (state) => state.sessionSettingGroups,

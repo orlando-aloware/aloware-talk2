@@ -4,25 +4,25 @@ export const SESSION_SETTINGS_ALL_FORMS = [
     label: 'Basics',
     children: [
       {
-        name: 'line',
+        name: 'campaign_id',
         label: 'Line',
         type: 'select',
         items: []
       },
       {
-        name: 'skipOutsideDaytimeHours',
+        name: 'skip_outside_daytime_hours',
         label: 'Skip Outside Daytime Hours',
         type: 'toggle',
         items: []
       },
       {
-        name: 'warmupPeriod',
+        name: 'warmup_period_in_seconds',
         label: 'Warmup Period',
         type: 'select',
         items: []
       },
       {
-        name: 'phoneScript',
+        name: 'script_id',
         label: 'Phone Script',
         type: 'select',
         items: []
@@ -34,19 +34,19 @@ export const SESSION_SETTINGS_ALL_FORMS = [
     label: 'Customizations',
     children: [
       {
-        name: 'setCallDispostionShortcuts',
+        name: 'call_disposition_ids',
         label: 'Set Call Disposition Shortcuts',
         type: 'select',
         items: []
       },
       {
-        name: 'setContactDispostionShortcuts',
+        name: 'contact_disposition_ids',
         label: 'Set Contact Disposition Shortcuts',
         type: 'select',
         items: []
       },
       {
-        name: 'setSessionMetrics',
+        name: 'metrics',
         label: 'Set Session Metrics',
         type: 'select',
         items: []
@@ -60,3 +60,17 @@ export const SESSION_SETTINGS_ALL_FORMS = [
     ]
   }
 ]
+
+export const DEFAULT_SETTING_VALUES = {
+  call_disposition_ids: [],
+  campaign_id: null,
+  company_id: null,
+  contact_disposition_ids: [],
+  is_company_scope: null,
+  metric_options: [],
+  name: null,
+  script_id: null,
+  skip_outside_daytime_hours: 1,
+  user_id: null,
+  warmup_period_in_seconds: 0
+}

@@ -143,15 +143,18 @@ export default function () {
     sessionLoader: false,
     sessionSidebarExpanded: false,
     sessionSettings: {},
-    sessionSettings2: {
-      line: [],
-      skipOutsideDaytimeHours: true,
-      warmupPeriod: 0,
-      phoneScript: '',
-      setSessionMetrics: '',
-      setCallDispostionShortcuts: [],
-      setContactDispostionShortcuts: '',
-      setVmDropShortcuts: ''
+    defaultSettings: {
+      call_disposition_ids: [],
+      campaign_id: null,
+      company_id: null,
+      contact_disposition_ids: [],
+      is_company_scope: null,
+      metric_options: [],
+      name: null,
+      script_id: null,
+      skip_outside_daytime_hours: 1,
+      user_id: null,
+      warmup_period_in_seconds: 0
     },
     dialerSessionSettings: [],
     changingSelectedContact: false,
