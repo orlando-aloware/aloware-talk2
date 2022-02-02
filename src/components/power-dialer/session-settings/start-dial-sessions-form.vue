@@ -43,7 +43,7 @@
           <CallDispositionSelector
             v-else-if="cform.name === 'call_disposition_ids'"
             v-model="resources[cform.name]"
-            :multiple="false"
+            :multiple="true"
             :highlighted="isChanged('call_dispositions')"
             @change="{}"
             class="pb-3">
@@ -53,11 +53,11 @@
             v-else-if="cform.name === 'contact_disposition_ids'"
             v-model="resources[cform.name]"
             :generic-styling="false"
-            :multiple="false"
-            :use-chips="false"
+            :multiple="true"
+            :use-chips="true"
             :outlined="true"
             :show-placeholder="false"
-            custom-class="padded-container generic-selector"
+            custom-class="padded-container-1 generic-selector-1"
             @change="{}"
             class="pb-3">
           </ContactDispositionSelector>

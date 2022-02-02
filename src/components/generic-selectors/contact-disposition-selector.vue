@@ -6,6 +6,7 @@
             input-debounce="0"
             ref="contactDispositionSelect"
             use-input
+            use-chips
             emit-value
             map-options
             dense
