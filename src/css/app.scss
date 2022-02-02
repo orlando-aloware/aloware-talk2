@@ -2019,6 +2019,8 @@ span.mention {
 }
 
 .contact-info-wrapper {
+  display: flex;
+  min-width: 0;
   .contact-name {
     display: inline-block;
     width: 160px;
@@ -7982,6 +7984,10 @@ button.grey-90 {
     font-size: $f-size-body !important;
     color: $grey-100;
     margin-top: 8px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     .focus-mode-icon {
       margin-top: -2px;
@@ -7993,6 +7999,10 @@ button.grey-90 {
     font-weight: 500 !important;
     font-size: $f-size-body-xs !important;
     color: $grey-80;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -8823,7 +8833,8 @@ screen and (max-width: 956px) {
       display: flex;
       justify-content: flex-start;
       .page-header {
-        div:nth-child(2),
+        & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
+        & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
         div:nth-child(3) {
           display: none !important;
         }
@@ -8862,6 +8873,13 @@ screen and (max-width: 956px) {
     .scrollableArea {
       max-height: calc(100vh - 307px) !important;
       min-height: calc(100vh - 307px) !important;
+    }
+  }
+  .contact-details-container {
+    &-drawer {
+      aside {
+        height: calc(100vh - 108px);
+      }
     }
   }
 }
@@ -8983,7 +9001,7 @@ screen and (max-width: 956px) {
       color: $grey-92;
       font-size: 18px;
       font-weight: bold;
-      font-family: $font-family-body2;
+      font-family: $font-family-body;
     }
   }
   .contact-activities-actions__desktop {
@@ -9089,7 +9107,7 @@ screen and (max-width: 956px) {
               padding-left: 0 !important;
               padding-right: 0 !important;
             }
-            .form-row:first-child,
+            .form-row:first-child:not(.general-settings-app-block),
             .row:first-child {
               display: none !important;
             }
@@ -9535,6 +9553,18 @@ screen and (max-width: 956px) {
   }
   &.mobile-phone-visible {
     height: calc(100vh - 50px);
+  }
+  .q-header {
+    left: 0 !important;
+    display: flex;
+    justify-content: flex-start;
+    .page-header {
+      & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
+      & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
+      div:nth-child(3) {
+        display: none !important;
+      }
+    }
   }
   .phone-header-title {
     font-size: 34px;
@@ -10359,4 +10389,22 @@ screen and (max-width: 956px) {
 .h-2-livebar {
   height: calc(100vh - 46px);
   min-height: unset !important;
+}
+
+.mobile-header-labels {
+  display: flex;
+  min-width: 0;
+  .contact-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.mobile-header {
+  .menu-avatar-wrapper {
+    padding-top: 9px !important;
+    padding-right: 2.5px !important;
+  }
 }

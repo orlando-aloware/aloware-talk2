@@ -1,5 +1,5 @@
 <template>
-  <div class="calls-header d-flex justify-content-between">
+  <div class="calls-header d-flex justify-content-between pr-3">
     <div class="calls-header__label">
       <back-button class="p-0"
                    v-if="$q.screen.lt.md"
@@ -150,6 +150,7 @@
         </q-btn>
       </div>
     </div>
+    <profile v-if="isMobile && $q.screen.lt.md"></profile>
   </div>
 </template>
 
@@ -163,9 +164,12 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import MailOpenIcon from 'components/icons/mail-open-icon'
 import EllipsisIcon from 'components/icons/ellipsis-icon'
 import BackButton from 'components/back-button'
+import Profile from 'components/profile'
+import { mapState } from 'vuex'
 export default {
   name: 'contact-activities-header',
   components: {
+    Profile,
     InboxOIcon,
     CheckOIcon,
     TimerOIcon,
@@ -195,6 +199,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['isMobile']),
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:

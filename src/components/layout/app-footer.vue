@@ -193,7 +193,7 @@ export default {
       // this.updateTab()
     },
     getTab () {
-      if (['Contact', 'Inbox'].includes(this.$route.name)) {
+      if (['Contact', 'Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) {
         this.setShowContactsHeader(false)
       }
 
