@@ -389,7 +389,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['channelChangedFilterFields']),
+    ...mapState('inbox', ['channelChangedFilterFields', 'isFilterDialogShown', 'isFilterModelFormShown']),
     ...mapState('auth', ['profile']),
     dateRangeLabel () {
       return ['Inbox Channel Task Status', 'Inbox'].includes(this.$route.name) ? 'Last Engagement Date' : 'Time'
@@ -450,6 +450,11 @@ export default {
         this.date_range.startDate = value[0]
         this.date_range.endDate = value[1]
       })
+  },
+
+  mounted () {
+    this.date_range.startDate = this.filter.from_date
+    this.date_range.endDate = this.filter.to_date
   },
 
   watch: {

@@ -195,11 +195,9 @@ export default {
       filter: {
         campaigns: [],
         ring_groups: [],
-        last_engagement_date: {
-          start: null,
-          end: null
-        },
-        owner_id: []
+        from_date: null,
+        to_date: null,
+        contact_owner: []
       },
       searchText: '',
       isSearch: false,
