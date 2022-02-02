@@ -78,6 +78,12 @@
               :false-value="0"
               size="md"
               val="md" />
+            <b-form-checkbox
+              v-model="resources[cform.name]"
+              name="check-button"
+              switch>
+              Switch
+            </b-form-checkbox>
           </p>
 
           <WarmupPeriodSelector

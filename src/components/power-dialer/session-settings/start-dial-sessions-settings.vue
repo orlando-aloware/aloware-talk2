@@ -439,7 +439,11 @@ export default {
       return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
     },
     async test () {
-      let res = await this.$axios.get('/api/v2/dialer-sessions')
+      let res = await this.$axios.get('/api/v2/agents/metrics', {
+        params: {
+          group_by_category: true
+        }
+      })
       console.log('res :>> ', res)
     },
     toggleSelected () {

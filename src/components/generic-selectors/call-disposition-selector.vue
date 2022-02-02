@@ -23,7 +23,7 @@
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
-      <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      <span class="text-size-xs text-grey-80">--{{ prepend }}--</span>
     </template>
 
     <template v-slot:no-option>
