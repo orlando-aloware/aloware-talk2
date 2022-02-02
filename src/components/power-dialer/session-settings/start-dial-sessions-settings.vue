@@ -77,7 +77,9 @@
                 :disable="loading"
                 clickable>
                 <q-item-section
-                  @click="loadSettings('Untitled')">New Setting</q-item-section>
+                  @click="loadSettings('Untitled')">
+                  New Setting
+                </q-item-section>
                 <q-item-section side>
                   <CheckIcon v-if="selectedItem === 'Untitled'" />
                 </q-item-section>
@@ -116,7 +118,7 @@
                       {{ f.name }}
                     </q-item-section>
                     <q-item-section
-                      v-if="!hovered"
+                      v-if="hovered !== f.id"
                       side>
                       <CheckIcon
                         v-if="selectedItem === f.name"
@@ -124,7 +126,7 @@
                     </q-item-section>
                     <q-item-section
                       @click.native.stop="{}"
-                      v-if="hovered"
+                      v-if="hovered === f.id"
                       side>
                       <q-btn
                         size="md"
@@ -146,7 +148,11 @@
                               </div>
                             </q-item-section>
                           </q-item>
-                          <q-item dense clickable v-close-popup>
+                          <q-item
+                            @click="onDeleteRequest(f.id)"
+                            dense
+                            clickable
+                            v-close-popup>
                             <q-item-section class="px-3">
                               <div class="text-red">
                                 <i class="fa fa-trash-alt mr-2"></i>
@@ -160,7 +166,10 @@
                   </q-item>
                 </template>
                 <div v-else :key="t.name">
-                  <span class="px-2 text-grey text-caption text-italic">No saved settings</span>
+                  <span
+                    class="px-2 text-grey text-caption text-italic">
+                    No saved settings
+                  </span>
                 </div>
               </template>
             </q-list>
@@ -180,6 +189,7 @@
                       <div>{{ selectedItem }}</div>
                       <q-space />
                       <q-btn
+                        @click="resetDefaults"
                         unelevated
                         no-caps
                         size="sm"
@@ -189,6 +199,7 @@
                         @click="newSetting = true"
                         unelevated
                         no-caps
+                        :disabled="disabled"
                         size="sm"
                         class="px-3 py-0"
                         color="primary">Save As New</q-btn>
@@ -237,35 +248,64 @@
 
       </q-card>
     </q-dialog>
+
+    <!-- DIALOG used for confirmation -->
     <q-dialog
       v-model="newSetting"
       persistent>
-      <q-card style="min-width: 350px">
+      <q-card style="width: 350px">
         <q-card-section>
-          <div class="text-subtitle1 text-bold text-grey-8">Save New Session Settings</div>
+          <div
+            class="text-subtitle1 text-bold text-grey-8">
+            <span v-if="deleteId">Delete Session Settings</span>
+            <span v-else>Save New Session Settings</span>
+          </div>
         </q-card-section>
 
         <q-card-section class="q-pt-none pt-3">
-          <q-input outlined v-model="newSettingObj.name" placeholder="New Settings Name" />
+          <div v-if="deleteId">
+            Are you sure you want to remove the selected session settings?
+          </div>
+          <q-input
+            v-else
+            outlined
+            v-model="newSettingName"
+            placeholder="New Settings Name" />
         </q-card-section>
 
         <q-card-actions
           class="px-3 pb-3"
           align="right">
-          <q-btn
+          <!-- <q-btn
             unelevated
             no-caps
             label="Cancel"
             color="grey-80"
             size="sm"
-            v-close-popup />
-          <q-btn
-            unelevated
-            no-caps
-            label="Save"
-            color="primary"
+            v-close-popup /> -->
+          <b-button
+            variant="dark-grey"
+            class="f-btn--cancel mr-2"
+            color="grey-80"
             size="sm"
-            v-close-popup />
+            v-close-popup
+            @click="newSetting = false">
+            Cancel
+          </b-button>
+          <b-button
+            v-if="deleteId"
+            variant="danger"
+            size="sm"
+            @click="onDeleteSetting">
+            Remove
+          </b-button>
+          <b-button
+            v-else
+            variant="success"
+            size="sm"
+            @click="saveAsNew">
+            Save
+          </b-button>
           <!-- <q-btn
             @click="beginDial"
             unelevated
@@ -282,10 +322,13 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
+import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
+
+const UNTITLED = 'Untitled'
 
 export default {
   name: 'StartDialsSessionsSettings',
@@ -299,11 +342,15 @@ export default {
       'personalSessionSettings',
       'companySessionSettings',
       'sessionSettings',
+      'defaultSettings',
       'sessionSettingGroups'
     ]),
     tabCollections () {
       let items = this.tabHeaders.filter(i => i.disabled === false)
       return items.concat(this.groupedSettings)
+    },
+    defaultValues () {
+      return { ...DEFAULT_SETTING_VALUES }
     }
   },
   async mounted () {
@@ -326,17 +373,24 @@ export default {
       hovered: '',
       hoveredMenu: '',
       newSetting: false,
-      newSettingObj: {
-        name: ''
-      },
-      selectedItem: 'Untitled'
+      newSettingName: '',
+      deleteId: null,
+      updateId: null,
+      selectedItem: UNTITLED
     }
   },
   methods: {
     ...mapActions('powerDialer', [
       'setSessionSettingGroup',
       'getDialerSessionSettings',
+      'clearSessionSetting',
+      'setDefaultSettings',
+      'createDialerSessionSetting',
+      'deleteDialerSessionSetting',
       'getSessionSetting'
+    ]),
+    ...mapMutations('powerDialer', [
+      'ADD_NEW_SESSION_SETTING'
     ]),
     dialPreparation () {
       this.dialog = true
@@ -349,11 +403,37 @@ export default {
       this.loading = true
       if (data?.id) {
         this.selectedItem = data.name
+        await this.getSessionSetting(data.id)
       } else {
+        this.resetDefaults(false)
         this.selectedItem = data
       }
-      await this.getSessionSetting(data.id)
       this.loading = false
+    },
+    async saveAsNew () {
+      this.loading = true
+      let newSettings = { ...this.defaultSettings }
+      newSettings.name = this.newSettingName
+      let res = await this.createDialerSessionSetting(this.removeEmptyParams(newSettings))
+      if (res?.id) {
+        await this.getDialerSessionSettings()
+      }
+      this.newSetting = false
+      this.loading = false
+      // this.ADD_NEW_SESSION_SETTING(res)
+    },
+    onDeleteRequest (id) {
+      this.newSetting = true
+      this.deleteId = id
+    },
+    async onDeleteSetting () {
+      let res = await this.deleteDialerSessionSetting(this.deleteId)
+      if (res.data) {
+        await this.getDialerSessionSettings()
+        this.newSetting = false
+        this.deleteId = null
+        this.$generalNotification('Dialer Session Setting has been removed!')
+      }
     },
     fetchedGroupSettings (type) {
       return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
@@ -364,16 +444,55 @@ export default {
     },
     toggleSelected () {
       if (this.hoveredMenu) {
-        // console.log('201 :>> ', 201)
+        // If hovered, trigger actions
       } else {
         this.hovered = ''
       }
+    },
+    resetDefaults (isExistingList = true) {
+      let params = {
+        call_disposition_ids: [],
+        campaign_id: null,
+        company_id: null,
+        contact_disposition_ids: [],
+        is_company_scope: null,
+        metric_options: [],
+        name: null,
+        script_id: null,
+        skip_outside_daytime_hours: 1,
+        user_id: null,
+        warmup_period_in_seconds: 0
+      }
+      if (this.sessionSettings?.id && isExistingList) {
+        params.id = this.sessionSettings.id
+      }
+      this.selectedItem = UNTITLED
+      this.setDefaultSettings(params)
+    },
+    removeEmptyParams (params) {
+      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v !== ''))
     }
   },
   watch: {
     async dialog (val) {
       if (val) {
+        this.loading = true
         await this.getDialerSessionSettings()
+        if (this.sessionSettings?.id) {
+          this.resetDefaults(false)
+        }
+        this.loading = false
+      }
+    },
+    selectedItem (val) {
+      if (val === UNTITLED) {
+        this.clearSessionSetting()
+      }
+    },
+    newSetting (val) {
+      if (!val) {
+        this.deleteId = null
+        this.updateId = null
       }
     }
   }

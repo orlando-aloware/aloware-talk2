@@ -43,7 +43,7 @@ export default {
     event: 'change'
   },
   props: {
-    modelValue: String,
+    modelValue: [String, Array],
     options: {
       type: Array,
       default: () => []

@@ -20,13 +20,13 @@
             </label>
 
           <MetricSelector
-            v-if="cform.name === 'setSessionMetrics'"
+            v-if="cform.name === 'metrics'"
             v-model="resources[cform.name]"
             :options="metricOptions"
             custom-class="generic-selector" />
 
           <LineSelector
-            v-else-if="cform.name === 'line'"
+            v-else-if="cform.name === 'campaign_id'"
             v-model="resources[cform.name]"
             :multiple="false"
             :use-chips="true"
@@ -35,13 +35,13 @@
             @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
 
           <ScriptSelector
-            v-else-if="cform.name === 'phoneScript'"
+            v-else-if="cform.name === 'script_id'"
             v-model="resources[cform.name]"
             :communication="contact"
             class="w-100"></ScriptSelector>
 
           <CallDispositionSelector
-            v-else-if="cform.name === 'setCallDispostionShortcuts'"
+            v-else-if="cform.name === 'call_disposition_ids'"
             v-model="resources[cform.name]"
             :multiple="false"
             :highlighted="isChanged('call_dispositions')"
@@ -50,7 +50,7 @@
           </CallDispositionSelector>
 
           <ContactDispositionSelector
-            v-else-if="cform.name === 'setContactDispostionShortcuts'"
+            v-else-if="cform.name === 'contact_disposition_ids'"
             v-model="resources[cform.name]"
             :generic-styling="false"
             :multiple="false"
@@ -69,15 +69,17 @@
             @change="{}">
           </VmDropSelector>
 
-          <p v-else-if="cform.name === 'skipOutsideDaytimeHours'">
+          <p v-else-if="cform.name === 'skip_outside_daytime_hours'">
             <q-toggle
               v-model="resources[cform.name]"
+              :true-value="1"
+              :false-value="0"
               size="md"
               val="md" />
           </p>
 
           <WarmupPeriodSelector
-            v-else-if="cform.name === 'warmupPeriod'"
+            v-else-if="cform.name === 'warmup_period_in_seconds'"
             v-model="resources[cform.name]" />
 
           <q-select
@@ -104,9 +106,9 @@ import CallDispositionSelector from 'components/generic-selectors/call-dispositi
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { METRIC_OPTIONS_3 } from 'src/constants/stats'
-import { SESSION_SETTINGS_ALL_FORMS } from 'src/constants/power-dialer/forms'
+import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
-// import { isEmpty } from 'lodash'
+import { isEmpty } from 'lodash'
 
 const stats = { METRIC_OPTIONS_3 }
 
@@ -129,7 +131,11 @@ export default {
   },
   mounted () {
     // Temporary disabled
-    // this.resourceObj = this.sessionSettings
+    if (isEmpty(this.sessionSettings)) {
+      this.resources = this.defaultSettings || DEFAULT_SETTING_VALUES
+    } else {
+      this.resources = Object.assign({}, this.sessionSettings)
+    }
   },
   computed: {
     ...mapState('inbox', [
@@ -139,6 +145,7 @@ export default {
       'contact'
     ]),
     ...mapGetters('powerDialer', [
+      'defaultSettings',
       'sessionSettings'
     ]),
     resourceObj: {
@@ -147,14 +154,15 @@ export default {
       },
       set (obj) {
         let { resources } = this
-        resources.line = ''
-        resources.skipOutsideDaytimeHours = obj.skip_outside_daytime_hours === 1
-        resources.warmupPeriod = obj.warmup_period_in_seconds || 0
-        resources.phoneScript = obj.script_id || ''
-        resources.setSessionMetrics = ''
-        resources.setCallDispostionShortcuts = obj.call_disposition_ids || []
-        resources.setContactDispostionShortcuts = obj.contact_disposition_ids || []
-        resources.setVmDropShortcuts = ''
+        resources.name = null
+        resources.campaign_id = null
+        resources.skip_outside_daytime_hours = true
+        resources.warmup_period_in_seconds = 0
+        resources.script_id = null
+        resources.metrics = []
+        resources.call_disposition_ids = []
+        resources.contact_disposition_ids = []
+        resources.is_company_scope = null
         return resources
       }
     },
@@ -174,14 +182,18 @@ export default {
     },
     forms () {
       return SESSION_SETTINGS_ALL_FORMS
+    },
+    defaultValues () {
+      return DEFAULT_SETTING_VALUES
     }
   },
   methods: {
     ...mapActions('powerDialer', [
+      'setDefaultSettings',
       'getWarmupDurations'
     ]),
     onLineFilterChange (value, prop) {
-      this.resources.line = value
+      this.resources.campaign_id = value
       // this.filter[prop] = value
       // this.updateChannelChangedFilterFields({
       //   name: prop,
@@ -193,36 +205,55 @@ export default {
       return !!item
     },
     onShowMetricsMenu () {
-      this.selectWidth = this.$refs.setSessionMetrics[0].$el.offsetWidth
+      this.selectWidth = this.$refs.metrics[0].$el.offsetWidth
     },
     onShowWarmUpMenu () {
-      this.selectWidth = this.$refs.warmupPeriod[0].$el.offsetWidth
+      this.selectWidth = this.$refs.warmup_period_in_seconds[0].$el.offsetWidth
     }
   },
   watch: {
     resources: {
       handler (val) {
-        if (val?.line?.toString().length > 0 && val?.warmupPeriod?.toString().length > 0) {
+        this.setDefaultSettings(val)
+        if (val?.campaign_id?.toString().length > 0 && val?.warmup_period_in_seconds?.toString().length > 0) {
           this.$emit('valid-form', true)
         } else {
           this.$emit('invalid-form', true)
         }
       },
       deep: true
+    },
+    sessionSettings (val) {
+      // console.log('val :>> ', isEmpty(val))
+      if (isEmpty(val)) {
+        // console.log('1001 :>> ', 1001)
+        this.resources = this.defaultSettings || this.defaultValues
+      } else {
+        this.resources = this.sessionSettings
+        // console.log('this.sessionSettings :>> ', this.sessionSettings)
+      }
+    },
+    defaultSettings (val) {
+      // console.log('1002 :>> ', this.defaultValues)
+      this.resources = this.defaultSettings
     }
   },
   data () {
     return {
       selectWidth: 0,
       resources: {
-        line: '',
-        skipOutsideDaytimeHours: true,
-        warmupPeriod: 0,
-        phoneScript: '',
-        setSessionMetrics: '',
-        setCallDispostionShortcuts: [],
-        setContactDispostionShortcuts: '',
-        setVmDropShortcuts: ''
+        call_disposition_ids: [],
+        campaign_id: null,
+        company_id: null,
+        contact_disposition_ids: [],
+        id: null,
+        is_company_scope: null,
+        metric_options: [],
+        name: null,
+        script_id: null,
+        skip_outside_daytime_hours: 1,
+        user_id: null,
+        warmup_period_in_seconds: 0
       }
     }
   }
