@@ -275,7 +275,7 @@ export default {
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
             workflows: Filters.DEFAULT_STATE.filter.workflows,
-            owner_id: Filters.DEFAULT_STATE.filter.owner_id,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
             to_date: Filters.DEFAULT_STATE.filter.to_date,
             my_contact: Filters.DEFAULT_STATE.filter.my_contact
@@ -299,7 +299,7 @@ export default {
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
             workflows: Filters.DEFAULT_STATE.filter.workflows,
-            owner_id: Filters.DEFAULT_STATE.filter.owner_id,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
             to_date: Filters.DEFAULT_STATE.filter.to_date,
             my_contact: Filters.DEFAULT_STATE.filter.my_contact
@@ -323,7 +323,7 @@ export default {
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
             workflows: Filters.DEFAULT_STATE.filter.workflows,
-            owner_id: Filters.DEFAULT_STATE.filter.owner_id,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
             to_date: Filters.DEFAULT_STATE.filter.to_date,
             my_contact: Filters.DEFAULT_STATE.filter.my_contact
@@ -333,7 +333,7 @@ export default {
           defaultFilterModel.type = 5
           defaultFilterModel.filter = {
             users: Filters.DEFAULT_STATE.filter.users,
-            owner_id: Filters.DEFAULT_STATE.filter.owner_id
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
           }
           break
         case ['messages'].includes(this.$route.params.channel):
@@ -351,7 +351,7 @@ export default {
             users: Filters.DEFAULT_STATE.filter.users,
             workflows: Filters.DEFAULT_STATE.filter.workflows,
             broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-            owner_id: Filters.DEFAULT_STATE.filter.owner_id,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
             to_date: Filters.DEFAULT_STATE.filter.to_date,
             my_contact: Filters.DEFAULT_STATE.filter.my_contact

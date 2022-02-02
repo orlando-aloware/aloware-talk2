@@ -217,7 +217,7 @@ export default {
           ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
-          owner_id: Filters.DEFAULT_STATE.filter.owner_id,
+          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
           my_contact: Filters.DEFAULT_STATE.filter.my_contact
         },
         scope: 'user'

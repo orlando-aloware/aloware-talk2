@@ -303,15 +303,15 @@
                    md="6">
               <b-form-group class="form-label"
                             label="Contact Owners">
-                <user-selector v-model="filter.owner_id"
+                <user-selector v-model="filter.contact_owner"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
-                               :highlighted="isChanged('owner_id')"
+                               :highlighted="isChanged('contact_owner')"
                                :clearable="false"
                                :disable="disableContactOwner"
                                custom-placeholder="Select Contact Owners"
-                               @change="(eventPayload) => onFilterChange(eventPayload, 'owner_id')">
+                               @change="(eventPayload) => onFilterChange(eventPayload, 'contact_owner')">
                 </user-selector>
               </b-form-group>
             </b-col>
@@ -465,7 +465,7 @@ export default {
       deep: true,
       handler (value) {
         if (value) {
-          this.filter.owner_id = []
+          this.filter.contact_owner = []
         }
 
         this.disableContactOwner = value

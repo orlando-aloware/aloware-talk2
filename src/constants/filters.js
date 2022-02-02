@@ -40,6 +40,7 @@ export const DEFAULT_STATE = {
     mentioner_user_id: [],
     mentioned_user_id: [],
     owner_id: [],
-    my_contact: false
+    my_contact: false,
+    contact_owner: []
   }
 }

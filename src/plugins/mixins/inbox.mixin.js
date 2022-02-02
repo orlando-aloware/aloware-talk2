@@ -107,6 +107,10 @@ export default {
         this.filters = { ...this.filters, 'owner_id': { value: this.filter.owner_id, operator: 1 } }
       }
 
+      if (this.filter.my_contact) {
+        this.filters = { ...this.filters, 'my_contact': { value: this.filter.my_contact, operator: 1 } }
+      }
+
       if (this.filter.from_date && this.filter.to_date) {
         this.filters = { ...this.filters, 'from_date': { value: this.filter.from_date, operator: 1 }, 'to_date': { value: this.filter.to_date, operator: 1 } }
       }
