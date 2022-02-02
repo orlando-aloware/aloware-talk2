@@ -303,6 +303,35 @@ export default {
           window.VueEvent.fire('new_desktop_fax', communication)
         }
       })
+      .listen('.user.contact_list_item.created', (event) => {
+        let contactListItem = event.contact_list_item
+        if (event.contact) {
+          contactListItem.contact = event.contact
+        }
+        if (event.communication) {
+          contactListItem.communication = event.communication
+          if (contactListItem.contact) {
+            contactListItem.communication.contact = contactListItem.contact
+          }
+        }
+        window.VueEvent.fire('contact_list_item_created', contactListItem)
+      })
+      .listen('.user.contact_list_item.updated', (event) => {
+        let contactListItem = event.contact_list_item
+        if (event.contact) {
+          contactListItem.contact = event.contact
+        }
+        if (event.communication) {
+          contactListItem.communication = event.communication
+          if (contactListItem.contact) {
+            contactListItem.communication.contact = contactListItem.contact
+          }
+        }
+        window.VueEvent.fire('contact_list_item_updated', contactListItem)
+      })
+      .listen('.user.contact_list_item.deleting', (event) => {
+        window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
+      })
       .notification((notification) => {
         if (!this.profile.sleep_mode) {
           switch (notification.type) {
