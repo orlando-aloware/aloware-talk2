@@ -223,7 +223,8 @@ export default {
         companyName: this.activeList.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.activeList.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       }
-      this.$VueEvent.fire('makeCall', data)
+      console.log('data :>> ', data)
+      // this.$VueEvent.fire('makeCall', data)
     }
   },
   watch: {

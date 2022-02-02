@@ -9,7 +9,7 @@
       <div class="d-flex t-menu__content over-flow px-3 pb-1">
         <ChipsEllipsis
           @on-selected-item="onSelectedCallDisposition"
-          :list-items="callDispositions"
+          :list-items="filteredCallDispositions"
           :selected-item="callDisposition"
           :display-count="4"
           identity="call-disposition"
@@ -24,7 +24,7 @@
       <div class="d-flex t-menu__content over-flow px-3 pb-1">
         <ChipsEllipsis
           @on-selected-item="onSelectedContactDisposition"
-          :list-items="dispositionStatuses"
+          :list-items="filteredContactDispositions"
           :selected-item="contactDisposition"
           :display-count="6"
           identity="contact-disposition"
@@ -70,8 +70,20 @@ export default {
       'contact'
     ]),
     ...mapGetters('powerDialer', [
-      'sessionLoader'
+      'sessionLoader',
+      'sessionSettings',
+      'defaultSettings'
     ]),
+    filteredCallDispositions () {
+      return this.callDispositions.filter(d => {
+        return this.defaultSettings.call_disposition_ids.includes(d.id)
+      })
+    },
+    filteredContactDispositions () {
+      return this.dispositionStatuses.filter(d => {
+        return this.defaultSettings.contact_disposition_ids.includes(d.id)
+      })
+    },
     contactDisposition () {
       return this.contact_disposition || this.contact?.disposition_status_id
     },
