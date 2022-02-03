@@ -59,7 +59,8 @@
                flat
                class="contact-activities-actions__mobile_btn"
                @click="$emit('toggleDetails')">
-          <information-circle-icon/>
+          <information-circle-icon width="33"
+                                   height="33"/>
         </q-btn>
       </div>
       <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">

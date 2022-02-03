@@ -26,7 +26,9 @@
           <q-avatar v-if="profile"
                     size="34px"
                     :style="avatarStyle(profile.name)">
-            <div class="avatar-initials">{{ profile.name | fixName | initials }}</div>
+            <div class="avatar-initials">
+              {{ profile.name | fixName | initials }}
+            </div>
             <q-badge :color="color(profile.agent_status)"
                      class="availability-status"
                      floating>
