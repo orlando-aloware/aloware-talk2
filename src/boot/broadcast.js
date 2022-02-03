@@ -303,6 +303,8 @@ export default {
           window.VueEvent.fire('new_desktop_fax', communication)
         }
       })
+
+      // Power Dialer Session Tasks
       .listen('.user.contact_list_item.created', (event) => {
         let contactListItem = event.contact_list_item
         if (event.contact) {
