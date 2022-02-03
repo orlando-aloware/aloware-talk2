@@ -76,9 +76,7 @@ export default {
     // compensate comparing of array/object values
     let comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
     let comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
-
     if (comparatorA !== comparatorB) {
-      // console.log('hello')
       let prop = state.channelChangedFilterFields.find(item => item.property === name)
       if (prop) {
         prop.value = value
@@ -86,7 +84,6 @@ export default {
         state.channelChangedFilterFields.push({ property: name, value: value })
       }
     } else {
-      // console.log('world')
       let changedProp = [...state.channelChangedFilterFields]
       state.channelChangedFilterFields = changedProp.filter(item => item.property !== name)
     }

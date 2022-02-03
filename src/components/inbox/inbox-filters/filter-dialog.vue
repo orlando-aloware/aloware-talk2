@@ -173,6 +173,8 @@ export default {
 
       for (const field of this.filterFields) {
         if (this.filter[field] !== filterIdentifier[field]) {
+          console.log(field)
+          console.log(this.filter[field], filterIdentifier[field])
           hasChanges = true
           break
         }
@@ -234,8 +236,8 @@ export default {
         'incoming_numbers',
         'users',
         'workflows',
-        'owner_id',
-        'my_contacts',
+        'contact_owner',
+        'my_contact',
         'from_date',
         'to_date'
       ]
@@ -270,11 +272,11 @@ export default {
       this.getFilters()
       if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter, ...this.filter }
-        this.setChannelClonedFilter(this.selectedFilter.filter)
       } else {
         this.filter = { ...this.filter, ...this.value }
-        this.setChannelClonedFilter(this.filter)
       }
+
+      this.setChannelClonedFilter(this.defaultFilterModel.filter)
     },
 
     onShown () {
@@ -305,7 +307,7 @@ export default {
       this.resetChannelChangedFilterFields()
 
       for (const item in this.filter) {
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && +this.filter[item] !== +this.defaultFilterModel.filter[item] && this.filterFields.includes(item)) {
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) && +this.filter[item] !== +this.defaultFilterModel.filter[item] && this.filterFields.includes(item)) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: +this.filter[item]
@@ -314,9 +316,7 @@ export default {
           continue
         }
 
-        console.log(item, !['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item))
-
-        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
+        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: this.filter[item]
