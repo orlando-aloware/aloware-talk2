@@ -206,15 +206,14 @@ const impersonate = async ({ commit }, payload) => {
 
     const response = await window.axios.post('/api/v1/user/' + userId + '/impersonate')
 
-    // eslint-disable-next-line camelcase
-    const { api_token } = response.data
+    const { apiToken } = response.data
 
     commit('SET_LOADING', false)
 
     if (company) {
-      localStorage.setItem('api_token', api_token)
+      localStorage.setItem('api_token', apiToken)
 
-      window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+      window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + apiToken
 
       localStorage.setItem('impersonate', true)
 
@@ -230,14 +229,24 @@ const impersonate = async ({ commit }, payload) => {
   }
 }
 
-const setAgentStatus = async ({ commit }, agentStatus) => {
+const setAgentStatus = ({ commit }, agentStatus) => {
   commit('SET_AGENT_STATUS', agentStatus)
 }
 
-const setProfile = async ({ commit }, user) => {
+const setProfile = ({ commit }, user) => {
   commit('SET_PROFILE', user)
 }
 
 export default {
-  check, login, logout, register, forgotPass, resetPass, impersonate, setAgentStatus, setProfile, getCookieUser, getSharedCookie
+  check,
+  login,
+  getSharedCookie,
+  getCookieUser,
+  logout,
+  register,
+  forgotPass,
+  resetPass,
+  impersonate,
+  setAgentStatus,
+  setProfile
 }

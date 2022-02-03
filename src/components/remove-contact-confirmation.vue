@@ -68,7 +68,7 @@ export default {
       }
 
       if (this.selectedContacts[this.listId]) {
-        return this.selectedContacts[this.listId].length
+        return this.selectedContacts[this.listId]?.length
       }
 
       return 0

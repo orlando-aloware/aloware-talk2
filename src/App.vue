@@ -13,14 +13,17 @@
                          position="b-toaster-top-center"/>
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
+
+    <intercom></intercom>
   </div>
 </template>
 <script>
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
+import Intercom from 'components/intercom'
 export default {
   name: 'App',
-  components: { ActionNotification },
+  components: { Intercom, ActionNotification },
   data () {
     return {
       cookieValidated: false,

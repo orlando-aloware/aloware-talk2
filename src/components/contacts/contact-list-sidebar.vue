@@ -101,6 +101,7 @@ export default {
         return
       }
       this.isExpanded = false
+      this.setShowContactsHeader(false)
       this.$emit('toggleContactActivities', false)
     },
 
@@ -169,12 +170,13 @@ export default {
     '$q.screen.lt.md': function () {
       if (this.$q.screen.lt.md) {
         this.isExpanded = false
-        this.setShowContactsHeader(true)
+        this.setShowContactsHeader(false)
         this.$emit('toggleContactActivities', false)
       }
 
       if (!this.$q.screen.lt.md) {
         this.isExpanded = true
+        this.setShowContactsHeader(true)
       }
     },
 

@@ -1,9 +1,12 @@
 <template>
   <div class="inbox-wrapper">
-    <div class="mobile-header align-items-center justify-content-start"
+    <div class="mobile-header align-items-center justify-content-between pr-3"
          v-if="isInboxTaskOpened">
-      <back-button @click="back"/>
-      <span v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
+      <div class="d-flex h-100 align-items-center justify-content-center">
+        <back-button @click="back"/>
+        <span v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
+      </div>
+      <profile class="p-0"></profile>
     </div>
     <div class="inbox-side border-top-0 flex-shrink-0 h-100">
       <div class="inbox-side__left"
@@ -44,6 +47,7 @@ import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
 import BackButton from 'components/back-button'
+import Profile from 'components/profile'
 
 export default {
   name: 'inbox-side',
@@ -52,7 +56,8 @@ export default {
     BackButton,
     InboxTab,
     InboxChannels,
-    InboxNavList
+    InboxNavList,
+    Profile
   },
 
   data () {
@@ -72,6 +77,7 @@ export default {
 
   computed: {
     ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts']),
+    ...mapState(['isMobile']),
 
     nextPage () {
       return this.currentPage + 1
@@ -95,6 +101,10 @@ export default {
   mounted () {
     if (this.isInboxTaskOpened && this.$q.screen.lt.md) {
       this.setShowContactsHeader(false)
+    }
+
+    if (this.isMobile && !this.$q.screen.lt.md) {
+      this.setShowContactsHeader(true)
     }
   },
 
@@ -121,12 +131,15 @@ export default {
     },
 
     back () {
-      if (this.$route.name === 'Inbox' && this.isInboxTaskOpened) {
+      this.setShowContactsHeader(true)
+
+      this.$router.push({
+        name: 'Inbox'
+      })
+
+      if (this.isInboxTaskOpened) {
         this.onLoadShowTasks = false
       }
-
-      this.$router.push('/')
-      this.setShowContactsHeader(true)
     },
 
     ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
@@ -134,7 +147,7 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (to.name.includes('Inbox')) {
+      if (to.name.includes('Inbox') && to.name !== 'Inbox') {
         this.onLoadShowTasks = true
       }
     },
@@ -149,6 +162,11 @@ export default {
         return
       }
       this.setShowContactsHeader(true)
+    },
+    isMobile () {
+      if (this.isMobile && !this.$q.screen.lt.md) {
+        this.setShowContactsHeader(true)
+      }
     }
   }
 }

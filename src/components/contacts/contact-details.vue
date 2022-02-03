@@ -1,9 +1,12 @@
 <template>
-  <div>
-    <div class="mobile-header align-items-center justify-content-start"
+  <div class="h-100">
+    <div class="mobile-header align-items-center justify-content-between pr-3"
          v-if="$q.screen.lt.md">
-      <back-button @click="$emit('back')"/>
-      <span>{{ contactName }} Details</span>
+      <div class="mobile-header-labels h-100 align-items-center justify-content-start">
+        <back-button @click="$emit('back')"/>
+        <span class="pr-1 contact-name">{{ contactName }} Details</span>
+      </div>
+      <profile class="p-0"></profile>
     </div>
     <div class="contact-details-wrapper">
       <div class="details-component-container"
@@ -50,6 +53,7 @@ import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 import _ from 'lodash'
+import Profile from 'components/profile'
 
 export default {
   name: 'contact-details',
@@ -57,6 +61,7 @@ export default {
   mixins: [contactMixins],
 
   components: {
+    Profile,
     ContactSaveBar,
     ContactScheduledMessages,
     ContactIntegrations,
