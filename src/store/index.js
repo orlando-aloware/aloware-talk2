@@ -66,8 +66,10 @@ export default function (/* { ssrContext } */) {
         recordingStatus: 'in-progress',
         timer: '',
         wrapUpTimer: '',
+        parkedCallTimer: '',
         duration: 0,
         wrapUpDuration: '',
+        parkedCallDuration: 0,
         parkedCall: null,
         dealId: null,
         callFishing: {
@@ -229,7 +231,12 @@ export default function (/* { ssrContext } */) {
       contactDetailsDrawer: false,
       showPhone: false,
       enableAudio: false,
-      callFishingQueue: []
+      callFishingQueue: [],
+      communicationNotifiedDesktop: [],
+      voicemailNotifiedDesktop: [],
+      contactNotifiedDesktop: [],
+      appointmentNotifiedDesktop: [],
+      reminderNotifiedDesktop: []
     },
 
     getters: {
@@ -301,6 +308,14 @@ export default function (/* { ssrContext } */) {
 
       setDialerWrapUpTimer ({ commit }, timer) {
         commit('SET_DIALER_WRAP_UP_TIMER', timer)
+      },
+
+      setDialerParkedCallDuration ({ commit }, duration) {
+        commit('SET_DIALER_PARKED_CALL_DURATION', duration)
+      },
+
+      setDialerParkedCallTimer ({ commit }, timer) {
+        commit('SET_DIALER_PARKED_CALL_TIMER', timer)
       },
 
       setDialerParkedCall ({ commit }, communication) {
@@ -577,6 +592,46 @@ export default function (/* { ssrContext } */) {
 
       removeFromCallFishingQueue ({ commit }, value) {
         commit('REMOVE_FROM_CALL_FISHING_QUEUE', value)
+      },
+
+      addCommunicationNotifiedDesktop ({ commit }, payload) {
+        commit('ADD_COMMUNICATION_NOTIFIED_DESKTOP', payload)
+      },
+
+      addVoicemailNotifiedDesktop ({ commit }, payload) {
+        commit('ADD_VOICEMAIL_NOTIFIED_DESKTOP', payload)
+      },
+
+      addContactNotifiedDesktop  ({ commit }, payload) {
+        commit('ADD_CONTACT_NOTIFIED_DESKTOP', payload)
+      },
+
+      addAppointmentNotifiedDesktop ({ commit }, payload) {
+        commit('ADD_APPOINTMENT_NOTIFIED_DESKTOP', payload)
+      },
+
+      addReminderNotifiedDesktop ({ commit }, payload) {
+        commit('ADD_REMINDER_NOTIFIED_DESKTOP', payload)
+      },
+
+      removeCommunicationNotifiedDesktop ({ commit }, value) {
+        commit('REMOVE_COMMUNICATION_NOTIFIED_DESKTOP', value)
+      },
+
+      removeVoicemailNotifiedDesktop ({ commit }, value) {
+        commit('REMOVE_VOICEMAIL_NOTIFIED_DESKTOP', value)
+      },
+
+      removeContactNotifiedDesktop  ({ commit }, value) {
+        commit('REMOVE_CONTACT_NOTIFIED_DESKTOP', value)
+      },
+
+      removeAppointmentNotifiedDesktop ({ commit }, value) {
+        commit('REMOVE_APPOINTMENT_NOTIFIED_DESKTOP', value)
+      },
+
+      removeReminderNotifiedDesktop ({ commit }, value) {
+        commit('REMOVE_REMINDER_NOTIFIED_DESKTOP', value)
       }
     },
 
@@ -664,6 +719,14 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_WRAP_UP_TIMER (state, timer) {
         state.dialer.wrapUpTimer = timer
+      },
+
+      SET_DIALER_PARKED_CALL_DURATION (state, duration) {
+        state.dialer.parkedCallDuration = duration
+      },
+
+      SET_DIALER_PARKED_CALL_TIMER (state, timer) {
+        state.dialer.parkedCallTimer = timer
       },
 
       SET_DIALER_PARKED_CALL (state, communication) {
@@ -1104,6 +1167,96 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)
         }
+      },
+
+      ADD_COMMUNICATION_NOTIFIED_DESKTOP (state, payload) {
+        state.communicationNotifiedDesktop.push(payload)
+      },
+
+      ADD_VOICEMAIL_NOTIFIED_DESKTOP (state, payload) {
+        state.voicemailNotifiedDesktop.push(payload)
+      },
+
+      ADD_CONTACT_NOTIFIED_DESKTOP (state, payload) {
+        state.contactNotifiedDesktop.push(payload)
+      },
+
+      ADD_APPOINTMENT_NOTIFIED_DESKTOP (state, payload) {
+        state.appointmentNotifiedDesktop.push(payload)
+      },
+
+      ADD_REMINDER_NOTIFIED_DESKTOP (state, payload) {
+        state.reminderNotifiedDesktop.push(payload)
+      },
+
+      REMOVE_COMMUNICATION_NOTIFIED_DESKTOP (state, value) {
+        if (state.communicationNotifiedDesktop.length === 0) {
+          return
+        }
+
+        let found = state.communicationNotifiedDesktop.find(item => item.id === value)
+
+        if (!found) {
+          return
+        }
+
+        state.communicationNotifiedDesktop.splice(state.communicationNotifiedDesktop.indexOf(found), 1)
+      },
+
+      REMOVE_VOICEMAIL_NOTIFIED_DESKTOP (state, value) {
+        if (state.voicemailNotifiedDesktop.length === 0) {
+          return
+        }
+
+        let found = state.voicemailNotifiedDesktop.find(item => item.id === value)
+
+        if (!found) {
+          return
+        }
+
+        state.voicemailNotifiedDesktop.splice(state.voicemailNotifiedDesktop.indexOf(found), 1)
+      },
+
+      REMOVE_CONTACT_NOTIFIED_DESKTOP (state, value) {
+        if (state.contactNotifiedDesktop.length === 0) {
+          return
+        }
+
+        let found = state.contactNotifiedDesktop.find(item => item.id === value)
+
+        if (!found) {
+          return
+        }
+
+        state.contactNotifiedDesktop.splice(state.contactNotifiedDesktop.indexOf(found), 1)
+      },
+
+      REMOVE_APPOINTMENT_NOTIFIED_DESKTOP (state, value) {
+        if (state.appointmentNotifiedDesktop.length === 0) {
+          return
+        }
+
+        let found = state.appointmentNotifiedDesktop.find(item => item.id === value)
+
+        if (!found) {
+          return
+        }
+
+        state.appointmentNotifiedDesktop.splice(state.appointmentNotifiedDesktop.indexOf(found), 1)
+      },
+
+      REMOVE_REMINDER_NOTIFIED_DESKTOP (state, value) {
+        if (state.reminderNotifiedDesktop.length === 0) {
+          return
+        }
+
+        let found = state.reminderNotifiedDesktop.find(item => item.id === value)
+
+        if (!found) {
+          return
+        }
+
+        state.reminderNotifiedDesktop.splice(state.reminderNotifiedDesktop.indexOf(found), 1)
       },
 
       updateField

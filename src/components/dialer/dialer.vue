@@ -37,7 +37,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'dialerFormStatus']),
+    ...mapState(['currentCompany', 'dialer', 'dialerFormStatus', 'isMobile']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -56,9 +56,15 @@ export default {
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         data = _.merge(this.dialer.parkedCall, data)
         this.setDialerParkedCall(data)
+        if (!this.dialer.parkedCallTimer) {
+          this.startParkedCallTimer()
+        }
 
         if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW || data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
           this.setDialerParkedCall()
+          if (this.dialer.parkedCallTimer) {
+            this.stopParkedCallTimer()
+          }
         }
       }
     })
@@ -132,7 +138,9 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).finally(() => {
+      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
+        this.$VueEvent.fire('new_in_app_call', res.data)
+      }).finally(() => {
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)s
         // })
@@ -651,6 +659,7 @@ export default {
         console.log('Call parked')
       }).catch(err => {
         this.setDialerParkedCall()
+        this.stopParkedCallTimer()
         console.log(err)
       }).finally(_ => {
         this.loadingPark = false
@@ -665,6 +674,7 @@ export default {
       this.loadingUnpark = true
       const parkedCall = this.dialer.parkedCall
       this.setDialerParkedCall()
+      this.stopParkedCallTimer()
       let data = {
         currentNumber: 'unhold:' + parkedCall.id,
         outboundCampaignId: parkedCall.campaign_id,
@@ -675,6 +685,10 @@ export default {
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
       console.log('Unhold is in progress.')
+
+      if (this.isMobile) {
+        this.$VueEvent.fire('doneUnparkCall')
+      }
     },
 
     unparkCommunication (parkedCallData, preventClear = false) {
@@ -682,6 +696,7 @@ export default {
 
       if (!preventClear) {
         this.setDialerParkedCall()
+        this.stopParkedCallTimer()
       }
 
       let data = {
@@ -718,9 +733,14 @@ export default {
         this.setDialerIsMuted(false)
       }).catch(err => {
         this.setDialerParkedCall()
+        this.stopParkedCallTimer()
         console.log(err)
       }).finally(_ => {
         this.loadingPark = false
+
+        if (this.isMobile) {
+          this.$VueEvent.fire('doneParkAndConnect')
+        }
       })
     },
 
@@ -750,6 +770,7 @@ export default {
                 this.makeCall('call:' + data.id, data.campaignId)
                 break
             }
+            this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
             clearInterval(hangupInterval)
           }
 
@@ -873,6 +894,7 @@ export default {
     resetCall () {
       this.stopCallTimer()
       this.stopWrapUpTimer()
+      this.stopParkedCallTimer()
       this.setDialerCall()
       this.setDialerCommunication()
       this.setDialerDeal()
@@ -904,6 +926,13 @@ export default {
         this.stopWrapUpTimer()
         this.backToDial()
       }
+    },
+
+    countParkedCallDuration () {
+      let duration = this.dialer.parkedCallDuration + 1
+      let timer = this.secondsToHms(duration)
+      this.setDialerParkedCallDuration(duration)
+      this.setDialerParkedCallTimer(timer)
     },
 
     secondsToHms (d) {
@@ -948,6 +977,19 @@ export default {
       this.setDialerWrapUpDuration(0)
       this.setDialerWrapUpTimer('')
       clearInterval(this.$options.wrapUpDurationInterval)
+    },
+
+    startParkedCallTimer () {
+      let timer = this.secondsToHms(0)
+      this.setDialerParkedCallDuration(0)
+      this.setDialerParkedCallTimer(timer)
+      this.$options.parkedCallDurationInterval = setInterval(this.countParkedCallDuration, 1000)
+    },
+
+    stopParkedCallTimer () {
+      this.setDialerParkedCallDuration(0)
+      this.setDialerParkedCallTimer('')
+      clearInterval(this.$options.parkedCallDurationInterval)
     },
 
     backToDial () {
@@ -1124,6 +1166,8 @@ export default {
       'setDialerTimer',
       'setDialerWrapUpDuration',
       'setDialerWrapUpTimer',
+      'setDialerParkedCallDuration',
+      'setDialerParkedCallTimer',
       'setOldAgentStatus',
       'setWarnings',
       'setShouldIntroduce',

@@ -29,8 +29,10 @@ export const DEFAULT_STATE = {
     recordingStatus: 'in-progress',
     timer: '',
     wrapUpTimer: '',
+    parkedCallTimer: '',
     duration: 0,
     wrapUpDuration: '',
+    parkedCallDuration: 0,
     parkedCall: null,
     dealId: null,
     callFishing: {

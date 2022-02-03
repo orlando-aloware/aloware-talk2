@@ -1554,7 +1554,7 @@ export default {
         return false
       }
 
-      return this.dialer && this.dialer.communication !== undefined
+      return this.dialer && !_.isEmpty(this.dialer.communication)
     },
     iconSizes () {
       return {

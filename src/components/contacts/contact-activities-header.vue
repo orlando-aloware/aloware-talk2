@@ -1,5 +1,5 @@
 <template>
-  <div class="calls-header d-flex justify-content-between">
+  <div class="calls-header d-flex justify-content-between pr-3">
     <div class="calls-header__label">
       <back-button class="p-0"
                    v-if="$q.screen.lt.md"
@@ -59,7 +59,8 @@
                flat
                class="contact-activities-actions__mobile_btn"
                @click="$emit('toggleDetails')">
-          <information-circle-icon/>
+          <information-circle-icon width="33"
+                                   height="33"/>
         </q-btn>
       </div>
       <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">
@@ -150,6 +151,8 @@
         </q-btn>
       </div>
     </div>
+    <profile v-if="isMobile && $q.screen.lt.md"
+      :hideProfileInfo="true"></profile>
   </div>
 </template>
 
@@ -163,9 +166,12 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import MailOpenIcon from 'components/icons/mail-open-icon'
 import EllipsisIcon from 'components/icons/ellipsis-icon'
 import BackButton from 'components/back-button'
+import Profile from 'components/profile'
+import { mapState } from 'vuex'
 export default {
   name: 'contact-activities-header',
   components: {
+    Profile,
     InboxOIcon,
     CheckOIcon,
     TimerOIcon,
@@ -195,6 +201,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['isMobile']),
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:
@@ -226,22 +233,21 @@ export default {
       })
     },
     back () {
-      if (this.$route.path.includes('inbox')) {
-        let path = this.$route.path.split('/')
-        path.pop()
-        path.pop()
-
-        if (!isNaN(path[(path.length - 1)] / 1)) {
-          path.pop()
-          path.pop()
-        }
-
-        this.$router.push(path.join('/'))
-      }
-
-      if (this.$route.path.includes('contact')) {
+      if (!this.$route.path.includes('channels') && this.$route.path.includes('contact')) {
         this.$emit('toggleContactSidebar', true)
+        return
       }
+
+      let path = this.$route.path.split('/')
+      path.pop()
+      path.pop()
+
+      if (!isNaN(path[(path.length - 1)] / 1)) {
+        path.pop()
+        path.pop()
+      }
+
+      this.$router.push(path.join('/'))
     }
   }
 }

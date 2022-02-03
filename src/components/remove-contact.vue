@@ -66,7 +66,7 @@ export default {
         return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return 'Remove ' + this.selectedContacts[this.listId].length + ' contacts?'
+        return 'Remove ' + this.selectedContacts[this.listId]?.length + ' contacts?'
       }
       return ''
     },
@@ -75,7 +75,7 @@ export default {
         return 'Are you sure you want to remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return `Are you sure you want to remove <span>${this.selectedContacts[this.listId].length}</span> contacts?`
+        return `Are you sure you want to remove <span>${this.selectedContacts[this.listId]?.length}</span> contacts?`
       }
       return ''
     },

@@ -444,6 +444,10 @@ const fixPhone = (
       return phoneNumber
     }
 
+    if (phoneNumber.includes('power_dialer_task:')) {
+      return phoneNumber
+    }
+
     if (phoneNumber.includes('call:')) {
       return phoneNumber
     }
