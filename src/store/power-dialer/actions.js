@@ -130,7 +130,17 @@ export default {
       return err
     })
   },
-  deleteDialerSessionSetting ({ commit }, id = '') {
+  async updateDialerSessionSetting ({ commit }, params = {}) {
+    return window.axios.patch(
+      `/api/v2/dialer-sessions/${params.id}`,
+      params
+    ).then(res => {
+      return res
+    }).catch(err => {
+      return err
+    })
+  },
+  async deleteDialerSessionSetting ({ commit }, id = '') {
     return window.axios.delete(
       `/api/v2/dialer-sessions/${id}`
     ).then(res => {

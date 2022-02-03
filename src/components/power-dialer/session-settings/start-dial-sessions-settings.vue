@@ -140,7 +140,11 @@
                         anchor="top right"
                         self="top left">
                         <q-list style="min-width: 100px">
-                          <q-item dense clickable v-close-popup>
+                          <q-item
+                            @click="onRename(f)"
+                            dense
+                            clickable
+                            v-close-popup>
                             <q-item-section class="px-3">
                               <div>
                                 <i class="fa fa-pencil-alt mr-2"></i>
@@ -258,6 +262,7 @@
           <div
             class="text-subtitle1 text-bold text-grey-8">
             <span v-if="deleteId">Delete Session Settings</span>
+            <span v-else-if="updateObj">Rename Session Settings</span>
             <span v-else>Save New Session Settings</span>
           </div>
         </q-card-section>
@@ -266,6 +271,11 @@
           <div v-if="deleteId">
             Are you sure you want to remove the selected session settings?
           </div>
+          <q-input
+            v-else-if="updateObj"
+            outlined
+            v-model="newSettingName"
+            :placeholder="updateObj.name" />
           <q-input
             v-else
             outlined
@@ -298,6 +308,14 @@
             size="sm"
             @click="onDeleteSetting">
             Remove
+          </b-button>
+          <b-button
+            v-else-if="updateObj"
+            :disabled="updateObj.name === newSettingName || newSettingName.length === 0"
+            variant="success"
+            size="sm"
+            @click="renameSetting">
+            Save
           </b-button>
           <b-button
             v-else
@@ -375,7 +393,7 @@ export default {
       newSetting: false,
       newSettingName: '',
       deleteId: null,
-      updateId: null,
+      updateObj: null,
       selectedItem: UNTITLED
     }
   },
@@ -387,6 +405,7 @@ export default {
       'setDefaultSettings',
       'createDialerSessionSetting',
       'deleteDialerSessionSetting',
+      'updateDialerSessionSetting',
       'getSessionSetting'
     ]),
     ...mapMutations('powerDialer', [
@@ -425,6 +444,22 @@ export default {
     onDeleteRequest (id) {
       this.newSetting = true
       this.deleteId = id
+    },
+    onRename (data) {
+      this.newSetting = true
+      this.updateObj = data
+    },
+    async renameSetting () {
+      this.updateObj.name = this.newSettingName
+      let res = await this.updateDialerSessionSetting({
+        id: this.updateObj.id,
+        name: this.updateObj.name
+      })
+      if (res.data) {
+        this.newSetting = false
+        this.updateObj = ''
+        this.$generalNotification(`Dialer Session Setting has been renamed to ${res.data.name}.`)
+      }
     },
     async onDeleteSetting () {
       let res = await this.deleteDialerSessionSetting(this.deleteId)
@@ -496,7 +531,7 @@ export default {
     newSetting (val) {
       if (!val) {
         this.deleteId = null
-        this.updateId = null
+        this.updateObj = null
       }
     }
   }
