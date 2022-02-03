@@ -12,7 +12,7 @@
       </b-form-row>
 
       <div v-if="!statics.whitelabel">
-        <b-form-row class="mt-3">
+        <b-form-row class="mt-3 general-settings-app-block">
           <b-col sm="12" md="12">
             <div class="d-inline-flex">
               <h5 class="mt-2"> Have you considered using Aloware app on your smartphone 📱? </h5>

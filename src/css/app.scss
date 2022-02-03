@@ -2019,6 +2019,8 @@ span.mention {
 }
 
 .contact-info-wrapper {
+  display: flex;
+  min-width: 0;
   .contact-name {
     display: inline-block;
     width: 160px;
@@ -7982,6 +7984,10 @@ button.grey-90 {
     font-size: $f-size-body !important;
     color: $grey-100;
     margin-top: 8px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     .focus-mode-icon {
       margin-top: -2px;
@@ -7993,6 +7999,14 @@ button.grey-90 {
     font-weight: 500 !important;
     font-size: $f-size-body-xs !important;
     color: $grey-80;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .q-btn__wrapper {
+    min-height: 44px;
   }
 }
 
@@ -8282,8 +8296,8 @@ button.grey-90 {
   &__drawer_btn,
   &__mobile_btn {
     border-radius: 50%;
-    height: 24px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
     min-height: 24px;
     display: flex;
     align-items: center;
@@ -8292,14 +8306,14 @@ button.grey-90 {
     }
     .q-btn__wrapper,
     .q-btn__content {
-      height: 24px;
-      min-height: 24px;
+      height: 30px;
+      min-height: 30px;
     }
   }
   &-dropdown {
     width: 20px;
     height: 20px;
-    margin-right: 14.25px !important;
+    margin-right: 5px !important;
     button {
       width: 100%;
       height: 100%;
@@ -8340,14 +8354,14 @@ button.grey-90 {
   width: 24px;
   min-height: 27px;
   align-items: center;
-  margin-right: 14px;
+  margin-right: 5px;
   .q-btn__wrapper {
     padding: 0 0 !important;
   }
   .q-btn__wrapper,
   .q-btn__content {
-    height: 24px;
-    min-height: 24px;
+    height: 27px;
+    min-height: 27px;
   }
 }
 
@@ -8741,6 +8755,10 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 784px) {
+  .mobile-back-btn-global-header {
+    transform: translateX(-10px);
+    margin-right: 4px;
+  }
   /*.main-content {
     padding-top: 62px;
   }*/
@@ -8783,11 +8801,14 @@ screen and (max-width: 956px) {
     }
     & > div > h1 {
       font-size: 18px;
-      font-family: 'Roboto', sans-serif;
+      font-family: $font-family-body;
+      height: 27px;
+      display: flex;
+      align-items: center;
     }
     &.q-toolbar {
       height: 58px;
-      padding: 0 18.5px !important;
+      padding: 0 15px 0 18.5px !important;
       justify-content: space-between;
       flex: 1 0 100%;
     }
@@ -8823,7 +8844,8 @@ screen and (max-width: 956px) {
       display: flex;
       justify-content: flex-start;
       .page-header {
-        div:nth-child(2),
+        & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
+        & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
         div:nth-child(3) {
           display: none !important;
         }
@@ -8862,6 +8884,13 @@ screen and (max-width: 956px) {
     .scrollableArea {
       max-height: calc(100vh - 307px) !important;
       min-height: calc(100vh - 307px) !important;
+    }
+  }
+  .contact-details-container {
+    &-drawer {
+      aside {
+        height: calc(100vh - 108px);
+      }
     }
   }
 }
@@ -8961,6 +8990,12 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 604px) {
+  .contact-activities-actions {
+    margin-right: 5px;
+  }
+  .profile-menu {
+    padding-right: 0 !important;
+  }
   .mobile-header {
     display: flex !important;
   }
@@ -8983,7 +9018,7 @@ screen and (max-width: 956px) {
       color: $grey-92;
       font-size: 18px;
       font-weight: bold;
-      font-family: $font-family-body2;
+      font-family: $font-family-body;
     }
   }
   .contact-activities-actions__desktop {
@@ -9089,7 +9124,7 @@ screen and (max-width: 956px) {
               padding-left: 0 !important;
               padding-right: 0 !important;
             }
-            .form-row:first-child,
+            .form-row:first-child:not(.general-settings-app-block),
             .row:first-child {
               display: none !important;
             }
@@ -9201,9 +9236,12 @@ screen and (max-width: 956px) {
           align-items: center;
         }
       }
+      .profile-menu {
+        min-width: 63px;
+      }
     }
     .contact-activities-actions-dropdown {
-      height: 24px;
+      height: 27px;
       width: auto;
     }
   }
@@ -9217,6 +9255,7 @@ screen and (max-width: 956px) {
   }
   .calls-header {
     height: 58px;
+    padding-right: 15px !important;
   }
   .calls-header {
     &__label {
@@ -9528,8 +9567,24 @@ screen and (max-width: 956px) {
 
 .mobile-phone-drawer {
   &:not(.mobile-phone-visible) {
+    height: 100%;
     .q-drawer__content {
       padding: 0 16px;
+    }
+  }
+  &.mobile-phone-visible {
+    height: calc(100vh - 50px);
+  }
+  .q-header {
+    left: 0 !important;
+    display: flex;
+    justify-content: flex-start;
+    .page-header {
+      & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
+      & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
+      div:nth-child(3) {
+        display: none !important;
+      }
     }
   }
   .phone-header-title {
@@ -10321,6 +10376,10 @@ screen and (max-width: 956px) {
   padding-top: 58px !important;
 }
 
+.pt-60 {
+  padding-top: 60px !important;
+}
+
 .contact-phone-number-search {
   .vbt-autcomplete-list{
     .list-group-item {
@@ -10343,6 +10402,7 @@ screen and (max-width: 956px) {
   }
 }
 
+<<<<<<< HEAD
 .border-radius-1 {
   border-radius: 5px;
 }
@@ -10355,3 +10415,42 @@ screen and (max-width: 956px) {
 .border-radius-4 {
   border-radius: 20px;
 }
+=======
+.h-1-livebar {
+  height: calc(100vh - 21px);
+  min-height: unset !important;
+}
+
+.h-2-livebar {
+  height: calc(100vh - 46px);
+  min-height: unset !important;
+}
+
+.mobile-header-labels {
+  display: flex;
+  min-width: 0;
+  .contact-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.mobile-header {
+  .menu-avatar-wrapper {
+    padding-top: 9px !important;
+    padding-right: 2.5px !important;
+  }
+}
+
+.btn-light {
+  border-color: $grey-light;
+}
+
+.q-avatar {
+  .avatar-initials {
+    height: 7px;
+  }
+}
+>>>>>>> 058c5a4eddf2b2e69cf2f0b4665346cb522cef8c

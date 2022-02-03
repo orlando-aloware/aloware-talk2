@@ -9,11 +9,13 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <q-layout class="page-layout h-100"
+      <mobile-live-call-bar v-if="!mobilePhoneDrawer" />
+      <q-layout class="page-layout"
                 view="lHh Lpr lff"
+                :class="pageLayoutHeightClass"
                 :height="'100%'">
         <div class="h-100"
-             :class="[ sidebarVisible ? 'sidebar-active' : '']">
+             :class="{ 'sidebar-active': sidebarVisible, 'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible) }">
           <q-header class="page-header bg-white text-black no-box-shadow"
                     v-if="authenticated && !isWidget && !loading && showContactsHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
@@ -202,11 +204,13 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
+import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 
 export default {
   name: 'MyLayout',
 
   components: {
+    MobileLiveCallBar,
     DialerForm,
     AppHeader,
     AppFooter,
@@ -244,11 +248,6 @@ export default {
       authCheckStatus: false,
       showRefreshButton: false,
       updateDialogText: null,
-      communicationNotifiedDesktop: [],
-      voicemailNotifiedDesktop: [],
-      contactNotifiedDesktop: [],
-      appointmentNotifiedDesktop: [],
-      reminderNotifiedDesktop: [],
       sidebarVisible: false,
       lightMode: true,
       mobilePhoneDrawer: false,
@@ -272,6 +271,22 @@ export default {
       let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
       return pageSlug.replace(/ /g, '_') + '-page'
     },
+    pageLayoutHeightClass () {
+      if (!this.isMobile || (this.mobilePhoneDrawer && !this.isPhoneVisible) || (this.$route.name === 'Phone' && !this.isPhoneVisible)) {
+        return ['h-100']
+      }
+
+      if (((this.dialer.call && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) && !this.dialer.parkedCall) ||
+        ((!this.dialer.call || ['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) && this.dialer.parkedCall)) {
+        return ['h-1-livebar']
+      }
+
+      if ((this.dialer.call && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) && this.dialer.parkedCall) {
+        return ['h-2-livebar']
+      }
+
+      return ['h-100']
+    },
     pageContainerClasses () {
       return {
         'page-container h-100': true,
@@ -281,6 +296,10 @@ export default {
   },
 
   created () {
+    if (this.$route.name === 'Phone' && !this.isMobile) {
+      this.$router.replace({ path: '/' })
+    }
+
     this.resetCall()
     this.resetNotifications()
 
@@ -524,21 +543,23 @@ export default {
       this.processActionNotification(data, 'mention')
     })
 
-    // missed call notification
     this.$VueEvent.listen('update_communication', (communication) => {
       if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
 
-      if (communication.type === CommunicationTypes.CALL && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW && !this.profile.sleep_mode) {
+      // missed call notification
+      if (communication.type === CommunicationTypes.CALL &&
+        communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
+        !this.profile.sleep_mode) {
         this.processActionNotification(communication, 'missed call')
       }
 
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
-      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW || ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
+      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+        ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
-        this.closeDesktopNotification(communication.id)
       }
     })
 
@@ -1211,11 +1232,9 @@ export default {
     },
 
     handleDesktopCommunicationNotification (communication) {
-      if (
-        window.Push.Permission.has() &&
-        !this.communicationNotifiedDesktop.includes(communication.id)
-      ) {
-        this.communicationNotifiedDesktop.push(communication.id)
+      let found = this.communicationNotifiedDesktop.length &&
+        this.communicationNotifiedDesktop.find(item => item.id === communication.id)
+      if (window.Push.Permission.has() && !found) {
         let self = this
         let title = ''
         let icon = ''
@@ -1249,7 +1268,7 @@ export default {
 
         const onClickFunction = (res) => {
           window.focus()
-          this.close()
+          self.closeDesktopNotification(communication.id, 'communication')
           self.decreaseAppBadge()
           self.restoreApp()
           if (communication.type === CommunicationTypes.CALL) {
@@ -1306,11 +1325,21 @@ export default {
           timeout:
             communication.type === CommunicationTypes.CALL ? 60000 : 30000,
           onClick: onClickFunction,
-          onError: function (err) {
+          onError: (err) => {
+            self.removeCommunicationNotifiedDesktop(communication.id)
             console.log(err)
+          },
+          onClose: () => {
+            self.removeCommunicationNotifiedDesktop(communication.id)
           }
         }
-        window.Push.create(title, options)
+
+        window.Push.create(title, options).then((data) => {
+          this.addCommunicationNotifiedDesktop({
+            id: communication.id,
+            close: data.close
+          })
+        })
 
         if (communication.type !== CommunicationTypes.CALL) {
           this.bounceDock()
@@ -1320,16 +1349,14 @@ export default {
     },
 
     handleDesktopVoicemailNotification (communication) {
-      if (
-        window.Push.Permission.has() &&
-        !this.voicemailNotifiedDesktop.includes(communication.id)
-      ) {
-        this.voicemailNotifiedDesktop.push(communication.id)
+      let found = this.voicemailNotifiedDesktop.length &&
+        this.voicemailNotifiedDesktop.find(item => item.id === communication.id)
+      if (window.Push.Permission.has() && !found) {
         let self = this
         const title = 'New Voicemail'
         const onClickFunction = function (res) {
           window.focus()
-          this.close()
+          self.closeDesktopNotification(communication.id, 'voicemail')
           self.decreaseAppBadge()
           self.restoreApp()
           self.$router
@@ -1356,27 +1383,36 @@ export default {
           requireInteraction: true,
           timeout: 10000,
           onClick: onClickFunction,
-          onError: function (err) {
+          onError: (err) => {
+            self.removeVoicemailNotifiedDesktop(communication.id)
             console.log(err)
+          },
+          onClose: () => {
+            self.removeVoicemailNotifiedDesktop(communication.id)
           }
         }
-        window.Push.create(title, options)
+
+        window.Push.create(title, options).then((data) => {
+          this.addVoicemailNotifiedDesktop({
+            id: communication.id,
+            close: data.close
+          })
+        })
+
         this.bounceDock()
         this.increaseAppBadge()
       }
     },
 
     handleDesktopContactNotification (contact) {
-      if (
-        window.Push.Permission.has() &&
-        !this.contactNotifiedDesktop.includes(contact.id)
-      ) {
-        this.contactNotifiedDesktop.push(contact.id)
+      let found = this.contactNotifiedDesktop.length &&
+        this.contactNotifiedDesktop.find(item => item.id === contact.id)
+      if (window.Push.Permission.has() && !found) {
         let self = this
         const title = 'You have been assigned to a contact.'
         const onClickFunction = function (res) {
           window.focus()
-          this.close()
+          self.closeDesktopNotification(contact.id, 'contact')
           self.decreaseAppBadge()
           self.restoreApp()
           self.$router
@@ -1402,22 +1438,31 @@ export default {
           requireInteraction: true,
           timeout: 10000,
           onClick: onClickFunction,
-          onError: function (err) {
+          onError: (err) => {
+            self.removeContactNotifiedDesktop(contact.id)
             console.log(err)
+          },
+          onClose: () => {
+            self.removeContactNotifiedDesktop(contact.id)
           }
         }
-        window.Push.create(title, options)
+
+        window.Push.create(title, options).then((data) => {
+          this.addVoicemailNotifiedDesktop({
+            id: contact.id,
+            close: data.close
+          })
+        })
+
         this.bounceDock()
         this.increaseAppBadge()
       }
     },
 
     handleDesktopAppointmentNotification (engagement, contact, timeDiff, unit) {
-      if (
-        window.Push.Permission.has() &&
-        !this.appointmentNotifiedDesktop.includes(engagement.id)
-      ) {
-        this.appointmentNotifiedDesktop.push(engagement.id)
+      let found = this.appointmentNotifiedDesktop.length &&
+        this.appointmentNotifiedDesktop.find(item => item.id === engagement.id)
+      if (window.Push.Permission.has() && !found) {
         let self = this
         let title = 'Appointment'
         if (timeDiff !== 0) {
@@ -1425,7 +1470,7 @@ export default {
         }
         const onClickFunction = function (res) {
           window.focus()
-          this.close()
+          self.closeDesktopNotification(engagement.id, 'appointment')
           self.decreaseAppBadge()
           self.restoreApp()
           self.$router
@@ -1457,22 +1502,31 @@ export default {
           requireInteraction: true,
           timeout: 10000,
           onClick: onClickFunction,
-          onError: function (err) {
+          onError: (err) => {
+            self.removeContactNotifiedDesktop(engagement.id)
             console.log(err)
+          },
+          onClose: () => {
+            self.removeContactNotifiedDesktop(engagement.id)
           }
         }
-        window.Push.create(title, options)
+
+        window.Push.create(title, options).then((data) => {
+          this.addAppointmentNotifiedDesktop({
+            id: engagement.id,
+            close: data.close
+          })
+        })
+
         this.bounceDock()
         this.increaseAppBadge()
       }
     },
 
     handleDesktopReminderNotification (engagement, contact, timeDiff, unit) {
-      if (
-        window.Push.Permission.has() &&
-        !this.reminderNotifiedDesktop.includes(engagement.id)
-      ) {
-        this.reminderNotifiedDesktop.push(engagement.id)
+      let found = this.reminderNotifiedDesktop.length &&
+        this.reminderNotifiedDesktop.find(item => item.id === engagement.id)
+      if (window.Push.Permission.has() && !found) {
         let self = this
         let title = 'Reminder'
         if (timeDiff !== 0) {
@@ -1480,7 +1534,7 @@ export default {
         }
         const onClickFunction = function (res) {
           window.focus()
-          this.close()
+          self.closeDesktopNotification(engagement.id, 'reminder')
           self.decreaseAppBadge()
           self.restoreApp()
           self.$router
@@ -1512,11 +1566,22 @@ export default {
           requireInteraction: true,
           timeout: 10000,
           onClick: onClickFunction,
-          onError: function (err) {
+          onError: (err) => {
+            self.removeContactNotifiedDesktop(engagement.id)
             console.log(err)
+          },
+          onClose: () => {
+            self.removeContactNotifiedDesktop(engagement.id)
           }
         }
-        window.Push.create(title, options)
+
+        window.Push.create(title, options).then((data) => {
+          this.addReminderNotifiedDesktop({
+            id: engagement.id,
+            close: data.close
+          })
+        })
+
         this.bounceDock()
         this.increaseAppBadge()
       }
@@ -1591,14 +1656,6 @@ export default {
       // more than 1084 or less than 605 pixels
       if (width > 1084 || width < 605) {
         this.setContactDetailsDrawer(false)
-      }
-    },
-
-    closeDesktopNotification (communicationId) {
-      let notification = this.communicationNotifiedDesktop.find(notification => notification.communication_id === communicationId)
-      if (notification) {
-        notification.dismiss()
-        this.communicationNotifiedDesktop = this.communicationNotifiedDesktop.filter(notification => notification.communication_id !== communicationId)
       }
     },
 
@@ -1732,9 +1789,13 @@ export default {
       }
     },
 
-    isMobile () {
-      if (!this.isMobile) {
+    isMobile (val) {
+      if (!val) {
         this.setShowContactsHeader(true)
+        this.mobilePhoneDrawer = false
+      }
+      if (!val && this.$route.name === 'Phone') {
+        this.$router.replace({ name: 'Inbox' })
       }
     }
   }
