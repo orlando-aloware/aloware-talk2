@@ -132,6 +132,7 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
@@ -158,6 +159,9 @@ export default {
       'contact',
       'selectedList',
       'listItems'
+    ]),
+    ...mapFields('powerDialer', [
+      'powerDialerTasks'
     ]),
     list () {
       return this.listItems[this.selectedList.id].data || []

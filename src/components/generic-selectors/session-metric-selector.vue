@@ -88,7 +88,7 @@ export default {
       }
     },
     placeholder () {
-      return this.localValue.length > 0 ? '' : 'Select Metrics'
+      return this.localValue?.length > 0 ? '' : 'Select Metrics'
     }
   },
   data () {

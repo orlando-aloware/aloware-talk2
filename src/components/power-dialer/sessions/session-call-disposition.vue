@@ -98,13 +98,13 @@ export default {
     ]),
     async onSelectedCallDisposition (data) {
       let response = await this.updateCallDisposition({
-        id: this.contact.last_communication.id,
+        id: this.contact?.last_communication?.id,
         params: {
           call_disposition_id: data.id
         }
       })
       if (response?.id) {
-        this.call_disposition = response.call_disposition_id
+        this.call_disposition = response?.call_disposition_id
       }
     },
     async onSelectedContactDisposition (data) {
@@ -116,7 +116,7 @@ export default {
       })
       if (response?.id) {
         let status = this.dispositionStatuses.find(ds => {
-          return ds.id === response.disposition_status_id
+          return ds.id === response?.disposition_status_id
         })
         this.contact_disposition = status.id
       }

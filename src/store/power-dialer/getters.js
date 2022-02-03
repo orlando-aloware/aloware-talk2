@@ -1,4 +1,7 @@
+import { getField } from 'vuex-map-fields'
+
 export default {
+  getField,
   myQueue: (state) => state.myQueue,
   flaggedCreateExisting: (state) => state.flaggedCreateExisting,
   opened: (state) => new Set(state.opened),

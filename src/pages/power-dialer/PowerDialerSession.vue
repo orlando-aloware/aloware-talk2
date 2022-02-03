@@ -28,10 +28,12 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import CallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionPage from 'src/components/power-dialer/sessions/session-main-page'
+import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 
 export default {
   name: 'PowerDialerSession',
@@ -42,15 +44,45 @@ export default {
     SessionPage
   },
   computed: {
+    ...mapGetters('contacts', [
+      'listItems',
+      'selectedList',
+      'contact'
+    ]),
     ...mapGetters('powerDialer', [
       'isStartingDial',
       'sessionSidebarExpanded'
-    ])
+    ]),
+    ...mapFields('powerDialer', [
+      'powerDialerTasks'
+    ]),
+    list () {
+      return this.listItems[this.selectedList.id].data || []
+    },
+    activeList () {
+      if (this.list.length) {
+        return this.list[0]
+      }
+      return {}
+    }
   },
   created () {
     console.log('Starting sessions...')
     if (!this.isStartingDial) {
       // this.$router.push({ name: 'Power Dialer' })
+    }
+  },
+  methods: {
+    prepareTasks () {
+      // Preparing tasks full
+    },
+    filteredList (key = '') {
+      if (!key) {
+        return this.list
+      }
+      return this.list.filter(lst => {
+        return lst.task_status === AutoDialTaskStatus[key]
+      })
     }
   }
 }

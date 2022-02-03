@@ -1,6 +1,8 @@
 // import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
+import { updateField } from 'vuex-map-fields'
 
 export default {
+  updateField,
   SET_MY_QUEUE_LIST: (state, data) => {
     state.myQueue = data
   },
