@@ -110,6 +110,14 @@
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
+      <div class="w-100 flex-grow-1" v-if="liveCalls.length > 0">
+        <inbox-task-list :contacts="liveCalls"
+                         :loading-contacts="isFetchingContacts"
+                         :search-text="searchText"
+                         :is-search="isSearch"
+                         @onItemSelected="onItemSelected">
+        </inbox-task-list>
+      </div>
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
@@ -208,7 +216,7 @@ export default {
       return 'outlined-light'
     },
     contactTasks () {
-      return [...this.liveContacts, ...this.contacts]
+      return [...this.incomingCalls, ...this.contacts]
     },
     hasLiveCall () {
       return this.dialer.call &&
@@ -221,6 +229,21 @@ export default {
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
       return i >= 0
+    },
+    incomingCalls () {
+      return this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
+    },
+    liveCalls () {
+      return [
+        // parked calls
+        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+        // connected calls
+        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2))
+      ]
     }
   },
 
