@@ -260,7 +260,6 @@ export default {
     },
 
     showCallFishingDataInPhone (data, type = 'callFishing') {
-      this.$VueEvent.fire('showPhone')
       let queue = _.get(this.notifications, 'callFishing.queue', [])
 
       if (!queue || (queue && queue.length === 0)) {
@@ -270,13 +269,15 @@ export default {
       if (queue && queue.length > 0) {
         this.setDialerCallFishing(data)
         this.switchCallFishingFromQueue()
+        this.$VueEvent.fire('showPhone')
         return
       }
 
       let counter = 0
-      let dialerCallFishingInterval = (queue && queue.length === 0) ? setInterval(() => {
+      let dialerCallFishingInterval = (!queue || (queue && queue.length === 0)) ? setInterval(() => {
         if (!document.getElementById(type)) {
           this.setDialerCallFishing(data)
+          this.$VueEvent.fire('showPhone')
           clearInterval(dialerCallFishingInterval)
         }
         counter++
