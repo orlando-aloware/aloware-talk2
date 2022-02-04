@@ -95,7 +95,12 @@ export default {
         if (from.name !== 'Contacts') {
           this.setUnsavedList(null)
         }
+        this.setShowContactsHeader(true)
         this.setShowContactsListSidebar(false)
+      }
+
+      if (to.name === 'Contact') {
+        this.setShowContactsHeader(false)
       }
     }
   }

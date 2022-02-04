@@ -10,11 +10,36 @@ export default {
   },
 
   computed: {
-    ...mapState(['enableAudio', 'notifications', 'ringGroups', 'dialer'])
+    ...mapState([
+      'enableAudio',
+      'notifications',
+      'ringGroups',
+      'dialer',
+      'communicationNotifiedDesktop',
+      'voicemailNotifiedDesktop',
+      'contactNotifiedDesktop',
+      'appointmentNotifiedDesktop',
+      'reminderNotifiedDesktop'
+    ])
   },
 
   methods: {
-    ...mapActions(['setNotifications', 'removeFromCallFishingNotificationQueue', 'removeFromCallFishingQueue', 'setDialerCallFishing']),
+    ...mapActions([
+      'setNotifications',
+      'removeFromCallFishingNotificationQueue',
+      'removeFromCallFishingQueue',
+      'setDialerCallFishing',
+      'addCommunicationNotifiedDesktop',
+      'addVoicemailNotifiedDesktop',
+      'addContactNotifiedDesktop',
+      'addAppointmentNotifiedDesktop',
+      'addReminderNotifiedDesktop',
+      'removeCommunicationNotifiedDesktop',
+      'removeVoicemailNotifiedDesktop',
+      'removeContactNotifiedDesktop',
+      'removeAppointmentNotifiedDesktop',
+      'removeReminderNotifiedDesktop'
+    ]),
 
     playAudio () {
       if (!this.enableAudio) {
@@ -48,8 +73,9 @@ export default {
 
       // for incoming call
       let notificationCommId = _.get(this.notifications, 'incomingCall.communication.id', null)
-      if (type === 'incomingCall' && notificationCommId === communicationId) {
+      if (type === 'incomingCall' && notificationCommId === communicationId && this.dialer.currentStatus !== 'RECEIVED_CALL_INVITE') {
         this.$closeActionNotification(type)
+        this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
@@ -66,17 +92,28 @@ export default {
 
       if ((notificationCommId === communicationId && type === 'callFishing' && !callFishingQueue) || forceClose) {
         this.$closeActionNotification(type)
+        this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
       if (notificationCommId === communicationId && type === 'callFishing' && document.getElementById('callFishing')) {
         this.switchCallFishingFromQueue()
+        this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
       if (type === 'callFishing' && communicationId) {
         this.removeFromCallFishingNotificationQueue(communicationId)
         this.removeFromCallFishingQueue(communicationId)
+        this.closeDesktopNotification(communicationId, 'communication')
+      }
+    },
+
+    closeDesktopNotification (communicationId, type) {
+      let notification = this.communicationNotifiedDesktop.find(notification => notification.id === communicationId)
+      if (notification) {
+        notification.close()
+        this[`remove${this.$options.filters.capitalize(type)}NotifiedDesktop`](communicationId)
       }
     },
 
@@ -124,14 +161,6 @@ export default {
     },
 
     processActionNotification (communication, type) {
-      // if (this.is_widget) {
-      //   return
-      // }
-
-      // if (this.communication_notified_in_app.includes(communication.id)) {
-      //   return
-      // }
-
       let name = ''
       let companyName = ''
       let firstAttachment = null
@@ -199,10 +228,10 @@ export default {
             break
           }
 
-          let type = 'incomingCall'
+          let callType = 'incomingCall'
 
           if (ringGroup && ringGroup.fishing_mode) {
-            type = 'callFishing'
+            callType = 'callFishing'
           }
 
           const campaignName = _.get(communication, 'campaign.name', null)
@@ -220,7 +249,7 @@ export default {
             phoneNumber: phoneNumber,
             communication: communication,
             contact: communication.contact,
-            type: type
+            type: callType
           }
           break
       }
@@ -228,12 +257,6 @@ export default {
       if (!_.isEmpty(data)) {
         this.$actionNotification(data)
       }
-
-      // push the notification obj to call notifications list
-      // this.notifications.push({
-      //   communication_id: communication.id,
-      //   notification: notification
-      // })
     },
 
     showCallFishingDataInPhone (data, type = 'callFishing') {
@@ -251,7 +274,7 @@ export default {
       }
 
       let counter = 0
-      let dialerCallFishingInterval = (queue && queue.length === 0) ? setInterval(() => {
+      let dialerCallFishingInterval = (!queue || (queue && queue.length === 0)) ? setInterval(() => {
         if (!document.getElementById(type)) {
           this.setDialerCallFishing(data)
           clearInterval(dialerCallFishingInterval)

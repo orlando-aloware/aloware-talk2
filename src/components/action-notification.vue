@@ -91,12 +91,11 @@
             <cancel-call-icon width="32"
                               height="32"
                               v-if="id === 'incomingCall'"/>
-            <ignore-call-icon v-if="id === 'callFishing'">
-              <q-tooltip anchor="top middle"
-                         self="center middle">
-                Ignore
-              </q-tooltip>
-            </ignore-call-icon>
+            <ignore-call-icon v-if="id === 'callFishing'"/>
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Ignore
+            </q-tooltip>
           </q-btn>
           <q-btn class="height-32"
                  ripple

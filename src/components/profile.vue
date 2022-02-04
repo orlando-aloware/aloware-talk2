@@ -11,7 +11,8 @@
                       :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
                       :menu-offset="[4, 16]">
         <template v-slot:label>
-          <q-item-section class="contact-info-wrapper">
+          <q-item-section class="contact-info-wrapper"
+                          v-if="!hideProfileInfo">
             <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
               <half-moon-icon v-if="profile.sleep_mode"
                               color="#9B51E0"
@@ -25,7 +26,9 @@
           <q-avatar v-if="profile"
                     size="34px"
                     :style="avatarStyle(profile.name)">
-            {{ profile.name | fixName | initials }}
+            <div class="avatar-initials">
+              {{ profile.name | fixName | initials }}
+            </div>
             <q-badge :color="color(profile.agent_status)"
                      class="availability-status"
                      floating>
@@ -176,6 +179,13 @@ export default {
   name: 'profile',
   components: { HalfMoonIcon, LogoutIcon },
   mixins: [aclMixin, avatarMixin, agentMixin],
+
+  props: {
+    hideProfileInfo: {
+      type: Boolean,
+      default: false
+    }
+  },
 
   data () {
     return {
