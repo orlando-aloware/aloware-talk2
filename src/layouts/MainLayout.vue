@@ -733,6 +733,7 @@ export default {
       this.setDialerContact()
       this.setDialerCurrentNumber('')
       this.setDialerIsMuted(false)
+      this.setDialerCallFishing()
     },
 
     nl2br (str, isXhtml) {

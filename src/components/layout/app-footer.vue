@@ -19,7 +19,7 @@
           <inbox-mobile-icon
             :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'"/>
         </span>
-        Inbox
+        Comm.’s
       </q-route-tab>
       <q-route-tab name="contacts"
                    to="/contacts"

@@ -248,6 +248,13 @@ body,
   }
 }
 
+@media (min-width: 605px) {
+  .contact-details-container.contact-details--opened {
+    margin-left: 15px;
+    margin-top: 15px;
+  }
+}
+
 @media (min-width: 605px) and (max-width: 991px) {
   .paginated {
     .table-pagination {
@@ -8249,8 +8256,6 @@ button.grey-90 {
 .contact-details-container {
   max-width: 250px;
   width: 100%;
-  margin-left: 15px;
-  margin-top: 15px;
   &-drawer {
     aside {
       border-radius: 0.25rem;
@@ -9017,7 +9022,7 @@ screen and (max-width: 956px) {
     span {
       color: $grey-92;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 600;
       font-family: $font-family-body;
     }
   }
@@ -9213,6 +9218,8 @@ screen and (max-width: 956px) {
     }
   }
   .contact-details-container.contact-details--opened {
+    padding-left: 15px;
+    padding-top: 15px;
     width: 100% !important;
     display: block !important;
     max-width: unset !important;
@@ -9225,6 +9232,15 @@ screen and (max-width: 956px) {
         margin-right: 10px !important;
         width: auto !important;
       }
+    }
+    .mobile-header {
+      padding-right: 13px !important;
+      .profile-menu {
+        min-width: 63px;
+      }
+    }
+    .menu-avatar-wrapper {
+      padding-top: 0 !important;
     }
   }
   .contact-activity-container {
@@ -10425,7 +10441,6 @@ screen and (max-width: 956px) {
 
 .mobile-header {
   .menu-avatar-wrapper {
-    padding-top: 9px !important;
     padding-right: 2.5px !important;
   }
 }
@@ -10437,6 +10452,7 @@ screen and (max-width: 956px) {
 .q-avatar {
   .avatar-initials {
     height: 7px;
+    font-weight: 500;
   }
 }
 
