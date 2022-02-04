@@ -262,9 +262,22 @@ const routes = [
         component: () => import('pages/Account.vue')
       },
       {
-        path: 'communication/:communicationId',
-        name: 'Communication',
+        path: 'line-activity/:campaignId',
+        name: 'Line Activity',
         component: () => import('pages/Account.vue')
+      },
+      {
+        path: 'ring-group-activity/:ringGroupId',
+        name: 'Ring Group Activity',
+        component: () => import('pages/Account.vue')
+      },
+      {
+        path: '/contacts/:contactId/communications/:communicationId',
+        name: 'Communication',
+        component: () => import('pages/Communication.vue'),
+        meta: {
+          title: 'Communication'
+        }
       },
       {
         path: 'phone',

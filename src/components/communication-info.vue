@@ -590,7 +590,7 @@
                v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && activityMode">
             <div class="col-12 text-center">
               <router-link
-                :to="{ name: 'Communication', params: {communicationId: communication.id}}">
+                :to="{ name: 'Communication', params: { contactId: contact.id , communicationId: communication.id}}">
                 <button class="more-details font-weight-light-bold btn btn-sm">
                   More Details
                   <chevron-right width="5"

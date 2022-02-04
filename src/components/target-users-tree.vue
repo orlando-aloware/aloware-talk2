@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="!isForm">
-      <p class="_600 mb-0">
+      <p class="_600 mb-0" v-if="showLabel">
         Target Users
         <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>
       </p>
@@ -24,7 +24,7 @@
       <br>
     </template>
     <template v-else-if="isForm">
-      <label class="form-control-label">
+      <label class="form-control-label" v-if="showLabel">
         Target Users
         <span v-if="communication.target_users && communication.target_users.length">({{attemptLabel}})</span>
       </label>
@@ -70,6 +70,11 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+    showLabel: {
+      required: false,
+      type: Boolean,
+      default: true
     }
   },
 
