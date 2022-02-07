@@ -2028,12 +2028,20 @@ span.mention {
 .contact-info-wrapper {
   display: flex;
   min-width: 0;
-  .contact-name {
-    display: inline-block;
-    width: 160px;
+  .contact-name-wrapper {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    flex-grow: 1;
+    .contact-name {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .contact-avatar {
@@ -10458,4 +10466,24 @@ screen and (max-width: 956px) {
 
 .q-tooltip {
   z-index: 9999;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.d-grid {
+  display: grid;
+}
+
+.truncated-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.grid-2-col {
+  &.task-item-body {
+    grid-template-columns: 26px 1fr;
+  }
 }
