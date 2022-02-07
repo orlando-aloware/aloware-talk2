@@ -147,7 +147,7 @@ export default {
       model: '',
       color: {
         color: 'black',
-        text: 'No Color',
+        text: 'Default',
         value: 'black'
       },
       selectWidth: 0,
