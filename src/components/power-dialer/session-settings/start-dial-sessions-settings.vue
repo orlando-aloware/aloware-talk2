@@ -453,7 +453,17 @@ export default {
       this.updateObj.name = this.newSettingName
       let res = await this.updateDialerSessionSetting({
         id: this.updateObj.id,
-        name: this.updateObj.name
+        name: this.updateObj.name,
+        call_disposition_ids: this.defaultSettings.call_disposition_ids,
+        campaign_id: this.defaultSettings.campaign_id,
+        company_id: this.defaultSettings.company_id,
+        contact_disposition_ids: this.defaultSettings.contact_disposition_ids,
+        is_company_scope: this.defaultSettings.is_company_scope,
+        metric_options: this.defaultSettings.metric_options,
+        // script_id: this.defaultSettings.script_id,
+        skip_outside_daytime_hours: this.defaultSettings.skip_outside_daytime_hours,
+        user_id: this.defaultSettings.user_id,
+        warmup_period_in_seconds: this.defaultSettings.warmup_period_in_seconds
       })
       if (res.data) {
         this.newSetting = false

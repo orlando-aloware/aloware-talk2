@@ -126,6 +126,7 @@
 <script>
 
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -152,12 +153,16 @@ export default {
   computed: {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
-      'sessionLoader'
+      'sessionLoader',
+      'sessionSettings'
     ]),
     ...mapGetters('contacts', [
       'contact',
       'listItems',
       'selectedList'
+    ]),
+    ...mapFields('powerDialer', [
+      'activeTask'
     ]),
     address () {
       if (this.contact?.cnam_city && !this.contact?.cnam_state) {
@@ -228,8 +233,9 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.TOGGLE_SESSION_LOADER(false)
+    await this.makeACall()
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -240,8 +246,23 @@ export default {
     ]),
     async nextContact () {
       this.TOGGLE_SESSION_LOADER(true)
+      this.activeTask = this.list[this.keyIndex]
       await this.getContact({ id: this.list[this.keyIndex].id })
       this.TOGGLE_SESSION_LOADER(false)
+      this.makeACall()
+    },
+    async makeACall () {
+      let data = {
+        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.contact_list_item_id}`), // we know this already based on the list (Required)
+        outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
+        contactName: `${this.activeTask.first_name} ${this.activeTask.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
+        companyName: this.activeTask.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
+        contactId: this.activeTask.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
+      }
+      console.log('Making a call from -->  ', data)
+      setTimeout(() => {
+        this.$VueEvent.fire('makeCall', data)
+      }, 3000)
     }
   },
   data () {

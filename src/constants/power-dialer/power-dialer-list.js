@@ -6,6 +6,7 @@ export const DEFAULT_FILTER_LIST = {
     id: 'in-queue',
     name: 'In Queue',
     link: '/in-queue/',
+    meta: 'in_queue',
     order: 1,
     status: 'STATUS_QUEUED'
   },
@@ -13,6 +14,7 @@ export const DEFAULT_FILTER_LIST = {
     id: 'called',
     name: 'Called',
     link: '/called/',
+    meta: 'called',
     order: 2,
     status: 'STATUS_COMPLETED'
   },
@@ -20,6 +22,7 @@ export const DEFAULT_FILTER_LIST = {
     id: 'failed',
     name: 'Failed',
     link: '/failed/',
+    meta: 'failed',
     order: 3,
     status: 'STATUS_FAILED'
   },
@@ -27,13 +30,15 @@ export const DEFAULT_FILTER_LIST = {
     id: 'scheduled',
     name: 'Scheduled',
     link: '/scheduled/',
+    meta: 'scheduled',
     order: 4,
     status: 'STATUS_SCHEDULED'
   },
-  All: {
+  ALL: {
     id: 'all',
     name: 'All',
     link: '/all/',
+    meta: 'all',
     order: 5,
     status: ''
   }

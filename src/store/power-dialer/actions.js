@@ -27,6 +27,7 @@ export default {
     let res = await window.axios.get(`api/v2/contacts/${params.id}`)
     if (res.status === 200) {
       commit('contacts/SET_CONTACT', res.data, { root: true })
+      // commit('SET_ACTIVE_TASK', res.data)
     }
   },
   getContacts: async ({ commit }) => {
@@ -157,6 +158,9 @@ export default {
     }).catch(err => {
       return err
     })
+  },
+  resetPowerDialerTasks ({ commit }) {
+    commit('RESET_POWER_DIALER_TASKS')
   },
   setDefaultSettings ({ commit }, data = {}) {
     commit('SET_DEFAULT_SETTING', data)

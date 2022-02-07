@@ -26,56 +26,49 @@
             </template>
 
             <InProgressContact
-              v-if="list"
-              :in-progress-contact="activeList" />
+              :in-progress-contact="activeTask" />
 
           </q-expansion-item>
           <q-separator />
         </div>
 
-        <div v-for="(group, key) in listFilters"
-          :key="`session-expanded-${key}`">
-
+        <div v-for="(group, key) in powerDialerTasks" :key="key">
           <q-expansion-item
-            :default-opened="key === 'IN_QUEUE' ? true : false"
+            :default-opened="key === 'in_queue'"
             class="t-expansion-panels px-0"
             header-class="text-black">
-
             <template v-slot:header>
-              <q-item-section class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
+              <q-item-section
+                class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
                 <div class="text-13">
-                  {{ group.name }}
+                  {{ listFilters[key.toUpperCase()].name }}
+                  <!-- - {{ key.toUpperCase() }} -->
                   <q-chip size="xs" square class="p-0">
-                    {{ totalCount(key) }}
+                    {{ group.length }}
+                    <!-- {{ totalCount(key) }} -->
                   </q-chip>
                 </div>
               </q-item-section>
             </template>
-
             <q-card class="t-cards">
               <q-list class="px-2 pb-2">
-                <template
-                  v-for="(item, i) in filteredList(group.status)">
+                <template v-for="(item, i) in group">
                   <q-item
-                    v-if="contact.id !== item.id"
                     :key="`acc-item-${i}`"
-                    :class="{ active: item.id === activeList.id && group.name === 'In Progress' }"
+                    :class="{ active: item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress' }"
                     class="t-expansion-panel px-2">
-
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
                         {{ avatarName(item.first_name, item.last_name) }}
                       </q-avatar>
                     </div>
-
                     <q-item-section class="pl-2">
                       <q-item-label>{{ item.first_name }} {{ item.last_name }}</q-item-label>
                       <q-item-label caption lines="2">{{ item.phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
                       <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
                     </q-item-section>
-
                     <q-item-section
-                      v-if=" item.id === activeList.id && group.name === 'In Progress'"
+                      v-if=" item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress'"
                       class="t-item-icon"
                       side top>
                       <q-avatar color="red" size="md">
@@ -112,16 +105,11 @@
                         </q-avatar>
                       </q-btn>
                     </div>
-
                   </q-item>
-                  <!-- <q-separator :key="`acc-item-line-${i}`" spaced inset /> -->
                 </template>
               </q-list>
             </q-card>
-            <!-- <q-separator /> -->
-
           </q-expansion-item>
-
           <q-separator />
         </div>
       </div>
@@ -146,14 +134,18 @@ export default {
     SearchList,
     PhoneIcon
   },
-  async mounted () {
-    // this.NEXT_CONTACT_IN_PROGRESS(this.activeList)
+  mounted () {
+    // this.NEXT_CONTACT_IN_PROGRESS(this.activeTask)
+    console.log('this.activeTask :>> ', this.activeTask)
+    // let { powerDialerTasks } = this
+    // this.powerDialerTasks.in_queue.shift()
   },
   computed: {
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
       // 'currentList',
-      'sessionLoader'
+      'sessionLoader',
+      'activeTask'
     ]),
     ...mapGetters('contacts', [
       'contact',
@@ -161,22 +153,26 @@ export default {
       'listItems'
     ]),
     ...mapFields('powerDialer', [
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'activeTask'
     ]),
-    list () {
-      return this.listItems[this.selectedList.id].data || []
-    },
-    activeList () {
-      if (this.list.length) {
-        return this.list[0]
-      }
-      return {}
-    },
+    // list () {
+    //   return this.listItems[this.selectedList.id].data || []
+    // },
+    // activeTask () {
+    //   if (this.list.length) {
+    //     return this.list[0]
+    //   }
+    //   return {}
+    // },
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
+    status () {
+      return AutoDialTaskStatus.STATUSES
+    },
     test () {
-      return this.$options.filters.fixPhone(`power_dialer_task:${this.activeList?.id}`)
+      return this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.id}`)
     }
   },
   methods: {
@@ -195,14 +191,14 @@ export default {
     onLeave () {
       this.$refs.dropdown.visible = false
     },
-    filteredList (key = '') {
-      if (!key) {
-        return this.list
-      }
-      return this.list.filter(lst => {
-        return lst.task_status === AutoDialTaskStatus[key]
-      })
-    },
+    // filteredList (key = '') {
+    //   if (!key) {
+    //     return this.list
+    //   }
+    //   return this.list.filter(lst => {
+    //     return lst.task_status === AutoDialTaskStatus[key]
+    //   })
+    // },
     totalCount (key = '') {
       if (!key) return ''
       let detail = this.listItems[this.selectedList.id]
@@ -218,25 +214,25 @@ export default {
         default:
           return detail.total
       }
-    },
-    makeACall () {
-      let data = {
-        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeList?.id}`), // we know this already based on the list (Required)
-        outboundCampaignId: '535', // this.session.campaignId, // ID of the line that you are calling from (Required)
-        contactName: `${this.activeList.first_name} ${this.activeList.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
-        companyName: this.activeList.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
-        contactId: this.activeList.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
-      }
-      console.log('data :>> ', data)
-      // this.$VueEvent.fire('makeCall', data)
     }
+    // makeACall () {
+    //   let data = {
+    //     currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.id}`), // we know this already based on the list (Required)
+    //     outboundCampaignId: '535', // this.session.campaignId, // ID of the line that you are calling from (Required)
+    //     contactName: `${this.activeTask.first_name} ${this.activeTask.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
+    //     companyName: this.activeTask.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
+    //     contactId: this.activeTask.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
+    //   }
+    //   console.log('data :>> ', data)
+    //   // this.$VueEvent.fire('makeCall', data)
+    // }
   },
   watch: {
-    async activeList (val) {
+    async activeTask (val) {
       this.flagged = true
-      await this.getContact({ id: this.activeList?.id })
-      this.makeACall()
-      this.flagged = true
+      await this.getContact({ id: this.activeTask?.id })
+      // this.makeACall()
+      this.flagged = false
     }
   },
   data () {

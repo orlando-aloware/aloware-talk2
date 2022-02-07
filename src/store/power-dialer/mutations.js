@@ -68,6 +68,9 @@ export default {
   CHANGING_SELECTED_CONTACT: (state, isChanging) => {
     state.changingSelectedContact = isChanging
   },
+  SET_ACTIVE_TASK: (state, payload) => {
+    state.activeTask = payload
+  },
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedList.id].data = payload
   },
@@ -93,7 +96,16 @@ export default {
     })
     state.sessionSettingGroups.personal = personal
     state.sessionSettingGroups.company = company
-  }, // sessionSettings
+  },
+  RESET_POWER_DIALER_TASKS: (state) => {
+    state.powerDialerTasks = {
+      in_queue: [],
+      called: [],
+      failed: [],
+      scheduled: [],
+      all: []
+    }
+  },
   SET_SESSION_SETTINGS: (state, data) => {
     state.sessionSettings = data
   },

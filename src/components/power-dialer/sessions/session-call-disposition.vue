@@ -97,6 +97,7 @@ export default {
       'updateCallDisposition'
     ]),
     async onSelectedCallDisposition (data) {
+      console.log('data :>> ', data)
       let response = await this.updateCallDisposition({
         id: this.contact?.last_communication?.id,
         params: {

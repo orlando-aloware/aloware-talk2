@@ -27,13 +27,14 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import CallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionPage from 'src/components/power-dialer/sessions/session-main-page'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
+import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
   name: 'PowerDialerSession',
@@ -50,7 +51,6 @@ export default {
       'contact'
     ]),
     ...mapGetters('powerDialer', [
-      'isStartingDial',
       'sessionSidebarExpanded'
     ]),
     ...mapFields('powerDialer', [
@@ -64,25 +64,48 @@ export default {
         return this.list[0]
       }
       return {}
+    },
+    listFilters () {
+      return DEFAULT_FILTER_LIST
+    },
+    status () {
+      return AutoDialTaskStatus.STATUSES
     }
   },
-  created () {
-    console.log('Starting sessions...')
-    if (!this.isStartingDial) {
-      // this.$router.push({ name: 'Power Dialer' })
-    }
+  mounted () {
+    this.resetPowerDialerTasks()
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'resetPowerDialerTasks'
+    ]),
     prepareTasks () {
-      // Preparing tasks full
-    },
-    filteredList (key = '') {
-      if (!key) {
-        return this.list
-      }
-      return this.list.filter(lst => {
-        return lst.task_status === AutoDialTaskStatus[key]
+      /**
+       * Preparing power dialer tasks
+       * Converting selected contacts list to vuex sessions-ready objects
+       */
+      let { list, powerDialerTasks } = this
+      list.forEach(lst => {
+        switch (lst.task_status) {
+          case AutoDialTaskStatus.STATUS_QUEUED:
+            powerDialerTasks.in_queue.push(lst)
+            break
+          case AutoDialTaskStatus.STATUS_COMPLETED:
+            powerDialerTasks.called.push(lst)
+            break
+          case AutoDialTaskStatus.STATUS_FAILED:
+            powerDialerTasks.failed.push(lst)
+            break
+          case AutoDialTaskStatus.STATUS_SCHEDULED:
+            powerDialerTasks.scheduled.push(lst)
+            break
+        }
       })
+    }
+  },
+  watch: {
+    listItems (val) {
+      this.prepareTasks()
     }
   }
 }
