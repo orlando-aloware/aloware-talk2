@@ -645,7 +645,7 @@ export default {
     },
 
     parkCall () {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
       this.loadingPark = true
