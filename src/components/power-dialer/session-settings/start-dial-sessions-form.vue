@@ -214,7 +214,7 @@ export default {
       return !!item
     },
     onShowMetricsMenu () {
-      this.selectWidth = this.$refs.metrics[0].$el.offsetWidth
+      this.selectWidth = this.$refs.metric_options[0].$el.offsetWidth
     },
     onShowWarmUpMenu () {
       this.selectWidth = this.$refs.warmup_period_in_seconds[0].$el.offsetWidth
