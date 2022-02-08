@@ -220,7 +220,7 @@ export default {
       this.metric = ''
       this.color = {
         color: 'black',
-        text: 'No Color',
+        text: 'Default',
         value: 'black'
       }
     },

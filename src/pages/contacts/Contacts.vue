@@ -99,7 +99,7 @@ export default {
         this.setShowContactsListSidebar(false)
       }
 
-      if (to.name === 'Contact') {
+      if (to.name === 'Contact' && this.$q.screen.lt.md) {
         this.setShowContactsHeader(false)
       }
     }
