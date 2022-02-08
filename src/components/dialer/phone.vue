@@ -1222,6 +1222,10 @@ import * as AnswerTypes from 'src/constants/answer-types'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 
+const MODULE = {
+  powerDialer: 'Power Dialer'
+}
+
 export default {
   name: 'phone',
 
@@ -1637,7 +1641,11 @@ export default {
 
     this.setupDraggable()
     this.setupContactLocalTime()
-    this.isVisible = true
+    if (this.$route.name === MODULE.powerDialer) {
+      this.isVisible = false
+    } else {
+      this.isVisible = true
+    }
     this.showLocalTime = true
   },
 
