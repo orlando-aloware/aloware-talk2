@@ -113,6 +113,7 @@ export default {
     })
   },
   async createDialerSessionSetting ({ commit }, params = {}) {
+    console.log('params :>> ', params)
     return window.axios.post(
       `/api/v2/dialer-sessions`,
       params

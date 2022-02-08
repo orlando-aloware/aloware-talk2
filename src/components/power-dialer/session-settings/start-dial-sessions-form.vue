@@ -20,7 +20,7 @@
             </label>
 
           <MetricSelector
-            v-if="cform.name === 'metrics'"
+            v-if="cform.name === 'metric_options'"
             v-model="resources[cform.name]"
             :options="metricOptions"
             :multiple="true"
@@ -168,7 +168,6 @@ export default {
         resources.warmup_period_in_seconds = 0
         resources.script_id = null
         resources.metric_options = []
-        resources.metrics = []
         resources.call_disposition_ids = []
         resources.contact_disposition_ids = []
         resources.is_company_scope = null
@@ -241,10 +240,6 @@ export default {
         this.resources = this.sessionSettings
         // console.log('this.sessionSettings :>> ', this.sessionSettings)
       }
-    },
-    defaultSettings (val) {
-      // console.log('1002 :>> ', this.defaultValues)
-      this.resources = this.defaultSettings
     }
   },
   data () {

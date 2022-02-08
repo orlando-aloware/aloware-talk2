@@ -304,8 +304,13 @@ export default {
         }
       })
 
-      // Power Dialer Session Tasks
+      /**
+       * ------------------------------------
+       * Power Dialer Session Tasks
+       * ------------------------------------
+       */
       .listen('.user.contact_list_item.created', (event) => {
+        console.log(' %c LISTENING: Contact list item created ', 'background: #000; color: green;')
         let contactListItem = event.contact_list_item
         if (event.contact) {
           contactListItem.contact = event.contact
@@ -319,6 +324,7 @@ export default {
         window.VueEvent.fire('contact_list_item_created', contactListItem)
       })
       .listen('.user.contact_list_item.updated', (event) => {
+        console.log(' %c LISTENING: Contact list item updated ', 'background: #000; color: green;')
         let contactListItem = event.contact_list_item
         if (event.contact) {
           contactListItem.contact = event.contact
@@ -332,8 +338,13 @@ export default {
         window.VueEvent.fire('contact_list_item_updated', contactListItem)
       })
       .listen('.user.contact_list_item.deleting', (event) => {
+        console.log(' %c LISTENING: Contact list item deleting... ', 'background: #000; color: green;')
         window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
       })
+      /**
+       * End of Power Dialer Session Tasks
+       */
+
       .notification((notification) => {
         if (!this.profile.sleep_mode) {
           switch (notification.type) {

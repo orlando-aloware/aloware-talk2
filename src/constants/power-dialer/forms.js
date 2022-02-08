@@ -46,7 +46,7 @@ export const SESSION_SETTINGS_ALL_FORMS = [
         items: []
       },
       {
-        name: 'metrics',
+        name: 'metric_options',
         label: 'Set Session Metrics',
         type: 'select',
         items: []

@@ -233,9 +233,11 @@ export default {
       }
     }
   },
-  async mounted () {
+  mounted () {
     this.TOGGLE_SESSION_LOADER(false)
-    await this.makeACall()
+    setTimeout(() => {
+      this.makeACall()
+    }, 3000)
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -254,15 +256,14 @@ export default {
     async makeACall () {
       let data = {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.contact_list_item_id}`), // we know this already based on the list (Required)
+        // currentNumber: this.$options.filters.fixPhone(`${this.activeTask?.phone_number}`), // we know this already based on the list (Required)
         outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
         contactName: `${this.activeTask.first_name} ${this.activeTask.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
         companyName: this.activeTask.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.activeTask.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       }
-      console.log('Making a call from -->  ', data)
-      setTimeout(() => {
-        this.$VueEvent.fire('makeCall', data)
-      }, 3000)
+      // console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
+      this.$VueEvent.fire('makeCall', data)
     }
   },
   data () {
