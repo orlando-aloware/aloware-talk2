@@ -3893,6 +3893,9 @@ span.mention {
 
   &:hover {
     background: $purple-40 !important;
+    .q-focus-helper {
+      background: unset !important;
+    }
   }
 
   .call-status {
