@@ -44,27 +44,14 @@
         flat
         style="width: 800px; max-width: 90vw; min-height: 500px;"
         class="my-card py-2 px-2">
-        <!-- <q-bar class="bg-white">
-          <q-space />
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-bar> -->
         <q-card-section
           class="p-0"
           horizontal>
           <q-card-section
             style="width: 26% !important"
             class="p-0 pt-2 pr-2 border-right">
+
             <p class="text-weight-bold px-2">Session Settings</p>
-            <!-- <q-btn
-              unelevated no-caps
-              class="px-2 mt-3 full-width"
-              color="grey-3"
-              text-color="black"
-              align="left">
-              Create New
-            </q-btn> -->
 
             <q-list
               dense
@@ -215,37 +202,15 @@
                         size="sm"
                         class="px-3 py-0"
                         color="success">Begin Dialing</q-btn>
-                      <q-btn
-                        @click="test"
-                        unelevated
-                        no-caps
-                        size="sm"
-                        class="px-3 py-0"
-                        color="success">Test</q-btn>
                     </q-card-actions>
                   </q-card>
                 </div>
               </div>
-              <!-- <q-tab-panels
-                v-model="tab"
-                keep-alive
-                transition-next="fade"
-                class="shadow-2 rounded-borders p-0 m-0">
-                <template
-                  v-for="panel in tabCollections">
-                  <q-tab-panel
-                    :key="panel.name"
-                    :name="panel.name"
-                    class="p-0 m-0">
-                    <SessionsForm
-                      @valid-form="disabled = false"
-                      @invalid-form="disabled = true" />
-                  </q-tab-panel>
-                </template>
-              </q-tab-panels> -->
+
               <SessionsForm
                 @valid-form="disabled = false"
                 @invalid-form="disabled = true" />
+
             </q-card>
           </q-card-section>
         </q-card-section>
@@ -286,13 +251,6 @@
         <q-card-actions
           class="px-3 pb-3"
           align="right">
-          <!-- <q-btn
-            unelevated
-            no-caps
-            label="Cancel"
-            color="grey-80"
-            size="sm"
-            v-close-popup /> -->
           <b-button
             variant="dark-grey"
             class="f-btn--cancel mr-2"
@@ -324,14 +282,6 @@
             @click="saveAsNew">
             Save
           </b-button>
-          <!-- <q-btn
-            @click="beginDial"
-            unelevated
-            no-caps
-            :disabled="disabled"
-            size="sm"
-            class="px-3 py-0"
-            color="success">Begin Dialing</q-btn> -->
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -482,14 +432,6 @@ export default {
     },
     fetchedGroupSettings (type) {
       return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
-    },
-    async test () {
-      let res = await this.$axios.get('/api/v2/agents/metrics', {
-        params: {
-          group_by_category: true
-        }
-      })
-      console.log('res :>> ', res)
     },
     toggleSelected () {
       if (this.hoveredMenu) {
