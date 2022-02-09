@@ -97,7 +97,7 @@
               anchor="top right"
               self="top left"
               v-model="showIncomingCallMenu"
-              :offset="[5, 12]"
+              :offset="[5, -4]"
               @hide="showIncomingCallMenu = false">
         <q-list>
           <q-item clickable
@@ -105,6 +105,7 @@
                   @click="onParkCurrentCallAndAnswer">
             <q-item-section class="d-inline-flex">
               <park-call-icon color="#9B51E0"
+                              class="park-call-icon"
                               width="11.7"
                               height="12.35"></park-call-icon>
               <span>Park Current Call &amp; Answer</span>
@@ -128,7 +129,7 @@
               anchor="top right"
               self="top left"
               v-model="showParkedCallMenu"
-              :offset="[5, 12]"
+              :offset="[5, -4]"
               @hide="showParkedCallMenu = false">
         <q-list>
           <q-item clickable
@@ -136,6 +137,7 @@
                   @click="onParkCurrentCallAndConnect">
             <q-item-section class="d-inline-flex">
               <park-call-icon color="#9B51E0"
+                              class="park-call-icon"
                               width="11.7"
                               height="12.35"></park-call-icon>
               <span>Park Current Call &amp; Connect</span>
