@@ -234,7 +234,8 @@ export default {
     },
     back () {
       if (!this.$route.path.includes('channels') && this.$route.path.includes('contact')) {
-        this.$emit('toggleContactSidebar', true)
+        // this.$emit('toggleContactSidebar', true)
+        this.$router.back()
         return
       }
 

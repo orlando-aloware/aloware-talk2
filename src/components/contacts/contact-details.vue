@@ -4,9 +4,12 @@
          v-if="$q.screen.lt.md">
       <div class="mobile-header-labels h-100 align-items-center justify-content-start">
         <back-button @click="$emit('back')"/>
-        <span class="pr-1 contact-name">{{ contactName }} Details</span>
+        <span class="pr-1 contact-name">
+          Contact Details
+        </span>
       </div>
-      <profile class="p-0"></profile>
+      <profile class="p-0"
+               :hide-profile-info="true"/>
     </div>
     <div class="contact-details-wrapper">
       <div class="details-component-container"

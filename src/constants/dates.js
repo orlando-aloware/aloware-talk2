@@ -18,6 +18,10 @@ export const DATE_RANGES = [
   {
     id: 5,
     label: 'This Year So Far'
+  },
+  {
+    id: 6,
+    label: 'All Time'
   }
 ]
 
