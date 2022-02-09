@@ -65,7 +65,7 @@
                 clickable>
                 <q-item-section
                   @click="loadSettings('Untitled')">
-                  New Setting
+                  <div class="text-bold">New <span class="text-weight-regular text-grey-80">(Untitled)</span></div>
                 </q-item-section>
                 <q-item-section side>
                   <CheckIcon v-if="selectedItem === 'Untitled'" />
@@ -313,6 +313,9 @@ export default {
       'defaultSettings',
       'sessionSettingGroups'
     ]),
+    ...mapGetters('contacts', [
+      'selectedList'
+    ]),
     tabCollections () {
       let items = this.tabHeaders.filter(i => i.disabled === false)
       return items.concat(this.groupedSettings)
@@ -356,6 +359,7 @@ export default {
       'createDialerSessionSetting',
       'deleteDialerSessionSetting',
       'updateDialerSessionSetting',
+      'getTemporarySessionSetting',
       'getSessionSetting'
     ]),
     ...mapMutations('powerDialer', [
@@ -374,6 +378,7 @@ export default {
         this.selectedItem = data.name
         await this.getSessionSetting(data.id)
       } else {
+        await this.getTemporarySessionSetting(this.selectedList.id)
         this.resetDefaults(false)
         this.selectedItem = data
       }
