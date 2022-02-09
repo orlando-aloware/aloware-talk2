@@ -468,10 +468,19 @@ export default {
       'setSelectedListContactCount',
       'pinnedCountLoaded'
     ]),
+    ...mapActions('powerDialer', [
+      'updateContactsList'
+    ]),
 
-    beginDial () {
+    async beginDial (uid = null) {
       this.START_DIAL_TOGGLE(true)
       // this.setSelectedContact({})
+      if (uid) {
+        await this.updateContactsList({
+          id: this.selectedList.id,
+          dialer_session_id: uid
+        })
+      }
       this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.selectedList.id}/sessions`)
     },

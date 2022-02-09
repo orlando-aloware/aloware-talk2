@@ -50,6 +50,10 @@ export default {
     let res = await window.axios.get(endpoint)
     return res.data
   },
+  async updateContactsList ({ commit }, params = {}) {
+    let res = await window.axios.patch(`api/v2/power-dialer-lists/${params.id}`, params)
+    return res
+  },
 
   /**
    * Disposition API calls

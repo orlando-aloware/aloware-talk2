@@ -368,9 +368,22 @@ export default {
     dialPreparation () {
       this.dialog = true
     },
-    beginDial () {
+    async beginDial () {
       this.dialog = false
-      this.$emit('start')
+      if (this.selectedItem === 'Untitled') {
+        let newSettings = { ...this.defaultSettings }
+        let res = await this.createDialerSessionSetting({
+          ...this.removeEmptyParams(newSettings),
+          contact_list_id: this.selectedList.id,
+          name: `${this.selectedList.name}-${new Date().valueOf()}`
+        })
+        if (res?.id) {
+          await this.getDialerSessionSettings()
+        }
+        this.$emit('start', null)
+      } else {
+        this.$emit('start', this.sessionSettings.id)
+      }
     },
     async loadSettings (data) {
       this.loading = true
