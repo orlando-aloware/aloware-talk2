@@ -15,9 +15,9 @@
       <q-item-label class="call-status">
         <span>{{ phoneStatus }}</span>
       </q-item-label>
-      <q-item-label class="call-status">
+      <!--q-item-label class="call-status">
         <span>{{ dialer.parkedCallTimer }}</span>
-      </q-item-label>
+      </q-item-label-->
     </q-item-section>
 
     <q-item-section side>

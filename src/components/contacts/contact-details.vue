@@ -5,7 +5,7 @@
       <div class="mobile-header-labels h-100 align-items-center justify-content-start">
         <back-button @click="$emit('back')"/>
         <span class="pr-1 contact-name">
-          {{ contactName }} Details
+          Contact Details
         </span>
       </div>
       <profile class="p-0"

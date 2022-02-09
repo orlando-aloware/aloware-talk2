@@ -249,7 +249,7 @@ body,
 }
 
 @media (min-width: 605px) {
-  .contact-details-container.contact-details--opened {
+  .contact-details-container {
     margin-left: 15px;
     margin-top: 15px;
   }
@@ -1354,6 +1354,10 @@ i.option-separator {
   border-radius: 8px;
 }
 
+.border-full-rounded {
+  border-radius: 14px;
+}
+
 .sms-activity {
   font-style: normal;
   font-weight: normal;
@@ -2028,12 +2032,20 @@ span.mention {
 .contact-info-wrapper {
   display: flex;
   min-width: 0;
-  .contact-name {
-    display: inline-block;
-    width: 160px;
+  .contact-name-wrapper {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    flex-grow: 1;
+    .contact-name {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .contact-avatar {
@@ -3873,11 +3885,15 @@ span.mention {
 }
 
 .parked-call {
-  background: rgba(155, 81, 224, 0.04);
-  border: 1px solid #9B51E0;
+  background: $purple-10;
+  border: 1px solid $purple-100;
   border-radius: 7px;
   width: 190px;
   @extend .text-grey-100;
+
+  &:hover {
+    background: $purple-40 !important;
+  }
 
   .call-status {
     font-size: 11px !important;
@@ -8352,8 +8368,15 @@ button.grey-90 {
   height: 0;
 }
 
+.dashboard {
+  &:not(.contact-page) {
+    .mobile-back-btn {
+      display: none;
+    }
+  }
+}
+
 .mobile-back-btn {
-  display: none;
   border-radius: 50%;
   height: 27px;
   width: 24px;
@@ -10460,7 +10483,6 @@ screen and (max-width: 956px) {
   z-index: 9999;
 }
 
-
 .ring-group-snapshot-table {
   box-shadow: none !important;
 }
@@ -10508,5 +10530,24 @@ screen and (max-width: 956px) {
 
   .communication-details-card {
     margin-top: 60px;
+  }
+}
+.min-w-0 {
+  min-width: 0;
+}
+
+.d-grid {
+  display: grid;
+}
+
+.truncated-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.grid-2-col {
+  &.task-item-body {
+    grid-template-columns: 26px 1fr;
   }
 }

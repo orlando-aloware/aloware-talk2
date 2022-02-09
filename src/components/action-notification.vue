@@ -12,19 +12,19 @@
            @hidden="onHidden"
            @shown="autoClose">
     <button
-      class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-rounded position-absolute call-fishing-clear-queues"
-      v-if="queue && queue.length > 0"
+      class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-full-rounded position-absolute call-fishing-clear-queues"
+      v-if="queueCount > 1"
       @click="clearNotificationQueue">
       Clear All
     </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
       <div class="d-flex flex-row align-items-start">
-        <b-badge v-if="id === 'callFishing' && queue && queue.length > 0"
+        <b-badge v-if="id === 'callFishing' && queueCount > 1"
                  class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
                  pill>
-          {{ queue.length }}
+          {{ queueCount }}
         </b-badge>
         <div class="mr-2 notification-icon"
         @click="toInbox">
@@ -130,7 +130,8 @@
           </q-btn>
 
           <b-dropdown no-caret
-                      right
+                      :right="$q.screen.lt.lg"
+                      :dropright="!$q.screen.lt.lg"
                       variant="transparent"
                       class="m-2 b-compact-dropdown-button text-bold height-32"
                       v-if="dialer.currentStatus !== 'WRAP_UP'">
@@ -138,7 +139,6 @@
               <accept-call-icon width="32" height="32"/>
             </template>
             <b-dropdown-item href=""
-                             :disabled="dialer.parkedCall !== null && dialer.parkedCall !== undefined"
                              @click="answerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
@@ -305,6 +305,13 @@ export default {
         (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
           (this.id === 'callFishing' && !this.dialer.call && !this.dialer.callFishing.communication)) &&
         !this.dialer.parkedCall
+    },
+    queueCount () {
+      if (_.isEmpty(this.queue)) {
+        return 1
+      }
+
+      return this.queue.length + 1
     }
   },
   methods: {

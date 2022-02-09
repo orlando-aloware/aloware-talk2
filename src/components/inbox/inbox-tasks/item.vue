@@ -15,10 +15,10 @@
               :name="contactAvatar">
       </avatar>
     </div>
-    <div class="task-details flex-grow-1 pb-1"
+    <div class="task-details flex-grow-1 pb-1 d-grid"
          role="button">
-      <div class="contact-name">
-        {{ contactName | truncate(20) }}
+      <div class="contact-name truncated-text">
+        {{ contactName }}
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top left"
                    self="top left"
@@ -27,7 +27,7 @@
         </q-tooltip>
       </div>
       <div v-if="contact.last_communication"
-           class="d-flex flex-row">
+           class="d-grid grid-2-col task-item-body">
         <div class="pr-2">
           <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction)"
                      height="18px"
@@ -45,9 +45,9 @@
           contact.last_communication.body.length < 1)">
             {{ smsEmptyBodyAlternativeText }}
           </span>
-          <span v-if="contact.last_communication.body !== null">
-            {{ contact.last_communication.body | truncate(22) }}
-          </span>
+          <div class="truncated-text" v-if="contact.last_communication.body !== null">
+            {{ contact.last_communication.body }}
+          </div>
 
         </div>
       </div>
