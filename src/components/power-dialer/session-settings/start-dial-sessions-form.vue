@@ -19,13 +19,6 @@
             {{ cform.label }}
             </label>
 
-          <!-- <MetricSelector
-            v-if="cform.name === 'metric_options'"
-            v-model="resources[cform.name]"
-            :options="metricOptions"
-            :multiple="true"
-            :use-chips="true"
-            custom-class="generic-selector" /> -->
           <q-select
             v-if="cform.name === 'metric_options'"
             v-model="resources[cform.name]"
@@ -56,15 +49,6 @@
               </q-item>
             </template>
           </q-select>
-          <!-- <b-form-select
-            v-if="cform.name === 'metric_options'"
-            v-model="resources[cform.name]"
-            :options="metricOptions"
-            value-field="value"
-            text-field="label"
-            multiple
-            :select-size="1">
-          </b-form-select> -->
 
           <LineSelector
             v-else-if="cform.name === 'campaign_id'"
@@ -117,12 +101,6 @@
               :false-value="0"
               size="md"
               val="md" />
-            <!-- <b-form-checkbox
-              v-model="resources[cform.name]"
-              name="check-button"
-              switch>
-              Switch
-            </b-form-checkbox> -->
           </p>
 
           <WarmupPeriodSelector
@@ -145,19 +123,15 @@
 <script>
 
 import { mapState, mapGetters, mapActions } from 'vuex'
-// import MetricSelector from 'components/generic-selectors/session-metric-selector'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
 import ScriptSelector from 'components/generic-selectors/script-selector'
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-// import { METRIC_OPTIONS_3 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { isEmpty } from 'lodash'
-
-// const stats = { METRIC_OPTIONS_3 }
 
 export default {
   name: 'StartDialSessionsForm',
@@ -168,7 +142,6 @@ export default {
     }
   },
   components: {
-    // MetricSelector,
     WarmupPeriodSelector,
     LineSelector,
     ScriptSelector,
@@ -224,12 +197,6 @@ export default {
         return resources
       }
     },
-    // metricOptions () {
-    //   if (stats) {
-    //     return stats.METRIC_OPTIONS_3
-    //   }
-    //   return []
-    // },
     warmUpPeriods () {
       let values = []
       values = [WARM_UP_PERIOD_LIST]
@@ -252,11 +219,6 @@ export default {
     ]),
     onLineFilterChange (value, prop) {
       this.resources.campaign_id = value
-      // this.filter[prop] = value
-      // this.updateChannelChangedFilterFields({
-      //   name: prop,
-      //   value: value
-      // })
     },
     isChanged (property) {
       let item = this.channelChangedFilterFields.find(item => item.property === property)
@@ -282,13 +244,10 @@ export default {
       deep: true
     },
     sessionSettings (val) {
-      // console.log('val :>> ', isEmpty(val))
       if (isEmpty(val)) {
-        // console.log('1001 :>> ', 1001)
         this.resources = this.defaultSettings || this.defaultValues
       } else {
         this.resources = this.sessionSettings
-        // console.log('this.sessionSettings :>> ', this.sessionSettings)
       }
     }
   },
