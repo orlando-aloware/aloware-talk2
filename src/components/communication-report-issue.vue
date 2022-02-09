@@ -1,7 +1,11 @@
 <template>
-  <div>
+  <div class="report-issue-wrapper">
     <b-button variant="primary"
-              size="sm" class="mr-1" @click="isOpen = true">Report Issue</b-button>
+              size="sm"
+              class="mr-1 btn-block"
+              @click="isOpen = true">
+      Report Issue
+    </b-button>
     <b-modal
       title="Report Issue"
       size="lg"

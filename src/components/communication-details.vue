@@ -7,10 +7,10 @@
 
         <q-card flat bordered class="communication-details-card bg-grey-1">
           <q-card-section class="pb-0">
-            <div class="d-flex justify-content-between">
-              <div class="fs-14 mt-1">Communication Info</div>
+            <div class="d-flex justify-content-between header">
+              <div class="fs-14 mt-1 header-title">Communication Info</div>
 
-              <div class="d-flex">
+              <div class="d-flex header-btn-wrapper">
                 <communication-report-issue
                   :communication-id="communication.id"></communication-report-issue>
                 <b-button v-if="hasPermissionTo('archive communication')"

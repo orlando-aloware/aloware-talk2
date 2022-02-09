@@ -10532,6 +10532,40 @@ screen and (max-width: 956px) {
     margin-top: 60px;
   }
 }
+
+@media (min-width: 401px){
+  .communication-details-card {
+    .header {
+      .header-btn-wrapper  {
+       .report-issue-wrapper {
+         margin-right: 5px !important;
+       }
+      }
+    }
+  }
+}
+
+@media (max-width: 400px){
+  .communication-details-card {
+    .header {
+      flex-direction: column !important;
+
+      .header-title {
+        text-align: center;
+      }
+
+      .header-btn-wrapper  {
+        margin-top: 5px;
+        flex-direction: column !important;
+
+        button {
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+}
+
 .min-w-0 {
   min-width: 0;
 }
