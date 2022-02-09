@@ -3,7 +3,7 @@
     <b-row>
       <b-col md="4"
              sm="12"
-             class="pl-0">
+             class="pl-0 pr-0">
 
         <q-card flat bordered class="communication-details-card bg-grey-1">
           <q-card-section class="pb-0">
@@ -36,6 +36,75 @@
               </span>
               {{ communication.type | fixCommType }}
             </div>
+          </q-card-section>
+
+          <!--ATTACHMENTS-->
+          <q-card-section v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
+                          class="pt-0 pb-0">
+
+            <div v-if="communication.attachments && communication.attachments.length > 0">
+              <div v-for="(attachment, index) in communication.attachments"
+                   :key="index">
+                <q-img
+                  class="img-fluid d-block r-2x br-8"
+                  height="300px"
+                  v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type"
+                  :class="index > 0 ? 'mb-1' : ''"
+                  :key="index"
+                  :src="attachment.url">
+                  <template v-slot:error>
+                    <div class="absolute-full flex flex-center bg-negative text-white">
+                      Error!
+                    </div>
+                  </template>
+                </q-img>
+
+                <div v-if="attachment.mime_type && isAttachmentAudio(attachment.mime_type)">
+                  <audio class="audio-player"
+                         controls>
+                    <source :src="attachment.url"
+                            :type="attachment.mime_type">
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+
+                <div v-if="attachment.mime_type && isAttachmentVideo(attachment.mime_type)">
+                  <video width="320"
+                         class="rounded"
+                         controls>
+                    <source :src="attachment.url"
+                            :type="attachment.mime_type">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+
+                <a :href="attachment.url"
+                   target="_blank"
+                   v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
+                  <div class="p-2 text-center">
+                    <figure>
+                      <img height="100"
+                           width="100"
+                           src="src/assets/icons/app/file.svg">
+                      <figcaption>{{ attachment.name ? attachment.name : 'Click Here To Download' }}</figcaption>
+                    </figure>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div v-if="communication.body"
+                 class="fs-13 my-2">
+              <span class="text-muted"
+                v-if="communication.type !== CommunicationTypes.SMS"
+                v-html="$options.filters.nl2br(communication.body)">
+              </span>
+              <span class="text-muted fs-14 font-weight-light-bold"
+                    v-else>
+                  {{ communication.body }}
+              </span>
+            </div>
+
           </q-card-section>
 
           <!--COMM DESCRIPTION-->
@@ -210,7 +279,7 @@
               <hr/>
             </div>
 
-            <b-form-row v-if="![CommunicationTypes.EMAIL, CommunicationTypes.FAX, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+            <b-form-row v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <b-col class="pl-0 pr-0">
                 <q-item-label>{{ communication.type === CommunicationTypes.CALL ? 'Started at' : 'Sent at'}}: </q-item-label>
               </b-col>
@@ -316,7 +385,7 @@
           <q-card-section v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
                           class="pt-0 pb-0">
 
-            <!--LINES-->
+            <!--LINE-->
             <b-form-row v-if="communication.campaign_id">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Line: </q-item-label>
@@ -588,6 +657,24 @@
           </q-card-section>
 
           <!--FILES HERE-->
+          <q-card-section v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
+                          class="pt-0 pb-0">
+            <b-form-row>
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Files: </q-item-label>
+              </b-col>
+
+              <b-col>
+                <b-link target="_blank"
+                        class="text-dark-greenish"
+                        v-for="(attachment, index) in communication.attachments"
+                        :key="index"
+                        :href="attachment.url">
+                  Click Here To Download
+                </b-link>
+              </b-col>
+            </b-form-row>
+          </q-card-section>
 
           <!--NOTES-->
           <q-card-section class="pt-0 pb-0">
@@ -604,7 +691,7 @@
                           @click="onEditNote">
                     <slot name="button">
                       <span>
-                        Edit
+                        {{ (!communication.notes || !communication.notes.trim().length) ? 'Add' : 'Edit' }} Note
                       </span>
                     </slot>
                   </b-link>
@@ -652,6 +739,7 @@
         </q-card>
       </b-col>
       <b-col md="8"
+             class="pr-0 ring-group-snapshot-wrapper"
              v-if="communication && communication.type === CommunicationTypes.CALL">
           <ring-group-snapshot :communication="communication"
                                :ring-group="usedRingGroup">
@@ -670,7 +758,7 @@ import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import * as CommunicationCurrentStatus from '../constants/communication-current-statuses'
+import * as CommunicationCurrentStatus from '../constants/communication-current-status'
 
 import talk2Api from 'src/plugins/api/api'
 import TargetUsersTree from 'components/target-users-tree'
@@ -836,6 +924,26 @@ export default {
     },
     onEditNote () {
       this.isEditingNote = true
+    },
+
+    isAttachmentImage (mimeType) {
+      return mimeType.includes('image/')
+    },
+
+    isAttachmentVideo (mimeType) {
+      return mimeType.includes('video/')
+    },
+
+    isAttachmentAudio (mimeType) {
+      return mimeType.includes('audio/')
+    },
+
+    isAttachmentText (mimeType) {
+      return mimeType.includes('text/')
+    },
+
+    isAttachmentApplication (mimeType) {
+      return mimeType.includes('application/')
     }
   }
 }

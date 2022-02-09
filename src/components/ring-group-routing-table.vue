@@ -13,7 +13,7 @@
           hide-pagination
           class="ring-group-snapshot-table"
           separator="none"
-          row-key="order"
+          row-key="user"
           :data="rows"
           :columns="columns"
         >

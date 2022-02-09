@@ -42,6 +42,12 @@ export default {
       if (value) {
         this.getCommunication(this.communicationId)
       }
+    },
+    '$route.params.communicationId': function (value) {
+      this.communicationId = value
+      if (this.$route.name === 'Communication' && this.communicationId) {
+        this.getCommunication(this.communicationId)
+      }
     }
   }
 }

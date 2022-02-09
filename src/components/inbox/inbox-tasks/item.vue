@@ -35,7 +35,7 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span v-if="contact.last_communication.type !== CommunicationTypes.SMS">
+          <span v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type)">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </span>
 

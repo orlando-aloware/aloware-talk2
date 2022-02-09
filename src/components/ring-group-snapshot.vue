@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-card flat bordered class="my-card">
+    <q-card flat bordered class="ring-group-snapshot-card">
       <q-card-section>
         <div class="text-h6">Ring Group Snapshot</div>
       </q-card-section>
@@ -40,10 +40,6 @@ export default {
   props: {
     ringGroup: {
       required: true
-    },
-    layers: {
-      type: [],
-      required: false
     },
     communication: {
       required: true
@@ -90,7 +86,7 @@ export default {
 
   methods: {
     setLayers () {
-      this.displayLayers = this.communication.metadata.ring_group_snapshot
+      this.displayLayers = this.communication.metadata && this.communication.metadata.ring_group_snapshot && this.ringGroup ? this.communication.metadata.ring_group_snapshot : null
       if (this.displayLayers) {
         this.displayLayers.forEach(function (layer) {
           layer.order = 1

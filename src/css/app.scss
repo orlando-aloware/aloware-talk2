@@ -10465,6 +10465,12 @@ screen and (max-width: 956px) {
   box-shadow: none !important;
 }
 
+.ring-group-snapshot-card,
+.communication-details-card {
+  border-radius: 8px !important;
+  background: $white !important;
+}
+
 .communication-details-card {
 
   .form-row {
@@ -10476,11 +10482,31 @@ screen and (max-width: 956px) {
   }
 
   .q-card__section {
-    //padding-top: 0 !important;
-    //padding-bottom: 0 !important;
   }
 
   .q-item__label:not(.custom-item-label) {
     margin-top: 0.25rem !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+}
+
+
+.br-8 {
+  border-radius: 8px;
+}
+
+.text-dark-greenish {
+  color: #00702f !important;
+}
+
+@media (max-width: 767px) {
+  .ring-group-snapshot-wrapper {
+    padding-left: 0 !important;
+    margin-top: 10px;
+  }
+
+  .communication-details-card {
+    margin-top: 60px;
   }
 }
