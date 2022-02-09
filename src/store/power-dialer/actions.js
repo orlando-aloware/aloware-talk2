@@ -103,6 +103,14 @@ export default {
       return err
     })
   },
+  async getSessionMetricsOptions ({ commit }) {
+    return window.axios.get(`/api/v2/dialer-sessions/metrics/options`)
+      .then((res) => {
+        return res.data
+      }).catch((err) => {
+        return err
+      })
+  },
   async createSessionSettings ({ commit }, params = {}) {
     return window.$axios.post(`api/v2/power-dialer-sessions`,
       params
