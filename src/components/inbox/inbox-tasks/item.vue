@@ -110,6 +110,7 @@
                       anchor="top right"
                       self="top left"
                       v-model="showIncomingCallMenu"
+                      :offset="[5, 25]"
                       @hide="showIncomingCallMenu = false">
                 <q-list>
                   <q-item clickable
@@ -167,6 +168,7 @@
                       anchor="top right"
                       self="top left"
                       v-model="showParkedCallMenu"
+                      :offset="[5, 25]"
                       @hide="showParkedCallMenu = false">
                 <q-list>
                   <q-item clickable
