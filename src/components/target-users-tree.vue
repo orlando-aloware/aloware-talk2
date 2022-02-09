@@ -21,7 +21,6 @@
         </q-tree>
       </template>
       <span v-else>-</span>
-      <br>
     </template>
     <template v-else-if="isForm">
       <label class="form-control-label" v-if="showLabel">

@@ -272,6 +272,16 @@ const routes = [
         component: () => import('pages/Account.vue')
       },
       {
+        path: 'sequence-activity/:sequenceId',
+        name: 'Sequence Activity',
+        component: () => import('pages/Account.vue')
+      },
+      {
+        path: 'broadcast-activity/:broadcastId',
+        name: 'Broadcast Activity',
+        component: () => import('pages/Account.vue')
+      },
+      {
         path: '/contacts/:contactId/communications/:communicationId',
         name: 'Communication',
         component: () => import('pages/Communication.vue'),

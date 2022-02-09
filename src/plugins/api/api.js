@@ -220,6 +220,9 @@ export default {
       },
       delete (id) {
         return window.axios.delete(`${suffixV1}communication/${id}`)
+      },
+      reportIssue (id, data) {
+        return window.axios.post(`${suffixV1}communications/${id}/report-issue`, data)
       }
     },
     statics: {

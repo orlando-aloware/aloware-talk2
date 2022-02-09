@@ -5,14 +5,14 @@
              sm="12"
              class="pl-0">
 
-        <q-card flat bordered class="my-card bg-grey-1">
+        <q-card flat bordered class="communication-details-card bg-grey-1">
           <q-card-section class="pb-0">
             <div class="d-flex justify-content-between">
               <div class="fs-14 mt-1">Communication Info</div>
 
-              <div>
-                <b-button variant="primary"
-                          size="sm" class="mr-1">Report Issue</b-button>
+              <div class="d-flex">
+                <communication-report-issue
+                  :communication-id="communication.id"></communication-report-issue>
                 <b-button v-if="hasPermissionTo('archive communication')"
                           variant="danger"
                           size="sm"
@@ -21,9 +21,10 @@
                 </b-button>
               </div>
             </div>
-            <hr/>
+            <hr class="has-margin mt-3"/>
           </q-card-section>
 
+          <!--COMM TYPE-->
           <q-card-section class="pt-0">
             <div class="text-lt p-x"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
@@ -37,7 +38,8 @@
             </div>
           </q-card-section>
 
-          <q-card-section>
+          <!--COMM DESCRIPTION-->
+          <q-card-section class="pt-0 pb-0">
             <div class="fs-13 my-2"
                                v-if="communication.type === CommunicationTypes.CALL">
             This call
@@ -47,7 +49,8 @@
 
           </q-card-section>
 
-          <q-card-section>
+          <q-card-section class="pt-0 pb-0">
+            <!--CONTACT-->
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>Contact: </q-item-label>
@@ -61,6 +64,8 @@
               </b-col>
             </b-form-row>
             <hr/>
+
+            <!--DISPOSITION-->
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>Disposition: </q-item-label>
@@ -99,7 +104,7 @@
               </b-col>
             </b-form-row>
           </q-card-section>
-          <q-card-section>
+          <q-card-section class="pt-0 pb-0">
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>To: </q-item-label>
@@ -126,18 +131,22 @@
               </b-col>
             </b-form-row>
             <hr/>
-            <b-form-row>
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Target Users <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>: </q-item-label>
-              </b-col>
-              <b-col>
-                <target-users-tree class="w-100"
-                                   :communication="communication"
-                                   :show-label="false"/>
-              </b-col>
-            </b-form-row>
-            <hr/>
-            <b-form-row v-if="[CommunicationTypes.CALL, CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+            <div v-if="[CommunicationTypes.CALL].includes(communication.type)">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label class="mt-2">Target Users <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>: </q-item-label>
+                </b-col>
+                <b-col>
+                  <target-users-tree class="w-100"
+                                     :communication="communication"
+                                     :show-label="false"/>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+
+            <div v-if="[CommunicationTypes.CALL, CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+              <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>User: </q-item-label>
               </b-col>
@@ -175,10 +184,35 @@
                 </div>
               </b-col>
             </b-form-row>
-            <hr/>
+              <hr/>
+            </div>
+            <div v-if="communication.type === CommunicationTypes.CALL && communication.attempting_users && communication.attempting_users.length > 0 && verbose">
+              <b-form-row >
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Attempting Users: </q-item-label>
+                </b-col>
+                <b-col>
+                  <ul class="list list-unstyled inset mb-0">
+                    <li v-for="(attemptingUser, index) in communication.attempting_users"
+                        :key="attemptingUser + '-user-' + index"
+                        class="pb-1">
+                      <router-link
+                        :to="{ name: 'User Activity', params: { userId: getUser(attemptingUser).id }}">
+                                        <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
+                                              :title="getUserName(getUser(attemptingUser))">
+                                            {{ getUserName(getUser(attemptingUser)) }}
+                                        </span>
+                      </router-link>
+                    </li>
+                  </ul>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+
             <b-form-row v-if="![CommunicationTypes.EMAIL, CommunicationTypes.FAX, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <b-col class="pl-0 pr-0">
-                <q-item-label>Started at: </q-item-label>
+                <q-item-label>{{ communication.type === CommunicationTypes.CALL ? 'Started at' : 'Sent at'}}: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
@@ -187,56 +221,105 @@
               </b-col>
             </b-form-row>
           </q-card-section>
-          <q-card-section>
-            <b-form-row>
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Ended at: </q-item-label>
-              </b-col>
-              <b-col>
-                <div class="d-flex align-items-center">
-                  {{ communication.created_at | fixCommunicationDateTime(communication.duration) }}
-                </div>
-              </b-col>
-            </b-form-row>
-            <hr/>
-            <b-form-row>
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Duration: </q-item-label>
-              </b-col>
-              <b-col>
-                <div class="d-flex align-items-center">
-                  {{ communication.duration | fixDuration }}
-                </div>
-              </b-col>
-            </b-form-row>
+          <q-card-section class="pt-0 pb-0">
+            <div v-if="communication.type === CommunicationTypes.SMS">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Current Status: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{
+                      communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
+                        ? $options.filters.translateCurrentStatusText(communication.current_status2) :
+                        $options.filters.translateDispositionStatusText(communication.disposition_status2) | replaceDash | capitalize
+                    }}
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+            <div v-if="communication.type === CommunicationTypes.CALL && verbose">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Ended at: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.created_at | fixCommunicationDateTime(communication.duration) }}
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+
+            <div v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && verbose">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Duration: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.duration | fixDuration }}
+                  </div>
+                </b-col>
+              </b-form-row>
+            </div>
+
+            <div v-if="[CommunicationTypes.SMS].includes(communication.type)">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Parts: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.duration }}
+                  </div>
+                </b-col>
+              </b-form-row>
+            </div>
           </q-card-section>
-          <q-card-section>
-            <b-form-row>
+
+          <q-card-section class="pt-0 pb-0">
+            <!--TALK TIME-->
+            <div v-if="communication.type === CommunicationTypes.CALL">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Talk Time: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.talk_time | fixDuration }}
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+
+            <!--WAIT TIME-->
+            <div v-if="![CommunicationTypes.SMS, CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && verbose">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Wait Time: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    <span v-if="communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW">{{ communication.wait_time | fixDuration }}</span>
+                    <span v-else>-</span>
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+          </q-card-section>
+
+          <q-card-section v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
+                          class="pt-0 pb-0">
+
+            <!--LINES-->
+            <b-form-row v-if="communication.campaign_id">
               <b-col class="pl-0 pr-0">
-                <q-item-label>Talk Time: </q-item-label>
-              </b-col>
-              <b-col>
-                <div class="d-flex align-items-center">
-                  {{ communication.talk_time | fixDuration }}
-                </div>
-              </b-col>
-            </b-form-row>
-            <hr/>
-            <b-form-row v-if="![CommunicationTypes.SMS, CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && verbose">
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Wait Time: </q-item-label>
-              </b-col>
-              <b-col>
-                <div class="d-flex align-items-center"
-                     v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
-                  {{ communication.wait_time | fixDuration }}
-                </div>
-              </b-col>
-            </b-form-row>
-            <hr/>
-            <b-form-row v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Lines: </q-item-label>
+                <q-item-label>Line: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
@@ -257,9 +340,9 @@
                 </div>
               </b-col>
             </b-form-row>
-          </q-card-section>
-          <q-card-section>
-            <b-form-row v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+
+            <!--RING GROUP-->
+            <b-form-row v-if="communication.ring_group_id">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Ring Group: </q-item-label>
               </b-col>
@@ -282,11 +365,189 @@
                 </div>
               </b-col>
             </b-form-row>
-          </q-card-section>
-          <q-card-section>
+
+            <!--SEQUENCE-->
+            <b-form-row v-if="communication.workflow_id">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Sequence: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link
+                    :to="{ name: 'Sequence Activity', params: { sequenceId: communication.workflow_id }}"
+                    v-if="useSequence">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
+                      Click for more info
+                    </q-tooltip>
+                    {{ useSequence.name }}
+                  </router-link>
+                  <template v-else>
+                    Deleted Sequence
+                  </template>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--BROADCAST-->
+            <b-form-row v-if="communication.broadcast_id">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Broadcast: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link
+                    :to="{ name: 'Broadcast Activity', params: { broadcastId: communication.broadcast_id }}"
+                    v-if="useBroadCast">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
+                      Click for more info
+                    </q-tooltip>
+                    {{ useBroadCast.name }}
+                  </router-link>
+                  <template v-else>
+                    Deleted Broadcast
+                  </template>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--TRANSFERRED FROM-->
+            <b-form-row v-if="communication.transfer_prior_user_ids">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Transferred from: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link
+                    v-for="(userId, index) in communication.transfer_prior_user_ids"
+                    :key="userId + '-user-' + index"
+                    :to="{ name: 'User Activity', params: {userId: userId }}">
+
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
+                      {{ getUserName(getUser(userId)) }}
+                    </q-tooltip>
+                    {{ getUserName(getUser(userId)) }}
+                  </router-link>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--TRANSFERRED TO-->
+            <b-form-row v-if="communication.transfer_target_user_ids">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Transferred to: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link
+                    v-for="(userId, index) in communication.transfer_target_user_ids"
+                    :key="userId + '-user-' + index"
+                    :to="{ name: 'User Activity', params: {userId: userId }}">
+
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
+                      {{ getUserName(getUser(userId)) }}
+                    </q-tooltip>
+                    {{ getUserName(getUser(userId)) }}
+                  </router-link>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--COLD TRANSFER-->
+            <b-form-row v-if="communication.transfer_target_user_ids">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Cold transferred: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  {{ communication.in_cold_transfer | fixBooleanType }}
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--CHILD CALL - NEW-->
+            <b-form-row v-if="communication.metadata && communication.metadata.new_communication_id">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Child Call: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link :to="{ name: 'Communication', params: {communicationId: communication.metadata.new_communication_id }}">
+                    More info
+                  </router-link>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--PARENT CALL - ORIGINAL-->
+            <b-form-row v-if="communication.metadata && communication.metadata.original_communication_id">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Parent Call: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link :to="{ name: 'Communication', params: {communicationId: communication.metadata.original_communication_id }}">
+                    More info
+                  </router-link>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--CHILD CALL - ACTIVE-->
+            <b-form-row v-if="communication.metadata && communication.metadata.active_communication_id">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Child Call: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link :to="{ name: 'Communication', params: {communicationId: communication.metadata.active_communication_id }}">
+                    More info
+                  </router-link>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--PARENT CALL - FAKE-->
+            <b-form-row v-if="communication.metadata && communication.metadata.fake_communication_id">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Parent Call: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <router-link :to="{ name: 'Communication', params: {communicationId: communication.metadata.fake_communication_id }}">
+                    More info
+                  </router-link>
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--SENT BY-->
+            <b-form-row v-if="getUser(communication.user_id) && communication.type === CommunicationTypes.SMS">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Sent by: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  {{ getUser(communication.user_id).name }}
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!--RECORDING-->
             <b-form-row v-if="communication.type === CommunicationTypes.CALL">
               <b-col class="pl-0 pr-0">
-                <q-item-label>Recording: </q-item-label>
+                <q-item-label class="mt-3 custom-item-label">Recording: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center"
@@ -303,10 +564,9 @@
                 </div>
               </b-col>
             </b-form-row>
-          </q-card-section>
 
-          <q-card-section v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
-            <b-form-row>
+            <!--VM-->
+            <b-form-row v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Voicemail: </q-item-label>
               </b-col>
@@ -321,28 +581,47 @@
                 </div>
                 <div class="d-flex align-items-center"
                      v-else>
-                 No Voicemail
+                  No Voicemail
                 </div>
               </b-col>
             </b-form-row>
           </q-card-section>
 
-          <q-card-section>
+          <!--FILES HERE-->
+
+          <!--NOTES-->
+          <q-card-section class="pt-0 pb-0">
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>Notes: </q-item-label>
               </b-col>
               <b-col>
-                <div class="d-flex align-items-center">
+                <div v-if="!isEditingNote"
+                     class="align-items-center">
+                  <div class="notes mt-1" v-html="communication.notes"></div>
+                  <b-link href="#"
+                          class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
+                          @click="onEditNote">
+                    <slot name="button">
+                      <span>
+                        Edit
+                      </span>
+                    </slot>
+                  </b-link>
+                </div>
+                <div v-if="isEditingNote"
+                     class="d-flex align-items-center">
                   <communication-note ref="communicationNotes"
-                                      :communication="communication">
+                                      :communication="communication"
+                                      @notesBlurred="isEditingNote = false">
                   </communication-note>
                 </div>
               </b-col>
             </b-form-row>
           </q-card-section>
 
-          <q-card-section>
+          <q-card-section class="pt-0 pb-0">
+            <!--TAGS-->
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>Tags: </q-item-label>
@@ -355,19 +634,28 @@
             </b-form-row>
           </q-card-section>
 
-          <q-card-section v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode">
+          <!--CALL DISPOSITION-->
+          <q-card-section v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode"
+                          class="pt-0 pb-0">
             <b-form-row>
               <b-col class="pl-0 pr-0">
-                <q-item-label>Call Disposition: </q-item-label>
+                <q-item-label class="mt-3 custom-item-label">Call Disposition: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <call-disposition-selector :communication="communication"></call-disposition-selector>
+                  <call-disposition-selector
+                    :communication="communication"></call-disposition-selector>
                 </div>
               </b-col>
             </b-form-row>
           </q-card-section>
         </q-card>
+      </b-col>
+      <b-col md="8"
+             v-if="communication && communication.type === CommunicationTypes.CALL">
+          <ring-group-snapshot :communication="communication"
+                               :ring-group="usedRingGroup">
+          </ring-group-snapshot>
       </b-col>
     </b-row>
   </div>
@@ -376,33 +664,39 @@
 <script>
 import _ from 'lodash'
 import { mapState } from 'vuex'
-import CommunicationInfoMixin from 'src/plugins/mixins/communication-info.mixin'
-import { aclMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, userMixin, communicationInfoMixin } from 'src/plugins/mixins'
 
+import * as CommunicationTypes from '../constants/communication-types'
+import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
+import * as CommunicationDirections from '../constants/communication-direction'
+import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import * as CommunicationCurrentStatus from '../constants/communication-current-statuses'
+
+import talk2Api from 'src/plugins/api/api'
 import TargetUsersTree from 'components/target-users-tree'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
 import CommunicationTags from 'components/generic-selectors/communication-tags'
 import CallDispositionSelector from 'components/call-disposition-selector'
 
-import talk2Api from 'src/plugins/api/api'
-
-import * as CommunicationTypes from '../constants/communication-types'
-import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
-import * as CommunicationDirections from '../constants/communication-direction'
-import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import CommunicationReportIssue from 'components/communication-report-issue'
+import RingGroupSnapshot from 'components/ring-group-snapshot'
+import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 
 export default {
   name: 'communication-details',
 
-  components: { CallDispositionSelector, CommunicationTags, CommunicationNote, CommunicationAudio, TargetUsersTree },
+  components: { PencilOIcon, PredefinedTimeDurationSelector, RingGroupSnapshot, CommunicationReportIssue, CallDispositionSelector, CommunicationTags, CommunicationNote, CommunicationAudio, TargetUsersTree },
 
-  mixins: [CommunicationInfoMixin, userMixin, aclMixin],
+  mixins: [communicationInfoMixin, userMixin, aclMixin],
 
   data () {
     return {
       activeName: false,
+      isEditingNote: false,
       CommunicationTypes,
+      CommunicationCurrentStatus,
       CommunicationDispositionStatus,
       CommunicationDirections,
       UploadedFileTypes
@@ -455,6 +749,24 @@ export default {
       }
 
       return null
+    },
+
+    useSequence () {
+      if (!this.communication.workflow_id) {
+        return null
+      }
+      let sequence = this.workflows.find(workflow => workflow.id === this.communication.workflow_id)
+
+      return sequence || null
+    },
+
+    useBroadCast () {
+      if (!this.communication.broadcast_id) {
+        return null
+      }
+      let broadcast = this.broadcasts.find(workflow => workflow.id === this.communication.broadcast_id)
+
+      return broadcast || null
     },
 
     attemptLabel () {
@@ -521,6 +833,9 @@ export default {
           console.log(err)
         })
       })
+    },
+    onEditNote () {
+      this.isEditingNote = true
     }
   }
 }

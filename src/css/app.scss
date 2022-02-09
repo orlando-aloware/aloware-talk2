@@ -10459,3 +10459,28 @@ screen and (max-width: 956px) {
 .q-tooltip {
   z-index: 9999;
 }
+
+
+.ring-group-snapshot-table {
+  box-shadow: none !important;
+}
+
+.communication-details-card {
+
+  .form-row {
+    padding: 10px 0;
+  }
+
+  hr:not(.has-margin) {
+    margin: 0 !important;
+  }
+
+  .q-card__section {
+    //padding-top: 0 !important;
+    //padding-bottom: 0 !important;
+  }
+
+  .q-item__label:not(.custom-item-label) {
+    margin-top: 0.25rem !important;
+  }
+}
