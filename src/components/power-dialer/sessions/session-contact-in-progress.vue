@@ -1,7 +1,9 @@
 <template>
   <q-card class="t-cards pt-2">
     <q-list class="px-2 pb-2">
-      <q-item class="active t-expansion-panel px-2">
+      <q-item
+        v-if="inProgressContact.id"
+        class="active t-expansion-panel px-2">
         <div class="py-2">
           <q-avatar size="30px" color="grey">
             {{ avatarName(firstname, lastname) }}
@@ -23,6 +25,9 @@
         </q-item-section>
 
       </q-item>
+      <div v-else class="px-0 pb-3 text-grey">
+        <span class="px-2 text-italic">No call in progress</span>
+      </div>
     </q-list>
   </q-card>
 </template>

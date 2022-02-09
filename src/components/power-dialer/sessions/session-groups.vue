@@ -25,8 +25,10 @@
               </q-item-section>
             </template>
 
+            <!-- <InProgressContact
+              :in-progress-contact="activeTask" /> -->
             <InProgressContact
-              :in-progress-contact="activeTask" />
+              :in-progress-contact="{}" />
 
           </q-expansion-item>
           <q-separator />
@@ -119,7 +121,7 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
@@ -141,11 +143,12 @@ export default {
     // this.powerDialerTasks.in_queue.shift()
   },
   computed: {
+    ...mapState(['dialer']),
     ...mapGetters('powerDialer', [
       'powerDialerListItems',
       // 'currentList',
-      'sessionLoader',
-      'activeTask'
+      'sessionLoader'
+      // 'activeTask'
     ]),
     ...mapGetters('contacts', [
       'contact',
@@ -228,9 +231,9 @@ export default {
     // }
   },
   watch: {
-    async activeTask (val) {
+    activeTask (val) {
       this.flagged = true
-      await this.getContact({ id: this.activeTask?.id })
+      this.getContact({ id: this.activeTask?.id })
       // this.makeACall()
       this.flagged = false
     }

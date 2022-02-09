@@ -168,6 +168,15 @@ export default {
       return err
     })
   },
+  getTemporarySessionSetting ({ commit }, id = null) {
+    return window.axios.get(
+      `api/v2/power-dialer-lists/${id}/temporary-session-settings`
+    ).then((res) => {
+      commit('SET_SESSION_SETTINGS', res.data)
+    }).catch(err => {
+      return err
+    })
+  },
   resetPowerDialerTasks ({ commit }) {
     commit('RESET_POWER_DIALER_TASKS')
   },

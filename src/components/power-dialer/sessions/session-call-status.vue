@@ -5,7 +5,7 @@
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
             <div class="text-15 text-lowercase text-capitalize px-2">
-              {{ timerCount > 0 ? 'Will call in' : 'In a call with' }}
+              {{ timerCount > 0 ? 'Will call in' : 'Call in progress...' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
                 v-if="timerCount > 0">
@@ -240,7 +240,32 @@ export default {
     this.timerCount = this.sessionSettings.warmup_period_in_seconds
     // setTimeout(() => {
     //   this.makeACall()
-    // }, this.timerCount)
+    // }, 3000)
+    // this.$VueEvent.listen('contact_list_item_created', (data) => {
+    //   console.log(' %c LISTENING: Contact list item created ', 'background: #000; color: green;', data)
+    // })
+
+    this.$VueEvent.listen('contact_list_item_created', (data) => {
+      console.log(' %c LISTENING: Contact list item created ', 'background: #000; color: green;', data)
+    })
+
+    this.$VueEvent.listen('contact_list_item_updated', (data) => {
+      console.log(' %c LISTENING: Contact list item updated ', 'background: #000; color: green;', data)
+    })
+
+    this.$VueEvent.listen('contact_list_item_deleted', (data) => {
+      console.log(' %c LISTENING: Contact list item deleting... ', 'background: #000; color: green;', data)
+    })
+
+    this.$VueEvent.listen('new_communication', communication => {
+      console.log(' %c communication :>> ', 'background: red; color: white;', communication)
+    })
+    this.$VueEvent.listen('update_communication', communication => {
+      console.log(' %c communication :>> ', 'background: red; color: white;', communication)
+    })
+    this.$VueEvent.listen('contact.updated', communication => {
+      console.log(' %c communication :>> ', 'background: red; color: white;', communication)
+    })
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -259,13 +284,16 @@ export default {
     async makeACall () {
       let data = {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.contact_list_item_id}`), // we know this already based on the list (Required)
+        // currentNumber: this.$options.filters.fixPhone(`${this.activeTask?.phone_number}`), // we know this already based on the list (Required)
         outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
         contactName: `${this.activeTask?.first_name} ${this.activeTask?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
         companyName: this.activeTask?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.activeTask?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       }
-      // console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
-      this.$VueEvent.fire('makeCall', data)
+      console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
+      if (this.activeTask?.contact_list_item_id) {
+        // this.$VueEvent.fire('makeCall', data)
+      }
     }
   },
   watch: {
@@ -281,7 +309,9 @@ export default {
             this.timerCount--
           }, 1000)
         } else if (value === 0) {
-          await this.makeACall()
+          setTimeout(async () => {
+            await this.makeACall()
+          }, 3000)
         }
       },
       deep: true
