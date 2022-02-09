@@ -19,13 +19,52 @@
             {{ cform.label }}
             </label>
 
-          <MetricSelector
+          <!-- <MetricSelector
             v-if="cform.name === 'metric_options'"
             v-model="resources[cform.name]"
             :options="metricOptions"
             :multiple="true"
             :use-chips="true"
-            custom-class="generic-selector" />
+            custom-class="generic-selector" /> -->
+          <q-select
+            v-if="cform.name === 'metric_options'"
+            v-model="resources[cform.name]"
+            :options="metricOptions"
+            option-value="value"
+            option-label="label"
+            multiple
+            use-chips
+            use-input
+            emit-value
+            map-options
+            class="generic-selector-2"
+            outlined dense>
+            <template v-slot:option="scope">
+              <q-item
+                v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+                <q-item-section>
+                  <q-item-label
+                    v-if="!scope.opt.value"
+                    class="text-subtitle2 font-weight-bold"
+                    disabled
+                    v-html="`${scope.opt.label}`" />
+                  <q-item-label
+                    v-else
+                    v-html="`&nbsp;&nbsp;  ${scope.opt.label}`" />
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+          <!-- <b-form-select
+            v-if="cform.name === 'metric_options'"
+            v-model="resources[cform.name]"
+            :options="metricOptions"
+            value-field="value"
+            text-field="label"
+            multiple
+            :select-size="1">
+          </b-form-select> -->
 
           <LineSelector
             v-else-if="cform.name === 'campaign_id'"
@@ -106,19 +145,19 @@
 <script>
 
 import { mapState, mapGetters, mapActions } from 'vuex'
-import MetricSelector from 'components/generic-selectors/session-metric-selector'
+// import MetricSelector from 'components/generic-selectors/session-metric-selector'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
 import ScriptSelector from 'components/generic-selectors/script-selector'
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-import { METRIC_OPTIONS_3 } from 'src/constants/stats'
+// import { METRIC_OPTIONS_3 } from 'src/constants/stats'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { isEmpty } from 'lodash'
 
-const stats = { METRIC_OPTIONS_3 }
+// const stats = { METRIC_OPTIONS_3 }
 
 export default {
   name: 'StartDialSessionsForm',
@@ -129,7 +168,7 @@ export default {
     }
   },
   components: {
-    MetricSelector,
+    // MetricSelector,
     WarmupPeriodSelector,
     LineSelector,
     ScriptSelector,
@@ -137,13 +176,24 @@ export default {
     VmDropSelector,
     CallDispositionSelector
   },
-  mounted () {
+  async mounted () {
     // Temporary disabled
     if (isEmpty(this.sessionSettings)) {
       this.resources = this.defaultSettings || DEFAULT_SETTING_VALUES
     } else {
       this.resources = Object.assign({}, this.sessionSettings)
     }
+    let metrics = await this.getSessionMetricsOptions()
+    let collection = []
+    metrics.forEach(m => {
+      collection.push({
+        label: m.label,
+        disable: true,
+        value: null
+      })
+      collection = collection.concat(...m.options)
+    })
+    this.metricOptions = collection
   },
   computed: {
     ...mapState('inbox', [
@@ -174,12 +224,12 @@ export default {
         return resources
       }
     },
-    metricOptions () {
-      if (stats) {
-        return stats.METRIC_OPTIONS_3
-      }
-      return []
-    },
+    // metricOptions () {
+    //   if (stats) {
+    //     return stats.METRIC_OPTIONS_3
+    //   }
+    //   return []
+    // },
     warmUpPeriods () {
       let values = []
       values = [WARM_UP_PERIOD_LIST]
@@ -198,7 +248,7 @@ export default {
   methods: {
     ...mapActions('powerDialer', [
       'setDefaultSettings',
-      'getWarmupDurations'
+      'getSessionMetricsOptions'
     ]),
     onLineFilterChange (value, prop) {
       this.resources.campaign_id = value
@@ -245,6 +295,7 @@ export default {
   data () {
     return {
       selectWidth: 0,
+      metricOptions: [],
       resources: {
         call_disposition_ids: [],
         campaign_id: null,
