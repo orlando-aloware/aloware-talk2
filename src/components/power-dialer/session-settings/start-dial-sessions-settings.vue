@@ -360,6 +360,7 @@ export default {
       'deleteDialerSessionSetting',
       'updateDialerSessionSetting',
       'getTemporarySessionSetting',
+      'updateContactsList',
       'getSessionSetting'
     ]),
     ...mapMutations('powerDialer', [
@@ -382,7 +383,9 @@ export default {
         }
         this.$emit('start', null)
       } else {
-        this.$emit('start', this.sessionSettings.id)
+        let { id } = this.sessionSettings
+        this.activeSessionSettingId = id
+        this.$emit('start', id)
       }
     },
     async loadSettings (data) {
@@ -488,8 +491,9 @@ export default {
         this.loading = true
         await this.getDialerSessionSettings()
         await this.getTemporarySessionSetting(this.selectedList.id)
+        this.selectedItem = this.sessionSettings?.name
         if (this.sessionSettings?.id) {
-          this.resetDefaults(false)
+          // this.resetDefaults(false)
         }
         this.loading = false
       }
