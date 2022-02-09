@@ -31,6 +31,7 @@
             emit-value
             map-options
             class="generic-selector-2"
+            :max-values="4"
             outlined dense>
             <template v-slot:option="scope">
               <q-item

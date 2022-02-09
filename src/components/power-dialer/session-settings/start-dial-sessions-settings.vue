@@ -474,6 +474,7 @@ export default {
       if (val) {
         this.loading = true
         await this.getDialerSessionSettings()
+        await this.getTemporarySessionSetting(this.selectedList.id)
         if (this.sessionSettings?.id) {
           this.resetDefaults(false)
         }
