@@ -248,6 +248,13 @@ body,
   }
 }
 
+@media (min-width: 605px) {
+  .contact-details-container {
+    margin-left: 15px;
+    margin-top: 15px;
+  }
+}
+
 @media (min-width: 605px) and (max-width: 991px) {
   .paginated {
     .table-pagination {
@@ -1347,6 +1354,10 @@ i.option-separator {
   border-radius: 8px;
 }
 
+.border-full-rounded {
+  border-radius: 14px;
+}
+
 .sms-activity {
   font-style: normal;
   font-weight: normal;
@@ -2021,12 +2032,20 @@ span.mention {
 .contact-info-wrapper {
   display: flex;
   min-width: 0;
-  .contact-name {
-    display: inline-block;
-    width: 160px;
+  .contact-name-wrapper {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    flex-grow: 1;
+    .contact-name {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .contact-avatar {
@@ -3866,11 +3885,18 @@ span.mention {
 }
 
 .parked-call {
-  background: rgba(155, 81, 224, 0.04);
-  border: 1px solid #9B51E0;
+  background: $purple-10;
+  border: 1px solid $purple-100;
   border-radius: 7px;
   width: 190px;
   @extend .text-grey-100;
+
+  &:hover {
+    background: $purple-40 !important;
+    .q-focus-helper {
+      background: unset !important;
+    }
+  }
 
   .call-status {
     font-size: 11px !important;
@@ -8249,8 +8275,6 @@ button.grey-90 {
 .contact-details-container {
   max-width: 250px;
   width: 100%;
-  margin-left: 15px;
-  margin-top: 15px;
   &-drawer {
     aside {
       border-radius: 0.25rem;
@@ -8347,8 +8371,15 @@ button.grey-90 {
   height: 0;
 }
 
+.dashboard {
+  &:not(.contact-page) {
+    .mobile-back-btn {
+      display: none;
+    }
+  }
+}
+
 .mobile-back-btn {
-  display: none;
   border-radius: 50%;
   height: 27px;
   width: 24px;
@@ -9017,7 +9048,7 @@ screen and (max-width: 956px) {
     span {
       color: $grey-92;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 600;
       font-family: $font-family-body;
     }
   }
@@ -9213,6 +9244,8 @@ screen and (max-width: 956px) {
     }
   }
   .contact-details-container.contact-details--opened {
+    padding-left: 15px;
+    padding-top: 15px;
     width: 100% !important;
     display: block !important;
     max-width: unset !important;
@@ -9225,6 +9258,15 @@ screen and (max-width: 956px) {
         margin-right: 10px !important;
         width: auto !important;
       }
+    }
+    .mobile-header {
+      padding-right: 13px !important;
+      .profile-menu {
+        min-width: 63px;
+      }
+    }
+    .menu-avatar-wrapper {
+      padding-top: 0 !important;
     }
   }
   .contact-activity-container {
@@ -10437,7 +10479,6 @@ screen and (max-width: 956px) {
 
 .mobile-header {
   .menu-avatar-wrapper {
-    padding-top: 9px !important;
     padding-right: 2.5px !important;
   }
 }
@@ -10449,5 +10490,30 @@ screen and (max-width: 956px) {
 .q-avatar {
   .avatar-initials {
     height: 7px;
+    font-weight: 500;
+  }
+}
+
+.q-tooltip {
+  z-index: 9999;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.d-grid {
+  display: grid;
+}
+
+.truncated-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.grid-2-col {
+  &.task-item-body {
+    grid-template-columns: 26px 1fr;
   }
 }

@@ -21,7 +21,7 @@
         anchor="center right"
         self="center left"
         :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inbox</span>
+        <span class="font-weight-bold text-sm">Comm.’s</span>
       </q-tooltip>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -36,7 +36,7 @@
         anchor="center right"
         self="center left"
         :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inbox</span>
+        <span class="font-weight-bold text-sm">Comm.’s</span>
       </q-tooltip>
     </q-btn>
 

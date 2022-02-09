@@ -145,10 +145,14 @@ export default {
       modal: false,
       metric: null,
       model: '',
-      color: '',
+      color: {
+        color: 'black',
+        text: 'Default',
+        value: 'black'
+      },
       selectWidth: 0,
       filteredMetricOptions: [],
-      placeholder: 'Add Metrics',
+      placeholder: 'Add Metric',
       MetricOptionColors,
       MetricOptionGroups
     }
@@ -184,7 +188,7 @@ export default {
       if (this.metric) {
         this.placeholder = ''
       } else {
-        this.placeholder = 'Add Metrics'
+        this.placeholder = 'Add Metric'
       }
     }
   },
@@ -214,7 +218,11 @@ export default {
     },
     resetData () {
       this.metric = ''
-      this.color = ''
+      this.color = {
+        color: 'black',
+        text: 'Default',
+        value: 'black'
+      }
     },
     onShowColorMenu () {
       this.selectWidth = this.$refs.statsSelectTextColor.$el.offsetWidth

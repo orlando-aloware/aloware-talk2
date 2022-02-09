@@ -274,7 +274,7 @@ export default {
       }
 
       let counter = 0
-      let dialerCallFishingInterval = (queue && queue.length === 0) ? setInterval(() => {
+      let dialerCallFishingInterval = (!queue || (queue && queue.length === 0)) ? setInterval(() => {
         if (!document.getElementById(type)) {
           this.setDialerCallFishing(data)
           clearInterval(dialerCallFishingInterval)

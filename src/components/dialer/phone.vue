@@ -116,7 +116,7 @@
       </div>
     </div>
     <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
-      <template v-if="screen === 'call' && ((dialer.call && dialer.call.direction === 'OUTGOING') || dialer.callFishing.communication)">
+      <template v-if="isPhoneBodyVisible">
         <div class="phone-notice d-flex flex-column align-items-center"
              v-if="contact && dialer.call && dialer.call.direction === 'OUTGOING' && showLocalTime">
           <q-banner class="bg-primary text-white pt-1 pb-1"
@@ -180,7 +180,7 @@
         </div>
         <div class="phone-cta">
           <div class="d-flex flex-row justify-content-between"
-               v-if="(dialer.call && dialer.call.direction === 'INCOMING') || dialer.callFishing.communication">
+               v-if="isPhoneCTAVisible">
             <div class="d-flex flex-column align-items-center"
                  v-if="dialer.call !== undefined">
               <q-btn class="height-52"
@@ -223,7 +223,7 @@
           </div>
 
           <div class="d-flex flex-column justify-content-center align-items-center"
-               v-if="dialer.call && dialer.call.direction === 'OUTGOING' && !dialer.callFishing.communication">
+               v-if="isHangupCallVisible">
             <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
                    :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
                    class="height-52"
@@ -1397,7 +1397,7 @@ export default {
     },
 
     isParkDisabled () {
-      return (!this.dialer.communication || this.loadingPark || this.dialer.parkedCall || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (_.isEmpty(this.dialer.communication) || this.loadingPark || this.isCallCompleted || (!_.isEmpty(this.currentCompany) && !this.currentCompany.conferencing_enabled) || (!_.isEmpty(this.dialer.communication.legc_uuid) && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (!_.isEmpty(this.dialer.communication.legz_uuid) && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
 
     isMuteDisabled () {
@@ -1623,6 +1623,18 @@ export default {
           height: this.isMobile ? 26 : 18
         }
       }
+    },
+
+    isPhoneBodyVisible () {
+      return this.screen === 'call' && ((!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'OUTGOING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication)))
+    },
+
+    isPhoneCTAVisible () {
+      return (!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'INCOMING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication))
+    },
+
+    isHangupCallVisible () {
+      return !_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'OUTGOING' && (!_.isEmpty(this.dialer.callFishing) && _.isEmpty(this.dialer.callFishing.communication))
     }
   },
 
