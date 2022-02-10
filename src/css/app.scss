@@ -1508,6 +1508,11 @@ i.option-separator {
   background: $purple-2;
 }
 
+.fs-45 {
+  font-size: 45px !important;
+}
+
+
 .fs-20 {
   font-size: 20px !important;
 }
@@ -10589,9 +10594,14 @@ screen and (max-width: 956px) {
 .communication-details-card {
   border-radius: 8px !important;
   background: $white !important;
+  color: $grey-100;
 }
 
 .communication-details-card {
+
+  .comm-type-wrapper {
+    margin-top: 1.4px;
+  }
 
   .form-row {
     padding: 10px 0;

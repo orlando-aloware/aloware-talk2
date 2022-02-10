@@ -1,7 +1,10 @@
 <template>
   <div class="mt-4">
     <div class="text-center mb-4">
-      <i class="fa fa-arrow-down fa-2x"></i>
+      <span class="material-icons-outlined fs-45">
+        arrow_downward
+      </span>
+
     </div>
     <q-card flat bordered class="my-card">
       <q-card-section>
@@ -43,7 +46,7 @@
                   <span>
                     <b-badge v-if="col.name === 'status'"
                              class="fs-12"
-                             :variant="[col.value === 'Available' ? 'success' : 'danger']">
+                             :variant="col.value === 'Available' ? 'success' : 'danger'">
                       {{ col.value }}
                     </b-badge>
                     <span v-else>{{ col.value }}</span>

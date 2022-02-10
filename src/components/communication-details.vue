@@ -26,15 +26,17 @@
 
           <!--COMM TYPE-->
           <q-card-section class="pt-0">
-            <div class="text-lt p-x"
+            <div class="text-lt p-x d-inline-flex"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
                          v-if="communication.disposition_status2">
               </component>
-              <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-                {{ communication.direction | fixCommDirection }}
-              </span>
-              {{ communication.type | fixCommType }}
+              <div class="comm-type-wrapper">
+                <span class="ml-3" v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                  {{ communication.direction | fixCommDirection }}
+                </span>
+                {{ communication.type | fixCommType }}
+              </div>
             </div>
           </q-card-section>
 
@@ -110,9 +112,9 @@
           <!--COMM DESCRIPTION-->
           <q-card-section class="pt-0 pb-0">
             <div class="fs-13 my-2"
-                               v-if="communication.type === CommunicationTypes.CALL">
-            This call
-            {{ communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ? 'is' : 'was' }}
+                 v-if="communication.type === CommunicationTypes.CALL">
+              <span>{{ callDescriptionText }}</span>
+
             {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash }}.
           </div>
 
@@ -859,6 +861,20 @@ export default {
 
     attemptLabel () {
       return this.communication.attempt ? `attempt ${this.communication.attempt}` : 'no attempts'
+    },
+    callDescriptionText () {
+      let text = 'This call '
+
+      switch (this.communication.disposition_status2) {
+        case CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW:
+          return text + 'left a'
+        case CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW:
+          return text
+        case CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW:
+          return text + 'is'
+        default:
+          return text + 'was'
+      }
     }
   },
 
