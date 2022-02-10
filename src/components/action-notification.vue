@@ -106,7 +106,7 @@
           </q-btn>
         </div-->
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
-             v-if="id === 'callFishing'">
+             v-if="id === 'callFishing' && dialer && dialer.call">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
