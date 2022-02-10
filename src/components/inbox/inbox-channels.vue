@@ -1022,7 +1022,7 @@ export default {
     this.$VueEvent.listen('update_communication', (data) => {
       // disable live dashboard for end clients
       // check data loaded
-      if (this.pagination.current_page) {
+      if (this.pagination.prev === null) {
         // check new communication exists in the old list
         let found = this.communications.filter(communication => {
           return communication.id === data.id
@@ -1054,7 +1054,7 @@ export default {
             this.checkCommunicationMatchesCampaign(data) &&
             this.checkCommunicationMatchesWorkflow(data) &&
             this.checkCommunicationMatchesUser(data) &&
-            this.pagination.current_page === 1 &&
+            this.pagination.prev === null &&
             this.communications.length > 0 &&
             data.id > this.communications[0].id) {
             this.pagination.total += 1
@@ -1072,7 +1072,7 @@ export default {
 
     this.$VueEvent.listen('delete_communication', (data) => {
       // check data loaded
-      if (this.pagination.current_page) {
+      if (this.pagination.prev === null) {
         // try to find the communication
         let found = this.communications.find(communication => communication.id === data.id)
         if (found) {

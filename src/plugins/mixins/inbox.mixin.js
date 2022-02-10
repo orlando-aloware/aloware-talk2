@@ -1,6 +1,7 @@
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
 
@@ -55,13 +56,29 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setContact', 'setContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
+    ...mapActions('inbox', ['setContact', 'setContacts', 'setLiveContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
+    getNoneLiveCallContactTasks (contacts) {
+      return contacts.filter(contact => contact.last_communication &&
+        ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
+    },
+    getLiveCallContactTasks (contacts) {
+      return contacts.filter(contact => contact.last_communication &&
+        [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
+    },
     loadContactTasks () {
       this.gettingContactsList(true)
       // always reset page when fresh loading contacts
       this.page = 1
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts(response.data.data)
+        this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
         this.gettingContactsList(false)
         this.setContactsCurrentPage(response.data.current_page)
         this.setHasMoreContacts(response.data.next_page_url)
@@ -73,7 +90,7 @@ export default {
       this.isLoaded = false
       this.isLoadingMore = true
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts([...this.contacts, ...response.data.data])
+        this.setContacts([...this.contacts, ...this.getNoneLiveCallContactTasks(response.data.data)])
 
         this.setContactsCurrentPage(response.data.current_page)
         this.setHasMoreContacts(response.data.next_page_url)

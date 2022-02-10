@@ -70,6 +70,7 @@ export default function () {
     communicationsCurrentPage: 0,
     hasMoreCommunications: false,
     contacts: [],
+    liveContacts: [], // contact task that are in live calls (incoming, in-progress or parked calls)
     contactsCurrentPage: 0,
     hasMoreContacts: false,
     selectedContact: {},

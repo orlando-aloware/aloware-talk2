@@ -73,6 +73,10 @@
                   <span>
                     {{ taskCounts.open | numberPlusFormatter(99) }}
                   </span>
+                <b-badge v-if="hasIncomingLiveCall"
+                         variant="danger"
+                         class="live-call-badge d-flex justify-center align-items-center position-absolute"
+                         pill></b-badge>
               </div>
             </div>
           </template>
@@ -106,10 +110,18 @@
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
+      <div class="w-100 flex-grow-1" v-if="liveCalls.length > 0">
+        <inbox-task-list :contacts="liveCalls"
+                         :loading-contacts="isFetchingContacts"
+                         :search-text="searchText"
+                         :is-search="isSearch"
+                         @onItemSelected="onItemSelected">
+        </inbox-task-list>
+      </div>
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
-        <inbox-task-list :contacts="contacts"
+        <inbox-task-list :contacts="contactTasks"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
@@ -145,6 +157,7 @@
 import _ from 'lodash'
 import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
@@ -157,6 +170,8 @@ import SearchToggle from 'components/search-toggle'
 import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as CommunicationDirections from 'src/constants/communication-direction'
 
 let scrollTimeout
 export default {
@@ -167,7 +182,19 @@ export default {
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
   computed: {
-    ...mapState('inbox', ['taskCounts', 'contacts', 'selectedContact', 'hasMoreContacts', 'isFetchingContacts', 'channelChangedFilterFields', 'selectedFilter']),
+    ...mapState(['dialer']),
+    ...mapState('inbox',
+      [
+        'taskCounts',
+        'contacts',
+        'liveContacts',
+        'selectedContact',
+        'hasMoreContacts',
+        'isFetchingContacts',
+        'channelChangedFilterFields',
+        'selectedFilter'
+      ]
+    ),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -187,6 +214,36 @@ export default {
     },
     filterButtonVariant () {
       return 'outlined-light'
+    },
+    contactTasks () {
+      return [...this.incomingCalls, ...this.contacts]
+    },
+    hasLiveCall () {
+      return this.dialer.call &&
+        this.dialer.call.state === 'open'
+    },
+    hasIncomingLiveCall () {
+      let i = this.liveContacts.findIndex(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
+      return i >= 0
+    },
+    incomingCalls () {
+      return this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
+    },
+    liveCalls () {
+      return [
+        // parked calls
+        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+        // connected calls
+        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2))
+      ]
     }
   },
 
@@ -212,7 +269,8 @@ export default {
           ring_groups: Filters.DEFAULT_STATE.filter.ring_groups
         },
         scope: 'user'
-      }
+      },
+      CommunicationCurrentStatus
     }
   },
 
@@ -282,7 +340,6 @@ export default {
       })
     },
     onItemSelected (contact) {
-      console.log('contact :> ---> ', contact)
       this.setSelectedContact(contact)
       const contactId = _.get(contact, 'id', null)
       if (contactId) {
@@ -334,7 +391,6 @@ export default {
         this.loadContactTasks()
       }
     },
-
     searching (value) {
       if ((value && value.length >= 3) || value === '') {
         if (value === '') {
@@ -349,11 +405,9 @@ export default {
       this.filter = { ...this.defaultFilterModel.filter }
       this.resetChannelChangedFilterFields()
     },
-
     onApplyFilter (filter) {
       this.filter = filter
     },
-
     onCreateNewFilter (filter) {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
       this.toggleFilterModelForm(true)
@@ -361,6 +415,7 @@ export default {
   },
 
   mounted () {
+    this.setLiveContacts([])
     this.setContacts([])
     this.setStatus()
 
@@ -420,29 +475,87 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
+      // Do not alter live contacts if it's in active mode
+      let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+        [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+        ].includes(item.last_communication.current_status2))
+
+      if (isActiveInLiveContactsIndex >= 0) {
+        return
+      }
+
       talk2Api.V2.contacts.get(communication.contact_id).then(response => {
         let contact = response.data
-        // only modify order if new contact task === current task
-        if (this.currentTask === contact.task_status) {
-          let foundContact = this.contacts.find(item => item.id === contact.id)
-          // if contact is not in the list, then automatically add it to the top
+        let contacts = _.cloneDeep(this.contacts)
+        let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+        let isInContacts = this.contacts.find(item => item.id === contact.id)
 
-          let contacts = [...this.contacts]
-          if (!foundContact) {
-            if (this.contacts.length > this.perPage) {
-              contacts.pop()
+        // check if communication is a live call
+        if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
+          [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+          let liveContacts = _.cloneDeep(this.liveContacts)
+
+          if (!isInLiveContacts) {
+            liveContacts.push(contact)
+          }
+
+          if (isInContacts) {
+            let index = contacts.findIndex(item => item.id === contact.id)
+            contacts.splice(index, 1)
+            this.setContacts(contacts)
+          }
+
+          this.setLiveContacts(
+            [
+              // connected calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+              // parked calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+              // incoming calls
+              ...liveContacts.filter(item => [
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+              ].includes(item.last_communication.current_status2))
+            ]
+          )
+        } else {
+          // only modify order if new contact task === current task
+          if (this.currentTask === contact.task_status) {
+            if (!isInLiveContacts) {
+              // if contact is not in the list, then automatically add it to the top
+              if (!isInContacts) {
+                if (this.contacts.length > this.perPage) {
+                  contacts.pop()
+                }
+              } else {
+                // get all contacts except the current one
+                contacts = _.clone(contacts.filter(item => item.id !== contact.id))
+              }
+
+              if (this.sorting.order === 'asc') {
+                contacts.push(contact)
+              } else {
+                contacts.unshift(contact)
+              }
+              this.setContacts(contacts)
             }
-          } else {
-            // get all contacts except the current one
-            contacts = [...this.contacts.filter(item => item.id !== contact.id)]
           }
-
-          if (this.sorting.order === 'asc') {
-            contacts.push(contact)
-          } else {
-            contacts.unshift(contact)
-          }
-          this.setContacts(contacts)
         }
       })
     })
@@ -452,7 +565,52 @@ export default {
         return
       }
 
-      this.setContact(communication)
+      // if communication is in live contacts
+      let index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      if (index >= 0) {
+        let liveContacts = _.cloneDeep(this.liveContacts)
+        liveContacts[index].last_communication = communication
+        // if type is call and completed/voicemail then remove from live calls
+        if (communication.direction === CommunicationDirections.INBOUND &&
+          communication.type === CommunicationTypes.CALL &&
+          [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
+          let contactTaskToRemove = liveContacts[index]
+          liveContacts.splice(index, 1)
+
+          // we then add to contact tasks
+          let contacts = _.cloneDeep(this.contacts)
+          if (this.sorting.order === 'asc') {
+            contacts.push(contactTaskToRemove)
+          } else {
+            contacts.unshift(contactTaskToRemove)
+          }
+          this.setContacts(contacts)
+        }
+        this.setLiveContacts(
+          [
+            // connected calls
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+            // parked calls
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+            // incoming calls
+            ...liveContacts.filter(item => [
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+            ].includes(item.last_communication.current_status2))
+          ]
+        )
+      }
+
+      let contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
+      if (contactIndex >= 0) {
+        let contacts = _.cloneDeep(this.contacts)
+        contacts[contactIndex].last_communication = communication
+        this.setContacts(contacts)
+        this.setContact(contacts[contactIndex])
+      }
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
