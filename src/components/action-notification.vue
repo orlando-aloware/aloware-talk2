@@ -81,7 +81,7 @@
             </template>
           </div>
         </div>
-        <div class="d-flex justify-content-center align-items-center call-actions"
+        <!--div class="d-flex justify-content-center align-items-center call-actions"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -104,9 +104,9 @@
                  @click="answerCall">
             <accept-call-icon width="32" height="32"/>
           </q-btn>
-        </div>
+        </div-->
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
-             v-if="id === 'callFishing' && dialer && dialer.call">
+             v-if="id === 'callFishing'">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -139,17 +139,16 @@
               <accept-call-icon width="32" height="32"/>
             </template>
             <b-dropdown-item href=""
+                             link-class="d-flex align-items-center"
                              @click="answerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
-                              color="#9B51E0"/>
-              Park Current Call & Connect
+                              color="#9B51E0"/>Park Current Call & Connect
             </b-dropdown-item>
             <b-dropdown-item href=""
                              @click="answerCommunication(false, true)">
-              <hangup-icon class="icon-margin"/>
-              Hangup Current Call & Connect
+              <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
             </b-dropdown-item>
           </b-dropdown>
         </div>
@@ -208,7 +207,7 @@ export default {
       }
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
-        toastClass += ' bg-blue-60-opaque background-blur incoming-call-notification'
+        toastClass += ' bg-blue-60-opaque position-relative background-blur incoming-call-notification'
       }
 
       if (this.queue) {
@@ -226,7 +225,7 @@ export default {
       }
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
-        headerClass += ' bg-blue-60-opaque background-blur'
+        headerClass += ' bg-blue-60-opaque'
       }
 
       return headerClass
@@ -318,23 +317,23 @@ export default {
     ...mapActions(['setNotifications', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
-      if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
-        this.onHidden()
-        this.$closeActionNotification(this.id)
-        return
-      }
-
-      if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
-        this.onHidden()
-        this.$closeActionNotification(this.id)
-        return
-      }
-
-      if (!this.title) {
-        this.onHidden()
-        this.$closeActionNotification(this.id)
-        return
-      }
+      // if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+      //   this.onHidden()
+      //   this.$closeActionNotification(this.id)
+      //   return
+      // }
+      //
+      // if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
+      //   this.onHidden()
+      //   this.$closeActionNotification(this.id)
+      //   return
+      // }
+      //
+      // if (!this.title) {
+      //   this.onHidden()
+      //   this.$closeActionNotification(this.id)
+      //   return
+      // }
 
       this.playAudio()
     },
