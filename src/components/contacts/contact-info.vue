@@ -1,6 +1,6 @@
 <template>
   <b-card class="border-0 contact-info-wrapper">
-    <b-media>
+    <b-media class="min-w-0">
       <template #aside>
         <q-item-section avatar>
           <avatar :name="contact.name"
@@ -11,15 +11,15 @@
         </q-item-section>
       </template>
 
-      <div class="d-flex justify-content-between relative-position">
-        <div>
-          <h2 class="mt-1 mb-0 contact-name">
+      <div class="d-flex justify-content-between relative-position w-100">
+        <div class="w-100 d-grid">
+          <div class="mt-1 mb-0 contact-name-wrapper">
             <q-tooltip anchor="top middle"
                        self="center middle">
               {{ contactName }}
             </q-tooltip>
-            {{ contactName | truncate(15) }}
-          </h2>
+            <h2 class="contact-name pb-1">{{ contactName }}</h2>
+          </div>
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
               <span class="contact-primary-phone">{{ contact.phone_number | fixPhone }}</span>

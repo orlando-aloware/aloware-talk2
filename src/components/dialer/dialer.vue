@@ -419,9 +419,11 @@ export default {
         return
       }
 
-      if (this.dialer.call || !currentNumber || !outboundCampaignId) {
+      if ((this.dialer.call && this.dialer.call.state !== 'pending') || !currentNumber || !outboundCampaignId) {
         console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
+      } else {
+        this.rejectCall()
       }
 
       let params = {
@@ -645,7 +647,7 @@ export default {
     },
 
     parkCall () {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || this.dialer.parkedCall) {
+      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
       this.loadingPark = true

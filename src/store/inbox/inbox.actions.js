@@ -38,6 +38,9 @@ export default {
   setContacts: ({ commit }, contacts) => {
     commit('SET_CONTACTS', contacts)
   },
+  setLiveContacts: ({ commit }, contacts) => {
+    commit('SET_LIVE_CONTACTS', contacts)
+  },
   setContactsCurrentPage: ({ commit }, page) => {
     commit('SET_CONTACTS_CURRENT_PAGE', page)
   },
