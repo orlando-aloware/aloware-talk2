@@ -3586,6 +3586,9 @@ span.mention {
   .comm-label {
     @include font-size(12px, 'normal');
     line-height: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 
     svg.item-identifier-icon {
       margin-top: -2px;
