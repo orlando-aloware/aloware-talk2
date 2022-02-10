@@ -10313,15 +10313,26 @@ screen and (max-width: 956px) {
       margin-top: 8px;
       padding: 6px 6px;
       background: rgba(21, 22, 63, 0.8) !important;
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 12px -2px rgba(0, 0, 0, 0.08);
-      backdrop-filter: blur(15px);
-      border-radius: 8px;
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 12px -2px rgba(0, 0, 0, 0.08) !important;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
       li a {
         color: white;
         padding: 6px 12.65px;
+        &:not(svg) {
+          font-size: 13px;
+        }
         .icon-margin {
           margin-right: 8px;
         }
+      }
+      &[x-placement="bottom-end"] {
+        width: 298px;
+        transform: translate(-249px, 40px) !important;
+      }
+      &[x-placement="right-start"] {
+        margin: 0 !important;
+        transform: translate(36px, -6px) !important;
       }
     }
     .dropdown-item:hover,
@@ -10405,7 +10416,19 @@ screen and (max-width: 956px) {
 
 .background-blur {
   box-shadow: 0px 10px 20px -4px rgba(4, 4, 4, 0.2);
-  backdrop-filter: blur(15px);
+  border-radius: 8px;
+  &::before {
+    content: '';
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 8px;
+  }
 }
 
 .menu-phone {
