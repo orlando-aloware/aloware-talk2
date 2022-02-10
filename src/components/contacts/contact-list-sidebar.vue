@@ -93,7 +93,9 @@ export default {
       this.isExpanded = !this.isExpanded
       this.desktopisExpanded = this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
-      this.setShowContactsHeader(this.isExpanded)
+      if (this.isMobile) {
+        this.setShowContactsHeader(this.isExpanded)
+      }
     },
 
     onSidebarToggleMobile () {
