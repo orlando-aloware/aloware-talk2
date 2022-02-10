@@ -3893,6 +3893,9 @@ span.mention {
 
   &:hover {
     background: $purple-40 !important;
+    .q-focus-helper {
+      background: unset !important;
+    }
   }
 
   .call-status {
@@ -6988,8 +6991,8 @@ table.datatable {
   .contact-unread-badge {
     left: 38px;
     top: -8px;
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
   }
 
   .overlay {
@@ -10355,6 +10358,10 @@ screen and (max-width: 956px) {
   }
 }
 
+.b-radius-12 {
+  border-radius: 12px;
+}
+
 .notification-body-wrapper {
   cursor: pointer;
   .call-actions {
@@ -10401,8 +10408,33 @@ screen and (max-width: 956px) {
 }
 
 .background-blur {
-  box-shadow: 0px 10px 20px -4px rgba(4, 4, 4, 0.2);
+  box-shadow: 0 10px 20px -4px rgba(4, 4, 4, 0.2);
   backdrop-filter: blur(15px);
+}
+
+.live-call-options {
+  padding: 6px;
+
+  .q-list {
+    .q-item {
+      padding: 5px 10px;
+      border-radius: 6px;
+      min-height: 28px !important;
+
+      .q-item__section {
+        display: block !important;
+        min-height: 0 !important;
+
+        svg:not(.hangup-icon) {
+          margin-right: 10px;
+        }
+
+        svg.hangup-icon {
+          margin-right: 6px !important;
+        }
+      }
+    }
+  }
 }
 
 .menu-phone {
@@ -10427,6 +10459,35 @@ screen and (max-width: 956px) {
   }
 }
 
+.call-connected {
+  border: 2px solid lighten($primary, 10%);
+
+  &-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: $primary;
+  }
+}
+
+.contact-task-item {
+
+  &.item-call-parked,
+  &.item-call-connected {
+    background: $light-blue4 !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+  }
+
+  .call-parked-label {
+    font-size: 12px;
+    color: $purple-100;
+  }
+
+  .call-connected-label {
+    font-size: 12px;
+    color: $primary;
+  }
+}
+
 .call-fishing-clear-queues {
   top: -32px;
 }
@@ -10439,6 +10500,17 @@ screen and (max-width: 956px) {
   .message-text:not(.has-ring-group) {
     max-width: 162px;
   }
+}
+
+.live-call-badge {
+  top: 1px !important;
+  right: 4px;
+  height: 8px;
+  width: 2px;
+}
+
+.item-live-call + .item-live-call {
+  border-bottom: 2px solid $grey-60 !important;
 }
 
 .h-1-livebar {
@@ -10584,4 +10656,9 @@ screen and (max-width: 956px) {
   &.task-item-body {
     grid-template-columns: 26px 1fr;
   }
+}
+
+
+.park-call-icon {
+  margin-top: -3px;
 }

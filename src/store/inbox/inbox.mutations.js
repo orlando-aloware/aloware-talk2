@@ -60,6 +60,9 @@ export default {
   SET_CONTACTS: (state, contacts) => {
     state.contacts = contacts
   },
+  SET_LIVE_CONTACTS: (state, contacts) => {
+    state.liveContacts = contacts
+  },
   SET_CONTACTS_CURRENT_PAGE: (state, page) => {
     state.contactsCurrentPage = page
   },

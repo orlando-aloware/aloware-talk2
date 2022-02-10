@@ -236,7 +236,8 @@ export default function (/* { ssrContext } */) {
       voicemailNotifiedDesktop: [],
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
-      reminderNotifiedDesktop: []
+      reminderNotifiedDesktop: [],
+      parkedCallQueue: []
     },
 
     getters: {
@@ -632,6 +633,18 @@ export default function (/* { ssrContext } */) {
 
       removeReminderNotifiedDesktop ({ commit }, value) {
         commit('REMOVE_REMINDER_NOTIFIED_DESKTOP', value)
+      },
+
+      setParkedCallQueue ({ commit }, payload) {
+        commit('SET_PARKED_CALL_QUEUE', payload)
+      },
+
+      addParkedCallInQueue ({ commit }, payload) {
+        commit('ADD_PARKED_CALL_IN_QUEUE', payload)
+      },
+
+      removeParkedCallFromQueue ({ commit }, value) {
+        commit('REMOVE_PARKED_CALL_FROM_QUEUE', value)
       }
     },
 
@@ -1257,6 +1270,28 @@ export default function (/* { ssrContext } */) {
         }
 
         state.reminderNotifiedDesktop.splice(state.reminderNotifiedDesktop.indexOf(found), 1)
+      },
+
+      SET_PARKED_CALL_QUEUE (state, payload) {
+        state.parkedCallQueue = payload
+      },
+
+      ADD_PARKED_CALL_IN_QUEUE (state, payload) {
+        state.parkedCallQueue.push(payload)
+      },
+
+      REMOVE_PARKED_CALL_FROM_QUEUE (state, value) {
+        if (state.parkedCallQueue.length === 0) {
+          return
+        }
+
+        let found = state.parkedCallQueue.find(item => item.id === value)
+
+        if (!found) {
+          return
+        }
+
+        state.parkedCallQueue.splice(state.parkedCallQueue.indexOf(found), 1)
       },
 
       updateField

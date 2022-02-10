@@ -12,12 +12,10 @@
                     v-else>
         </q-skeleton>
       </q-item-label>
-      <q-item-label class="call-status">
+      <q-item-label class="call-status d-flex justify-content-between">
         <span>{{ phoneStatus }}</span>
-      </q-item-label>
-      <!--q-item-label class="call-status">
         <span>{{ dialer.parkedCallTimer }}</span>
-      </q-item-label-->
+      </q-item-label>
     </q-item-section>
 
     <q-item-section side>
