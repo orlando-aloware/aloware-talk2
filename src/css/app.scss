@@ -7078,7 +7078,7 @@ table.datatable {
   }
 
   .action-option-container {
-    padding-right: 22px;
+    padding-right: 28px;
   }
 
   .filter-name {
@@ -7095,8 +7095,8 @@ table.datatable {
   .left-column-wrapper {
 
     border-right: 1px solid $grey-60;
-    padding-right: 11px;
-    padding-left: 11px;
+    padding-right: 10px;
+    padding-left: 10px;
     max-width: 50%;
 
     .filter-group-title {
@@ -7196,6 +7196,7 @@ table.datatable {
   overflow: auto;
   height: auto;
   max-height: 72vh;
+  padding-right: 8px;
 
 
   .section-header {

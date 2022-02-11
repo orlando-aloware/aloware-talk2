@@ -7,10 +7,11 @@
           <b-form-row class="mt-2">
             <b-col sm="12" md="6">
               <b-form-group
-                :label="dateRangeLabel"
                 class="form-label"
+                :label="dateRangeLabel"
               >
-                <div class="last-engagement-tooltip-wrapper" v-if="isInbox">
+                <div class="last-engagement-tooltip-wrapper"
+                     v-if="isInbox">
                   <information-circle-icon color="#2F80ED">
                   </information-circle-icon>
                   <q-tooltip  anchor="top middle"
@@ -20,7 +21,7 @@
                 </div>
 
                 <date-range-picker
-                  v-model="date_range"
+                  v-model="dateRange"
                   ref="picker"
                   :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
                   :opens="opens"
@@ -34,7 +35,8 @@
                 </date-range-picker>
               </b-form-group>
             </b-col>
-            <b-col sm="12" md="6">
+            <b-col sm="12"
+                   md="6">
               <b-form-group label="My Contacts"
                             class="form-label">
                 <b-form-checkbox
@@ -50,7 +52,8 @@
             </b-col>
           </b-form-row>
           <b-form-row class="mt-2">
-            <b-col sm="12" md="6">
+            <b-col sm="12"
+                   md="6">
               <b-form-group
                 label="Lines"
                 class="form-label"
@@ -144,8 +147,8 @@
                 class="form-label"
                 label="Callback Status"
               >
-                <callback-status-selector v-model="filter.callback_status"
-                                          custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                                          v-model="filter.callback_status"
                                           :clearable="true"
                                           :highlighted="isChanged('callback_status')"
                                           :use-input="false"
@@ -399,23 +402,28 @@ export default {
     },
     dateHasChanges () {
       return this.filter.from_date !== this.defaultFilterModel.filter.from_date || this.filter.to_date !== this.defaultFilterModel.filter.to_date
+    },
+    isRangeSelectionOpen () {
+      if (!this.rangePicker) {
+        return false
+      }
+      return this.rangePicker.$data.showCustomRangeCalendars
     }
 
   },
 
   data () {
     return {
-      startDate: new Date(),
-      endDate: new Date(),
       disableContactOwner: false,
-      date_range: {
+      dateRange: {
         startDate: null, // window.moment('2015-01-01')._d,
         endDate: null // window.moment()._d
       },
       opens: 'right',
       ranges: {
         'All Time': [null, null]
-      }
+      },
+      rangePicker: null
     }
   },
 
@@ -451,22 +459,23 @@ export default {
       // The type of value or oldValue is the array returned above
 
       (value, oldValue) => {
-        this.date_range.startDate = value[0]
-        this.date_range.endDate = value[1]
+        this.dateRange.startDate = value[0]
+        this.dateRange.endDate = value[1]
       })
   },
 
   mounted () {
-    this.date_range.startDate = this.filter.from_date
-    this.date_range.endDate = this.filter.to_date
+    this.dateRange.startDate = this.filter.from_date
+    this.dateRange.endDate = this.filter.to_date
+    this.rangePicker = this.$refs.picker
   },
 
   watch: {
-    date_range: {
+    dateRange: {
       deep: true,
       handler () {
-        this.filter.from_date = this.date_range.startDate ? window.moment(this.date_range.startDate).format('YYYY-MM-DD') : null
-        this.filter.to_date = this.date_range.endDate ? window.moment(this.date_range.endDate).format('YYYY-MM-DD') : null
+        this.filter.from_date = this.dateRange.startDate ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD') : null
+        this.filter.to_date = this.dateRange.endDate ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD') : null
       }
     },
 
@@ -484,6 +493,12 @@ export default {
         if (value.length) {
           this.filter.my_contact = 0
         }
+      }
+    },
+    isRangeSelectionOpen: function (value) {
+      if (value) {
+        this.dateRange.startDate = window.moment().subtract(1, 'day').format('YYYY-MM-DD')
+        this.dateRange.endDate = window.moment().format('YYYY-MM-DD')
       }
     }
   }

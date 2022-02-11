@@ -18,18 +18,24 @@
 
         <div class="mt-3">
           <div class="mb-4">
-            <div class="filter-items cursor-pointer text-italic"
+            <div class="filter-items cursor-pointer"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>New <span v-if="!selectedFilter"
-                              class="float-right check-icon"><check-o-icon color="#040404"></check-o-icon></span></span>
-
+              <span>New (Untitled)
+                <span v-if="!selectedFilter"
+                      class="float-right check-icon">
+                  <check-o-icon color="#040404"></check-o-icon>
+                </span>
+              </span>
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
           <div class="saved-filters">
-            <q-skeleton type="rect" v-if="isGettingFilters" />
-            <p class="text-muted fs-12 empty-filter-placeholder" v-show="!isGettingFilters" v-if="personalFilters.length < 1">None</p>
+            <q-skeleton type="rect"
+                        v-if="isGettingFilters" />
+            <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+               v-show="!isGettingFilters"
+               v-if="personalFilters.length < 1">None</p>
             <filter-list-items v-for="item in personalFilters"
                                :key="item.id"
                                :filter="item"
@@ -40,8 +46,13 @@
           </div>
           <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
           <div class="saved-filters">
-            <q-skeleton type="rect" v-if="isGettingFilters" />
-            <p class="text-muted fs-12 empty-filter-placeholder" v-show="!isGettingFilters" v-if="companyFilters.length < 1">None</p>
+            <q-skeleton type="rect"
+                        v-if="isGettingFilters" />
+            <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+               v-show="!isGettingFilters"
+               v-if="companyFilters.length < 1">
+              None
+            </p>
             <div class="filter-items cursor-pointer"
                  v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === item.id }"
                  v-for="item in companyFilters"
@@ -63,9 +74,9 @@
           <div class="w-100 text-center">
             <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
           </div>
-          <compact-btn class="border-0"
+          <compact-btn class="border-0 pl-0 pr-0"
                        @clicked="onHide">
-            <i class="fa fa-times"></i>
+            <close-icon iconColor="#000000"></close-icon>
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
@@ -117,13 +128,14 @@ import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
 import CheckOIcon from 'components/icons/check-o-icon'
+import CloseIcon from 'components/icons/close-icon'
 
 let inputTimeout
 
 export default {
   name: 'filter-dialog',
 
-  components: { CheckOIcon, FilterListItems, CompactBtn, FilterForm },
+  components: { CloseIcon, CheckOIcon, FilterListItems, CompactBtn, FilterForm },
 
   props: {
     value: {
