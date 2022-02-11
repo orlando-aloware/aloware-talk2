@@ -60,7 +60,7 @@
               style="display:contents;"
               class="mt-3">
               <q-item
-                :class="`px-2 border-radius-1 ${selectedItem === 'Untitled' ? 'bg-grey-70' : ''}`"
+                :class="`px-2 border-radius-1 ${selectedItemName === 'Untitled' ? 'bg-grey-70' : ''}`"
                 :disable="loading"
                 clickable>
                 <q-item-section
@@ -68,7 +68,7 @@
                   <div class="text-bold">New <span class="text-weight-regular text-grey-80">(Untitled)</span></div>
                 </q-item-section>
                 <q-item-section side>
-                  <CheckIcon v-if="selectedItem === 'Untitled'" />
+                  <CheckIcon v-if="selectedItemName === 'Untitled'" />
                 </q-item-section>
               </q-item>
             </q-list>
@@ -93,13 +93,13 @@
                   v-if="fetchedGroupSettings(t.name).length > 0">
                   <q-item
                     v-for="(f, fk) in fetchedGroupSettings(t.name)"
-                    :key="fk"
+                    :key="`${t.name}-${fk}`"
                     @click.native.prevent="loadSettings(f)"
                     @mouseenter="hovered = f.id"
                     @mouseleave="toggleSelected"
                     clickable
                     v-ripple
-                    :class="`px-2 py-0 border-radius-1 ${selectedItem === f.name ? 'bg-grey-70' : ''}`"
+                    :class="`px-2 py-0 border-radius-1 ${isSessionValid(f) ? 'bg-grey-70' : ''}`"
                     :disable="loading">
                     <q-item-section class="mr-2">
                       {{ f.name }}
@@ -108,7 +108,7 @@
                       v-if="hovered !== f.id"
                       side>
                       <CheckIcon
-                        v-if="selectedItem === f.name"
+                        v-if="isSessionValid(f)"
                         class="mr-2" />
                     </q-item-section>
                     <q-item-section
@@ -177,7 +177,7 @@
                 <div class="col-12">
                   <q-card flat class="p-0">
                     <q-card-actions class="px-0">
-                      <div>{{ selectedItem }}</div>
+                      <div>{{ selectedItemName }}</div>
                       <q-space />
                       <q-btn
                         @click="resetDefaults"
@@ -186,6 +186,14 @@
                         size="sm"
                         class="px-3 py-0"
                         color="grey-5">Reset</q-btn>
+                      <q-btn
+                        @click="newSetting = true"
+                        unelevated
+                        no-caps
+                        :disabled="disabled"
+                        size="sm"
+                        class="px-3 py-0"
+                        color="primary">Save</q-btn>
                       <q-btn
                         @click="newSetting = true"
                         unelevated
@@ -208,6 +216,7 @@
               </div>
 
               <SessionsForm
+                v-model="selectedItem"
                 @valid-form="disabled = false"
                 @invalid-form="disabled = true" />
 
@@ -291,37 +300,41 @@
 <script>
 
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 
-const UNTITLED = 'Untitled'
+// const UNTITLED = 'Untitled'
 
 export default {
   name: 'StartDialsSessionsSettings',
+  props: {
+    list: {
+      type: Object
+    }
+  },
   components: {
     SessionsForm,
     PhoneIcon,
     CheckIcon
   },
   computed: {
+    ...mapFields('powerDialer', [
+      'sessionSettings',
+      'dialerSessionSettings'
+    ]),
     ...mapGetters('powerDialer', [
       'personalSessionSettings',
       'companySessionSettings',
-      'sessionSettings',
-      'defaultSettings',
       'sessionSettingGroups'
     ]),
-    ...mapGetters('contacts', [
-      'selectedList'
-    ]),
-    tabCollections () {
-      let items = this.tabHeaders.filter(i => i.disabled === false)
-      return items.concat(this.groupedSettings)
-    },
     defaultValues () {
       return { ...DEFAULT_SETTING_VALUES }
+    },
+    selectedItemName () {
+      return this.selectedItem?.name
     }
   },
   async mounted () {
@@ -347,7 +360,8 @@ export default {
       newSettingName: '',
       deleteId: null,
       updateObj: null,
-      selectedItem: UNTITLED
+      selectedItem: null,
+      selectedItemId: null
     }
   },
   methods: {
@@ -371,39 +385,51 @@ export default {
     },
     async beginDial () {
       this.dialog = false
-      if (this.selectedItem === 'Untitled') {
-        let newSettings = { ...this.defaultSettings }
+      /**
+       * TODOs
+       * Identify first before exiting the component
+       * IF selected item is temporary OR
+       * IF selected item is personal/company
+       */
+      if (this.selectedItemName === 'Untitled') {
+        let newSettings = { ...this.defaultValues }
         let res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
-          contact_list_id: this.selectedList.id,
-          name: `${this.selectedList.name}-${new Date().valueOf()}`
+          contact_list_id: this.list.id,
+          name: `${this.list.name}-${new Date().valueOf()}`
         })
         if (res?.id) {
           await this.getDialerSessionSettings()
         }
-        this.$emit('start', null)
       } else {
         let { id } = this.sessionSettings
-        this.activeSessionSettingId = id
-        this.$emit('start', id)
+        // this.activeSessionSettingId = id
+        await this.updateContactsList({
+          id: this.list.id,
+          dialer_session_id: id
+        })
       }
+      this.$emit('start')
     },
     async loadSettings (data) {
       this.loading = true
+      let res = null
       if (data?.id) {
-        this.selectedItem = data.name
-        await this.getSessionSetting(data.id)
+        res = await this.getSessionSetting(data.id)
       } else {
-        await this.getTemporarySessionSetting(this.selectedList.id)
+        res = await this.getTemporarySessionSetting(this.list.id)
         this.resetDefaults(false)
-        this.selectedItem = data
       }
+      // this.sessionSettings = res
+      this.selectedItemId = res.id
+      this.selectedItem = res
       this.loading = false
     },
     async saveAsNew () {
       this.loading = true
-      let newSettings = { ...this.defaultSettings }
+      let newSettings = { ...this.defaultValues }
       newSettings.name = this.newSettingName
+      newSettings.is_company_scope = 0
       let res = await this.createDialerSessionSetting(this.removeEmptyParams(newSettings))
       if (res?.id) {
         await this.getDialerSessionSettings()
@@ -425,16 +451,16 @@ export default {
       let res = await this.updateDialerSessionSetting({
         id: this.updateObj.id,
         name: this.updateObj.name,
-        call_disposition_ids: this.defaultSettings.call_disposition_ids,
-        campaign_id: this.defaultSettings.campaign_id,
-        company_id: this.defaultSettings.company_id,
-        contact_disposition_ids: this.defaultSettings.contact_disposition_ids,
-        is_company_scope: this.defaultSettings.is_company_scope,
-        metric_options: this.defaultSettings.metric_options,
-        // script_id: this.defaultSettings.script_id,
-        skip_outside_daytime_hours: this.defaultSettings.skip_outside_daytime_hours,
-        user_id: this.defaultSettings.user_id,
-        warmup_period_in_seconds: this.defaultSettings.warmup_period_in_seconds
+        call_disposition_ids: this.defaultValues.call_disposition_ids,
+        campaign_id: this.defaultValues.campaign_id,
+        company_id: this.defaultValues.company_id,
+        contact_disposition_ids: this.defaultValues.contact_disposition_ids,
+        is_company_scope: 0, // this.defaultValues.is_company_scope,
+        metric_options: this.defaultValues.metric_options,
+        // script_id: this.defaultValues.script_id,
+        skip_outside_daytime_hours: this.defaultValues.skip_outside_daytime_hours,
+        user_id: this.defaultValues.user_id,
+        warmup_period_in_seconds: this.defaultValues.warmup_period_in_seconds
       })
       if (res.data) {
         this.newSetting = false
@@ -478,11 +504,14 @@ export default {
       if (this.sessionSettings?.id && isExistingList) {
         params.id = this.sessionSettings.id
       }
-      this.selectedItem = UNTITLED
+      this.selectedItemId = this.list.dialer_session_id
       this.setDefaultSettings(params)
     },
     removeEmptyParams (params) {
       return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v !== ''))
+    },
+    isSessionValid (data) {
+      return this.selectedItemId === data.id
     }
   },
   watch: {
@@ -490,19 +519,22 @@ export default {
       if (val) {
         this.loading = true
         await this.getDialerSessionSettings()
-        await this.getTemporarySessionSetting(this.selectedList.id)
-        this.selectedItem = this.sessionSettings?.name
-        if (this.sessionSettings?.id) {
-          // this.resetDefaults(false)
-        }
+        await this.getTemporarySessionSetting(this.list.dialer_session_id)
+        this.selectedItemId = this.list.dialer_session_id
+        this.selectedItem = this.dialerSessionSettings.find((setting) => {
+          return setting.id === this.selectedItemId
+        })
+        // if (this.sessionSettings?.id) {
+        //   // this.resetDefaults(false)
+        // }
         this.loading = false
       }
     },
-    selectedItem (val) {
-      if (val === UNTITLED) {
-        this.clearSessionSetting()
-      }
-    },
+    // selectedItem (val) {
+    //   if (val === UNTITLED) {
+    //     this.clearSessionSetting()
+    //   }
+    // },
     newSetting (val) {
       if (!val) {
         this.deleteId = null
