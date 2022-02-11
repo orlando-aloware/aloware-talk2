@@ -2,20 +2,22 @@
   <div class="contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative"
        :class="[activeClass, isParkedCall ? 'item-call-parked' : '', isConnectedCall ? 'item-call-connected' : '', isLiveCall ? 'item-live-call' : '']"
        @click="onItemClick(contact)">
-    <div class="avatar d-flex justify-content-center pb-1 position-relative"
-         role="button">
-      <b-badge v-if="totalUnreads > 0"
-               class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
-               variant="danger"
-               pill>
-        <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
-        <span v-else>99<sup>+</sup></span>
-      </b-badge>
-      <avatar width="34"
-              height="34"
-              :style="avatarStyle(false)"
-              :name="contactAvatar">
-      </avatar>
+    <div class="d-flex justify-content-center avatar-wrapper">
+      <div class="avatar d-flex justify-content-center pb-1 position-relative"
+           role="button">
+        <b-badge v-if="totalUnreads > 0"
+                 class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
+                 variant="danger"
+                 pill>
+          <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
+          <span v-else>99<sup>+</sup></span>
+        </b-badge>
+        <avatar width="34"
+                height="34"
+                :style="avatarStyle(false)"
+                :name="contactAvatar">
+        </avatar>
+      </div>
     </div>
     <div class="task-details flex-grow-1 pb-1 d-grid"
          role="button">

@@ -81,7 +81,7 @@
             </template>
           </div>
         </div>
-        <!--div class="d-flex justify-content-center align-items-center call-actions"
+        <div class="d-flex justify-content-center align-items-center call-actions"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -104,9 +104,9 @@
                  @click="answerCall">
             <accept-call-icon width="32" height="32"/>
           </q-btn>
-        </div-->
+        </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
-             v-if="id === 'callFishing'">
+             v-if="id === 'callFishing' && dialer && dialer.call">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -317,23 +317,23 @@ export default {
     ...mapActions(['setNotifications', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
-      // if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
-      //   this.onHidden()
-      //   this.$closeActionNotification(this.id)
-      //   return
-      // }
-      //
-      // if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
-      //   this.onHidden()
-      //   this.$closeActionNotification(this.id)
-      //   return
-      // }
-      //
-      // if (!this.title) {
-      //   this.onHidden()
-      //   this.$closeActionNotification(this.id)
-      //   return
-      // }
+      if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
+
+      if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
+
+      if (!this.title) {
+        this.onHidden()
+        this.$closeActionNotification(this.id)
+        return
+      }
 
       this.playAudio()
     },
