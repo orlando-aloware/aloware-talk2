@@ -148,7 +148,6 @@ export default {
     return window.axios.get(
       `api/v2/power-dialer-lists/${id}/temporary-session-settings`
     ).then((res) => {
-      console.log('res :>> 11', res)
       return res.data
       // commit('SET_SESSION_SETTINGS', res.data)
     }).catch(err => {

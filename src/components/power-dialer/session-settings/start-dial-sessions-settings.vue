@@ -187,7 +187,8 @@
                         class="px-3 py-0"
                         color="grey-5">Reset</q-btn>
                       <q-btn
-                        @click="newSetting = true"
+                        v-if="!hasSelectedTemporarySetting"
+                        @click="updateSelectedSetting"
                         unelevated
                         no-caps
                         :disabled="disabled"
@@ -195,6 +196,7 @@
                         class="px-3 py-0"
                         color="primary">Save</q-btn>
                       <q-btn
+                        v-if="hasSelectedTemporarySetting"
                         @click="newSetting = true"
                         unelevated
                         no-caps
@@ -335,6 +337,12 @@ export default {
     },
     selectedItemName () {
       return this.selectedItem?.name
+    },
+    hasSelectedTemporarySetting () {
+      if (this.temporarySetting?.id) {
+        return this.selectedItem.id === this.temporarySetting?.id
+      }
+      return false
     }
   },
   async mounted () {
@@ -361,7 +369,8 @@ export default {
       deleteId: null,
       updateObj: null,
       selectedItem: null,
-      selectedItemId: null
+      selectedItemId: null,
+      temporarySetting: {}
     }
   },
   methods: {
@@ -438,6 +447,15 @@ export default {
       this.loading = false
       // this.ADD_NEW_SESSION_SETTING(res)
     },
+    async updateSelectedSetting () {
+      console.log(`Settings to update : ${this.selectedItem.id} `, this.selectedItem)
+      let res = await this.updateDialerSessionSetting(
+        this.removeEmptyParams(this.selectedItem)
+      )
+      if (res?.data) {
+        this.$generalNotification(`Dialer Session Setting has been updated!`)
+      }
+    },
     onDeleteRequest (id) {
       this.newSetting = true
       this.deleteId = id
@@ -450,17 +468,7 @@ export default {
       this.updateObj.name = this.newSettingName
       let res = await this.updateDialerSessionSetting({
         id: this.updateObj.id,
-        name: this.updateObj.name,
-        call_disposition_ids: this.defaultValues.call_disposition_ids,
-        campaign_id: this.defaultValues.campaign_id,
-        company_id: this.defaultValues.company_id,
-        contact_disposition_ids: this.defaultValues.contact_disposition_ids,
-        is_company_scope: 0, // this.defaultValues.is_company_scope,
-        metric_options: this.defaultValues.metric_options,
-        // script_id: this.defaultValues.script_id,
-        skip_outside_daytime_hours: this.defaultValues.skip_outside_daytime_hours,
-        user_id: this.defaultValues.user_id,
-        warmup_period_in_seconds: this.defaultValues.warmup_period_in_seconds
+        name: this.updateObj.name
       })
       if (res.data) {
         this.newSetting = false
@@ -519,7 +527,8 @@ export default {
       if (val) {
         this.loading = true
         await this.getDialerSessionSettings()
-        await this.getTemporarySessionSetting(this.list.dialer_session_id)
+        let temporarySetting = await this.getTemporarySessionSetting(this.list.id)
+        this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list.dialer_session_id
         this.selectedItem = this.dialerSessionSettings.find((setting) => {
           return setting.id === this.selectedItemId
