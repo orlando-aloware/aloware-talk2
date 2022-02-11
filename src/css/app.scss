@@ -10595,12 +10595,29 @@ screen and (max-width: 956px) {
   border-radius: 8px !important;
   background: $white !important;
   color: $grey-100;
+  border: 1px solid rgba(120, 140, 140, 0.13);
+
+  .q-card {
+    border: 1px solid rgba(120, 140, 140, 0.13);
+  }
+
+  hr:not(.q-separator) {
+    border-top: 1px solid rgba(120, 140, 140, 0.13);
+  }
 }
 
 .communication-details-card {
 
+  .comm-type-container {
+    padding-bottom: 20px !important;
+  }
+
   .comm-type-wrapper {
     margin-top: 1.4px;
+
+    span {
+      margin-left: 11px;
+    }
   }
 
   .form-row {

@@ -1,10 +1,7 @@
 <template>
   <div class="mt-4">
     <div class="text-center mb-4">
-      <span class="material-icons-outlined fs-45">
-        arrow_downward
-      </span>
-
+      <arrow-down-icon></arrow-down-icon>
     </div>
     <q-card flat bordered class="my-card">
       <q-card-section>
@@ -95,10 +92,11 @@
 <script>
 import * as RingGroupDialMode from 'src/constants/ring-group-dial-modes'
 import * as AgentStatusLabels from 'src/constants/agent-status-labels'
+import ArrowDownIcon from 'components/icons/arrow-down-icon'
 
 export default {
   name: 'ring-group-routing-table',
-
+  components: { ArrowDownIcon },
   props: {
     columns: {
       type: Array,

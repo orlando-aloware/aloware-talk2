@@ -21,18 +21,18 @@
                 </b-button>
               </div>
             </div>
-            <hr class="has-margin mt-3"/>
+            <hr class="has-margin mt-3" style="margin-bottom: 33px !important;"/>
           </q-card-section>
 
           <!--COMM TYPE-->
-          <q-card-section class="pt-0">
+          <q-card-section class="pt-0 comm-type-container">
             <div class="text-lt p-x d-inline-flex"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
                          v-if="communication.disposition_status2">
               </component>
               <div class="comm-type-wrapper">
-                <span class="ml-3" v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
                   {{ communication.direction | fixCommDirection }}
                 </span>
                 {{ communication.type | fixCommType }}
@@ -110,8 +110,8 @@
           </q-card-section>
 
           <!--COMM DESCRIPTION-->
-          <q-card-section class="pt-0 pb-0">
-            <div class="fs-13 my-2"
+          <q-card-section class="pb-0" style="padding-top: 0;">
+            <div class="fs-13 my-2 text-grey-90"
                  v-if="communication.type === CommunicationTypes.CALL">
               <span>{{ callDescriptionText }}</span>
 
