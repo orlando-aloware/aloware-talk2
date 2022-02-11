@@ -105,7 +105,7 @@
                       {{ f.name }}
                     </q-item-section>
                     <q-item-section
-                      v-if="hovered !== f.id"
+                      v-if="hovered !== f.id || t.name === 'company'"
                       side>
                       <CheckIcon
                         v-if="isSessionValid(f)"
@@ -113,7 +113,7 @@
                     </q-item-section>
                     <q-item-section
                       @click.native.stop="{}"
-                      v-if="hovered === f.id"
+                      v-if="hovered === f.id && t.name !== 'company'"
                       side>
                       <q-btn
                         size="md"
