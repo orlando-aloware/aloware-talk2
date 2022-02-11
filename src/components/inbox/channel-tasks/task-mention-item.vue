@@ -1,22 +1,24 @@
 <template>
   <div :class="`task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
        @click="onItemClick(mention)">
-    <div class="avatar d-flex justify-content-center pb-1"
-         role="button">
-      <i v-if="mention.mention_subject && !mention.mention_subject.is_read && mention.mention_subject.direction === CommunicationDirection.INBOUND"
-         class="fa fa-circle position-relative"
-         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;">
-      </i>
-      <avatar width="34"
-              height="34"
-              :style="avatarStyle(false)"
-              :name="contactAvatar">
-      </avatar>
+    <div class="d-flex justify-content-center avatar-wrapper">
+      <div class="d-flex justify-content-center avatar d-flex justify-content-center pb-1"
+           role="button">
+        <i v-if="mention.mention_subject && !mention.mention_subject.is_read && mention.mention_subject.direction === CommunicationDirection.INBOUND"
+           class="fa fa-circle position-relative"
+           style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: -5px;">
+        </i>
+        <avatar width="34"
+                height="34"
+                :style="avatarStyle(false)"
+                :name="contactAvatar">
+        </avatar>
+      </div>
     </div>
-    <div class="task-details flex-grow-1 pb-1"
+    <div class="task-details flex-grow-1 pb-1 d-grid"
          role="button">
-      <div class="contact-name">
-        {{ contactName | truncate(20) }}
+      <div class="contact-name truncated-text">
+        {{ contactName }}
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top middle"
                    self="center middle">
@@ -28,7 +30,7 @@
           <span v-if="mention.preview_text !== null" v-html="parseBody"></span>
         </div>
       </div>
-      <div class="campaign-name text-grey-10 mt-1">
+      <div class="campaign-name text-grey-10 mt-1 truncated-text">
         {{ directionSummaryText }}
       </div>
     </div>

@@ -2,23 +2,25 @@
   <div :class="`task-item w-100 d-flex flex-row py-2 align-items-center border-bottom ${activeClass}`"
        v-if="communication.contact_id"
        @click="onItemClick(communication)">
-    <div class="avatar d-flex justify-content-center pb-1 position-relative"
-         role="button">
-      <i v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read"
-         class="fa fa-circle"
-         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;">
-      </i>
-      <avatar width="34"
-              height="34"
-              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
-              :style="avatarStyle(false)"
-              :name="contactAvatar">
-      </avatar>
+    <div class="d-flex justify-content-center avatar-wrapper">
+      <div class="avatar d-flex justify-content-center pb-1 position-relative"
+           role="button">
+        <i v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read"
+           class="fa fa-circle"
+           style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;">
+        </i>
+        <avatar width="34"
+                height="34"
+                :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
+                :style="avatarStyle(false)"
+                :name="contactAvatar">
+        </avatar>
+      </div>
     </div>
-    <div class="task-details flex-grow-1 pb-1"
+    <div class="task-details flex-grow-1 pb-1 d-grid"
          role="button">
-      <div class="contact-name">
-        {{ contactName | truncate(20) }}
+      <div class="contact-name truncated-text">
+        {{ contactName }}
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top left"
                    self="top left"
@@ -26,7 +28,7 @@
           {{ contactName }}
         </q-tooltip>
       </div>
-      <div class="d-flex flex-row">
+      <div class="d-flex flex-row truncated-text">
         <div class="pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, channelAnswerStatus)"
                      height="18px"
@@ -34,7 +36,8 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span v-if="communication.type !== CommunicationTypes.SMS && !isParkedCall && !isConnectedCall">
+          <div class="truncated-text"
+               v-if="communication.type !== CommunicationTypes.SMS && !isParkedCall && !isConnectedCall">
             {{ communication.direction | fixCommDirection }} {{ communication.type | fixCommType }}
             <record-icon v-if="communication.type === CommunicationTypes.CALL && channelAnswerStatus === 'recorded'"
                          class="item-identifier-icon"
@@ -48,25 +51,25 @@
                          width="16"
                          color="#62666E">
             </voicemail-icon>
-          </span>
+          </div>
 
-          <span v-if="isParkedCall && !isConnectedCall" class="call-parked-label">
+          <div class="call-parked-label truncated-text"
+               v-if="isParkedCall && !isConnectedCall">
             Parked Call
-          </span>
+          </div>
 
-          <span v-if="isConnectedCall && !isParkedCall" class="call-connected-label">
+          <div class="truncated-text call-connected-label"
+                v-if="isConnectedCall && !isParkedCall" >
             Connected
-          </span>
+          </div>
 
-          <span v-if="communication.type === CommunicationTypes.SMS && (communication.body === null || !communication.body ||communication.body.length < 1)">
-            {{ smsEmptyBodyAlternativeText }}
-          </span>
-          <span v-if="communication.body !== null">
-            {{ communication.body | truncate(22) }}
-          </span>
+          <div class="truncated-text"
+               v-if="communicationBody">
+            {{ communicationBody }}
+          </div>
         </div>
       </div>
-      <div class="campaign-name text-grey-10">
+      <div class="campaign-name text-grey-10 truncated-text">
         {{ campaignName }}
       </div>
     </div>
@@ -331,6 +334,17 @@ export default {
     },
     contact () {
       return this.communication.contact
+    },
+    communicationBody () {
+      if (this.communication.type === CommunicationTypes.SMS && (this.communication.body === null || !this.communication.body || this.communication.body.length < 1)) {
+        return this.smsEmptyBodyAlternativeText
+      }
+
+      if (this.communication.body !== null) {
+        return this.communication.body
+      }
+
+      return null
     }
   },
 
