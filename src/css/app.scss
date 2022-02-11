@@ -1508,6 +1508,11 @@ i.option-separator {
   background: $purple-2;
 }
 
+.fs-45 {
+  font-size: 45px !important;
+}
+
+
 .fs-20 {
   font-size: 20px !important;
 }
@@ -6998,6 +7003,10 @@ table.datatable {
     width: 20px;
   }
 
+  .avatar-wrapper {
+    min-width: 64px;
+  }
+
   .overlay {
     opacity: 0.9 !important;
     background: white;
@@ -8141,7 +8150,7 @@ button.grey-90 {
 }
 
 .badge-task-status {
-  margin-top: 1px;
+  margin: 1px 0 0 12px;
 }
 
 .default-btn-padding {
@@ -8380,7 +8389,6 @@ button.grey-90 {
 }
 
 .contact-activities-actions {
-  margin-right: 22px;
   &__mobile {
     display: none;
   }
@@ -10391,8 +10399,8 @@ screen and (max-width: 956px) {
       padding: 6px 6px;
       background: rgba(21, 22, 63, 0.8) !important;
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 12px -2px rgba(0, 0, 0, 0.08) !important;
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       li a {
         color: white;
         padding: 6px 12.65px;
@@ -10506,8 +10514,8 @@ screen and (max-width: 956px) {
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-radius: 8px;
   }
 }
@@ -10658,6 +10666,119 @@ screen and (max-width: 956px) {
 
 .q-tooltip {
   z-index: 9999;
+}
+
+.ring-group-snapshot-table {
+  box-shadow: none !important;
+}
+
+.ring-group-snapshot-card,
+.communication-details-card {
+  border-radius: 8px !important;
+  background: $white !important;
+  color: $grey-100;
+  border: 1px solid rgba(120, 140, 140, 0.13);
+
+  .q-card {
+    border: 1px solid rgba(120, 140, 140, 0.13);
+  }
+
+  hr:not(.q-separator) {
+    border-top: 1px solid rgba(120, 140, 140, 0.13);
+  }
+}
+
+.communication-details-card {
+
+  .header-line {
+    margin-bottom: 33px !important;
+  }
+
+  .comm-description-card {
+    padding-top: 0 !important;
+  }
+
+  .comm-type-container {
+    padding-bottom: 20px !important;
+  }
+
+  .comm-type-wrapper {
+    margin-top: 1.4px;
+
+    span {
+      margin-left: 11px;
+    }
+  }
+
+  .form-row {
+    padding: 10px 0;
+  }
+
+  hr:not(.has-margin) {
+    margin: 0 !important;
+  }
+
+  .q-card__section {
+  }
+
+  .q-item__label:not(.custom-item-label) {
+    margin-top: 0.25rem !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+}
+
+
+.br-8 {
+  border-radius: 8px;
+}
+
+.text-dark-greenish {
+  color: #00702f !important;
+}
+
+@media (max-width: 767px) {
+  .ring-group-snapshot-wrapper {
+    padding-left: 0 !important;
+    margin-top: 10px;
+  }
+
+  .communication-details-card {
+    margin-top: 60px;
+  }
+}
+
+@media (min-width: 401px){
+  .communication-details-card {
+    .header {
+      .header-btn-wrapper  {
+       .report-issue-wrapper {
+         margin-right: 5px !important;
+       }
+      }
+    }
+  }
+}
+
+@media (max-width: 400px){
+  .communication-details-card {
+    .header {
+      flex-direction: column !important;
+
+      .header-title {
+        text-align: center;
+      }
+
+      .header-btn-wrapper  {
+        margin-top: 5px;
+        flex-direction: column !important;
+
+        button {
+          margin-top: 5px;
+        }
+      }
+    }
+  }
 }
 
 .min-w-0 {

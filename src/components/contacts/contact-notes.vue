@@ -77,7 +77,7 @@ export default {
       this.isEdit = false
       if (this.prevValue !== this.contact.notes) {
         if (this.prevValue !== this.contact.notes) {
-          this.$emit('blue', this.contact.notes)
+          this.$emit('blur', this.contact.notes)
         }
       }
     },
