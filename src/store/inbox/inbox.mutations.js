@@ -79,7 +79,6 @@ export default {
     // compensate comparing of array/object values
     let comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
     let comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
-
     if (comparatorA !== comparatorB) {
       let prop = state.channelChangedFilterFields.find(item => item.property === name)
       if (prop) {

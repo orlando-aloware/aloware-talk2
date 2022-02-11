@@ -120,6 +120,18 @@ export default {
         this.filters = { ...this.filters, 'ring_groups': { value: this.filter.ring_groups, operator: 1 } }
       }
 
+      if (this.filter.contact_owner.length && !this.filter.my_contact) {
+        this.filters = { ...this.filters, 'contact_owner': { value: this.filter.contact_owner, operator: 1 } }
+      }
+
+      if (this.filter.my_contact) {
+        query.my_contact = this.filter.my_contact
+      }
+
+      if (this.filter.from_date && this.filter.to_date) {
+        this.filters = { ...this.filters, 'last_engagement_at': { value: [this.filter.from_date, this.filter.to_date], operator: 5 } }
+      }
+
       query.filters = this.filters
       return query
     },

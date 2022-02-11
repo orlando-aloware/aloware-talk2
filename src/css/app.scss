@@ -7082,7 +7082,7 @@ table.datatable {
   }
 
   .action-option-container {
-    padding-right: 22px;
+    padding-right: 28px;
   }
 
   .filter-name {
@@ -7099,8 +7099,8 @@ table.datatable {
   .left-column-wrapper {
 
     border-right: 1px solid $grey-60;
-    padding-right: 11px;
-    padding-left: 11px;
+    padding-right: 10px;
+    padding-left: 10px;
     max-width: 50%;
 
     .filter-group-title {
@@ -7117,7 +7117,7 @@ table.datatable {
       line-height: 1.2;
       height: 30px;
 
-      span {
+      span:not(.check-icon) {
         font-size: 13px;
         color: $grey-100;
         width: 8vw;
@@ -7168,7 +7168,7 @@ table.datatable {
     .filter-group-title,
     .filter-type-description,
     .empty-filter-placeholder {
-      padding: 7px 12px;
+      //padding: 7px 12px;
     }
 
     .saved-filters {
@@ -7187,14 +7187,20 @@ table.datatable {
   .q-toggle {
     margin-left: -10px !important;
   }
+
+  .comm-owner-filter-tooltip-wrapper {
+    position: absolute;
+    top: -1px;
+    right: 48%;
+  }
 }
 
 .inbox-channel-filter-form {
   position: relative;
   overflow: auto;
   height: auto;
-  max-height: 78vh;
-  min-height: 78vh;
+  max-height: 72vh;
+  padding-right: 8px;
 
 
   .section-header {
@@ -7216,6 +7222,13 @@ table.datatable {
     color: $white;
     border-color: $success;
     background-color: $success;
+  }
+}
+
+@media (min-width: 992px) {
+  #inbox-channel-filter-modal .modal-lg,
+  #inbox-channel-filter-modal.modal-xl {
+    max-width: 950px;
   }
 }
 
@@ -7241,7 +7254,7 @@ button.grey-90 {
   margin-top: 14px;
 
   .filter-toggle-button {
-    max-width: 87px;
+    max-width: 81px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -7734,7 +7747,7 @@ button.grey-90 {
     //margin-left: 30px;
 
     .filter-icon {
-      margin-top: 1px;
+      margin-top: -2px;
     }
   }
 
@@ -7749,6 +7762,58 @@ button.grey-90 {
 .inbox-filter-actions-wrapper {
   width: 50%;
   margin-top: 15px;
+
+  div.search-icon {
+    margin-top: -2px;
+  }
+
+  .q-user-selector {
+    width: 8vw;
+  }
+
+  .q-line-and-ring-group-selector {
+    width: 8vw;
+  }
+
+  .generic-selector {
+
+    margin-top: -3px;
+
+    .q-field__control:before {
+      border: none !important;
+    }
+
+    .q-field__native {
+      padding-left: 20px !important;
+
+      span {
+        font-size: 14px;
+        color: $grey-100;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 5.5vw;
+        overflow: hidden;
+      }
+    }
+
+    .q-field__input {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .q-field__marginal {
+      font-size: 14px;
+    }
+  }
+}
+
+.mentions-filter-actions-wrapper {
+  width: 50%;
+  margin-top: 15px;
+
+  .filter-wrapper {
+    margin-left: 15px;
+  }
 
   div.search-icon {
     margin-top: -2px;
@@ -10067,6 +10132,16 @@ screen and (max-width: 956px) {
   }
 }
 
+.vue-daterange-picker {
+  width: 100%;
+}
+
+.last-engagement-tooltip-wrapper {
+  position: absolute;
+  right: 50%;
+  top: -1px;
+}
+
 .bridge-menu-wrapper {
   margin-right: 20px;
 }
@@ -10539,6 +10614,11 @@ screen and (max-width: 956px) {
   .message-text:not(.has-ring-group) {
     max-width: 162px;
   }
+}
+
+
+.daterange-picker-highlighted .reportrange-text {
+  border: 2px solid $primary !important;
 }
 
 .live-call-badge {

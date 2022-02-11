@@ -55,42 +55,26 @@
       </div>
       <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <div class="channel-filter-actions-wrapper inbox-tab--filter pr-1 ml-2 d-inline-flex">
+          <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 ml-2 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
                             :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
-            <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
-            <div class="filter-wrapper" :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
-              <compact-btn v-if="hasChannelFilterChanges"
-                           borderless
-                           customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
-                           :variant="filterButtonVariant"
-                           @clicked="resetFilters">
-                <i class="fa fa-times"></i>
-              </compact-btn>
-              <compact-btn borderless
-                           customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
-                           @clicked="toggleFilterDialog(true)">
-                <q-tooltip v-if="appliedFilter"
-                           anchor="top middle"
-                           self="center middle">
-                  {{ appliedFilter.name }}
-                </q-tooltip>
-                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
-                             color="#62666E"
-                             class="filter-icon">
-                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
-                {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
-              </compact-btn>
-              <b-badge v-if="hasChannelFilterChanges"
-                       class="ml-1 fs-12"
-                       variant="primary"
-                       v-b-modal:inbox-channel-filter-modal>
-                {{ channelChangedFilterFields.length }}
-              </b-badge>
+
+            <div class="filter-wrapper">
+              <div class="position-absolute filter-icon">
+                <filter-icon></filter-icon>
+              </div>
+              <user-selector custom-placeholder="Filter by User"
+                             :clearable="true"
+                             :hide-dropdown-icon="true"
+                             :outlined="false"
+                             :borderless="true"
+                             :value="mentionUserId"
+                             @change="userMentionSelected">
+              </user-selector>
             </div>
           </div>
 
@@ -194,6 +178,7 @@ import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
+import UserSelector from 'components/generic-selectors/user-selector'
 
 let scrollTimeout
 export default {
@@ -202,6 +187,7 @@ export default {
   mixins: [ aclMixin, communicationMixin ],
 
   components: {
+    UserSelector,
     CreateFilterDialog,
     InboxSearcher,
     FilterIcon,
@@ -257,7 +243,10 @@ export default {
     ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'appliedFilter', 'hasMoreCommunications']),
 
     nextPage () {
-      return this.currentPage + 1
+      if (this.$route.params.channel === 'mentions') {
+        return this.currentPage + 1
+      }
+      return this.pagination.next
     },
 
     filterButtonVariant () {
@@ -288,7 +277,11 @@ export default {
             exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact
           }
           break
         case ['calls'].includes(this.$route.params.channel):
@@ -308,7 +301,11 @@ export default {
             exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact
           }
           break
         case ['recordings'].includes(this.$route.params.channel):
@@ -328,13 +325,18 @@ export default {
             exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact
           }
           break
         case ['mentions'].includes(this.$route.params.channel):
           defaultFilterModel.type = 5
           defaultFilterModel.filter = {
-            users: Filters.DEFAULT_STATE.filter.users
+            users: Filters.DEFAULT_STATE.filter.users,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
           }
           break
         case ['messages'].includes(this.$route.params.channel):
@@ -351,7 +353,11 @@ export default {
             incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
             users: Filters.DEFAULT_STATE.filter.users,
             workflows: Filters.DEFAULT_STATE.filter.workflows,
-            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts
+            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact
           }
       }
 
@@ -431,7 +437,11 @@ export default {
       this.filter.search_text = this.searchText
       this.filter.search_fields = this.searchFields
       this.filter.per_page = 20
-      this.filter.page = 1
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = 1
+      } else {
+        this.filter.cursor = 1
+      }
 
       if (this.campaignId) {
         this.filter.campaign_id = this.campaignId
@@ -787,7 +797,13 @@ export default {
         // Run the callback
         if (this.hasMoreCommunications && this.isLoaded) {
           this.isScrolled = true
-          this.filter.page = this.nextPage
+
+          if (this.$route.params.channel === 'mentions') {
+            this.filter.page = this.nextPage
+          } else {
+            this.filter.cursor = this.nextPage
+          }
+
           this.loadMoreCommunications(this.filter)
         }
       }, 66)
@@ -891,7 +907,11 @@ export default {
 
     onSearchClosed () {
       this.searchText = null
-      this.filter.page = 1
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = 1
+      } else {
+        this.filter.cursor = 1
+      }
       this.filter.search_text = this.searchText
       this.isSearch = false
       this.getCommunications(this.filter)
@@ -950,7 +970,11 @@ export default {
           this.setCommunications([])
         } else {
           this.filter.search_text = value
-          this.filter.page = 1
+          if (this.$route.params.channel === 'mentions') {
+            this.filter.page = 1
+          } else {
+            this.filter.cursor = 1
+          }
           this.getCommunications(this.filter)
         }
       }
@@ -1102,7 +1126,11 @@ export default {
     let _this = this
 
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
-      _this.filter.page = _this.nextPage
+      if (_this.$route.params.channel === 'mentions') {
+        _this.filter.page = _this.nextPage
+      } else {
+        _this.filter.cursor = _this.nextPage
+      }
       _this.loadMoreCommunications(this.filter).then(() => {
         let communication = this.communications[lastNavigatedIndex + 1]
         this.setSelectedCommunication(communication)

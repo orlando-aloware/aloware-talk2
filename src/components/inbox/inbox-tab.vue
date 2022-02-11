@@ -251,7 +251,11 @@ export default {
     return {
       filter: {
         campaigns: [],
-        ring_groups: []
+        ring_groups: [],
+        from_date: null,
+        to_date: null,
+        contact_owner: [],
+        my_contact: 0
       },
       searchText: '',
       isSearch: false,
@@ -266,7 +270,11 @@ export default {
         type: 5,
         filter: {
           campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups
+          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+          from_date: Filters.DEFAULT_STATE.filter.from_date,
+          to_date: Filters.DEFAULT_STATE.filter.to_date,
+          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact
         },
         scope: 'user'
       },
@@ -275,7 +283,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm']),
+    ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm', 'setChannelClonedFilter']),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -403,6 +411,7 @@ export default {
     },
     onResetFilter () {
       this.filter = { ...this.defaultFilterModel.filter }
+      this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
     },
     onApplyFilter (filter) {
@@ -412,6 +421,11 @@ export default {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
       this.toggleFilterModelForm(true)
     }
+  },
+
+  created () {
+    this.onResetFilter()
+    this.toggleFilterDialog(false)
   },
 
   mounted () {
