@@ -327,9 +327,8 @@
             </div>
 
             <div class="mb-2 pb-2 border-bottom d-flex"
-                 v-if="communication.type === CommunicationTypes.CALL">
-              <div class="w-100"
-                   v-if="communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id)">
+                 v-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id)">
+              <div class="w-100">
                 <label class="form-control-label mb-1">Ring Group</label>
                 <router-link
                   :to="{ name: 'Ring Group Activity', params: { ring_group_id: communication.ring_group_id }}"
