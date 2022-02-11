@@ -25,8 +25,10 @@
         </q-item-section>
 
       </q-item>
-      <div v-else class="px-0 pb-3 text-grey">
-        <span class="px-2 text-italic">No call in progress</span>
+      <div v-else class="px-0 pb-1 text-grey">
+        <q-card flat class="bg-grey-50 p-2 mx-2">
+          <span class="px-2">No call in progress</span>
+        </q-card>
       </div>
     </q-list>
   </q-card>
