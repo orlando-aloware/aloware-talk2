@@ -3581,6 +3581,14 @@ span.mention {
   .contact-name {
     @include font-size(14px, 500);
     line-height: 17px;
+
+    &.truncated-text {
+      padding-right: 5px;
+    }
+  }
+
+  .avatar-wrapper {
+    min-width: 64px;
   }
 
   .avatar {
@@ -7003,10 +7011,6 @@ table.datatable {
     width: 20px;
   }
 
-  .avatar-wrapper {
-    min-width: 64px;
-  }
-
   .overlay {
     opacity: 0.9 !important;
     background: white;
@@ -10402,6 +10406,7 @@ screen and (max-width: 956px) {
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 12px -2px rgba(0, 0, 0, 0.08) !important;
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
+      border-radius: 8px;
       li a {
         color: white;
         padding: 6px 12.65px;

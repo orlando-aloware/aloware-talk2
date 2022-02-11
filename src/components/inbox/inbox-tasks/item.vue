@@ -39,31 +39,34 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
+          <div class="truncated-text"
+               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
-          </span>
-          <span v-if="isParkedCall && !isConnectedCall" class="call-parked-label">
+          </div>
+          <div class="truncated-text call-parked-label"
+               v-if="isParkedCall && !isConnectedCall" >
             Parked Call
-          </span>
-
-          <span v-if="isConnectedCall && !isParkedCall" class="call-connected-label">
+          </div>
+          <div class="truncated-text call-connected-label"
+               v-if="isConnectedCall && !isParkedCall">
             Connected
-          </span>
+          </div>
 
-          <span v-if="contact.last_communication.type === CommunicationTypes.SMS &&
-          (contact.last_communication.body === null ||
-          !contact.last_communication.body ||
-          contact.last_communication.body.length < 1)">
+          <div class="truncated-text"
+               v-if="contact.last_communication.type === CommunicationTypes.SMS &&
+               (contact.last_communication.body === null ||
+               !contact.last_communication.body ||contact.last_communication.body.length < 1)">
             {{ smsEmptyBodyAlternativeText }}
-          </span>
-          <div class="truncated-text" v-if="contact.last_communication.body !== null">
+          </div>
+          <div class="truncated-text"
+               v-if="contact.last_communication.body !== null">
             {{ contact.last_communication.body }}
           </div>
 
         </div>
       </div>
       <div v-if="contact.last_communication"
-           class="campaign-name text-grey-10">
+           class="campaign-name text-grey-10 truncated-text">
         {{ campaignName }}
       </div>
     </div>
