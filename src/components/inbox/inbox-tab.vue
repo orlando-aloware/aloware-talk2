@@ -283,7 +283,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm']),
+    ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm', 'setChannelClonedFilter']),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -411,6 +411,7 @@ export default {
     },
     onResetFilter () {
       this.filter = { ...this.defaultFilterModel.filter }
+      this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
     },
     onApplyFilter (filter) {
@@ -422,11 +423,15 @@ export default {
     }
   },
 
+  created () {
+    this.onResetFilter()
+    this.toggleFilterDialog(false)
+  },
+
   mounted () {
     this.setLiveContacts([])
     this.setContacts([])
     this.setStatus()
-    this.toggleFilterDialog(false)
 
     if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {

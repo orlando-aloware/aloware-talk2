@@ -16,12 +16,14 @@
       <div class="left-column-wrapper">
         <span class="filter-type-description">{{ channelFilterName }} Filters</span>
 
-        <div class="mt-5">
+        <div class="mt-3">
           <div class="mb-4">
             <div class="filter-items cursor-pointer text-italic"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>New</span>
+              <span>New <span v-if="!selectedFilter"
+                              class="float-right check-icon"><check-o-icon color="#040404"></check-o-icon></span></span>
+
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
@@ -70,7 +72,7 @@
                      :default-filter-model="defaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="container d-flex justify-content-between mb-3 mt-3 action-option-container">
+        <div class="container d-flex justify-content-between mt-3 action-option-container">
           <div></div>
           <div>
             <compact-btn class="mr-3 btn-tertiary"
@@ -79,7 +81,7 @@
               Reset
             </compact-btn>
             <compact-btn class="btn-secondary"
-                         :disabled="!(filterHasChanges) || ![1,2,3,4].includes(defaultFilterModel.type)"
+                         :disabled="!(filterHasChanges) || ![1,2,3,4, 5].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
@@ -114,13 +116,14 @@ import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
+import CheckOIcon from 'components/icons/check-o-icon'
 
 let inputTimeout
 
 export default {
   name: 'filter-dialog',
 
-  components: { FilterListItems, CompactBtn, FilterForm },
+  components: { CheckOIcon, FilterListItems, CompactBtn, FilterForm },
 
   props: {
     value: {
@@ -173,8 +176,6 @@ export default {
 
       for (const field of this.filterFields) {
         if (this.filter[field] !== filterIdentifier[field]) {
-          console.log(field)
-          console.log(this.filter[field], filterIdentifier[field])
           hasChanges = true
           break
         }

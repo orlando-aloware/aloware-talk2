@@ -7104,7 +7104,7 @@ table.datatable {
       line-height: 1.2;
       height: 30px;
 
-      span {
+      span:not(.check-icon) {
         font-size: 13px;
         color: $grey-100;
         width: 8vw;
@@ -7186,8 +7186,7 @@ table.datatable {
   position: relative;
   overflow: auto;
   height: auto;
-  max-height: 78vh;
-  min-height: 78vh;
+  max-height: 72vh;
 
 
   .section-header {

@@ -10,7 +10,7 @@
                 :label="dateRangeLabel"
                 class="form-label"
               >
-                <div class="last-engagement-tooltip-wrapper" v-if="['Inbox Channel Task Status', 'Inbox'].includes($route.name)">
+                <div class="last-engagement-tooltip-wrapper" v-if="isInbox">
                   <information-circle-icon color="#2F80ED">
                   </information-circle-icon>
                   <q-tooltip  anchor="top middle"
@@ -391,12 +391,16 @@ export default {
   computed: {
     ...mapState('inbox', ['channelChangedFilterFields', 'isFilterDialogShown', 'isFilterModelFormShown']),
     ...mapState('auth', ['profile']),
+    isInbox () {
+      return ['Inbox Channel Task Status', 'Inbox', 'Inbox Contact Task'].includes(this.$route.name)
+    },
     dateRangeLabel () {
-      return ['Inbox Channel Task Status', 'Inbox'].includes(this.$route.name) ? 'Last Engagement Date' : 'Time'
+      return this.isInbox ? 'Last Engagement Date' : 'Time'
     },
     dateHasChanges () {
       return this.filter.from_date !== this.defaultFilterModel.filter.from_date || this.filter.to_date !== this.defaultFilterModel.filter.to_date
     }
+
   },
 
   data () {
