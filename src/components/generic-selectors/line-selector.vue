@@ -1,6 +1,6 @@
 <template>
   <div>
-    <generic-multi-select :label="`${label}-selector`"
+    <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
                           :values="campaignId"
                           :options="campaignOptions"

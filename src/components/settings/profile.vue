@@ -211,7 +211,7 @@
           <b-col sm="12" md="12">
             <div>
               <h5 class="form-label">Backup Routing (Beta)</h5>
-              <p class="form-helper-text">Call routing will check if the user is online on Aloware. If you check this, the backup phone number will ring if your not available.</p>
+              <p class="form-helper-text">Call routing will check if the user is online on Aloware. If you check this, the backup phone number will ring if you're not available.</p>
             </div>
 
             <b-form-group label="" >

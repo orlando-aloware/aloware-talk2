@@ -47,6 +47,7 @@ Vue.component('inbound-fax-inprogress-icon', require('src/components/icons/conta
 Vue.component('outbound-fax-completed-icon', require('src/components/icons/contact-activity/outbound-fax-completed-icon').default)
 Vue.component('outbound-fax-missed-icon', require('src/components/icons/contact-activity/outbound-fax-missed-icon').default)
 Vue.component('outbound-fax-inprogress-icon', require('src/components/icons/contact-activity/outbound-fax-inprogress-icon').default)
+Vue.component('outbound-fax-failed-icon', require('src/components/icons/contact-activity/outbound-fax-failed-icon').default)
 
 // appointment
 Vue.component('appointment-icon', require('src/components/icons/contact-activity/appointment-icon').default)
