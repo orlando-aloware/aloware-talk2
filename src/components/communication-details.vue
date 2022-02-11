@@ -21,7 +21,7 @@
                 </b-button>
               </div>
             </div>
-            <hr class="has-margin mt-3" style="margin-bottom: 33px !important;"/>
+            <hr class="has-margin mt-3 header-line"/>
           </q-card-section>
 
           <!--COMM TYPE-->
@@ -110,7 +110,7 @@
           </q-card-section>
 
           <!--COMM DESCRIPTION-->
-          <q-card-section class="pb-0" style="padding-top: 0;">
+          <q-card-section class="pb-0 comm-description-card">
             <div class="fs-13 my-2 text-grey-90"
                  v-if="communication.type === CommunicationTypes.CALL">
               <span>{{ callDescriptionText }}</span>

@@ -10608,6 +10608,14 @@ screen and (max-width: 956px) {
 
 .communication-details-card {
 
+  .header-line {
+    margin-bottom: 33px !important;
+  }
+
+  .comm-description-card {
+    padding-top: 0 !important;
+  }
+
   .comm-type-container {
     padding-bottom: 20px !important;
   }
