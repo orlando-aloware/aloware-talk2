@@ -94,6 +94,7 @@ export default {
         company.push(d)
       }
     })
+    state.dialerSessionSettings = data
     state.sessionSettingGroups.personal = personal
     state.sessionSettingGroups.company = company
   },

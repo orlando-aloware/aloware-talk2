@@ -144,7 +144,6 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
-
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: this.buildQueryString(params, isContactModule),

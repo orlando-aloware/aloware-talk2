@@ -43,7 +43,7 @@ export default {
       commit('SET_CONTACT_RESOURCES', res.data.data)
     }
   },
-  contactsLoaded2: ({ commit }, payload) => {
+  contactsLoaded: ({ commit }, payload) => {
     commit('CONTACTS_LOADED', payload)
   },
   getList: async ({ commit }, endpoint = '') => {
@@ -125,12 +125,32 @@ export default {
     })
   },
   async createDialerSessionSetting ({ commit }, params = {}) {
-    console.log('params :>> ', params)
     return window.axios.post(
       `/api/v2/dialer-sessions`,
       params
     ).then(res => {
       return res.data
+    }).catch(err => {
+      return err
+    })
+  },
+  async getSessionSetting ({ commit }, id = '') {
+    return window.axios.get(
+      `/api/v2/dialer-sessions/${id}`
+    ).then(res => {
+      return res.data
+      // commit('SET_SESSION_SETTINGS', res.data)
+    }).catch(err => {
+      return err
+    })
+  },
+  getTemporarySessionSetting ({ commit }, id = null) {
+    return window.axios.get(
+      `api/v2/power-dialer-lists/${id}/temporary-session-settings`
+    ).then((res) => {
+      console.log('res :>> 11', res)
+      return res.data
+      // commit('SET_SESSION_SETTINGS', res.data)
     }).catch(err => {
       return err
     })
@@ -159,24 +179,6 @@ export default {
       `/api/v2/dialer-sessions/${id}`
     ).then(res => {
       return res
-    }).catch(err => {
-      return err
-    })
-  },
-  async getSessionSetting ({ commit }, id = '') {
-    return window.axios.get(
-      `/api/v2/dialer-sessions/${id}`
-    ).then(res => {
-      commit('SET_SESSION_SETTINGS', res.data)
-    }).catch(err => {
-      return err
-    })
-  },
-  getTemporarySessionSetting ({ commit }, id = null) {
-    return window.axios.get(
-      `api/v2/power-dialer-lists/${id}/temporary-session-settings`
-    ).then((res) => {
-      commit('SET_SESSION_SETTINGS', res.data)
     }).catch(err => {
       return err
     })
