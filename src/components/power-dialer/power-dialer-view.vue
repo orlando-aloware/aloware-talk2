@@ -11,6 +11,7 @@
         {{ numberOfContacts }}
       </div>
       <StartDialing
+        :list="filteredList"
         @start="beginDial" />
     </template>
 
@@ -365,7 +366,8 @@ export default {
       'powerDialerLists',
       'powerDialerListItems',
       'powerDialerDirectoryList',
-      'datatableLoader'
+      'datatableLoader',
+      'myQueue'
     ]),
     ...mapGetters('contacts', [
       'contact',
@@ -435,6 +437,19 @@ export default {
     },
     isMyQueue () {
       return this.id === 'my-queue'
+    },
+    atest1 () {
+      return this.$route.params.id
+    },
+    atest2 () {
+      return this.lists
+    },
+    filteredList () {
+      if (this.id === 'my-queue') {
+        return this.myQueue
+        // return this.lists['my-queue']
+      }
+      return this.list
     }
   },
   data () {
@@ -472,15 +487,9 @@ export default {
       'updateContactsList'
     ]),
 
-    async beginDial (uid = null) {
+    async beginDial () {
       this.START_DIAL_TOGGLE(true)
       // this.setSelectedContact({})
-      if (uid) {
-        await this.updateContactsList({
-          id: this.selectedList.id,
-          dialer_session_id: uid
-        })
-      }
       this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.selectedList.id}/sessions`)
     },
