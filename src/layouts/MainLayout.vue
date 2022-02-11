@@ -79,6 +79,7 @@
           ref="mobilePhone"
           :overlay="false"
           bordered
+          no-swipe-close
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
@@ -884,7 +885,10 @@ export default {
         this.loadingCampaigns = true
         return this.$axios
           .get('/api/v1/campaign', {
-            mode: 'no-cors'
+            mode: 'no-cors',
+            params: {
+              is_lite: true
+            }
           })
           .then((res) => {
             this.setCampaigns(res.data)

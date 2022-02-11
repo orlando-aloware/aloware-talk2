@@ -15,10 +15,11 @@
             :options="phoneNumberOptions"
             :multiple="multiple"
             :placeholder="placeholder"
-            :disable="disable"
+            :disable="disable || loadingCampaigns"
             :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            :loading="loadingCampaigns"
             @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
@@ -67,11 +68,13 @@
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import { aclMixin } from 'src/boot/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
   name: 'incoming-number-selector',
   components: { RemoveTagIcon },
+  mixins: [aclMixin],
   props: {
     campaign_id: {
       required: false
@@ -130,12 +133,14 @@ export default {
     return {
       phoneNumber: this.value,
       phoneNumberOptions: [],
-      selectWidth: 0
+      selectWidth: 0,
+      loadingCampaigns: false,
+      campaigns: []
     }
   },
 
   computed: {
-    ...mapState(['users', 'campaigns']),
+    ...mapState(['users']),
     placeholder () {
       switch (true) {
         case this.multiple && this.phoneNumber.length < 1:
@@ -218,11 +223,29 @@ export default {
           number.phone_number.toLowerCase().indexOf(needle) > -1
         )
       })
+    },
+    getCampaigns () {
+      if (this.hasPermissionTo('list campaign')) {
+        this.loadingCampaigns = true
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.campaigns = res.data
+            this.loadingCampaigns = false
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingCampaigns = false
+          })
+      }
     }
   },
 
   created () {
     this.phoneNumberOptions = this.incomingNumbers
+    this.getCampaigns()
   },
 
   watch: {
