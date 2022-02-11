@@ -46,8 +46,8 @@
                   {{ listFilters[key.toUpperCase()].name }}
                   <!-- - {{ key.toUpperCase() }} -->
                   <q-chip size="xs" square class="p-0">
-                    {{ group.length }}
-                    <!-- {{ totalCount(key) }} -->
+                    <!-- {{ group.length }} -->
+                    {{ totalCount(key) }}-{{key}}
                   </q-chip>
                 </div>
               </q-item-section>
@@ -205,7 +205,7 @@ export default {
     totalCount (key = '') {
       if (!key) return ''
       let detail = this.listItems[this.selectedList.id]
-      switch (key) {
+      switch (key.toUpperCase()) {
         case AutoDialTaskStatus.STATUSES.called:
           return detail.total_called
         case AutoDialTaskStatus.STATUSES.failed:
