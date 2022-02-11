@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div v-if="resources" class="row">
     <div
       class="col-12 px-0"
       v-for="form in forms"
@@ -132,15 +132,22 @@ import ContactDispositionSelector from 'components/generic-selectors/contact-dis
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import { isEmpty } from 'lodash'
+// import { isEmpty } from 'lodash'
 
 export default {
   name: 'StartDialSessionsForm',
   props: {
+    modelValue: {
+      type: Object
+    },
     name: {
       type: String,
       default: ''
     }
+  },
+  model: {
+    prop: 'modelValue',
+    event: 'change'
   },
   components: {
     WarmupPeriodSelector,
@@ -152,11 +159,11 @@ export default {
   },
   async mounted () {
     // Temporary disabled
-    if (isEmpty(this.sessionSettings)) {
-      this.resources = this.defaultSettings || DEFAULT_SETTING_VALUES
-    } else {
-      this.resources = Object.assign({}, this.sessionSettings)
-    }
+    // if (isEmpty(this.sessionSettings)) {
+    //   this.resources = this.defaultSettings || DEFAULT_SETTING_VALUES
+    // } else {
+    //   this.resources = Object.assign({}, this.sessionSettings)
+    // }
     let metrics = await this.getSessionMetricsOptions()
     let collection = []
     metrics.forEach(m => {
@@ -211,6 +218,14 @@ export default {
     },
     defaultValues () {
       return DEFAULT_SETTING_VALUES
+    },
+    localValue: {
+      get () {
+        return this.modelValue
+      },
+      set (val) {
+        this.$emit('change', val)
+      }
     }
   },
   methods: {
@@ -244,32 +259,20 @@ export default {
       },
       deep: true
     },
-    sessionSettings (val) {
-      if (isEmpty(val)) {
-        this.resources = this.defaultSettings || this.defaultValues
-      } else {
-        this.resources = this.sessionSettings
-      }
+    modelValue (val) {
+      // if (isEmpty(val)) {
+      //   this.resources = this.defaultSettings || this.defaultValues
+      // } else {
+      //   this.resources = this.sessionSettings
+      // }
+      this.resources = val
     }
   },
   data () {
     return {
       selectWidth: 0,
       metricOptions: [],
-      resources: {
-        call_disposition_ids: [],
-        campaign_id: null,
-        company_id: null,
-        contact_disposition_ids: [],
-        id: null,
-        is_company_scope: null,
-        metric_options: [],
-        name: null,
-        script_id: null,
-        skip_outside_daytime_hours: 1,
-        user_id: null,
-        warmup_period_in_seconds: 0
-      }
+      resources: this.modelValue
     }
   }
 }
