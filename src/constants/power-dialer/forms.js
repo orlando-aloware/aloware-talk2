@@ -66,7 +66,7 @@ export const DEFAULT_SETTING_VALUES = {
   campaign_id: null,
   company_id: null,
   contact_disposition_ids: [],
-  is_company_scope: null,
+  is_company_scope: 0,
   metric_options: [],
   name: null,
   script_id: null,
