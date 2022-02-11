@@ -26,6 +26,7 @@
         <q-btn
           @click="nextContact"
           no-wrap unelevated no-caps
+          :disabled="timerCount !== 0"
           size="sm" color="red-7"
           class="sessions-button free-width mx-1">
           <CallDropIcon class="mr-2" color="white" />
@@ -79,7 +80,9 @@
         </div>
         <q-btn
           @click="toggleMute = !toggleMute"
-          no-wrap outline no-caps size="sm" color="grey-4"
+          no-wrap outline no-caps
+          size="sm" color="grey-4"
+          :disabled="timerCount !== 0"
           class="sessions-button free-width mx-1">
           <MuteIcon height="13px" class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
@@ -88,7 +91,10 @@
         </q-btn>
         <q-btn
           @click="toggleRecording = !toggleRecording"
-          no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+          no-wrap outline no-caps
+          size="sm" color="grey-4"
+          :disabled="timerCount !== 0"
+          class="sessions-button free-width mx-1">
           <StopIcon v-if="toggleRecording" class="mr-2" color="#62666E" />
           <RecordIcon v-else class="mr-2" color="red" />
           <div class="text-body2 text-black">
@@ -110,13 +116,18 @@
           :color="`${togglePause ? 'red-3' : 'grey-4'}`"
           unelevated outline
           no-wrap no-caps size="sm"
+          :disabled="timerCount !== 0"
           :class="`${togglePause ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
           <PauseIcon class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
             {{ togglePause ? 'Pausing Session' : 'Pause Session' }}
           </div>
         </q-btn>
-        <q-btn no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+        <q-btn
+          no-wrap outline no-caps
+          size="sm" color="grey-4"
+          :disabled="timerCount !== 0"
+          class="sessions-button free-width mx-1">
           <EndCallIcon class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">End Session</div>
         </q-btn>
@@ -241,31 +252,6 @@ export default {
     // setTimeout(() => {
     //   this.makeACall()
     // }, 3000)
-    // this.$VueEvent.listen('contact_list_item_created', (data) => {
-    //   console.log(' %c LISTENING: Contact list item created ', 'background: #000; color: green;', data)
-    // })
-
-    this.$VueEvent.listen('contact_list_item_created', (data) => {
-      console.log(' %c LISTENING: Contact list item created ', 'background: #000; color: green;', data)
-    })
-
-    this.$VueEvent.listen('contact_list_item_updated', (data) => {
-      console.log(' %c LISTENING: Contact list item updated ', 'background: #000; color: green;', data)
-    })
-
-    this.$VueEvent.listen('contact_list_item_deleted', (data) => {
-      console.log(' %c LISTENING: Contact list item deleting... ', 'background: #000; color: green;', data)
-    })
-
-    this.$VueEvent.listen('new_communication', communication => {
-      console.log(' %c communication :>> ', 'background: red; color: white;', communication)
-    })
-    this.$VueEvent.listen('update_communication', communication => {
-      console.log(' %c communication :>> ', 'background: red; color: white;', communication)
-    })
-    this.$VueEvent.listen('contact.updated', communication => {
-      console.log(' %c communication :>> ', 'background: red; color: white;', communication)
-    })
   },
   methods: {
     ...mapActions('powerDialer', [
