@@ -51,6 +51,25 @@
           <q-item-label header class="text-size-xs">{{ scope.opt.group }}</q-item-label>
         </q-item>
       </template>
+
+      <template v-slot:selected-item="scope">
+        <q-chip
+          dense
+          :tabindex="scope.tabindex"
+          color="white"
+          class="tag-selected-chip"
+          text-color="secondary"
+        >
+          <i class="fa fa-circle position-absolute"
+             :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+          <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
+          <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+               @click="scope.removeAtIndex(scope.index)">
+            <remove-tag-icon class="ml-1 remove-tag-icon">
+            </remove-tag-icon>
+          </div>
+        </q-chip>
+      </template>
     </q-select>
   </div>
 </template>
@@ -58,9 +77,10 @@
 <script>
 import auth from 'boot/auth'
 import { mapState } from 'vuex'
+import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 export default {
   name: 'broadcast-selector',
-
+  components: { RemoveTagIcon },
   props: {
     value: {
       required: false

@@ -94,7 +94,7 @@ export default {
         return `${this.mention.mention_subject.contact.first_name} ${this.mention.mention_subject.contact.last_name}`
       }
 
-      return this.$options.filters.fixPhone(this.mention.mention_subject.contact.phone_number)
+      return this.mention.mention_subject.contact ? this.$options.filters.fixPhone(this.mention.mention_subject.contact.phone_number) : ''
     },
 
     contactAvatar () {

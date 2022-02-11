@@ -243,7 +243,10 @@ export default {
     ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'appliedFilter', 'hasMoreCommunications']),
 
     nextPage () {
-      return this.currentPage + 1
+      if (this.$route.params.channel === 'mentions') {
+        return this.currentPage + 1
+      }
+      return this.pagination.next
     },
 
     filterButtonVariant () {
@@ -434,7 +437,11 @@ export default {
       this.filter.search_text = this.searchText
       this.filter.search_fields = this.searchFields
       this.filter.per_page = 20
-      this.filter.page = 1
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = 1
+      } else {
+        this.filter.cursor = 1
+      }
 
       if (this.campaignId) {
         this.filter.campaign_id = this.campaignId
@@ -790,7 +797,13 @@ export default {
         // Run the callback
         if (this.hasMoreCommunications && this.isLoaded) {
           this.isScrolled = true
-          this.filter.page = this.nextPage
+
+          if (this.$route.params.channel === 'mentions') {
+            this.filter.page = this.nextPage
+          } else {
+            this.filter.cursor = this.nextPage
+          }
+
           this.loadMoreCommunications(this.filter)
         }
       }, 66)
@@ -894,7 +907,11 @@ export default {
 
     onSearchClosed () {
       this.searchText = null
-      this.filter.page = 1
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = 1
+      } else {
+        this.filter.cursor = 1
+      }
       this.filter.search_text = this.searchText
       this.isSearch = false
       this.getCommunications(this.filter)
@@ -953,7 +970,11 @@ export default {
           this.setCommunications([])
         } else {
           this.filter.search_text = value
-          this.filter.page = 1
+          if (this.$route.params.channel === 'mentions') {
+            this.filter.page = 1
+          } else {
+            this.filter.cursor = 1
+          }
           this.getCommunications(this.filter)
         }
       }
@@ -1105,7 +1126,11 @@ export default {
     let _this = this
 
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
-      _this.filter.page = _this.nextPage
+      if (_this.$route.params.channel === 'mentions') {
+        _this.filter.page = _this.nextPage
+      } else {
+        _this.filter.cursor = _this.nextPage
+      }
       _this.loadMoreCommunications(this.filter).then(() => {
         let communication = this.communications[lastNavigatedIndex + 1]
         this.setSelectedCommunication(communication)
