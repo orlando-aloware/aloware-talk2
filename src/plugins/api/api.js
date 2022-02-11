@@ -214,6 +214,15 @@ export default {
     communication: {
       forceTerminate (id) {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
+      },
+      get (id) {
+        return window.axios.get(`${suffixV1}communication/${id}`)
+      },
+      delete (id) {
+        return window.axios.delete(`${suffixV1}communication/${id}`)
+      },
+      reportIssue (id, data) {
+        return window.axios.post(`${suffixV1}communications/${id}/report-issue`, data)
       }
     },
     statics: {

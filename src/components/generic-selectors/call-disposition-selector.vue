@@ -6,12 +6,12 @@
             option-label="name"
             input-debounce="0"
             style="word-break: break-all;"
-            use-input
-            use-chips
             emit-value
             map-options
             outlined
             dense
+            :use-chips="useChips"
+            :use-input="useInput"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             :options="callDispositionsOptions"
             :multiple="multiple"
@@ -91,6 +91,14 @@ export default {
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
+    },
+    useChips: {
+      type: Boolean,
+      default: false
+    },
+    useInput: {
+      type: Boolean,
+      default: true
     }
   },
 
