@@ -3,7 +3,7 @@
     <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
                           :values="campaignId"
-                          :options="campaignOptions"
+                          :options="campaignsAlphabeticalOrder"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
                           v-if="genericMultiselect"

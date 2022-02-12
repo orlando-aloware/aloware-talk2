@@ -3,7 +3,7 @@
     <generic-multi-select :label="label"
                           buttonText="Ring Groups"
                           :values="ringGroupId"
-                          :options="ringGroupOptions"
+                          :options="ringGroupsAlphabeticalOrder"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
                           v-if="genericMultiselect"
