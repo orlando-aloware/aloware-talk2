@@ -1,6 +1,6 @@
 <template>
   <q-card flat :disabled="sessionLoader || hasDefaultContact">
-    <div v-show="!hasDefaultContact" class="t-menu-2 no-border">
+    <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-2 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
@@ -54,9 +54,9 @@
       </div>
       <div class="d-flex align-items-center p-0">
         <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-          {{ contact.name || '' }}
+          {{ fullname || '' }}
           <span class="text-15 text-subtitle1">
-            {{ contact.phone_number || '' | fixPhone('NATIONAL', true) }}
+            {{ activeTask.phone_number || '' | fixPhone('NATIONAL', true) }}
           </span>
         </div>
       </div>
@@ -64,8 +64,8 @@
         <div class="text-14 pl-3 text-subtitle1 text-capitalize">
           {{ companyName }}
           <span
-            v-if="contact.company_name"
-            class="text-13 text-subtitle2 text-grey"> | {{ contact.company_name }}</span>
+            v-if="companyName"
+            class="text-13 text-subtitle2 text-grey"> | {{ companyName }}</span>
         </div>
       </div>
       <div class="d-flex align-items-center p-0">
@@ -76,7 +76,7 @@
             height="18px"
             class="mr-0 py-0"
             style="position:relative;top:-2px;" />
-          {{ address }} - {{ contact.created_at || '' | fixTime }}
+          {{ address }} - {{ activeTask.created_at || '' | fixTime }}
         </div>
         <q-btn
           @click="toggleMute = !toggleMute"
@@ -178,12 +178,12 @@ export default {
       'activeTask'
     ]),
     address () {
-      if (this.contact?.cnam_city && !this.contact?.cnam_state) {
-        return `${this.contact?.cnam_city}`
-      } else if (!this.contact?.cnam_city && this.contact?.cnam_state) {
-        return `${this.contact?.cnam_state}`
+      if (this.activeTask?.cnam_city && !this.activeTask?.cnam_state) {
+        return `${this.activeTask?.cnam_city}`
+      } else if (!this.activeTask?.cnam_city && this.activeTask?.cnam_state) {
+        return `${this.activeTask?.cnam_state}`
       } else {
-        return `${this.contact?.cnam_city}, ${this.contact?.cnam_state}`
+        return `${this.activeTask?.cnam_city}, ${this.activeTask?.cnam_state}`
       }
     },
     listObject () {
@@ -192,8 +192,14 @@ export default {
     list () {
       return this.listObject.data || []
     },
+    hasExistingTaskList () {
+      return this.list.length > 0
+    },
     companyName () {
-      return this.contact?.company?.name || ''
+      return this.activeTask?.company_name || 'Company: N/A'
+    },
+    fullname () {
+      return `${this.activeTask.first_name} ${this.activeTask.last_name}`
     },
     keyIndex () {
       let keyCtr = 0
@@ -208,7 +214,7 @@ export default {
       return keyCtr
     },
     hasDefaultContact () {
-      if (this.contact?.id) {
+      if (this.activeTask?.id) {
         return false
       }
       return true
@@ -248,6 +254,9 @@ export default {
   },
   mounted () {
     this.TOGGLE_SESSION_LOADER(false)
+    if (this.hasExistingTaskList) {
+      this.activeTask = this.list[0]
+    }
     this.timerCount = this.sessionSettings.warmup_period_in_seconds
     // setTimeout(() => {
     //   this.makeACall()
@@ -278,30 +287,50 @@ export default {
       }
       console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
       if (this.activeTask?.contact_list_item_id) {
-        // this.$VueEvent.fire('makeCall', data)
+        this.$VueEvent.fire('makeCall', data)
       }
-    }
-  },
-  watch: {
-    activeTask (val) {
-      setTimeout(() => {
-        this.timerCount = this.sessionSettings.warmup_period_in_seconds
-      }, this.timerCount)
     },
-    timerCount: {
-      async handler (value) {
-        if (value > 0) {
+    tickTimer () {
+      if (this.hasExistingTaskList) {
+        if (this.timerCount > 0) {
           setTimeout(() => {
             this.timerCount--
           }, 1000)
-        } else if (value === 0) {
+        } else if (this.timerCount === 0) {
           setTimeout(async () => {
             await this.makeACall()
           }, 3000)
         }
+      }
+    }
+  },
+  watch: {
+    async activeTask (obj) {
+      setTimeout(() => {
+        this.timerCount = this.sessionSettings.warmup_period_in_seconds
+      }, this.timerCount)
+      if (obj?.id) {
+        setTimeout(async () => {
+          await this.getContact({ id: obj[this.keyIndex].id })
+        }, 500)
+      }
+    },
+    timerCount: {
+      async handler (value) {
+        this.tickTimer()
       },
       deep: true
       // immediate: true // This ensures the watcher is triggered upon creation
+    },
+    hasExistingTaskList (isTrue) {
+      if (isTrue) {
+        this.tickTimer()
+      }
+    },
+    list (lst) {
+      if (lst.length > 0) {
+        this.activeTask = this.list[0]
+      }
     }
   },
   data () {

@@ -60,7 +60,7 @@
               style="display:contents;"
               class="mt-3">
               <q-item
-                :class="`px-2 border-radius-1 ${selectedItemName === 'Untitled' ? 'bg-grey-70' : ''}`"
+                :class="`px-2 border-radius-1 ${selectedItemName === 'Untitled' || selectedItemName === null ? 'bg-grey-70' : ''}`"
                 :disable="loading"
                 clickable>
                 <q-item-section
@@ -347,6 +347,7 @@ export default {
   },
   async mounted () {
     // await this.setSessionSettingGroup()
+    this.selectedItem = this.defaultValues
   },
   data () {
     return {
@@ -427,11 +428,11 @@ export default {
         res = await this.getSessionSetting(data.id)
       } else {
         res = await this.getTemporarySessionSetting(this.list.id)
-        this.resetDefaults(false)
+        // this.resetDefaults(false)
       }
       // this.sessionSettings = res
-      this.selectedItemId = res.id
-      this.selectedItem = res
+      this.selectedItemId = res.id || ''
+      this.selectedItem = res?.id ? res : this.defaultValues
       this.loading = false
     },
     async saveAsNew () {
@@ -530,9 +531,12 @@ export default {
         let temporarySetting = await this.getTemporarySessionSetting(this.list.id)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list.dialer_session_id
-        this.selectedItem = this.dialerSessionSettings.find((setting) => {
+        let fetchedSettings = this.dialerSessionSettings.find((setting) => {
           return setting.id === this.selectedItemId
         })
+        if (fetchedSettings?.id) {
+          this.selectedItem = fetchedSettings
+        }
         // if (this.sessionSettings?.id) {
         //   // this.resetDefaults(false)
         // }

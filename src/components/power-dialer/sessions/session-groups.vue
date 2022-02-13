@@ -25,10 +25,10 @@
               </q-item-section>
             </template>
 
-            <!-- <InProgressContact
-              :in-progress-contact="activeTask" /> -->
             <InProgressContact
-              :in-progress-contact="{}" />
+              :in-progress-contact="activeTask" />
+            <!-- <InProgressContact
+              :in-progress-contact="{}" /> -->
 
           </q-expansion-item>
           <q-separator />
@@ -47,7 +47,7 @@
                   <!-- - {{ key.toUpperCase() }} -->
                   <q-chip size="xs" square class="p-0">
                     <!-- {{ group.length }} -->
-                    {{ totalCount(key) }}-{{key}}
+                    {{ totalCount(key) }}
                   </q-chip>
                 </div>
               </q-item-section>
@@ -231,11 +231,16 @@ export default {
     // }
   },
   watch: {
-    activeTask (val) {
-      this.flagged = true
-      this.getContact({ id: this.activeTask?.id })
-      // this.makeACall()
-      this.flagged = false
+    activeTask: {
+      handler (newVal, oldVal) {
+        this.flagged = true
+        console.log('newVal -> ' + newVal.first_name + ' : ', newVal.id)
+        console.log('oldVal -> ' + newVal.first_name + ' : ', oldVal.id)
+        // this.getContact({ id: this.activeTask?.id })
+        // this.makeACall()
+        this.flagged = false
+      },
+      deep: true
     }
   },
   data () {
