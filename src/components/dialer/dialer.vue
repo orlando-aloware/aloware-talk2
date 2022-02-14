@@ -303,6 +303,10 @@ export default {
       this.unparkCall()
     })
 
+    this.$VueEvent.listen('unparkCommunication', (data) => {
+      this.unparkCommunication(data)
+    })
+
     this.$VueEvent.listen('mergeCalls', () => {
       this.mergeCalls()
     })
@@ -1198,6 +1202,7 @@ export default {
     this.$VueEvent.stop('forceRefreshCommunication')
     this.$VueEvent.stop('parkCall')
     this.$VueEvent.stop('unparkCall')
+    this.$VueEvent.stop('unparkCommunication')
     this.$VueEvent.stop('answerCallFishing')
     this.$VueEvent.stop('mergeCalls')
     this.$VueEvent.stop('dropThirdParty')

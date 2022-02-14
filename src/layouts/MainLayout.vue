@@ -99,10 +99,10 @@
           </phone>
           <dialer-form ref="dialerForm"
                        class="dialerForm"
+                       :class="{ 'hide': isPhoneVisible }"
                        :isMobile="true"
                        v-model="mobilePhoneDrawer"
                        v-if="mobilePhoneDrawer"
-                       v-show="!isPhoneVisible"
                        @hide="onDialerFormHide">
           </dialer-form>
         </q-drawer>

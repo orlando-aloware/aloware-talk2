@@ -194,5 +194,10 @@ export const DEFAULT_STATE = {
   contactDetailsDrawer: false,
   showPhone: false,
   enableAudio: false,
-  callFishingQueue: []
+  callFishingQueue: [],
+  communicationNotifiedDesktop: [],
+  voicemailNotifiedDesktop: [],
+  contactNotifiedDesktop: [],
+  appointmentNotifiedDesktop: [],
+  reminderNotifiedDesktop: []
 }

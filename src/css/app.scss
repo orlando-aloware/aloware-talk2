@@ -3920,6 +3920,33 @@ span.mention {
   }
 }
 
+.mobile-parked-call {
+  background: $purple-9;
+  height: 59px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+  .parked-call-content {
+    padding-left: 2px;
+    display: grid;
+    grid-template-columns: 33.69px 1fr;
+    font-size: 20px;
+    font-weight: 600;
+    color: $grey-80;
+    min-width: 0;
+    svg {
+      margin-right: 14.31px;
+    }
+  }
+  button {
+    height: 28px;
+    color: #9B51E0;
+    .q-btn__wrapper {
+      padding: 0 10px !important;
+    }
+  }
+}
+
 .phone {
   position: fixed;
   top: 67px;
@@ -9100,6 +9127,25 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 604px) {
+  .mobile-phone-drawer {
+    &:not(.mobile-phone-visible) {
+      .phone-padding {
+        padding: 0 16px;
+      }
+    }
+  }
+  .dialer-wrapper {
+    &:not(.hide) {
+      display: grid !important;
+      grid-template-rows: 1fr auto;
+      > div:last-child {
+        max-height: 353px;
+      }
+    }
+    &.hide {
+      display: none !important;
+    }
+  }
   .contact-activities-actions {
     margin-right: 5px;
   }
@@ -9689,9 +9735,6 @@ screen and (max-width: 956px) {
 .mobile-phone-drawer {
   &:not(.mobile-phone-visible) {
     height: 100%;
-    .q-drawer__content {
-      padding: 0 16px;
-    }
   }
   &.mobile-phone-visible {
     height: calc(100vh - 50px);
@@ -9732,8 +9775,13 @@ screen and (max-width: 956px) {
         &.row {
           display: flex;
           flex-direction: column;
-          height: calc(100% - 51px);
           padding-bottom: 0 !important;
+          &.dialerForm {
+            height: 100%;
+          }
+          &:not(.dialerForm) {
+            height: calc(100% - 51px);
+          }
           &.loading-cover-screen {
             position: absolute;
             top: 0;
@@ -10806,7 +10854,10 @@ screen and (max-width: 956px) {
   }
 }
 
-
 .park-call-icon {
   margin-top: -3px;
+}
+
+.lh-27 {
+  line-height: 27px;
 }

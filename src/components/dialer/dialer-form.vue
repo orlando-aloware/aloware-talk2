@@ -1,5 +1,5 @@
 <template>
-  <div class="row no-wrap pt-3 pb-3 width-380"
+  <div class="row no-wrap pt-3 pb-3 width-380 dialer-wrapper"
        :class="{ 'loading-cover-screen': isMakingCall }">
     <div class="loading-container"
          v-if="isMakingCall">
@@ -11,7 +11,8 @@
       </div>
     </div>
     <div v-if="!isMakingCall"
-         class="col no-padding">
+         class="col phone-padding dialer-tabs-wrapper"
+         :class="{'no-padding': !isMobile}">
       <b-tabs class="dialer-tabs"
               pills
               vertical>
@@ -149,16 +150,44 @@
         </b-tab>
       </b-tabs>
     </div>
+    <h1 class="phone-padding lh-27 mb-3"
+        v-if="parkedCalls.length > 0">
+      Parked Call{{ parkedCalls.length > 1 ? 's' : ''}}
+    </h1>
+    <div class=""
+         v-if="isMobile">
+      <div class="loading-container"
+           v-if="loadingParkedCalls">
+        <div class="mobile-call-loader">
+          <q-spinner-bars
+            color="white"
+            size="5em"
+          />
+        </div>
+      </div>
+      <div class="position-relative h-100"
+           v-if="parkedCalls.length">
+        <div class="overflow-y-scroll h-100">
+          <template v-for="parkedCall in parkedCalls">
+            <mobile-parked-call :key="parkedCall.id"
+                                :communication="parkedCall"/>
+          </template>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import MobileParkedCall from 'components/dialer/mobile-parked-call'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'dialer-form',
@@ -166,6 +195,7 @@ export default {
   mixins: [contactMixins],
 
   components: {
+    MobileParkedCall,
     ContactPhoneNumberSearch,
     LineSelector,
     SendTextIcon
@@ -197,7 +227,9 @@ export default {
       loadingContact: false,
       textMessage: '',
       isMakingCall: false,
-      hasPhoneNumberSearchResults: false
+      hasPhoneNumberSearchResults: false,
+      parkedCalls: [],
+      loadingParkedCalls: false
     }
   },
 
@@ -253,9 +285,31 @@ export default {
     } else {
       this.hideDialer()
     }
+    this.fetchAllParkedCalls()
   },
 
   methods: {
+    fetchAllParkedCalls: _.debounce(function () {
+      this.loadingParkedCalls = true
+      this.parkedCalls = []
+      this.$axios
+        .post('/api/v1/contact-center/parked-calls')
+        .then((res) => {
+          console.log(res)
+          this.parkedCalls = res.data
+          this.loadingParkedCalls = false
+        })
+        .catch((error) => {
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+          this.loadingParkedCalls = false
+        })
+    }),
+
     showDialer () {
       // find default outbound campaign
       this.findDefaultOutboundCampaign()
@@ -265,6 +319,7 @@ export default {
     hideDialer () {
       this.$emit('hide')
       this.resetForm()
+      this.fetchAllParkedCalls()
     },
 
     resetForm () {
