@@ -172,8 +172,11 @@ export default {
     '$q.screen.lt.md': function () {
       if (this.$q.screen.lt.md) {
         this.isExpanded = false
-        this.setShowContactsHeader(false)
         this.$emit('toggleContactActivities', false)
+      }
+
+      if (this.$q.screen.lt.md && this.$route.name === 'Contact') {
+        this.setShowContactsHeader(false)
       }
 
       if (!this.$q.screen.lt.md) {

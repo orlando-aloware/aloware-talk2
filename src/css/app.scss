@@ -8892,7 +8892,13 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 784px) {
-
+  .page-layout {
+    .sidebar-active {
+      .page-header + .page-container {
+        padding-top: 58px;
+      }
+    }
+  }
   .mobile-phone-drawer {
     &:not(.mobile-phone-visible) {
       .phone-padding {

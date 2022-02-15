@@ -291,7 +291,7 @@ export default {
     pageContainerClasses () {
       return {
         'page-container h-100': true,
-        'pt-58': ['Contacts', 'Settings', 'Settings Tab'].includes(this.$route.name)
+        'pt-58': this.showContactsHeader
       }
     }
   },
