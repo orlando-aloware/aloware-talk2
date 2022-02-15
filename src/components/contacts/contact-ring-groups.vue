@@ -31,7 +31,9 @@ export default {
   methods: {
     submit (ringGroupIds) {
       talk2Api.V1.contact.storeRingGroups(this.contact.id, { ring_group_ids: ringGroupIds })
-        .catch(err => {
+        .then(() => {
+          this.$generalNotification("Contact's ring group is updated.")
+        }).catch(err => {
           console.log(err)
           this.$root.handleErrors(err.response)
         })

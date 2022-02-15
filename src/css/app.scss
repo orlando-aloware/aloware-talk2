@@ -8927,7 +8927,10 @@ screen and (max-width: 956px) {
   }*/
   .general-notification {
     margin-left: 5px !important;
-    margin-bottom: 50px !important;
+    &:last-child:not(:only-child),
+    &:only-child {
+      margin-bottom: 50px !important;
+    }
   }
   .b-toaster {
     &.b-toaster-bottom-right {

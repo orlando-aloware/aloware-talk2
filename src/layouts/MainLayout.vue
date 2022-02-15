@@ -1666,6 +1666,7 @@ export default {
 
     beforeUnload () {
       this.unsubscribeFromPusher()
+      this.resetContactsDefaultVuex()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
@@ -1675,6 +1676,7 @@ export default {
 
     ...mapActions([
       'resetVuex',
+      'resetContactsDefaultVuex',
       'setUsage',
       'setCurrentCompany',
       'setCampaigns',

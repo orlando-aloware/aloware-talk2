@@ -446,6 +446,10 @@ export default function (/* { ssrContext } */) {
         commit('RESET_VUEX')
       },
 
+      resetContactsDefaultVuex ({ commit }) {
+        commit('RESET_CONTACTS_DEFAULT_VUEX')
+      },
+
       resetFilters ({ commit }) {
         commit('RESET_FILTERS')
       },
@@ -965,6 +969,10 @@ export default function (/* { ssrContext } */) {
         state = Object.assign(state, Default.DEFAULT_STATE)
         contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
         inbox.state = Object.assign(inbox.state, InboxDefault.DEFAULT_STATE)
+      },
+
+      RESET_CONTACTS_DEFAULT_VUEX (state) {
+        contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
       },
 
       RESET_FILTERS (state) {

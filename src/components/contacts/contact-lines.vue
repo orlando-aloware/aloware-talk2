@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/generic-selectors/line-selector'
@@ -32,11 +32,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setLines', 'setContactLines']),
-
     submitLines (lines) {
       talk2Api.V1.contact.storeLines(this.contact.id, {
         campaign_ids: lines
+      }).then(() => {
+        this.$generalNotification("Contact's line is updated.")
       }).catch(err => {
         console.log(err)
         this.$root.handleErrors(err.response)

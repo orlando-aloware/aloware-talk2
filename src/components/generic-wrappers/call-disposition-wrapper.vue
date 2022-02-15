@@ -38,7 +38,7 @@ export default {
         this.loadingCallDisposition = false
         this.callDispositionId = callDispositionId
         this.$emit('change', callDispositionId)
-        this.$generalNotification('Call disposed')
+        this.$generalNotification('Call disposition updated.')
       }).catch((err) => {
         this.loadingCallDisposition = false
         console.log(err)
