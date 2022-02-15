@@ -15,6 +15,7 @@ export const DEFAULT_STATE = {
     user_id: null,
     workflow_id: null,
     page: 1,
+    cursor: 1,
     per_page: 20,
     checked_table_fields: null,
     first_time_only: 0,
@@ -38,6 +39,9 @@ export const DEFAULT_STATE = {
     callback_status: null,
     broadcasts: [],
     mentioner_user_id: [],
-    mentioned_user_id: []
+    mentioned_user_id: [],
+    owner_id: [],
+    my_contact: 0,
+    contact_owner: []
   }
 }

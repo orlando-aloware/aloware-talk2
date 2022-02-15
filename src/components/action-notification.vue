@@ -139,17 +139,16 @@
               <accept-call-icon width="32" height="32"/>
             </template>
             <b-dropdown-item href=""
+                             link-class="d-flex align-items-center"
                              @click="answerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
-                              color="#9B51E0"/>
-              Park Current Call & Connect
+                              color="#9B51E0"/>Park Current Call & Connect
             </b-dropdown-item>
             <b-dropdown-item href=""
                              @click="answerCommunication(false, true)">
-              <hangup-icon class="icon-margin"/>
-              Hangup Current Call & Connect
+              <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
             </b-dropdown-item>
           </b-dropdown>
         </div>
@@ -208,7 +207,7 @@ export default {
       }
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
-        toastClass += ' bg-blue-60-opaque background-blur incoming-call-notification'
+        toastClass += ' bg-blue-60-opaque position-relative background-blur incoming-call-notification'
       }
 
       if (this.queue) {
@@ -226,7 +225,7 @@ export default {
       }
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
-        headerClass += ' bg-blue-60-opaque background-blur'
+        headerClass += ' bg-blue-60-opaque'
       }
 
       return headerClass

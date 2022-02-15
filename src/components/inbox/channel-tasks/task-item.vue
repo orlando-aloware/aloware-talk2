@@ -2,23 +2,25 @@
   <div :class="`task-item w-100 d-flex flex-row py-2 align-items-center border-bottom ${activeClass}`"
        v-if="communication.contact_id"
        @click="onItemClick(communication)">
-    <div class="avatar d-flex justify-content-center pb-1 position-relative"
-         role="button">
-      <i v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read"
-         class="fa fa-circle"
-         style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;">
-      </i>
-      <avatar width="34"
-              height="34"
-              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
-              :style="avatarStyle(false)"
-              :name="contactAvatar">
-      </avatar>
+    <div class="d-flex justify-content-center avatar-wrapper">
+      <div class="avatar d-flex justify-content-center pb-1 position-relative"
+           role="button">
+        <i v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) && (communication.body || communication.attachments)) && !communication.is_read"
+           class="fa fa-circle"
+           style="color: rgb(64, 158, 255); font-size: 50%; position: absolute; left: 4px;">
+        </i>
+        <avatar width="34"
+                height="34"
+                :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
+                :style="avatarStyle(false)"
+                :name="contactAvatar">
+        </avatar>
+      </div>
     </div>
-    <div class="task-details flex-grow-1 pb-1"
+    <div class="task-details flex-grow-1 pb-1 d-grid"
          role="button">
-      <div class="contact-name">
-        {{ contactName | truncate(20) }}
+      <div class="contact-name truncated-text">
+        {{ contactName }}
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top left"
                    self="top left"
@@ -26,7 +28,7 @@
           {{ contactName }}
         </q-tooltip>
       </div>
-      <div class="d-flex flex-row">
+      <div class="d-flex flex-row truncated-text">
         <div class="pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, channelAnswerStatus)"
                      height="18px"
@@ -34,7 +36,8 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <span v-if="communication.type !== CommunicationTypes.SMS">
+          <div class="truncated-text"
+               v-if="communication.type !== CommunicationTypes.SMS && !isParkedCall && !isConnectedCall">
             {{ communication.direction | fixCommDirection }} {{ communication.type | fixCommType }}
             <record-icon v-if="communication.type === CommunicationTypes.CALL && channelAnswerStatus === 'recorded'"
                          class="item-identifier-icon"
@@ -48,16 +51,25 @@
                          width="16"
                          color="#62666E">
             </voicemail-icon>
-          </span>
-          <span v-if="communication.type === CommunicationTypes.SMS && (communication.body === null || !communication.body ||communication.body.length < 1)">
-            {{ smsEmptyBodyAlternativeText }}
-          </span>
-          <span v-if="communication.body !== null">
-            {{ communication.body | truncate(22) }}
-          </span>
+          </div>
+
+          <div class="call-parked-label truncated-text"
+               v-if="isParkedCall && !isConnectedCall">
+            Parked Call
+          </div>
+
+          <div class="truncated-text call-connected-label"
+                v-if="isConnectedCall && !isParkedCall" >
+            Connected
+          </div>
+
+          <div class="truncated-text"
+               v-if="communicationBody">
+            {{ communicationBody }}
+          </div>
         </div>
       </div>
-      <div class="campaign-name text-grey-10">
+      <div class="campaign-name text-grey-10 truncated-text">
         {{ campaignName }}
       </div>
     </div>
@@ -67,13 +79,123 @@
             v-if="(communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || communication.type !== CommunicationTypes.CALL">
         <task-item-time :from-time="communication.created_at" :update-interval="6000"></task-item-time>
       </span>
-      <div class="time-passed text-grey-90 d-flex flex-row justify-center"
-           v-else-if="communication.direction === CommunicationDirection.INBOUND && communication.type === CommunicationTypes.CALL && [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW].includes(communication.current_status2)">
-        <div class="px-2">
-          <cancel-call-icon role="button"/>
+      <div v-if="isLiveCall">
+        <!-- Incoming Call-->
+        <!-- only show this if call is incoming and is not a parked call-->
+        <div class="text-grey-90 d-flex flex-row justify-center"
+             v-if="shouldShowIncomingCallMenu">
+
+          <!-- show reject button if call is not parked-->
+          <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onRejectCall">
+              <!-- show remove icon for call fishing mode -->
+              <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode && isCallFishing"
+                                height="24"
+                                width="24" />
+              <!-- only show reject button if -->
+              <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishing"/>
+            </b-button>
+          </div>
+          <div v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)"
+               class="pl-1 pr-0" >
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onAcceptCall">
+              <accept-call-icon/>
+              <q-menu v-if="isDialerConnected"
+                      fit
+                      content-class="live-call-options"
+                      anchor="top right"
+                      self="top left"
+                      v-model="showIncomingCallMenu"
+                      @hide="showIncomingCallMenu = false">
+                <q-list>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onParkCurrentCallAndAnswer">
+                    <q-item-section class="d-inline-flex">
+                      <park-call-icon color="#9B51E0"
+                                      width="11.7"
+                                      height="12.35">
+                      </park-call-icon>
+                      <span>Park Current Call &amp; Answer</span>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onHangUpCurrentCallAndAnswer">
+                    <q-item-section>
+                      <hangup-icon  width="16"
+                                    height="16"
+                                    class="hangup-icon"></hangup-icon>
+                      <span>Hang up Current Call &amp; Answer</span>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </b-button>
+          </div>
         </div>
-        <div class="px-2">
-          <accept-call-icon role="button"/>
+
+        <!-- Answered / In Progress Call-->
+        <div class="text-grey-90 d-flex flex-row justify-center"
+             v-if="shouldShowAnsweredCallMenu">
+          <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onHangUpCall">
+              <cancel-call-icon/>
+            </b-button>
+          </div>
+        </div>
+
+        <!-- Parked Call-->
+        <div class="text-grey-90 d-flex flex-row justify-center"
+             v-if="shouldShowParkedCallMenu">
+          <div class="pl-0">
+            <b-button variant="light"
+                      size="sm"
+                      class="bg-transparent no-border no-box-shadow p-0"
+                      @click="onUnparkCall">
+              <parked-call-icon/>
+              <q-menu v-if="isDialerConnected"
+                      fit
+                      content-class="live-call-options"
+                      anchor="top right"
+                      self="top left"
+                      v-model="showParkedCallMenu"
+                      @hide="showParkedCallMenu = false">
+                <q-list>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onParkCurrentCallAndConnect">
+                    <q-item-section class="d-inline-flex">
+                      <park-call-icon color="#9B51E0"
+                                      width="11.7"
+                                      height="12.35">
+                      </park-call-icon>
+                      <span>Park Current Call &amp; Connect</span>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable
+                          v-close-popup
+                          @click="onHangupCurrentCallAndConnect">
+                    <q-item-section>
+                      <hangup-icon  width="16"
+                                    height="16"
+                                    class="hangup-icon"></hangup-icon>
+                      <span>Hang up Current Call &amp; Connect</span>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </b-button>
+          </div>
         </div>
       </div>
     </div>
@@ -82,7 +204,7 @@
 
 <script>
 import _ from 'lodash'
-import { avatarMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import { avatarMixin, communicationInfoMixin, liveCallsMixin } from 'src/plugins/mixins'
 import Avatar from 'components/avatar'
 import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
@@ -94,16 +216,25 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import TaskItemTime from 'components/inbox/channel-tasks/task-item-time'
 import RecordIcon from 'components/icons/inbox/record-icon'
 import VoicemailIcon from 'components/icons/inbox/voicemail-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import HangupIcon from 'components/icons/hangup-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
 
 export default {
   name: 'task-item',
 
   mixins: [
     avatarMixin,
-    communicationInfoMixin
+    communicationInfoMixin,
+    liveCallsMixin
   ],
 
   components: {
+    ParkedCallIcon,
+    ParkCallIcon,
+    HangupIcon,
+    IgnoreCallIcon,
     RecordIcon,
     VoicemailIcon,
     TaskItemTime,
@@ -140,8 +271,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns']),
-    ...mapState('inbox', ['selectedCommunication', 'activeChannel']),
+    ...mapState(['campaigns', 'dialer']),
+    ...mapState('inbox', ['selectedCommunication', 'activeChannel', 'liveContacts', 'contacts']),
 
     contactName () {
       if (this.communication && this.communication.contact.name) {
@@ -200,6 +331,20 @@ export default {
         default:
           return directionText + ' a file'
       }
+    },
+    contact () {
+      return this.communication.contact
+    },
+    communicationBody () {
+      if (this.communication.type === CommunicationTypes.SMS && (this.communication.body === null || !this.communication.body || this.communication.body.length < 1)) {
+        return this.smsEmptyBodyAlternativeText
+      }
+
+      if (this.communication.body !== null) {
+        return this.communication.body
+      }
+
+      return null
     }
   },
 
@@ -234,7 +379,8 @@ export default {
       })
     },
 
-    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel'])
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel']),
+    ...mapActions(['setShowPhone'])
   }
 }
 </script>

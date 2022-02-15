@@ -141,12 +141,18 @@ export default {
 
     computedCommunication () {
       if (this.communication) {
-        return this.communication
+        let found = this.callDispositionsAlphabeticalOrder.find(callDisposition => callDisposition.id === this.communication.call_disposition_id)
+        return {
+          id: this.communication.call_disposition_id,
+          call_disposition_id: this.communication.call_disposition_id,
+          name: found ? found.name : ''
+        }
       }
 
       return {
         id: null,
-        callDispositionId: null
+        call_disposition_id: null,
+        name: ''
       }
     },
 
@@ -180,9 +186,9 @@ export default {
     }
   },
 
-  created () {
+  mounted () {
     if (this.communication) {
-      this.callDispositionId = this.communication.callDispositionId
+      this.callDispositionId = this.computedCommunication
     }
   },
 
@@ -224,7 +230,7 @@ export default {
         call_disposition_id: this.selectCallDisposition(this.callDispositionId, true)
       }).then((res) => {
         this.loadingCallDisposition = false
-        this.$generalNotification('Call disposed')
+        this.$generalNotification('Call disposition updated.')
         this.$emit('callDisposed', res.data.call_disposition_id)
       }).catch((err) => {
         this.loadingCallDisposition = false
@@ -277,3 +283,4 @@ export default {
   }
 }
 </script>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

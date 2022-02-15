@@ -11,6 +11,15 @@
               @click="navigateBack">
         <i class="fa fa-chevron-left"></i>
       </b-link-->
+
+      <router-link
+        class="btn-header-nav-back"
+        v-if="['Communication'].includes($route.name)"
+        :to="{ name: 'Contact', params: { id: $route.params.contactId }}">
+        <button class="more-details font-weight-light-bold btn btn-sm">
+          <i class="fa fa-chevron-left"></i>
+        </button>
+      </router-link>
       <h1 v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ $route.params.tab.replace('-', ' ') | ucwords }}</h1>
@@ -194,6 +203,15 @@ export default {
     hideDialer () {
       this.dialerIcon = 'img:app-icons/header/dialer_gray.svg'
       this.dialerStatus = false
+    },
+
+    navigateToContactActivity () {
+      this.$router.push({
+        name: 'Communication',
+        params: {
+          contactId: this.$route.params.contactId
+        }
+      })
     },
 
     navigateBack (e) {

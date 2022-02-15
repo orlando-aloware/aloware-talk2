@@ -3,6 +3,7 @@
        class="phone d-flex flex-column"
        ref="phone"
        v-if="shouldShow">
+    <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
          :class="{ 'call-ended': isCallCompleted }"
          ref="phoneHeader">
@@ -1221,6 +1222,7 @@ import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 
 const MODULE = {
   powerDialer: 'Power Dialer'
@@ -1230,6 +1232,7 @@ export default {
   name: 'phone',
 
   components: {
+    MobileLiveCallBar,
     IgnoreCallIcon,
     CopyIcon,
     MergeIcon,

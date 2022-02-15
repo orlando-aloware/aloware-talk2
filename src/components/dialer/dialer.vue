@@ -303,6 +303,10 @@ export default {
       this.unparkCall()
     })
 
+    this.$VueEvent.listen('unparkCommunication', (data) => {
+      this.unparkCommunication(data)
+    })
+
     this.$VueEvent.listen('mergeCalls', () => {
       this.mergeCalls()
     })
@@ -419,9 +423,11 @@ export default {
         return
       }
 
-      if (this.dialer.call || !currentNumber || !outboundCampaignId) {
+      if ((this.dialer.call && this.dialer.call.state !== 'pending') || !currentNumber || !outboundCampaignId) {
         console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
+      } else {
+        this.rejectCall()
       }
 
       let params = {
@@ -1196,6 +1202,7 @@ export default {
     this.$VueEvent.stop('forceRefreshCommunication')
     this.$VueEvent.stop('parkCall')
     this.$VueEvent.stop('unparkCall')
+    this.$VueEvent.stop('unparkCommunication')
     this.$VueEvent.stop('answerCallFishing')
     this.$VueEvent.stop('mergeCalls')
     this.$VueEvent.stop('dropThirdParty')

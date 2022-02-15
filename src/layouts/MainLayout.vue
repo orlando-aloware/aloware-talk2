@@ -79,6 +79,7 @@
           ref="mobilePhone"
           :overlay="false"
           bordered
+          no-swipe-close
           class="mobile-phone-drawer position-relative"
           :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
           side="right"
@@ -98,10 +99,10 @@
           </phone>
           <dialer-form ref="dialerForm"
                        class="dialerForm"
+                       :class="{ 'hide': isPhoneVisible }"
                        :isMobile="true"
                        v-model="mobilePhoneDrawer"
                        v-if="mobilePhoneDrawer"
-                       v-show="!isPhoneVisible"
                        @hide="onDialerFormHide">
           </dialer-form>
         </q-drawer>
@@ -290,7 +291,7 @@ export default {
     pageContainerClasses () {
       return {
         'page-container h-100': true,
-        'pt-58': ['Contacts', 'Settings', 'Settings Tab'].includes(this.$route.name)
+        'pt-58': this.showContactsHeader
       }
     }
   },
@@ -792,7 +793,7 @@ export default {
           }
         }
 
-        if (this.profile.go_to_available_after_login && !this.dialer.call) {
+        if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
           this.$VueEvent.fire(
             'change_agent_status',
             AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
@@ -884,7 +885,10 @@ export default {
         this.loadingCampaigns = true
         return this.$axios
           .get('/api/v1/campaign', {
-            mode: 'no-cors'
+            mode: 'no-cors',
+            params: {
+              is_lite: true
+            }
           })
           .then((res) => {
             this.setCampaigns(res.data)
@@ -1662,6 +1666,7 @@ export default {
 
     beforeUnload () {
       this.unsubscribeFromPusher()
+      this.resetContactsDefaultVuex()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
@@ -1671,6 +1676,7 @@ export default {
 
     ...mapActions([
       'resetVuex',
+      'resetContactsDefaultVuex',
       'setUsage',
       'setCurrentCompany',
       'setCampaigns',

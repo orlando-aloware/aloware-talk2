@@ -93,7 +93,9 @@ export default {
       this.isExpanded = !this.isExpanded
       this.desktopisExpanded = this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
-      this.setShowContactsHeader(this.isExpanded)
+      if (this.isMobile) {
+        this.setShowContactsHeader(this.isExpanded)
+      }
     },
 
     onSidebarToggleMobile () {
@@ -170,8 +172,11 @@ export default {
     '$q.screen.lt.md': function () {
       if (this.$q.screen.lt.md) {
         this.isExpanded = false
-        this.setShowContactsHeader(false)
         this.$emit('toggleContactActivities', false)
+      }
+
+      if (this.$q.screen.lt.md && this.$route.name === 'Contact') {
+        this.setShowContactsHeader(false)
       }
 
       if (!this.$q.screen.lt.md) {

@@ -6,12 +6,12 @@
             option-label="name"
             input-debounce="0"
             style="word-break: break-all;"
-            use-input
-            use-chips
             emit-value
             map-options
             outlined
             dense
+            :use-chips="useChips"
+            :use-input="useInput"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             :options="callDispositionsOptions"
             :multiple="multiple"
@@ -52,16 +52,36 @@
         </q-item-section>
       </q-item>
     </template>
+
+    <template v-slot:selected-item="scope">
+      <q-chip
+        dense
+        :tabindex="scope.tabindex"
+        color="white"
+        class="tag-selected-chip"
+        text-color="secondary"
+      >
+        <i class="fa fa-circle position-absolute"
+           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+        <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
+        <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+             @click="scope.removeAtIndex(scope.index)">
+          <remove-tag-icon class="ml-1 remove-tag-icon">
+          </remove-tag-icon>
+        </div>
+      </q-chip>
+    </template>
   </q-select>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
   name: 'call-disposition-selector',
-
+  components: { RemoveTagIcon },
   props: {
     value: {
       required: false,
@@ -91,6 +111,14 @@ export default {
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
+    },
+    useChips: {
+      type: Boolean,
+      default: false
+    },
+    useInput: {
+      type: Boolean,
+      default: true
     }
   },
 

@@ -14,20 +14,28 @@
 
     <div class="modal-body-wrapper d-flex">
       <div class="left-column-wrapper">
-        <span class="filter-type-description">{{ channelFilterName }}</span>
+        <span class="filter-type-description">{{ channelFilterName }} Filters</span>
 
-        <div class="mt-5">
+        <div class="mt-3">
           <div class="mb-4">
-            <div class="filter-items cursor-pointer text-italic"
+            <div class="filter-items cursor-pointer"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>Create New</span>
+              <span>New (Untitled)
+                <span v-if="!selectedFilter"
+                      class="float-right check-icon">
+                  <check-o-icon color="#040404"></check-o-icon>
+                </span>
+              </span>
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
           <div class="saved-filters">
-            <q-skeleton type="rect" v-if="isGettingFilters" />
-            <p class="text-muted fs-12 empty-filter-placeholder" v-show="!isGettingFilters" v-if="personalFilters.length < 1">None</p>
+            <q-skeleton type="rect"
+                        v-if="isGettingFilters" />
+            <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+               v-show="!isGettingFilters"
+               v-if="personalFilters.length < 1">None</p>
             <filter-list-items v-for="item in personalFilters"
                                :key="item.id"
                                :filter="item"
@@ -38,8 +46,13 @@
           </div>
           <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
           <div class="saved-filters">
-            <q-skeleton type="rect" v-if="isGettingFilters" />
-            <p class="text-muted fs-12 empty-filter-placeholder" v-show="!isGettingFilters" v-if="companyFilters.length < 1">None</p>
+            <q-skeleton type="rect"
+                        v-if="isGettingFilters" />
+            <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+               v-show="!isGettingFilters"
+               v-if="companyFilters.length < 1">
+              None
+            </p>
             <div class="filter-items cursor-pointer"
                  v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === item.id }"
                  v-for="item in companyFilters"
@@ -58,19 +71,19 @@
       </div>
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <div>
-            <span class="filter-name">{{ selectedFilter ? selectedFilter.name : '(Unsaved) Filter' }}</span>
+          <div class="w-100 text-center">
+            <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
           </div>
-          <compact-btn class="border-0"
+          <compact-btn class="border-0 pl-0 pr-0"
                        @clicked="onHide">
-            <i class="fa fa-times"></i>
+            <close-icon iconColor="#000000"></close-icon>
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
                      :default-filter-model="defaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="container d-flex justify-content-between mb-3 mt-3 action-option-container">
+        <div class="container d-flex justify-content-between mt-3 action-option-container">
           <div></div>
           <div>
             <compact-btn class="mr-3 btn-tertiary"
@@ -79,7 +92,7 @@
               Reset
             </compact-btn>
             <compact-btn class="btn-secondary"
-                         :disabled="!(filterHasChanges) || ![1,2,3,4].includes(defaultFilterModel.type)"
+                         :disabled="!(filterHasChanges) || ![1,2,3,4, 5].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
@@ -114,13 +127,15 @@ import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
+import CheckOIcon from 'components/icons/check-o-icon'
+import CloseIcon from 'components/icons/close-icon'
 
 let inputTimeout
 
 export default {
   name: 'filter-dialog',
 
-  components: { FilterListItems, CompactBtn, FilterForm },
+  components: { CloseIcon, CheckOIcon, FilterListItems, CompactBtn, FilterForm },
 
   props: {
     value: {
@@ -147,11 +162,11 @@ export default {
       switch (true) {
         case !this.$route.params.channel && this.$route.name === 'Inbox':
         case ['inbox'].includes(this.$route.params.channel):
-          return 'Communications'
+          return 'Inbox'
         case ['messages'].includes(this.$route.params.channel):
           return 'Messages'
         case ['voicemails'].includes(this.$route.params.channel):
-          return 'Voicemails'
+          return 'Voice Messages'
         case ['mentions'].includes(this.$route.params.channel):
           return 'Mentions'
         case ['calls', 'recordings'].includes(this.$route.params.channel):
@@ -233,7 +248,11 @@ export default {
         'exclude_automated_communications',
         'incoming_numbers',
         'users',
-        'workflows'
+        'workflows',
+        'contact_owner',
+        'my_contact',
+        'from_date',
+        'to_date'
       ]
     }
   },
@@ -266,11 +285,11 @@ export default {
       this.getFilters()
       if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter, ...this.filter }
-        this.setChannelClonedFilter(this.selectedFilter.filter)
       } else {
         this.filter = { ...this.filter, ...this.value }
-        this.setChannelClonedFilter(this.filter)
       }
+
+      this.setChannelClonedFilter(this.defaultFilterModel.filter)
     },
 
     onShown () {
@@ -299,8 +318,18 @@ export default {
 
     onApply () {
       this.resetChannelChangedFilterFields()
+
       for (const item in this.filter) {
-        if (JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) && +this.filter[item] !== +this.defaultFilterModel.filter[item] && this.filterFields.includes(item)) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: +this.filter[item]
+          })
+
+          continue
+        }
+
+        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: this.filter[item]
@@ -344,7 +373,10 @@ export default {
 
       if (!filterObject) {
         this.filter = { ...this.defaultFilterModel.filter }
+      } else {
+        this.filter = { ...this.defaultFilterModel.filter, ...filterObject.filter }
       }
+
       this.applyFilter()
     },
 
@@ -420,6 +452,8 @@ export default {
       for (const prop in this.selectedFilter.filter) {
         this.filter[prop] = this.selectedFilter.filter[prop]
       }
+
+      this.filter = { ...this.filter, untagged_only: +this.filter.untagged_only, first_time_only: +this.filter.first_time_only, exclude_automated_communications: +this.filter.exclude_automated_communications }
 
       setTimeout(function () {
         _this.refreshTagSelector()

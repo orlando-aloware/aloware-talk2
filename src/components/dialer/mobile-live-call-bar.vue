@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100"
+  <div class="w-100 mobile-live-call-bar"
        v-if="isMobile && (hasLiveCall || hasParkedCall)">
     <div class="w-100 bg-success call-status text-center"
          role='button'
@@ -9,13 +9,14 @@
         {{ liveCallText }}
       </span>
     </div>
-    <div class="w-100 bg-purple call-status text-center"
+    <div class="w-100 bg-purple call-status text-center position-relative"
          role='button'
          v-if="hasParkedCall">
       <b-dropdown no-caret
                   offset="25%"
                   variant="transparent"
                   class="h-auto b-compact-dropdown-button text-bold w-100"
+                  :menu-class="{ 'bg-grey-93': hideLiveCall }"
                   :disabled="loading"
                   v-if="dialer.currentStatus !== 'WRAP_UP' && hasParkedAndLiveCall">
         <template #button-content>
@@ -60,6 +61,12 @@ export default {
     ParkCallIcon,
     HangupIcon
   },
+  props: {
+    hideLiveCall: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       loading: false
@@ -84,7 +91,7 @@ export default {
       return `Parked Call... ${this.dialer.parkedCallTimer}`
     },
     hasLiveCall () {
-      return !_.isEmpty(this.dialer.call) && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)
+      return !this.hideLiveCall && !_.isEmpty(this.dialer.call) && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)
     },
     hasParkedCall () {
       return !_.isEmpty(this.dialer.parkedCall)

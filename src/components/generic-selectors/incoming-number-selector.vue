@@ -15,10 +15,11 @@
             :options="phoneNumberOptions"
             :multiple="multiple"
             :placeholder="placeholder"
-            :disable="disable"
+            :disable="disable || loadingCampaigns"
             :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            :loading="loadingCampaigns"
             @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
@@ -42,16 +43,38 @@
         </q-item-section>
       </q-item>
     </template>
+
+    <template v-slot:selected-item="scope">
+      <q-chip
+        dense
+        :tabindex="scope.tabindex"
+        color="white"
+        class="tag-selected-chip"
+        text-color="secondary"
+      >
+        <i class="fa fa-circle position-absolute"
+           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+        <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.phone_number }}</span>
+        <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+             @click="scope.removeAtIndex(scope.index)">
+          <remove-tag-icon class="ml-1 remove-tag-icon">
+          </remove-tag-icon>
+        </div>
+      </q-chip>
+    </template>
   </q-select>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import { aclMixin } from 'src/boot/mixins'
+import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
   name: 'incoming-number-selector',
-
+  components: { RemoveTagIcon },
+  mixins: [aclMixin],
   props: {
     campaign_id: {
       required: false
@@ -110,18 +133,20 @@ export default {
     return {
       phoneNumber: this.value,
       phoneNumberOptions: [],
-      selectWidth: 0
+      selectWidth: 0,
+      loadingCampaigns: false,
+      campaigns: []
     }
   },
 
   computed: {
-    ...mapState(['users', 'campaigns']),
+    ...mapState(['users']),
     placeholder () {
       switch (true) {
         case this.multiple && this.phoneNumber.length < 1:
-          return 'Select Numbers'
+          return 'Select Line Phone Numbers'
         case !this.multiple && !this.phoneNumber:
-          return 'Select Number'
+          return 'Select Line Phone Number'
         case this.multiple && this.phoneNumber.length > 0:
         case !this.multiple && this.phoneNumber:
         default:
@@ -198,11 +223,29 @@ export default {
           number.phone_number.toLowerCase().indexOf(needle) > -1
         )
       })
+    },
+    getCampaigns () {
+      if (this.hasPermissionTo('list campaign')) {
+        this.loadingCampaigns = true
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.campaigns = res.data
+            this.loadingCampaigns = false
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingCampaigns = false
+          })
+      }
     }
   },
 
   created () {
     this.phoneNumberOptions = this.incomingNumbers
+    this.getCampaigns()
   },
 
   watch: {

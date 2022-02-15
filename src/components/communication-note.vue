@@ -11,7 +11,8 @@
              placeholder="Write notes"
              ref="communicationNotes"
              dense
-             @input="changeNote">
+             @input="changeNote"
+             @blur="onBlur">
     </q-input>
     <div class="comm-notes-state d-flex w-100 justify-end">
       <span class="text-muted"
@@ -82,6 +83,10 @@ export default {
         this.saveNote()
       }
     }, 2000),
+
+    onBlur () {
+      this.$emit('notesBlurred')
+    },
 
     saveNote () {
       this.loadingBtn = true

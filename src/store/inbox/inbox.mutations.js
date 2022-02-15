@@ -60,6 +60,9 @@ export default {
   SET_CONTACTS: (state, contacts) => {
     state.contacts = contacts
   },
+  SET_LIVE_CONTACTS: (state, contacts) => {
+    state.liveContacts = contacts
+  },
   SET_CONTACTS_CURRENT_PAGE: (state, page) => {
     state.contactsCurrentPage = page
   },
@@ -76,7 +79,6 @@ export default {
     // compensate comparing of array/object values
     let comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
     let comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
-
     if (comparatorA !== comparatorB) {
       let prop = state.channelChangedFilterFields.find(item => item.property === name)
       if (prop) {

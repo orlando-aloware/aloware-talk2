@@ -16,7 +16,7 @@
                         v-if="step !== 1">
                 <i class="fa fa-arrow-left"></i>
               </b-button>
-              <h6 class="mb-0 ml-1">Filters</h6>
+              <h6 class="mb-0 ml-1 d-flex align-items-center">Filters</h6>
             </div>
 
             <b-button variant="light"

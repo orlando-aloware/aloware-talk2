@@ -7,6 +7,54 @@
           <b-form-row class="mt-2">
             <b-col sm="12" md="6">
               <b-form-group
+                class="form-label"
+                :label="dateRangeLabel"
+              >
+                <div class="last-engagement-tooltip-wrapper"
+                     v-if="isInbox">
+                  <information-circle-icon color="#2F80ED">
+                  </information-circle-icon>
+                  <q-tooltip  anchor="top middle"
+                              self="center middle">
+                    Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)
+                  </q-tooltip>
+                </div>
+
+                <date-range-picker
+                  v-model="dateRange"
+                  ref="picker"
+                  :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
+                  :opens="opens"
+                  :ranges="ranges"
+                  :always-show-calendars="false"
+                  :auto-apply="true"
+                >
+                  <template v-slot:input="picker" style="min-width: 350px;">
+                    {{ getDateRangeInputLabel(picker) }}
+                  </template>
+                </date-range-picker>
+              </b-form-group>
+            </b-col>
+            <b-col sm="12"
+                   md="6">
+              <b-form-group label="My Contacts"
+                            class="form-label">
+                <b-form-checkbox
+                  class="mt-1"
+                  switch
+                  v-model="filter.my_contact"
+                  :value="1"
+                  :unchecked-value="0"
+                  @change="(eventPayload) => onFilterChange(eventPayload, 'my_contact')"
+                >
+                </b-form-checkbox>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+          <b-form-row class="mt-2">
+            <b-col sm="12"
+                   md="6">
+              <b-form-group
                 label="Lines"
                 class="form-label"
               >
@@ -99,8 +147,8 @@
                 class="form-label"
                 label="Callback Status"
               >
-                <callback-status-selector v-model="filter.callback_status"
-                                          custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                                          v-model="filter.callback_status"
                                           :clearable="true"
                                           :highlighted="isChanged('callback_status')"
                                           :use-input="false"
@@ -191,14 +239,14 @@
           </b-form-row>
         </div>
 
-        <div v-if="$route.params.channel && !['inbox'].includes($route.params.channel)">
+        <div>
           <h5 class="mt-4 section-header">Attribution</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
                    md="6"
-                   v-if="!['mentions', 'inbox'].includes($route.params.channel)">
+                   v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
               <b-form-group class="form-label"
-                            label="Phone Numbers">
+                            label="Line Phone Numbers">
                 <incoming-number-selector v-model="filter.incoming_numbers"
                                           :multiple="true"
                                           :use-chips="true"
@@ -207,12 +255,31 @@
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'messages', 'mentions'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'voicemails'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
-                            label="Users">
+                            label="Communication Owners">
+                <div class="comm-owner-filter-tooltip-wrapper">
+                  <information-circle-icon color="#2F80ED">
+                  </information-circle-icon>
+                  <q-tooltip  anchor="top middle"
+                              self="center middle">
+                    <p class="font-weight-bold">Who is the communication owner?</p>
+                    <p class="font-weight-bold mb-0">For outbound communication:</p>
+                    <p class="mb-0">Calls, SMS, fax & emails:</p>
+                    <p><ul><li>The agent that sent the communication</li></ul></p>
+
+                    <p class="font-weight-bold mb-0">For inbound communication:</p>
+                    <p class="mb-0">Calls:</p>
+                    <p><ul><li>The agent that answered the call</li></ul></p>
+
+                    <p class="mb-0">SMS, fax & email:</p>
+                    <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
+                  </q-tooltip>
+                </div>
                 <user-selector v-model="filter.users"
+                               custom-placeholder="Select Communication Owners"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
@@ -223,7 +290,7 @@
             </b-col>
             <b-col  sm="12"
                     md="6"
-                    v-if="!['mentions'].includes($route.params.channel)">
+                    v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector v-model="filter.workflows"
@@ -233,6 +300,22 @@
                                    :highlighted="isChanged('workflows')"
                                    @change="(eventPayload) => onFilterChange(eventPayload, 'workflows')">
                 </sequence-selector>
+              </b-form-group>
+            </b-col>
+            <b-col sm="12"
+                   md="6">
+              <b-form-group class="form-label"
+                            label="Contact Owners">
+                <user-selector v-model="filter.contact_owner"
+                               :generic-styling="false"
+                               :multiple="true"
+                               :use-chips="true"
+                               :highlighted="isChanged('contact_owner')"
+                               :clearable="false"
+                               :disable="disableContactOwner"
+                               custom-placeholder="Select Contact Owners"
+                               @change="(eventPayload) => onFilterChange(eventPayload, 'contact_owner')">
+                </user-selector>
               </b-form-group>
             </b-col>
             <b-col v-if="['messages'].includes($route.params.channel)"
@@ -271,10 +354,16 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import { mapActions, mapState } from 'vuex'
+
+import DateRangePicker from 'vue2-daterange-picker'
+import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
+
 export default {
   name: 'filter-form',
 
   components: {
+    InformationCircleIcon,
     SequenceSelector,
     IncomingNumberSelector,
     UserSelector,
@@ -287,11 +376,8 @@ export default {
     CallDispositionSelector,
     TagSelector,
     CallbackStatusSelector,
-    BroadcastSelector
-  },
-
-  computed: {
-    ...mapState('inbox', ['channelChangedFilterFields'])
+    BroadcastSelector,
+    DateRangePicker
   },
 
   props: {
@@ -305,6 +391,48 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('inbox', ['channelChangedFilterFields', 'isFilterDialogShown', 'isFilterModelFormShown']),
+    ...mapState('auth', ['profile']),
+    isInbox () {
+      return ['Inbox Channel Task Status', 'Inbox', 'Inbox Contact Task'].includes(this.$route.name)
+    },
+    dateRangeLabel () {
+      return this.isInbox ? 'Last Engagement Date' : 'Time'
+    },
+    dateHasChanges () {
+      return this.filter.from_date !== this.defaultFilterModel.filter.from_date || this.filter.to_date !== this.defaultFilterModel.filter.to_date
+    },
+    isRangeSelectionOpen () {
+      if (!this.rangePicker) {
+        return false
+      }
+      return this.rangePicker.$data.showCustomRangeCalendars
+    }
+
+  },
+
+  data () {
+    return {
+      disableContactOwner: false,
+      dateRange: {
+        startDate: null, // window.moment('2015-01-01')._d,
+        endDate: null // window.moment()._d
+      },
+      opens: 'right',
+      ranges: {
+        'All Time': [null, null]
+      },
+      rangePicker: null
+    }
+  },
+
+  filters: {
+    date (date) {
+      return window.moment(date).format('MM/DD/YYYY')
+    }
+  },
+
   methods: {
     ...mapActions('inbox', ['updateChannelChangedFilterFields']),
     onFilterChange (value, prop) {
@@ -312,6 +440,66 @@ export default {
     },
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
+    },
+    getDateRangeInputLabel (data) {
+      if (data.startDate && data.endDate) {
+        return this.$options.filters.date(data.startDate) + ' - ' + this.$options.filters.date(data.endDate)
+      }
+      return 'All Time'
+    }
+  },
+
+  created () {
+    this.$watch(
+
+      // Evaluate the value including the two properties
+
+      () => [this.filter.from_date, this.filter.to_date],
+
+      // The type of value or oldValue is the array returned above
+
+      (value, oldValue) => {
+        this.dateRange.startDate = value[0]
+        this.dateRange.endDate = value[1]
+      })
+  },
+
+  mounted () {
+    this.dateRange.startDate = this.filter.from_date
+    this.dateRange.endDate = this.filter.to_date
+    this.rangePicker = this.$refs.picker
+  },
+
+  watch: {
+    dateRange: {
+      deep: true,
+      handler () {
+        this.filter.from_date = this.dateRange.startDate ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD') : null
+        this.filter.to_date = this.dateRange.endDate ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD') : null
+      }
+    },
+
+    'filter.my_contact': {
+      deep: true,
+      handler (value) {
+        if (value) {
+          this.filter.contact_owner = []
+        }
+      }
+    },
+    'filter.contact_owner': {
+      deep: true,
+      handler (value) {
+        if (value.length) {
+          this.filter.my_contact = 0
+        }
+      }
+    },
+    isRangeSelectionOpen: function (value) {
+      if (value) {
+        this.dateRange.startDate = window.moment().subtract(1, 'day').format('YYYY-MM-DD')
+        this.dateRange.endDate = window.moment().format('YYYY-MM-DD')
+      }
     }
   }
 }
