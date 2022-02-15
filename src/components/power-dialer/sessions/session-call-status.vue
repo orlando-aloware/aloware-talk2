@@ -176,12 +176,13 @@ export default {
       'selectedList'
     ]),
     address () {
-      if (this.taskToCall?.cnam_city && !this.taskToCall?.cnam_state) {
-        return `${this.taskToCall?.cnam_city}`
-      } else if (!this.taskToCall?.cnam_city && this.taskToCall?.cnam_state) {
-        return `${this.taskToCall?.cnam_state}`
+      let { taskToCall } = this
+      if (taskToCall?.cnam_city && !taskToCall?.cnam_state) {
+        return `${taskToCall?.cnam_city}`
+      } else if (!taskToCall?.cnam_city && taskToCall?.cnam_state) {
+        return `${taskToCall?.cnam_state}`
       } else {
-        return `${this.taskToCall?.cnam_city}, ${this.taskToCall?.cnam_state}`
+        return `${taskToCall?.cnam_city}, ${taskToCall?.cnam_state}`
       }
     },
     listObject () {
@@ -197,7 +198,8 @@ export default {
       return this.taskToCall?.company_name || 'Company: N/A'
     },
     fullname () {
-      return `${this.taskToCall.first_name} ${this.taskToCall.last_name}`
+      let { taskToCall } = this
+      return `${taskToCall.first_name} ${taskToCall.last_name}`
     },
     keyIndex () {
       let keyCtr = 0
@@ -256,7 +258,7 @@ export default {
   mounted () {
     this.TOGGLE_SESSION_LOADER(false)
     if (this.hasExistingTaskList) {
-      this.taskToCall = this.list[0]
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
     }
     this.timerCount = this.sessionSettings.warmup_period_in_seconds
     // setTimeout(() => {
@@ -300,6 +302,8 @@ export default {
         setTimeout(async () => {
           await this.getContact({ id: obj[this.keyIndex].id })
         }, 500)
+      } else {
+        this.timerCount = this.sessionSettings.warmup_period_in_seconds
       }
     },
     timerCount: {
@@ -316,7 +320,7 @@ export default {
     },
     list (lst) {
       if (lst.length > 0) {
-        this.taskToCall = this.list[0]
+        this.taskToCall = this.powerDialerTasks.in_queue[0]
       }
     }
   },

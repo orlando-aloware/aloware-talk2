@@ -1,7 +1,9 @@
 <template>
-  <div class="t-menu1">
+  <div class="t-menu1 border-top">
     <q-card flat :disabled="sessionLoader">
-      <div class="t-menu__header d-flex align-items-center">
+      <div
+        v-if="false"
+        class="t-menu__header d-flex align-items-center">
         <div class="header__header__title font-weight-bold p-3 flex-grow-1">
 
           <SearchList
@@ -46,14 +48,16 @@
                   {{ listFilters[key.toUpperCase()].name }}
                   <!-- - {{ key.toUpperCase() }} -->
                   <q-chip size="xs" square class="p-0">
-                    <!-- {{ group.length }} -->
-                    {{ totalCount(key) }}
+                    {{ group.length || 0 }}
+                    <!-- {{ totalCount(key) }} -->
                   </q-chip>
                 </div>
               </q-item-section>
             </template>
             <q-card class="t-cards">
-              <q-list class="px-2 pb-2">
+              <q-list
+                v-if="group.length > 0"
+                class="px-2 pb-2">
                 <template v-for="(item, i) in group">
                   <q-item
                     :key="`acc-item-${i}`"
@@ -110,6 +114,11 @@
                   </q-item>
                 </template>
               </q-list>
+              <div v-else class="px-0 pb-1 text-grey">
+                <q-card flat class="bg-grey-50 p-2 mx-3 my-2">
+                  <span class="px-2">No task listed</span>
+                </q-card>
+              </div>
             </q-card>
           </q-expansion-item>
           <q-separator />

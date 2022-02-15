@@ -1,4 +1,5 @@
 import { mapFields } from 'vuex-map-fields'
+import { mapActions } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 
 export default {
@@ -17,6 +18,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['setShowPhone']),
     async runTask () {
       let data = {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
@@ -51,6 +53,8 @@ export default {
       // TODOs: Remove task from list
     },
     updateTaskStatus (task) {
+      this.setShowPhone(false)
+      console.log('task.task_status :>> ', task.task_status)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           console.log(' %c Changing status to : IN_PROGRESS ', 'background: red; color: white;')
