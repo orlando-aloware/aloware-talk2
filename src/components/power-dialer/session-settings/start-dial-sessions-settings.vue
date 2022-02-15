@@ -388,7 +388,8 @@ export default {
       'getSessionSetting'
     ]),
     ...mapMutations('powerDialer', [
-      'ADD_NEW_SESSION_SETTING'
+      'ADD_NEW_SESSION_SETTING',
+      'SET_SESSION_SETTINGS'
     ]),
     dialPreparation () {
       this.dialog = true
@@ -418,6 +419,7 @@ export default {
           id: this.list.id,
           dialer_session_id: id
         })
+        this.SET_SESSION_SETTINGS(this.selectedItem)
       }
       this.$emit('start')
     },

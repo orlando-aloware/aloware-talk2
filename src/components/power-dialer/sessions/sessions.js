@@ -28,7 +28,7 @@ export default {
       }
       console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
       if (this.taskToCall?.contact_list_item_id) {
-        // this.$VueEvent.fire('makeCall', data)
+        this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -53,21 +53,26 @@ export default {
     updateTaskStatus (task) {
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
+          console.log(' %c Changing status to : IN_PROGRESS ', 'background: red; color: white;')
           this.activeTask = this.list.find(lst => lst.id === task.contact_id)
           this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
           break
         case AutoDialTaskStatus.STATUS_COMPLETED:
+          console.log(' %c Changing status to : COMPLETED/CALLED ', 'background: red; color: white;')
           this.powerDialerTasks.called.push(this.activeTask)
           this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_FAILED:
+          console.log(' %c Changing status to : FAILED ', 'background: red; color: white;')
           this.powerDialerTasks.failed.push(this.activeTask)
           this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_QUEUED:
+          console.log(' %c Changing status to : IN_QUEUE ', 'background: red; color: white;')
           this.powerDialerTasks.in_queue.push(this.activeTask)
           break
         case AutoDialTaskStatus.STATUS_SCHEDULED:
+          console.log(' %c Changing status to : SCHEDULED ', 'background: red; color: white;')
           this.powerDialerTasks.scheduled.push(this.activeTask)
           break
         default:

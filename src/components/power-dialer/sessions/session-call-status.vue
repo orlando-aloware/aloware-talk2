@@ -293,10 +293,10 @@ export default {
   },
   watch: {
     async activeTask (obj) {
-      setTimeout(() => {
-        this.timerCount = this.sessionSettings.warmup_period_in_seconds
-      }, this.timerCount)
       if (obj?.id) {
+        setTimeout(() => {
+          this.timerCount = this.sessionSettings.warmup_period_in_seconds
+        }, this.timerCount)
         setTimeout(async () => {
           await this.getContact({ id: obj[this.keyIndex].id })
         }, 500)
