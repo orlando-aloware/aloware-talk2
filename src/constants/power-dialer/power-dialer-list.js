@@ -40,7 +40,7 @@ export const DEFAULT_FILTER_LIST = {
     link: '/all/',
     meta: 'all',
     order: 5,
-    status: ''
+    status: 'STATUS_ALL'
   }
 }
 

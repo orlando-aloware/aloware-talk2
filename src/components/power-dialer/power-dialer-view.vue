@@ -364,7 +364,6 @@ export default {
     ...mapGetters('powerDialer', [
       'contactResources',
       'powerDialerLists',
-      'powerDialerListItems',
       'powerDialerDirectoryList',
       'datatableLoader',
       'myQueue'

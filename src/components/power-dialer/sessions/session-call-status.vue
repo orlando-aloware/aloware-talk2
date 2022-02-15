@@ -4,8 +4,8 @@
       <div class="d-flex align-items-center pt-2 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
-            <div class="text-15 text-lowercase text-capitalize px-2">
-              {{ timerCount > 0 ? 'Will call in' : 'Call in progress...' }}
+            <div :class="`text-15 text-lowercase text-capitalize px-2`">
+              {{ timerCount > 0 ? 'Will call in' : callInProgress ? 'Call in progress...' : 'Call Failed' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
                 v-if="timerCount > 0">
@@ -56,7 +56,7 @@
         <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
           {{ fullname || '' }}
           <span class="text-15 text-subtitle1">
-            {{ activeTask.phone_number || '' | fixPhone('NATIONAL', true) }}
+            {{ taskToCall.phone_number || '' | fixPhone('NATIONAL', true) }}
           </span>
         </div>
       </div>
@@ -76,7 +76,7 @@
             height="18px"
             class="mr-0 py-0"
             style="position:relative;top:-2px;" />
-          {{ address }} - {{ activeTask.created_at || '' | fixTime }}
+          {{ address }} - {{ taskToCall.created_at || '' | fixTime }}
         </div>
         <q-btn
           @click="toggleMute = !toggleMute"
@@ -139,7 +139,6 @@
 <script>
 
 import { mapGetters, mapActions, mapMutations } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -149,6 +148,8 @@ import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import MuteIcon from 'components/icons/mute-icon'
+import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
+import sessionsMixins from './sessions'
 
 export default {
   name: 'SessionCallStatus',
@@ -163,9 +164,9 @@ export default {
     RecordIcon,
     MuteIcon
   },
+  mixins: [ sessionsMixins ],
   computed: {
     ...mapGetters('powerDialer', [
-      'powerDialerListItems',
       'sessionLoader',
       'sessionSettings'
     ]),
@@ -174,16 +175,13 @@ export default {
       'listItems',
       'selectedList'
     ]),
-    ...mapFields('powerDialer', [
-      'activeTask'
-    ]),
     address () {
-      if (this.activeTask?.cnam_city && !this.activeTask?.cnam_state) {
-        return `${this.activeTask?.cnam_city}`
-      } else if (!this.activeTask?.cnam_city && this.activeTask?.cnam_state) {
-        return `${this.activeTask?.cnam_state}`
+      if (this.taskToCall?.cnam_city && !this.taskToCall?.cnam_state) {
+        return `${this.taskToCall?.cnam_city}`
+      } else if (!this.taskToCall?.cnam_city && this.taskToCall?.cnam_state) {
+        return `${this.taskToCall?.cnam_state}`
       } else {
-        return `${this.activeTask?.cnam_city}, ${this.activeTask?.cnam_state}`
+        return `${this.taskToCall?.cnam_city}, ${this.taskToCall?.cnam_state}`
       }
     },
     listObject () {
@@ -196,10 +194,10 @@ export default {
       return this.list.length > 0
     },
     companyName () {
-      return this.activeTask?.company_name || 'Company: N/A'
+      return this.taskToCall?.company_name || 'Company: N/A'
     },
     fullname () {
-      return `${this.activeTask.first_name} ${this.activeTask.last_name}`
+      return `${this.taskToCall.first_name} ${this.taskToCall.last_name}`
     },
     keyIndex () {
       let keyCtr = 0
@@ -214,7 +212,7 @@ export default {
       return keyCtr
     },
     hasDefaultContact () {
-      if (this.activeTask?.id) {
+      if (this.taskToCall?.id) {
         return false
       }
       return true
@@ -250,16 +248,19 @@ export default {
       set (val) {
         this.statuses.mute = val
       }
+    },
+    status () {
+      return AutoDialTaskStatus.STATUSES
     }
   },
   mounted () {
     this.TOGGLE_SESSION_LOADER(false)
     if (this.hasExistingTaskList) {
-      this.activeTask = this.list[0]
+      this.taskToCall = this.list[0]
     }
     this.timerCount = this.sessionSettings.warmup_period_in_seconds
     // setTimeout(() => {
-    //   this.makeACall()
+    //   this.runTask()
     // }, 3000)
   },
   methods: {
@@ -274,21 +275,7 @@ export default {
       this.activeTask = this.list[this.keyIndex]
       await this.getContact({ id: this.list[this.keyIndex].id })
       this.TOGGLE_SESSION_LOADER(false)
-      // this.makeACall()
-    },
-    async makeACall () {
-      let data = {
-        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.contact_list_item_id}`), // we know this already based on the list (Required)
-        // currentNumber: this.$options.filters.fixPhone(`${this.activeTask?.phone_number}`), // we know this already based on the list (Required)
-        outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
-        contactName: `${this.activeTask?.first_name} ${this.activeTask?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
-        companyName: this.activeTask?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
-        contactId: this.activeTask?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
-      }
-      console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
-      if (this.activeTask?.contact_list_item_id) {
-        this.$VueEvent.fire('makeCall', data)
-      }
+      // this.runTask()
     },
     tickTimer () {
       if (this.hasExistingTaskList) {
@@ -298,7 +285,7 @@ export default {
           }, 1000)
         } else if (this.timerCount === 0) {
           setTimeout(async () => {
-            await this.makeACall()
+            await this.runTask()
           }, 3000)
         }
       }
@@ -329,7 +316,7 @@ export default {
     },
     list (lst) {
       if (lst.length > 0) {
-        this.activeTask = this.list[0]
+        this.taskToCall = this.list[0]
       }
     }
   },
@@ -355,7 +342,8 @@ export default {
         time: '6:15 PM',
         group: 'Google Map List',
         line: 'Bently Personal'
-      }
+      },
+      taskToCall: {}
     }
   }
 }

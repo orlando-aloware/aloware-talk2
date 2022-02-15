@@ -61,7 +61,7 @@
                     class="t-expansion-panel px-2">
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
-                        {{ avatarName(item.first_name, item.last_name) }}
+                        <!-- {{ avatarName(item.first_name, item.last_name) }} -->
                       </q-avatar>
                     </div>
                     <q-item-section class="pl-2">
@@ -138,7 +138,7 @@ export default {
   },
   mounted () {
     // this.NEXT_CONTACT_IN_PROGRESS(this.activeTask)
-    console.log('this.activeTask :>> ', this.activeTask)
+    // console.log('this.activeTask :>> ', this.activeTask)
     // let { powerDialerTasks } = this
     // this.powerDialerTasks.in_queue.shift()
   },
@@ -148,7 +148,6 @@ export default {
       'powerDialerListItems',
       // 'currentList',
       'sessionLoader'
-      // 'activeTask'
     ]),
     ...mapGetters('contacts', [
       'contact',
@@ -229,19 +228,6 @@ export default {
     //   console.log('data :>> ', data)
     //   // this.$VueEvent.fire('makeCall', data)
     // }
-  },
-  watch: {
-    activeTask: {
-      handler (newVal, oldVal) {
-        this.flagged = true
-        console.log('newVal -> ' + newVal.first_name + ' : ', newVal.id)
-        console.log('oldVal -> ' + newVal.first_name + ' : ', oldVal.id)
-        // this.getContact({ id: this.activeTask?.id })
-        // this.makeACall()
-        this.flagged = false
-      },
-      deep: true
-    }
   },
   data () {
     return {

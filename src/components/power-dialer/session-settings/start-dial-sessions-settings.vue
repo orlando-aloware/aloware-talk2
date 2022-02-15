@@ -449,7 +449,6 @@ export default {
       // this.ADD_NEW_SESSION_SETTING(res)
     },
     async updateSelectedSetting () {
-      console.log(`Settings to update : ${this.selectedItem.id} `, this.selectedItem)
       let res = await this.updateDialerSessionSetting(
         this.removeEmptyParams(this.selectedItem)
       )
