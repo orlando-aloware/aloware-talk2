@@ -27,6 +27,7 @@
       color="success"
       no-caps
       unelevated
+      :disabled="disabledTrigger"
       @click="dialPreparation">
       <PhoneIcon
         class="mr-2"
@@ -35,6 +36,9 @@
         width="12" />
       <div class="button-label">
         Start Dialing
+        <q-tooltip v-if="disabledTrigger">
+          To start dialing, a minimum of 1 (one) contact item in the list is required
+        </q-tooltip>
       </div>
     </q-btn>
     <q-dialog
@@ -315,6 +319,10 @@ export default {
   props: {
     list: {
       type: Object
+    },
+    disabledTrigger: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

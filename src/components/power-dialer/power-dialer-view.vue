@@ -8,9 +8,10 @@
 
     <template slot="options">
       <div class="text-13 pr-3 border-right right-spacing-2">
-        {{ numberOfContacts }}
+        {{ numberOfContacts }} Contacts
       </div>
       <StartDialing
+        :disabled-trigger="numberOfContacts === 0"
         :list="filteredList"
         @start="beginDial" />
     </template>
@@ -402,7 +403,7 @@ export default {
       }
     },
     numberOfContacts () {
-      return `${this.activeList.length} Contacts`
+      return this.activeList.length
     },
     activeList () {
       return this.listItems[this.id]?.data || []
