@@ -98,9 +98,6 @@ export default {
     },
     hasParkedAndLiveCall () {
       return !_.isEmpty(this.dialer.parkedCall) && !_.isEmpty(this.dialer.call)
-    },
-    isLiveCallBarVisible () {
-      return this.hasLiveCall || this.hasParkedCall
     }
   },
   created () {
@@ -159,11 +156,6 @@ export default {
       })
     },
     ...mapActions(['setShowPhone'])
-  },
-  watch: {
-    isLiveCallBarVisible (value) {
-      this.$emit('mobileLiveCallVisibility', value)
-    }
   },
   beforeDestroy () {
     this.$VueEvent.stop('doneParkAndConnect')
