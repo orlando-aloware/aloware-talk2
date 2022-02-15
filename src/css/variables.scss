@@ -102,6 +102,8 @@ $grey-light10: #cccccc;
 $grey-light11: #e0e0e0;
 $grey-mid: #999999;
 $grey-100: #040404;
+$grey-94: #585A6D;
+$grey-93: #BDBDBD;
 $grey-92: #333333;
 $grey-91: #E5E5E5;
 $grey-90: #62666E;
@@ -177,6 +179,7 @@ $primary-hover: #054CDB;
 // Background Colors
 @include bg-color('grey-light', $grey-light, true);
 @include bg-color('grey-light11', $grey-light11, true);
+@include bg-color('grey-93', $grey-93, true);
 @include bg-color('grey-91', $grey-91, true);
 @include bg-color('grey-90', $grey-90, true);
 @include bg-color('grey-80', $grey-80, true);

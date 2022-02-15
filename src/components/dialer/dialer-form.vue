@@ -186,6 +186,7 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
@@ -277,6 +278,18 @@ export default {
         this.makeCall()
       })
     })
+    this.$VueEvent.listen('update_communication', (data) => {
+      let found = this.parkedCalls.find(parkedCall => parkedCall.id === data.id)
+
+      if (data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && found) {
+        this.parkedCalls.splice(this.parkedCalls.indexOf(found), 1)
+        return
+      }
+
+      if (data.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && !found) {
+        this.parkedCalls.push(data)
+      }
+    })
   },
 
   mounted () {
@@ -291,7 +304,6 @@ export default {
   methods: {
     fetchAllParkedCalls: _.debounce(function () {
       this.loadingParkedCalls = true
-      this.parkedCalls = []
       this.$axios
         .post('/api/v1/contact-center/parked-calls')
         .then((res) => {
@@ -319,7 +331,7 @@ export default {
     hideDialer () {
       this.$emit('hide')
       this.resetForm()
-      this.fetchAllParkedCalls()
+      // this.fetchAllParkedCalls()
     },
 
     resetForm () {
@@ -497,6 +509,7 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('changePhoneNumber')
+    this.$VueEvent.stop('update_communication')
     clearInterval(this.$options.localTimeInterval)
   }
 }

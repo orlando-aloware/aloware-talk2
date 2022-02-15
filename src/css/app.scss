@@ -8892,6 +8892,26 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 784px) {
+
+  .mobile-phone-drawer {
+    &:not(.mobile-phone-visible) {
+      .phone-padding {
+        padding: 0 16px;
+      }
+    }
+  }
+  .dialer-wrapper {
+    &:not(.hide) {
+      display: grid !important;
+      grid-template-rows: 1fr auto;
+      > div:last-child {
+        max-height: 353px;
+      }
+    }
+    &.hide {
+      display: none !important;
+    }
+  }
   .mobile-back-btn-global-header {
     transform: translateX(-10px);
     margin-right: 4px;
@@ -8908,6 +8928,36 @@ screen and (max-width: 956px) {
       bottom: 50px !important;
       .b-toaster-slot {
         max-width: 300px !important;
+      }
+    }
+  }
+  .dashboard:not(.communications-page) {
+    .h-1-livebar,
+    .h-2-livebar {
+      .sidebar-active {
+        > .page-container {
+          padding-top: 58px;
+        }
+      }
+    }
+  }
+  .h-2-livebar {
+    .stats-container {
+      height: calc(100vh - 153px);
+    }
+    .sidebar-active {
+      > .page-header {
+        top: 45px !important;
+      }
+    }
+  }
+  .h-1-livebar {
+    .stats-container {
+      height: calc(100vh - 129px);
+    }
+    .sidebar-active {
+      > .page-header {
+        top: 20px !important;
       }
     }
   }
@@ -9127,25 +9177,6 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 604px) {
-  .mobile-phone-drawer {
-    &:not(.mobile-phone-visible) {
-      .phone-padding {
-        padding: 0 16px;
-      }
-    }
-  }
-  .dialer-wrapper {
-    &:not(.hide) {
-      display: grid !important;
-      grid-template-rows: 1fr auto;
-      > div:last-child {
-        max-height: 353px;
-      }
-    }
-    &.hide {
-      display: none !important;
-    }
-  }
   .contact-activities-actions {
     margin-right: 5px;
   }
@@ -9905,6 +9936,25 @@ screen and (max-width: 956px) {
         height: 100%;
         overflow-y: scroll;
         border-radius: unset;
+        .mobile-live-call-bar {
+          z-index: 10;
+          position: absolute;
+          top: 28px;
+          .dropdown-menu {
+            max-width: 375px;
+            width: 100%;
+            top: 23px !important;
+            right: 0;
+            margin: auto;
+            transform: unset !important;
+            &.bg-grey-93 {
+              .dropdown-item:hover {
+                background: $grey-94;
+                color: #FFF;
+              }
+            }
+          }
+        }
         #signal-strength {
           height: 20px;
           li {
@@ -10860,4 +10910,10 @@ screen and (max-width: 956px) {
 
 .lh-27 {
   line-height: 27px;
+}
+
+.mobile-live-call-bar {
+  .dropdown-menu {
+    z-index: 10;
+  }
 }
