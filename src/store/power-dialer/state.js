@@ -19,7 +19,6 @@ export default function () {
     powerDialerListItems: {
       'all': DEFAULT_CONTACT_LIST_ITEMS,
       'my-queue': DEFAULT_CONTACT_LIST_ITEMS,
-      'in-queue': DEFAULT_CONTACT_LIST_ITEMS,
       'called': DEFAULT_CONTACT_LIST_ITEMS,
       'failed': DEFAULT_CONTACT_LIST_ITEMS,
       'scheduled': DEFAULT_CONTACT_LIST_ITEMS

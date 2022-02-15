@@ -182,6 +182,12 @@ export default {
       return err
     })
   },
+  async getSessionTaskByFilter ({ commit }, params = {}) {
+    // let res = await window.axios.get(`api/v2/power-dialer-lists/${params.id}/itemspage=1&per_page=25&sort_order=desc&task_status=${params.taks_status}`)
+    let endpoint = params?.task_status ? `api/v2/power-dialer-lists/${params.id}/items?task_status=${params.task_status}` : `api/v2/power-dialer-lists/${params.id}/items`
+    let res = await window.axios.get(endpoint)
+    return res
+  },
   resetPowerDialerTasks ({ commit }) {
     commit('RESET_POWER_DIALER_TASKS')
   },
@@ -190,15 +196,6 @@ export default {
   },
   clearSessionSetting ({ commit }) {
     commit('CLEAR_SESSION_SETTING')
-  },
-  async updateateSessionSettings ({ commit }, params = {}) {
-    return window.$axios.patch(`api/v2/power-dialer-sessions/${params.id}`,
-      params
-    ).then((res) => {
-      return res
-    }).catch((err) => {
-      return err
-    })
   },
   async setSessionSettingGroup ({ commit }, params = {}) {
     commit('SET_SESSION_SETTING_GROUPS', {

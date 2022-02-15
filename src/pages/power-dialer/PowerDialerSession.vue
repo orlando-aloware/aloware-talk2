@@ -35,6 +35,7 @@ import CallStatus from 'src/components/power-dialer/sessions/session-call-status
 import SessionPage from 'src/components/power-dialer/sessions/session-main-page'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import sessionsMixins from 'src/components/power-dialer/sessions/sessions'
 
 export default {
   name: 'PowerDialerSession',
@@ -44,6 +45,7 @@ export default {
     CallStatus,
     SessionPage
   },
+  mixins: [ sessionsMixins ],
   computed: {
     ...mapGetters('contacts', [
       'listItems',
@@ -67,19 +69,36 @@ export default {
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
-    },
-    status () {
-      return AutoDialTaskStatus.STATUSES
     }
   },
   mounted () {
     this.resetPowerDialerTasks()
+    this.$VueEvent.listen('contact_list_item_created', (task) => {
+      console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+      //   this.handleDesktopVoicemailNotification(task)
+      // }
+    })
+    this.$VueEvent.listen('contact_list_item_updated', (task) => {
+      console.log(' %c TASK was UPDATED : ', 'background: green; color: #000;', task)
+      this.updateTaskStatus(task)
+      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+      //   this.handleDesktopVoicemailNotification(task)
+      // }
+    })
+    this.$VueEvent.listen('contact_list_item_deleting', (task) => {
+      console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
+      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+      //   this.handleDesktopVoicemailNotification(task)
+      // }
+    })
   },
   methods: {
     ...mapActions('powerDialer', [
-      'resetPowerDialerTasks'
+      'resetPowerDialerTasks',
+      'getSessionTaskByFilter'
     ]),
-    prepareTasks () {
+    getTasks () {
       /**
        * Preparing power dialer tasks
        * Converting selected contacts list to vuex sessions-ready objects
@@ -101,11 +120,25 @@ export default {
             break
         }
       })
+    },
+    async fetchTasks () {
+      Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
+        let params = {}
+        let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+        if (stat === 'all') {
+          params = { id: this.selectedList.id }
+        } else {
+          params = { id: this.selectedList.id, task_status: taskStatus }
+        }
+        let res = await this.getSessionTaskByFilter(params)
+        this.powerDialerTasks[stat] = res.data.data
+      })
     }
   },
   watch: {
-    listItems (val) {
-      this.prepareTasks()
+    async listItems (val) {
+      this.getTasks()
+      await this.fetchTasks()
     }
   }
 }

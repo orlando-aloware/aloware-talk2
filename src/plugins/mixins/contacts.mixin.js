@@ -163,6 +163,7 @@ export default {
           }
 
           if (this.apiEndpoint(queued).includes('my-queue')) {
+            // TODOs: Use vuex for storing filtered power dialer contact lists
             this.updateMyQueueListData(data.data)
           }
 

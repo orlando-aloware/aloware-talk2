@@ -28,7 +28,7 @@ export default {
     this.loadList(this.$route.params.id)
   },
   computed: {
-    ...mapGetters('powerDialer', ['powerDialerListItems']),
+    // ...mapGetters('powerDialer', ['powerDialerListItems']),
     ...mapGetters('contacts', ['lists', 'listItems']),
     contactList () {
       return this.lists[this.id]
@@ -42,9 +42,9 @@ export default {
       }
       return false
     },
-    powerDialerList () {
-      return this.powerDialerListItems[String(this.$route.params.id)]
-    },
+    // powerDialerList () {
+    //   return this.powerDialerListItems[String(this.$route.params.id)]
+    // },
     id () {
       if (this.$route.meta.id === 'power-dialer-add-queue-list') {
         return 'my-queue'

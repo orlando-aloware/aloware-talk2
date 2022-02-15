@@ -8,6 +8,8 @@ export const STATUS_COMPLETED = 3
 export const STATUS_FAILED = 4
 // The task is scheduled
 export const STATUS_SCHEDULED = 5
+// The task is all
+export const STATUS_ALL = ''
 
 export const STATUSES = {
   called: 'CALLED',
