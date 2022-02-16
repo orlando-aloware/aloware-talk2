@@ -54,7 +54,6 @@
             :multiple="false"
             :use-chips="false"
             :outlined="true"
-            :show-placeholder="false"
             custom-class="generic-selector"
             @change="{}">
           </ContactDispositionSelector>

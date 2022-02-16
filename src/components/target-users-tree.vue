@@ -146,14 +146,13 @@ export default {
       for (let userId of attemptingUsers) {
         order++
         let user = this.getUser(userId)
-        if (user) {
-          if (attemptingUsers.length === 1) {
-            order = ''
-          }
-          data.push({
-            label: order + this.getUserName(user)
-          })
+        if (!user) {
+          continue
         }
+
+        data.push({
+          label: (attemptingUsers.length > 1 ? `(${order}) ` : '') + `${this.getUserName(user)}`
+        })
       }
 
       // return the tree
