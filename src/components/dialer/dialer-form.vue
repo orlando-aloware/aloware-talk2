@@ -179,21 +179,22 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
+import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'dialer-form',
 
-  mixins: [contactMixins],
+  mixins: [
+    contactMixins,
+    parkCallMixins
+  ],
 
   components: {
     MobileParkedCall,
@@ -228,9 +229,7 @@ export default {
       loadingContact: false,
       textMessage: '',
       isMakingCall: false,
-      hasPhoneNumberSearchResults: false,
-      parkedCalls: [],
-      loadingParkedCalls: false
+      hasPhoneNumberSearchResults: false
     }
   },
 
@@ -278,18 +277,6 @@ export default {
         this.makeCall()
       })
     })
-    this.$VueEvent.listen('update_communication', (data) => {
-      let found = this.parkedCalls.find(parkedCall => parkedCall.id === data.id)
-
-      if (data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && found) {
-        this.parkedCalls.splice(this.parkedCalls.indexOf(found), 1)
-        return
-      }
-
-      if (data.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && !found) {
-        this.parkedCalls.push(data)
-      }
-    })
   },
 
   mounted () {
@@ -298,30 +285,9 @@ export default {
     } else {
       this.hideDialer()
     }
-    this.fetchAllParkedCalls()
   },
 
   methods: {
-    fetchAllParkedCalls: _.debounce(function () {
-      this.loadingParkedCalls = true
-      this.$axios
-        .post('/api/v1/contact-center/parked-calls')
-        .then((res) => {
-          console.log(res)
-          this.parkedCalls = res.data
-          this.loadingParkedCalls = false
-        })
-        .catch((error) => {
-          const {
-            message,
-            html
-          } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-          this.loadingParkedCalls = false
-        })
-    }),
-
     showDialer () {
       // find default outbound campaign
       this.findDefaultOutboundCampaign()
@@ -503,6 +469,12 @@ export default {
     'dialer.currentStatus': function () {
       if (!this.dialer.currentStatus || (this.dialer.currentStatus && this.dialer.currentStatus === 'READY')) {
         this.isMakingCall = false
+      }
+    },
+
+    mode (value) {
+      if (value === 'call') {
+        this.findDefaultOutboundCampaign()
       }
     }
   },
