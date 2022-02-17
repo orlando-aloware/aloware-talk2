@@ -393,7 +393,7 @@
                                  :height="iconSizes.recording.height"
                                  v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
               </pause-record-icon>
-              <span>{{ recordingText }}</span>
+              <span>{{ recordingText }}--</span>
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
@@ -910,7 +910,6 @@
                                                      class="flex-grow-1"
                                                      @change="changeAddUser">
                             </available-user-selector>
-
                             <q-btn color="black"
                                    icon="refresh"
                                    class="text-size-xxs ml-1"
@@ -1028,7 +1027,6 @@
                                                      class="flex-grow-1"
                                                      @change="changeTransferUser">
                             </available-user-selector>
-
                             <q-btn color="black"
                                    icon="refresh"
                                    class="text-size-xxs ml-1"
@@ -1171,7 +1169,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
@@ -1223,14 +1220,8 @@ import * as AnswerTypes from 'src/constants/answer-types'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
-
-const MODULE = {
-  powerDialer: 'Power Dialer'
-}
-
 export default {
   name: 'phone',
-
   components: {
     MobileLiveCallBar,
     IgnoreCallIcon,
@@ -1273,32 +1264,27 @@ export default {
     CancelCallIcon,
     ContactIntegrations
   },
-
   mixins: [
     communicationInfoMixin,
     notificationMixin
   ],
-
   props: {
     is_widget: {
       type: Boolean,
       required: false,
       default: false
     },
-
     ignore_calls: {
       type: Boolean,
       required: false,
       default: false
     },
-
     isMobile: {
       type: Boolean,
       required: false,
       default: false
     }
   },
-
   data () {
     return {
       pos1: 0,
@@ -1367,98 +1353,74 @@ export default {
       UploadedFileTypes
     }
   },
-
   computed: {
     ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification']),
-
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
-
     isHangupDisabled () {
       return this.isCallCompleted
     },
-
     isAddDisabled () {
       return !this.devMode && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
-
     isTransferDisabled () {
       return !this.devMode && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
-
     isMoreDisabled () {
       return !this.devMode && this.isCallCompleted
     },
-
     isVmDropDisabled () {
       return !this.devMode && this.isCallCompleted
     },
-
     isHoldDisabled () {
       return (!this.dialer.communication || this.loadingHold || this.loadingUnhold || this.isCallCompleted || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
-
     isParkDisabled () {
       return (_.isEmpty(this.dialer.communication) || this.loadingPark || this.isCallCompleted || (!_.isEmpty(this.currentCompany) && !this.currentCompany.conferencing_enabled) || (!_.isEmpty(this.dialer.communication.legc_uuid) && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (!_.isEmpty(this.dialer.communication.legz_uuid) && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
-
     isMuteDisabled () {
       return this.isCallCompleted
     },
-
     isRecordingDisabled () {
       return this.isCallCompleted
     },
-
     isCallAdded () {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
     },
-
     isCallAdding () {
       return this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_RINGING_NEW
     },
-
     transferValidated () {
       if (this.transfer.mode === 'user' && this.transfer.userId) {
         return true
       }
-
       if (this.transfer.mode === 'ring-group' && this.transfer.ringGroupId) {
         return true
       }
-
       if (this.transfer.mode === 'phone-number' && this.transfer.phoneNumber && this.$options.filters.fixPhone(this.transfer.phoneNumber)) {
         return true
       }
-
       return false
     },
-
     addValidated () {
       if (this.add.mode === 'user' && this.add.userId) {
         return true
       }
-
       if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
         return true
       }
-
       return false
     },
-
     introduceValidated () {
       if (this.add.mode === 'user' && this.add.userId) {
         return true
       }
-
       if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
         return true
       }
-
       return false
     },
-
     bottomExpansionLabel () {
       switch (this.bottomExpansion) {
         case 'integrations':
@@ -1485,16 +1447,13 @@ export default {
           return ''
       }
     },
-
     phoneExpansionLabel () {
       return this.bottomExpansion === 'tags' ? 'Done' : 'Cancel'
     },
-
     phoneStatus () {
       if (!this.dialer.communication) {
         return ''
       }
-
       switch (this.dialer.communication.current_status2) {
         case CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW:
           return 'Calling...'
@@ -1502,65 +1461,51 @@ export default {
           return ''
       }
     },
-
     recordingText () {
       if (this.dialer.recordingStatus === 'in-progress' && this.dialer.communication && this.dialer.communication.should_record === true) {
         return 'Pause Rec'
       }
-
       if (this.dialer.recordingStatus === 'paused' && this.dialer.communication && this.dialer.communication.should_record === true) {
         return 'Start Rec'
       }
-
       return 'Start Rec'
     },
-
     signalStrength () {
       return 100 - (this.warnings.length * 25)
     },
-
     contactName () {
       if (this.contact) {
         return this.contact.name || 'No Name'
       }
-
       const callFishingContactName = _.get(this.dialer.callFishing, 'contact.name', 'No Name')
       if (callFishingContactName) {
         return callFishingContactName
       }
-
       return 'No Name'
     },
-
     leadNumberRaw () {
       let leadNumber = _.get(this.dialer, 'communication.lead_number', null)
       return !leadNumber ? _.get(this.dialer, 'callFishing.communication.lead_number', null) : leadNumber
     },
-
     leadNumber () {
       return this.$options.filters.fixPhone(this.leadNumberRaw)
     },
-
     companyName () {
       let companyName = _.get(this.dialer, 'contact.company_name', '')
       return !companyName ? _.get(this.dialer, 'callFishing.contact.company_name', '') : companyName
     },
-
     contact () {
       let contact = this.dialer.contact
       return !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
     },
-
     shouldShow () {
       let callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
       if (callFishingCommunication) {
         return true
       }
-
       if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
         return false
       }
-
       return this.dialer && !_.isEmpty(this.dialer.communication)
     },
     iconSizes () {
@@ -1627,43 +1572,34 @@ export default {
         }
       }
     },
-
     isPhoneBodyVisible () {
       return this.screen === 'call' && ((!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'OUTGOING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication)))
     },
-
     isPhoneCTAVisible () {
       return (!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'INCOMING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication))
     },
-
     isHangupCallVisible () {
       return !_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'OUTGOING' && (!_.isEmpty(this.dialer.callFishing) && _.isEmpty(this.dialer.callFishing.communication))
+    },
+    isOnPowerDialerSessionRoute () {
+      return this.$route.meta.id === 'power-dialer-session'
     }
   },
-
   mounted () {
     this.$VueEvent.listen('togglePhone', () => {
       this.togglePhone()
     })
-
     this.$VueEvent.listen('showPhone', () => {
       this.isVisible = true
     })
-
     this.$VueEvent.listen('hidePhone', () => {
       this.isVisible = false
     })
-
     this.setupDraggable()
     this.setupContactLocalTime()
-    if (this.$route.name === MODULE.powerDialer) {
-      this.isVisible = false
-    } else {
-      this.isVisible = true
-    }
+    this.isVisible = true
     this.showLocalTime = true
   },
-
   methods: {
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
@@ -1674,7 +1610,6 @@ export default {
         }, 100)
       }
     },
-
     setupContactLocalTime () {
       let contact = this.contact
       contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
@@ -1683,11 +1618,9 @@ export default {
         this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
       }
     },
-
     hideLocalTime () {
       this.showLocalTime = false
     },
-
     getContactLocalTime () {
       let contact = this.contact
       contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
@@ -1695,7 +1628,6 @@ export default {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
     },
-
     goToContact () {
       let contact = this.contact
       contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
@@ -1710,37 +1642,30 @@ export default {
         })
       }
     },
-
     copyPhoneNumber () {
       let phoneNumberClone = document.querySelector('#phone-number-clone')
       phoneNumberClone.setAttribute('type', 'text')
       phoneNumberClone.select()
-
       try {
         document.execCommand('copy')
         this.$generalNotification('Phone number copied to clipboard.')
       } catch (err) {
         this.$generalNotification('Error copying phone number to clipboard.', 'error')
       }
-
       /* unselect the range */
       phoneNumberClone.setAttribute('type', 'hidden')
       window.getSelection().removeAllRanges()
     },
-
     endCall ($event) {
       this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
-
     hangupCall ($event) {
       this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
-
     answerCall () {
       this.$VueEvent.fire('answerCall')
-
       if (this.dialer.callFishing.communication) {
         this.$VueEvent.fire('makeCall', {
           currentNumber: 'call:' + _.get(this.dialer, 'callFishing.communication.id', null),
@@ -1751,33 +1676,25 @@ export default {
         })
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
-
       this.changeScreen('menu')
     },
-
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
-
       if (this.dialer.callFishing) {
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
-
       this.closePhone()
     },
-
     toggleMute () {
       this.$VueEvent.fire('toggleMute')
     },
-
     toggleHold () {
       if (this.dialer.isHeld) {
         this.loadingUnhold = true
       } else {
         this.loadingHold = true
       }
-
       this.$VueEvent.fire('toggleHold')
-
       setTimeout(() => {
         if (this.dialer.isHeld) {
           this.loadingHold = false
@@ -1786,7 +1703,6 @@ export default {
         }
       }, 1000)
     },
-
     openDialpad () {
       this.expansionEnabled = true
       this.bottomExpansion = 'dialpad'
@@ -1794,7 +1710,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openNotes () {
       this.expansionEnabled = true
       this.bottomExpansion = 'notes'
@@ -1802,7 +1717,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openTags () {
       this.expansionEnabled = true
       this.bottomExpansion = 'tags'
@@ -1810,7 +1724,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openScripts () {
       this.expansionEnabled = true
       this.bottomExpansion = 'scripts'
@@ -1818,7 +1731,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openAdd () {
       this.expansionEnabled = true
       this.bottomExpansion = 'add'
@@ -1826,7 +1738,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openTransfer () {
       this.resetTransfer()
       this.expansionEnabled = true
@@ -1835,7 +1746,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openMore () {
       this.expansionEnabled = true
       this.bottomExpansion = 'more'
@@ -1843,7 +1753,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openVmDrop () {
       this.expansionEnabled = true
       this.bottomExpansion = 'vm-drop'
@@ -1851,7 +1760,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openIntegrations () {
       this.expansionEnabled = true
       this.bottomExpansion = 'integrations'
@@ -1859,7 +1767,6 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openMembers () {
       this.expansionEnabled = true
       this.bottomExpansion = 'members'
@@ -1867,12 +1774,10 @@ export default {
         this.expanded = true
       }, 50)
     },
-
     openContact ($event) {
       this.saveAndResetExpansion($event)
       this.goToContact()
     },
-
     parkCall ($event) {
       this.loadingPark = true
       this.$VueEvent.fire('parkCall')
@@ -1881,7 +1786,6 @@ export default {
         this.loadingPark = false
       }, 1000)
     },
-
     saveAndResetExpansion ($event) {
       if ($event) {
         $event.stopPropagation()
@@ -1892,7 +1796,6 @@ export default {
       this.resetAdd()
       this.resetTransfer()
     },
-
     toggleRecordingStatus () {
       this.loadingToggleRecordingStatus = true
       this.$VueEvent.fire('toggleRecordingStatus')
@@ -1900,7 +1803,6 @@ export default {
         this.loadingToggleRecordingStatus = false
       }, 1000)
     },
-
     handleLongPress (isLong = false) {
       if (isLong) {
         this.sendDigit('+')
@@ -1908,12 +1810,10 @@ export default {
         this.sendDigit('0')
       }
     },
-
     sendDigit (digit) {
       this.digits += digit.toString()
       this.$VueEvent.fire('sendDigit', digit)
     },
-
     getCampaign (id) {
       if (!id) {
         return null
@@ -1922,35 +1822,28 @@ export default {
       if (found) {
         return found
       }
-
       return null
     },
-
     togglePhone () {
       this.isVisible = !this.isVisible
       this.$emit('onPhoneVisible', true)
     },
-
     openPhone () {
       this.isVisible = true
       this.$emit('onPhoneVisible', true)
     },
-
     closePhone () {
       this.isVisible = false
       this.$emit('onPhoneVisible', false)
     },
-
     endWrapUp () {
       this.$VueEvent.fire('endWrapUp')
       this.$emit('onPhoneVisible', false)
     },
-
     makeCall () {
       if (!this.dialer.communication) {
         return
       }
-
       let data = {
         currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
         outboundCampaignId: this.dialer.communication.campaign_id,
@@ -1958,12 +1851,9 @@ export default {
         companyName: (this.contact) ? this.contact.company_name : '',
         contactId: this.dialer.communication.contact_id
       }
-
       this.endWrapUp()
-
       this.$VueEvent.fire('makeCall', data)
     },
-
     resizeHandler (e) {
       e = e || window.event
       if (this.$refs.phone) {
@@ -1971,36 +1861,30 @@ export default {
         this.$refs.phone.style.left = 'auto'
       }
     },
-
     dragElement () {
       if (this.$refs.phoneHeader) {
         // if present, the header is where you move the DIV from:
         this.$refs.phoneHeader.onmousedown = this.dragMouseDown
       }
     },
-
     dragMouseDown (e) {
       e = e || window.event
       e.preventDefault()
       // get the mouse cursor position at startup:
       this.pos3 = e.clientX
       this.pos4 = e.clientY
-
       // store the current viewport and element dimensions when a drag starts
       this.rect = this.$refs.phone.getBoundingClientRect()
       this.viewport.bottom = window.innerHeight - this.padding.bottom
       this.viewport.left = this.padding.left
       this.viewport.right = window.innerWidth - this.padding.right
       this.viewport.top = this.padding.top
-
       // add active class
       this.$refs.phone.classList.add('active')
-
       document.onmouseup = this.closeDragElement
       // call a function whenever the cursor moves:
       document.onmousemove = this.elementDrag
     },
-
     elementDrag (e) {
       e = e || window.event
       e.preventDefault()
@@ -2009,11 +1893,9 @@ export default {
       this.pos2 = this.pos4 - e.clientY
       this.pos3 = e.clientX
       this.pos4 = e.clientY
-
       // check to make sure the element will be within our viewport boundary
       let newLeft = this.$refs.phone.offsetLeft - this.pos1
       let newTop = this.$refs.phone.offsetTop - this.pos2
-
       if (newLeft < this.viewport.left ||
         newTop < this.viewport.top ||
         newLeft + this.rect.width > this.viewport.right ||
@@ -2026,7 +1908,6 @@ export default {
         this.$refs.phone.style.left = (this.$refs.phone.offsetLeft - this.pos1) + 'px'
       }
     },
-
     closeDragElement () {
       // remove active class
       this.$refs.phone.classList.remove('active')
@@ -2034,19 +1915,15 @@ export default {
       document.onmouseup = null
       document.onmousemove = null
     },
-
     setInputDevice () {
       this.$VueEvent.fire('setInputDevice', this.inputDevice)
     },
-
     setOutputDevice () {
       this.$VueEvent.fire('setOutputDevice', this.outputDevice)
     },
-
     testOutputDevice () {
       this.$VueEvent.fire('testOutputDevice', this.outputDevice)
     },
-
     forceRefreshCommunication ($event) {
       $event.target.blur()
       this.loadingCommunication = true
@@ -2055,39 +1932,33 @@ export default {
         this.loadingCommunication = false
       }, 1000)
     },
-
     resetBottomExpansion () {
       this.bottomExpansion = 'integrations'
       this.expanded = false
       this.expansionEnabled = true
     },
-
     changeTemplate (template) {
       if (template) {
         this.templateId = template.id
       }
       this.template = template
     },
-
     changeScript (script) {
       if (script) {
         this.scriptId = script.id
       }
       this.script = script
     },
-
     changeVmDrop (vmDrop) {
       if (vmDrop) {
         this.vmDropId = vmDrop.id
       }
       this.vmDrop = vmDrop
     },
-
     sendVmDrop ($event) {
       if (!this.dialer.communication || this.isCallCompleted || !this.vmDrop) {
         return
       }
-
       this.loadingSendVmDrop = true
       this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
         communication_id: this.dialer.communication.id,
@@ -2105,12 +1976,10 @@ export default {
         this.loadingSendVmDrop = false
       })
     },
-
     sendMessage () {
       if (!this.dialer.communication || !this.template) {
         return
       }
-
       this.loadingSendMessage = true
       this.$axios.post('/api/v1/campaign/send-message/' + this.dialer.communication.campaign_id + '/' + this.dialer.communication.contact_id, {
         message: this.template.body,
@@ -2126,47 +1995,39 @@ export default {
         this.loadingSendMessage = false
       })
     },
-
     resetTransfer () {
       this.transfer.userId = null
       this.transfer.ringGroupId = null
       this.transfer.phoneNumber = ''
       this.transfer.mode = 'user'
     },
-
     changeTransferUser (userId) {
       this.transfer.ringGroupId = null
       this.transfer.phoneNumber = ''
       this.transfer.userId = userId
     },
-
     changeTransferRingGroup (ringGroupId) {
       this.transfer.userId = null
       this.transfer.phoneNumber = ''
       this.transfer.ringGroupId = ringGroupId
     },
-
     changeTransferPhoneNumber () {
       this.transfer.userId = null
       this.transfer.ringGroupId = null
     },
-
     resetAdd () {
       this.add.introduce = false
       this.add.userId = null
       this.add.phoneNumber = ''
       this.add.mode = 'user'
     },
-
     changeAddUser (userId) {
       this.add.phoneNumber = ''
       this.add.userId = userId
     },
-
     changeAddPhoneNumber () {
       this.add.userId = null
     },
-
     getUsers () {
       this.add.userId = null
       this.transfer.userId = null
@@ -2174,7 +2035,6 @@ export default {
         this.$refs.availableUserSelector.getUsers()
       }
     },
-
     transferCall ($event) {
       this.loadingTransfer = true
       this.$VueEvent.fire('transferCall', this.transfer)
@@ -2184,7 +2044,6 @@ export default {
         this.loadingTransfer = false
       }, 1000)
     },
-
     addParticipant ($event) {
       this.loadingAdd = true
       this.$VueEvent.fire('addParticipant', this.add)
@@ -2194,7 +2053,6 @@ export default {
         this.loadingAdd = false
       }, 1000)
     },
-
     introduceParticipant ($event) {
       this.loadingAdd = true
       this.add.introduce = true
@@ -2205,7 +2063,6 @@ export default {
         this.loadingAdd = false
       }, 1000)
     },
-
     dropThirdParty () {
       this.loadingDropThirdParty = true
       this.$VueEvent.fire('dropThirdParty')
@@ -2213,7 +2070,6 @@ export default {
         this.loadingDropThirdParty = false
       }, 1000)
     },
-
     mergeCalls () {
       this.loadingMerge = true
       this.$VueEvent.fire('mergeCalls')
@@ -2221,18 +2077,15 @@ export default {
         this.loadingMerge = false
       }, 1000)
     },
-
     saveNotes () {
       if (this.$refs.communicationNotes) {
         this.$refs.communicationNotes.saveNote()
       }
     },
-
     getLabel (user) {
       if (!user) {
         return
       }
-
       switch (user.answer_by) {
         case AnswerTypes.BY_PHONE_NUMBER:
           return 'Phone Number (' + user.phone_number + ')'
@@ -2244,22 +2097,18 @@ export default {
           return 'Will Not Answer'
       }
     },
-
     changeScreen (screen) {
       // don't go from wrap-up to menu (edge case)
       if (this.screen === 'wrap_up' && screen === 'menu') {
         return
       }
-
       this.screen = screen
     },
-
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
     ])
   },
-
   watch: {
     shouldShow () {
       this.setupDraggable()
@@ -2271,24 +2120,20 @@ export default {
         this.$emit('onPhoneVisible', false)
       }
     },
-
     screen () {
       console.log('Current screen: ' + this.screen)
     },
-
     dialer: {
       handler () {
         if (!this.dialer.communication) {
           return
         }
-
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
           this.changeScreen('menu')
         }
       },
       deep: true
     },
-
     'dialer.currentStatus': function () {
       switch (this.dialer.currentStatus) {
         case 'READY':
@@ -2328,7 +2173,6 @@ export default {
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
             this.changeScreen('menu')
           }
-
           if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             setTimeout(() => {
               if (this.screen !== 'wrap-up') {
@@ -2351,17 +2195,14 @@ export default {
           break
       }
     },
-
     'dialer.contact': function () {
       this.setupContactLocalTime()
     },
-
     isCallCompleted () {
       this.resetBottomExpansion()
       this.expansionEnabled = false
     }
   },
-
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('togglePhone')

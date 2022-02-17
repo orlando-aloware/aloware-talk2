@@ -15,6 +15,31 @@ export default {
     ]),
     status () {
       return AutoDialTaskStatus.STATUSES
+    },
+    aaa () {
+      return this.$router
+    },
+    currentCallStatusDisplay () {
+      switch (this.dialer?.currentStatus) {
+        case 'READY':
+          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+        case 'WRAP_UP':
+          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+        case 'MAKING_CALL':
+          return `Calling...`
+        case 'ANSWERING_CALL':
+          return '---'
+        case 'REJECTING_CALL':
+          return '---'
+        case 'CALL_CONNECTED':
+          return `Connected: <span class="text-weight-bold text-grey-7 text-lowercase">${this.dialer.timer}</span>`
+        case 'HANGING_UP_CALL':
+          return '---'
+        case 'CALL_DISCONNECTED':
+          return '---'
+        default:
+          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+      }
     }
   },
   methods: {
@@ -22,15 +47,15 @@ export default {
     async runTask () {
       let data = {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
-        // currentNumber: this.$options.filters.fixPhone(`${this.activeTask?.phone_number}`), // we know this already based on the list (Required)
         outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
         contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
         companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       }
-      console.log(' %c Making a call from --> ', 'background: #000; color: #fff000;', data)
+      console.log(data)
       if (this.taskToCall?.contact_list_item_id) {
-        this.$VueEvent.fire('makeCall', data)
+        // Fires an event to make a call
+        // this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -53,8 +78,8 @@ export default {
       // TODOs: Remove task from list
     },
     updateTaskStatus (task) {
+      this.currentTask = task
       this.setShowPhone(false)
-      console.log('task.task_status :>> ', task.task_status)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           console.log(' %c Changing status to : IN_PROGRESS ', 'background: red; color: white;')
@@ -64,11 +89,13 @@ export default {
         case AutoDialTaskStatus.STATUS_COMPLETED:
           console.log(' %c Changing status to : COMPLETED/CALLED ', 'background: red; color: white;')
           this.powerDialerTasks.called.push(this.activeTask)
+          this.$VueEvent.fire('endWrapUp')
           this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_FAILED:
           console.log(' %c Changing status to : FAILED ', 'background: red; color: white;')
           this.powerDialerTasks.failed.push(this.activeTask)
+          this.$VueEvent.fire('endWrapUp')
           this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_QUEUED:

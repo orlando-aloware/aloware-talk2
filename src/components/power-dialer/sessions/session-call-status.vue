@@ -4,19 +4,31 @@
       <div class="d-flex align-items-center pt-2 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
-            <div :class="`text-15 text-lowercase text-capitalize px-2`">
-              {{ timerCount > 0 ? 'Will call in' : callInProgress ? 'Call in progress...' : 'Call Failed' }}
+            <div
+              :class="`text-15 text-lowercase text-capitalize px-2`"
+              v-html="currentCallStatusDisplay">
+              <!-- {{ timerCount > 0 ? 'Will call in' : 'Connected: ' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
                 v-if="timerCount > 0">
                 {{ timerCount }}s
               </span>
+              <span
+                class="text-weight-bold text-grey-7 text-lowercase"
+                v-else>
+                {{ dialer.timer }}
+              </span> -->
             </div>
           </q-chip>
         </div>
         <q-btn
-          @click="toggleHold = !toggleHold"
-          no-wrap outline no-caps size="sm" color="grey-4" class="sessions-button free-width mx-1">
+          @click="onToggleHold"
+          no-wrap no-caps size="sm"
+          unelevated
+          outline
+          :color="togglePause ? 'grey-5' : 'grey-4'"
+          class="sessions-button free-width mx-1"
+          :disabled="togglePause">
           <UnholdIcon v-if="toggleHold" class="mr-2" color="#F2994A" />
           <PauseIcon v-else class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
@@ -26,8 +38,8 @@
         <q-btn
           @click="nextContact"
           no-wrap unelevated no-caps
-          :disabled="timerCount !== 0"
-          size="sm" color="red-7"
+          :disabled="(timerCount !== 0 || togglePause) || !statusCallConnected"
+          size="sm" :color="togglePause ? 'grey-7' : 'red-7'"
           class="sessions-button free-width mx-1">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
@@ -53,33 +65,33 @@
         </b-dropdown>
       </div>
       <div class="d-flex align-items-center p-0">
-        <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-          {{ fullname || '' }}
+        <div
+          class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1"
+          v-html="fullname">
           <span class="text-15 text-subtitle1">
-            {{ taskToCall.phone_number || '' | fixPhone('NATIONAL', true) }}
+            {{ phoneNumber | fixPhone('NATIONAL', true) }}
           </span>
         </div>
       </div>
-      <div class="d-flex align-items-center p-0">
+      <!-- <div class="d-flex align-items-center p-0">
         <div class="text-14 pl-3 text-subtitle1 text-capitalize">
           {{ companyName }}
           <span
             v-if="companyName"
             class="text-13 text-subtitle2 text-grey"> | {{ companyName }}</span>
         </div>
-      </div>
+      </div> -->
       <div class="d-flex align-items-center p-0">
         <div class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
           <DropIcon
-            v-if="address"
             width="18px"
             height="18px"
             class="mr-0 py-0"
             style="position:relative;top:-2px;" />
-          {{ address }} - {{ taskToCall.created_at || '' | fixTime }}
+          {{ address }} - {{ taskCreatedAt | fixTime }}
         </div>
         <q-btn
-          @click="toggleMute = !toggleMute"
+          @click="onToggleMute"
           no-wrap outline no-caps
           size="sm" color="grey-4"
           :disabled="timerCount !== 0"
@@ -90,7 +102,7 @@
           </div>
         </q-btn>
         <q-btn
-          @click="toggleRecording = !toggleRecording"
+          @click="onToggleRecording"
           no-wrap outline no-caps
           size="sm" color="grey-4"
           :disabled="timerCount !== 0"
@@ -104,11 +116,11 @@
       </div>
       <div class="d-flex align-items-center p-0 pt-2 pb-2">
         <div class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
-          {{ stats.group }}
+          {{ selectedListName }}
           <span class="text-subtitle2 text-grey"></span>
           <div class="text-10 pt-1">
             <HeadphoneIcon width="12px" height="12px" class="mr-0 py-0" style="position:relative;top:-2px;" />
-            {{ stats.line }}
+            {{ lineName }}
           </div>
         </div>
         <q-btn
@@ -120,7 +132,7 @@
           :class="`${togglePause ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
           <PauseIcon class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
-            {{ togglePause ? 'Pausing Session' : 'Pause Session' }}
+            {{ togglePause ? 'Unpause Session' : 'Pause Session' }}
           </div>
         </q-btn>
         <q-btn
@@ -138,7 +150,7 @@
 
 <script>
 
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -150,6 +162,7 @@ import RecordIcon from 'components/icons/record-icon'
 import MuteIcon from 'components/icons/mute-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import sessionsMixins from './sessions'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'SessionCallStatus',
@@ -165,7 +178,16 @@ export default {
     MuteIcon
   },
   mixins: [ sessionsMixins ],
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
+  },
   computed: {
+    ...mapState([
+      'campaigns',
+      'dialer'
+    ]),
     ...mapGetters('powerDialer', [
       'sessionLoader',
       'sessionSettings'
@@ -177,13 +199,18 @@ export default {
     ]),
     address () {
       let { taskToCall } = this
-      if (taskToCall?.cnam_city && !taskToCall?.cnam_state) {
-        return `${taskToCall?.cnam_city}`
-      } else if (!taskToCall?.cnam_city && taskToCall?.cnam_state) {
-        return `${taskToCall?.cnam_state}`
-      } else {
-        return `${taskToCall?.cnam_city}, ${taskToCall?.cnam_state}`
+      let address = ''
+      if (isEmpty(this.taskToCall)) {
+        return 'N/A'
       }
+      if (taskToCall?.cnam_city && !taskToCall?.cnam_state) {
+        address = `${taskToCall?.cnam_city || ''}`
+      } else if (!taskToCall?.cnam_city && taskToCall?.cnam_state) {
+        address = `${taskToCall?.cnam_state || ''}`
+      } else {
+        address = `${taskToCall?.cnam_city || ''} ${taskToCall?.cnam_state || ''}`
+      }
+      return address
     },
     listObject () {
       return this.listItems[this.selectedList?.id]
@@ -192,14 +219,14 @@ export default {
       return this.listObject.data || []
     },
     hasExistingTaskList () {
-      return this.list.length > 0
+      return this.powerDialerTasks.in_queue.length > 0
     },
     companyName () {
       return this.taskToCall?.company_name || 'Company: N/A'
     },
     fullname () {
       let { taskToCall } = this
-      return `${taskToCall.first_name} ${taskToCall.last_name}`
+      return `${taskToCall?.first_name || '&nbsp;'} ${taskToCall?.last_name || '&nbsp;'}`
     },
     keyIndex () {
       let keyCtr = 0
@@ -218,6 +245,9 @@ export default {
         return false
       }
       return true
+    },
+    getLine () {
+      return this.campaigns.find((line) => line.id === this.currentTask?.communication?.campaign_id)
     },
     togglePause: {
       get () {
@@ -253,17 +283,22 @@ export default {
     },
     status () {
       return AutoDialTaskStatus.STATUSES
+    },
+    selectedListName () {
+      return this.selectedList?.name || ''
+    },
+    lineName () {
+      return this.dialer?.communication?.campaign?.name || 'N/A'
+    },
+    phoneNumber () {
+      return this.taskToCall?.phone_number || ''
+    },
+    taskCreatedAt () {
+      return this.taskToCall?.created_at || ''
+    },
+    statusCallConnected () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED'
     }
-  },
-  mounted () {
-    this.TOGGLE_SESSION_LOADER(false)
-    if (this.hasExistingTaskList) {
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
-    }
-    this.timerCount = this.sessionSettings.warmup_period_in_seconds
-    // setTimeout(() => {
-    //   this.runTask()
-    // }, 3000)
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -274,59 +309,104 @@ export default {
     ]),
     async nextContact () {
       this.TOGGLE_SESSION_LOADER(true)
-      this.activeTask = this.list[this.keyIndex]
-      await this.getContact({ id: this.list[this.keyIndex].id })
+      this.$VueEvent.fire('hangupCall')
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
+      await this.getContact({ id: this.taskToCall.id })
       this.TOGGLE_SESSION_LOADER(false)
       // this.runTask()
     },
-    tickTimer () {
+    async tickTimer () {
       if (this.hasExistingTaskList) {
         if (this.timerCount > 0) {
           setTimeout(() => {
             this.timerCount--
           }, 1000)
         } else if (this.timerCount === 0) {
-          setTimeout(async () => {
-            await this.runTask()
-          }, 3000)
+          if (!this.togglePause) {
+            setTimeout(async () => {
+              await this.runTask()
+            }, 1000)
+          }
         }
       }
+    },
+    initialize () {
+      this.TOGGLE_SESSION_LOADER(false)
+      if (this.hasExistingTaskList) {
+        this.taskToCall = this.powerDialerTasks.in_queue[0]
+      }
+      this.timerCount = this.sessionSettings.warmup_period_in_seconds
+    },
+    onToggleMute () {
+      this.toggleMute = !this.toggleMute
+      this.$VueEvent.fire('toggleMute')
+    },
+    onToggleHold () {
+      this.toggleHold = !this.toggleHold
+      this.$VueEvent.fire('toggleHold')
+    },
+    onToggleRecording () {
+      this.toggleRecording = !this.toggleRecording
+      this.$VueEvent.fire('toggleRecordingStatus')
     }
   },
   watch: {
-    async activeTask (obj) {
-      if (obj?.id) {
-        setTimeout(() => {
-          this.timerCount = this.sessionSettings.warmup_period_in_seconds
-        }, this.timerCount)
-        setTimeout(async () => {
-          await this.getContact({ id: obj[this.keyIndex].id })
-        }, 500)
-      } else {
-        this.timerCount = this.sessionSettings.warmup_period_in_seconds
+    async activeTask (task) {
+      if (!task?.id && !this.hasExistingTaskList) {
+        let routePath = '/power-dialer'
+        if (this.selectedList.name !== 'My Queue') {
+          routePath += `/${this.selectedList.id}`
+        }
+        this.$router.push(routePath)
       }
+      if (task?.id) {
+        await this.getContact({ id: task.id })
+      }
+      // if (obj?.id) {
+      //   setTimeout(() => {
+      //     this.timerCount = this.sessionSettings.warmup_period_in_seconds
+      //   }, this.timerCount)
+      //   setTimeout(async () => {
+      //     await this.getContact({ id: obj[this.keyIndex].id })
+      //   }, 500)
+      // }
+      // setTimeout(async () => {
+      //   await this.getContact({ id: obj[this.keyIndex].id })
+      // }, 500)
     },
     timerCount: {
       async handler (value) {
-        this.tickTimer()
+        await this.tickTimer()
       },
       deep: true
       // immediate: true // This ensures the watcher is triggered upon creation
     },
-    hasExistingTaskList (isTrue) {
+    async hasExistingTaskList (isTrue) {
       if (isTrue) {
-        this.tickTimer()
+        await this.tickTimer()
       }
     },
-    list (lst) {
-      if (lst.length > 0) {
-        this.taskToCall = this.powerDialerTasks.in_queue[0]
+    'dialer.currentStatus' (callStatus) {
+      console.log('Status: ', callStatus)
+      switch (callStatus) {
+        case 'HANGING_UP_CALL':
+          this.taskToCall = this.powerDialerTasks.in_queue[0]
+          this.timerCount = this.sessionSettings.warmup_period_in_seconds
+          break
+        default:
+      }
+    },
+    'powerDialerTasks.in_queue' (tasks) {
+      if (tasks.length > 0) {
+        this.initialize()
       }
     }
   },
   data () {
     return {
-      timerCount: 0,
+      prevRoute: null,
+      currentTask: {},
+      timerCount: -1,
       loading: false,
       statuses: {
         pause: false,
