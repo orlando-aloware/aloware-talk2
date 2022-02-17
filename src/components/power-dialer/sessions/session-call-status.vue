@@ -375,7 +375,9 @@ export default {
         this.$router.push(routePath)
       }
       if (task?.id) {
+        this.TOGGLE_SESSION_LOADER(true)
         await this.getContact({ id: task.id })
+        this.TOGGLE_SESSION_LOADER(false)
       }
       // if (obj?.id) {
       //   setTimeout(() => {

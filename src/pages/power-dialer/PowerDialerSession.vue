@@ -137,8 +137,8 @@ export default {
   },
   watch: {
     async listItems (val) {
-      this.getTasks()
       await this.fetchTasks()
+      this.getTasks()
     }
   }
 }

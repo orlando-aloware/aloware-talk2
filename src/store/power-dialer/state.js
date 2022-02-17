@@ -157,7 +157,7 @@ export default function () {
       scheduled: [],
       all: []
     },
-    activeTask: null,
+    activeTask: {},
     selectedDialerSessionId: null
   }
 }

@@ -10,7 +10,7 @@
         <i class="material-icons">{{ !sessionSidebarExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
       <SessionStats />
-      <SessionGroups v-if="activeTask" />
+      <SessionGroups />
     </div>
   </div>
 </template>
