@@ -217,15 +217,15 @@ const routes = [
           }
         ]
       },
-      {
-        name: 'Power Dialer Session',
-        meta: {
-          title: 'Power Dialer Session',
-          id: 'power-dialer-session'
-        },
-        path: 'power-dialer/session',
-        component: () => import('src/pages/power-dialer/PowerDialerSession')
-      },
+      // {
+      //   name: 'Power Dialer Session',
+      //   meta: {
+      //     title: 'Power Dialer Session',
+      //     id: 'power-dialer-session'
+      //   },
+      //   path: 'power-dialer/session',
+      //   component: () => import('src/pages/power-dialer/PowerDialerSession')
+      // },
       // {
       //   path: 'power-dialer/:id',
       //   name: 'Power Dialer',
