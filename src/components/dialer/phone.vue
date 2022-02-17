@@ -393,7 +393,7 @@
                                  :height="iconSizes.recording.height"
                                  v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
               </pause-record-icon>
-              <span>{{ recordingText }}--</span>
+              <span>{{ recordingText }}</span>
             </button>
           </div>
           <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">

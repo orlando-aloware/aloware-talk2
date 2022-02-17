@@ -54,13 +54,20 @@
             <i class="fa fa-ellipsis-h"></i>
           </template>
           <b-dropdown-item href="#">
-            Option 1
+            <DialPadIcon />
+            Dial Pad
           </b-dropdown-item>
           <b-dropdown-item href="#">
-            Option 2
+            <AddUserIcon color="#62666E" />
+            Add
           </b-dropdown-item>
           <b-dropdown-item href="#">
-            Option 3
+            <TransferIcon color="#62666E" />
+            Transfer
+          </b-dropdown-item>
+          <b-dropdown-item href="#">
+            <CalendarIcon />
+            Schedule Callback
           </b-dropdown-item>
         </b-dropdown>
       </div>
@@ -151,6 +158,10 @@
 <script>
 
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
+import DialPadIcon from 'components/icons/dialpad-icon'
+import TransferIcon from 'components/icons/transfer-icon-2'
+import AddUserIcon from 'components/icons/add-user-icon-2'
+import CalendarIcon from 'components/icons/calendar-icon'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -167,6 +178,10 @@ import { isEmpty } from 'lodash'
 export default {
   name: 'SessionCallStatus',
   components: {
+    CalendarIcon,
+    TransferIcon,
+    DialPadIcon,
+    AddUserIcon,
     DropIcon,
     HeadphoneIcon,
     PauseIcon,
