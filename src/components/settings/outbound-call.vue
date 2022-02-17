@@ -160,7 +160,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('settings', ['userClone']),
     outboundCallSettingEnabled () {
       return !this.hasRole(['Company Admin', 'Company Agent']) || (this.currentCompany && this.currentCompany.force_outbound_recording)

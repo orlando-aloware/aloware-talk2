@@ -234,7 +234,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['dialer']),
     ...mapGetters('auth', ['profile']),
 
     sendTextColor () {

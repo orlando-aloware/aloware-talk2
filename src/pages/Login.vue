@@ -25,6 +25,7 @@ export default {
   methods: {
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
+    ...mapActions('cache', ['setCurrentCompany']),
     async validateCookieUser () {
       this.getSharedCookie().then(sharedCookie => {
         if (sharedCookie) {

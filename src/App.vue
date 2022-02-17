@@ -105,10 +105,10 @@ export default {
       getCookieUser: 'getCookieUser',
       getSharedCookie: 'getSharedCookie'
     }),
+    ...mapActions('cache', ['setCurrentCompany']),
     ...mapActions([
       'resetVuex',
-      'setUsage',
-      'setCurrentCompany'
+      'setUsage'
     ])
   }
 }

@@ -325,7 +325,7 @@ export default {
     ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount']),
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
-    ...mapState(['currentCompany']),
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('powerDialer', [
       'activeFilter'
     ]),

@@ -261,7 +261,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
@@ -1674,11 +1675,11 @@ export default {
       clearInterval(window.sessionIntervalId)
     },
 
+    ...mapActions('cache', ['setCurrentCompany']),
     ...mapActions([
       'resetVuex',
       'resetContactsDefaultVuex',
       'setUsage',
-      'setCurrentCompany',
       'setCampaigns',
       'setRingGroups',
       'setUsers',

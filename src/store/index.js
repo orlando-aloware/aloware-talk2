@@ -8,6 +8,7 @@ import * as ActionNotificationsDefault from '../constants/action-notifications-d
 import createPersistedState from 'vuex-persistedstate'
 import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
+import cache from './cache'
 import contacts from './contacts'
 import inbox from './inbox'
 import stats from './stats'
@@ -33,7 +34,8 @@ export default function (/* { ssrContext } */) {
       inbox,
       stats,
       powerDialer,
-      settings
+      settings,
+      cache
     },
     state: {
       showMenu: false,
@@ -213,7 +215,6 @@ export default function (/* { ssrContext } */) {
       showIncomingCallNotification: true,
       // cached states
       sidebarFolded: false,
-      currentCompany: null,
       smsTemplates: [],
       tagOptions: {
         isReset: false
@@ -432,14 +433,6 @@ export default function (/* { ssrContext } */) {
 
       setRingGroups ({ commit }, ringGroups) {
         commit('SET_RING_GROUPS', ringGroups)
-      },
-
-      deleteCurrentCompany ({ commit }) {
-        commit('DELETE_CURRENT_COMPANY')
-      },
-
-      setCurrentCompany ({ commit }, currentCompany) {
-        commit('SET_CURRENT_COMPANY', currentCompany)
       },
 
       resetVuex ({ commit }) {
@@ -957,14 +950,6 @@ export default function (/* { ssrContext } */) {
         state.ringGroups = ringGroups
       },
 
-      DELETE_CURRENT_COMPANY (state) {
-        state.currentCompany = null
-      },
-
-      SET_CURRENT_COMPANY (state, currentCompany) {
-        state.currentCompany = currentCompany
-      },
-
       RESET_VUEX (state) {
         state = Object.assign(state, Default.DEFAULT_STATE)
         contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
@@ -993,10 +978,6 @@ export default function (/* { ssrContext } */) {
 
       SET_COMM_TABLE_FIELDS (state, fields) {
         state.comm_table_fields = fields
-      },
-
-      SET_CURRENT_COMPANY_DEFAULT_FILTER_ID (state, filterId) {
-        state.currentCompany.default_filter_id = filterId
       },
 
       NEW_WORKFLOW (state, workflow) {
@@ -1272,7 +1253,8 @@ export default function (/* { ssrContext } */) {
 
     plugins: [
       createPersistedState({
-        key: 'AloWare_vuex'
+        key: 'AloWare_vuex',
+        paths: ['cache']
       })
     ]
   })

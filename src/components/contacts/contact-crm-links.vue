@@ -65,7 +65,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState('cache', ['currentCompany']),
     activeCrmIntegrations () {
       return this.integrations.filter(integration => integration.link)
     },

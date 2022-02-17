@@ -314,8 +314,8 @@ export default {
       })
     window.Echo.private('company-' + this.profile.company_id)
       .listen('.company.updated', (event) => {
-        if (store().state.currentCompany && store().state.currentCompany.id === event.company.id) {
-          store().dispatch('setCurrentCompany', event.company)
+        if (store().state.cache.currentCompany && store().state.cache.currentCompany.id === event.company.id) {
+          store().dispatch('cache/setCurrentCompany', event.company)
         }
       })
       .listen('.communication.created', (event) => {
@@ -483,7 +483,7 @@ export default {
         }
       })
       .listen('.user.created', (event) => {
-        if (store().state.currentCompany && event.user.company_id && event.user.company_id === store().state.currentCompany.id) {
+        if (store().state.cache.currentCompany && event.user.company_id && event.user.company_id === store().state.cache.currentCompany.id) {
           window.VueEvent.fire('user_created', event.user)
         }
       })
@@ -491,7 +491,7 @@ export default {
         window.VueEvent.fire('user_updated', event.user)
       })
       .listen('.user.deleted', (event) => {
-        if (store().state.currentCompany && event.user.company_id && event.user.company_id === store().state.currentCompany.id) {
+        if (store().state.cache.currentCompany && event.user.company_id && event.user.company_id === store().state.cache.currentCompany.id) {
           window.VueEvent.fire('user_deleted', event.user)
         }
       })

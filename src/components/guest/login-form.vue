@@ -187,7 +187,8 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
+    ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions(['resetVuex', 'setUsage']),
     ...mapActions('auth', ['login'])
   }
 }
