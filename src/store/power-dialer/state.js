@@ -158,6 +158,7 @@ export default function () {
       all: []
     },
     activeTask: {},
-    selectedDialerSessionId: null
+    selectedDialerSessionId: null,
+    sessionPaused: false
   }
 }

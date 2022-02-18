@@ -65,7 +65,7 @@
             <TransferIcon color="#62666E" />
             Transfer
           </b-dropdown-item>
-          <b-dropdown-item href="#">
+          <b-dropdown-item disabled href="#">
             <CalendarIcon />
             Schedule Callback
           </b-dropdown-item>
@@ -131,15 +131,17 @@
           </div>
         </div>
         <q-btn
-          @click="togglePause = !togglePause"
-          :color="`${togglePause ? 'red-3' : 'grey-4'}`"
-          unelevated outline
+          @click="onTogglePause"
+          :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
+          unelevated :outline="!sessionPaused"
           no-wrap no-caps size="sm"
-          :disabled="timerCount !== 0"
-          :class="`${togglePause ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
-          <PauseIcon class="mr-2" color="#62666E" />
-          <div class="text-body2 text-black">
-            {{ togglePause ? 'Unpause Session' : 'Pause Session' }}
+          :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`">
+          <PauseIcon
+            class="mr-2"
+            :color="`${sessionPaused ? '#fff' : '#62666E'}`" />
+          <div
+            :class="`text-body2 ${sessionPaused ? 'text-white' : 'text-black'}`">
+            {{ togglePause ? sessionPaused ? 'Resume Session' : 'Unpause Session' : 'Pause Session' }}
           </div>
         </q-btn>
         <q-btn
@@ -158,6 +160,7 @@
 <script>
 
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
 import TransferIcon from 'components/icons/transfer-icon-2'
 import AddUserIcon from 'components/icons/add-user-icon-2'
@@ -199,6 +202,9 @@ export default {
     })
   },
   computed: {
+    ...mapFields([
+      'sessionPaused'
+    ]),
     ...mapState([
       'campaigns',
       'dialer'
@@ -313,6 +319,9 @@ export default {
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
+    },
+    statusReady () {
+      return this.dialer.currentStatus === 'READY'
     }
   },
   methods: {
@@ -342,6 +351,9 @@ export default {
               await this.runTask()
             }, 1000)
           }
+          if (this.togglePause) {
+            this.sessionPaused = true
+          }
         }
       }
     },
@@ -350,7 +362,9 @@ export default {
       if (this.hasExistingTaskList) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
       }
-      this.timerCount = this.sessionSettings.warmup_period_in_seconds
+      if (!this.togglePause) {
+        this.resetTimer()
+      }
     },
     onToggleMute () {
       this.toggleMute = !this.toggleMute
@@ -363,10 +377,24 @@ export default {
     onToggleRecording () {
       this.toggleRecording = !this.toggleRecording
       this.$VueEvent.fire('toggleRecordingStatus')
+    },
+    onTogglePause () {
+      this.togglePause = !this.togglePause
+    },
+    resetTimer () {
+      this.timerCount = this.sessionSettings.warmup_period_in_seconds
     }
   },
   watch: {
+    async taskToCall (task) {
+      if (task) {
+        await this.getContact({ id: this.taskToCall.id })
+      }
+    },
     async activeTask (task) {
+      if (!task && this.togglePause) {
+        this.sessionPaused = true
+      }
       if (!task?.id && !this.hasExistingTaskList) {
         let routePath = '/power-dialer'
         if (this.selectedList.name !== 'My Queue') {
@@ -403,12 +431,24 @@ export default {
         await this.tickTimer()
       }
     },
+    togglePause (value) {
+      console.log('togglePause', value)
+      if (!value) {
+        if ((!this.statusCallConnected || this.statusReady) && this.timerCount === 0) {
+          console.log('...Resetting timer')
+          this.resetTimer()
+        }
+        this.sessionPaused = false
+      }
+    },
     'dialer.currentStatus' (callStatus) {
       console.log('Status: ', callStatus)
       switch (callStatus) {
         case 'HANGING_UP_CALL':
           this.taskToCall = this.powerDialerTasks.in_queue[0]
-          this.timerCount = this.sessionSettings.warmup_period_in_seconds
+          if (!this.togglePause) {
+            this.resetTimer()
+          }
           break
         default:
       }

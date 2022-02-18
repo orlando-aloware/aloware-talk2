@@ -63,6 +63,7 @@ export default {
       'call_disposition_id': params.params.call_disposition_id,
       paramsSerializer: qs.stringify
     })
+    console.log('res :>> ', res)
     if (res.status === 200) {
       return res.data
     }
