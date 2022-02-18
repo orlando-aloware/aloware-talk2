@@ -100,7 +100,7 @@ export default {
     },
 
     contactAvatar () {
-      if (this.mention.mention_subject.contact && this.mention.mention_subject.contact.first_name && this.mention.mention_subject.contact.last_name) {
+      if (this.mention.mention_subject && this.mention.mention_subject.contact && this.mention.mention_subject.contact.first_name && this.mention.mention_subject.contact.last_name) {
         return `${this.mention.mention_subject.contact.first_name} ${this.mention.mention_subject.contact.last_name}`
       }
 

@@ -249,16 +249,9 @@ export default {
 
   data () {
     return {
-      filter: {
-        campaigns: [],
-        ring_groups: [],
-        from_date: null,
-        to_date: null,
-        contact_owner: [],
-        my_contact: 0
-      },
       searchText: '',
       isSearch: false,
+      previousRoute: null,
       newFilterModel: {
         name: '',
         type: 5,
@@ -277,6 +270,14 @@ export default {
           my_contact: Filters.DEFAULT_STATE.filter.my_contact
         },
         scope: 'user'
+      },
+      filter: {
+        campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+        ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+        from_date: Filters.DEFAULT_STATE.filter.from_date,
+        to_date: Filters.DEFAULT_STATE.filter.to_date,
+        contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+        my_contact: Filters.DEFAULT_STATE.filter.my_contact
       },
       CommunicationCurrentStatus
     }
@@ -409,22 +410,26 @@ export default {
         }
       }
     },
-    onResetFilter () {
+    resetFilter () {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
     },
+    onResetFilter () {
+      this.resetFilter()
+      this.loadContactTasks()
+    },
     onApplyFilter (filter) {
       this.filter = filter
+      this.loadContactTasks()
     },
     onCreateNewFilter (filter) {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
       this.toggleFilterModelForm(true)
     }
   },
-
   created () {
-    this.onResetFilter()
+    this.resetFilter()
     this.toggleFilterDialog(false)
   },
 
@@ -628,6 +633,9 @@ export default {
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+      if (this.$route.name !== 'Inbox Contact Task') {
+        return
+      }
       let index = this.contacts.findIndex(item => item.id === contact.id)
       if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status)) {
         this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
@@ -641,15 +649,12 @@ export default {
   },
 
   watch: {
+    $route (to, from) {
+      this.previousRoute = from
+    },
     'sorting.order': function () {
       this.setContacts([])
       this.loadContactTasks()
-    },
-    filter: {
-      deep: true,
-      handler () {
-        this.loadContactTasks()
-      }
     },
     '$route.params.status': function () {
       this.setStatus()
@@ -662,6 +667,10 @@ export default {
         // prevent reset of filters if coming from the root
         if (!this.$route.params.id) {
           this.resetList()
+        } else {
+          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+            this.loadContactTasks()
+          }
         }
       }
     },

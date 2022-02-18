@@ -67,6 +67,9 @@ export default {
   methods: {
     ...mapActions('inbox', ['setActiveChannel']),
     onItemClicked (nextActive) {
+      if (this.activeChannel.value === nextActive) {
+        return
+      }
       this.active = nextActive
       let channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
