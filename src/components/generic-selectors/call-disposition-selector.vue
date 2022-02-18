@@ -129,7 +129,7 @@ export default {
 
   data () {
     return {
-      callDisposition: null,
+      callDisposition: this.value,
       callDispositionsOptions: [],
       selectWidth: 0
     }
@@ -233,6 +233,7 @@ export default {
   watch: {
     value () {
       this.getCallDisposition()
+      this.callDisposition = this.value
     },
 
     callDisposition (val) {
