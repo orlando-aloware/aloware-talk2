@@ -137,7 +137,7 @@ import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-lis
 export default {
   name: 'StartDialSessionsForm',
   props: {
-    modelValue: {
+    value: {
       type: Object
     },
     name: {
@@ -146,7 +146,7 @@ export default {
     }
   },
   model: {
-    prop: 'modelValue',
+    prop: 'value',
     event: 'change'
   },
   components: {
@@ -221,7 +221,7 @@ export default {
     },
     localValue: {
       get () {
-        return this.modelValue
+        return this.value
       },
       set (val) {
         this.$emit('change', val)
@@ -259,7 +259,7 @@ export default {
       },
       deep: true
     },
-    modelValue (val) {
+    value (val) {
       // if (isEmpty(val)) {
       //   this.resources = this.defaultSettings || this.defaultValues
       // } else {
@@ -272,7 +272,7 @@ export default {
     return {
       selectWidth: 0,
       metricOptions: [],
-      resources: this.modelValue
+      resources: this.value
     }
   }
 }
