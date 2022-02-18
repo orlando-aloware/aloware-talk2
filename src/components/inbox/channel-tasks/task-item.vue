@@ -1,6 +1,5 @@
 <template>
   <div :class="`task-item w-100 d-flex flex-row py-2 align-items-center border-bottom ${activeClass}`"
-       v-if="communication.contact_id"
        @click="onItemClick(communication)">
     <div class="d-flex justify-content-center avatar-wrapper">
       <div class="avatar d-flex justify-content-center pb-1 position-relative"
@@ -275,11 +274,11 @@ export default {
     ...mapState('inbox', ['selectedCommunication', 'activeChannel', 'liveContacts', 'contacts']),
 
     contactName () {
-      if (this.communication && this.communication.contact.name) {
+      if (this.communication.contact && this.communication.contact.name) {
         return this.communication.contact.name
       }
 
-      if (this.communication) {
+      if (this.communication && (this.communication.lead_number || this.communication.lead_number.trim().length > 0)) {
         return this.$options.filters.fixPhone(this.communication.lead_number)
       }
 
@@ -287,7 +286,7 @@ export default {
     },
 
     contactAvatar () {
-      if (this.communication && this.communication.contact.name) {
+      if (this.communication.contact && this.communication.contact.name) {
         return this.communication.contact.name
       }
 
@@ -306,7 +305,9 @@ export default {
     },
 
     activeClass () {
-      return this.selectedCommunication && this.communication.id === this.selectedCommunication.id ? 'active' : ''
+      return (this.selectedCommunication && this.communication.id === this.selectedCommunication.id) ||
+      (this.$route.params.communicationId && this.$route.params.communicationId === this.communication.id.toString())
+        ? 'active' : ''
     },
 
     channelAnswerStatus () {
@@ -370,6 +371,11 @@ export default {
     },
 
     onItemClick (communication) {
+      if (!communication.contact_id) {
+        this.$generalNotification(`Unable to find contact associated with this communication.`, 'error')
+        return
+      }
+
       this.setSelectedCommunication(communication)
       this.$router.push({
         name: 'Inbox Contact',

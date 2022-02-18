@@ -527,6 +527,10 @@ export default {
     },
 
     resetSelectedContact () {
+      if (!this.CancelToken) {
+        this.CancelToken = this.$axios.CancelToken
+      }
+
       this.source = this.CancelToken.source()
       this.contactId = null
       this.selectedCampaignId = null

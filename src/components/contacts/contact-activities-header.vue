@@ -95,7 +95,7 @@
                 class="mx-2">
             <timer-o-icon></timer-o-icon>
           </span>
-          <q-spinner-bars v-if="isUpdatingStatus"
+          <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_PENDING"
                           class="pl-1 pr-1"
                           color="primary"
                           size="20px"
@@ -210,6 +210,14 @@ export default {
           return 'danger'
         default:
           return ''
+      }
+    },
+    activityContact: {
+      get () {
+        return this.contact
+      },
+      set (isOpen) {
+        return isOpen
       }
     }
   },
