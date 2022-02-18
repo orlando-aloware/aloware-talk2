@@ -162,13 +162,14 @@ export default {
     },
     async fetchApi (params) {
       switch (this.$route.meta.id) {
-        case 'power-dialer':
+        case 'power-dialer-queue-filter':
           this.processFetch(params, false, true)
           break
-        case 'power-dialer-list':
+        case 'power-dialer-list-filter':
           this.processFetch(params, false, false)
           break
         default:
+          console.log('333 :>> ', this.id)
           this.processFetch(params, false, false, this.id)
       }
     },

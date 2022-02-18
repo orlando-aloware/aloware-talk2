@@ -168,9 +168,11 @@ export default {
             this.updateMyQueueListData(data.data)
           }
 
-          let list = _.get(this.lists, this.id, { id: null, name: '', type: null })
+          let listId = this.id === 'my-queue' ? this.myQueue?.id : this.id
+          let list = _.get(this.lists, listId, { id: null, name: '', type: null })
+
           this.setSelectedList({
-            id: list.id === 'my-queue' ? this.myQueue?.id : list.id,
+            id: listId,
             name: list.name,
             type: list.type
           })
@@ -196,16 +198,17 @@ export default {
       if (typeof this.isPowerDialer !== 'undefined') {
         // the variable is defined
         switch (this.$route.meta.id) {
-          case 'power-dialer':
+          case 'power-dialer-queue-filter':
             this.processFetch(params, false, true)
             break
-          case 'power-dialer-list':
+          case 'power-dialer-list-filter':
             this.processFetch(params, false, false)
             break
           default:
             this.processFetch(params, false, false)
         }
       } else {
+        console.log('params dsa :>> ', params)
         this.processFetch(params)
       }
     },
