@@ -179,9 +179,7 @@ export default {
   },
   computed: {
     ...mapState('contacts', ['isAddAppointmentOpen']),
-    ...mapState({
-      currentCompany: 'currentCompany'
-    }),
+    ...mapState('cache', ['currentCompany']),
     isValid () {
       return this.appointment.date && this.appointment.time && this.appointment.timezone && this.contact
     },

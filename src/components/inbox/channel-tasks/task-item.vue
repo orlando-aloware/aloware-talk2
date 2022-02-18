@@ -315,8 +315,12 @@ export default {
 
     smsEmptyBodyAlternativeText () {
       let directionText = (this.communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      let lastAttachment = this.communication.attachments.pop()
+      let lastAttachment = null
+
+      if (_.isEmpty(this.communication.attachments)) {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        lastAttachment = this.communication.attachments.pop()
+      }
 
       switch (true) {
         case ['text'].includes(lastAttachment.mime_type):

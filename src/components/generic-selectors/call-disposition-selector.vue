@@ -18,7 +18,7 @@
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '' ]"
-            v-model="callDispositionId"
+            v-model="callDisposition"
             @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
@@ -129,7 +129,7 @@ export default {
 
   data () {
     return {
-      callDispositionId: this.value,
+      callDisposition: null,
       callDispositionsOptions: [],
       selectWidth: 0
     }
@@ -140,11 +140,11 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && this.callDispositionId.length < 1:
+        case this.multiple && (!this.callDisposition || (this.callDisposition && this.callDisposition.length < 1)):
           return 'Select Call Dispositions'
         case !this.multiple && !this.callDispositionId:
           return 'Select Call Disposition'
-        case this.multiple && this.callDispositionId.length > 0:
+        case this.multiple && this.callDisposition && this.callDisposition.length > 0:
         case !this.multiple && this.callDispositionId:
         default:
           return ''
@@ -162,14 +162,48 @@ export default {
       }
 
       return []
+    },
+
+    callDispositionId () {
+      if (!this.callDisposition) {
+        return null
+      }
+
+      if (this.multiple) {
+        return this.callDisposition.id
+      }
+
+      return this.callDisposition
+    },
+
+    values () {
+      return this.multiple ? _.reject(this.value, _.isEmpty) : this.value
     }
   },
 
   created () {
     this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder
+    this.callDisposition = this.multiple ? [] : this.callDisposition
+    this.getCallDisposition()
   },
 
   methods: {
+    getCallDisposition () {
+      if (!_.isEmpty(this.values) && this.multiple) {
+        this.callDisposition = []
+        for (let callDispId in this.values) {
+          let found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === callDispId)
+          this.callDisposition.push(found)
+        }
+        return
+      }
+
+      if (!_.isEmpty(this.values) && !this.multiple) {
+        let found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === this.values)
+        this.callDisposition = found
+      }
+    },
+
     onShowMenu () {
       this.selectWidth = this.$refs.callDispositionSelect.$el.offsetWidth
     },
@@ -198,11 +232,16 @@ export default {
 
   watch: {
     value () {
-      this.callDispositionId = this.value
+      this.getCallDisposition()
     },
 
-    callDispositionId (val) {
-      if (this.callDispositionId !== this.value) {
+    callDisposition (val) {
+      if (!this.multiple && val !== this.values) {
+        this.$emit('change', val)
+        return
+      }
+
+      if (this.multiple && !_.isEqual(val, this.values)) {
         this.$emit('change', val)
       }
     }

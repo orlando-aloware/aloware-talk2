@@ -1,10 +1,12 @@
+import * as storage from 'src/plugins/helpers/storage'
+
 const check = async ({ commit }, preventLogout = false) => {
   try {
-    if (localStorage.getItem('api_token') === null) {
+    if (storage.local.getItem('api_token') === null) {
       return Promise.reject('unauthorized')
     }
 
-    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
     commit('SET_LOADING', true)
 
@@ -12,7 +14,7 @@ const check = async ({ commit }, preventLogout = false) => {
       device_info: null
     })
 
-    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
     commit('SET_AUTHENTICATED', true)
     commit('SET_PROFILE', response.data.user)
@@ -53,9 +55,9 @@ const login = async ({ commit }, {
 
     const { meta, data } = response.data
 
-    localStorage.setItem('shared_cookie', meta.hashed_token)
+    storage.local.setItem('shared_cookie', meta.hashed_token)
 
-    localStorage.setItem('api_token', meta.token)
+    storage.local.setItem('api_token', meta.token)
 
     commit('SET_FIRST_LOGIN', data.first_login, { root: true })
 
@@ -100,7 +102,7 @@ const getCookieUser = async ({ commit }) => {
       return Promise.reject()
     }
 
-    localStorage.setItem('api_token', meta.token)
+    storage.local.setItem('api_token', meta.token)
 
     commit('SET_FIRST_LOGIN', data.first_login, { root: true })
 
@@ -121,11 +123,11 @@ const logout = async ({ commit }) => {
 
     const response = await window.axios.post('/logout')
 
-    localStorage.removeItem('api_token')
-    localStorage.removeItem('impersonate')
-    localStorage.removeItem('portal_session')
-    localStorage.removeItem('company_id')
-    localStorage.removeItem('shared_cookie')
+    storage.local.removeItem('api_token')
+    storage.local.removeItem('impersonate')
+    storage.local.removeItem('portal_session')
+    storage.local.removeItem('company_id')
+    storage.local.removeItem('shared_cookie')
 
     window.axios.defaults.headers.common['Authorization'] = null
 
@@ -211,13 +213,13 @@ const impersonate = async ({ commit }, payload) => {
     commit('SET_LOADING', false)
 
     if (company) {
-      localStorage.setItem('api_token', apiToken)
+      storage.local.setItem('api_token', apiToken)
 
       window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + apiToken
 
-      localStorage.setItem('impersonate', true)
+      storage.local.setItem('impersonate', true)
 
-      localStorage.setItem('company_id', company.id)
+      storage.local.setItem('company_id', company.id)
 
       return Promise.resolve()
     } else {

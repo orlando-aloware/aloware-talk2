@@ -37,7 +37,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'dialerFormStatus', 'isMobile']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 

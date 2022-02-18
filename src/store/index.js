@@ -8,11 +8,13 @@ import * as ActionNotificationsDefault from '../constants/action-notifications-d
 import createPersistedState from 'vuex-persistedstate'
 import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
+import cache from './cache'
 import contacts from './contacts'
 import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
+import * as storage from '../plugins/helpers/storage'
 
 Vue.use(Vuex)
 
@@ -33,14 +35,17 @@ export default function (/* { ssrContext } */) {
       inbox,
       stats,
       powerDialer,
-      settings
+      settings,
+      cache
     },
     state: {
       showMenu: false,
       filter: {},
       tags: [],
       campaigns: [],
+      campaignsIsLoading: false,
       users: [],
+      usersIsLoading: false,
       ringGroups: [],
       workflows: [],
       changelogs: [],
@@ -213,7 +218,6 @@ export default function (/* { ssrContext } */) {
       showIncomingCallNotification: true,
       // cached states
       sidebarFolded: false,
-      currentCompany: null,
       smsTemplates: [],
       tagOptions: {
         isReset: false
@@ -366,6 +370,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_CAMPAIGNS', campaigns)
       },
 
+      setCampaignsIsLoading ({ commit }, value) {
+        commit('SET_CAMPAIGNS_IS_LOADING', value)
+      },
+
       newDispositionStatus ({ commit }, dispositionStatus) {
         commit('NEW_DISPOSITION_STATUS', dispositionStatus)
       },
@@ -414,6 +422,14 @@ export default function (/* { ssrContext } */) {
         commit('NEW_TAG', tag)
       },
 
+      updateTag ({ commit }, tag) {
+        commit('UPDATE_TAG', tag)
+      },
+
+      deleteTag ({ commit }, tag) {
+        commit('DELETE_TAG', tag)
+      },
+
       setTags ({ commit }, tags) {
         commit('SET_TAGS', tags)
       },
@@ -432,14 +448,6 @@ export default function (/* { ssrContext } */) {
 
       setRingGroups ({ commit }, ringGroups) {
         commit('SET_RING_GROUPS', ringGroups)
-      },
-
-      deleteCurrentCompany ({ commit }) {
-        commit('DELETE_CURRENT_COMPANY')
-      },
-
-      setCurrentCompany ({ commit }, currentCompany) {
-        commit('SET_CURRENT_COMPANY', currentCompany)
       },
 
       resetVuex ({ commit }) {
@@ -504,6 +512,10 @@ export default function (/* { ssrContext } */) {
 
       deleteUser ({ commit }, user) {
         commit('DELETE_USER', user)
+      },
+
+      setUsersIsLoading ({ commit }, value) {
+        commit('SET_USERS_IS_LOADING', value)
       },
 
       setWarnings ({ commit }, warnings) {
@@ -777,6 +789,10 @@ export default function (/* { ssrContext } */) {
         state.campaigns = campaigns
       },
 
+      SET_CAMPAIGNS_IS_LOADING (state, value) {
+        state.campaignsIsLoading = value
+      },
+
       NEW_DISPOSITION_STATUS (state, dispositionStatus) {
         if (resourceExists(state.dispositionStatuses, dispositionStatus)) {
           return
@@ -956,14 +972,6 @@ export default function (/* { ssrContext } */) {
         state.ringGroups = ringGroups
       },
 
-      DELETE_CURRENT_COMPANY (state) {
-        state.currentCompany = null
-      },
-
-      SET_CURRENT_COMPANY (state, currentCompany) {
-        state.currentCompany = currentCompany
-      },
-
       RESET_VUEX (state) {
         state = Object.assign(state, Default.DEFAULT_STATE)
         contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
@@ -992,10 +1000,6 @@ export default function (/* { ssrContext } */) {
 
       SET_COMM_TABLE_FIELDS (state, fields) {
         state.comm_table_fields = fields
-      },
-
-      SET_CURRENT_COMPANY_DEFAULT_FILTER_ID (state, filterId) {
-        state.currentCompany.default_filter_id = filterId
       },
 
       NEW_WORKFLOW (state, workflow) {
@@ -1050,6 +1054,10 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.users.splice(state.users.indexOf(found), 1)
         }
+      },
+
+      SET_USERS_IS_LOADING (state, value) {
+        state.usersIsLoading = value
       },
 
       SET_WARNINGS (state, warnings) {
@@ -1271,7 +1279,13 @@ export default function (/* { ssrContext } */) {
 
     plugins: [
       createPersistedState({
-        key: 'AloWare_vuex'
+        key: 'AloWare_vuex',
+        paths: ['cache', 'auth.profile'],
+        storage: {
+          getItem: (key) => storage.local.getItem(key),
+          setItem: (key, value) => storage.local.setItem(key, value),
+          removeItem: (key) => storage.local.removeItem(key)
+        }
       })
     ]
   })

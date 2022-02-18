@@ -38,7 +38,7 @@ export default {
   components: { ContactCrmLinks, IntegrationHubspot },
 
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState('cache', ['currentCompany']),
 
     isIntegrationsDisabled () {
       if (!this.currentCompany) {

@@ -11,6 +11,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
+import * as storage from 'src/plugins/helpers/storage'
 
 import { Screen } from 'quasar'
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
@@ -19,10 +20,10 @@ import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
 
 // local storage
-localStorage.setItem('api_url', process.env.API_URL)
-localStorage.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
-localStorage.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
-localStorage.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
+storage.local.setItem('api_url', process.env.API_URL)
+storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
+storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
+storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
@@ -120,11 +121,11 @@ window.Sentry = Sentry
 
 // set env to browser's local storage
 if (process.env.APP_ENV === 'production') {
-  localStorage.setItem('env', 'production')
+  storage.local.setItem('env', 'production')
 }
 
 if (process.env.APP_ENV !== 'production') {
-  localStorage.setItem('env', 'development')
+  storage.local.setItem('env', 'development')
 }
 
 if (
@@ -137,7 +138,7 @@ if (
     tracingOptions: {
       trackComponents: true
     },
-    dsn: localStorage.getItem('sentry_dsn_public')
+    dsn: storage.local.getItem('sentry_dsn_public')
   })
 
   Sentry.configureScope((scope) => {

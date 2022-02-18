@@ -47,6 +47,7 @@
     "quasar": "^1.0.0",
     "rage-edit": "^1.2.0",
     "randomcolor": "^0.5.4",
+    "storage-factory": "^0.2.0",
     "textarea-caret": "^3.1.0",
     "twilio-client": "^1.14.0",
     "uuid": "^8.3.2",

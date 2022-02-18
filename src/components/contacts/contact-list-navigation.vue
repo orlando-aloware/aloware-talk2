@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -34,7 +35,7 @@ export default {
       'changingSelectedContact'
     ]),
     contacts () {
-      return this.listItems[this.selectedList.id].data
+      return _.get(this.listItems, `${this.selectedList.id}.data`, [])
     },
     currentIndex () {
       return this.contacts.findIndex(item => item.id === this.contact.id)

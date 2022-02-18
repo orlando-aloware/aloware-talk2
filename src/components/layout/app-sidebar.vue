@@ -184,6 +184,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'app-sidebar',
@@ -197,7 +198,7 @@ export default {
 
   computed: {
     isProd () {
-      return localStorage.env === 'production'
+      return storage.local.env === 'production'
     }
   },
 
