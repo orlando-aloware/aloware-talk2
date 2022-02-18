@@ -438,12 +438,6 @@ export default {
     isMyQueue () {
       return this.id === 'my-queue'
     },
-    atest1 () {
-      return this.$route.params.id
-    },
-    atest2 () {
-      return this.lists
-    },
     filteredList () {
       if (this.id === 'my-queue') {
         return this.myQueue
@@ -491,7 +485,7 @@ export default {
       this.START_DIAL_TOGGLE(true)
       // this.setSelectedContact({})
       this.setContact(this.contact)
-      this.$router.push(`/power-dialer/list/${this.selectedList.id}/sessions`)
+      this.$router.push(`/power-dialer/list/${this.filteredList.id}/sessions`)
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
