@@ -58,7 +58,7 @@ export default {
       await this.loadList(data.id)
     },
     async fetchResources () {
-      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+      if (this.$route.meta.title === 'Power Dialer') {
         let response = await this.getMyQueueList()
         this.listLoaded({ ...response.data, id: 'my-queue' })
         this.setSelectedList({

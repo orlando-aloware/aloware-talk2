@@ -169,7 +169,11 @@ export default {
           }
 
           let list = _.get(this.lists, this.id, { id: null, name: '', type: null })
-          this.setSelectedList({ id: list.id, name: list.name, type: list.type })
+          this.setSelectedList({
+            id: list.id === 'my-queue' ? this.myQueue?.id : list.id,
+            name: list.name,
+            type: list.type
+          })
           this.markCheckedAll()
         })
         .finally(() => {
