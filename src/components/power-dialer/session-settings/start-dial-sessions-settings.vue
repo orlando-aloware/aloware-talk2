@@ -421,7 +421,7 @@ export default {
           await this.getDialerSessionSettings()
         }
       } else {
-        let { id } = this.sessionSettings
+        let { id } = this.selectedItem
         // this.activeSessionSettingId = id
         await this.updateContactsList({
           id: this.list.id,
