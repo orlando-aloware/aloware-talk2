@@ -654,7 +654,6 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CURRENT_STATUS (state, status) {
         state.dialer.currentStatus = status
-        console.log('Dialer current status: ', this.state.dialer.currentStatus)
       },
 
       SET_DIALER_COMMUNICATION (state, communication) {
