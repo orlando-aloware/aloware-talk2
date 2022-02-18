@@ -36,6 +36,7 @@ import SessionPage from 'src/components/power-dialer/sessions/session-main-page'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import sessionsMixins from 'src/components/power-dialer/sessions/sessions'
+import broadcast from 'src/plugins/mixins/broadcast.mixin'
 
 export default {
   name: 'PowerDialerSession',
@@ -45,7 +46,10 @@ export default {
     CallStatus,
     SessionPage
   },
-  mixins: [ sessionsMixins ],
+  mixins: [
+    sessionsMixins,
+    broadcast
+  ],
   computed: {
     ...mapGetters('contacts', [
       'listItems',
