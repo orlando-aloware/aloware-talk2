@@ -482,7 +482,6 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('changePhoneNumber')
-    this.$VueEvent.stop('update_communication')
     clearInterval(this.$options.localTimeInterval)
   }
 }

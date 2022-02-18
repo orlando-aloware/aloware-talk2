@@ -1,6 +1,6 @@
 <template>
   <div class="p-0 d-inline-block">
-    <MetricLoader v-if="loader" />
+    <MetricLoader v-if="loader || metricLoader" />
     <div
       v-else
       class="box-container w-auto"
@@ -99,6 +99,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import EditMetricsModal from './form-metrics-modal'
 import MetricLoader from '../metrics/metric-loader'
@@ -148,7 +149,7 @@ export default {
       return this.metric.value ? this.metric.value : 0
     },
     metricCategory () {
-      return this.$options.filters.ucwords(this.metric.categoryLabel.replace(/_/g, ' '))
+      return this.$options.filters.ucwords(_.get(this.metric, 'categoryLabel', '').replace(/_/g, ' '))
     }
   },
   data () {
@@ -170,9 +171,6 @@ export default {
     },
     metric () {
       this.loader = false
-    },
-    metricLoader () {
-      this.loader = this.metricLoader
     }
   },
   methods: {

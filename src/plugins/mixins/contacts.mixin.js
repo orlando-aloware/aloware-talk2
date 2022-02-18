@@ -41,7 +41,8 @@ export default {
       'setCurrentListFilters',
       'setListSelectedContacts',
       'setShouldUpdateSelectedListContactCount',
-      'setSelectedListContactCount'
+      'setSelectedListContactCount',
+      'setSelectedList'
     ]),
     ...mapActions('powerDialer', [
       'updateMyQueueListData'
@@ -133,7 +134,7 @@ export default {
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
-    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, tempId = null) {
+    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
       params.search = this.search
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
@@ -167,6 +168,8 @@ export default {
             this.updateMyQueueListData(data.data)
           }
 
+          let list = _.get(this.lists, this.id, { id: null, name: '', type: null })
+          this.setSelectedList({ id: list.id, name: list.name, type: list.type })
           this.markCheckedAll()
         })
         .finally(() => {
@@ -196,7 +199,7 @@ export default {
             this.processFetch(params, false, false)
             break
           default:
-            this.processFetch(params, false, false, this.id)
+            this.processFetch(params, false, false)
         }
       } else {
         this.processFetch(params)

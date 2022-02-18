@@ -9,7 +9,7 @@
         {{ liveCallText }}
       </span>
     </div>
-    <div class="w-100 bg-purple call-status text-center position-relative"
+    <div class="w-100 bg-purple-100 call-status text-center position-relative"
          role='button'
          v-if="hasParkedCall">
       <b-dropdown no-caret

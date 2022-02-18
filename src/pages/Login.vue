@@ -11,6 +11,8 @@ import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
 import { mapActions, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
+import * as storage from 'src/plugins/helpers/storage'
+
 export default {
   name: 'login',
 
@@ -47,16 +49,16 @@ export default {
       this.setUsage(usage)
 
       this.getSharedCookie().then(sharedCookie => {
-        localStorage.setItem('shared_cookie', sharedCookie)
+        storage.local.setItem('shared_cookie', sharedCookie)
       })
 
-      localStorage.setItem('company_id', company.id)
+      storage.local.setItem('company_id', company.id)
 
       const urlParams = new URLSearchParams(window.location.search)
       const fromClassic = Number(urlParams.get('from_classic'))
 
       if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && fromClassic !== 1 && !this.isAdmin) {
-        location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
+        location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
         window.location.reload()
       }

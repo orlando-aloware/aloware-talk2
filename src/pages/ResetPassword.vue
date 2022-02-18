@@ -94,6 +94,7 @@
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import { mapActions } from 'vuex'
 import { guestMixin } from 'boot/mixins'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'ResetPassword',
@@ -193,7 +194,7 @@ export default {
       this.resetVuex()
       this.setUsage(usage)
 
-      localStorage.setItem('company_id', company.id)
+      storage.local.setItem('company_id', company.id)
 
       this.loading = false
 

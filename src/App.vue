@@ -18,6 +18,7 @@
   </div>
 </template>
 <script>
+import * as storage from 'src/plugins/helpers/storage'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
@@ -38,7 +39,7 @@ export default {
     this.getSharedCookie().then(sharedCookie => {
       this.sharedCookie = sharedCookie
 
-      // localStorage.getItem('shared_cookie') !== this.sharedCookie &&
+      // storage.local.getItem('shared_cookie') !== this.sharedCookie &&
       if (this.$route.name !== 'Login') {
         this.validateCookieUser()
       }
@@ -53,7 +54,7 @@ export default {
       this.getSharedCookie().then(sharedCookie => {
         this.sharedCookie = sharedCookie
 
-        if (localStorage.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+        if (storage.local.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
           this.validateCookieUser()
         }
       })
@@ -79,8 +80,8 @@ export default {
       this.setUsage(usage)
       this.cookieValidated = true
 
-      localStorage.setItem('shared_cookie', this.sharedCookie)
-      localStorage.setItem('company_id', company.id)
+      storage.local.setItem('shared_cookie', this.sharedCookie)
+      storage.local.setItem('company_id', company.id)
 
       const urlParams = new URLSearchParams(window.location.search)
       const fromClassic = Number(urlParams.get('from_classic'))

@@ -14,6 +14,7 @@ import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
+import * as storage from '../plugins/helpers/storage'
 
 Vue.use(Vuex)
 
@@ -42,7 +43,9 @@ export default function (/* { ssrContext } */) {
       filter: {},
       tags: [],
       campaigns: [],
+      campaignsIsLoading: false,
       users: [],
+      usersIsLoading: false,
       ringGroups: [],
       workflows: [],
       changelogs: [],
@@ -367,6 +370,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_CAMPAIGNS', campaigns)
       },
 
+      setCampaignsIsLoading ({ commit }, value) {
+        commit('SET_CAMPAIGNS_IS_LOADING', value)
+      },
+
       newDispositionStatus ({ commit }, dispositionStatus) {
         commit('NEW_DISPOSITION_STATUS', dispositionStatus)
       },
@@ -413,6 +420,14 @@ export default function (/* { ssrContext } */) {
 
       newTag ({ commit }, tag) {
         commit('NEW_TAG', tag)
+      },
+
+      updateTag ({ commit }, tag) {
+        commit('UPDATE_TAG', tag)
+      },
+
+      deleteTag ({ commit }, tag) {
+        commit('DELETE_TAG', tag)
       },
 
       setTags ({ commit }, tags) {
@@ -497,6 +512,10 @@ export default function (/* { ssrContext } */) {
 
       deleteUser ({ commit }, user) {
         commit('DELETE_USER', user)
+      },
+
+      setUsersIsLoading ({ commit }, value) {
+        commit('SET_USERS_IS_LOADING', value)
       },
 
       setWarnings ({ commit }, warnings) {
@@ -771,6 +790,10 @@ export default function (/* { ssrContext } */) {
         state.campaigns = campaigns
       },
 
+      SET_CAMPAIGNS_IS_LOADING (state, value) {
+        state.campaignsIsLoading = value
+      },
+
       NEW_DISPOSITION_STATUS (state, dispositionStatus) {
         if (resourceExists(state.dispositionStatuses, dispositionStatus)) {
           return
@@ -1034,6 +1057,10 @@ export default function (/* { ssrContext } */) {
         }
       },
 
+      SET_USERS_IS_LOADING (state, value) {
+        state.usersIsLoading = value
+      },
+
       SET_WARNINGS (state, warnings) {
         state.warnings = warnings
       },
@@ -1254,7 +1281,12 @@ export default function (/* { ssrContext } */) {
     plugins: [
       createPersistedState({
         key: 'AloWare_vuex',
-        paths: ['cache']
+        paths: ['cache', 'auth.profile'],
+        storage: {
+          getItem: (key) => storage.local.getItem(key),
+          setItem: (key, value) => storage.local.setItem(key, value),
+          removeItem: (key) => storage.local.removeItem(key)
+        }
       })
     ]
   })

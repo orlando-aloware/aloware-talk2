@@ -49,5 +49,9 @@ export default {
           this.loadingParkedCalls = false
         })
     })
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('update_communication')
   }
 }

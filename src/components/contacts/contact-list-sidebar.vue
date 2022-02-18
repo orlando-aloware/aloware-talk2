@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import ContactListSidebarItem from 'components/contacts/contact-list-sidebar-item'
@@ -66,7 +67,7 @@ export default {
     },
 
     contacts () {
-      return this.listItems[this.selectedList.id].data
+      return _.get(this.listItems, `${this.selectedList.id}.data`, [])
     },
 
     widthClass () {
@@ -77,7 +78,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed']),
+    ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed', 'setShowContactsHeader']),
     onBottomScroll () {
       clearTimeout(scrollTimeout)
       // Set a timeout to run after scrolling ends
@@ -111,9 +112,7 @@ export default {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
         this.onBottomScroll()
       }
-    },
-
-    ...mapActions('contacts', ['setShowContactsHeader'])
+    }
   },
 
   mounted () {
@@ -126,7 +125,7 @@ export default {
       this.setShowContactsHeader(this.isExpanded)
     }
 
-    if (this.listItems[this.selectedList.id].data.length < 1) {
+    if (_.get(this.listItems, `${this.selectedList.id}.data.length`, 0) < 1) {
       this.fetch()
     }
   },
@@ -137,10 +136,17 @@ export default {
 
   watch: {
     'contact': function (value) {
-      let index = this.listItems[this.selectedList.id].data.findIndex(item => item.id === value.id)
-      if (index) {
-        this.listItems[this.selectedList.id].data[index] = value
+      if (!_.get(this.listItems, `${this.selectedList.id}.data`, null)) {
+        return
       }
+
+      let index = this.listItems[this.selectedList.id].data.findIndex(item => item.id === value.id)
+
+      if (index === -1) {
+        return
+      }
+
+      this.listItems[this.selectedList.id].data[index] = value
     },
 
     '$route': {

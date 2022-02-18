@@ -91,6 +91,10 @@ export default {
     },
 
     isLiveCall () {
+      if (!this.communication) {
+        return false
+      }
+
       return this.liveCallStatuses.includes(this.communication.current_status2)
     },
 

@@ -60,6 +60,7 @@ import { mapActions, mapGetters } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import _ from 'lodash'
 import { aclMixin } from 'src/plugins/mixins'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'shared-login-menu',
@@ -80,7 +81,7 @@ export default {
   methods: {
     ...mapActions('auth', ['setProfile']),
     onGoToClassic () {
-      window.location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
+      window.location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
     },
     updateDefaultLogin () {
       talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.user.default_app }).then(response => {

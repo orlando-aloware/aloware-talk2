@@ -178,6 +178,10 @@ export default {
       return this.tab === 'phone'
     },
     inProgressAndParkedCallClass () {
+      if (this.tab === 'phone') {
+        return ''
+      }
+
       if (!_.isEmpty(this.dialer.call) && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
         return ['green-phone']
       }

@@ -72,6 +72,7 @@ $spaces: (
  */
 
 // greens
+$green-91: #07D858;
 $green-90: #04BE4C;
 $green-10: #CCF2DB;
 $green-3: #6FCF97;
@@ -222,10 +223,6 @@ $primary-hover: #054CDB;
 
 .bg-dark {
   background: $dark !important;
-}
-
-.bg-purple {
-  background: $purple-90 !important;
 }
 
 // Font family
@@ -429,4 +426,3 @@ $purple-2: #BB6BD9;
 $f-size-12: 12px;
 $f-size-13: 13px;
 $f-size-14: 14px;
-

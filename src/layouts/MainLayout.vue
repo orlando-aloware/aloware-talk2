@@ -190,8 +190,14 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, htmlMixin, webrtcMixin, notificationMixin } from 'src/boot/mixins'
-import broadcast from 'src/boot/broadcast'
+import {
+  aclMixin,
+  communicationMixin,
+  htmlMixin,
+  webrtcMixin,
+  notificationMixin,
+  broadcastMixin
+} from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
 import AppSidebar from 'src/components/layout/app-sidebar'
@@ -206,6 +212,7 @@ import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'MyLayout',
@@ -220,7 +227,15 @@ export default {
     Phone
   },
 
-  mixins: [webrtcMixin, htmlMixin, aclMixin, communicationMixin, notificationMixin],
+  mixins: [
+    webrtcMixin,
+    htmlMixin,
+    aclMixin,
+    communicationMixin,
+    notificationMixin,
+    broadcastMixin
+  ],
+
   data () {
     return {
       loading: true,
@@ -384,7 +399,7 @@ export default {
 
       this.$q.electron.ipcRenderer.on('app_version', (event, data) => {
         this.version = data.version
-        localStorage.setItem('version', this.version)
+        storage.local.setItem('version', this.version)
         window.axios.defaults.headers.common['Version'] = this.version
         this.$axios = window.axios
       })
@@ -436,6 +451,7 @@ export default {
 
     // new in-app call notification
     this.$VueEvent.listen('new_in_app_call', (communication) => {
+      console.log('test 3')
       if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
         this.processActionNotification(communication, 'call')
       }
@@ -721,7 +737,7 @@ export default {
     unsubscribeFromPusher () {
       if (this.authenticated) {
         // just leave the channels
-        broadcast.leave()
+        this.broadcastLeave()
       }
     },
 
@@ -801,7 +817,7 @@ export default {
           )
         }
 
-        broadcast.init()
+        this.broadcastInit()
       }).finally(() => {
         this.getRingGroups()
         this.getBroadcasts()
@@ -809,7 +825,6 @@ export default {
 
         if (['Stats'].includes(this.$route.name)) {
           this.getAvailableMetrics()
-          this.getMetricGroups()
           this.metricsDataLoaded = true
         }
 
@@ -884,6 +899,7 @@ export default {
     getCampaigns () {
       if (this.hasPermissionTo('list campaign')) {
         this.loadingCampaigns = true
+        this.setCampaignsIsLoading(true)
         return this.$axios
           .get('/api/v1/campaign', {
             mode: 'no-cors',
@@ -894,6 +910,7 @@ export default {
           .then((res) => {
             this.setCampaigns(res.data)
             this.loadingCampaigns = false
+            this.setCampaignsIsLoading(false)
             return Promise.resolve()
           })
           .catch((err) => {
@@ -927,6 +944,7 @@ export default {
     getUsers () {
       if (this.hasPermissionTo('list user')) {
         this.loading_users = true
+        this.setUsersIsLoading(true)
         return this.$axios
           .get('/api/v1/user', {
             mode: 'no-cors'
@@ -934,6 +952,7 @@ export default {
           .then((res) => {
             this.setUsers(res.data)
             this.loadingUsers = false
+            this.setUsersIsLoading(false)
             return Promise.resolve()
           })
           .catch((err) => {
@@ -1094,6 +1113,7 @@ export default {
       }
 
       this.loadingAvailableMetrics = true
+      this.setMetricLoader(true)
       return this.$axios
         .get('/api/v2/agents/metrics', {
           params: {
@@ -1135,11 +1155,13 @@ export default {
             }
           }
           this.setAvailableMetrics(structuredMetricGroups)
+          this.getMetricGroups()
           return Promise.resolve()
         })
         .catch((err) => {
           console.error(err)
           this.loadingAvailableMetrics = false
+          this.setMetricLoader(false)
           return Promise.reject()
         })
     },
@@ -1149,6 +1171,7 @@ export default {
         return
       }
 
+      this.setMetricLoader(true)
       this.loadingMetricGroups = true
       return this.$axios
         .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
@@ -1158,12 +1181,14 @@ export default {
         })
         .then(response => {
           this.loadingMetricGroups = false
+          this.setMetricLoader(false)
           this.setMetricGroups(response.data)
           return Promise.resolve()
         })
         .catch((err) => {
           console.error(err)
           this.loadingMetricGroups = false
+          this.setMetricLoader(false)
           return Promise.reject()
         })
     },
@@ -1174,7 +1199,7 @@ export default {
           scope.setTag('id', this.profile.id)
           scope.setTag('name', this.profile.name)
           scope.setTag('company_name', this.profile.company_name)
-          scope.setTag('version', localStorage.getItem('version'))
+          scope.setTag('version', storage.local.getItem('version'))
         })
         if (this.profile.company_id) {
           this.$Sentry.configureScope((scope) => {
@@ -1681,8 +1706,10 @@ export default {
       'resetContactsDefaultVuex',
       'setUsage',
       'setCampaigns',
+      'setCampaignsIsLoading',
       'setRingGroups',
       'setUsers',
+      'setUsersIsLoading',
       'newTag',
       'newWorkflow',
       'setDispositionStatuses',
@@ -1712,7 +1739,7 @@ export default {
       logoutUser: 'logout',
       check: 'check'
     }),
-    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups'])
+    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups', 'setMetricLoader'])
   },
 
   watch: {
@@ -1759,7 +1786,6 @@ export default {
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
         this.getAvailableMetrics()
-        this.getMetricGroups()
         this.metricsDataLoaded = true
       }
 

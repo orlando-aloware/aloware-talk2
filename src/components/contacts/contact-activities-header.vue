@@ -226,7 +226,11 @@ export default {
       this.nextStat = status
       talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
         let contact = { ...this.contact }
-        contact.task_status = status
+        for (let key in res.data) {
+          if (typeof contact[key] !== 'undefined') {
+            contact[key] = res.data[key]
+          }
+        }
         this.$VueEvent.fire('contact_task_status_updated', contact)
         this.isUpdatingStatus = false
         this.nextStat = null

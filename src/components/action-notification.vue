@@ -166,6 +166,7 @@ import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'action-notification',
@@ -198,7 +199,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['notifications', 'dialer']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue']),
     toastClass () {
       let toastClass = 'action-notification notification-border-round'
 
@@ -311,12 +312,32 @@ export default {
       }
 
       return this.queue.length + 1
+    },
+    isCommunicationInCallFishingQueue () {
+      return !_.isEmpty(this.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === this.communicationId))
     }
+  },
+  created () {
+    this.$VueEvent.listen('update_communication', (data) => {
+      if (![
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW
+      ].includes(data.current_status2) && this.isCommunicationInCallFishingQueue) {
+        this.removeFromCallFishingQueue(data.id)
+      }
+    })
   },
   methods: {
     ...mapActions(['setNotifications', 'setShowPhone']),
     autoClose () {
       this.runDateTimeInterval()
+      if ((this.id === 'callFishing' && document.getElementById('callFishing') && !this.isCommunicationInCallFishingQueue) ||
+        (this.id === 'incomingCall' && document.getElementById('incomingCall') && _.isEmpty(this.dialer.call))) {
+        this.processRemoveFromNotification(this.communication)
+        return
+      }
+
       if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
         this.onHidden()
         this.$closeActionNotification(this.id)
@@ -489,6 +510,9 @@ export default {
         })
       }
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('update_communication')
   }
 }
 </script>

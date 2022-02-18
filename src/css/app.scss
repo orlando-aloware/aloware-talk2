@@ -504,7 +504,6 @@ body,
     max-height: 160px;
     height: 100%;
     .tag-items {
-      max-width: 200px;
       .tag-text {
         padding-left: 4px;
       }
@@ -10924,5 +10923,46 @@ screen and (max-width: 956px) {
 .mobile-live-call-bar {
   .dropdown-menu {
     z-index: 10;
+  }
+}
+
+.green-phone,
+.purple-phone {
+  .q-tab__indicator {
+    top: 0 !important;
+    max-width: 38px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 1;
+  }
+}
+
+.green-phone {
+  svg {
+    path {
+      fill: $green-91 !important;
+    }
+  }
+  .q-tab__content {
+    color: $green-91 !important;
+  }
+  .q-tab__indicator {
+    background: $green-91 !important;
+  }
+}
+
+.purple-phone {
+  svg {
+    path {
+      fill: $purple-100 !important;
+    }
+  }
+  .q-tab__content {
+    color: $purple-100 !important;
+  }
+  .q-tab__indicator {
+    background: $purple-100 !important;
   }
 }

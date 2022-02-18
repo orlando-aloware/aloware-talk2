@@ -1,5 +1,6 @@
 import { mapActions } from 'vuex'
 import store from '../../store'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   data () {
@@ -38,13 +39,13 @@ export default {
     },
 
     init () {
-      if (this.$route.query.api_token && (!localStorage.getItem('api_token') || localStorage.getItem('api_token') !== this.$route.query.api_token)) {
+      if (this.$route.query.api_token && (!storage.local.getItem('api_token') || storage.local.getItem('api_token') !== this.$route.query.api_token)) {
         // document.body.className = 'd-none'
         this.loading = true
         // show fullscreen loading
-        localStorage.setItem('api_token', this.$route.query.api_token)
+        storage.local.setItem('api_token', this.$route.query.api_token)
         this.check().then((res) => {
-          localStorage.setItem('company_id', res.data.user.company.id)
+          storage.local.setItem('company_id', res.data.user.company.id)
           this.setCurrentCompany(res.data.user.company)
           this.resetVuex()
           this.$router.push(this.$route.query.redirect || '/').catch((err) => {
