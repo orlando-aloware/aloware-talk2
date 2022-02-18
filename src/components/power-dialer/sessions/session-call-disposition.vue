@@ -1,6 +1,14 @@
 <template>
-  <q-card flat :disabled="sessionLoader">
-    <div class="t-menu pb-2">
+  <q-card
+    flat
+    :disabled="sessionLoader"
+    style="height: 100%;">
+    <div
+      v-if="sessionPaused"
+      class="text-h6 text-grey-80 full-height fill-width row justify-center items-center">
+      Session Paused
+    </div>
+    <div v-else class="t-menu pb-2">
       <div class="t-menu__header no-border t-dense d-flex align-items-center">
         <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
           CALL DISPOSITION
@@ -53,6 +61,7 @@
 
 <script>
 
+import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
 
@@ -61,7 +70,13 @@ export default {
   components: {
     ChipsEllipsis
   },
+  mounted () {
+    this.sessionPaused = false
+  },
   computed: {
+    ...mapFields([
+      'sessionPaused'
+    ]),
     ...mapState([
       'callDispositions',
       'dispositionStatuses'
@@ -104,6 +119,7 @@ export default {
           call_disposition_id: data.id
         }
       })
+      console.log('response :>> ', response)
       if (response?.id) {
         this.call_disposition = response?.call_disposition_id
       }

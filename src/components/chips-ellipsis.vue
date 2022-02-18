@@ -108,7 +108,7 @@ export default {
     },
     selectedItemObject () {
       return this.filteredListItems.find((list, index) => {
-        if (index > this.displayCount) {
+        if (index >= this.displayCount) {
           return list.id === this.selectedItemId
         }
       })
