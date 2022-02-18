@@ -6,7 +6,7 @@
           <q-chip color="grey-50" class="p-0">
             <div
               :class="`text-15 text-lowercase text-capitalize px-2`"
-              v-html="currentCallStatusDisplay">
+              v-html="statusDisplayButton">
               <!-- {{ timerCount > 0 ? 'Will call in' : 'Connected: ' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
@@ -38,7 +38,7 @@
         <q-btn
           @click="nextContact"
           no-wrap unelevated no-caps
-          :disabled="(timerCount !== 0 || togglePause) || !statusCallConnected"
+          :disabled="(!timerIsOver || togglePause) || !statusCallConnected"
           size="sm" :color="togglePause ? 'grey-7' : 'red-7'"
           class="sessions-button free-width mx-1">
           <CallDropIcon class="mr-2" color="white" />
@@ -101,7 +101,7 @@
           @click="onToggleMute"
           no-wrap outline no-caps
           size="sm" color="grey-4"
-          :disabled="timerCount !== 0"
+          :disabled="!timerIsOver"
           class="sessions-button free-width mx-1">
           <MuteIcon height="13px" class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
@@ -112,7 +112,7 @@
           @click="onToggleRecording"
           no-wrap outline no-caps
           size="sm" color="grey-4"
-          :disabled="timerCount !== 0"
+          :disabled="!timerIsOver"
           class="sessions-button free-width mx-1">
           <StopIcon v-if="toggleRecording" class="mr-2" color="#62666E" />
           <RecordIcon v-else class="mr-2" color="red" />
@@ -135,6 +135,7 @@
           :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           unelevated :outline="!sessionPaused"
           no-wrap no-caps size="sm"
+          :disabled="toggleEnd"
           :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`">
           <PauseIcon
             class="mr-2"
@@ -145,12 +146,15 @@
           </div>
         </q-btn>
         <q-btn
+          @click="onToggleEnd"
           no-wrap outline no-caps
-          size="sm" color="grey-4"
-          :disabled="timerCount !== 0"
-          class="sessions-button free-width mx-1">
+          size="sm"
+          :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
+          :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
           <EndCallIcon class="mr-2" color="#62666E" />
-          <div class="text-body2 text-black">End Session</div>
+          <div class="text-body2 text-black">
+            {{ toggleEnd ? 'Ending Session' : 'End Session'}}
+          </div>
         </q-btn>
       </div>
     </div>
@@ -218,6 +222,9 @@ export default {
       'listItems',
       'selectedList'
     ]),
+    currentSessionStatus () {
+      return this.dialer?.currentStatus || ''
+    },
     address () {
       let { taskToCall } = this
       let address = ''
@@ -302,6 +309,14 @@ export default {
         this.statuses.mute = val
       }
     },
+    toggleEnd: {
+      get () {
+        return this.statuses.end
+      },
+      set (val) {
+        this.statuses.end = val
+      }
+    },
     status () {
       return AutoDialTaskStatus.STATUSES
     },
@@ -322,6 +337,9 @@ export default {
     },
     statusReady () {
       return this.dialer.currentStatus === 'READY'
+    },
+    timerIsOver () {
+      return this.timerCount === 0
     }
   },
   methods: {
@@ -345,7 +363,7 @@ export default {
           setTimeout(() => {
             this.timerCount--
           }, 1000)
-        } else if (this.timerCount === 0) {
+        } else if (this.timerIsOver) {
           if (!this.togglePause) {
             setTimeout(async () => {
               await this.runTask()
@@ -381,8 +399,54 @@ export default {
     onTogglePause () {
       this.togglePause = !this.togglePause
     },
+    onToggleEnd () {
+      this.toggleEnd = !this.toggleEnd
+    },
     resetTimer () {
       this.timerCount = this.sessionSettings.warmup_period_in_seconds
+    },
+    reRoute () {
+      let routePath = '/power-dialer'
+      if (this.selectedList.name !== 'My Queue') {
+        routePath += `/${this.selectedList.id}`
+      }
+      this.$router.push(routePath)
+    },
+    managingSessionFlows (status = '') {
+      let {
+        togglePause,
+        statusCallConnected,
+        timerIsOver
+      } = this
+      switch (status) {
+        // If Status is READY
+        case 'READY':
+          if (!statusCallConnected && timerIsOver) {
+            console.log('2121 :>> ', 2121)
+            this.resetTimer()
+          }
+          break
+        case 'WRAP_UP':
+          break
+        case 'MAKING_CALL':
+          break
+        case 'ANSWERING_CALL':
+          break
+        case 'REJECTING_CALL':
+          break
+        case 'CALL_CONNECTED':
+          break
+        case 'HANGING_UP_CALL':
+          this.taskToCall = this.powerDialerTasks.in_queue[0]
+          if (!togglePause) {
+            this.resetTimer()
+          }
+          break
+        case 'CALL_DISCONNECTED':
+          break
+        default:
+          break
+      }
     }
   },
   watch: {
@@ -396,11 +460,10 @@ export default {
         this.sessionPaused = true
       }
       if (!task?.id && !this.hasExistingTaskList) {
-        let routePath = '/power-dialer'
-        if (this.selectedList.name !== 'My Queue') {
-          routePath += `/${this.selectedList.id}`
-        }
-        this.$router.push(routePath)
+        this.reRoute()
+      }
+      if (!task?.id && !this.statusCallConnected && this.toggleEnd) {
+        this.reRoute()
       }
       if (task?.id) {
         this.TOGGLE_SESSION_LOADER(true)
@@ -421,6 +484,11 @@ export default {
     },
     timerCount: {
       async handler (value) {
+        if (value === 0 && !this.statusCallConnected) {
+          if (this.toggleEnd) {
+            console.log('Should END SESSION...')
+          }
+        }
         await this.tickTimer()
       },
       deep: true
@@ -432,31 +500,30 @@ export default {
       }
     },
     togglePause (value) {
-      console.log('togglePause', value)
       if (!value) {
-        if ((!this.statusCallConnected || this.statusReady) && this.timerCount === 0) {
-          console.log('...Resetting timer')
+        console.log('value ---------- :>> ', value)
+        this.sessionPaused = false
+        if (this.timerIsOver) {
           this.resetTimer()
         }
-        this.sessionPaused = false
       }
     },
-    'dialer.currentStatus' (callStatus) {
-      console.log('Status: ', callStatus)
-      switch (callStatus) {
-        case 'HANGING_UP_CALL':
-          this.taskToCall = this.powerDialerTasks.in_queue[0]
-          if (!this.togglePause) {
-            this.resetTimer()
-          }
-          break
-        default:
+    toggleEnd (value) {
+      console.log('END? ', value && this.timerIsOver)
+      if ((value && this.timerIsOver) && !this.statusCallConnected) {
+        setTimeout(() => {
+          this.reRoute()
+        }, 2000)
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
       if (tasks.length > 0) {
         this.initialize()
       }
+    },
+    currentSessionStatus (status) {
+      console.log(' %c CURRENT SESSION STATUS : ', 'background: red; color: white;', status)
+      this.managingSessionFlows(status)
     }
   },
   data () {

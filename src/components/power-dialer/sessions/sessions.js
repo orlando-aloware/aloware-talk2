@@ -1,7 +1,7 @@
 import { mapFields } from 'vuex-map-fields'
 import { mapActions } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
-
+import { isEmpty } from 'lodash'
 export default {
   data () {
     return {
@@ -16,24 +16,28 @@ export default {
     status () {
       return AutoDialTaskStatus.STATUSES
     },
-    currentCallStatusDisplay () {
+    statusDisplayButton () {
       switch (this.dialer?.currentStatus) {
         case 'READY':
-          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+          if (isEmpty(this.activeTask)) {
+            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+          } else {
+            return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+          }
         case 'WRAP_UP':
-          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+          return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
         case 'MAKING_CALL':
-          return `Calling...`
+          return `Dialing...`
         case 'ANSWERING_CALL':
-          return '---'
+          return 'Answering Call'
         case 'REJECTING_CALL':
-          return '---'
+          return 'Rejecting Call'
         case 'CALL_CONNECTED':
-          return `Connected: <span class="text-weight-bold text-grey-7 text-lowercase">${this.dialer.timer}</span>`
+          return `Connected <span class="text-weight-bold text-grey-7 text-lowercase">${this.dialer.timer}</span>`
         case 'HANGING_UP_CALL':
-          return '---'
+          return 'Hanging Up Call'
         case 'CALL_DISCONNECTED':
-          return '---'
+          return 'Call Disconnected'
         default:
           return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
       }
@@ -52,7 +56,7 @@ export default {
       console.log(data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        // this.$VueEvent.fire('makeCall', data)
+        this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -79,28 +83,28 @@ export default {
       this.setShowPhone(false)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
-          console.log(' %c Changing status to : IN_PROGRESS ', 'background: red; color: white;')
+          console.log(' %c Changing status to : IN_PROGRESS ', 'background: yellow; color: black;')
           this.activeTask = this.list.find(lst => lst.id === task.contact_id)
           this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
           break
         case AutoDialTaskStatus.STATUS_COMPLETED:
-          console.log(' %c Changing status to : COMPLETED/CALLED ', 'background: red; color: white;')
+          console.log(' %c Changing status to : COMPLETED/CALLED ', 'background: yellow; color: black;')
           this.powerDialerTasks.called.push(this.activeTask)
           this.$VueEvent.fire('endWrapUp')
           this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_FAILED:
-          console.log(' %c Changing status to : FAILED ', 'background: red; color: white;')
+          console.log(' %c Changing status to : FAILED ', 'background: yellow; color: black;')
           this.powerDialerTasks.failed.push(this.activeTask)
           this.$VueEvent.fire('endWrapUp')
           this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_QUEUED:
-          console.log(' %c Changing status to : IN_QUEUE ', 'background: red; color: white;')
+          console.log(' %c Changing status to : IN_QUEUE ', 'background: yellow; color: black;')
           this.powerDialerTasks.in_queue.push(this.activeTask)
           break
         case AutoDialTaskStatus.STATUS_SCHEDULED:
-          console.log(' %c Changing status to : SCHEDULED ', 'background: red; color: white;')
+          console.log(' %c Changing status to : SCHEDULED ', 'background: yellow; color: black;')
           this.powerDialerTasks.scheduled.push(this.activeTask)
           break
         default:
