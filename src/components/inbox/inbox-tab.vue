@@ -195,6 +195,7 @@ export default {
         'selectedFilter'
       ]
     ),
+    ...mapState('contacts', ['contact']),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -285,6 +286,7 @@ export default {
 
   methods: {
     ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm', 'setChannelClonedFilter']),
+    ...mapActions('contacts', ['setContact']),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -426,6 +428,28 @@ export default {
     onCreateNewFilter (filter) {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
       this.toggleFilterModelForm(true)
+    },
+    updateContact (contact) {
+      if (_.isEmpty(this.contact)) {
+        return
+      }
+
+      if (_.isEmpty(contact)) {
+        return
+      }
+
+      let currentContact = JSON.parse(JSON.stringify(this.contact))
+      for (let key in contact) {
+        if (key === 'communications_and_audits') {
+          continue
+        }
+
+        if (typeof currentContact[key] !== 'undefined') {
+          currentContact[key] = contact[key]
+        }
+      }
+
+      this.setContact(currentContact)
     }
   },
   created () {
@@ -488,6 +512,7 @@ export default {
           let contact = response.data
           // check data loaded
           this.setSelectedContact(contact)
+          // this.setContact(contact)
           this.updateContacts(contact)
         })
       }
@@ -510,73 +535,76 @@ export default {
         return
       }
 
-      talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-        let contact = response.data
-        let contacts = _.cloneDeep(this.contacts)
-        let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-        let isInContacts = this.contacts.find(item => item.id === contact.id)
+      setTimeout(() => {
+        talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+          let contact = response.data
+          let contacts = _.cloneDeep(this.contacts)
+          let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+          let isInContacts = this.contacts.find(item => item.id === contact.id)
+          this.updateContact(contact)
 
-        // check if communication is a live call
-        if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
-          [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
-          let liveContacts = _.cloneDeep(this.liveContacts)
+          // check if communication is a live call
+          if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
+            [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+            let liveContacts = _.cloneDeep(this.liveContacts)
 
-          if (!isInLiveContacts) {
-            liveContacts.push(contact)
-          }
-
-          if (isInContacts) {
-            let index = contacts.findIndex(item => item.id === contact.id)
-            contacts.splice(index, 1)
-            this.setContacts(contacts)
-          }
-
-          this.setLiveContacts(
-            [
-              // connected calls
-              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
-              // parked calls
-              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
-              // incoming calls
-              ...liveContacts.filter(item => [
-                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-              ].includes(item.last_communication.current_status2))
-            ]
-          )
-        } else {
-          // only modify order if new contact task === current task
-          if (this.currentTask === contact.task_status) {
             if (!isInLiveContacts) {
-              // if contact is not in the list, then automatically add it to the top
-              if (!isInContacts) {
-                if (this.contacts.length > this.perPage) {
-                  contacts.pop()
-                }
-              } else {
-                // get all contacts except the current one
-                contacts = _.clone(contacts.filter(item => item.id !== contact.id))
-              }
+              liveContacts.push(contact)
+            }
 
-              if (this.sorting.order === 'asc') {
-                contacts.push(contact)
-              } else {
-                contacts.unshift(contact)
-              }
+            if (isInContacts) {
+              let index = contacts.findIndex(item => item.id === contact.id)
+              contacts.splice(index, 1)
               this.setContacts(contacts)
             }
+
+            this.setLiveContacts(
+              [
+                // connected calls
+                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+                // parked calls
+                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+                // incoming calls
+                ...liveContacts.filter(item => [
+                  CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                  CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                  CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                  CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                  CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+                ].includes(item.last_communication.current_status2))
+              ]
+            )
+          } else {
+            // only modify order if new contact task === current task
+            if (this.currentTask === contact.task_status) {
+              if (!isInLiveContacts) {
+                // if contact is not in the list, then automatically add it to the top
+                if (!isInContacts) {
+                  if (this.contacts.length > this.perPage) {
+                    contacts.pop()
+                  }
+                } else {
+                  // get all contacts except the current one
+                  contacts = _.clone(contacts.filter(item => item.id !== contact.id))
+                }
+
+                if (this.sorting.order === 'asc') {
+                  contacts.push(contact)
+                } else {
+                  contacts.unshift(contact)
+                }
+                this.setContacts(contacts)
+              }
+            }
           }
-        }
-      })
+        })
+      }, 1000)
     })
 
     this.$VueEvent.listen('update_communication', communication => {

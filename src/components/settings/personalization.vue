@@ -101,7 +101,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany'])
+    ...mapState('cache', ['currentCompany'])
   },
 
   data () {

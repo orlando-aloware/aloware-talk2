@@ -163,7 +163,8 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile']),
-    ...mapState(['ringGroups', 'currentCompany'])
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['ringGroups'])
   },
 
   data () {

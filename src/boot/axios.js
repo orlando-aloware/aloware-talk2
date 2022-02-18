@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import { Platform } from 'quasar'
+import * as storage from 'src/plugins/helpers/storage'
 
 window.axios = axios
 
@@ -20,9 +21,9 @@ if (Platform.within.iframe) {
   window.axios.defaults.headers.common['Requested-From'] = 'talk2-iframe'
 }
 
-let apiToken = localStorage.getItem('api_token')
+let apiToken = storage.local.getItem('api_token')
 if (apiToken) {
-  window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+  window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 }
 
 Vue.prototype.$axios = window.axios

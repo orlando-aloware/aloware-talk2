@@ -3,6 +3,7 @@ import auth from '../../boot/auth'
 import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   data () {
@@ -97,7 +98,7 @@ export default {
       },
       headers: {
         Accept: 'application/json',
-        Authorization: 'Bearer ' + localStorage.getItem('api_token'),
+        Authorization: 'Bearer ' + storage.local.getItem('api_token'),
         'X-Socket-Id': window.Echo ? window.Echo.socketId() : ''
       },
       isLoadingPreviousActivities: false,
@@ -233,10 +234,22 @@ export default {
           if (index === 'communications_and_audits') {
             continue
           }
+
+          if (index === 'unread_texts_count' && typeof data[index] === 'undefined') {
+            updatedContact[index] = 0
+            continue
+          }
+
           updatedContact[index] = data[index]
         }
 
+        if (typeof updatedContact['unread_texts_count'] !== 'undefined' &&
+          typeof data['unread_texts_count'] === 'undefined') {
+          updatedContact['unread_texts_count'] = 0
+        }
+
         this.updateSelectedContact(updatedContact)
+        this.setContact(updatedContact)
         this.updateContacts(updatedContact)
       }
     })
@@ -388,7 +401,7 @@ export default {
 
       this.scrollMessages()
 
-      if (!this.smsOnly && (localStorage.getItem('PREVIOUS_ROUTE_NAME') !== 'Contacts' || forceClearLoading)) {
+      if (!this.smsOnly && (storage.local.getItem('PREVIOUS_ROUTE_NAME') !== 'Contacts' || forceClearLoading)) {
         this.loadingContactCommunications = false
       }
     },

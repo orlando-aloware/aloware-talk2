@@ -24,7 +24,7 @@ export default {
   components: { VueMultiselect },
   computed: {
     ...mapGetters({ }),
-    ...mapState({ currentCompany: 'currentCompany' }),
+    ...mapState('cache', ['currentCompany']),
     timezones () {
       if (this.currentCompany && this.currentCompany.country) {
         if (!['US', 'CA'].includes(this.currentCompany.country)) {

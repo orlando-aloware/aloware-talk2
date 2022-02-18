@@ -19,7 +19,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
     isProduction () {
       return process.env.APP_ENV === 'production'

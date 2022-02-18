@@ -84,6 +84,7 @@
 import { mapActions, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { aclMixin } from 'src/plugins/mixins'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   mixins: [aclMixin],
@@ -146,11 +147,11 @@ export default {
       this.resetVuex()
       this.setUsage(usage)
 
-      localStorage.setItem('company_id', company.id)
+      storage.local.setItem('company_id', company.id)
 
       // redirect to Alo classic for agents
       if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && !this.isAdmin) {
-        location.href = process.env.API_URL + '?from_talk_2=1&token=' + localStorage.getItem('shared_cookie')
+        location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
         let redirectPath = this.$route.query.redirect || '/'
 
@@ -187,7 +188,8 @@ export default {
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
+    ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions(['resetVuex', 'setUsage']),
     ...mapActions('auth', ['login'])
   }
 }

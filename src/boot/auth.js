@@ -1,4 +1,5 @@
 import store from '../store/index'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   user: {
@@ -7,18 +8,18 @@ export default {
   },
 
   check (preventLogout = false) {
-    if (localStorage.getItem('api_token') === null) {
+    if (storage.local.getItem('api_token') === null) {
       this.user.authenticated = false
       this.user.profile = null
 
       return Promise.reject()
     } else {
-      window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+      window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
       return window.axios.post('/get-auth-user', {
         device_info: null
       }).then((res) => {
         // success
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
         this.user.authenticated = true
         this.user.profile = res.data.user
         store().commit('SET_USAGE', res.data.user.usage)
@@ -46,7 +47,7 @@ export default {
       device_info: deviceInfo
     }).then((res) => {
       // success
-      localStorage.setItem('api_token', res.data.meta.token)
+      storage.local.setItem('api_token', res.data.meta.token)
       store().commit('SET_FIRST_LOGIN', res.data.data.first_login)
       this.check()
 
@@ -62,10 +63,10 @@ export default {
       device_info: deviceInfo
     }).then((res) => {
       // success
-      localStorage.removeItem('api_token')
-      localStorage.removeItem('impersonate')
-      localStorage.removeItem('portal_session')
-      localStorage.removeItem('company_id')
+      storage.local.removeItem('api_token')
+      storage.local.removeItem('impersonate')
+      storage.local.removeItem('portal_session')
+      storage.local.removeItem('company_id')
       window.axios.defaults.headers.common['Authorization'] = null
       this.user.authenticated = false
       this.user.profile = null
@@ -125,10 +126,10 @@ export default {
     return window.axios.post('/api/v1/user/' + userId + '/impersonate').then((res) => {
       // success
       if (company) {
-        localStorage.setItem('api_token', res.data.api_token)
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
-        localStorage.setItem('impersonate', true)
-        localStorage.setItem('company_id', company.id)
+        storage.local.setItem('api_token', res.data.api_token)
+        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
+        storage.local.setItem('impersonate', true)
+        storage.local.setItem('company_id', company.id)
       } else {
         return Promise.reject()
       }

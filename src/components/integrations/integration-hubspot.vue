@@ -153,7 +153,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany']),
+    ...mapState('cache', ['currentCompany']),
 
     isWorkflowValid () {
       return this.workflow.id

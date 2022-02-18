@@ -1,11 +1,12 @@
 <template>
-  <b-overlay :show="changingSelectedContact"
+  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !campaigns || !users"
              :opacity="0.85"
              class="h-100 w-100"
              variant="white"
              rounded="sm"
              v-if="authenticated">
-    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
+         v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
       <template v-if="!isInbox">
         <contact-list-sidebar ref="contactListSidebar"
                               @toggleContactActivities="toggleContactListSidebar"/>
@@ -100,7 +101,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
     ...mapGetters('auth', ['authenticated']),
-    ...mapState(['contactDetailsDrawer']),
+    ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'campaigns', 'users']),
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     }

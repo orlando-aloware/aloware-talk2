@@ -35,6 +35,8 @@
         Contacts
       </q-route-tab>
       <q-route-tab name="phone"
+                   class="phone-tab"
+                   :class="inProgressAndParkedCallClass"
                    to="/phone"
                    :content-class="isActive('phone') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
                    :ripple="false"
@@ -145,7 +147,9 @@ import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
+import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
 import { mapActions, mapState } from 'vuex'
+import _ from 'lodash'
 export default {
   name: 'app-footer',
   components: {
@@ -160,6 +164,8 @@ export default {
     ContactMenuItem
   },
 
+  mixins: [parkCallMixins],
+
   computed: {
     ...mapState(['isMobile', 'dialer', 'showPhone']),
     isMoreActive () {
@@ -170,11 +176,27 @@ export default {
     },
     isPhoneActive () {
       return this.tab === 'phone'
+    },
+    inProgressAndParkedCallClass () {
+      if (this.tab === 'phone') {
+        return ''
+      }
+
+      if (!_.isEmpty(this.dialer.call) && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
+        return ['green-phone']
+      }
+
+      if (this.parkedCalls.length) {
+        return ['purple-phone']
+      }
+
+      return []
     }
   },
   data () {
     return {
-      tab: 'inbox'
+      tab: 'inbox',
+      parkedCallQueue: []
     }
   },
 

@@ -281,7 +281,8 @@
         </b-button>
 
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
-          <router-link class="activity-status text-decoration-none" :to="{ name: 'Communication', params: {communicationId: communication.id }}"
+          <router-link class="activity-status text-decoration-none"
+                       :to="{ name: 'Communication', params: {communicationId: communication.id }}"
                        :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
             <template
               v-if="communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
@@ -609,13 +610,19 @@ export default {
       if (!id) {
         return null
       }
+
       id = parseInt(id)
       let found = this.campaigns.find(campaign => campaign.id === id)
+
       if (found) {
         return found
       }
 
-      return null
+      return {
+        id: id,
+        name: 'Unknown Line',
+        incoming_number: ''
+      }
     },
 
     getRelativeDateTime () {

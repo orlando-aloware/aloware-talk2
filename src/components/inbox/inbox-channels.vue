@@ -497,6 +497,10 @@ export default {
     },
 
     checkCommunicationChannels (communication) {
+      if (!this.activeChannel) {
+        return true
+      }
+
       switch (communication.type) {
         case CommunicationTypes.CALL:
           return ['calls', 'voicemails', 'recordings'].includes(this.activeChannel.value)
@@ -1118,8 +1122,14 @@ export default {
     })
 
     this.$VueEvent.listen('mark_contact_communications_all_as_read', (data) => {
+      let contactId = _.get(data, 'id', null)
+
+      if (!contactId) {
+        return
+      }
+
       // get current contact's communications
-      let contactCommunications = this.communications.filter(communication => communication.contact.id === data.id)
+      let contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
 
       // iterate through and update is_read value
       contactCommunications.forEach((communication) => {
