@@ -66,7 +66,8 @@
       </q-item>
     </template>
 
-    <template v-slot:selected-item="scope">
+    <template v-slot:selected-item="scope"
+              v-if="useChips">
       <q-chip
         dense
         :tabindex="scope.tabindex"

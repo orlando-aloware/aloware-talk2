@@ -451,7 +451,6 @@ export default {
 
     // new in-app call notification
     this.$VueEvent.listen('new_in_app_call', (communication) => {
-      console.log('test 3')
       if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
         this.processActionNotification(communication, 'call')
       }
@@ -613,7 +612,7 @@ export default {
     if (this.authenticated) {
       this.initAuth()
     } else {
-      this.check().then(() => {
+      this.check().then((res) => {
         this.loading = false
         this.authCheckStatus = true
         this.showRefreshButton = false

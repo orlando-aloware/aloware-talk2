@@ -661,9 +661,10 @@ export default {
     })
 
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
-      if (this.$route.name !== 'Inbox Contact Task') {
+      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch) {
         return
       }
+
       let index = this.contacts.findIndex(item => item.id === contact.id)
       if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status)) {
         this.onItemSelected(this.contacts[index + 1] || this.contacts[0])

@@ -216,8 +216,8 @@ export default {
       get () {
         return this.contact
       },
-      set (isOpen) {
-        return isOpen
+      set (activityContact) {
+        return activityContact
       }
     }
   },
@@ -239,6 +239,8 @@ export default {
             contact[key] = res.data[key]
           }
         }
+        contact.task_status = status
+        this.activityContact = contact
         this.$VueEvent.fire('contact_task_status_updated', contact)
         this.isUpdatingStatus = false
         this.nextStat = null

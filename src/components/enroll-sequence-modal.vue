@@ -9,7 +9,7 @@
         label-for="input-1"
         description="Choose the sequence you want this contact to enroll"
       >
-        <sequence-selector @change="onSequenceSelected"></sequence-selector>
+        <sequence-selector :multiple="true" :use-chips="true" @change="onSequenceSelected"></sequence-selector>
       </b-form-group>
     </b-form>
     <template slot="modal-footer">

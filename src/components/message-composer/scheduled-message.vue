@@ -119,7 +119,8 @@ export default {
     onSend () {
       this.isSending = true
       return talk2Api.V1.message.scheduled(this.formatMessage())
-        .then(response => {
+        .then(() => {
+          this.$generalNotification('Message has been successfully scheduled to be sent.', 'success')
           this.resetMessageComposerSms()
           this.scheduleMessageOpen(false)
         }).finally(() => {
