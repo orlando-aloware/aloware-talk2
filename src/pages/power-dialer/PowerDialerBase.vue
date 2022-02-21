@@ -51,7 +51,7 @@ export default {
     ]),
     ...mapActions('powerDialer', [
       'getMyQueueList',
-      'setSelectedList'
+      'setSelectedPDList'
     ]),
     async updateList (data) {
       await this.loadList(data.id)
@@ -60,7 +60,7 @@ export default {
       if (this.$route.meta.title === 'Power Dialer') {
         let response = await this.getMyQueueList()
         this.listLoaded({ ...response.data, id: 'my-queue' })
-        // this.setSelectedList({
+        // this.setSelectedPDList({
         //   id: response.data.id,
         //   name: response.data.name,
         //   type: response.data.type

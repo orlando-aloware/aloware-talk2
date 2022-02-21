@@ -11,7 +11,7 @@ export default {
       'resetSearch'
     ]),
     ...mapActions('powerDialer', [
-      'setSelectedList'
+      'setSelectedPDList'
     ]),
     async loadList (id) {
       if (!id) {
@@ -36,7 +36,7 @@ export default {
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })
-          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
           let filters = {
             contact_lists: {
               operator: 1,
