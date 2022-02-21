@@ -16,7 +16,7 @@
                            borderless
                            customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"
-                           @clicked="resetFilters">
+                           @clicked="onResetFilters">
                 <i class="fa fa-times"></i>
               </compact-btn>
               <compact-btn borderless
@@ -369,6 +369,7 @@ export default {
     return {
       filter: null,
       clonedFilter: null,
+      previousRoute: null,
       searchFields: ['contact.name', 'contact.phone_number'],
       currentPage: 0,
       isLoadingMore: false,
@@ -432,6 +433,11 @@ export default {
       'toggleFilterModelForm',
       'toggleFilterDialog']),
 
+    onResetFilters () {
+      this.resetFilters()
+      this.getCommunications(this.filter)
+    },
+
     resetFilters () {
       this.filter = _.clone(Filters.DEFAULT_STATE.filter)
       this.filter.search_text = this.searchText
@@ -460,6 +466,9 @@ export default {
       this.filter.answer_status = this.answerStatus
       this.mentionUserId = null
 
+      this.filterRight = 'newest'
+      this.sorting.order = 'desc'
+
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setCommunications([])
@@ -478,6 +487,8 @@ export default {
           this.filter.mentioned_user_id = filter.users
         }
       }
+
+      this.getCommunications(this.filter)
     },
 
     onCreateNewFilter (filter) {
@@ -857,6 +868,7 @@ export default {
 
     sortFilter (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
+      this.getCommunications(this.filter)
     },
 
     redirectMentionsChannel (mention) {
@@ -931,8 +943,6 @@ export default {
       }
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setCommunications', 'setSelectedCommunication', 'setChannelClonedFilter', 'resetChannelChangedFilterFields']),
-
     handleNewMention (communication) {
       let api = talk2Api.V2.mentions
 
@@ -961,6 +971,9 @@ export default {
   },
 
   watch: {
+    $route (to, from) {
+      this.previousRoute = from
+    },
     'activeChannel': function (value) {
       if (this.$route.name === 'Inbox Channel') {
         this.searchText = null
@@ -983,9 +996,6 @@ export default {
         }
       }
     },
-    'sorting.order': function () {
-      this.getCommunications(this.filter)
-    },
     '$route.name': function (value) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(value)) {
         // since mention has different data structure to other channels, need to set property to compare as comm id
@@ -998,15 +1008,15 @@ export default {
       if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value) && !this.$route.params.id) {
         this.resetFilters()
         this.isScrolled = false
+        this.getCommunications(this.filter)
       }
     },
-    filter: {
-      deep: true,
-      handler () {
-        if (['Inbox Channel', 'Inbox Contact Mention Communication', 'Inbox Contact', 'Inbox Channel Task Status'].includes(this.$route.name) && !this.isScrolled) {
-          this.getCommunications(this.filter)
-        }
+
+    '$route.params.channel': function () {
+      if (this.previousRoute && this.previousRoute.params.channel === 'inbox') {
+        return
       }
+      this.getCommunications(this.filter)
     }
   },
 
@@ -1195,6 +1205,10 @@ export default {
           _this.setSelectedCommunication(communication)
         }
       }
+    }
+
+    if (['Inbox Channel', 'Inbox Contact Mention Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+      this.getCommunications(this.filter)
     }
   }
 }

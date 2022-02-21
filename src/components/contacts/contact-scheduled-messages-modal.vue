@@ -21,8 +21,7 @@
                            :options="sortOptions"
                            :show-labels="false"
                            :allow-empty="false"
-                           v-model="filter.sort"
-                           @select="onSort">
+                           v-model="filter.sort">
           </vue-multiselect>
           <b-button variant="primary" @click="refreshList">Refresh List</b-button>
         </b-form>
@@ -173,7 +172,7 @@ export default {
       placeholder: 'Sort by',
       sortOptions: [
         {
-          value: 'scheduled',
+          value: 'schedule',
           label: 'Scheduled Date'
         },
         {
@@ -183,7 +182,7 @@ export default {
       ],
       filter: {
         sort: {
-          value: 'scheduled',
+          value: 'schedule',
           label: 'Scheduled Date'
         },
         size: 10,
@@ -274,6 +273,12 @@ export default {
   watch: {
     'isScheduledMessageListOpen': function (value) {
       this.isOpen = value
+    },
+    'filter.sort': {
+      deep: true,
+      handler () {
+        this.getMessages()
+      }
     }
   }
 }

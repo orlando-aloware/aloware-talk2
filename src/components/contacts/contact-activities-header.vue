@@ -95,7 +95,7 @@
                 class="mx-2">
             <timer-o-icon></timer-o-icon>
           </span>
-          <q-spinner-bars v-if="isUpdatingStatus"
+          <q-spinner-bars v-if="isUpdatingStatus && nextStat === ContactTaskStatus.STATUS_PENDING"
                           class="pl-1 pr-1"
                           color="primary"
                           size="20px"
@@ -211,6 +211,14 @@ export default {
         default:
           return ''
       }
+    },
+    activityContact: {
+      get () {
+        return this.contact
+      },
+      set (activityContact) {
+        return activityContact
+      }
     }
   },
   data () {
@@ -231,6 +239,8 @@ export default {
             contact[key] = res.data[key]
           }
         }
+        contact.task_status = status
+        this.activityContact = contact
         this.$VueEvent.fire('contact_task_status_updated', contact)
         this.isUpdatingStatus = false
         this.nextStat = null

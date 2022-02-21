@@ -133,6 +133,8 @@ export default {
       }
 
       query.filters = this.filters
+
+      query.relations = ['lastCommunication']
       return query
     },
     resetFilters () {

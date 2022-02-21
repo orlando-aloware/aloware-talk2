@@ -26,6 +26,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
+import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 export default {
   name: 'settings-save-bar',
 
@@ -88,10 +89,33 @@ export default {
           delete user.password_confirmation
         }
 
+        if (user.outbound_calling_selector === 1) {
+          user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+        }
+
+        if (user.outbound_calling_selector === 2) {
+          user.default_outbound_campaign_id = null
+          user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+        }
+
+        if (user.outbound_calling_selector === 3) {
+          user.default_outbound_campaign_id = null
+          user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+        }
+
         return talk2Api.V1.user.update(this.user.id, user).then(response => {
           let data = { ...response.data, operating_hours: JSON.parse(response.data.operating_hours) }
           data.password = ''
           data.password_confirmation = ''
+
+          if (data.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && data.default_outbound_campaign_id) {
+            data.outbound_calling_selector = 1
+          } else if (data.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+            data.outbound_calling_selector = 3
+          } else {
+            data.outbound_calling_selector = 2
+          }
+          console.log(data)
           this.setUserClone(_.cloneDeep(data))
           this.setUser(_.cloneDeep(this.userClone))
 

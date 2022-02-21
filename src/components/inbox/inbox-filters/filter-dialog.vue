@@ -320,7 +320,9 @@ export default {
       this.resetChannelChangedFilterFields()
 
       for (const item in this.filter) {
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) && +this.filter[item] !== +this.defaultFilterModel.filter[item] && this.filterFields.includes(item)) {
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
+          +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
+          (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: +this.filter[item]
@@ -329,7 +331,9 @@ export default {
           continue
         }
 
-        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) && JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) && this.filterFields.includes(item)) {
+        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
+          JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) &&
+          (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: this.filter[item]
