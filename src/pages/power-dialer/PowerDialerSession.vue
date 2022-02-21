@@ -75,7 +75,13 @@ export default {
       return DEFAULT_FILTER_LIST
     },
     isValidList () {
+      if (this.selectedList.id !== this.$route.params.id) {
+        return false
+      }
       return this.selectedList.name.length > 0
+    },
+    test () {
+      return this.$route
     }
   },
   mounted () {
@@ -130,11 +136,7 @@ export default {
       })
     },
     async fetchTasks () {
-      let id = this.selectedList.name.length === 0 || this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
-      console.log('this.selectedList :>> ', this.selectedList)
-      console.log('id :>> ', id)
-      let resx = await this.getPowerDialerList(id)
-      console.log('resx :>> ', resx)
+      await this.fetchCurrentList()
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
         let params = {}
         let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
@@ -146,14 +148,25 @@ export default {
         let res = await this.getSessionTaskByFilter(params)
         this.powerDialerTasks[stat] = res.data.data
       })
+    },
+    async fetchCurrentList () {
+      let res = null
+      let id = ''
+      if (this.isValidList) {
+        id = this.selectedList.id
+        console.log('100 :>> ', id)
+        res = await this.getPowerDialerList(id)
+      } else {
+        id = this.selectedList.name.length === 0 || this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+        console.log('101 :>> ', this.$route.params.id)
+        res = await this.getPowerDialerList(this.$route.params.id)
+      }
+      console.log('RES -------- :>> ', res)
     }
   },
   watch: {
     async listItems (val) {
-      if (parseInt(this.selectedList?.id) && this.isValidList) {
-        console.log('878787 :>> ', 878787)
-        await this.fetchTasks()
-      }
+      await this.fetchTasks()
       this.getTasks()
     }
   }
