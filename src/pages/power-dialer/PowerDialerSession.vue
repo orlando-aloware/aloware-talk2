@@ -53,11 +53,11 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'listItems',
-      'selectedList',
       'contact'
     ]),
     ...mapGetters('powerDialer', [
-      'sessionSidebarExpanded'
+      'sessionSidebarExpanded',
+      'selectedList'
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks'
@@ -73,6 +73,9 @@ export default {
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
+    },
+    isValidList () {
+      return this.selectedList.name.length > 0
     }
   },
   mounted () {
@@ -100,7 +103,8 @@ export default {
   methods: {
     ...mapActions('powerDialer', [
       'resetPowerDialerTasks',
-      'getSessionTaskByFilter'
+      'getSessionTaskByFilter',
+      'getPowerDialerList'
     ]),
     getTasks () {
       /**
@@ -126,6 +130,11 @@ export default {
       })
     },
     async fetchTasks () {
+      let id = this.selectedList.name.length === 0 || this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+      console.log('this.selectedList :>> ', this.selectedList)
+      console.log('id :>> ', id)
+      let resx = await this.getPowerDialerList(id)
+      console.log('resx :>> ', resx)
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
         let params = {}
         let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
@@ -141,7 +150,10 @@ export default {
   },
   watch: {
     async listItems (val) {
-      await this.fetchTasks()
+      if (parseInt(this.selectedList?.id) && this.isValidList) {
+        console.log('878787 :>> ', 878787)
+        await this.fetchTasks()
+      }
       this.getTasks()
     }
   }

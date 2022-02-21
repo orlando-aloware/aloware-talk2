@@ -169,7 +169,6 @@ export default {
           this.processFetch(params, false, false)
           break
         default:
-          console.log('333 :>> ', this.id)
           this.processFetch(params, false, false, this.id)
       }
     },
