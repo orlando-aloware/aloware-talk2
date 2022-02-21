@@ -122,5 +122,9 @@ export default {
   },
   SET_WARMUP_DURATIONS: (state, data) => {
     state.warmupDurations = data
+  },
+  SET_SELECTED_PD_LIST: (state, data) => {
+    console.log('data  ===================== :>> ', data)
+    state.selectedList = data
   }
 }

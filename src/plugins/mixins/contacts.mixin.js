@@ -171,11 +171,13 @@ export default {
           let listId = this.id === 'my-queue' ? this.myQueue?.id : this.id
           let list = _.get(this.lists, listId, { id: null, name: '', type: null })
 
-          this.setSelectedList({
-            id: listId,
-            name: list.name,
-            type: list.type
-          })
+          if (isContactModule) {
+            this.setSelectedList({
+              id: listId,
+              name: list.name,
+              type: list.type
+            })
+          }
           this.markCheckedAll()
         })
         .finally(() => {

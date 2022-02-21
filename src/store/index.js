@@ -1280,7 +1280,7 @@ export default function (/* { ssrContext } */) {
     plugins: [
       createPersistedState({
         key: 'AloWare_vuex',
-        paths: ['cache', 'auth.profile'],
+        paths: ['cache', 'auth.profile', 'powerDialer.sessionSettings'],
         storage: {
           getItem: (key) => storage.local.getItem(key),
           setItem: (key, value) => storage.local.setItem(key, value),
