@@ -45,7 +45,8 @@ export default {
       'setSelectedList'
     ]),
     ...mapActions('powerDialer', [
-      'updateMyQueueListData'
+      'updateMyQueueListData',
+      'setSelectedPDList'
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init () {
@@ -173,6 +174,12 @@ export default {
 
           if (isContactModule) {
             this.setSelectedList({
+              id: listId,
+              name: list.name,
+              type: list.type
+            })
+          } else {
+            this.setSelectedPDList({
               id: listId,
               name: list.name,
               type: list.type

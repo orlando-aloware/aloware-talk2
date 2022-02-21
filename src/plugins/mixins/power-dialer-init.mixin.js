@@ -8,8 +8,10 @@ export default {
       'listLoaded',
       'contactsLoaded',
       'setCurrentListFilters',
-      'setSelectedList',
       'resetSearch'
+    ]),
+    ...mapActions('powerDialer', [
+      'setSelectedList'
     ]),
     async loadList (id) {
       if (!id) {

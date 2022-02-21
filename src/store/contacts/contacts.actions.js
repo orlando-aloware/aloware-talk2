@@ -91,7 +91,7 @@ export default {
   },
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
-    commit('powerDialer/SET_SELECTED_PD_LIST', payload, { root: true })
+    // commit('powerDialer/SET_SELECTED_PD_LIST', payload, { root: true })
   },
 
   setSelectedListContactCount: ({ commit }, count) => {

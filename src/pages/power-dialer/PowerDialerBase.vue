@@ -47,11 +47,11 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'resetSearch',
-      'setSelectedList',
       'listLoaded'
     ]),
     ...mapActions('powerDialer', [
-      'getMyQueueList'
+      'getMyQueueList',
+      'setSelectedList'
     ]),
     async updateList (data) {
       await this.loadList(data.id)

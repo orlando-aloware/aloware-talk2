@@ -110,7 +110,8 @@ export default {
     ...mapActions('powerDialer', [
       'resetPowerDialerTasks',
       'getSessionTaskByFilter',
-      'getPowerDialerList'
+      'getPowerDialerList',
+      'setSelectedPDList'
     ]),
     getTasks () {
       /**
@@ -157,10 +158,15 @@ export default {
         console.log('100 :>> ', id)
         res = await this.getPowerDialerList(id)
       } else {
-        id = this.selectedList.name.length === 0 || this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+        id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
         console.log('101 :>> ', this.$route.params.id)
         res = await this.getPowerDialerList(this.$route.params.id)
       }
+      this.setSelectedPDList({
+        id: res.id,
+        name: res.name,
+        type: res.type
+      })
       console.log('RES -------- :>> ', res)
     }
   },
