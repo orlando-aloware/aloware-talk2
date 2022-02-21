@@ -467,14 +467,14 @@ export default {
       'contactsLoaded',
       'columnsReordered',
       'setListSelectedContacts',
-      'setSelectedList',
+      // 'setSelectedList',
       'createListOpen',
       'removeListClose',
       'setCurrentListFilters',
       'removeListOpen',
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
-      'setSelectedListContactCount',
+      // 'setSelectedListContactCount',
       'pinnedCountLoaded'
     ]),
     ...mapActions('powerDialer', [

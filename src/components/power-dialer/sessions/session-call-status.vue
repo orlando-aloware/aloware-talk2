@@ -205,6 +205,9 @@ export default {
       vm.prevRoute = from
     })
   },
+  mounted () {
+    this.tickTimer()
+  },
   computed: {
     ...mapFields([
       'sessionPaused'
@@ -452,7 +455,9 @@ export default {
   watch: {
     async taskToCall (task) {
       if (task) {
+        this.TOGGLE_SESSION_LOADER(true)
         await this.getContact({ id: this.taskToCall.id })
+        this.TOGGLE_SESSION_LOADER(false)
       }
     },
     async activeTask (task) {
@@ -494,11 +499,11 @@ export default {
       deep: true
       // immediate: true // This ensures the watcher is triggered upon creation
     },
-    async hasExistingTaskList (isTrue) {
-      if (isTrue) {
-        await this.tickTimer()
-      }
-    },
+    // async hasExistingTaskList (isTrue) {
+    //   if (isTrue) {
+    //     await this.tickTimer()
+    //   }
+    // },
     togglePause (value) {
       if (!value) {
         console.log('value ---------- :>> ', value)

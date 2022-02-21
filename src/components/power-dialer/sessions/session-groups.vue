@@ -181,9 +181,6 @@ export default {
     },
     status () {
       return AutoDialTaskStatus.STATUSES
-    },
-    test () {
-      return this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.id}`)
     }
   },
   methods: {

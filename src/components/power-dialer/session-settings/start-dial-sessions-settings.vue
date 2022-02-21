@@ -411,7 +411,7 @@ export default {
        * IF selected item is personal/company
        */
       if (this.selectedItemName === 'Untitled') {
-        let newSettings = { ...this.defaultValues }
+        let newSettings = { ...this.selectedItem }
         let res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
           contact_list_id: this.list.id,

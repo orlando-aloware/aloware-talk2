@@ -86,17 +86,16 @@ export default {
     ]),
     ...mapGetters('powerDialer', [
       'sessionLoader',
-      'sessionSettings',
-      'defaultSettings'
+      'sessionSettings'
     ]),
     filteredCallDispositions () {
       return this.callDispositions.filter(d => {
-        return this.defaultSettings.call_disposition_ids.includes(d.id)
+        return this.sessionSettings.call_disposition_ids.includes(d.id)
       })
     },
     filteredContactDispositions () {
       return this.dispositionStatuses.filter(d => {
-        return this.defaultSettings.contact_disposition_ids.includes(d.id)
+        return this.sessionSettings.contact_disposition_ids.includes(d.id)
       })
     },
     contactDisposition () {
