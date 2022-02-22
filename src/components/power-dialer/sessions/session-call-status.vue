@@ -38,7 +38,7 @@
         <q-btn
           @click="nextContact"
           no-wrap unelevated no-caps
-          :disabled="(!timerIsOver || togglePause) || !statusCallConnected"
+          :disabled="(!timerIsOver || togglePause) && !statusCallConnected"
           size="sm" :color="togglePause ? 'grey-7' : 'red-7'"
           class="sessions-button free-width mx-1">
           <CallDropIcon class="mr-2" color="white" />
@@ -209,7 +209,7 @@ export default {
     this.tickTimer()
   },
   computed: {
-    ...mapFields([
+    ...mapFields('powerDialer', [
       'sessionPaused'
     ]),
     ...mapState([
@@ -342,10 +342,11 @@ export default {
       return this.dialer.currentStatus === 'READY'
     },
     timerIsOver () {
-      return this.timerCount === 0
+      return this.timerCount === 0 || this.timerCount === -1
     }
   },
   methods: {
+    ...mapActions(['setShowPhone']),
     ...mapActions('powerDialer', [
       'getContact'
     ]),
@@ -367,16 +368,26 @@ export default {
             this.timerCount--
           }, 1000)
         } else if (this.timerIsOver) {
+          console.log('100 :>> ', 100)
           if (!this.togglePause) {
+            console.log('101 :>> ', 101)
             setTimeout(async () => {
               await this.runTask()
+              this.$VueEvent.fire('togglePhone')
+              this.setShowPhone(false)
             }, 1000)
           }
           if (this.togglePause) {
             this.sessionPaused = true
+            console.log('Pausing session :>> ', this.sessionPaused)
           }
         }
       }
+    },
+    async fetchContact (taskId = '') {
+      this.TOGGLE_SESSION_LOADER(true)
+      await this.getContact({ id: taskId })
+      this.TOGGLE_SESSION_LOADER(false)
     },
     initialize () {
       this.TOGGLE_SESSION_LOADER(false)
@@ -403,6 +414,9 @@ export default {
       this.togglePause = !this.togglePause
     },
     onToggleEnd () {
+      if (this.sessionPaused) {
+        this.reRoute()
+      }
       this.toggleEnd = !this.toggleEnd
     },
     resetTimer () {
@@ -455,9 +469,7 @@ export default {
   watch: {
     async taskToCall (task) {
       if (task) {
-        this.TOGGLE_SESSION_LOADER(true)
-        await this.getContact({ id: this.taskToCall.id })
-        this.TOGGLE_SESSION_LOADER(false)
+        await this.fetchContact(this.taskToCall.id)
       }
     },
     async activeTask (task) {
@@ -471,9 +483,7 @@ export default {
         this.reRoute()
       }
       if (task?.id) {
-        this.TOGGLE_SESSION_LOADER(true)
-        await this.getContact({ id: task.id })
-        this.TOGGLE_SESSION_LOADER(false)
+        await this.fetchContact(task.id)
       }
       // if (obj?.id) {
       //   setTimeout(() => {
@@ -505,8 +515,8 @@ export default {
     //   }
     // },
     togglePause (value) {
+      console.log('value pause :>> ', value)
       if (!value) {
-        console.log('value ---------- :>> ', value)
         this.sessionPaused = false
         if (this.timerIsOver) {
           this.resetTimer()

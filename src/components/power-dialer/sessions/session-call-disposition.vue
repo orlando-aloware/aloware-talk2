@@ -74,7 +74,7 @@ export default {
     this.sessionPaused = false
   },
   computed: {
-    ...mapFields([
+    ...mapFields('powerDialer', [
       'sessionPaused'
     ]),
     ...mapState([

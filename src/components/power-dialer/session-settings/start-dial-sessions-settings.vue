@@ -410,7 +410,8 @@ export default {
        * IF selected item is temporary OR
        * IF selected item is personal/company
        */
-      if (this.selectedItemName === 'Untitled') {
+      if (!this.selectedItemName || this.selectedItemName === 'Untitled') {
+        console.log('Creating temporary session...')
         let newSettings = { ...this.selectedItem }
         let res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
@@ -421,6 +422,7 @@ export default {
           await this.getDialerSessionSettings()
         }
       } else {
+        console.log('Updating session setting list...')
         let { id } = this.selectedItem
         // this.activeSessionSettingId = id
         await this.updateContactsList({

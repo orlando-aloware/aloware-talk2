@@ -84,7 +84,7 @@ export default {
       return this.$route
     }
   },
-  mounted () {
+  async mounted () {
     this.resetPowerDialerTasks()
     this.$VueEvent.listen('contact_list_item_created', (task) => {
       console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
@@ -105,6 +105,7 @@ export default {
       //   this.handleDesktopVoicemailNotification(task)
       // }
     })
+    await this.fetchTasks()
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -120,6 +121,7 @@ export default {
        */
       let { list, powerDialerTasks } = this
       list.forEach(lst => {
+        console.log('lst.task_status :>> ', lst.task_status)
         switch (lst.task_status) {
           case AutoDialTaskStatus.STATUS_QUEUED:
             powerDialerTasks.in_queue.push(lst)
@@ -155,11 +157,9 @@ export default {
       let id = ''
       if (this.isValidList) {
         id = this.selectedList.id
-        console.log('100 :>> ', id)
         res = await this.getPowerDialerList(id)
       } else {
         id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
-        console.log('101 :>> ', this.$route.params.id)
         res = await this.getPowerDialerList(this.$route.params.id)
       }
       this.setSelectedPDList({
@@ -172,7 +172,6 @@ export default {
   },
   watch: {
     async listItems (val) {
-      await this.fetchTasks()
       this.getTasks()
     }
   }

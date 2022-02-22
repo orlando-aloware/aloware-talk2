@@ -110,10 +110,10 @@ export default {
     },
 
     togglePhone () {
-      // if (this.$route.name !== 'Power Dialer') {
-      //   this.$VueEvent.fire('togglePhone')
-      // }
-      this.$VueEvent.fire('togglePhone')
+      if (this.$route.meta.id !== 'power-dialer-session') {
+        this.$VueEvent.fire('togglePhone')
+      }
+      // this.$VueEvent.fire('togglePhone')
     }
   }
 }

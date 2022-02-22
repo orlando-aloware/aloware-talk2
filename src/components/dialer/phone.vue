@@ -1590,15 +1590,18 @@ export default {
     this.$VueEvent.listen('togglePhone', () => {
       this.togglePhone()
     })
+
     this.$VueEvent.listen('showPhone', () => {
       this.isVisible = true
     })
+
     this.$VueEvent.listen('hidePhone', () => {
       this.isVisible = false
     })
+
     this.setupDraggable()
     this.setupContactLocalTime()
-    this.isVisible = true
+    this.isVisible = this.$route.meta.id !== 'power-dialer-session'
     this.showLocalTime = true
   },
   methods: {
