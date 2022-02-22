@@ -57,7 +57,7 @@ export default {
       this.broadcastListen()
     },
     broadcastListen () {
-      let userId = _.get(this.profile, 'id', null)
+      const userId = _.get(this.profile, 'id', null)
 
       if (!userId) {
         return
@@ -68,262 +68,255 @@ export default {
           this.setUserStatus(event.status)
         })
         .listen('.user.in-app.contact.contact_assigned', (event) => {
-          let contact = event.contact
           if (event.tags) {
-            contact.tags = event.tags
-            contact.tag_ids = contact.tags.map((a) => a.id)
+            event.contact.tags = event.tags
+            event.contact.tag_ids = event.contact.tags.map((a) => a.id)
           }
           if (event.user) {
-            contact.user = event.user
+            event.contact.user = event.user
           }
-          this.$VueEvent.fire('new_in_app_contact_assigned', contact)
+          this.$VueEvent.fire('new_in_app_contact_assigned', event.contact)
         })
         .listen('.user.in-app.appointment', (event) => {
-          let engagement = event.engagement
-          let contact = event.contact
-          let timeDiff = event.time_diff
-          let unit = event.unit
-          this.$VueEvent.fire('new_in_app_appointment', { engagement, contact, timeDiff, unit })
+          this.$VueEvent.fire('new_in_app_appointment', {
+            engagement: event.engagement,
+            contact: event.contact,
+            timeDiff: event.time_diff,
+            unit: event.unit
+          })
         })
         .listen('.user.in-app.reminder', (event) => {
-          let engagement = event.engagement
-          let contact = event.contact
-          let timeDiff = event.timeDiff
-          let unit = event.unit
-          this.$VueEvent.fire('new_in_app_reminder', { engagement, contact, timeDiff, unit })
+          this.$VueEvent.fire('new_in_app_reminder', {
+            engagement: event.engagement,
+            contact: event.contact,
+            timeDiff: event.timeDiff,
+            unit: event.unit
+          })
         })
         .listen('.user.in-app.communication.new_call', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = communication.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
-            if (event.contact_tags && communication && communication.contact) {
-              communication.contact.tags = event.contact_tags
+            if (event.contact_tags && event.communication && event.communication.contact) {
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_in_app_call', communication)
+            this.$VueEvent.fire('new_in_app_call', event.communication)
           }
         })
         .listen('.user.in-app.communication.answered_call', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = communication.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
-            if (event.contact_tags && communication && communication.contact) {
-              communication.contact.tags = event.contact_tags
+            if (event.contact_tags && event.communication && event.communication.contact) {
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('answered_in_app_call', communication)
+            this.$VueEvent.fire('answered_in_app_call', event.communication)
           }
         })
         .listen('.user.in-app.communication.new_sms', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = communication.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
-            if (event.contact_tags && communication && communication.contact) {
-              communication.contact.tags = event.contact_tags
+            if (event.contact_tags && event.communication && event.communication.contact) {
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_in_app_sms', communication)
+            this.$VueEvent.fire('new_in_app_sms', event.communication)
           }
         })
         .listen('.user.in-app.communication.new_voicemail', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = event.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
-            if (event.contact_tags && communication && communication.contact) {
-              communication.contact.tags = event.contact_tags
+            if (event.contact_tags && event.communication && event.communication.contact) {
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_in_app_voicemail', communication)
+            this.$VueEvent.fire('new_in_app_voicemail', event.communication)
           }
         })
         .listen('.user.in-app.communication.new_fax', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = communication.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.communication.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
-            if (event.contact_tags && communication && communication.contact) {
-              communication.contact.tags = event.contact_tags
+            if (event.contact_tags && event.communication && event.communication.contact) {
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_in_app_fax', communication)
+            this.$VueEvent.fire('new_in_app_fax', event.communication)
           }
         })
         .listen('.user.desktop.contact.contact_assigned', (event) => {
-          let contact = event.contact
           if (event.tags) {
-            contact.tags = event.tags
-            contact.tag_ids = contact.tags.map((a) => a.id)
+            event.contact.tags = event.tags
+            event.contact.tag_ids = event.contact.tags.map((a) => a.id)
           }
           if (event.user) {
-            contact.user = event.user
+            event.contact.user = event.user
           }
-          this.$VueEvent.fire('new_desktop_contact_assigned', contact)
+          this.$VueEvent.fire('new_desktop_contact_assigned', event.contact)
         })
         .listen('.user.desktop.appointment', (event) => {
-          let engagement = event.engagement
-          let contact = event.contact
-          let timeDiff = event.timeDiff
-          let unit = event.unit
-          this.$VueEvent.fire('new_desktop_appointment', { engagement, contact, timeDiff, unit })
+          this.$VueEvent.fire('new_desktop_appointment', {
+            engagement: event.engagement,
+            contact: event.contact,
+            timeDiff: event.timeDiff,
+            unit: event.unit
+          })
         })
         .listen('.user.desktop.reminder', (event) => {
-          let engagement = event.engagement
-          let contact = event.contact
-          let timeDiff = event.timeDiff
-          let unit = event.unit
-          this.$VueEvent.fire('new_desktop_reminder', { engagement, contact, timeDiff, unit })
+          this.$VueEvent.fire('new_desktop_reminder', {
+            engagement: event.engagement,
+            contact: event.contact,
+            timeDiff: event.timeDiff,
+            unit: event.unit
+          })
         })
         .listen('.user.desktop.communication.new_call', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = event.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
             if (event.contact_tags) {
-              communication.contact.tags = event.contact_tags
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_desktop_call', communication)
+            this.$VueEvent.fire('new_desktop_call', event.communication)
           }
         })
         .listen('.user.desktop.communication.answered_call', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = event.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
             if (event.contact_tags) {
-              communication.contact.tags = event.contact_tags
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_answered_call', communication)
+            this.$VueEvent.fire('new_answered_call', event.communication)
           }
         })
         .listen('.user.desktop.communication.new_sms', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = event.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
             if (event.contact_tags) {
-              communication.contact.tags = event.contact_tags
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_desktop_sms', communication)
+            this.$VueEvent.fire('new_desktop_sms', event.communication)
           }
         })
         .listen('.user.desktop.communication.new_voicemail', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = event.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
             if (event.contact_tags) {
-              communication.contact.tags = event.contact_tags
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_desktop_voicemail', communication)
+            this.$VueEvent.fire('new_desktop_voicemail', event.communication)
           }
         })
         .listen('.user.desktop.communication.new_fax', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            let communication = event.communication
-            communication.campaign = campaign
+            event.communication.campaign = campaign
             if (event.tags) {
-              communication.tags = event.tags
-              communication.tag_ids = event.tags.map((a) => a.id)
+              event.communication.tags = event.tags
+              event.communication.tag_ids = event.tags.map((a) => a.id)
             }
             if (event.contact) {
-              communication.contact = event.contact
+              event.communication.contact = event.contact
             }
             if (event.contact_tags) {
-              communication.contact.tags = event.contact_tags
+              event.communication.contact.tags = event.contact_tags
             }
             if (event.owner) {
-              communication.owner = event.owner
+              event.communication.owner = event.owner
             }
-            this.$VueEvent.fire('new_desktop_fax', communication)
+            this.$VueEvent.fire('new_desktop_fax', event.communication)
           }
         })
         .notification((notification) => {
@@ -342,150 +335,133 @@ export default {
           }
         })
         .listen('.communication.created', (event) => {
-          let communication = event.communication
           if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = communication.tags.map((a) => a.id)
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
           }
           if (event.contact) {
-            communication.contact = event.contact
+            event.communication.contact = event.contact
           }
           if (event.owner) {
-            communication.owner = event.owner
+            event.communication.owner = event.owner
           }
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            communication.campaign = campaign
+            event.communication.campaign = campaign
           }
-          this.$VueEvent.fire('new_communication', communication)
+          this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
-          let communication = event.communication
           if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = communication.tags.map((a) => a.id)
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
           }
           if (event.contact) {
-            communication.contact = event.contact
+            event.communication.contact = event.contact
           }
           if (event.owner) {
-            communication.owner = event.owner
+            event.communication.owner = event.owner
           }
-          let campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
-            communication.campaign = campaign
+            event.communication.campaign = campaign
           }
-          this.$VueEvent.fire('update_communication', communication)
+          this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.communication.deleted', (event) => {
           this.$VueEvent.fire('delete_communication', event.communication)
         })
         .listen('.incoming_number.created', (event) => {
-          let campaign = this.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
+          const campaign = this.campaigns.find(campaign => campaign.id === event.incoming_number.campaign_id)
           if (campaign) {
             campaign.incoming_number = event.incoming_number.phone_number
             this.updateCampaign(campaign)
           }
         })
         .listen('.campaign.created', (event) => {
-          let campaign = event.campaign
-          campaign.last_call_datetime = event.last_call_datetime
-          this.newCampaign(campaign)
-          this.$VueEvent.fire('campaign_created', campaign)
+          event.campaign.last_call_datetime = event.last_call_datetime
+          this.newCampaign(event.campaign)
+          this.$VueEvent.fire('campaign_created', event.campaign)
         })
         .listen('.campaign.updated', (event) => {
-          let campaign = event.campaign
-          campaign.last_call_datetime = event.last_call_datetime
-          this.updateCampaign(campaign)
-          this.$VueEvent.fire('campaign_updated', campaign)
+          event.campaign.last_call_datetime = event.last_call_datetime
+          this.updateCampaign(event.campaign)
+          this.$VueEvent.fire('campaign_updated', event.campaign)
         })
         .listen('.campaign.deleted', (event) => {
           this.deleteCampaign(event.campaign)
           this.$VueEvent.fire('campaign_deleted', event.campaign)
         })
         .listen('.tag.created', (event) => {
-          let tag = event.tag
-          this.newTag(tag)
-          this.$VueEvent.fire('tag_created', tag)
+          this.newTag(event.tag)
+          this.$VueEvent.fire('tag_created', event.tag)
         })
         .listen('.tag.updated', (event) => {
-          let tag = event.tag
-          this.updateTag(tag)
-          this.$VueEvent.fire('tag_updated', tag)
+          this.updateTag(event.tag)
+          this.$VueEvent.fire('tag_updated', event.tag)
         })
         .listen('.tag.deleting', (event) => {
-          let tag = event.tag
-          this.deleteTag(tag)
-          this.$VueEvent.fire('tag_deleting', tag)
+          this.deleteTag(event.tag)
+          this.$VueEvent.fire('tag_deleting', event.tag)
         })
         .listen('.disposition_status.created', (event) => {
-          let dispositionStatus = event.disposition_status
-          this.newDispositionStatus(dispositionStatus)
-          this.$VueEvent.fire('disposition_status_created', dispositionStatus)
+          this.newDispositionStatus(event.disposition_status)
+          this.$VueEvent.fire('disposition_status_created', event.disposition_status)
         })
         .listen('.disposition_status.updated', (event) => {
-          let dispositionStatus = event.disposition_status
-          this.updateDispositionStatus(dispositionStatus)
-          this.$VueEvent.fire('disposition_status_updated', dispositionStatus)
+          this.updateDispositionStatus(event.disposition_status)
+          this.$VueEvent.fire('disposition_status_updated', event.disposition_status)
         })
         .listen('.disposition_status.deleted', (event) => {
-          let dispositionStatus = event.disposition_status
-          this.deleteDispositionStatus(dispositionStatus)
-          this.$VueEvent.fire('disposition_status_deleted', dispositionStatus)
+          this.deleteDispositionStatus(event.disposition_status)
+          this.$VueEvent.fire('disposition_status_deleted', event.disposition_status)
         })
         .listen('.call_disposition.bulk_created', (event) => {
-          let callDispositions = event.call_dispositions
-          this.newBulkCallDisposition(callDispositions)
-          this.$VueEvent.fire('call_disposition_bulk_created', callDispositions)
+          this.newBulkCallDisposition(event.call_dispositions)
+          this.$VueEvent.fire('call_disposition_bulk_created', event.call_dispositions)
         })
         .listen('.call_disposition.created', (event) => {
-          let callDisposition = event.call_disposition
-          this.newCallDisposition(callDisposition)
-          this.$VueEvent.fire('call_disposition_created', callDisposition)
+          this.newCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_created', event.call_disposition)
         })
         .listen('.call_disposition.updated', (event) => {
-          let callDisposition = event.call_disposition
-          this.updateCallDisposition(callDisposition)
-          this.$VueEvent.fire('call_disposition_updated', callDisposition)
+          this.updateCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_updated', event.call_disposition)
         })
         .listen('.call_disposition.deleted', (event) => {
-          let callDisposition = event.call_disposition
-          this.deleteCallDisposition(callDisposition)
-          this.$VueEvent.fire('call_disposition_deleted', callDisposition)
+          this.deleteCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_deleted', event.call_disposition)
         })
         .listen('.contact.created', (event) => {
-          let contact = event.contact
-          if (contact) {
+          if (event.contact) {
             if (event.user) {
-              contact.user = event.user
+              event.contact.user = event.user
             }
             if (event.tags) {
-              contact.tags = event.tags
-              contact.tag_ids = contact.tags.map((a) => a.id)
+              event.contact.tags = event.tags
+              event.contact.tag_ids = event.contact.tags.map((a) => a.id)
             }
-            this.$VueEvent.fire('contact_created', contact)
+            this.$VueEvent.fire('contact_created', event.contact)
           }
         })
         .listen('.contact.updated', (event) => {
-          let contact = event.contact
-          if (contact) {
+          if (event.contact) {
             if (event.user) {
-              contact.user = event.user
+              event.contact.user = event.user
             }
             if (event.tags) {
-              contact.tags = event.tags
-              contact.tag_ids = contact.tags.map((a) => a.id)
+              event.contact.tags = event.tags
+              event.contact.tag_ids = event.contact.tags.map((a) => a.id)
             }
-            this.$VueEvent.fire('contact_updated', contact)
+            this.$VueEvent.fire('contact_updated', event.contact)
           }
         })
         .listen('.contact.deleted', (event) => {
-          let contact = event.contact
-          if (contact) {
+          if (event.contact) {
             if (event.user) {
-              contact.user = event.user
+              event.contact.user = event.user
             }
-            this.$VueEvent.fire('delete_contact', contact)
+            this.$VueEvent.fire('delete_contact', event.contact)
           }
         })
         .listen('.filter.created', (event) => {
@@ -523,9 +499,8 @@ export default {
           this.$VueEvent.fire('workflow_created', event.workflow)
         })
         .listen('.workflow.updated', (event) => {
-          let workflow = event.workflow
-          this.updateWorkflow(workflow)
-          this.$VueEvent.fire('workflow_updated', workflow)
+          this.updateWorkflow(event.workflow)
+          this.$VueEvent.fire('workflow_updated', event.workflow)
         })
         .listen('.workflow.deleted', (event) => {
           this.deleteWorkflow(event.workflow)

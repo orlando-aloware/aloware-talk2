@@ -160,6 +160,18 @@ const translateDispositionStatusText = (status) => {
     // voicemail status
     case CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW:
       return CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL
+    // missed + voicemail virtual status
+    case CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_AND_VOICEMAIL_NEW:
+      return 'Missed (Including Voicemail)'
+    // attended appointment status
+    case CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED:
+      return CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED_NEW
+    // canceled appointment status
+    case CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED:
+      return CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED_NEW
+    // set appointment status
+    case CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET:
+      return CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET_NEW
     default:
       return 'N/A'
   }

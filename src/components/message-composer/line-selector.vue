@@ -57,28 +57,28 @@ export default {
     ...mapGetters('contacts', ['contact']),
 
     formattedLineOptions () {
-      let contactLines = []
+      const contactLines = { data: [] }
       if (this.contactCampaignsFromCommunications.length > 0) {
-        contactLines = [...this.contactCampaignsFromCommunications]
+        contactLines.data = [...this.contactCampaignsFromCommunications]
 
-        contactLines.unshift({
+        contactLines.data.unshift({
           group: 'Contact Lines',
           disable: true
         })
       }
 
-      let linesArray = contactLines
+      const linesArray = { data: contactLines.data }
 
       if (this.otherCampaignsFromCommunications && this.otherCampaignsFromCommunications.length > 0) {
-        let otherLines = [...this.otherCampaignsFromCommunications]
+        const otherLines = [...this.otherCampaignsFromCommunications]
         otherLines.unshift({
           group: 'Other Lines',
           disable: true
         })
-        linesArray = [...contactLines, ...otherLines]
+        linesArray.data = [...contactLines.data, ...otherLines]
       }
 
-      return linesArray
+      return linesArray.data
     }
   },
 
@@ -154,8 +154,8 @@ export default {
       if (!this.selectedLine && Object.keys(this.selectedLine).length < 1) {
         return 'Select line...'
       }
-      let title = this.incomingNumber ? this.$options.filters.fixPhone(this.incomingNumber.phone_number) : ''
-      let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
+      const title = this.incomingNumber ? this.$options.filters.fixPhone(this.incomingNumber.phone_number) : ''
+      const titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.selectedLine.name}</span> ${titleText}`
     },
 

@@ -43,7 +43,9 @@ export default {
     },
     onUpdate () {
       talk2Api.V1.contact.update(this.contact.id, { 'text_authorized': this.contact.text_authorized }).then(response => {
-        this.setContact(response.data)
+        if (response.data.id === this.contact.id) {
+          this.setContact(response.data)
+        }
       })
     }
   },
@@ -54,7 +56,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

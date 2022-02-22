@@ -16,6 +16,14 @@ export const DISPOSITION_STATUS_INVALID = 'invalid'
 export const DISPOSITION_STATUS_PLACED = 'placed'
 // voicemail disposition
 export const DISPOSITION_STATUS_VOICEMAIL = 'voicemail'
+// missed + voicemail virtual status
+export const DISPOSITION_STATUS_MISSED_AND_VOICEMAIL = 'missed+voicemail'
+// attended appointment status
+export const DISPOSITION_STATUS_APPOINTMENT_ATTENDED_NEW = 'attended'
+// canceled appointment status
+export const DISPOSITION_STATUS_APPOINTMENT_CANCELED_NEW = 'canceled'
+// set appointment status
+export const DISPOSITION_STATUS_APPOINTMENT_SET_NEW = 'set'
 // Call is still going on.
 export const DISPOSITION_STATUS_INPROGRESS_NEW = 1
 // call is abandoned without ringing target.
@@ -34,6 +42,8 @@ export const DISPOSITION_STATUS_INVALID_NEW = 7
 export const DISPOSITION_STATUS_PLACED_NEW = 8
 // virtual status for automation rules
 export const DISPOSITION_STATUS_VOICEMAIL_NEW = 12
+// missed + voicemail virtual status
+export const DISPOSITION_STATUS_MISSED_AND_VOICEMAIL_NEW = 13
 
 // appointment statuses
 export const DISPOSITION_STATUS_APPOINTMENT_ATTENDED = 9

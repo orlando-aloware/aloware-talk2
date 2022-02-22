@@ -12,16 +12,22 @@ export default {
       const users = _.get(this, 'users', null)
 
       if (!id || !users) {
-        return null
+        return {
+          id: id,
+          name: ''
+        }
       }
 
-      let found = users.find(user => user.id === id)
+      const found = users.find(user => user.id === id)
 
       if (found) {
         return found
       }
 
-      return null
+      return {
+        id: id,
+        name: ''
+      }
     },
 
     getUserName (user) {

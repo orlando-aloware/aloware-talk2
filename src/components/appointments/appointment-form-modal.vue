@@ -255,27 +255,20 @@ export default {
     },
     onSubmit () {
       this.isSaving = true
-      let pastActionText = 'Added'
-      let presentActionText = 'Adding'
-      let request = talk2Api.V1.contact.addEngagement(this.contact.id, this.getParams())
-      if (this.id) {
-        request = talk2Api.V1.contact.updateEngagement(this.contact.id, this.id, this.getParams())
-        pastActionText = 'Updated'
-        presentActionText = 'Updating'
-      }
 
-      request.then(response => {
-        this.$generalNotification(`Event has been ${pastActionText.toLowerCase()}`)
-        this.onHidden()
-      }).catch(error => {
-        console.log(error)
-        this.$generalNotification(`Error while ${presentActionText.toLowerCase()} event`, 'error')
-      }).finally(() => {
-        this.isSaving = false
-      })
+      talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.id, this.getParams())
+        .then(response => {
+          this.$generalNotification(`Event has been ${(this.id ? 'updated' : 'added')}`)
+          this.onHidden()
+        }).catch(error => {
+          console.log(error)
+          this.$generalNotification(`Error while ${(this.id ? 'adding' : 'updating')} event`, 'error')
+        }).finally(() => {
+          this.isSaving = false
+        })
     },
     getParams () {
-      let params = {
+      const params = {
         date: this.appointment.date,
         time: this.appointment.time,
         duration: this.appointment.duration,
@@ -326,13 +319,11 @@ export default {
       this.appointment.smsReminder.frequencies = frequencies
     },
     appendSmsReminderTemplateVariable (variable) {
-      let body = this.appointment.smsReminder.body ?? ''
-      this.appointment.smsReminder.body = body + ' ' + variable
+      this.appointment.smsReminder.body = `${(this.appointment.smsReminder.body ?? '')} ${variable}`
     },
     setSmsReminderBody () {
       this.appointment.smsReminder.body = this.currentCompany ? this.currentCompany.sms_reminder_default_text : ''
     }
-
   },
   watch: {
     'isAddAppointmentOpen': function (value) {

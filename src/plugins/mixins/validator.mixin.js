@@ -444,7 +444,7 @@ export default {
     },
 
     labelValidator (rule, value, callback) {
-      let validationResult = this.validateLabel()
+      const validationResult = this.validateLabel()
       if (validationResult) {
         callback()
       } else {
@@ -660,7 +660,7 @@ export default {
 
     checkIfCallerIdIsOnCampaignList (phoneNumber) {
       // get campaign list
-      let campaignList = []
+      const campaignList = []
 
       this.$store.state.campaigns.forEach(item => {
         if (item.incoming_numbers && item.incoming_numbers.length > 0) {

@@ -230,12 +230,11 @@ export default {
 
   watch: {
     value () {
-      let _this = this
       this.selectedTags = this.value
       this.$refs.tagSelect.focus()
-      setTimeout(function () {
-        _this.$refs.tagSelect.blur()
-        _this.$refs.tagSelect.hidePopup()
+      setTimeout(() => {
+        this.$refs.tagSelect.blur()
+        this.$refs.tagSelect.hidePopup()
       }, 200)
     },
     selectedTags (val) {

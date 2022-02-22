@@ -71,7 +71,7 @@ export default {
         return
       }
       this.active = nextActive
-      let channel = this.items.find(item => item.value === nextActive)
+      const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
       this.$emit('channelClicked')
       if (this.active === 'inbox') {

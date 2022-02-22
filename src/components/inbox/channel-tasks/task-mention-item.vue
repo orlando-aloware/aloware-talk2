@@ -109,12 +109,10 @@ export default {
 
     directionSummaryText () {
       if (this.direction === 'received') {
-        let mentionerName = (this.mentioner) ? `@${this.mentioner.name}` : 'Someone'
-        return `${mentionerName} mentioned you`
+        return (this.mentioner ? `@${this.mentioner.name}` : 'Someone') + ' mentioned you'
       }
 
-      let mentionedName = (this.mentioned) ? `@${this.mentioned.name}` : 'someone'
-      return `Sent to ${mentionedName}`
+      return 'Sent to ' + (this.mentioned ? `@${this.mentioned.name}` : 'someone')
     },
 
     activeClass () {
@@ -136,10 +134,10 @@ export default {
   methods: {
     markable (mention) {
       // Markable if mention is SMS and the comm direction is INBOUND
-      let smsRule = mention.type === CommunicationTypes.SMS &&
+      const smsRule = mention.type === CommunicationTypes.SMS &&
         mention.direction === CommunicationDirection.INBOUND
       // Markable if mention is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
-      let callRule = mention.type === CommunicationTypes.CALL &&
+      const callRule = mention.type === CommunicationTypes.CALL &&
         [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(mention.disposition_status2) &&
         mention.direction === CommunicationDirection.INBOUND
 

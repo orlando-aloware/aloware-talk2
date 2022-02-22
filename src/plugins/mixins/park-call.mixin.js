@@ -12,7 +12,7 @@ export default {
 
   created () {
     this.$VueEvent.listen('update_communication', (data) => {
-      let found = this.parkedCalls.find(parkedCall => parkedCall.id === data.id)
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === data.id)
 
       if (data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && found) {
         this.parkedCalls.splice(this.parkedCalls.indexOf(found), 1)

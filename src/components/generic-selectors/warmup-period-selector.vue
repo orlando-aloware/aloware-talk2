@@ -41,10 +41,10 @@ export default {
       }
     },
     warmUpPeriods () {
-      let values = []
-      values = [WARM_UP_PERIOD_LIST]
-      for (let i = 1; i <= 10; i++) {
-        values.push(`${i * 5} seconds`)
+      const values = [WARM_UP_PERIOD_LIST]
+      const item = { i: null }
+      for (item.i = 1; item.i <= 10; item.i++) {
+        values.push(`${(item.i * 5)} seconds`)
       }
       return values
     }

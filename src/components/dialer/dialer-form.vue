@@ -396,17 +396,18 @@ export default {
         return
       }
 
-      let data = {
+      this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.phoneNumber),
         outboundCampaignId: this.campaignId,
         contactName: this.contactName,
         companyName: this.companyName,
         contactId: this.contactId
-      }
-      this.$VueEvent.fire('makeCall', data)
+      })
+
       if (!this.isMobile) {
         this.hideDialer()
       }
+
       if (this.isMobile) {
         this.isMakingCall = true
       }

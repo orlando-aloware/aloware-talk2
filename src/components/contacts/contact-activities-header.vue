@@ -233,10 +233,11 @@ export default {
       this.isUpdatingStatus = true
       this.nextStat = status
       talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
-        let contact = { ...this.contact }
-        for (let key in res.data) {
-          if (typeof contact[key] !== 'undefined') {
-            contact[key] = res.data[key]
+        const contact = { ...this.contact }
+        const key = { data: null }
+        for (key.data in res.data) {
+          if (typeof contact[key.data] !== 'undefined') {
+            contact[key.data] = res.data[key.data]
           }
         }
         contact.task_status = status
@@ -253,7 +254,7 @@ export default {
         return
       }
 
-      let path = this.$route.path.split('/')
+      const path = this.$route.path.split('/')
       path.pop()
       path.pop()
 

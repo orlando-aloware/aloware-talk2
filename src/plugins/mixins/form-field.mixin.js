@@ -76,29 +76,29 @@ export const formFieldMixin = {
       )
     },
     filteredTimes: function () {
-      let prevTime = this.getPrevious(this.hours, this.index, this.inputNum),
-        nextTime = this.getNext(
+      const prevTime = { data: this.getPrevious(this.hours, this.index, this.inputNum) },
+        nextTime = { data: this.getNext(
           this.hours,
           this.index,
           this.inputNum,
           this.totalInputs
-        ),
-        filteredTimes = this.times
+        ) },
+        filteredTimes = { data: this.times }
 
-      if (!this.isFirstRow(this.index) && prevTime === '') {
-        prevTime = this.getPrevious(this.hours, this.index, this.inputNum - 1)
+      if (!this.isFirstRow(this.index) && prevTime.data === '') {
+        prevTime.data = this.getPrevious(this.hours, this.index, this.inputNum - 1)
       }
 
       if (this.isFirstInput(this.inputNum)) {
-        filteredTimes = this.getFiltered('before', nextTime, filteredTimes)
+        filteredTimes.data = this.getFiltered('before', nextTime.data, filteredTimes.data)
       } else if (this.isLastInput(this.inputNum, this.totalInputs)) {
-        filteredTimes = this.getFiltered('after', prevTime, filteredTimes)
+        filteredTimes.data = this.getFiltered('after', prevTime.data, filteredTimes.data)
       } else {
-        filteredTimes = this.getFiltered('before', nextTime, filteredTimes)
-        filteredTimes = this.getFiltered('after', prevTime, filteredTimes)
+        filteredTimes.data = this.getFiltered('before', nextTime.data, filteredTimes.data)
+        filteredTimes.data = this.getFiltered('after', prevTime.data, filteredTimes.data)
       }
 
-      return filteredTimes
+      return filteredTimes.data
     },
     showMidnightOption: function () {
       return (
@@ -113,15 +113,15 @@ export const formFieldMixin = {
       this.$emit('input-change', e.target.value)
     },
     generateTimes: function (timeIncrement) {
-      let currentTime = '0000',
+      const currentTime = { data: '0000' },
         times = []
 
       do {
-        times.push(currentTime)
-        currentTime = moment(currentTime, 'HHmm')
+        times.push(currentTime.data)
+        currentTime.data = moment(currentTime.data, 'HHmm')
           .add(timeIncrement, 'minutes')
           .format('HHmm')
-      } while (currentTime !== '0000')
+      } while (currentTime.data !== '0000')
 
       return times
     },

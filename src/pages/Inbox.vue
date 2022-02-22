@@ -60,12 +60,12 @@ export default {
 
     setChannel () {
       if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
-        let channel = this.items.find(item => item.value === this.$route.params.channel)
+        const channel = this.items.find(item => item.value === this.$route.params.channel)
         this.setActiveChannel(channel)
       }
 
       if (['Inbox'].includes(this.$route.name) && !this.activeChannel) {
-        let channel = this.items.find(item => item.value === 'inbox')
+        const channel = this.items.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
     },

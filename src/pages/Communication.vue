@@ -52,9 +52,3 @@ export default {
   }
 }
 </script>
-
-<style>
-  .main-content {
-    overflow: auto !important;
-  }
-</style>

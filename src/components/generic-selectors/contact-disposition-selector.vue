@@ -140,10 +140,9 @@ export default {
 
     contactDispositionsAlphabeticalOrder () {
       if (this.dispositionStatuses) {
-        let callDispositions = _.clone(this.dispositionStatuses)
-        return callDispositions.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.dispositionStatuses).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

@@ -163,10 +163,9 @@ export default {
 
     ringGroupsAlphabeticalOrder () {
       if (this.ringGroups) {
-        let ringGroups = _.clone(this.ringGroups)
-        return ringGroups.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.ringGroups).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

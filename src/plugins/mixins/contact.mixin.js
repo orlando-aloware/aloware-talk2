@@ -114,7 +114,8 @@ export default {
       activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups'],
       contactId: null,
       CancelToken: null,
-      source: null
+      source: null,
+      contactActivitiesInterval: null
     }
   },
 
@@ -132,35 +133,36 @@ export default {
     },
 
     filteredCommunications () {
-      let communications = []
+      const communications = { data: [] }
       if (this.communicationsAndAudits) {
         if (this.type !== undefined && this.type === 0) {
           // returns all communications
-          communications = this.communicationsAndAudits
+          communications.data = this.communicationsAndAudits
         } else if (this.type !== undefined && this.type === CommunicationTypes.NOTE) {
           // returns all note communications
-          communications = this.communicationsAndAudits.filter(communication => ((communication.type !== undefined && [CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE].includes(communication.type)) || communication.type === undefined))
+          communications.data = this.communicationsAndAudits.filter(communication => ((communication.type !== undefined && [CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE].includes(communication.type)) || communication.type === undefined))
         } else if (this.type === undefined) {
-          communications = this.communicationsAndAudits.filter(communication => [CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE].includes(communication.type))
+          communications.data = this.communicationsAndAudits.filter(communication => [CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE].includes(communication.type))
         } else {
           // returns selected filter communications
-          communications = this.communicationsAndAudits.filter(communication => communication.type === this.type)
+          communications.data = this.communicationsAndAudits.filter(communication => communication.type === this.type)
         }
       }
-      return communications
+      return communications.data
     },
 
     contactCampaignsFromCommunications () {
       if (this.contact && this.campaigns.length) {
-        let contactCampaigns = this.campaignsAlphabeticalOrder.filter((cmp) => {
+        const contactCampaigns = this.campaignsAlphabeticalOrder.filter((cmp) => {
           if (this.selectedContactCampaigns.includes(cmp.id)) {
             return true
           }
         })
 
-        for (let campaign of contactCampaigns) {
-          campaign.unread_count = this.communicationsAndAudits.filter((comm) => {
-            if (comm.type && (comm.type === CommunicationTypes.SMS || (comm.type === CommunicationTypes.CALL && [CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(comm.disposition_status2))) && comm.is_read === false && comm.campaign_id === campaign.id) {
+        const campaign = { data: null }
+        for (campaign.data of contactCampaigns) {
+          campaign.data.unread_count = this.communicationsAndAudits.filter((comm) => {
+            if (comm.type && (comm.type === CommunicationTypes.SMS || (comm.type === CommunicationTypes.CALL && [CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(comm.disposition_status2))) && comm.is_read === false && comm.campaign_id === campaign.data.id) {
               return true
             }
           }).length
@@ -184,8 +186,7 @@ export default {
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {
-        let campaigns = _.clone(this.campaigns)
-        return campaigns.sort((a, b) => {
+        return _.clone(this.campaigns).sort((a, b) => {
           const textA = a.name.toUpperCase()
           const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
@@ -229,18 +230,19 @@ export default {
     this.$VueEvent.listen('contact_updated', (data) => {
       // check data loaded
       if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
-        let updatedContact = _.get(this, 'contact', {})
-        for (let index in data) {
-          if (index === 'communications_and_audits') {
+        const updatedContact = _.get(this, 'contact', {})
+        const item = { index: null }
+        for (item.index in data) {
+          if (item.index === 'communications_and_audits') {
             continue
           }
 
-          if (index === 'unread_texts_count' && typeof data[index] === 'undefined') {
-            updatedContact[index] = 0
+          if (item.index === 'unread_texts_count' && typeof data[item.index] === 'undefined') {
+            updatedContact[item.index] = 0
             continue
           }
 
-          updatedContact[index] = data[index]
+          updatedContact[item.index] = data[item.index]
         }
 
         if (typeof updatedContact['unread_texts_count'] !== 'undefined' &&
@@ -249,7 +251,9 @@ export default {
         }
 
         this.updateSelectedContact(updatedContact)
-        this.setContact(updatedContact)
+        if (this.contact.id === updatedContact.id) {
+          this.setContact(updatedContact)
+        }
         this.updateContacts(updatedContact)
       }
     })
@@ -316,7 +320,7 @@ export default {
       // check data loaded
       if (this.communicationsAndAudits) {
         // try to find the communication
-        let found = this.communicationsAndAudits.find(communication => communication.id === data.id)
+        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
         if (found) {
           // remove it from the list
           this.communicationsAndAudits.splice(this.communicationsAndAudits.indexOf(found), 1)
@@ -424,10 +428,11 @@ export default {
     async fetchContactCommunications (contactId, skipContactInfo = true) {
       this.source.cancel('fetchContactCommunications operation canceled by the user.')
       this.source = this.CancelToken.source()
-      let lastAuditCreatedAt = null
-      for (let index in this.communicationsAndAudits) {
-        lastAuditCreatedAt = _.get(this.communicationsAndAudits, `[${index}].created_at`, null)
-        if (lastAuditCreatedAt) {
+      const lastAuditCreatedAt = { data: null }
+      const item = { index: null }
+      for (item.index in this.communicationsAndAudits) {
+        lastAuditCreatedAt.data = _.get(this.communicationsAndAudits, `[${item.index}].created_at`, null)
+        if (lastAuditCreatedAt.data) {
           break
         }
       }
@@ -435,7 +440,7 @@ export default {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
-          last_audit_created_at: lastAuditCreatedAt
+          last_audit_created_at: lastAuditCreatedAt.data
         },
         cancelToken: this.source.token
       }).then(res => {
@@ -543,8 +548,9 @@ export default {
         this.loadingMarkAsRead = true
         this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
           this.loadingMarkAsRead = false
-          for (let communication of this.filteredCommunications) {
-            this.$set(communication, 'is_read', true)
+          const communication = { data: null }
+          for (communication.data of this.filteredCommunications) {
+            this.$set(communication.data, 'is_read', true)
           }
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
@@ -707,11 +713,18 @@ export default {
     },
 
     scrollMessages () {
-      setTimeout(() => {
+      const counter = { data: 0 }
+      clearInterval(this.contactActivitiesInterval)
+      this.contactActivitiesInterval = setInterval(() => {
         if (this.$refs.contactActivities) {
           this.$refs.contactActivities.scrollMessages()
+          clearInterval(this.contactActivitiesInterval)
         }
-      }, 50)
+        counter.data++
+        if (counter.data > 180) {
+          clearInterval(this.contactActivitiesInterval)
+        }
+      }, 250)
     },
 
     hasCommunication () {
@@ -719,9 +732,7 @@ export default {
     },
 
     isCommunicationFound () {
-      let found = null
-      found = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
-      return !!found
+      return !!this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
     },
 
     isHashActivityType () {
@@ -729,50 +740,41 @@ export default {
         return false
       }
 
-      let hasActivity = false
+      const hasActivity = { data: false }
 
-      for (let type of this.activityTypes) {
-        if (this.$route.hash.includes(type)) {
-          hasActivity = true
+      const type = { data: null }
+      for (type.data of this.activityTypes) {
+        if (this.$route.hash.includes(type.data)) {
+          hasActivity.data = true
           break
         }
       }
 
-      if (!hasActivity) {
+      if (!hasActivity.data) {
         return false
       }
 
-      let hash = this.$route.hash
-      hash = hash.split('-')
+      const hash = { data: this.$route.hash }
+      hash.data = hash.split('-')
 
       // hash only has 2 items: activity type and id
-      return hash.length === 2
+      return hash.data.length === 2
     },
 
     isHashActivityFound () {
-      let hash = this.$route.hash.replace('#', '')
-      hash = hash.split('-')
+      const hash = (this.$route.hash.replace('#', '')).split('-')
+      const id = hash[1].trim()
 
-      let activityType = hash[0] // communication, contact-audit, etc...
-      let id = hash[1].trim()
-
-      let found = null
-      if (activityType === 'communication') {
-        found = this.communicationsAndAudits.find(communication => communication.type !== undefined && communication.id.toString() === id)
-      } else {
-        found = this.communicationsAndAudits.find(communication => communication.property !== undefined && communication.id.toString() === id)
-      }
-
-      return !!found
+      return !!(hash[0] === 'communication' ? this.communicationsAndAudits.find(communication => communication.type !== undefined && communication.id.toString() === id) : this.communicationsAndAudits.find(communication => communication.property !== undefined && communication.id.toString() === id))
     },
 
     scrollIntoActivity () {
-      let communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
-      let ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
-      let count = 0
+      const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
+      const count = { data: 0 }
 
       // scroll to activity
-      let scrollInterval = setInterval(() => {
+      const scrollInterval = setInterval(() => {
         const communicationActivity = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
         if (communicationActivity) {
           communicationActivity.$el.scrollIntoView({
@@ -787,42 +789,45 @@ export default {
 
         // if we've been waiting for too long to load,
         // clear this interval
-        if (count >= 40) {
+        if (count.data >= 120) {
           clearInterval(scrollInterval)
         }
 
-        count++
+        count.data++
       }, 250)
     },
 
     highlightActivity (commActivity) {
-      let element = commActivity.$el
+      const element = commActivity.$el
+
       if (!element) {
         return
       }
 
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
-        let counter = 0
-        let containerElInterval = setInterval(() => {
-          let containerEl = document.querySelector('.contact-activities .scrollbar-white')
+        const counter = { data: 0 }
+        const containerElInterval = setInterval(() => {
+          const containerEl = document.querySelector('.contact-activities .scrollbar-white')
 
           if (containerEl) {
             containerEl.scrollTop = element.offsetTop
             clearInterval(containerElInterval)
           }
 
-          counter++
-          if (counter > 120) {
+          counter.data++
+          if (counter.data > 120) {
             clearInterval(containerElInterval)
           }
         }, 500)
       }
 
-      let highlighted = document.querySelector('.shine')
+      const highlighted = document.querySelector('.shine')
+
       if (highlighted) {
         highlighted.classList.remove('shine')
       }
+
       element.classList.add('shine')
 
       setTimeout(() => {
@@ -848,7 +853,7 @@ export default {
       } else {
         this.canEmail = false
         this.$axios.get(`/api/v1/intake-route/${this.selectedCampaign.id}/line`).then(res => {
-          let intakeRoutes = res.data
+          const intakeRoutes = res.data
           intakeRoutes.filter((route) => {
             if (route.type === 'email') {
               this.canEmail = true
@@ -870,16 +875,14 @@ export default {
     processFetchContactInfo (callback) {
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
-        let contact = res.data
-
         // if contact status changes then redirect to the right url
-        if (this.$route.name === 'Inbox Contact Task' && this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() !== this.$route.params.status) {
+        if (this.$route.name === 'Inbox Contact Task' && this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
           this.$router.push({
             name: 'Inbox Contact Task',
             params: {
-              id: contact.id,
+              id: res.data.id,
               channel: 'inbox',
-              status: this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
+              status: this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase()
             }
           }).catch(err => {
             console.log(err)
@@ -887,11 +890,11 @@ export default {
         }
 
         // if contact has no task status, then fallback to all status
-        if (this.$route.name === 'Inbox Contact Task' && !contact.task_status) {
+        if (this.$route.name === 'Inbox Contact Task' && !res.data.task_status) {
           this.$router.push({
             name: 'Inbox Contact Task',
             params: {
-              id: contact.id,
+              id: res.data.id,
               channel: 'inbox',
               status: 'all'
             }
@@ -938,7 +941,7 @@ export default {
     },
 
     loadingContactsFailed () {
-      // TODO: do we need to do anything here?
+      this.$generalNotification('Failed to load contacts.', 'error')
     },
 
     loadMoreContacts () {

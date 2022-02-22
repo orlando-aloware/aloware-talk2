@@ -222,20 +222,20 @@ export default {
     filterByGroup () {
       // eslint-disable-next-line camelcase
       return function (groupId) {
-        let label = ''
+        const label = { data: '' }
         // eslint-disable-next-line camelcase
         switch (groupId) {
           case this.filterGroups.GROUP_PRIMARY_INFO:
-            label = 'Primary Information'
+            label.data = 'Primary Information'
             break
           case this.filterGroups.GROUP_CONTACT_LOCATION:
-            label = 'Contact Location'
+            label.data = 'Contact Location'
             break
           case this.filterGroups.GROUP_CONTACT_RELEVANCE:
-            label = 'Contact Relevance'
+            label.data = 'Contact Relevance'
             break
           case this.filterGroups.GROUP_CONTACT_COMM_METADATA:
-            label = 'Contact Communication'
+            label.data = 'Contact Communication'
         }
 
         const compare = function (a, b) {
@@ -243,23 +243,15 @@ export default {
           const filterA = a.label.toUpperCase()
           const filterB = b.label.toUpperCase()
 
-          let comparison = 0
-
-          if (filterA > filterB) {
-            comparison = 1
-          } else if (filterA < filterB) {
-            comparison = -1
-          }
-
-          return comparison
+          return filterA > filterB ? 1 : (filterA < filterB ? -1 : 0)
         }
 
-        let filters = !groupId ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
+        const filters = !groupId ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
           : this.filtersFiltered.filter(list => list.group_id === groupId)
 
         return {
           filters: filters.sort(compare),
-          label: label
+          label: label.data
         }
       }
     }
@@ -360,57 +352,45 @@ export default {
     },
 
     generateListFilters () {
-      let filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
-      for (let groupIndex in filterGroups) {
-        if (isNaN(groupIndex / 1) || groupIndex === 'search') {
-          if (filterGroups instanceof Array) {
-            filterGroups.splice(groupIndex, 1)
-          } else {
-            delete filterGroups[groupIndex]
-          }
-
+      const filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
+      const groupIndex = { data: null }
+      const filterIndex = { data: null }
+      for (groupIndex.data in filterGroups) {
+        if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
+          filterGroups instanceof Array && filterGroups.splice(groupIndex.data, 1)
+          !(filterGroups instanceof Array) && delete filterGroups[groupIndex.data]
           continue
         }
 
-        for (let filterIndex in filterGroups[groupIndex].filters) {
-          if (filterIndex === 'search') {
+        for (filterIndex.data in filterGroups[groupIndex.data].filters) {
+          if (filterIndex.data === 'search') {
             continue
           }
 
-          const found = this.filters.find(filter => filter.key === filterIndex)
+          const found = this.filters.find(filter => filter.key === filterIndex.data)
           const operators = found ? _.get(found, 'operators', null) : null
 
           if (operators) {
-            const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex].filters[filterIndex].operator)
+            const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
             const options = operator ? _.get(operator, 'options', null) : null
-            const option = options ? options.find(option => option.value === filterGroups[groupIndex].filters[filterIndex].value) : null
-            let trueValue = filterGroups[groupIndex].filters[filterIndex].value
+            const option = options ? options.find(option => option.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
+            const trueValue = { data: filterGroups[groupIndex.data].filters[filterIndex.data].value }
+            trueValue.data = option ? [option.label] : trueValue.data
+            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : trueValue.data
 
-            if (option) {
-              trueValue = [option.label]
-            } else if (typeof filterGroups[groupIndex].filters[filterIndex].value === 'string') {
-              trueValue = filterGroups[groupIndex].filters[filterIndex].value.split(',')
-            }
-
-            let newValue = trueValue
-
-            if (newValue) {
-              newValue = [trueValue.join(' and ')]
-            }
-
-            filterGroups[groupIndex].filters[filterIndex] = {
-              key: filterIndex,
+            filterGroups[groupIndex.data].filters[filterIndex.data] = {
+              key: filterIndex.data,
               label: found.label,
               operator: operator.label,
-              trueValue: trueValue,
-              value: JSON.stringify(newValue)
+              trueValue: trueValue.data,
+              value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data))
             }
           } else {
-            filterGroups[groupIndex].filters[filterIndex] = {
-              key: filterIndex,
+            filterGroups[groupIndex.data].filters[filterIndex.data] = {
+              key: filterIndex.data,
               label: found.label,
-              trueValue: filterGroups[groupIndex].filters[filterIndex].value,
-              value: JSON.stringify(filterGroups[groupIndex].filters[filterIndex].value)
+              trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
+              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value)
             }
           }
         }
@@ -427,29 +407,30 @@ export default {
       const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
       if (typeof filter.trueValue === 'object') {
-        let values = []
+        const values = { data: [] }
         switch (true) {
           case filter.trueValue.length === 1 || (isRelationType):
-            values = filter.trueValue
+            values.data = filter.trueValue
             break
           case filter.trueValue.length === 2 && filter.operator !== 'Is between':
             return filter.trueValue.join(' or ')
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
         }
-        let labels = []
+        const labels = { data: [] }
 
         if (filterFound && isRelationType) {
-          for (let item of values) {
-            const optionFound = filterFound.options.find(option => option.value === item)
-            labels.push(optionFound ? optionFound.label : '')
+          const item = { index: null }
+          for (item.index of values.data) {
+            const optionFound = filterFound.options.find(option => option.value === item.index)
+            labels.data.push(optionFound ? optionFound.label : '')
           }
         } else {
-          labels = filter.trueValue
+          labels.data = filter.trueValue
         }
 
-        const joinedValues = labels.join(', ')
-        if (labels > 1) {
+        const joinedValues = labels.data.join(', ')
+        if (labels.data > 1) {
           return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
         }
 
@@ -464,7 +445,7 @@ export default {
     },
 
     onDeleteFilter (index, key) {
-      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
 
       if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Array') {
@@ -480,7 +461,7 @@ export default {
     },
 
     onDeleteGroupFilter (index) {
-      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
 
       if (updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)

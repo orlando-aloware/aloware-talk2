@@ -68,13 +68,10 @@ export default {
 
     tagsAlphabeticalOrder () {
       if (this.availableTags) {
-        let tags = _.clone(this.availableTags)
-        if (this.category) {
-          tags = tags.filter(tag => tag.category === this.category)
-        }
+        const tags = this.category ? _.clone(this.availableTags).filter(tag => tag.category === this.category) : _.clone(this.availableTags)
         return tags.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }
@@ -103,16 +100,18 @@ export default {
     },
 
     combinedTags () {
-      let companyTags = this.companyTagsAlphabeticalOrder
-      let importTags = this.importTagsAlphabeticalOrder
+      const companyTags = this.companyTagsAlphabeticalOrder
+      const importTags = this.importTagsAlphabeticalOrder
 
-      let tags = []
+      const tags = []
+
       if (companyTags && companyTags.length) {
         tags.push({
           title: 'Account Tags',
           children: companyTags
         })
       }
+
       if (importTags && importTags.length) {
         tags.push({
           title: 'Import Tags',
@@ -147,7 +146,7 @@ export default {
       }
 
       this.loadingTags = true
-      let params = {
+      const params = {
         full_load: true
       }
       return this.$axios.get('/api/v1/tag', { params }).then(res => {

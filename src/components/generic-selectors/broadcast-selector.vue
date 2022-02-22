@@ -127,8 +127,8 @@ export default {
       if (this.broadcasts) {
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         return this.broadcasts.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

@@ -49,7 +49,9 @@ export default {
   methods: {
     ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties']),
     onCancel () {
-      this.setContact({ ...this.contactClone })
+      if (this.contactClone.id === this.contact.id) {
+        this.setContact({ ...this.contactClone })
+      }
       this.resetChangedContactProperties()
     },
     onSave () {
@@ -64,27 +66,31 @@ export default {
       })
     },
     saveChanges () {
-      let parameters = this.getParameters()
+      const parameters = this.getParameters()
       if (Object.entries(parameters).length > 0) {
         return talk2Api.V1.contact.update(this.contact.id, parameters).then(response => {
-          this.setContact(response.data)
-          this.setContactClone(response.data)
+          if (response.data.id === this.contact.id) {
+            this.setContact(response.data)
+            this.setContactClone(response.data)
+          }
         })
       }
     },
     disposeContact () {
-      let dispositionStatusProp = this.changedContactProperties.find(item => item.property === 'disposition_status_id')
+      const dispositionStatusProp = this.changedContactProperties.find(item => item.property === 'disposition_status_id')
       if (dispositionStatusProp) {
         return talk2Api.V1.contact.dispose(this.contact.id, { 'disposition_status': this.contact.disposition_status_id }).then(response => {
-          this.setContact(response.data)
-          this.setContactClone(response.data)
+          if (response.data.id === this.contact.id) {
+            this.setContact(response.data)
+            this.setContactClone(response.data)
+          }
         }).catch(() => {
           return Promise.reject('Error while saving changes.')
         })
       }
     },
     getParameters () {
-      let params = {}
+      const params = {}
       this.changedContactProperties.filter(item => item.property !== 'disposition_status_id').forEach(function (item) {
         params[item.property] = item.value
       })

@@ -208,7 +208,7 @@ export default {
     },
 
     copyPhoneNumber () {
-      let phoneNumberClone = document.querySelector('#phone-number-clone')
+      const phoneNumberClone = document.querySelector('#phone-number-clone')
       phoneNumberClone.setAttribute('type', 'text')
       phoneNumberClone.select()
 
@@ -229,7 +229,7 @@ export default {
     },
 
     callContact () {
-      let data = {
+      const data = {
         currentNumber: this.contact.phone_number,
         contactName: this.contact.name,
         companyName: this.contact.company_name,

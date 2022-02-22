@@ -117,12 +117,11 @@ export default {
     ]),
     fetchContact () {
       this.selectedContactChanging(true)
-      let _this = this
-      this.processFetchContactInfo(function (contact) {
-        _this.setContact(_this.contact)
-        _this.setContactClone(_this.contact)
-        _this.resetChangedContactProperties([])
-        _this.selectedContactChanging(false)
+      this.processFetchContactInfo((contact) => {
+        this.setContact(contact)
+        this.setContactClone(contact)
+        this.resetChangedContactProperties([])
+        this.selectedContactChanging(false)
       })
     },
     prepareActivities () {

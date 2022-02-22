@@ -49,12 +49,13 @@ export default {
   },
   CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
     if (append) {
-      let newData = data
-      for (let item of state.listItems[String(id)].data) {
-        let found = newData.find(contact => contact.id === item.id)
-        let index = found ? newData.indexOf(found) : null
-        if (index !== -1 && index !== null) {
-          newData.splice(index, 1)
+      const found = {}
+      const item = { data: null }
+      for (item.data of state.listItems[String(id)].data) {
+        found.data = data.find(contact => contact.id === item.data.id)
+        found.data = found.data ? data.indexOf(found.data) : null
+        if (found.data !== -1 && found.data !== null) {
+          data.splice(found.data, 1)
         }
       }
       state.listItems = {
@@ -62,7 +63,7 @@ export default {
         [String(id)]: {
           ...state.listItems[String(id)],
           ...rest,
-          data: state.listItems[String(id)].data.concat(newData)
+          data: state.listItems[String(id)].data.concat(data)
         }
       }
     } else {
@@ -269,7 +270,7 @@ export default {
   },
 
   REMOVE_MESSAGE_COMPOSER_SMS_ATTACHMENT: (state, attachment) => {
-    let found = state.messageComposer.sms.attachments.find(item => item.id === attachment.id)
+    const found = state.messageComposer.sms.attachments.find(item => item.id === attachment.id)
     if (found) {
       state.messageComposer.sms.attachments.splice(state.messageComposer.sms.attachments.indexOf(found), 1)
     }
@@ -328,8 +329,9 @@ export default {
     state.currentListFilters = {}
     state.contact = {}
     state.lists = Object.assign({}, ContactsListDefaultList.DEFAULT_STATE.lists)
-    for (let index in state.listItems) {
-      state.listItems[index] = DEFAULT_CONTACT_LIST_ITEMS
+    const item = { index: null }
+    for (item.index in state.listItems) {
+      state.listItems[item.index] = DEFAULT_CONTACT_LIST_ITEMS
     }
   },
   SET_SEARCH: (state, value) => {
@@ -339,26 +341,31 @@ export default {
     state.search = ''
   },
   UPDATE_CHANGED_CONTACT_PROPERTIES: (state, { name, value }) => {
+    const found = { data: null }
     if (state.contactClone[name] !== value) {
-      let prop = state.changedContactProperties.find(item => item.property === name)
-      if (prop) {
-        prop.value = value
-      } else {
-        state.changedContactProperties.push({ property: name, value: value })
+      found.data = state.changedContactProperties.find(item => item.property === name)
+      found.data = found.data ? state.changedContactProperties.indexOf(found.data) : null
+
+      if (found.data !== -1 && found.data !== null) {
+        Vue.set(state.changedContactProperties[found.data], 'value', value)
+        return
       }
+
+      state.changedContactProperties.push({ property: name, value: value })
     } else {
-      let changedProp = [...state.changedContactProperties]
-      state.changedContactProperties = changedProp.filter(item => item.property !== name)
+      found.data = [...state.changedContactProperties]
+      state.changedContactProperties = found.data.filter(item => item.property !== name)
     }
   },
   RESET_CHANGED_CONTACT_PROPERTIES: (state) => {
     state.changedContactProperties = []
   },
   UPDATE_CONTACTS: (state, payload) => {
-    let found = state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id)
-    let index = found ? state.listItems[state.selectedList.id].data.indexOf(found) : null
-    if (index !== -1 && index !== null) {
-      Vue.set(state.listItems[state.selectedList.id].data, index, payload)
+    const found = { data: state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id) }
+    found.data = found.data ? state.listItems[state.selectedList.id].data.indexOf(found.data) : null
+
+    if (found.data !== -1 && found.data !== null) {
+      Vue.set(state.listItems[state.selectedList.id].data, found.data, payload)
     }
   },
   SET_CONTACTS: (state, payload) => {

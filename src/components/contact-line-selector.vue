@@ -26,28 +26,27 @@ export default {
   components: { VueMultiselect },
   computed: {
     formattedLineOptions () {
-      let contactLines = []
+      const contactLines = { data: [] }
       if (this.contactCampaignsFromCommunications.length > 0) {
-        contactLines = [...this.contactCampaignsFromCommunications]
-
-        contactLines.unshift({
+        contactLines.data = [...this.contactCampaignsFromCommunications]
+        contactLines.data.unshift({
           group: 'Contact Lines',
           disable: true
         })
       }
 
-      let linesArray = contactLines
+      const linesArray = { data: contactLines.data }
 
       if (this.otherCampaignsFromCommunications && this.otherCampaignsFromCommunications.length > 0) {
-        let otherLines = [...this.otherCampaignsFromCommunications]
+        const otherLines = [...this.otherCampaignsFromCommunications]
         otherLines.unshift({
           group: 'Other Lines',
           disable: true
         })
-        linesArray = [...contactLines, ...otherLines]
+        linesArray.data = [...contactLines.data, ...otherLines]
       }
 
-      return linesArray
+      return linesArray.data
     }
   },
   data () {

@@ -50,16 +50,17 @@ export default {
       this.source = this.CancelToken.source()
       this.loading = true
       this.paginationLoading = true
-      let params = this.filter
+      const params = this.filter
 
       return this.$axios.get('/api/v1/contact', {
         params: params,
         cancelToken: this.source.token
       }).then(res => {
-        let contacts = []
-        for (let contact of res.data.data) {
-          contact.tag_ids = contact.tags.map((a) => a.id)
-          contacts.push(contact)
+        const contacts = []
+        const contact = { data: null }
+        for (contact.data of res.data.data) {
+          contact.data.tag_ids = contact.data.tags.map((a) => a.id)
+          contacts.push(contact.data)
         }
         this.contacts = _.union(this.contacts, contacts)
         console.log(this.contacts)

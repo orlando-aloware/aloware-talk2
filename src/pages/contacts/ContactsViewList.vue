@@ -23,7 +23,7 @@ export default {
     ...mapGetters('contacts', ['lists', 'listItems']),
     id () {
       if (['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
-        let list = this.lists[String(this.$route.params.id)]
+        const list = this.lists[String(this.$route.params.id)]
         return list.id
       }
 
@@ -77,15 +77,11 @@ export default {
           this.setSelectedList({ id: response.id, name: response.name, type: response.type })
           this.name = response.name
           this.type = response.type
-          let filters = {
+          const filters = response.type === DYNAMIC ? response.filters : {
             contact_lists: {
               operator: 1,
               value: [stringId]
             }
-          }
-
-          if (response.type === DYNAMIC) {
-            filters = response.filters
           }
           this.setCurrentListFilters(filters)
           return response
@@ -136,11 +132,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-  .loader-spacer {
-    min-height: calc(100vh - 300px);
-    width: 100%;
-    position: relative;
-  }
-</style>

@@ -173,10 +173,9 @@ export default {
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {
-        let campaigns = _.clone(this.campaigns)
-        return campaigns.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.campaigns).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }
@@ -186,8 +185,8 @@ export default {
 
     activeCampaignsAlphabeticalOrder () {
       if (this.campaignsAlphabeticalOrder.length) {
-        let campaigns = _.clone(this.campaignsAlphabeticalOrder)
-        return campaigns.filter(campaign => campaign.active === true)
+        return _.clone(this.campaignsAlphabeticalOrder)
+          .filter(campaign => campaign.active === true)
       }
 
       return []
@@ -195,8 +194,8 @@ export default {
 
     pausedCampaignsAlphabeticalOrder () {
       if (this.campaignsAlphabeticalOrder.length) {
-        let campaigns = _.clone(this.campaignsAlphabeticalOrder)
-        return campaigns.filter(campaign => campaign.active === false)
+        return _.clone(this.campaignsAlphabeticalOrder)
+          .filter(campaign => campaign.active === false)
       }
 
       return []
