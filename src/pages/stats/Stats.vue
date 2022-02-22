@@ -2,7 +2,7 @@
   <div class="h-100 w-100 position-relative">
     <b-overlay
       class="h-100 w-100 position-absolute"
-      :show="metricGroups.length === 0"
+      :show="metricLoader"
       rounded="sm"
     >
       <template #overlay>
@@ -11,7 +11,7 @@
     </b-overlay>
     <q-scroll-area
       class="pb-4 bg-grey-40 stats-container"
-      v-if="metricGroups.length > 0">
+      v-if="!metricLoader">
       <div class="px-4 py-0 stats-header">
         <AddMetricGroup @focusToNewMetricGroup="focusToNewMetricGroup"/>
       </div>
@@ -45,7 +45,7 @@ export default {
   },
 
   computed: {
-    ...mapState('stats', ['metricGroups']),
+    ...mapState('stats', ['metricGroups', 'metricLoader']),
     ...mapState('auth', ['profile'])
   },
 
