@@ -247,7 +247,7 @@
         :isLoadingMore="isLoadingMore"
         :is-loading="isLoading"
         :contact-list-id="id"
-        :paginated="true"
+        :paginated="false"
         :show-pagination="!isStartState"
         :total-rows="listItems[id].total"
         :current-page="listItems[id].current_page"
