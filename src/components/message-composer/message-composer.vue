@@ -65,7 +65,8 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
-    ...mapState(['currentCompany', 'templates'])
+    ...mapState(['templates']),
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {

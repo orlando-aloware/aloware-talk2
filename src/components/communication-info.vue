@@ -902,7 +902,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('inbox', ['liveContacts', 'contacts']),
 
     hasSMSReminder () {

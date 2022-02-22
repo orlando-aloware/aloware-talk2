@@ -1365,7 +1365,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['currentCompany', 'dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification']),
+    ...mapState(['dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification']),
+    ...mapState('cache', ['currentCompany']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))

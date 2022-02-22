@@ -36,7 +36,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['dispositionStatuses', 'currentCompany']),
+    ...mapState(['dispositionStatuses']),
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('contacts', ['contact']),
 
     isCompanyAgent () {

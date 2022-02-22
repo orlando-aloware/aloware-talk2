@@ -120,7 +120,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'currentCompany']),
+    ...mapState(['campaigns']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('contacts', ['contact']),
     ...mapState('inbox', { selectContact: 'selectedContact' }),
 

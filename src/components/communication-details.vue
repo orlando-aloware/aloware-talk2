@@ -810,7 +810,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'currentCompany', 'callDispositions']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'callDispositions']),
+    ...mapState('cache', ['currentCompany']),
     usedCampaign () {
       if (!this.communication.campaign_id) {
         return null

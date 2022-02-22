@@ -393,12 +393,14 @@ export default {
     },
     toggleSidebar (callback, event) {
       this.setUnsavedList(null)
+      this.setShowContactsListSidebar(false)
       if (this.id !== undefined) {
         callback(event)
-      } else {
+        return
+      }
+      if (this.$route.path !== '/contacts/list/unsaved') {
         this.$router.push('/contacts/list/unsaved')
       }
-      this.setShowContactsListSidebar(false)
     }
   },
   beforeDestroy () {

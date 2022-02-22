@@ -129,9 +129,9 @@ export default {
 
   computed: {
     ...mapState({
-      currentCompany: state => state.currentCompany,
       workflows: state => state.workflows
     }),
+    ...mapState('cache', ['currentCompany']),
     placeholder () {
       switch (true) {
         case this.multiple && this.sequence.length < 1:

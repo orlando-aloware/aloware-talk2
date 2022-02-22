@@ -304,10 +304,10 @@ export default {
       }
     },
     fixDefaultFilters () {
-      if (!this.list) {
+      if (_.isEmpty(this.list)) {
         return []
       }
-      const defaultFilters = JSON.parse(JSON.stringify(this.list.filters))
+      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
       if (this.$route.params.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
@@ -420,9 +420,10 @@ export default {
       return this.lists[this.id].filters
     },
     list () {
-      if (!this.$route.params.id) {
+      if (!this.$route.params.id || typeof this.lists[this.$route.params.id] === 'undefined') {
         return this.lists['all']
       }
+
       return this.lists[this.$route.params.id]
     },
     contactsRelations () {

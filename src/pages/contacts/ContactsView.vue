@@ -654,6 +654,9 @@ export default {
           this.defaultIds.includes(this.id)
       }
     },
+    listItemsData () {
+      return this.listItems[this.id]
+    },
     listItemsDataCount () {
       const total = _.get(this.listItems, `[${this.id}].data.length`, null)
       return total !== null ? total : 0
@@ -742,7 +745,10 @@ export default {
       this.reRouteToBase()
     },
     checked: function (value) {
-      document.querySelector('.data-table-check-all').checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
     }
   }
 }
