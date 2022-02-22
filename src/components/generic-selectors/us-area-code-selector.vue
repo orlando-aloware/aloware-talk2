@@ -159,15 +159,15 @@ export default {
       }
     },
     optsArray () {
-      let groupedOptions = []
-      AreaCodes.forEach((value, i) => {
-        groupedOptions.push({ state_code: value.state_code, state_name: value.state_name, group: true, disable: true })
+      const groupedOptions = { data: [] }
+      AreaCodes.forEach((value) => {
+        groupedOptions.data.push({ state_code: value.state_code, state_name: value.state_name, group: true, disable: true })
         if (value.area_codes.length > 0) {
-          groupedOptions = [...groupedOptions, ...value.area_codes]
+          groupedOptions.data = [...groupedOptions.data, ...value.area_codes]
         }
       })
 
-      return groupedOptions
+      return groupedOptions.data
     },
     areaObject () {
       if (!this.model) {

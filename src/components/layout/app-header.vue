@@ -215,7 +215,7 @@ export default {
     },
 
     navigateBack (e) {
-      let previousPage = _.get(this.$route.query, 'previousPage', null)
+      const previousPage = _.get(this.$route.query, 'previousPage', null)
 
       if (previousPage === 'PowerDialer') {
         this.$router.push({

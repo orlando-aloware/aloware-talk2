@@ -96,7 +96,9 @@ export default {
     },
     getContact () {
       talk2Api.V1.contact.get(this.contact.id).then(response => {
-        this.setContact(response.data)
+        if (response.data.id === this.contact.id) {
+          this.setContact(response.data)
+        }
       })
     },
     removeSelectedPhone () {

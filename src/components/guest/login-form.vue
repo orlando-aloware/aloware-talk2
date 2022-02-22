@@ -116,7 +116,7 @@ export default {
     async submit () {
       try {
         this.loading = true
-        let response = await this.login({
+        const response = await this.login({
           ...this.getLoginParams()
         })
 
@@ -141,7 +141,7 @@ export default {
     },
 
     async onLoginSuccess ({ data: { data } }) {
-      let { usage, company } = data
+      const { usage, company } = data
 
       this.setCurrentCompany(company)
       this.resetVuex()
@@ -153,7 +153,7 @@ export default {
       if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && !this.isAdmin) {
         location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
-        let redirectPath = this.$route.query.redirect || '/'
+        const redirectPath = this.$route.query.redirect || '/'
 
         await this.$router.push(String(redirectPath))
         await this.redirectTimeout()
@@ -182,7 +182,7 @@ export default {
       if (!this.$refs.myForm || !this.$refs.myForm.$el || !this.$refs.myForm.$el.elements) {
         return
       }
-      let next = $event.target.tabIndex
+      const next = $event.target.tabIndex
       if (next < this.$refs.myForm.$el.elements.length) {
         this.$refs.myForm.$el.elements[next + 1].focus()
       }

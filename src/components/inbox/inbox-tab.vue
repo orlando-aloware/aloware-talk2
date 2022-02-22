@@ -173,7 +173,6 @@ import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dia
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 
-let scrollTimeout
 export default {
   name: 'inbox-tab',
 
@@ -224,7 +223,7 @@ export default {
         this.dialer.call.state === 'open'
     },
     hasIncomingLiveCall () {
-      let i = this.liveContacts.findIndex(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+      const i = this.liveContacts.findIndex(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
@@ -280,13 +279,13 @@ export default {
         contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
         my_contact: Filters.DEFAULT_STATE.filter.my_contact
       },
+      scrollTimeout: null,
       CommunicationCurrentStatus
     }
   },
 
   methods: {
     ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm', 'setChannelClonedFilter']),
-    ...mapActions('contacts', ['setContact']),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -296,9 +295,9 @@ export default {
       }
     },
     onTaskListBottomScroll () {
-      clearTimeout(scrollTimeout)
+      clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
-      scrollTimeout = setTimeout(() => {
+      this.scrollTimeout = setTimeout(() => {
         // Run the callback
         if (this.hasMoreContacts && this.isLoaded) {
           this.page = this.nextPage
@@ -307,7 +306,7 @@ export default {
       }, 66)
     },
     updateContacts (updatedContact) {
-      let index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
+      const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
         Vue.set(this.contacts, index, updatedContact)
         this.setContacts(this.contacts)
@@ -375,8 +374,8 @@ export default {
       this.lineOrRingGroupFilter = item
     },
     makeSelectedItemVisible () {
-      let container = document.querySelector('.task-list-scroller')
-      let target = document.querySelector('.contact-task-item.active')
+      const container = document.querySelector('.task-list-scroller')
+      const target = document.querySelector('.contact-task-item.active')
 
       if (target.offsetTop > (container.offsetHeight - 100)) {
         container.scrollTop = target.offsetTop - 757
@@ -438,18 +437,21 @@ export default {
         return
       }
 
-      let currentContact = JSON.parse(JSON.stringify(this.contact))
-      for (let key in contact) {
-        if (key === 'communications_and_audits') {
+      const currentContact = JSON.parse(JSON.stringify(this.contact))
+      const key = { data: null }
+      for (key.data in contact) {
+        if (key.data === 'communications_and_audits') {
           continue
         }
 
-        if (typeof currentContact[key] !== 'undefined') {
-          currentContact[key] = contact[key]
+        if (typeof currentContact[key.data] !== 'undefined') {
+          currentContact[key.data] = contact[key.data]
         }
       }
 
-      this.setContact(currentContact)
+      if (currentContact.id === this.contact.id) {
+        this.setContact(currentContact)
+      }
     }
   },
   created () {
@@ -481,7 +483,7 @@ export default {
     this.$VueEvent.listen('load_and_navigate_inbox_tab', (lastNavigatedIndex) => {
       this.page = this.nextPage
       this.loadMoreContactTasks().then(() => {
-        let contact = this.contacts[lastNavigatedIndex + 1]
+        const contact = this.contacts[lastNavigatedIndex + 1]
         this.setSelectedContact(contact)
 
         this.$router.push({
@@ -509,7 +511,7 @@ export default {
       // this is to avoid swarm of api request when numbers of contacts get updated
       if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
         talk2Api.V2.contacts.get(data.id).then(response => {
-          let contact = response.data
+          const contact = response.data
           // check data loaded
           this.setSelectedContact(contact)
           // this.setContact(contact)
@@ -520,7 +522,7 @@ export default {
 
     this.$VueEvent.listen('new_communication', communication => {
       // Do not alter live contacts if it's in active mode
-      let isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+      const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
         [
           CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
@@ -538,10 +540,10 @@ export default {
       // TODO issue is selected contact is overridden by contact from new comms
       setTimeout(() => {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-          let contact = response.data
-          let contacts = _.cloneDeep(this.contacts)
-          let isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-          let isInContacts = this.contacts.find(item => item.id === contact.id)
+          const contact = response.data
+          const contacts = { data: _.cloneDeep(this.contacts) }
+          const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+          const isInContacts = this.contacts.find(item => item.id === contact.id)
           this.updateContact(contact)
 
           // check if communication is a live call
@@ -553,16 +555,16 @@ export default {
               CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
-            let liveContacts = _.cloneDeep(this.liveContacts)
+            const liveContacts = _.cloneDeep(this.liveContacts)
 
             if (!isInLiveContacts) {
               liveContacts.push(contact)
             }
 
             if (isInContacts) {
-              let index = contacts.findIndex(item => item.id === contact.id)
-              contacts.splice(index, 1)
-              this.setContacts(contacts)
+              const index = contacts.data.findIndex(item => item.id === contact.id)
+              contacts.data.splice(index, 1)
+              this.setContacts(contacts.data)
             }
 
             this.setLiveContacts(
@@ -588,19 +590,19 @@ export default {
                 // if contact is not in the list, then automatically add it to the top
                 if (!isInContacts) {
                   if (this.contacts.length > this.perPage) {
-                    contacts.pop()
+                    contacts.data.pop()
                   }
                 } else {
                   // get all contacts except the current one
-                  contacts = _.clone(contacts.filter(item => item.id !== contact.id))
+                  contacts.data = _.clone(contacts.data.filter(item => item.id !== contact.id))
                 }
 
                 if (this.sorting.order === 'asc') {
-                  contacts.push(contact)
+                  contacts.data.push(contact)
                 } else {
-                  contacts.unshift(contact)
+                  contacts.data.unshift(contact)
                 }
-                this.setContacts(contacts)
+                this.setContacts(contacts.data)
               }
             }
           }
@@ -614,19 +616,19 @@ export default {
       }
 
       // if communication is in live contacts
-      let index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
       if (index >= 0) {
-        let liveContacts = _.cloneDeep(this.liveContacts)
+        const liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
         // if type is call and completed/voicemail then remove from live calls
         if (communication.direction === CommunicationDirections.INBOUND &&
           communication.type === CommunicationTypes.CALL &&
           [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
-          let contactTaskToRemove = liveContacts[index]
+          const contactTaskToRemove = liveContacts[index]
           liveContacts.splice(index, 1)
 
           // we then add to contact tasks
-          let contacts = _.cloneDeep(this.contacts)
+          const contacts = _.cloneDeep(this.contacts)
           if (this.sorting.order === 'asc') {
             contacts.push(contactTaskToRemove)
           } else {
@@ -652,12 +654,14 @@ export default {
         )
       }
 
-      let contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
+      const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
-        let contacts = _.cloneDeep(this.contacts)
+        const contacts = _.cloneDeep(this.contacts)
         contacts[contactIndex].last_communication = communication
         this.setContacts(contacts)
-        this.setContact(contacts[contactIndex])
+        if (contacts[contactIndex].id === this.contact.id) {
+          this.setContact(contacts[contactIndex])
+        }
       }
     })
 
@@ -666,12 +670,12 @@ export default {
         return
       }
 
-      let index = this.contacts.findIndex(item => item.id === contact.id)
+      const index = this.contacts.findIndex(item => item.id === contact.id)
       if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status)) {
         this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
         this.loadContactTasks()
       } else {
-        let contacts = [...this.contacts]
+        const contacts = [...this.contacts]
         contacts[index] = contact
         this.setContacts(contacts)
       }

@@ -400,19 +400,18 @@ export default {
       })
     },
     onCheckAllItems (checked) {
-      let items = []
-      let _this = this
+      const items = { data: [] }
       document
         .querySelectorAll('.checker')
-        .forEach(function (checkbox) {
+        .forEach((checkbox) => {
           if (checked) {
-            items.push(_this.listItems[_this.id].data.find(item => item.id === Number(checkbox.value)))
+            items.data.push(this.listItems[this.id].data.find(item => item.id === Number(checkbox.value)))
           } else {
-            items = items.filter(item => item.id !== Number(checkbox.value))
+            items.data = items.data.filter(item => item.id !== Number(checkbox.value))
           }
         })
 
-      this.setListSelectedContacts({ id: this.id, contacts: items })
+      this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
     onCheckedRows (checked) {
       this.setListSelectedContacts({ id: this.id, contacts: checked })
@@ -475,7 +474,7 @@ export default {
       } else {
         console.log('Creating new dynamic list...')
         // debugger
-        let params = this.unsavedList.params
+        const params = this.unsavedList.params
         params.filters = this.currentListFilters
         return this.$axios
           .post('/api/v2/contacts-list', params)
@@ -549,26 +548,28 @@ export default {
       }
     },
     generateFolderPath (folders = [], folderNames = [], level = 0) {
-      let tempFolderNames = _.clone(folderNames)
+      const tempFolderNames = { data: _.clone(folderNames) }
 
       if (!folders.length && level > 0) {
-        return [tempFolderNames, false]
+        return [tempFolderNames.data, false]
       }
 
-      for (let item of folders) {
+      const item = { data: null }
+      const list = { data: null }
+      for (item.data of folders) {
         if (level > 0) {
-          tempFolderNames.push(item.name)
+          tempFolderNames.data.push(item.data.name)
         } else {
-          tempFolderNames = []
+          tempFolderNames.data = []
         }
 
-        let found = false
+        const found = { data: false }
 
-        if (item.lists.length) {
-          for (let list of item.lists) {
+        if (item.data.lists.length) {
+          for (list.data of item.data.lists) {
             const isNotNumber = isNaN(this.id / 1)
 
-            if (isNotNumber || (!isNotNumber && list.id !== parseInt(this.id))) {
+            if (isNotNumber || (!isNotNumber && list.data.id !== parseInt(this.id))) {
               continue
             }
 
@@ -576,35 +577,35 @@ export default {
               return []
             }
 
-            return [tempFolderNames, true]
+            return [tempFolderNames.data, true]
           }
         }
 
-        const childFolders = _.get(item, 'child_folders', [])
+        const childFolders = _.get(item.data, 'child_folders', [])
 
-        if (childFolders.length === 0 && !found) {
-          tempFolderNames.pop()
+        if (childFolders.length === 0 && !found.data) {
+          tempFolderNames.data.pop()
         }
 
-        if (childFolders.length === 0 && found) {
-          return [tempFolderNames, found]
+        if (childFolders.length === 0 && found.data) {
+          return [tempFolderNames.data, found.data]
         }
 
-        [tempFolderNames, found] = this.generateFolderPath(item.child_folders, tempFolderNames, (level + 1))
+        [tempFolderNames.data, found.data] = this.generateFolderPath(item.data.child_folders, tempFolderNames.data, (level + 1))
 
-        if (found && level > 0) {
-          return [tempFolderNames, found]
+        if (found.data && level > 0) {
+          return [tempFolderNames.data, found.data]
         }
 
-        if (found && level === 0) {
-          return tempFolderNames
+        if (found.data && level === 0) {
+          return tempFolderNames.data
         }
 
-        tempFolderNames.pop()
+        tempFolderNames.data.pop()
       }
 
       if (level > 0) {
-        return [tempFolderNames, false]
+        return [tempFolderNames.data, false]
       }
 
       return []
@@ -719,7 +720,7 @@ export default {
       deep: true,
       handler: function () {
         if (this.$route.name === 'Contacts') {
-          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.fetch(params)
           this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }

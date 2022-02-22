@@ -46,7 +46,7 @@ export default {
         return
       }
 
-      let promise = this.notificationAudio.play()
+      const promise = this.notificationAudio.play()
 
       if (promise !== undefined) {
         promise.catch(err => {
@@ -62,8 +62,7 @@ export default {
         return
       }
 
-      let type = this.getNotificationType(communication.ring_group_id)
-      this.closeCallNotifications(type, communication.id)
+      this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
     },
 
     closeCallNotifications (type = 'incomingCall', communicationId = null, forceClose = false) {
@@ -72,31 +71,31 @@ export default {
       }
 
       // for incoming call
-      let notificationCommId = _.get(this.notifications, 'incomingCall.communication.id', null)
-      if (type === 'incomingCall' && notificationCommId === communicationId && this.dialer.currentStatus !== 'RECEIVED_CALL_INVITE') {
+      const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
+      if (type === 'incomingCall' && notificationCommId.data === communicationId && this.dialer.currentStatus !== 'RECEIVED_CALL_INVITE') {
         this.$closeActionNotification(type)
         this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
       // for call fishing
-      notificationCommId = _.get(this.notifications, 'callFishing.communicationId', null)
-      let dialerCallFishingCommId = _.get(this.dialer, 'callFishing.communication.id', null)
+      notificationCommId.data = _.get(this.notifications, 'callFishing.communicationId', null)
+      const dialerCallFishingCommId = _.get(this.dialer, 'callFishing.communication.id', null)
 
       if (communicationId && dialerCallFishingCommId && communicationId === dialerCallFishingCommId) {
         this.clearDialerCallFishing()
       }
 
-      let callFishingQueue = _.get(this.notifications, 'callFishing.queue', null)
-      callFishingQueue = callFishingQueue && callFishingQueue.constructor === Array && callFishingQueue.length
+      const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
+      callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
 
-      if ((notificationCommId === communicationId && type === 'callFishing' && !callFishingQueue) || forceClose) {
+      if ((notificationCommId.data === communicationId && type === 'callFishing' && !callFishingQueue.data) || forceClose) {
         this.$closeActionNotification(type)
         this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
-      if (notificationCommId === communicationId && type === 'callFishing' && document.getElementById('callFishing')) {
+      if (notificationCommId.data === communicationId && type === 'callFishing' && document.getElementById('callFishing')) {
         this.switchCallFishingFromQueue()
         this.closeDesktopNotification(communicationId, 'communication')
         return
@@ -110,7 +109,7 @@ export default {
     },
 
     closeDesktopNotification (communicationId, type) {
-      let notification = this.communicationNotifiedDesktop.find(notification => notification.id === communicationId)
+      const notification = this.communicationNotifiedDesktop.find(notification => notification.id === communicationId)
       if (notification) {
         notification.close()
         this[`remove${this.$options.filters.capitalize(type)}NotifiedDesktop`](communicationId)
@@ -119,7 +118,7 @@ export default {
 
     clearDialerCallFishing () {
       // clear dialer's call fishing details
-      let dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+      const dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
       if (dialerCallFishingCommunication) {
         this.setDialerCallFishing({
           communication: null,
@@ -134,8 +133,8 @@ export default {
     },
 
     switchCallFishingFromQueue () {
-      let queue = _.get(this.notifications, 'callFishing.queue', [])
-      let callFishingFirstQueue = queue && queue.length > 0 ? queue.shift() : queue
+      const callFishingFirstQueue = { data: _.get(this.notifications, 'callFishing.queue', []) }
+      callFishingFirstQueue.data = callFishingFirstQueue.data && callFishingFirstQueue.data.length > 0 ? callFishingFirstQueue.data.shift() : callFishingFirstQueue.data
 
       if (!callFishingFirstQueue) {
         return
@@ -144,78 +143,78 @@ export default {
       this.setNotifications({
         type: 'callFishing',
         data: {
-          title: callFishingFirstQueue.title,
-          message: callFishingFirstQueue.message,
-          dateTime: callFishingFirstQueue.dateTime,
-          contactId: callFishingFirstQueue.contactId,
-          communicationId: callFishingFirstQueue.communicationId,
-          campaignId: callFishingFirstQueue.campaignId,
-          campaignName: callFishingFirstQueue.campaignName,
-          ringGroupName: callFishingFirstQueue.ringGroupName,
-          phoneNumber: callFishingFirstQueue.phoneNumber
+          title: callFishingFirstQueue.data.title,
+          message: callFishingFirstQueue.data.message,
+          dateTime: callFishingFirstQueue.data.dateTime,
+          contactId: callFishingFirstQueue.data.contactId,
+          communicationId: callFishingFirstQueue.data.communicationId,
+          campaignId: callFishingFirstQueue.data.campaignId,
+          campaignName: callFishingFirstQueue.data.campaignName,
+          ringGroupName: callFishingFirstQueue.data.ringGroupName,
+          phoneNumber: callFishingFirstQueue.data.phoneNumber
         }
       })
 
-      this.removeFromCallFishingNotificationQueue(callFishingFirstQueue.communicationId)
-      this.removeFromCallFishingQueue(callFishingFirstQueue.communicationId)
+      this.removeFromCallFishingNotificationQueue(callFishingFirstQueue.data.communicationId)
+      this.removeFromCallFishingQueue(callFishingFirstQueue.data.communicationId)
     },
 
     processActionNotification (communication, type) {
-      let name = ''
-      let companyName = ''
-      let firstAttachment = null
-      let contactId = null
-      let communicationId = null
-      let campaignId = _.get(communication, 'campaign_id', null)
-      let message = ''
+      const name = { data: '' }
+      const companyName = { data: '' }
+      const firstAttachment = { data: null }
+      const contactId = { data: null }
+      const communicationId = { data: null }
+      const campaignId = { data: _.get(communication, 'campaign_id', null) }
+      const message = { data: '' }
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
 
       if (type !== 'mention') {
-        name = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
-        companyName = communication.contact.company_name
-        firstAttachment = _.get(communication.attachments, '0.url', null)
+        name.data = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
+        companyName.data = communication.contact.company_name
+        firstAttachment.data = _.get(communication.attachments, '0.url', null)
       }
 
-      let data = {}
+      const params = { data: {} }
       switch (type) {
         case 'sms':
-          data = {
-            title: name,
+          params.data = {
+            title: name.data,
             message: communication.body,
-            attachment: firstAttachment,
+            attachment: firstAttachment.data,
             type: 'sms',
             contactId: communication.contact.id,
             communicationId: communication.id,
-            campaignId: campaignId
+            campaignId: campaignId.data
           }
           break
         case 'missed voicemail':
-          data = {
-            title: name,
+          params.data = {
+            title: name.data,
             message: 'Missed Call with Voicemail',
             messageIcon: 'call-voicemail-icon',
             type: 'call',
             contactId: communication.contact.id,
             communicationId: communication.id,
-            campaignId: campaignId
+            campaignId: campaignId.data
           }
           break
         case 'mention':
-          name = _.get(communication, 'mentioner_user.name', '')
-          contactId = _.get(communication, 'contact_id', null)
-          communicationId = _.get(communication, 'mention_subject_id', null)
-          message = _.get(communication, 'preview_text', '')
-          data = {
-            title: name,
-            message: message,
+          name.data = _.get(communication, 'mentioner_user.name', '')
+          contactId.data = _.get(communication, 'contact_id', null)
+          communicationId.data = _.get(communication, 'mention_subject_id', null)
+          message.data = _.get(communication, 'preview_text', '')
+          params.data = {
+            title: name.data,
+            message: message.data,
             type: 'mention',
-            contactId: contactId,
-            communicationId: communicationId
+            contactId: contactId.data,
+            communicationId: communicationId.data
           }
           break
         case 'missed call':
-          data = {
-            title: name,
+          params.data = {
+            title: name.data,
             message: 'Missed Call',
             type: 'call',
             contactId: communication.contact.id,
@@ -228,22 +227,17 @@ export default {
             break
           }
 
-          let callType = 'incomingCall'
-
-          if (ringGroup && ringGroup.fishing_mode) {
-            callType = 'callFishing'
-          }
-
+          const callType = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
 
-          data = {
-            title: name,
-            message: companyName,
+          params.data = {
+            title: name.data,
+            message: companyName.data,
             contactId: communication.contact.id,
             communicationId: communication.id,
-            campaignId: campaignId,
+            campaignId: campaignId.data,
             campaignName: campaignName,
             ringGroupName: ringGroupName,
             phoneNumber: phoneNumber,
@@ -254,14 +248,14 @@ export default {
           break
       }
 
-      if (!_.isEmpty(data)) {
-        this.$actionNotification(data)
+      if (!_.isEmpty(params.data)) {
+        this.$actionNotification(params.data)
       }
     },
 
     showCallFishingDataInPhone (data, type = 'callFishing') {
       this.$VueEvent.fire('showPhone')
-      let queue = _.get(this.notifications, 'callFishing.queue', [])
+      const queue = _.get(this.notifications, 'callFishing.queue', [])
 
       if (!queue || (queue && queue.length === 0)) {
         this.$closeActionNotification(type)
@@ -273,15 +267,15 @@ export default {
         return
       }
 
-      let counter = 0
-      let dialerCallFishingInterval = (!queue || (queue && queue.length === 0)) ? setInterval(() => {
+      const counter = { data: 0 }
+      const dialerCallFishingInterval = (!queue || (queue && queue.length === 0)) ? setInterval(() => {
         if (!document.getElementById(type)) {
           this.setDialerCallFishing(data)
           clearInterval(dialerCallFishingInterval)
         }
-        counter++
+        counter.data++
 
-        if (counter > 120) {
+        if (counter.data > 120) {
           clearInterval(dialerCallFishingInterval)
         }
       }, 500) : null

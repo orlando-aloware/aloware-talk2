@@ -110,7 +110,7 @@ export default {
     },
     onUpload (file) {
       this.isUploading = true
-      let formData = new FormData()
+      const formData = new FormData()
       formData.append('file', file)
       talk2Api.V1.lines.pdfUpload(
         this.selectedLine.id,

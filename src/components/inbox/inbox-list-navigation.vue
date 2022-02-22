@@ -40,11 +40,11 @@ export default {
       return this.contacts.length - 1
     },
     previousItem () {
-      let index = this.currentIndex - 1
+      const index = this.currentIndex - 1
       return this.currentIndex !== 0 ? this.contacts[index] : null
     },
     nextItem () {
-      let index = this.currentIndex + 1
+      const index = this.currentIndex + 1
       return this.currentIndex !== this.lastIndex ? this.contacts[index] : null
     },
     disablePreviousButton () {

@@ -93,22 +93,18 @@ export default {
     },
 
     availableExtensions () {
-      let availableExtensions = []
+      const availableExtensions = []
+      const item = { i: 100 }
       // fill the extensions array
-      for (let i = 100; i < 1000; i++) {
-        availableExtensions.push(i.toString())
+      for (item.i = 100; item.i < 1000; item.i++) {
+        availableExtensions.push(item.i.toString())
       }
 
       // find used extensions
-      let usedExtensions = []
-      if (this.users) {
-        usedExtensions = this.users.map(user => (user.extension) ? user.extension : null).filter(o => o !== null)
-      }
+      const usedExtensions = this.users ? this.users.map(user => (user.extension) ? user.extension : null).filter(o => o !== null) : []
 
       // remove used extensions from available extensions
-      availableExtensions = availableExtensions.filter((extension) => !usedExtensions.includes(extension))
-
-      return availableExtensions
+      return availableExtensions.filter((extension) => !usedExtensions.includes(extension))
     }
   },
 

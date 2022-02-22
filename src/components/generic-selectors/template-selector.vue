@@ -84,10 +84,9 @@ export default {
 
     templatesAlphabeticalOrder () {
       if (this.templates) {
-        let templates = _.clone(this.templates)
-        return templates.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.templates).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

@@ -41,7 +41,6 @@ import { mapActions, mapState } from 'vuex'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import ContactListSidebarItem from 'components/contacts/contact-list-sidebar-item'
 
-let scrollTimeout
 export default {
   name: 'contact-list-sidebar',
 
@@ -54,7 +53,8 @@ export default {
   data () {
     return {
       isExpanded: true,
-      desktopisExpanded: true
+      desktopisExpanded: true,
+      scrollTimeout: null
     }
   },
 
@@ -71,8 +71,7 @@ export default {
     },
 
     widthClass () {
-      let widthClass = this.$q.screen.lt.md ? 'contact-list-sidebar-open' : 'width-300'
-      widthClass = this.isExpanded ? widthClass : 'width-0'
+      const widthClass = this.isExpanded ? (this.$q.screen.lt.md ? 'contact-list-sidebar-open' : 'width-300') : 'width-0'
       return `px-0 contact-list-sidebar-container ${widthClass}${this.$q.screen.lt.md ? ' mx-0' : ''}`
     }
   },
@@ -80,9 +79,9 @@ export default {
   methods: {
     ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed', 'setShowContactsHeader']),
     onBottomScroll () {
-      clearTimeout(scrollTimeout)
+      clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
-      scrollTimeout = setTimeout(() => {
+      this.scrollTimeout = setTimeout(() => {
         // Run the callback
         if (!this.isEmpty) {
           this.onLoadMore()
@@ -103,6 +102,7 @@ export default {
       if (!this.isMobile) {
         return
       }
+
       this.isExpanded = false
       this.setShowContactsHeader(false)
       this.$emit('toggleContactActivities', false)
@@ -131,7 +131,7 @@ export default {
   },
 
   beforeDestroy () {
-    clearTimeout(scrollTimeout)
+    clearTimeout(this.scrollTimeout)
   },
 
   watch: {
@@ -140,7 +140,7 @@ export default {
         return
       }
 
-      let index = this.listItems[this.selectedList.id].data.findIndex(item => item.id === value.id)
+      const index = this.listItems[this.selectedList.id].data.findIndex(item => item.id === value.id)
 
       if (index === -1) {
         return

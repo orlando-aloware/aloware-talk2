@@ -2,7 +2,7 @@ export default {
   methods: {
     sanitizeText (string) {
       if (string) {
-        let entityMap = {
+        const entityMap = {
           '&': '&amp;',
           '<': '&lt;',
           '>': '&gt;',

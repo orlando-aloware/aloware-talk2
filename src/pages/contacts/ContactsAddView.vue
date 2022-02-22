@@ -14,7 +14,6 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-
 import {
   STATIC,
   DYNAMIC
@@ -92,11 +91,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.loader-spacer {
-  min-height: calc(100vh - 300px);
-  width: 100%;
-  position: relative;
-}
-</style>

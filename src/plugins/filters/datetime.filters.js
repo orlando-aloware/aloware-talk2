@@ -7,20 +7,20 @@ import moment from 'moment'
  */
 export const dateTimePassed = (dt) => {
   if (dt) {
-    let difference = 0
-    let dateTimePassed = ''
+    const difference = { data: 0 }
+    const dateTimePassed = { data: '' }
     if (window.timezone) {
-      difference = window.moment.utc(dt).tz(window.timezone).diff(window.moment.utc(new Date()), 'days')
-      dateTimePassed = window.moment.utc(dt).tz(window.timezone).fromNow()
+      difference.data = window.moment.utc(dt).tz(window.timezone).diff(window.moment.utc(new Date()), 'days')
+      dateTimePassed.data = window.moment.utc(dt).tz(window.timezone).fromNow()
     } else {
-      difference = window.moment.utc(dt).diff(window.moment.utc(new Date()), 'days')
-      dateTimePassed = window.moment.utc(dt).local().fromNow()
+      difference.data = window.moment.utc(dt).diff(window.moment.utc(new Date()), 'days')
+      dateTimePassed.data = window.moment.utc(dt).local().fromNow()
     }
 
-    if (difference < 1 || difference > 60) {
-      return dateTimePassed
+    if (difference.data < 1 || difference > 60) {
+      return dateTimePassed.data
     } else {
-      return difference + ' days ago'
+      return difference.data + ' days ago'
     }
   }
 }
@@ -31,41 +31,41 @@ export const dateTimePassed = (dt) => {
  * @returns {string|*}
  */
 export const shortDateTimePassed = (dt, replaceAgo = true) => {
-  let dateTimePassed = ''
+  const dateTimePassed = { text: '' }
 
   if (dt && window.timezone) {
-    dateTimePassed = window.moment.utc(dt).tz(window.timezone).fromNow()
+    dateTimePassed.text = window.moment.utc(dt).tz(window.timezone).fromNow()
   }
 
   if (dt && !window.timezone) {
-    dateTimePassed = window.moment.utc(dt).local().fromNow()
+    dateTimePassed.text = window.moment.utc(dt).local().fromNow()
   }
 
   if (!dt && window.timezone) {
-    dateTimePassed = window.moment.utc().tz(window.timezone).fromNow()
+    dateTimePassed.text = window.moment.utc().tz(window.timezone).fromNow()
   }
 
   if (!dt && !window.timezone) {
-    dateTimePassed = window.moment.utc().local().fromNow()
+    dateTimePassed.text = window.moment.utc().local().fromNow()
   }
 
-  dateTimePassed = dateTimePassed.split(' ')
+  dateTimePassed.text = dateTimePassed.text.split(' ')
 
-  if (dateTimePassed.length > 0 && ['a', 'an'].includes(dateTimePassed[0])) {
-    dateTimePassed[0] = '1'
+  if (dateTimePassed.text.length > 0 && ['a', 'an'].includes(dateTimePassed.text[0])) {
+    dateTimePassed.text[0] = '1'
   }
 
-  dateTimePassed = dateTimePassed.join(' ')
+  dateTimePassed.text = dateTimePassed.text.join(' ')
 
   if (replaceAgo) {
-    dateTimePassed = dateTimePassed.replace(' ago', '')
+    dateTimePassed.text = dateTimePassed.text.replace(' ago', '')
   }
 
   if (!replaceAgo) {
-    dateTimePassed = dateTimePassed.replace('1 few seconds ago', 'Now')
+    dateTimePassed.text = dateTimePassed.text.replace('1 few seconds ago', 'Now')
   }
 
-  let units = {
+  const units = {
     ' few': '',
     ' seconds': 's',
     ' second': 's',
@@ -83,13 +83,14 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
     ' year': 'y'
   }
 
-  for (let unit in units) {
-    if (dateTimePassed.includes(unit)) {
-      dateTimePassed = dateTimePassed.replace(unit, units[unit])
+  const unit = { data: null }
+  for (unit.data in units) {
+    if (dateTimePassed.text.includes(unit.data)) {
+      dateTimePassed.text = dateTimePassed.text.replace(unit.data, units[unit.data])
     }
   }
 
-  return dateTimePassed
+  return dateTimePassed.text
 }
 
 /**
@@ -265,28 +266,28 @@ export const fixDuration = (duration, forceDuration = false) => {
  */
 export const fixFullDuration = (duration) => {
   if (duration !== undefined) {
-    let seconds = duration
-    let hour = Math.floor(seconds / 3600)
-    let min = Math.floor(seconds / 60 % 60)
-    let sec = Math.floor(seconds % 60)
-    let result = ''
-    let unitCount = 0
+    const seconds = duration
+    const hour = Math.floor(seconds / 3600)
+    const min = Math.floor(seconds / 60 % 60)
+    const sec = Math.floor(seconds % 60)
+    const result = { data: '' }
+    const unitCount = { data: 0 }
 
     if (hour) {
-      result += `${hour}h`
-      unitCount++
+      result.data += `${hour}h`
+      unitCount.data++
     }
 
     if (min) {
-      result += ` ${min}m`
-      unitCount++
+      result.data += ` ${min}m`
+      unitCount.data++
     }
 
-    if (unitCount === 2) {
-      return result
+    if (unitCount.data === 2) {
+      return result.data
     }
 
-    return (result + ` ${sec}s`).trim()
+    return (result.data + ` ${sec}s`).trim()
   } else {
     return '-'
   }
@@ -298,7 +299,7 @@ export const fixFullDuration = (duration) => {
  * @returns {string|*}
  */
 export const humanizeDuration = (duration) => {
-  let func = require('humanize-duration')
+  const func = require('humanize-duration')
   if (duration) {
     return func(window.moment.duration(duration, 'seconds').asMilliseconds())
   } else {
@@ -316,12 +317,10 @@ export const fixDurationHumanize = (datetime) => {
     return '-'
   }
 
-  let now = window.timezone ? window.moment.utc(new Date()).tz(window.timezone) : window.moment.utc(new Date())
-  let end = window.timezone ? window.moment.utc(datetime).tz(window.timezone) : window.moment.utc(datetime)
-  let duration = window.moment.duration(now.diff(end))
-  let asSeconds = duration.asSeconds()
+  const now = window.timezone ? window.moment.utc(new Date()).tz(window.timezone) : window.moment.utc(new Date())
+  const end = window.timezone ? window.moment.utc(datetime).tz(window.timezone) : window.moment.utc(datetime)
 
-  return window.moment.duration(asSeconds, 'seconds').humanize()
+  return window.moment.duration(window.moment.duration(now.diff(end)).asSeconds(), 'seconds').humanize()
 }
 
 /**
@@ -331,9 +330,7 @@ export const fixDurationHumanize = (datetime) => {
  */
 export const fixDurationUTCRelative = (dt) => {
   if (dt) {
-    let now = window.moment.utc()
-    let datetime = window.moment.utc(dt)
-    let duration = now.diff(datetime, 'seconds')
+    const duration = window.moment.utc().diff(window.moment.utc(dt), 'seconds')
 
     if (window.moment.duration(duration, 'seconds').hours() >= 1) {
       return window.moment.duration(duration, 'seconds').format('HH:mm:ss', {
@@ -390,8 +387,8 @@ export const fixFullDateLocal = (dt) => {
  */
 export const fixFullDateUTCRelative = (dt) => {
   if (dt) {
-    let now = window.moment.utc()
-    let datetime = window.moment.utc(dt)
+    const now = window.moment.utc()
+    const datetime = window.moment.utc(dt)
 
     if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
       if (window.timezone) {

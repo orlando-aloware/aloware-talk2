@@ -247,7 +247,7 @@ export default {
       return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
     },
     checkedItemIds () {
-      let ids = []
+      const ids = []
       this.checked.forEach(check => {
         ids.push(check.id)
       })
@@ -281,7 +281,7 @@ export default {
       'setSearch'
     ]),
     updateListName (data) {
-      let id = this.$attrs.id === 'my-queue' ? this.selectedList.id : this.$attrs.id
+      const id = this.$attrs.id === 'my-queue' ? this.selectedList.id : this.$attrs.id
       this.$axios
         .patch(`/api/v2/power-dialer-lists/${id}`, {
           name: data
@@ -369,15 +369,14 @@ export default {
       })
     },
     onCheckAllItems (checked) {
-      let _this = this
       this.checked = []
       document
         .querySelectorAll('.checker')
-        .forEach(function (checkbox) {
+        .forEach((checkbox) => {
           if (checked) {
-            _this.checked.push(_this.listItems['all'].data.find(item => item.id === Number(checkbox.value)))
+            this.checked.push(this.listItems['all'].data.find(item => item.id === Number(checkbox.value)))
           } else {
-            _this.checked = _this.checked.filter(item => item.id !== Number(checkbox.value))
+            this.checked = this.checked.filter(item => item.id !== Number(checkbox.value))
           }
         })
     },

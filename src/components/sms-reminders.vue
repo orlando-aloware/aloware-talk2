@@ -75,6 +75,7 @@ export default {
 
   mounted () {
     this.filteredCampaigns = this.campaigns
+    this.selectedCampaign = this.campaigns.find(campaign => campaign.id === this.campaignId)
     this.showSendSmsReminderButton()
   },
 
@@ -130,8 +131,13 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
+        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase() === needle)
       })
+    }
+  },
+  watch: {
+    campaignId (value) {
+      this.selectedCampaign = this.campaigns.find(campaign => campaign.id === value)
     }
   }
 }

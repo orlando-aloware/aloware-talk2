@@ -169,26 +169,22 @@ export default {
     incomingNumbers () {
       // in line activity
       if (this.campaign && this.campaign.incoming_numbers && this.campaign.incoming_numbers.length > 0) {
-        let numbers = _.clone(this.campaign.incoming_numbers)
-
-        return numbers.sort((a, b) => {
-          let textA = a.phone_number.toString()
-          let textB = b.phone_number.toString()
+        return _.clone(this.campaign.incoming_numbers).sort((a, b) => {
+          const textA = a.phone_number.toString()
+          const textB = b.phone_number.toString()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }
 
       // in dashboard and reports
       if (this.campaigns && this.campaigns.length > 0) {
-        let campaigns = _.clone(this.campaigns)
-        let numbers = []
-        numbers = campaigns.map(campaign => (campaign.incoming_numbers && campaign.incoming_numbers.length > 0) ? campaign.incoming_numbers : null).filter(o => o !== null)
+        const campaigns = _.clone(this.campaigns)
+        const numbers = campaigns.map(campaign => (campaign.incoming_numbers && campaign.incoming_numbers.length > 0) ? campaign.incoming_numbers : null).filter(o => o !== null)
 
         if (numbers.length > 0) {
-          numbers = _.flatten(numbers)
-          return numbers.sort((a, b) => {
-            let textA = a.phone_number.toString()
-            let textB = b.phone_number.toString()
+          return _.flatten(numbers).sort((a, b) => {
+            const textA = a.phone_number.toString()
+            const textB = b.phone_number.toString()
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
           })
         }

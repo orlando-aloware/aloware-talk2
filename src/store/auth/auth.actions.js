@@ -73,15 +73,17 @@ const login = async ({ commit }, {
 }
 
 const getSharedCookie = () => {
-  let name = 'aloware_shared_auth_token='
-  let ca = document.cookie.split(';')
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i]
-    while (c.charAt(0) === ' ') {
-      c = c.substring(1)
+  const name = 'aloware_shared_auth_token='
+  const ca = document.cookie.split(';')
+  const index = { i: 0 }
+  const c = { data: null }
+  for (index.i = 0; index.i < ca.length; index.i++) {
+    c.data = ca[index.i]
+    while (c.data.charAt(0) === ' ') {
+      c.data = c.data.substring(1)
     }
-    if (c.indexOf(name) === 0) {
-      return c.substring(name.length, c.length)
+    if (c.data.indexOf(name) === 0) {
+      return c.data.substring(name.length, c.data.length)
     }
   }
   return null
@@ -91,7 +93,7 @@ const getCookieUser = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
-    let cookieParams = { shared_token: getSharedCookie() }
+    const cookieParams = { shared_token: getSharedCookie() }
 
     const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
 

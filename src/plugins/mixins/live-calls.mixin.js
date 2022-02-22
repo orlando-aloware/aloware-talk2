@@ -69,8 +69,7 @@ export default {
     },
     isCallFishingMode () {
       if (this.callFishingQueue) {
-        let index = this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id)
-        return index >= 0
+        return this.callFishingQueue.findIndex(item => item.communicationId === this.communication.id) >= 0
       }
 
       return false
@@ -129,16 +128,14 @@ export default {
 
       this.isAnsweringCall = true
 
-      let communication = this.communication
-
-      if (communication.ring_group_id) {
-        const ringGroup = this.getRingGroup(communication.ring_group_id)
+      if (this.communication.ring_group_id) {
+        const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
         if (ringGroup && ringGroup.fishing_mode) {
           const data = {
             communication: {
-              id: communication.id,
-              campaignId: communication.campaign_id,
+              id: this.communication.id,
+              campaignId: this.communication.campaign_id,
               contactName: this.contact.name,
               companyName: this.contact.company_name,
               contactId: this.contact.id,
@@ -165,18 +162,14 @@ export default {
       this.isRejecting = true
       if (this.isCallFishingMode) {
         this.removeFromCallFishingQueue(this.communication.id)
-        let isInLiveContacts = this.liveContacts.find(item => item.id === this.contact.id)
-        let isInContacts = this.contacts.find(item => item.id === this.contact.id)
-        let liveContacts = _.cloneDeep(this.liveContacts)
-        let contact = _.cloneDeep(this.contact)
-        if (isInLiveContacts) {
-          let index = this.liveContacts.findIndex(item => item.id === this.contact.id)
-          liveContacts.splice(index, 1)
+        const liveContacts = _.cloneDeep(this.liveContacts)
+        if (this.liveContacts.find(item => item.id === this.contact.id)) {
+          liveContacts.splice(this.liveContacts.findIndex(item => item.id === this.contact.id), 1)
           this.setLiveContacts(liveContacts)
         }
-        let contacts = _.cloneDeep(this.contacts)
-        if (!isInContacts) {
-          contacts.unshift(contact)
+        const contacts = _.cloneDeep(this.contacts)
+        if (!this.contacts.find(item => item.id === this.contact.id)) {
+          contacts.unshift(this.contact)
           this.setContacts(contacts)
         }
 

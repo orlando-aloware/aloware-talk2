@@ -172,8 +172,6 @@ import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import pdList from 'src/plugins/mixins/power-dialer-list'
 import { createPopper } from '@popperjs/core'
 
-let popperInstance
-
 export default {
   props: {
     isContactModuleType: {
@@ -257,7 +255,8 @@ export default {
     return {
       isCreatingFolder: false,
       isLoading: false,
-      isMenuOpen: false
+      isMenuOpen: false,
+      popperInstance: null
     }
   },
   methods: {
@@ -312,7 +311,7 @@ export default {
     createSubmenu () {
       this.isMenuOpen = true
       this.$nextTick(() => {
-        popperInstance = createPopper(
+        this.popperInstance = createPopper(
           document.getElementById('folder-submenu-' + this.rootFolder?.id),
           document.getElementById('folder-submenu-items-' + this.rootFolder?.id),
           {
@@ -323,9 +322,9 @@ export default {
     },
     destroySubmenu (evt) {
       this.isMenuOpen = false
-      if (popperInstance) {
-        popperInstance.destroy()
-        popperInstance = null
+      if (this.popperInstance) {
+        this.popperInstance.destroy()
+        this.popperInstance = null
       }
     }
   },

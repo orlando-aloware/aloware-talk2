@@ -190,16 +190,18 @@ export default {
       if (!this.optionsIsGrouped) {
         return this.options
       }
-      let newOptions = []
-      for (let item of this.options) {
-        newOptions = newOptions.concat(item.children)
+      const newOptions = { data: [] }
+      const option = { item: null }
+      for (option.item of this.options) {
+        newOptions.data = newOptions.data.concat(option.item.children)
       }
-      return newOptions
+      return newOptions.data
     },
     formattedValues () {
-      let newValues = []
-      for (let item of this.selectedValues) {
-        let found = this.allOptions.find(option => option.id === item)
+      const newValues = []
+      const values = { item: null }
+      for (values.item of this.selectedValues) {
+        const found = this.allOptions.find(option => option.id === values.item)
         if (found) {
           newValues.push(found)
         }
@@ -210,11 +212,12 @@ export default {
       if (!this.optionsIsGrouped) {
         return this.options.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
       }
-      let newOptions = []
-      for (let item of this.options) {
+      const newOptions = []
+      const option = { item: null }
+      for (option.item of this.options) {
         newOptions.push({
-          title: item.title,
-          children: item.children.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
+          title: option.item.title,
+          children: option.item.children.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
         })
       }
       return newOptions
@@ -252,10 +255,10 @@ export default {
       })
     },
     remove (id) {
-      let found = this.selectedValues.find(value => value === id)
-      let index = found ? this.selectedValues.indexOf(found) : null
-      if (index !== null && index !== -1) {
-        this.selectedValues.splice(index, 1)
+      const found = { data: this.selectedValues.find(value => value === id) }
+      found.data = found.data ? this.selectedValues.indexOf(found.data) : null
+      if (found.data !== null && found.data !== -1) {
+        this.selectedValues.splice(found.data, 1)
       }
       this.$emit('valuesUpdated', this.selectedValues)
     }

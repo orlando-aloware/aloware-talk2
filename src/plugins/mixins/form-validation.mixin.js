@@ -10,7 +10,7 @@ export default {
   },
   methods: {
     preValidateForm: _.debounce(function (formName, reset = false, forceValidate = false, override = null) {
-      let formElement = _.get(this.$refs, formName, null)
+      const formElement = _.get(this.$refs, formName, null)
 
       if (!formElement) {
         return
@@ -25,7 +25,7 @@ export default {
         }
       }
 
-      let fields = formElement.fields
+      const fields = formElement.fields
       if (fields.find((f) => f.validateState === 'validating')) {
         setTimeout(() => {
           this.preValidateForm(formName)
@@ -42,26 +42,26 @@ export default {
     }, 100),
 
     validateForm (formName) {
-      let formElement = _.get(this.$refs, formName, null)
+      const formElement = _.get(this.$refs, formName, null)
 
       if (!formElement) {
         return false
       }
 
-      let res = null
+      const res = { data: null }
       formElement.validate((valid) => {
-        res = valid
+        res.data = valid
       })
 
-      if (res) {
+      if (res.data) {
         formElement.clearValidate()
       }
 
-      return res
+      return res.data
     },
 
     resetForm (formName) {
-      let formElement = _.get(this.$refs, formName, null)
+      const formElement = _.get(this.$refs, formName, null)
 
       if (!formElement) {
         return

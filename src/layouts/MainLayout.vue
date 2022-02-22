@@ -285,7 +285,7 @@ export default {
       return _.get(this.$route.meta, 'isGuest', false)
     },
     pageClass () {
-      let pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
+      const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
       return pageSlug.replace(/ /g, '_') + '-page'
     },
     pageLayoutHeightClass () {
@@ -324,25 +324,25 @@ export default {
     this.$q.iconSet.arrow.dropdown = 'o_expand_more'
 
     window.handleOpenURL = (url) => {
-      let action = url.replace(/(^\w+:|^)\/\//, '')
+      const action = url.replace(/(^\w+:|^)\/\//, '')
 
       if (url.indexOf('callto:') > -1) {
-        let phoneNumber = url.replace('callto:', '')
+        const phoneNumber = url.replace('callto:', '')
         return this.sendCall(phoneNumber)
       }
 
       if (url.indexOf('tel:') > -1) {
-        let phoneNumber = url.replace('tel:', '')
+        const phoneNumber = url.replace('tel:', '')
         return this.sendCall(phoneNumber)
       }
 
       if (action.indexOf('call:') > -1) {
-        let phoneNumber = action.replace('call:', '')
+        const phoneNumber = action.replace('call:', '')
         return this.sendCall(phoneNumber)
       }
 
       if (action.indexOf('hs:') > -1) {
-        let phoneNumber = action
+        const phoneNumber = action
         this.setHubSpotDeal(phoneNumber)
         return this.sendCall(phoneNumber)
       }
@@ -352,25 +352,25 @@ export default {
       this.$q.electron.ipcRenderer.send('app_version')
 
       this.$q.electron.ipcRenderer.on('open-url', (event, data) => {
-        let action = data.replace(/(^\w+:|^)\/\//, '')
+        const action = data.replace(/(^\w+:|^)\/\//, '')
 
         if (data.indexOf('callto:') > -1) {
-          let phoneNumber = data.replace('callto:', '')
+          const phoneNumber = data.replace('callto:', '')
           return this.sendCall(phoneNumber)
         }
 
         if (data.indexOf('tel:') > -1) {
-          let phoneNumber = data.replace('tel:', '')
+          const phoneNumber = data.replace('tel:', '')
           return this.sendCall(phoneNumber)
         }
 
         if (action.indexOf('call:') > -1) {
-          let phoneNumber = action.replace('call:', '')
+          const phoneNumber = action.replace('call:', '')
           return this.sendCall(phoneNumber)
         }
 
         if (action.indexOf('hs:') > -1) {
-          let phoneNumber = action
+          const phoneNumber = action
           this.setHubSpotDeal(phoneNumber)
           return this.sendCall(phoneNumber)
         }
@@ -618,7 +618,7 @@ export default {
         this.showRefreshButton = false
       }).catch(() => {
         if (!this.isGuest) {
-          let route = {
+          const route = {
             name: 'Login'
           }
 
@@ -710,8 +710,8 @@ export default {
     },
 
     setHubSpotDeal (phoneNumber) {
-      let link = phoneNumber.replace('hs:', '').replace('deal=', '')
-      let parts = link.split('?')
+      const link = phoneNumber.replace('hs:', '').replace('deal=', '')
+      const parts = link.split('?')
       if (parts.length === 2) {
         this.setDialerDeal(parts[1])
       }
@@ -757,11 +757,11 @@ export default {
       if (typeof str === 'undefined' || str === null) {
         return ''
       }
-      let breakTag =
+      const breakTag =
         isXhtml || typeof isXhtml === 'undefined' ? '<br />' : '<br>'
       return (str + '').replace(
         /([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,
-        '$1' + breakTag + '$2'
+        `$1${breakTag}$2`
       )
     },
 
@@ -780,8 +780,8 @@ export default {
 
     mediaPlaybackRequiresUserGesture () {
       // test if play() is ignored when not called from an input event handler
-      let audio = document.createElement('audio')
-      let promise = audio.play()
+      const audio = document.createElement('audio')
+      const promise = audio.play()
       if (promise !== undefined) {
         promise
           .catch(() => {
@@ -871,7 +871,7 @@ export default {
       if (!id) {
         return null
       }
-      let found = this.campaigns.find((campaign) => campaign.id === id)
+      const found = this.campaigns.find((campaign) => campaign.id === id)
       if (found) {
         return found
       }
@@ -942,7 +942,7 @@ export default {
 
     getUsers () {
       if (this.hasPermissionTo('list user')) {
-        this.loading_users = true
+        this.loadingUsers = true
         this.setUsersIsLoading(true)
         return this.$axios
           .get('/api/v1/user', {
@@ -985,7 +985,7 @@ export default {
       if (page === 1) {
         this.loadingTags = true
       }
-      let params = {
+      const params = {
         page: page
       }
       return this.$axios
@@ -1126,30 +1126,33 @@ export default {
             return
           }
 
-          let structuredMetricGroups = []
+          const structuredMetricGroups = []
           const availableMetrics = response.data
-          for (let index in availableMetrics) {
-            const optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index)
-            const categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
+          const index = { data: null }
+          const option = { data: null }
+          const key = { data: null }
+          for (index.data in availableMetrics) {
+            const optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index.data)
+            const categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.data.replace(/_/g, ' '))
             structuredMetricGroups.push({
               disable: true,
               value: null,
               label: categoryLabel
             })
 
-            if (availableMetrics[index].constructor.name === 'Array') {
-              for (let option of availableMetrics[index]) {
-                option.disable = false
-                option.categoryLabel = categoryLabel
-                structuredMetricGroups.push(option)
+            if (availableMetrics[index.data].constructor.name === 'Array') {
+              for (option.data of availableMetrics[index.data]) {
+                option.data.disable = false
+                option.data.categoryLabel = categoryLabel
+                structuredMetricGroups.push(option.data)
               }
             }
 
-            if (availableMetrics[index].constructor.name === 'Object') {
-              for (let key of Object.keys(availableMetrics[index])) {
-                availableMetrics[index][key].disable = false
-                availableMetrics[index][key].categoryLabel = categoryLabel
-                structuredMetricGroups.push(availableMetrics[index][key])
+            if (availableMetrics[index.data].constructor.name === 'Object') {
+              for (key.data of Object.keys(availableMetrics[index.data])) {
+                availableMetrics[index.data][key.data].disable = false
+                availableMetrics[index.data][key.data].categoryLabel = categoryLabel
+                structuredMetricGroups.push(availableMetrics[index.data][key.data])
               }
             }
           }
@@ -1205,8 +1208,8 @@ export default {
             scope.setTag('company_id', this.profile.company_id)
           })
         }
-        let getCurrentCompany = this.getCurrentCompany()
-        let getUsers = this.getUsers()
+        const getCurrentCompany = this.getCurrentCompany()
+        const getUsers = this.getUsers()
 
         await Promise.all([
           getCurrentCompany,
@@ -1262,24 +1265,24 @@ export default {
     },
 
     handleDesktopCommunicationNotification (communication) {
-      let found = this.communicationNotifiedDesktop.length &&
+      const found = this.communicationNotifiedDesktop.length &&
         this.communicationNotifiedDesktop.find(item => item.id === communication.id)
       if (window.Push.Permission.has() && !found) {
-        let self = this
-        let title = ''
-        let icon = ''
+        const self = this
+        const title = { data: '' }
+        const icon = { data: '' }
         switch (communication.type) {
           case CommunicationTypes.CALL:
-            title = 'Incoming Call'
-            icon = 'call'
+            title.data = 'Incoming Call'
+            icon.data = 'call'
             break
           case CommunicationTypes.SMS:
-            title = 'Incoming Text Message'
-            icon = 'text'
+            title.data = 'Incoming Text Message'
+            icon.data = 'text'
             break
           case CommunicationTypes.FAX:
-            title = 'Incoming Fax'
-            icon = 'fax'
+            title.data = 'Incoming Fax'
+            icon.data = 'fax'
             break
         }
 
@@ -1288,12 +1291,12 @@ export default {
           communication.type === CommunicationTypes.CALL &&
           communication.user_id
         ) {
-          title = 'Answered Incoming Call'
+          title.data = 'Answered Incoming Call'
         }
 
         // handling answered calls
         if (communication.type === CommunicationTypes.CALL && communication.user_id) {
-          title = 'Answered Incoming Call'
+          title.data = 'Answered Incoming Call'
         }
 
         const onClickFunction = (res) => {
@@ -1308,7 +1311,8 @@ export default {
                   name: 'Communication',
                   params: {
                     communicationObj: communication,
-                    communicationId: communication.id
+                    communicationId: communication.id,
+                    contactId: _.get(communication, 'contact.id', null)
                   }
                 })
                 .catch((err) => {
@@ -1342,9 +1346,9 @@ export default {
           }
         }
 
-        let lineName = this.getCampaign(communication.campaign_id).name
+        const lineName = this.getCampaign(communication.campaign_id).name
         const options = {
-          icon: 'notification-icons/' + icon + '.png',
+          icon: 'notification-icons/' + icon.data + '.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1364,7 +1368,7 @@ export default {
           }
         }
 
-        window.Push.create(title, options).then((data) => {
+        window.Push.create(title.data, options).then((data) => {
           this.addCommunicationNotifiedDesktop({
             id: communication.id,
             close: data.close
@@ -1379,10 +1383,10 @@ export default {
     },
 
     handleDesktopVoicemailNotification (communication) {
-      let found = this.voicemailNotifiedDesktop.length &&
+      const found = this.voicemailNotifiedDesktop.length &&
         this.voicemailNotifiedDesktop.find(item => item.id === communication.id)
       if (window.Push.Permission.has() && !found) {
-        let self = this
+        const self = this
         const title = 'New Voicemail'
         const onClickFunction = function (res) {
           window.focus()
@@ -1394,14 +1398,15 @@ export default {
               name: 'Communication',
               params: {
                 communicationObj: communication,
-                communicationId: communication.id
+                communicationId: communication.id,
+                contactId: _.get(communication, 'contact.id', null)
               }
             })
             .catch((err) => {
               console.log(err)
             })
         }
-        let lineName = this.getCampaign(communication.campaign_id).name
+        const lineName = this.getCampaign(communication.campaign_id).name
         const options = {
           icon: 'notification-icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(
@@ -1435,10 +1440,10 @@ export default {
     },
 
     handleDesktopContactNotification (contact) {
-      let found = this.contactNotifiedDesktop.length &&
+      const found = this.contactNotifiedDesktop.length &&
         this.contactNotifiedDesktop.find(item => item.id === contact.id)
       if (window.Push.Permission.has() && !found) {
-        let self = this
+        const self = this
         const title = 'You have been assigned to a contact.'
         const onClickFunction = function (res) {
           window.focus()
@@ -1490,13 +1495,13 @@ export default {
     },
 
     handleDesktopAppointmentNotification (engagement, contact, timeDiff, unit) {
-      let found = this.appointmentNotifiedDesktop.length &&
+      const found = this.appointmentNotifiedDesktop.length &&
         this.appointmentNotifiedDesktop.find(item => item.id === engagement.id)
       if (window.Push.Permission.has() && !found) {
-        let self = this
-        let title = 'Appointment'
+        const self = this
+        const title = { data: 'Appointment' }
         if (timeDiff !== 0) {
-          title += ` in ${timeDiff} ${unit}`
+          title.data += ` in ${timeDiff} ${unit}`
         }
         const onClickFunction = function (res) {
           window.focus()
@@ -1541,7 +1546,7 @@ export default {
           }
         }
 
-        window.Push.create(title, options).then((data) => {
+        window.Push.create(title.data, options).then((data) => {
           this.addAppointmentNotifiedDesktop({
             id: engagement.id,
             close: data.close
@@ -1554,13 +1559,13 @@ export default {
     },
 
     handleDesktopReminderNotification (engagement, contact, timeDiff, unit) {
-      let found = this.reminderNotifiedDesktop.length &&
+      const found = this.reminderNotifiedDesktop.length &&
         this.reminderNotifiedDesktop.find(item => item.id === engagement.id)
       if (window.Push.Permission.has() && !found) {
-        let self = this
-        let title = 'Reminder'
+        const self = this
+        const title = { data: 'Reminder' }
         if (timeDiff !== 0) {
-          title += ` in ${timeDiff} ${unit}`
+          title.data += ` in ${timeDiff} ${unit}`
         }
         const onClickFunction = function (res) {
           window.focus()
@@ -1605,7 +1610,7 @@ export default {
           }
         }
 
-        window.Push.create(title, options).then((data) => {
+        window.Push.create(title.data, options).then((data) => {
           this.addReminderNotifiedDesktop({
             id: engagement.id,
             close: data.close
@@ -1655,7 +1660,7 @@ export default {
         return null
       }
 
-      let found = this.ringGroups.find(ringGroup => ringGroup.id === id)
+      const found = this.ringGroups.find(ringGroup => ringGroup.id === id)
 
       if (found) {
         return found
@@ -1690,12 +1695,36 @@ export default {
     },
 
     beforeUnload () {
+      this.$VueEvent.stop('bounce_dock')
+      this.$VueEvent.stop('set_badge')
+      this.$VueEvent.stop('increase_badge')
+      this.$VueEvent.stop('decrease_badge')
+      this.$VueEvent.stop('new_in_app_call')
+      this.$VueEvent.stop('new_in_app_sms')
+      this.$VueEvent.stop('new_in_app_voicemail')
+      // this.$VueEvent.stop('new_in_app_fax')
+      this.$VueEvent.stop('new_desktop_contact_assigned')
+      this.$VueEvent.stop('new_desktop_appointment')
+      this.$VueEvent.stop('new_desktop_reminder')
+      this.$VueEvent.stop('new_desktop_call')
+      this.$VueEvent.stop('answered_desktop_call')
+      this.$VueEvent.stop('new_desktop_sms')
+      this.$VueEvent.stop('new_desktop_fax')
+      this.$VueEvent.stop('new_desktop_voicemail')
+      this.$VueEvent.stop('mention')
+      this.$VueEvent.stop('update_communication')
+      this.$VueEvent.stop('new_version')
       this.unsubscribeFromPusher()
       this.resetContactsDefaultVuex()
       this.resetContactsVuex()
       this.resetInboxVuex()
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
+      window.removeEventListener('keydown', this.removeBehaviorsRestrictions)
+      window.removeEventListener('mousedown', this.removeBehaviorsRestrictions)
+      window.removeEventListener('touchstart', this.removeBehaviorsRestrictions)
+      window.removeEventListener('online', this.updateOnlineStatus)
+      window.removeEventListener('offline', this.updateOnlineStatus)
       clearInterval(window.sessionIntervalId)
     },
 

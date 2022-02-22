@@ -67,9 +67,11 @@ export default {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
       }
+
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
+
       return 'No Name'
     },
     hasUnreads () {
@@ -83,7 +85,8 @@ export default {
   },
   methods: {
     scrollMessages () {
-      let activitiesWrap = this.$refs.activitiesWrap
+      console.log('test asdas')
+      const activitiesWrap = this.$refs.activitiesWrap
       if (activitiesWrap && activitiesWrap.scrollHeight) {
         activitiesWrap.scrollTop = activitiesWrap.scrollHeight
       }

@@ -42,8 +42,6 @@ import PencilIcon from 'components/icons/pencil-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import talk2Api from 'src/plugins/api/api'
 
-let inputTimeout
-
 export default {
   name: 'filter-list-items',
   components: { TrashOIcon, PencilIcon },
@@ -61,7 +59,8 @@ export default {
   data () {
     return {
       isRenaming: false,
-      isUpdating: false
+      isUpdating: false,
+      inputTimeout: null
     }
   },
 
@@ -86,7 +85,7 @@ export default {
 
     onEdit (e) {
       this.isRenaming = true
-      inputTimeout = setTimeout(() => {
+      this.inputTimeout = setTimeout(() => {
         document.getElementById('filter-input-' + this.filter.id).focus()
       })
 
@@ -120,7 +119,7 @@ export default {
   },
 
   beforeDestroy () {
-    clearTimeout(inputTimeout)
+    clearTimeout(this.inputTimeout)
   }
 }
 </script>

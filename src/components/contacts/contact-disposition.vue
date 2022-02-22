@@ -45,17 +45,17 @@ export default {
 
     sortedStatusDispositions () {
       if (this.dispositionStatuses) {
-        let dispositionStatuses = _.clone(this.dispositionStatuses)
+        const dispositionStatuses = _.clone(this.dispositionStatuses)
           .sort((a, b) => {
-            let textA = a.name.toUpperCase()
-            let textB = b.name.toUpperCase()
+            const textA = a.name.toUpperCase()
+            const textB = b.name.toUpperCase()
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
           })
 
         // if company == 550 (GoSite), user is an agent,
         // exclude 'uncalled' and 'skipped' in the contact dispositions.
         if (this.currentCompany.id === 550 && this.isCompanyAgent) {
-          dispositionStatuses = dispositionStatuses.filter(
+          return dispositionStatuses.filter(
             dispositionStatuses => ![10659, 11951].includes(dispositionStatuses.id)
           )
         }

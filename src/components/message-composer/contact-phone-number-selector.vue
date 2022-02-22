@@ -52,31 +52,31 @@ export default {
       this.selectWidth = this.$refs.phoneNumberSelector.$el.offsetWidth
     },
     getSelectedPhoneLabel () {
-      let title = (this.selectedPhone.phone_number === this.contact.phone_number) ? 'Primary' : this.selectedPhone.title
-      let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
+      const title = (this.selectedPhone.phone_number === this.contact.phone_number) ? 'Primary' : this.selectedPhone.title
+      const titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.$options.filters.fixPhone(this.selectedPhone.phone_number)}</span> ${titleText}`
     },
     getOptionLabel (phone) {
-      let title = (phone.phone_number === this.contact.phone_number) ? 'Primary' : phone.title
-      let titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
+      const title = (phone.phone_number === this.contact.phone_number) ? 'Primary' : phone.title
+      const titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.$options.filters.fixPhone(phone.phone_number)}</span> ${titleText}`
     },
     getPhoneVariableLabels (phone) {
-      let primaryLabel = (phone.phone_number === this.contact.phone_number) ? 'Primary' : ''
+      const primaryLabel = { data: (phone.phone_number === this.contact.phone_number) ? 'Primary' : '' }
 
       // show only separator if has both primary label and phone title
-      let separator = phone.title && phone.title.length > 0 && primaryLabel && primaryLabel.length > 0 ? '<i class="fa fa-circle option-separator"></i>' : ''
+      const separator = phone.title && phone.title.length > 0 && primaryLabel.data && primaryLabel.data.length > 0 ? '<i class="fa fa-circle option-separator"></i>' : ''
 
-      primaryLabel = primaryLabel && primaryLabel.length > 0 ? `${separator} <span class="selected-option-title">${primaryLabel}</span>` : ''
-      let titleLabel = phone.title && phone.title.length > 0 ? `<span class="custom-option">${phone.title}</span>` : ''
+      primaryLabel.data = primaryLabel.data && primaryLabel.data.length > 0 ? `${separator} <span class="selected-option-title">${primaryLabel.data}</span>` : ''
+      const titleLabel = phone.title && phone.title.length > 0 ? `<span class="custom-option">${phone.title}</span>` : ''
 
-      return `${titleLabel} ${primaryLabel}`
+      return `${titleLabel} ${primaryLabel.data}`
     },
     getPhoneObject (phoneNumber) {
       return this.contactPhoneNumbers.find(phone => phone.phone_number === phoneNumber)
     },
     setPhone (phoneNumber) {
-      let phone = this.getPhoneObject(phoneNumber)
+      const phone = this.getPhoneObject(phoneNumber)
       if (phone) {
         this.selectedPhone = phone
       }
@@ -92,7 +92,7 @@ export default {
   },
   watch: {
     'contactAndPhoneNumbers': function () {
-      let phone = this.getPhoneObject(this.contact.phone_number)
+      const phone = this.getPhoneObject(this.contact.phone_number)
       if (phone) {
         this.selectedPhone = phone
       }

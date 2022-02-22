@@ -18,7 +18,8 @@
                             :pendingCount="taskCounts.pending"
                             :value.sync="active"
                             v-model="active"
-                            @active="newActive">
+                            @active="newActive"
+                            @toInbox="navigateToInbox">
             </inbox-nav-list>
           </div>
         </div>
@@ -76,7 +77,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts']),
+    ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts', 'items']),
     ...mapState(['isMobile']),
 
     nextPage () {
@@ -88,7 +89,7 @@ export default {
     },
 
     channelName () {
-      let path = this.$route.path.split('/')
+      const path = this.$route.path.split('/')
       return _.get(path, '[2]', 'Inbox')
     }
   },
@@ -105,6 +106,10 @@ export default {
 
     if (this.isMobile && !this.$q.screen.lt.md) {
       this.setShowContactsHeader(true)
+    }
+
+    if (this.$q.screen.lt.md) {
+      this.navigateToInbox()
     }
   },
 
@@ -133,13 +138,22 @@ export default {
     back () {
       this.setShowContactsHeader(true)
 
-      this.$router.push({
-        name: 'Inbox'
-      })
-
-      if (this.isInboxTaskOpened) {
-        this.onLoadShowTasks = false
+      if (this.$route.name !== 'Inbox') {
+        this.$router.push({
+          name: 'Inbox'
+        })
       }
+
+      this.onLoadShowTasks = false
+
+      if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
+        const channel = this.items.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
+      }
+    },
+
+    navigateToInbox () {
+      this.onLoadShowTasks = true
     },
 
     ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])

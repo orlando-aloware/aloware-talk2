@@ -119,8 +119,9 @@ export default _.merge({
       }
 
       if (Array.isArray(permissions)) {
-        for (let permission of permissions) {
-          if (!source.profile.user_permissions.includes(permission)) {
+        const permission = { index: null }
+        for (permission.index of permissions) {
+          if (!source.profile.user_permissions.includes(permission.index)) {
             return false
           }
         }
@@ -147,8 +148,9 @@ export default _.merge({
       }
 
       if (Array.isArray(roles)) {
-        for (let role of roles) {
-          if (!source.profile.user_roles.includes(role)) {
+        const role = { data: null }
+        for (role.data of roles) {
+          if (!source.profile.user_roles.includes(role.data)) {
             return false
           }
         }

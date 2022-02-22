@@ -9,26 +9,27 @@ export default {
       return
     }
 
-    for (let index in data) {
-      if (typeof data[index].agent_metrics === 'undefined') {
+    const index = { data: null }
+    for (index.data in data) {
+      if (typeof data[index.data].agent_metrics === 'undefined') {
         continue
       }
 
-      for (let metricIndex in data[index].agent_metrics) {
-        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index].agent_metrics[metricIndex].metric_id)
+      for (let metricIndex in data[index.data].agent_metrics) {
+        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index.data].agent_metrics[metricIndex].metric_id)
 
         if (!metric) {
           continue
         }
 
-        data[index].agent_metrics[metricIndex].category = metric.category
-        data[index].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
+        data[index.data].agent_metrics[metricIndex].category = metric.category
+        data[index.data].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
 
-        if (typeof data[index].agent_metrics[metricIndex].label !== 'undefined') {
+        if (typeof data[index.data].agent_metrics[metricIndex].label !== 'undefined') {
           continue
         }
 
-        data[index].agent_metrics[metricIndex].label = metric.label
+        data[index.data].agent_metrics[metricIndex].label = metric.label
       }
     }
 
@@ -63,26 +64,28 @@ export default {
       return
     }
 
-    for (let metricIndex in data.agent_metrics) {
-      let metric = _.get(metricGroup.agent_metrics, metricIndex, null)
-      let metricInfo = !metric ? state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex].name) : null
+    const metricIndex = { index: null }
+    for (metricIndex.data in data.agent_metrics) {
+      const metric = _.get(metricGroup.agent_metrics, metricIndex.data, null)
+      const metricInfo = { data: !metric ? state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex.data].name) : null }
 
-      if (metricInfo) {
-        data.agent_metrics[metricIndex].category = metricInfo.category
-        data.agent_metrics[metricIndex].categoryLabel = metricInfo.categoryLabel
+      if (metricInfo.data) {
+        data.agent_metrics[metricIndex.data].category = metricInfo.data.category
+        data.agent_metrics[metricIndex.data].categoryLabel = metricInfo.data.categoryLabel
         continue
       }
 
-      metricInfo = state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex].name)
+      metricInfo.data = state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex.data].name)
 
-      if (!metricInfo) {
+      if (!metricInfo.data) {
         continue
       }
 
-      for (let metricKey in metricInfo) {
-        let metricPropValue = _.get(data.agent_metrics[metricIndex], metricKey, null)
+      const metricKey = { data: null }
+      for (metricKey.data in metricInfo.data) {
+        const metricPropValue = _.get(data.agent_metrics[metricIndex.data], metricKey.data, null)
         if (!metricPropValue) {
-          data.agent_metrics[metricIndex][metricKey] = metricInfo[metricKey]
+          data.agent_metrics[metricIndex.data][metricKey.data] = metricInfo.data[metricKey.data]
         }
       }
     }
@@ -90,7 +93,7 @@ export default {
     Vue.set(state.metricGroups, index, data)
   },
   UPDATE_METRIC_GROUP_ORDER: (state, data) => {
-    let metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.metricGroupId)
+    const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.metricGroupId)
     const index = metricGroup ? state.metricGroups.indexOf(metricGroup) : null
 
     if (index === -1 || index === null) {
@@ -103,17 +106,19 @@ export default {
     state.metricGroups.splice(newIndex, 0, metricGroup)
 
     if (data.step > 0) {
-      for (let index in state.metricGroups) {
-        if (index < newIndex) {
-          Vue.set(state.metricGroups[index], 'order', (state.metricGroups[index].order - 1))
+      const item = { index: null }
+      for (item.index in state.metricGroups) {
+        if (item.index < newIndex) {
+          Vue.set(state.metricGroups[item.index], 'order', (state.metricGroups[item.index].order - 1))
         }
       }
     }
 
     if (data.step < 0) {
-      for (let index in state.metricGroups) {
-        if (index > newIndex) {
-          Vue.set(state.metricGroups[index], 'order', (state.metricGroups[index].order + 1))
+      const item = { index: null }
+      for (item.index in state.metricGroups) {
+        if (item.index > newIndex) {
+          Vue.set(state.metricGroups[item.index], 'order', (state.metricGroups[item.index].order + 1))
         }
       }
     }
@@ -126,17 +131,17 @@ export default {
       return
     }
 
-    let index = 0
+    const index = { data: 0 }
     if (typeof state.metricGroups[metricGroupIndex].agent_metrics === 'undefined') {
       state.metricGroups[metricGroupIndex].agent_metrics = []
     }
 
     if (state.metricGroups[metricGroupIndex].agent_metrics.constructor.name === 'Array') {
-      index = state.metricGroups[metricGroupIndex].agent_metrics.length
+      index.data = state.metricGroups[metricGroupIndex].agent_metrics.length
     }
 
     if (state.metricGroups[metricGroupIndex].agent_metrics.constructor.name === 'Object') {
-      index = Object.keys(state.metricGroups[metricGroupIndex].agent_metrics).length
+      index.data = Object.keys(state.metricGroups[metricGroupIndex].agent_metrics).length
     }
 
     const metric = state.availableMetrics.find(metric => metric.metric_id === data.data.metric_id)
@@ -146,7 +151,7 @@ export default {
       data.data.categoryLabel = metric.categoryLabel
     }
 
-    Vue.set(state.metricGroups[metricGroupIndex].agent_metrics, index, data.data)
+    Vue.set(state.metricGroups[metricGroupIndex].agent_metrics, index.data, data.data)
   },
   UPDATE_METRIC: (state, data) => {
     const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.agent_metric_group_id)
@@ -175,8 +180,8 @@ export default {
 
     if (state.metricGroups[metricGroupIndex].agent_metrics.length) {
       // arrange the metrics by order
-      let metricsLilst = JSON.parse(JSON.stringify(state.metricGroups[metricGroupIndex].agent_metrics))
-      metricsLilst.sort((a, b) => (a.order > b.order) ? 1 : -1)
+      const metricsLilst = JSON.parse(JSON.stringify(state.metricGroups[metricGroupIndex].agent_metrics))
+        .sort((a, b) => (a.order > b.order) ? 1 : -1)
       Vue.set(state.metricGroups, `${metricGroupIndex}.agent_metrics`, metricsLilst)
     }
 
@@ -187,8 +192,8 @@ export default {
       return
     }
 
-    let newIndex = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.order === data.order)
-    newIndex = newIndex ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(newIndex) : 0
+    const newIndex = { data: state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.order === data.order) }
+    newIndex.data = newIndex.data ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(newIndex.data) : 0
 
     // store the old order of the metric
     const oldMetricOrder = metric.order
@@ -196,21 +201,23 @@ export default {
     metric.order = data.order
     // move the metric to its new index
     state.metricGroups[metricGroupIndex].agent_metrics.splice(metricIndex, 1)
-    state.metricGroups[metricGroupIndex].agent_metrics.splice(newIndex, 0, metric)
+    state.metricGroups[metricGroupIndex].agent_metrics.splice(newIndex.data, 0, metric)
 
     // if metric was moved more than 1 step up, update the order of the metrics below it
     if (data.step > 1) {
-      for (let index = (newIndex - 1); index >= 0; index--) {
+      const index = { data: null }
+      for (index.data = (newIndex.data - 1); index.data >= 0; index.data--) {
         data.order -= 1
-        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index], 'order', data.order)
+        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index.data], 'order', data.order)
       }
       return
     }
     // if metric was moved more than 1 step down, update the order of the metrics above it
     if (data.step < -1) {
-      for (let index = (newIndex + 1); index < state.metricGroups[metricGroupIndex].agent_metrics.length; index++) {
+      const index = { data: null }
+      for (index.data = (newIndex + 1); index.data < state.metricGroups[metricGroupIndex].agent_metrics.length; index.data++) {
         data.order += 1
-        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index], 'order', data.order)
+        Vue.set(state.metricGroups[metricGroupIndex].agent_metrics[index.data], 'order', data.order)
       }
       return
     }

@@ -227,7 +227,7 @@ export default {
 
     async logoutAction () {
       try {
-        let response = await this.logout()
+        const response = await this.logout()
 
         this.response = response?.data
 

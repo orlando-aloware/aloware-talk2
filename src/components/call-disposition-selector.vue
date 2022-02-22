@@ -172,14 +172,11 @@ export default {
 
     callDispositionsAlphabeticalOrder () {
       if (this.availableDispositions) {
-        let callDispositions = _.clone(this.availableDispositions)
-        callDispositions = callDispositions.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.availableDispositions).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
-
-        return callDispositions
       }
 
       return []

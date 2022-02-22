@@ -145,7 +145,7 @@ export default {
       }
     },
     formattedSequences () {
-      let activeSequences = this.availableWorkflows.filter(workflow => workflow.active)
+      const activeSequences = this.availableWorkflows.filter(workflow => workflow.active)
       if (activeSequences.length > 0) {
         activeSequences.unshift({
           group: 'Active',
@@ -153,7 +153,7 @@ export default {
         })
       }
 
-      let pausedSequences = this.availableWorkflows.filter(workflow => !workflow.active)
+      const pausedSequences = this.availableWorkflows.filter(workflow => !workflow.active)
       if (pausedSequences.length > 0) {
         pausedSequences.unshift({
           group: 'Paused',
@@ -171,8 +171,8 @@ export default {
           }
           return workflow.id !== this.exclude
         }).sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

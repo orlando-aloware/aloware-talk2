@@ -66,7 +66,9 @@ export default {
         last_name: this.selected_contact.last_name
       }).then(response => {
         this.$generalNotification('Contact updated.')
-        this.setContact(response.data)
+        if (response.data.id === this.contact.id) {
+          this.setContact(response.data)
+        }
         this.$emit('close')
         this.$VueEvent.fire('contact_updated', response.data)
       }).catch(err => {
@@ -91,7 +93,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

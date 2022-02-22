@@ -35,13 +35,16 @@ export const helperMixin = {
     },
     frontendInputFormat: function (value) {
       if (value === '24hrs') {
-        value = this.localization.t24hours
-      } else if (value === '2400') {
-        value = this.localization.midnight
-      } else if (this.isValidBackendTime(value)) {
-        value = this.frontendTimeFormat(value)
-      } else if (value === '') {
-        value = ''
+        return this.localization.t24hours
+      }
+      if (value === '2400') {
+        return this.localization.midnight
+      }
+      if (this.isValidBackendTime(value)) {
+        return this.frontendTimeFormat(value)
+      }
+      if (value === '') {
+        return ''
       }
 
       return value
@@ -52,15 +55,17 @@ export const helperMixin = {
         value === this.localization.midnight.toLowerCase()
       ) {
         return '2400'
-      } else if (
+      }
+      if (
         value.toLowerCase() === this.localization.t24hours.toLowerCase()
       ) {
         return '24hrs'
-      } else if (this.isValidFrontendTime(value)) {
-        return this.backendTimeFormat(value)
-      } else {
-        return value
       }
+      if (this.isValidFrontendTime(value)) {
+        return this.backendTimeFormat(value)
+      }
+
+      return value
     },
     isEven: function (value) {
       return value % 2 === 0

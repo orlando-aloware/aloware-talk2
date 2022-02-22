@@ -174,8 +174,8 @@ export default {
           this.onHide()
         })
       }).catch(error => {
-        let errors = error.response.data.errors
-        let keys = Object.keys(errors)
+        const errors = error.response.data.errors
+        const keys = Object.keys(errors)
 
         if (keys && keys.length > 0) {
           this.$generalNotification(errors[keys[0]], 'error')

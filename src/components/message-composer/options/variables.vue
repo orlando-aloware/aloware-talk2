@@ -55,55 +55,55 @@ export default {
   computed: {
     ...mapGetters('contacts', ['messageComposer']),
     formattedOptions () {
-      let contactVariables = [...this.Variables.CONTACT_VARIABLES]
+      const contactVariables = [...this.Variables.CONTACT_VARIABLES]
 
       contactVariables.unshift({
         group: 'Contact Variables',
         disable: true
       })
 
-      let variablesArray = contactVariables
+      const variablesArray = { data: contactVariables }
 
       if (this.Variables.AGENT_VARIABLES && this.Variables.AGENT_VARIABLES.length > 0) {
-        let agentVariables = [...this.Variables.AGENT_VARIABLES]
+        const agentVariables = [...this.Variables.AGENT_VARIABLES]
         agentVariables.unshift({
           group: 'Agent Variables',
           disable: true
         })
-        variablesArray = [...contactVariables, ...agentVariables]
+        variablesArray.data = [...contactVariables, ...agentVariables]
       }
 
       if (this.Variables.LINE_VARIABLES && this.Variables.LINE_VARIABLES.length > 0) {
-        let lineVariables = [...this.Variables.LINE_VARIABLES]
+        const lineVariables = [...this.Variables.LINE_VARIABLES]
         lineVariables.unshift({
           group: 'Line Variables',
           disable: true
         })
-        variablesArray = [...contactVariables, ...lineVariables]
+        variablesArray.data = [...contactVariables, ...lineVariables]
       }
 
       if (this.Variables.ACCOUNT_VARIABLES && this.Variables.ACCOUNT_VARIABLES.length > 0) {
-        let accountVariables = [...this.Variables.ACCOUNT_VARIABLES]
+        const accountVariables = [...this.Variables.ACCOUNT_VARIABLES]
         accountVariables.unshift({
           group: 'Account Variables',
           disable: true
         })
-        variablesArray = [...contactVariables, ...accountVariables]
+        variablesArray.data = [...contactVariables, ...accountVariables]
       }
 
       if (this.Variables.CSF_VARIABLES && this.Variables.CSF_VARIABLES.length > 0) {
-        let csfVariables = [...this.Variables.CSF_VARIABLES]
+        const csfVariables = [...this.Variables.CSF_VARIABLES]
         csfVariables.unshift({
           group: 'CSF Variables',
           disable: true
         })
-        variablesArray = [...contactVariables, ...csfVariables]
+        variablesArray.data = [...contactVariables, ...csfVariables]
       }
 
-      return variablesArray
+      return variablesArray.data
     },
     multiselectOptions () {
-      let groups = [
+      const groups = [
         {
           type: 'Contact Variables',
           variables: this.Variables.CONTACT_VARIABLES

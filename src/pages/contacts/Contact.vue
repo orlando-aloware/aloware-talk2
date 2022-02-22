@@ -1,18 +1,18 @@
 <template>
-  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !campaigns || !users"
+  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags"
              :opacity="0.85"
              class="h-100 w-100"
              variant="white"
              rounded="sm"
              v-if="authenticated">
-    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
-         v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
       <template v-if="!isInbox">
         <contact-list-sidebar ref="contactListSidebar"
                               @toggleContactActivities="toggleContactListSidebar"/>
       </template>
       <div class="contact-activity-wrapper flex-grow-1"
-           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }">
+           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
+           v-if="!campaignsIsLoading && !usersIsLoading && tagsFullyLoaded && campaigns && users && tags">
         <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
@@ -42,7 +42,8 @@
         </contact-activities>
       </div>
       <div class="contact-details-container"
-           :class="{ 'contact-details--opened': detailsOpen }">
+           :class="{ 'contact-details--opened': detailsOpen }"
+           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
         <contact-details @back="toggleDetails"></contact-details>
       </div>
       <q-drawer
@@ -52,7 +53,8 @@
         side="right"
         :breakpoint="0"
         :width="300"
-        v-model="drawer">
+        v-model="drawer"
+        v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
         <compact-btn borderless
                      customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
@@ -101,7 +103,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
     ...mapGetters('auth', ['authenticated']),
-    ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'campaigns', 'users']),
+    ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'tagsFullyLoaded', 'campaigns', 'users', 'tags']),
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     }
@@ -122,12 +124,11 @@ export default {
     ...mapActions(['setContactDetailsDrawer']),
     fetchContact () {
       this.selectedContactChanging(true)
-      let _this = this
-      this.processFetchContactInfo(function (selectedContact) {
-        _this.setContact(selectedContact)
-        _this.setContactClone(selectedContact)
-        _this.resetChangedContactProperties([])
-        _this.selectedContactChanging(false)
+      this.processFetchContactInfo((selectedContact) => {
+        this.setContact(selectedContact)
+        this.setContactClone(selectedContact)
+        this.resetChangedContactProperties([])
+        this.selectedContactChanging(false)
       })
     },
     toggleDrawer () {
@@ -161,15 +162,18 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
+      this.contactListSidebarOpen = false
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
-      } else {
-        this.setContact(this.selectedContact)
-        this.resetSelectedContact()
+        return
       }
-      this.contactListSidebarOpen = false
+
+      if (this.contact.id === this.selectedContact.id) {
+        this.setContact(this.selectedContact)
+      }
+      this.resetSelectedContact()
     },
 
     '$route.params.communicationId': function (value) {

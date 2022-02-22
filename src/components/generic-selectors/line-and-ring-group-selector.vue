@@ -156,10 +156,9 @@ export default {
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {
-        let campaigns = _.clone(this.campaigns)
-        return campaigns.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.campaigns).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }
@@ -185,7 +184,7 @@ export default {
     },
 
     formattedOptions () {
-      let campaignOptions = [...this.sortToAlphabeticalOrder(this.campaigns.map(function (item) { return { ...item, model: 'lines' } }))]
+      const campaignOptions = [...this.sortToAlphabeticalOrder(this.campaigns.map(function (item) { return { ...item, model: 'lines' } }))]
 
       if (campaignOptions && campaignOptions.length > 0) {
         campaignOptions.unshift({
@@ -194,8 +193,7 @@ export default {
         })
       }
 
-      let campaignAndRingGroupArray = campaignOptions
-      let ringGroupOptions = [...this.sortToAlphabeticalOrder(this.ringGroups.map(function (item) { return { ...item, model: 'ring_groups' } }))]
+      const ringGroupOptions = [...this.sortToAlphabeticalOrder(this.ringGroups.map(function (item) { return { ...item, model: 'ring_groups' } }))]
 
       if (ringGroupOptions && ringGroupOptions.length > 0) {
         ringGroupOptions.unshift({
@@ -204,9 +202,7 @@ export default {
         })
       }
 
-      campaignAndRingGroupArray = [...campaignOptions, ...ringGroupOptions]
-
-      return campaignAndRingGroupArray
+      return [...campaignOptions, ...ringGroupOptions]
     }
   },
 
@@ -277,10 +273,9 @@ export default {
 
     sortToAlphabeticalOrder (items) {
       if (items) {
-        let sortable = _.clone(items)
-        return sortable.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(items).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

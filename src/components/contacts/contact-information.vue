@@ -181,9 +181,7 @@ export default {
     },
     timeToFirstOutboundCall () {
       if (this.contact && this.firstOutboundCall) {
-        let contactCreated = window.moment(this.contact.created_at)
-        let callCreated = window.moment(this.firstOutboundCall.created_at)
-        let formatted = this.formatHumanized(callCreated.diff(contactCreated))
+        const formatted = this.formatHumanized(window.moment(this.firstOutboundCall.created_at).diff(window.moment(this.contact.created_at)))
         return !formatted ? '--:--' : `After ${formatted}`
       }
       return '--:--'
@@ -230,7 +228,7 @@ export default {
       if (period === 0) {
         return '0 second'
       }
-      let segments = []
+      const segments = []
       const duration = window.moment.duration(period)
       // return nothing when the duration is falsy or not correctly parsed (P0D)
       if (duration.toISOString() === 'P0D' || !duration.isValid()) return ''

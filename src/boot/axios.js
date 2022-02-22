@@ -21,8 +21,7 @@ if (Platform.within.iframe) {
   window.axios.defaults.headers.common['Requested-From'] = 'talk2-iframe'
 }
 
-let apiToken = storage.local.getItem('api_token')
-if (apiToken) {
+if (storage.local.getItem('api_token')) {
   window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 }
 
