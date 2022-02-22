@@ -1,22 +1,22 @@
 export default (err) => {
-  let message = err.message
+  const message = { data: err.message }
 
   if (err.response && err.response.data && err.response.data.errors) {
-    message = []
+    message.data = []
 
     const errObject = err.response.data.errors
 
     Object.keys(errObject).forEach((k) => {
-      message = message.concat(errObject[k])
+      message.data = message.data.concat(errObject[k])
     })
 
-    return { message: message.join('<br />'), html: true }
+    return { message: message.data.join('<br />'), html: true }
   }
 
   if (err.response && err.response.data && err.response.data.message) {
-    message = err.response.data.message
-    return { message, html: false }
+    message.data = err.response.data.message
+    return { message: message.data, html: false }
   }
 
-  return { message, html: false }
+  return { message: message.data, html: false }
 }

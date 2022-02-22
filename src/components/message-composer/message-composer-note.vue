@@ -79,7 +79,8 @@ export default {
   data () {
     return {
       isAdding: false,
-      items: []
+      items: [],
+      focustInputInterval: null
     }
   },
   methods: {
@@ -118,10 +119,17 @@ export default {
       }
     },
     focusInput () {
-      let _this = this
-      setTimeout(function () {
-        _this.$refs.noteContentEditable.focus()
-      }, 10)
+      const counter = { data: 0 }
+      this.focustInputInterval = setInterval(() => {
+        if (typeof this.$refs.noteContentEditable !== 'undefined') {
+          this.$refs.noteContentEditable.focus()
+          clearInterval(this.focustInputInterval)
+        }
+        counter.data++
+        if (counter > 180) {
+          clearInterval(this.focustInputInterval)
+        }
+      }, 250)
     }
   },
   mounted () {
@@ -137,7 +145,7 @@ export default {
     'messageComposer.note.body': function (value) {
       if (this.$refs.noteContentEditable.lastElementChild && navigator.userAgent.indexOf('Firefox') !== -1) {
         if (this.$refs.noteContentEditable.lastElementChild.tagName !== 'BR') {
-          let brNode = document.createElement('BR')
+          const brNode = document.createElement('BR')
           this.$refs.noteContentEditable.appendChild(brNode)
           this.setMessageComposerNoteBody(this.$refs.noteContentEditable.innerHTML)
         }

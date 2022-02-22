@@ -201,26 +201,27 @@ export default {
     fixOperatingHours () {
       this.loadingOperatingHours = true
       // fixes null issue
-      for (let day of ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) {
-        for (let item in this.localUser.operating_hours[day]) {
-          if (!this.localUser.operating_hours[day][item].open) {
-            this.localUser.operating_hours[day][item].open = ''
+      const day = { data: null }
+      for (day.data of ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) {
+        for (let item in this.localUser.operating_hours[day.data]) {
+          if (!this.localUser.operating_hours[day.data][item].open) {
+            this.localUser.operating_hours[day.data][item].open = ''
           }
 
-          if (!this.localUser.operating_hours[day][item].close) {
-            this.localUser.operating_hours[day][item].close = ''
+          if (!this.localUser.operating_hours[day.data][item].close) {
+            this.localUser.operating_hours[day.data][item].close = ''
           }
 
-          if (this.localUser.operating_hours[day][item].isOpen && this.localUser.operating_hours[day][item].open === '') {
-            this.localUser.operating_hours[day][item].open = '24hrs'
+          if (this.localUser.operating_hours[day.data][item].isOpen && this.localUser.operating_hours[day.data][item].open === '') {
+            this.localUser.operating_hours[day.data][item].open = '24hrs'
           }
 
-          if (this.localUser.operating_hours[day][item].isOpen && this.localUser.operating_hours[day][item].close === '') {
-            this.localUser.operating_hours[day][item].close = '24hrs'
+          if (this.localUser.operating_hours[day.data][item].isOpen && this.localUser.operating_hours[day.data][item].close === '') {
+            this.localUser.operating_hours[day.data][item].close = '24hrs'
           }
 
-          if (this.localUser.operating_hours[day][item].isOpen && this.localUser.operating_hours[day][item].open !== '24hrs' && this.localUser.operating_hours[day][item].close === '24hrs') {
-            this.localUser.operating_hours[day][item].open = '24hrs'
+          if (this.localUser.operating_hours[day.data][item].isOpen && this.localUser.operating_hours[day.data][item].open !== '24hrs' && this.localUser.operating_hours[day.data][item].close === '24hrs') {
+            this.localUser.operating_hours[day.data][item].open = '24hrs'
           }
         }
       }

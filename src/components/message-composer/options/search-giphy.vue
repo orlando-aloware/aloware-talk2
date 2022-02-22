@@ -111,12 +111,13 @@ export default {
         return
       }
 
-      let newGifs = gifs.map((gif) => ({
+      const newGifs = gifs.map((gif) => ({
         src: gif.images.downsized.url
       }))
 
-      for (let gif of newGifs) {
-        this.gifs_arr.push(gif)
+      const gif = { data: null }
+      for (gif.data of newGifs) {
+        this.gifs_arr.push(gif.data)
       }
     },
     findGif: _.debounce(function () {

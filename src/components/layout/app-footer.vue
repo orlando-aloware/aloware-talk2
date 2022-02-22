@@ -276,7 +276,7 @@ export default {
         this.$emit('toggleMobilePhone', false)
       }
 
-      let tab = this.getTab()
+      const tab = this.getTab()
       if (this.tab !== tab) {
         this.tab = tab
       }

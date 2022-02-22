@@ -235,14 +235,14 @@ export default {
       return _.get(this.$route, 'params.id', null)
     },
     currentPinnedContactList () {
-      let id = this.currentPinnedContactListId
+      const id = { data: this.currentPinnedContactListId }
 
-      if (!id) {
+      if (!id.data) {
         return {}
       }
 
-      id = parseInt(id)
-      const index = this.pinnedLists.findIndex(list => list.id === id)
+      id.data = parseInt(id.data)
+      const index = this.pinnedLists.findIndex(list => list.id === id.data)
 
       if (index === -1) {
         return {}

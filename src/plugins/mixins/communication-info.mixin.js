@@ -5,154 +5,143 @@ import * as CommunicationTypes from '../../constants/communication-types'
 export default {
   methods: {
     stateToTextColor (dispositionStatus, type) {
-      let color = ''
+      const color = { data: '' }
       if (type === CommunicationTypes.CALL) {
         if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          color = 'has-text-info'
+          color.data = 'has-text-info'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          color = 'has-text-success'
+          color.data = 'has-text-success'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
-          color = 'has-text-primary'
+          color.data = 'has-text-primary'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-          color = 'has-text-danger'
+          color.data = 'has-text-danger'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          color = 'has-text-danger'
+          color.data = 'has-text-danger'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          color = 'has-text-danger'
+          color.data = 'has-text-danger'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
-          color = 'has-text-warn'
+          color.data = 'has-text-warn'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
-          color = 'has-text-danger'
+          color.data = 'has-text-danger'
         }
-      } else if (type === CommunicationTypes.SMS) {
+        return color.data
+      }
+      if (type === CommunicationTypes.SMS) {
         // if type is sms
         if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          color = 'has-text-info'
+          color.data = 'has-text-info'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          color = 'has-text-success'
+          color.data = 'has-text-success'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          color = 'has-text-danger'
+          color.data = 'has-text-danger'
         } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          color = 'has-text-danger'
+          color.data = 'has-text-danger'
         }
-      } else {
-        // if type is voicemail
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          color = 'has-text-info'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          color = 'has-text-success'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          color = 'has-text-danger'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          color = 'has-text-danger'
-        }
+        return color.data
       }
-
-      return color
+      // if type is voicemail
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+        color.data = 'has-text-info'
+      } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+        color.data = 'has-text-success'
+      } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+        color.data = 'has-text-danger'
+      } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+        color.data = 'has-text-danger'
+      }
+      return color.data
     },
 
     stateToColor (dispositionStatus, type) {
-      let color = ''
-      if (type === CommunicationTypes.CALL) {
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          color = 'is-info'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          color = 'is-success'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
-          color = 'is-primary'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-          color = 'is-danger'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          color = 'is-danger'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          color = 'is-danger'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
-          color = 'is-warn'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
-          color = 'is-danger'
-        }
-      } else if (type === CommunicationTypes.SMS) {
-        // if type is sms
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          color = 'is-info'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          color = 'is-success'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          color = 'is-danger'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          color = 'is-danger'
-        }
-      } else {
-        // if type is voicemail
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          color = 'is-info'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          color = 'is-success'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          color = 'is-danger'
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          color = 'is-danger'
-        }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+        return 'is-info'
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+        return 'is-success'
+      }
+      if (type === CommunicationTypes.CALL && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+        return 'is-primary'
+      }
+      if (type === CommunicationTypes.CALL && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+        return 'is-danger'
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+        return 'is-danger'
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+        return 'is-danger'
+      }
+      if (type === CommunicationTypes.CALL && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
+        return 'is-warn'
+      }
+      if (type === CommunicationTypes.CALL && dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+        return 'is-danger'
       }
 
-      return color
+      return ''
     },
 
     stateToIcon: function (dispositionStatus, type, direction = null) {
-      let icon = ''
+      const icon = { data: '' }
 
       if (![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
-        if (direction === CommunicationDirections.INBOUND) {
-          icon += 'inbound-'
-        } else {
-          icon += 'outbound-'
-        }
+        icon.data += (direction === CommunicationDirections.INBOUND) ? 'inbound-' : 'outbound-'
       }
-
       if (type === CommunicationTypes.CALL) {
-        icon += 'call-'
-      } else if (type === CommunicationTypes.SMS) {
-        icon += 'sms-'
-      } else if (type === CommunicationTypes.EMAIL) {
-        icon += 'email-'
-      } else if (type === CommunicationTypes.RVM) {
-        icon += 'voicemail-'
-      } else if (type === CommunicationTypes.FAX) {
-        icon += 'fax-'
-      } else if (type === CommunicationTypes.NOTE) {
-        icon += 'note-'
-      } else if (type === CommunicationTypes.APPOINTMENT) {
-        icon += 'appointment-'
-      } else if (type === CommunicationTypes.REMINDER) {
-        icon += 'reminder-'
+        icon.data += 'call-'
+      }
+      if (type === CommunicationTypes.SMS) {
+        icon.data += 'sms-'
+      }
+      if (type === CommunicationTypes.EMAIL) {
+        icon.data += 'email-'
+      }
+      if (type === CommunicationTypes.RVM) {
+        icon.data += 'voicemail-'
+      }
+      if (type === CommunicationTypes.FAX) {
+        icon.data += 'fax-'
+      }
+      if (type === CommunicationTypes.NOTE) {
+        icon.data += 'note-'
+      }
+      if (type === CommunicationTypes.APPOINTMENT) {
+        icon.data += 'appointment-'
+      }
+      if (type === CommunicationTypes.REMINDER) {
+        icon.data += 'reminder-'
       }
 
-      if (![CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
-        if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          icon += `inprogress-`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          icon += type === CommunicationTypes.CALL ? `answered-` : `completed-`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
-          icon += `abandoned-`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-          icon += `missed-`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          if (type === CommunicationTypes.FAX) {
-            icon += `inprogress-`
-          } else {
-            icon += `failed-`
-          }
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
-          icon += `failed-`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
-          icon += `deadend-`
-        } else if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
-          icon += `voicemail-`
-        } else {
-          icon += `failed-`
-        }
+      if ([CommunicationTypes.RVM, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
+        return `${icon.data}icon`
       }
-      return icon + 'icon'
+
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+        return `${icon.data}inprogress-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+        return `${icon.data}${(type === CommunicationTypes.CALL ? 'answered' : 'completed')}-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+        return `${icon.data}abandoned-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
+        return `${icon.data}missed-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
+        return `${icon.data}${(type === CommunicationTypes.FAX ? 'inprogress' : 'failed')}-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW) {
+        return `${icon.data}failed-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
+        return `${icon.data}deadend-icon`
+      }
+      if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+        return `${icon.data}voicemail-icon`
+      }
+
+      return `${icon.data}failed-icon`
     },
 
     rejectionToIcon (rejectionReason) {

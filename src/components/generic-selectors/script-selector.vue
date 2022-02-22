@@ -89,10 +89,9 @@ export default {
 
     scriptsAlphabeticalOrder () {
       if (this.scripts) {
-        let scripts = _.clone(this.scripts)
-        return scripts.sort((a, b) => {
-          let textA = a.title.toUpperCase()
-          let textB = b.title.toUpperCase()
+        return _.clone(this.scripts).sort((a, b) => {
+          const textA = a.title.toUpperCase()
+          const textB = b.title.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

@@ -116,8 +116,8 @@ export default {
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       console.log('Received call invite', call)
-      let map = call._connection.customParameters
-      let customParameters = {}
+      const map = call._connection.customParameters
+      const customParameters = {}
       map.forEach((value, key) => {
         customParameters[key] = value
       })
@@ -163,8 +163,8 @@ export default {
 
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
       console.log('Successfully connected call', call)
-      let map = call._connection.customParameters
-      let customParameters = {}
+      const map = call._connection.customParameters
+      const customParameters = {}
       map.forEach((value, key) => {
         customParameters[key] = value
       })
@@ -431,7 +431,7 @@ export default {
         this.rejectCall()
       }
 
-      let params = {
+      const params = {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
         'CampaignId': outboundCampaignId ? outboundCampaignId.toString() : '',
         'UserId': this.profile ? this.profile.id.toString() : '',
@@ -623,7 +623,7 @@ export default {
       if (!this.dialer.isHeld) {
         console.log('Holding call')
         this.loadingHold = true
-        let params = {
+        const params = {
           communication_id: this.dialer.communication.id
         }
         this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
@@ -637,7 +637,7 @@ export default {
       } else {
         console.log('Unholding call')
         this.loadingUnhold = true
-        let params = {
+        const params = {
           communication_id: this.dialer.communication.id
         }
         this.$axios.post('/api/v1/dialer/new-unhold', params).then(() => {
@@ -655,9 +655,10 @@ export default {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
+
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
-      let params = {
+      const params = {
         communication_id: this.dialer.communication.id
       }
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
@@ -680,7 +681,7 @@ export default {
       const parkedCall = this.dialer.parkedCall
       this.setDialerParkedCall()
       this.stopParkedCallTimer()
-      let data = {
+      const data = {
         currentNumber: 'unhold:' + parkedCall.id,
         outboundCampaignId: parkedCall.campaign_id,
         contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
@@ -704,7 +705,7 @@ export default {
         this.stopParkedCallTimer()
       }
 
-      let data = {
+      const data = {
         currentNumber: 'unhold:' + parkedCallData.id,
         outboundCampaignId: parkedCallData.campaign_id,
         contactName: (parkedCallData.contact) ? parkedCallData.contact.name : '',
@@ -720,9 +721,10 @@ export default {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
+
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
-      let params = {
+      const params = {
         communication_id: this.dialer.communication.id
       }
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
@@ -762,8 +764,8 @@ export default {
         // hangup an incoming call
         this.device.activeConnection().hangup()
 
-        let counter = 0
-        let hangupInterval = setInterval(() => {
+        const counter = { data: 0 }
+        const hangupInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.backToDial()
 
@@ -779,8 +781,8 @@ export default {
             clearInterval(hangupInterval)
           }
 
-          counter++
-          if (counter > 120) {
+          counter.data++
+          if (counter.data > 120) {
             clearInterval(hangupInterval)
           }
         }, 500)
@@ -791,8 +793,9 @@ export default {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
+
       this.loadingMerge = true
-      let params = {
+      const params = {
         communication_id: this.dialer.communication.id
       }
       this.$axios.post('/api/v1/dialer/merge-calls', params).then(res => {
@@ -809,6 +812,7 @@ export default {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
+
       this.loadingDropThirdParty = true
       this.$axios.post('/api/v1/dialer/drop-third-party', {
         communication_id: this.dialer.communication.id
@@ -829,7 +833,7 @@ export default {
       }
 
       this.loadingTransfer = true
-      let params = {
+      const params = {
         communication_id: this.dialer.communication.id,
         user_id: null,
         ring_group_id: null,
@@ -864,7 +868,7 @@ export default {
       }
 
       this.loadingAdd = true
-      let params = {
+      const params = {
         communication_id: this.dialer.communication.id,
         introduce: add.introduce,
         user_id: null,
@@ -874,7 +878,7 @@ export default {
 
       if (add.mode === 'user') {
         params.user_id = add.userId
-        let user = this.getUser(add.userId)
+        const user = this.getUser(add.userId)
         if (user) {
           this.setAddedParty(user)
         }
@@ -916,15 +920,15 @@ export default {
     },
 
     countCallDuration () {
-      let duration = this.dialer.duration + 1
-      let timer = this.secondsToHms(duration)
+      const duration = this.dialer.duration + 1
+      const timer = this.secondsToHms(duration)
       this.setDialerDuration(duration)
       this.setDialerTimer(timer)
     },
 
     countWrapUpDuration () {
-      let duration = this.dialer.wrapUpDuration - 1
-      let timer = this.secondsToHms(duration)
+      const duration = this.dialer.wrapUpDuration - 1
+      const timer = this.secondsToHms(duration)
       this.setDialerWrapUpDuration(duration)
       this.setDialerWrapUpTimer(timer)
       if (duration <= 0) {
@@ -934,22 +938,22 @@ export default {
     },
 
     countParkedCallDuration () {
-      let duration = this.dialer.parkedCallDuration + 1
-      let timer = this.secondsToHms(duration)
+      const duration = this.dialer.parkedCallDuration + 1
+      const timer = this.secondsToHms(duration)
       this.setDialerParkedCallDuration(duration)
       this.setDialerParkedCallTimer(timer)
     },
 
     secondsToHms (d) {
       d = Number(d)
-      let h = Math.floor(d / 3600)
-      let m = Math.floor(d % 3600 / 60)
-      let s = Math.floor(d % 3600 % 60)
+      const h = Math.floor(d / 3600)
+      const m = Math.floor(d % 3600 / 60)
+      const s = Math.floor(d % 3600 % 60)
       return ((h > 0 ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s)
     },
 
     startCallTimer () {
-      let timer = this.secondsToHms(0)
+      const timer = this.secondsToHms(0)
       this.setDialerDuration(0)
       this.setDialerTimer(timer)
       this.$options.callDurationInterval = setInterval(this.countCallDuration, 1000)
@@ -963,16 +967,19 @@ export default {
 
     startWrapUpTimer () {
       this.setDialerCurrentStatus('WRAP_UP')
-      let wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
+      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
+
       if (wrapUpTimer < 0) {
         this.backToDial()
         return
       }
+
       if (wrapUpTimer === 0) {
         this.stopWrapUpTimer()
         return
       }
+
       this.setDialerWrapUpDuration(wrapUpTimer)
       this.setDialerWrapUpTimer(this.secondsToHms(this.dialer.wrapUpDuration))
       this.$options.wrapUpDurationInterval = setInterval(this.countWrapUpDuration, 1000)
@@ -985,7 +992,7 @@ export default {
     },
 
     startParkedCallTimer () {
-      let timer = this.secondsToHms(0)
+      const timer = this.secondsToHms(0)
       this.setDialerParkedCallDuration(0)
       this.setDialerParkedCallTimer(timer)
       this.$options.parkedCallDurationInterval = setInterval(this.countParkedCallDuration, 1000)
@@ -1004,7 +1011,7 @@ export default {
 
     playDispositionNotification () {
       if (this.$q.platform.is.electron) {
-        let myMedia = new window.Media(process.env.API_URL + '/static/ivr/default-communication-notification.wav', () => {
+        const myMedia = new window.Media(process.env.API_URL + '/static/ivr/default-communication-notification.wav', () => {
         }, (err) => {
           console.log('playAudio():Audio Error: ' + err)
         })
@@ -1022,12 +1029,14 @@ export default {
     },
 
     getInputDevices () {
-      let inputDevices = []
+      const inputDevices = []
+
       if (!this.device) {
         return inputDevices
       }
 
-      let devices = this.device.availableInputDevices()
+      const devices = this.device.availableInputDevices()
+
       if (devices) {
         devices.forEach(function (device, id) {
           inputDevices.push({
@@ -1050,12 +1059,14 @@ export default {
     },
 
     getOutputDevices () {
-      let outputDevices = []
+      const outputDevices = []
+
       if (!this.device) {
         return outputDevices
       }
 
-      let devices = this.device.availableOutputDevices()
+      const devices = this.device.availableOutputDevices()
+
       if (devices) {
         devices.forEach(function (device, id) {
           outputDevices.push({
@@ -1095,7 +1106,7 @@ export default {
 
     handleError (error) {
       this.setDialerCurrentStatus('GOT_ERROR')
-      let err = new Error(error.message + ' Code: ' + error.code)
+      const err = new Error(error.message + ' Code: ' + error.code)
       err.code = error.code
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
       // there may be an issue resolving the hostname provided. If a region is being specified in Device setup, ensure it's a valid region.
@@ -1122,12 +1133,8 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
-      let parkedCall = null
-
       // store temporarily the parked call
-      if (this.dialer.parkedCall) {
-        parkedCall = JSON.parse(JSON.stringify(this.dialer.parkedCall))
-      }
+      const parkedCall = this.dialer.parkedCall ? JSON.parse(JSON.stringify(this.dialer.parkedCall)) : null
 
       // park the in-progress call
       if (shouldPark && !parkedCall) {

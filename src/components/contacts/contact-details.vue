@@ -118,8 +118,8 @@ export default {
         }
 
         this.communicationsSummary.summaries.total_count++
-        let type = communication.type
-        let direction = communication.direction
+        const type = communication.type
+        const direction = communication.direction
 
         if (type === CALL && direction === INBOUND) {
           this.communicationsSummary.summaries.inbound_calls_count++

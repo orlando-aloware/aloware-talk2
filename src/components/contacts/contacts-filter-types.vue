@@ -208,33 +208,33 @@ export default {
         this.allFilters[this.filterGroupIndex].filters = JSON.parse(JSON.stringify(filterGroup.filters))
       }
 
-      let value = null
+      const value = { data: null }
       switch (this.filter.type) {
         case 'string':
-          value = this.getStringValue()
+          value.data = this.getStringValue()
           break
         case 'relation':
         case 'multi_relation':
-          value = this.getRelationTypesValue()
+          value.data = this.getRelationTypesValue()
           break
         case 'number':
-          value = this.getNumberValue()
+          value.data = this.getNumberValue()
           break
         case 'date':
-          value = this.getDateValue()
+          value.data = this.getDateValue()
           break
         default:
-          value = this.filterOperatorValue
+          value.data = this.filterOperatorValue
       }
 
       const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      let toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+      const toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
 
-      if (!value && currentFilter && !this.validated && toDelete) {
+      if (!value.data && currentFilter && !this.validated && toDelete) {
         delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
       } else {
         this.allFilters[this.filterGroupIndex].filters[this.filter.key] = {
-          value: JSON.parse(JSON.stringify(value)),
+          value: JSON.parse(JSON.stringify(value.data)),
           operator: this.filterOperator
         }
       }
@@ -327,11 +327,9 @@ export default {
       }
     },
     resetForm () {
-      const filterOperator = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
-      const filterValue = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, [])
-      this.filterOperator = filterOperator
+      this.filterOperator = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
       this.$nextTick(() => {
-        this.filterOperatorValue = filterValue
+        this.filterOperatorValue = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, [])
       })
     },
     ...mapActions('contacts', [ 'setCurrentListFilters' ])
@@ -364,6 +362,10 @@ export default {
       debounce()
       this.validateValue()
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('filters-reset')
+    this.$VueEvent.stop('filters-back')
   }
 }
 </script>

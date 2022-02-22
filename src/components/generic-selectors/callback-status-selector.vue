@@ -131,10 +131,9 @@ export default {
     setAlternativePlaceholder () {
       this.$el.querySelector('.q-field__native > span').classList.remove('text-muted')
       if (!this.value && !this.useInput) {
-        let _this = this
-        setTimeout(function () {
-          _this.$el.querySelector('.q-field__native > span').innerText = 'None'
-          _this.$el.querySelector('.q-field__native > span').classList.add('text-muted')
+        setTimeout(() => {
+          this.$el.querySelector('.q-field__native > span').innerText = 'None'
+          this.$el.querySelector('.q-field__native > span').classList.add('text-muted')
         }, 300)
       }
     }

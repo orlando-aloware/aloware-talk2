@@ -187,7 +187,7 @@ export default {
     ...mapState('auth', ['profile']),
     metricGroupName: {
       get () {
-        let { name } = this.resources
+        const { name } = this.resources
 
         if (name) {
           return name
@@ -209,8 +209,12 @@ export default {
       return `remove-group-dialog-${this.resources.id}`
     },
     arrangedMetricList () {
-      let list = JSON.parse(JSON.stringify(this.resources.agent_metrics))
-      return list.sort((a, b) => (a.order > b.order) ? 1 : -1)
+      const agentMetrics = _.get(this.resources, 'agent_metrics', [])
+      if (!_.isEmpty(agentMetrics)) {
+        return JSON.parse(JSON.stringify(agentMetrics))
+          .sort((a, b) => (a.order > b.order) ? 1 : -1)
+      }
+      return agentMetrics
     }
   },
   mounted () {
@@ -253,9 +257,10 @@ export default {
     }, 200),
     toggleLoader (value) {
       this.updateLoading = value
-      for (let index in this.metricsList) {
-        if (this.$refs[`metric-box-${index}`]) {
-          this.$refs[`metric-box-${index}`][0].toggleLoader(value)
+      const index = { data: null }
+      for (index.data in this.metricsList) {
+        if (this.$refs[`metric-box-${index.data}`]) {
+          this.$refs[`metric-box-${index.data}`][0].toggleLoader(value)
         }
       }
     },
@@ -291,7 +296,7 @@ export default {
         return
       }
 
-      let { newIndex, oldIndex, element } = val.moved
+      const { newIndex, oldIndex, element } = val.moved
       const metric = this.arrangedMetricList.find(metric => metric.id === element.id)
 
       if (!metric) {
@@ -300,8 +305,8 @@ export default {
 
       const previousMetrics = JSON.parse(JSON.stringify(this.arrangedMetricList))
 
-      let order = this.arrangedMetricList[newIndex].order
-      let step = newIndex - oldIndex
+      const order = this.arrangedMetricList[newIndex].order
+      const step = newIndex - oldIndex
 
       await this.updateMetricOrder({
         metricGroupId: this.metricGroupId,
@@ -331,7 +336,7 @@ export default {
       this.$emit('updated')
     },
     checkMove (event) {
-      let element = _.get(this.$refs.addMetric, '$el', null)
+      const element = _.get(this.$refs.addMetric, '$el', null)
       return event.from === event.to && event.related !== element
     },
     onLoaderToggled (toggle) {
@@ -352,7 +357,7 @@ export default {
     arrangedMetricList () {
       const list1 = JSON.stringify(this.metricsList)
       const list2 = JSON.stringify(this.arrangedMetricList)
-      if (list1 !== list2) {
+      if (list1 !== list2 && !_.isEmpty(list2)) {
         this.metricsList = JSON.parse(list2)
       }
     }

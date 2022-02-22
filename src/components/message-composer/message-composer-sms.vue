@@ -265,7 +265,8 @@ export default {
       isSending: false,
       filesOnQueue: [],
       fileOnQueueIcon: ['fa', 'fa-times'],
-      filesOnQueueToken: []
+      filesOnQueueToken: [],
+      focusInterval: null
     }
   },
 
@@ -344,14 +345,16 @@ export default {
       this.onUpload(file)
     },
     onDrop (e) {
-      let files = e.dataTransfer.files
-      for (let i = 0; i < files.length; i++) {
-        this.processFilesToQueue(files[i])
+      const files = e.dataTransfer.files
+      const index = { i: 0 }
+      for (index.i = 0; index.i < files.length; index.i++) {
+        this.processFilesToQueue(files[index.i])
       }
     },
     onPaste (e) {
-      for (let i = 0; i < e.clipboardData.items.length; i++) {
-        let item = e.clipboardData.items[i]
+      const index = { i: 0 }
+      for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
+        const item = e.clipboardData.items[index.i]
         if (item.type && item.type.length > 0) {
           this.processFilesToQueue(item.getAsFile())
         }
@@ -410,9 +413,8 @@ export default {
       this.$refs.variablesMenu.hide()
     },
     onAttachmentUploaded (files) {
-      let _this = this
-      files.forEach(function (file) {
-        _this.appendMessageComposerSmsAttachments(file)
+      files.forEach((file) => {
+        this.appendMessageComposerSmsAttachments(file)
       })
 
       this.$refs.attachmentMenu.hide()
@@ -421,24 +423,31 @@ export default {
       this.scheduleMessageOpen(true)
     },
     focusInput () {
-      let _this = this
-      setTimeout(function () {
-        _this.$refs.smsMessageBody.focus()
-      }, 100)
+      const count = { data: 0 }
+      this.focusInterval = setInterval(() => {
+        if (typeof this.$refs.smsMessageBody !== 'undefined') {
+          this.$refs.smsMessageBody.focus()
+          clearInterval(this.focusInterval)
+        }
+        count.data++
+        if (count.data > 180) {
+          clearInterval(this.focusInterval)
+        }
+      }, 250)
     },
     onUpload (file) {
-      let formData = new FormData(), _this = this
+      const formData = new FormData()
       formData.append('file', file)
 
       const cancelToken = axios.CancelToken
       this.filesOnQueueToken[file.name] = cancelToken.source()
 
       talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, { cancelToken: this.filesOnQueueToken[file.name].token }).then(response => {
-        _this.appendMessageComposerSmsAttachments(response.data.uploaded_file)
-        _this.filesOnQueue.splice(_this.filesOnQueue.findIndex(item => item.name === file.name), 1)
+        this.appendMessageComposerSmsAttachments(response.data.uploaded_file)
+        this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
       }).catch(error => {
         console.log(error)
-        let message = _this.filesOnQueue.length > 1 ? 'Error while uploading one of the files.' : 'Error while uploading file.'
+        const message = this.filesOnQueue.length > 1 ? 'Error while uploading one of the files.' : 'Error while uploading file.'
         this.$generalNotification(message, 'error')
         this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
       })
@@ -451,20 +460,25 @@ export default {
       contentType = contentType || ''
       sliceSize = sliceSize || 512
 
-      let byteCharacters = window.atob(b64Data)
-      let byteArrays = []
+      const byteCharacters = window.atob(b64Data)
+      const byteArrays = []
+      const offset = { data: null }
+      const slice = { data: null }
+      const byteNumbers = { data: null }
+      const byteArray = { data: null }
+      const index = { i: 0 }
 
-      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        let slice = byteCharacters.slice(offset, offset + sliceSize)
+      for (offset.data = 0; offset.data < byteCharacters.length; offset.data += sliceSize) {
+        slice.data = byteCharacters.slice(offset.data, offset.data + sliceSize)
 
-        let byteNumbers = new Array(slice.length)
-        for (let i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i)
+        byteNumbers.data = new Array(slice.data.length)
+        for (index.i = 0; index.i < slice.data.length; index.i++) {
+          byteNumbers.data[index.i] = slice.data.charCodeAt(index.i)
         }
 
-        let byteArray = new Uint8Array(byteNumbers)
+        byteArray.data = new Uint8Array(byteNumbers.data)
 
-        byteArrays.push(byteArray)
+        byteArrays.push(byteArray.data)
       }
 
       return new Blob(byteArrays, { type: contentType })

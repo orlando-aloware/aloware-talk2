@@ -177,7 +177,7 @@ export default {
 
     hubspotLink () {
       if (this.hubspotContactBaseLink) {
-        let contactId = this.getContactId()
+        const contactId = this.getContactId()
         return contactId ? `${this.hubspotContactBaseLink}contact/${contactId}` : false
       }
 
@@ -217,19 +217,19 @@ export default {
     },
 
     getContactId () {
-      let contactId
+      const contactId = { data: null }
       switch (true) {
         case this.contact.integration_data && !_.isEmpty(this.contact.integration_data):
-          contactId = this.contact.integration_data.hubspot.contact_id
+          contactId.data = this.contact.integration_data.hubspot.contact_id
           break
         case this.contact.integrations && !_.isEmpty(this.contact.integrations):
-          contactId = this.contact.integrations.hubspot.contact_id
+          contactId.data = this.contact.integrations.hubspot.contact_id
           break
         default:
-          contactId = null
+          contactId.data = null
       }
 
-      return contactId
+      return contactId.data
     },
 
     onWorkflowSelected (workflowId) {

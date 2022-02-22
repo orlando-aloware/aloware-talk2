@@ -37,12 +37,12 @@ export default function ({ store }) {
 
   Router.beforeEach((to, from, next) => {
     next()
-    let record = to.matched.find(record => record.meta.title)
-    let documentTitle = ''
+    const record = to.matched.find(record => record.meta.title)
+    const documentTitle = { data: '' }
     if (record) {
-      documentTitle = (record.meta.title || '')
+      documentTitle.data = (record.meta.title || '')
     }
-    document.title = documentTitle + ' - Aloware Talk'
+    document.title = documentTitle.data + ' - Aloware Talk'
   })
 
   Router.afterEach((to, from) => {

@@ -43,11 +43,11 @@ export default {
       return this.communications.length - 1
     },
     previousItem () {
-      let index = this.currentIndex - 1
+      const index = this.currentIndex - 1
       return this.currentIndex !== 0 ? this.communications[index] : null
     },
     nextItem () {
-      let index = this.currentIndex + 1
+      const index = this.currentIndex + 1
       return this.currentIndex !== this.lastIndex ? this.communications[index] : null
     },
     disablePreviousButton () {

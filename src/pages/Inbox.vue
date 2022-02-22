@@ -4,7 +4,8 @@
     <!--div class="call-active">
     </div-->
     <div class="inbox animate__animated animate__fadeIn position-relative">
-      <inbox-side :class="inboxSideClasses">
+      <inbox-side ref="inbox-side"
+                  :class="inboxSideClasses">
       </inbox-side>
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
@@ -58,15 +59,19 @@ export default {
   methods: {
     ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
 
-    setChannel () {
+    setChannel (routeChanged = false) {
       if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
-        let channel = this.items.find(item => item.value === this.$route.params.channel)
+        const channel = this.items.find(item => item.value === this.$route.params.channel)
         this.setActiveChannel(channel)
       }
 
       if (['Inbox'].includes(this.$route.name) && !this.activeChannel) {
-        let channel = this.items.find(item => item.value === 'inbox')
+        const channel = this.items.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
+      }
+
+      if (routeChanged && this.$refs['inbox-side']) {
+        this.$refs['inbox-side'].navigateToInbox()
       }
     },
     fetchTaskCounts () {
@@ -95,8 +100,8 @@ export default {
   },
 
   watch: {
-    '$route.name': function () {
-      this.setChannel()
+    '$route.name': function (value) {
+      this.setChannel(!value.includes('Inbox'))
     }
   }
 }

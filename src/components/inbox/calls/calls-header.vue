@@ -118,16 +118,17 @@ export default {
 
   computed: {
     filterOptions () {
-      let options = this.optionsLeft
+      const options = this.optionsLeft
       if (this.commCampaigns.length > 0) {
         options.push({
           group: 'Lines',
           disable: true
         })
-        for (let campaign of this.commCampaigns) {
+        const campaign = { data: null }
+        for (campaign.data of this.commCampaigns) {
           options.push({
-            label: campaign.name,
-            value: campaign.id
+            label: campaign.data.name,
+            value: campaign.data.id
           })
         }
       }
@@ -136,10 +137,11 @@ export default {
           group: 'Ring Groups',
           disable: true
         })
-        for (let campaign of this.commRingGroups) {
+        const campaign = { data: null }
+        for (campaign.data of this.commRingGroups) {
           options.push({
-            label: campaign.name,
-            value: campaign.id
+            label: campaign.data.name,
+            value: campaign.data.id
           })
         }
       }

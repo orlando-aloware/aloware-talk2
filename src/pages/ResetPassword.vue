@@ -229,18 +229,15 @@ export default {
       if (!this.$refs.myForm || !this.$refs.myForm.$el || !this.$refs.myForm.$el.elements) {
         return
       }
-      let next = $event.target.tabIndex
+      const next = $event.target.tabIndex
       if (next < this.$refs.myForm.$el.elements.length) {
         this.$refs.myForm.$el.elements[next + 1].focus()
       }
     },
 
-    ...mapActions(['setCurrentCompany', 'resetVuex', 'setUsage']),
+    ...mapActions(['resetVuex', 'setUsage']),
+    ...mapActions('cache', ['setCurrentCompany']),
     ...mapActions('auth', ['login', 'resetPass'])
   }
 }
 </script>
-
-<style scoped>
-
-</style>

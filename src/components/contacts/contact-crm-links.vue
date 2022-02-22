@@ -89,9 +89,8 @@ export default {
         this.contact &&
         this.contact.phone_number) {
         // eslint-disable-next-line camelcase
-        let phoneNumber = this.contact.phone_number
-        phoneNumber = phoneNumber.replace('+1', '')
-        return `https://www.batscrm.com/search/phone/` + phoneNumber
+        const phoneNumber = this.contact.phone_number.replace('+1', '')
+        return `https://www.batscrm.com/search/phone/${phoneNumber}`
       }
 
       return false

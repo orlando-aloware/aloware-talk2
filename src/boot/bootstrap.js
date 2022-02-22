@@ -50,18 +50,18 @@ window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
     return false
   }
 
-  let validCountries = ['US', 'CA']
+  const validCountries = ['US', 'CA']
 
   try {
-    for (let validCountry of validCountries) {
-      let number = window.phoneUtil.parseAndKeepRawInput(
+    const validCountry = { data: null }
+    for (validCountry.data of validCountries) {
+      const number = window.phoneUtil.parseAndKeepRawInput(
         phoneNumber,
-        validCountry
+        validCountry.data
       )
-      let isPossible = window.phoneUtil.isPossibleNumber(number)
-      if (isPossible) {
-        if (window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
-          return validCountry
+      if (window.phoneUtil.isPossibleNumber(number)) {
+        if (window.phoneUtil.isValidNumberForRegion(number, validCountry.data)) {
+          return validCountry.data
         }
       }
     }
@@ -78,7 +78,7 @@ window.guessLocale = function (phoneNumber) {
 
   try {
     // handle US and CA as an special case
-    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(
+    const northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(
       phoneNumber
     )
     if (northAmericaLocale) {
@@ -91,8 +91,8 @@ window.guessLocale = function (phoneNumber) {
       phoneNumber = '+' + phoneNumber
     }
 
-    let number = window.phoneUtil.parse(phoneNumber)
-    let locale = window.phoneUtil.getRegionCodeForNumber(number)
+    const number = window.phoneUtil.parse(phoneNumber)
+    const locale = window.phoneUtil.getRegionCodeForNumber(number)
 
     if (!locale) {
       return false
@@ -165,39 +165,40 @@ Vue.prototype.$Sentry = window.Sentry
 
 Vue.prototype.$handleErrors = function (response, title = null) {
   if (response && response.status) {
-    let message = ''
+    const message = { data: '' }
+    const error = { data: null }
     switch (response.status) {
       case 401:
         if (response.data.error) {
-          message += '<p class="pt-1 pb-1">- ' + response.data.error + '</p>'
+          message.data += `<p class="pt-1 pb-1">- ${response.data.error}</p>`
         }
-        for (let error of response.data.errors) {
-          message += '<p class="pt-1 pb-1">- ' + error + '</p>'
+        for (error.data of response.data.errors) {
+          message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
         }
         break
       case 403:
-        message = 'You do not have enough permissions to make this request.'
+        message.data = 'You do not have enough permissions to make this request.'
         if (response.data && response.data.error) {
-          message = response.data.error
+          message.data = response.data.error
         }
         break
       case 404:
-        message = 'Requested resource not found.'
+        message.data = 'Requested resource not found.'
         break
       case 400:
-        message = response.data.error
+        message.data = response.data.error
         break
       case 422:
-        message = ''
-        for (let error of response.data.errors) {
-          message += '<p class="pt-1 pb-1">- ' + error + '</p>'
+        message.data = ''
+        for (error.data of response.data.errors) {
+          message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
         }
         break
       case 500:
-        message = 'Oops! We are having some problems right now, please try again later.'
+        message.data = 'Oops! We are having some problems right now, please try again later.'
         break
     }
-    this.$generalNotification(message, 'error')
+    this.$generalNotification(message.data, 'error')
   }
 }
 
@@ -205,13 +206,13 @@ Vue.prototype.$handleUploadErrors = function (error) {
   if (typeof error === 'string') {
     error = JSON.parse(error)
   }
-  let err
+  const err = { data: {} }
   if (error.message === 'This action is unauthorized.') {
-    err = {
+    err.data = {
       status: 403
     }
   } else {
-    err = {
+    err.data = {
       status: 422,
       data: {
         errors: error.errors.file
@@ -219,26 +220,26 @@ Vue.prototype.$handleUploadErrors = function (error) {
     }
   }
 
-  this.$handleErrors(err)
+  this.$handleErrors(err.data)
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000) {
-  let colorClass = ''
+  const colorClass = { data: '' }
   switch (type) {
     case 'updated':
-      colorClass = 'bg-blue-10'
+      colorClass.data = 'bg-blue-10'
       break
     case 'deleted':
     case 'error':
-      colorClass = 'bg-red-10'
+      colorClass.data = 'bg-red-10'
       break
     default:
-      colorClass = 'bg-green-10'
+      colorClass.data = 'bg-green-10'
   }
 
   this.$q.notify({
     group: false,
-    classes: `general-notification text-black ${colorClass} ml-7`,
+    classes: `general-notification text-black ${colorClass.data} ml-7`,
     timeout: timeout,
     message: message,
     position: 'bottom-left',
@@ -247,7 +248,7 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
 }
 
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {
-  let settings = {
+  const settings = {
     title: window._.get(notificationData, 'title', null),
     message: window._.get(notificationData, 'message', null),
     messageIcon: window._.get(notificationData, 'messageIcon', null),
@@ -276,7 +277,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     return
   }
 
-  let data = {
+  const data = {
     type: settings.type,
     data: null
   }
@@ -287,18 +288,18 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
     this.$store.state.notifications[settings.type].contactId !== settings.contactId
   ) {
-    let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
-    queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
-    let found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
+    const queue = { data: window._.get(this.$store.state.notifications, `${settings.type}.queue`, []) }
+    queue.data = !queue.data ? [] : JSON.parse(JSON.stringify(queue.data))
+    const found = queue.data.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
       return
     }
 
-    queue.push(settings)
+    queue.data.push(settings)
 
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
-    data.data.queue = queue
+    data.data.queue = queue.data
     this.$store.commit('SET_NOTIFICATIONS', data)
     settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
 
@@ -318,17 +319,17 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     return
   }
 
-  let counter = 0
-  let notificationInterval = setInterval(() => {
+  const counter = { data: 0 }
+  const notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
       settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
       this.$bvToast.show(settings.type)
       clearInterval(notificationInterval)
     }
-    counter++
+    counter.data++
 
-    if (counter > 120) {
+    if (counter.data > 120) {
       clearInterval(notificationInterval)
     }
   }, 500)
@@ -342,15 +343,11 @@ Vue.prototype.$closeActionNotification = function (type) {
 
 Vue.prototype.$generalActionNotification = window._.debounce(function (title = 'System Updates', message = 'Refresh your screen', messageIcon = null, type = 'system', contactId = null, communicationId = null, dateTime = this.$moment()) {
   // action notifications that will show up many times
-  let icon = 'sms-icon'
-
-  if (type === 'call' || type === 'call-voicemail') {
-    icon = 'call-icon'
-  }
+  const icon = (type === 'call' || type === 'call-voicemail') ? 'call-icon' : 'sms-icon'
   // Use a shorter name for this.$createElement
-  let h = this.$createElement
+  const h = this.$createElement
   // Create the message
-  let vNodesMsg = h(
+  const vNodesMsg = h(
     'div',
     { class: ['d-flex', 'flex-row', 'align-items-center'] },
     [

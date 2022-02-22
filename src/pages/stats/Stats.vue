@@ -1,14 +1,26 @@
 <template>
-  <q-scroll-area
-    class="pb-4 bg-grey-40 stats-container">
-    <div class="px-4 py-0 stats-header">
-      <AddMetricGroup @focusToNewMetricGroup="focusToNewMetricGroup"/>
-    </div>
-    <div class="stats-metrics-container px-4 pt-0 pb-5">
-      <StatsAndMetrics :editGroupId="metricGroupId"
-                       @updated="updated"/>
-    </div>
-  </q-scroll-area>
+  <div class="h-100 w-100 position-relative">
+    <b-overlay
+      class="h-100 w-100 position-absolute"
+      :show="metricGroups.length === 0"
+      rounded="sm"
+    >
+      <template #overlay>
+        <q-spinner-bars color="primary" size="40px" />
+      </template>
+    </b-overlay>
+    <q-scroll-area
+      class="pb-4 bg-grey-40 stats-container"
+      v-if="metricGroups.length > 0">
+      <div class="px-4 py-0 stats-header">
+        <AddMetricGroup @focusToNewMetricGroup="focusToNewMetricGroup"/>
+      </div>
+      <div class="stats-metrics-container px-4 pt-0 pb-5">
+        <StatsAndMetrics :editGroupId="metricGroupId"
+                         @updated="updated"/>
+      </div>
+    </q-scroll-area>
+  </div>
 </template>
 
 <script>
@@ -40,16 +52,16 @@ export default {
   methods: {
     ...mapActions('stats', ['setMetricGroups']),
     focusToNewMetricGroup (metricGroupId) {
-      let counter = 0
-      let clearFocusInterval = setInterval(() => {
+      const counter = { data: 0 }
+      const clearFocusInterval = setInterval(() => {
         const metricGroup = this.metricGroups.find(metricGroup => metricGroup.id === metricGroupId)
         if (metricGroup) {
           // test this
           this.metricGroupId = metricGroup.id
           clearInterval(clearFocusInterval)
         }
-        counter++
-        if (counter > 60000) {
+        counter.data++
+        if (counter.data > 60000) {
           clearInterval(clearFocusInterval)
         }
       }, 100)

@@ -97,7 +97,9 @@ export default {
         first_name: this.selected_contact.first_name,
         last_name: this.selected_contact.last_name
       }).then(response => {
-        this.setContact(response.data)
+        if (response.data === this.contact.id) {
+          this.setContact(response.data)
+        }
         this.is_busy = false
         this.onClose()
       }).catch(err => {

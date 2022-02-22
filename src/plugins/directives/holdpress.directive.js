@@ -1,7 +1,7 @@
 export default () => ({
   bind: function (el, binding, vNode) {
     el.dataset.longPressTimeoutId = '0'
-    let stop = (e) => {
+    const stop = (e) => {
       clearTimeout(parseInt(el.dataset.longPressTimeoutId))
       if (vNode.componentInstance) {
         vNode.componentInstance.$emit('holdpress-stop')
@@ -11,10 +11,10 @@ export default () => ({
       // Remove Event listeners
       document.removeEventListener('mouseup', stop)
     }
-    let start = (e) => {
+    const start = (e) => {
       // Add Event listeners
       document.addEventListener('mouseup', stop)
-      let timeout = setTimeout(() => {
+      const timeout = setTimeout(() => {
         if (vNode.componentInstance) {
           vNode.componentInstance.$emit('holdpress-start')
         } else {

@@ -127,35 +127,29 @@ export default {
 
     filteredUsers () {
       if (this.allUsers) {
-        let filteredUsers = this.allUsers.filter((user) =>
+        return this.allUsers.filter((user) =>
           !(user.role_names.length === 1 && user.read_only_access) &&
           user.answer_by !== AnswerTypes.BY_NONE
         )
-
-        return filteredUsers
       }
 
       return []
     },
 
     formattedOptions () {
-      let availableUsers = [...this.availableUsers]
-
+      const availableUsers = [...this.availableUsers]
       availableUsers.unshift({
         group: 'Available Users',
         disable: true
       })
 
-      let usersArray = availableUsers
-
-      let unavailableUsers = [...this.unavailableUsers]
+      const unavailableUsers = [...this.unavailableUsers]
       unavailableUsers.unshift({
         group: 'Unavailable Users',
         disable: true
       })
-      usersArray = [...availableUsers, ...unavailableUsers]
 
-      return usersArray
+      return [...availableUsers, ...unavailableUsers]
     }
   },
 

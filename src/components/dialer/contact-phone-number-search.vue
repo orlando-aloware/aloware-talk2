@@ -54,10 +54,7 @@ export default {
   computed: {
     serializer () {
       return item => {
-        let name = this.getContactName(item)
-
-        let searchTerm = name + ' - ' + item.phone_number
-        return searchTerm
+        return `${this.getContactName(item)} ${item.phone_number}`
       }
     },
 
@@ -115,11 +112,10 @@ export default {
     changePhoneNumber ($event) {
       this.selectedPhoneNumber = $event.phone_number
       this.$refs.searchField.inputValue = this.selectedPhoneNumber
-      let name = this.getContactName($event)
 
       this.$emit('change', {
         currentNumber: this.selectedPhoneNumber,
-        contactName: name,
+        contactName: this.getContactName($event),
         companyName: $event.company_name,
         contactId: $event.contact_id,
         contactTimezone: $event.timezone
@@ -128,9 +124,10 @@ export default {
     },
 
     getContactName (item) {
-      let name = (item.first_name + ' ' + item.last_name).trim()
+      const name = (item.first_name + ' ' + item.last_name).trim()
+
       if (!name.length) {
-        name = 'No Name'
+        return 'No Name'
       }
 
       return name

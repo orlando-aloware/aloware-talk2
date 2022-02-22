@@ -88,11 +88,10 @@ export default {
       )
     },
     onCancel () {
-      let _this = this
       this.showDeleteConfirmation = false
-      this.$nextTick(function () {
-        setTimeout(function () {
-          _this.$root.$emit('bv::show::popover', 'sms-templates-popover')
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.$root.$emit('bv::show::popover', 'sms-templates-popover')
         }, 500)
       })
     },

@@ -130,8 +130,6 @@ import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
 import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
 
-let inputTimeout
-
 export default {
   name: 'filter-dialog',
 
@@ -182,18 +180,18 @@ export default {
       return JSON.stringify(this.$options.filters.sortObjectByKey(this.filter)) !== JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilterClone.filter))
     },
     filterHasChanges () {
-      let hasChanges = false
+      const hasChanges = { data: false }
 
-      let filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
+      const filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const field of this.filterFields) {
         if (this.filter[field] !== filterIdentifier[field]) {
-          hasChanges = true
+          hasChanges.data = true
           break
         }
       }
 
-      return hasChanges
+      return hasChanges.data
     },
 
     toggleApplyButtonEnabled () {
@@ -253,7 +251,8 @@ export default {
         'my_contact',
         'from_date',
         'to_date'
-      ]
+      ],
+      inputTimeout: null
     }
   },
 
@@ -297,19 +296,18 @@ export default {
     },
 
     refreshTagSelector () {
-      let _this = this
       if (this.$refs.inboxChannelFilterForm.$refs.tagSelector) {
         this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
-        setTimeout(function () {
-          _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
-          _this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
+        setTimeout(() => {
+          this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
+          this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
         }, 200)
       }
     },
 
     onResetFilter: function () {
       // if has selected filter, then use selected filter saved values, otherwise use channel's default filter
-      let useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
+      const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const item in useFilter) {
         this.filter[item] = useFilter[item]
@@ -399,20 +397,20 @@ export default {
 
     updateFilter (filter, params) {
       if (!params.scope) {
-        let scope = [1, '1', true].includes(filter.is_on_company) ? 'company' : 'user'
+        const scope = [1, '1', true].includes(filter.is_on_company) ? 'company' : 'user'
         params = { ...params, scope: scope }
       }
 
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {
-        let updatedFilter = res.data.filter
+        const updatedFilter = res.data.filter
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
-          let filter = { ...this.selectedFilter }
+          const filter = { ...this.selectedFilter }
           filter.filter = { ...this.filter }
           this.setSelectedFilter(filter)
         }
 
         if (!updatedFilter.is_on_company) {
-          let index = this.personalFilters.findIndex(item => item.id === filter.id)
+          const index = this.personalFilters.findIndex(item => item.id === filter.id)
           if (index >= 0) {
             this.personalFilters[index] = updatedFilter
           }
@@ -448,7 +446,6 @@ export default {
     },
 
     applyFilter () {
-      let _this = this
       if (!this.selectedFilter) {
         return
       }
@@ -459,8 +456,8 @@ export default {
 
       this.filter = { ...this.filter, untagged_only: +this.filter.untagged_only, first_time_only: +this.filter.first_time_only, exclude_automated_communications: +this.filter.exclude_automated_communications }
 
-      setTimeout(function () {
-        _this.refreshTagSelector()
+      setTimeout(() => {
+        this.refreshTagSelector()
       }, 1000)
     }
   },
@@ -474,7 +471,7 @@ export default {
     this.setSelectedFilter(null)
   },
   beforeDestroy () {
-    clearTimeout(inputTimeout)
+    clearTimeout(this.inputTimeout)
   },
   mounted () {
     this.toggleFilterDialog()

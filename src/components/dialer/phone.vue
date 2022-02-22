@@ -1478,28 +1478,29 @@ export default {
         return this.contact.name || 'No Name'
       }
       const callFishingContactName = _.get(this.dialer.callFishing, 'contact.name', 'No Name')
+
       if (callFishingContactName) {
         return callFishingContactName
       }
       return 'No Name'
     },
     leadNumberRaw () {
-      let leadNumber = _.get(this.dialer, 'communication.lead_number', null)
+      const leadNumber = _.get(this.dialer, 'communication.lead_number', null)
       return !leadNumber ? _.get(this.dialer, 'callFishing.communication.lead_number', null) : leadNumber
     },
     leadNumber () {
       return this.$options.filters.fixPhone(this.leadNumberRaw)
     },
     companyName () {
-      let companyName = _.get(this.dialer, 'contact.company_name', '')
+      const companyName = _.get(this.dialer, 'contact.company_name', '')
       return !companyName ? _.get(this.dialer, 'callFishing.contact.company_name', '') : companyName
     },
     contact () {
-      let contact = this.dialer.contact
+      const contact = this.dialer.contact
       return !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
     },
     shouldShow () {
-      let callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+      const callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
       if (callFishingCommunication) {
         return true
       }
@@ -1611,8 +1612,8 @@ export default {
       }
     },
     setupContactLocalTime () {
-      let contact = this.contact
-      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+      const contact = !this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
+
       if (contact) {
         this.getContactLocalTime()
         this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
@@ -1622,15 +1623,15 @@ export default {
       this.showLocalTime = false
     },
     getContactLocalTime () {
-      let contact = this.contact
-      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+      const contact = this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
+
       if (contact && contact.timezone) {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
     },
     goToContact () {
-      let contact = this.contact
-      contact = !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
+      const contact = this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
+
       if (contact) {
         this.$router.push({
           name: 'Contact',
@@ -1643,7 +1644,7 @@ export default {
       }
     },
     copyPhoneNumber () {
-      let phoneNumberClone = document.querySelector('#phone-number-clone')
+      const phoneNumberClone = document.querySelector('#phone-number-clone')
       phoneNumberClone.setAttribute('type', 'text')
       phoneNumberClone.select()
       try {
@@ -1818,7 +1819,9 @@ export default {
       if (!id) {
         return null
       }
-      let found = this.campaigns.find(campaign => campaign.id === id)
+
+      const found = this.campaigns.find(campaign => campaign.id === id)
+
       if (found) {
         return found
       }
@@ -1844,15 +1847,16 @@ export default {
       if (!this.dialer.communication) {
         return
       }
-      let data = {
+
+      this.endWrapUp()
+
+      this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
         outboundCampaignId: this.dialer.communication.campaign_id,
         contactName: this.contactName,
         companyName: (this.contact) ? this.contact.company_name : '',
         contactId: this.dialer.communication.contact_id
-      }
-      this.endWrapUp()
-      this.$VueEvent.fire('makeCall', data)
+      })
     },
     resizeHandler (e) {
       e = e || window.event
@@ -1894,8 +1898,9 @@ export default {
       this.pos3 = e.clientX
       this.pos4 = e.clientY
       // check to make sure the element will be within our viewport boundary
-      let newLeft = this.$refs.phone.offsetLeft - this.pos1
-      let newTop = this.$refs.phone.offsetTop - this.pos2
+      const newLeft = this.$refs.phone.offsetLeft - this.pos1
+      const newTop = this.$refs.phone.offsetTop - this.pos2
+
       if (newLeft < this.viewport.left ||
         newTop < this.viewport.top ||
         newLeft + this.rect.width > this.viewport.right ||
@@ -2206,6 +2211,8 @@ export default {
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('togglePhone')
+    this.$VueEvent.stop('showPhone')
+    this.$VueEvent.stop('hidePhone')
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
   }

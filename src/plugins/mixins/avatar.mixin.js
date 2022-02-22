@@ -3,16 +3,13 @@ import randomColor from 'randomcolor'
 export default {
   methods: {
     avatarStyle (isSender = false) {
-      let style = {
+      const style = {
         backgroundColor: '#95989E',
         color: '#fff'
       }
 
       if (isSender) {
-        style = {
-          backgroundColor: '#859ED1',
-          color: '#fff'
-        }
+        style.backgroundColor = '#859ED1'
       }
 
       return style
@@ -23,30 +20,34 @@ export default {
         return
       }
 
-      let initials = this.getInitials(name)
-      let color1 = randomColor({
-        seed: initials[0].charCodeAt(0)
+      const data = {
+        initials: this.getInitials(name),
+        color1: null,
+        color2: null
+      }
+      data.color1 = randomColor({
+        seed: data.initials[0].charCodeAt(0)
       })
-      let color2 = randomColor({
-        seed: initials[1].charCodeAt(0)
+      data.color2 = randomColor({
+        seed: data.initials[1].charCodeAt(0)
       })
       return {
-        backgroundImage: `linear-gradient(to bottom, ${color1}, ${color2})`,
-        color: this.overlayColor(color1)
+        backgroundImage: `linear-gradient(to bottom, ${data.color1}, ${data.color2})`,
+        color: this.overlayColor(data.color1)
       }
     },
 
     getInitials (name) {
-      let initials = name.match(/\b\w/g) || []
+      const initials = name.match(/\b\w/g) || []
       return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
     },
 
     hashCode (str) {
-      let hash = 0
-      for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash)
+      const data = { hash: 0, index: null }
+      for (data.index = 0; data.index < str.length; data.index++) {
+        data.hash = str.charCodeAt(data.index) + ((data.hash << 5) - data.hash)
       }
-      return hash
+      return data.hash
     },
 
     overlayColor (color) {
@@ -62,10 +63,7 @@ export default {
         return 0
       }
 
-      let createdAtDate = this.$moment(contact.created_at)
-      let now = this.$moment()
-
-      return now.diff(createdAtDate, 'days')
+      return this.$moment().diff(this.$moment(contact.created_at), 'days')
     }
   }
 }

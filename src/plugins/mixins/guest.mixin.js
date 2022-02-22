@@ -61,8 +61,7 @@ export default {
 
     setTitle () {
       this.$axios.get('/get-statics').then(res => {
-        let name = res.data.name
-        document.title = this.title + ' - ' + name + ' Talk'
+        document.title = this.title + ' - ' + res.data.name + ' Talk'
       }).catch(err => {
         document.title = this.title + ' - Aloware Talk'
         console.log(err)

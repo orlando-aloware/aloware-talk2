@@ -145,26 +145,27 @@ export default {
       return this.$axios.get('api/v2/contact-list-bookmark').then((response) => response.data).then(async (data) => {
         const pinnedIds = []
 
-        for (let i = 0; i < data.length; i++) {
-          const contactListId = data[i].contact_list_id
+        const item = { i: 0 }
+        for (item.i = 0; item.i < data.length; item.i++) {
+          const contactListId = data[item.i].contact_list_id
 
           pinnedIds.push(contactListId)
 
           this.listLoaded({
             id: contactListId,
-            name: data[i].name,
-            headers: data[i].headers,
-            filters: data[i].filters,
-            type: data[i].type,
-            order: data[i].order
+            name: data[item.i].name,
+            headers: data[item.i].headers,
+            filters: data[item.i].filters,
+            type: data[item.i].type,
+            order: data[item.i].order
           })
 
-          if (data[i].type === STATIC) {
+          if (data[item.i].type === STATIC) {
             this.loadPinnedCount(contactListId)
           }
 
-          if (data[i].type === DYNAMIC) {
-            this.loadDynamicListPinnedCount(data[i])
+          if (data[item.i].type === DYNAMIC) {
+            this.loadDynamicListPinnedCount(data[item.i])
           }
         }
 

@@ -37,10 +37,8 @@ const capitalize = (text) => {
  * @returns {string|*|string}
  */
 const initials = (name) => {
-  let initials = name.match(/\b\w/g) || []
-  initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
-
-  return initials
+  const initials = name.match(/\b\w/g) || []
+  return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
 }
 
 /**
@@ -137,25 +135,26 @@ const checkIfTrue = (value) => {
  * @returns {string}
  */
 const prettifyCamelCase = (value) => {
-  let output = ''
-  let len = value.length
-  let char
+  const output = { data: '' }
+  const len = value.length
+  const char = { data: '' }
 
-  for (let i = 0; i < len; i++) {
-    char = value.charAt(i)
+  const index = { i: 0 }
+  for (index.i = 0; index.i < len; index.i++) {
+    char.data = value.charAt(index.i)
 
-    if (i === 0) {
-      output += char.toUpperCase()
-    } else if (char !== char.toLowerCase() && char === char.toUpperCase()) {
-      output += ' ' + char
-    } else if (char === '-' || char === '_') {
-      output += ' '
+    if (index.i === 0) {
+      output.data += char.data.toUpperCase()
+    } else if (char.data !== char.data.toLowerCase() && char.data === char.data.toUpperCase()) {
+      output.data += ' ' + char.data
+    } else if (char.data === '-' || char.data === '_') {
+      output.data += ' '
     } else {
-      output += char
+      output.data += char.data
     }
   }
 
-  return output
+  return output.data
 }
 
 /**
@@ -261,7 +260,7 @@ const pretty = (value) => {
 const firstName = (fullName) => {
   if (fullName) {
     if (fullName.indexOf(' ') > -1) {
-      let nameArr = fullName.split(/\s+/)
+      const nameArr = fullName.split(/\s+/)
       return nameArr.slice(0, -1).join(' ')
     } else {
       return fullName
@@ -279,7 +278,7 @@ const firstName = (fullName) => {
 const lastName = (fullName) => {
   if (fullName) {
     if (fullName.indexOf(' ') > -1) {
-      let nameArr = fullName.split(/\s+/)
+      const nameArr = fullName.split(/\s+/)
       return nameArr.pop()
     } else {
       return fullName
@@ -347,7 +346,7 @@ const readableArrayValue = (value) => {
     return ''
   }
   if (value.length >= 2) {
-    let last = value.pop()
+    const last = value.pop()
     return value.join(', ') + ', or ' + last
   } else {
     return value.pop()
@@ -362,7 +361,7 @@ const nl2br = (value, noValue = true) => {
   if (!value) {
     return noValue ? '-' : ''
   } else {
-    let breakTag = '<br />'
+    const breakTag = '<br />'
     return (value + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
   }
 }
@@ -383,17 +382,17 @@ const momentFormat = (datetime, format, toUserTimezone = false) => {
 
 const textTruncate = (text, lines, maxLength = 43) => {
   if (text) {
-    let texts = text.split('<br />').filter(Boolean)
-    if (texts.length >= 2) {
-      texts = texts.slice(0, 2).join('<br />')
+    const texts = { data: text.split('<br />').filter(Boolean) }
+    if (texts.data.length >= 2) {
+      texts.data = texts.data.slice(0, 2).join('<br />')
     } else {
-      texts = text
+      texts.data = text
     }
-    let newMaxLength = maxLength * lines
-    texts = texts.substring(0, (texts.length > newMaxLength ? newMaxLength : texts.length))
-    let hasEllipse = texts.length < text.length
-    texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
-    return texts + (hasEllipse ? '…' : '')
+    const newMaxLength = maxLength * lines
+    texts.data = texts.data.substring(0, (texts.data.length > newMaxLength ? newMaxLength : texts.data.length))
+    const hasEllipse = texts.data.length < text.length
+    texts.data = texts.data.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
+    return texts.data + (hasEllipse ? '…' : '')
   }
   return text
 }
@@ -463,10 +462,10 @@ const fixPhone = (
 
     // Use substring() and indexOf() functions to remove
     // portion of string after certain character (w => wait)
-    let pos = phoneNumber.indexOf('w')
-    let suffix = ''
+    const pos = phoneNumber.indexOf('w')
+    const suffix = { data: '' }
     if (pos !== -1) {
-      suffix = phoneNumber.substring(pos, phoneNumber.length - 1).trim()
+      suffix.data = phoneNumber.substring(pos, phoneNumber.length - 1).trim()
       phoneNumber = phoneNumber.substring(0, pos).trim()
     }
 
@@ -474,13 +473,13 @@ const fixPhone = (
       return force ? '-' : false
     }
 
-    let locale = window.guessLocale(phoneNumber)
+    const locale = window.guessLocale(phoneNumber)
 
     if (!locale) {
       return force ? '-' : false
     }
 
-    let tel = window.phoneUtil.parse(phoneNumber, locale)
+    const tel = window.phoneUtil.parse(phoneNumber, locale)
 
     if (['US', 'CA'].includes(locale) && !format) {
       format = 'NATIONAL'
@@ -490,22 +489,22 @@ const fixPhone = (
       format = 'E164'
     }
 
-    let formattedPhoneNumber
+    const formattedPhoneNumber = { data: null }
 
     if (format === 'INTERNATIONAL') {
-      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.INTERNATIONAL).toString()
+      formattedPhoneNumber.data = window.phoneUtil.format(tel, window.PNF.INTERNATIONAL).toString()
     } else if (format === 'E164') {
-      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.E164).toString()
+      formattedPhoneNumber.data = window.phoneUtil.format(tel, window.PNF.E164).toString()
     } else {
-      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.NATIONAL).toString()
+      formattedPhoneNumber.data = window.phoneUtil.format(tel, window.PNF.NATIONAL).toString()
     }
 
     // if we have to include suffix
     if (includeSuffix) {
-      formattedPhoneNumber = formattedPhoneNumber + suffix
+      formattedPhoneNumber.data = formattedPhoneNumber.data + suffix.data
     }
 
-    return formattedPhoneNumber
+    return formattedPhoneNumber.data
   } else {
     return ''
   }
@@ -523,31 +522,31 @@ const parseMentionToView = (content) => {
     return content
   }
 
-  let markups = content.match(/(<user:([^>]+)>)/gi)
-  let parsedBody = content
-  let users = store().state['users']
+  const markups = content.match(/(<user:([^>]+)>)/gi)
+  const parsedBody = { data: content }
+  const users = store().state['users']
 
   if (markups) {
     markups.forEach(function (value, i) {
-      let userId = value.match(/\d/g).join('')
-      let user = users.find(user => user.id.toString() === userId)
+      const userId = value.match(/\d/g).join('')
+      const user = users.find(user => user.id.toString() === userId)
       if (user) {
-        let idPattern = new RegExp(`<user:${userId}>`, 'gi')
-        parsedBody = parsedBody.replace(idPattern, `<span class="mention-tag">@${user.name}</span>`)
+        const idPattern = new RegExp(`<user:${userId}>`, 'gi')
+        parsedBody.data = parsedBody.data.replace(idPattern, `<span class="mention-tag">@${user.name}</span>`)
       }
     })
   }
 
-  return parsedBody
+  return parsedBody.data
 }
 
 const parseMentionToMarkup = (content) => {
-  let parser = new DOMParser()
-  let doc = parser.parseFromString(content, 'text/html')
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(content, 'text/html')
 
-  let spanEl = doc.querySelectorAll('span.mention-tag')
+  const spanEl = doc.querySelectorAll('span.mention-tag')
   spanEl.forEach(function (value, i) {
-    let id = value.getAttribute('data-id')
+    const id = value.getAttribute('data-id')
 
     value.parentNode.replaceChild(document.createTextNode('<user:' + id + '>'), value)
   })
@@ -559,8 +558,8 @@ const sortObjectByKey = obj => Object.keys(obj).sort().reduce((res, key) => (res
 
 const objAlphabeticalOrder = (object, sortProp) => {
   object = object.sort((a, b) => {
-    let textA = a[sortProp].toUpperCase()
-    let textB = b[sortProp].toUpperCase()
+    const textA = a[sortProp].toUpperCase()
+    const textB = b[sortProp].toUpperCase()
     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
   })
 

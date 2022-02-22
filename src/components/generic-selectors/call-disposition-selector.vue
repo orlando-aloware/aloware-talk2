@@ -153,10 +153,9 @@ export default {
 
     callDispositionsAlphabeticalOrder () {
       if (this.callDispositions) {
-        let callDispositions = _.clone(this.callDispositions)
-        return callDispositions.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.callDispositions).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }
@@ -191,16 +190,19 @@ export default {
     getCallDisposition () {
       if (!_.isEmpty(this.values) && this.multiple) {
         this.callDisposition = []
-        for (let callDispId in this.values) {
-          let found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === callDispId)
-          this.callDisposition.push(found)
+        const callDispId = { data: null }
+        for (callDispId.data in this.values) {
+          const found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === callDispId.data)
+
+          if (found) {
+            this.callDisposition.push(found)
+          }
         }
         return
       }
 
       if (!_.isEmpty(this.values) && !this.multiple) {
-        let found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === this.values)
-        this.callDisposition = found
+        this.callDisposition = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === this.values)
       }
     },
 

@@ -44,12 +44,10 @@ export default {
       return this.contacts.length - 1
     },
     prevContact () {
-      let index = this.currentIndex - 1
-      return this.currentIndex !== 0 ? this.contacts[index] : null
+      return this.currentIndex !== 0 ? this.contacts[(this.currentIndex - 1)] : null
     },
     nextContact () {
-      let index = this.currentIndex + 1
-      return this.currentIndex !== this.lastIndex ? this.contacts[index] : null
+      return this.currentIndex !== this.lastIndex ? this.contacts[(this.currentIndex + 1)] : null
     }
   },
   methods: {

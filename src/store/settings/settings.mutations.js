@@ -11,25 +11,25 @@ export default {
     state.userClone = _.cloneDeep(user)
   },
   UPDATE_CHANGED_USER_PROPERTIES: (state, { name, value }) => {
-    let hasChanges = !1
+    const hasChanges = { data: !1 }
 
     if ([ typeof value, typeof state.userClone[name] ].includes('object')) {
-      hasChanges = JSON.stringify(state.userClone[name]) !== JSON.stringify(value)
+      hasChanges.data = JSON.stringify(state.userClone[name]) !== JSON.stringify(value)
     } else if (name === 'missed_calls_settings.missed_call_handling_mode') {
-      hasChanges = state.userClone.missed_calls_settings['missed_call_handling_mode'] !== value
+      hasChanges.data = state.userClone.missed_calls_settings['missed_call_handling_mode'] !== value
     } else {
-      hasChanges = state.userClone[name] !== value
+      hasChanges.data = state.userClone[name] !== value
     }
 
-    if (hasChanges) {
-      let prop = state.changedUserProperties.find(item => item.property === name)
+    if (hasChanges.data) {
+      const prop = state.changedUserProperties.find(item => item.property === name)
       if (prop) {
         prop.value = value
       } else {
         state.changedUserProperties.push({ property: name, value: value })
       }
     } else {
-      let changedProp = [...state.changedUserProperties]
+      const changedProp = [...state.changedUserProperties]
       state.changedUserProperties = changedProp.filter(item => item.property !== name)
     }
   },

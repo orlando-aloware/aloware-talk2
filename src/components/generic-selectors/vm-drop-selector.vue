@@ -125,10 +125,9 @@ export default {
 
     vmDropAlphabeticalOrder () {
       if (this.vmDrops) {
-        let vmDrops = _.clone(this.vmDrops)
-        return vmDrops.sort((a, b) => {
-          let textA = a.name.toUpperCase()
-          let textB = b.name.toUpperCase()
+        return _.clone(this.vmDrops).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }

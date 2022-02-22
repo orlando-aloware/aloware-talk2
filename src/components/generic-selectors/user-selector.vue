@@ -207,12 +207,10 @@ export default {
 
     filteredUsers () {
       if (this.availableUsers) {
-        let filteredUsers = this.availableUsers.filter((user) =>
+        return this.availableUsers.filter((user) =>
           !(user.role_names.length === 1 && user.read_only_access) &&
           user.answer_by !== AnswerTypes.BY_NONE
         )
-
-        return filteredUsers
       }
 
       return []
@@ -227,7 +225,7 @@ export default {
     },
 
     formattedOptions () {
-      let normalUsers = [...this.normalUsers]
+      const normalUsers = [...this.normalUsers]
 
       if (normalUsers.length > 0) {
         normalUsers.unshift({
@@ -236,18 +234,18 @@ export default {
         })
       }
 
-      let usersArray = normalUsers
+      const usersArray = { data: normalUsers }
 
       if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
-        let extensionUsers = [...this.extensionUsers]
+        const extensionUsers = [...this.extensionUsers]
         extensionUsers.unshift({
           group: 'Extensions',
           disable: true
         })
-        usersArray = [...normalUsers, ...extensionUsers]
+        usersArray.data = [...normalUsers, ...extensionUsers]
       }
 
-      return usersArray
+      return usersArray.data
     },
 
     userObject () {

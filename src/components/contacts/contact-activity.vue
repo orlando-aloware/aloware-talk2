@@ -7,7 +7,7 @@
          v-if="communication.property === undefined">
       <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
                rounded
-               v-if="(markable(communication) || (communication.type === CommunicationTypes.SMS ||
+               v-if="(markable || (communication.type === CommunicationTypes.SMS ||
                (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) &&
                (communication.body || communication.attachments)) && !communication.is_read">
       </q-badge>
@@ -268,21 +268,21 @@
 
         <b-button variant="link"
                   class="pl-2 p-y-sm inline mark-as mark-read _400 d-none"
-                  v-if="markable(communication) && !communication.is_read"
+                  v-if="markable && !communication.is_read"
                   @click="markAsRead">
           Mark as read
         </b-button>
 
         <b-button variant="link"
                   class="pl-2 p-y-sm inline mark-as mark-read _400 d-none"
-                  v-if="markable(communication) && communication.is_read"
+                  v-if="markable && communication.is_read"
                   @click="markAsUnread">
           Mark as unread
         </b-button>
 
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
           <router-link class="activity-status text-decoration-none"
-                       :to="{ name: 'Communication', params: {communicationId: communication.id }}"
+                       :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.id }}"
                        :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
             <template
               v-if="communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
@@ -462,6 +462,20 @@ export default {
       }
 
       return this.contact.name || 'No Name'
+    },
+
+    markable () {
+      // Markable if communication is SMS and the comm direction is INBOUND or
+      // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
+      return (this.communication.type === CommunicationTypes.SMS &&
+          this.communication.direction === CommunicationDirection.INBOUND) ||
+        (this.communication.type === CommunicationTypes.CALL &&
+          [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(this.communication.disposition_status2) &&
+          this.communication.direction === CommunicationDirection.INBOUND)
+    },
+
+    contactId () {
+      return _.get(this.communication, 'contact.id', null)
     }
   },
 
@@ -478,80 +492,58 @@ export default {
   },
 
   methods: {
-    markable (communication) {
-      // Markable if communication is SMS and the comm direction is INBOUND
-      let smsRule = communication.type === CommunicationTypes.SMS &&
-        communication.direction === CommunicationDirection.INBOUND
-      // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
-      let callRule = communication.type === CommunicationTypes.CALL &&
-        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2) &&
-        communication.direction === CommunicationDirection.INBOUND
-
-      return smsRule || callRule
-    },
-
     generalAuditsConditions (data) {
       // skip if not a property of contact audits
       if (!this.general_audit_properties.includes(data.property)) {
         return false
       }
+
       return (!data.from && data.to && data.property !== 'phone_number') ||
         (data.from && data.to && data.property !== 'workflow_id') ||
         (data.from && !data.to && data.property !== 'phone_number')
     },
 
     customAuditsConditions (data) {
-      let allowedData = null
-      let property = data.property
-      let propertyValue = data.to !== null ? parseInt(data.to) : data.to
-      switch (property) {
+      switch (data.property) {
         case 'is_dnc':
         case 'is_blocked':
-          allowedData = [0, 1]
-          return allowedData.includes(propertyValue)
+          return [0, 1].includes((data.to !== null ? parseInt(data.to) : data.to))
         case 'thread_status':
-          allowedData = [
+          const allowedData = [
             ContactThreadStatusTypes.THREAD_STATUS_OPEN,
             ContactThreadStatusTypes.THREAD_STATUS_PENDING,
             ContactThreadStatusTypes.THREAD_STATUS_CLOSED,
             ContactThreadStatusTypes.THREAD_STATUS_LIVE
           ]
-          propertyValue = [
-            (data.from !== null ? parseInt(data.from) : data.from),
-            (data.to !== null ? parseInt(data.to) : data.to)
-          ]
-          return allowedData.includes(propertyValue[0]) ||
-            allowedData.includes(propertyValue[1])
+          return allowedData.includes((data.from !== null ? parseInt(data.from) : data.from)) ||
+            allowedData.includes((data.to !== null ? parseInt(data.to) : data.to))
         default:
           return false
       }
     },
 
     hasAuditNotes (data) {
-      let allowed = [
-        'tag_ids'
-      ]
       return data.notes &&
         !this.generalAuditsConditions(data) &&
-        (allowed.includes(data.property) || (!data.from && !data.to))
+        (['tag_ids'].includes(data.property) || (!data.from && !data.to))
     },
 
     generalAuditMessages (data) {
-      let generalMessage = 'Contact' + (data.property !== 'disposition_status_id' ? "'s " : ' ')
-      let propertyReadableName = data.property.replace('user_id', 'owner').replace('_id', '').replace('_', ' ')
-      propertyReadableName = propertyReadableName === 'phone number' ? 'primary ' + propertyReadableName : propertyReadableName
-      generalMessage += ' ' + propertyReadableName
-      let workflowToName = this.getWorkflow(data.to).name
-      workflowToName = !workflowToName ? 'Deleted' : workflowToName
-      let workflowFromName = this.getWorkflow(data.from).name
-      workflowFromName = !workflowFromName ? 'Deleted' : workflowFromName
-      let workflowMessage = [
-        `Enrolled contact into "${workflowToName}" sequence.`,
-        `Contact finished all "${workflowFromName}" sequence steps.`
+      const generalMessage = { data: `Contact${(data.property !== 'disposition_status_id' ? "'s " : ' ')}` }
+      const propertyReadableName = { data: data.property.replace('user_id', 'owner').replace('_id', '').replace('_', ' ') }
+      propertyReadableName.data = propertyReadableName.data === 'phone number' ? `primary ${propertyReadableName.data}` : propertyReadableName.data
+      generalMessage.data = `${generalMessage.data} ${propertyReadableName.data}`
+      const workflowToName = { data: this.getWorkflow(data.to).name }
+      workflowToName.data = !workflowToName.data ? 'Deleted' : workflowToName.data
+      const workflowFromName = { data: this.getWorkflow(data.from).name }
+      workflowFromName.data = !workflowFromName.data ? 'Deleted' : workflowFromName.data
+      const workflowMessage = [
+        `Enrolled contact into "${workflowToName.data}" sequence.`,
+        `Contact finished all "${workflowFromName.data}" sequence steps.`
       ]
 
       if (data.from && !data.to) {
-        workflowMessage[1] = `Contact was disenrolled from "${workflowFromName}" sequence.`
+        workflowMessage[1] = `Contact was disenrolled from "${workflowFromName.data}" sequence.`
       }
 
       if (data.notes && data.notes.length) {
@@ -559,39 +551,45 @@ export default {
         workflowMessage[1] += ' Reason: ' + data.notes
       }
 
-      let fromValue = ''
-      let toValue = ''
+      const fromValue = { data: '' }
+      const toValue = { data: '' }
+
       if (data.from) {
-        fromValue = data.property === 'disposition_status_id' ? this.getContactDisposition(data.from).name : ''
-        fromValue = data.property === 'user_id' ? this.getUser(data.from).name : fromValue
-        fromValue = !['disposition_status_id', 'user_id'].includes(data.property) ? data.from : fromValue
+        fromValue.data = data.property === 'disposition_status_id' ? this.getContactDisposition(data.from).name : ''
+        fromValue.data = data.property === 'user_id' ? this.getUser(data.from).name : fromValue.data
+        fromValue.data = !['disposition_status_id', 'user_id'].includes(data.property) ? data.from : fromValue.data
       }
+
       if (data.to) {
-        toValue = data.property === 'disposition_status_id' ? this.getContactDisposition(data.to).name : ''
-        toValue = data.property === 'user_id' ? this.getUser(data.to).name : toValue
-        toValue = !['disposition_status_id', 'user_id'].includes(data.property) ? data.to : toValue
+        toValue.data = data.property === 'disposition_status_id' ? this.getContactDisposition(data.to).name : ''
+        toValue.data = data.property === 'user_id' ? this.getUser(data.to).name : toValue.data
+        toValue.data = !['disposition_status_id', 'user_id'].includes(data.property) ? data.to : toValue.data
       }
+
       if (!data.from && data.to) {
         switch (data.property) {
           case 'disposition_status_id':
           case 'user_id':
-            return generalMessage + ' has been set to "' + toValue + '"'
+            return generalMessage.data + ' has been set to "' + toValue.data + '"'
           case 'workflow_id':
             return workflowMessage[0]
         }
       }
+
       if (data.from && data.to && data.property !== 'workflow_id') {
-        return generalMessage + ' has been changed from "' + fromValue + '" to "' + toValue + '"'
+        return generalMessage.data + ' has been changed from "' + fromValue.data + '" to "' + toValue.data + '"'
       }
+
       if (data.from && !data.to) {
         switch (data.property) {
           case 'disposition_status_id':
           case 'user_id':
-            return generalMessage + ' has been removed from "' + fromValue + '"'
+            return generalMessage.data + ' has been removed from "' + fromValue.data + '"'
           case 'workflow_id':
             return workflowMessage[1]
         }
       }
+
       return ''
     },
 
@@ -599,8 +597,8 @@ export default {
       if (['thread_status'].includes(communication.property)) {
         return this.$options.filters.ucwords(communication.property.replace(/_/g, ' ')) +
           ' has been changed ' +
-          (this.custom_audit_messages[communication.property][communication.from] ? 'from ' + this.custom_audit_messages[communication.property][communication.from] : '') +
-          ' to ' + this.custom_audit_messages[communication.property][communication.to]
+          (this.custom_audit_messages[communication.property][communication.from] ? `from ${this.custom_audit_messages[communication.property][communication.from]}` : '') +
+          ` to ${this.custom_audit_messages[communication.property][communication.to]}`
       } else {
         return this.custom_audit_messages[communication.property][communication.to]
       }
@@ -612,7 +610,7 @@ export default {
       }
 
       id = parseInt(id)
-      let found = this.campaigns.find(campaign => campaign.id === id)
+      const found = this.campaigns.find(campaign => campaign.id === id)
 
       if (found) {
         return found
@@ -677,11 +675,14 @@ export default {
       if (!id) {
         return { name: '' }
       }
+
       id = parseInt(id)
-      let found = this.users.find(user => user.id === id)
+      const found = this.users.find(user => user.id === id)
+
       if (!_.isEmpty(found)) {
         return found
       }
+
       return { name: '' }
     },
 
@@ -691,7 +692,7 @@ export default {
       }
 
       id = parseInt(id)
-      let found = this.workflows.find(workflow => workflow.id === id)
+      const found = this.workflows.find(workflow => workflow.id === id)
 
       if (found) {
         return found
@@ -704,8 +705,10 @@ export default {
       if (!id) {
         return { name: '' }
       }
+
       id = parseInt(id)
-      let found = this.broadcasts.find(broadcast => broadcast.id === id)
+      const found = this.broadcasts.find(broadcast => broadcast.id === id)
+
       if (found) {
         return found
       }
@@ -717,8 +720,10 @@ export default {
       if (!contactDispositionId) {
         return { name: '' }
       }
+
       contactDispositionId = parseInt(contactDispositionId)
-      let found = this.dispositionStatuses.find(contactDisposition => contactDisposition.id === contactDispositionId)
+      const found = this.dispositionStatuses.find(contactDisposition => contactDisposition.id === contactDispositionId)
+
       if (found) {
         return found
       }
@@ -768,8 +773,7 @@ export default {
       })
     },
     getNotesBottomLabel () {
-      let name = this.getUser(this.communication.user_id).name
-
+      const name = this.getUser(this.communication.user_id).name
       return name + (name.charAt(name.length - 1) === 's' ? `'` : `'s`) + ' note'
     }
   }

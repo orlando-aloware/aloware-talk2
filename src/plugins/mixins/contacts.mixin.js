@@ -58,14 +58,12 @@ export default {
     onSortByField (sorts) {
       this.isLoaded = false
       this.sorts = sorts
-      let params = {
+      this.fetch({
         search: this.search,
         page: this.listItems[this.id].current_page,
         sort: sorts.orderBy,
         order: sorts.order
-      }
-
-      this.fetch(params)
+      })
     },
     onLoadMore () {
       if (this.hasMore) {
@@ -101,22 +99,18 @@ export default {
     },
     onFetchMyContacts (checked) {
       this.isLoading = true
-      let params = {
+      this.fetch({
         contact_owner: checked ? this.profile.id : undefined,
         search: this.search,
         page: this.listItems[this.id].page
-      }
-
-      this.fetch(params)
+      })
     },
     onSearch (searchText) {
       this.isLoaded = false
       this.setSearch(searchText)
-      let params = {
+      this.fetch({
         search: this.search
-      }
-
-      this.fetch(params)
+      })
     },
     apiEndpoint (queued) {
       if (!this.isPowerDialer) {
@@ -170,7 +164,7 @@ export default {
           }
 
           let listId = this.id === 'my-queue' ? this.myQueue?.id : this.id
-          let list = _.get(this.lists, listId, { id: null, name: '', type: null })
+          const list = _.get(this.lists, listId, { id: null, name: '', type: null })
 
           if (isContactModule) {
             this.setSelectedList({
@@ -185,6 +179,7 @@ export default {
               type: list.type
             })
           }
+
           this.markCheckedAll()
         })
         .finally(() => {
@@ -231,7 +226,7 @@ export default {
         per_page: params.per_page || 25
       }
 
-      let filters = {}
+      const filters = {}
 
       if (params.search) {
         filters.search = {}
@@ -272,10 +267,11 @@ export default {
       }
 
       if (!_.isEmpty(this.currentListFilters)) {
-        for (let filterIndex of Object.keys(this.currentListFilters)) {
+        const filterIndex = { data: null }
+        for (filterIndex.data of Object.keys(this.currentListFilters)) {
           // check if filter index is a number
-          if (!isNaN(filterIndex / 1)) {
-            query.filter_groups = query.filter_groups.concat(this.currentListFilters[filterIndex])
+          if (!isNaN(filterIndex.data / 1)) {
+            query.filter_groups = query.filter_groups.concat(this.currentListFilters[filterIndex.data])
           }
         }
       }
@@ -302,20 +298,22 @@ export default {
       return this.isPowerDialer ? powerQuery : query
     },
     getFiltersCount (filters) {
-      let filtersCount = 0
+      const filtersCount = { data: 0 }
       if (filters && filters.constructor.name === 'Object' && Object.keys(filters).length) {
-        for (let index of Object.keys(filters)) {
-          const filter = _.get(filters[index], 'filters', null)
-          filtersCount += filter ? Object.keys(filter).length : 0
+        const index = { data: null }
+        for (index.data of Object.keys(filters)) {
+          const filter = _.get(filters[index.data], 'filters', null)
+          filtersCount.data += filter ? Object.keys(filter).length : 0
         }
       } else if (filters.constructor.name === 'Array' && filters.length) {
-        for (let group of filters) {
-          const filter = _.get(group, 'filters', null)
-          filtersCount += filter ? Object.keys(filter).length : 0
+        const group = { data: null }
+        for (group.data of filters) {
+          const filter = _.get(group.data, 'filters', null)
+          filtersCount.data += filter ? Object.keys(filter).length : 0
         }
       }
 
-      return filtersCount
+      return filtersCount.data
     },
     markCheckedAll () {
       if (this.selectedContacts[this.id] && this.listItems[this.id]) {
@@ -328,7 +326,7 @@ export default {
       if (!this.list) {
         return []
       }
-      let defaultFilters = JSON.parse(JSON.stringify(this.list.filters))
+      const defaultFilters = JSON.parse(JSON.stringify(this.list.filters))
       if (this.$route.params.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
@@ -358,21 +356,18 @@ export default {
       return 'last_engagement_at'
     },
     hasMore () {
-      let result = this.listItems[this.id]?.next_page_url &&
+      return (this.listItems[this.id]?.next_page_url &&
         !this.isLoadingMore &&
-        !this.isLoading
-      return result || false
+        !this.isLoading) ||
+        false
     },
     isPowerDialer () {
-      if (this.$route.name === 'Power Dialer' &&
+      return (this.$route.name === 'Power Dialer' &&
         (
           this.$route.meta.id !== 'power-dialer-add-list' &&
           this.$route.meta.id !== 'power-dialer-add-queue-list'
         )
-      ) {
-        return true
-      }
-      return false
+      )
     },
     isLoadingDisabled () {
       return this.isLoading || !this.isLoaded
@@ -398,50 +393,50 @@ export default {
     },
     columns () {
       try {
-        let headers = []
+        const headers = { data: [] }
         if (this.lists[this.id] && this.lists[this.id].headers) {
-          headers = this.lists[this.id].headers
+          headers.data = this.lists[this.id].headers
           if (typeof headers === 'string') {
-            headers = JSON.parse(headers)
+            headers.data = JSON.parse(headers.data)
           }
         }
 
-        if (!Array.isArray(headers)) {
+        if (!Array.isArray(headers.data)) {
           throw new Error('Headers field is broken')
         }
 
-        for (let key in headers) {
-          const found = ALL_COLUMNS.find(column => column.name === headers[key].name)
+        const item = { key: null }
+        for (item.key in headers.data) {
+          const found = ALL_COLUMNS.find(column => column.name === headers.data[item.key].name)
 
           if (!found) {
             continue
           }
 
-          let headerRelation = _.get(headers[key], 'relationName', null)
-          let columnRelation = _.get(found, 'relationName', null)
+          const headerRelation = _.get(headers.data[item.key], 'relationName', null)
+          const columnRelation = _.get(found, 'relationName', null)
 
           if (columnRelation && columnRelation !== headerRelation) {
-            headers[key].relationName = columnRelation
+            headers.data[item.key].relationName = columnRelation
           }
         }
 
-        return _.uniqBy(headers, 'name')
+        return _.uniqBy(headers.data, 'name')
       } catch (err) {
         console.log('Error', err)
         return []
       }
     },
     listFilters () {
-      let filters = {}
-
-      if (this.lists[this.id] && this.lists[this.id].filters) {
-        filters = this.lists[this.id].filters
-        if (typeof filters === 'string') {
-          filters = JSON.parse(filters)
-        }
+      if (_.isEmpty(this.lists[this.id]) || _.isEmpty(this.lists[this.id].filters)) {
+        return {}
       }
 
-      return filters
+      if (typeof this.lists[this.id].filters === 'string') {
+        return JSON.parse(this.lists[this.id].filters)
+      }
+
+      return this.lists[this.id].filters
     },
     list () {
       if (!this.$route.params.id) {
@@ -450,9 +445,10 @@ export default {
       return this.lists[this.$route.params.id]
     },
     contactsRelations () {
-      let relations = []
-      for (let column of this.columns) {
-        const relationName = _.get(column, 'relationName', null)
+      const relations = []
+      const column = { data: null }
+      for (column.data of this.columns) {
+        const relationName = _.get(column.data, 'relationName', null)
         if (relationName && RELATIONS.includes(relationName)) {
           relations.push(relationName)
         }

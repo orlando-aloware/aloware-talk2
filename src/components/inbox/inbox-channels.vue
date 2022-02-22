@@ -180,7 +180,6 @@ import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
 
-let scrollTimeout
 export default {
   name: 'inbox-channels',
 
@@ -258,7 +257,7 @@ export default {
     },
 
     channelDefaultFilterModel () {
-      let defaultFilterModel = {
+      const defaultFilterModel = {
         name: '',
         type: 2,
         filter: [],
@@ -416,7 +415,8 @@ export default {
         type: 2,
         filter: [],
         scope: 'user'
-      }
+      },
+      scrollTimeout: null
     }
   },
 
@@ -681,9 +681,10 @@ export default {
     checkCommunicationMatchesSearch (communication) {
       // checks if communication matches search
       if (this.searchText && this.searchText.trim().length > 0) {
-        for (let searchField of this.searchFields) {
-          if (communication[searchField]) {
-            if (communication[searchField].toString().indexOf(this.searchText) > -1) {
+        const searchField = { data: null }
+        for (searchField.data of this.searchFields) {
+          if (communication[searchField.data]) {
+            if (communication[searchField.data].toString().indexOf(this.searchText) > -1) {
               return true
             }
           }
@@ -698,10 +699,10 @@ export default {
     getCommunications (params) {
       this.gettingTasksList(true)
 
-      let api = talk2Api.V1.reports.communications
+      const api = { data: talk2Api.V1.reports.communications }
 
       if (this.$route.params.channel === 'mentions') {
-        api = talk2Api.V2.mentions
+        api.data = talk2Api.V2.mentions
         params = {
           ...{
             direction: this.mentionType,
@@ -723,7 +724,7 @@ export default {
 
       params = this.removeUnnecessaryParameters(params)
 
-      return api.get({ params: params })
+      return api.data.get({ params: params })
         .then(response => {
           this.gettingTasksList(false)
           this.setCommunications(response.data.data)
@@ -739,10 +740,10 @@ export default {
       this.isLoadingMore = true
       this.isLoaded = false
 
-      let api = talk2Api.V1.reports.communications
+      const api = { data: talk2Api.V1.reports.communications }
 
       if (this.$route.params.channel === 'mentions') {
-        api = talk2Api.V2.mentions
+        api.data = talk2Api.V2.mentions
         params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, order_by: this.sorting.order } }
 
         if (this.mentionType === 'sent' && this.filter.mentioned_user_id) {
@@ -762,7 +763,7 @@ export default {
 
       params = this.removeUnnecessaryParameters(params)
 
-      return api.get({ params: params })
+      return api.data.get({ params: params })
         .then(response => {
           this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
@@ -806,9 +807,9 @@ export default {
     },
 
     onTaskListBottomScroll () {
-      clearTimeout(scrollTimeout)
+      clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
-      scrollTimeout = setTimeout(() => {
+      this.scrollTimeout = setTimeout(() => {
         // Run the callback
         if (this.hasMoreCommunications && this.isLoaded) {
           this.isScrolled = true
@@ -944,18 +945,16 @@ export default {
     },
 
     handleNewMention (communication) {
-      let api = talk2Api.V2.mentions
+      const api = talk2Api.V2.mentions
 
-      let params = _.cloneDeep(this.filter)
+      const params = { data: _.cloneDeep(this.filter) }
 
-      params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, mentioner_user_id: params.mentioner_user_id, mentioned_user_id: params.mentioned_user_id } }
-      params = { ...params, order_by: this.sorting.order }
+      params.data = { ...{ direction: this.mentionType, page: params.data.page, per_page: params.data.per_page, mentioner_user_id: params.data.mentioner_user_id, mentioned_user_id: params.data.mentioned_user_id } }
+      params.data = { ...params.data, order_by: this.sorting.order }
 
-      api.get({ params: params })
+      api.get({ params: params.data })
         .then(response => {
-          let results = response.data.data
-
-          let mention = results.find(item => item.mention_subject_id === communication.id)
+          const mention = response.data.data.find(item => item.mention_subject_id === communication.id)
           if (mention) {
             this.pagination.total += 1
             // push new data to top of array
@@ -999,8 +998,8 @@ export default {
     '$route.name': function (value) {
       if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(value)) {
         // since mention has different data structure to other channels, need to set property to compare as comm id
-        let identifierProp = value === 'Inbox Contact Mention Communication' ? 'mention_subject_id' : 'id'
-        let communication = this.communications.find(item => item[identifierProp] === this.$route.params.communicationId)
+        const identifierProp = value === 'Inbox Contact Mention Communication' ? 'mention_subject_id' : 'id'
+        const communication = this.communications.find(item => item[identifierProp] === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
       }
     },
@@ -1027,7 +1026,7 @@ export default {
 
     this.$VueEvent.listen('new_communication', (data) => {
       // check new communication exists in the old list
-      let found = this.communications.filter(communication => {
+      const found = this.communications.filter(communication => {
         return communication.id === data.id
       })
 
@@ -1062,7 +1061,7 @@ export default {
       // check data loaded
       if (this.pagination.prev === null) {
         // check new communication exists in the old list
-        let found = this.communications.filter(communication => {
+        const found = this.communications.filter(communication => {
           return communication.id === data.id
         })
         if (found.length) {
@@ -1112,7 +1111,7 @@ export default {
       // check data loaded
       if (this.pagination.prev === null) {
         // try to find the communication
-        let found = this.communications.find(communication => communication.id === data.id)
+        const found = this.communications.find(communication => communication.id === data.id)
         if (found) {
           // remove it from the list
           this.communications.splice(this.communications.indexOf(found), 1)
@@ -1122,18 +1121,18 @@ export default {
     })
 
     this.$VueEvent.listen('mark_contact_communications_all_as_read', (data) => {
-      let contactId = _.get(data, 'id', null)
+      const contactId = _.get(data, 'id', null)
 
       if (!contactId) {
         return
       }
 
       // get current contact's communications
-      let contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
+      const contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
 
       // iterate through and update is_read value
       contactCommunications.forEach((communication) => {
-        let index = this.communications.findIndex(item => item.id === communication.id)
+        const index = this.communications.findIndex(item => item.id === communication.id)
         this.communications[index].is_read = true
       })
 
@@ -1143,16 +1142,14 @@ export default {
   },
 
   mounted () {
-    let _this = this
-
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
-      if (_this.$route.params.channel === 'mentions') {
-        _this.filter.page = _this.nextPage
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = this.nextPage
       } else {
-        _this.filter.cursor = _this.nextPage
+        this.filter.cursor = this.nextPage
       }
-      _this.loadMoreCommunications(this.filter).then(() => {
-        let communication = this.communications[lastNavigatedIndex + 1]
+      this.loadMoreCommunications(this.filter).then(() => {
+        const communication = this.communications[lastNavigatedIndex + 1]
         this.setSelectedCommunication(communication)
 
         if (this.$route.name === 'Inbox Contact') {
@@ -1182,7 +1179,7 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      let communications = [...this.communications]
+      const communications = [...this.communications]
 
       communications.filter(item => item.contact.id === data.id).forEach((value) => {
         value.contact = data
@@ -1192,17 +1189,17 @@ export default {
     })
 
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(_this.$route.name)) {
-        let communication
+      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+        const communication = { data: null }
 
-        if (_this.$route.name === 'Inbox Contact Mention Communication') {
-          communication = _this.communications.find(item => item.mention_subject_id.toString() === _this.$route.params.communicationId.toString())
+        if (this.$route.name === 'Inbox Contact Mention Communication') {
+          communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
         } else {
-          communication = _this.communications.find(item => item.id.toString() === _this.$route.params.communicationId.toString())
+          communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
         }
 
-        if (communication) {
-          _this.setSelectedCommunication(communication)
+        if (communication.data) {
+          this.setSelectedCommunication(communication.data)
         }
       }
     }
