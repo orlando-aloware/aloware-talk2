@@ -85,7 +85,6 @@ export default {
   },
   methods: {
     scrollMessages () {
-      console.log('test asdas')
       const activitiesWrap = this.$refs.activitiesWrap
       if (activitiesWrap && activitiesWrap.scrollHeight) {
         activitiesWrap.scrollTop = activitiesWrap.scrollHeight

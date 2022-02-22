@@ -29,6 +29,7 @@
                size="md"
                color="primary"
                :loading="loading"
+               :disable="loading"
                v-if="recentShowSendSmsReminderButton"
                @click="sendDefaultSmsReminder">
           <div class="mx-2 px-1">
@@ -131,7 +132,7 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase() === needle)
+        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
