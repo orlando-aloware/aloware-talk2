@@ -420,7 +420,7 @@ export default {
       return this.lists[this.id].filters
     },
     list () {
-      if (!this.$route.params.id || typeof this.lists[this.$route.params.id] === 'undefined') {
+      if (!this.$route.params.id) {
         return this.lists['all']
       }
 

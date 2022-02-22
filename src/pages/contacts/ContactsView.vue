@@ -24,7 +24,7 @@
           <div class="d-flex align-items-center">
             <span
               :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
-              {{ list.name || unsavedList.name }}
+              {{ list.name || (isUnsavedList ? unsavedList.name : '') }}
               <q-chip
                 class="m-0 p-0"
                 text-color="white"
@@ -252,6 +252,7 @@
         :total-rows="listItems[id].total"
         :current-page="listItems[id].current_page"
         :last-page="listItems[id].last_page"
+        v-if="listItemsHasData"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
@@ -654,8 +655,8 @@ export default {
           this.defaultIds.includes(this.id)
       }
     },
-    listItemsData () {
-      return this.listItems[this.id]
+    listItemsHasData () {
+      return typeof this.listItems[this.id] !== 'undefined'
     },
     listItemsDataCount () {
       const total = _.get(this.listItems, `[${this.id}].data.length`, null)

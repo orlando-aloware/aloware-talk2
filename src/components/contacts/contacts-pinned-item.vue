@@ -51,8 +51,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setShowContactsListSidebar']),
+    ...mapActions('contacts', ['setShowContactsListSidebar', 'setUnsavedList']),
     toggleSidebar (callback, event) {
+      this.setUnsavedList(null)
       callback(event)
       this.setShowContactsListSidebar(false)
     }
