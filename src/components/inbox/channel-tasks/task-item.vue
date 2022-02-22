@@ -321,21 +321,25 @@ export default {
       if (_.isEmpty(this.communication.attachments)) {
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         lastAttachment = this.communication.attachments.pop()
+
+        if (lastAttachment) {
+          switch (true) {
+            case ['text'].includes(lastAttachment.mime_type):
+              return directionText + ' a text file'
+            case ['audio'].includes(lastAttachment.mime_type):
+              return directionText + ' an audio file'
+            case ['image'].includes(lastAttachment.mime_type):
+              return directionText + ' an image'
+            case ['video'].includes(lastAttachment.mime_type):
+              return directionText + ' a video file'
+            case ['application'].includes(lastAttachment.mime_type):
+            default:
+              return directionText + ' a file'
+          }
+        }
       }
 
-      switch (true) {
-        case ['text'].includes(lastAttachment.mime_type):
-          return directionText + ' a text file'
-        case ['audio'].includes(lastAttachment.mime_type):
-          return directionText + ' an audio file'
-        case ['image'].includes(lastAttachment.mime_type):
-          return directionText + ' an image'
-        case ['video'].includes(lastAttachment.mime_type):
-          return directionText + ' a video file'
-        case ['application'].includes(lastAttachment.mime_type):
-        default:
-          return directionText + ' a file'
-      }
+      return directionText
     },
     contact () {
       return this.communication.contact

@@ -233,8 +233,8 @@ export default {
       this.isUpdatingStatus = true
       this.nextStat = status
       talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
-        let contact = { ...this.contact }
-        for (let key in res.data) {
+        const contact = { ...this.contact }
+        for (const key in res.data) {
           if (typeof contact[key] !== 'undefined') {
             contact[key] = res.data[key]
           }
