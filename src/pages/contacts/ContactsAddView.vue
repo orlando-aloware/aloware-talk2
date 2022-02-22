@@ -71,8 +71,7 @@ export default {
           this.listLoaded({ ...response, id: stringId })
         })
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
+          const { message } = extractErrorMessage(error)
           this.$generalNotification(message, 'error')
           this.$router.replace('/contacts/')
         })
@@ -86,7 +85,9 @@ export default {
   },
   watch: {
     '$route.params.id': function (id) {
-      this.loadList(id)
+      if (this.$route.name === 'Contacts' && id) {
+        this.loadList(id)
+      }
     }
   }
 }

@@ -53,12 +53,12 @@
           </div>
 
           <div class="call-parked-label truncated-text"
-               v-if="isParkedCall && !isConnectedCall">
+               v-if="communication.type === CommunicationTypes.CALL && isParkedCall && !isConnectedCall">
             Parked Call
           </div>
 
           <div class="truncated-text call-connected-label"
-                v-if="isConnectedCall && !isParkedCall" >
+                v-if="communication.type === CommunicationTypes.CALL && isConnectedCall && !isParkedCall" >
             Connected
           </div>
 
