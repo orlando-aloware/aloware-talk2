@@ -68,12 +68,12 @@ export default {
     ...mapActions('inbox', ['setActiveChannel']),
     onItemClicked (nextActive) {
       if (this.activeChannel.value === nextActive) {
+        this.$q.screen.lt.md && this.$emit('toInbox')
         return
       }
       this.active = nextActive
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
-      this.$emit('channelClicked')
       if (this.active === 'inbox') {
         this.$router.push({
           name: 'Inbox Channel Task Status',
