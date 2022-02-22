@@ -121,9 +121,9 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
-    ...mapState('cache', ['currentCompany']),
     ...mapState('contacts', ['contact']),
     ...mapState('inbox', { selectContact: 'selectedContact' }),
+    ...mapState('cache', ['currentCompany']),
 
     selectedCampaign () {
       if (this.campaigns) {
