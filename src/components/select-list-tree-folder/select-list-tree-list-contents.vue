@@ -19,6 +19,7 @@ export default {
   components: {
     selectListTreeListItem: () => import('./select-list-tree-list-item.vue')
   },
+
   props: {
     lists: {
       type: Array

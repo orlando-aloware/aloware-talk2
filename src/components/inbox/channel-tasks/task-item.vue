@@ -318,7 +318,6 @@ export default {
       const directionText = (this.communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       const lastAttachment = _.isEmpty(this.communication.attachments) ? this.communication.attachments.pop() : null
-
       switch (true) {
         case ['text'].includes(lastAttachment.mime_type):
           return directionText + ' a text file'

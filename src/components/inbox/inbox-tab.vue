@@ -537,6 +537,7 @@ export default {
         return
       }
 
+      // TODO issue is selected contact is overridden by contact from new comms
       setTimeout(() => {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
           const contact = response.data

@@ -299,10 +299,8 @@ export default {
       return filtersCount.data
     },
     markCheckedAll () {
-      if (this.selectedContacts[this.id] && this.listItems[this.id]) {
-        if (document.querySelector('.data-table-check-all')) {
-          document.querySelector('.data-table-check-all').checked = this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
-        }
+      if (this.selectedContacts[this.id] && this.listItems[this.id] && document.querySelector('.data-table-check-all')) {
+        document.querySelector('.data-table-check-all').checked = this.listItems[this.id].data.length > 0 && this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
       }
     },
     fixDefaultFilters () {

@@ -740,6 +740,9 @@ export default {
     },
     id () {
       this.reRouteToBase()
+    },
+    checked: function (value) {
+      document.querySelector('.data-table-check-all').checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
     }
   }
 }
