@@ -240,7 +240,8 @@ export default function (/* { ssrContext } */) {
       voicemailNotifiedDesktop: [],
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
-      reminderNotifiedDesktop: []
+      reminderNotifiedDesktop: [],
+      defaultDateFilter: null
     },
 
     getters: {
@@ -648,6 +649,9 @@ export default function (/* { ssrContext } */) {
 
       removeReminderNotifiedDesktop ({ commit }, value) {
         commit('REMOVE_REMINDER_NOTIFIED_DESKTOP', value)
+      },
+      setDefaultDateFilter ({ commit }, value) {
+        commit('SET_DEFAULT_DATE_FILTER', value)
       }
     },
 
@@ -1273,6 +1277,10 @@ export default function (/* { ssrContext } */) {
         }
 
         state.reminderNotifiedDesktop.splice(state.reminderNotifiedDesktop.indexOf(found), 1)
+      },
+
+      SET_DEFAULT_DATE_FILTER (state, value) {
+        state.defaultDateFilter = value
       },
 
       updateField

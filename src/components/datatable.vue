@@ -145,7 +145,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import draggable from 'vuedraggable'
 import MoveIcon from 'components/icons/move-icon-2'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
@@ -220,7 +220,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     defaultContactDateFilter () {
-      if (this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+      if (this.currentCompany.default_contact_date_filter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
       }
       return 'last_engagement_at'
@@ -294,6 +294,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setDefaultDateFilter']),
     handleScroll: function (element) {
       if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= (element.srcElement.scrollHeight + 5)) {
         this.onVisibilityChanged(true)
@@ -338,6 +339,7 @@ export default {
       this.$emit('sort', Object.assign({}, this.getColumnSorts(column)))
     },
     getColumnSorts (column) {
+      this.setDefaultDateFilter(column.name)
       this.sorts = {
         orderBy: column.name,
         order: this.sorts.order === 'asc' ? 'desc' : 'asc'

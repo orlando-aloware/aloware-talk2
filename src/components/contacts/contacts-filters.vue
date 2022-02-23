@@ -368,6 +368,9 @@ export default {
           }
 
           const found = this.filters.find(filter => filter.key === filterIndex.data)
+          if (!found) {
+            continue
+          }
           const operators = found ? _.get(found, 'operators', null) : null
 
           if (operators) {
