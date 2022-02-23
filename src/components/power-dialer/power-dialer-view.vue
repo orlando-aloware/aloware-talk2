@@ -362,12 +362,17 @@ export default {
   },
   computed: {
     ...mapState(['prevRoute']),
+    ...mapState('powerDialer', [
+      'activeMetrics',
+      'selectedList'
+    ]),
     ...mapGetters('powerDialer', [
       'contactResources',
       'powerDialerLists',
       'powerDialerDirectoryList',
       'datatableLoader',
-      'myQueue'
+      'myQueue',
+      'activeFilter'
     ]),
     ...mapGetters('contacts', [
       'contact',
@@ -376,12 +381,8 @@ export default {
       'listItems',
       'selectedContacts',
       'isFiltersOpen',
-      'selectedList',
       'currentListFilters',
       'clearList'
-    ]),
-    ...mapGetters('powerDialer', [
-      'activeFilter'
     ]),
     filter () {
       return this.activeFilter
