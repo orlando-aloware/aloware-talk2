@@ -319,7 +319,6 @@ export default {
       this.appointment.smsReminder.time = time.value
     },
     smsReminderFrequencySelected (frequencies) {
-      console.log(frequencies)
       this.appointment.smsReminder.frequencies = frequencies
     },
     appendSmsReminderTemplateVariable (variable) {

@@ -355,6 +355,7 @@ export default {
       this.setAppliedFilter(this.selectedFilter || null)
 
       this.$emit('applyFilter', { ...this.filter })
+      this.hideModal()
     },
 
     onSaveFilter () {
