@@ -26,10 +26,10 @@
           no-wrap no-caps size="sm"
           unelevated
           outline
-          :color="togglePause ? 'grey-5' : 'grey-4'"
+          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
           class="sessions-button free-width mx-1"
-          :disabled="togglePause">
-          <UnholdIcon v-if="toggleHold" class="mr-2" color="#F2994A" />
+          :disabled="!statusCallConnected">
+          <UnholdIcon v-if="toggleHold" class="mr-2" color="#F2997A" />
           <PauseIcon v-else class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
             {{ toggleHold ? 'Unhold' : 'Hold' }}
@@ -38,8 +38,9 @@
         <q-btn
           @click="nextContact"
           no-wrap unelevated no-caps
-          :disabled="(!timerIsOver || togglePause) && !statusCallConnected"
-          size="sm" :color="togglePause ? 'grey-7' : 'red-7'"
+          :disabled="!statusCallConnected"
+          size="sm"
+          :color="statusCallConnected ? 'red-7' : 'grey-8'"
           class="sessions-button free-width mx-1">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
@@ -101,7 +102,7 @@
           @click="onToggleMute"
           no-wrap outline no-caps
           size="sm" color="grey-4"
-          :disabled="!timerIsOver"
+          :disabled="!statusCallConnected"
           class="sessions-button free-width mx-1">
           <MuteIcon height="13px" class="mr-2" color="#62666E" />
           <div class="text-body2 text-black">
@@ -112,7 +113,7 @@
           @click="onToggleRecording"
           no-wrap outline no-caps
           size="sm" color="grey-4"
-          :disabled="!timerIsOver"
+          :disabled="!statusCallConnected"
           class="sessions-button free-width mx-1">
           <StopIcon v-if="toggleRecording" class="mr-2" color="#62666E" />
           <RecordIcon v-else class="mr-2" color="red" />
@@ -280,6 +281,18 @@ export default {
     getLine () {
       return this.campaigns.find((line) => line.id === this.currentTask?.communication?.campaign_id)
     },
+    toggleMute () {
+      return this.dialer.isMuted
+    },
+    toggleRecording () {
+      if (this.dialer.recordingStatus === 'in-progress' && this.dialer.communication && this.dialer.communication.should_record === true) {
+        return true
+      }
+      if (this.dialer.recordingStatus === 'paused' && this.dialer.communication && this.dialer.communication.should_record === true) {
+        return false
+      }
+      return false
+    },
     togglePause: {
       get () {
         return this.statuses.pause
@@ -288,28 +301,12 @@ export default {
         this.statuses.pause = val
       }
     },
-    toggleRecording: {
-      get () {
-        return this.statuses.recording
-      },
-      set (val) {
-        this.statuses.recording = val
-      }
-    },
     toggleHold: {
       get () {
         return this.statuses.hold
       },
       set (val) {
         this.statuses.hold = val
-      }
-    },
-    toggleMute: {
-      get () {
-        return this.statuses.mute
-      },
-      set (val) {
-        this.statuses.mute = val
       }
     },
     toggleEnd: {
@@ -368,9 +365,7 @@ export default {
             this.timerCount--
           }, 1000)
         } else if (this.timerIsOver) {
-          console.log('100 :>> ', 100)
           if (!this.togglePause) {
-            console.log('101 :>> ', 101)
             setTimeout(async () => {
               await this.runTask()
               this.$VueEvent.fire('togglePhone')
@@ -399,7 +394,6 @@ export default {
       }
     },
     onToggleMute () {
-      this.toggleMute = !this.toggleMute
       this.$VueEvent.fire('toggleMute')
     },
     onToggleHold () {
@@ -407,7 +401,6 @@ export default {
       this.$VueEvent.fire('toggleHold')
     },
     onToggleRecording () {
-      this.toggleRecording = !this.toggleRecording
       this.$VueEvent.fire('toggleRecordingStatus')
     },
     onTogglePause () {
@@ -438,8 +431,10 @@ export default {
       switch (status) {
         // If Status is READY
         case 'READY':
+          // if (this.toggleEnd) {
+          //   this.reRoute()
+          // }
           if (!statusCallConnected && timerIsOver) {
-            console.log('2121 :>> ', 2121)
             this.resetTimer()
           }
           break
@@ -479,9 +474,9 @@ export default {
       if (!task?.id && !this.hasExistingTaskList) {
         this.reRoute()
       }
-      if (!task?.id && !this.statusCallConnected && this.toggleEnd) {
-        this.reRoute()
-      }
+      // if (!task?.id && !this.statusCallConnected && this.toggleEnd) {
+      //   this.reRoute()
+      // }
       if (task?.id) {
         await this.fetchContact(task.id)
       }
@@ -502,9 +497,13 @@ export default {
         if (value === 0 && !this.statusCallConnected) {
           if (this.toggleEnd) {
             console.log('Should END SESSION...')
+            this.reRoute()
+          } else {
+            await this.tickTimer()
           }
+        } else {
+          await this.tickTimer()
         }
-        await this.tickTimer()
       },
       deep: true
       // immediate: true // This ensures the watcher is triggered upon creation
@@ -515,7 +514,6 @@ export default {
     //   }
     // },
     togglePause (value) {
-      console.log('value pause :>> ', value)
       if (!value) {
         this.sessionPaused = false
         if (this.timerIsOver) {
@@ -524,7 +522,6 @@ export default {
       }
     },
     toggleEnd (value) {
-      console.log('END? ', value && this.timerIsOver)
       if ((value && this.timerIsOver) && !this.statusCallConnected) {
         setTimeout(() => {
           this.reRoute()

@@ -1,9 +1,10 @@
 <template>
-  <q-item :class="[ profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? 'wrap-up' : '' ]"
+  <q-item :class="[ sessionPaused ? 'bg-grey-7' : '', profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? 'wrap-up' : '' ]"
           class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
           v-if="dialer && profile && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(dialer.currentStatus)"
           clickable
           v-ripple
+          :disabled="sessionPaused"
           @click="togglePhone">
     <q-item-section>
       <q-item-label class="_600">
@@ -61,6 +62,8 @@
 </template>
 
 <script>
+
+import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as AgentStatus from 'src/constants/agent-status'
@@ -77,7 +80,9 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState(['dialer']),
-
+    ...mapFields('powerDialer', [
+      'sessionPaused'
+    ]),
     phoneStatus () {
       if (!this.dialer.communication) {
         return ''
@@ -110,10 +115,10 @@ export default {
     },
 
     togglePhone () {
-      if (this.$route.meta.id !== 'power-dialer-session') {
-        this.$VueEvent.fire('togglePhone')
-      }
-      // this.$VueEvent.fire('togglePhone')
+      // if (this.$route.meta.id !== 'power-dialer-session') {
+      //   this.$VueEvent.fire('togglePhone')
+      // }
+      this.$VueEvent.fire('togglePhone')
     }
   }
 }

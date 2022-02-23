@@ -169,7 +169,7 @@ export default {
         name: res.name,
         type: res.type
       })
-      console.log('RES -------- :>> ', res)
+      // console.log('RES -------- :>> ', res)
     }
   },
   watch: {
