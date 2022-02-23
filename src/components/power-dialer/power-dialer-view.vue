@@ -364,7 +364,8 @@ export default {
     ...mapState(['prevRoute']),
     ...mapState('powerDialer', [
       'activeMetrics',
-      'selectedPdList'
+      'selectedPdList',
+      'metrics'
     ]),
     ...mapGetters('powerDialer', [
       'contactResources',
