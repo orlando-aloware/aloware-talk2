@@ -45,8 +45,6 @@ import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
-let popperInstance
-
 export default {
   props: {
     isContactModuleType: {
@@ -63,7 +61,8 @@ export default {
     return {
       searchValue: '',
       itemsList: [],
-      isMoving: false
+      isMoving: false,
+      popperInstance: null
     }
   },
   computed: {
@@ -179,15 +178,16 @@ export default {
       })
     },
     getFolderNames (names, folders) {
-      for (let i = 0; i < folders.length; i++) {
-        names += folders[i].name.toLowerCase()
+      const index = { i: 0 }
+      for (index.i = 0; index.i < folders.length; index.i++) {
+        names += folders[index.i].name.toLowerCase()
         if (
-          Array.isArray(folders[i].child_folders) &&
-          folders[i].child_folders.length
+          Array.isArray(folders[index.i].child_folders) &&
+          folders[index.i].child_folders.length
         ) {
           names += this.getFolderNames(
-            folders[i].name,
-            folders[i].child_folders
+            folders[index.i].name,
+            folders[index.i].child_folders
           )
         }
       }
@@ -204,7 +204,7 @@ export default {
 
       this.$refs.moveDialog.classList.add('d-flex')
 
-      popperInstance = createPopper(reference, this.$refs.moveDialog, {
+      this.popperInstance = createPopper(reference, this.$refs.moveDialog, {
         placement: 'auto'
       })
 
@@ -213,9 +213,9 @@ export default {
     destroyDialogInstance () {
       this.$refs.moveDialog.classList.remove('d-flex')
 
-      if (popperInstance) {
-        popperInstance.destroy()
-        popperInstance = null
+      if (this.popperInstance) {
+        this.popperInstance.destroy()
+        this.popperInstance = null
       }
     },
     handleClick (evt) {
@@ -246,10 +246,10 @@ export default {
       }
     },
     folders: function (value) {
-      let itemsList = []
+      const itemsList = { data: [] }
       if (value?.length) {
         value = value[0].child_folders
-        itemsList = this.createFolders('', [
+        itemsList.data = this.createFolders('', [
           {
             id: 0,
             name: 'Root Folder',
@@ -257,7 +257,7 @@ export default {
           }
         ])
       }
-      this.itemsList = itemsList
+      this.itemsList.data = itemsList.data
     }
   }
 }

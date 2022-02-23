@@ -55,8 +55,6 @@ import SelectListTreeFolderContents from 'src/components/select-list-tree-folder
 import SelectListTreeListContents from 'components/select-list-tree-folder/select-list-tree-list-contents'
 import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
 
-let inputTimeout
-
 export default {
   props: {
     id: {
@@ -110,7 +108,8 @@ export default {
       ContactListTypes: {
         STATIC,
         DYNAMIC
-      }
+      },
+      inputTimeout: null
     }
   },
 
@@ -199,7 +198,7 @@ export default {
   },
 
   beforeDestroy () {
-    clearTimeout(inputTimeout)
+    clearTimeout(this.inputTimeout)
   }
 }
 </script>

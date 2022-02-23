@@ -947,9 +947,9 @@ export default {
     },
 
     onActivityHide () {
-      let activityClass = 'activity-unexpanded'
+      const activityClass = { data: 'activity-unexpanded' }
       if (this.hasNotes) {
-        activityClass += ' collapsed-has-notes'
+        activityClass.data += ' collapsed-has-notes'
       }
       this.activityExpansionClass = [activityClass]
     },
@@ -958,7 +958,7 @@ export default {
       if (!id) {
         return null
       }
-      let found = this.campaigns.find(campaign => campaign.id === id)
+      const found = this.campaigns.find(campaign => campaign.id === id)
       if (found) {
         return found
       }
@@ -967,11 +967,11 @@ export default {
     },
 
     getCommunicationCampaignName () {
-      let communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
+      const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {
         return null
       }
-      let found = this.campaigns.find(campaign => campaign.id === this.campaignId)
+      const found = this.campaigns.find(campaign => campaign.id === this.campaignId)
       if (found) {
         return found.name
       }
@@ -983,7 +983,7 @@ export default {
       if (!id) {
         return getName ? '' : null
       }
-      let found = this.ringGroups.find(ringGroup => ringGroup.id === id)
+      const found = this.ringGroups.find(ringGroup => ringGroup.id === id)
       if (found) {
         return getName ? found.name : found
       }
@@ -995,7 +995,7 @@ export default {
       if (!id) {
         return null
       }
-      let found = this.workflows.find(workflow => workflow.id === id)
+      const found = this.workflows.find(workflow => workflow.id === id)
       if (found) {
         return found
       }
@@ -1007,7 +1007,7 @@ export default {
       if (!id) {
         return null
       }
-      let found = this.broadcasts.find(broadcast => broadcast.id === id)
+      const found = this.broadcasts.find(broadcast => broadcast.id === id)
       if (found) {
         return found
       }
@@ -1028,7 +1028,7 @@ export default {
     },
 
     changeEngagementStatus (event) {
-      let params = {
+      const params = {
         status: this.communication.disposition_status2
       }
 

@@ -76,7 +76,7 @@ export default {
         return
       }
 
-      let { newIndex, oldIndex, element } = val.moved
+      const { newIndex, oldIndex, element } = val.moved
       const group = this.metricGroupList.find(group => group.id === element.id)
 
       if (!group) {
@@ -85,19 +85,19 @@ export default {
 
       const previousMetricGroups = JSON.parse(JSON.stringify(this.metricGroups))
 
-      let order = previousMetricGroups[newIndex].order
-      let step = 0
+      const order = previousMetricGroups[newIndex].order
+      const step = { data: 0 }
 
       if (newIndex > oldIndex) {
-        step = (newIndex - oldIndex)
+        step.data = (newIndex - oldIndex)
       } else {
-        step = (oldIndex - newIndex)
+        step.data = (oldIndex - newIndex)
       }
 
       await this.updateMetricGroupOrder({
         metricGroupId: element.id,
         order: order,
-        step: oldIndex > newIndex ? (-1 * step) : step
+        step: oldIndex > newIndex ? (-1 * step.data) : step.data
       })
 
       await this.$axios.patch(`api/v2/agents/${this.profile.id}/statistics/metric-groups/${element.id}/order`, {

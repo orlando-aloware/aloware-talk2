@@ -130,7 +130,7 @@ export default {
       return `remove-metric-dialog-${this.metric.id}`
     },
     color () {
-      let col = this.MetricOptionColors.METRIC_OPTIONS_COLORS.find(c => {
+      const col = this.MetricOptionColors.METRIC_OPTIONS_COLORS.find(c => {
         return c.value === this.metric.color
       })
       if (col) {
@@ -204,7 +204,7 @@ export default {
         type: data.type,
         color: data.color
       }).then(res => {
-        let newData = { ...this.metric }
+        const newData = { ...this.metric }
         newData.metric_id = data.metricId
         newData.color = data.color
         const metric = this.availableMetrics.find(metric => metric.metric_id === data.metricId)

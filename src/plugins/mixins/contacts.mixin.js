@@ -183,10 +183,14 @@ export default {
         })
     }, 1000),
     fetch (params = {}, hasOrder = true) {
-      const sort = (this.sorts) ? this.sorts.orderBy : _.get(params, 'sort', this.defaultContactDateFilter)
+      const defaultSort = { data: _.get(params, 'sort', this.defaultContactDateFilter) }
+      if (defaultSort.data.constructor !== 'Function') {
+        defaultSort.data = this.defaultContactDateFilter
+      }
+      // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
       const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
       if (hasOrder) {
-        params.sort = sort
+        params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
         params.order = order
       }
 
@@ -342,14 +346,15 @@ export default {
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
     ...mapState('cache', ['currentCompany']),
+    ...mapState(['defaultDateFilter']),
     ...mapGetters('powerDialer', [
       'activeFilter'
     ]),
     defaultContactDateFilter () {
-      if (this.currentCompany && this.currentCompany === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
+      if (this.currentCompany && this.defaultDateFilter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
       }
-      if (typeof this.isPowerDialer !== 'undefined') {
+      if (typeof this.isPowerDialer !== 'undefined' && this.isPowerDialer) {
         return 'created_at'
       }
       return 'last_engagement_at'
@@ -361,10 +366,11 @@ export default {
         false
     },
     isPowerDialer () {
+      const routeMetaId = _.get(this.$route, 'meta.id', null)
       return (this.$route.name === 'Power Dialer' &&
         (
-          this.$route.meta.id !== 'power-dialer-add-list' &&
-          this.$route.meta.id !== 'power-dialer-add-queue-list'
+          routeMetaId !== 'power-dialer-add-list' &&
+          routeMetaId !== 'power-dialer-add-queue-list'
         )
       )
     },

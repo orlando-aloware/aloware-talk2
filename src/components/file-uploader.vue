@@ -73,7 +73,7 @@ export default {
       this.selectedFiles = event.target.files
     },
     onUpload (file) {
-      let formData = new FormData()
+      const formData = new FormData()
       formData.append('file', file)
       this.isUploading = true
 
@@ -109,8 +109,9 @@ export default {
   watch: {
     selectedFiles: function () {
       if (this.selectedFiles) {
-        for (let i = 0; i < this.selectedFiles.length; i++) {
-          this.onUpload(this.selectedFiles[i])
+        const index = { i: 0 }
+        for (index.i = 0; index.i < this.selectedFiles.length; index.i++) {
+          this.onUpload(this.selectedFiles[index.i])
         }
       }
     }

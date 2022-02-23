@@ -15,21 +15,22 @@ export default {
         continue
       }
 
-      for (let metricIndex in data[index.data].agent_metrics) {
-        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index.data].agent_metrics[metricIndex].metric_id)
+      const metricIndex = { data: null }
+      for (metricIndex.data in data[index.data].agent_metrics) {
+        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index.data].agent_metrics[metricIndex.data].metric_id)
 
         if (!metric) {
           continue
         }
 
-        data[index.data].agent_metrics[metricIndex].category = metric.category
-        data[index.data].agent_metrics[metricIndex].categoryLabel = metric.categoryLabel
+        data[index.data].agent_metrics[metricIndex.data].category = metric.category
+        data[index.data].agent_metrics[metricIndex.data].categoryLabel = metric.categoryLabel
 
-        if (typeof data[index.data].agent_metrics[metricIndex].label !== 'undefined') {
+        if (typeof data[index.data].agent_metrics[metricIndex.data].label !== 'undefined') {
           continue
         }
 
-        data[index.data].agent_metrics[metricIndex].label = metric.label
+        data[index.data].agent_metrics[metricIndex.data].label = metric.label
       }
     }
 

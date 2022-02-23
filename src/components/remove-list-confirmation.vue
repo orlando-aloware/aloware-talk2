@@ -141,13 +141,14 @@ export default {
       this.handleDeletion({ deletion_type: this.removeListActionType })
     },
     removeListFromFolders (id, haystack) {
-      for (let i = 0; i < haystack.length; i++) {
-        let list = haystack[i].lists.find(list => list.id === id)
+      const index = { i: 0 }
+      for (index.i = 0; index.i < haystack.length; index.i++) {
+        const list = haystack[index.i].lists.find(list => list.id === id)
 
         if (list) {
-          haystack[i].lists.splice(haystack[i].lists.indexOf(list), 1)
+          haystack[index.i].lists.splice(haystack[index.i].lists.indexOf(list), 1)
         } else {
-          this.removeListFromFolders(id, haystack[i].child_folders)
+          this.removeListFromFolders(id, haystack[index.i].child_folders)
         }
       }
 

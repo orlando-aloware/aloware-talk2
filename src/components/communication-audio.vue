@@ -88,7 +88,7 @@ export default {
         this.loading = true
         this.remoteUrl = null
         this.downloadUrl = null
-        let options = {
+        const options = {
           params: {
             type: this.type
           }

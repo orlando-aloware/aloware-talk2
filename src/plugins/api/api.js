@@ -1,5 +1,5 @@
-let suffixV1 = '/api/v1/'
-let suffixV2 = '/api/v2/'
+const suffixV1 = '/api/v1/'
+const suffixV2 = '/api/v2/'
 import qs from 'qs'
 import _ from 'lodash'
 

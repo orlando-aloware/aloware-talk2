@@ -585,7 +585,7 @@ export default {
       //  return
       // }
 
-      // let data = {
+      // const data = {
       //   title: 'System Updates',
       //   message: 'Refresh your screen',
       //   messageIcon: null,
@@ -887,6 +887,7 @@ export default {
         })
         .then((res) => {
           this.setCurrentCompany(res.data)
+          this.setDefaultDateFilter(res.data.default_contact_date_filter)
           return Promise.resolve()
         })
         .catch((err) => {
@@ -1759,7 +1760,8 @@ export default {
       'setIsMobile',
       'setIsTabletOrMobile',
       'setContactDetailsDrawer',
-      'setEnableAudio'
+      'setEnableAudio',
+      'setDefaultDateFilter'
     ]),
     ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
     ...mapActions('inbox', ['resetInboxVuex']),

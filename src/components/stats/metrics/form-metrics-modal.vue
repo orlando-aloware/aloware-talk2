@@ -170,7 +170,7 @@ export default {
         this.resetData()
       } else {
         if (this.actionCreate) {
-          let { color, metricId } = this.resources
+          const { color, metricId } = this.resources
           this.color = this.colors.find(col => {
             return col.value === color
           })

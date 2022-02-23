@@ -82,19 +82,19 @@ export default {
   },
   computed: {
     filteredListItems () {
-      let listItems = [ ...this.listItems ]
-      let flag = null
+      const listItems = [ ...this.listItems ]
+      const flag = { data: null }
       if (this.selectedItem) {
         listItems.forEach((list, key) => {
           if (list.id === this.selectedItem) {
             listItems.splice()
-            flag = list
+            flag.data = list
             // listItems.splice(key, 1)
           }
         })
       }
-      if (flag && listItems) {
-        // listItems.unshift(flag)
+      if (flag.data && listItems) {
+        // listItems.unshift(flag.data)
         return listItems
       }
       return this.listItems

@@ -138,8 +138,6 @@ import PeopleIcon from 'components/icons/people-icon.vue'
 // import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import pdList from 'src/plugins/mixins/power-dialer-list'
 
-let popperInstance
-
 export default {
   components: {
     ContactMenu,
@@ -167,7 +165,8 @@ export default {
   data () {
     return {
       isMenuOpen: false,
-      isChildMenuOpen: false
+      isChildMenuOpen: false,
+      popperInstance: null
     }
   },
   computed: {
@@ -194,7 +193,7 @@ export default {
     createSubmenu () {
       this.isMenuOpen = true
       this.$nextTick(() => {
-        popperInstance = createPopper(
+        this.popperInstance = createPopper(
           document.getElementById('folder-submenu-' + this.id),
           document.getElementById('folder-submenu-items-' + this.id),
           {
@@ -205,15 +204,15 @@ export default {
     },
     destroySubmenu (evt) {
       this.isMenuOpen = false
-      if (popperInstance) {
-        popperInstance.destroy()
-        popperInstance = null
+      if (this.popperInstance) {
+        this.popperInstance.destroy()
+        this.popperInstance = null
       }
     },
     createChildSubmenu () {
       this.isChildMenuOpen = true
       this.$nextTick(() => {
-        popperInstance = createPopper(
+        this.popperInstance = createPopper(
           document.getElementById('folder-submenu-child-' + this.id),
           document.getElementById('folder-submenu-child-items-' + this.id),
           {
@@ -224,9 +223,9 @@ export default {
     },
     destroyChildSubmenu (evt) {
       this.isChildMenuOpen = false
-      if (popperInstance) {
-        popperInstance.destroy()
-        popperInstance = null
+      if (this.popperInstance) {
+        this.popperInstance.destroy()
+        this.popperInstance = null
       }
     },
     onCreateFromExistingList () {
@@ -238,7 +237,7 @@ export default {
       })
     },
     onCreateByManualSelection () {
-      let { id } = this
+      const { id } = this
       this.createListOpen({
         contact_folder_id: id
       })

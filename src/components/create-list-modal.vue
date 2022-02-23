@@ -137,7 +137,7 @@ export default {
     ]),
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
-        let typeText = (this.createList.type === STATIC) ? 'Static' : 'Dynamic'
+        const typeText = (this.createList.type === STATIC) ? 'Static' : 'Dynamic'
         return `New ${typeText} Lists`
       }
 
@@ -174,38 +174,40 @@ export default {
       }
     },
     getParams () {
-      let params = {
-        contact_folder_id: this.createList.contact_folder_id,
-        name: this.createList.name,
-        type: this.createList.type,
-        headers: DEFAULT_COLUMNS,
-        mode: this.createList.mode,
-        order: 0
+      const params = {
+        data: {
+          contact_folder_id: this.createList.contact_folder_id,
+          name: this.createList.name,
+          type: this.createList.type,
+          headers: DEFAULT_COLUMNS,
+          mode: this.createList.mode,
+          order: 0
+        }
       }
 
       switch (true) {
         case this.createList.mode === FROM_FILTERS:
-          let clonedCurrentListFilters = { ...this.currentListFilters }
+          const clonedCurrentListFilters = { ...this.currentListFilters }
           if (this.createList.type === DYNAMIC) {
             // remove contact_lists filter since we are creating dynamic one
             delete clonedCurrentListFilters.contact_lists
           }
-          params = { ...params, filters: clonedCurrentListFilters }
+          params.data = { ...params.data, filters: clonedCurrentListFilters }
 
           break
         case this.createList.mode === FROM_BULK_MENU:
-          let contacts = []
+          const contacts = { data: [] }
 
           if (this.selectedContacts[this.selectedList.id]) {
-            contacts = this.selectedContacts[this.selectedList.id]
+            contacts.data = this.selectedContacts[this.selectedList.id]
           }
-          params = { ...params, contacts: contacts.map(contact => contact.id) }
+          params.data = { ...params.data, contacts: contacts.data.map(contact => contact.id) }
           break
         case this.createList.mode === FROM_FOLDERS:
         default:
       }
 
-      return params
+      return params.data
     },
     onSubmit () {
       this.isLoading = true
@@ -238,7 +240,7 @@ export default {
             this.isLoading = false
           })
       } else {
-        let data = {
+        const data = {
           ...this.defaultTemplateResponse,
           name: this.getParams().name,
           contact_folder_id: this.getParams().contact_folder_id,

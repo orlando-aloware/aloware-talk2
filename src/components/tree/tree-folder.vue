@@ -131,8 +131,6 @@ import FolderActions from '../folder-actions.vue'
 import TreeFolderCreate from './tree-folder-create.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
-let inputTimeout
-
 export default {
   props: {
     id: {
@@ -198,7 +196,8 @@ export default {
     return {
       isCreatingFolder: false,
       isEditing: false,
-      isRenaming: false
+      isRenaming: false,
+      inputTimeout: null
     }
   },
 
@@ -223,7 +222,7 @@ export default {
     },
 
     folderId () {
-      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-option-${module}-${this.id}`
     }
   },
@@ -343,7 +342,7 @@ export default {
 
     onEditFolder () {
       this.isEditing = true
-      inputTimeout = setTimeout(() => {
+      this.inputTimeout = setTimeout(() => {
         document.getElementById('folder-input-' + this.id).focus()
       })
     },
@@ -363,7 +362,7 @@ export default {
   },
 
   beforeDestroy () {
-    clearTimeout(inputTimeout)
+    clearTimeout(this.inputTimeout)
   }
 }
 </script>
