@@ -198,7 +198,10 @@ export default {
 
   computed: {
     isProd () {
-      return storage.local.env === 'production'
+      return storage.local.getItem('env') === 'production'
+    },
+    envName () {
+      return storage.local.getItem('env')
     }
   },
 
