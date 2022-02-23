@@ -32,7 +32,7 @@ export default {
     ]),
     filteredList () {
       return {
-        count: this.myQueue.items.length,
+        count: this.myQueue?.items?.length,
         id: this.myQueue.id,
         link: '/power-dialer/list/',
         name: 'My Queue',
