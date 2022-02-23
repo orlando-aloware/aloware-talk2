@@ -215,7 +215,7 @@ export default {
         toastClass.data += ' has-clear-queues'
       }
 
-      return toastClass
+      return toastClass.data
     },
 
     headerClass () {
