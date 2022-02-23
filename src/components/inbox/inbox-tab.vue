@@ -290,7 +290,7 @@ export default {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
     handleScroll (el) {
-      if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
+      if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70) && el.target.scrollTop > 0) {
         this.onTaskListBottomScroll()
       }
     },

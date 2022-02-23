@@ -129,6 +129,7 @@ import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
 import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
+import _ from 'lodash'
 
 export default {
   name: 'filter-dialog',
@@ -185,7 +186,7 @@ export default {
       const filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const field of this.filterFields) {
-        if (this.filter[field] !== filterIdentifier[field]) {
+        if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
           hasChanges.data = true
           break
         }
@@ -281,11 +282,12 @@ export default {
     onShow () {
       this.personalFilters = []
       this.companyFilters = []
+      this.filterFields = Object.keys(this.defaultFilterModel.filter)
       this.getFilters()
       if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter, ...this.filter }
       } else {
-        this.filter = { ...this.filter, ...this.value }
+        this.filter = _.pick(this.value, this.filterFields)
       }
 
       this.setChannelClonedFilter(this.defaultFilterModel.filter)
@@ -367,16 +369,17 @@ export default {
     },
 
     onSaveNewFilter () {
-      this.$emit('createNewFilter', this.filter)
+      this.$emit('createNewFilter', _.pick(this.filter, this.filterFields))
     },
 
-    onSelectFilter (filterObject) {
-      this.setSelectedFilter(filterObject)
+    onSelectFilter (personalFilter) {
+      this.setSelectedFilter(personalFilter)
 
-      if (!filterObject) {
+      if (!personalFilter) {
         this.filter = { ...this.defaultFilterModel.filter }
       } else {
-        this.filter = { ...this.defaultFilterModel.filter, ...filterObject.filter }
+        const personalFilterObject = personalFilter.filter
+        this.filter = _.pick(personalFilterObject, this.filterFields)
       }
 
       this.applyFilter()
