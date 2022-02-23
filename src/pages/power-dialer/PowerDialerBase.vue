@@ -60,11 +60,6 @@ export default {
       if (this.$route.meta.title === 'Power Dialer') {
         let response = await this.getMyQueueList()
         this.listLoaded({ ...response.data, id: 'my-queue' })
-        // this.setSelectedPDList({
-        //   id: response.data.id,
-        //   name: response.data.name,
-        //   type: response.data.type
-        // })
       } else {
         await this.loadList(this.id)
       }
