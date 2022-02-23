@@ -358,8 +358,8 @@ export default {
       return start !== null
     },
     isEmpty () {
-      const data = _.get(this.listItems[this.id], 'data', null)
-      return this.isLoaded && !data
+      const data = _.get(this.listItems[this.id], 'data', [])
+      return this.isLoaded && !data.length
     },
     isMyContactsView () {
       return DEFAULT_PINNED_LIST.MY_CONTACTS.id === this.id

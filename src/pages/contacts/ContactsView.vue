@@ -131,7 +131,7 @@
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
-        <div class="d-flex align-items-center pr-2"
+        <div class="d-flex align-items-center pr-2 pl-2"
              :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
           <compact-btn borderless
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
@@ -162,7 +162,7 @@
         <compact-btn
           variant="primary"
           v-if="selectedList.type !== ContactListType.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
-          :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList"
+          :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList || list.show_in_public_folder"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
           <q-spinner-bars v-if="isUpdatingList"
@@ -176,7 +176,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
-                    v-if="(list.type === ContactListType.STATIC && isEditable) || this.id === 'all'">
+                    v-if="((list.type === ContactListType.STATIC && isEditable) || this.id === 'all') &&  !list.show_in_public_folder">
           <template #button-content class="filter-toggle-button">
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
@@ -266,6 +266,7 @@
             :columns="columns"
             :checked="checked"
             :contactListId="id"
+            :has-delete="!list.show_in_public_folder"
             @checked="onCheckedRows"
           />
         </template>
