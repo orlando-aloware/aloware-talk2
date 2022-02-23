@@ -22,7 +22,7 @@
           <q-select
             v-if="cform.name === 'metric_options'"
             v-model="resources[cform.name]"
-            :options="metricOptions"
+            :options="metrics"
             option-value="value"
             option-label="label"
             multiple
@@ -123,6 +123,7 @@
 
 <script>
 
+import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
@@ -164,19 +165,11 @@ export default {
     // } else {
     //   this.resources = Object.assign({}, this.sessionSettings)
     // }
-    let metrics = await this.getSessionMetricsOptions()
-    let collection = []
-    metrics.forEach(m => {
-      collection.push({
-        label: m.label,
-        disable: true,
-        value: null
-      })
-      collection = collection.concat(...m.options)
-    })
-    this.metricOptions = collection
   },
   computed: {
+    ...mapFields('powerDialer', [
+      'metrics'
+    ]),
     ...mapState('inbox', [
       'channelChangedFilterFields'
     ]),
@@ -271,7 +264,6 @@ export default {
   data () {
     return {
       selectWidth: 0,
-      metricOptions: [],
       resources: this.value
     }
   }

@@ -10,8 +10,15 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'SummaryInfoLabels',
+  computed: {
+    ...mapState('powerDialer', [
+      'activeMetrics',
+      'metrics'
+    ])
+  },
   data () {
     return {
       infos: [
