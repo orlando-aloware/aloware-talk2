@@ -37,7 +37,7 @@
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Ring Groups</h5>
-            <p class="form-helper-text">
+            <p class="form-helper-text" v-if="profile.ring_group_ids && profile.ring_group_ids.length > 0">
               This user is a member of the following ring groups
             </p>
 
@@ -53,7 +53,7 @@
             </ul>
 
             <p class="form-helper-text text-bold text-red-8" v-else>
-              This user is not connected to any ring group.
+              You are not connected to any ring group.
             </p>
           </div>
         </b-col>

@@ -144,6 +144,8 @@ export default {
     },
     onHidden () {
       this.$v.filter.$reset()
+      this.filter.name = ''
+      this.filter.scope = 'user'
       this.toggleFilterModelForm()
     },
     onHide () {

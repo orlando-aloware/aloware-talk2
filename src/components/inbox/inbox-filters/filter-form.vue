@@ -490,7 +490,7 @@ export default {
     'filter.contact_owner': {
       deep: true,
       handler (value) {
-        if (value.length) {
+        if (value && value.length) {
           this.filter.my_contact = 0
         }
       }
