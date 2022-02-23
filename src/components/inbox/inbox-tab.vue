@@ -334,6 +334,20 @@ export default {
         default:
       }
     },
+    getStatusName (taskStatusId) {
+      switch (taskStatusId) {
+        case ContactTaskStatus.STATUS_PENDING:
+          return 'Pending'
+        case ContactTaskStatus.STATUS_CLOSED:
+          return 'Closed'
+        case ContactTaskStatus.STATUS_NEW:
+          return 'New'
+        case ContactTaskStatus.STATUS_OPEN:
+        default:
+          return 'Open'
+      }
+    },
+
     onToggleStatus () {
       this.$nextTick(() => {
         this.$refs.taskListScroller.scrollTop = 0
@@ -537,6 +551,7 @@ export default {
         return
       }
 
+      // TODO issue is selected contact is overridden by contact from new comms
       setTimeout(() => {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
           const contact = response.data
@@ -670,13 +685,21 @@ export default {
       }
 
       const index = this.contacts.findIndex(item => item.id === contact.id)
-      if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status)) {
-        this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
-        this.loadContactTasks()
-      } else {
-        const contacts = [...this.contacts]
-        contacts[index] = contact
-        this.setContacts(contacts)
+      switch (true) {
+        // reload if on closed tab and the contact status is set to pending
+        // reload if on pending tab and the contact status is set to closed
+        // reload if on open tab and the contact status is set to pending or closed
+        case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
+        case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
+        case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+          this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
+          this.loadContactTasks()
+          break
+        case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
+        default:
+          const contacts = [...this.contacts]
+          contacts[index] = contact
+          this.setContacts(contacts)
       }
     })
   },

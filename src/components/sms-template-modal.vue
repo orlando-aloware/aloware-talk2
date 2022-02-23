@@ -103,9 +103,7 @@ export default {
   },
   computed: {
     ...mapState('contacts', ['smsTemplateModal']),
-    ...mapState({
-      currentCompany: 'currentCompany'
-    }),
+    ...mapState('cache', ['currentCompany']),
     isValid () {
       return this.template.name && this.template.body
     },

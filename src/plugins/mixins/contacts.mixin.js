@@ -316,17 +316,15 @@ export default {
       return filtersCount.data
     },
     markCheckedAll () {
-      if (this.selectedContacts[this.id] && this.listItems[this.id]) {
-        if (document.querySelector('.data-table-check-all')) {
-          document.querySelector('.data-table-check-all').checked = this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
-        }
+      if (this.selectedContacts[this.id] && this.listItems[this.id] && document.querySelector('.data-table-check-all')) {
+        document.querySelector('.data-table-check-all').checked = this.listItems[this.id].data.length > 0 && this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
       }
     },
     fixDefaultFilters () {
-      if (!this.list) {
+      if (_.isEmpty(this.list)) {
         return []
       }
-      const defaultFilters = JSON.parse(JSON.stringify(this.list.filters))
+      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
       if (this.$route.params.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
@@ -377,8 +375,8 @@ export default {
       return start !== null
     },
     isEmpty () {
-      const data = _.get(this.listItems[this.id], 'data', null)
-      return this.isLoaded && !data
+      const data = _.get(this.listItems[this.id], 'data', [])
+      return this.isLoaded && !data.length
     },
     isMyContactsView () {
       return DEFAULT_PINNED_LIST.MY_CONTACTS.id === this.id
@@ -442,6 +440,7 @@ export default {
       if (!this.$route.params.id) {
         return this.lists['all']
       }
+
       return this.lists[this.$route.params.id]
     },
     contactsRelations () {

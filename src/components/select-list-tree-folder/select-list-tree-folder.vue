@@ -115,7 +115,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList', 'selectList']),
+    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList', 'selectList', 'selectedList']),
 
     indentStyle () {
       return {
@@ -132,10 +132,12 @@ export default {
     },
 
     filterStaticList () {
-      if (this.selectList.search_value.length > 0) {
-        return this.lists.filter(list => list.name.toLowerCase().includes(this.selectList.search_value.toLowerCase()))
+      if (this.selectList.search_value && this.selectList.search_value.length > 0) {
+        return this.lists.filter(item => item.name.toLowerCase().includes(this.selectList.search_value.toLowerCase()) &&
+          item.type === this.ContactListTypes.STATIC &&
+          item.id.toString() !== this.selectedList.id)
       }
-      return this.lists
+      return this.lists.filter(item => item.type === this.ContactListTypes.STATIC && item.id.toString() !== this.selectedList.id)
     }
   },
 

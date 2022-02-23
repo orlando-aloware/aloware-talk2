@@ -204,19 +204,17 @@
         class="text-left datatable-row__actions"
         :key="column.name">
         <div>
-          <button
-            class="btn btn-sm btn-link datatable-row__actions__action--call pl-0"
-            @click="onCall">
+          <button class="btn btn-sm btn-link datatable-row__actions__action--call pl-0"
+                  @click="onCall">
             <call-o-icon color="#62666E"></call-o-icon>
           </button>
-          <button
-            class="btn btn-sm btn-link datatable-row__actions__action--chat"
-            @click="onMessage">
+          <button class="btn btn-sm btn-link datatable-row__actions__action--chat"
+                  @click="onMessage">
             <message-o-icon></message-o-icon>
           </button>
-          <button
-            @click="onRemove"
-            class="btn btn-sm btn-link datatable-row__actions__action--trash">
+          <button v-if="hasDelete"
+                  class="btn btn-sm btn-link datatable-row__actions__action--trash"
+                  @click="onRemove">
             <trash-o-icon></trash-o-icon>
           </button>
         </div>
@@ -341,6 +339,10 @@ export default {
     customRowContent: {
       type: Boolean,
       default: false
+    },
+    hasDelete: {
+      type: Boolean,
+      default: true
     }
   },
 

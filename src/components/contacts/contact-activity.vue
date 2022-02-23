@@ -430,7 +430,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'currentCompany']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses']),
+    ...mapState('cache', ['currentCompany']),
 
     getCommunicationClass () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {

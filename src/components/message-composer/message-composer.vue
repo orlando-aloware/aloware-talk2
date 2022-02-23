@@ -9,10 +9,17 @@
         </b-link>
         <b-link href="#"
                 v-if="currentCompany && currentCompany.reseller_id !== 357"
+                :disabled="disableFax || isPhoneNumberInvalid"
                 :class="{ active : messageComposer.mode === 'fax' }"
                 @click="setMode('fax')">Fax
+          <q-tooltip v-if="disableFax"
+                     anchor="top middle"
+                     self="center middle">
+            Selected line is not capable of sending faxes
+          </q-tooltip>
         </b-link>
         <b-link href="#"
+                v-if="currentCompany && currentCompany.reseller_id !== 357"
                 :disabled="!contact.email"
                 :class="{ active : messageComposer.mode === 'email' }"
                 @click="setMode('email')">Email
@@ -65,7 +72,20 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
-    ...mapState(['currentCompany', 'templates'])
+    ...mapState(['templates']),
+    ...mapState('cache', ['currentCompany']),
+    disableFax () {
+      return this.selectedLine ? !this.selectedLine.is_fax : true
+    },
+    isPhoneNumberInvalid () {
+      if (this.selectContact && this.selectContact.phone_numbers && this.selectContact.phone_numbers.length) {
+        const number = this.selectContact.phone_numbers.find(num => num.phone_number === this.selectContact.phone_number)
+
+        return !number || number.is_invalid || number.is_wrong_number
+      }
+
+      return false
+    }
   },
 
   methods: {

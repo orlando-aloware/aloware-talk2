@@ -129,7 +129,7 @@
         :last-page="lastPage"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
-        @paginated="onPaginate"
+        @paginated="onPagination"
         @sort="onSortByField"
         @more="onLoadMore"
       >
@@ -369,6 +369,7 @@ export default {
       })
     },
     onCheckAllItems (checked) {
+      this.checked = []
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
@@ -406,6 +407,10 @@ export default {
     },
     updateFiltersCount (count) {
       this.filtersCount = count
+    },
+    onPagination (params) {
+      this.checked = []
+      this.onPaginate(params)
     }
   },
   mounted () {
@@ -421,6 +426,9 @@ export default {
       handler: function () {
         this.fetch(this.currentListFilters)
       }
+    },
+    checkedItemIds: function (value) {
+      document.querySelector('.data-table-check-all').checked = this.items.length > 0 && value.length === this.items.length
     }
   }
 }

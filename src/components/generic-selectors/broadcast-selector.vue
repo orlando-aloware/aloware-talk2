@@ -120,9 +120,9 @@ export default {
 
   computed: {
     ...mapState({
-      currentCompany: state => state.currentCompany,
       broadcasts: state => state.broadcasts
     }),
+    ...mapState('cache', ['currentCompany']),
     broadcastsAlphabeticalOrder () {
       if (this.broadcasts) {
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties

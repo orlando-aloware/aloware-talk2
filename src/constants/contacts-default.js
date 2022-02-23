@@ -87,6 +87,14 @@ export const DEFAULT_STATE = {
       id: 'static',
       headers: STATIC_COLUMNS,
       filters: {}
+    },
+    unsaved: {
+      id: 'unsaved',
+      headers: DEFAULT_COLUMNS,
+      filters: {},
+      type: 2,
+      module_type: 1,
+      name: ''
     }
   },
   columns: null,

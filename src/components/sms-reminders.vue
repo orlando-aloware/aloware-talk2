@@ -4,14 +4,16 @@
       <div v-if="campaignId">
         <q-select class="p-1"
                   use-input
+                  emit-value
+                  map-options
                   clearable
                   input-debounce="0"
                   label="Send from"
                   option-value="id"
                   option-label="name"
-                  :options="campaigns"
-                  @filter="filterFn"
-                  v-model="selectedCampaign">
+                  v-model="selectedCampaignId"
+                  :options="filteredCampaigns"
+                  @filter="filterFn">
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="no-results text-grey">
@@ -27,6 +29,7 @@
                size="md"
                color="primary"
                :loading="loading"
+               :disable="loading"
                v-if="recentShowSendSmsReminderButton"
                @click="sendDefaultSmsReminder">
           <div class="mx-2 px-1">
@@ -61,9 +64,9 @@ export default {
     return {
       auth: auth,
       loading: false,
-      selectedCampaign: null,
+      selectedCampaignId: this.campaignId,
       recentShowSendSmsReminderButton: false,
-      filteredCampaigns: null
+      filteredCampaigns: []
     }
   },
 
@@ -85,15 +88,15 @@ export default {
     },
 
     sendDefaultSmsReminder () {
-      if (!this.selectedCampaign) {
+      if (!this.selectedCampaignId) {
         this.$generalNotification('Please select a line where to send from.', 'error')
       }
 
-      if (this.selectedCampaign) {
+      if (this.selectedCampaignId) {
         this.loading = true
         this.$axios
           .post(`/api/v1/communications/${this.communicationId}/send-sms-reminder`, {
-            campaign_id: this.selectedCampaign
+            campaign_id: this.selectedCampaignId
           })
           .then(res => {
             this.loading = false
@@ -113,6 +116,13 @@ export default {
       }
     },
     filterFn (val, update) {
+      if (this.selectedCampaignId && val === this.selectedCampaignId) {
+        update(() => {
+          this.filteredCampaigns = this.campaigns.filter(campaign => campaign.id === this.selectedCampaignId)
+        })
+        return
+      }
+
       if (val === '') {
         update(() => {
           this.filteredCampaigns = this.campaigns
@@ -122,7 +132,7 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase() === needle)
+        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
