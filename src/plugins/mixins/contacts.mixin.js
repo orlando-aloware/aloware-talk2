@@ -274,6 +274,16 @@ export default {
         powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
+      if (params.contact_owner) {
+        query.filter_groups.push({ filters: {
+          contact_owner: {
+            value: [params.contact_owner],
+            operator: 1
+          }
+        },
+        is_conjunction: true })
+      }
+
       if (params.task_status) {
         powerQuery.task_status = params.task_status
       }
