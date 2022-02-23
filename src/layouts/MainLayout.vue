@@ -585,7 +585,7 @@ export default {
       //  return
       // }
 
-      // let data = {
+      // const data = {
       //   title: 'System Updates',
       //   message: 'Refresh your screen',
       //   messageIcon: null,

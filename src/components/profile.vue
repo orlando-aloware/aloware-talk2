@@ -219,7 +219,7 @@ export default {
     },
 
     personalPhoneNumber () {
-      let found = this.campaigns.find(campaign => campaign.id === this.profile.campaign_id)
+      const found = this.campaigns.find(campaign => campaign.id === this.profile.campaign_id)
       if (found && found.incoming_numbers.length) {
         return found.incoming_numbers[0].phone_number
       }

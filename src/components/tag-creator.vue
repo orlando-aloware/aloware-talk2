@@ -174,14 +174,14 @@ export default {
     addTag () {
       if (this.validateForm('add_tag')) {
         this.loadingBtn = true
-        let url = '/api/v1/tag'
-        let data = _.clone(this.tag)
+        const url = { data: '/api/v1/tag' }
+        const data = _.clone(this.tag)
         if (this.isFilterTags) {
-          url = '/api/v1/save-filters-tag'
+          url.data = '/api/v1/save-filters-tag'
           data.filters = this.filters
           data.filters = _.pickBy(data.filters, _.identity)
         }
-        this.$axios.post(url, data)
+        this.$axios.post(url.data, data)
           .then(res => {
             this.loadingBtn = false
             this.hideAdd = false

@@ -113,7 +113,7 @@ export default {
   },
   computed: {
     rows () {
-      let rows = []
+      const rows = []
       this.layer.user_results.forEach((value) => {
         rows.push({
           order: value.agent_is_eligible_to_take_call ? (this.ringGroup.dial_mode === RingGroupDialMode.DIAL_MODE_SIMUL ? 1 : this.layer.order++) : '-',

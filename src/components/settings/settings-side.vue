@@ -99,9 +99,9 @@ export default {
     ...mapState('settings', ['userClone', 'changedUserProperties', 'user']),
     ...mapGetters('auth', ['authenticated', 'profile']),
     searchResult () {
-      let query = this.searchText.trim().toLocaleLowerCase()
+      const query = this.searchText.trim().toLocaleLowerCase()
 
-      let mapping = Object.values(this.settingsMap)
+      const mapping = Object.values(this.settingsMap)
 
       if (!this.isAdmin) {
         // eslint-disable-next-line no-return-assign

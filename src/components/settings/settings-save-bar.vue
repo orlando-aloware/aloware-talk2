@@ -76,11 +76,11 @@ export default {
       })
     },
     saveChanges () {
-      let parameters = this.getParameters()
+      const parameters = this.getParameters()
       if (Object.entries(parameters).length > 0) {
-        let passwordIndex = this.changedUserProperties.findIndex(item => item.property === 'password')
+        const passwordIndex = this.changedUserProperties.findIndex(item => item.property === 'password')
 
-        let user = _.cloneDeep(this.user)
+        const user = _.cloneDeep(this.user)
 
         // Check if password is one of changed field
         // If not changed, we need to remove it to prevent unintentional change of password
@@ -104,7 +104,7 @@ export default {
         }
 
         return talk2Api.V1.user.update(this.user.id, user).then(response => {
-          let data = { ...response.data, operating_hours: JSON.parse(response.data.operating_hours) }
+          const data = { ...response.data, operating_hours: JSON.parse(response.data.operating_hours) }
           data.password = ''
           data.password_confirmation = ''
 
@@ -127,7 +127,7 @@ export default {
       }
     },
     getParameters () {
-      let params = {}
+      const params = {}
       this.changedUserProperties.filter(item => item.property !== 'disposition_status_id').forEach(function (item) {
         params[item.property] = item.value
       })

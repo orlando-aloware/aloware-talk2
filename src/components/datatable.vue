@@ -151,9 +151,6 @@ import MoveIcon from 'components/icons/move-icon-2'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 
-let column
-let scrollTimeout
-
 export default {
   components: {
     draggable,
@@ -236,20 +233,21 @@ export default {
       return !!this.$slots.empty
     },
     fixedColumns () {
-      let newItems = JSON.parse(JSON.stringify(this.columns))
+      const newItems = JSON.parse(JSON.stringify(this.columns))
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
-      for (let index in newItems) {
-        let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+      const index = { data: null }
+      for (index.data in newItems) {
+        const found = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
         if (found && found.required) {
-          newItems[index].sortable = found.sortable
+          newItems[index.data].sortable = found.sortable
         }
         if (found) {
-          newItems[index].label = found.label
-          newItems[index].default = found.default
-          newItems[index].sortable = found.sortable
-          newItems[index].maxWidth = found.maxWidth
-          newItems[index].minWidth = found.minWidth
+          newItems[index.data].label = found.label
+          newItems[index.data].default = found.default
+          newItems[index.data].sortable = found.sortable
+          newItems[index.data].maxWidth = found.maxWidth
+          newItems[index.data].minWidth = found.minWidth
         }
       }
       return newItems
@@ -289,7 +287,9 @@ export default {
       ],
       isHovering: false,
       hoverKey: null,
-      moveColor: '#4F4F4F'
+      moveColor: '#4F4F4F',
+      column: null,
+      scrollTimeout: null
     }
   },
 
@@ -303,32 +303,33 @@ export default {
       }
     },
     onResizeMouseMove (evt) {
-      if (column) {
-        for (let i = 0; i < evt.pageX; i++) {
+      if (this.column) {
+        const index = { i: 0 }
+        for (index.i = 0; index.i < evt.pageX; index.i++) {
           requestAnimationFrame(() => {
-            if (column) {
-              column.style.minWidth = `${this.startOffset + i}px`
-              column.style.maxWidth = `${this.startOffset + i}px`
+            if (this.column) {
+              this.column.style.minWidth = `${this.startOffset + index.i}px`
+              this.column.style.maxWidth = `${this.startOffset + index.i}px`
             }
           })
         }
       }
     },
     onResizerMouseUp () {
-      column = null
+      this.column = null
       this.startOffset = 0
       document.body.style.cursor = ''
     },
     onResizerMouseDown (evt) {
-      column = evt.target.parentNode
-      this.startOffset = column.offsetWidth - evt.pageX
+      this.column = evt.target.parentNode
+      this.startOffset = this.column.offsetWidth - evt.pageX
       document.body.style.cursor = 'col-resize'
     },
     onCheckboxClicked (evt) {
       this.$emit('checked', evt.target.checked)
     },
     onOrderChanged ({ oldIndex, newIndex }) {
-      let columns = [...this.fixedColumns]
+      const columns = [...this.fixedColumns]
 
       columns[oldIndex] = this.fixedColumns[newIndex]
       columns[newIndex] = this.fixedColumns[oldIndex]
@@ -357,9 +358,9 @@ export default {
         return
       }
 
-      clearTimeout(scrollTimeout)
+      clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
-      scrollTimeout = setTimeout(() => {
+      this.scrollTimeout = setTimeout(() => {
         // Run the callback
         if (this.isLoaderVisible && !this.isEmpty) {
           this.$emit('more')
@@ -384,7 +385,7 @@ export default {
   },
 
   beforeDestroy () {
-    clearTimeout(scrollTimeout)
+    clearTimeout(this.scrollTimeout)
     this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)

@@ -183,11 +183,14 @@ export default {
         })
     }, 1000),
     fetch (params = {}, hasOrder = true) {
-      const defaultSort = _.get(params, 'sort', this.defaultContactDateFilter, null)
+      const defaultSort = { data: _.get(params, 'sort', this.defaultContactDateFilter) }
+      if (defaultSort.data.constructor !== 'Function') {
+        defaultSort.data = this.defaultContactDateFilter
+      }
       // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
       const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
       if (hasOrder) {
-        params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort // sort
+        params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
         params.order = order
       }
 

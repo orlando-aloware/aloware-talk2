@@ -24,24 +24,25 @@ export default {
   computed: {
     times () {
       const times = []
-      for (let hour = 6; hour < 24; hour++) {
+      const hour = { data: 6 }
+      for (hour.data = 6; hour.data < 24; hour.data++) {
         times.push({
-          label: window.moment({ hour }).format('h:mm A'),
-          value: window.moment({ hour }).format('HH:mm')
+          label: window.moment({ hour: hour.data }).format('h:mm A'),
+          value: window.moment({ hour: hour.data }).format('HH:mm')
         })
         times.push({
-          label: window.moment({ hour, minute: 15 }).format('h:mm A'),
-          value: window.moment({ hour, minute: 15 }).format('HH:mm')
+          label: window.moment({ hour: hour.data, minute: 15 }).format('h:mm A'),
+          value: window.moment({ hour: hour.data, minute: 15 }).format('HH:mm')
         }
         )
         times.push({
-          label: window.moment({ hour, minute: 30 }).format('h:mm A'),
-          value: window.moment({ hour, minute: 30 }).format('HH:mm')
+          label: window.moment({ hour: hour.data, minute: 30 }).format('h:mm A'),
+          value: window.moment({ hour: hour.data, minute: 30 }).format('HH:mm')
         }
         )
         times.push({
-          label: window.moment({ hour, minute: 45 }).format('h:mm A'),
-          value: window.moment({ hour, minute: 45 }).format('HH:mm')
+          label: window.moment({ hour: hour.data, minute: 45 }).format('h:mm A'),
+          value: window.moment({ hour: hour.data, minute: 45 }).format('HH:mm')
         }
         )
       }

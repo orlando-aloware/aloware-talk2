@@ -706,7 +706,7 @@ export default {
   mounted () {
     this.reRouteToBase()
     this.setShouldUpdateSelectedListContactCount(true)
-    this.fetch()
+    // this.fetch()
     // force close filter
     this.closeFilters()
     this.folderPath = this.generateFolderPath(this.folders)

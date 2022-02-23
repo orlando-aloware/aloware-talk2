@@ -137,19 +137,19 @@ export default {
 
     startRecordingTime () {
       this.resetRecordingTime()
-      let timeStarted = new Date().getTime()
-      let estimatedFileSize = 0
+      const timeStarted = new Date().getTime()
+      const estimatedFileSize = { data: 0 }
       this.timeInterval = setInterval(() => {
-        let currentTime = new Date().getTime()
-        let timeElapsed = new Date(currentTime - timeStarted)
-        this.hours = _.padStart(timeElapsed.getUTCHours(), 2, '0')
-        this.minutes = _.padStart(timeElapsed.getUTCMinutes(), 2, '0')
-        this.seconds = _.padStart(timeElapsed.getUTCSeconds(), 2, '0')
+        const currentTime = new Date().getTime()
+        const timeElapsed = { data: new Date(currentTime - timeStarted) }
+        this.hours = _.padStart(timeElapsed.data.getUTCHours(), 2, '0')
+        this.minutes = _.padStart(timeElapsed.data.getUTCMinutes(), 2, '0')
+        this.seconds = _.padStart(timeElapsed.data.getUTCSeconds(), 2, '0')
 
         // per_second_size is in kilobytes
-        estimatedFileSize += this.sizePerSecond
+        estimatedFileSize.data += this.sizePerSecond
         // once the 8MB limit is reached, stop the recording.
-        if ((estimatedFileSize + this.sizePerSecond) >= 8000) {
+        if ((estimatedFileSize.data + this.sizePerSecond) >= 8000) {
           this.$generalNotification('The audio recording has reached the limit of 8MB. Recording is automatically stopped.', 'error')
           this.stopRecording()
         }
@@ -164,10 +164,9 @@ export default {
 
     captureRecording () {
       this.audioBlob = this.mic.export()
-      let reader = new FileReader()
-      let _this = this
-      reader.onload = function () {
-        _this.recordedAudio = new Audio(this.result)
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.recordedAudio = new Audio(this.result)
       }
 
       reader.readAsDataURL(this.audioBlob)
@@ -184,8 +183,8 @@ export default {
 
     uploadRecordedAudio () {
       this.isUploading = true
-      let audioFileName = new Date().getTime() + '_recording_upload.wav'
-      let data = new FormData()
+      const audioFileName = new Date().getTime() + '_recording_upload.wav'
+      const data = new FormData()
       data.append('file', this.audioBlob, audioFileName)
       return window.axios.post(this.uploadUrl, data).then(response => {
         this.$emit('recordedAudioUploaded', {

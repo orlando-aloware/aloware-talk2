@@ -199,7 +199,7 @@ export default {
       return this.ringGroups.find(item => item.id === id)
     },
     getRingGroupName (id) {
-      let ringGroup = this.getRingGroup(id)
+      const ringGroup = this.getRingGroup(id)
 
       return ringGroup ? ringGroup.name : null
     }

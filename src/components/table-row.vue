@@ -371,18 +371,19 @@ export default {
       return document.getElementById(`popover-tags-${this.contact.id}`)
     },
     fixedColumns () {
-      let newItems = JSON.parse(JSON.stringify(this.columns))
+      const newItems = JSON.parse(JSON.stringify(this.columns))
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
-      for (let index in newItems) {
-        let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+      const index = { data: null }
+      for (index.data in newItems) {
+        const found = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
         if (found && found.required) {
-          newItems[index].sortable = found.sortable
+          newItems[index.data].sortable = found.sortable
         }
         if (found) {
-          newItems[index].label = found.label
-          newItems[index].maxWidth = found.maxWidth
-          newItems[index].minWidth = found.minWidth
+          newItems[index.data].label = found.label
+          newItems[index.data].maxWidth = found.maxWidth
+          newItems[index.data].minWidth = found.minWidth
         }
       }
       return newItems
@@ -407,16 +408,16 @@ export default {
       return found ? found.name : '-'
     },
     onCheckerClicked () {
-      let items = []
-      let found = this.checked.find(item => item.id === this.contact.id)
+      const items = { data: [] }
+      const found = this.checked.find(item => item.id === this.contact.id)
       if (found) {
-        items = this.checked.filter(item => item.id !== this.contact.id)
+        items.data = this.checked.filter(item => item.id !== this.contact.id)
       } else {
-        items = [...this.checked]
-        items.push(this.contact)
+        items.data = [...this.checked]
+        items.data.push(this.contact)
       }
 
-      this.$emit('checked', items)
+      this.$emit('checked', items.data)
     },
 
     onRemove () {
@@ -473,11 +474,11 @@ export default {
 
     makeCall () {
       if (this.profile.enabled_two_legged_outbound) {
-        let message = 'We will call your secondary phone'
-        message += ' on ' + this.profile.secondary_phone_number
-        message += ` and connect you with ${this.contact.name}. Proceed?`
+        const message = { data: 'We will call your secondary phone' }
+        message.data += ` on ${this.profile.secondary_phone_number}`
+        message.data += ` and connect you with ${this.contact.name}. Proceed?`
 
-        return this.$confirm(message, 'Going old school?', {
+        return this.$confirm(message.data, 'Going old school?', {
           confirmButtonText: 'OK',
           cancelButtonText: 'Cancel',
           customClass: 'width-500 fixed',
@@ -488,7 +489,7 @@ export default {
         })
       }
 
-      let data = {
+      const data = {
         currentNumber: this.contact.phone_number,
         contactName: this.contact.name,
         companyName: this.contact.company_name,
@@ -511,7 +512,7 @@ export default {
         })
     },
     generateRoute (contactId) {
-      let routeData = {
+      const routeData = {
         path: `/contacts/${contactId}`
       }
 

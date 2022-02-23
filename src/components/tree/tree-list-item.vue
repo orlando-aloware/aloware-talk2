@@ -104,8 +104,6 @@ import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
-let inputTimeout
-
 export default {
   components: {
     FolderArrowCloseIcon,
@@ -145,7 +143,8 @@ export default {
       ContactListTypes,
       isEditing: false,
       isRenaming: false,
-      folderExists: false
+      folderExists: false,
+      inputTimeout: null
     }
   },
   computed: {
@@ -192,7 +191,7 @@ export default {
       return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     folderId () {
-      let module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-item-option-${module}-${this.id}`
     },
     unsavedListId () {
@@ -205,14 +204,14 @@ export default {
     }
 
     if (this.isMobile && this.$refs[this.folderId] !== undefined) {
-      let count = 0
-      let folderInterval = setInterval(() => {
+      const count = { data: 0 }
+      const folderInterval = setInterval(() => {
         if (document.getElementById(this.folderId)) {
           this.folderExists = true
           clearInterval(folderInterval)
         }
-        count++
-        if (count === 60) {
+        count.data++
+        if (count.data === 60) {
           clearInterval(folderInterval)
         }
       }, 500)
@@ -312,7 +311,7 @@ export default {
     },
     onRenameList () {
       this.isEditing = true
-      inputTimeout = setTimeout(() => {
+      this.inputTimeout = setTimeout(() => {
         document.getElementById('folder-input-' + this.id).focus()
       })
     },
@@ -404,7 +403,7 @@ export default {
     }
   },
   beforeDestroy () {
-    clearTimeout(inputTimeout)
+    clearTimeout(this.inputTimeout)
   }
 }
 </script>

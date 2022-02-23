@@ -169,10 +169,10 @@ export default {
       return `${window.axios.defaults.baseURL}/api/v1/user/pre-recorded-voicemail`
     },
     rules () {
-      let rulesObject = {}
+      const rulesObject = { data: {} }
 
       if (this.showOutboundLineSelector) {
-        rulesObject = { ...rulesObject,
+        rulesObject.data = { ...rulesObject.data,
           default_outbound_campaign_id: {
             required
           }
@@ -180,7 +180,7 @@ export default {
       }
 
       if (this.user.enabled_two_legged_outbound) {
-        rulesObject = { ...rulesObject,
+        rulesObject.data = { ...rulesObject.data,
           secondary_phone_number: {
             required,
             validPhone: (value) => this.$options.filters.fixPhone(value) !== false
@@ -188,7 +188,7 @@ export default {
         }
       }
 
-      return rulesObject
+      return rulesObject.data
     }
   },
 
