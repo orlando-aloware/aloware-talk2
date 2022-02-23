@@ -329,7 +329,6 @@ export default {
     },
 
     async fetchContactInfo () {
-      console.log('555 :>> ', 555)
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
