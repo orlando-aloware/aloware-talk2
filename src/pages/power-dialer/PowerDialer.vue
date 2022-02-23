@@ -40,6 +40,7 @@
 
 <script>
 
+import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 import MoveDialog from 'components/move-dialog'
@@ -74,6 +75,9 @@ export default {
   },
   mixins: [powermixin, contactsMixins, pdMixin],
   computed: {
+    ...mapFields('powerDialer', [
+      'metrics'
+    ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
       'isStartingDial',
@@ -109,9 +113,22 @@ export default {
     }
   },
   async mounted () {
+    let metrics = await this.getSessionMetricsOptions()
+    let collection = []
+
     this.START_DIAL_TOGGLE(false)
     // await this.initialize()
     await this.setFilterParams(this.$route.params)
+
+    metrics.forEach(m => {
+      collection.push({
+        label: m.label,
+        disable: true,
+        value: null
+      })
+      collection = collection.concat(...m.options)
+    })
+    this.metrics = collection
   },
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Sessions') {
@@ -130,6 +147,9 @@ export default {
     ...mapActions('contacts', [
       'contactsLoaded',
       'clearList'
+    ]),
+    ...mapActions('powerDialer', [
+      'getSessionMetricsOptions'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',

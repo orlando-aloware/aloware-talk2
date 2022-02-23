@@ -158,14 +158,13 @@ export default {
     }
   },
   watch: {
-    contact (val) {
-      if (val?.id) {
+    contact (newVal, oldVal) {
+      if (newVal?.id !== oldVal?.id) {
         if (this.flagged) {
+          this.flagged = false
           this.prepareActivities()
+          this.flagged = true
         }
-        // this.setContact(this.contact)
-        // this.flagged = true
-        // this.fetchContact()
       }
     }
   },
