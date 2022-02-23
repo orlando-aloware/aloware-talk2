@@ -78,7 +78,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Power Dialer')"
-           v-if="false"
+           v-if="!isProd"
            flat>
       <q-tooltip
         anchor="center right"
@@ -94,7 +94,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer')"
-           v-if="false"
+           v-if="!isProd"
            flat>
       <q-tooltip
         anchor="center right"
@@ -198,7 +198,10 @@ export default {
 
   computed: {
     isProd () {
-      return storage.local.env === 'production'
+      return storage.local.getItem('env') === 'production'
+    },
+    envName () {
+      return storage.local.getItem('env')
     }
   },
 
