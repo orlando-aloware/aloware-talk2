@@ -364,7 +364,7 @@ export default {
     ...mapState(['prevRoute']),
     ...mapState('powerDialer', [
       'activeMetrics',
-      'selectedList'
+      'selectedPdList'
     ]),
     ...mapGetters('powerDialer', [
       'contactResources',
@@ -434,7 +434,7 @@ export default {
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
-      return `/api/v2/power-dialer-list-items/${this.selectedList.id}/items/${this.selectedItem.id}`
+      return `/api/v2/power-dialer-list-items/${this.selectedPdList.id}/items/${this.selectedItem.id}`
     },
     isMyQueue () {
       return this.id === 'my-queue'
@@ -530,14 +530,14 @@ export default {
       this.removeListClose()
       setTimeout(() => {
         // this.removeListOpen({ id: this.id, name: this.name })
-        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
+        this.removeListOpen({ id: this.selectedPdList.id, name: this.selectedPdList.name })
       }, 10)
     },
     onClearList () {
       this.removeListClose()
       setTimeout(() => {
         // this.removeListOpen({ id: this.id, name: this.name })
-        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name, clear: true })
+        this.removeListOpen({ id: this.selectedPdList.id, name: this.selectedPdList.name, clear: true })
       }, 10)
     },
     onCheckedRows (checked) {
@@ -569,7 +569,7 @@ export default {
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
-          this.$emit('on-list-update', this.selectedList)
+          this.$emit('on-list-update', this.selectedPdList)
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
@@ -593,7 +593,7 @@ export default {
         }
       }
     },
-    selectedList (value) {
+    selectedPdList (value) {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
     },
     clearList (value) {

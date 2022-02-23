@@ -133,7 +133,7 @@ export default {
       params.sort = sort
       params.order = order
       this.isLoading = true
-      this.processFetch2(params)
+      // this.processFetch2(params)
     },
     onSortByField (sorts) {
       this.TOGGLE_TABLE_LOADER(true)

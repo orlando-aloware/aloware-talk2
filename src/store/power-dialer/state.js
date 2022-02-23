@@ -160,7 +160,7 @@ export default function () {
     activeTask: {},
     selectedDialerSessionId: null,
     sessionPaused: false,
-    selectedList: {},
+    selectedPdList: {},
     metrics: [],
     activeMetrics: []
   }

@@ -72,7 +72,7 @@ export default {
     state.activeTask = payload
   },
   SET_CONTACTS: (state, payload) => {
-    state.listItems[state.selectedList.id].data = payload
+    state.listItems[state.selectedPdList.id].data = payload
   },
   SET_ACTIVE_FILTER: (state, filter) => {
     state.activeFilter = filter
@@ -124,6 +124,6 @@ export default {
     state.warmupDurations = data
   },
   SET_SELECTED_PD_LIST: (state, data) => {
-    state.selectedList = data
+    state.selectedPdList = data
   }
 }

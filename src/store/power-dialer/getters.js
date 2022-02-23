@@ -18,7 +18,7 @@ export default {
   isRemoveFolderOpen: (state) => !!state.removeFolder,
   folders: (state) => state.folders,
   listItems: (state) => state.listItems,
-  selectedList: (state) => state.selectedList,
+  selectedPdList: (state) => state.selectedPdList,
   currentListFilters: (state) => state.currentListFilters,
   powerDialerLists: (state) => state.powerDialerLists,
   powerDialerListItems: (state) => state.powerDialerListItems,
