@@ -5526,25 +5526,25 @@ table.datatable {
           &.has-sorting {
             opacity: 1;
 
-            a.sorter.sorter-desc {
+            a.sorter.sorter-asc {
               &:before {
                 opacity: 1 !important;
                 position: relative;
-                top: 3px;
+                top: 0;
               }
               &:after {
-                opacity: 0 !important;
+                //opacity: 0 !important;
               }
             }
 
-            a.sorter.sorter-asc {
+            a.sorter.sorter-desc {
               &:before {
-                opacity: 0 !important;
+                //opacity: 0 !important;
               }
               &:after {
                 opacity: 1 !important;
                 position: relative;
-                top: -3px;
+                top: 0;
               }
             }
 
@@ -5631,12 +5631,12 @@ table.datatable {
           // opacity: 0;
         }
 
-        a.sorter.sorter-desc:before {
+        a.sorter.sorter-asc:before {
           border-bottom-color: $primary;
           opacity: 1;
         }
 
-        a.sorter.sorter-asc:after {
+        a.sorter.sorter-desc:after {
           border-top-color: $primary;
           opacity: 1;
         }

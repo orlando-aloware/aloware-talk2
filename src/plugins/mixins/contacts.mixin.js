@@ -59,20 +59,28 @@ export default {
       this.sorts = sorts
       this.fetch({
         search: this.search,
-        page: this.listItems[this.id].current_page,
+        page: 1,
         sort: sorts.orderBy,
         order: sorts.order
       })
+      document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
     },
     onLoadMore () {
       if (this.hasMore) {
         this.isLoadingMore = true
         const nextPage = this.listItems[this.id].current_page + 1
+
+        const sort = (this.sorts) ? this.sorts.orderBy : this.defaultContactDateFilter
+        const order = (this.sorts) ? this.sorts.order : 'desc'
+
         return this.$axios
           .get('api/v2/contacts', {
             params: this.buildQueryString({
               page: nextPage,
-              search: this.search
+              search: this.search,
+              sort: sort,
+              order: order,
+              relations: this.contactsRelations
             }),
             paramsSerializer: qs.stringify
           })
@@ -361,8 +369,8 @@ export default {
       return start !== null
     },
     isEmpty () {
-      const data = _.get(this.listItems[this.id], 'data', null)
-      return this.isLoaded && !data
+      const data = _.get(this.listItems[this.id], 'data', [])
+      return this.isLoaded && !data.length
     },
     isMyContactsView () {
       return DEFAULT_PINNED_LIST.MY_CONTACTS.id === this.id
