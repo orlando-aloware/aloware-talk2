@@ -41,7 +41,6 @@ export default {
         .get('/api/v2/power-dialer-lists/' + stringId)
         .then((response) => response.data)
         .then((response) => {
-          console.log('response :>> ', response)
           this.listLoaded({ ...response, id: stringId })
           this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
           let filters = {

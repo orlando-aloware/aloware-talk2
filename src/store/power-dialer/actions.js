@@ -31,9 +31,6 @@ export default {
           id: res.data.id,
           name: res.data.name,
           type: res.data.type
-        },
-        {
-          root: true
         }
       )
     }

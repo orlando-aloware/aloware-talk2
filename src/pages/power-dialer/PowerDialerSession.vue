@@ -116,30 +116,6 @@ export default {
       'getPowerDialerList',
       'setSelectedPDList'
     ]),
-    getTasks () {
-      /**
-       * Preparing power dialer tasks
-       * Converting selected contacts list to vuex sessions-ready objects
-       */
-      let { list, powerDialerTasks } = this
-      list.forEach(lst => {
-        console.log('lst.task_status :>> ', lst.task_status)
-        switch (lst.task_status) {
-          case AutoDialTaskStatus.STATUS_QUEUED:
-            powerDialerTasks.in_queue.push(lst)
-            break
-          case AutoDialTaskStatus.STATUS_COMPLETED:
-            powerDialerTasks.called.push(lst)
-            break
-          case AutoDialTaskStatus.STATUS_FAILED:
-            powerDialerTasks.failed.push(lst)
-            break
-          case AutoDialTaskStatus.STATUS_SCHEDULED:
-            powerDialerTasks.scheduled.push(lst)
-            break
-        }
-      })
-    },
     async fetchTasks () {
       await this.fetchCurrentList()
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
@@ -170,12 +146,6 @@ export default {
         type: res.type
       })
       // console.log('RES -------- :>> ', res)
-    }
-  },
-  watch: {
-    async listItems (val) {
-      // this.getTasks()
-      console.log('val :>> ', val)
     }
   }
 }
