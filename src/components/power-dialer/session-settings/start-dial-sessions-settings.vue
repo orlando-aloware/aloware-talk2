@@ -449,10 +449,11 @@ export default {
     },
     async saveAsNew () {
       this.loading = true
-      let newSettings = { ...this.defaultValues }
+      let newSettings = { ...this.selectedItem }
       newSettings.name = this.newSettingName
       newSettings.is_company_scope = 0
       let res = await this.createDialerSessionSetting(this.removeEmptyParams(newSettings))
+      console.log('res :>> ', res)
       if (res?.id) {
         await this.getDialerSessionSettings()
       }
@@ -539,7 +540,7 @@ export default {
       if (val) {
         this.loading = true
         await this.getDialerSessionSettings()
-        let temporarySetting = await this.getTemporarySessionSetting(this.list.id)
+        let temporarySetting = await this.getTemporarySessionSetting(this.list?.id)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list.dialer_session_id
         let fetchedSettings = this.dialerSessionSettings.find((setting) => {

@@ -98,7 +98,7 @@
             style="position:relative;top:-2px;" />
           {{ address }} - {{ taskCreatedAt | fixTime }}
         </div>
-        <q-btn
+        <!-- <q-btn
           @click="onToggleMute"
           no-wrap outline no-caps
           size="sm" color="grey-4"
@@ -108,7 +108,7 @@
           <div class="text-body2 text-black">
             {{ toggleMute ? 'Unmute' : 'Mute' }}
           </div>
-        </q-btn>
+        </q-btn> -->
         <q-btn
           @click="onToggleRecording"
           no-wrap outline no-caps
@@ -132,6 +132,21 @@
           </div>
         </div>
         <q-btn
+          v-if="toggleEnd"
+          @click="resumeSession"
+          color="primary"
+          unelevated
+          no-wrap no-caps size="sm"
+          class="btn-btn-primary sessions-button free-width mx-1">
+          <PauseIcon
+            class="mr-2"
+            color="white" />
+          <div class="text-body2 text-white">
+            Resume
+          </div>
+        </q-btn>
+        <q-btn
+          v-else
           @click="onTogglePause"
           :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           unelevated :outline="!sessionPaused"
@@ -178,7 +193,7 @@ import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
-import MuteIcon from 'components/icons/mute-icon'
+// import MuteIcon from 'components/icons/mute-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import sessionsMixins from './sessions'
 import { isEmpty } from 'lodash'
@@ -197,8 +212,8 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon,
-    MuteIcon
+    RecordIcon
+    // MuteIcon
   },
   mixins: [ sessionsMixins ],
   beforeRouteEnter (to, from, next) {
@@ -374,7 +389,6 @@ export default {
           }
           if (this.togglePause) {
             this.sessionPaused = true
-            console.log('Pausing session :>> ', this.sessionPaused)
           }
         }
       }
@@ -411,6 +425,12 @@ export default {
         this.reRoute()
       }
       this.toggleEnd = !this.toggleEnd
+    },
+    resumeSession () {
+      this.toggleEnd = false
+      if (!this.statusCallConnected) {
+        this.resetTimer()
+      }
     },
     resetTimer () {
       this.timerCount = this.sessionSettings.warmup_period_in_seconds
@@ -496,12 +516,11 @@ export default {
       async handler (value) {
         if (value === 0 && !this.statusCallConnected) {
           if (this.toggleEnd) {
-            console.log('Should END SESSION...')
             this.reRoute()
           } else {
             await this.tickTimer()
           }
-        } else {
+        } else if (value > 0) {
           await this.tickTimer()
         }
       },

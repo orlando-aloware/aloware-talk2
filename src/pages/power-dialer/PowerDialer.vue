@@ -76,7 +76,8 @@ export default {
   mixins: [powermixin, contactsMixins, pdMixin],
   computed: {
     ...mapFields('powerDialer', [
-      'metrics'
+      'metrics',
+      'activeMetrics'
     ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
@@ -132,6 +133,10 @@ export default {
       collection = collection.concat(...m.options)
     })
     this.metrics = collection
+
+    this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
+      this.activeMetrics = sessionMetrics.session_metrics_calculations
+    })
   },
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Sessions') {

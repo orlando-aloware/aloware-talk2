@@ -19,7 +19,7 @@ export default {
     statusDisplayButton () {
       switch (this.dialer?.currentStatus) {
         case 'READY':
-          if (!this.toggleEnd) {
+          if (!this.toggleEnd || !this.togglePause) {
             return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
           } else {
             return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`

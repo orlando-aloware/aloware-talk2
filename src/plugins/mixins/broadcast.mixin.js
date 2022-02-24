@@ -326,7 +326,6 @@ export default {
          * ------------------------------------
          */
         .listen('.user.contact_list_item.created', (event) => {
-          // console.log(' %c LISTENING: Contact list item created ', 'background: green; color: #fff;', event)
           let contactListItem = event.contact_list_item
           if (event.contact) {
             contactListItem.contact = event.contact
@@ -340,7 +339,6 @@ export default {
           window.VueEvent.fire('contact_list_item_created', contactListItem)
         })
         .listen('.user.contact_list_item.updated', (event) => {
-          // console.log(' %c LISTENING: Contact list item updated ', 'background: green; color: #fff;', event)
           let contactListItem = event.contact_list_item
           if (event.contact) {
             contactListItem.contact = event.contact
@@ -354,8 +352,10 @@ export default {
           window.VueEvent.fire('contact_list_item_updated', contactListItem)
         })
         .listen('.user.contact_list_item.deleting', (event) => {
-          // console.log(' %c LISTENING: Contact list item deleting... ', 'background: green; color: #fff;', event)
           window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
+        })
+        .listen('.user.session_metrics_calculation', (event) => {
+          window.VueEvent.fire('metric_sessions_update', event)
         })
         /**
          * End of Power Dialer Session Tasks
