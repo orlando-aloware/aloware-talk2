@@ -64,7 +64,7 @@
               style="display:contents;"
               class="mt-3">
               <q-item
-                :class="`px-2 border-radius-1 ${selectedItemName === 'Untitled' || selectedItemName === null ? 'bg-grey-70' : ''}`"
+                :class="`px-2 border-radius-1 ${hasSelectedTemporarySetting ? 'bg-grey-70' : ''}`"
                 :disable="loading"
                 clickable>
                 <q-item-section
@@ -393,7 +393,8 @@ export default {
       'updateDialerSessionSetting',
       'getTemporarySessionSetting',
       'updateContactsList',
-      'getSessionSetting'
+      'getSessionSetting',
+      'getPowerDialerList'
     ]),
     ...mapMutations('powerDialer', [
       'ADD_NEW_SESSION_SETTING',
@@ -410,8 +411,7 @@ export default {
        * IF selected item is temporary OR
        * IF selected item is personal/company
        */
-      if (!this.selectedItemName || this.selectedItemName === 'Untitled') {
-        console.log('Creating temporary session...')
+      if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.selectedItem }
         let res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
@@ -420,9 +420,13 @@ export default {
         })
         if (res?.id) {
           await this.getDialerSessionSettings()
+          await this.updateContactsList({
+            id: this.list.id,
+            dialer_session_id: null
+          })
+          this.SET_SESSION_SETTINGS(this.selectedItem)
         }
       } else {
-        console.log('Updating session setting list...')
         let { id } = this.selectedItem
         // this.activeSessionSettingId = id
         await this.updateContactsList({
@@ -452,20 +456,23 @@ export default {
       let newSettings = { ...this.selectedItem }
       newSettings.name = this.newSettingName
       newSettings.is_company_scope = 0
+      newSettings.id = null
+      newSettings.contact_list_id = null
       let res = await this.createDialerSessionSetting(this.removeEmptyParams(newSettings))
-      console.log('res :>> ', res)
       if (res?.id) {
         await this.getDialerSessionSettings()
       }
       this.newSetting = false
       this.loading = false
-      // this.ADD_NEW_SESSION_SETTING(res)
     },
     async updateSelectedSetting () {
       let res = await this.updateDialerSessionSetting(
         this.removeEmptyParams(this.selectedItem)
       )
       if (res?.data) {
+        if (this.sessionSettings.id === res.data.id) {
+          await this.getPowerDialerList(this.list.id)
+        }
         this.$generalNotification(`Dialer Session Setting has been updated!`)
       }
     },
@@ -525,7 +532,7 @@ export default {
       if (this.sessionSettings?.id && isExistingList) {
         params.id = this.sessionSettings.id
       }
-      this.selectedItemId = this.list.dialer_session_id
+      this.selectedItemId = this.list?.dialer_session_id
       this.setDefaultSettings(params)
     },
     removeEmptyParams (params) {
@@ -542,12 +549,14 @@ export default {
         await this.getDialerSessionSettings()
         let temporarySetting = await this.getTemporarySessionSetting(this.list?.id)
         this.temporarySetting = temporarySetting || {}
-        this.selectedItemId = this.list.dialer_session_id
+        this.selectedItemId = this.list?.dialer_session_id
         let fetchedSettings = this.dialerSessionSettings.find((setting) => {
           return setting.id === this.selectedItemId
         })
         if (fetchedSettings?.id) {
           this.selectedItem = fetchedSettings
+        } else {
+          this.selectedItem = this.temporarySetting
         }
         // if (this.sessionSettings?.id) {
         //   // this.resetDefaults(false)

@@ -152,7 +152,7 @@
         :is-loading-more="isLoadingMore"
         :is-loading="isLoading"
         :contact-list-id="id"
-        :paginated="true"
+        :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
         :total-rows="totalRows"
