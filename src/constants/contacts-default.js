@@ -23,7 +23,7 @@ export const DEFAULT_STATE = {
       name: 'All Contacts'
     },
     'my-contacts': {
-      all: 'my-contacts',
+      id: 'my-contacts',
       headers: DEFAULT_COLUMNS,
       filters: {
         contact_owner: {
