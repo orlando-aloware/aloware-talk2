@@ -47,7 +47,8 @@ export default {
             user_id: this.profile.id, // Current user id
             user_hash: response.data, // Current user hash
             background_color: '#256eff',
-            action_color: '#256eff'
+            action_color: '#256eff',
+            vertical_padding: 80
           })
         }
       })
