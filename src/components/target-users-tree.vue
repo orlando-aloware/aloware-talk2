@@ -87,16 +87,17 @@ export default {
         return []
       }
 
-      let data = []
-      let layerNumber = 0
-      for (let userIds of this.communication.target_users) {
-        layerNumber++
-        let entry = {
-          id: layerNumber,
-          label: `Layer ${layerNumber}`,
+      const data = []
+      const layerNumber = { data: 0 }
+      const userIds = { id: null }
+      for (userIds.id of this.communication.target_users) {
+        layerNumber.data++
+        const entry = {
+          id: layerNumber.data,
+          label: `Layer ${layerNumber.data}`,
           children: []
         }
-        entry.children = this.generateAttemptingUsersTree(userIds)
+        entry.children = this.generateAttemptingUsersTree(userIds.id)
         data.push(entry)
       }
 
@@ -141,17 +142,19 @@ export default {
         return
       }
 
-      let data = []
-      let order = 0
-      for (let userId of attemptingUsers) {
-        order++
-        let user = this.getUser(userId)
-        if (!user) {
+      const data = []
+      const order = { data: 0 }
+      const userId = { id: null }
+      const user = { data: null }
+      for (userId.id of attemptingUsers) {
+        order.data++
+        user.data = this.getUser(userId.id)
+        if (!user.data) {
           continue
         }
 
         data.push({
-          label: (attemptingUsers.length > 1 ? `(${order}) ` : '') + `${this.getUserName(user)}`
+          label: (attemptingUsers.length > 1 ? `(${order.data}) ` : '') + `${this.getUserName(user.data)}`
         })
       }
 

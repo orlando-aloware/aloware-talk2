@@ -152,11 +152,11 @@ export default {
 
     onSubmit () {
       this.isSaving = true
-      let pastActionText = 'Created'
-      let presentActionText = 'Creating'
-      let params = this.getParams()
+      const pastActionText = { data: 'Created' }
+      const presentActionText = { data: 'Creating' }
+      const params = this.getParams()
 
-      let request = null
+      const request = { data: null }
 
       if (this.smsTemplateModal.template && this.smsTemplateModal.template.id) {
         if (!this.currentCompany) {
@@ -167,21 +167,21 @@ export default {
 
         params.company_id = this.currentCompany.id
 
-        request = talk2Api.V1.smsTemplate.update(this.smsTemplateModal.template.id, params)
-        pastActionText = 'Updated'
-        presentActionText = 'Updating'
+        request.data = talk2Api.V1.smsTemplate.update(this.smsTemplateModal.template.id, params)
+        pastActionText.data = 'Updated'
+        presentActionText.data = 'Updating'
       } else {
-        request = talk2Api.V1.smsTemplate.create(params)
+        request.data = talk2Api.V1.smsTemplate.create(params)
       }
 
-      request.then(response => {
+      request.data.then(response => {
         this.getSmsTemplates()
         this.onHidden()
-        this.$generalNotification(`Template has been ${pastActionText.toLowerCase()}.`)
+        this.$generalNotification(`Template has been ${pastActionText.data.toLowerCase()}.`)
         this.$emit('templateSaved', response.data)
       }).catch(error => {
         console.log(error)
-        this.$generalNotification(`Error while ${presentActionText.toLowerCase()} sms template.`, 'error')
+        this.$generalNotification(`Error while ${presentActionText.data.toLowerCase()} sms template.`, 'error')
       }).finally(() => {
         this.isSaving = false
       })

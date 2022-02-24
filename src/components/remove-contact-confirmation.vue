@@ -122,22 +122,22 @@ export default {
       this.$bvModal.hide('remove-contact-confirmation-dialog')
     },
     handleSingleDeletion () {
-      let url = null
+      const url = { data: null }
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url = `/api/v2/${this.endpointForList}/` +
+          url.data = `/api/v2/${this.endpointForList}/` +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
-          url = `/api/v2/contacts/${this.contactToRemove.id}`
+          url.data = `/api/v2/contacts/${this.contactToRemove.id}`
           break
       }
       this.isBusy = true
       return this.$axios
         .delete(
-          url
+          url.data
         )
         .then(() => {
           this.$generalNotification('Contact was successfully removed.')
@@ -156,19 +156,19 @@ export default {
         })
     },
     handleBulkDeletion () {
-      let url = null
+      const url = { data: null }
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url = `/api/v2/${this.endpointForList}/bulk/${this.selectedList.id}`
+          url.data = `/api/v2/${this.endpointForList}/bulk/${this.selectedList.id}`
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
-          url = `/api/v2/contacts/bulk-delete`
+          url.data = `/api/v2/contacts/bulk-delete`
           break
       }
       this.isBusy = true
-      let ids = this.selectedContacts[this.listId].map(contact => contact.id)
+      const ids = this.selectedContacts[this.listId].map(contact => contact.id)
       return this.$axios
-        .delete(url, { params: { contacts: ids } })
+        .delete(url.data, { params: { contacts: ids } })
         .then(() => {
           this.$emit('on-remove-contacts', this.selectedList)
           this.$generalNotification('Contacts was successfully removed.')

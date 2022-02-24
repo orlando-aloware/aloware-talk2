@@ -240,7 +240,8 @@ export default function (/* { ssrContext } */) {
       voicemailNotifiedDesktop: [],
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
-      reminderNotifiedDesktop: []
+      reminderNotifiedDesktop: [],
+      defaultDateFilter: null
     },
 
     getters: {
@@ -648,6 +649,9 @@ export default function (/* { ssrContext } */) {
 
       removeReminderNotifiedDesktop ({ commit }, value) {
         commit('REMOVE_REMINDER_NOTIFIED_DESKTOP', value)
+      },
+      setDefaultDateFilter ({ commit }, value) {
+        commit('SET_DEFAULT_DATE_FILTER', value)
       }
     },
 
@@ -767,8 +771,8 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_CAMPAIGN (state, campaign) {
-        let found = state.campaigns.find((cmp) => cmp.id === campaign.id)
-        let updatedCampaign = _.extend(found, campaign)
+        const found = state.campaigns.find((cmp) => cmp.id === campaign.id)
+        const updatedCampaign = _.extend(found, campaign)
         if (found) {
           Vue.set(
             state.campaigns,
@@ -779,7 +783,7 @@ export default function (/* { ssrContext } */) {
       },
 
       DELETE_CAMPAIGN (state, campaign) {
-        let found = state.campaigns.find((cmp) => cmp.id === campaign.id)
+        const found = state.campaigns.find((cmp) => cmp.id === campaign.id)
         if (found) {
           state.campaigns.splice(state.campaigns.indexOf(found), 1)
         }
@@ -801,11 +805,11 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_DISPOSITION_STATUS (state, dispositionStatus) {
-        let found = state.dispositionStatuses.find(
+        const found = state.dispositionStatuses.find(
           (o) => o.id === dispositionStatus.id
         )
         if (found) {
-          let updatedDispositionStatus = _.extend(found, dispositionStatus)
+          const updatedDispositionStatus = _.extend(found, dispositionStatus)
           Vue.set(
             state.dispositionStatuses,
             state.dispositionStatuses.indexOf(found),
@@ -815,7 +819,7 @@ export default function (/* { ssrContext } */) {
       },
 
       DELETE_DISPOSITION_STATUS (state, dispositionStatus) {
-        let found = state.dispositionStatuses.find(
+        const found = state.dispositionStatuses.find(
           (o) => o.id === dispositionStatus.id
         )
         if (found) {
@@ -848,11 +852,11 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_CALL_DISPOSITION (state, callDisposition) {
-        let found = state.callDispositions.find(
+        const found = state.callDispositions.find(
           (o) => o.id === callDisposition.id
         )
         if (found) {
-          let updatedCallDisposition = _.extend(found, callDisposition)
+          const updatedCallDisposition = _.extend(found, callDisposition)
           Vue.set(
             state.callDispositions,
             state.callDispositions.indexOf(found),
@@ -862,7 +866,7 @@ export default function (/* { ssrContext } */) {
       },
 
       DELETE_CALL_DISPOSITION (state, callDisposition) {
-        let found = state.callDispositions.find(
+        const found = state.callDispositions.find(
           (o) => o.id === callDisposition.id
         )
         if (found) {
@@ -904,14 +908,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_FILTER (state, filter) {
-        let found = state.filters.find((o) => o.id === filter.id)
+        const found = state.filters.find((o) => o.id === filter.id)
         if (found) {
           Vue.set(state.filters, state.filters.indexOf(found), filter)
         }
       },
 
       DELETE_FILTER (state, filter) {
-        let found = state.filters.find((o) => o.id === filter.id)
+        const found = state.filters.find((o) => o.id === filter.id)
         if (found) {
           state.filters.splice(state.filters.indexOf(found), 1)
         }
@@ -925,14 +929,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_TAG (state, tag) {
-        let found = state.tags.find((o) => o.id === tag.id)
+        const found = state.tags.find((o) => o.id === tag.id)
         if (found) {
           Vue.set(state.tags, state.tags.indexOf(found), tag)
         }
       },
 
       DELETE_TAG (state, tag) {
-        let found = state.tags.find((o) => o.id === tag.id)
+        const found = state.tags.find((o) => o.id === tag.id)
         if (found) {
           state.tags.splice(state.tags.indexOf(found), 1)
         }
@@ -950,8 +954,8 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_RING_GROUP (state, ringGroup) {
-        let found = state.ringGroups.find((o) => o.id === ringGroup.id)
-        let updatedRingGroup = _.extend(found, ringGroup)
+        const found = state.ringGroups.find((o) => o.id === ringGroup.id)
+        const updatedRingGroup = _.extend(found, ringGroup)
         if (found) {
           Vue.set(
             state.ringGroups,
@@ -962,7 +966,7 @@ export default function (/* { ssrContext } */) {
       },
 
       DELETE_RING_GROUP (state, ringGroup) {
-        let found = state.ringGroups.find((o) => o.id === ringGroup.id)
+        const found = state.ringGroups.find((o) => o.id === ringGroup.id)
         if (found) {
           state.ringGroups.splice(state.ringGroups.indexOf(found), 1)
         }
@@ -1014,14 +1018,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_WORKFLOW (state, workflow) {
-        let found = state.workflows.find((wf) => wf.id === workflow.id)
+        const found = state.workflows.find((wf) => wf.id === workflow.id)
         if (found) {
           Vue.set(state.workflows, state.workflows.indexOf(found), workflow)
         }
       },
 
       DELETE_WORKFLOW (state, workflow) {
-        let found = state.workflows.find((wf) => wf.id === workflow.id)
+        const found = state.workflows.find((wf) => wf.id === workflow.id)
         if (found) {
           state.workflows.splice(state.workflows.indexOf(found), 1)
         }
@@ -1043,14 +1047,14 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_USER (state, user) {
-        let found = state.users.find((u) => u.id === user.id)
+        const found = state.users.find((u) => u.id === user.id)
         if (found) {
           Vue.set(state.users, state.users.indexOf(found), user)
         }
       },
 
       DELETE_USER (state, user) {
-        let found = state.users.find((wf) => wf.id === user.id)
+        const found = state.users.find((wf) => wf.id === user.id)
         if (found) {
           state.users.splice(state.users.indexOf(found), 1)
         }
@@ -1093,7 +1097,7 @@ export default function (/* { ssrContext } */) {
       },
 
       DELETE_SMS_TEMPLATE (state, smsTemplate) {
-        let found = state.smsTemplates.find(template => template.id === smsTemplate.id)
+        const found = state.smsTemplates.find(template => template.id === smsTemplate.id)
         if (found) {
           state.smsTemplates.splice(state.smsTemplates.indexOf(found), 1)
         }
@@ -1104,8 +1108,9 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_NOTIFICATIONS (state, payload) {
-        for (let index in payload.data) {
-          Vue.set(state.notifications[payload.type], `${index}`, payload.data[index])
+        const index = { data: null }
+        for (index.data in payload.data) {
+          Vue.set(state.notifications[payload.type], `${index.data}`, payload.data[index.data])
         }
       },
 
@@ -1161,7 +1166,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.notifications.callFishing.queue.find(queue => queue.communicationId === value)
+        const found = state.notifications.callFishing.queue.find(queue => queue.communicationId === value)
 
         if (found) {
           state.notifications.callFishing.queue.splice(state.notifications.callFishing.queue.indexOf(found), 1)
@@ -1177,7 +1182,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === value)
+        const found = state.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === value)
 
         if (found) {
           state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)
@@ -1209,7 +1214,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.communicationNotifiedDesktop.find(item => item.id === value)
+        const found = state.communicationNotifiedDesktop.find(item => item.id === value)
 
         if (!found) {
           return
@@ -1223,7 +1228,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.voicemailNotifiedDesktop.find(item => item.id === value)
+        const found = state.voicemailNotifiedDesktop.find(item => item.id === value)
 
         if (!found) {
           return
@@ -1237,7 +1242,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.contactNotifiedDesktop.find(item => item.id === value)
+        const found = state.contactNotifiedDesktop.find(item => item.id === value)
 
         if (!found) {
           return
@@ -1251,7 +1256,7 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.appointmentNotifiedDesktop.find(item => item.id === value)
+        const found = state.appointmentNotifiedDesktop.find(item => item.id === value)
 
         if (!found) {
           return
@@ -1265,13 +1270,17 @@ export default function (/* { ssrContext } */) {
           return
         }
 
-        let found = state.reminderNotifiedDesktop.find(item => item.id === value)
+        const found = state.reminderNotifiedDesktop.find(item => item.id === value)
 
         if (!found) {
           return
         }
 
         state.reminderNotifiedDesktop.splice(state.reminderNotifiedDesktop.indexOf(found), 1)
+      },
+
+      SET_DEFAULT_DATE_FILTER (state, value) {
+        state.defaultDateFilter = value
       },
 
       updateField

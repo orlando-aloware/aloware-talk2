@@ -75,12 +75,12 @@ export default {
       'breadcrumbs'
     ]),
     breadcrumbName () {
-      let { crumbs, name } = this.breadcrumbs
+      const { crumbs, name } = this.breadcrumbs
       return isEmpty(crumbs) && isEmpty(name) ? 'My Queue' : name
     }
   },
   mounted () {
-    let id = this.$route.params.id
+    const id = this.$route.params.id
     this.findParents(this.directoryList, id)
     if (isNaN(id)) {
       this.resetBreabcrumbs()
@@ -92,11 +92,12 @@ export default {
     ]),
     findParents (node, searchForId) {
       var breadcrumbs = {}
-      let vNode = null
+      const vNode = { data: null }
+      const treeNode = { data: null }
       if (Array.isArray(node)) {
-        vNode = node[0]
+        vNode.data = node[0]
       } else {
-        vNode = node
+        vNode.data = node
       }
       // If current node name matches the search name, return
       // empty array which is the beginning of our parent result
@@ -105,9 +106,9 @@ export default {
       }
       // Otherwise, if this node has a tree field/value, recursively
       // process the nodes in this tree array
-      if (Array.isArray(vNode?.child_folders)) {
-        if (vNode.name === 'Root') {
-          let rootItem = vNode.lists.find(i => i.id.toString() === searchForId.toString())
+      if (Array.isArray(vNode.data?.child_folders)) {
+        if (vNode.data.name === 'Root') {
+          const rootItem = vNode.data.lists.find(i => i.id.toString() === searchForId.toString())
           if (rootItem) {
             breadcrumbs = {
               crumbs: '',
@@ -115,19 +116,19 @@ export default {
             }
           }
         }
-        for (var treeNode of vNode.child_folders) {
-          let name = vNode.name
+        for (treeNode.data of vNode.data.child_folders) {
+          const name = vNode.data.name
           // Recursively process treeNode. If an array result is
           // returned, then add the treeNode.name to that result
           // and return recursively
-          const childResult = this.findParents(treeNode, searchForId)
+          const childResult = this.findParents(treeNode.data, searchForId)
           if (Array.isArray(childResult)) {
-            return [ treeNode.name ].concat(childResult)
+            return [ treeNode.data.name ].concat(childResult)
           } else {
-            let foundItem = treeNode.lists.find(i => i.id.toString() === searchForId.toString())
+            const foundItem = treeNode.data.lists.find(i => i.id.toString() === searchForId.toString())
             if (foundItem) {
               breadcrumbs = {
-                crumbs: `${name === 'Root' ? '' : name + ' / '}${treeNode.name} / `,
+                crumbs: `${name === 'Root' ? '' : name + ' / '}${treeNode.data.name} / `,
                 name: foundItem.name
               }
             }
@@ -157,7 +158,7 @@ export default {
       this.findParents(this.directoryList, filter)
     },
     directoryList (data) {
-      let id = this.$route.params.id
+      const id = this.$route.params.id
       this.findParents(data, id)
     }
   }

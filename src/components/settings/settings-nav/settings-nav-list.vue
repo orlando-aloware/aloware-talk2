@@ -84,7 +84,7 @@ export default {
       }
 
       this.active = nextActive
-      let tab = this.items.find(item => item.value === nextActive)
+      const tab = this.items.find(item => item.value === nextActive)
       this.$router.push({
         name: 'Settings Tab',
         params: {

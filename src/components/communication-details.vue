@@ -817,12 +817,12 @@ export default {
         return null
       }
 
-      let communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
+      const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {
         return null
       }
 
-      let campaign = this.campaigns.find(campaign => campaign.id === this.communication.campaign_id)
+      const campaign = this.campaigns.find(campaign => campaign.id === this.communication.campaign_id)
       if (campaign) {
         return campaign
       }
@@ -834,7 +834,7 @@ export default {
       if (!this.communication.ring_group_id) {
         return null
       }
-      let ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.communication.ring_group_id)
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.communication.ring_group_id)
       if (ringGroup) {
         return ringGroup
       }
@@ -846,7 +846,7 @@ export default {
       if (!this.communication.workflow_id) {
         return null
       }
-      let sequence = this.workflows.find(workflow => workflow.id === this.communication.workflow_id)
+      const sequence = this.workflows.find(workflow => workflow.id === this.communication.workflow_id)
 
       return sequence || null
     },
@@ -855,7 +855,7 @@ export default {
       if (!this.communication.broadcast_id) {
         return null
       }
-      let broadcast = this.broadcasts.find(workflow => workflow.id === this.communication.broadcast_id)
+      const broadcast = this.broadcasts.find(workflow => workflow.id === this.communication.broadcast_id)
 
       return broadcast || null
     },
@@ -864,7 +864,7 @@ export default {
       return this.communication.attempt ? `attempt ${this.communication.attempt}` : 'no attempts'
     },
     callDescriptionText () {
-      let text = 'This call '
+      const text = 'This call '
 
       switch (this.communication.disposition_status2) {
         case CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW:
@@ -884,11 +884,11 @@ export default {
 
   methods: {
     getCommunicationCampaignName () {
-      let communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
+      const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {
         return null
       }
-      let campaign = this.campaigns.find(campaign => campaign.id === this.campaignId)
+      const campaign = this.campaigns.find(campaign => campaign.id === this.campaignId)
       if (campaign) {
         return campaign.name
       }
@@ -899,7 +899,7 @@ export default {
       if (!id) {
         return null
       }
-      let campaign = this.campaigns.find(campaign => campaign.id === id)
+      const campaign = this.campaigns.find(campaign => campaign.id === id)
       if (campaign) {
         return campaign
       }

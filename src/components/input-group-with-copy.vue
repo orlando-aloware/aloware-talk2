@@ -39,7 +39,7 @@ export default {
 
   methods: {
     copy () {
-      let inputElement = this.$refs.input_copy
+      const inputElement = this.$refs.input_copy
 
       this.isCopying = true
       inputElement.select()

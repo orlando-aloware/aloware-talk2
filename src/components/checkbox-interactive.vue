@@ -35,15 +35,15 @@ export default {
   },
   methods: {
     onCheckerClicked () {
-      let items = []
-      let found = this.checkedItems.find(item => item.id === this.resource.id)
+      const items = { data: [] }
+      const found = this.checkedItems.find(item => item.id === this.resource.id)
       if (found) {
-        items = this.checkedItems.filter(item => item.id !== this.resource.id)
+        items.data = this.checkedItems.filter(item => item.id !== this.resource.id)
       } else {
-        items = [...this.checkedItems]
-        items.push(this.resource)
+        items.data = [...this.checkedItems]
+        items.data.push(this.resource)
       }
-      this.$emit('checked', items)
+      this.$emit('checked', items.data)
     }
   }
 }

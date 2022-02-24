@@ -155,6 +155,7 @@ import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
 import DateSelector from 'components/date-selector'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'appointment-form-modal',
@@ -255,8 +256,7 @@ export default {
     },
     onSubmit () {
       this.isSaving = true
-
-      talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.id, this.getParams())
+      talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.getParams())
         .then(response => {
           this.$generalNotification(`Event has been ${(this.id ? 'updated' : 'added')}`)
           this.onHidden()
@@ -276,7 +276,11 @@ export default {
         body: this.appointment.body,
         type: this.appointment.type,
         contact: this.contact,
-        user: this.profile
+        user: this.profile,
+        called_from: 'contact',
+        // TODO change when updating an appointment
+        status: CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW,
+        user_timezone: window.timezone
       }
 
       if (this.appointment.smsReminder.enabled) {
@@ -315,7 +319,6 @@ export default {
       this.appointment.smsReminder.time = time.value
     },
     smsReminderFrequencySelected (frequencies) {
-      console.log(frequencies)
       this.appointment.smsReminder.frequencies = frequencies
     },
     appendSmsReminderTemplateVariable (variable) {

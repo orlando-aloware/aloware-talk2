@@ -201,35 +201,35 @@ export default {
   computed: {
     ...mapState(['notifications', 'dialer', 'callFishingQueue']),
     toastClass () {
-      let toastClass = 'action-notification notification-border-round'
+      const toastClass = { data: 'action-notification notification-border-round' }
 
       if (!['incomingCall', 'callFishing'].includes(this.id)) {
-        toastClass += ' bg-grey-80'
+        toastClass.data += ' bg-grey-80'
       }
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
-        toastClass += ' bg-blue-60-opaque position-relative background-blur incoming-call-notification'
+        toastClass.data += ' bg-blue-60-opaque position-relative background-blur incoming-call-notification'
       }
 
       if (this.queue) {
-        toastClass += ' has-clear-queues'
+        toastClass.data += ' has-clear-queues'
       }
 
-      return toastClass
+      return toastClass.data
     },
 
     headerClass () {
-      let headerClass = 'border-0 p-0'
+      const headerClass = { data: 'border-0 p-0' }
 
       if (!['incomingCall', 'callFishing'].includes(this.id)) {
-        headerClass += ' bg-grey-80'
+        headerClass.data += ' bg-grey-80'
       }
 
       if (['incomingCall', 'callFishing'].includes(this.id)) {
-        headerClass += ' bg-blue-60-opaque'
+        headerClass.data += ' bg-blue-60-opaque'
       }
 
-      return headerClass
+      return headerClass.data
     },
 
     queue () {
@@ -237,7 +237,7 @@ export default {
     },
 
     message () {
-      let message = _.get(this.notifications[this.id], 'message', '')
+      const message = _.get(this.notifications[this.id], 'message', '')
 
       return this.$options.filters.parseMentionToView(message)
     },
@@ -245,9 +245,9 @@ export default {
       return _.get(this.notifications[this.id], 'messageIcon', null)
     },
     title () {
-      let title = _.get(this.notifications[this.id], 'title', '')
+      const title = _.get(this.notifications[this.id], 'title', '')
 
-      let fixedTitle = this.$options.filters.fixPhone(title)
+      const fixedTitle = this.$options.filters.fixPhone(title)
 
       if (!['sms', 'call'].includes(this.id) || !fixedTitle) {
         return title
@@ -300,7 +300,7 @@ export default {
       return _.get(this.notifications[this.id], 'contact', null)
     },
     isValidPhoneShowInfo () {
-      let dialerCommunicationId = _.get(this.dialer, 'communication.id', null)
+      const dialerCommunicationId = _.get(this.dialer, 'communication.id', null)
       return (
         (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
           (this.id === 'callFishing' && !this.dialer.call && !this.dialer.callFishing.communication)) &&
@@ -431,7 +431,7 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {
-      let data = {
+      const data = {
         communication: {
           id: this.communicationId,
           campaignId: this.campaignId,
@@ -463,9 +463,10 @@ export default {
       }
     },
     onNotificationClick (event) {
-      let found = event.path.find((item) => {
-        let className = _.get(item, 'className', null)
-        return className && typeof className === 'string' && (className.includes('call-actions') || className.includes('call-fishing-actions'))
+      const className = { data: null }
+      const found = event.path.find((item) => {
+        className.data = _.get(item, 'className', null)
+        return className.data && typeof className.data === 'string' && (className.data.includes('call-actions') || className.data.includes('call-fishing-actions'))
       })
 
       if (!found && this.isValidPhoneShowInfo) {

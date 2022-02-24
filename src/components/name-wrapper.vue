@@ -44,7 +44,7 @@ export default {
       return this.resource || {}
     },
     name () {
-      let { computedResource } = this
+      const { computedResource } = this
       if (computedResource.first_name && computedResource.last_name) {
         return `${computedResource.first_name} ${computedResource.last_name}`
       }

@@ -177,22 +177,23 @@ export default {
           (c) => c.name !== column.name
         )
       } else {
-        let newItems = JSON.parse(JSON.stringify(this.currentColumns))
+        const newItems = JSON.parse(JSON.stringify(this.currentColumns))
+        const index = { data: null }
 
         // now, check if columns have order property, or
         // check if column is required then update the sortable property.
-        for (let index in newItems) {
-          let found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
-          if (newItems[index].name !== 'checkbox' && typeof newItems[index].order === 'undefined' && found) {
-            newItems[index].order = found.order
+        for (index.data in newItems) {
+          const found = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
+          if (newItems[index.data].name !== 'checkbox' && typeof newItems[index.data].order === 'undefined' && found) {
+            newItems[index.data].order = found.order
           }
         }
 
         // insert the column to the nearest existing neighboring column.
-        let lesserOrder = newItems.find(col => col.order < column.order)
-        let lesserOrderIndex = lesserOrder ? newItems.indexOf(lesserOrder) : null
-        let greaterOrder = newItems.find(col => parseInt(col.order) > column.order)
-        let greaterOrderIndex = greaterOrder ? newItems.indexOf(greaterOrder) : null
+        const lesserOrder = newItems.find(col => col.order < column.order)
+        const lesserOrderIndex = lesserOrder ? newItems.indexOf(lesserOrder) : null
+        const greaterOrder = newItems.find(col => parseInt(col.order) > column.order)
+        const greaterOrderIndex = greaterOrder ? newItems.indexOf(greaterOrder) : null
 
         if (greaterOrderIndex !== -1 && greaterOrderIndex !== null) {
           newItems.splice(greaterOrderIndex, 0, column)
@@ -201,8 +202,8 @@ export default {
         }
 
         // correct the actions order, should always be at the last.
-        let actions = newItems.find(column => column.label === 'Actions')
-        let actionsIndex = actions ? newItems.indexOf(actions) : null
+        const actions = newItems.find(column => column.label === 'Actions')
+        const actionsIndex = actions ? newItems.indexOf(actions) : null
         if (actionsIndex !== -1 && actionsIndex !== null && actionsIndex < (newItems.length - 1)) {
           newItems.splice(actionsIndex, 1)
           newItems.splice(actions.order, 0, actions)
@@ -298,12 +299,12 @@ export default {
       return this.columns.id === 'my-queue' ? this.predefinedId : this.columns.id
     },
     title () {
-      let title = this.columns?.name || 'My Queue'
+      const title = this.columns?.name || 'My Queue'
       return `Manage ${String(title).toLowerCase()} columns`
     },
     allColumns () {
       const columns = []
-      let results = 0
+      const results = { data: 0 }
 
       const matches = sortBy(ALL_COLUMNS, ['name']).filter((item) => {
         if (this.searchText && this.searchText.trim().length > 1) {
@@ -317,17 +318,14 @@ export default {
         }
       })
 
-      for (let i = 0; i < COLUMN_CATEGORIES.length; i++) {
+      const item = { i: 0 }
+      for (item.i = 0; item.i < COLUMN_CATEGORIES.length; item.i++) {
         if (this.endpointUrl === 'contacts-list') {
-          columns[i] = matches.filter((c) => {
-            return c.category === i && c.name !== 'task_status'
-          })
+          columns[item.i] = matches.filter((c) => c.category === item.i && c.name !== 'task_status')
         } else {
-          columns[i] = matches.filter((c) => {
-            return c.category === i
-          })
+          columns[item.i] = matches.filter((c) => c.category === item.i)
         }
-        results = results + columns[i].length
+        results.data = results.data + columns[item.i].length
       }
 
       return {

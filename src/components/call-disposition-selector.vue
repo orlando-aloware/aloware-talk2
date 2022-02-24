@@ -141,7 +141,7 @@ export default {
 
     computedCommunication () {
       if (this.communication) {
-        let found = this.callDispositionsAlphabeticalOrder.find(callDisposition => callDisposition.id === this.communication.call_disposition_id)
+        const found = this.callDispositionsAlphabeticalOrder.find(callDisposition => callDisposition.id === this.communication.call_disposition_id)
         return {
           id: this.communication.call_disposition_id,
           call_disposition_id: this.communication.call_disposition_id,
@@ -191,20 +191,21 @@ export default {
 
   methods: {
     initializeTagValues (overrideValue = undefined) {
-      let found = null
+      const found = { data: null }
       const value = overrideValue || this.value
       if (value instanceof Array) {
         this.callDispositionId = []
-        for (let item of value) {
-          found = this.availableDispositions.find(disposition => disposition.id === item)
-          if (found !== null) {
-            this.callDispositionId.push(found)
+        const item = { index: null }
+        for (item.index of value) {
+          found.data = this.availableDispositions.find(disposition => disposition.id === item.index)
+          if (found.data !== null) {
+            this.callDispositionId.push(found.data)
           }
         }
       } else {
-        found = this.availableDispositions.find(disposition => disposition.id === value)
-        if (found !== null) {
-          this.callDispositionId = found
+        found.data = this.availableDispositions.find(disposition => disposition.id === value)
+        if (found.data !== null) {
+          this.callDispositionId = found.data
         }
       }
     },
@@ -236,21 +237,22 @@ export default {
     },
 
     selectCallDisposition (callDisposition, returnValue = false) {
-      let callDispositionIds = null
+      const callDispositionIds = { data: null }
       if (callDisposition instanceof Array) {
-        callDispositionIds = []
-        for (let item of callDisposition) {
-          callDispositionIds.push(item.id)
+        callDispositionIds.data = []
+        const item = { data: null }
+        for (item.data of callDisposition) {
+          callDispositionIds.data.push(item.data.id)
         }
       } else {
-        callDispositionIds = callDisposition.id
+        callDispositionIds.data = callDisposition.id
       }
 
       if (returnValue) {
-        return callDispositionIds
+        return callDispositionIds.data
       }
 
-      this.$emit('change', callDispositionIds)
+      this.$emit('change', callDispositionIds.data)
     },
 
     filterFn (val, update) {

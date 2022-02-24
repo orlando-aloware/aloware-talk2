@@ -288,17 +288,17 @@ export default {
     },
 
     rules () {
-      let rulesObject = {}
+      const rulesObject = { data: {} }
 
       if (this.shouldObserve) {
-        rulesObject = { ...rulesObject,
+        rulesObject.data = { ...rulesObject.data,
           observing_campaigns: {
             required
           }
         }
       }
 
-      return rulesObject
+      return rulesObject.data
     }
   },
 

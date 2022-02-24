@@ -428,17 +428,17 @@ export default {
       return this.user.should_message_caller_if_completed === 1
     },
     rules () {
-      let rulesObject = {}
+      const rulesObject = { data: {} }
 
       if (this.user.should_message_if_missed) {
-        rulesObject = { ...rulesObject, missed_call_message: { required } }
+        rulesObject.data = { ...rulesObject.data, missed_call_message: { required } }
       }
 
       if (this.user.should_message_caller_if_completed) {
-        rulesObject = { ...rulesObject, completed_call_message_caller: { required } }
+        rulesObject.data = { ...rulesObject.data, completed_call_message_caller: { required } }
       }
 
-      return rulesObject
+      return rulesObject.data
     }
   },
 
@@ -519,7 +519,7 @@ export default {
       }
 
       if (prop === 'operating_hours') {
-        let key = Object.keys(value)[0]
+        const key = Object.keys(value)[0]
         this.user['operating_hours'] = { ...this.user['operating_hours'], key: value[key] }
         this.updateChangedUserProperties({
           name: 'operating_hours',
@@ -562,7 +562,7 @@ export default {
       }
 
       if (prop === 'checkAllUS') {
-        let states = value ? this.states.us : []
+        const states = value ? this.states.us : []
         this.user['operating_states_limit'] = { ...this.user.operating_states_limit, us: states }
         this.updateChangedUserProperties({
           name: 'operating_states_limit.us',
@@ -579,7 +579,7 @@ export default {
       }
 
       if (prop === 'checkAllCA') {
-        let states = value ? this.states.ca : []
+        const states = value ? this.states.ca : []
         this.user.operating_states_limit.ca = states
         this.updateChangedUserProperties({
           name: 'operating_states_limit.ca',

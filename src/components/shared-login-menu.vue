@@ -85,8 +85,8 @@ export default {
     },
     updateDefaultLogin () {
       talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.user.default_app }).then(response => {
-        let message = this.user.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC ? 'Classic' : 'Talk'
-        let user = _.cloneDeep(this.user)
+        const message = this.user.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC ? 'Classic' : 'Talk'
+        const user = _.cloneDeep(this.user)
         this.setProfile(user)
 
         this.$generalNotification('Default application login has been set to Aloware ' + message + '.')

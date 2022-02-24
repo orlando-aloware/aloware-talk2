@@ -30,8 +30,6 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 
-let inputTimeout
-
 export default {
   components: {
     FolderStaticIcon,
@@ -73,11 +71,12 @@ export default {
   },
   data () {
     return {
-      ContactListTypes
+      ContactListTypes,
+      inputTimeout: null
     }
   },
   beforeDestroy () {
-    clearTimeout(inputTimeout)
+    clearTimeout(this.inputTimeout)
   },
   methods: {
     ...mapActions('contacts', [

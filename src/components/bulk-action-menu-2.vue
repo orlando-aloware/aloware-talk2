@@ -78,7 +78,7 @@ export default {
       await this.onMoveContacts(MOVE_CONTACTS_DIRECTION.bottom)
     },
     async onMoveContacts (direction = MOVE_CONTACTS_DIRECTION.top) {
-      let res = await this.moveContactItems({
+      const res = await this.moveContactItems({
         id: this.isMyQueue ? this.myQueue.id : this.id,
         params: {
           contact_ids: this.selectedContactIds,

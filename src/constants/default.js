@@ -199,5 +199,6 @@ export const DEFAULT_STATE = {
   voicemailNotifiedDesktop: [],
   contactNotifiedDesktop: [],
   appointmentNotifiedDesktop: [],
-  reminderNotifiedDesktop: []
+  reminderNotifiedDesktop: [],
+  defaultDateFilter: null
 }
