@@ -592,10 +592,14 @@ export default {
           this.fetch(params)
           this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
+        // this.isLoading = false
       }
     },
     selectedPdList (value) {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
+      if (this.activeList.length > 0) {
+        this.isLoading = false
+      }
     },
     clearList (value) {
       this.fetch()

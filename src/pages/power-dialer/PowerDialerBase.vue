@@ -37,7 +37,8 @@ export default {
   },
   async mounted () {
     this.resetSearch()
-    await this.fetchResources()
+    await this.myQueueList()
+    await this.loadList(this.id)
   },
   data () {
     return {
@@ -57,13 +58,16 @@ export default {
       await this.loadList(data.id)
     },
     async fetchResources () {
-      if (this.$route.meta.title === 'Power Dialer') {
-        let response = await this.getMyQueueList()
-        this.listLoaded({ ...response.data, id: 'my-queue' })
+      if (this.$route.meta.id === 'power-dialer-queue-filter') {
+        await this.myQueueList()
         await this.loadList('my-queue')
       } else {
         await this.loadList(this.id)
       }
+    },
+    async myQueueList () {
+      let response = await this.getMyQueueList()
+      this.listLoaded({ ...response.data, id: 'my-queue' })
     }
   },
   watch: {
