@@ -47,7 +47,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties']),
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'setChangedContactProperties']),
     onCancel () {
       if (this.contactClone.id === this.contact.id) {
         this.setContact({ ...this.contactClone })
@@ -59,20 +59,44 @@ export default {
       return Promise.all([
         this.saveChanges(),
         this.disposeContact()
-      ]).finally(() => {
-        this.resetChangedContactProperties()
+      ]).then(response => {
+        if (response[0] && response[0].status && response[1] && response[1].status) {
+          const contact = response[0].contact
+          this.setContact(contact)
+          this.setContactClone(contact)
+          this.resetChangedContactProperties()
+        }
+
+        // contact has been updated while disposition is not
+        if (response[0] && response[0].status && (!response[1] || !response[1].status)) {
+          this.setChangedContactProperties([...this.changedContactProperties.filter(item => item.property === 'disposition_status_id')])
+        }
+
+        // contact has not been updated while disposition is
+        if ((!response[0] || !response[0].status) && response[1] && response[1].status) {
+          this.setChangedContactProperties([...this.changedContactProperties.filter(item => item.property !== 'disposition_status_id')])
+        }
+      }).finally(() => {
         this.isBusy = false
-        this.$generalNotification('Your changes has been saved.')
       })
     },
     saveChanges () {
       const parameters = this.getParameters()
       if (Object.entries(parameters).length > 0) {
         return talk2Api.V1.contact.update(this.contact.id, parameters).then(response => {
+          this.$generalNotification('Your changes has been saved.')
           if (response.data.id === this.contact.id) {
-            this.setContact(response.data)
-            this.setContactClone(response.data)
+            return { status: true, contact: response.data }
           }
+
+          return { status: true }
+        }).catch(err => {
+          if (err.response.data && err.response.data.errors) {
+            Object.keys(err.response.data.errors).forEach((value) => {
+              this.$generalNotification(err.response.data.errors[value][0], 'error')
+            })
+          }
+          return { status: false }
         })
       }
     },
@@ -80,12 +104,15 @@ export default {
       const dispositionStatusProp = this.changedContactProperties.find(item => item.property === 'disposition_status_id')
       if (dispositionStatusProp) {
         return talk2Api.V1.contact.dispose(this.contact.id, { 'disposition_status': this.contact.disposition_status_id }).then(response => {
+          this.$generalNotification('Contact disposition status has been saved.')
           if (response.data.id === this.contact.id) {
-            this.setContact(response.data)
-            this.setContactClone(response.data)
+            return { status: true, contact: response.data }
           }
+
+          return { status: true }
         }).catch(() => {
-          return Promise.reject('Error while saving changes.')
+          this.$generalNotification('Error while updating contact disposition status.', 'error')
+          return { status: false }
         })
       }
     },
@@ -104,7 +131,7 @@ export default {
 
   watch: {
     contact: function () {
-      this.resetChangedContactProperties()
+      // this.resetChangedContactProperties()
     }
   }
 }
