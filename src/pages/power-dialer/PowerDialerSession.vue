@@ -62,16 +62,11 @@ export default {
       'selectedPdList'
     ]),
     ...mapFields('powerDialer', [
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'activeList'
     ]),
     list () {
       return this.listItems[this.selectedPdList.id].data || []
-    },
-    activeList () {
-      if (this.list.length) {
-        return this.list[0]
-      }
-      return {}
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
@@ -131,19 +126,20 @@ export default {
       })
     },
     async fetchCurrentList () {
-      let res = null
+      let response = null
       let id = ''
       if (this.isValidList) {
         id = this.selectedPdList.id
-        res = await this.getPowerDialerList(id)
+        response = await this.getPowerDialerList(id)
       } else {
         id = this.selectedPdList?.name?.length === 0 || this.selectedPdList?.name === 'My Queue' ? 'my-queue' : this.selectedPdList?.id
-        res = await this.getPowerDialerList(this.$route.params.id)
+        response = await this.getPowerDialerList(this.$route.params.id)
       }
+      this.activeList = response
       this.setSelectedPDList({
-        id: res.id,
-        name: res.name,
-        type: res.type
+        id: response.id,
+        name: response.name,
+        type: response.type
       })
       // console.log('RES -------- :>> ', res)
     }

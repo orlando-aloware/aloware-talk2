@@ -1,6 +1,6 @@
 <template>
   <div class="t-session-settings">
-    <b-dropdown
+    <!-- <b-dropdown
       text="..."
       no-caret
       right size="sm"
@@ -21,8 +21,9 @@
         <i class="fa fa-bars mr-1"></i>
         Option 2
       </b-dropdown-item>
-    </b-dropdown>
+    </b-dropdown> -->
     <q-btn
+      v-if="defaultTrigger"
       class="start-dial-button p-0"
       color="success"
       no-caps
@@ -40,6 +41,16 @@
           To start dialing, a minimum of 1 (one) contact item in the list is required
         </q-tooltip>
       </div>
+    </q-btn>
+    <q-btn
+      v-else
+      no-caps
+      unelevated
+      @click="dialPreparation">
+      <SettingIcon
+        width="15px"
+        height="15px"
+        class="mx-1" />
     </q-btn>
     <q-dialog
       v-model="dialog"
@@ -215,7 +226,9 @@
                         :disabled="disabled"
                         size="sm"
                         class="px-3 py-0"
-                        color="success">Begin Dialing</q-btn>
+                        color="success">
+                        {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                      </q-btn>
                     </q-card-actions>
                   </q-card>
                 </div>
@@ -311,6 +324,7 @@ import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
+import SettingIcon from 'components/icons/setting-o-icon'
 
 // const UNTITLED = 'Untitled'
 
@@ -323,17 +337,23 @@ export default {
     disabledTrigger: {
       type: Boolean,
       default: false
+    },
+    defaultTrigger: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
     SessionsForm,
     PhoneIcon,
-    CheckIcon
+    CheckIcon,
+    SettingIcon
   },
   computed: {
     ...mapFields('powerDialer', [
       'sessionSettings',
-      'dialerSessionSettings'
+      'dialerSessionSettings',
+      'activeList'
     ]),
     ...mapGetters('powerDialer', [
       'personalSessionSettings',
@@ -435,7 +455,11 @@ export default {
         })
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
-      this.$emit('start')
+      if (this.defaultTrigger) {
+        this.$emit('start')
+      } else {
+        this.$emit('update')
+      }
     },
     async loadSettings (data) {
       this.loading = true
@@ -558,6 +582,7 @@ export default {
         } else {
           this.selectedItem = this.temporarySetting
         }
+        this.activeList = this.list
         // if (this.sessionSettings?.id) {
         //   // this.resetDefaults(false)
         // }

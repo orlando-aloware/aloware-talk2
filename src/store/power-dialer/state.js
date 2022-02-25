@@ -162,6 +162,7 @@ export default function () {
     sessionPaused: false,
     selectedPdList: {},
     metrics: [],
-    activeMetrics: []
+    activeMetrics: [],
+    activeList: {}
   }
 }

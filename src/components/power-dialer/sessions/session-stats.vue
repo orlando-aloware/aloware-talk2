@@ -31,10 +31,10 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <SettingIcon
-        width="15px"
-        height="15px"
-        class="mr-2" />
+      <StartDialing
+        :list="activeList"
+        :default-trigger="false"
+        @update="updateSettings" />
 
     </div>
     <div class="t-menu__header d-flex align-items-center">
@@ -70,12 +70,16 @@
 
 <script>
 
-import SettingIcon from 'components/icons/setting-o-icon'
+import { mapFields } from 'vuex-map-fields'
+import StartDialing from '../session-settings/start-dial-sessions-settings'
 
 export default {
   name: 'SessionStats',
   components: {
-    SettingIcon
+    StartDialing
+  },
+  computed: {
+    ...mapFields('powerDialer', ['activeList'])
   },
   data () {
     return {
@@ -86,6 +90,11 @@ export default {
         { name: 'Interested Call Disp.', values: { primary: '2', secondary: '(8%)' } },
         { name: 'Closed Contact Disp.', values: { primary: '1', secondary: '(4%)' } }
       ]
+    }
+  },
+  methods: {
+    updateSettings () {
+      this.$generalNotification('Session settings has been updated.', 'success')
     }
   }
 }
