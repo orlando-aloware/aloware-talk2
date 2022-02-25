@@ -1,5 +1,5 @@
 <template>
-  <div v-if="resources" class="row">
+  <q-card v-if="resources" class="row">
     <div
       class="col-12 px-0"
       v-for="form in forms"
@@ -30,6 +30,7 @@
             use-input
             emit-value
             map-options
+            :disable="disabled"
             class="generic-selector-2"
             :max-values="4"
             outlined dense>
@@ -56,6 +57,7 @@
             v-model="resources[cform.name]"
             :multiple="false"
             :use-chips="true"
+            :disable="disabled"
             :generic-styling="false"
             :generic-multiselect="false"
             @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
@@ -64,6 +66,7 @@
             v-else-if="cform.name === 'script_id'"
             v-model="resources[cform.name]"
             :communication="contact"
+            :disable="disabled"
             class="w-100"></ScriptSelector>
 
           <CallDispositionSelector
@@ -71,6 +74,7 @@
             v-model="resources[cform.name]"
             :multiple="true"
             :highlighted="isChanged('call_dispositions')"
+            :disable="disabled"
             @change="{}"
             class="pb-3">
           </CallDispositionSelector>
@@ -82,6 +86,7 @@
             :multiple="true"
             :use-chips="true"
             :outlined="true"
+            :disable="disabled"
             :show-placeholder="false"
             custom-class="padded-container-1 generic-selector-1"
             @change="{}"
@@ -91,6 +96,7 @@
           <VmDropSelector
             v-else-if="cform.name === 'setVmDropShortcuts'"
             v-model="resources[cform.name]"
+            :disable="disabled"
             class="w-100"
             @change="{}">
           </VmDropSelector>
@@ -100,13 +106,15 @@
               v-model="resources[cform.name]"
               :true-value="1"
               :false-value="0"
+              :disable="disabled"
               size="md"
               val="md" />
           </p>
 
           <WarmupPeriodSelector
             v-else-if="cform.name === 'warmup_period_in_seconds'"
-            v-model="resources[cform.name]" />
+            v-model="resources[cform.name]"
+            :disable="disabled" />
 
           <q-select
             v-else
@@ -118,7 +126,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </q-card>
 </template>
 
 <script>
@@ -144,6 +152,10 @@ export default {
     name: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   model: {

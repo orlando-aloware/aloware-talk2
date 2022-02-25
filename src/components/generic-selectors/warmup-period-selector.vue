@@ -6,6 +6,7 @@
     :options="warmups"
     option-label="text"
     option-value="value"
+    :disable="disable"
     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
     v-model="localValue"
     :emit-value="true"
@@ -34,6 +35,11 @@ export default {
     customClass: {
       type: String,
       default: ''
+    },
+    disable: {
+      type: Boolean,
+      default: false,
+      required: false
     }
   },
   computed: {

@@ -237,7 +237,8 @@
               <SessionsForm
                 v-model="selectedItem"
                 @valid-form="disabled = false"
-                @invalid-form="disabled = true" />
+                @invalid-form="disabled = true"
+                :disabled="isCompanyScope" />
 
             </q-card>
           </q-card-section>
@@ -371,6 +372,9 @@ export default {
         return this.selectedItem.id === this.temporarySetting?.id
       }
       return false
+    },
+    isCompanyScope () {
+      return this.selectedItem.is_company_scope === 1
     }
   },
   async mounted () {
