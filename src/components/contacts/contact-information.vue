@@ -27,7 +27,7 @@
                                       :use-chips="false"
                                       :outlined="false"
                                       :show-placeholder="false"
-                                      :emit-value="false"
+                                      :emit-value="true"
                                       custom-class="inline-select"
                                       v-model="contact.disposition_status_id"
                                       @change="(eventPayload) => onUpdateFields(eventPayload, 'disposition_status_id')">
