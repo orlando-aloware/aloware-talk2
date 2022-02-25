@@ -7,7 +7,7 @@
             ref="contactDispositionSelect"
             use-input
             use-chips
-            emit-value
+            :emit-value="emitValue"
             map-options
             dense
             :options="contactDispositionsOptions"
@@ -108,6 +108,11 @@ export default {
     showPlaceholder: {
       type: Boolean,
       default: true
+    },
+
+    emitValue: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -157,7 +162,7 @@ export default {
     }
   },
 
-  created () {
+  mounted () {
     this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder
   },
 
@@ -196,6 +201,9 @@ export default {
       if (this.contactDispositionId !== this.value) {
         this.$emit('change', val)
       }
+    },
+    contactDispositionsAlphabeticalOrder () {
+      this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder
     }
   }
 }
