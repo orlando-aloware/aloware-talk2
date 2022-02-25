@@ -93,7 +93,8 @@ export default {
     }
   },
   methods: {
-    updateSettings () {
+    updateSettings (obj) {
+      this.activeList = obj.data
       this.$generalNotification('Session settings has been updated.', 'success')
     }
   }

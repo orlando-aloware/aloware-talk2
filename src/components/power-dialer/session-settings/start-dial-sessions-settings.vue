@@ -431,6 +431,7 @@ export default {
        * IF selected item is temporary OR
        * IF selected item is personal/company
        */
+      let newList = null
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.selectedItem }
         let res = await this.createDialerSessionSetting({
@@ -440,7 +441,7 @@ export default {
         })
         if (res?.id) {
           await this.getDialerSessionSettings()
-          await this.updateContactsList({
+          newList = await this.updateContactsList({
             id: this.list.id,
             dialer_session_id: null
           })
@@ -449,7 +450,7 @@ export default {
       } else {
         let { id } = this.selectedItem
         // this.activeSessionSettingId = id
-        await this.updateContactsList({
+        newList = await this.updateContactsList({
           id: this.list.id,
           dialer_session_id: id
         })
@@ -458,7 +459,7 @@ export default {
       if (this.defaultTrigger) {
         this.$emit('start')
       } else {
-        this.$emit('update')
+        this.$emit('update', newList)
       }
     },
     async loadSettings (data) {
