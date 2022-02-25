@@ -180,8 +180,13 @@ export default {
         this.$generalNotification(`Template has been ${pastActionText.data.toLowerCase()}.`)
         this.$emit('templateSaved', response.data)
       }).catch(error => {
-        console.log(error)
-        this.$generalNotification(`Error while ${presentActionText.data.toLowerCase()} sms template.`, 'error')
+        if (error.response.data && error.response.data.errors) {
+          Object.keys(error.response.data.errors).forEach((value) => {
+            this.$generalNotification(error.response.data.errors[value][0], 'error')
+          })
+        } else {
+          this.$generalNotification(`Error while ${presentActionText.data.toLowerCase()} sms template.`, 'error')
+        }
       }).finally(() => {
         this.isSaving = false
       })
