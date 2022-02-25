@@ -270,7 +270,8 @@
         </b-form-row>
       </div>
 
-      <b-form-row class="mt-4" :id="`${SettingsMap.text_message_handling.hash_keyword}-container`">
+      <b-form-row v-if="isAdmin"
+                  class="mt-4" :id="`${SettingsMap.text_message_handling.hash_keyword}-container`">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Text Message Handling (Beta)</h5>
@@ -359,7 +360,8 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4"
+      <b-form-row v-if="isAdmin"
+                  class="mt-4"
                   :id="`${SettingsMap.campaign_id.hash_keyword}-container`">
         <b-col sm="12"
                md="6">
