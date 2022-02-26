@@ -93,14 +93,16 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="mt-4" v-if="hasAdminRole">
+      <b-form-row v-if="hasAdminRole"
+                  class="mt-4"
+                  :id="`${SettingsMap.account_level_notifications.hash_keyword}-container`">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Account Level Notifications (Admins Only)</h5>
             <p class="form-helper-text">Receive daily emails for account activity:</p>
           </div>
 
-          <b-form-group label="" :id="`${SettingsMap.enabled_billing_warnings.hash_keyword}-container`">
+          <b-form-group label="">
             <b-form-checkbox switch
                              v-model="user.enabled_billing_warnings"
                              :value="true"
@@ -108,16 +110,39 @@
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
               Billing Warnings
             </b-form-checkbox>
+            <div class="account-level-notification-tooltip-wrapper">
+              <information-circle-icon color="#2F80ED">
+              </information-circle-icon>
+              <q-tooltip anchor="center start"
+                         self="center left"
+                         :offset="[-20, 10]">
+                Only enabled for billing admins
+              </q-tooltip>
+            </div>
           </b-form-group>
 
-          <b-form-group label="" :id="`${SettingsMap.enabled_sync_reports.hash_keyword}-container`">
+          <b-form-group label="" :id="`${SettingsMap.enabled_integration_reports.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="user.enabled_sync_reports"
+                             v-model="user.enabled_integration_reports"
                              :value="true"
                              :unchecked-value="false"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_sync_reports')">
-              Integration Sync Report
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_integration_reports')">
+              Integration Reports
             </b-form-checkbox>
+            <div class="account-level-notification-tooltip-wrapper">
+              <information-circle-icon color="#2F80ED">
+              </information-circle-icon>
+              <q-tooltip anchor="center start"
+                         self="center left"
+                         :offset="[-20, 10]">
+                <p class="font-weight-bold">Integration Reports include:</p>
+                <p class="mt-1 mb-0">- Push/Pull Users Sync</p>
+                <p class="mt-0 mb-0">- Contacts Sync</p>
+                <p class="mt-0 mb-0">- Contact Dispositions Sync</p>
+                <p class="mt-0 mb-0">- Call Disposition Sync</p>
+                <p class="mt-0 mb-0">- Failed Integration Connection Status</p>
+              </q-tooltip>
+            </div>
           </b-form-group>
 
           <b-form-group label="" :id="`${SettingsMap.enabled_account_reports.hash_keyword}-container`">
@@ -128,6 +153,19 @@
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_account_reports')">
               Account Reports
             </b-form-checkbox>
+            <div class="account-level-notification-tooltip-wrapper">
+              <information-circle-icon color="#2F80ED">
+              </information-circle-icon>
+              <q-tooltip anchor="center start"
+                         self="center left"
+                         :offset="[-20, 10]">
+                <p class="font-weight-bold">Account Reports include:</p>
+                <p class="mt-1 mb-0">- Daily Activity Reports</p>
+                <p class="mt-0 mb-0">- Daily Inbound SMS Report</p>
+                <p class="mt-0 mb-0">- Daily Outbound SMS Report</p>
+                <p class="mt-0 mb-0">- Daily Spending Report</p>
+              </q-tooltip>
+            </div>
           </b-form-group>
 
           <b-form-group label="" :id="`${SettingsMap.enabled_other_reports.hash_keyword}-container`">
@@ -138,6 +176,17 @@
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_other_reports')">
               Other Notifications
             </b-form-checkbox>
+            <div class="account-level-notification-tooltip-wrapper">
+              <information-circle-icon color="#2F80ED">
+              </information-circle-icon>
+              <q-tooltip anchor="center start"
+                         self="center left"
+                         :offset="[-20, 10]">
+                <p class="font-weight-bold">Other Notifications:</p>
+                <p class="mt-1 mb-0">- Imports/Exports Reports</p>
+                <p class="mt-0 pt-0">- Webhook Failure Reports</p>
+              </q-tooltip>
+            </div>
           </b-form-group>
 
         </b-col>
@@ -266,13 +315,14 @@ import { mapActions } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { settingsMixin } from 'src/plugins/mixins'
 import { required } from 'vuelidate/lib/validators'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'notification-settings',
 
   mixins: [settingsMixin],
 
-  components: { LineSelector },
+  components: { InformationCircleIcon, LineSelector },
 
   props: {
     user: {
@@ -289,7 +339,7 @@ export default {
       return this.user.role_names.includes('Billing Admin')
     },
     hasAdminRole () {
-      return this.isCompanyAdmin || this.isBillingAdmin
+      return this.user && (this.isCompanyAdmin || this.isBillingAdmin)
     },
 
     rules () {
@@ -450,8 +500,6 @@ export default {
 
   mounted () {
     this.shouldObserve = !!this.user.observing_campaigns.length
-    console.clear()
-    console.log(this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs)
 
     this.myCalls = this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs
     this.myTexts = this.user.texts_inapp_notifs || this.user.texts_desktop_notifs || this.user.texts_push_notifs || this.user.texts_email_notifs || this.user.texts_text_notifs
@@ -469,11 +517,6 @@ export default {
     this.textNotifications = this.user.calls_text_notifs || this.user.texts_text_notifs || this.user.voicemails_text_notifs || this.user.contacts_text_notifs || this.user.faxes_text_notifs || this.user.mentions_text_notifs
 
     this.$VueEvent.listen('resetSettingsForm', () => {
-      console.log(this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs)
-      console.log(this.user.calls_inapp_notifs, this.user.calls_desktop_notifs)
-      console.log(this.user.calls_push_notifs, this.user.calls_email_notifs)
-      console.log(this.user.calls_text_notifs)
-
       this.myCalls = this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs
       this.myTexts = this.user.texts_inapp_notifs || this.user.texts_desktop_notifs || this.user.texts_push_notifs || this.user.texts_email_notifs || this.user.texts_text_notifs
       this.myVoicemails = this.user.voicemails_inapp_notifs || this.user.voicemails_desktop_notifs || this.user.voicemails_push_notifs || this.user.voicemails_email_notifs || this.user.voicemails_text_notifs

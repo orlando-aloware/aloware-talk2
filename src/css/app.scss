@@ -1532,6 +1532,14 @@ i.option-separator {
   font-size: 12px !important;
 }
 
+.fs-8 {
+  font-size: 8px !important;
+}
+
+.fs-6 {
+  font-size: 6px !important;
+}
+
 .multiselect.border-blue {
   .multiselect__tags {
     border: 1px solid $blue
@@ -10971,4 +10979,11 @@ screen and (max-width: 956px) {
   .main-content {
     overflow: auto !important;
   }
+}
+
+.account-level-notification-tooltip-wrapper {
+  position: absolute;
+  right: 300px;
+  margin-top: -22px;
+  z-index: 10;
 }

@@ -258,12 +258,12 @@ export default {
     onSubmit () {
       this.isSaving = true
       talk2Api.V1.contact[(this.id ? 'updateEngagement' : 'addEngagement')](this.contact.id, this.getParams())
-        .then(response => {
-          this.$generalNotification(`Event has been ${(this.id ? 'updated' : 'added')}`)
+        .then(() => {
+          this.$generalNotification(`Event has been ${(this.id ? 'updated.' : 'added.')}`)
           this.onHidden()
         }).catch(error => {
           console.log(error)
-          this.$generalNotification(`Error while ${(this.id ? 'adding' : 'updating')} event`, 'error')
+          this.$generalNotification(`Error while ${(this.id ? 'adding' : 'updating')} event.`, 'error')
         }).finally(() => {
           this.isSaving = false
         })
