@@ -58,12 +58,15 @@ export default {
   },
   methods: {
     ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
-    onCancel () {
+    async resetSetting () {
       this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
       this.setFormValidity(true)
-
-      this.$VueEvent.fire('resetSettingsForm')
+    },
+    async onCancel () {
+      this.resetSetting().then(() => {
+        this.$VueEvent.fire('resetSettingsForm')
+      })
     },
     onSave () {
       this.isBusy = true
@@ -115,7 +118,6 @@ export default {
           } else {
             data.outbound_calling_selector = 2
           }
-          console.log(data)
           this.setUserClone(_.cloneDeep(data))
           this.setUser(_.cloneDeep(this.userClone))
 

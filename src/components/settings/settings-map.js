@@ -370,7 +370,7 @@ const SettingsMap = {
     hash_keyword: 'other-reports',
     visible: true
   },
-  'reminder_options': {
+  'reminders_options': {
     title: 'Event Notifications',
     description: 'Notify this user for appointment or reminder events.',
     route: '/settings/notification',

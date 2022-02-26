@@ -64,9 +64,11 @@ import talk2Api from 'src/plugins/api/api'
 
 import At from 'vue-at'
 import Avatar from 'components/avatar'
+import { mentionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'message-composer-note',
+  mixins: [mentionsMixin],
   components: { Avatar, At },
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
@@ -93,7 +95,7 @@ export default {
         time: null,
         date: null,
         timezone: this.profile.timezone,
-        body: this.$options.filters.parseMentionToMarkup(this.messageComposer.note.body),
+        body: this.parseMentionToMarkup(this.messageComposer.note.body),
         type: 10
       }
     },
