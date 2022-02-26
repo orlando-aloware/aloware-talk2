@@ -93,7 +93,7 @@
 
       <b-form-row :id="`${SettingsMap.profile_settings_password.hash_keyword}-container`"
                   class="mt-4"
-                  v-if="isAdmin && !user.is_destination">
+                  v-if="(user.id === profile.id || isAdmin) && !user.is_destination">
         <b-col sm="12"
                md="12"
                class="d-flex justify-between">
@@ -425,6 +425,7 @@ export default {
 
   computed: {
     ...mapState('settings', ['userClone']),
+    ...mapState('auth', ['profile']),
     userDestinationEditable () {
       return this.user.role_name && !this.user.read_only_access
     },

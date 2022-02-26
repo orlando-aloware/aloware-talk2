@@ -2,11 +2,12 @@
   <b-modal title="Add Reminder"
            size="md"
            v-model="isOpen"
-           @hidden="onHidden">
+           @hidden="onHidden"
+           @shown="onShown">
     <b-form @submit.prevent="onSubmit">
       <b-form-group
         id="input-group-1"
-        label=""
+        label="Date"
         label-for="input-1"
       >
         <date-selector :min-date="minDate"
@@ -15,14 +16,21 @@
       </b-form-group>
 
       <b-form-group id="input-group-2"
-                    label=""
+                    label="Time"
                     label-for="input-2">
-        <predefined-time-selector v-model="time"
+        <predefined-time-selector v-model="reminder.time"
                                   @select="onTimeSelected">
         </predefined-time-selector>
       </b-form-group>
 
       <b-form-group id="input-group-2"
+                    label="Timezone"
+                    label-for="input-2">
+        <timezone-selector @select="timezoneSelected"></timezone-selector>
+      </b-form-group>
+
+      <b-form-group id="input-group-2"
+                    label="Notes"
                     label-for="input-2">
         <b-form-textarea
           id="textarea-no-auto-shrink"
@@ -60,16 +68,17 @@ import talk2Api from 'src/plugins/api/api'
 import { mapGetters, mapActions, mapState } from 'vuex'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import DateSelector from 'components/date-selector'
+import TimezoneSelector from 'components/timezone-selector'
 
 export default {
   name: 'contact-add-reminder-modal',
-  components: { DateSelector, PredefinedTimeSelector },
+  components: { TimezoneSelector, DateSelector, PredefinedTimeSelector },
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isAddReminderOpen']),
     ...mapState('auth', ['profile']),
     isValid () {
-      return this.reminder.date && this.reminder.time && this.reminder.note
+      return this.reminder.date && this.reminder.time && this.reminder.note && this.reminder.timezone
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
@@ -85,11 +94,9 @@ export default {
   },
   data () {
     return {
-      date: '',
-      time: '',
       isAdding: false,
       reminder: {
-        date: '',
+        date: window.moment('MM/DD/YYYY').format(),
         time: '',
         note: '',
         timezone: ''
@@ -102,7 +109,7 @@ export default {
       event.preventDefault()
       this.isAdding = true
       talk2Api.V1.contact.addEngagement(this.contact.id, this.formatParameters())
-        .then(response => {
+        .then(() => {
           this.onHidden()
           this.$generalNotification('Reminder has been added.')
         }).catch(error => {
@@ -115,22 +122,37 @@ export default {
     onTimeSelected (value) {
       this.reminder.time = value.value
     },
+    timezoneSelected (timezone) {
+      this.reminder.timezone = timezone.value
+    },
     formatParameters () {
       return {
         body: this.reminder.note,
         date: this.reminder.date,
         time: this.reminder.time,
-        timezone: this.profile.timezone,
+        timezone: this.reminder.timezone,
         type: 13
       }
     },
     onHidden () {
+      this.resetForm()
       this.addReminderOpen(false)
+    },
+    onShown () {
+      this.reminder.date = window.moment().format('MM/DD/YYYY')
     },
     dateSelected (value) {
       this.reminder.date = window.moment(value).format('MM/DD/YYYY')
       // enable this when the vue-date-time-selector is working properly
       // this.reminder.time = window.moment(value).format('hh:mm')
+    },
+    resetForm () {
+      this.reminder = {
+        date: window.moment('MM/DD/YYYY').format(),
+        time: '',
+        note: '',
+        timezone: this.profile.timezone
+      }
     }
   },
   watch: {

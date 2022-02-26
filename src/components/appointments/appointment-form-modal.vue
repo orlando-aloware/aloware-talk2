@@ -9,7 +9,7 @@
     <b-form class="appointment-form"
             ref="appointmentForm"
             @submit.prevent="onSubmit"
-            @reset="onReset">
+            @reset="resetForm">
       <b-form-row>
         <b-col sm="12">
           <b-form-group
@@ -57,7 +57,7 @@
               rows="3"
               max-rows="8"
               no-auto-shrink
-              v-model="appointment.note">
+              v-model="appointment.body">
             </b-form-textarea>
           </b-form-group>
         </b-col>
@@ -253,6 +253,7 @@ export default {
       this.addAppointmentOpen(false)
       this.appointment.smsReminder.enabled = false
       this.setSmsReminderBody()
+      this.resetForm()
     },
     onSubmit () {
       this.isSaving = true
@@ -296,7 +297,25 @@ export default {
 
       return params
     },
-    onReset () {
+    resetForm () {
+      this.appointment = {
+        date: window.moment().format('MM/DD/YYYY'),
+        time: '',
+        duration: '',
+        timezone: '',
+        body: '',
+        type: 12,
+        smsReminder: {
+          enabled: false,
+          body: '',
+          campaign_id: '',
+          frequencies: [],
+          time: '',
+          template_variables: ['[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]']
+        },
+        contact: null,
+        user: null
+      }
     },
     durationSelected (duration) {
       this.appointment.duration = duration.value

@@ -250,22 +250,22 @@
                      v-if="communication.type === CommunicationTypes.APPOINTMENT">
                   <div class="w-75">
                     <label class="form-control-label w-100 mb-1">Date</label>
-                    {{ communication.engagement_data.appointment_datetime | fixScheduleDate }}
+                    {{ communication.engagement_data.appointment_datetime | fixScheduleDate('dddd, D MMMM YYYY', communication.engagement_data.appointment_contact_timezone) }}
                   </div>
                   <div class="w-35">
                     <label class="form-control-label w-100 mb-1">Time</label>
-                    {{ communication.engagement_data.appointment_datetime | fixScheduleTime }}
+                    {{ communication.engagement_data.appointment_datetime | fixScheduleTime(0, communication.engagement_data.appointment_contact_timezone) }}
                   </div>
                 </div>
                 <div class="d-flex align-items-center w-100"
                      v-if="communication.type === CommunicationTypes.REMINDER">
                   <div class="w-75">
                     <label class="form-control-label w-100 mb-1">Date</label>
-                    {{ communication.engagement_data.reminder_datetime | fixScheduleDate }}
+                    {{ communication.engagement_data.reminder_datetime | fixScheduleDate('dddd, D MMMM YYYY', communication.engagement_data.reminder_contact_timezone) }}
                   </div>
                   <div class="w-35">
                     <label class="form-control-label w-100 mb-1">Time</label>
-                    {{ communication.engagement_data.reminder_datetime | fixScheduleTime }}
+                    {{ communication.engagement_data.reminder_datetime | fixScheduleTime(0, communication.engagement_data.reminder_contact_timezone) }}
                   </div>
                 </div>
               </div>
