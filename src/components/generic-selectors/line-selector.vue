@@ -160,11 +160,11 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && this.campaignId.length < 1:
+        case this.multiple && this.campaignId && this.campaignId.length < 1:
           return 'Select Lines'
         case !this.multiple && !this.campaignId:
           return 'Select Line'
-        case this.multiple && this.campaignId.length > 0:
+        case this.multiple && this.campaignId && this.campaignId.length > 0:
         case !this.multiple && this.campaignId:
         default:
           return ''

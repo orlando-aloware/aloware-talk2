@@ -1,11 +1,11 @@
 <template>
-  <b-card
-    header-tag="header"
-    footer-tag="footer"
-    title="Record an audio file"
+  <b-card header-tag="header"
+          footer-tag="footer"
+          title="Record an audio file"
   >
     <div v-if="!recordedAudio">
-      <div class="text-center mt-4" v-if="!isRecording">
+      <div class="text-center mt-4"
+           v-if="!isRecording">
         <b-button pill
                   variant="light"
                   @click="startRecording">
@@ -15,10 +15,11 @@
 
       </div>
 
-      <div class="text-center mt-4" v-else>
+      <div class="text-center mt-4"
+           v-else>
         <b-button pill
-                  :class="[isRecording ? 'recording' : '']"
                   variant="danger"
+                  :class="[isRecording ? 'recording' : '']"
                   @click="stopRecording">
           <i class="fa fa-microphone fa-2x"></i>
         </b-button>
@@ -36,33 +37,38 @@
     </div>
 
     <template #footer>
-      <b-button size="sm"
-                href="#"
-                variant="primary"
-                :disabled="isRecording"
-                v-if="!recordedAudio && !isRecording" @click="startRecording">Start Recording</b-button>
-      <b-button size="sm"
-                href="#"
-                variant="danger"
-                :disabled="!isRecording"
-                v-if="!recordedAudio && isRecording" @click="stopRecording">Stop Recording</b-button>
-      <b-button size="sm"
-                href="#"
-                variant="primary"
-                v-if="recordedAudio" @click="removeRecordedAudio">Change</b-button>
-<!--      <b-button class="ml-2"-->
-<!--                size="sm"-->
-<!--                href="#"-->
-<!--                variant="primary"-->
-<!--                v-if="recordedAudio"-->
-<!--                :disabled="!recordedAudio" @click="playRecordedAudio"><i class="fa fa-play"></i> Play</b-button>-->
-      <b-button class="ml-2"
+      <b-button v-if="!recordedAudio && !isRecording"
                 size="sm"
                 href="#"
                 variant="primary"
-                v-if="recordedAudio"
+                :disabled="isRecording"
+                @click="startRecording">Start Recording</b-button>
+      <b-button v-if="!recordedAudio && isRecording"
+                size="sm"
+                href="#"
+                variant="danger"
+                :disabled="!isRecording"
+                @click="stopRecording">Stop Recording</b-button>
+      <b-button v-if="recordedAudio"
+                size="sm"
+                href="#"
+                variant="primary"
+                :disabled="isUploading"
+                @click="removeRecordedAudio">Change</b-button>
+
+      <b-button v-if="recordedAudio"
+                class="ml-2"
+                size="sm"
+                href="#"
+                variant="primary"
                 :disabled="!recordedAudio || isUploading"
-                @click="uploadRecordedAudio"><i class="fa fa-upload"></i> Upload</b-button>
+                @click="uploadRecordedAudio">
+        <q-spinner-bars v-if="isUploading"
+                        class="mr-1"
+                        color="white" />
+        <i class="fa fa-upload" v-else></i>
+        {{ isUploading ? ' Uploading...' : 'Upload' }}
+      </b-button>
     </template>
   </b-card>
 
@@ -165,8 +171,9 @@ export default {
     captureRecording () {
       this.audioBlob = this.mic.export()
       const reader = new FileReader()
-      reader.onload = () => {
-        this.recordedAudio = new Audio(this.result)
+      const _this = this
+      reader.onload = function () {
+        _this.recordedAudio = new Audio(this.result)
       }
 
       reader.readAsDataURL(this.audioBlob)
