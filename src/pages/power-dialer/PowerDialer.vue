@@ -76,7 +76,6 @@ export default {
   mixins: [powermixin, contactsMixins, pdMixin],
   computed: {
     ...mapFields('powerDialer', [
-      'metrics',
       'activeMetrics'
     ]),
     ...mapGetters('auth', ['authenticated']),
@@ -117,22 +116,9 @@ export default {
     }
   },
   async mounted () {
-    let metrics = await this.getSessionMetricsOptions()
-    let collection = []
-
     this.START_DIAL_TOGGLE(false)
-    // await this.initialize()
+    // // await this.initialize()
     await this.setFilterParams(this.$route.params)
-
-    metrics.forEach(m => {
-      collection.push({
-        label: m.label,
-        disable: true,
-        value: null
-      })
-      collection = collection.concat(...m.options)
-    })
-    this.metrics = collection
 
     this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
       this.activeMetrics = sessionMetrics.session_metrics_calculations

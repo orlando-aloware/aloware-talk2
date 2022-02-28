@@ -44,25 +44,9 @@
     </div>
     <div class="d-flex t-menu__content flex-column pb-0 pl-2">
       <q-card class="py-0 my-0 pl-1" flat>
-        <div class="row">
-          <div
-            class="col col-4 p-0 px-1 pb-3"
-            v-for="stat in stats"
-            :key="stat.name">
-            <q-card-section
-              class="p-0">
-              <div class="t-value text-subtitle1 text-weight-medium d-flex">
-                {{ stat.values.primary }}
-                <div class="text-caption pt-1 pl-1 text-grey">
-                  {{stat.values.secondary}}
-                </div>
-              </div>
-              <div class="t-label text-caption text-grey-90">
-                {{ stat.name }}
-              </div>
-            </q-card-section>
-            </div>
-        </div>
+        <SummaryInfoLabels
+          :prefetched-items="defaultStats"
+          metric-type="1" />
       </q-card>
     </div>
   </div>
@@ -72,24 +56,82 @@
 
 import { mapFields } from 'vuex-map-fields'
 import StartDialing from '../session-settings/start-dial-sessions-settings'
+import SummaryInfoLabels from '../details/summary-info-labels'
+import moment from 'moment'
 
 export default {
   name: 'SessionStats',
   components: {
-    StartDialing
+    StartDialing,
+    SummaryInfoLabels
+  },
+  mounted () {
+    this.startTime = moment()
+    this.totalSeconds = 0
   },
   computed: {
-    ...mapFields('powerDialer', ['activeList'])
+    ...mapFields('powerDialer', [
+      'activeList',
+      'powerDialerTasks'
+    ]),
+    completedTasks () {
+      return this.powerDialerTasks.called.length + this.powerDialerTasks.failed.length
+    },
+    allTasks () {
+      return this.powerDialerTasks.all.length
+    },
+    timer () {
+      return this.totalSeconds
+    },
+    defaultStats () {
+      return [
+        {
+          completed_contacts_count: this.$options.filters.secondsInMinutes(this.timer),
+          name: 'Duration',
+          percentage: 0,
+          type: 0
+        },
+        {
+          completed_contacts_count: this.completedTasks,
+          name: 'Contacts',
+          percentage: this.allTasks,
+          type: 0
+        }
+      ]
+    },
+    hasReachedHour () {
+      return this.totalSeconds === 3600
+    }
+  },
+  filters: {
+    secondsInMinutes: function (seconds) {
+      if (seconds) {
+        if (this.hasReachedHour) {
+          return moment('2015-01-01')
+            .startOf('day')
+            .seconds(seconds)
+            .format('HH:mm:ss')
+        }
+        return moment('2015-01-01')
+          .startOf('day')
+          .seconds(seconds)
+          .format('mm:ss')
+      }
+      return 0
+    }
   },
   data () {
     return {
-      stats: [
-        { name: 'Duration', values: { primary: '36m', secondary: '' } },
-        { name: 'Contacts', values: { primary: '33', secondary: '/324' } },
-        { name: 'Connected Call Disp.', values: { primary: '23', secondary: '(71%)' } },
-        { name: 'Interested Call Disp.', values: { primary: '2', secondary: '(8%)' } },
-        { name: 'Closed Contact Disp.', values: { primary: '1', secondary: '(4%)' } }
-      ]
+      totalSeconds: null,
+      startTime: Date.now(),
+      currentTime: 0
+    }
+  },
+  watch: {
+    totalSeconds (val) {
+      setTimeout(() => {
+        this.totalSeconds++
+      }, 1000)
     }
   },
   methods: {

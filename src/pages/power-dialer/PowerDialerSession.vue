@@ -63,7 +63,8 @@ export default {
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',
-      'activeList'
+      'activeList',
+      'activeMetrics'
     ]),
     list () {
       return this.listItems[this.selectedPdList.id].data || []
@@ -136,6 +137,7 @@ export default {
         response = await this.getPowerDialerList(this.$route.params.id)
       }
       this.activeList = response
+      this.activeMetrics = response.session_metrics
       this.setSelectedPDList({
         id: response.id,
         name: response.name,

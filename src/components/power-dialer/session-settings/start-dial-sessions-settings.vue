@@ -374,7 +374,7 @@ export default {
       return false
     },
     isCompanyScope () {
-      return this.selectedItem.is_company_scope === 1
+      return this.selectedItem?.is_company_scope === 1
     }
   },
   async mounted () {

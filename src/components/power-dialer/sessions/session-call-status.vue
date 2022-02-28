@@ -222,7 +222,7 @@ export default {
     })
   },
   mounted () {
-    this.tickTimer()
+    // fsdfds
   },
   computed: {
     ...mapFields('powerDialer', [
@@ -394,6 +394,7 @@ export default {
       }
     },
     async fetchContact (taskId = '') {
+      console.log('Fetching contact for current session...', taskId)
       this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: taskId })
       this.TOGGLE_SESSION_LOADER(false)
@@ -485,6 +486,7 @@ export default {
     async taskToCall (task) {
       if (task) {
         await this.fetchContact(this.taskToCall.id)
+        this.tickTimer()
       }
     },
     async activeTask (task) {
@@ -497,9 +499,9 @@ export default {
       // if (!task?.id && !this.statusCallConnected && this.toggleEnd) {
       //   this.reRoute()
       // }
-      if (task?.id) {
-        await this.fetchContact(task.id)
-      }
+      // if (task?.id) {
+      //   await this.fetchContact(task.id)
+      // }
       // if (obj?.id) {
       //   setTimeout(() => {
       //     this.timerCount = this.sessionSettings.warmup_period_in_seconds
