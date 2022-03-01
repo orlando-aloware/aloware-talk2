@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { avatarMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import { avatarMixin, communicationInfoMixin, mentionsMixin } from 'src/plugins/mixins'
 import Avatar from 'components/avatar'
 import { mapActions, mapState } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -58,7 +58,8 @@ export default {
 
   mixins: [
     avatarMixin,
-    communicationInfoMixin
+    communicationInfoMixin,
+    mentionsMixin
   ],
 
   components: {
@@ -127,7 +128,7 @@ export default {
       return this.users.length > 0 ? this.users.find(user => user.id === this.mention.mentioned_user_id) : null
     },
     parseBody () {
-      return this.$options.filters.parseMentionToView(this.mention.preview_text)
+      return this.parseMentionToView(this.mention.preview_text)
     }
   },
 

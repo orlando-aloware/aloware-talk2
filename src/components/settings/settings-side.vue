@@ -105,7 +105,7 @@ export default {
 
       if (!this.isAdmin) {
         // eslint-disable-next-line no-return-assign
-        mapping.filter(item => ['visibility'].includes(item.tag)).map(item => item.visible = false)
+        mapping.filter(item => ['visibility', 'account-level-notifications'].includes(item.tag)).map(item => item.visible = false)
       }
 
       // eslint-disable-next-line no-return-assign
@@ -118,6 +118,15 @@ export default {
       return mapping.filter(data => {
         return (data.title.toLocaleLowerCase().includes(query) || data.description.toLocaleLowerCase().includes(query)) && data.visible
       })
+    },
+    hasAdminRole () {
+      return this.user && (this.isCompanyAdmin || this.isBillingAdmin)
+    },
+    isCompanyAdmin () {
+      return this.user.role_names.includes('Company Admin')
+    },
+    isBillingAdmin () {
+      return this.user.role_names.includes('Billing Admin')
     }
   },
 

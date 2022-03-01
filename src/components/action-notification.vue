@@ -160,7 +160,7 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { notificationMixin } from 'src/plugins/mixins'
+import { mentionsMixin, notificationMixin } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -170,9 +170,12 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 
 export default {
   name: 'action-notification',
+
   mixins: [
-    notificationMixin
+    notificationMixin,
+    mentionsMixin
   ],
+
   components: {
     IgnoreCallIcon,
     HangupIcon,
@@ -180,6 +183,7 @@ export default {
     CancelCallIcon,
     ParkCallIcon
   },
+
   props: {
     id: {
       required: false,
@@ -192,14 +196,16 @@ export default {
       default: 'b-toaster-bottom-right'
     }
   },
+
   data () {
     return {
       runningDateTime: null,
       runningDateTimeInterval: null
     }
   },
+
   computed: {
-    ...mapState(['notifications', 'dialer', 'callFishingQueue']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
     toastClass () {
       const toastClass = { data: 'action-notification notification-border-round' }
 
@@ -239,7 +245,7 @@ export default {
     message () {
       const message = _.get(this.notifications[this.id], 'message', '')
 
-      return this.$options.filters.parseMentionToView(message)
+      return this.parseMentionToView(message)
     },
     messageIcon () {
       return _.get(this.notifications[this.id], 'messageIcon', null)
@@ -328,6 +334,7 @@ export default {
       }
     })
   },
+
   methods: {
     ...mapActions(['setNotifications', 'setShowPhone']),
     autoClose () {
@@ -512,6 +519,7 @@ export default {
       }
     }
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('update_communication')
   }

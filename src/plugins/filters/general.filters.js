@@ -3,7 +3,6 @@ import numeral from 'numeral'
 import numFormat from 'vue-filter-number-format'
 import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
-import store from 'src/store/index'
 
 /**
  * Convert to uppercase
@@ -517,42 +516,6 @@ const numberPlusFormatter = (value, limit = 99) => {
   return value
 }
 
-const parseMentionToView = (content) => {
-  if (!content) {
-    return content
-  }
-
-  const markups = content.match(/(<user:([^>]+)>)/gi)
-  const parsedBody = { data: content }
-  const users = store().state['users']
-
-  if (markups) {
-    markups.forEach(function (value, i) {
-      const userId = value.match(/\d/g).join('')
-      const user = users.find(user => user.id.toString() === userId)
-      if (user) {
-        const idPattern = new RegExp(`<user:${userId}>`, 'gi')
-        parsedBody.data = parsedBody.data.replace(idPattern, `<span class="mention-tag">@${user.name}</span>`)
-      }
-    })
-  }
-
-  return parsedBody.data
-}
-
-const parseMentionToMarkup = (content) => {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(content, 'text/html')
-
-  const spanEl = doc.querySelectorAll('span.mention-tag')
-  spanEl.forEach(function (value, i) {
-    const id = value.getAttribute('data-id')
-
-    value.parentNode.replaceChild(document.createTextNode('<user:' + id + '>'), value)
-  })
-  return doc.body.innerText
-}
-
 // eslint-disable-next-line no-return-assign,no-sequences
 const sortObjectByKey = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {})
 
@@ -598,8 +561,6 @@ export default ({ Vue }) => {
     momentFormat,
     textTruncate,
     numberPlusFormatter,
-    parseMentionToView,
-    parseMentionToMarkup,
     sortObjectByKey,
     objAlphabeticalOrder
   }
