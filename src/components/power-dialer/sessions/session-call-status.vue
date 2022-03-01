@@ -226,7 +226,8 @@ export default {
   },
   computed: {
     ...mapFields('powerDialer', [
-      'sessionPaused'
+      'sessionPaused',
+      'hubspot'
     ]),
     ...mapState([
       'campaigns',
@@ -234,12 +235,12 @@ export default {
     ]),
     ...mapGetters('powerDialer', [
       'sessionLoader',
-      'sessionSettings'
+      'sessionSettings',
+      'selectedPdList'
     ]),
     ...mapGetters('contacts', [
       'contact',
-      'listItems',
-      'selectedList'
+      'listItems'
     ]),
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
@@ -260,7 +261,7 @@ export default {
       return address
     },
     listObject () {
-      return this.listItems[this.selectedList?.id]
+      return this.listItems[this.selectedPdList?.id]
     },
     list () {
       return this.listObject.data || []
@@ -336,7 +337,7 @@ export default {
       return AutoDialTaskStatus.STATUSES
     },
     selectedListName () {
-      return this.selectedList?.name || ''
+      return this.selectedPdList?.name || ''
     },
     lineName () {
       return this.dialer?.communication?.campaign?.name || 'N/A'
@@ -355,6 +356,12 @@ export default {
     },
     timerIsOver () {
       return this.timerCount === 0 || this.timerCount === -1
+    },
+    hasHubspotEnabled () {
+      return this.activeTask?.company?.hubspot_integration_enabled
+    },
+    integrationsHubspot () {
+      return this.activeTask?.integrations?.hubspot
     }
   },
   methods: {
@@ -366,12 +373,9 @@ export default {
       'TOGGLE_SESSION_LOADER'
     ]),
     async nextContact () {
-      this.TOGGLE_SESSION_LOADER(true)
       this.$VueEvent.fire('hangupCall')
       this.taskToCall = this.powerDialerTasks.in_queue[0]
-      await this.getContact({ id: this.taskToCall.id })
-      this.TOGGLE_SESSION_LOADER(false)
-      // this.runTask()
+      await this.fetchContact(this.taskToCall.id)
     },
     async tickTimer () {
       if (this.hasExistingTaskList) {
@@ -396,7 +400,12 @@ export default {
     async fetchContact (taskId = '') {
       console.log('Fetching contact for current session...', taskId)
       this.TOGGLE_SESSION_LOADER(true)
-      await this.getContact({ id: taskId })
+      let res = null
+      res = await this.getContact({ id: taskId })
+      if (!this.flagged) {
+        this.activeTask = res
+      }
+      console.log('RESPONSE from Contacts API : ', res)
       this.TOGGLE_SESSION_LOADER(false)
     },
     initialize () {
@@ -437,11 +446,7 @@ export default {
       this.timerCount = this.sessionSettings.warmup_period_in_seconds
     },
     reRoute () {
-      let routePath = '/power-dialer'
-      if (this.selectedList.name !== 'My Queue') {
-        routePath += `/${this.selectedList.id}`
-      }
-      this.$router.push(routePath)
+      this.$emit('on-redirect', this.selectedPdList)
     },
     managingSessionFlows (status = '') {
       let {
@@ -496,23 +501,6 @@ export default {
       if (!task?.id && !this.hasExistingTaskList) {
         this.reRoute()
       }
-      // if (!task?.id && !this.statusCallConnected && this.toggleEnd) {
-      //   this.reRoute()
-      // }
-      // if (task?.id) {
-      //   await this.fetchContact(task.id)
-      // }
-      // if (obj?.id) {
-      //   setTimeout(() => {
-      //     this.timerCount = this.sessionSettings.warmup_period_in_seconds
-      //   }, this.timerCount)
-      //   setTimeout(async () => {
-      //     await this.getContact({ id: obj[this.keyIndex].id })
-      //   }, 500)
-      // }
-      // setTimeout(async () => {
-      //   await this.getContact({ id: obj[this.keyIndex].id })
-      // }, 500)
     },
     timerCount: {
       async handler (value) {
@@ -557,6 +545,11 @@ export default {
     currentSessionStatus (status) {
       console.log(' %c CURRENT SESSION STATUS : ', 'background: red; color: white;', status)
       this.managingSessionFlows(status)
+    },
+    integrationsHubspot (obj) {
+      if (obj?.contact_id) {
+        this.hubspot = obj
+      }
     }
   },
   data () {
@@ -584,7 +577,8 @@ export default {
         group: 'Google Map List',
         line: 'Bently Personal'
       },
-      taskToCall: {}
+      taskToCall: {},
+      flagged: false
     }
   }
 }

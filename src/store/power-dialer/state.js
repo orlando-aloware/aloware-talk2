@@ -138,7 +138,7 @@ export default function () {
     currentListFilters: [],
     datatableLoader: false,
     search: '',
-    // contact: null,
+    contact: null,
     sessionLoader: false,
     sessionSidebarExpanded: false,
     sessionSettings: {},
@@ -163,6 +163,7 @@ export default function () {
     selectedPdList: {},
     metrics: [],
     activeMetrics: [],
-    activeList: {}
+    activeList: {},
+    hubspot: {}
   }
 }
