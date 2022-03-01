@@ -65,7 +65,7 @@
                     class="t-expansion-panel px-2">
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
-                        <!-- {{ avatarName(item.first_name, item.last_name) }} -->
+                        {{ avatarName(item.first_name, item.last_name) }}
                       </q-avatar>
                     </div>
                     <q-item-section class="pl-2">
@@ -74,7 +74,7 @@
                       <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
                     </q-item-section>
                     <q-item-section
-                      v-if=" item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress'"
+                      v-if="item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress'"
                       class="t-item-icon"
                       side top>
                       <q-avatar color="red" size="md">
@@ -104,10 +104,13 @@
                         Option 3
                       </b-dropdown-item>
                     </b-dropdown>
-                    <div class="dropdown t-btn-floater t-btn-floater__bottom">
-                      <q-btn size="xs" flat round>
+                    <div
+                      class="dropdown t-btn-floater t-btn-floater__bottom">
+                      <q-btn
+                        size="xs" flat round>
                         <q-avatar size="15px">
-                          <img src="icons/refresh-call.png">
+                          <!-- <img src="icons/refresh-call.png"> -->
+                          <ContactInQueue />
                         </q-avatar>
                       </q-btn>
                     </div>
@@ -135,6 +138,7 @@ import { mapFields } from 'vuex-map-fields'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
+import ContactInQueue from 'components/icons/contact-in-queue'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 
@@ -143,6 +147,7 @@ export default {
   components: {
     InProgressContact,
     SearchList,
+    ContactInQueue,
     PhoneIcon
   },
   mounted () {
@@ -181,6 +186,9 @@ export default {
     },
     status () {
       return AutoDialTaskStatus.STATUSES
+    },
+    btnVisibility () {
+      return this.$refs.dropdown.visible
     }
   },
   methods: {

@@ -14,7 +14,8 @@
             <CallDisposition />
           </div>
           <div class="col-5 p-0">
-            <CallStatus />
+            <CallStatus
+              @on-redirect="redirectRoute" />
           </div>
         </div>
 
@@ -37,6 +38,7 @@ import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import sessionsMixins from 'src/components/power-dialer/sessions/sessions'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -144,6 +146,14 @@ export default {
         type: response.type
       })
       // console.log('RES -------- :>> ', res)
+    },
+    redirectRoute (route) {
+      console.log('THIS: route :>> ', isEmpty(route.name))
+      let routePath = '/power-dialer'
+      if (route.name !== 'My Queue' && !isEmpty(route.name)) {
+        routePath += `/list/${route.id}`
+      }
+      this.$router.push(routePath)
     }
   }
 }

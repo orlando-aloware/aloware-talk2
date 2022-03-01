@@ -47,6 +47,7 @@
 
 import { mapFields } from 'vuex-map-fields'
 import { mapState, mapActions } from 'vuex'
+import { isEmpty } from 'lodash'
 
 const METRIC = {
   contact_disposition: 1,
@@ -94,6 +95,9 @@ export default {
       return this.metricType === metric.plain
     },
     filteredMetrics () {
+      if (isEmpty(this.activeMetrics)) {
+        return []
+      }
       return this.prefetchedItems.concat(this.activeMetrics)
     }
   },
@@ -105,7 +109,7 @@ export default {
       let metric = this.metrics.find((m) => {
         let id = m.value?.split('_&_')[1].toString()
         let key = m.value?.split('_&_')[0].toString()
-        switch (metricObj.type) {
+        switch (metricObj?.type) {
           case METRIC.contact_disposition:
             if (m.value && key === 'contact_disposition' && id === metricObj.metric_id.toString()) {
               return m

@@ -56,7 +56,7 @@ export default {
       console.log(data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        this.$VueEvent.fire('makeCall', data)
+        // this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -67,7 +67,6 @@ export default {
       if (!this.activeTask) {
         return
       }
-      console.log(`Manually skipped ${this.activeTask.id}`)
       if (this.callInProgress) {
         this.$VueEvent.fire('hangupCall')
       }
