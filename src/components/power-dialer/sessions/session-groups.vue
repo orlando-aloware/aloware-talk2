@@ -74,7 +74,7 @@
                       <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
                     </q-item-section>
                     <q-item-section
-                      v-if="item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress'"
+                      v-if="!item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress'"
                       class="t-item-icon"
                       side top>
                       <q-avatar color="red" size="md">
@@ -84,7 +84,6 @@
                     <b-dropdown
                       @mouseover="onOver"
                       @mouseleave="onLeave"
-                      v-else
                       text="..."
                       no-caret
                       right size="xs"
@@ -105,8 +104,10 @@
                       </b-dropdown-item>
                     </b-dropdown>
                     <div
-                      class="dropdown t-btn-floater t-btn-floater__bottom">
+                      class="dropdown t-btn-floater t-btn-floater__bottom"
+                      ref="returnToQueue">
                       <q-btn
+                        @click="moveToInQueue(item)"
                         size="xs" flat round>
                         <q-avatar size="15px">
                           <!-- <img src="icons/refresh-call.png"> -->
@@ -186,9 +187,6 @@ export default {
     },
     status () {
       return AutoDialTaskStatus.STATUSES
-    },
-    btnVisibility () {
-      return this.$refs.dropdown.visible
     }
   },
   methods: {
@@ -203,18 +201,15 @@ export default {
     },
     onOver () {
       this.$refs.dropdown.visible = true
+      this.$refs.returnToQueue.visible = true
     },
     onLeave () {
       this.$refs.dropdown.visible = false
+      this.$refs.returnToQueue.visible = false
     },
-    // filteredList (key = '') {
-    //   if (!key) {
-    //     return this.list
-    //   }
-    //   return this.list.filter(lst => {
-    //     return lst.task_status === AutoDialTaskStatus[key]
-    //   })
-    // },
+    moveToInQueue (contact) {
+      console.log('This contact should move to IN-QUEUE : ', contact)
+    },
     totalCount (key = '') {
       if (!key) return ''
       let detail = this.listItems[this.selectedList.id]
