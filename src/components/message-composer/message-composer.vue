@@ -95,7 +95,7 @@ export default {
     setMode (mode) {
       this.setMessageComposerMode(mode)
     },
-    ...mapActions(['setSmsTemplates']),
+    ...mapActions(['setTemplates']),
     setSelectedPhone (phoneNumber) {
       this.setMessageComposerSmsPhoneNumber(phoneNumber)
     },
@@ -103,7 +103,7 @@ export default {
     getSmsTemplates () {
       return talk2Api.V1.smsTemplate.get()
         .then(response => {
-          this.setSmsTemplates(response.data)
+          this.setTemplates(response.data)
         })
     },
     onLineChange (line) {
@@ -116,8 +116,6 @@ export default {
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
     if (!this.templates || this.templates.length < 1) {
       this.getSmsTemplates()
-    } else {
-      this.setSmsTemplates(this.templates)
     }
   },
 

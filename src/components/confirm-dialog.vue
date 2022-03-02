@@ -1,15 +1,15 @@
 <template>
   <b-modal
+    modal-class="confirm-dialog"
+    ref="modal"
+    centered
     v-model="modelValue"
     :id="id"
     :size="size"
     :title="title"
-    modal-class="confirm-dialog"
-    ref="modal"
-    centered
     :hide-header="hideHeader"
     :hide-footer="hideFooter"
-  >
+    @hide="onHide">
     <slot name="content" />
     <template slot="modal-footer">
       <slot name="footer" />
@@ -56,6 +56,11 @@ export default {
         return this.isOpen
       },
       set (val) {}
+    }
+  },
+  methods: {
+    onHide () {
+      this.$emit('hide')
     }
   }
 }
