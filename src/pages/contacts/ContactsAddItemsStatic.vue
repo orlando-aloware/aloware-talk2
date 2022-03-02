@@ -340,6 +340,8 @@ export default {
       } else {
         if (this.contactList.id === 'my-queue') {
           return {
+            allow_international_phone_numbers: 1,
+            multiple_phone_numbers: 1,
             contact_ids: this.checkedItemIds
           }
         }

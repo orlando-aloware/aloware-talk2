@@ -56,7 +56,7 @@ export default {
       console.log(data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        // this.$VueEvent.fire('makeCall', data)
+        this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -90,13 +90,13 @@ export default {
           // console.log(' %c Changing status to : COMPLETED/CALLED ', 'background: yellow; color: black;')
           this.powerDialerTasks.called.push(this.activeTask)
           this.$VueEvent.fire('endWrapUp')
-          this.activeTask = {}
+          // this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_FAILED:
           // console.log(' %c Changing status to : FAILED ', 'background: yellow; color: black;')
           this.powerDialerTasks.failed.push(this.activeTask)
           this.$VueEvent.fire('endWrapUp')
-          this.activeTask = {}
+          // this.activeTask = {}
           break
         case AutoDialTaskStatus.STATUS_QUEUED:
           // console.log(' %c Changing status to : IN_QUEUE ', 'background: yellow; color: black;')

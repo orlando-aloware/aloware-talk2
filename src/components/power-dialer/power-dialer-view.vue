@@ -109,7 +109,9 @@
                     <i class="fa fa-bars mr-1"></i>
                     Edit Columns
                   </b-dropdown-item>
-                  <b-dropdown-item href="#">
+                  <b-dropdown-item
+                    href="#"
+                    @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
                   </b-dropdown-item>
@@ -435,7 +437,7 @@ export default {
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
-      return `/api/v2/power-dialer-list-items/${this.selectedPdList.id}/items/${this.selectedItem.id}`
+      return `/api/v2/power-dialer-lists/${this.selectedPdList.id}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
       return this.id === 'my-queue'
@@ -450,7 +452,8 @@ export default {
   },
   data () {
     return {
-      selectedItem: null
+      selectedItem: null,
+      hasFilters: false
     }
   },
   methods: {
@@ -480,9 +483,13 @@ export default {
       'pinnedCountLoaded'
     ]),
     ...mapActions('powerDialer', [
-      'updateContactsList'
+      'updateContactsList',
+      'exportCsv'
     ]),
-
+    async exportAsCsv () {
+      let response = await this.exportCsv(this.selectedPdList.id)
+      console.log('CSV response :>> ', response)
+    },
     async beginDial () {
       this.START_DIAL_TOGGLE(true)
       // this.setSelectedContact({})
@@ -586,10 +593,10 @@ export default {
   watch: {
     currentListFilters: {
       deep: true,
-      handler: function () {
+      handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.fetch(params)
+          this.fetch(params, this.hasFilters)
           this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
         // this.isLoading = false

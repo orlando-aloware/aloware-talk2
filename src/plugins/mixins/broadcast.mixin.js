@@ -357,6 +357,9 @@ export default {
         .listen('.user.session_metrics_calculation', (event) => {
           window.VueEvent.fire('metric_sessions_update', event)
         })
+        .listen('.export-events', (event) => {
+          window.VueEvent.fire('export_event_updates', event)
+        })
         /**
          * End of Power Dialer Session Tasks
          */

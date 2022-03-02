@@ -224,7 +224,6 @@ export default {
             this.processFetch(params, false, false)
         }
       } else {
-        console.log('params dsa :>> ', params)
         this.processFetch(params)
       }
     },
@@ -288,7 +287,7 @@ export default {
         }
       }
 
-      if (params.sort) {
+      if (params?.sort) {
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
         powerQuery.sort_by = params.sort

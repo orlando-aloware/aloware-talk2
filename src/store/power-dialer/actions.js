@@ -8,6 +8,10 @@ export default {
     let res = await window.axios.get('api/v2/contact-folders')
     return res.data
   },
+  async exportCsv ({ commit }, id = '') {
+    let res = await window.axios.get(`api/v2/power-dialer-lists/${id}/export-csv?all=1`)
+    return res
+  },
 
   /**
    * Actual API Calls for

@@ -52,7 +52,7 @@ export default {
       return this.selectedContacts[this.id].length || 0
     },
     selectedContactIds () {
-      return this.selectedContacts[this.id].map(contact => contact.id)
+      return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
     },
     isMyQueue () {
       return this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter'
@@ -81,7 +81,8 @@ export default {
       const res = await this.moveContactItems({
         id: this.isMyQueue ? this.myQueue.id : this.id,
         params: {
-          contact_ids: this.selectedContactIds,
+          // contact_ids: this.selectedContactIds,
+          contact_list_item_ids: this.selectedContactIds,
           direction: direction
         }
       })

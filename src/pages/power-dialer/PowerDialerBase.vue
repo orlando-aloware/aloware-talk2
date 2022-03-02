@@ -39,6 +39,10 @@ export default {
     this.resetSearch()
     await this.myQueueList()
     await this.loadList(this.id)
+    // export_event_updates
+    this.$VueEvent.listen('export_event_updates', (task) => {
+      console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
+    })
   },
   data () {
     return {

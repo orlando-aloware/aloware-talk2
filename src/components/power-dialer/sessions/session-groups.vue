@@ -209,6 +209,8 @@ export default {
     },
     moveToInQueue (contact) {
       console.log('This contact should move to IN-QUEUE : ', contact)
+      // https://app.alodev.org/api/v2/power-dialer-list-items
+      // contact_ids:
     },
     totalCount (key = '') {
       if (!key) return ''
