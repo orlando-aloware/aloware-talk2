@@ -54,7 +54,7 @@ export default {
   computed: {
     ...mapState('inbox', ['items', 'activeChannel']),
     isShowActive () {
-      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && ['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Mention Communication', 'Inbox Channel'].includes(this.$route.name))
+      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && ['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name))
     }
   },
 

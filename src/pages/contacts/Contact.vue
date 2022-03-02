@@ -105,7 +105,7 @@ export default {
     ...mapGetters('auth', ['authenticated']),
     ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'tagsFullyLoaded', 'campaigns', 'users', 'tags']),
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication'].includes(this.$route.name)
     }
   },
 
@@ -163,7 +163,7 @@ export default {
   watch: {
     '$route.params.id': function (value) {
       this.contactListSidebarOpen = false
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -177,7 +177,7 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+      if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
     },
