@@ -54,7 +54,8 @@
             </b-dropdown-item>
             <b-dropdown-item  v-if="hasPermissionTo('update contact')"
                               class="phone-actions"
-                              :disabled="contact.is_dnc">
+                              :disabled="contact.is_dnc"
+                              @click="onCall(phone)">
               <call-icon></call-icon> Call
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions" @click="onComposerMedia('fax', phone)">
@@ -102,6 +103,9 @@ export default {
     },
     onComposerMedia (type, phone) {
       this.$emit('composerMedia', type, phone)
+    },
+    onCall (phone) {
+      this.$emit('call', phone)
     }
   }
 }
