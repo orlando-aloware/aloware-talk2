@@ -236,16 +236,16 @@
           <div
             v-if="contact[column.name].length > 0"
             :id="`${column.name}-${contact.id}`">
-            <div
-              v-if="`${typeof contact[column.name][0].phone_number !== 'undefined'}`"
+            <span
+              v-if="typeof contact[column.name][0].phone_number !== 'undefined'"
               :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
               {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
-            </div>
-            <div
+            </span>
+            <span
               v-else
               :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
               {{ contact[column.name][0].name }}
-            </div>
+            </span>
             <span
               v-if="contact[column.name].length > 1"
               class="ml-1 text-grey-7">
@@ -262,14 +262,15 @@
               <div class="contact-tags-title">{{ column.label }}</div>
             </template>
             <span
-              class="ml-1"
+              class="ml-1 d-flex align-items-center"
               v-for="(item, index) in contact[column.name]"
               :id="`${column.name}-${contact.id}`"
               :key="`${column.name}-${index}`">
-              <span v-if="`${typeof item.phone_number !== 'undefined'}`">
+              <span v-if="typeof item.phone_number !== 'undefined'">
                 {{ item.phone_number | fixPhone('NATIONAL', true) }}
               </span>
               <span v-else>
+                <i class="fa fa-circle" :style="`font-size:50%;position: relative; top: -2px;`"></i>
                 {{ item.name }}
               </span>
             </span>
