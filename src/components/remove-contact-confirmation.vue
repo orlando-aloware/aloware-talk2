@@ -26,7 +26,7 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="(contactsToDelete !== contactToDeleteCount) || isBusy"
+                :disabled="(contactsToDelete.toString() !== contactToDeleteCount.toString()) || isBusy"
                 @click="onConfirm">
           <b-spinner variant="warning"
                      type="grow"
@@ -75,10 +75,7 @@ export default {
       return 0
     },
     isContactsRoute () {
-      if (this.$route.meta.title === 'Contacts') {
-        return true
-      }
-      return false
+      return this.$route.meta.title === 'Contacts'
     },
     endpointForList () {
       if (this.isContactsRoute) {
