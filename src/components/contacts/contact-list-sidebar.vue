@@ -14,12 +14,13 @@
               @scroll="handScroll">
         <b-list-group class="p-2 pr-2">
           <b-list-group-item class="d-flex align-items-center border-0"
-                             v-for="(contact, index) in contacts"
-                             :key="contact.id"
-                             :to="`/contacts/${contact.id}`"
+                             :class="[contact.id === item.id ? 'router-link-exact-active router-link-active' : '']"
+                             v-for="(item, index) in contacts"
+                             :key="item.id"
+                             :to="`/contacts/${item.id}`"
                              @click="onSidebarToggleMobile">
             <contact-list-sidebar-item v-model="contacts[index]"
-                                       :key="contact.id"/>
+                                       :key="item.id"/>
           </b-list-group-item>
         </b-list-group>
         <div class="relative py-4">

@@ -88,6 +88,7 @@ import contactMixins from 'src/plugins/mixins/contact.mixin'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   mixins: [contactsMixins, contactMixins],
@@ -150,6 +151,18 @@ export default {
     if (this.authenticated) {
       this.fetchContact()
     }
+
+    this.$VueEvent.listen('contact_updated', (data) => {
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
+        talk2Api.V2.contacts.get(data.id).then(response => {
+          const contact = response.data
+          // check data loaded
+          this.setContact(contact)
+        })
+      }
+    })
   },
 
   created () {
