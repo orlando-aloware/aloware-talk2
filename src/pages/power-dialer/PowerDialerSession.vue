@@ -147,7 +147,6 @@ export default {
       // console.log('RES -------- :>> ', res)
     },
     redirectRoute (route) {
-      console.log('THIS: route :>> ', isEmpty(route.name))
       let routePath = '/power-dialer'
       if (route.name !== 'My Queue' && !isEmpty(route.name)) {
         routePath += `/list/${route.id}`
