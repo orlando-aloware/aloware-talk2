@@ -183,7 +183,7 @@
                 <td
                   v-if="column.name === 'checkbox'"
                   :key="key"
-                  class="p-0">
+                  class="p-0 text-left pull-left datatable-row__checkbox">
                   <CheckBox
                     :resource="contact"
                     :checked-items="checked"

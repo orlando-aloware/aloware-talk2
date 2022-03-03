@@ -59,6 +59,9 @@ export default {
       'isBulkDelete',
       'listItems'
     ]),
+    ...mapGetters('powerDialer', [
+      'selectedPdList'
+    ]),
     title () {
       return `Delete ${this.contactToDeleteCount} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
     },

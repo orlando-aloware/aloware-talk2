@@ -88,7 +88,7 @@ export default {
       })
       this.setListSelectedContacts({ id: this.id, contacts: [] })
 
-      if (res.data.message) {
+      if (res.data?.message) {
         this.$emit('moved-contacts', true)
       }
       this.$generalNotification(
