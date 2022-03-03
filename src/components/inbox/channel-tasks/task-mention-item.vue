@@ -150,6 +150,11 @@ export default {
     },
 
     onItemClick (mention) {
+      if (!mention.mention_subject.contact_id) {
+        this.$generalNotification(`Unable to find contact associated with this mention.`, 'error')
+        return
+      }
+
       this.setSelectedCommunication(mention)
       this.$router.push({
         name: 'Inbox Contact Communication',
