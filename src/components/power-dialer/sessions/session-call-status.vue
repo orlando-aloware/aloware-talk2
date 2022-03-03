@@ -235,12 +235,12 @@ export default {
     ]),
     ...mapGetters('powerDialer', [
       'sessionLoader',
-      'sessionSettings',
-      'selectedPdList'
+      'sessionSettings'
     ]),
     ...mapGetters('contacts', [
       'contact',
-      'listItems'
+      'listItems',
+      'selectedList'
     ]),
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
@@ -261,7 +261,7 @@ export default {
       return address
     },
     listObject () {
-      return this.listItems[this.selectedPdList?.id]
+      return this.listItems[this.selectedList?.id]
     },
     list () {
       return this.listObject.data || []
@@ -337,7 +337,7 @@ export default {
       return AutoDialTaskStatus.STATUSES
     },
     selectedListName () {
-      return this.selectedPdList?.name || ''
+      return this.selectedList?.name || ''
     },
     lineName () {
       return this.dialer?.communication?.campaign?.name || 'N/A'
@@ -446,7 +446,7 @@ export default {
       this.timerCount = this.sessionSettings.warmup_period_in_seconds
     },
     reRoute () {
-      this.$emit('on-redirect', this.selectedPdList)
+      this.$emit('on-redirect', this.selectedList)
     },
     managingSessionFlows (status = '') {
       let {

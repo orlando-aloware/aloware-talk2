@@ -19,6 +19,7 @@ export default {
    */
   setSelectedPDList: async ({ commit }, data = {}) => {
     commit('SET_SELECTED_PD_LIST', data)
+    commit('contacts/SET_SELECTED_LIST', data, { root: true })
   },
   getMyQueueList: async ({ commit }) => {
     let res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)

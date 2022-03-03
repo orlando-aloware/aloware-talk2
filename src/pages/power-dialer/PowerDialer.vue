@@ -85,12 +85,10 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'listItems',
-      'lists'
+      'lists',
+      'selectedList'
     ]),
     ...mapState(['currentRoute']),
-    ...mapState('powerDialer', [
-      'selectedPdList'
-    ]),
     filterKeys () {
       let filterKeys = []
       let keys = DEFAULT_FILTER_LIST
@@ -112,7 +110,7 @@ export default {
       return this.$route.meta.id === 'power-dialer-session'
     },
     myQueueId () {
-      return this.selectedPdList.type ? null : this.selectedPdList.id
+      return this.selectedList.type ? null : this.selectedList.id
     }
   },
   async mounted () {

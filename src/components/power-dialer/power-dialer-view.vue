@@ -366,7 +366,6 @@ export default {
     ...mapState(['prevRoute']),
     ...mapState('powerDialer', [
       'activeMetrics',
-      'selectedPdList',
       'metrics'
     ]),
     ...mapGetters('powerDialer', [
@@ -383,6 +382,7 @@ export default {
       'lists',
       'listItems',
       'selectedContacts',
+      'selectedList',
       'isFiltersOpen',
       'currentListFilters',
       'clearList'
@@ -437,7 +437,7 @@ export default {
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
-      return `/api/v2/power-dialer-lists/${this.selectedPdList.id}/items/${this.selectedItem.contact_list_item_id}`
+      return `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
       return this.id === 'my-queue'
@@ -487,7 +487,7 @@ export default {
       'exportCsv'
     ]),
     async exportAsCsv () {
-      let response = await this.exportCsv(this.selectedPdList.id)
+      let response = await this.exportCsv(this.selectedList.id)
       console.log('CSV response :>> ', response)
     },
     async beginDial () {
@@ -538,14 +538,14 @@ export default {
       this.removeListClose()
       setTimeout(() => {
         // this.removeListOpen({ id: this.id, name: this.name })
-        this.removeListOpen({ id: this.selectedPdList.id, name: this.selectedPdList.name })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
       }, 10)
     },
     onClearList () {
       this.removeListClose()
       setTimeout(() => {
         // this.removeListOpen({ id: this.id, name: this.name })
-        this.removeListOpen({ id: this.selectedPdList.id, name: this.selectedPdList.name, clear: true })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name, clear: true })
       }, 10)
     },
     onCheckedRows (checked) {
@@ -577,7 +577,7 @@ export default {
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
-          this.$emit('on-list-update', this.selectedPdList)
+          this.$emit('on-list-update', this.selectedList)
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
@@ -602,7 +602,7 @@ export default {
         // this.isLoading = false
       }
     },
-    selectedPdList (value) {
+    selectedList (value) {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
       if (this.activeList.length > 0) {
         this.isLoading = false

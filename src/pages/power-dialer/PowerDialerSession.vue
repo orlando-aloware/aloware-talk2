@@ -28,7 +28,7 @@
 
 <script>
 
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
@@ -55,13 +55,11 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'listItems',
-      'contact'
+      'contact',
+      'selectedList'
     ]),
     ...mapGetters('powerDialer', [
       'sessionSidebarExpanded'
-    ]),
-    ...mapState('powerDialer', [
-      'selectedPdList'
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',
@@ -69,16 +67,16 @@ export default {
       'activeMetrics'
     ]),
     list () {
-      return this.listItems[this.selectedPdList.id].data || []
+      return this.listItems[this.selectedList.id].data || []
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
     isValidList () {
-      if (this.selectedPdList.id !== this.$route.params.id) {
+      if (this.selectedList.id !== this.$route.params.id) {
         return false
       }
-      return this.selectedPdList.name.length > 0
+      return this.selectedList.name.length > 0
     },
     test () {
       return this.$route
@@ -120,9 +118,9 @@ export default {
         let params = {}
         let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
         if (stat === 'all') {
-          params = { id: this.selectedPdList.id }
+          params = { id: this.selectedList.id }
         } else {
-          params = { id: this.selectedPdList.id, task_status: taskStatus }
+          params = { id: this.selectedList.id, task_status: taskStatus }
         }
         let res = await this.getSessionTaskByFilter(params)
         this.powerDialerTasks[stat] = res.data.data
@@ -132,10 +130,10 @@ export default {
       let response = null
       let id = ''
       if (this.isValidList) {
-        id = this.selectedPdList.id
+        id = this.selectedList.id
         response = await this.getPowerDialerList(id)
       } else {
-        id = this.selectedPdList?.name?.length === 0 || this.selectedPdList?.name === 'My Queue' ? 'my-queue' : this.selectedPdList?.id
+        id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
         response = await this.getPowerDialerList(this.$route.params.id)
       }
       this.activeList = response

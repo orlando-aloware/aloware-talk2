@@ -61,7 +61,6 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', ['isRemoveContactOpen', 'contactToRemove', 'selectedContacts', 'selectedList']),
-    ...mapGetters('powerDialer', ['selectedPdList']),
     title () {
       if (this.contactToRemove) {
         return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
@@ -81,10 +80,7 @@ export default {
       return ''
     },
     listId () {
-      if (this.isContactModuleType) {
-        return this.selectedList.id
-      }
-      return this.selectedPdList.name === '' ? 'my-queue' : this.selectedPdList.id
+      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
     }
   },
   data () {
