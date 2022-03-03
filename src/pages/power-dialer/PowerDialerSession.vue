@@ -59,7 +59,8 @@ export default {
       'selectedList'
     ]),
     ...mapGetters('powerDialer', [
-      'sessionSidebarExpanded'
+      'sessionSidebarExpanded',
+      'selectedPdList'
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',

@@ -57,7 +57,8 @@
             <q-card class="t-cards">
               <q-list
                 v-if="group.length > 0"
-                class="px-2 pb-2">
+                class="px-2 pb-2"
+                @mouseleave="onLeave">
                 <template v-for="(item, i) in group">
                   <q-item
                     :key="`acc-item-${i}`"
@@ -84,7 +85,6 @@
                     <b-dropdown
                       @mouseover="onOver"
                       @mouseleave="onLeave"
-                      text="..."
                       no-caret
                       right size="xs"
                       variant="white"
@@ -93,15 +93,42 @@
                       <template #button-content>
                         <i class="fa fa-ellipsis-h"></i>
                       </template>
-                      <b-dropdown-item href="#">
-                        Option 1
-                      </b-dropdown-item>
-                      <b-dropdown-item href="#">
-                        Option 2
-                      </b-dropdown-item>
-                      <b-dropdown-item href="#">
-                        Option 3
-                      </b-dropdown-item>
+                      <template>
+                        <b-dropdown-item
+                          v-if="key === 'in_queue'"
+                          @click="moveTask(item, moveDirection.top)"
+                          href="#">
+                          <ArrowUpIcon height="16px" width="16px" />
+                          Move to Top
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          v-if="key === 'in_queue'"
+                          @click="moveTask(item, moveDirection.bottom)"
+                          href="#">
+                          <ArrowDownIcon height="15px" width="15px" />
+                          Move to Bottom
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          v-if="key !== 'in_queue'"
+                          @click="addTask(item, moveDirection.top)"
+                          href="#">
+                          <ArrowUpIcon height="16px" width="16px" />
+                          Add to Top of In Queue
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          v-if="key !== 'in_queue'"
+                          @click="addTask(item, moveDirection.bottom)"
+                          href="#">
+                          <ArrowDownIcon height="15px" width="15px" />
+                          Add to Bottom of In Queue
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          v-if="key === 'in_queue'"
+                          href="#">
+                          <TrashIcon />
+                          Remove from List
+                        </b-dropdown-item>
+                      </template>
                     </b-dropdown>
                     <div
                       class="dropdown t-btn-floater t-btn-floater__bottom"
@@ -139,9 +166,18 @@ import { mapFields } from 'vuex-map-fields'
 import InProgressContact from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
+import ArrowDownIcon from 'components/icons/arrow-down-icon'
+import ArrowUpIcon from 'components/icons/arrow-up-icon'
+import TrashIcon from 'components/icons/trash-o-icon'
 import ContactInQueue from 'components/icons/contact-in-queue'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+
+const DIRECTION = {
+  top: 1,
+  bottom: 2
+}
 
 export default {
   name: 'SessionGroups',
@@ -149,7 +185,10 @@ export default {
     InProgressContact,
     SearchList,
     ContactInQueue,
-    PhoneIcon
+    PhoneIcon,
+    ArrowDownIcon,
+    ArrowUpIcon,
+    TrashIcon
   },
   mounted () {
     // this.NEXT_CONTACT_IN_PROGRESS(this.activeTask)
@@ -173,6 +212,9 @@ export default {
       'powerDialerTasks',
       'activeTask'
     ]),
+    moveDirection () {
+      return DIRECTION
+    },
     // list () {
     //   return this.listItems[this.selectedList.id].data || []
     // },
@@ -191,8 +233,42 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'getContact'
+      'getContact',
+      'moveContactItems',
+      'getSessionTaskByFilter'
     ]),
+    addTask (item = {}, direction = this.moveDirection.top) {
+      return this.$axios
+        .post('api/v2/power-dialer-list-items', {
+          contact_ids: [item.id],
+          direction: direction,
+          multiple_phone_numbers: 1
+        })
+        .then(async () => {
+          let res = await this.getSessionTaskByFilter({
+            id: this.selectedList.id,
+            task_status: 1
+          })
+          this.powerDialerTasks['in_queue'] = res.data.data
+          this.$generalNotification('Task has been successfully moved to In Queue.', 'success')
+        })
+        .catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+        })
+    },
+    async moveTask (item = {}, direction = this.moveDirection.top) {
+      const res = await this.moveContactItems({
+        id: this.selectedList.id,
+        params: {
+          // contact_ids: this.selectedContactIds,
+          contact_list_item_ids: [item.id],
+          direction: direction
+        }
+      })
+      console.log('res :>> ', res)
+    },
     chipped (data) {
       return data.length || 0
     },
@@ -200,6 +276,7 @@ export default {
       return `${fname?.[0]}${lname?.[0]}`
     },
     onOver () {
+      console.log('this.$refs.dropdown.visible :>> ', this.$refs.dropdown.visible)
       this.$refs.dropdown.visible = true
       this.$refs.returnToQueue.visible = true
     },
@@ -226,6 +303,20 @@ export default {
           return detail.total_scheduled
         default:
           return detail.total
+      }
+    },
+    taskGroupMenu (group) {
+      switch (group) {
+        case 'called':
+          return [
+            'Add to Top of In Queue',
+            'Add to Bottom of In Queue',
+            'Remove from List'
+          ]
+        default:
+          return [
+            'Remove from List'
+          ]
       }
     }
     // makeACall () {
