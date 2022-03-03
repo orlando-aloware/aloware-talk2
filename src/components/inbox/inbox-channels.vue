@@ -55,14 +55,7 @@
       </div>
       <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 ml-2 d-inline-flex">
-            <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
-                            :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
-                            @search="onSearch"
-                            @closed="onSearchClosed"
-                            @opened="onSearchOpened">
-            </inbox-searcher>
-
+          <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 d-inline-flex">
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
                 <filter-icon></filter-icon>
@@ -865,6 +858,7 @@ export default {
       if (this.mentionType === MentionType.TYPE_SENT) {
         this.filter.mentioned_user_id = this.mentionUserId
       }
+      this.getCommunications(this.filter)
     },
 
     sortFilter (value) {
