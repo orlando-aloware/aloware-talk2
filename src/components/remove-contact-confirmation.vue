@@ -26,7 +26,7 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="(contactsToDelete.toString() !== contactToDeleteCount.toString()) || isBusy"
+                :disabled="(contactsToDelete !== contactToDeleteCount.toString()) || isBusy"
                 @click="onConfirm">
           <b-spinner variant="warning"
                      type="grow"
