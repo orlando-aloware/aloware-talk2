@@ -180,12 +180,6 @@ export default {
               name: list.name,
               type: list.type
             })
-          } else {
-            // this.setSelectedPDList({
-            //   id: listId,
-            //   name: list.name,
-            //   type: list.type
-            // })
           }
 
           this.markCheckedAll()
