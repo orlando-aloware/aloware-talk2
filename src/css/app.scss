@@ -7027,7 +7027,7 @@ table.datatable {
   }
 
   a.linkified {
-    color: $grey-50;
+    color: $grey-90;
   }
 }
 
@@ -10998,4 +10998,8 @@ screen and (max-width: 956px) {
   right: 300px;
   margin-top: -22px;
   z-index: 10;
+}
+
+.cursor-default {
+  cursor: default !important;
 }

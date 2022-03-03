@@ -252,7 +252,7 @@
         :total-rows="listItems[id].total"
         :current-page="listItems[id].current_page"
         :last-page="listItems[id].last_page"
-        v-if="listItemsHasData"
+        v-if="listItemsHasData && isLoaded"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
@@ -271,7 +271,8 @@
           />
         </template>
 
-        <template slot="empty" v-if="isStartState">
+        <template slot="empty"
+                  v-if="showEmptySlot">
           <router-link
             v-slot="{ navigate }"
             :to="'/contacts/list/' + $route.params.id + '/add'"
@@ -280,10 +281,10 @@
               <div
                 class="p-4 bg-light w-100 text-center border-bottom text-primary"
               >
-                <template v-if="list.type == ContactListType.STATIC">
+                <template v-if="list.type === ContactListType.STATIC">
                   Add contacts <i class="fa fa-plus"></i>
                 </template>
-                <template v-else-if="list.type == ContactListType.DYNAMIC">
+                <template v-else-if="list.type === ContactListType.DYNAMIC">
                   Add Contacts through a Filter <i class="fa fa-plus"></i>
                 </template>
               </div>
@@ -330,6 +331,7 @@ import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   components: {
@@ -371,7 +373,8 @@ export default {
       defaultContactLists: DEFAULT_PINNED_LIST,
       isUpdatingList: false,
       folderPath: [],
-      createContactModalId: 'contacts-list-create-contact-modal'
+      createContactModalId: 'contacts-list-create-contact-modal',
+      ContactListTypes
     }
   },
 
@@ -700,6 +703,9 @@ export default {
     },
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
+    },
+    showEmptySlot () {
+      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListType.STATIC)
     }
   },
 

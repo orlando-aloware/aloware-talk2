@@ -136,6 +136,9 @@
           </q-menu>
 
           <gif-icon></gif-icon>
+          <q-tooltip>
+            Add Gif image
+          </q-tooltip>
         </b-link>
 
         <b-link href="#">
@@ -146,6 +149,9 @@
             </div>
           </q-menu>
           <attachment-icon></attachment-icon>
+          <q-tooltip>
+            Add attachments
+          </q-tooltip>
         </b-link>
         <b-link href="#">
           <q-menu content-class="mx-height-300"
@@ -156,6 +162,9 @@
             </div>
           </q-menu>
           <calendar-today-icon></calendar-today-icon>
+          <q-tooltip>
+            Add template
+          </q-tooltip>
         </b-link>
         <b-link href="#">
           <q-menu content-class="mx-height-300"
@@ -166,6 +175,9 @@
             </div>
           </q-menu>
           <variable-icon></variable-icon>
+          <q-tooltip>
+            Add variable
+          </q-tooltip>
         </b-link>
       </div>
       <div>

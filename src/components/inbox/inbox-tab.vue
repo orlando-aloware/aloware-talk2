@@ -474,15 +474,24 @@ export default {
   },
 
   mounted () {
+    const _this = this
     this.setLiveContacts([])
     this.setContacts([])
     this.setStatus()
 
-    if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+    if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
         // do other possible actions
       } else {
-        this.loadContactTasks()
+        this.loadContactTasks().finally(function () {
+          if (_this.$route.params.id) {
+            const id = _this.$route.params.id
+            const contact = _this.contactTasks.find(item => item.id.toString() === id)
+            if (contact) {
+              _this.setSelectedContact(contact)
+            }
+          }
+        })
       }
     }
 
@@ -714,7 +723,7 @@ export default {
     },
     '$route.params.status': function () {
       this.setStatus()
-      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+      if (['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name)) {
         if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
           this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
         }
@@ -737,7 +746,14 @@ export default {
       }
     },
     '$route.params.id': function (value) {
-      if (!value) {
+      if (['Inbox Contact Communication', 'Inbox Contact Task'].includes(this.$route.name) && value && this.contactTasks && this.contactTasks.length) {
+        const contact = this.contactTasks.find(item => item.id.toString() === value)
+        if (contact) {
+          this.setSelectedContact(contact)
+        }
+      }
+
+      if (['Inbox Contact Communication', 'Inbox Contact Task'].includes(this.$route.name) && !value) {
         this.setSelectedContact({})
       }
     },

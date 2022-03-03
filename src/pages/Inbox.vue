@@ -36,7 +36,7 @@ export default {
     },
 
     isContactShow () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)
     },
 
     inboxSideClasses () {
@@ -60,7 +60,7 @@ export default {
     ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
 
     setChannel (routeChanged = false) {
-      if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+      if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name)) {
         const channel = this.items.find(item => item.value === this.$route.params.channel)
         this.setActiveChannel(channel)
       }

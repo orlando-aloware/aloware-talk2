@@ -24,12 +24,6 @@
       </b-form-group>
 
       <b-form-group id="input-group-2"
-                    label="Timezone"
-                    label-for="input-2">
-        <timezone-selector @select="timezoneSelected"></timezone-selector>
-      </b-form-group>
-
-      <b-form-group id="input-group-2"
                     label="Notes"
                     label-for="input-2">
         <b-form-textarea
@@ -40,6 +34,12 @@
           no-auto-shrink
           v-model="reminder.note"
         ></b-form-textarea>
+      </b-form-group>
+
+      <b-form-group id="input-group-2"
+                    label="Timezone"
+                    label-for="input-2">
+        <timezone-selector @select="timezoneSelected"></timezone-selector>
       </b-form-group>
     </b-form>
     <template slot="modal-footer">

@@ -152,7 +152,7 @@ export default {
     onItemClick (mention) {
       this.setSelectedCommunication(mention)
       this.$router.push({
-        name: 'Inbox Contact Mention Communication',
+        name: 'Inbox Contact Communication',
         params: {
           id: mention.mention_subject.contact_id, // mention.contact_id.toString(),
           communicationId: mention.mention_subject_id,

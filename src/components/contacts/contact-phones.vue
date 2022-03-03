@@ -5,13 +5,15 @@
       <contact-phones-list-items :phones="primaryPhone"
                                  @edit="onEditPhone"
                                  @delete="onDeletePhone"
-                                 @composerMedia="setComposerVariables">
+                                 @composerMedia="setComposerVariables"
+                                 @call="onCall">
       </contact-phones-list-items>
 
       <contact-phones-list-items :phones="otherPhones"
                                  @edit="onEditPhone"
                                  @delete="onDeletePhone"
-                                 @composerMedia="setComposerVariables">
+                                 @composerMedia="setComposerVariables"
+                                 @call="onCall">
       </contact-phones-list-items>
 
       <b-link ref="phone_form"
@@ -142,6 +144,26 @@ export default {
             })
         }
       })
+    },
+
+    onCall (phone) {
+      const data = {
+        currentNumber: phone.phone_number,
+        contactName: this.contact.name,
+        companyName: this.contact.company_name,
+        contactId: this.contact.id,
+        contactTimezone: this.contact.timezone
+      }
+
+      if (this.isMobile) {
+        this.setShowPhone(true)
+        setTimeout(() => {
+          this.$VueEvent.fire('changePhoneNumber', data)
+        }, 100)
+        return
+      }
+
+      this.$VueEvent.fire('callContact', data)
     },
 
     setComposerVariables (mode, phone) {

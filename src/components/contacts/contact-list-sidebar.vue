@@ -13,13 +13,14 @@
               class="no-border position-relative"
               @scroll="handScroll">
         <b-list-group class="p-2 pr-2">
-          <b-list-group-item v-for="(contact, index) in contacts"
-                             :key="contact.id"
-                             :to="`/contacts/${contact.id}`"
-                             @click="onSidebarToggleMobile"
-                             class="d-flex align-items-center border-0">
+          <b-list-group-item class="d-flex align-items-center border-0"
+                             :class="[contact.id === item.id ? 'router-link-exact-active router-link-active' : '']"
+                             v-for="(item, index) in contacts"
+                             :key="item.id"
+                             :to="`/contacts/${item.id}`"
+                             @click="onSidebarToggleMobile">
             <contact-list-sidebar-item v-model="contacts[index]"
-                                       :key="contact.id"/>
+                                       :key="item.id"/>
           </b-list-group-item>
         </b-list-group>
         <div class="relative py-4">
@@ -53,7 +54,7 @@ export default {
   data () {
     return {
       isExpanded: true,
-      desktopisExpanded: true,
+      desktopIsExpanded: true,
       scrollTimeout: null
     }
   },
@@ -91,7 +92,7 @@ export default {
 
     onSidebarToggle () {
       this.isExpanded = !this.isExpanded
-      this.desktopisExpanded = this.isExpanded
+      this.desktopIsExpanded = this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
       if (this.isMobile) {
         this.setShowContactsHeader(this.isExpanded)
@@ -153,16 +154,20 @@ export default {
       deep: true,
       handler: function () {
         if (this.isMobile && this.$route.name === 'Contact') {
-          this.desktopisExpanded = this.isExpanded
+          this.desktopIsExpanded = this.isExpanded
           this.isExpanded = false
           this.setSidebarCollapsed(!this.isExpanded)
+        }
+
+        if (this.$route.name === 'Contact' && this.$route.params.id) {
+          this.fetch()
         }
       }
     },
 
     isMobile () {
       if (!this.isMobile) {
-        this.isExpanded = this.desktopisExpanded
+        this.isExpanded = this.desktopIsExpanded
       }
 
       if (!this.$q.screen.lt.md) {

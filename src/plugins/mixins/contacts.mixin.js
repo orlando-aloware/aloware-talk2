@@ -351,8 +351,22 @@ export default {
         const profileId = _.get(this.profile, 'id', null)
         if (filter && profileId) {
           defaultFilters[0].filters.contact_owner.value = [profileId]
+          defaultFilters[0].filters.contact_owner.default = 1
         }
       }
+
+      if (['unassigned'].includes(this.$route.params.id)) {
+        defaultFilters[0].filters.is_unassigned.default = 1
+      }
+
+      if (['unanswered'].includes(this.$route.params.id)) {
+        defaultFilters[0].filters.is_unanswered_contact.default = 1
+      }
+
+      if (['new-leads'].includes(this.$route.params.id)) {
+        defaultFilters[0].filters.is_new_contact.default = 1
+      }
+
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     }
   },

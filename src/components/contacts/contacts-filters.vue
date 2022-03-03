@@ -48,6 +48,7 @@
                       {{ group.is_conjunction ? 'AND' : 'OR' }}
                     </div>
                     <compact-btn class="py-0 delete-group-filter ml-auto"
+                                 v-if="!hasDefault(group)"
                                  @clicked="onDeleteGroupFilter(groupIndex)">
                       Remove
                     </compact-btn>
@@ -56,9 +57,10 @@
                           :key="groupIndex">
                     <template v-for="(filter, key, index) in group.filters">
                       <b-card class="mb-2 filter-item"
+                              :class="[isDefault(filter) ? 'cursor-default' : '']"
                               role="button"
                               :key="key"
-                              @click="selectFilterByKey(filter.key, groupIndex, group.is_conjunction)">
+                              @click="selectFilterByKey(filter, groupIndex, group.is_conjunction)">
                         <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
                           Not
                         </span>
@@ -70,13 +72,17 @@
                         <span class="font-weight-bold">
                           {{ getFormattedFilterSummary(filter, key) }}
                         </span>
-                        <compact-btn class="py-0 delete-filter"
+                        <compact-btn v-if="!isDefault(filter)"
+                                     class="py-0 delete-filter"
                                      @clicked="onDeleteFilter(groupIndex, filter.key)">
                           <i class="fa fa-trash"></i>
                           <q-tooltip>
                             Remove this condition
                           </q-tooltip>
                         </compact-btn>
+                        <q-tooltip v-if="isDefault(filter)">
+                          This is a default filter for this list and cannot be modified.
+                        </q-tooltip>
                       </b-card>
                       <div v-if="getFilterLength(group.filters) >= 2 && index < (getFilterLength(group.filters) - 1)"
                            class="mb-2 font-weight-bold"
@@ -319,9 +325,11 @@ export default {
       this.step = 3
     },
 
-    selectFilterByKey (key, index, conjunction) {
-      const found = this.filters.find(filter => filter.key === key)
-
+    selectFilterByKey (filter, index, conjunction) {
+      if (typeof filter.default !== 'undefined' && filter.default === 1) {
+        return
+      }
+      const found = this.filters.find(item => item.key === filter.key)
       if (found) {
         this.selectedFilter = found
         this.toAddFiltersStep(index, conjunction, true)
@@ -386,14 +394,16 @@ export default {
               label: found.label,
               operator: operator.label,
               trueValue: trueValue.data,
-              value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data))
+              value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
+              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
             }
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.label,
               trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
-              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value)
+              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value),
+              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
             }
           }
         }
@@ -448,11 +458,14 @@ export default {
     },
 
     onDeleteFilter (index, key) {
-      const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      const updatedFilter = _.cloneDeep(JSON.parse(JSON.stringify(this.currentListFilters)))
       delete updatedFilter[index].filters[key]
 
       if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
+        this.setCurrentListFilters(updatedFilter)
+        this.$emit('filtersUpdated')
+        return
       }
 
       if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Object') {
@@ -476,6 +489,23 @@ export default {
 
       this.setCurrentListFilters(updatedFilter)
       this.$emit('filtersUpdated')
+    },
+
+    hasDefault (filter) {
+      const keys = Object.keys(filter.filters)
+      const result = { hasDefault: 0 }
+      for (let value of keys) {
+        if (filter.filters[value].default === 1) {
+          result.hasDefault = 1
+          break
+        }
+      }
+
+      return result.hasDefault
+    },
+
+    isDefault (filter) {
+      return typeof filter.default !== 'undefined' && filter.default === 1
     },
 
     ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),

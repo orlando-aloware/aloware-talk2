@@ -874,7 +874,7 @@ export default {
 
     redirectMentionsChannel (mention) {
       this.$router.push({
-        name: 'Inbox Contact Mention Communication',
+        name: 'Inbox Contact Communication',
         params: {
           id: mention.mention_subject.contact_id,
           communicationId: mention.mention_subject_id,
@@ -996,9 +996,9 @@ export default {
       }
     },
     '$route.name': function (value) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(value)) {
+      if (['Inbox Contact', 'Inbox Contact Communication'].includes(value)) {
         // since mention has different data structure to other channels, need to set property to compare as comm id
-        const identifierProp = value === 'Inbox Contact Mention Communication' ? 'mention_subject_id' : 'id'
+        const identifierProp = value === 'Inbox Contact Communication' ? 'mention_subject_id' : 'id'
         const communication = this.communications.find(item => item[identifierProp] === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
       }
@@ -1156,7 +1156,7 @@ export default {
           this.redirectChannel(communication)
         }
 
-        if (this.$route.name === 'Inbox Contact Mention Communication') {
+        if (this.$route.name === 'Inbox Contact Communication') {
           this.redirectMentionsChannel(communication)
         }
 
@@ -1171,7 +1171,7 @@ export default {
         this.redirectChannel(communication)
       }
 
-      if (this.$route.name === 'Inbox Contact Mention Communication') {
+      if (this.$route.name === 'Inbox Contact Communication') {
         this.redirectMentionsChannel(communication)
       }
 
@@ -1189,10 +1189,10 @@ export default {
     })
 
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+      if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         const communication = { data: null }
 
-        if (this.$route.name === 'Inbox Contact Mention Communication') {
+        if (this.$route.name === 'Inbox Contact Communication') {
           communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
         } else {
           communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
@@ -1204,7 +1204,7 @@ export default {
       }
     }
 
-    if (['Inbox Channel', 'Inbox Contact Mention Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
       this.getCommunications(this.filter)
     }
   }

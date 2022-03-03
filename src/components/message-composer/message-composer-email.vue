@@ -24,9 +24,15 @@
       <div class="message-options">
         <b-link href="#" id="smsTemplate">
           <calendar-today-icon></calendar-today-icon>
+          <q-tooltip>
+            Add template
+          </q-tooltip>
         </b-link>
         <b-link href="#" id="smsVariables">
           <variable-icon></variable-icon>
+          <q-tooltip>
+            Add variable
+          </q-tooltip>
         </b-link>
       </div>
       <div>
@@ -49,7 +55,8 @@
                target="smsVariables"
                triggers="click blur"
                @show="onPopoverShown">
-      <variables @variableSelected="variableSelected" always-open></variables>
+      <variables always-open
+                 @variableSelected="variableSelected" ></variables>
     </b-popover>
 
     <b-popover ref="popover"
