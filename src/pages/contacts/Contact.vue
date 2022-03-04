@@ -165,10 +165,12 @@ export default {
       }
     })
 
-    this.$VueEvent.listen('contact_disposed', (dispositionStatusId) => {
-      const contact = _.cloneDeep(this.contact)
-      contact.disposition_status_id = dispositionStatusId
-      this.setContact(contact)
+    this.$VueEvent.listen('contact_disposed', (disposedContact) => {
+      if (disposedContact.id === this.contact.id) {
+        const contact = _.cloneDeep(this.contact)
+        contact.disposition_status_id = disposedContact.disposition_status_id
+        this.setContact(contact)
+      }
     })
   },
 
