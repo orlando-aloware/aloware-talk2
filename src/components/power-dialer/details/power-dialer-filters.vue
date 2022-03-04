@@ -96,7 +96,7 @@ export default {
         'called': 'total_called',
         'failed': 'total_failed',
         'scheduled': 'total_scheduled',
-        'all': 'total'
+        'all': 'total_items'
       }
     }
   }

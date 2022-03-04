@@ -85,8 +85,9 @@ export default {
   },
   async mounted () {
     this.resetPowerDialerTasks()
-    this.$VueEvent.listen('contact_list_item_created', (task) => {
+    this.$VueEvent.listen('contact_list_item_created', async (task) => {
       console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+      await this.fetchInQueueTasks(task)
       // if (this.checkCommunicationMatchesUserAccessibility(task)) {
       //   this.handleDesktopVoicemailNotification(task)
       // }
@@ -102,7 +103,10 @@ export default {
       console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
       // if (this.checkCommunicationMatchesUserAccessibility(task)) {
       //   this.handleDesktopVoicemailNotification(task)
-      // }
+      // }contact_list_bulk_created
+    })
+    this.$VueEvent.listen('contact_list_bulk_created', (task) => {
+      console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
     })
     await this.fetchTasks()
   },
@@ -113,6 +117,13 @@ export default {
       'getPowerDialerList',
       'setSelectedPDList'
     ]),
+    async fetchInQueueTasks (task) {
+      let res = await this.getSessionTaskByFilter({
+        id: task.contact_list_id,
+        task_status: 1
+      })
+      this.powerDialerTasks['in_queue'] = res.data.data
+    },
     async fetchTasks () {
       await this.fetchCurrentList()
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {

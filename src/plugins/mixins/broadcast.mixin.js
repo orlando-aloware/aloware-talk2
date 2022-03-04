@@ -339,7 +339,6 @@ export default {
           window.VueEvent.fire('contact_list_item_created', contactListItem)
         })
         .listen('.user.contact_list_item.updated', (event) => {
-          console.log('event -----------:>> ', event)
           let contactListItem = event.contact_list_item
           if (event.contact) {
             contactListItem.contact = event.contact
@@ -354,6 +353,9 @@ export default {
         })
         .listen('.user.contact_list_item.deleting', (event) => {
           window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
+        })
+        .listen('.user.bulk_contact_list_items.created', (event) => {
+          window.VueEvent.fire('contact_list_bulk_created', event)
         })
         .listen('.user.session_metrics_calculation', (event) => {
           window.VueEvent.fire('metric_sessions_update', event)

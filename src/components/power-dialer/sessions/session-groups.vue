@@ -241,15 +241,9 @@ export default {
       return this.$axios
         .post('api/v2/power-dialer-list-items', {
           contact_ids: [item.id],
-          direction: direction,
-          multiple_phone_numbers: 1
+          direction: direction
         })
         .then(async () => {
-          let res = await this.getSessionTaskByFilter({
-            id: this.selectedList.id,
-            task_status: 1
-          })
-          this.powerDialerTasks['in_queue'] = res.data.data
           this.$generalNotification('Task has been successfully moved to In Queue.', 'success')
         })
         .catch((err) => {
@@ -263,11 +257,18 @@ export default {
         id: this.selectedList.id,
         params: {
           // contact_ids: this.selectedContactIds,
-          contact_list_item_ids: [item.id],
+          contact_list_item_ids: [item.contact_list_item_id],
           direction: direction
         }
       })
-      console.log('res :>> ', res)
+      if (res.status === 200) {
+        let res = await this.getSessionTaskByFilter({
+          id: this.selectedList.id,
+          task_status: 1
+        })
+        this.powerDialerTasks['in_queue'] = res.data.data
+        this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
+      }
     },
     chipped (data) {
       return data.length || 0
