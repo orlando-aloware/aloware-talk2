@@ -60,11 +60,22 @@ export default {
         this.saveChanges(),
         this.disposeContact()
       ]).then(response => {
-        if (response[0] && response[0].status && response[1] && response[1].status) {
-          const contact = response[0].contact
-          this.setContact(contact)
-          this.setContactClone(contact)
-          this.resetChangedContactProperties()
+        if ((response[0] && response[0].status) || (response[1] && response[1].status)) {
+          const contactData = { contact: null }
+
+          if (response[0] && response[0].contact) {
+            contactData.contact = response[0].contact
+          }
+
+          if (response[1] && response[1].contact) {
+            contactData.contact = response[1].contact
+          }
+
+          if (contactData.contact) {
+            this.setContact(contactData.contact)
+            this.setContactClone(this.contact)
+            this.resetChangedContactProperties()
+          }
         }
 
         // contact has been updated while disposition is not

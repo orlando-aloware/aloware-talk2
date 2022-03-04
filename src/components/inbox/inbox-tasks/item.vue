@@ -214,7 +214,7 @@
               :style="avatarStyle(false)"
               :name="contactName">
       </avatar>
-      <p class="text-muted _500">You reopened this conversation</p>
+      <p class="text-muted _500">This conversation has been reopened</p>
     </div>
   </div>
 </template>
@@ -341,6 +341,11 @@ export default {
         return
       }
       this.$emit('onItemSelected', contact)
+    }
+  },
+  watch: {
+    isReopened: function () {
+      console.trace()
     }
   }
 }
