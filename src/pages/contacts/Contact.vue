@@ -89,6 +89,7 @@ import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
 
 export default {
   mixins: [contactsMixins, contactMixins],
@@ -162,6 +163,12 @@ export default {
           this.setContact(contact)
         })
       }
+    })
+
+    this.$VueEvent.listen('contact_disposed', (dispositionStatusId) => {
+      const contact = _.cloneDeep(this.contact)
+      contact.disposition_status_id = dispositionStatusId
+      this.setContact(contact)
     })
   },
 

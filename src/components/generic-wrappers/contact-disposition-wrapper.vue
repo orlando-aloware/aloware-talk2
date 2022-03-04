@@ -38,6 +38,7 @@ export default {
         this.loadingContactDisposition = false
         this.dispositionStatusId = dispositionStatusId
         this.$emit('change', dispositionStatusId)
+        this.$VueEvent.fire('contact_disposed', dispositionStatusId)
         this.$generalNotification('Contact disposed')
       }).catch((err) => {
         this.loadingContactDisposition = false

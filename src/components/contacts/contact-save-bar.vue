@@ -25,6 +25,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
+
 export default {
   name: 'contact-save-bar',
   computed: {
@@ -68,14 +70,16 @@ export default {
           }
 
           if (response[1] && response[1].contact) {
-            contactData.contact = response[1].contact
+            contactData.contact = _.cloneDeep(this.contact)
+            contactData.contact.disposition_status_id = response[1].contact.disposition_status_id
           }
 
           if (contactData.contact) {
             this.setContact(contactData.contact)
-            this.setContactClone(this.contact)
-            this.resetChangedContactProperties()
           }
+
+          this.setContactClone(this.contact)
+          this.resetChangedContactProperties()
         }
 
         // contact has been updated while disposition is not
