@@ -339,6 +339,7 @@ export default {
           window.VueEvent.fire('contact_list_item_created', contactListItem)
         })
         .listen('.user.contact_list_item.updated', (event) => {
+          console.log('event -----------:>> ', event)
           let contactListItem = event.contact_list_item
           if (event.contact) {
             contactListItem.contact = event.contact

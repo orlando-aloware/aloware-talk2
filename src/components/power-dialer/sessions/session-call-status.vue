@@ -62,7 +62,9 @@
             <AddUserIcon color="#62666E" />
             Add
           </b-dropdown-item>
-          <b-dropdown-item href="#">
+          <b-dropdown-item
+            @click="openTransfer"
+            href="#">
             <TransferIcon color="#62666E" />
             Transfer
           </b-dropdown-item>
@@ -443,11 +445,28 @@ export default {
       }
     },
     resetTimer () {
-      this.timerCount = this.sessionSettings.warmup_period_in_seconds
+      setTimeout(() => {
+        this.timerCount = this.sessionSettings.warmup_period_in_seconds
+      }, 500)
     },
     reRoute () {
       this.$emit('on-redirect', this.selectedList)
     },
+    openTransfer () {
+      console.log('Opening transfer on dialer...')
+      // this.resetTransfer()
+      // this.expansionEnabled = true
+      // this.bottomExpansion = 'transfer'
+      // setTimeout(() => {
+      //   this.expanded = true
+      // }, 50)
+    },
+    // resetTransfer () {
+    //   this.transfer.userId = null
+    //   this.transfer.ringGroupId = null
+    //   this.transfer.phoneNumber = ''
+    //   this.transfer.mode = 'user'
+    // },
     managingSessionFlows (status = '') {
       let {
         togglePause,
@@ -491,7 +510,7 @@ export default {
     async taskToCall (task) {
       if (task) {
         await this.fetchContact(this.taskToCall.id)
-        this.tickTimer()
+        this.resetTimer()
       }
     },
     async activeTask (task) {
@@ -538,8 +557,9 @@ export default {
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
-      if (tasks.length > 0) {
+      if (tasks.length > 0 && !this.flagged) {
         this.initialize()
+        this.flagged = true
       }
     },
     currentSessionStatus (status) {
