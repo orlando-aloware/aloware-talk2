@@ -4,7 +4,7 @@
       <div class="header__header__title font-weight-bold pl-3 text-13 flex-grow-1">
         SESSION
       </div>
-      <b-dropdown
+      <!-- <b-dropdown
         size="xs"
         variant="link"
         toggle-class="text-decoration-none"
@@ -29,7 +29,7 @@
           href="#">
           Item 2
         </b-dropdown-item>
-      </b-dropdown>
+      </b-dropdown> -->
 
       <StartDialing
         :list="activeList"
