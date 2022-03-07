@@ -2,7 +2,6 @@
   <div class="t-flex-group__no-bg flex-column border-top">
 
     <SessionTabsHeaders
-      :tabs="panelList"
       @selected-tab="selectTab" />
 
     <div class="t-panel-container">
@@ -50,21 +49,7 @@ export default {
   },
   data () {
     return {
-      panel: 'Details',
-      panelList: [
-        {
-          id: 1,
-          name: 'Details'
-        },
-        {
-          id: 2,
-          name: 'Activity'
-        },
-        {
-          id: 3,
-          name: 'CRM View'
-        }
-      ]
+      panel: 'Details'
     }
   }
 }
