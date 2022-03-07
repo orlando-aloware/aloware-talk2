@@ -46,6 +46,12 @@
               Phone number unavailable
             </span>
           </p>
+          <div class="flex mb-4">
+            <span class="material-icons">
+                schedule
+            </span>
+            <digital-clock class="ml-2" :timezone="contact.timezone"></digital-clock>
+          </div>
         </div>
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                   size="sm"
@@ -139,6 +145,7 @@ import AppointmentFormModal from 'src/components/appointments/appointment-form-m
 import EnrollSequenceModal from 'src/components/enroll-sequence-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import { aclMixin } from 'src/plugins/mixins'
+import DigitalClock from 'components/digital-clock'
 
 export default {
   name: 'contact-info',
@@ -146,6 +153,7 @@ export default {
   mixins: [aclMixin],
 
   components: {
+    DigitalClock,
     ContactAddReminderModal,
     EnrollSequenceModal,
     AppointmentFormModal,

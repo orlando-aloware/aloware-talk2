@@ -25,6 +25,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
+
 export default {
   name: 'contact-save-bar',
   computed: {
@@ -60,10 +62,23 @@ export default {
         this.saveChanges(),
         this.disposeContact()
       ]).then(response => {
-        if (response[0] && response[0].status && response[1] && response[1].status) {
-          const contact = response[0].contact
-          this.setContact(contact)
-          this.setContactClone(contact)
+        if ((response[0] && response[0].status) || (response[1] && response[1].status)) {
+          const contactData = { contact: null }
+
+          if (response[0] && response[0].contact) {
+            contactData.contact = response[0].contact
+          }
+
+          if (response[1] && response[1].contact) {
+            contactData.contact = _.cloneDeep(this.contact)
+            contactData.contact.disposition_status_id = response[1].contact.disposition_status_id
+          }
+
+          if (contactData.contact) {
+            this.setContact(contactData.contact)
+          }
+
+          this.setContactClone(this.contact)
           this.resetChangedContactProperties()
         }
 
