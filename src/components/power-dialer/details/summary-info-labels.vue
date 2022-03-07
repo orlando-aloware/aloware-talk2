@@ -96,7 +96,7 @@ export default {
     },
     filteredMetrics () {
       if (isEmpty(this.activeMetrics)) {
-        return []
+        return this.prefetchedItems
       }
       return this.prefetchedItems.concat(this.activeMetrics)
     }
