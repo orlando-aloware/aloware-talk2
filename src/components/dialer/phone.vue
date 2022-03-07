@@ -1835,7 +1835,6 @@ export default {
       this.$emit('onPhoneVisible', true)
     },
     openPhone () {
-      console.log('4444 :>> ', 4444)
       this.isVisible = this.$route.meta.id !== 'power-dialer-session'
       // this.isVisible = true
       this.$emit('onPhoneVisible', true)
