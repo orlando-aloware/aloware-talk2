@@ -13,7 +13,7 @@
 
       <div
         class="col-4 p-1 px-2"
-        style="height:63vh;">
+        style="height:70vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div
@@ -30,7 +30,7 @@
 
       <div
         class="col-4 p-1 px-2"
-        style="height:63vh;">
+        style="height:70vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div class="text-18 text-weight-medium">
@@ -47,7 +47,7 @@
       </div>
       <div
         class="col-4 p-1 px-2"
-        style="height:63vh;">
+        style="height:70vh;">
 
         <DetailsTools />
 
@@ -77,6 +77,9 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'contact'
+    ]),
+    ...mapGetters('powerDialer', [
+      'sessionLoader'
     ])
   },
   data () {
