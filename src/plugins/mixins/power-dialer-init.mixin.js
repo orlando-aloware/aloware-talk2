@@ -23,7 +23,6 @@ export default {
       if (!id) {
         id = 'my-queue'
       }
-      console.log('id :>> ', id)
       let stringId = String(id)
 
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {

@@ -389,7 +389,7 @@ export default {
     initialize () {
       this.TOGGLE_SESSION_LOADER(false)
       if (this.hasExistingTaskList) {
-        this.taskToCall = this.powerDialerTasks.in_queue[0]
+        this.taskToCall = this.powerDialerTasks.in_queue[0] || []
       }
       // if (!this.togglePause) {
       //   this.resetTimer()
