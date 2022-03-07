@@ -124,6 +124,7 @@
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-if="key === 'in_queue'"
+                          @click="onDeleteTask(item)"
                           href="#">
                           <TrashIcon />
                           Remove from List
@@ -269,6 +270,23 @@ export default {
         this.powerDialerTasks['in_queue'] = res.data.data
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
       }
+    },
+    async onDeleteTask (data) {
+      return this.$axios
+        .delete(
+          `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${data.contact_list_item_id}`
+        )
+        .then(async (res) => {
+          let response = await this.getSessionTaskByFilter({
+            id: this.selectedList.id,
+            task_status: 1
+          })
+          this.powerDialerTasks['in_queue'] = response.data.data
+          this.$generalNotification(res.data.message)
+        })
+        .catch(() => {
+          this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
+        })
     },
     chipped (data) {
       return data.length || 0

@@ -195,9 +195,8 @@ import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
-// import MuteIcon from 'components/icons/mute-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
-import sessionsMixins from './sessions'
+import sessionsMixins from 'src/plugins/mixins/sessions'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -215,16 +214,12 @@ export default {
     StopIcon,
     EndCallIcon,
     RecordIcon
-    // MuteIcon
   },
   mixins: [ sessionsMixins ],
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.prevRoute = from
     })
-  },
-  mounted () {
-    // fsdfds
   },
   computed: {
     ...mapFields('powerDialer', [
@@ -359,9 +354,6 @@ export default {
     timerIsOver () {
       return this.timerCount === 0 || this.timerCount === -1
     },
-    hasHubspotEnabled () {
-      return this.activeTask?.company?.hubspot_integration_enabled
-    },
     integrationsHubspot () {
       return this.activeTask?.integrations?.hubspot
     }
@@ -406,6 +398,7 @@ export default {
       res = await this.getContact({ id: taskId })
       if (!this.flagged) {
         this.activeTask = res
+        this.flagged = true
       }
       console.log('RESPONSE from Contacts API : ', res)
       this.TOGGLE_SESSION_LOADER(false)
@@ -415,9 +408,9 @@ export default {
       if (this.hasExistingTaskList) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
       }
-      if (!this.togglePause) {
-        this.resetTimer()
-      }
+      // if (!this.togglePause) {
+      //   this.resetTimer()
+      // }
     },
     onToggleMute () {
       this.$VueEvent.fire('toggleMute')
@@ -471,7 +464,8 @@ export default {
       let {
         togglePause,
         statusCallConnected,
-        timerIsOver
+        timerIsOver,
+        flagged
       } = this
       switch (status) {
         // If Status is READY
@@ -479,7 +473,7 @@ export default {
           // if (this.toggleEnd) {
           //   this.reRoute()
           // }
-          if (!statusCallConnected && timerIsOver) {
+          if (!statusCallConnected && timerIsOver && flagged) {
             this.resetTimer()
           }
           break
@@ -523,7 +517,7 @@ export default {
     },
     timerCount: {
       async handler (value) {
-        if (value === 0 && !this.statusCallConnected) {
+        if (this.timerIsOver && !this.statusCallConnected) {
           if (this.toggleEnd) {
             this.reRoute()
           } else {
@@ -559,7 +553,6 @@ export default {
     'powerDialerTasks.in_queue' (tasks) {
       if (tasks.length > 0 && !this.flagged) {
         this.initialize()
-        this.flagged = true
       }
     },
     currentSessionStatus (status) {
