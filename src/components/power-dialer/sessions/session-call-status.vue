@@ -366,11 +366,6 @@ export default {
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
     ]),
-    async nextContact () {
-      this.$VueEvent.fire('hangupCall')
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
-      await this.fetchContact(this.taskToCall.id)
-    },
     async tickTimer () {
       if (this.hasExistingTaskList) {
         if (this.timerCount > 0) {
@@ -390,18 +385,6 @@ export default {
           }
         }
       }
-    },
-    async fetchContact (taskId = '') {
-      console.log('Fetching contact for current session...', taskId)
-      this.TOGGLE_SESSION_LOADER(true)
-      let res = null
-      res = await this.getContact({ id: taskId })
-      if (!this.flagged) {
-        this.activeTask = res
-        this.flagged = true
-      }
-      console.log('RESPONSE from Contacts API : ', res)
-      this.TOGGLE_SESSION_LOADER(false)
     },
     initialize () {
       this.TOGGLE_SESSION_LOADER(false)
@@ -502,7 +485,7 @@ export default {
   },
   watch: {
     async taskToCall (task) {
-      if (task) {
+      if (task?.id) {
         await this.fetchContact(this.taskToCall.id)
         this.resetTimer()
       }
@@ -521,9 +504,11 @@ export default {
           if (this.toggleEnd) {
             this.reRoute()
           } else {
+            console.log('7777 :>> ', value)
             await this.tickTimer()
           }
         } else if (value > 0) {
+          console.log('TICK : ', value)
           await this.tickTimer()
         }
       },

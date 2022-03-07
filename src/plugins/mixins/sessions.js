@@ -45,6 +45,25 @@ export default {
   },
   methods: {
     ...mapActions(['setShowPhone']),
+    async nextContact () {
+      this.$VueEvent.fire('hangupCall')
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
+      if (this.taskToCall?.id) {
+        await this.fetchContact(this.taskToCall?.id)
+      }
+    },
+    async fetchContact (taskId = '') {
+      console.log('Fetching contact for current session...', taskId)
+      this.TOGGLE_SESSION_LOADER(true)
+      let res = null
+      res = await this.getContact({ id: taskId })
+      if (!this.flagged) {
+        this.activeTask = res
+        this.flagged = true
+      }
+      console.log('RESPONSE from Contacts API : ', res)
+      this.TOGGLE_SESSION_LOADER(false)
+    },
     async runTask () {
       let data = {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)

@@ -119,6 +119,7 @@ export default {
     await this.setFilterParams(this.$route.params)
 
     this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
+      console.log('sessionMetrics :>> ', sessionMetrics)
       this.activeMetrics = sessionMetrics.session_metrics_calculations
     })
   },
