@@ -358,6 +358,7 @@ export default {
           window.VueEvent.fire('contact_list_bulk_created', event)
         })
         .listen('.user.session_metrics_calculation', (event) => {
+          console.log('event 32543 324w5t 34t34r :>> ', event)
           window.VueEvent.fire('metric_sessions_update', event)
         })
         .listen('.export-events', (event) => {
