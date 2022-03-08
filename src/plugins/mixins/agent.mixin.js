@@ -164,5 +164,6 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('change_agent_status')
+    clearInterval(window.agentStatusIntervalId)
   }
 }

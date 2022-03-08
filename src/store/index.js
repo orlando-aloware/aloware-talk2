@@ -2,8 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import _ from 'lodash'
 import * as Default from '../constants/default'
-import * as ContactsDefault from '../constants/contacts-default'
-import * as InboxDefault from '../constants/inbox-default'
 import * as ActionNotificationsDefault from '../constants/action-notifications-default'
 import createPersistedState from 'vuex-persistedstate'
 import { getField, updateField } from 'vuex-map-fields'
@@ -15,6 +13,7 @@ import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
 import * as storage from '../plugins/helpers/storage'
+import * as DefaultCachePaths from 'src/constants/default-cache'
 
 Vue.use(Vuex)
 
@@ -451,12 +450,49 @@ export default function (/* { ssrContext } */) {
         commit('SET_RING_GROUPS', ringGroups)
       },
 
-      resetVuex ({ commit }) {
-        commit('RESET_VUEX')
-      },
+      resetVuex ({ commit }, value) {
+        if (['contacts', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
+          commit('contacts/RESET_VUEX', value, { root: true })
 
-      resetContactsDefaultVuex ({ commit }) {
-        commit('RESET_CONTACTS_DEFAULT_VUEX')
+          if (!['non-cache', 'all'].some(item => value.includes(item))) {
+            return
+          }
+        }
+
+        if (['inbox', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
+          commit('inbox/RESET_VUEX', value, { root: true })
+
+          if (!['non-cache', 'all'].some(item => value.includes(item))) {
+            return
+          }
+        }
+
+        if (['stats', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
+          commit('stats/RESET_VUEX', value, { root: true })
+
+          if (!['non-cache', 'all'].some(item => value.includes(item))) {
+            return
+          }
+        }
+
+        if (['root', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
+          commit('RESET_VUEX', value)
+
+          if (!['non-cache', 'all'].some(item => value.includes(item))) {
+            return
+          }
+        }
+
+        if (value.includes('non-cache')) {
+          // do other things for non-cached state and modules
+        }
+
+        // reset all others
+        if (value.includes('all')) {
+          console.log('here!')
+          commit('settings/RESET_VUEX', null, { root: true })
+          commit('cache/RESET_VUEX', null, { root: true })
+        }
       },
 
       resetFilters ({ commit }) {
@@ -977,14 +1013,8 @@ export default function (/* { ssrContext } */) {
         state.ringGroups = ringGroups
       },
 
-      RESET_VUEX (state) {
-        state = Object.assign(state, Default.DEFAULT_STATE)
-        contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
-        inbox.state = Object.assign(inbox.state, InboxDefault.DEFAULT_STATE)
-      },
-
-      RESET_CONTACTS_DEFAULT_VUEX (state) {
-        contacts.state = Object.assign(contacts.state, ContactsDefault.DEFAULT_STATE)
+      RESET_VUEX ({ state }) {
+        state = Object.assign({}, Default.DEFAULT_STATE)
       },
 
       RESET_FILTERS (state) {
@@ -1290,7 +1320,7 @@ export default function (/* { ssrContext } */) {
     plugins: [
       createPersistedState({
         key: 'AloWare_vuex',
-        paths: ['cache', 'auth.profile'],
+        paths: DefaultCachePaths.DEFAULT_STATE.paths,
         storage: {
           getItem: (key) => storage.local.getItem(key),
           setItem: (key, value) => storage.local.setItem(key, value),

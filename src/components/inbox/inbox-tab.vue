@@ -466,6 +466,28 @@ export default {
       if (currentContact.id === this.contact.id) {
         this.setContact(currentContact)
       }
+    },
+    onRouteChange () {
+      this.setStatus()
+      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        }
+
+        this.lineOrRingGroupFilter = null
+        // prevent reset of filters if coming from the root
+        if (!this.$route.params.id) {
+          this.resetList()
+        } else {
+          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+            this.loadContactTasks()
+          }
+        }
+      }
+    },
+    onRouteNameChange () {
+      this.currentTask = ContactTaskStatus.STATUS_OPEN
+      this.resetList()
     }
   },
   created () {
@@ -702,6 +724,14 @@ export default {
           this.setContacts(contacts)
       }
     })
+
+    this.$VueEvent.listen('inbox_route_change', () => {
+      this.onRouteChange()
+    })
+
+    this.$VueEvent.listen('inbox_route_name_change', () => {
+      this.onRouteNameChange()
+    })
   },
 
   watch: {
@@ -711,30 +741,6 @@ export default {
     'sorting.order': function () {
       this.setContacts([])
       this.loadContactTasks()
-    },
-    '$route.params.status': function () {
-      this.setStatus()
-      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
-        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
-          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
-        }
-
-        this.lineOrRingGroupFilter = null
-        // prevent reset of filters if coming from the root
-        if (!this.$route.params.id) {
-          this.resetList()
-        } else {
-          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
-            this.loadContactTasks()
-          }
-        }
-      }
-    },
-    '$route.name': function (value) {
-      if (['Inbox'].includes(value)) {
-        this.currentTask = ContactTaskStatus.STATUS_OPEN
-        this.resetList()
-      }
     },
     '$route.params.id': function (value) {
       if (!value) {

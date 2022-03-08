@@ -1,7 +1,27 @@
+const MainLayout = () => import('layouts/MainLayout.vue')
+const Login = () => import('pages/Login.vue')
+const ForgotPassword = () => import('pages/ForgotPassword.vue')
+const ResetPassword = () => import('pages/ResetPassword.vue')
+const Inbox = () => import('pages/Inbox.vue')
+const Contact = () => import('src/pages/contacts/Contact.vue')
+const Contacts = () => import('src/pages/contacts/Contacts.vue')
+const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
+const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
+const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
+const PowerDialerBase = () => import('src/pages/power-dialer/PowerDialerBase')
+const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
+const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
+const Stats = () => import('pages/stats/Stats.vue')
+const Settings = () => import('pages/Settings.vue')
+const Account = () => import('pages/Account.vue')
+const Communication = () => import('pages/Communication.vue')
+const Phone = () => import('pages/Phone.vue')
+const Error404 = () => import('pages/Error404.vue')
+
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: MainLayout,
     children: [
       {
         path: 'login',
@@ -9,7 +29,7 @@ const routes = [
         meta: {
           isGuest: true
         },
-        component: () => import('pages/Login.vue')
+        component: Login
       },
       {
         path: 'forgot-password',
@@ -17,7 +37,7 @@ const routes = [
         meta: {
           isGuest: true
         },
-        component: () => import('pages/ForgotPassword.vue')
+        component: ForgotPassword
       },
       {
         path: 'reset/:token',
@@ -25,12 +45,12 @@ const routes = [
         meta: {
           isGuest: true
         },
-        component: () => import('pages/ResetPassword.vue')
+        component: ResetPassword
       },
       {
         path: '',
         name: 'Inbox',
-        component: () => import('pages/Inbox.vue'),
+        component: Inbox,
         meta: {
           title: 'Communications'
         },
@@ -38,7 +58,7 @@ const routes = [
           {
             path: 'channels/:channel/:status/contacts/:id',
             name: 'Inbox Contact Task',
-            component: () => import('src/pages/contacts/Contact.vue'),
+            component: Contact,
             meta: {
               title: 'Communications'
             }
@@ -46,7 +66,7 @@ const routes = [
           {
             path: 'channels/:channel/:status',
             name: 'Inbox Channel Task Status',
-            component: () => import('src/pages/contacts/Contact.vue'),
+            component: Contact,
             meta: {
               title: 'Communications'
             }
@@ -54,7 +74,7 @@ const routes = [
           {
             path: 'channels/:channel/contacts/:id/communications/:communicationId',
             name: 'Inbox Contact',
-            component: () => import('src/pages/contacts/Contact.vue'),
+            component: Contact,
             meta: {
               title: 'Communications'
             }
@@ -62,7 +82,7 @@ const routes = [
           {
             path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
             name: 'Inbox Contact Mention Communication',
-            component: () => import('src/pages/contacts/Contact.vue'),
+            component: Contact,
             meta: {
               title: 'Communications'
             }
@@ -70,7 +90,7 @@ const routes = [
           {
             path: 'channels/:channel',
             name: 'Inbox Channel',
-            component: () => import('src/pages/Inbox.vue'),
+            component: Inbox,
             meta: {
               title: 'Communications'
             }
@@ -79,19 +99,19 @@ const routes = [
       },
       {
         path: 'contacts',
-        component: () => import('src/pages/contacts/Contacts.vue'),
+        component: Contacts,
         meta: {
           title: 'Contacts'
         },
         children: [
           {
             name: 'Contacts',
-            path: '/contacts',
+            path: '/',
             meta: {
               title: 'Contacts',
               page: 'Contacts'
             },
-            component: () => import('src/pages/contacts/ContactsViewList.vue')
+            component: ContactsView
           },
           {
             name: 'Contacts',
@@ -100,7 +120,7 @@ const routes = [
               title: 'Contacts',
               page: 'Default Contacts List'
             },
-            component: () => import('src/pages/contacts/ContactsViewList.vue')
+            component: ContactsView
           },
           {
             name: 'Contacts',
@@ -109,12 +129,12 @@ const routes = [
               title: 'Contacts',
               page: 'Contacts List'
             },
-            component: () => import('src/pages/contacts/ContactsViewList.vue')
+            component: ContactsView
           },
           {
             name: 'Contacts List Public',
             path: 'list/public/:id(\\d+)+',
-            component: () => import('src/pages/contacts/ContactsViewList.vue'),
+            component: ContactsView,
             meta: {
               title: 'Contacts',
               page: 'Public Contacts List'
@@ -124,21 +144,21 @@ const routes = [
             name: 'Contacts',
             path: 'list/:id(\\d+)+/add',
             meta: { title: 'Contacts' },
-            component: () => import('src/pages/contacts/ContactsAddView.vue')
+            component: ContactsAddView
+          },
+          {
+            path: ':id',
+            name: 'Contact',
+            component: Contact,
+            meta: {
+              title: 'Contact'
+            }
           }
         ]
       },
       {
-        path: 'contacts/:id',
-        name: 'Contact',
-        component: () => import('src/pages/contacts/Contact.vue'),
-        meta: {
-          title: 'Contact'
-        }
-      },
-      {
         path: 'power-dialer',
-        component: () => import('pages/power-dialer/PowerDialer.vue'),
+        component: PowerDialer,
         meta: {
           title: 'Power Dialer',
           id: 'power-dialer'
@@ -154,7 +174,7 @@ const routes = [
             redirect: {
               path: 'in-queue'
             },
-            component: () => import('src/pages/power-dialer/PowerDialerBase')
+            component: PowerDialerBase
           },
           {
             name: 'Power Dialer',
@@ -163,7 +183,7 @@ const routes = [
               id: 'power-dialer-queue-filter'
             },
             path: ':id(in-queue|called|failed|scheduled|all)+',
-            component: () => import('src/pages/power-dialer/PowerDialerBase')
+            component: PowerDialerBase
           },
           {
             name: 'Power Dialer',
@@ -175,7 +195,7 @@ const routes = [
             redirect: {
               path: 'list/:id(\\d+)+/in-queue'
             },
-            component: () => import('src/pages/power-dialer/PowerDialerBase'),
+            component: PowerDialerBase,
             children: [
               {
                 name: 'Power Dialer',
@@ -184,7 +204,7 @@ const routes = [
                   id: 'power-dialer-list-filter'
                 },
                 path: ':filter(in-queue|called|failed|scheduled|all)+',
-                component: () => import('src/pages/power-dialer/PowerDialerBase')
+                component: PowerDialerBase
               }
             ]
           },
@@ -195,7 +215,7 @@ const routes = [
               id: 'power-dialer-add-list'
             },
             path: 'list/:id(\\d+)+/add',
-            component: () => import('src/pages/power-dialer/PowerDialerAddView')
+            component: PowerDialerAddView
           },
           {
             name: 'Power Dialer',
@@ -204,7 +224,7 @@ const routes = [
               id: 'power-dialer-add-queue-list'
             },
             path: 'list/add',
-            component: () => import('src/pages/power-dialer/PowerDialerAddView')
+            component: PowerDialerAddView
           }
         ]
       },
@@ -215,7 +235,7 @@ const routes = [
           id: 'power-dialer-session'
         },
         path: 'power-dialer/session',
-        component: () => import('src/pages/power-dialer/PowerDialerSession')
+        component: PowerDialerSession
       },
       // {
       //   path: 'power-dialer/:id',
@@ -228,7 +248,7 @@ const routes = [
       {
         path: 'stats',
         name: 'Stats',
-        component: () => import('pages/stats/Stats.vue'),
+        component: Stats,
         meta: {
           title: 'Stats'
         }
@@ -236,7 +256,7 @@ const routes = [
       {
         path: 'settings',
         name: 'Settings',
-        component: () => import('pages/Settings.vue'),
+        component: Settings,
         meta: {
           title: 'Settings'
         },
@@ -244,7 +264,7 @@ const routes = [
           {
             path: '/settings/:tab',
             name: 'Settings Tab',
-            component: () => import('src/pages/Settings.vue'),
+            component: Settings,
             meta: {
               title: 'Settings'
             }
@@ -254,37 +274,37 @@ const routes = [
       {
         path: 'account',
         name: 'Account',
-        component: () => import('pages/Account.vue')
+        component: Account
       },
       {
         path: 'user-activity/:userId',
         name: 'User Activity',
-        component: () => import('pages/Account.vue')
+        component: Account
       },
       {
         path: 'line-activity/:campaignId',
         name: 'Line Activity',
-        component: () => import('pages/Account.vue')
+        component: Account
       },
       {
         path: 'ring-group-activity/:ringGroupId',
         name: 'Ring Group Activity',
-        component: () => import('pages/Account.vue')
+        component: Account
       },
       {
         path: 'sequence-activity/:sequenceId',
         name: 'Sequence Activity',
-        component: () => import('pages/Account.vue')
+        component: Account
       },
       {
         path: 'broadcast-activity/:broadcastId',
         name: 'Broadcast Activity',
-        component: () => import('pages/Account.vue')
+        component: Account
       },
       {
         path: '/contacts/:contactId/communications/:communicationId',
         name: 'Communication',
-        component: () => import('pages/Communication.vue'),
+        component: Communication,
         meta: {
           title: 'Communication'
         }
@@ -292,7 +312,7 @@ const routes = [
       {
         path: 'phone',
         name: 'Phone',
-        component: () => import('pages/Phone.vue')
+        component: Phone
       }
     ]
   },
@@ -301,7 +321,7 @@ const routes = [
   // but you can also remove it
   {
     path: '*',
-    component: () => import('pages/Error404.vue')
+    component: Error404
   }
 ]
 

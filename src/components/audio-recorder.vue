@@ -137,19 +137,23 @@ export default {
 
     startRecordingTime () {
       this.resetRecordingTime()
-      const timeStarted = new Date().getTime()
-      const estimatedFileSize = { data: 0 }
+      const timeData = {
+        timeStarted: new Date().getTime(),
+        currentTime: null,
+        timeElapsed: null,
+        estimatedFileSize: 0
+      }
       this.timeInterval = setInterval(() => {
-        const currentTime = new Date().getTime()
-        const timeElapsed = { data: new Date(currentTime - timeStarted) }
-        this.hours = _.padStart(timeElapsed.data.getUTCHours(), 2, '0')
-        this.minutes = _.padStart(timeElapsed.data.getUTCMinutes(), 2, '0')
-        this.seconds = _.padStart(timeElapsed.data.getUTCSeconds(), 2, '0')
+        timeData.currentTime = new Date().getTime()
+        timeData.timeElapsed = new Date(timeData.currentTime - timeData.timeStarted)
+        this.hours = _.padStart(timeData.timeElapsed.getUTCHours(), 2, '0')
+        this.minutes = _.padStart(timeData.timeElapsed.getUTCMinutes(), 2, '0')
+        this.seconds = _.padStart(timeData.timeElapsed.getUTCSeconds(), 2, '0')
 
         // per_second_size is in kilobytes
-        estimatedFileSize.data += this.sizePerSecond
+        timeData.estimatedFileSize += this.sizePerSecond
         // once the 8MB limit is reached, stop the recording.
-        if ((estimatedFileSize.data + this.sizePerSecond) >= 8000) {
+        if ((timeData.estimatedFileSize + this.sizePerSecond) >= 8000) {
           this.$generalNotification('The audio recording has reached the limit of 8MB. Recording is automatically stopped.', 'error')
           this.stopRecording()
         }
@@ -166,7 +170,7 @@ export default {
       this.audioBlob = this.mic.export()
       const reader = new FileReader()
       reader.onload = () => {
-        this.recordedAudio = new Audio(this.result)
+        this.recordedAudio = new Audio(reader.result)
       }
 
       reader.readAsDataURL(this.audioBlob)
@@ -206,10 +210,10 @@ export default {
     if (typeof navigator.mediaDevices !== 'undefined') {
       this.isSecureOrigin = true
     }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.timeInterval)
   }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -32,9 +32,6 @@ export default {
   closeFilters: ({ commit }) => {
     commit('FILTERS_CLOSE')
   },
-  contactsLoaded: ({ commit }, payload) => {
-    commit('CONTACTS_LOADED', payload)
-  },
   pinnedCountLoaded: ({ commit }, payload) => {
     commit('PINNED_COUNT_LOADED', payload)
   },
@@ -252,9 +249,6 @@ export default {
   setSmsTemplateModal: ({ commit }, params) => {
     commit('SMS_TEMPLATE_MODAL', params)
   },
-  resetContactsVuex: ({ commit }) => {
-    commit('RESET_CONTACTS_VUEX')
-  },
   setSearch: ({ commit }, value) => {
     commit('SET_SEARCH', value)
   },
@@ -287,5 +281,17 @@ export default {
   },
   setActiveFolder: ({ commit }, value) => {
     commit('SET_ACTIVE_FOLDER', value)
+  },
+  setPinnedListsLoaded: ({ commit }, value) => {
+    commit('SET_PINNED_LISTS_LOADED', value)
+  },
+  setPublicListsLoaded: ({ commit }, value) => {
+    commit('SET_PUBLIC_LISTS_LOADED', value)
+  },
+  setMyListsLoaded: ({ commit }, value) => {
+    commit('SET_MY_LISTS_LOADED', value)
+  },
+  setListContactsLoaded: ({ commit }, value) => {
+    commit('SET_LIST_CONTACTS_LOADED', value)
   }
 }

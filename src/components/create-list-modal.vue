@@ -105,10 +105,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import {
-  STATIC,
-  DYNAMIC
-} from 'src/constants/contacts-list-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import {
   DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
@@ -119,8 +116,6 @@ import {
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
-
-const ContactListTypes = { STATIC, DYNAMIC }
 export default {
   props: {
     isDefault: {
@@ -137,7 +132,7 @@ export default {
     ]),
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
-        const typeText = (this.createList.type === STATIC) ? 'Static' : 'Dynamic'
+        const typeText = (this.createList.type === this.ContactListTypes.STATIC) ? 'Static' : 'Dynamic'
         return `New ${typeText} Lists`
       }
 
@@ -188,7 +183,7 @@ export default {
       switch (true) {
         case this.createList.mode === FROM_FILTERS:
           const clonedCurrentListFilters = { ...this.currentListFilters }
-          if (this.createList.type === DYNAMIC) {
+          if (this.createList.type === this.ContactListTypes.DYNAMIC) {
             // remove contact_lists filter since we are creating dynamic one
             delete clonedCurrentListFilters.contact_lists
           }
@@ -211,7 +206,7 @@ export default {
     },
     onSubmit () {
       this.isLoading = true
-      if (this.createList.type === STATIC) {
+      if (this.createList.type === this.ContactListTypes.STATIC) {
         this.$axios
           .post(this.listsEndpoint, this.getParams())
           .then((response) => {
@@ -267,9 +262,9 @@ export default {
     return {
       isOpen: false,
       name: null,
+      ContactListTypes,
       type: ContactListTypes.DYNAMIC,
       isLoading: false,
-      ContactListTypes,
       CreateListMode: { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU },
       errorMsg: ''
     }
@@ -278,7 +273,7 @@ export default {
     createList ({ open }) {
       this.isOpen = open
       this.name = null
-      this.type = ContactListTypes.DYNAMIC
+      this.type = this.ContactListTypes.DYNAMIC
     }
   }
 }

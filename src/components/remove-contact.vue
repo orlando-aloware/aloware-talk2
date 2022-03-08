@@ -20,7 +20,7 @@
         <button
           class="btn btn-sm btn-outline-success mr-2"
           @click="onRemoveFromList"
-          v-if="selectedList.type === ContactListType.STATIC"
+          v-if="selectedList.type === ContactListTypes.STATIC"
         >
           Remove From List Only
         </button>
@@ -46,7 +46,7 @@
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
-import * as ContactListType from 'src/constants/contacts-list-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
@@ -85,7 +85,7 @@ export default {
   },
   data () {
     return {
-      ContactListType,
+      ContactListTypes,
       flag: false
     }
   },

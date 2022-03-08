@@ -251,7 +251,7 @@ export default {
         this.$generalNotification('Contact has been successfully enrolled to the workflow.')
       }).catch(err => {
         console.log(err)
-        this.$generalNotification('Error while enrolling contact to the workflow.', 'error')
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.isEnrolling = false
         this.showWorkflowSelectorForm = false

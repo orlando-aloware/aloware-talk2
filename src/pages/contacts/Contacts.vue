@@ -2,12 +2,33 @@
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100"
        v-if="authenticated">
     <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar"
+         v-show="$route.name === 'Contacts'"
          :class="sidebarClass">
       <contacts-sidebar></contacts-sidebar>
     </div>
+    <contact-list-sidebar ref="contactListSidebar"
+                          v-if="$route.name === 'Contact'"
+                          :isLoadingMore="isLoadingMore"
+                          @toggleContactActivities="toggleContactListSidebar"/>
     <div class="px-0 mb-0 main flex-1"
          :class="mainClass">
-      <router-view></router-view>
+      <router-view :list="list"
+                   :is-loading-disabled="isLoadingDisabled"
+                   :is-start-state="isStartState"
+                   :is-editable="isEditable"
+                   :search="search"
+                   :is-my-contacts-view="isMyContactsView"
+                   :is-loading="isLoading"
+                   :columns="columns"
+                   :is-empty="isEmpty"
+                   :is-loading-more="isLoadingMore"
+                   :filters-count="filtersCount"
+                   @search="onSearch"
+                   @checkboxChanged="onFetchMyContacts"
+                   @sort="onSortByField"
+                   @paginated="onPaginate"
+                   @loadMore="onLoadMore">
+      </router-view>
     </div>
     <remove-folder-dialog v-if="isActive" />
     <column-headers v-if="isActive" />
@@ -22,6 +43,7 @@
 </template>
 
 <script>
+import ContactListSidebar from 'src/components/contacts/contact-list-sidebar'
 import ContactsSidebar from 'components/contacts/contacts-sidebar.vue'
 import RemoveListModal from 'components/remove-list.vue'
 import RemoveFolderDialog from 'components/remove-folder.vue'
@@ -32,10 +54,21 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
+import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'Contacts',
+
+  provide () {
+    return {
+      contactsData: this.contactsData
+    }
+  },
+
+  mixins: [
+    ContactsMixins
+  ],
 
   components: {
     RemoveListConfirmation,
@@ -47,7 +80,8 @@ export default {
     RemoveContactConfirmation,
     ColumnHeaders,
     MoveDialog,
-    CreateListModal
+    CreateListModal,
+    ContactListSidebar
   },
 
   computed: {
@@ -55,9 +89,14 @@ export default {
     ...mapState('contacts', ['showContactsListSidebar']),
     ...mapState(['isMobile']),
     mainClass () {
+      if (this.$route.name === 'Contact') {
+        return 'w-100'
+      }
+
       if (!this.$q.screen.lt.md) {
         return ''
       }
+
       return !this.showContactsListSidebar ? 'w-100 no-min-max-width' : 'w-0'
     },
     sidebarClass () {
@@ -86,6 +125,12 @@ export default {
     ]),
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
+    },
+    toggleContactListSidebar (isOpen) {
+      this.contactListSidebarOpen = isOpen
+      if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
+        this.$refs.contactListSidebar.onSidebarToggle()
+      }
     }
   },
 
@@ -103,6 +148,10 @@ export default {
         this.setShowContactsHeader(false)
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('fetchContactsLists')
   }
 }
 </script>

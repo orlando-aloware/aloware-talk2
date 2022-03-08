@@ -181,7 +181,7 @@ export default {
         this.$emit('templateSaved', response.data)
       }).catch(error => {
         console.log(error)
-        this.$generalNotification(`Error while ${presentActionText.data.toLowerCase()} sms template.`, 'error')
+        this.$handleErrors(error.response)
       }).finally(() => {
         this.isSaving = false
       })

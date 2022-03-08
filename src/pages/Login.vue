@@ -44,8 +44,8 @@ export default {
     },
     async cookieUserValidated ({ data: { data } }) {
       const { usage, company } = data
+      this.resetVuex(['all'])
       this.setCurrentCompany(company)
-      this.resetVuex()
       this.setUsage(usage)
 
       this.getSharedCookie().then(sharedCookie => {

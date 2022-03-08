@@ -95,6 +95,7 @@
           <div
             class="d-flex align-items-center contact-tags-item"
             :id="`popover-tags-${contact.id}`"
+            ref="`popover-tags-${contact.id}`"
             v-if="contact.id">
             <span :style="`color: ${contact.tags[0].color};`">
               <i
@@ -115,7 +116,7 @@
             </span>
           </div>
           <b-popover
-            v-if="contact.id && hasTargetTags"
+            v-if="contact.id"
             triggers="hover"
             placement="topright"
             boundary="window"

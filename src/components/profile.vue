@@ -229,7 +229,6 @@ export default {
 
   methods: {
     ...mapActions('auth', ['logout', 'setProfile']),
-    ...mapActions('stats', ['resetStatVuex']),
     ...mapActions(['resetVuex']),
     changeStatus (status) {
       if (this.agentStatus === status) {
@@ -249,8 +248,9 @@ export default {
       talk2Api.V1.profile.store({ sleep_mode: !this.profile.sleep_mode }).then(response => {
         this.setProfile({ ...this.profile, sleep_mode: response.data.sleep_mode })
         this.togglingSleepMode = false
-      }).catch(() => {
+      }).catch((err) => {
         this.togglingSleepMode = false
+        this.$handleErrors(err.response)
       })
     },
 
@@ -260,8 +260,7 @@ export default {
         const response = this.logout()
         response.then(() => {
           this.response = response?.data
-          this.resetVuex()
-          this.resetStatVuex()
+          this.resetVuex(['all'])
           this.$router.push({ name: 'Login' })
         })
       } catch (err) {

@@ -144,7 +144,8 @@ export default {
       isEditing: false,
       isRenaming: false,
       folderExists: false,
-      inputTimeout: null
+      inputTimeout: null,
+      folderInterval: null
     }
   },
   computed: {
@@ -205,14 +206,14 @@ export default {
 
     if (this.isMobile && this.$refs[this.folderId] !== undefined) {
       const count = { data: 0 }
-      const folderInterval = setInterval(() => {
+      this.folderInterval = setInterval(() => {
         if (document.getElementById(this.folderId)) {
           this.folderExists = true
-          clearInterval(folderInterval)
+          clearInterval(this.folderInterval)
         }
         count.data++
         if (count.data === 60) {
-          clearInterval(folderInterval)
+          clearInterval(this.folderInterval)
         }
       }, 500)
     }
@@ -404,6 +405,7 @@ export default {
   },
   beforeDestroy () {
     clearTimeout(this.inputTimeout)
+    clearInterval(this.folderInterval)
   }
 }
 </script>

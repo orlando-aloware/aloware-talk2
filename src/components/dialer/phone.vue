@@ -1947,15 +1947,16 @@ export default {
         return
       }
 
-      this.endWrapUp()
-
-      this.$VueEvent.fire('makeCall', {
+      const data = {
         currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
         outboundCampaignId: this.dialer.communication.campaign_id,
         contactName: this.contactName,
         companyName: (this.contact) ? this.contact.company_name : '',
         contactId: this.dialer.communication.contact_id
-      })
+      }
+      this.endWrapUp()
+
+      this.$VueEvent.fire('makeCall', data)
     },
 
     resizeHandler (e) {

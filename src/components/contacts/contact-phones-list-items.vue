@@ -54,7 +54,8 @@
             </b-dropdown-item>
             <b-dropdown-item  v-if="hasPermissionTo('update contact')"
                               class="phone-actions"
-                              :disabled="contact.is_dnc">
+                              :disabled="contact.is_dnc"
+                              @click="call">
               <call-icon></call-icon> Call
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions" @click="onComposerMedia('fax', phone)">
@@ -75,7 +76,7 @@
 <script>
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import { aclMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import TextIcon from 'components/icons/text-icon'
 import CallIcon from 'components/icons/call-icon'
 import FaxIcon from 'components/icons/fax-icon'
@@ -91,7 +92,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['contact'])
+    ...mapGetters('contacts', ['contact']),
+    ...mapState(['isMobile'])
   },
   methods: {
     onEdit (phone) {
@@ -102,6 +104,25 @@ export default {
     },
     onComposerMedia (type, phone) {
       this.$emit('composerMedia', type, phone)
+    },
+    call () {
+      const data = {
+        currentNumber: this.contact.phone_number,
+        contactName: this.contact.name,
+        companyName: this.contact.company_name,
+        contactId: this.contact.id,
+        contactTimezone: this.contact.timezone
+      }
+
+      if (this.isMobile) {
+        this.setShowPhone(true)
+        setTimeout(() => {
+          this.$VueEvent.fire('changePhoneNumber', data)
+        }, 100)
+        return
+      }
+
+      this.$VueEvent.fire('callContact', data)
     }
   }
 }

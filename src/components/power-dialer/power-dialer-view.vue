@@ -156,7 +156,7 @@
         <template slot="tbody">
           <TableRow
             v-for="(contact, nkey) in activeList"
-            :key="contact.id + nkey + Math.random()"
+            :key="`${contact.id}-${nkey}`"
             :contact="contact"
             :columns="filteredColumns"
             :checked="checked"
@@ -443,7 +443,6 @@ export default {
       'columnsOpen',
       'openFilters',
       'closeFilters',
-      'contactsLoaded',
       'columnsReordered',
       'setListSelectedContacts',
       'setSelectedList',
@@ -519,7 +518,7 @@ export default {
       })
     },
     onContactCreated (contact) {
-      if (this.list.type === this.ContactListType.STATIC) {
+      if (this.list.type === this.ContactListTypes.STATIC) {
         talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
           this.setShouldUpdateSelectedListContactCount(true)
           this.fetch()

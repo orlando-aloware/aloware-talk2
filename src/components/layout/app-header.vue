@@ -35,6 +35,13 @@
         <refresh-icon />
         Refresh
       </compact-btn>
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
+                   v-if="$route.name === 'Contacts'"
+                   :disabled="loading || contactsRefreshIsDisabled"
+                   @clicked="refreshContacts">
+        <refresh-icon />
+        Refresh
+      </compact-btn>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
@@ -158,7 +165,13 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['authenticated', 'profile']),
-    ...mapState('contacts', ['selectedList']),
+    ...mapState('contacts', [
+      'selectedList',
+      'pinnedListsLoaded',
+      'publicListsLoaded',
+      'myListsLoaded',
+      'listContactsLoaded'
+    ]),
     ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile']),
 
@@ -178,6 +191,13 @@ export default {
       }
 
       return !['Contact'].includes(this.$route.name) && !this.forcePageTitle
+    },
+
+    contactsRefreshIsDisabled () {
+      return !this.pinnedListsLoaded ||
+        !this.publicListsLoaded ||
+        !this.myListsLoaded ||
+        !this.listContactsLoaded
     }
   },
 
@@ -261,6 +281,12 @@ export default {
           this.$generalNotification('Failed to fetch metric groups.', 'error')
         })
     },
+
+    refreshContacts () {
+      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContactsLists')
+    },
+
     ...mapActions('stats', ['setMetricGroups', 'setMetricLoader']),
     ...mapActions(['setDialerFormStatus'])
   },

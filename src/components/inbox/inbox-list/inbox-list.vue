@@ -79,6 +79,7 @@ export default {
           this.paginationLoading = false
           this.loading = false
         }
+        this.$handleErrors(err.response)
         return Promise.reject(err)
       })
     },
@@ -95,6 +96,7 @@ export default {
         if (!this.$axios.isCancel(err)) {
           done(true)
         }
+        this.$handleErrors(err.response)
       }).finally(() => {
         if (this.$refs.scrollTargetRef) {
           this.$refs.scrollTargetRef.focus()

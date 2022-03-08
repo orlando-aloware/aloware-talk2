@@ -18,11 +18,9 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
-import contactMixin from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'contact-line-selector',
-  mixins: [contactMixin],
   components: { VueMultiselect },
   computed: {
     formattedLineOptions () {
@@ -61,7 +59,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

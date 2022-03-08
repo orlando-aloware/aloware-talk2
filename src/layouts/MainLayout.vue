@@ -566,11 +566,11 @@ export default {
       }
 
       // missed call notification
-      if (communication.type === CommunicationTypes.CALL &&
-        communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
-        !this.profile.sleep_mode) {
-        this.processActionNotification(communication, 'missed call')
-      }
+      // if (communication.type === CommunicationTypes.CALL &&
+      //   communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
+      //   !this.profile.sleep_mode) {
+      //   this.processActionNotification(communication, 'missed call')
+      // }
 
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
@@ -641,6 +641,12 @@ export default {
 
     if (!this.isMobile) {
       this.setShowContactsHeader(true)
+    }
+
+    if (this.$route.name.includes('Inbox')) {
+      setTimeout(() => {
+        this.$VueEvent.fire('inbox_route_name_change')
+      }, 1000)
     }
   },
 
@@ -1716,9 +1722,7 @@ export default {
       this.$VueEvent.stop('update_communication')
       this.$VueEvent.stop('new_version')
       this.unsubscribeFromPusher()
-      this.resetContactsDefaultVuex()
-      this.resetContactsVuex()
-      this.resetInboxVuex()
+      this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
       window.removeEventListener('keydown', this.removeBehaviorsRestrictions)
@@ -1732,7 +1736,6 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
     ...mapActions([
       'resetVuex',
-      'resetContactsDefaultVuex',
       'setUsage',
       'setCampaigns',
       'setCampaignsIsLoading',
@@ -1763,8 +1766,7 @@ export default {
       'setEnableAudio',
       'setDefaultDateFilter'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
-    ...mapActions('inbox', ['resetInboxVuex']),
+    ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
@@ -1800,7 +1802,7 @@ export default {
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
         (to.name !== from.name)) {
         if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
-          this.resetContactsVuex()
+          this.resetVuex(['contacts', 'non-cache'])
         }
       }
 
@@ -1811,7 +1813,7 @@ export default {
       if (!(from.name === 'Inbox' && this.$route.name === 'Inbox Contact') &&
         !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
         (to.name !== from.name)) {
-        this.resetInboxVuex()
+        this.resetVuex(['inbox', 'non-cache'])
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
@@ -1831,6 +1833,19 @@ export default {
 
       if (!this.isMobile && to.name === 'Phone' && fromName) {
         this.$router.back()
+      }
+
+      const inboxStatus = _.get(this.$route, 'params.status', null)
+      if (inboxStatus) {
+        setTimeout(() => {
+          this.$VueEvent.fire('inbox_route_change')
+        }, 1000)
+      }
+
+      if (to.name.includes('Inbox')) {
+        setTimeout(() => {
+          this.$VueEvent.fire('inbox_route_name_change')
+        }, 1000)
       }
     },
 

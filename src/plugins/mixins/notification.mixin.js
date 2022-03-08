@@ -5,7 +5,8 @@ import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls
 export default {
   data () {
     return {
-      notificationAudio: new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
+      notificationAudio: new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3'),
+      dialerCallFishingInterval: null
     }
   },
 
@@ -268,17 +269,23 @@ export default {
       }
 
       const counter = { data: 0 }
-      const dialerCallFishingInterval = (!queue || (queue && queue.length === 0)) ? setInterval(() => {
-        if (!document.getElementById(type)) {
-          this.setDialerCallFishing(data)
-          clearInterval(dialerCallFishingInterval)
-        }
-        counter.data++
+      if (!queue || (queue && queue.length === 0)) {
+        this.dialerCallFishingInterval = setInterval(() => {
+          if (!document.getElementById(type)) {
+            this.setDialerCallFishing(data)
+            clearInterval(this.dialerCallFishingInterval)
+          }
+          counter.data++
 
-        if (counter.data > 120) {
-          clearInterval(dialerCallFishingInterval)
-        }
-      }, 500) : null
+          if (counter.data > 120) {
+            clearInterval(this.dialerCallFishingInterval)
+          }
+        }, 500)
+      }
     }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.dialerCallFishingInterval)
   }
 }

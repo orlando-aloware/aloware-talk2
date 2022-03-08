@@ -53,7 +53,7 @@ import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon.vue'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import SelectListTreeFolderContents from 'src/components/select-list-tree-folder/select-list-tree-folder-contents'
 import SelectListTreeListContents from 'components/select-list-tree-folder/select-list-tree-list-contents'
-import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   props: {
@@ -105,10 +105,7 @@ export default {
   data () {
     return {
       isOpen: false,
-      ContactListTypes: {
-        STATIC,
-        DYNAMIC
-      },
+      ContactListTypes,
       inputTimeout: null
     }
   },

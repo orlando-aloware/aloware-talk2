@@ -74,16 +74,10 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import {
-  STATIC,
-  DYNAMIC
-} from 'src/constants/contacts-list-types'
-
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import SelectListTreeFolder from 'src/components/select-list-tree-folder/select-list-tree-folder'
 import Search from 'src/components/search'
-
-const ContactListTypes = { STATIC, DYNAMIC }
 export default {
   components: { Search, SelectListTreeFolder },
   computed: {
@@ -155,7 +149,7 @@ export default {
     selectList ({ open }) {
       this.isOpen = open
       this.name = null
-      this.type = ContactListTypes.STATIC
+      this.type = this.ContactListTypes.STATIC
     }
   }
 }

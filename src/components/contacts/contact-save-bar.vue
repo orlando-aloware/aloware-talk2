@@ -84,7 +84,8 @@ export default {
             this.setContact(response.data)
             this.setContactClone(response.data)
           }
-        }).catch(() => {
+        }).catch((err) => {
+          this.$handleErrors(err.response)
           return Promise.reject('Error while saving changes.')
         })
       }

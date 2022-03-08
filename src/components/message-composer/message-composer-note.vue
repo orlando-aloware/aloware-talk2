@@ -105,7 +105,7 @@ export default {
           this.$generalNotification('Note has been added.')
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while adding note.', 'error')
+          this.$handleErrors(error.response)
         }).finally(() => {
           this.isAdding = false
           // this.$refs.noteMessageBody.focus()
@@ -151,6 +151,9 @@ export default {
         }
       }
     }
+  },
+  beforeDestroy () {
+    clearInterval(this.focustInputInterval)
   }
 }
 </script>

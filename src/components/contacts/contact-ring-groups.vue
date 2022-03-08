@@ -35,7 +35,7 @@ export default {
           this.$generalNotification("Contact's ring group is updated.")
         }).catch(err => {
           console.log(err)
-          this.$root.handleErrors(err.response)
+          this.$handleErrors(err.response)
         })
     }
   }

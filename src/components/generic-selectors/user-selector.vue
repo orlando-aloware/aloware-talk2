@@ -19,7 +19,8 @@
             :options="userOptions"
             :multiple="multiple"
             :placeholder="placeholder"
-            :disable="disable"
+            :loading="usersIsLoading"
+            :disable="disable || usersIsLoading"
             :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
@@ -182,7 +183,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['users']),
+    ...mapState(['users', 'usersIsLoading']),
 
     placeholder () {
       if (!this.showPlaceholder) {
@@ -257,7 +258,7 @@ export default {
     }
   },
 
-  created () {
+  mounted () {
     this.userOptions = this.formattedOptions
   },
 
@@ -351,6 +352,17 @@ export default {
       }
 
       this.showInputPlaceholder()
+    },
+
+    usersIsLoading (val) {
+      if (val) {
+        return
+      }
+
+      this.userOptions = this.formattedOptions
+      if (typeof this.$refs.userSelect !== 'undefined') {
+        this.$refs.userSelect.refresh()
+      }
     }
   }
 }

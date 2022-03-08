@@ -1,6 +1,6 @@
 <template>
   <div class="row no-wrap pt-3 pb-3 width-380 dialer-wrapper"
-       :class="{ 'loading-cover-screen': isMakingCall }">
+       :class="{ 'loading-cover-screen': isMakingCall, 'on-call-tab': mode === 'call', 'on-text-tab': mode === 'text' }">
     <div class="loading-container"
          v-if="isMakingCall">
       <div class="mobile-call-loader">
@@ -126,7 +126,7 @@
             <b-input-group>
               <template #append>
                 <b-input-group-text class="bg-white border-left-0 align-items-end">
-                  <q-btn :disable="sendDisabled"
+                  <q-btn :disable="sendDisabled || loadingBtn"
                          :ripple="false"
                          class="height-16 no-q-btn-focus"
                          padding="none"
@@ -151,10 +151,10 @@
       </b-tabs>
     </div>
     <h1 class="phone-padding lh-27 mb-3"
-        v-if="parkedCalls.length > 0">
+        v-if="isMobile && parkedCalls.length > 0">
       Parked Call{{ parkedCalls.length > 1 ? 's' : ''}}
     </h1>
-    <div class=""
+    <div class="mobile-parked-calls-list"
          v-if="isMobile">
       <div class="loading-container"
            v-if="loadingParkedCalls">
@@ -182,18 +182,18 @@
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
 import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
+import contactMixin from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'dialer-form',
 
   mixins: [
-    contactMixins,
-    parkCallMixins
+    parkCallMixins,
+    contactMixin
   ],
 
   components: {
@@ -229,7 +229,8 @@ export default {
       loadingContact: false,
       textMessage: '',
       isMakingCall: false,
-      hasPhoneNumberSearchResults: false
+      hasPhoneNumberSearchResults: false,
+      loadingBtn: false
     }
   },
 
@@ -418,12 +419,12 @@ export default {
         return
       }
 
-      this.loading_btn = true
+      this.loadingBtn = true
       this.$axios.post('/api/v1/campaign/send-message-to-phone-number/' + this.campaignId, {
         phone_number: this.$options.filters.fixPhone(this.phoneNumber),
         message: this.textMessage
       }).then(res => {
-        this.loading_btn = false
+        this.loadingBtn = false
         this.hideDialer()
         this.$generalNotification('Message sent')
         if (!this.isMobile) {
@@ -437,7 +438,7 @@ export default {
           })
         }
       }).catch(err => {
-        this.loading_btn = false
+        this.loadingBtn = false
         this.$handleErrors(err.response)
       })
     },
@@ -462,10 +463,6 @@ export default {
       } else {
         this.hideDialer()
       }
-    },
-
-    selected () {
-      this.resetSelectorId()
     },
 
     'dialer.currentStatus': function () {

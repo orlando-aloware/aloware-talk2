@@ -108,7 +108,7 @@ export default {
         this.$generalNotification('Email has been sent.')
       }).catch(error => {
         console.log(error)
-        this.$generalNotification('Error while sending email.', 'error')
+        this.$handleErrors(error.response)
       }).finally(() => {
         this.isSending = false
       })

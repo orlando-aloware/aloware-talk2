@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import * as SettingsDefault from 'src/constants/settings-default'
 
 export default {
   SET_ITEMS: (state, items) => {
@@ -39,5 +40,9 @@ export default {
 
   SET_FORM_VALIDITY: (state, isValid) => {
     state.formIsValid = isValid
+  },
+
+  RESET_VUEX (state) {
+    state = Object.assign({}, SettingsDefault.DEFAULT_STATE)
   }
 }

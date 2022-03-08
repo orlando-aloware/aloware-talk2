@@ -83,6 +83,7 @@ export default {
           }
         }).catch(err => {
           console.log(err)
+          this.$handleErrors(err.response)
         })
       } else {
         this.$router.push({
@@ -92,6 +93,7 @@ export default {
           }
         }).catch(err => {
           console.log(err)
+          this.$handleErrors(err.response)
         })
       }
     },

@@ -1,12 +1,12 @@
 <template>
   <contacts-add-items-static
-    v-if="isLoaded && contactList.type === ContactListType.STATIC"
+    v-if="isLoaded && contactList.type === ContactListTypes.STATIC"
     :id="contactList.id"
     :contactList="contactList"
     :name="contactList.name"
   />
   <contacts-view
-    v-else-if="isLoaded && contactList.type === ContactListType.DYNAMIC"
+    v-else-if="isLoaded && contactList.type === ContactListTypes.DYNAMIC"
     :id="contactList.id"
     :name="contactList.name"
   />
@@ -14,13 +14,9 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import {
-  STATIC,
-  DYNAMIC
-} from 'src/constants/contacts-list-types'
-import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
-import ContactsAddItemsStatic from './ContactsAddItemsStatic.vue'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import ContactsView from './ContactsView.vue'
+import ContactsAddItemsStatic from 'pages/contacts/ContactsAddItemsStatic'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
@@ -28,41 +24,80 @@ export default {
     ContactsAddItemsStatic,
     ContactsView
   },
-  computed: {
-    ...mapGetters('contacts', ['lists', 'listItems']),
-    contactList () {
-      return this.lists[String(this.$route.params.id)]
-    },
-    isLoaded () {
-      if (this.lists[String(this.$route.params.id)]) {
-        return true
+  props: {
+    contactsData: {
+      type: Object,
+      default: () => {
+        return {
+          data: []
+        }
       }
-      return false
+    },
+    list: {
+      type: Object,
+      default: () => {}
+    },
+    isLoadingDisabled: {
+      type: Boolean,
+      default: false
+    },
+    isStartState: {
+      type: Boolean,
+      default: false
+    },
+    isEditable: {
+      type: Boolean,
+      default: false
+    },
+    search: {
+      type: String,
+      default: ''
+    },
+    isMyContactsView: {
+      type: Boolean,
+      default: false
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+    columns: {
+      type: Array,
+      default: () => []
+    },
+    isEmpty: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingMore: {
+      type: Boolean,
+      default: false
+    },
+    filtersCount: {
+      type: Number,
+      default: 0
     }
+  },
+  computed: {
+    ...mapGetters('contacts', ['lists', 'listItems'])
   },
   data () {
     return {
-      ContactListType: {
-        STATIC,
-        DYNAMIC
-      }
+      ContactListTypes
     }
   },
   methods: {
-    ...mapActions('contacts', ['listLoaded', 'contactsLoaded', 'openFilters']),
+    ...mapActions('contacts', [
+      'listLoaded',
+      'openFilters'
+    ]),
     loadList (id) {
       if (!id) {
         id = 'all'
       }
 
+      this.clearContacts()
       const stringId = String(id)
-
-      if (!this.listItems[stringId]) {
-        this.contactsLoaded({
-          id: stringId,
-          ...DEFAULT_CONTACT_LIST_ITEMS
-        })
-      }
 
       this.$axios
         .get('/api/v2/contacts-list/' + stringId)
@@ -79,7 +114,7 @@ export default {
   },
   mounted () {
     this.loadList(this.$route.params.id)
-    if (this.contactList && this.contactList.type === this.ContactListType.DYNAMIC) {
+    if (this.contactList && this.contactList.type === this.ContactListTypes.DYNAMIC) {
       this.openFilters()
     }
   },

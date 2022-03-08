@@ -250,6 +250,9 @@ export default {
   },
   mounted () {
     this.initResources()
+    this.$VueEvent.listen('fetchContactsLists', () => {
+      this.initResources()
+    })
   },
   data () {
     return {
@@ -264,7 +267,8 @@ export default {
       'foldersLoaded',
       'createListOpen',
       'createPdListOpen',
-      'setActiveFolder'
+      'setActiveFolder',
+      'setMyListsLoaded'
     ]),
     initResources () {
       this.loadFolders()
@@ -296,6 +300,7 @@ export default {
     },
     async loadFolders () {
       this.isLoading = true
+      this.setMyListsLoaded(false)
       await this.$axios
         .get(this.foldersEndpoint)
         .then((response) => response.data)
@@ -303,9 +308,12 @@ export default {
         .catch((err) => {
           console.error(err)
           this.$generalNotification('Unable to load folders please try again.', 'error')
+          this.setMyListsLoaded(true)
+          this.isLoading = false
         })
         .finally(() => {
           this.isLoading = false
+          this.setMyListsLoaded(true)
         })
     },
     createSubmenu () {

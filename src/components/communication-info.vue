@@ -951,7 +951,7 @@ export default {
       if (this.hasNotes) {
         activityClass.data += ' collapsed-has-notes'
       }
-      this.activityExpansionClass = [activityClass]
+      this.activityExpansionClass = [activityClass.data]
     },
 
     getCampaign (id) {

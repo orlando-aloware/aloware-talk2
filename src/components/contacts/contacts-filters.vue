@@ -287,6 +287,7 @@ export default {
           .catch((err) => {
             console.error(err)
             this.loadingFilters = false
+            this.$handleErrors(err.response)
             return Promise.reject()
           })
       }
@@ -459,6 +460,11 @@ export default {
         delete updatedFilter[index]
       }
 
+      if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
+        this.$VueEvent.fire('clearContacts')
+        this.$VueEvent.fire('fetchContacts')
+      }
+
       this.setCurrentListFilters(updatedFilter)
       this.$emit('filtersUpdated')
     },
@@ -472,6 +478,11 @@ export default {
 
       if (updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
+      }
+
+      if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
+        this.$VueEvent.fire('clearContacts')
+        this.$VueEvent.fire('fetchContacts')
       }
 
       this.setCurrentListFilters(updatedFilter)

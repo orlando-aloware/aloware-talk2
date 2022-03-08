@@ -197,5 +197,16 @@ export const DEFAULT_STATE = {
     open: false,
     scope: 'user',
     template: null
-  }
+  },
+  search: '',
+  searchedPdItem: '',
+  showMenu: false,
+  showContactsHeader: true,
+  showContactsListSidebar: false,
+  unsavedList: null,
+  activeFolder: '',
+  pinnedListsLoaded: false,
+  publicListsLoaded: false,
+  myListsLoaded: false,
+  listContactsLoaded: false
 }
