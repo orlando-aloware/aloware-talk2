@@ -366,6 +366,9 @@ export default {
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
     ]),
+    ...mapActions('contacts', [
+      'setContactClone'
+    ]),
     async tickTimer () {
       if (this.hasExistingTaskList) {
         if (this.timerCount > 0) {
@@ -500,6 +503,7 @@ export default {
           this.resetTimer()
         }
       }
+      this.setContactClone(task)
     },
     async activeTask (task) {
       if (!task && this.togglePause) {
