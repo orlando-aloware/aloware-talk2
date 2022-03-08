@@ -96,7 +96,6 @@ export default {
       // TODOs: Remove task from list
     },
     updateTaskStatus (task) {
-      console.log('task :>> ', task)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           // console.log(' %c Changing status to : IN_PROGRESS ', 'background: yellow; color: black;')

@@ -103,7 +103,7 @@ export default {
     //   console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
     //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
     //   //   this.handleDesktopVoicemailNotification(task)
-    //   // }contact_list_bulk_created
+    //   // }
     // })
     // this.$VueEvent.listen('contact_list_bulk_created', (task) => {
     //   console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
