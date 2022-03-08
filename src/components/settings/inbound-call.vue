@@ -333,13 +333,13 @@
             label=""
             class="form-label"
           >
-            <b-form-textarea
-              placeholder="Enter missed call message here..."
-              rows="3"
-              max-rows="6"
-              v-model.trim="$v.user.completed_call_message_caller.$model"
-              :state="validateState('completed_call_message_caller')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'completed_call_message_caller')"
+            <b-form-textarea placeholder="Enter missed call message here..."
+                             rows="3"
+                             max-rows="6"
+                             id="ta-user-completed-call-message"
+                             v-model.trim="$v.user.completed_call_message_caller.$model"
+                             :state="validateState('completed_call_message_caller')"
+                             @input="(eventPayload) => onUpdateFields(eventPayload, 'completed_call_message_caller')"
             ></b-form-textarea>
             <b-form-invalid-feedback v-if="!$v.user.completed_call_message_caller.required">Please provide a completed call message to the caller.</b-form-invalid-feedback>
 
@@ -482,6 +482,11 @@ export default {
     },
     templateSelected (template, field) {
       this.user[field] += ' ' + template.body
+      this.$nextTick(function () {
+        const element = document.getElementById('ta-user-completed-call-message')
+        element.dispatchEvent(new Event('input'))
+        element.focus()
+      })
 
       this.$refs.templatesMenu.hide()
     },
@@ -520,7 +525,7 @@ export default {
 
       if (prop === 'operating_hours') {
         const key = Object.keys(value)[0]
-        this.user['operating_hours'] = { ...this.user['operating_hours'], key: value[key] }
+        this.user['operating_hours'][key] = value[key]
         this.updateChangedUserProperties({
           name: 'operating_hours',
           value: this.user[prop]

@@ -81,6 +81,8 @@ import contactMixins from 'src/plugins/mixins/contact.mixin'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
+import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
 
 export default {
   name: 'contact',
@@ -99,7 +101,7 @@ export default {
     ...mapGetters('auth', ['authenticated']),
     ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'tagsFullyLoaded', 'campaigns', 'users', 'tags']),
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication'].includes(this.$route.name)
     }
   },
 
@@ -139,6 +141,26 @@ export default {
     if (this.authenticated) {
       this.fetchContact()
     }
+
+    this.$VueEvent.listen('contact_updated', (data) => {
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
+        talk2Api.V2.contacts.get(data.id).then(response => {
+          const contact = response.data
+          // check data loaded
+          this.setContact(contact)
+        })
+      }
+    })
+
+    this.$VueEvent.listen('contact_disposed', (disposedContact) => {
+      if (disposedContact.id === this.contact.id) {
+        const contact = _.cloneDeep(this.contact)
+        contact.disposition_status_id = disposedContact.disposition_status_id
+        this.setContact(contact)
+      }
+    })
   },
 
   created () {
@@ -152,7 +174,7 @@ export default {
   watch: {
     '$route.params.id': function (value) {
       this.contactListSidebarOpen = false
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Mention Communication'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -166,7 +188,7 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+      if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
     },

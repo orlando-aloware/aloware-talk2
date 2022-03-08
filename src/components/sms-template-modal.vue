@@ -1,62 +1,54 @@
 <template>
-  <b-modal :title="title"
-           size="md"
+  <b-modal size="md"
+           no-close-on-esc
            v-model="isOpen"
-           scrollable
+           :title="title"
            @hidden="onHidden"
            @shown="onShown">
 
-    <b-form class="appointment-form"
+    <b-form class="appointment-forms"
             ref="appointmentForm"
             @submit.prevent="onSubmit">
-      <b-form-row>
-        <b-col sm="12">
-          <b-form-group
-            id="input-group-1"
-            label="Name"
-            label-for="input-1"
-            description=""
-          >
-            <b-input v-model="template.name" placeholder="Template name"></b-input>
-          </b-form-group>
-        </b-col>
+      <b-form-group
+        label="Name"
+        description="">
+        <b-input v-model="template.name" placeholder="Template name"></b-input>
+      </b-form-group>
 
-        <b-col>
-          <b-form-group id="input-group-2" label="Template Body" label-for="input-2">
-            <b-form-textarea
-              class="textarea-no-auto-shrink"
-              placeholder="Enter template body.."
-              rows="3"
-              max-rows="8"
-              no-auto-shrink
-              v-model="template.body"
-            ></b-form-textarea>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
+      <b-form-group label="Template Body">
+        <b-form-textarea
+          class="textarea-no-auto-shrink"
+          placeholder="Enter template body.."
+          rows="3"
+          max-rows="8"
+          no-auto-shrink
+          v-model="template.body"
+        ></b-form-textarea>
+      </b-form-group>
+
+      <b-form-group label="">
+        <b-button
+          v-if="!showVariableSelector"
+          id="btn-sms-variables"
+          variant="primary"
+          class="custom-btn"
+          size="sm"
+          @click="showVariableSelector = true"
+        >
+          Add Variable
+        </b-button>
+
+        <variables v-if="showVariableSelector"
+                   :close-on-select="true"
+                   @close="showVariableSelector = false"
+                   @variableSelected="variableSelected">
+        </variables>
+      </b-form-group>
     </b-form>
 
     <template slot="modal-footer">
       <div class="w-100 d-flex align-items-center">
         <div class="d-flex align-items-center">
-          <b-button
-            id="btn-sms-variables"
-            variant="primary"
-            class="custom-btn"
-            size="sm"
-          >
-            Add Variable
-            <q-menu content-class="mx-height-300"
-                    anchor="bottom right"
-                    self="bottom left"
-                    ref="variablesMenu"
-                    persistent
-                    auto-close>
-              <div class="row no-wrap q-pa-md">
-                <variables @variableSelected="variableSelected" always-open></variables>
-              </div>
-            </q-menu>
-          </b-button>
         </div>
         <div class="flex-grow-1"></div>
         <b-button
@@ -90,7 +82,9 @@ import Variables from 'src/components/message-composer/options/variables'
 
 export default {
   name: 'sms-template-modal',
+
   components: { Variables },
+
   props: {
     id: {
       type: Number,
@@ -101,6 +95,7 @@ export default {
       required: false
     }
   },
+
   computed: {
     ...mapState('contacts', ['smsTemplateModal']),
     ...mapState('cache', ['currentCompany']),
@@ -119,6 +114,7 @@ export default {
       return (!this.smsTemplateModal.template ? 'Create' : 'Edit') + ' SMS Template'
     }
   },
+
   data () {
     return {
       auth,
@@ -127,12 +123,13 @@ export default {
         id: '',
         name: '',
         body: ''
-      }
+      },
+      showVariableSelector: false
     }
   },
   methods: {
     ...mapActions('contacts', ['setSmsTemplateModal']),
-    ...mapActions(['setSmsTemplates']),
+    ...mapActions(['setTemplates']),
     onHidden () {
       this.setSmsTemplateModal({
         isOpen: false
@@ -189,7 +186,7 @@ export default {
 
     getSmsTemplates () {
       return talk2Api.V1.smsTemplate.get().then(response => {
-        this.setSmsTemplates(response.data)
+        this.setTemplates(response.data)
       })
     },
 

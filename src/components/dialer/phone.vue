@@ -1691,13 +1691,11 @@ export default {
     },
 
     goToContact () {
-      const contact = this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
-
-      if (contact) {
+      if (this.contact) {
         this.$router.push({
           name: 'Contact',
           params: {
-            id: contact.id
+            id: this.contact.id
           }
         }).catch(err => {
           console.log(err)

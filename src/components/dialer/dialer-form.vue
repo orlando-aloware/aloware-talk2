@@ -126,7 +126,7 @@
             <b-input-group>
               <template #append>
                 <b-input-group-text class="bg-white border-left-0 align-items-end">
-                  <q-btn :disable="sendDisabled || loadingBtn"
+                  <q-btn :disable="sendDisabled || isSending"
                          :ripple="false"
                          class="height-16 no-q-btn-focus"
                          padding="none"
@@ -229,8 +229,8 @@ export default {
       loadingContact: false,
       textMessage: '',
       isMakingCall: false,
-      hasPhoneNumberSearchResults: false,
-      loadingBtn: false
+      isSending: false,
+      hasPhoneNumberSearchResults: false
     }
   },
 
@@ -415,16 +415,16 @@ export default {
     },
 
     sendText () {
-      if (this.sendDisabled) {
+      if (this.sendDisabled || this.isSending) {
         return
       }
 
-      this.loadingBtn = true
+      this.isSending = true
       this.$axios.post('/api/v1/campaign/send-message-to-phone-number/' + this.campaignId, {
         phone_number: this.$options.filters.fixPhone(this.phoneNumber),
         message: this.textMessage
       }).then(res => {
-        this.loadingBtn = false
+        this.isSending = false
         this.hideDialer()
         this.$generalNotification('Message sent')
         if (!this.isMobile) {
@@ -438,7 +438,7 @@ export default {
           })
         }
       }).catch(err => {
-        this.loadingBtn = false
+        this.isSending = false
         this.$handleErrors(err.response)
       })
     },

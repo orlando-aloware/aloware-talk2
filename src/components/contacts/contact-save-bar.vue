@@ -25,6 +25,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
+
 export default {
   name: 'contact-save-bar',
   computed: {
@@ -47,7 +49,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties']),
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'setChangedContactProperties']),
     onCancel () {
       if (this.contactClone.id === this.contact.id) {
         this.setContact({ ...this.contactClone })
@@ -59,20 +61,57 @@ export default {
       return Promise.all([
         this.saveChanges(),
         this.disposeContact()
-      ]).finally(() => {
-        this.resetChangedContactProperties()
+      ]).then(response => {
+        if ((response[0] && response[0].status) || (response[1] && response[1].status)) {
+          const contactData = { contact: null }
+
+          if (response[0] && response[0].contact) {
+            contactData.contact = response[0].contact
+          }
+
+          if (response[1] && response[1].contact) {
+            contactData.contact = _.cloneDeep(this.contact)
+            contactData.contact.disposition_status_id = response[1].contact.disposition_status_id
+          }
+
+          if (contactData.contact) {
+            this.setContact(contactData.contact)
+          }
+
+          this.setContactClone(this.contact)
+          this.resetChangedContactProperties()
+        }
+
+        // contact has been updated while disposition is not
+        if (response[0] && response[0].status && (!response[1] || !response[1].status)) {
+          this.setChangedContactProperties([...this.changedContactProperties.filter(item => item.property === 'disposition_status_id')])
+        }
+
+        // contact has not been updated while disposition is
+        if ((!response[0] || !response[0].status) && response[1] && response[1].status) {
+          this.setChangedContactProperties([...this.changedContactProperties.filter(item => item.property !== 'disposition_status_id')])
+        }
+      }).finally(() => {
         this.isBusy = false
-        this.$generalNotification('Your changes has been saved.')
       })
     },
     saveChanges () {
       const parameters = this.getParameters()
       if (Object.entries(parameters).length > 0) {
         return talk2Api.V1.contact.update(this.contact.id, parameters).then(response => {
+          this.$generalNotification('Your changes has been saved.')
           if (response.data.id === this.contact.id) {
-            this.setContact(response.data)
-            this.setContactClone(response.data)
+            return { status: true, contact: response.data }
           }
+
+          return { status: true }
+        }).catch(err => {
+          if (err.response.data && err.response.data.errors) {
+            Object.keys(err.response.data.errors).forEach((value) => {
+              this.$generalNotification(err.response.data.errors[value][0], 'error')
+            })
+          }
+          return { status: false }
         })
       }
     },
@@ -80,13 +119,15 @@ export default {
       const dispositionStatusProp = this.changedContactProperties.find(item => item.property === 'disposition_status_id')
       if (dispositionStatusProp) {
         return talk2Api.V1.contact.dispose(this.contact.id, { 'disposition_status': this.contact.disposition_status_id }).then(response => {
+          this.$generalNotification('Contact disposition status has been saved.')
           if (response.data.id === this.contact.id) {
-            this.setContact(response.data)
-            this.setContactClone(response.data)
+            return { status: true, contact: response.data }
           }
+
+          return { status: true }
         }).catch((err) => {
           this.$handleErrors(err.response)
-          return Promise.reject('Error while saving changes.')
+          return { status: false }
         })
       }
     },
@@ -105,7 +146,7 @@ export default {
 
   watch: {
     contact: function () {
-      this.resetChangedContactProperties()
+      // this.resetChangedContactProperties()
     }
   }
 }

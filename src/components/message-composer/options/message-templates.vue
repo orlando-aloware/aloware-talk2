@@ -15,7 +15,10 @@
     <hr/>
     <div class="list-group-title d-flex justify-content-between p-2">
       <span>Account Templates</span>
-      <b-link class="action-links" href="" @click="onAdd('company')">
+      <b-link v-if="isCompanyAdmin"
+              class="action-links"
+              href=""
+              @click="onAdd('company')">
         <add-icon-circle width="14" height="14"></add-icon-circle>
         New
       </b-link>
@@ -63,9 +66,21 @@ import MessageTemplatesList from 'components/message-composer/options/message-te
 import AddIconCircle from 'components/icons/add-icon-circle'
 import { mapActions } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import * as Roles from 'src/constants/roles'
+import { aclMixin } from 'src/plugins/mixins'
 export default {
   name: 'message-templates',
+
+  mixins: [aclMixin],
+
   components: { AddIconCircle, MessageTemplatesList },
+
+  computed: {
+    isCompanyAdmin () {
+      return this.hasRole(Roles.COMPANY_ADMIN) || this.hasRole(Roles.BILLING_ADMIN)
+    }
+  },
+
   data () {
     return {
       selectedTemplate: {},
@@ -73,8 +88,9 @@ export default {
       isDeleting: false
     }
   },
+
   methods: {
-    ...mapActions(['deleteSmsTemplate']),
+    ...mapActions(['deleteTemplate']),
     ...mapActions('contacts', ['setSmsTemplateModal']),
     templateSelected (template) {
       this.$emit('templateSelected', template)
@@ -110,7 +126,7 @@ export default {
       talk2Api.V1.smsTemplate.delete(this.selectedTemplate.id)
         .then(response => {
           if (response.status === 204) {
-            this.deleteSmsTemplate(this.selectedTemplate)
+            this.deleteTemplate(this.selectedTemplate)
             this.showDeleteConfirmation = false
           }
         }).finally(() => {

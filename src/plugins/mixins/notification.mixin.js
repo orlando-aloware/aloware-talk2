@@ -141,6 +141,8 @@ export default {
         return
       }
 
+      const currentCommunicationId = this.notifications.callFishing.communicationId
+
       this.setNotifications({
         type: 'callFishing',
         data: {
@@ -156,8 +158,8 @@ export default {
         }
       })
 
-      this.removeFromCallFishingNotificationQueue(callFishingFirstQueue.data.communicationId)
-      this.removeFromCallFishingQueue(callFishingFirstQueue.data.communicationId)
+      this.removeFromCallFishingNotificationQueue(currentCommunicationId)
+      this.removeFromCallFishingQueue(currentCommunicationId)
     },
 
     processActionNotification (communication, type) {

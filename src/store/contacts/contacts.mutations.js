@@ -326,6 +326,9 @@ export default {
       state.changedContactProperties = found.data.filter(item => item.property !== name)
     }
   },
+  SET_CHANGED_CONTACT_PROPERTIES: (state, payload) => {
+    state.changedContactProperties = payload
+  },
   RESET_CHANGED_CONTACT_PROPERTIES: (state) => {
     state.changedContactProperties = []
   },

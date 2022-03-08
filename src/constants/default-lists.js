@@ -16,12 +16,13 @@ export const DEFAULT_STATE = {
       name: 'All Contacts'
     },
     'my-contacts': {
-      all: 'my-contacts',
+      id: 'my-contacts',
       headers: DEFAULT_COLUMNS,
       filters: [
         {
           filters: {
             contact_owner: {
+              default: 1,
               value: null,
               operator: OPERATORS.IS_ANY_OF
             }
@@ -40,7 +41,8 @@ export const DEFAULT_STATE = {
         {
           filters: {
             is_unassigned: {
-              value: 1
+              value: 1,
+              default: 1
             }
           },
           is_conjunction: true
@@ -57,7 +59,8 @@ export const DEFAULT_STATE = {
         {
           filters: {
             is_unanswered_contact: {
-              value: 1
+              value: 1,
+              default: 1
             }
           },
           is_conjunction: true
@@ -74,7 +77,8 @@ export const DEFAULT_STATE = {
         {
           filters: {
             is_new_contact: {
-              value: 1
+              value: 1,
+              default: 1
             }
           },
           is_conjunction: true

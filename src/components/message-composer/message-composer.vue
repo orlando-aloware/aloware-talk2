@@ -39,7 +39,9 @@
     <div class="composer-footer d-flex justify-content-between pt-1">
       <div class="phone-lines-left d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
-        <contact-phone-number-selector @setSelectedPhone="setSelectedPhone"></contact-phone-number-selector>
+        <contact-phone-number-selector v-if="contact"
+                                       @setSelectedPhone="setSelectedPhone">
+        </contact-phone-number-selector>
       </div>
 
       <div class="phone-lines-right">
@@ -95,7 +97,7 @@ export default {
     setMode (mode) {
       this.setMessageComposerMode(mode)
     },
-    ...mapActions(['setSmsTemplates']),
+    ...mapActions(['setTemplates']),
     setSelectedPhone (phoneNumber) {
       this.setMessageComposerSmsPhoneNumber(phoneNumber)
     },
@@ -103,7 +105,7 @@ export default {
     getSmsTemplates () {
       return talk2Api.V1.smsTemplate.get()
         .then(response => {
-          this.setSmsTemplates(response.data)
+          this.setTemplates(response.data)
         })
     },
     onLineChange (line) {
@@ -116,8 +118,6 @@ export default {
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
     if (!this.templates || this.templates.length < 1) {
       this.getSmsTemplates()
-    } else {
-      this.setSmsTemplates(this.templates)
     }
   },
 

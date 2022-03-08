@@ -1533,6 +1533,14 @@ i.option-separator {
   font-size: 12px !important;
 }
 
+.fs-8 {
+  font-size: 8px !important;
+}
+
+.fs-6 {
+  font-size: 6px !important;
+}
+
 .multiselect.border-blue {
   .multiselect__tags {
     border: 1px solid $blue
@@ -1802,14 +1810,6 @@ i.option-separator {
   color: $grey-40;
   pointer-events: none;
   height: 0;
-}
-
-span.mention {
-  color: $black;
-  background: $blue-3;
-  padding: 2px 4px;
-  border-radius: 8px;
-  font-size: 13px !important;
 }
 
 .border-no-top {
@@ -7026,7 +7026,7 @@ table.datatable {
   }
 
   a.linkified {
-    color: $grey-50;
+    color: $grey-90;
   }
 }
 
@@ -7656,7 +7656,8 @@ button.grey-90 {
   margin-right: 10px;
 }
 
-.mention-tag {
+.mention-tag,
+span.mention {
   color: $grey-100;
   font-weight: 500;
   background: #CDDCFF;
@@ -10991,6 +10992,17 @@ screen and (max-width: 956px) {
   .main-content {
     overflow: auto !important;
   }
+}
+
+.account-level-notification-tooltip-wrapper {
+  position: absolute;
+  right: 300px;
+  margin-top: -22px;
+  z-index: 10;
+}
+
+.cursor-default {
+  cursor: default !important;
 }
 
 .aloicons {

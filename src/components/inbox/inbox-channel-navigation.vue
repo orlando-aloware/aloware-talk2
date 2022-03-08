@@ -57,7 +57,7 @@ export default {
       return this.changingSelectedContact || (!this.nextItem && !this.hasMoreCommunications)
     },
     disabled () {
-      return !['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)
+      return !['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)
     }
   },
   methods: {

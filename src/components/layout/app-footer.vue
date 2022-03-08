@@ -230,7 +230,7 @@ export default {
         case 'Inbox Contact':
         case 'Inbox Contact Task':
         case 'Inbox Channel Task Status':
-        case 'Inbox Contact Mention Communication':
+        case 'Inbox Contact Communication':
           return 'inbox'
         case 'Contacts':
         case 'Contact':

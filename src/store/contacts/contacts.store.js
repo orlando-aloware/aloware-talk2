@@ -23,7 +23,7 @@ export default function () {
         name: 'All Contacts'
       },
       'my-contacts': {
-        all: 'my-contacts',
+        id: 'my-contacts',
         headers: DEFAULT_COLUMNS,
         filters: [
           {

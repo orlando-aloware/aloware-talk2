@@ -250,22 +250,22 @@
                      v-if="communication.type === CommunicationTypes.APPOINTMENT">
                   <div class="w-75">
                     <label class="form-control-label w-100 mb-1">Date</label>
-                    {{ communication.engagement_data.appointment_datetime | fixScheduleDate }}
+                    {{ communication.engagement_data.appointment_datetime | fixScheduleDate('dddd, D MMMM YYYY', communication.engagement_data.appointment_contact_timezone) }}
                   </div>
                   <div class="w-35">
                     <label class="form-control-label w-100 mb-1">Time</label>
-                    {{ communication.engagement_data.appointment_datetime | fixScheduleTime }}
+                    {{ communication.engagement_data.appointment_datetime | fixScheduleTime(0, communication.engagement_data.appointment_contact_timezone) }}
                   </div>
                 </div>
                 <div class="d-flex align-items-center w-100"
                      v-if="communication.type === CommunicationTypes.REMINDER">
                   <div class="w-75">
                     <label class="form-control-label w-100 mb-1">Date</label>
-                    {{ communication.engagement_data.reminder_datetime | fixScheduleDate }}
+                    {{ communication.engagement_data.reminder_datetime | fixScheduleDate('dddd, D MMMM YYYY', communication.engagement_data.reminder_contact_timezone) }}
                   </div>
                   <div class="w-35">
                     <label class="form-control-label w-100 mb-1">Time</label>
-                    {{ communication.engagement_data.reminder_datetime | fixScheduleTime }}
+                    {{ communication.engagement_data.reminder_datetime | fixScheduleTime(0, communication.engagement_data.reminder_contact_timezone) }}
                   </div>
                 </div>
               </div>
@@ -742,7 +742,16 @@
 
 <script>
 import _ from 'lodash'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, userMixin, notificationMixin, liveCallsMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  avatarMixin,
+  communicationInfoMixin,
+  dateMixin,
+  userMixin,
+  notificationMixin,
+  liveCallsMixin,
+  mentionsMixin
+} from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
@@ -775,7 +784,8 @@ export default {
     dateMixin,
     userMixin,
     notificationMixin,
-    liveCallsMixin
+    liveCallsMixin,
+    mentionsMixin
   ],
 
   components: {
@@ -920,7 +930,7 @@ export default {
     },
     parseBody () {
       if (this.communication.type === CommunicationTypes.NOTE) {
-        return this.$options.filters.parseMentionToView(this.communication.body)
+        return this.parseMentionToView(this.communication.body)
       }
 
       return this.communication.body

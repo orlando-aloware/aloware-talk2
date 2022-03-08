@@ -97,10 +97,16 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
  * Fix schedule date
  * @param {date|string|Moment} dt
  * @param format
+ * @param timezone
  * @returns {string|*}
  */
-export const fixScheduleDate = (dt, format = 'dddd, D MMMM YYYY') => {
+export const fixScheduleDate = (dt, format = 'dddd, D MMMM YYYY', timezone) => {
+  console.log(timezone)
   if (dt) {
+    if (timezone) {
+      return window.moment.utc(dt).tz(timezone).format(format)
+    }
+
     if (window.timezone) {
       return window.moment.utc(dt).tz(window.timezone).format(format)
     } else {
@@ -115,10 +121,15 @@ export const fixScheduleDate = (dt, format = 'dddd, D MMMM YYYY') => {
  * Fix schedule date
  * @param {datetime|string|Moment} dt
  * @param duration
+ * @param timezone
  * @returns {string|*}
  */
-export const fixScheduleTime = (dt, duration = 0) => {
+export const fixScheduleTime = (dt, duration = 0, timezone) => {
   if (dt) {
+    if (timezone) {
+      return window.moment.utc(dt).tz(timezone).add(duration, 'seconds').format('h:mm A z')
+    }
+
     if (window.timezone) {
       if (window.timezone === 'Asia/Manila') {
         return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('h:mm A') + ' MNL'

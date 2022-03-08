@@ -55,14 +55,7 @@
       </div>
       <div class="header w-100" v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
-          <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 ml-2 d-inline-flex">
-            <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
-                            :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
-                            @search="onSearch"
-                            @closed="onSearchClosed"
-                            @opened="onSearchOpened">
-            </inbox-searcher>
-
+          <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 d-inline-flex">
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
                 <filter-icon></filter-icon>
@@ -132,12 +125,12 @@
                    :answer-status="answerStatus"
                    :channel="channel"
                    :search-text="searchText"
-                   v-if="!isGettingTasksList && $route.params.channel !== 'mentions'">
+                   v-if="!isGettingTasksList && $route.params.channel !== 'mentions' && communications.length">
         </task-list>
         <task-mention-list :communications="communications"
                            :direction="mentionType"
                            :search-text="searchText"
-                           v-if="!isGettingTasksList && $route.params.channel === 'mentions'">
+                           v-if="!isGettingTasksList && $route.params.channel === 'mentions' && communications.length">
         </task-mention-list>
         <div :class="[isGettingTasksList ? 'py-5' : 'py-4', 'relative']">
           <b-overlay :show="isLoadingMore || isGettingTasksList"
@@ -723,7 +716,6 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-
       return api.data.get({ params: params })
         .then(response => {
           this.gettingTasksList(false)
@@ -865,6 +857,7 @@ export default {
       if (this.mentionType === MentionType.TYPE_SENT) {
         this.filter.mentioned_user_id = this.mentionUserId
       }
+      this.getCommunications(this.filter)
     },
 
     sortFilter (value) {
@@ -874,7 +867,7 @@ export default {
 
     redirectMentionsChannel (mention) {
       this.$router.push({
-        name: 'Inbox Contact Mention Communication',
+        name: 'Inbox Contact Communication',
         params: {
           id: mention.mention_subject.contact_id,
           communicationId: mention.mention_subject_id,
@@ -996,9 +989,9 @@ export default {
       }
     },
     '$route.name': function (value) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(value)) {
+      if (['Inbox Contact', 'Inbox Contact Communication'].includes(value)) {
         // since mention has different data structure to other channels, need to set property to compare as comm id
-        const identifierProp = value === 'Inbox Contact Mention Communication' ? 'mention_subject_id' : 'id'
+        const identifierProp = value === 'Inbox Contact Communication' ? 'mention_subject_id' : 'id'
         const communication = this.communications.find(item => item[identifierProp] === this.$route.params.communicationId)
         this.setSelectedCommunication(communication)
       }
@@ -1010,12 +1003,10 @@ export default {
         this.getCommunications(this.filter)
       }
     },
-
-    '$route.params.channel': function () {
-      if (this.previousRoute && this.previousRoute.params.channel === 'inbox') {
-        return
+    '$route.params.channel': function (value) {
+      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings'].includes(value)) {
+        this.getCommunications(this.filter)
       }
-      this.getCommunications(this.filter)
     }
   },
 
@@ -1156,7 +1147,7 @@ export default {
           this.redirectChannel(communication)
         }
 
-        if (this.$route.name === 'Inbox Contact Mention Communication') {
+        if (this.$route.name === 'Inbox Contact Communication') {
           this.redirectMentionsChannel(communication)
         }
 
@@ -1171,7 +1162,7 @@ export default {
         this.redirectChannel(communication)
       }
 
-      if (this.$route.name === 'Inbox Contact Mention Communication') {
+      if (this.$route.name === 'Inbox Contact Communication') {
         this.redirectMentionsChannel(communication)
       }
 
@@ -1181,18 +1172,24 @@ export default {
     this.$VueEvent.listen('contact_updated', (data) => {
       const communications = [...this.communications]
 
-      communications.filter(item => item.contact.id === data.id).forEach((value) => {
-        value.contact = data
-      })
+      if (this.$route.params.channel === 'mentions') {
+        communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
+          value.mention_subject.contact = data
+        })
+      } else {
+        communications.filter(item => item.contact.id === data.id).forEach((value) => {
+          value.contact = data
+        })
+      }
 
       this.setCommunications(communications)
     })
 
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-      if (['Inbox Contact', 'Inbox Contact Mention Communication'].includes(this.$route.name)) {
+      if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         const communication = { data: null }
 
-        if (this.$route.name === 'Inbox Contact Mention Communication') {
+        if (this.$route.name === 'Inbox Contact Communication') {
           communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
         } else {
           communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
@@ -1204,7 +1201,7 @@ export default {
       }
     }
 
-    if (['Inbox Channel', 'Inbox Contact Mention Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
       this.getCommunications(this.filter)
     }
   }

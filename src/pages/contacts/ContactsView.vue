@@ -548,7 +548,8 @@
           </tr>
         </template>
 
-        <template slot="empty" v-if="isStartState">
+        <template slot="empty"
+                  v-if="showEmptySlot">
           <div class="start-state" @click="onNavigateToAdd($event)">
             <div
               class="p-4 bg-light w-100 text-center border-bottom text-primary"
@@ -1362,6 +1363,9 @@ export default {
     },
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
+    },
+    showEmptySlot () {
+      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListType.STATIC)
     },
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))

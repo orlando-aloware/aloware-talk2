@@ -27,8 +27,11 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import { settingsMixin } from 'src/plugins/mixins'
 export default {
   name: 'settings-save-bar',
+
+  mixins: [settingsMixin],
 
   props: {
     user: {
@@ -58,12 +61,15 @@ export default {
   },
   methods: {
     ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
-    onCancel () {
+    async resetSetting () {
       this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
       this.setFormValidity(true)
-
-      this.$VueEvent.fire('resetSettingsForm')
+    },
+    async onCancel () {
+      this.resetSetting().then(() => {
+        this.$VueEvent.fire('resetSettingsForm')
+      })
     },
     onSave () {
       this.isBusy = true
@@ -104,19 +110,13 @@ export default {
         }
 
         return talk2Api.V1.user.update(this.user.id, user).then(response => {
-          const data = { ...response.data, operating_hours: JSON.parse(response.data.operating_hours) }
-          data.password = ''
-          data.password_confirmation = ''
+          this.localUser = response.data
+          this.setupUser()
 
-          if (data.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && data.default_outbound_campaign_id) {
-            data.outbound_calling_selector = 1
-          } else if (data.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
-            data.outbound_calling_selector = 3
-          } else {
-            data.outbound_calling_selector = 2
-          }
-          console.log(data)
-          this.setUserClone(_.cloneDeep(data))
+          this.localUser.password = ''
+          this.localUser.password_confirmation = ''
+
+          this.setUserClone(_.cloneDeep(this.localUser))
           this.setUser(_.cloneDeep(this.userClone))
 
           this.resetChangedUserProperties()

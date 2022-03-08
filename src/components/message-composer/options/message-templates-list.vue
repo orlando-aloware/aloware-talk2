@@ -30,7 +30,8 @@
               </div>
             </q-menu>
           </b-link>
-          <b-link href="#"
+          <b-link v-if="canEdit(template)"
+                  href="#"
                   @click="onEdit(template)">
             <q-tooltip anchor="top middle"
                        self="center middle">
@@ -38,7 +39,8 @@
             </q-tooltip>
             <pencil-o-icon color="#62666E"/>
           </b-link>
-          <b-link href="#"
+          <b-link v-if="canDelete(template)"
+                  href="#"
                   @click="onDelete(template)">
             <q-tooltip anchor="top middle"
                        self="center middle">
@@ -65,9 +67,15 @@ import PencilOIcon from 'components/icons/pencil-o-icon'
 import AddIconSquare from 'components/icons/add-icon-square'
 import EyeIcon from 'components/icons/eye-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'
+import { aclMixin } from 'src/plugins/mixins'
+import * as Roles from 'src/constants/roles'
 export default {
   name: 'sms-templates-list',
+
+  mixins: [aclMixin],
+
   components: { TrashOIcon, EyeIcon, AddIconSquare, PencilOIcon },
+
   props: {
     template_scope: {
       default: 'user',
@@ -76,28 +84,59 @@ export default {
       }
     }
   },
+
   computed: {
-    ...mapState(['smsTemplates']),
+    ...mapState({ smsTemplates: 'templates' }),
     ...mapGetters('contacts', ['messageComposer']),
     agentTemplates () {
-      return this.smsTemplates.filter(template => template.is_on_user)
+      return this.smsTemplates.filter(template => template.is_on_user === 1)
     },
     accountTemplates () {
-      return this.smsTemplates.filter(template => template.is_on_company)
+      return this.smsTemplates.filter(template => template.is_on_company === 1)
     },
     templates () {
       return this.template_scope === 'user' ? this.agentTemplates : this.accountTemplates
+    },
+
+    isCompanyAdmin () {
+      return this.hasRole(Roles.COMPANY_ADMIN) || this.hasRole(Roles.BILLING_ADMIN)
     }
   },
+
   data () {
     return {
       selectedTemplate: {}
     }
   },
+
   methods: {
     ...mapActions('contacts', ['setSmsTemplateModal']),
     templateSelected (template) {
       this.$emit('templateSelected', template)
+    },
+
+    canEdit (template) {
+      return this.canDoActions(template, 'update')
+    },
+
+    canDelete (template) {
+      return this.canDoActions(template, 'archive')
+    },
+
+    canDoActions (template, action) {
+      if (template.deleted_at) {
+        return false
+      }
+
+      switch (this.template_scope) {
+        case 'user':
+          return this.hasPermissionTo(action + ' sms template')
+        case 'company':
+          return this.isCompanyAdmin &&
+            this.hasPermissionTo(action + ' sms template')
+      }
+
+      return false
     },
 
     onDelete (template) {

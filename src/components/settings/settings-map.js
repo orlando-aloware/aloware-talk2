@@ -342,14 +342,15 @@ const SettingsMap = {
     visible: true
   },
 
-  'enabled_billing_warnings': {
+  'account_level_notifications': {
     title: 'Account Level Notifications (Admins Only)',
-    description: 'Billing Warnings',
+    description: 'Account Level Notifications',
     route: '/settings/notification',
-    hash_keyword: 'billing-warnings',
+    hash_keyword: 'account-level-notifications',
+    tag: 'account-level-notifications',
     visible: true
   },
-  'enabled_sync_reports': {
+  'enabled_integration_reports': {
     title: 'Sync Reports',
     description: 'Sync Reports',
     route: '/settings/notification',
@@ -370,7 +371,7 @@ const SettingsMap = {
     hash_keyword: 'other-reports',
     visible: true
   },
-  'reminder_options': {
+  'reminders_options': {
     title: 'Event Notifications',
     description: 'Notify this user for appointment or reminder events.',
     route: '/settings/notification',

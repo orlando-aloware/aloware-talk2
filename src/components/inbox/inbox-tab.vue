@@ -490,21 +490,31 @@ export default {
       this.resetList()
     }
   },
+
   created () {
     this.resetFilter()
     this.toggleFilterDialog(false)
   },
 
   mounted () {
+    const _this = this
     this.setLiveContacts([])
     this.setContacts([])
     this.setStatus()
 
-    if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+    if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
         // do other possible actions
       } else {
-        this.loadContactTasks()
+        this.loadContactTasks().finally(function () {
+          if (_this.$route.params.id) {
+            const id = _this.$route.params.id
+            const contact = _this.contactTasks.find(item => item.id.toString() === id)
+            if (contact) {
+              _this.setSelectedContact(contact)
+            }
+          }
+        })
       }
     }
 
@@ -734,6 +744,10 @@ export default {
     })
   },
 
+  beforeDestroy () {
+    this.setSelectedContact({})
+  },
+
   watch: {
     $route (to, from) {
       this.previousRoute = from
@@ -742,8 +756,39 @@ export default {
       this.setContacts([])
       this.loadContactTasks()
     },
+    '$route.params.status': function () {
+      this.setStatus()
+      if (['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name)) {
+        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        }
+
+        this.lineOrRingGroupFilter = null
+        // prevent reset of filters if coming from the root
+        if (!this.$route.params.id) {
+          this.resetList()
+        } else {
+          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+            this.loadContactTasks()
+          }
+        }
+      }
+    },
+    '$route.name': function (value) {
+      if (['Inbox'].includes(value)) {
+        this.currentTask = ContactTaskStatus.STATUS_OPEN
+        this.resetList()
+      }
+    },
     '$route.params.id': function (value) {
-      if (!value) {
+      if (['Inbox Contact Communication', 'Inbox Contact Task'].includes(this.$route.name) && value && this.contactTasks && this.contactTasks.length) {
+        const contact = this.contactTasks.find(item => item.id.toString() === value)
+        if (contact) {
+          this.setSelectedContact(contact)
+        }
+      }
+
+      if (['Inbox Contact Communication', 'Inbox Contact Task'].includes(this.$route.name) && !value) {
         this.setSelectedContact({})
       }
     },

@@ -27,6 +27,7 @@
                                       :use-chips="false"
                                       :outlined="false"
                                       :show-placeholder="false"
+                                      :emit-value="true"
                                       custom-class="inline-select"
                                       v-model="contact.disposition_status_id"
                                       @change="(eventPayload) => onUpdateFields(eventPayload, 'disposition_status_id')">
@@ -92,6 +93,14 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Timezone</p>
+        <q-timezone-selector v-model="contact.timezone"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @select="(eventPayload) => onUpdateFields(eventPayload, 'timezone')">
+        </q-timezone-selector>
+      </div>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
@@ -151,6 +160,7 @@ import LocationCountrySelector from 'src/components/contacts/location-country-se
 import ContactInputField from 'src/components/contacts/contact-input-field'
 import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
+import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -162,6 +172,7 @@ export default {
     }
   },
   components: {
+    QTimezoneSelector,
     ContactDispositionSelector,
     UserSelector,
     ContactInputField,

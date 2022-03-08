@@ -217,7 +217,6 @@ export default function (/* { ssrContext } */) {
       showIncomingCallNotification: true,
       // cached states
       sidebarFolded: false,
-      smsTemplates: [],
       tagOptions: {
         isReset: false
       },
@@ -583,12 +582,8 @@ export default function (/* { ssrContext } */) {
         commit('SET_OUTPUT_DEVICES', outputDevices)
       },
 
-      setSmsTemplates ({ commit }, smsTemplates) {
-        commit('SET_SMS_TEMPLATES', smsTemplates)
-      },
-
-      deleteSmsTemplate ({ commit }, smsTemplate) {
-        commit('DELETE_SMS_TEMPLATE', smsTemplate)
+      deleteTemplate ({ commit }, smsTemplate) {
+        commit('DELETE_TEMPLATE', smsTemplate)
       },
 
       setTagsFullyLoaded ({ commit }, tagsFullyLoaded) {
@@ -645,6 +640,10 @@ export default function (/* { ssrContext } */) {
 
       removeFromCallFishingQueue ({ commit }, value) {
         commit('REMOVE_FROM_CALL_FISHING_QUEUE', value)
+      },
+
+      clearCallFishingQueue ({ commit }) {
+        commit('CLEAR_CALL_FISHING_QUEUE')
       },
 
       addCommunicationNotifiedDesktop ({ commit }, payload) {
@@ -922,6 +921,13 @@ export default function (/* { ssrContext } */) {
         state.templates = templates
       },
 
+      DELETE_TEMPLATE (state, template) {
+        const found = state.templates.find(item => item.id === template.id)
+        if (found) {
+          state.templates.splice(state.smsTemplates.indexOf(found), 1)
+        }
+      },
+
       SET_BROADCASTS (state, broadcasts) {
         state.broadcasts = broadcasts
       },
@@ -1123,17 +1129,6 @@ export default function (/* { ssrContext } */) {
         state.outputDevices = outputDevices
       },
 
-      SET_SMS_TEMPLATES (state, smsTemplates) {
-        state.smsTemplates = smsTemplates
-      },
-
-      DELETE_SMS_TEMPLATE (state, smsTemplate) {
-        const found = state.smsTemplates.find(template => template.id === smsTemplate.id)
-        if (found) {
-          state.smsTemplates.splice(state.smsTemplates.indexOf(found), 1)
-        }
-      },
-
       SET_TAGS_FULLY_LOADED (state, tagsFullyLoaded) {
         state.tagsFullyLoaded = tagsFullyLoaded
       },
@@ -1218,6 +1213,10 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)
         }
+      },
+
+      CLEAR_CALL_FISHING_QUEUE (state) {
+        state.callFishingQueue = []
       },
 
       ADD_COMMUNICATION_NOTIFIED_DESKTOP (state, payload) {

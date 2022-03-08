@@ -214,7 +214,7 @@
               :style="avatarStyle(false)"
               :name="contactName">
       </avatar>
-      <p class="text-muted _500">You reopened this conversation</p>
+      <p class="text-muted _500">This conversation has been reopened</p>
     </div>
   </div>
 </template>
@@ -295,7 +295,19 @@ export default {
       return this.$route.params.status &&
         this.$route.params.status !== 'open' &&
         this.$options.filters.fixTaskStatusName(this.contact.task_status).toLowerCase() === 'open' &&
-        !this.loadingContact
+        !this.loadingContact &&
+        !this.isLive
+    },
+    isLive () {
+      return [
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+      ].includes(this.contact.last_communication.current_status2)
     },
     smsEmptyBodyAlternativeText () {
       const directionText = (this.contact.last_communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
@@ -341,6 +353,10 @@ export default {
         return
       }
       this.$emit('onItemSelected', contact)
+    }
+  },
+  watch: {
+    isReopened: function () {
     }
   }
 }

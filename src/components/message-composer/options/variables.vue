@@ -1,28 +1,29 @@
 <template>
   <div>
-    <vue-multiselect
-                 v-model="variable"
-                 track-by="value"
-                 label="label"
-                 :class="`custom-multi-select custom-multi-select-single ${alwaysOpenClass} options__no-border`"
-                 placeholder="Select a variable"
-                 :options="multiselectOptions"
-                 :searchable="true"
-                 :showNoResults="false"
-                 :close-on-select="false"
-                 :show-labels="false"
-                 tagPosition="bottom"
-                 ref="multiselect"
-                 :maxHeight="220"
-                 group-label="type"
-                 group-values="variables"
-                 :group-select="false"
-                 @select="onSelect"
-                 @remove="onRemove">
+    <vue-multiselect track-by="value"
+                     label="label"
+                     placeholder="Select a variable"
+                     tagPosition="bottom"
+                     ref="multiselect"
+                     group-label="type"
+                     group-values="variables"
+                     v-model="variable"
+                     :class="`custom-multi-select custom-multi-select-single ${alwaysOpenClass} options__no-border`"
+                     :options="multiselectOptions"
+                     :searchable="true"
+                     :showNoResults="false"
+                     :close-on-select="closeOnSelect"
+                     :show-labels="false"
+                     :maxHeight="220"
+                     :group-select="false"
+                     @select="onSelect"
+                     @remove="onRemove"
+                     @close="onClose">
+
       <template slot="caret">
         <i class="fa fa-search search-icon"></i>
       </template>
-<!--      <template slot="singleLabel" slot-scope="{ option }">{{ option.label }}</template>-->
+      <!--      <template slot="singleLabel" slot-scope="{ option }">{{ option.label }}</template>-->
       <template v-slot:option="props">
         <div v-if=" props.option.hasOwnProperty('$groupLabel')" class="option__group_header">
           <span class="option__title">{{ props.option.$groupLabel }}</span>
@@ -48,7 +49,10 @@ export default {
   props: {
     alwaysOpen: {
       type: Boolean,
-      required: false,
+      default: false
+    },
+    closeOnSelect: {
+      type: Boolean,
       default: false
     }
   },
@@ -173,10 +177,13 @@ export default {
       })
     },
     onSelect (selectedOption, id) {
-      this.$el.querySelector('.custom-multi-select-single input.multiselect__input').placeholder = (selectedOption) || this.placeholder
+      this.$el.querySelector('.custom-multi-select-single input.multiselect__input').placeholder = selectedOption ? selectedOption.label : this.placeholder
     },
     onRemove () {
       this.$el.querySelector('.custom-multi-select-single input.multiselect__input').placeholder = this.placeholder
+    },
+    onClose () {
+      this.$emit('close')
     }
   },
   watch: {
@@ -184,6 +191,7 @@ export default {
       if (value) {
         this.$emit('variableSelected', value.value)
       }
+      this.variable = null
     }
   },
   mounted () {
