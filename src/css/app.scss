@@ -1811,14 +1811,6 @@ i.option-separator {
   height: 0;
 }
 
-span.mention {
-  color: $black;
-  background: $blue-3;
-  padding: 2px 4px;
-  border-radius: 8px;
-  font-size: 13px !important;
-}
-
 .border-no-top {
   border: 1px solid $grey-60;
   border-top: 0 !important;
@@ -7657,7 +7649,8 @@ button.grey-90 {
   margin-right: 10px;
 }
 
-.mention-tag {
+.mention-tag,
+span.mention {
   color: $grey-100;
   font-weight: 500;
   background: #CDDCFF;

@@ -357,7 +357,6 @@ export default {
   },
   watch: {
     isReopened: function () {
-      console.trace()
     }
   }
 }

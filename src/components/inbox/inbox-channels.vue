@@ -125,12 +125,12 @@
                    :answer-status="answerStatus"
                    :channel="channel"
                    :search-text="searchText"
-                   v-if="!isGettingTasksList && $route.params.channel !== 'mentions'">
+                   v-if="!isGettingTasksList && $route.params.channel !== 'mentions' && communications.length">
         </task-list>
         <task-mention-list :communications="communications"
                            :direction="mentionType"
                            :search-text="searchText"
-                           v-if="!isGettingTasksList && $route.params.channel === 'mentions'">
+                           v-if="!isGettingTasksList && $route.params.channel === 'mentions' && communications.length">
         </task-mention-list>
         <div :class="[isGettingTasksList ? 'py-5' : 'py-4', 'relative']">
           <b-overlay :show="isLoadingMore || isGettingTasksList"
@@ -716,7 +716,6 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-
       return api.data.get({ params: params })
         .then(response => {
           this.gettingTasksList(false)
@@ -1004,12 +1003,10 @@ export default {
         this.getCommunications(this.filter)
       }
     },
-
-    '$route.params.channel': function () {
-      if (this.previousRoute && this.previousRoute.params.channel === 'inbox') {
-        return
+    '$route.params.channel': function (value) {
+      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings'].includes(value)) {
+        this.getCommunications(this.filter)
       }
-      this.getCommunications(this.filter)
     }
   },
 
@@ -1175,9 +1172,15 @@ export default {
     this.$VueEvent.listen('contact_updated', (data) => {
       const communications = [...this.communications]
 
-      communications.filter(item => item.contact.id === data.id).forEach((value) => {
-        value.contact = data
-      })
+      if (this.$route.params.channel === 'mentions') {
+        communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
+          value.mention_subject.contact = data
+        })
+      } else {
+        communications.filter(item => item.contact.id === data.id).forEach((value) => {
+          value.contact = data
+        })
+      }
 
       this.setCommunications(communications)
     })
@@ -1198,7 +1201,7 @@ export default {
       }
     }
 
-    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
       this.getCommunications(this.filter)
     }
   }

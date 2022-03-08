@@ -468,6 +468,7 @@ export default {
       }
     }
   },
+
   created () {
     this.resetFilter()
     this.toggleFilterDialog(false)
@@ -711,6 +712,10 @@ export default {
           this.setContacts(contacts)
       }
     })
+  },
+
+  beforeDestroy () {
+    this.setSelectedContact({})
   },
 
   watch: {

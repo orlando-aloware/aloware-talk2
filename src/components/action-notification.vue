@@ -336,7 +336,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setNotifications', 'setShowPhone']),
+    ...mapActions(['setNotifications', 'setShowPhone', 'clearCallFishingQueue', 'removeFromCallFishingQueue']),
     autoClose () {
       this.runDateTimeInterval()
       if ((this.id === 'callFishing' && document.getElementById('callFishing') && !this.isCommunicationInCallFishingQueue) ||
@@ -465,8 +465,12 @@ export default {
         this.$VueEvent.fire('hidePhone')
       }
 
-      if (this.id === 'callFishing' && this.queue && this.queue.length) {
-        this.switchCallFishingFromQueue()
+      if (this.id === 'callFishing') {
+        if (this.queue && this.queue.length) {
+          this.switchCallFishingFromQueue()
+        } else {
+          this.removeFromCallFishingQueue(this.communicationId)
+        }
       }
     },
     onNotificationClick (event) {
@@ -494,6 +498,7 @@ export default {
           queue: null
         }
       })
+      this.clearCallFishingQueue()
       this.$closeActionNotification(this.id)
     },
     toInbox () {
