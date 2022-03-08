@@ -119,8 +119,34 @@ export default {
     await this.setFilterParams(this.$route.params)
 
     this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
-      console.log('sessionMetrics :>> ', sessionMetrics)
       this.activeMetrics = sessionMetrics.session_metrics_calculations
+    })
+    this.$VueEvent.listen('contact_list_item_created', async (task) => {
+      console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+      if (this.hasSessions) {
+        await this.fetchInQueueTasks(task)
+      }
+      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+      //   this.handleDesktopVoicemailNotification(task)
+      // }
+    })
+    this.$VueEvent.listen('contact_list_item_updated', (task) => {
+      console.log(' %c TASK was UPDATED : ', 'background: green; color: #000;', task)
+      if (this.hasSessions) {
+        this.updateTaskStatus(task)
+      }
+      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+      //   this.handleDesktopVoicemailNotification(task)
+      // }
+    })
+    this.$VueEvent.listen('contact_list_item_deleting', (task) => {
+      console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
+      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+      //   this.handleDesktopVoicemailNotification(task)
+      // }
+    })
+    this.$VueEvent.listen('contact_list_bulk_created', (task) => {
+      console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
     })
   },
   beforeRouteUpdate (to, from, next) {
