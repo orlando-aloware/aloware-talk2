@@ -1,5 +1,5 @@
 <template>
-  <q-card flat :disabled="sessionLoader || hasDefaultContact">
+  <q-card flat :disabled="sessionLoader">
     <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-2 pb-0">
         <div class="font-weight-bold pl-3 flex-grow-1">
@@ -292,7 +292,7 @@ export default {
       return true
     },
     getLine () {
-      return this.campaigns.find((line) => line.id === this.currentTask?.communication?.campaign_id)
+      return this.campaigns.find((line) => line.id === this.activeTask?.task?.communication?.campaign_id)
     },
     toggleMute () {
       return this.dialer.isMuted
@@ -373,7 +373,10 @@ export default {
             this.timerCount--
           }, 1000)
         } else if (this.timerIsOver) {
-          if (!this.togglePause) {
+          if (this.wrapUp) {
+            this.wrapUp = false
+            this.resetTimer()
+          } else if (!this.togglePause) {
             setTimeout(async () => {
               await this.runTask()
               this.$VueEvent.fire('togglePhone')
@@ -384,12 +387,16 @@ export default {
             this.sessionPaused = true
           }
         }
+      } else {
+        setTimeout(() => {
+          this.timerCount--
+        }, 1000)
       }
     },
     initialize () {
       this.TOGGLE_SESSION_LOADER(false)
       if (this.hasExistingTaskList) {
-        this.taskToCall = this.powerDialerTasks.in_queue[0] || []
+        this.taskToCall = this.powerDialerTasks.in_queue[0]
       }
       // if (!this.togglePause) {
       //   this.resetTimer()
@@ -461,6 +468,8 @@ export default {
           }
           break
         case 'WRAP_UP':
+          this.wrapUp = true
+          this.resetTimer()
           break
         case 'MAKING_CALL':
           break
@@ -487,7 +496,9 @@ export default {
     async taskToCall (task) {
       if (task?.id) {
         await this.fetchContact(this.taskToCall.id)
-        this.resetTimer()
+        if (!this.wrapUp) {
+          this.resetTimer()
+        }
       }
     },
     async activeTask (task) {
@@ -504,11 +515,9 @@ export default {
           if (this.toggleEnd) {
             this.reRoute()
           } else {
-            console.log('7777 :>> ', value)
             await this.tickTimer()
           }
         } else if (value > 0) {
-          console.log('TICK : ', value)
           await this.tickTimer()
         }
       },
@@ -536,7 +545,11 @@ export default {
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
+      if (tasks.length === 0) {
+        this.shouldRedirect = true
+      }
       if (tasks.length > 0 && !this.flagged) {
+        this.shouldRedirect = false
         this.initialize()
       }
     },
@@ -548,12 +561,18 @@ export default {
       if (obj?.contact_id) {
         this.hubspot = obj
       }
+    },
+    wrapUp (value) {
+      if (value) {
+
+      }
     }
   },
   data () {
     return {
       prevRoute: null,
-      currentTask: {},
+      shouldRedirect: false,
+      wrapUp: false,
       timerCount: -1,
       loading: false,
       statuses: {
