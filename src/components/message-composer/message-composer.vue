@@ -39,7 +39,9 @@
     <div class="composer-footer d-flex justify-content-between pt-1">
       <div class="phone-lines-left d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
-        <contact-phone-number-selector @setSelectedPhone="setSelectedPhone"></contact-phone-number-selector>
+        <contact-phone-number-selector v-if="contact"
+                                       @setSelectedPhone="setSelectedPhone">
+        </contact-phone-number-selector>
       </div>
 
       <div class="phone-lines-right">

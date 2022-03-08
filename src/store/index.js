@@ -606,6 +606,10 @@ export default function (/* { ssrContext } */) {
         commit('REMOVE_FROM_CALL_FISHING_QUEUE', value)
       },
 
+      clearCallFishingQueue ({ commit }) {
+        commit('CLEAR_CALL_FISHING_QUEUE')
+      },
+
       addCommunicationNotifiedDesktop ({ commit }, payload) {
         commit('ADD_COMMUNICATION_NOTIFIED_DESKTOP', payload)
       },
@@ -1178,6 +1182,10 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.callFishingQueue.splice(state.callFishingQueue.indexOf(found), 1)
         }
+      },
+
+      CLEAR_CALL_FISHING_QUEUE (state) {
+        state.callFishingQueue = []
       },
 
       ADD_COMMUNICATION_NOTIFIED_DESKTOP (state, payload) {

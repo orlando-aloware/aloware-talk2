@@ -64,7 +64,7 @@ export default {
     getPhoneVariableLabels (phone) {
       const primaryLabel = { data: (phone.phone_number === this.contact.phone_number) ? 'Primary' : '' }
 
-      // show only separator if has both primary label and phone title
+      // show only separator if it has both primary label and phone title
       const separator = phone.title && phone.title.length > 0 && primaryLabel.data && primaryLabel.data.length > 0 ? '<i class="fa fa-circle option-separator"></i>' : ''
 
       primaryLabel.data = primaryLabel.data && primaryLabel.data.length > 0 ? `${separator} <span class="selected-option-title">${primaryLabel.data}</span>` : ''
@@ -79,6 +79,10 @@ export default {
       const phone = this.getPhoneObject(phoneNumber)
       if (phone) {
         this.selectedPhone = phone
+      } else {
+        if (this.contactPhoneNumbers.length) {
+          this.selectedPhone = this.contactPhoneNumbers[0]
+        }
       }
     },
     onPhoneChange (phone) {
