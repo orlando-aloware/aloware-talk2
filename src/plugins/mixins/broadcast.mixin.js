@@ -354,12 +354,11 @@ export default {
         .listen('.user.contact_list_item.deleting', (event) => {
           window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
         })
-        .listen('.user.bulk_contact_list_items.created', (event) => {
-          window.VueEvent.fire('contact_list_bulk_created', event)
-        })
         .listen('.user.session_metrics_calculation', (event) => {
-          console.log('event 32543 324w5t 34t34r :>> ', event)
           window.VueEvent.fire('metric_sessions_update', event)
+        })
+        .listen('.bulk_contact_list_items.created', (event) => {
+          window.VueEvent.fire('contact_list_bulk_created', event)
         })
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
