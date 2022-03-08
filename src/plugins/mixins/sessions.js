@@ -19,7 +19,7 @@ export default {
     statusDisplayButton () {
       switch (this.dialer?.currentStatus) {
         case 'READY':
-          if (!this.toggleEnd || !this.togglePause) {
+          if ((!this.toggleEnd || !this.togglePause) && !this.wrapUp) {
             return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
           } else {
             return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
@@ -53,7 +53,6 @@ export default {
       }
     },
     async fetchContact (taskId = '') {
-      console.log('Fetching contact for current session...', taskId)
       this.TOGGLE_SESSION_LOADER(true)
       let res = null
       res = await this.getContact({ id: taskId })
@@ -61,7 +60,7 @@ export default {
         this.activeTask = res
         this.flagged = true
       }
-      console.log('RESPONSE from Contacts API : ', res)
+      console.log(` %c Fetching contact for current task ${taskId} : `, 'color:yellow;background:black;', res)
       this.TOGGLE_SESSION_LOADER(false)
     },
     async runTask () {
@@ -97,7 +96,7 @@ export default {
       // TODOs: Remove task from list
     },
     updateTaskStatus (task) {
-      this.currentTask = task
+      console.log('task :>> ', task)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           // console.log(' %c Changing status to : IN_PROGRESS ', 'background: yellow; color: black;')
@@ -127,6 +126,7 @@ export default {
           break
         default:
       }
+      this.activeTask.task = task
       this.setShowPhone(false)
     }
   }
