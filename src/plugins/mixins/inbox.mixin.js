@@ -51,12 +51,13 @@ export default {
       page: 1,
       perPage: 20,
       lineOrRingGroupFilter: null,
-      lineOrRingGroupFilteredId: null
+      lineOrRingGroupFilteredId: null,
+      contacts: []
     }
   },
 
   methods: {
-    ...mapActions('inbox', ['setContact', 'setContacts', 'setLiveContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
+    ...mapActions('inbox', ['setContact', 'setLiveContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
     getNoneLiveCallContactTasks (contacts) {
       return contacts.filter(contact => (contact.last_communication &&
         ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
@@ -146,6 +147,9 @@ export default {
         search: {
         }
       }
+    },
+    setContacts (contacts) {
+      this.contacts = contacts
     }
   }
 }

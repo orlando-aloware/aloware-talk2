@@ -1365,7 +1365,7 @@ export default {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
     showEmptySlot () {
-      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListType.STATIC)
+      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListTypes.STATIC)
     },
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))

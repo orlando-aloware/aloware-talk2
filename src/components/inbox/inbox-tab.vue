@@ -185,7 +185,6 @@ export default {
     ...mapState('inbox',
       [
         'taskCounts',
-        'contacts',
         'liveContacts',
         'selectedContact',
         'hasMoreContacts',
@@ -309,7 +308,6 @@ export default {
       const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
         Vue.set(this.contacts, index, updatedContact)
-        this.setContacts(this.contacts)
       }
     },
     resetList () {

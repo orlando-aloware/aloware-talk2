@@ -572,15 +572,27 @@ export default {
         }
       }
     },
-    $route (to, from) {
-      if ((from.name === 'Contact' && to.name !== 'Contacts') &&
-        (from.name === 'Contacts' && to.name !== 'Contact')) {
+    'list.id': function (value) {
+      if (value && this.$route.name === 'Contacts') {
         this.clearContacts()
       }
+    },
+    $route (to, from) {
+      this.isNavigated = true
 
       if (to.name === 'Contacts') {
         this.init()
-        this.isNavigated = true
+      }
+
+      if (from.name === 'Contact' && to.name === 'Contacts') {
+        this.isNavigated = false
+        return
+      }
+
+      console.log('from.name: ', from.name)
+      console.log('to.name: ', to.name)
+      if (from.name === 'Contacts' && to.name === 'Contacts') {
+        this.isNavigated = false
       }
     }
   },
