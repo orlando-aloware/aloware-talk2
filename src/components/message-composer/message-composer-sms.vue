@@ -125,61 +125,10 @@
     </div>
     <div class="d-flex justify-content-between"
          @dragover.prevent>
-      <div class="message-options">
-        <b-link href="#">
-          <q-menu content-class="mx-height-500"
-                  ref="giphyMenu"
-                  :offset="[0,5]" >
-            <div class="row no-wrap q-pa-md">
-              <search-giphy @selected="setMessageGif"></search-giphy>
-            </div>
-          </q-menu>
-
-          <gif-icon></gif-icon>
-          <q-tooltip>
-            Add Gif image
-          </q-tooltip>
-        </b-link>
-
-        <b-link href="#">
-          <q-menu ref="attachmentMenu"
-                  :offset="[0,5]">
-            <div class="row no-wrap q-pa-md">
-              <attachments @attachmentUploaded="onAttachmentUploaded"></attachments>
-            </div>
-          </q-menu>
-          <attachment-icon></attachment-icon>
-          <q-tooltip>
-            Add attachments
-          </q-tooltip>
-        </b-link>
-        <b-link href="#">
-          <q-menu content-class="mx-height-300"
-                  ref="templatesMenu"
-                  :offset="[0,5]">
-            <div class="row no-wrap q-pa-md">
-              <message-templates @templateSelected="templateSelected"></message-templates>
-            </div>
-          </q-menu>
-          <calendar-today-icon></calendar-today-icon>
-          <q-tooltip>
-            Add template
-          </q-tooltip>
-        </b-link>
-        <b-link href="#">
-          <q-menu content-class="mx-height-300"
-                  ref="variablesMenu"
-                  :offset="[0,5]">
-            <div class="row no-wrap q-pa-md">
-              <variables @variableSelected="variableSelected" always-open></variables>
-            </div>
-          </q-menu>
-          <variable-icon></variable-icon>
-          <q-tooltip>
-            Add variable
-          </q-tooltip>
-        </b-link>
-      </div>
+      <message-composer-options @gifSelected="gifSelected"
+                                @attachmentUploaded="attachmentUploaded"
+                                @templateSelected="templateSelected"
+                                @variableSelected="variableSelected"/>
       <div>
         <q-btn-dropdown
           split
@@ -218,39 +167,25 @@
 import axios from 'axios'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import GifIcon from 'components/icons/gif-icon'
-import AttachmentIcon from 'components/icons/attachment-icon'
-import CalendarTodayIcon from 'components/icons/calendar-today-icon'
-import VariableIcon from 'components/icons/variable-icon'
-import SearchGiphy from 'components/message-composer/options/search-giphy'
-import Attachments from 'components/message-composer/options/attachments'
-import Variables from 'components/message-composer/options/variables'
 import ScheduledMessage from 'components/message-composer/scheduled-message'
 import SmsTemplateModal from 'components/sms-template-modal'
-import MessageTemplates from 'components/message-composer/options/message-templates'
 import ImagePlaceholder from 'components/message-composer/file-placeholders/image-placeholder'
 import VideoPlaceholder from 'components/message-composer/file-placeholders/video-placeholder'
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
+import MessageComposerOptions from 'components/message-composer/message-composer-options'
 
 export default {
   name: 'message-composer-sms',
 
   components: {
+    MessageComposerOptions,
     AudioPlaceholder,
     ApplicationPlaceholder,
     VideoPlaceholder,
     ImagePlaceholder,
     SmsTemplateModal,
-    ScheduledMessage,
-    MessageTemplates,
-    Variables,
-    Attachments,
-    SearchGiphy,
-    VariableIcon,
-    CalendarTodayIcon,
-    AttachmentIcon,
-    GifIcon
+    ScheduledMessage
   },
 
   computed: {
@@ -266,9 +201,6 @@ export default {
     },
     messageAttachments () {
       return this.messageComposer.sms.attachments
-    },
-    messageGifUrl () {
-      return this.messageComposer.sms.gif_url
     }
   },
 
@@ -278,25 +210,9 @@ export default {
       filesOnQueue: [],
       fileOnQueueIcon: ['fa', 'fa-times'],
       filesOnQueueToken: [],
-      focusInterval: null
-    }
-  },
-
-  methods: {
-    ...mapActions('contacts', [
-      'setMessageComposerSmsGif',
-      'removeMessageComposerSmsAttachment',
-      'setMessageComposerSmsBody',
-      'resetMessageComposerSms',
-      'appendMessageComposerSmsAttachments',
-      'scheduleMessageOpen'
-    ]),
-    processFilesToQueue (file) {
-      if (!file) {
-        return
-      }
-
-      if (!['audio/basic',
+      focusInterval: null,
+      fileTypes: [
+        'audio/basic',
         'audio/L24',
         'audio/mp4',
         'audio/mpeg',
@@ -336,7 +252,25 @@ export default {
         'text/calendar',
         'text/directory',
         'application/pdf',
-        'application/vcard'].includes(file.type)) {
+        'application/vcard']
+    }
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setMessageComposerSmsGif',
+      'removeMessageComposerSmsAttachment',
+      'setMessageComposerSmsBody',
+      'resetMessageComposerSms',
+      'appendMessageComposerSmsAttachments',
+      'scheduleMessageOpen'
+    ]),
+    processFilesToQueue (file) {
+      if (!file) {
+        return
+      }
+
+      if (!this.fileTypes.includes(file.type)) {
         this.$generalNotification('Unsupported file type detected.', 'error')
         return
       }
@@ -403,9 +337,8 @@ export default {
           this.isSending = false
         })
     },
-    setMessageGif (gif) {
+    gifSelected (gif) {
       this.setMessageComposerSmsGif(gif)
-      this.$refs.giphyMenu.hide()
     },
     removeMessageGif () {
       this.setMessageComposerSmsGif('')
@@ -418,18 +351,14 @@ export default {
     },
     templateSelected (template) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
-      this.$refs.templatesMenu.hide()
     },
     variableSelected (variable) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
-      this.$refs.variablesMenu.hide()
     },
-    onAttachmentUploaded (files) {
+    attachmentUploaded (files) {
       files.forEach((file) => {
         this.appendMessageComposerSmsAttachments(file)
       })
-
-      this.$refs.attachmentMenu.hide()
     },
     showScheduleMessage () {
       this.scheduleMessageOpen(true)

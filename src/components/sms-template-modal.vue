@@ -39,7 +39,7 @@
         </b-button>
 
         <variables v-if="showVariableSelector"
-                   :close-on-select="true"
+                   :close-on-select="false"
                    @close="showVariableSelector = false"
                    @variableSelected="variableSelected">
         </variables>
@@ -144,7 +144,6 @@ export default {
 
     variableSelected (variable) {
       this.template.body = (this.template.body ?? '') + ' ' + variable
-      this.$refs.variablesMenu.hide()
     },
 
     onSubmit () {
