@@ -53,6 +53,7 @@ export default {
     loadFolders () {
       this.isLoading = true
       this.setPublicListsLoaded(false)
+      this.lists = []
       talk2Api.V2.contactList.public().then(response => {
         this.lists = response.data.data
       }).catch((err) => {
@@ -82,7 +83,7 @@ export default {
   },
   watch: {
     $route (to) {
-      if (to.name === 'Contacts') {
+      if (to.name !== 'Contacts') {
         this.loadFolders()
       }
     }

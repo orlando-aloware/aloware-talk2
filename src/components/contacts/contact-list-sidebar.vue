@@ -139,6 +139,8 @@ export default {
     if (this.fixedContactsData.length === 0) {
       this.$VueEvent.fire('fetchContacts')
     }
+
+    this.$VueEvent.fire('contactsListSidebarDataLoaded', this.fixedContactsData.data)
   },
 
   beforeDestroy () {

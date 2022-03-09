@@ -24,6 +24,7 @@ export default {
     ContactsAddItemsStatic,
     ContactsView
   },
+
   props: {
     contactsData: {
       type: Object,
@@ -79,7 +80,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['lists', 'listItems'])
+    ...mapGetters('contacts', ['lists', 'listItems']),
+    contactList () {
+      return this.lists[String(this.$route.params.id)]
+    },
+    isLoaded () {
+      return !!this.lists[String(this.$route.params.id)]
+    }
   },
   data () {
     return {
@@ -96,7 +103,6 @@ export default {
         id = 'all'
       }
 
-      this.clearContacts()
       const stringId = String(id)
 
       this.$axios

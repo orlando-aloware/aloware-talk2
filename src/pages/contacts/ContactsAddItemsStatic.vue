@@ -119,14 +119,14 @@
         :stickyHeaders="true"
         :columns="validColumns"
         :hasMore="hasMore"
-        :paginated="true"
+        :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
         :isEmpty="isEmpty"
         :isLoadingMore="isLoadingMore"
-        :total-rows="totalRows"
-        :current-page="currentPage"
-        :last-page="lastPage"
+        :total-rows="contactsData.total"
+        :current-page="contactsData.current_page"
+        :last-page="contactsData.last_page"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @paginated="onPagination"
@@ -135,7 +135,7 @@
       >
         <template slot="tbody">
           <table-row
-            v-for="(contact, index) in items"
+            v-for="(contact, index) in contactsData.data"
             :key="contact.id + index + Math.random()"
             :contact="contact"
             :columns="validColumns"
@@ -174,6 +174,7 @@ import ContactsFilters from 'components/contacts/contacts-filters'
 
 export default {
   mixins: [contactsMixins],
+
   components: {
     ContactsFilters,
     CompactBtn,
@@ -185,6 +186,7 @@ export default {
     TextPopover,
     FolderStaticIcon
   },
+
   props: {
     contactList: {
       type: Object,
@@ -199,14 +201,16 @@ export default {
       default: false
     }
   },
+
   data () {
     return {
       checked: [],
-      id: 'all',
       filterHasChanges: false,
-      listName: ''
+      listName: '',
+      myContacts: false
     }
   },
+
   computed: {
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'isFiltersOpen']),
@@ -274,7 +278,6 @@ export default {
       'columnsOpen',
       'openFilters',
       'closeFilters',
-      'contactsLoaded',
       'foldersLoaded',
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount',
@@ -374,7 +377,7 @@ export default {
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           if (checked) {
-            this.checked.push(this.listItems['all'].data.find(item => item.id === Number(checkbox.value)))
+            this.checked.push(this.contactsData.data.find(item => item.id === Number(checkbox.value)))
           } else {
             this.checked = this.checked.filter(item => item.id !== Number(checkbox.value))
           }
@@ -428,7 +431,7 @@ export default {
       }
     },
     checkedItemIds: function (value) {
-      document.querySelector('.data-table-check-all').checked = this.items.length > 0 && value.length === this.items.length
+      document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && value.length === this.contactsData.data.length
     }
   }
 }
