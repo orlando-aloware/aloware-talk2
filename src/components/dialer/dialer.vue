@@ -30,6 +30,7 @@ export default {
       device: new TwilioDevice(),
       connection: null,
       warnings: [],
+      hangupInterval: null,
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus
@@ -765,7 +766,7 @@ export default {
         this.device.activeConnection().hangup()
 
         const counter = { data: 0 }
-        const hangupInterval = setInterval(() => {
+        this.$options.hangupInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.backToDial()
 
@@ -778,12 +779,12 @@ export default {
                 break
             }
             this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
-            clearInterval(hangupInterval)
+            clearInterval(this.$options.hangupInterval)
           }
 
           counter.data++
           if (counter.data > 120) {
-            clearInterval(hangupInterval)
+            clearInterval(this.$options.hangupInterval)
           }
         }, 500)
       }
@@ -1194,7 +1195,6 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('update_communication')
     this.$VueEvent.stop('endWrapUp')
     this.$VueEvent.stop('resetCall')
     this.$VueEvent.stop('makeCall')
@@ -1220,6 +1220,9 @@ export default {
     this.$VueEvent.stop('initializeSettings')
     clearInterval(this.$options.callDurationInterval)
     clearInterval(this.$options.wrapUpDurationInterval)
+    clearInterval(this.$options.parkedCallDurationInterval)
+    clearInterval(this.$options.webrtcTokenRegenerateInterval)
+    clearInterval(this.$options.hangupInterval)
   }
 }
 </script>

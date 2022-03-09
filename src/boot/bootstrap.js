@@ -165,15 +165,18 @@ Vue.prototype.$Sentry = window.Sentry
 
 Vue.prototype.$handleErrors = function (response, title = null) {
   if (response && response.status) {
-    const message = { data: '' }
+    const message = { data: response.data.error }
     const error = { data: null }
     switch (response.status) {
       case 401:
         if (response.data.error) {
-          message.data += `<p class="pt-1 pb-1">- ${response.data.error}</p>`
+          message.data = `<p class="pt-1 pb-1">- ${response.data.error}</p>`
         }
-        for (error.data of response.data.errors) {
-          message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
+        if (response.data.errors.length) {
+          response.data.errors = ''
+          for (error.data of response.data.errors) {
+            message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
+          }
         }
         break
       case 403:
@@ -320,17 +323,18 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   }
 
   const counter = { data: 0 }
-  const notificationInterval = setInterval(() => {
+  const notificationInterval = { data: null }
+  notificationInterval.data = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
       settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
       this.$bvToast.show(settings.type)
-      clearInterval(notificationInterval)
+      clearInterval(notificationInterval.data)
     }
     counter.data++
 
     if (counter.data > 120) {
-      clearInterval(notificationInterval)
+      clearInterval(notificationInterval.data)
     }
   }, 500)
 }, 100)

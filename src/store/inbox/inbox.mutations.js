@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import _ from 'lodash'
+import * as InboxDefault from 'src/constants/inbox-default'
 
 export default {
   SET_CONTACT_ID: (state, id) => {
@@ -13,11 +14,6 @@ export default {
   },
   SET_COMMUNICATIONS_CURRENT_PAGE: (state, page) => {
     state.communicationsCurrentPage = page
-  },
-  RESET_INBOX_VUEX: (state) => {
-    state.activeChannel = null
-    state.selectedContactId = null
-    state.selectedCommunication = null
   },
   GETTING_TASKS_LIST: (state, isGetting) => {
     state.isGettingTasksList = isGetting
@@ -120,5 +116,21 @@ export default {
   },
   SET_SEARCHER_OPEN: (state, isOpen) => {
     state.isSearcherOpen = isOpen
+  },
+
+  RESET_VUEX (state, value) {
+    if (!_.isArray(value) || _.isEmpty(value)) {
+      return
+    }
+
+    state.activeChannel = null
+    state.selectedContactId = null
+    state.selectedCommunication = null
+
+    if (!value.includes('all')) {
+      return
+    }
+
+    state = Object.assign({}, InboxDefault.DEFAULT_STATE)
   }
 }

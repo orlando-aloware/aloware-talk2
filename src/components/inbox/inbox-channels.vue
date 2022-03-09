@@ -1120,11 +1120,12 @@ export default {
 
       // get current contact's communications
       const contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
+      const index = { data: null }
 
       // iterate through and update is_read value
       contactCommunications.forEach((communication) => {
-        const index = this.communications.findIndex(item => item.id === communication.id)
-        this.communications[index].is_read = true
+        index.data = this.communications.findIndex(item => item.id === communication.id)
+        this.communications[index.data].is_read = true
       })
 
       // set updated communications

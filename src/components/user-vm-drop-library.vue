@@ -133,7 +133,7 @@ export default {
         this.isLoadingLibrary = false
       }).catch(err => {
         console.log(err)
-        this.$generalActionNotification(err.response, 'error')
+        this.$handleErrors(err.response)
         this.isLoadingLibrary = false
       })
     },
@@ -157,7 +157,7 @@ export default {
         this.$generalNotification('Voicemail drop has been added to your library.', 'success')
       }).catch(err => {
         console.log(err)
-        this.$generalNotification(err.response, 'error')
+        this.$handleErrors(err.response)
       })
     },
 

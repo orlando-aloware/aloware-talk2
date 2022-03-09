@@ -8,8 +8,8 @@
                        v-if="$q.screen.lt.md"
                        @click="toggleSidebar"/>
           <div class="d-flex align-items-center">
-            <div v-for="folderName in folderPath"
-                 :key="folderName"
+            <div v-for="(folderName, index) in folderPath"
+                 :key="`f-${index}`"
                  class="d-flex align-items-center title-path">
               <div class="title-breadcrumb d-flex align-items-center">{{ folderName }}</div>
               <slash-icon class="title-slash d-flex align-items-center" />
@@ -43,7 +43,7 @@
       <compact-btn
         :class="`${isUnsavedList ? 'hidden' : ''}`"
         variant="primary"
-        v-if="list.type === ContactListType.DYNAMIC && isEditable"
+        v-if="list.type === ContactListTypes.DYNAMIC && isEditable"
         :disabled="isFiltersOpen"
         @clicked="onFiltersClicked"
       >
@@ -161,7 +161,7 @@
 
         <compact-btn
           variant="primary"
-          v-if="selectedList.type !== ContactListType.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
+          v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
           :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList || list.show_in_public_folder"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
@@ -176,7 +176,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
-                    v-if="((list.type === ContactListType.STATIC && isEditable) || this.id === 'all') &&  !list.show_in_public_folder">
+                    v-if="((list.type === ContactListTypes.STATIC && isEditable) || this.id === 'all') &&  !list.show_in_public_folder">
           <template #button-content class="filter-toggle-button">
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
@@ -185,8 +185,8 @@
                style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
-                           :disabled="!(list.type === ContactListType.STATIC && isEditable)"
-                           v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListType.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
+                           :disabled="!(list.type === ContactListTypes.STATIC && isEditable)"
+                           v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onAddContactsToList">
             <search-icon color="#62666E">
             </search-icon>
@@ -249,49 +249,360 @@
         :contact-list-id="id"
         :paginated="false"
         :show-pagination="!isStartState"
-        :total-rows="listItems[id].total"
-        :current-page="listItems[id].current_page"
-        :last-page="listItems[id].last_page"
-        v-if="listItemsHasData && isLoaded"
+        :total-rows="this.fixedContactsData.total"
+        :current-page="this.fixedContactsData.current_page"
+        :last-page="this.fixedContactsData.last_page"
+        v-if="listItemsHasData"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
         @paginated="onPaginate"
         @more="onLoadMore">
         <template slot="tbody">
-          <table-row
-            v-for="(contact, index) in listItems[id].data"
-            :key="contact.id + index + Math.random()"
-            :contact="contact"
-            :columns="columns"
-            :checked="checked"
-            :contactListId="id"
-            :has-delete="!list.show_in_public_folder"
-            @checked="onCheckedRows"
-          />
+          <tr v-for="(contact, index) in this.fixedContactsData.data"
+              :key="`${index}`"
+              class="datatable-row">
+            <template
+              v-if="customRowContent">
+              <slot name="custom-content" />
+            </template>
+
+            <template
+              v-else
+              v-for="(column, colIndx) in fixedColumns">
+              <td
+                v-if="column.name === 'checkbox'"
+                :key="`c-${colIndx}`"
+                class="text-left pull-left datatable-row__checkbox">
+
+                <label class="custom-checkbox-container">
+                  <input
+                    type="checkbox"
+                    class="checker"
+                    :value="contact.id"
+                    :checked="checked.find(item => item.id === contact.id)"
+                    @change="onCheckerClicked(contact.id)" />
+                  <span class="checkmark"></span>
+                </label>
+              </td>
+
+              <td
+                v-else-if="column.name === 'name'"
+                class="datatable-row__name"
+                :key="`c-${colIndx}`">
+                <div class="d-flex align-items-center">
+                  <div class="pr-2">
+                    <div
+                      class="avatar"
+                      :style="computedStyle">
+                      <div
+                        class="avatar__inner">
+                        <span v-if="!contact.name || !contact.name.length">
+                          <i class="fa fa-user"></i>
+                        </span>
+                        <span v-else>
+                          {{ getInitials(contact.name || 'No Name') }}
+                        </span>
+                      </div>
+                      <slot></slot>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <a href=""
+                       @click="onNavigate(contact.id, $event)"
+                       class="d-flex align-items-center item contact-name">
+                      <template v-if="contact.name">
+                        <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                          {{ contact.name | ucwords }}
+                        </div>
+                      </template>
+                      <template v-if="!contact.name">
+                        <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                          No Name
+                        </div>
+                      </template>
+                    </a>
+                  </div>
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'phone_number'"
+                class="datatable-row__phone"
+                :key="`c-${colIndx}`">
+                <div
+                  v-if="contact.phone_number"
+                  :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+                </div>
+                <div
+                  v-else
+                  class="ml-1 text-grey-7 text-center "
+                  :class="`${column.draggable ? 'col-indented' : ''}`">
+                  -
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'last_engagement_text'"
+                :key="`c-${colIndx}`">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  <div>{{ contact.last_engagement_text }}</div>
+                  <div class="small text-muted">
+                    {{ moment(contact.last_engagement_at).format('LLL') }}
+                  </div>
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'tags'"
+                :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${colIndx}`"
+                @mouseleave="onMouseLeavePopover($event)">
+
+                <template
+                  v-if="!contact.tags || (contact.tags && !contact.tags.length)">
+                  -
+                </template>
+
+                <template
+                  v-if="Array.isArray(contact.tags) && contact.tags.length">
+                  <div
+                    class="d-flex align-items-center contact-tags-item"
+                    :id="`pt-${index}-${colIndx}`"
+                    v-if="contact.id"
+                    @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
+                    <span :style="`color: ${contact.tags[0].color};`">
+                      <i
+                        class="fa fa-circle"
+                        :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
+                      <span v-if="contact.tags.length > 1">
+                        {{ contact.tags[0].name | truncate(17) }}
+                      </span>
+                      <span
+                        v-else>
+                        {{ contact.tags[0].name | truncate(27) }}
+                      </span>
+                    </span>
+                    <span
+                      v-if="contact.tags.length > 1"
+                      class="ml-1 text-grey-7">
+                      +{{ (contact.tags.length - 1) }} more
+                    </span>
+                  </div>
+                </template>
+              </td>
+
+              <td
+                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${colIndx}`"
+                v-else-if="column.name === 'unread_texts_count'">
+                <span
+                  class="badge badge-danger unread-text bg-red-80"
+                  v-if="contact.unread_texts_count > 0">
+                  {{ contact.unread_texts_count }}
+                </span>
+              </td>
+
+              <td
+                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${colIndx}`"
+                v-else-if="column.name === 'unread_missed_calls_count'">
+                <span
+                  class="badge badge-danger unread-text bg-red-80"
+                  v-if="contact.unread_missed_calls_count > 0">
+                  {{ contact.unread_missed_calls_count }}
+                </span>
+              </td>
+
+              <td
+                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${colIndx}`"
+                v-else-if="column.name === 'unread_voicemails_count'">
+                <span
+                  class="badge badge-danger unread-text bg-red-80"
+                  v-if="contact.unread_voicemails_count > 0">
+                  {{ contact.unread_voicemails_count }}
+                </span>
+              </td>
+
+              <td
+                v-else-if="column.name === 'text_authorized_at'"
+                class="text-left"
+                :key="`c-${colIndx}`">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ contact.text_authorized_at ? 'Yes' : 'No' }}
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'initial_campaign_id'"
+                class="text-left"
+                :key="`c-${colIndx}`">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ getLineName(contact.initial_campaign_id) }}
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'created_at'"
+                class="text-left"
+                :key="`c-${colIndx}`">
+                <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
+                  {{ contact.created_at | fixDate }}
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'actions'"
+                class="text-left datatable-row__actions"
+                :key="`c-${colIndx}`">
+                <div>
+                  <button class="btn btn-sm datatable-row__actions__action--call"
+                          @click="onCall(contact)">
+                    <!--call-o-icon color="#62666E"></call-o-icon-->
+                    <span class="aloicons action-icons">@</span>
+                  </button>
+                  <button class="btn btn-sm datatable-row__actions__action--chat"
+                          @click="onMessage(contact.id)">
+                    <!--message-o-icon></message-o-icon-->
+                    <span class="aloicons action-icons">A</span>
+                  </button>
+                  <button v-if="!list.show_in_public_folder"
+                          class="btn btn-sm datatable-row__actions__action--trash"
+                          @click="onRemove(contact, id)">
+                    <span class="aloicons action-icons">B</span>
+                  </button>
+                </div>
+              </td>
+
+              <td
+                v-else
+                :key="`c-${colIndx}`"
+                @mouseleave="onMouseLeavePopover($event)">
+
+                <div
+                  v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)"
+                  class="text-left">
+                  <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                    -
+                  </div>
+                </div>
+
+                <div
+                  v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length"
+                  class="text-left"
+                  @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${colIndx}`, index, column.name, $event)">
+                  <div
+                    v-if="contact[column.name].length > 0"
+                    :id="`ot-${index}-${colIndx}`">
+                    <div
+                      v-if="typeof contact[column.name][0].phone_number !== 'undefined'"
+                      :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                      {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
+                    </div>
+                    <div
+                      v-else
+                      :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                      {{ contact[column.name][0].name }}
+                    </div>
+                    <span
+                      v-if="contact[column.name].length > 1"
+                      class="ml-1 text-grey-7">
+                      +{{ (contact[column.name].length - 1) }} more
+                    </span>
+                  </div>
+                  <span
+                    v-if="contact[column.name].length === 0">
+                    -
+                  </span>
+                </div>
+                <div
+                  v-else-if="contact[column.name] && contact[column.name] instanceof Object && Object.keys(contact[column.name]).length"
+                  class="text-left">
+                  <div
+                    v-if="contact[column.name].id && typeof contact[column.name].name !== 'undefined'"
+                    :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                    {{ contact[column.name].name }}
+                  </div>
+                </div>
+                <span
+                  v-else-if="contact[column.name] && contact[column.name] instanceof Object && !Object.keys(contact[column.name]).length"
+                  class="text-left">
+                  - {{ contact[column.name] }}
+                </span>
+                <div
+                  v-else-if="column.name.includes('_at') || column.name.includes('date')"
+                  class="text-left ellipse">
+                  {{ contact[column.name] | fixFullDateTime }}
+                </div>
+                <div
+                  v-else
+                  class="ellipse"
+                  :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`">
+                  {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
+                  (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : ( contact[column.name] === null ? '-' : contact[column.name] ) ) }}
+                </div>
+              </td>
+            </template>
+          </tr>
         </template>
 
         <template slot="empty"
                   v-if="showEmptySlot">
-          <router-link
-            v-slot="{ navigate }"
-            :to="'/contacts/list/' + $route.params.id + '/add'"
-          >
-            <div class="start-state" @click="navigate">
-              <div
-                class="p-4 bg-light w-100 text-center border-bottom text-primary"
-              >
-                <template v-if="list.type === ContactListType.STATIC">
-                  Add contacts <i class="fa fa-plus"></i>
-                </template>
-                <template v-else-if="list.type === ContactListType.DYNAMIC">
-                  Add Contacts through a Filter <i class="fa fa-plus"></i>
-                </template>
-              </div>
+          <div class="start-state" @click="onNavigateToAdd($event)">
+            <div
+              class="p-4 bg-light w-100 text-center border-bottom text-primary"
+            >
+              <template v-if="list.type == ContactListTypes.STATIC">
+                Add contacts <i class="fa fa-plus"></i>
+              </template>
+              <template v-else-if="list.type == ContactListTypes.DYNAMIC">
+                Add Contacts through a Filter <i class="fa fa-plus"></i>
+              </template>
             </div>
-          </router-link>
+          </div>
         </template>
       </datatable>
+
+      <b-popover
+        triggers="hover"
+        placement="topright"
+        boundary="window"
+        ref="popover"
+        :key="hoverPopover.key"
+        :show.sync="hoverPopover.show"
+        :target="hoverPopover.target">
+        <template #title>
+          <div class="contact-tags-title">{{ hoverPopover.title }}</div>
+        </template>
+        <template v-if="hoverPopover.title === 'Tags'">
+          <span class="d-flex align-items-center contact-tags-item"
+                v-for="(item, index) in hoverPopover.data"
+                :key="`t-${index}`">
+            <span :style="`color: ${item.color};`">
+              <i class="fa fa-circle" :style="`color: ${item.color};font-size:50%;position: relative; top: -2px;`"></i>
+              {{ item.name }}
+            </span>
+          </span>
+        </template>
+        <template v-if="hoverPopover.title !== 'Tags'">
+          <div
+            class="ml-1 w-100"
+            v-for="(item, index) in hoverPopover.data"
+            :key="`ct-${index}`">
+            <i
+              class="fa fa-circle text-black"
+              :style="`font-size:36%;position: relative; top: -3px;`"></i>
+            <span v-if="typeof item.phone_number !== 'undefined'">
+              {{ item.phone_number | fixPhone('NATIONAL', true) }}
+            </span>
+            <span v-else>
+              {{ item.name }}
+            </span>
+          </div>
+        </template>
+      </b-popover>
     </template>
     <template slot="filters">
       <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
@@ -303,15 +614,15 @@
 </template>
 
 <script>
+import moment from 'moment'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
-import TableRow from 'src/components/table-row.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters'
 import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
@@ -331,9 +642,20 @@ import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+import { avatarMixin } from 'src/plugins/mixins'
 
 export default {
+  name: 'contacts-view',
+
+  mixins: [
+    avatarMixin
+  ],
+
+  inject: [
+    'contactsData'
+  ],
+
   components: {
     BackButton,
     DeleteRedIcon,
@@ -354,16 +676,61 @@ export default {
     CompactBtn,
     ContactsScreen,
     Datatable,
-    ImportContactsModal,
-    TableRow
+    ImportContactsModal
   },
 
-  mixins: [contactsMixins],
-
   props: {
-    id: {
-      type: [String, Number],
-      required: true
+    // contactsData: {
+    //   type: Object,
+    //   default: () => {}
+    // },
+    list: {
+      type: Object,
+      default: () => {}
+    },
+    isLoadingDisabled: {
+      type: Boolean,
+      default: false
+    },
+    isStartState: {
+      type: Boolean,
+      default: false
+    },
+    isEditable: {
+      type: Boolean,
+      default: false
+    },
+    search: {
+      type: String,
+      default: ''
+    },
+    isMyContactsView: {
+      type: Boolean,
+      default: false
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+    columns: {
+      type: Array,
+      default: () => []
+    },
+    isEmpty: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingMore: {
+      type: Boolean,
+      default: false
+    },
+    filtersCount: {
+      type: Number,
+      default: 0
+    },
+    customRowContent: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -374,16 +741,41 @@ export default {
       isUpdatingList: false,
       folderPath: [],
       createContactModalId: 'contacts-list-create-contact-modal',
+      myContacts: false,
+      moment,
+      hoverPopover: {
+        key: 0,
+        title: '',
+        target: '',
+        show: false,
+        data: [],
+        cancelled: false,
+        isOut: false,
+        currentTarget: null
+      },
+      countFields: [
+        'unread_texts_count',
+        'unread_missed_calls_count',
+        'unread_voicemails_count',
+        'inbound_calls_count',
+        'inbound_texts_count',
+        'inbound_communications_count',
+        'outbound_calls_count',
+        'outbound_texts_count',
+        'outbound_communications_count',
+        'communications_count'
+      ],
       ContactListTypes
     }
   },
 
   methods: {
     ...mapActions('contacts', [
+      'listLoaded',
+      'setSelectedList',
       'columnsOpen',
       'openFilters',
       'closeFilters',
-      'contactsLoaded',
       'columnsReordered',
       'setListSelectedContacts',
       'createListOpen',
@@ -396,8 +788,66 @@ export default {
       'setShowContactsListSidebar',
       'createListClose',
       'foldersLoaded',
-      'setUnsavedList'
+      'setUnsavedList',
+      'removeContactOpen',
+      'setBulkDelete',
+      'setMessageComposerMode'
     ]),
+    onSearch (searchText) {
+      this.$emit('search', searchText)
+    },
+    onFetchMyContacts (checked) {
+      this.$emit('checkboxChanged', checked)
+    },
+    onSortByField (sorts) {
+      this.$emit('sort', sorts)
+    },
+    onPaginate (params) {
+      this.$emit('paginated', params)
+    },
+    onLoadMore () {
+      this.$emit('loadMore')
+    },
+    loadList (id) {
+      if (!id) {
+        id = 'all'
+      }
+
+      this.$VueEvent.fire('clearContacts')
+      const stringId = String(id)
+
+      this.$axios
+        .get('/api/v2/contacts-list/' + stringId + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
+        .then((response) => response.data)
+        .then((response) => {
+          this.listLoaded({ ...response, id: stringId })
+          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          this.name = response.name
+          this.type = response.type
+          const filters = response.type === this.ContactListTypes.DYNAMIC ? response.filters : {
+            contact_lists: {
+              operator: 1,
+              value: [stringId]
+            }
+          }
+          this.setCurrentListFilters(filters)
+          return response
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+          this.$router.replace('/contacts/')
+        })
+    },
+    setData (id) {
+      const list = this.lists[id] || {}
+      if (Object.values(list).length > 0) {
+        this.name = list.name
+        this.type = list.type
+        this.setSelectedList({ id: this.id, name: this.name, type: this.type })
+      }
+    },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
         id: this.id,
@@ -410,7 +860,7 @@ export default {
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           if (checked) {
-            items.data.push(this.listItems[this.id].data.find(item => item.id === Number(checkbox.value)))
+            items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
           } else {
             items.data = items.data.filter(item => item.id !== Number(checkbox.value))
           }
@@ -453,7 +903,7 @@ export default {
       })
     },
     onUpdateContactList () {
-      if (this.selectedList.type === this.ContactListType.STATIC || this.defaultIds.includes(this.id)) {
+      if (this.selectedList.type === this.ContactListTypes.STATIC || this.defaultIds.includes(this.id)) {
         return
       }
       this.isUpdatingList = true
@@ -540,15 +990,31 @@ export default {
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     },
+    fixDefaultFilters () {
+      if (_.isEmpty(this.list)) {
+        return []
+      }
+      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+      if (this.$route.params.id === 'my-contacts') {
+        const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
+        const profileId = _.get(this.profile, 'id', null)
+        if (filter && profileId) {
+          defaultFilters[0].filters.contact_owner.value = [profileId]
+        }
+      }
+      return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
+    },
     onContactCreated (contact) {
-      if (this.list.type === this.ContactListType.STATIC) {
+      if (this.list.type === this.ContactListTypes.STATIC) {
         talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
           this.setShouldUpdateSelectedListContactCount(true)
-          this.fetch()
+          this.$VueEvent.fire('fetchContacts')
         })
       } else {
-        this.fetch({
-          page: this.listItems[this.id].current_page
+        this.$VueEvent.fire('fetchContacts', {
+          params: {
+            page: this.fixedContactsData.current_page
+          }
         })
       }
     },
@@ -624,13 +1090,178 @@ export default {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
+    },
+
+    getLineName (id) {
+      const found = this.campaigns.find(campaign => campaign.id === id)
+      return found ? found.name : '-'
+    },
+
+    onCheckerClicked (contactId) {
+      const items = { data: [] }
+      const found = this.checked.find(item => item.id === contactId)
+      if (found) {
+        items.data = this.checked.filter(item => item.id !== contactId)
+      } else {
+        items.data = [...this.checked]
+        items.data.push(this.contact)
+      }
+
+      this.onCheckedRows(items.data)
+    },
+
+    isCountField (columnName) {
+      return this.countFields.includes(columnName)
+    },
+
+    onRemove (contact, contactListId) {
+      this.setShouldUpdateSelectedListContactCount(false)
+      this.setBulkDelete(false)
+      this.removeContactOpen({
+        ...contact,
+        contactListId: contactListId
+      })
+      // this.$emit('on-action-remove', true)
+    },
+
+    onMessage (contactId) {
+      this.setMessageComposerMode('sms')
+      this.$router.push(`/contacts/${contactId}`)
+    },
+
+    onCall (contact) {
+      // check contact has timezone or not
+      if (contact.timezone) {
+        // if have timezone check is it day time?
+        const startDay = moment()
+          .tz(contact.timezone)
+          .hour(8)
+          .minute(0)
+          .second(0)
+        const endDay = moment()
+          .tz(contact.timezone)
+          .hour(18)
+          .minute(0)
+          .second(0)
+        const contactLocalTime = moment().tz(contact.timezone)
+        if (!contactLocalTime.isBetween(startDay, endDay)) {
+          return this.$confirm(
+            `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
+              'hh:mm A'
+            )} for ${contact.name}.`,
+            'Call Lead',
+            {
+              confirmButtonText: 'OK',
+              cancelButtonText: 'Cancel',
+              customClass: 'width-500 fixed',
+              type: 'warning'
+            }
+          ).then(() => {
+            this.makeCall(contact)
+          }).catch(() => {
+          })
+        }
+      }
+
+      this.makeCall()
+    },
+
+    makeCall (contact) {
+      if (this.profile.enabled_two_legged_outbound) {
+        const message = { data: 'We will call your secondary phone' }
+        message.data += ` on ${this.profile.secondary_phone_number}`
+        message.data += ` and connect you with ${contact.name}. Proceed?`
+
+        return this.$confirm(message.data, 'Going old school?', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          customClass: 'width-500 fixed',
+          type: 'warning'
+        }).then(() => {
+          this.makeTwoLeggedCall(contact.id, contact.phone_number)
+        }).catch(() => {
+        })
+      }
+
+      const data = {
+        currentNumber: contact.phone_number,
+        contactName: contact.name,
+        companyName: contact.company_name,
+        contactId: contact.id,
+        contactTimezone: contact.timezone
+      }
+      this.$VueEvent.fire('callContact', data)
+    },
+
+    makeTwoLeggedCall (id, phoneNumber) {
+      this.$axios
+        .post('/api/v1/contacts/' + id + '/make-two-legged-call', {
+          phone_number: phoneNumber
+        })
+        .then(() => {
+        })
+        .catch(() => {
+        })
+    },
+    generateRoute (contactId) {
+      const routeData = {
+        path: `/contacts/${contactId}`
+      }
+
+      if (this.$route.name !== 'Power Dialer') {
+        routeData.query = {
+          previousPage: this.$route.name
+        }
+      }
+
+      return routeData
+    },
+
+    showPopover: _.debounce(function (title, id, index, colName, e) {
+      if (this.hoverPopover.currentTarget !== e.target.id) {
+        this.hoverPopover.currentTarget = null
+        return
+      }
+
+      this.hoverPopover.key = (this.hoverPopover.key + 1)
+      this.hoverPopover.title = title
+      this.hoverPopover.target = id
+      this.hoverPopover.data = this.fixedContactsData.data[index][colName]
+      this.hoverPopover.show = true
+      this.hoverPopover.cancelled = false
+    }, 500),
+
+    onMouseOverPopover (title, id, index, colName, e) {
+      // console.log('over event: ', e)
+      this.showPopover(title, id, index, colName, e)
+    },
+
+    onMouseLeavePopover (e) {
+      this.hoverPopover.target = ''
+      this.hoverPopover.title = ''
+      this.hoverPopover.show = false
+      this.hoverPopover.data = []
+      this.hoverPopover.currentTarget = null
+      const id = _.get(e.target, 'firstElementChild.id', null)
+      if (id) {
+        this.hoverPopover.currentTarget = e.target.firstElementChild.id
+      }
+    },
+
+    onNavigate (contactId, e) {
+      e.preventDefault()
+      this.$router.push(this.generateRoute(contactId))
+    },
+
+    onNavigateToAdd (e) {
+      e.preventDefault()
+      this.$router.push({
+        path: `/contacts/list/${this.$route.params.id}/add`
+      })
     }
   },
 
   computed: {
-    ...mapGetters('auth', [
-      'profile'
-    ]),
     ...mapState('contacts', [
       'folders',
       'showContactsListSidebar',
@@ -646,28 +1277,57 @@ export default {
       'unsavedList'
     ]),
     ...mapState([
-      'isTabletOrMobile'
+      'isTabletOrMobile',
+      'campaigns'
     ]),
+    ...mapState('auth', [
+      'profile'
+    ]),
+    fixedContactsData () {
+      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
+        return this.$parent.$data.contactsData
+      }
+
+      return this.contactsData
+    },
+    id () {
+      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        return this.$route.params.id
+      }
+
+      return 'all'
+    },
+    contactList () {
+      return this.lists[this.id]
+    },
+    isLoaded () {
+      if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        return true
+      }
+
+      return !!(this.listItems[String(this.id)] &&
+        this.lists[String(this.id)])
+    },
     checked () {
       return this.selectedContacts[this.id] || []
     },
     saveFilterButtonClass () {
       return {
-        'disabledButton': this.selectedList.type === this.ContactListType.STATIC ||
-          (this.selectedList.type === this.ContactListType.DYNAMIC &&
+        'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
+          (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
             !this.filterHasChanges) ||
           this.defaultIds.includes(this.id)
       }
     },
     listItemsHasData () {
-      return typeof this.listItems[this.id] !== 'undefined'
+      return !_.isEmpty(this.fixedContactsData)
     },
     listItemsDataCount () {
-      const total = _.get(this.listItems, `[${this.id}].data.length`, null)
+      const total = _.get(this.fixedContactsData, 'data.length', null)
       return total !== null ? total : 0
     },
     listItemsTotalContacts () {
-      const total = _.get(this.listItems, `[${this.id}].total`, null)
+      const total = _.get(this.fixedContactsData, `total`, null)
       return total !== null ? total : 0
     },
     filterButtonVariant () {
@@ -705,14 +1365,51 @@ export default {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
     showEmptySlot () {
-      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListType.STATIC)
+      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListTypes.STATIC)
+    },
+    fixedColumns () {
+      const newItems = JSON.parse(JSON.stringify(this.columns))
+      // now, check if columns have order, label, maxWidth or minWidth property, or
+      // check if column is required then update sortable.
+      const index = { data: null }
+      const found = { data: null }
+      for (index.data in newItems) {
+        found.data = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
+        if (found.data && found.required) {
+          newItems[index.data].sortable = found.sortable
+        }
+        if (found) {
+          newItems[index.data].label = found.data.label
+          newItems[index.data].maxWidth = found.data.maxWidth
+          newItems[index.data].minWidth = found.data.minWidth
+        }
+      }
+      return newItems
+    },
+    hasMore () {
+      return (this.fixedContactsData?.next_page_url &&
+          !this.isLoadingMore &&
+          !this.isLoading) ||
+        false
+    },
+    computedStyle () {
+      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     }
   },
 
   mounted () {
+    if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
+      this.loadList(this.$route.params.id)
+    }
+
+    if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+      this.setData(this.id)
+      this.setSelectedList({ id: this.id, name: this.name, type: this.type })
+    }
+
     this.reRouteToBase()
     this.setShouldUpdateSelectedListContactCount(true)
-    // this.fetch()
+    // this.$VueEvent.fire('fetchContacts')
     // force close filter
     this.closeFilters()
     this.folderPath = this.generateFolderPath(this.folders)
@@ -720,21 +1417,20 @@ export default {
 
   watch: {
     '$route.params.id': function () {
+      if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
+        this.loadList(this.id)
+        this.setCurrentListFilters({})
+      }
+
+      if (this.id && this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        this.setData(this.id)
+      }
+
       if (this.$route.name === 'Contacts') {
         this.resetFilters()
         this.initialListFilters = this.currentListFilters
         this.myContacts = false
         this.setShouldUpdateSelectedListContactCount(true)
-      }
-    },
-    currentListFilters: {
-      deep: true,
-      handler: function () {
-        if (this.$route.name === 'Contacts') {
-          const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.fetch(params)
-          this.filtersCount = this.getFiltersCount(this.currentListFilters)
-        }
       }
     },
     selectedList: function (value) {
@@ -746,7 +1442,7 @@ export default {
     shouldUpdateSelectedListContactCount (val) {
       if (val) {
         this.setShouldUpdateSelectedListContactCount(true)
-        this.fetch()
+        // this.$VueEvent.fire('fetchContacts')
       }
     },
     id () {

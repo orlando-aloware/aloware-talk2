@@ -1,5 +1,16 @@
 <template>
-  <q-select :options="userOptions"
+  <q-select use-input
+            emit-value
+            map-options
+            outlined
+            dense
+            clearable
+            options-selected-class="text-primary"
+            color="primary"
+            option-value="id"
+            option-label="name"
+            input-debounce="0"
+            :options="userOptions"
             :multiple="multiple"
             :placeholder="placeholder"
             :loading="loadingUsers"
@@ -7,16 +18,6 @@
             :class="[ prepend ? 'with-prepend' : '' ]"
             class="generic-selector"
             v-model="userId"
-            options-selected-class="text-primary"
-            color="primary"
-            option-value="id"
-            option-label="name"
-            input-debounce="0"
-            use-input
-            emit-value
-            map-options
-            outlined
-            dense
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">

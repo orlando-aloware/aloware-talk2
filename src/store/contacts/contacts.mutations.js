@@ -1,6 +1,8 @@
-import * as ContactsListDefaultList from 'src/constants/default-lists'
-import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import Vue from 'vue'
+import _ from 'lodash'
+import * as ContactsListDefaultList from 'src/constants/default-lists'
+import * as ContactsDefault from 'src/constants/contacts-default'
+import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 
 export default {
   TOGGLE_FOLDER: (state, id) => {
@@ -46,29 +48,6 @@ export default {
   },
   FILTERS_OPEN: (state) => {
     state.isFiltersOpen = true
-  },
-  CONTACTS_LOADED: (state, { id, append, data, ...rest }) => {
-    if (append) {
-      const found = {}
-      const item = { data: null }
-      for (item.data of state.listItems[String(id)].data) {
-        found.data = data.find(contact => contact.id === item.data.id)
-        found.data = found.data ? data.indexOf(found.data) : null
-        if (found.data !== -1 && found.data !== null) {
-          data.splice(found.data, 1)
-        }
-      }
-      state.listItems = {
-        ...state.listItems,
-        [String(id)]: {
-          ...state.listItems[String(id)],
-          ...rest,
-          data: state.listItems[String(id)].data.concat(data)
-        }
-      }
-    } else {
-      state.listItems = { ...state.listItems, [String(id)]: { data, ...rest } }
-    }
   },
   PINNED_COUNT_LOADED: (state, payload) => {
     state.pinnedCounts[payload.id] = payload.count
@@ -324,16 +303,6 @@ export default {
   CHANGING_SELECTED_CONTACT: (state, isChanging) => {
     state.changingSelectedContact = isChanging
   },
-  RESET_CONTACTS_VUEX: (state) => {
-    state.search = ''
-    state.currentListFilters = {}
-    state.contact = {}
-    state.lists = Object.assign({}, ContactsListDefaultList.DEFAULT_STATE.lists)
-    const item = { index: null }
-    for (item.index in state.listItems) {
-      state.listItems[item.index] = DEFAULT_CONTACT_LIST_ITEMS
-    }
-  },
   SET_SEARCH: (state, value) => {
     state.search = value
   },
@@ -388,5 +357,64 @@ export default {
   },
   SET_ACTIVE_FOLDER: (state, value) => {
     state.activeFolder = value
+  },
+
+  RESET_VUEX (state, value) {
+    if (!_.isArray(value) || _.isEmpty(value)) {
+      return
+    }
+
+    state.search = ''
+    state.currentListFilters = {}
+    state.contact = {}
+
+    const contactsListDefaultListState = Object.assign({}, ContactsListDefaultList.DEFAULT_STATE.lists)
+    const item = { index: null }
+    for (item.index in state.lists) {
+      if (typeof contactsListDefaultListState[item.index] === 'undefined') {
+        Vue.delete(state.lists, item.index)
+        continue
+      }
+
+      if (value.includes('non-cache')) {
+        // delete contactsListDefaultListState[item.index].filters
+        delete contactsListDefaultListState[item.index].headers
+      }
+
+      Vue.set(state.lists, `${item.index}`, Object.assign(state.lists[item.index], contactsListDefaultListState[item.index]))
+    }
+
+    // cached state
+    const contactsDefaultState = Object.assign({}, ContactsDefault.DEFAULT_STATE)
+    if (value.includes('non-cache')) {
+      delete contactsDefaultState.lists
+    }
+
+    state = Object.assign(state, contactsDefaultState)
+
+    if (value.includes('non-cache')) {
+      for (item.index in state.listItems) {
+        state.listItems[item.index] = DEFAULT_CONTACT_LIST_ITEMS
+      }
+    }
+
+    if (!value.includes('all')) {
+      return
+    }
+
+    // else, perform state reset
+    state = Object.assign({}, ContactsDefault.DEFAULT_STATE)
+  },
+  SET_PINNED_LISTS_LOADED (state, value) {
+    state.pinnedListsLoaded = value
+  },
+  SET_PUBLIC_LISTS_LOADED (state, value) {
+    state.publicListsLoaded = value
+  },
+  SET_MY_LISTS_LOADED (state, value) {
+    state.myListsLoaded = value
+  },
+  SET_LIST_CONTACTS_LOADED (state, value) {
+    state.listContactsLoaded = value
   }
 }

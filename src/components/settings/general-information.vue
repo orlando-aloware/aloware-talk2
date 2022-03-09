@@ -47,7 +47,7 @@
                   :key="ringGroupId"
                   class="pb-0">
                   <span class="text-grey-90 _400 fs-12">
-                      {{ (getRingGroupName(ringGroupId) || fixName) || 'Ring group data not available' }}
+                      {{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}
                   </span>
               </li>
             </ul>
@@ -201,7 +201,7 @@ export default {
     getRingGroupName (id) {
       const ringGroup = this.getRingGroup(id)
 
-      return ringGroup ? ringGroup.name : null
+      return this.$options.filters.fixName(ringGroup ? ringGroup.name : null)
     }
   }
 }

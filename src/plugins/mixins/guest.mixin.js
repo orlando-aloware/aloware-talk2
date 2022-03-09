@@ -46,8 +46,8 @@ export default {
         storage.local.setItem('api_token', this.$route.query.api_token)
         this.check().then((res) => {
           storage.local.setItem('company_id', res.data.user.company.id)
+          this.resetVuex(['all'])
           this.setCurrentCompany(res.data.user.company)
-          this.resetVuex()
           this.$router.push(this.$route.query.redirect || '/').catch((err) => {
             console.log(err)
           })

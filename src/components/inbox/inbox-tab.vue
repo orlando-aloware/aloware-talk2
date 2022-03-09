@@ -185,7 +185,6 @@ export default {
     ...mapState('inbox',
       [
         'taskCounts',
-        'contacts',
         'liveContacts',
         'selectedContact',
         'hasMoreContacts',
@@ -309,7 +308,6 @@ export default {
       const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
         Vue.set(this.contacts, index, updatedContact)
-        this.setContacts(this.contacts)
       }
     },
     resetList () {
@@ -466,6 +464,28 @@ export default {
       if (currentContact.id === this.contact.id) {
         this.setContact(currentContact)
       }
+    },
+    onRouteChange () {
+      this.setStatus()
+      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        }
+
+        this.lineOrRingGroupFilter = null
+        // prevent reset of filters if coming from the root
+        if (!this.$route.params.id) {
+          this.resetList()
+        } else {
+          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+            this.loadContactTasks()
+          }
+        }
+      }
+    },
+    onRouteNameChange () {
+      this.currentTask = ContactTaskStatus.STATUS_OPEN
+      this.resetList()
     }
   },
 
@@ -711,6 +731,14 @@ export default {
           contacts[index] = contact
           this.setContacts(contacts)
       }
+    })
+
+    this.$VueEvent.listen('inbox_route_change', () => {
+      this.onRouteChange()
+    })
+
+    this.$VueEvent.listen('inbox_route_name_change', () => {
+      this.onRouteNameChange()
     })
   },
 

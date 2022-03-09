@@ -138,7 +138,7 @@ export default {
               this.getPhoneNumbers()
             }).catch(error => {
               console.log(error)
-              this.$generalNotification('Error while deleting phone number.', 'error')
+              this.$handleErrors(error.response)
             }).finally(() => {
               this.isDeleting = false
             })

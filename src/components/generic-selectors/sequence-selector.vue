@@ -134,11 +134,11 @@ export default {
     ...mapState('cache', ['currentCompany']),
     placeholder () {
       switch (true) {
-        case this.multiple && this.sequence.length < 1:
+        case this.multiple && this.sequence && this.sequence.length < 1:
           return 'Select Sequences'
         case !this.multiple && !this.sequence:
           return 'Select Sequence'
-        case this.multiple && this.sequence.length > 0:
+        case this.multiple && this.sequence && this.sequence.length > 0:
         case !this.multiple && this.sequence:
         default:
           return ''
@@ -183,7 +183,7 @@ export default {
 
   data () {
     return {
-      sequence: this.value,
+      sequence: null,
       auth: auth,
       isLoading: false,
       sequencesOptions: [],

@@ -115,7 +115,14 @@ export default {
       contactId: null,
       CancelToken: null,
       source: null,
-      contactActivitiesInterval: null
+      contactActivitiesInterval: null,
+      containerElInterval: null,
+      scrollInterval: null,
+      skipComponents: [
+        'line-selector',
+        'contact-details',
+        'message-composer'
+      ]
     }
   },
 
@@ -216,6 +223,13 @@ export default {
 
   created () {
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
+    this.CancelToken = this.$axios.CancelToken
+    this.source = this.CancelToken.source()
+
+    if (this.skipComponents.includes(this.$options.name)) {
+      return
+    }
+
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
     })
@@ -266,9 +280,6 @@ export default {
         this.scrollMessages()
       }
     })
-
-    this.CancelToken = this.$axios.CancelToken
-    this.source = this.CancelToken.source()
   },
 
   methods: {
@@ -773,25 +784,26 @@ export default {
       const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       const count = { data: 0 }
+      const communicationActivity = { data: null }
 
       // scroll to activity
-      const scrollInterval = setInterval(() => {
-        const communicationActivity = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
-        if (communicationActivity) {
-          communicationActivity.$el.scrollIntoView({
+      this.scrollInterval = setInterval(() => {
+        communicationActivity.data = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
+        if (communicationActivity.data) {
+          communicationActivity.data.$el.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest',
             inline: 'start'
           })
           // highlight the activity
-          this.highlightActivity(communicationActivity)
-          clearInterval(scrollInterval)
+          this.highlightActivity(communicationActivity.data)
+          clearInterval(this.scrollInterval)
         }
 
         // if we've been waiting for too long to load,
         // clear this interval
         if (count.data >= 120) {
-          clearInterval(scrollInterval)
+          clearInterval(this.scrollInterval)
         }
 
         count.data++
@@ -808,17 +820,18 @@ export default {
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
         const counter = { data: 0 }
-        const containerElInterval = setInterval(() => {
-          const containerEl = document.querySelector('.contact-activities .scrollbar-white')
+        const containerEl = { data: null }
+        this.containerElInterval = setInterval(() => {
+          containerEl.data = document.querySelector('.contact-activities .scrollbar-white')
 
-          if (containerEl) {
-            containerEl.scrollTop = element.offsetTop
-            clearInterval(containerElInterval)
+          if (containerEl.data) {
+            containerEl.data.scrollTop = element.offsetTop
+            clearInterval(this.containerElInterval)
           }
 
           counter.data++
           if (counter.data > 120) {
-            clearInterval(containerElInterval)
+            clearInterval(this.containerElInterval)
           }
         }, 500)
       }
@@ -909,8 +922,9 @@ export default {
         if (['Inbox Contact Task'].includes(this.$route.name)) {
           this.setSelectedContact(res.data)
         }
-      }).catch(() => {
-        this.loadingContactsFailed()
+      }).catch((err) => {
+        console.log('err: ', err)
+        // this.loadingContactsFailed()
       })
     },
 
@@ -943,6 +957,9 @@ export default {
 
     loadingContactsFailed () {
       this.$generalNotification('Failed to load contacts.', 'error')
+      this.$router.replace({
+        name: 'Contacts'
+      })
     },
 
     loadMoreContacts () {
@@ -1031,5 +1048,11 @@ export default {
     selectedCampaign () {
       this.updateMessageComposer()
     }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.contactActivitiesInterval)
+    clearInterval(this.containerElInterval)
+    clearInterval(this.scrollInterval)
   }
 }

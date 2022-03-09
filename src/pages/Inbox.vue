@@ -23,6 +23,8 @@ import talk2Api from 'src/plugins/api/api'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 
 export default {
+  name: 'inbox',
+
   mixins: [contactMixins],
 
   components: { InboxSide },

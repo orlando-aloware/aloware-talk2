@@ -60,7 +60,8 @@
                     :color="moveColor"
                     :class="{ handle: column.draggable }" />
                 </div>
-                <span class="handle-label">
+                <span class="handle-label"
+                      :class="{ 'pl-2': column.label === 'Actions' }">
                   {{ column.label }}
                 </span>
                 <div
@@ -216,6 +217,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+    ...mapState(['isMobile']),
     defaultContactDateFilter () {
       if (this.currentCompany.default_contact_date_filter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
@@ -265,7 +267,8 @@ export default {
       return [
         `${this.isScrollable ? 'scrollableArea position-relative ' : ''}d-flex flex-column h-100 w-100 flex-grow-1`,
         this.scrollAreaClass,
-        `${this.isEmpty ? 'overflow-hidden' : ''}`
+        `${this.isEmpty ? 'overflow-hidden' : ''}`,
+        `${this.isMobile ? 'mobile-scrollableArea' : ''}`
       ]
     }
   },

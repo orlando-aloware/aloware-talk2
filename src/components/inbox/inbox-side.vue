@@ -95,7 +95,7 @@ export default {
   },
 
   created () {
-    this.resetInboxVuex()
+    this.resetVuex(['inbox', 'non-cache'])
     this.closed = this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('Inbox') && this.$q.screen.lt.md
   },
 
@@ -123,6 +123,9 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'setCommunications']),
+    ...mapActions(['resetVuex']),
+
     toggle () {
       this.closed = !this.closed
     },
@@ -154,9 +157,7 @@ export default {
 
     navigateToInbox () {
       this.onLoadShowTasks = true
-    },
-
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
+    }
   },
 
   watch: {

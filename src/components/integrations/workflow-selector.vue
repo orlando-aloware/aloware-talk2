@@ -109,7 +109,7 @@ export default {
           this.workflows = response.data
         })
         .catch((err) => {
-          this.$root.handleErrors(err.response)
+          this.$handleErrors(err.response)
           console.log(err)
         })
         .finally(() => {

@@ -10,7 +10,7 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="type === ListTypes.DYNAMIC"
+      v-if="type === ContactListTypes.DYNAMIC"
       @click="$emit('clonestatic')"
     >
       <template slot="icon">
@@ -70,7 +70,7 @@ import PlusIcon from 'components/icons/plus-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
-import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import MoveIcon from 'components/icons/move-icon.vue'
 
 export default {
@@ -86,10 +86,7 @@ export default {
   },
   data () {
     return {
-      ListTypes: {
-        DYNAMIC,
-        STATIC
-      }
+      ContactListTypes
     }
   },
   props: {

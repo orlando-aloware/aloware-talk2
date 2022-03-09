@@ -1,15 +1,12 @@
 <template>
-  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags"
+  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving"
              :opacity="0.85"
              class="h-100 w-100"
              variant="white"
              rounded="sm"
              v-if="authenticated">
-    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100">
-      <template v-if="!isInbox">
-        <contact-list-sidebar ref="contactListSidebar"
-                              @toggleContactActivities="toggleContactListSidebar"/>
-      </template>
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
+         v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && tagsFullyLoaded && campaigns && users && tags">
@@ -19,8 +16,7 @@
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
-                            @toggleDetails="toggleDetails"
-                            @toggleContactSidebar="toggleContactListSidebar">
+                            @toggleDetails="toggleDetails">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -29,7 +25,6 @@
                    class="prev-activities mx-2"
                    color="primary"
                    size="md"
-                   :isLoadingMore="isLoadingMore"
                    :loading="isLoadingPreviousActivities"
                    :disable="isLoadingPreviousActivities"
                    v-if="hasMoreCommunications"
@@ -80,10 +75,8 @@
 </template>
 
 <script>
-import ContactListSidebar from 'src/components/contacts/contact-list-sidebar'
 import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -92,13 +85,14 @@ import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 
 export default {
-  mixins: [contactsMixins, contactMixins],
+  name: 'contact',
+
+  mixins: [contactMixins],
 
   components: {
     CloseIcon,
     ContactDetails,
     ContactActivities,
-    ContactListSidebar,
     CompactBtn
   },
 
@@ -117,7 +111,8 @@ export default {
       totalContacts: 0,
       drawer: false,
       detailsOpen: false,
-      contactListSidebarOpen: false
+      contactListSidebarOpen: false,
+      leaving: false
     }
   },
 
@@ -139,12 +134,6 @@ export default {
     },
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
-    },
-    toggleContactListSidebar (isOpen) {
-      this.contactListSidebarOpen = isOpen
-      if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
-        this.$refs.contactListSidebar.onSidebarToggle()
-      }
     }
   },
 
@@ -209,6 +198,15 @@ export default {
         this.drawer = false
       }
     }
+  },
+
+  beforeRouteUpdate () {
+    this.leaving = false
+  },
+
+  beforeRouteLeave (to, from, next) {
+    this.leaving = true
+    next()
   }
 }
 </script>

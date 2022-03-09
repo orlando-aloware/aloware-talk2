@@ -15,11 +15,11 @@
         <b-list-group class="p-2 pr-2">
           <b-list-group-item class="d-flex align-items-center border-0"
                              :class="[contact.id === item.id ? 'router-link-exact-active router-link-active' : '']"
-                             v-for="(item, index) in contacts"
+                             v-for="(item, index) in fixedContactsData.data"
                              :key="item.id"
                              :to="`/contacts/${item.id}`"
                              @click="onSidebarToggleMobile">
-            <contact-list-sidebar-item v-model="contacts[index]"
+            <contact-list-sidebar-item v-model="fixedContactsData.data[index]"
                                        :key="item.id"/>
           </b-list-group-item>
         </b-list-group>
@@ -39,16 +39,22 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import ContactListSidebarItem from 'components/contacts/contact-list-sidebar-item'
 
 export default {
   name: 'contact-list-sidebar',
 
-  mixins: [contactsMixins],
+  inject: ['contactsData'],
 
   components: {
     ContactListSidebarItem
+  },
+
+  props: {
+    isLoadingMore: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data () {
@@ -67,25 +73,29 @@ export default {
       return this.selectedList.id
     },
 
-    contacts () {
-      return _.get(this.listItems, `${this.selectedList.id}.data`, [])
-    },
-
     widthClass () {
       const widthClass = this.isExpanded ? (this.$q.screen.lt.md ? 'contact-list-sidebar-open' : 'width-300') : 'width-0'
       return `px-0 contact-list-sidebar-container ${widthClass}${this.$q.screen.lt.md ? ' mx-0' : ''}`
+    },
+
+    fixedContactsData () {
+      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
+        return this.$parent.$data.contactsData
+      }
+
+      return this.contactsData
     }
   },
 
   methods: {
-    ...mapActions('contacts', ['contactsLoaded', 'setSidebarCollapsed', 'setShowContactsHeader']),
+    ...mapActions('contacts', ['setSidebarCollapsed', 'setShowContactsHeader']),
     onBottomScroll () {
       clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
       this.scrollTimeout = setTimeout(() => {
         // Run the callback
         if (!this.isEmpty) {
-          this.onLoadMore()
+          this.$VueEvent.fire('onLoadMoreContacts')
         }
       }, 66)
     },
@@ -126,8 +136,8 @@ export default {
       this.setShowContactsHeader(this.isExpanded)
     }
 
-    if (_.get(this.listItems, `${this.selectedList.id}.data.length`, 0) < 1) {
-      this.fetch()
+    if (this.fixedContactsData.length === 0) {
+      this.$VueEvent.fire('fetchContacts')
     }
   },
 
@@ -157,10 +167,6 @@ export default {
           this.desktopIsExpanded = this.isExpanded
           this.isExpanded = false
           this.setSidebarCollapsed(!this.isExpanded)
-        }
-
-        if (this.$route.name === 'Contact' && this.$route.params.id) {
-          this.fetch()
         }
       }
     },

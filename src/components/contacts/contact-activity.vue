@@ -476,7 +476,10 @@ export default {
     },
 
     contactId () {
-      return _.get(this.communication, 'contact.id', null)
+      const id = { data: _.get(this.communication, 'contact.id', null) }
+      id.data = _.isEmpty(id.data) ? this.communication.contact_id : id.data
+
+      return _.isEmpty(id.data) ? _.get(this.contact, 'id', null) : id.data
     }
   },
 
@@ -650,7 +653,7 @@ export default {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = false
       }).catch(err => {
-        this.$root.$handleErrors(err.response)
+        this.$handleErrors(err.response)
       })
     },
 
@@ -768,7 +771,7 @@ export default {
         this.$generalNotification('Message sent.')
       }).catch(error => {
         console.log(error)
-        this.$generalNotification('Error while sending message.', 'error')
+        this.$handleErrors(error.response)
       }).finally(() => {
         this.isRetryingSendSms = false
       })

@@ -100,24 +100,26 @@
       :folder-id="id"
     ></tree-list-contents>
 
-    <b-popover
-      triggers="click blur"
-      placement="bottomright"
-      boundary="window"
-      custom-class="contact-popover"
-      :target="folderId">
-      <!-- v-if="$refs[folderId] !== undefined"> -->
-      <folder-actions
-        :id="id"
-        :hasEdit="hasEdit"
-        :hasDelete="hasDelete"
-        @create="onCreateFolder"
-        @edit="onEditFolder"
-        @remove="onRemoveFolder"
-        @move="onMove"
-        @createlist="onCreateList"
-      />
-    </b-popover>
+    <template
+      v-if="isReferenceExists">
+      <b-popover
+        triggers="click blur"
+        placement="bottomright"
+        boundary="window"
+        custom-class="contact-popover"
+        :target="folderId">
+        <folder-actions
+          :id="id"
+          :hasEdit="hasEdit"
+          :hasDelete="hasDelete"
+          @create="onCreateFolder"
+          @edit="onEditFolder"
+          @remove="onRemoveFolder"
+          @move="onMove"
+          @createlist="onCreateList"
+        />
+      </b-popover>
+    </template>
   </div>
 </template>
 
@@ -224,6 +226,10 @@ export default {
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-option-${module}-${this.id}`
+    },
+
+    isReferenceExists () {
+      return document.getElementById(this.folderId)
     }
   },
 

@@ -78,6 +78,7 @@ export default {
         this.addGifs(res.data)
       }).catch((err) => {
         console.log(err)
+        this.$handleErrors(err.response)
       })
     },
     trendingGiphy () {
@@ -92,6 +93,7 @@ export default {
         //
       }).catch((err) => {
         console.log(err)
+        this.$handleErrors(err.response)
       })
     },
     loadMoreGiphy () {

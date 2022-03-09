@@ -513,6 +513,10 @@ export default {
         })
     },
     broadcastLeave () {
+      if (!window.Echo) {
+        return
+      }
+
       if (this.profile) {
         window.Echo.leave('user-' + this.profile.id)
         window.Echo.leave('company-' + this.profile.company_id)

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { updateField } from 'vuex-map-fields'
 import _ from 'lodash'
+import * as StatsDefault from 'src/constants/stats-default'
 
 export default {
   SET_METRIC_GROUPS: (state, data) => {
@@ -251,11 +252,22 @@ export default {
   SET_AVAILABLE_METRICS: (state, data) => {
     state.availableMetrics = data
   },
-  updateField,
-  RESET_STAT_VUEX: (state) => {
+
+  RESET_VUEX (state, value) {
+    if (!_.isArray(value) || _.isEmpty(value)) {
+      return
+    }
     state.availableMetrics = []
     state.metricGroups = []
     state.metricLoader = false
     state.groupMetricLoader = false
-  }
+
+    if (!value.includes('non-cache')) {
+      return
+    }
+
+    state = Object.assign({}, StatsDefault.DEFAULT_STATE)
+  },
+
+  updateField
 }

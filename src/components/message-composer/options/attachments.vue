@@ -98,6 +98,7 @@ export default {
         this.hasError = true
         this.isUploading = false
         this.files = []
+        this.$handleErrors(error.response)
       })
     },
     emitFileUploaded () {

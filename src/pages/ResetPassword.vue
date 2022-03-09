@@ -190,8 +190,8 @@ export default {
     async onLoginSuccess ({ data: { data } }) {
       const { usage, company } = data
 
+      this.resetVuex(['all'])
       this.setCurrentCompany(company)
-      this.resetVuex()
       this.setUsage(usage)
 
       storage.local.setItem('company_id', company.id)

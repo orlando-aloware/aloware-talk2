@@ -21,11 +21,12 @@
               map-options
               outlined
               dense
+              :loading="campaignsIsLoading"
               :use-input="useInput"
               :error="hasError"
               :options="campaignOptions"
               :placeholder="placeholder"
-              :disable="disable"
+              :disable="disable || campaignsIsLoading"
               :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :multiple="multiple"
               :use-chips="useChips"
@@ -156,7 +157,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'campaignsIsLoading']),
 
     placeholder () {
       switch (true) {
@@ -243,6 +244,17 @@ export default {
     campaignId (val) {
       if (this.campaignId !== this.value) {
         this.$emit('change', val)
+      }
+    },
+
+    campaignsIsLoading (val) {
+      if (val) {
+        return
+      }
+
+      this.campaignOptions = this.campaignsAlphabeticalOrder
+      if (typeof this.$refs.lineSelect !== 'undefined') {
+        this.$refs.lineSelect.refresh()
       }
     }
   }

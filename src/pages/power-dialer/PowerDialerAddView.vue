@@ -14,10 +14,6 @@ import { mapGetters, mapActions } from 'vuex'
 import PowerDialerAddItems from 'src/pages/contacts/ContactsAddItemsStatic.vue'
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import {
-  STATIC,
-  DYNAMIC
-} from 'src/constants/contacts-list-types'
 
 export default {
   name: 'PowerDialerAddView',
@@ -57,11 +53,7 @@ export default {
   },
   data () {
     return {
-      name: 'Power Dialer X',
-      ContactListType: {
-        STATIC,
-        DYNAMIC
-      }
+      name: 'Power Dialer X'
     }
   },
   methods: {

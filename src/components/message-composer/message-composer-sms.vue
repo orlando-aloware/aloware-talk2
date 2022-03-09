@@ -437,6 +437,10 @@ export default {
     'messageComposer.sms.body': function (value) {
       this.setMessageComposerSmsBody(value)
     }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.focusInterval)
   }
 }
 </script>

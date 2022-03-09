@@ -48,7 +48,7 @@ export default {
           this.$generalNotification('Contact has been enrolled to sequence.')
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while enrolling contact to sequence.', 'error')
+          this.$handleErrors(error.response)
         }).finally(() => {
           this.isEnrolling = false
         })

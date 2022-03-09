@@ -275,6 +275,11 @@ export default {
       this.$refs.filterOperation[0].focus()
     },
     applyFilter () {
+      if (!_.isEqual(this.allFilters, this.currentListFilters)) {
+        this.$VueEvent.fire('clearContacts')
+        this.$VueEvent.fire('fetchContacts')
+      }
+
       this.setCurrentListFilters(this.allFilters)
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')

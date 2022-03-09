@@ -142,13 +142,15 @@ export default {
     },
     removeListFromFolders (id, haystack) {
       const index = { i: 0 }
+      const list = { data: null }
       for (index.i = 0; index.i < haystack.length; index.i++) {
-        const list = haystack[index.i].lists.find(list => list.id === id)
+        list.data = haystack[index.i].lists.find(item => item.id === id)
 
-        if (list) {
-          haystack[index.i].lists.splice(haystack[index.i].lists.indexOf(list), 1)
+        if (list.data) {
+          haystack[index.i].lists.splice(haystack[index.i].lists.indexOf(list.data), 1)
         } else {
           this.removeListFromFolders(id, haystack[index.i].child_folders)
+          return
         }
       }
 

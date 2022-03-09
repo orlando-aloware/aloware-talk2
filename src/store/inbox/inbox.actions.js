@@ -11,9 +11,6 @@ export default {
   setCommunicationsCurrentPage: ({ commit }, page) => {
     commit('SET_COMMUNICATIONS_CURRENT_PAGE', page)
   },
-  resetInboxVuex: ({ commit }) => {
-    commit('RESET_INBOX_VUEX')
-  },
   gettingTasksList: ({ commit }, isGetting) => {
     commit('GETTING_TASKS_LIST', isGetting)
   },

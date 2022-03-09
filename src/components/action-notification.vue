@@ -307,9 +307,10 @@ export default {
     },
     isValidPhoneShowInfo () {
       const dialerCommunicationId = _.get(this.dialer, 'communication.id', null)
+      const callFishingCommunicationId = _.get(this.dialer, 'callFishing.communication', null)
       return (
         (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
-          (this.id === 'callFishing' && !this.dialer.call && !this.dialer.callFishing.communication)) &&
+          (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
         !this.dialer.parkedCall
     },
     queueCount () {
@@ -501,8 +502,18 @@ export default {
       this.clearCallFishingQueue()
       this.$closeActionNotification(this.id)
     },
-    toInbox () {
+    toInbox (event) {
       if (this.isValidPhoneShowInfo) {
+        return
+      }
+
+      const className = { data: null }
+      const found = event.path.find((item) => {
+        className.data = _.get(item, 'className', null)
+        return className.data && typeof className.data === 'string' && (className.data.includes('notification-icon'))
+      })
+
+      if (!found) {
         return
       }
 
@@ -513,7 +524,21 @@ export default {
       }
     },
     toContact () {
+      if (!['incomingCall', 'callFishing'].includes(this.id)) {
+        return
+      }
+
       if (this.isValidPhoneShowInfo) {
+        return
+      }
+
+      const className = { data: null }
+      const found = event.path.find((item) => {
+        className.data = _.get(item, 'className', null)
+        return className.data && typeof className.data === 'string' && (className.data.includes('notification-details'))
+      })
+
+      if (!found) {
         return
       }
 
@@ -526,7 +551,7 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('update_communication')
+    this.clearDateTimeInterval()
   }
 }
 </script>
