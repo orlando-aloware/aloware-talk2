@@ -22,7 +22,7 @@
         class="metric-box text-black m-2">
         <q-card-actions>
           <div :class="`metric-box-label text-weight-medium text-${color}`">
-            <span v-if="metric && ['call_time_&_duration', 'agent_status'].includes(metric.category)">
+            <span v-if="isDurationMetric">
               {{ (metric.value ? metric.value : 0) | fixFullDuration }}
             </span>
             <span v-else>
@@ -150,6 +150,11 @@ export default {
     },
     metricCategory () {
       return this.$options.filters.ucwords(_.get(this.metric, 'categoryLabel', '').replace(/_/g, ' '))
+    },
+    isDurationMetric () {
+      return this.metric &&
+          (['call_time_&_duration', 'agent_status'].includes(this.metric.category) ||
+              ['Total talk time'].includes(this.metric.label))
     }
   },
   data () {
