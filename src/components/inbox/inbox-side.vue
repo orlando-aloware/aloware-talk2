@@ -187,6 +187,12 @@ export default {
       if (this.isMobile && !this.$q.screen.lt.md) {
         this.setShowContactsHeader(true)
       }
+    },
+    '$route.name': function (value) {
+      if (value === 'Inbox') {
+        const channel = this.items.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
+      }
     }
   }
 }
