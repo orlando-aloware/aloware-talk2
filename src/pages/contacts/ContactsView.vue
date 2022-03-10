@@ -1378,7 +1378,7 @@ export default {
         if (found.data && found.required) {
           newItems[index.data].sortable = found.sortable
         }
-        if (found) {
+        if (found.data) {
           newItems[index.data].label = found.data.label
           newItems[index.data].maxWidth = found.data.maxWidth
           newItems[index.data].minWidth = found.data.minWidth
