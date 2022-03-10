@@ -217,6 +217,10 @@ export default {
       return DIRECTION
     },
     filteredTasks () {
+      /**
+       * Filter and exclude the in-progress task
+       * everytime items are displayed
+       */
       let { powerDialerTasks, activeTask } = this
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
         return task.id !== activeTask.id
