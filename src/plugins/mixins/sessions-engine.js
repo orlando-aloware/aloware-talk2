@@ -30,6 +30,7 @@ export default {
       this.powerDialerTasks['in_queue'] = res.data.data
     },
     updateTaskStatus (task) {
+      console.log(` %c TASK UPDATED : ${task.status} `, 'backgroud:red;color:white;', task)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           this.onStatusInProgress(task)
@@ -54,7 +55,6 @@ export default {
     onStatusInProgress (task) {
       this.activeTask = this.powerLists?.find(lst => lst.contact_list_item_id === task.id)
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
-      console.log('this.powerDialerTasks.in_queue :>> ', this.powerDialerTasks.in_queue)
     },
     onStatusCompleted (task) {
       this.powerDialerTasks.called.push(this.activeTask)

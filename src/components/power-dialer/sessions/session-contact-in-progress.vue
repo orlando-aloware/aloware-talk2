@@ -2,7 +2,7 @@
   <q-card class="t-cards pt-2">
     <q-list class="px-2 pb-2">
       <q-item
-        v-if="inProgressContact.id"
+        v-if="activeTask.id"
         class="active t-expansion-panel px-2">
         <div class="py-2">
           <q-avatar size="30px" color="grey">
@@ -36,6 +36,7 @@
 
 <script>
 
+import { mapFields } from 'vuex-map-fields'
 import PhoneIcon from 'components/icons/call-drop-icon'
 
 export default {
@@ -43,23 +44,21 @@ export default {
   components: {
     PhoneIcon
   },
-  props: {
-    inProgressContact: {
-      type: Object
-    }
-  },
   computed: {
+    ...mapFields('powerDialer', [
+      'activeTask'
+    ]),
     firstname () {
-      return this.inProgressContact?.first_name
+      return this.activeTask?.first_name
     },
     lastname () {
-      return this.inProgressContact?.last_name
+      return this.activeTask?.last_name
     },
     phone_number () {
-      return this.inProgressContact?.phone_number
+      return this.activeTask?.phone_number
     },
     company_name () {
-      return this.inProgressContact?.company_name
+      return this.activeTask?.company_name
     }
   },
   methods: {

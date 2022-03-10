@@ -134,8 +134,6 @@ export default {
       }
     })
     this.$VueEvent.listen('contact_list_item_updated', (task) => {
-      console.log(' %c TASK was UPDATED : ', 'background: green; color: #000;', task)
-      console.log('hasSessions :>> ', this.hasSessions)
       if (this.hasSessions) {
         this.updateTaskStatus(task)
       }
