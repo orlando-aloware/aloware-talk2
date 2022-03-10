@@ -27,7 +27,8 @@
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"
-                   :search-text="searchText"></inbox-tab>
+                   :search-text="searchText"
+                   @itemSelected="onItemSelected"/>
         <inbox-channels v-if="activeChannel && !['inbox'].includes(activeChannel.value)"
                         class="h-100 w-100 flex-grow-1 scroll-y"
                         :filter-type="activeChannel.type"
@@ -157,6 +158,10 @@ export default {
 
     navigateToInbox () {
       this.onLoadShowTasks = true
+    },
+
+    onItemSelected (routeData) {
+      this.$emit('itemSelected', routeData)
     }
   },
 
@@ -181,6 +186,12 @@ export default {
     isMobile () {
       if (this.isMobile && !this.$q.screen.lt.md) {
         this.setShowContactsHeader(true)
+      }
+    },
+    '$route.name': function (value) {
+      if (value === 'Inbox') {
+        const channel = this.items.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
       }
     }
   }

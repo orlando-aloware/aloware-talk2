@@ -13,12 +13,11 @@
               class="no-border position-relative"
               @scroll="handScroll">
         <b-list-group class="p-2 pr-2">
-          <b-list-group-item class="d-flex align-items-center border-0"
+          <b-list-group-item class="d-flex align-items-center border-0 cursor-pointer"
                              :class="[contact.id === item.id ? 'router-link-exact-active router-link-active' : '']"
                              v-for="(item, index) in fixedContactsData.data"
                              :key="item.id"
-                             :to="`/contacts/${item.id}`"
-                             @click="onSidebarToggleMobile">
+                             @click="onSidebarToggleMobile(item)">
             <contact-list-sidebar-item v-model="fixedContactsData.data[index]"
                                        :key="item.id"/>
           </b-list-group-item>
@@ -109,7 +108,9 @@ export default {
       }
     },
 
-    onSidebarToggleMobile () {
+    onSidebarToggleMobile (contact) {
+      this.$emit('contactSelected', contact)
+
       if (!this.isMobile) {
         return
       }
@@ -139,6 +140,8 @@ export default {
     if (this.fixedContactsData.length === 0) {
       this.$VueEvent.fire('fetchContacts')
     }
+
+    this.$VueEvent.fire('contactsListSidebarDataLoaded', this.fixedContactsData.data)
   },
 
   beforeDestroy () {

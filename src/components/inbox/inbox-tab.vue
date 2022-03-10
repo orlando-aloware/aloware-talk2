@@ -369,15 +369,13 @@ export default {
           this.currentTask = contact.task_status
         }
 
-        this.$router.push({
+        this.$emit('itemSelected', {
           name: 'Inbox Contact Task',
           params: {
             id: contactId.toString(),
             channel: 'inbox',
             status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }
-        }).catch(err => {
-          console.log(err)
         })
       }
     },
@@ -484,6 +482,7 @@ export default {
       }
     },
     onRouteNameChange () {
+      console.log(this.$route.name)
       this.currentTask = ContactTaskStatus.STATUS_OPEN
       this.resetList()
     }
@@ -733,13 +732,13 @@ export default {
       }
     })
 
-    this.$VueEvent.listen('inbox_route_change', () => {
-      this.onRouteChange()
-    })
-
-    this.$VueEvent.listen('inbox_route_name_change', () => {
-      this.onRouteNameChange()
-    })
+    // this.$VueEvent.listen('inbox_route_change', () => {
+    //   this.onRouteChange()
+    // })
+    //
+    // this.$VueEvent.listen('inbox_route_name_change', () => {
+    //   this.onRouteNameChange()
+    // })
   },
 
   beforeDestroy () {

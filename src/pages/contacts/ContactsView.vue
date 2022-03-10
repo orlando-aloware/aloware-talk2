@@ -281,7 +281,7 @@
                     class="checker"
                     :value="contact.id"
                     :checked="checked.find(item => item.id === contact.id)"
-                    @change="onCheckerClicked(contact.id)" />
+                    @change="onCheckerClicked(contact)" />
                   <span class="checkmark"></span>
                 </label>
               </td>
@@ -1097,14 +1097,14 @@ export default {
       return found ? found.name : '-'
     },
 
-    onCheckerClicked (contactId) {
+    onCheckerClicked (contact) {
       const items = { data: [] }
-      const found = this.checked.find(item => item.id === contactId)
+      const found = this.checked.find(item => item.id === contact.id)
       if (found) {
-        items.data = this.checked.filter(item => item.id !== contactId)
+        items.data = this.checked.filter(item => item.id !== contact.id)
       } else {
         items.data = [...this.checked]
-        items.data.push(this.contact)
+        items.data.push(contact)
       }
 
       this.onCheckedRows(items.data)

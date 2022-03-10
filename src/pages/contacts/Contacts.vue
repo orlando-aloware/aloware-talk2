@@ -4,15 +4,18 @@
     <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar"
          v-show="$route.name === 'Contacts'"
          :class="sidebarClass">
-      <contacts-sidebar></contacts-sidebar>
+      <contacts-sidebar v-if="$route.name === 'Contacts'"></contacts-sidebar>
     </div>
     <contact-list-sidebar ref="contactListSidebar"
                           v-if="$route.name === 'Contact'"
                           :isLoadingMore="isLoadingMore"
-                          @toggleContactActivities="toggleContactListSidebar"/>
+                          @toggleContactActivities="toggleContactListSidebar"
+                          @contactSelected="onContactSelected"/>
     <div class="px-0 mb-0 main flex-1"
          :class="mainClass">
-      <router-view :list="list"
+      <Contact v-if="$route.name === 'Contact'"></Contact>
+      <router-view v-if="$route.name === 'Contacts'"
+                   :list="list"
                    :is-loading-disabled="isLoadingDisabled"
                    :is-start-state="isStartState"
                    :is-editable="isEditable"
@@ -56,6 +59,7 @@ import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
 import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import Contact from 'pages/contacts/Contact'
 
 export default {
   name: 'Contacts',
@@ -71,6 +75,7 @@ export default {
   ],
 
   components: {
+    Contact,
     RemoveListConfirmation,
     SelectListModal,
     ContactsSidebar,
@@ -131,6 +136,16 @@ export default {
       if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
         this.$refs.contactListSidebar.onSidebarToggle()
       }
+    },
+    onContactSelected (contact) {
+      this.$router.push({
+        name: 'Contact',
+        params: {
+          id: contact.id
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
 
