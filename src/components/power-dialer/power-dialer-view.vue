@@ -327,7 +327,7 @@ import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
-import talk2Api from 'src/plugins/api/api'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEmpty } from 'lodash'
@@ -558,17 +558,33 @@ export default {
         name: this.list?.name
       })
     },
-    onContactCreated (contact) {
-      if (this.list.type === this.ContactListType.STATIC) {
-        talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
-          this.setShouldUpdateSelectedListContactCount(true)
-          this.fetch()
-        })
-      } else {
-        this.fetch({
-          page: this.listItems[this.id].current_page
-        })
+    generateParams (contact) {
+      if (this.selectedList.name === 'My Queue') {
+        return {
+          contact_ids: [contact.id]
+        }
       }
+      return {
+        contact_list_id: this.selectedList.id,
+        contact_ids: [contact.id]
+      }
+    },
+    onContactCreated (contact) {
+      this.isLoading = true
+      return this.$axios
+        .post(`api/v2/power-dialer-list-items`, this.generateParams(contact))
+        .then(() => {
+          this.fetch()
+          this.$generalNotification('Selected contacts were successfully added')
+        })
+        .catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
     },
     onDeleteContact (data) {
       return this.$axios

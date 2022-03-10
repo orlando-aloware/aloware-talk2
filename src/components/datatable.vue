@@ -61,7 +61,7 @@
                     :class="{ handle: column.draggable }" />
                 </div>
                 <span class="handle-label">
-                  {{ column.label }}
+                 {{ column.label }}
                 </span>
                 <div
                   class="sorter-container"

@@ -249,7 +249,7 @@ export default {
     addTask (item = {}, direction = this.moveDirection.top) {
       return this.$axios
         .post('api/v2/power-dialer-list-items', {
-          contact_ids: [item.id],
+          contact_ids: [item?.id],
           direction: direction
         })
         .then(async () => {
