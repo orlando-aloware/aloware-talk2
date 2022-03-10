@@ -152,9 +152,7 @@ export default {
       return this.$options.filters.ucwords(_.get(this.metric, 'categoryLabel', '').replace(/_/g, ' '))
     },
     isDurationMetric () {
-      return this.metric &&
-          (['call_time_&_duration', 'agent_status'].includes(this.metric.category) ||
-              ['Total talk time'].includes(this.metric.label))
+      return this.metric && ['call_time_&_duration', 'agent_status'].includes(this.metric.category)
     }
   },
   data () {
