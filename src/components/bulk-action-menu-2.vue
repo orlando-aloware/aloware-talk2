@@ -91,8 +91,9 @@ export default {
       if (res.data?.message) {
         this.$emit('moved-contacts', true)
       }
+      console.log('res :>> ', res)
       this.$generalNotification(
-        res.data.message,
+        res?.data?.message || 'Error in moving contact list items.',
         res?.data ? 'success' : 'error'
       )
     }
