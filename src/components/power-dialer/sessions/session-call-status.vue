@@ -495,7 +495,7 @@ export default {
       }
     },
     prepareNextContact () {
-      if (this.statusReady && this.taskToCall.id !== this.powerDialerTasks.in_queue[0].id) {
+      if (this.statusReady && this.taskToCall?.id !== this.powerDialerTasks.in_queue[0]?.id) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
         this.activeTask = this.taskToCall
       }
@@ -504,7 +504,7 @@ export default {
   watch: {
     async taskToCall (task) {
       if (task?.id) {
-        await this.fetchContact(this.taskToCall.id)
+        await this.fetchContact(this.taskToCall?.id)
         if (!this.wrapUp) {
           this.resetTimer()
         }

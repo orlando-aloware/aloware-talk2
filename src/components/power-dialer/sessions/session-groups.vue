@@ -218,7 +218,9 @@ export default {
     },
     filteredTasks () {
       let { powerDialerTasks, activeTask } = this
-      let inQueue = this.powerDialerTasks.in_queue.filter(task => task.id !== activeTask.id)
+      let inQueue = this.powerDialerTasks.in_queue.filter(task => {
+        return task.id !== activeTask.id
+      })
       return {
         ...powerDialerTasks,
         in_queue: inQueue
