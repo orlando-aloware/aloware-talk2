@@ -1354,7 +1354,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification']),
+    ...mapState(['dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification', 'sessionPhoneExpansion']),
     ...mapState('cache', ['currentCompany']),
 
     isCallCompleted () {
@@ -2213,6 +2213,19 @@ export default {
     isCallCompleted () {
       this.resetBottomExpansion()
       this.expansionEnabled = false
+    },
+    sessionPhoneExpansion (value) {
+      switch (value) {
+        case 'add':
+          this.openAdd()
+          break
+        case 'dialpad':
+          this.openDialpad()
+          break
+        case 'transfer':
+          this.openTransfer()
+          break
+      }
     }
   },
   beforeDestroy () {

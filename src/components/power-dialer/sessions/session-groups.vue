@@ -62,7 +62,7 @@
                 <template v-for="(item, i) in group">
                   <q-item
                     :key="`acc-item-${i}`"
-                    :class="{ active: item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress' }"
+                    :class="{ active: item.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }"
                     class="t-expansion-panel px-2">
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
@@ -75,7 +75,7 @@
                       <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
                     </q-item-section>
                     <q-item-section
-                      v-if="!item.id === activeTask.id && listFilters[key.toUpperCase()].name === 'In Progress'"
+                      v-if="!item.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'"
                       class="t-item-icon"
                       side top>
                       <q-avatar color="red" size="md">
@@ -215,6 +215,9 @@ export default {
     ]),
     moveDirection () {
       return DIRECTION
+    },
+    activeTaskId () {
+      return this.activeTask?.id
     },
     filteredTasks () {
       /**

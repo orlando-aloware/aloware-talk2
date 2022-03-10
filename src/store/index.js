@@ -240,7 +240,8 @@ export default function (/* { ssrContext } */) {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      defaultDateFilter: null
+      defaultDateFilter: null,
+      sessionPhoneExpansion: ''
     },
 
     getters: {

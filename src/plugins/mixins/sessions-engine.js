@@ -48,7 +48,7 @@ export default {
           break
         default:
       }
-      this.activeTask.task = task
+      // this.activeTask.task = task
       this.setShowPhone(false)
     },
     onStatusInProgress (task) {

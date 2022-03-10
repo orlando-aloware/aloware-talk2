@@ -6,7 +6,7 @@
           <q-chip color="grey-50" class="p-0">
             <div
               :class="`text-15 text-lowercase text-capitalize px-2`"
-              v-html="`${statusDisplayButton}-${currentSessionStatus}`">
+              v-html="statusDisplayButton">
               <!-- {{ timerCount > 0 ? 'Will call in' : 'Connected: ' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
@@ -50,15 +50,20 @@
           no-caret
           right size="sm"
           variant="white"
+          :disabled="!statusCallConnected"
           class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
           <template #button-content>
             <i class="fa fa-ellipsis-h"></i>
           </template>
-          <b-dropdown-item href="#">
+          <b-dropdown-item
+            @click="openDialPad"
+            href="#">
             <DialPadIcon />
             Dial Pad
           </b-dropdown-item>
-          <b-dropdown-item href="#">
+          <b-dropdown-item
+            @click="openAdd"
+            href="#">
             <AddUserIcon color="#62666E" />
             Add
           </b-dropdown-item>
@@ -222,6 +227,9 @@ export default {
     })
   },
   computed: {
+    ...mapFields([
+      'sessionPhoneExpansion'
+    ]),
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
@@ -439,15 +447,6 @@ export default {
     reRoute () {
       this.$emit('on-redirect', this.selectedList)
     },
-    openTransfer () {
-      console.log('Opening transfer on dialer...')
-      // this.resetTransfer()
-      // this.expansionEnabled = true
-      // this.bottomExpansion = 'transfer'
-      // setTimeout(() => {
-      //   this.expanded = true
-      // }, 50)
-    },
     // resetTransfer () {
     //   this.transfer.userId = null
     //   this.transfer.ringGroupId = null
@@ -499,6 +498,25 @@ export default {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
         this.activeTask = this.taskToCall
       }
+    },
+    openAdd () {
+      this.$VueEvent.fire('togglePhone')
+      this.sessionPhoneExpansion = 'add'
+    },
+    openDialPad () {
+      this.$VueEvent.fire('togglePhone')
+      this.sessionPhoneExpansion = 'dialpad'
+    },
+    openTransfer () {
+      this.$VueEvent.fire('togglePhone')
+      this.sessionPhoneExpansion = 'transfer'
+      console.log('Opening transfer on dialer...')
+      // this.resetTransfer()
+      // this.expansionEnabled = true
+      // this.bottomExpansion = 'transfer'
+      // setTimeout(() => {
+      //   this.expanded = true
+      // }, 50)
     }
   },
   watch: {
