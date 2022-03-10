@@ -31,8 +31,11 @@ export default {
     ...mapGetters('contacts', [
       'changingSelectedContact'
     ]),
+    currentId () {
+      return this.$route.params.id
+    },
     currentIndex () {
-      return this.contacts.findIndex(item => item.id.toString() === this.$route.params.id)
+      return this.contacts.findIndex(item => String(item.id) === String(this.$route.params.id))
     },
     lastIndex () {
       return this.contacts.length - 1

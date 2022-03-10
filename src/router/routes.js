@@ -145,16 +145,16 @@ const routes = [
             path: 'list/:id(\\d+)+/add',
             meta: { title: 'Contacts' },
             component: ContactsAddView
-          },
-          {
-            path: ':id',
-            name: 'Contact',
-            component: Contact,
-            meta: {
-              title: 'Contact'
-            }
           }
         ]
+      },
+      {
+        path: 'contacts/:id',
+        name: 'Contact',
+        component: Contacts,
+        meta: {
+          title: 'Contact'
+        }
       },
       {
         path: 'power-dialer',
