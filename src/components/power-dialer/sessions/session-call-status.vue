@@ -6,7 +6,7 @@
           <q-chip color="grey-50" class="p-0">
             <div
               :class="`text-15 text-lowercase text-capitalize px-2`"
-              v-html="statusDisplayButton">
+              v-html="`${statusDisplayButton}-${currentSessionStatus}`">
               <!-- {{ timerCount > 0 ? 'Will call in' : 'Connected: ' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
@@ -224,6 +224,7 @@ export default {
   computed: {
     ...mapFields('powerDialer', [
       'sessionPaused',
+      'activeTask',
       'hubspot'
     ]),
     ...mapState([
@@ -483,7 +484,6 @@ export default {
         case 'CALL_CONNECTED':
           break
         case 'HANGING_UP_CALL':
-          this.taskToCall = this.powerDialerTasks.in_queue[0]
           if (!togglePause) {
             this.resetTimer()
           }
@@ -492,6 +492,12 @@ export default {
           break
         default:
           break
+      }
+    },
+    prepareNextContact () {
+      if (this.statusReady && this.taskToCall.id !== this.powerDialerTasks.in_queue[0].id) {
+        this.taskToCall = this.powerDialerTasks.in_queue[0]
+        this.activeTask = this.taskToCall
       }
     }
   },
@@ -519,6 +525,7 @@ export default {
           if (this.toggleEnd) {
             this.reRoute()
           } else {
+            this.prepareNextContact()
             await this.tickTimer()
           }
         } else if (value > 0) {
@@ -558,7 +565,7 @@ export default {
       }
     },
     currentSessionStatus (status) {
-      console.log(' %c CURRENT SESSION STATUS : ', 'background: red; color: white;', status)
+      // console.log(' %c CURRENT SESSION STATUS : ', 'background: red; color: white;', status)
       this.managingSessionFlows(status)
     },
     integrationsHubspot (obj) {

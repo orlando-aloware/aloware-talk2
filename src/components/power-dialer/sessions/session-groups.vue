@@ -36,7 +36,7 @@
           <q-separator />
         </div>
 
-        <div v-for="(group, key) in powerDialerTasks" :key="key">
+        <div v-for="(group, key) in filteredTasks" :key="key">
           <q-expansion-item
             :default-opened="key === 'in_queue'"
             class="t-expansion-panels px-0"
@@ -216,15 +216,14 @@ export default {
     moveDirection () {
       return DIRECTION
     },
-    // list () {
-    //   return this.listItems[this.selectedList.id].data || []
-    // },
-    // activeTask () {
-    //   if (this.list.length) {
-    //     return this.list[0]
-    //   }
-    //   return {}
-    // },
+    filteredTasks () {
+      let { powerDialerTasks, activeTask } = this
+      let inQueue = this.powerDialerTasks.in_queue.filter(task => task.id !== activeTask.id)
+      return {
+        ...powerDialerTasks,
+        in_queue: inQueue
+      }
+    },
     listFilters () {
       return DEFAULT_FILTER_LIST
     },

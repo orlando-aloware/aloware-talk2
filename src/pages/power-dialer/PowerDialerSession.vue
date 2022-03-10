@@ -117,13 +117,6 @@ export default {
       'getPowerDialerList',
       'setSelectedPDList'
     ]),
-    async fetchInQueueTasks (task) {
-      let res = await this.getSessionTaskByFilter({
-        id: task.contact_list_id,
-        task_status: 1
-      })
-      this.powerDialerTasks['in_queue'] = res.data.data
-    },
     async fetchTasks () {
       await this.fetchCurrentList()
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {

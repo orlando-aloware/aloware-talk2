@@ -55,6 +55,7 @@ import ColumnHeaders from 'components/column-headers'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
+import sessionsMixins from 'src/plugins/mixins/sessions-engine'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
@@ -73,7 +74,12 @@ export default {
     RemoveFolderDialog,
     CreateListModal
   },
-  mixins: [powermixin, contactsMixins, pdMixin],
+  mixins: [
+    powermixin,
+    contactsMixins,
+    pdMixin,
+    sessionsMixins
+  ],
   computed: {
     ...mapFields('powerDialer', [
       'activeMetrics'
@@ -126,24 +132,16 @@ export default {
       if (this.hasSessions) {
         await this.fetchInQueueTasks(task)
       }
-      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
-      //   this.handleDesktopVoicemailNotification(task)
-      // }
     })
     this.$VueEvent.listen('contact_list_item_updated', (task) => {
       console.log(' %c TASK was UPDATED : ', 'background: green; color: #000;', task)
+      console.log('hasSessions :>> ', this.hasSessions)
       if (this.hasSessions) {
         this.updateTaskStatus(task)
       }
-      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
-      //   this.handleDesktopVoicemailNotification(task)
-      // }
     })
     this.$VueEvent.listen('contact_list_item_deleting', (task) => {
       console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
-      // if (this.checkCommunicationMatchesUserAccessibility(task)) {
-      //   this.handleDesktopVoicemailNotification(task)
-      // }
     })
     this.$VueEvent.listen('contact_list_bulk_created', (task) => {
       console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)

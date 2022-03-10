@@ -596,6 +596,7 @@ export default {
       handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          console.log('params :>> ', params)
           this.fetch(params, this.hasFilters)
           this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }

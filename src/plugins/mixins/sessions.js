@@ -1,5 +1,5 @@
 import { mapFields } from 'vuex-map-fields'
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 // import { isEmpty } from 'lodash'
 export default {
@@ -10,16 +10,26 @@ export default {
   },
   computed: {
     ...mapFields('powerDialer', [
+      'sessionPaused',
       'activeTask',
       'powerDialerTasks'
     ]),
+    ...mapGetters('contacts', [
+      'listItems',
+      'selectedList'
+    ]),
+    list () {
+      return this.listItems[this.selectedList?.id]?.data
+    },
     status () {
       return AutoDialTaskStatus.STATUSES
     },
     statusDisplayButton () {
       switch (this.dialer?.currentStatus) {
         case 'READY':
-          if ((!this.toggleEnd || !this.togglePause) && !this.wrapUp) {
+          if (this.sessionPaused) {
+            return 'Up Next'
+          } else if ((!this.toggleEnd || !this.togglePause) && !this.wrapUp) {
             return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
           } else {
             return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
@@ -47,6 +57,8 @@ export default {
     ...mapActions(['setShowPhone']),
     async nextContact () {
       this.$VueEvent.fire('hangupCall')
+    },
+    async fetchNextContact () {
       this.taskToCall = this.powerDialerTasks.in_queue[0]
       if (this.taskToCall?.id) {
         await this.fetchContact(this.taskToCall?.id)
@@ -57,6 +69,7 @@ export default {
       let res = null
       res = await this.getContact({ id: taskId })
       if (!this.flagged) {
+        console.log('FETCHING CONTACT...', res)
         this.activeTask = res
         this.flagged = true
       }
@@ -94,39 +107,6 @@ export default {
     },
     removeTaskFromList () {
       // TODOs: Remove task from list
-    },
-    updateTaskStatus (task) {
-      switch (task.task_status) {
-        case AutoDialTaskStatus.STATUS_IN_PROGRESS:
-          // console.log(' %c Changing status to : IN_PROGRESS ', 'background: yellow; color: black;')
-          this.activeTask = this.list.find(lst => lst.contact_list_item_id === task.id)
-          this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
-          // console.log(`NUMBER: ${this.powerDialerTasks.in_queue.length}`, this.powerDialerTasks.in_queue)
-          break
-        case AutoDialTaskStatus.STATUS_COMPLETED:
-          // console.log(' %c Changing status to : COMPLETED/CALLED ', 'background: yellow; color: black;')
-          this.powerDialerTasks.called.push(this.activeTask)
-          this.$VueEvent.fire('endWrapUp')
-          // this.activeTask = {}
-          break
-        case AutoDialTaskStatus.STATUS_FAILED:
-          // console.log(' %c Changing status to : FAILED ', 'background: yellow; color: black;')
-          this.powerDialerTasks.failed.push(this.activeTask)
-          this.$VueEvent.fire('endWrapUp')
-          // this.activeTask = {}
-          break
-        case AutoDialTaskStatus.STATUS_QUEUED:
-          // console.log(' %c Changing status to : IN_QUEUE ', 'background: yellow; color: black;')
-          // this.powerDialerTasks.in_queue.push(this.activeTask)
-          break
-        case AutoDialTaskStatus.STATUS_SCHEDULED:
-          // console.log(' %c Changing status to : SCHEDULED ', 'background: yellow; color: black;')
-          this.powerDialerTasks.scheduled.push(this.activeTask)
-          break
-        default:
-      }
-      this.activeTask.task = task
-      this.setShowPhone(false)
     }
   }
 }
