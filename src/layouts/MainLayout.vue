@@ -804,6 +804,11 @@ export default {
 
     initAuth () {
       this.loading = true
+
+      if (['Stats'].includes(this.$route.name)) {
+        this.setMetricLoader(true)
+      }
+
       this.initAccount().then(() => {
         this.loading = false
         if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
@@ -824,14 +829,14 @@ export default {
 
         this.broadcastInit()
       }).finally(() => {
-        this.getRingGroups()
-        this.getBroadcasts()
-        this.getTemplates()
-
         if (['Stats'].includes(this.$route.name)) {
           this.getAvailableMetrics()
           this.metricsDataLoaded = true
         }
+
+        this.getRingGroups()
+        this.getBroadcasts()
+        this.getTemplates()
 
         this.getCampaigns()
         this.getFullTags()
@@ -1138,19 +1143,22 @@ export default {
           const index = { data: null }
           const option = { data: null }
           const key = { data: null }
+          const optionGroup = { data: null }
+          const categoryLabel = { data: null }
           for (index.data in availableMetrics) {
-            const optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index.data)
-            const categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.data.replace(/_/g, ' '))
+            optionGroup.data = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(item => item.name === index.data)
+            categoryLabel.data = optionGroup.data ? optionGroup.data.label : this.$options.filters.ucwords(index.data.replace(/_/g, ' '))
             structuredMetricGroups.push({
               disable: true,
               value: null,
-              label: categoryLabel
+              label: categoryLabel.data
             })
 
             if (availableMetrics[index.data].constructor.name === 'Array') {
               for (option.data of availableMetrics[index.data]) {
                 option.data.disable = false
-                option.data.categoryLabel = categoryLabel
+                option.data.categoryLabel = categoryLabel.data
+                option.data.metric_id = `${option.data.type}_${option.data.metric_id}`
                 structuredMetricGroups.push(option.data)
               }
             }
@@ -1158,7 +1166,8 @@ export default {
             if (availableMetrics[index.data].constructor.name === 'Object') {
               for (key.data of Object.keys(availableMetrics[index.data])) {
                 availableMetrics[index.data][key.data].disable = false
-                availableMetrics[index.data][key.data].categoryLabel = categoryLabel
+                availableMetrics[index.data][key.data].categoryLabel = categoryLabel.data
+                availableMetrics[index.data][key.data].metric_id = `${availableMetrics[index.data][key.data].type}_${availableMetrics[index.data][key.data].metric_id}`
                 structuredMetricGroups.push(availableMetrics[index.data][key.data])
               }
             }

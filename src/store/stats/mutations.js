@@ -11,27 +11,29 @@ export default {
     }
 
     const index = { data: null }
+    const metricIndex = { data: null }
+    const metric = { data: null }
     for (index.data in data) {
       if (typeof data[index.data].agent_metrics === 'undefined') {
         continue
       }
 
-      const metricIndex = { data: null }
+      metricIndex.data = null
       for (metricIndex.data in data[index.data].agent_metrics) {
-        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index.data].agent_metrics[metricIndex.data].metric_id)
+        metric.data = state.availableMetrics.find(item => item.metric_id === `${data[index.data].agent_metrics[metricIndex.data].type}_${data[index.data].agent_metrics[metricIndex.data].metric_id}`)
 
-        if (!metric) {
+        if (!metric.data) {
           continue
         }
 
-        data[index.data].agent_metrics[metricIndex.data].category = metric.category
-        data[index.data].agent_metrics[metricIndex.data].categoryLabel = metric.categoryLabel
+        data[index.data].agent_metrics[metricIndex.data].category = metric.data.category
+        data[index.data].agent_metrics[metricIndex.data].categoryLabel = metric.data.categoryLabel
 
         if (typeof data[index.data].agent_metrics[metricIndex.data].label !== 'undefined') {
           continue
         }
 
-        data[index.data].agent_metrics[metricIndex.data].label = metric.label
+        data[index.data].agent_metrics[metricIndex.data].label = metric.data.label
       }
     }
 

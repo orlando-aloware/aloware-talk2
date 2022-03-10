@@ -34,8 +34,11 @@
               @popup-show="onShowMetricsMenu"
               @filter="filterFn">
               <template v-slot:option="scope">
-                <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-                  <q-item-section v-if="!scope.opt.disable" avatar></q-item-section>
+                <q-item v-bind="scope.itemProps"
+                        v-on="scope.itemEvents"
+                        :key="scope.opt.key">
+                  <q-item-section v-if="!scope.opt.disable"
+                                  avatar></q-item-section>
                   <q-item-section>
                     <q-item-label
                       v-if="scope.opt.disable"
