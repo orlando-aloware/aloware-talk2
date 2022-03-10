@@ -261,7 +261,7 @@ export default {
       this.updateLoading = value
       const index = { data: null }
       for (index.data in this.metricsList) {
-        if (this.$refs[`metric-box-${index.data}`]) {
+        if (!_.isEmpty(this.$refs[`metric-box-${index.data}`])) {
           this.$refs[`metric-box-${index.data}`][0].toggleLoader(value)
         }
       }
