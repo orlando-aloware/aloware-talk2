@@ -11,27 +11,29 @@ export default {
     }
 
     const index = { data: null }
+    const metricIndex = { data: null }
+    const metric = { data: null }
     for (index.data in data) {
       if (typeof data[index.data].agent_metrics === 'undefined') {
         continue
       }
 
-      const metricIndex = { data: null }
+      metricIndex.data = null
       for (metricIndex.data in data[index.data].agent_metrics) {
-        const metric = state.availableMetrics.find(metric => metric.metric_id === data[index.data].agent_metrics[metricIndex.data].metric_id)
+        metric.data = state.availableMetrics.find(item => item.metric_id === data[index.data].agent_metrics[metricIndex.data].metric_id)
 
-        if (!metric) {
+        if (!metric.data) {
           continue
         }
 
-        data[index.data].agent_metrics[metricIndex.data].category = metric.category
-        data[index.data].agent_metrics[metricIndex.data].categoryLabel = metric.categoryLabel
+        data[index.data].agent_metrics[metricIndex.data].category = metric.data.category
+        data[index.data].agent_metrics[metricIndex.data].categoryLabel = metric.data.categoryLabel
 
         if (typeof data[index.data].agent_metrics[metricIndex.data].label !== 'undefined') {
           continue
         }
 
-        data[index.data].agent_metrics[metricIndex.data].label = metric.label
+        data[index.data].agent_metrics[metricIndex.data].label = metric.data.label
       }
     }
 
@@ -67,9 +69,13 @@ export default {
     }
 
     const metricIndex = { index: null }
+    const metricKey = { data: null }
+    const metric = { data: null }
+    const metricInfo = { data: null }
+    const metricPropValue = { data: null }
     for (metricIndex.data in data.agent_metrics) {
-      const metric = _.get(metricGroup.agent_metrics, metricIndex.data, null)
-      const metricInfo = { data: !metric ? state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex.data].name) : null }
+      metric.data = _.get(metricGroup.agent_metrics, metricIndex.data, null)
+      metricInfo.data = !metric.data ? state.availableMetrics.find(metricItem => metricItem.metric_id === data.agent_metrics[metricIndex.data].metric_id) : null
 
       if (metricInfo.data) {
         data.agent_metrics[metricIndex.data].category = metricInfo.data.category
@@ -77,16 +83,16 @@ export default {
         continue
       }
 
-      metricInfo.data = state.availableMetrics.find(metricItem => metricItem.name === data.agent_metrics[metricIndex.data].name)
+      metricInfo.data = state.availableMetrics.find(metricItem => metricItem.metric_id === data.agent_metrics[metricIndex.data].metric_id)
 
       if (!metricInfo.data) {
         continue
       }
 
-      const metricKey = { data: null }
+      metricKey.data = null
       for (metricKey.data in metricInfo.data) {
-        const metricPropValue = _.get(data.agent_metrics[metricIndex.data], metricKey.data, null)
-        if (!metricPropValue) {
+        metricPropValue.data = _.get(data.agent_metrics[metricIndex.data], metricKey.data, null)
+        if (!metricPropValue.data) {
           data.agent_metrics[metricIndex.data][metricKey.data] = metricInfo.data[metricKey.data]
         }
       }
@@ -156,6 +162,8 @@ export default {
     Vue.set(state.metricGroups[metricGroupIndex].agent_metrics, index.data, data.data)
   },
   UPDATE_METRIC: (state, data) => {
+    const previousMetricId = data.previousMetricId
+    data = data.data
     const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.agent_metric_group_id)
     const metricGroupIndex = metricGroup ? state.metricGroups.indexOf(metricGroup) : null
 
@@ -163,7 +171,7 @@ export default {
       return
     }
 
-    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.id === data.id)
+    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.metric_id === previousMetricId)
     const metricIndex = metric ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(metric) : null
 
     if (metricIndex === -1 || metricIndex === null) {
@@ -187,7 +195,7 @@ export default {
       Vue.set(state.metricGroups, `${metricGroupIndex}.agent_metrics`, metricsLilst)
     }
 
-    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.id === data.metricId)
+    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.metric_id === data.metricId)
     const metricIndex = metric ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(metric) : null
 
     if (metricIndex === -1 || metricIndex === null) {
@@ -234,7 +242,7 @@ export default {
       return
     }
 
-    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.id === data.id)
+    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.metric_id === data.id)
     const metricIndex = metric ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(metric) : null
 
     if (metricIndex === -1 || metricIndex === null) {

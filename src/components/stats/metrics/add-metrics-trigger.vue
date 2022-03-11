@@ -68,7 +68,7 @@ export default {
       this.$emit('toggle-loader', true)
       this.modal = false
       this.$axios.post(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.groupId}/metrics`, {
-        metric_id: data.metricId,
+        metric_id: data.metricId.replace(`${data.type}_`, ''),
         color: data.color,
         type: data.type
       }).then(res => {

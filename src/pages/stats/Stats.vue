@@ -98,11 +98,11 @@ export default {
     }
   },
 
-  mounted () {
-    if (this.metricGroups && this.metricGroups.length < 1) {
-      this.getMetricGroups()
-    }
-  },
+  // mounted () {
+  //   if (this.metricGroups && this.metricGroups.length < 1) {
+  //     this.getMetricGroups()
+  //   }
+  // },
 
   beforeDestroy () {
     clearInterval(this.clearFocusInterval)
