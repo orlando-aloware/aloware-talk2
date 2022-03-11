@@ -53,10 +53,18 @@ export default {
     const _this = this
 
     this.$VueEvent.listen('new_communication', function (communication) {
+      if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(_this.$route.name)) {
+        return
+      }
+
       const index = _this.contactsData.data.findIndex(item => item.id === communication.contact_id)
       if (index >= 0) {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
           _this.contactsData.data[index] = response.data
+
+          if (_this.contact.id === communication.contact_id) {
+            _this.setContact(response.data)
+          }
         })
       }
     })
@@ -71,7 +79,8 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
       'setSelectedList',
-      'setListContactsLoaded'
+      'setListContactsLoaded',
+      'setContact'
     ]),
     ...mapActions('powerDialer', [
       'updateMyQueueListData'
@@ -441,7 +450,7 @@ export default {
   computed: {
     ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount']),
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList', 'contact']),
     ...mapState('cache', ['currentCompany']),
     ...mapState(['defaultDateFilter']),
     ...mapGetters('powerDialer', [

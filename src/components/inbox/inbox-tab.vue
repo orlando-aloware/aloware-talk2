@@ -439,11 +439,7 @@ export default {
       this.toggleFilterModelForm(true)
     },
     updateContact (contact) {
-      if (_.isEmpty(this.contact)) {
-        return
-      }
-
-      if (_.isEmpty(contact)) {
+      if (_.isEmpty(this.contact) || _.isEmpty(contact)) {
         return
       }
 
@@ -627,6 +623,12 @@ export default {
               ]
             )
           } else {
+            if (isInContacts) {
+              const index = contacts.data.findIndex(item => item.id === contact.id)
+              contacts.data[index] = contact
+              this.setContacts(contacts.data)
+            }
+
             // only modify order if new contact task === current task
             if (this.currentTask === contact.task_status) {
               if (!isInLiveContacts) {
