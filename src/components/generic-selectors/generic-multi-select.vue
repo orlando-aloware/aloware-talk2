@@ -140,6 +140,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
@@ -198,6 +199,10 @@ export default {
       return newOptions.data
     },
     formattedValues () {
+      if (_.isEmpty(this.selectedValues)) {
+        return []
+      }
+
       const newValues = []
       const values = { item: null }
       for (values.item of this.selectedValues) {
@@ -228,6 +233,10 @@ export default {
   },
   methods: {
     isSelected (id) {
+      if (_.isEmpty(this.selectedValues)) {
+        return false
+      }
+
       return this.selectedValues.includes(id)
     },
     onSelectOption (id) {

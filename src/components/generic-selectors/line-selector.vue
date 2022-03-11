@@ -4,7 +4,7 @@
                           :buttonText="buttonText"
                           :values="campaignId"
                           :options="campaignsAlphabeticalOrder"
-                          :disable="disable"
+                          :disable="disable || campaignsIsLoading"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
                           v-if="genericMultiselect"
                           @valuesUpdated="updateLines">
@@ -150,7 +150,7 @@ export default {
 
   data () {
     return {
-      campaignId: this.value,
+      campaignId: null,
       campaignOptions: [],
       selectWidth: 0
     }
@@ -205,6 +205,9 @@ export default {
 
   created () {
     this.campaignOptions = this.campaignsAlphabeticalOrder
+    if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+      this.campaignId = this.value
+    }
   },
 
   methods: {
@@ -249,9 +252,11 @@ export default {
 
     campaignsIsLoading (val) {
       if (val) {
+        this.campaignId = null
         return
       }
 
+      this.campaignId = this.value
       this.campaignOptions = this.campaignsAlphabeticalOrder
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
