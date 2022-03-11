@@ -804,6 +804,8 @@ export default {
 
     initAuth () {
       this.loading = true
+      this.setCampaignsIsLoading(true)
+      this.setTagsFullyLoaded(true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -910,7 +912,6 @@ export default {
     getCampaigns () {
       if (this.hasPermissionTo('list campaign')) {
         this.loadingCampaigns = true
-        this.setCampaignsIsLoading(true)
         return this.$axios
           .get('/api/v1/campaign', {
             mode: 'no-cors',
@@ -980,7 +981,6 @@ export default {
         .get('/api/v1/tag', { params: { full_load: true } })
         .then((res) => {
           this.setTags(res.data)
-          this.setTagsFullyLoaded(true)
           this.$VueEvent.fire('tags_loaded')
           this.loadingTags = false
           return Promise.resolve()
