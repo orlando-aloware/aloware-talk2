@@ -2,7 +2,7 @@ import _ from 'lodash'
 import auth from '../../boot/auth'
 import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+// import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -161,22 +161,23 @@ export default {
 
     contactCampaignsFromCommunications () {
       if (this.contact && this.campaigns.length) {
-        const contactCampaigns = this.campaignsAlphabeticalOrder.filter((cmp) => {
-          if (this.selectedContactCampaigns.includes(cmp.id)) {
-            return true
-          }
-        })
+        return this.campaignsAlphabeticalOrder
+        // .filter((cmp) => {
+        //   if (this.selectedContactCampaigns.includes(cmp.id)) {
+        //     return true
+        //   }
+        // })
 
-        const campaign = { data: null }
-        for (campaign.data of contactCampaigns) {
-          campaign.data.unread_count = this.communicationsAndAudits.filter((comm) => {
-            if (comm.type && (comm.type === CommunicationTypes.SMS || (comm.type === CommunicationTypes.CALL && [CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(comm.disposition_status2))) && comm.is_read === false && comm.campaign_id === campaign.data.id) {
-              return true
-            }
-          }).length
-        }
+        // const campaign = { data: null }
+        // for (campaign.data of contactCampaigns) {
+        //   campaign.data.unread_count = this.communicationsAndAudits.filter((comm) => {
+        //     if (comm.type && (comm.type === CommunicationTypes.SMS || (comm.type === CommunicationTypes.CALL && [CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(comm.disposition_status2))) && comm.is_read === false && comm.campaign_id === campaign.data.id) {
+        //       return true
+        //     }
+        //   }).length
+        // }
 
-        return contactCampaigns
+        // return contactCampaigns
       }
 
       return []
