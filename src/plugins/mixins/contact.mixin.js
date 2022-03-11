@@ -4,6 +4,7 @@ import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
 // import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as storage from 'src/plugins/helpers/storage'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   data () {
@@ -233,6 +234,11 @@ export default {
 
     this.$VueEvent.listen('new_communication', (data) => {
       this.addNewCommunication(data)
+      if (data.contact_id === this.contact.id) {
+        talk2Api.V2.contacts.get(this.contact.id).then(response => {
+          this.setContact(response.data)
+        })
+      }
     })
 
     this.$VueEvent.listen('update_communication', (data) => {
