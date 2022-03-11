@@ -161,7 +161,7 @@ export default {
     }
   },
   mounted () {
-    this.filteredMetricOptions = this.availableMetrics
+    this.filteredMetricOptions = this.fixedAvailableMetrics()
   },
   watch: {
     isOpen (val) {
@@ -184,7 +184,7 @@ export default {
     availableMetrics: {
       deep: true,
       handler: function () {
-        this.filteredMetricOptions = this.availableMetrics
+        this.filteredMetricOptions = this.fixedAvailableMetrics()
       }
     },
     metric () {
@@ -197,7 +197,7 @@ export default {
   },
   methods: {
     async submit () {
-      const option = this.availableMetrics.find(option => option.metric_id === this.metric)
+      const option = this.availableMetrics.find(option => `${option.type}_${option.metric_id}` === this.metric)
       if (this.actionCreate) {
         this.$emit('update', {
           type: option ? option.type : null,
@@ -215,10 +215,6 @@ export default {
       })
       this.modal = true
     },
-    getOptionsText (id) {
-      const option = this.availableMetrics.find(option => option.metric_id === id)
-      return option ? option.label : ''
-    },
     resetData () {
       this.metric = ''
       this.color = {
@@ -233,16 +229,28 @@ export default {
     onShowMetricsMenu () {
       this.selectWidth = this.$refs.statsSelectMetrics.$el.offsetWidth
     },
+    fixedAvailableMetrics () {
+      const newMetrics = JSON.parse(JSON.stringify(this.availableMetrics))
+      const index = { data: null }
+      for (index.data in newMetrics) {
+        if (typeof newMetrics[index.data].metric_id !== 'undefined') {
+          newMetrics[index.data].metric_id = `${newMetrics[index.data].type}_${newMetrics[index.data].metric_id}`
+        }
+      }
+
+      return newMetrics
+    },
     filterFn (val, update) {
+      const fixedMetrics = this.fixedAvailableMetrics()
       if (val === '') {
         update(() => {
-          this.filteredMetricOptions = this.availableMetrics
+          this.filteredMetricOptions = fixedMetrics
         })
         return
       }
 
       update(() => {
-        this.filteredMetricOptions = this.availableMetrics.filter(metric => metric.label.toLowerCase().indexOf(val.toLowerCase()) !== -1)
+        this.filteredMetricOptions = fixedMetrics.filter(metric => metric.label.toLowerCase().indexOf(val.toLowerCase()) !== -1)
       })
     },
     pluralizeLabel (label) {

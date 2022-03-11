@@ -1158,7 +1158,6 @@ export default {
               for (option.data of availableMetrics[index.data]) {
                 option.data.disable = false
                 option.data.categoryLabel = categoryLabel.data
-                option.data.metric_id = `${option.data.type}_${option.data.metric_id}`
                 structuredMetricGroups.push(option.data)
               }
             }
@@ -1167,7 +1166,6 @@ export default {
               for (key.data of Object.keys(availableMetrics[index.data])) {
                 availableMetrics[index.data][key.data].disable = false
                 availableMetrics[index.data][key.data].categoryLabel = categoryLabel.data
-                availableMetrics[index.data][key.data].metric_id = `${availableMetrics[index.data][key.data].type}_${availableMetrics[index.data][key.data].metric_id}`
                 structuredMetricGroups.push(availableMetrics[index.data][key.data])
               }
             }

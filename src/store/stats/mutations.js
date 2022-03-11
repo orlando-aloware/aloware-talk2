@@ -20,7 +20,7 @@ export default {
 
       metricIndex.data = null
       for (metricIndex.data in data[index.data].agent_metrics) {
-        metric.data = state.availableMetrics.find(item => item.metric_id === `${data[index.data].agent_metrics[metricIndex.data].type}_${data[index.data].agent_metrics[metricIndex.data].metric_id}`)
+        metric.data = state.availableMetrics.find(item => item.metric_id === data[index.data].agent_metrics[metricIndex.data].metric_id)
 
         if (!metric.data) {
           continue
@@ -75,7 +75,7 @@ export default {
     const metricPropValue = { data: null }
     for (metricIndex.data in data.agent_metrics) {
       metric.data = _.get(metricGroup.agent_metrics, metricIndex.data, null)
-      metricInfo.data = !metric.data ? state.availableMetrics.find(metricItem => metricItem.metric_id === `${data.agent_metrics[metricIndex.data].type}_${data.agent_metrics[metricIndex.data].metric_id}`) : null
+      metricInfo.data = !metric.data ? state.availableMetrics.find(metricItem => metricItem.metric_id === data.agent_metrics[metricIndex.data].metric_id) : null
 
       if (metricInfo.data) {
         data.agent_metrics[metricIndex.data].category = metricInfo.data.category
@@ -83,7 +83,7 @@ export default {
         continue
       }
 
-      metricInfo.data = state.availableMetrics.find(metricItem => metricItem.metric_id === `${data.agent_metrics[metricIndex.data].type}_${data.agent_metrics[metricIndex.data].metric_id}`)
+      metricInfo.data = state.availableMetrics.find(metricItem => metricItem.metric_id === data.agent_metrics[metricIndex.data].metric_id)
 
       if (!metricInfo.data) {
         continue
@@ -162,6 +162,8 @@ export default {
     Vue.set(state.metricGroups[metricGroupIndex].agent_metrics, index.data, data.data)
   },
   UPDATE_METRIC: (state, data) => {
+    const previousMetricId = data.previousMetricId
+    data = data.data
     const metricGroup = state.metricGroups.find(metricGroup => metricGroup.id === data.agent_metric_group_id)
     const metricGroupIndex = metricGroup ? state.metricGroups.indexOf(metricGroup) : null
 
@@ -169,7 +171,7 @@ export default {
       return
     }
 
-    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.id === data.id)
+    const metric = state.metricGroups[metricGroupIndex].agent_metrics.find(metric => metric.metric_id === previousMetricId)
     const metricIndex = metric ? state.metricGroups[metricGroupIndex].agent_metrics.indexOf(metric) : null
 
     if (metricIndex === -1 || metricIndex === null) {
