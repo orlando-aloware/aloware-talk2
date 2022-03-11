@@ -8,6 +8,7 @@ import _ from 'lodash'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   data () {
@@ -47,6 +48,17 @@ export default {
     })
     this.$VueEvent.listen('onLoadMoreContacts', () => {
       this.onLoadMore()
+    })
+
+    const _this = this
+
+    this.$VueEvent.listen('new_communication', function (communication) {
+      const index = _this.contactsData.data.findIndex(item => item.id === communication.contact_id)
+      if (index >= 0) {
+        talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+          _this.contactsData.data[index] = response.data
+        })
+      }
     })
   },
 
@@ -558,6 +570,7 @@ export default {
       return POWER_DIALER_FILTERS
     }
   },
+
   watch: {
     // 'list.filters': function () {
     //   this.init()
@@ -596,6 +609,7 @@ export default {
       }
     }
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('fetchContacts')
     this.$VueEvent.stop('clearContacts')
