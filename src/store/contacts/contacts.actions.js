@@ -91,6 +91,7 @@ export default {
   },
 
   setSelectedListContactCount: ({ commit }, count) => {
+    console.trace(count)
     commit('SET_SELECTED_LIST_CONTACT_COUNT', count)
   },
   setShouldUpdateSelectedListContactCount: ({ commit }, shouldUpdate) => {
