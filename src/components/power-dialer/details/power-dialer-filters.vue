@@ -12,11 +12,7 @@
             {{ lsFilter.name }}
           </div>
           <div :class="`t__badge ${id === lsFilter.id ? 'active' : ''}`">
-            <span v-if="lsFilter.id === 'in-queue'">{{ filtersCounter.in_queue }}</span>
-            <span v-else-if="lsFilter.id === 'called'">{{ filtersCounter.called }}</span>
-            <span v-else-if="lsFilter.id === 'failed'">{{ filtersCounter.failed }}</span>
-            <span v-else-if="lsFilter.id === 'scheduled'">{{ filtersCounter.scheduled }}</span>
-            <span v-else>{{ filtersCounter.all }}</span>
+            <span>{{ filtersCounter[lsFilter.meta] }}</span>
           </div>
         </div>
       </router-link>
@@ -74,21 +70,6 @@ export default {
     },
     list () {
       return this.listData
-    },
-    totalInQueue () {
-      return this.list.total_queued
-    },
-    totalCalled () {
-      return this.list?.total_called || 0
-    },
-    totalFailed () {
-      return this.list?.total_failed || 0
-    },
-    totalScheduled () {
-      return this.list?.total_scheduled || 0
-    },
-    totalItems () {
-      return this.list?.total_items || 0
     }
   },
   methods: {
