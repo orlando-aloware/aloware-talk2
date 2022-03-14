@@ -32,6 +32,10 @@ export default {
   props: {
     contact: {
       required: true
+    },
+    exclude: {
+      required: false,
+      default: null
     }
   },
 

@@ -42,6 +42,10 @@ export default {
       required: false,
       type: String,
       default: 'Add Tags'
+    },
+    exclude: {
+      required: false,
+      default: null
     }
   },
 

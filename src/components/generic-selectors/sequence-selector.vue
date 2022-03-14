@@ -87,7 +87,8 @@ export default {
       required: false
     },
     exclude: {
-      required: false
+      required: false,
+      default: null
     },
     blockBroadcast: {
       type: Boolean,
