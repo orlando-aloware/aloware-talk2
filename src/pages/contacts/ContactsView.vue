@@ -1171,7 +1171,7 @@ export default {
         }
       }
 
-      this.makeCall()
+      this.makeCall(contact)
     },
     makeCall (contact) {
       if (this.profile.enabled_two_legged_outbound) {

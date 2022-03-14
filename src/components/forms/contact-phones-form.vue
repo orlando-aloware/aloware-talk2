@@ -127,6 +127,7 @@ export default {
         phone_number: this.phone.number
       }).then(response => {
         this.addContactPhoneNumber(response.data)
+        this.$generalNotification('Phone number added')
         this.removeSelectedPhone()
         this.onClose()
       }).catch(err => {
