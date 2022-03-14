@@ -7,10 +7,14 @@
               option-label="phone_number"
               behavior="menu"
               v-model="selectedPhone"
-              :options="contactPhoneNumbers"
+              :use-input="true"
+              :options="options"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMenu"
-              @input="onPhoneChange">
+              @input="onPhoneChange"
+              @focus="onFocus"
+              @blur="onBlur"
+              @filter="filterFn">
       <template v-slot:selected>
         <div class="selected-option-container"
              v-html="getSelectedPhoneLabel()"></div>
@@ -31,6 +35,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import _ from 'lodash'
 
 export default {
   name: 'contact-phone-number-selector',
@@ -44,14 +49,50 @@ export default {
     return {
       selectedPhone: {},
       isFocused: false,
-      selectWidth: 0
+      selectWidth: 0,
+      options: []
     }
   },
   methods: {
     onShowMenu () {
       this.selectWidth = this.$refs.phoneNumberSelector.$el.offsetWidth
     },
+
+    onFocus () {
+      this.isFocused = true
+      this.$el.querySelector('.inline-select .q-field__input').placeholder = !_.isEmpty(this.selectedPhone) ? this.$options.filters.fixPhone(this.selectedPhone.phone_number) : 'Select phone number'
+      this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
+      if (!_.isEmpty(this.selectedPhone)) {
+        this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
+      }
+    },
+
+    onBlur () {
+      this.isFocused = false
+      this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
+      this.showPlaceholder()
+      if (!_.isEmpty(this.selectedPhone)) {
+        this.$el.querySelector('.inline-select .selected-option-container').style.display = ''
+      }
+    },
+
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.contact.phone_numbers
+        })
+        return
+      }
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.contact.phone_numbers.filter(v => v.phone_number && (v.phone_number.toLowerCase().indexOf(needle) > -1 || v.title.toLowerCase().indexOf(needle) > -1))
+      })
+    },
+
     getSelectedPhoneLabel () {
+      if (_.isEmpty(this.selectedPhone)) {
+        return ''
+      }
       const title = (this.selectedPhone.phone_number === this.contact.phone_number) ? 'Primary' : this.selectedPhone.title
       const titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
       return `<span class="selected-option">${this.$options.filters.fixPhone(this.selectedPhone.phone_number)}</span> ${titleText}`
@@ -86,13 +127,24 @@ export default {
       }
     },
     onPhoneChange (phone) {
+      this.$el.querySelector('.inline-select .q-field__input').blur()
       if (phone) {
         this.$emit('setSelectedPhone', phone.phone_number)
+      }
+    },
+    showPlaceholder () {
+      if (_.isEmpty(this.selectedPhone)) {
+        this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select phone number'
+        this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
+      } else {
+        this.$el.querySelector('.inline-select .q-field__input').style.display = 'none'
       }
     }
   },
   mounted () {
     this.setPhone(this.contact.phone_number)
+    this.options = this.contact.phone_numbers
+    this.showPlaceholder()
   },
   watch: {
     'contactAndPhoneNumbers': function () {
@@ -101,10 +153,14 @@ export default {
         this.selectedPhone = phone
       }
     },
-    'messageComposer.sms.phone_number': function (phone) {
-      if (phone !== this.selectedPhone.phone_number) {
-        this.setPhone(phone)
-      }
+    'contact.id': function () {
+      this.options = this.contact.phone_numbers
+      this.selectedPhone = {}
+      this.setPhone(this.contact.phone_number)
+      this.showPlaceholder()
+    },
+    selectedPhone: function () {
+      this.showPlaceholder()
     }
   }
 }

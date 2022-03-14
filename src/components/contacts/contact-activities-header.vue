@@ -170,6 +170,7 @@ import Profile from 'components/profile'
 import { mapState } from 'vuex'
 export default {
   name: 'contact-activities-header',
+
   components: {
     Profile,
     InboxOIcon,
@@ -180,6 +181,7 @@ export default {
     EllipsisIcon,
     BackButton
   },
+
   props: {
     contact: {
       type: Object,
@@ -200,6 +202,7 @@ export default {
       default: 0
     }
   },
+
   computed: {
     ...mapState(['isMobile']),
     resolveVariant () {
@@ -228,6 +231,7 @@ export default {
       nextStat: null
     }
   },
+
   methods: {
     onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
@@ -249,7 +253,6 @@ export default {
     },
     back () {
       if (!this.$route.path.includes('channels') && this.$route.path.includes('contact')) {
-        // this.$emit('toggleContactSidebar', true)
         this.$router.back()
         return
       }

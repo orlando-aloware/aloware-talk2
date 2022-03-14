@@ -96,6 +96,7 @@ export default {
   mounted () {
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
+      this.setDefaultLine(this.contact.id)
       this.showPlaceholder()
     }
   },

@@ -22,9 +22,10 @@
               View
             </q-tooltip>
             <eye-icon height="16" width="16"></eye-icon>
-            <q-menu content-class="mx-height-300"
+            <q-menu content-class="mx-height-300 template-preview"
                     ref="templatesMenu"
-                    anchor="bottom left" self="top middle">
+                    max-width="15rem"
+                    :offset="[225, 0]">
               <div class="row no-wrap q-pa-md">
                 {{ template.body }}
               </div>
@@ -48,13 +49,6 @@
             </q-tooltip>
             <trash-o-icon/>
           </b-link>
-
-          <b-popover ref="popover"
-                     placement="topright"
-                     :target="`template-view-${template.id}`"
-                     triggers="click blur">
-            {{ template.body }}
-          </b-popover>
         </div>
       </li>
     </ul>

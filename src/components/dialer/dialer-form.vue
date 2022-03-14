@@ -1,6 +1,6 @@
 <template>
   <div class="row no-wrap pt-3 pb-3 width-380 dialer-wrapper"
-       :class="{ 'loading-cover-screen': isMakingCall }">
+       :class="{ 'loading-cover-screen': isMakingCall, 'on-call-tab': mode === 'call', 'on-text-tab': mode === 'text' }">
     <div class="loading-container"
          v-if="isMakingCall">
       <div class="mobile-call-loader">
@@ -151,10 +151,10 @@
       </b-tabs>
     </div>
     <h1 class="phone-padding lh-27 mb-3"
-        v-if="parkedCalls.length > 0">
+        v-if="isMobile && parkedCalls.length > 0">
       Parked Call{{ parkedCalls.length > 1 ? 's' : ''}}
     </h1>
-    <div class=""
+    <div class="mobile-parked-calls-list"
          v-if="isMobile">
       <div class="loading-container"
            v-if="loadingParkedCalls">
@@ -182,18 +182,18 @@
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
 import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
+import contactMixin from 'src/plugins/mixins/contact.mixin'
 
 export default {
   name: 'dialer-form',
 
   mixins: [
-    contactMixins,
-    parkCallMixins
+    parkCallMixins,
+    contactMixin
   ],
 
   components: {
@@ -463,10 +463,6 @@ export default {
       } else {
         this.hideDialer()
       }
-    },
-
-    selected () {
-      this.resetSelectorId()
     },
 
     'dialer.currentStatus': function () {

@@ -60,8 +60,9 @@
                     :color="moveColor"
                     :class="{ handle: column.draggable }" />
                 </div>
-                <span class="handle-label">
-                 {{ column.label }}
+                <span class="handle-label"
+                      :class="{ 'pl-2': column.label === 'Actions' }">
+                  {{ column.label }}
                 </span>
                 <div
                   class="sorter-container"
@@ -110,7 +111,7 @@
       </template>
       <div class="empty-state"
            v-else-if="!hasEmptySlot && isEmpty &&  !isLoading">
-        <div class="h5">No contacts found based on the current filters</div>
+        <div class="h5">{{ defaultPlaceholderMessage }}</div>
       </div>
     </div>
 
@@ -216,6 +217,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+    ...mapState(['isMobile']),
     defaultContactDateFilter () {
       if (this.currentCompany.default_contact_date_filter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
@@ -265,8 +267,18 @@ export default {
       return [
         `${this.isScrollable ? 'scrollableArea position-relative ' : ''}d-flex flex-column h-100 w-100 flex-grow-1`,
         this.scrollAreaClass,
-        `${this.isEmpty ? 'overflow-hidden' : ''}`
+        `${this.isEmpty ? 'overflow-hidden' : ''}`,
+        `${this.isMobile ? 'mobile-scrollableArea' : ''}`
       ]
+    },
+    test () {
+      return this.$route
+    },
+    defaultPlaceholderMessage () {
+      if (this.$route.name === 'Contacts' || this.$route.name === 'Contact') {
+        return 'No contacts found based on the current filters'
+      }
+      return 'No contacts found on the current list'
     }
   },
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <PowerDialerView
-      :id="id"
+      :pd-id="pdId"
       :name="name"
       @on-list-update="updateList" />
   </div>
@@ -30,7 +30,7 @@ export default {
     objId () {
       return this.$route
     },
-    id () {
+    pdId () {
       let id = this.$route.params.id
       return !isNaN(id) ? id : 'my-queue'
     }
@@ -38,7 +38,7 @@ export default {
   async mounted () {
     this.resetSearch()
     await this.myQueueList()
-    await this.loadList(this.id)
+    await this.loadList(this.pdId)
     // export_event_updates
     this.$VueEvent.listen('export_event_updates', (task) => {
       console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
@@ -59,14 +59,14 @@ export default {
       'setSelectedPDList'
     ]),
     async updateList (data) {
-      await this.loadList(data.id)
+      await this.loadList(data.pdId)
     },
     async fetchResources () {
       if (this.$route.meta.id === 'power-dialer-queue-filter') {
         await this.myQueueList()
         await this.loadList('my-queue')
       } else {
-        await this.loadList(this.id)
+        await this.loadList(this.pdId)
       }
     },
     async myQueueList () {

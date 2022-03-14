@@ -1,16 +1,15 @@
 <template>
   <div class="h-100"
        v-if="authenticated">
-    <!--div class="call-active">
-    </div-->
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side ref="inbox-side"
-                  :class="inboxSideClasses">
+                  :class="inboxSideClasses"
+                  @itemSelected="onItemSelected">
       </inbox-side>
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
            v-if="isContactShow">
-        <router-view></router-view>
+        <Contact></Contact>
       </div>
     </div>
   </div>
@@ -21,11 +20,14 @@ import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
+import Contact from 'pages/contacts/Contact'
 
 export default {
+  name: 'inbox',
+
   mixins: [contactMixins],
 
-  components: { InboxSide },
+  components: { Contact, InboxSide },
 
   computed: {
     ...mapGetters('auth', ['authenticated']),
@@ -83,6 +85,10 @@ export default {
           closed: res.data.closed
         })
       })
+    },
+    onItemSelected (routeData) {
+      this.contactId = routeData.params.id
+      this.$router.push(routeData)
     }
   },
 

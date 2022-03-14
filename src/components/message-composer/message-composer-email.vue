@@ -21,20 +21,8 @@
       </form>
     </div>
     <div class="d-flex justify-content-between">
-      <div class="message-options">
-        <b-link href="#" id="smsTemplate">
-          <calendar-today-icon></calendar-today-icon>
-          <q-tooltip>
-            Add template
-          </q-tooltip>
-        </b-link>
-        <b-link href="#" id="smsVariables">
-          <variable-icon></variable-icon>
-          <q-tooltip>
-            Add variable
-          </q-tooltip>
-        </b-link>
-      </div>
+      <message-composer-options @templateSelected="templateSelected"
+                                @variableSelected="variableSelected"/>
       <div>
         <q-btn color="primary"
                class="message-composer-send-button"
@@ -49,39 +37,21 @@
         </q-btn>
       </div>
     </div>
-    <b-popover ref="popover"
-               id="email-variables-popover"
-               placement="topright"
-               target="smsVariables"
-               triggers="click blur"
-               @show="onPopoverShown">
-      <variables always-open
-                 @variableSelected="variableSelected" ></variables>
-    </b-popover>
-
-    <b-popover ref="popover"
-               id="email-templates-popover"
-               placement="topright"
-               target="smsTemplate"
-               triggers="click blur"
-               @show="onPopoverShown">
-      <message-templates @templateSelected="templateSelected"></message-templates>
-    </b-popover>
+    <sms-template-modal></sms-template-modal>
   </div>
 </template>
 
 <script>
-import CalendarTodayIcon from 'components/icons/calendar-today-icon'
-import VariableIcon from 'components/icons/variable-icon'
-import Variables from 'components/message-composer/options/variables'
-import { mapActions, mapGetters } from 'vuex'
-import MessageTemplates from 'components/message-composer/options/message-templates'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import SmsTemplateModal from 'components/sms-template-modal'
+import MessageComposerOptions from 'components/message-composer/message-composer-options'
 export default {
   name: 'message-composer-email',
-  components: { MessageTemplates, Variables, VariableIcon, CalendarTodayIcon },
+  components: { MessageComposerOptions, SmsTemplateModal },
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapState('auth', ['profile']),
     validEmail () {
       return (this.messageComposer.email.body && this.messageComposer.email.body.trim().length > 0) && (this.messageComposer.email.subject && this.messageComposer.email.subject.trim().length > 0)
     },
@@ -103,7 +73,7 @@ export default {
     formatMessage () {
       return {
         campaign_id: this.selectedLine.id,
-        from_name: this.contact.name,
+        from_name: this.profile.name,
         message: this.messageComposer.email.body,
         subject: this.messageComposer.email.subject
       }
@@ -115,30 +85,19 @@ export default {
         this.$generalNotification('Email has been sent.')
       }).catch(error => {
         console.log(error)
-        this.$generalNotification('Error while sending email.', 'error')
+        this.$handleErrors(error.response)
       }).finally(() => {
         this.isSending = false
       })
     },
     templateSelected (template) {
       this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + template.body)
-      this.closeTemplatesPopover()
-    },
-    closeTemplatesPopover () {
-      this.$root.$emit('bv::hide::popover', 'email-templates-popover')
-      this.focusEmailBody()
     },
     variableSelected (variable) {
       this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + variable)
-      this.closeVariablesPopover()
-    },
-    closeVariablesPopover () {
-      this.$root.$emit('bv::hide::popover', 'email-variables-popover')
       this.focusEmailBody()
     },
-    onPopoverShown () {
-      this.$root.$emit('bv::hide::popover')
-    },
+
     focusEmailBody () {
       this.$refs.emailMessageBody.focus()
     }

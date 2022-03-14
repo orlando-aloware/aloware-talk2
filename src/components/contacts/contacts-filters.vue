@@ -293,6 +293,7 @@ export default {
           .catch((err) => {
             console.error(err)
             this.loadingFilters = false
+            this.$handleErrors(err.response)
             return Promise.reject()
           })
       }
@@ -363,6 +364,13 @@ export default {
       const filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
       const groupIndex = { data: null }
       const filterIndex = { data: null }
+      const operators = { data: null }
+      const found = { data: null }
+      const operator = { data: null }
+      const options = { data: null }
+      const option = { data: null }
+      const trueValue = { data: null }
+
       for (groupIndex.data in filterGroups) {
         if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
           filterGroups instanceof Array && filterGroups.splice(groupIndex.data, 1)
@@ -375,24 +383,26 @@ export default {
             continue
           }
 
-          const found = this.filters.find(filter => filter.key === filterIndex.data)
-          if (!found) {
+          found.data = this.filters.find(filter => filter.key === filterIndex.data)
+
+          if (!found.data) {
             continue
           }
-          const operators = found ? _.get(found, 'operators', null) : null
 
-          if (operators) {
-            const operator = found.operators.find(operator => operator.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
-            const options = operator ? _.get(operator, 'options', null) : null
-            const option = options ? options.find(option => option.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
-            const trueValue = { data: filterGroups[groupIndex.data].filters[filterIndex.data].value }
-            trueValue.data = option ? [option.label] : trueValue.data
+          operators.data = found.data ? _.get(found.data, 'operators', null) : null
+
+          if (operators.data) {
+            operator.data = found.data.operators.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
+            options.data = operator.data ? _.get(operator.data, 'options', null) : null
+            option.data = options.data ? options.data.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
+            trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].value
+            trueValue.data = option.data ? [option.data.label] : trueValue.data
             trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : trueValue.data
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
-              label: found.label,
-              operator: operator.label,
+              label: found.data.label,
+              operator: operator.data.label,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
               default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
@@ -400,7 +410,7 @@ export default {
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
-              label: found.label,
+              label: found.data.label,
               trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
               value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value),
               default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
@@ -419,8 +429,13 @@ export default {
       const filterFound = this.filters.find(filter => filter.key === key)
       const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
+      const labels = { data: null }
+      const item = { index: null }
+      const optionFound = { data: null }
+      const joinedValues = { data: null }
+      const values = { data: [] }
+
       if (typeof filter.trueValue === 'object') {
-        const values = { data: [] }
         switch (true) {
           case filter.trueValue.length === 1 || (isRelationType):
             values.data = filter.trueValue
@@ -430,24 +445,24 @@ export default {
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
         }
-        const labels = { data: [] }
+
+        labels.data = []
 
         if (filterFound && isRelationType) {
-          const item = { index: null }
           for (item.index of values.data) {
-            const optionFound = filterFound.options.find(option => option.value === item.index)
-            labels.data.push(optionFound ? optionFound.label : '')
+            optionFound.data = filterFound.options.find(option => option.value === item.index)
+            labels.data.push(optionFound.data ? optionFound.data.label : '')
           }
         } else {
           labels.data = filter.trueValue
         }
 
-        const joinedValues = labels.data.join(', ')
+        joinedValues.data = labels.data.join(', ')
         if (labels.data > 1) {
-          return joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+          return joinedValues.data.substring(0, joinedValues.data.lastIndexOf(',')) + ' or' + joinedValues.data.substring(joinedValues.data.lastIndexOf(',') + 1, joinedValues.data.length)
         }
 
-        return joinedValues
+        return joinedValues.data
       } else {
         return !isSimpleType ? filter.trueValue : ''
       }
@@ -472,6 +487,11 @@ export default {
         delete updatedFilter[index]
       }
 
+      if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
+        this.$VueEvent.fire('clearContacts')
+        this.$VueEvent.fire('fetchContacts')
+      }
+
       this.setCurrentListFilters(updatedFilter)
       this.$emit('filtersUpdated')
     },
@@ -485,6 +505,11 @@ export default {
 
       if (updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
+      }
+
+      if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
+        this.$VueEvent.fire('clearContacts')
+        this.$VueEvent.fire('fetchContacts')
       }
 
       this.setCurrentListFilters(updatedFilter)

@@ -42,6 +42,7 @@ export default {
       }).catch((err) => {
         this.loadingCallDisposition = false
         console.log(err)
+        this.$handleErrors(err.response)
       })
     }
   }

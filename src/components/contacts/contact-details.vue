@@ -50,8 +50,7 @@ import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-
 import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
 import { mapGetters, mapActions } from 'vuex'
-import { contact as contactMixins } from 'src/plugins/mixins'
-
+import contactMixins from 'src/plugins/mixins/contact.mixin'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'

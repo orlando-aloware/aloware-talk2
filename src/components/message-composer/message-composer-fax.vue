@@ -148,7 +148,7 @@ export default {
           }
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while sending fax.', 'error')
+          this.$handleErrors(error.response)
         }).finally(() => {
           this.isSending = false
         })

@@ -4,7 +4,7 @@
                           :buttonText="buttonText"
                           :values="campaignId"
                           :options="campaignsAlphabeticalOrder"
-                          :disable="disable"
+                          :disable="disable || campaignsIsLoading"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
                           v-if="genericMultiselect"
                           @valuesUpdated="updateLines">
@@ -21,11 +21,12 @@
               map-options
               outlined
               dense
+              :loading="campaignsIsLoading"
               :use-input="useInput"
               :error="hasError"
               :options="campaignOptions"
               :placeholder="placeholder"
-              :disable="disable"
+              :disable="disable || campaignsIsLoading"
               :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :multiple="multiple"
               :use-chips="useChips"
@@ -149,14 +150,15 @@ export default {
 
   data () {
     return {
-      campaignId: this.value || null,
+      // campaignId: this.value || null,
+      campaignId: null,
       campaignOptions: [],
       selectWidth: 0
     }
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'campaignsIsLoading']),
 
     placeholder () {
       switch (true) {
@@ -204,6 +206,9 @@ export default {
 
   created () {
     this.campaignOptions = this.campaignsAlphabeticalOrder
+    if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+      this.campaignId = this.value
+    }
   },
 
   methods: {
@@ -243,6 +248,19 @@ export default {
     campaignId (val) {
       if (this.campaignId !== this.value) {
         this.$emit('change', val)
+      }
+    },
+
+    campaignsIsLoading (val) {
+      if (val) {
+        this.campaignId = null
+        return
+      }
+
+      this.campaignId = this.value
+      this.campaignOptions = this.campaignsAlphabeticalOrder
+      if (typeof this.$refs.lineSelect !== 'undefined') {
+        this.$refs.lineSelect.refresh()
       }
     }
   }

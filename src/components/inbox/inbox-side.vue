@@ -27,7 +27,8 @@
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"
-                   :search-text="searchText"></inbox-tab>
+                   :search-text="searchText"
+                   @itemSelected="onItemSelected"/>
         <inbox-channels v-if="activeChannel && !['inbox'].includes(activeChannel.value)"
                         class="h-100 w-100 flex-grow-1 scroll-y"
                         :filter-type="activeChannel.type"
@@ -95,7 +96,7 @@ export default {
   },
 
   created () {
-    this.resetInboxVuex()
+    this.resetVuex(['inbox', 'non-cache'])
     this.closed = this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('Inbox') && this.$q.screen.lt.md
   },
 
@@ -123,6 +124,9 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
+    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'setCommunications']),
+    ...mapActions(['resetVuex']),
+
     toggle () {
       this.closed = !this.closed
     },
@@ -156,7 +160,9 @@ export default {
       this.onLoadShowTasks = true
     },
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'resetInboxVuex', 'setCommunications'])
+    onItemSelected (routeData) {
+      this.$emit('itemSelected', routeData)
+    }
   },
 
   watch: {
@@ -180,6 +186,12 @@ export default {
     isMobile () {
       if (this.isMobile && !this.$q.screen.lt.md) {
         this.setShowContactsHeader(true)
+      }
+    },
+    '$route.name': function (value) {
+      if (value === 'Inbox') {
+        const channel = this.items.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
       }
     }
   }

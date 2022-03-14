@@ -43,6 +43,7 @@ export default {
       }).catch((err) => {
         this.loadingContactDisposition = false
         console.log(err)
+        this.$handleErrors(err.response)
       })
     }
   }

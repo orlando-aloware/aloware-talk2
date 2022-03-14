@@ -1852,18 +1852,16 @@ export default {
         return
       }
 
-      // we need to assign dialer communication here to obtain values, for the reason that end wrap up resets all dialer data including communication
-      const communication = _.cloneDeep(this.dialer.communication)
-
-      this.endWrapUp()
-
-      this.$VueEvent.fire('makeCall', {
-        currentNumber: this.$options.filters.fixPhone(communication.lead_number),
-        outboundCampaignId: communication.campaign_id,
+      const data = {
+        currentNumber: this.$options.filters.fixPhone(this.dialer.communication.lead_number),
+        outboundCampaignId: this.dialer.communication.campaign_id,
         contactName: this.contactName,
         companyName: (this.contact) ? this.contact.company_name : '',
-        contactId: communication.contact_id
-      })
+        contactId: this.dialer.communication.contact_id
+      }
+      this.endWrapUp()
+
+      this.$VueEvent.fire('makeCall', data)
     },
     resizeHandler (e) {
       e = e || window.event

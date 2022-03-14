@@ -109,18 +109,18 @@ export default {
   methods: {
     fetchTemplates () {
       this.loading_templates = true
-      axios.get('/api/v1/sms-template').then(res => {
+      this.$axios.get('/api/v1/sms-template').then(res => {
         this.loading_templates = false
         this.templates = res.data
       }).catch(err => {
-        this.$root.handleErrors(err.response)
+        this.$handleErrors(err.response)
         this.loading_templates = false
       })
     },
 
     sendMessage () {
       this.loading_send_message = true
-      axios.post('/api/v1/campaign/send-message/' + this.campaign_id + '/' + this.contact_id, {
+      this.$axios.post('/api/v1/campaign/send-message/' + this.campaign_id + '/' + this.contact_id, {
         message: this.message,
         phone_number: this.phone_number
       }).then(res => {
@@ -129,7 +129,7 @@ export default {
         this.$generalNotification('Message sent')
         this.$emit('messageSent')
       }).catch(err => {
-        this.$root.handleErrors(err.response)
+        this.$handleErrors(err.response)
         this.loading_send_message = false
       })
     },

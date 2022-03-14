@@ -261,8 +261,8 @@ export default {
             .then(response => {
               this.$generalNotification('Scheduled message has been deleted.')
               this.getMessages()
-            }).catch(() => {
-              this.$generalNotification('Error while deleting scheduled message.', 'error')
+            }).catch((err) => {
+              this.$handleErrors(err.response)
             }).finally(() => {
               this.isDeleting = false
             })

@@ -40,7 +40,8 @@ export default {
   data () {
     return {
       metricGroupId: null,
-      loadingMetricGroups: false
+      loadingMetricGroups: false,
+      clearFocusInterval: null
     }
   },
 
@@ -53,16 +54,17 @@ export default {
     ...mapActions('stats', ['setMetricGroups']),
     focusToNewMetricGroup (metricGroupId) {
       const counter = { data: 0 }
-      const clearFocusInterval = setInterval(() => {
-        const metricGroup = this.metricGroups.find(metricGroup => metricGroup.id === metricGroupId)
-        if (metricGroup) {
+      const metricGroup = { data: null }
+      this.clearFocusInterval = setInterval(() => {
+        metricGroup.data = this.metricGroups.find(metricGroup => metricGroup.id === metricGroupId)
+        if (metricGroup.data) {
           // test this
-          this.metricGroupId = metricGroup.id
-          clearInterval(clearFocusInterval)
+          this.metricGroupId = metricGroup.data.id
+          clearInterval(this.clearFocusInterval)
         }
         counter.data++
         if (counter.data > 60000) {
-          clearInterval(clearFocusInterval)
+          clearInterval(this.clearFocusInterval)
         }
       }, 100)
     },
@@ -90,15 +92,20 @@ export default {
         .catch((err) => {
           console.error(err)
           this.loadingMetricGroups = false
+          this.$handleErrors(err.response)
           return Promise.reject()
         })
     }
   },
 
-  mounted () {
-    if (this.metricGroups && this.metricGroups.length < 1) {
-      this.getMetricGroups()
-    }
+  // mounted () {
+  //   if (this.metricGroups && this.metricGroups.length < 1) {
+  //     this.getMetricGroups()
+  //   }
+  // },
+
+  beforeDestroy () {
+    clearInterval(this.clearFocusInterval)
   }
 }
 </script>

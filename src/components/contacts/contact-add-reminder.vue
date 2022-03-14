@@ -75,7 +75,7 @@ export default {
           this.$generalNotification('Reminder has been added.')
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while adding reminder.', 'error')
+          this.$handleErrors(error.response)
         }).finally(() => {
           this.isAdding = false
         })

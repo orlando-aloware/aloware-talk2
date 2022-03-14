@@ -1,16 +1,37 @@
 <template>
   <div
     v-if="authenticated"
-    class="row mx-0 content-row d-flex overflow-hidden h-100">
+    class="contacts mx-0 content-row d-flex overflow-hidden h-100">
 
     <div
       v-show="!hasSessions"
-      class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
+      class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
       <PowerDialerSidebar />
     </div>
-    <div :class="`${hasSessions ? 'col-12' : 'col-10 main'} px-0 pr-1 mb-0`">
+    <div
+      class="px-0 mb-0 main flex-1"
+      :class="mainClass">
       <!-- Router Here -->
-      <router-view></router-view>
+      <router-view
+        :list="list"
+        :is-loading-disabled="isLoadingDisabled"
+        :is-start-state="isStartState"
+        :is-editable="isEditable"
+        :search="search"
+        :is-my-contacts-view="isMyContactsView"
+        :is-loading="isLoading"
+        :columns="columns"
+        :is-empty="isEmpty"
+        :is-loading-more="isLoadingMore"
+        :filters-count="filtersCount"
+        :selected-list-id="id"
+        @search="onSearch"
+        @checkboxChanged="onFetchMyContacts"
+        @sort="onSortByField"
+        @paginated="onPaginate"
+        @loadMore="onLoadMore"
+        @onFiltersCount="getFiltersCount">
+      </router-view>
     </div>
 
     <template v-if="!hasSessions">
@@ -53,12 +74,11 @@ import RemoveContact from 'components/remove-contact'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import ColumnHeaders from 'components/column-headers'
 import powermixin from 'src/plugins/mixins/power-dialer'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
 import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import sessionsMixins from 'src/plugins/mixins/sessions-engine'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 
 export default {
   name: 'PowerDialer',
@@ -76,11 +96,17 @@ export default {
   },
   mixins: [
     powermixin,
-    contactsMixins,
+    ContactsMixins,
     pdMixin,
     sessionsMixins
   ],
+  provide () {
+    return {
+      contactsData: this.contactsData
+    }
+  },
   computed: {
+    ...mapState(['isMobile']),
     ...mapFields('powerDialer', [
       'activeMetrics'
     ]),
@@ -95,6 +121,17 @@ export default {
       'selectedList'
     ]),
     ...mapState(['currentRoute']),
+    mainClass () {
+      if (this.$route.name === 'Contact') {
+        return 'w-100'
+      }
+
+      if (!this.$q.screen.lt.md) {
+        return ''
+      }
+
+      return !this.showContactsListSidebar ? 'w-100 no-min-max-width' : 'w-0'
+    },
     filterKeys () {
       let filterKeys = []
       let keys = DEFAULT_FILTER_LIST
@@ -153,14 +190,9 @@ export default {
     }
     next()
   },
-  data () {
-    return {
-      id: ''
-    }
-  },
   methods: {
     ...mapActions('contacts', [
-      'contactsLoaded',
+      // 'contactsLoaded',
       'clearList'
     ]),
     ...mapActions('powerDialer', [
@@ -183,10 +215,10 @@ export default {
         if (isEmpty(this.id)) {
           await this.fetchApi(params)
         } else {
-          this.contactsLoaded({
-            id: this.tempId,
-            ...DEFAULT_LIST_ITEMS
-          })
+          // this.contactsLoaded({
+          //   id: this.tempId,
+          //   ...DEFAULT_LIST_ITEMS
+          // })
           await this.fetchApi(params)
         }
       } else {
@@ -213,10 +245,10 @@ export default {
         this.START_DIAL_TOGGLE(false)
       }
       if (!route.id && this.$route.name === 'Power Dialer') {
-        route.id = 'in-queue'
-        this.id = 'in-queue'
+        // route.id = 'in-queue'
+        // this.id = 'in-queue'
       } else if (route.id && this.$route.name === 'Power Dialer') {
-        this.id = route.id
+        // this.id = route.id
       }
       await this.fetchContacts()
     },

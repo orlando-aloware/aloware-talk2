@@ -116,7 +116,7 @@ export default {
         this.onClose()
       }).catch(err => {
         console.log(err)
-        this.$generalNotification('Error while updating phone number.', 'error')
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.isBusy = false
       })
@@ -131,7 +131,7 @@ export default {
         this.onClose()
       }).catch(err => {
         console.log(err)
-        this.$generalNotification('Error while creating phone number.', 'error')
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.isBusy = false
       })

@@ -185,7 +185,6 @@ export default {
     ...mapState('inbox',
       [
         'taskCounts',
-        'contacts',
         'liveContacts',
         'selectedContact',
         'hasMoreContacts',
@@ -309,7 +308,6 @@ export default {
       const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
       if (index >= 0) {
         Vue.set(this.contacts, index, updatedContact)
-        this.setContacts(this.contacts)
       }
     },
     resetList () {
@@ -371,15 +369,13 @@ export default {
           this.currentTask = contact.task_status
         }
 
-        this.$router.push({
+        this.$emit('itemSelected', {
           name: 'Inbox Contact Task',
           params: {
             id: contactId.toString(),
             channel: 'inbox',
             status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }
-        }).catch(err => {
-          console.log(err)
         })
       }
     },
@@ -443,11 +439,7 @@ export default {
       this.toggleFilterModelForm(true)
     },
     updateContact (contact) {
-      if (_.isEmpty(this.contact)) {
-        return
-      }
-
-      if (_.isEmpty(contact)) {
+      if (_.isEmpty(this.contact) || _.isEmpty(contact)) {
         return
       }
 
@@ -466,6 +458,29 @@ export default {
       if (currentContact.id === this.contact.id) {
         this.setContact(currentContact)
       }
+    },
+    onRouteChange () {
+      this.setStatus()
+      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        }
+
+        this.lineOrRingGroupFilter = null
+        // prevent reset of filters if coming from the root
+        if (!this.$route.params.id) {
+          this.resetList()
+        } else {
+          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+            this.loadContactTasks()
+          }
+        }
+      }
+    },
+    onRouteNameChange () {
+      console.log(this.$route.name)
+      this.currentTask = ContactTaskStatus.STATUS_OPEN
+      this.resetList()
     }
   },
 
@@ -608,6 +623,12 @@ export default {
               ]
             )
           } else {
+            if (isInContacts) {
+              const index = contacts.data.findIndex(item => item.id === contact.id)
+              contacts.data[index] = contact
+              this.setContacts(contacts.data)
+            }
+
             // only modify order if new contact task === current task
             if (this.currentTask === contact.task_status) {
               if (!isInLiveContacts) {
@@ -712,6 +733,14 @@ export default {
           this.setContacts(contacts)
       }
     })
+
+    // this.$VueEvent.listen('inbox_route_change', () => {
+    //   this.onRouteChange()
+    // })
+    //
+    // this.$VueEvent.listen('inbox_route_name_change', () => {
+    //   this.onRouteNameChange()
+    // })
   },
 
   beforeDestroy () {

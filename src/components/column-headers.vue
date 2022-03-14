@@ -330,7 +330,7 @@ export default {
 
       return {
         items: columns,
-        results
+        results: results.data
       }
     },
     selected () {

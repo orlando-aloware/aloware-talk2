@@ -10,8 +10,8 @@
        class="d-flex align-items-center item"
        @click="toggleSidebar(navigate, $event)">
       <div class="icon d-flex align-items-center">
-        <folder-static-icon v-if="item.type === contactListType.STATIC"></folder-static-icon>
-        <folder-dynamic-icon v-if="item.type === contactListType.DYNAMIC || !item.type"></folder-dynamic-icon>
+        <folder-static-icon v-if="item.type === ContactListTypes.STATIC"></folder-static-icon>
+        <folder-dynamic-icon v-if="item.type === ContactListTypes.DYNAMIC || !item.type"></folder-dynamic-icon>
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <span>{{ item.name }}</span>
@@ -23,7 +23,7 @@
 <script>
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
-import { DYNAMIC, STATIC } from 'src/constants/contacts-list-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions } from 'vuex'
 
 export default {
@@ -35,10 +35,7 @@ export default {
   data () {
     return {
       loading: false,
-      contactListType: {
-        STATIC,
-        DYNAMIC
-      }
+      ContactListTypes
     }
   },
   props: {

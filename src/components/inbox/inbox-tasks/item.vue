@@ -344,7 +344,6 @@ export default {
 
   methods: {
     ...mapActions(['setShowPhone']),
-    ...mapActions('inbox', ['setLiveContacts', 'setContacts']),
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },

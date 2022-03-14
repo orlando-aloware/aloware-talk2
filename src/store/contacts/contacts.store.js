@@ -217,6 +217,10 @@ export default function () {
     showContactsListSidebar: false,
     unsavedList: null,
     activeFolder: '',
-    clearList: false
+    clearList: false,
+    pinnedListsLoaded: false,
+    publicListsLoaded: false,
+    myListsLoaded: false,
+    listContactsLoaded: false
   }
 }

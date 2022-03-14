@@ -26,7 +26,7 @@ export default {
   },
 
   mounted () {
-    this.fetchAllParkedCalls()
+    // this.fetchAllParkedCalls()
   },
 
   methods: {
@@ -49,9 +49,5 @@ export default {
           this.loadingParkedCalls = false
         })
     })
-  },
-
-  beforeDestroy () {
-    this.$VueEvent.stop('update_communication')
   }
 }

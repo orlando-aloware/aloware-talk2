@@ -5,13 +5,10 @@ import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import qs from 'qs'
 import _ from 'lodash'
-
-import {
-  DYNAMIC,
-  STATIC
-} from 'src/constants/contacts-list-types'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { RELATIONS } from 'src/constants/contacts-list-relations'
+import moment from 'moment'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   data () {
@@ -19,19 +16,57 @@ export default {
       isLoading: false,
       isLoaded: false,
       isLoadingMore: false,
-      myContacts: false,
-      ContactListType: { STATIC, DYNAMIC },
       initialListFilters: null,
       filtersCount: 0,
       DefaultContactDateFilter,
       ContactListTypes,
       sorts: null,
+      contactsData: {
+        total: 0,
+        current_page: 1,
+        next_page_url: null,
+        prev_page_url: null,
+        data: []
+      },
+      isNavigated: false,
       ALL_COLUMNS
     }
   },
 
   created () {
     this.init()
+    const hasOrder = { data: null }
+    const params = { data: null }
+    this.$VueEvent.listen('fetchContacts', (data) => {
+      hasOrder.data = _.get(data, 'hasOrder', true)
+      params.data = _.get(data, 'params', {})
+      this.fetch(params.data, hasOrder.data)
+    })
+    this.$VueEvent.listen('clearContacts', () => {
+      this.clearContacts()
+    })
+    this.$VueEvent.listen('onLoadMoreContacts', () => {
+      this.onLoadMore()
+    })
+
+    const _this = this
+
+    this.$VueEvent.listen('new_communication', function (communication) {
+      if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(_this.$route.name)) {
+        return
+      }
+
+      const index = _this.contactsData.data.findIndex(item => item.id === communication.contact_id)
+      if (index >= 0) {
+        talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+          _this.contactsData.data[index] = response.data
+
+          if (_this.contact.id === communication.contact_id) {
+            _this.setContact(response.data)
+          }
+        })
+      }
+    })
   },
 
   methods: {
@@ -42,19 +77,22 @@ export default {
       'setListSelectedContacts',
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
-      'setSelectedList'
+      'setSelectedList',
+      'setListContactsLoaded',
+      'setContact'
     ]),
     ...mapActions('powerDialer', [
       'updateMyQueueListData',
       'setSelectedPDList'
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
-    init () {
+    init: _.debounce(function () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
+      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
       this.initialListFilters = defaultFilters
       this.filtersCount = this.getFiltersCount(defaultFilters)
-    },
+    }, 200),
     onSortByField (sorts) {
       this.isLoaded = false
       this.sorts = sorts
@@ -68,8 +106,9 @@ export default {
     },
     onLoadMore () {
       if (this.hasMore) {
+        this.setListContactsLoaded(false)
         this.isLoadingMore = true
-        const nextPage = this.listItems[this.id].current_page + 1
+        const nextPage = this.contactsData.current_page + 1
 
         const sort = (this.sorts) ? this.sorts.orderBy : this.defaultContactDateFilter
         const order = (this.sorts) ? this.sorts.order : 'desc'
@@ -87,17 +126,16 @@ export default {
           })
           .then((response) => response.data)
           .then((data) => {
-            this.contactsLoaded({
-              id: this.id || 'all',
-              append: true,
-              ...data
-            })
+            this.setListContactsLoaded(true)
+            this.contactsLoaded(data)
             this.markCheckedAll()
           })
           .finally(() => {
             this.isLoadingMore = false
           })
           .catch((err) => {
+            this.setListContactsLoaded(true)
+            this.isLoadingMore = false
             console.log(err)
           })
       }
@@ -107,15 +145,17 @@ export default {
     },
     onFetchMyContacts (checked) {
       this.isLoading = true
+      this.$VueEvent.fire('clearContacts')
       this.fetch({
         contact_owner: checked ? this.profile.id : undefined,
         search: this.search,
-        page: this.listItems[this.id].page
+        page: this.contactsData.page
       })
     },
     onSearch (searchText) {
       this.isLoaded = false
       this.setSearch(searchText)
+      this.$VueEvent.fire('clearContacts')
       this.fetch({
         search: this.search
       })
@@ -138,6 +178,7 @@ export default {
       }
     },
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
+      this.setListContactsLoaded(false)
       params.search = this.search
       if (this.$route.name === 'Contacts') {
         params.relations = this.contactsRelations
@@ -155,11 +196,8 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          this.contactsLoaded({
-            id: this.id || 'all',
-            append: false,
-            ...data
-          })
+          this.contactsLoaded(data)
+          this.setListContactsLoaded(true)
 
           if (this.shouldUpdateSelectedListContactCount) {
             this.setSelectedListContactCount(data.total)
@@ -174,13 +212,11 @@ export default {
           let listId = this.id === 'my-queue' ? this.myQueue?.id : this.id
           const list = _.get(this.lists, listId, { id: null, name: '', type: null })
 
-          if (isContactModule) {
-            this.setSelectedList({
-              id: listId,
-              name: list.name,
-              type: list.type
-            })
-          }
+          this.setSelectedList({
+            id: listId,
+            name: list.name,
+            type: list.type
+          })
 
           this.markCheckedAll()
         })
@@ -189,6 +225,9 @@ export default {
           this.isLoaded = true
         })
         .catch((err) => {
+          this.isLoading = false
+          this.isLoaded = true
+          this.setListContactsLoaded(true)
           console.log(err)
         })
     }, 1000),
@@ -331,8 +370,8 @@ export default {
       return filtersCount.data
     },
     markCheckedAll () {
-      if (this.selectedContacts[this.id] && this.listItems[this.id] && document.querySelector('.data-table-check-all')) {
-        document.querySelector('.data-table-check-all').checked = this.listItems[this.id].data.length > 0 && this.selectedContacts[this.id].length >= this.listItems[this.id].data.length
+      if (this.selectedContacts[this.id] && !_.isEmpty(this.contactsData) && document.querySelector('.data-table-check-all')) {
+        document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && this.selectedContacts[this.id].length >= this.contactsData.data.length
       }
     },
     fixDefaultFilters () {
@@ -362,18 +401,79 @@ export default {
       }
 
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
+    },
+    contactsLoaded (listData) {
+      const dataLength = listData.data.length
+      const found = { data: null }
+      const item = { data: null }
+      const currentPage = _.get(listData, 'current_page', 0)
+
+      if (!_.isEmpty(this.contactsData.data)) {
+        for (item.data in this.contactsData.data) {
+          found.data = listData.data.find(contact => contact.id === this.contactsData.data[item.data].id)
+          found.data = found.data ? listData.data.indexOf(found.data) : null
+
+          if (currentPage === 1 && found.data !== -1 && found.data !== null) {
+            this.contactsData.data[item.data] = listData.data[found.data]
+          }
+
+          if (found.data !== -1 && found.data !== null) {
+            listData.data.splice(found.data, 1)
+          }
+        }
+      }
+
+      // we have to skip the pagination data from api
+      // if we navigated from Contact to Contacts page
+      if (!this.isNavigated) {
+        for (item.data in listData) {
+          if (item.data === 'data') {
+            continue
+          }
+
+          if (this.contactsData[item.data] !== 'undefined') {
+            this.contactsData[item.data] = listData[item.data]
+          }
+        }
+      }
+
+      this.isNavigated = false
+
+      for (item.data of listData.data) {
+        this.contactsData.data.push(item.data)
+      }
+
+      if (currentPage === 1 && this.contactsData.data.length > dataLength) {
+        this.contactsData.data.sort((a, b) => { return moment(b.last_engagement_at).unix() - moment(a.last_engagement_at).unix() })
+      }
+    },
+    clearContacts () {
+      this.contactsData = {
+        data: []
+      }
     }
   },
 
   computed: {
     ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount']),
     ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList']),
+    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList', 'contact']),
     ...mapState('cache', ['currentCompany']),
     ...mapState(['defaultDateFilter']),
     ...mapGetters('powerDialer', [
       'activeFilter'
     ]),
+    id () {
+      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        return this.$route.params.id
+      } else if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
+        return this.$route.params.id
+      } else if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
+        return this.$route.params.id
+      }
+
+      return 'all'
+    },
     defaultContactDateFilter () {
       if (this.currentCompany && this.defaultDateFilter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
@@ -384,7 +484,7 @@ export default {
       return 'last_engagement_at'
     },
     hasMore () {
-      return (this.listItems[this.id]?.next_page_url &&
+      return (this.contactsData?.next_page_url &&
         !this.isLoadingMore &&
         !this.isLoading) ||
         false
@@ -406,14 +506,15 @@ export default {
       return start !== null
     },
     isEmpty () {
-      const data = _.get(this.listItems[this.id], 'data', [])
+      const data = _.get(this.contactsData, 'data', [])
       return this.isLoaded && !data.length
     },
     isMyContactsView () {
       return DEFAULT_PINNED_LIST.MY_CONTACTS.id === this.id
     },
     isEditable () {
-      return !this.defaultIds.includes(this.list.id)
+      const listId = _.get(this.list, 'id', null)
+      return !listId || (listId && !this.defaultIds.includes(listId))
     },
     defaultIds () {
       return Object.keys(DEFAULT_PINNED_LIST)
@@ -468,11 +569,11 @@ export default {
       return this.lists[this.id].filters
     },
     list () {
-      if (!this.$route.params.id) {
+      if (!this.id) {
         return this.lists['all']
       }
 
-      return this.lists[this.$route.params.id]
+      return this.lists[this.id]
     },
     contactsRelations () {
       const relations = []
@@ -489,12 +590,47 @@ export default {
       return POWER_DIALER_FILTERS
     }
   },
+
   watch: {
-    list: {
+    // 'list.filters': function () {
+    //   this.init()
+    // },
+    currentListFilters: {
       deep: true,
       handler: function () {
+        if (this.$route.name === 'Contacts') {
+          // const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          // this.fetch(params)
+          this.filtersCount = this.getFiltersCount(this.currentListFilters)
+        }
+      }
+    },
+    'list.id': function (value) {
+      if (value && (this.$route.name === 'Contacts' || this.$route.name === 'Power Dialer')) {
+        this.clearContacts()
+      }
+    },
+    $route (to, from) {
+      this.isNavigated = true
+
+      if (to.name === 'Contacts' || to.name === 'Power Dialer') {
         this.init()
       }
+
+      if (from.name === 'Contact' && to.name === 'Contacts') {
+        this.isNavigated = false
+        return
+      }
+
+      if ((from.name === 'Contacts' && to.name === 'Contacts') || (from.name === 'Power Dialer' && to.name === 'Power Dialer')) {
+        this.isNavigated = false
+      }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('fetchContacts')
+    this.$VueEvent.stop('clearContacts')
+    this.$VueEvent.stop('onLoadMoreContacts')
   }
 }

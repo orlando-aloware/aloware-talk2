@@ -1208,6 +1208,7 @@ i.option-separator {
 
 .contact-activity {
   max-width: 380px;
+  transition: transform 270ms cubic-bezier(0.79, 0.14, 0.15, 0.86) 0ms, border-color 270ms linear 0ms;
 
   .q-item {
     min-height: 41px;
@@ -5335,6 +5336,12 @@ button#bs-folder-options {
   overflow-x: auto;
   max-height: calc(100vh - 172px);
   height: 100vh !important;
+  &:not(.mobile-scrollableArea) {
+    max-height: calc(100vh - 172px);
+  }
+  &.mobile-scrollableArea {
+    max-height: calc(100vh - 242px);
+  }
 }
 
 .paginated {
@@ -5861,7 +5868,7 @@ table.datatable {
     min-width: 40px;
     max-width: 40px;
 
-    &__action {
+    /*&__action {
       &--call:hover {
         color: $green;
       }
@@ -5873,7 +5880,7 @@ table.datatable {
       &--trash:hover {
         color: $red;
       }
-    }
+    }*/
 
     button {
       color: $grey-mid;
@@ -8527,9 +8534,6 @@ span.mention {
 @media screen and (max-width: 1425px) and (min-width: 1085px),
 screen and (max-width: 956px) {
   .contacts-total {
-    white-space: nowrap;
-    margin-left: 15px;
-
     &.mobile {
       display: none;
     }
@@ -8838,6 +8842,15 @@ screen and (max-width: 956px) {
 }
 
 @media (max-width: 991px) {
+  .contacts-total {
+    white-space: nowrap;
+    margin-left: 15px;
+  }
+  .datatable-wrapper {
+    .scrollableArea:not(.mobile-scrollableArea) {
+      max-height: calc(100vh - 195px);
+    }
+  }
   .main-content {
     .contacts {
       > .main .mycard > div:first-child,
@@ -8910,8 +8923,15 @@ screen and (max-width: 956px) {
     &:not(.hide) {
       display: grid !important;
       grid-template-rows: 1fr auto;
-      > div:last-child {
-        max-height: 353px;
+      &.on-text-tab {
+        .mobile-parked-calls-list {
+          max-height: calc(100vh - 413px);
+        }
+      }
+      &.on-call-tab {
+        .mobile-parked-calls-list {
+          max-height: calc(100vh - 343px);
+        }
       }
     }
     &.hide {
@@ -9644,7 +9664,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media screen and (max-height: 600px) {
+@media screen and (max-height: 500px) {
   .unsupported {
     display: flex !important;
     height: 100%;
@@ -10995,4 +11015,17 @@ screen and (max-width: 956px) {
 
 .cursor-default {
   cursor: default !important;
+}
+
+
+.template-preview {
+  min-width: 15rem !important;
+}
+
+.aloicons {
+  font-family: $font-family-icons;
+  color: #62666E !important;
+  &.action-icons {
+    font-size: $f-size-h3;
+  }
 }

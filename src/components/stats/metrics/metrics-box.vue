@@ -22,7 +22,7 @@
         class="metric-box text-black m-2">
         <q-card-actions>
           <div :class="`metric-box-label text-weight-medium text-${color}`">
-            <span v-if="metric && metric.category === 'call_time_&_duration'">
+            <span v-if="isDurationMetric">
               {{ (metric.value ? metric.value : 0) | fixFullDuration }}
             </span>
             <span v-else>
@@ -142,7 +142,7 @@ export default {
     preformattedMetric () {
       return {
         color: this.metric.color,
-        metricId: this.metric.metric_id
+        metricId: `${this.metric.type}_${this.metric.metric_id}`
       }
     },
     metricValue () {
@@ -150,6 +150,9 @@ export default {
     },
     metricCategory () {
       return this.$options.filters.ucwords(_.get(this.metric, 'categoryLabel', '').replace(/_/g, ' '))
+    },
+    isDurationMetric () {
+      return this.metric && ['call_time_&_duration', 'agent_status'].includes(this.metric.category)
     }
   },
   data () {
@@ -186,7 +189,7 @@ export default {
         .then(res => {
           this.deleteMetric({
             metricGroupId: this.metric.agent_metric_group_id,
-            id: this.metric.id
+            id: this.metric.metric_id
           })
           this.$generalNotification('Metric successfully removed.')
           this.$emit('remove', false)
@@ -199,24 +202,28 @@ export default {
         })
     },
     updateExistingMetric (data) {
+      this.loader = true
+      const metricId = parseInt(data.metricId.replace(`${data.type}_`, ''))
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.metric.agent_metric_group_id}/metrics/${this.metric.id}`, {
-        metric_id: data.metricId,
+        metric_id: metricId,
         type: data.type,
         color: data.color
       }).then(res => {
         const newData = { ...this.metric }
-        newData.metric_id = data.metricId
+        newData.metric_id = metricId
         newData.color = data.color
-        const metric = this.availableMetrics.find(metric => metric.metric_id === data.metricId)
+        const metric = this.availableMetrics.find(item => item.metric_id === metricId)
         newData.label = metric ? metric.label : ''
         newData.order = res.data.order
-        this.updateMetric(newData)
+        this.updateMetric({ data: newData, previousMetricId: this.metric.metric_id })
         this.$generalNotification('Metric updated successfully.')
         this.editModal = false
+        this.loader = false
       }).catch(err => {
         console.log(err)
         this.$generalNotification('Failed to update metric.', 'error')
         this.editModal = false
+        this.loader = false
       })
     },
     confirmDeletion () {

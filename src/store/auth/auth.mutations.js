@@ -1,3 +1,6 @@
+import _ from 'lodash'
+import * as AuthDefault from 'src/constants/auth-default'
+
 export default {
   SET_PROFILE (state, profile) {
     state.profile = profile
@@ -10,5 +13,26 @@ export default {
   },
   SET_LOADING (state, loading) {
     state.loading = loading
+  },
+
+  RESET_VUEX (state, value) {
+    if (!_.isArray(value) || _.isEmpty(value)) {
+      return
+    }
+
+    const newState = { data: AuthDefault.DEFAULT_STATE }
+
+    if (value.includes('non-cache')) {
+      delete newState.profile
+    }
+
+    state = Object.assign(state, newState)
+
+    if (!value.includes('all')) {
+      return
+    }
+
+    // else, perform state reset
+    state = Object.assign({}, AuthDefault.DEFAULT_STATE)
   }
 }

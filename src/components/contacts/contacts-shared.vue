@@ -37,7 +37,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['foldersLoaded', 'createListOpen']),
+    ...mapActions('contacts', [
+      'foldersLoaded',
+      'createListOpen',
+      'setPublicListsLoaded'
+    ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
     },
@@ -48,13 +52,18 @@ export default {
     },
     loadFolders () {
       this.isLoading = true
+      this.setPublicListsLoaded(false)
+      this.lists = []
       talk2Api.V2.contactList.public().then(response => {
         this.lists = response.data.data
       }).catch((err) => {
         console.error(err)
         this.$generalNotification('Unable to load folders please try again.', 'error')
+        this.setPublicListsLoaded(true)
+        this.isLoading = false
       }).finally(() => {
         this.isLoading = false
+        this.setPublicListsLoaded(true)
       })
     }
   },
@@ -68,6 +77,16 @@ export default {
   },
   mounted () {
     this.loadFolders()
+    this.$VueEvent.listen('fetchContactsLists', () => {
+      this.loadFolders()
+    })
+  },
+  watch: {
+    $route (to) {
+      if (to.name !== 'Contacts') {
+        this.loadFolders()
+      }
+    }
   }
 }
 </script>

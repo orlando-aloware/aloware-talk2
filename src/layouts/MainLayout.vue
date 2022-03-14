@@ -566,11 +566,11 @@ export default {
       }
 
       // missed call notification
-      if (communication.type === CommunicationTypes.CALL &&
-        communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
-        !this.profile.sleep_mode) {
-        this.processActionNotification(communication, 'missed call')
-      }
+      // if (communication.type === CommunicationTypes.CALL &&
+      //   communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
+      //   !this.profile.sleep_mode) {
+      //   this.processActionNotification(communication, 'missed call')
+      // }
 
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
@@ -641,6 +641,12 @@ export default {
 
     if (!this.isMobile) {
       this.setShowContactsHeader(true)
+    }
+
+    if (this.$route.name.includes('Inbox')) {
+      setTimeout(() => {
+        this.$VueEvent.fire('inbox_route_name_change')
+      }, 1000)
     }
   },
 
@@ -798,6 +804,13 @@ export default {
 
     initAuth () {
       this.loading = true
+      this.setCampaignsIsLoading(true)
+      this.setTagsFullyLoaded(true)
+
+      if (['Stats'].includes(this.$route.name)) {
+        this.setMetricLoader(true)
+      }
+
       this.initAccount().then(() => {
         this.loading = false
         if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
@@ -818,14 +831,14 @@ export default {
 
         this.broadcastInit()
       }).finally(() => {
-        this.getRingGroups()
-        this.getBroadcasts()
-        this.getTemplates()
-
         if (['Stats'].includes(this.$route.name)) {
           this.getAvailableMetrics()
           this.metricsDataLoaded = true
         }
+
+        this.getRingGroups()
+        this.getBroadcasts()
+        this.getTemplates()
 
         this.getCampaigns()
         this.getFullTags()
@@ -899,7 +912,6 @@ export default {
     getCampaigns () {
       if (this.hasPermissionTo('list campaign')) {
         this.loadingCampaigns = true
-        this.setCampaignsIsLoading(true)
         return this.$axios
           .get('/api/v1/campaign', {
             mode: 'no-cors',
@@ -969,7 +981,6 @@ export default {
         .get('/api/v1/tag', { params: { full_load: true } })
         .then((res) => {
           this.setTags(res.data)
-          this.setTagsFullyLoaded(true)
           this.$VueEvent.fire('tags_loaded')
           this.loadingTags = false
           return Promise.resolve()
@@ -1132,19 +1143,21 @@ export default {
           const index = { data: null }
           const option = { data: null }
           const key = { data: null }
+          const optionGroup = { data: null }
+          const categoryLabel = { data: null }
           for (index.data in availableMetrics) {
-            const optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(optionGroup => optionGroup.name === index.data)
-            const categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.data.replace(/_/g, ' '))
+            optionGroup.data = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(item => item.name === index.data)
+            categoryLabel.data = optionGroup.data ? optionGroup.data.label : this.$options.filters.ucwords(index.data.replace(/_/g, ' '))
             structuredMetricGroups.push({
               disable: true,
               value: null,
-              label: categoryLabel
+              label: categoryLabel.data
             })
 
             if (availableMetrics[index.data].constructor.name === 'Array') {
               for (option.data of availableMetrics[index.data]) {
                 option.data.disable = false
-                option.data.categoryLabel = categoryLabel
+                option.data.categoryLabel = categoryLabel.data
                 structuredMetricGroups.push(option.data)
               }
             }
@@ -1152,7 +1165,7 @@ export default {
             if (availableMetrics[index.data].constructor.name === 'Object') {
               for (key.data of Object.keys(availableMetrics[index.data])) {
                 availableMetrics[index.data][key.data].disable = false
-                availableMetrics[index.data][key.data].categoryLabel = categoryLabel
+                availableMetrics[index.data][key.data].categoryLabel = categoryLabel.data
                 structuredMetricGroups.push(availableMetrics[index.data][key.data])
               }
             }
@@ -1716,9 +1729,7 @@ export default {
       this.$VueEvent.stop('update_communication')
       this.$VueEvent.stop('new_version')
       this.unsubscribeFromPusher()
-      this.resetContactsDefaultVuex()
-      this.resetContactsVuex()
-      this.resetInboxVuex()
+      this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
       window.removeEventListener('keydown', this.removeBehaviorsRestrictions)
@@ -1732,7 +1743,6 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
     ...mapActions([
       'resetVuex',
-      'resetContactsDefaultVuex',
       'setUsage',
       'setCampaigns',
       'setCampaignsIsLoading',
@@ -1763,8 +1773,7 @@ export default {
       'setEnableAudio',
       'setDefaultDateFilter'
     ]),
-    ...mapActions('contacts', ['resetContactsVuex', 'resetSearch', 'setShowContactsHeader']),
-    ...mapActions('inbox', ['resetInboxVuex']),
+    ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
@@ -1799,8 +1808,8 @@ export default {
       if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
         (to.name !== from.name)) {
-        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Sessions') {
-          this.resetContactsVuex()
+        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
+          this.resetVuex(['contacts', 'non-cache'])
         }
       }
 
@@ -1811,7 +1820,7 @@ export default {
       if (!(from.name === 'Inbox' && this.$route.name === 'Inbox Contact') &&
         !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
         (to.name !== from.name)) {
-        this.resetInboxVuex()
+        this.resetVuex(['inbox', 'non-cache'])
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
@@ -1836,6 +1845,19 @@ export default {
 
       if (!this.isMobile && to.name === 'Phone' && fromName) {
         this.$router.back()
+      }
+
+      const inboxStatus = _.get(this.$route, 'params.status', null)
+      if (inboxStatus) {
+        setTimeout(() => {
+          this.$VueEvent.fire('inbox_route_change')
+        }, 1000)
+      }
+
+      if (to.name.includes('Inbox')) {
+        setTimeout(() => {
+          this.$VueEvent.fire('inbox_route_name_change')
+        }, 1000)
       }
     },
 

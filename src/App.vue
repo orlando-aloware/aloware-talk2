@@ -75,7 +75,7 @@ export default {
     },
     async cookieUserValidated ({ data: { data } }) {
       const { usage, company } = data
-      this.resetVuex()
+      this.resetVuex(['non-cache'])
       this.setCurrentCompany(company)
       this.setUsage(usage)
       this.cookieValidated = true

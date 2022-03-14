@@ -125,8 +125,8 @@ export default {
           }
 
           return { status: true }
-        }).catch(() => {
-          this.$generalNotification('Error while updating contact disposition status.', 'error')
+        }).catch((err) => {
+          this.$handleErrors(err.response)
           return { status: false }
         })
       }

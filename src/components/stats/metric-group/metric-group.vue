@@ -53,16 +53,18 @@
             :move="checkMove"
             tag="ul">
             <transition-group type="transition"
-                              :class="{ 'd-flex': loaderToggled }"
+                              class="d-flex flex-wrap"
                               name="flip-list">
               <template v-if="metricsList">
-                <MetricsBox
-                  :ref="`metric-box-${index}`"
-                  class="metric-box-item movable"
-                  v-for="(metric, index) in metricsList"
-                  :key="metric.id"
-                  :metric="metric"
-                  @remove="onLoaderToggled"/>
+                <template v-for="(metric, index) in metricsList">
+                  <MetricsBox
+                    class="metric-box-item movable"
+                    :ref="`metric-box-${index}`"
+                    :key="metric.id"
+                    :metric="metric"
+                    v-if="metric.label"
+                    @remove="onLoaderToggled"/>
+                </template>
                 <MetricLoader :key="`metric-loader-` + metricGroupId"
                               v-if="loader" />
               </template>
@@ -259,7 +261,7 @@ export default {
       this.updateLoading = value
       const index = { data: null }
       for (index.data in this.metricsList) {
-        if (this.$refs[`metric-box-${index.data}`]) {
+        if (!_.isEmpty(this.$refs[`metric-box-${index.data}`])) {
           this.$refs[`metric-box-${index.data}`][0].toggleLoader(value)
         }
       }

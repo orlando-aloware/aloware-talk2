@@ -12,12 +12,8 @@
 
 import { mapGetters, mapActions } from 'vuex'
 import PowerDialerAddItems from 'src/pages/contacts/ContactsAddItemsStatic.vue'
-import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
+// import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import {
-  STATIC,
-  DYNAMIC
-} from 'src/constants/contacts-list-types'
 
 export default {
   name: 'PowerDialerAddView',
@@ -57,17 +53,13 @@ export default {
   },
   data () {
     return {
-      name: 'Power Dialer X',
-      ContactListType: {
-        STATIC,
-        DYNAMIC
-      }
+      name: 'Power Dialer X'
     }
   },
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
-      'contactsLoaded',
+      // 'contactsLoaded',
       'openFilters'
     ]),
     loadList (id) {
@@ -82,10 +74,10 @@ export default {
       }
 
       if (!this.listItems[stringId]) {
-        this.contactsLoaded({
-          id: stringId,
-          ...DEFAULT_CONTACT_LIST_ITEMS
-        })
+        // this.contactsLoaded({
+        //   id: stringId,
+        //   ...DEFAULT_CONTACT_LIST_ITEMS
+        // })
       }
 
       this.$axios

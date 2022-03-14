@@ -39,7 +39,7 @@
         </b-button>
 
         <variables v-if="showVariableSelector"
-                   :close-on-select="true"
+                   :close-on-select="false"
                    @close="showVariableSelector = false"
                    @variableSelected="variableSelected">
         </variables>
@@ -144,7 +144,6 @@ export default {
 
     variableSelected (variable) {
       this.template.body = (this.template.body ?? '') + ' ' + variable
-      this.$refs.variablesMenu.hide()
     },
 
     onSubmit () {
@@ -177,13 +176,8 @@ export default {
         this.$generalNotification(`Template has been ${pastActionText.data.toLowerCase()}.`)
         this.$emit('templateSaved', response.data)
       }).catch(error => {
-        if (error.response.data && error.response.data.errors) {
-          Object.keys(error.response.data.errors).forEach((value) => {
-            this.$generalNotification(error.response.data.errors[value][0], 'error')
-          })
-        } else {
-          this.$generalNotification(`Error while ${presentActionText.data.toLowerCase()} sms template.`, 'error')
-        }
+        console.log(error)
+        this.$handleErrors(error.response)
       }).finally(() => {
         this.isSaving = false
       })

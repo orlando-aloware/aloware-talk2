@@ -1,6 +1,6 @@
 import { mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
+// import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
@@ -12,7 +12,7 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
-      'contactsLoaded',
+      // 'contactsLoaded',
       'setCurrentListFilters',
       'resetSearch'
     ]),
@@ -30,10 +30,10 @@ export default {
       }
 
       if (!this.listItems[stringId]) {
-        this.contactsLoaded({
-          id: stringId,
-          ...DEFAULT_LIST_ITEMS
-        })
+        // this.contactsLoaded({
+        //   id: stringId,
+        //   ...DEFAULT_LIST_ITEMS
+        // })
       }
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
