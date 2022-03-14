@@ -1163,7 +1163,7 @@ export default {
         }
       }
 
-      this.makeCall()
+      this.makeCall(contact)
     },
 
     makeCall (contact) {

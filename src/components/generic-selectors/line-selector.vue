@@ -242,7 +242,9 @@ export default {
 
   watch: {
     value () {
-      this.campaignId = this.value
+      if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
+        this.campaignId = this.value
+      }
     },
 
     campaignId (val) {

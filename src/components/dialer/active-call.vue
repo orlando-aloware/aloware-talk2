@@ -35,7 +35,7 @@
     </q-item-section>
 
     <q-item-section side>
-      <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
+      <q-btn :disable="dialer.currentStatus === 'MAKING_CALL' || isHangingUp"
              v-if="profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP"
              icon="img:app-icons/dialer/hangup_btn.svg"
              size="22px"
@@ -73,6 +73,7 @@ export default {
 
   data () {
     return {
+      isHangingUp: false,
       AgentStatus
     }
   },
@@ -103,6 +104,7 @@ export default {
 
   methods: {
     hangupCall ($event) {
+      this.isHangingUp = true
       $event.stopPropagation()
       $event.preventDefault()
       this.$VueEvent.fire('hangupCall')
@@ -119,6 +121,18 @@ export default {
       //   this.$VueEvent.fire('togglePhone')
       // }
       this.$VueEvent.fire('togglePhone')
+    }
+  },
+  watch: {
+    'dialer.currentStatus': function (value) {
+      if (value === 'MAKING_CALL') {
+        this.isHangingUp = false
+      }
+    },
+    'profile.agent_status': function (value) {
+      if (value === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        this.isHangingUp = false
+      }
     }
   }
 }
