@@ -19,6 +19,7 @@
               :disable="disable"
               :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :use-chips="useChips"
+              :clearable="clearable"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMenu"
               @filter="filterFn">
@@ -95,6 +96,11 @@ export default {
       default: false
     },
     multiple: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    clearable: {
       type: Boolean,
       default: false,
       required: false
