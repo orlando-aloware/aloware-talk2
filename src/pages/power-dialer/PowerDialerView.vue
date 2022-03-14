@@ -27,6 +27,7 @@
             <b-col cols="12">
               <div class="d-flex">
                 <PowerDialerFilter
+                  v-if="fixedContactsData"
                   :list-data="fixedContactsData"
                   :id="selectedListId"
                   :filter="filter"
@@ -50,7 +51,7 @@
               v-if="$q.screen.name === 'lg'">
               <div class="d-flex">
                 <PowerDialerFilter
-                  v-if="activeRoute"
+                  v-if="fixedContactsData"
                   :list-data="fixedContactsData"
                   :id="selectedListId"
                   :filter="filter"

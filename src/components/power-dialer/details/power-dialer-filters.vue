@@ -1,6 +1,8 @@
 <template>
   <b-card class="filter-chips border-0 text-center px-2" no-body>
-    <div class="t-grouped-buttons">
+    <div
+      class="t-grouped-buttons"
+      v-if="listData">
 
       <router-link
         class="link px-1"
