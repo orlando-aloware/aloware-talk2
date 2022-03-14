@@ -1,6 +1,6 @@
 <template>
   <b-card class="filter-chips border-0 text-center px-2" no-body>
-    <div v-if="hasValidData" class="t-grouped-buttons">
+    <div class="t-grouped-buttons">
 
       <router-link
         class="link px-1"
@@ -12,11 +12,11 @@
             {{ lsFilter.name }}
           </div>
           <div :class="`t__badge ${id === lsFilter.id ? 'active' : ''}`">
-            <span v-if="lsFilter.id === 'in-queue'">{{ list.total_queued }}</span>
-            <span v-else-if="lsFilter.id === 'called'">{{ list.total_called }}</span>
-            <span v-else-if="lsFilter.id === 'failed'">{{ list.total_failed }}</span>
-            <span v-else-if="lsFilter.id === 'scheduled'">{{ list.total_scheduled }}</span>
-            <span v-else>{{ list.total_items }}</span>
+            <span v-if="lsFilter.id === 'in-queue'">{{ filtersCounter.in_queue }}</span>
+            <span v-else-if="lsFilter.id === 'called'">{{ filtersCounter.called }}</span>
+            <span v-else-if="lsFilter.id === 'failed'">{{ filtersCounter.failed }}</span>
+            <span v-else-if="lsFilter.id === 'scheduled'">{{ filtersCounter.scheduled }}</span>
+            <span v-else>{{ filtersCounter.all }}</span>
           </div>
         </div>
       </router-link>
@@ -30,7 +30,7 @@
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import { mapGetters } from 'vuex'
-import { isEmpty } from 'lodash'
+// import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerFilters',
@@ -49,7 +49,7 @@ export default {
     },
     listData: {
       type: Object,
-      default: () => {}
+      default: null
     }
   },
   computed: {
@@ -58,7 +58,7 @@ export default {
       'filteredEndpoint'
     ]),
     hasValidData () {
-      return !isEmpty(this.listData)
+      return this.listData.path !== undefined
     },
     activeFilters () {
       return POWER_DIALER_FILTERS
@@ -99,9 +99,30 @@ export default {
       return `/power-dialer/list/${this.id}/${listFilter.id}`
     }
   },
+  watch: {
+    'listData': {
+      handler (val) {
+        this.filtersCounter = {
+          in_queue: val.total_queued,
+          called: val.total_called,
+          failed: val.total_failed,
+          scheduled: val.total_scheduled,
+          all: val.total_items
+        }
+      },
+      deep: true
+    }
+  },
   data () {
     return {
-      valid: true
+      valid: true,
+      filtersCounter: {
+        in_queue: 0,
+        called: 0,
+        failed: 0,
+        scheduled: 0,
+        all: 0
+      }
     }
   }
 }

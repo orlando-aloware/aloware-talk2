@@ -708,12 +708,17 @@ export default {
       this.initialListFilters = this.currentListFilters
       this.loadList(this.selectedListId)
     },
+    '$route.params.filter': function (value) {
+      console.log('CHANGED LIST FILTERS', value)
+      this.resetFilters()
+      this.initialListFilters = this.currentListFilters
+      this.loadList(this.selectedListId)
+    },
     currentListFilters: {
       deep: true,
       handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          console.log('params :>> ', params)
           this.fetch(params, this.hasFilters)
           this.$emit('onFiltersCount', this.currentListFilters)
           // this.filtersCount = this.getFiltersCount(this.currentListFilters)

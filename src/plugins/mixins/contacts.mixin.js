@@ -196,6 +196,7 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          console.log('data :>> ', data)
           this.contactsLoaded(data)
           this.setListContactsLoaded(true)
 
