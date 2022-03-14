@@ -41,6 +41,10 @@ export default {
     filter: {
       type: String,
       default: 'in-queue'
+    },
+    listData: {
+      type: Object,
+      default: () => {}
     }
   },
   computed: {
@@ -78,7 +82,7 @@ export default {
       return `/power-dialer/list/${this.id}/${listFilter.id}`
     },
     contactListCount (filterId) {
-      return this.listResources?.[this.filters?.[filterId]] || 0
+      return this.listData?.[this.filters?.[filterId]] || 0
     },
     getListWithFilter () {
       let ctr = 0

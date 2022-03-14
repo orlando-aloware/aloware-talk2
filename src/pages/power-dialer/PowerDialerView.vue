@@ -27,7 +27,7 @@
             <b-col cols="12">
               <div class="d-flex">
                 <PowerDialerFilter
-                  v-if="activeRoute"
+                  :list-data="fixedContactsData"
                   :id="selectedListId"
                   :filter="filter"
                   :active-route="activeRoute" />
@@ -51,6 +51,7 @@
               <div class="d-flex">
                 <PowerDialerFilter
                   v-if="activeRoute"
+                  :list-data="fixedContactsData"
                   :id="selectedListId"
                   :filter="filter"
                   :active-route="activeRoute" />
@@ -168,7 +169,7 @@
         @more="onLoadMore">
         <template slot="tbody">
           <TableRow
-            v-for="(contact, nkey) in fixedContactsData.data"
+            v-for="(contact, nkey) in fixedContactsDataItems"
             :key="`${contact.id}-${nkey}`"
             :contact="contact"
             :columns="filteredColumns"
@@ -463,7 +464,7 @@ export default {
       }
     },
     numberOfContacts () {
-      return this.activeList.length
+      return this.fixedContactsData?.data.length
     },
     activeList () {
       return this.listItems[this.selectedListId]?.data || []
@@ -513,10 +514,13 @@ export default {
     },
     fixedContactsData () {
       if (isEqual(this.$parent.$data.contactsData, this.contactsData)) {
-        return this.$parent.$data.contactsData
+        return this.contactsData
       }
 
-      return this.contactsData
+      return this.$parent.$data.contactsData
+    },
+    fixedContactsDataItems () {
+      return this.fixedContactsData.data
     }
   },
   data () {
