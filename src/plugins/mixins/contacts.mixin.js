@@ -199,11 +199,6 @@ export default {
           this.contactsLoaded(data)
           this.setListContactsLoaded(true)
 
-          if (this.shouldUpdateSelectedListContactCount) {
-            this.setSelectedListContactCount(data.total)
-            this.setShouldUpdateSelectedListContactCount(false)
-          }
-
           if (this.apiEndpoint(queued).includes('my-queue')) {
             // TODOs: Use vuex for storing filtered power dialer contact lists
             this.updateMyQueueListData(data.data)

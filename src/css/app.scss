@@ -3850,7 +3850,7 @@ i.option-separator {
     padding-right: 10px !important;
 
     span {
-      position: absolute;
+      position: relative;
       overflow: hidden;
       width: 100%;
       white-space: nowrap;
@@ -11028,4 +11028,8 @@ screen and (max-width: 956px) {
   &.action-icons {
     font-size: $f-size-h3;
   }
+}
+
+button.q-field__focusable-action {
+  font-size: 16px;
 }

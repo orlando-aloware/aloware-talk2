@@ -25,8 +25,12 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import ContactsPinnedItem from 'components/contacts/contacts-pinned-item'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
+import { contactListCountMixin } from 'src/plugins/mixins'
 
 export default {
+
+  mixins: [contactListCountMixin],
+
   components: {
     ContactsSidebarLoader,
     ContactsPinnedItem
@@ -159,18 +163,17 @@ export default {
     },
 
     async loadDynamicListPinnedCount (data) {
-      await this.$axios.get(`api/v2/contacts`, { params: this.buildQueryString(JSON.parse(data.filters)), paramsSerializer: qs.stringify })
-        .then((response) => {
-          this.pinnedCountLoaded({
-            id: data.contact_list_id,
-            count: response.data.total
-          })
-        }).catch((err) => {
-          console.error(err)
-          this.$generalNotification('Unable to load pinned count, please try again.', 'error')
-          this.setPinnedListsLoaded(true)
-          this.loadingPinned = false
+      await this.getListDataCount(data).then((response) => {
+        this.pinnedCountLoaded({
+          id: data.contact_list_id,
+          count: response.data.count
         })
+      }).catch((err) => {
+        console.error(err)
+        this.$generalNotification('Unable to load pinned count, please try again.', 'error')
+        this.setPinnedListsLoaded(true)
+        this.loadingPinned = false
+      })
     },
 
     loadPinned () {
@@ -209,23 +212,6 @@ export default {
           this.setPinnedListsLoaded(true)
           this.loadingPinned = false
         })
-    },
-
-    buildQueryString (filters) {
-      const query = {
-        page: 1
-      }
-
-      if (filters.length > 0) {
-        query.filter_groups = []
-
-        query.filter_groups.push({
-          is_conjunction: true,
-          filters: filters[0].filters
-        })
-      }
-
-      return query
     }
   },
   watch: {

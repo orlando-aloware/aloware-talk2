@@ -122,7 +122,7 @@
           <div
             class="small text-muted fs-13 text-right"
             v-if="selectedList.type === ContactListTypes.DYNAMIC">
-            {{ listItemsTotalContacts }} Contacts
+            {{ selectedList.contactCount }} Contacts
           </div>
           <div
             class="small text-muted fs-13 text-right"
@@ -162,7 +162,7 @@
         <compact-btn
           variant="primary"
           v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
-          :disabled="!filterHasChanges || this.defaultIds.includes(this.id) || isUpdatingList || list.show_in_public_folder"
+          :disabled="!filterHasChanges || defaultIds.includes(this.id) || isUpdatingList || list.show_in_public_folder"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
           <q-spinner-bars v-if="isUpdatingList"
@@ -643,13 +643,14 @@ import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
-import { avatarMixin } from 'src/plugins/mixins'
+import { avatarMixin, contactListCountMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contacts-view',
 
   mixins: [
-    avatarMixin
+    avatarMixin,
+    contactListCountMixin
   ],
 
   inject: [
@@ -831,6 +832,18 @@ export default {
             }
           }
           this.setCurrentListFilters(filters)
+          this.setDataCount(
+            response.type === this.ContactListTypes.DYNAMIC ? response.filters : {
+              0: {
+                filters: {
+                  contact_lists: {
+                    operator: 1,
+                    value: [stringId]
+                  }
+                }
+              }
+            }
+          )
           return response
         })
         .catch((error) => {
@@ -918,12 +931,15 @@ export default {
             this.isUpdatingList = false
             this.$generalNotification('Changes to contact list has been saved.')
 
-            this.pinnedCountLoaded({
-              id: this.selectedList.id,
-              count: this.listItems[this.selectedList.id].total
-            })
+            if (this.listItems[this.selectedList.id] && this.listItems[this.selectedList.id].total) {
+              this.pinnedCountLoaded({
+                id: this.selectedList.id,
+                count: this.listItems[this.selectedList.id].total
+              })
+            }
           })
           .catch((_err) => {
+            console.log(_err)
             this.$generalNotification('Unable to update contact list.', 'error')
           })
       } else {
@@ -1081,22 +1097,18 @@ export default {
 
       return []
     },
-
     toggleSidebar () {
       this.setShowContactsListSidebar(!this.showContactsListSidebar)
     },
-
     reRouteToBase () {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
     },
-
     getLineName (id) {
       const found = this.campaigns.find(campaign => campaign.id === id)
       return found ? found.name : '-'
     },
-
     onCheckerClicked (contact) {
       const items = { data: [] }
       const found = this.checked.find(item => item.id === contact.id)
@@ -1109,11 +1121,9 @@ export default {
 
       this.onCheckedRows(items.data)
     },
-
     isCountField (columnName) {
       return this.countFields.includes(columnName)
     },
-
     onRemove (contact, contactListId) {
       this.setShouldUpdateSelectedListContactCount(false)
       this.setBulkDelete(false)
@@ -1123,12 +1133,10 @@ export default {
       })
       // this.$emit('on-action-remove', true)
     },
-
     onMessage (contactId) {
       this.setMessageComposerMode('sms')
       this.$router.push(`/contacts/${contactId}`)
     },
-
     onCall (contact) {
       // check contact has timezone or not
       if (contact.timezone) {
@@ -1165,7 +1173,6 @@ export default {
 
       this.makeCall(contact)
     },
-
     makeCall (contact) {
       if (this.profile.enabled_two_legged_outbound) {
         const message = { data: 'We will call your secondary phone' }
@@ -1192,7 +1199,6 @@ export default {
       }
       this.$VueEvent.fire('callContact', data)
     },
-
     makeTwoLeggedCall (id, phoneNumber) {
       this.$axios
         .post('/api/v1/contacts/' + id + '/make-two-legged-call', {
@@ -1216,7 +1222,6 @@ export default {
 
       return routeData
     },
-
     showPopover: _.debounce(function (title, id, index, colName, e) {
       if (this.hoverPopover.currentTarget !== e.target.id) {
         this.hoverPopover.currentTarget = null
@@ -1230,12 +1235,10 @@ export default {
       this.hoverPopover.show = true
       this.hoverPopover.cancelled = false
     }, 500),
-
     onMouseOverPopover (title, id, index, colName, e) {
       // console.log('over event: ', e)
       this.showPopover(title, id, index, colName, e)
     },
-
     onMouseLeavePopover (e) {
       this.hoverPopover.target = ''
       this.hoverPopover.title = ''
@@ -1247,16 +1250,19 @@ export default {
         this.hoverPopover.currentTarget = e.target.firstElementChild.id
       }
     },
-
     onNavigate (contactId, e) {
       e.preventDefault()
       this.$router.push(this.generateRoute(contactId))
     },
-
     onNavigateToAdd (e) {
       e.preventDefault()
       this.$router.push({
         path: `/contacts/list/${this.$route.params.id}/add`
+      })
+    },
+    setDataCount (data) {
+      this.getListDataCount({ filters: JSON.stringify(data) }).then(response => {
+        this.setSelectedListContactCount(response.data.count)
       })
     }
   },
@@ -1265,7 +1271,8 @@ export default {
     ...mapState('contacts', [
       'folders',
       'showContactsListSidebar',
-      'shouldUpdateSelectedListContactCount'
+      'shouldUpdateSelectedListContactCount',
+      'pinnedCounts'
     ]),
     ...mapGetters('contacts', [
       'lists',
@@ -1297,6 +1304,11 @@ export default {
 
       return 'all'
     },
+    defaultIds () {
+      return Object.keys(DEFAULT_PINNED_LIST)
+        .map((k) => DEFAULT_PINNED_LIST[k].id)
+        .concat(['static'])
+    },
     contactList () {
       return this.lists[this.id]
     },
@@ -1327,8 +1339,8 @@ export default {
       return total !== null ? total : 0
     },
     listItemsTotalContacts () {
-      const total = _.get(this.fixedContactsData, `total`, null)
-      return total !== null ? total : 0
+      const data = _.get(this.fixedContactsData, `data`, null)
+      return data.length || 0
     },
     filterButtonVariant () {
       return this.isFiltersOpen ? 'primary' : 'outlined-light'
@@ -1445,13 +1457,24 @@ export default {
         // this.$VueEvent.fire('fetchContacts')
       }
     },
-    id () {
+    id (value) {
       this.reRouteToBase()
+      if (this.pinnedCounts.hasOwnProperty(value)) {
+        this.setSelectedListContactCount(this.pinnedCounts[value])
+      }
     },
     checked: function (value) {
       const elem = document.querySelector('.data-table-check-all')
       if (elem) {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
+    },
+    'pinnedCounts': {
+      deep: true,
+      handler (value) {
+        if (value.hasOwnProperty(this.id)) {
+          this.setSelectedListContactCount(value[this.id])
+        }
       }
     }
   }
