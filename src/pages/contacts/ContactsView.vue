@@ -839,7 +839,8 @@ export default {
                     operator: 1,
                     value: [stringId]
                   }
-                }
+                },
+                is_conjunction: true
               }
             }
           )
