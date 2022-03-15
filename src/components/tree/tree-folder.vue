@@ -199,6 +199,7 @@ export default {
       isCreatingFolder: false,
       isEditing: false,
       isRenaming: false,
+      isReferenceExists: false,
       inputTimeout: null
     }
   },
@@ -226,10 +227,6 @@ export default {
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-option-${module}-${this.id}`
-    },
-
-    isReferenceExists () {
-      return document.getElementById(this.folderId)
     }
   },
 
@@ -365,6 +362,10 @@ export default {
     onToggleFolder () {
       this.toggleFolder(this.id)
     }
+  },
+
+  mounted () {
+    this.isReferenceExists = document.getElementById(this.folderId)
   },
 
   beforeDestroy () {
