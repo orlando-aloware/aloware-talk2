@@ -6,7 +6,6 @@ export default {
       return this.$axios.get(`api/v2/contacts/count`, { params: this.buildQueryString(JSON.parse(data.filters)), paramsSerializer: qs.stringify })
     },
     buildQueryString (filters) {
-      console.log(filters)
       const query = {}
 
       const keys = Object.keys(filters)
