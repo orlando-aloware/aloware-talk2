@@ -481,7 +481,12 @@ export default {
       this.user.campaign_id = campaignId
     },
     templateSelected (template, field) {
-      this.user[field] += ' ' + template.body
+      if (!this.user[field]) {
+        this.user[field] = template.body
+      } else {
+        this.user[field] += ' ' + template.body
+      }
+
       this.$nextTick(function () {
         const element = document.getElementById('ta-user-completed-call-message')
         element.dispatchEvent(new Event('input'))
@@ -491,7 +496,18 @@ export default {
       this.$refs.templatesMenu.hide()
     },
     variableSelected (variable, field) {
-      this.user[field] += ' ' + variable
+      if (!this.user[field]) {
+        this.user[field] = variable
+      } else {
+        this.user[field] += ' ' + variable
+      }
+
+      this.$nextTick(function () {
+        const element = document.getElementById('ta-user-completed-call-message')
+        element.dispatchEvent(new Event('input'))
+        element.focus()
+      })
+
       this.$refs.variablesMenu.hide()
     },
     playMissedCallVMAudioFile () {
