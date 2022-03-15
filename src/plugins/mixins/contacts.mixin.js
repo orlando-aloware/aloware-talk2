@@ -441,12 +441,16 @@ export default {
       if (currentPage === 1 && this.contactsData.data.length > dataLength) {
         this.contactsData.data.sort((a, b) => { return moment(b.last_engagement_at).unix() - moment(a.last_engagement_at).unix() })
       }
-      // console.log('this.contactsData :>> ', this.contactsData)
     },
     clearContacts () {
       this.contactsData = {
         data: []
       }
+    },
+    stopEvents () {
+      this.$VueEvent.stop('fetchContacts')
+      this.$VueEvent.stop('clearContacts')
+      this.$VueEvent.stop('onLoadMoreContacts')
     }
   },
 
@@ -608,7 +612,7 @@ export default {
       }
     },
     'list.id': function (value) {
-      if (value && (this.$route.name === 'Contacts' || this.$route.name === 'Power Dialer')) {
+      if (value && this.$route.name === 'Contacts') {
         this.clearContacts()
       }
     },
@@ -631,8 +635,8 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('fetchContacts')
-    this.$VueEvent.stop('clearContacts')
-    this.$VueEvent.stop('onLoadMoreContacts')
+    if (!(this.$route.meta.id === 'power-dialer-queue-filter' || this.$route.meta.id === 'power-dialer-list-filter')) {
+      this.stopEvents()
+    }
   }
 }

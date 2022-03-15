@@ -417,7 +417,8 @@ export default {
   async mounted () {
     this.removeListClose()
     await this.myQueueList()
-    this.loadList(this.selectedListId)
+    this.init()
+    // this.loadList(this.selectedListId)
 
     this.$VueEvent.listen('export_event_updates', (task) => {
       console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
@@ -710,12 +711,24 @@ export default {
     }
   },
   watch: {
-    '$route.params.id': function () {
-      this.init()
+    '$route.params': {
+      handler (params) {
+        console.log('PARAMS have changed!', params)
+        // if (params.filter) {
+        //   this.init()
+        // }
+        this.init()
+      },
+      deep: true
     },
-    '$route.params.filter': function (value) {
-      this.init()
-    },
+    // '$route.params.id': function (value) {
+    //   console.log('100 :>> ', value)
+    //   this.init()
+    // },
+    // '$route.params.filter': function (value) {
+    //   console.log('200 :>> ', value)
+    //   this.init()
+    // },
     currentListFilters: {
       deep: true,
       handler: function (val) {

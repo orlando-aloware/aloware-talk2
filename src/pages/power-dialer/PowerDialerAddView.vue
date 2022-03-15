@@ -45,7 +45,7 @@ export default {
       if (this.$route.meta.id === 'power-dialer-add-queue-list') {
         return 'my-queue'
       }
-      return this.$route.params.id || 'all'
+      return this.$route.params.id || 'my-queue'
     },
     filteredName () {
       return this.contactList?.name || ''

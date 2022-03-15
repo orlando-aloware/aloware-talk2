@@ -121,9 +121,6 @@ export default {
       'selectedList'
     ]),
     ...mapState(['currentRoute']),
-    aaa () {
-      return this.$route.meta.id
-    },
     mainClass () {
       if (this.$route.name === 'Contact') {
         return 'w-100'
