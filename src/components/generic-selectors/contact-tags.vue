@@ -133,7 +133,13 @@ export default {
   },
 
   mounted () {
-    this.getTags()
+    if (this.tags) {
+      this.options = this.tags
+    }
+
+    if (!this.tags) {
+      this.getTags()
+    }
   },
 
   methods: {
@@ -183,6 +189,14 @@ export default {
       })
     },
     ...mapActions(['setTagsFullyLoaded'])
+  },
+  watch: {
+    tags: {
+      deep: true,
+      handler: function () {
+        this.options = this.tags
+      }
+    }
   }
 }
 </script>
