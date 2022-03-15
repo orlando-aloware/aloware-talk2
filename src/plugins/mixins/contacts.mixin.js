@@ -196,7 +196,6 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          console.log('data :>> ', data)
           this.contactsLoaded(data)
           this.setListContactsLoaded(true)
 
@@ -404,10 +403,13 @@ export default {
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     },
     contactsLoaded (listData) {
+      // console.log('listData :>> ', listData)
+      console.log('fetched data --------->> ', listData)
       const dataLength = listData.data.length
       const found = { data: null }
       const item = { data: null }
       const currentPage = _.get(listData, 'current_page', 0)
+      console.log('this.contactsData.data :>> ', this.contactsData.data)
 
       if (!_.isEmpty(this.contactsData.data)) {
         for (item.data in this.contactsData.data) {
@@ -447,6 +449,7 @@ export default {
       if (currentPage === 1 && this.contactsData.data.length > dataLength) {
         this.contactsData.data.sort((a, b) => { return moment(b.last_engagement_at).unix() - moment(a.last_engagement_at).unix() })
       }
+      // console.log('this.contactsData :>> ', this.contactsData)
     },
     clearContacts () {
       this.contactsData = {
@@ -474,6 +477,9 @@ export default {
       }
 
       return 'all'
+    },
+    myQueueId () {
+      return this.selectedList.type ? null : this.selectedList.id
     },
     defaultContactDateFilter () {
       if (this.currentCompany && this.defaultDateFilter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
@@ -572,6 +578,9 @@ export default {
     list () {
       if (!this.id) {
         return this.lists['all']
+      }
+      if (this.myQueueId) {
+        return this.lists['my-queue']
       }
 
       return this.lists[this.id]

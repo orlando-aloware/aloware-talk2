@@ -158,9 +158,6 @@ export default {
     },
     hasSessions () {
       return this.$route.meta.id === 'power-dialer-session'
-    },
-    myQueueId () {
-      return this.selectedList.type ? null : this.selectedList.id
     }
   },
   async mounted () {

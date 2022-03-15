@@ -20,6 +20,7 @@ export default {
       'setSelectedPDList'
     ]),
     async loadList (id) {
+      console.log('Loading list...............')
       if (!id) {
         id = 'my-queue'
       }

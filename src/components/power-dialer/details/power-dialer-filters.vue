@@ -84,11 +84,11 @@ export default {
     'listData': {
       handler (val) {
         this.filtersCounter = {
-          in_queue: val.total_queued,
-          called: val.total_called,
-          failed: val.total_failed,
-          scheduled: val.total_scheduled,
-          all: val.total_items
+          in_queue: val.total_queued || 0,
+          called: val.total_called || 0,
+          failed: val.total_failed || 0,
+          scheduled: val.total_scheduled || 0,
+          all: val.total_items || 0
         }
       },
       deep: true

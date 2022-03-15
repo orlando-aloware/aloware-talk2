@@ -416,9 +416,14 @@ export default {
     ContactCreateModal,
     BulkActionMenu
   },
-  mounted () {
+  async mounted () {
     this.removeListClose()
+    await this.myQueueList()
     this.loadList(this.selectedListId)
+
+    this.$VueEvent.listen('export_event_updates', (task) => {
+      console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
+    })
   },
   computed: {
     ...mapState(['prevRoute']),
@@ -535,9 +540,6 @@ export default {
       'SET_LIST_SELECTED_CONTACTS',
       'START_DIAL_TOGGLE'
     ]),
-    // ...mapActions('inbox', [
-    //   'setSelectedContact'
-    // ]),
     ...mapActions('contacts', [
       'setContact',
       'columnsOpen',
@@ -545,20 +547,32 @@ export default {
       'closeFilters',
       'columnsReordered',
       'setListSelectedContacts',
-      // 'setSelectedList',
       'createListOpen',
       'removeListClose',
       'setCurrentListFilters',
       'removeListOpen',
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
-      // 'setSelectedListContactCount',
+      'listLoaded',
       'pinnedCountLoaded'
     ]),
     ...mapActions('powerDialer', [
       'updateContactsList',
+      'getMyQueueList',
       'exportCsv'
     ]),
+    async myQueueList () {
+      let response = await this.getMyQueueList()
+      this.listLoaded({ ...response.data, id: 'my-queue' })
+    },
+    // async fetchResources () {
+    //   if (this.$route.meta.id === 'power-dialer-queue-filter') {
+    //     await this.myQueueList()
+    //     await this.loadList('my-queue')
+    //   } else {
+    //     await this.loadList(this.pdId)
+    //   }
+    // },
     onSearch (searchText) {
       this.$emit('search', searchText)
     },
@@ -720,6 +734,7 @@ export default {
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.fetch(params, this.hasFilters)
+          // console.log('params :>> ', params)
           this.$emit('onFiltersCount', this.currentListFilters)
           // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
