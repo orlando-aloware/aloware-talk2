@@ -27,7 +27,6 @@
             <b-col cols="12">
               <div class="d-flex">
                 <PowerDialerFilter
-                  v-if="fixedContactsData"
                   :list-data="fixedContactsData"
                   :id="selectedListId"
                   :filter="filter"
@@ -51,7 +50,6 @@
               v-if="$q.screen.name === 'lg'">
               <div class="d-flex">
                 <PowerDialerFilter
-                  v-if="fixedContactsData"
                   :list-data="fixedContactsData"
                   :id="selectedListId"
                   :filter="filter"
@@ -428,7 +426,6 @@ export default {
   computed: {
     ...mapState(['prevRoute']),
     ...mapState('powerDialer', [
-      // 'activeMetrics',
       'metrics'
     ]),
     ...mapGetters('powerDialer', [
@@ -565,14 +562,6 @@ export default {
       let response = await this.getMyQueueList()
       this.listLoaded({ ...response.data, id: 'my-queue' })
     },
-    // async fetchResources () {
-    //   if (this.$route.meta.id === 'power-dialer-queue-filter') {
-    //     await this.myQueueList()
-    //     await this.loadList('my-queue')
-    //   } else {
-    //     await this.loadList(this.pdId)
-    //   }
-    // },
     onSearch (searchText) {
       this.$emit('search', searchText)
     },
@@ -594,7 +583,6 @@ export default {
     },
     async beginDial () {
       this.START_DIAL_TOGGLE(true)
-      // this.setSelectedContact({})
       this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.filteredList.id}/sessions`)
     },
@@ -713,20 +701,20 @@ export default {
       }
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
+    },
+    init () {
+      this.resetFilters()
+      this.$VueEvent.fire('clearContacts')
+      this.initialListFilters = this.currentListFilters
+      this.loadList(this.selectedListId)
     }
   },
   watch: {
     '$route.params.id': function () {
-      console.log('CHANGED LIST')
-      this.resetFilters()
-      this.initialListFilters = this.currentListFilters
-      this.loadList(this.selectedListId)
+      this.init()
     },
     '$route.params.filter': function (value) {
-      console.log('CHANGED LIST FILTERS', value)
-      this.resetFilters()
-      this.initialListFilters = this.currentListFilters
-      this.loadList(this.selectedListId)
+      this.init()
     },
     currentListFilters: {
       deep: true,
@@ -734,7 +722,6 @@ export default {
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.fetch(params, this.hasFilters)
-          // console.log('params :>> ', params)
           this.$emit('onFiltersCount', this.currentListFilters)
           // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
@@ -743,9 +730,6 @@ export default {
     },
     selectedList (value) {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
-      if (this.activeList.length > 0) {
-        // this.isLoading = false
-      }
     },
     clearList (value) {
       this.fetch()

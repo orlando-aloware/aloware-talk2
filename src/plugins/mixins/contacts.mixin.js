@@ -404,6 +404,7 @@ export default {
     },
     contactsLoaded (listData) {
       // console.log('listData :>> ', listData)
+      this.clearContacts()
       console.log('fetched data --------->> ', listData)
       const dataLength = listData.data.length
       const found = { data: null }

@@ -83,12 +83,14 @@ export default {
   watch: {
     'listData': {
       handler (val) {
-        this.filtersCounter = {
-          in_queue: val.total_queued || 0,
-          called: val.total_called || 0,
-          failed: val.total_failed || 0,
-          scheduled: val.total_scheduled || 0,
-          all: val.total_items || 0
+        if (val.path) {
+          this.filtersCounter = {
+            in_queue: val.total_queued || 0,
+            called: val.total_called || 0,
+            failed: val.total_failed || 0,
+            scheduled: val.total_scheduled || 0,
+            all: val.total_items || 0
+          }
         }
       },
       deep: true
