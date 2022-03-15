@@ -8,14 +8,28 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Are you sure you want to remove
+          Are you sure you want to {{ clearable ? 'clear' : 'remove' }}
           <span class="font-weight-bold">{{ listToRemove.name }}</span>?
         </div>
       </div>
     </div>
 
     <div slot="footer" class="w-100">
-      <div class="d-flex w-100">
+      <div
+        class="d-flex w-100"
+        v-if="clearable">
+        <div class="flex-grow-1"></div>
+
+        <button
+          @click="onClearList"
+          class="btn btn-sm btn-danger mr-2">
+          Clear List
+        </button>
+
+      </div>
+      <div
+        class="d-flex w-100"
+        v-else>
         <div class="flex-grow-1"></div>
 
         <button
@@ -61,6 +75,9 @@ export default {
         return '/api/v2/contacts-list/'
       }
       return '/api/v2/power-dialer-lists/'
+    },
+    clearable () {
+      return this.listToRemove.clear === true
     }
   },
   data () {
@@ -104,9 +121,9 @@ export default {
           this.removeListClose()
         })
     },
-    reloadFolders () {
+    reloadFolders (endpoint = '/api/v2/contact-folders') {
       return this.$axios
-        .get('/api/v2/contact-folders')
+        .get(endpoint)
         .then((response) => response.data)
         .then((response) => {
           this.foldersLoaded(response)
@@ -116,6 +133,23 @@ export default {
         })
         .catch((_err) => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+    },
+    onClearList () {
+      console.log('Clearing up My Queue list...')
+      return this.$axios
+        .post(`/api/v2/power-dialer-list-items/clear-tasks/${this.listToRemove.id}`)
+        .then((response) => response.data)
+        .then((response) => {
+          this.$generalNotification('My Queue list items has been cleared!', 'success')
+        })
+        .catch(() => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+        .finally(() => {
+          this.reloadFolders('/api/v2/power-dialer-folders')
+          this.removeListClose()
+          this.$emit('on-clear-list')
         })
     },
     onRemoveListOnly () {

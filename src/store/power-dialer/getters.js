@@ -1,4 +1,7 @@
+import { getField } from 'vuex-map-fields'
+
 export default {
+  getField,
   myQueue: (state) => state.myQueue,
   flaggedCreateExisting: (state) => state.flaggedCreateExisting,
   opened: (state) => new Set(state.opened),
@@ -15,6 +18,7 @@ export default {
   isRemoveFolderOpen: (state) => !!state.removeFolder,
   folders: (state) => state.folders,
   listItems: (state) => state.listItems,
+  selectedPdList: (state) => state.selectedPdList,
   currentListFilters: (state) => state.currentListFilters,
   powerDialerLists: (state) => state.powerDialerLists,
   powerDialerListItems: (state) => state.powerDialerListItems,
@@ -42,5 +46,11 @@ export default {
     }
     return 'in-queue'
   },
-  filteredEndpoint: (state) => state.filteredEndpoint
+  filteredEndpoint: (state) => state.filteredEndpoint,
+  sessionSettings: (state) => state.sessionSettings,
+  defaultSettings: (state) => state.defaultSettings,
+  personalSessionSettings: (state) => state.sessionSettingGroups.personal,
+  companySessionSettings: (state) => state.sessionSettingGroups.company,
+  sessionSettingGroups: (state) => state.sessionSettingGroups,
+  warmupDurations: (state) => state.warmupDurations
 }

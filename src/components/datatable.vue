@@ -111,7 +111,7 @@
       </template>
       <div class="empty-state"
            v-else-if="!hasEmptySlot && isEmpty &&  !isLoading">
-        <div class="h5">No contacts found based on the current filters</div>
+        <div class="h5">{{ defaultPlaceholderMessage }}</div>
       </div>
     </div>
 
@@ -270,6 +270,15 @@ export default {
         `${this.isEmpty ? 'overflow-hidden' : ''}`,
         `${this.isMobile ? 'mobile-scrollableArea' : ''}`
       ]
+    },
+    test () {
+      return this.$route
+    },
+    defaultPlaceholderMessage () {
+      if (this.$route.name === 'Contacts' || this.$route.name === 'Contact') {
+        return 'No contacts found based on the current filters'
+      }
+      return 'No contacts found on the current list'
     }
   },
 

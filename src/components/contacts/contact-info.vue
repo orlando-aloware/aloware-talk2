@@ -252,6 +252,7 @@ export default {
         }, 100)
         return
       }
+      console.log('data :>> ', data)
 
       this.$VueEvent.fire('callContact', data)
     }

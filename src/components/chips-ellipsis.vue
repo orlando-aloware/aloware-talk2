@@ -24,6 +24,7 @@
       </template>
 
       <b-dropdown
+        v-if="!hasReachedLimit"
         text="..."
         no-caret
         right size="sm"
@@ -107,7 +108,7 @@ export default {
     },
     selectedItemObject () {
       return this.filteredListItems.find((list, index) => {
-        if (index > this.displayCount) {
+        if (index >= this.displayCount) {
           return list.id === this.selectedItemId
         }
       })
@@ -117,6 +118,9 @@ export default {
         return true
       }
       return false
+    },
+    hasReachedLimit () {
+      return this.listItems.length < this.displayCount
     }
   }
 }

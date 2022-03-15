@@ -66,7 +66,7 @@ export default {
         return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return 'Remove ' + this.selectedContacts[this.listId]?.length + ' contacts?'
+        return `Remove ${this.selectedContacts[this.listId]?.length} contacts?`
       }
       return ''
     },

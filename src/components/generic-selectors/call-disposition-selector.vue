@@ -23,7 +23,7 @@
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
-      <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      <span class="text-size-xs text-grey-80">--{{ prepend }}--</span>
     </template>
 
     <template v-slot:no-option>
@@ -85,7 +85,7 @@ export default {
   props: {
     value: {
       required: false,
-      default: () => { return [] }
+      default: null
     },
 
     multiple: {
@@ -122,9 +122,14 @@ export default {
     }
   },
 
+  model: {
+    prop: 'value',
+    event: 'change'
+  },
+
   data () {
     return {
-      callDisposition: null,
+      callDisposition: this.value,
       callDispositionsOptions: [],
       selectWidth: 0
     }
@@ -230,6 +235,7 @@ export default {
   watch: {
     value () {
       this.getCallDisposition()
+      this.callDisposition = this.value
     },
 
     callDisposition (val) {

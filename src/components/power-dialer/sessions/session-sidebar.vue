@@ -18,6 +18,7 @@
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import SessionStats from './session-stats'
 import SessionGroups from './session-groups'
 
@@ -30,7 +31,18 @@ export default {
   computed: {
     ...mapGetters('powerDialer', [
       'sessionSidebarExpanded'
+    ]),
+    ...mapFields('powerDialer', [
+      'powerDialerTasks',
+      'activeTask'
     ])
+  },
+  mounted () {
+    // this.activeTask = this.powerDialerTasks.in_queue[0]
+    // let { powerDialerTasks } = this
+    // powerDialerTasks.in_queue.shift()
+    // Removing the first element in array
+    console.log('Removing the first element in array :>> ', this.powerDialerTasks.in_queue)
   },
   data () {
     return {

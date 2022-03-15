@@ -358,6 +358,9 @@ export default {
   SET_ACTIVE_FOLDER: (state, value) => {
     state.activeFolder = value
   },
+  CLEAR_LIST: (state) => {
+    state.clearList = !state.clearList
+  },
 
   RESET_VUEX (state, value) {
     if (!_.isArray(value) || _.isEmpty(value)) {
