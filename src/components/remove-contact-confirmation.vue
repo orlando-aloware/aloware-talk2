@@ -167,9 +167,10 @@ export default {
           break
       }
       this.isBusy = true
-      const ids = this.selectedContacts[this.listId].map(contact => contact.id)
+      const ids = this.selectedContacts[this.listId].map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+      const params = this.isContactsRoute ? { contacts: ids } : { contact_list_items: ids }
       return this.$axios
-        .delete(url.data, { params: { contacts: ids } })
+        .delete(url.data, { params: params })
         .then(() => {
           this.$emit('on-remove-contacts', this.selectedList)
           this.$generalNotification('Contacts was successfully removed.')

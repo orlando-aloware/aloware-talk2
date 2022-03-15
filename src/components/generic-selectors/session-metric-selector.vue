@@ -1,21 +1,33 @@
 <template>
   <q-select
-    :class="`${customClass}`"
-    option-value="text"
-    option-label="text"
+    :class="`padded-container`"
+    option-value="metric_id"
+    option-label="label"
     ref="sessionMetrics"
     outlined dense emit-value
     v-model="localValue"
-    :options="options"
+    :options="availableMetrics"
+    :use-chips="useChips"
+    use-input
+    map-options
+    :multiple="multiple"
+    :placeholder="placeholder"
     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
     @popup-show="onShowMetricsMenu">
-    <template v-slot:selected>
+    <!-- <template v-slot:selected>
       <template v-if="modelValue">
         {{ modelValue }}
       </template>
       <template v-else>
         Add Metrics
       </template>
+    </template> -->
+    <template v-slot:no-option>
+      <q-item>
+        <q-item-section class="no-results text-grey">
+          No results
+        </q-item-section>
+      </q-item>
     </template>
     <template v-slot:option="scope">
       <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
@@ -25,10 +37,10 @@
             v-if="scope.opt.disable"
             class="text-subtitle2 font-weight-bold"
             disabled label
-            v-html="scope.opt.text" />
+            v-html="scope.opt.label" />
           <q-item-label
             v-else
-            v-html="scope.opt.text" />
+            v-html="scope.opt.label" />
         </q-item-section>
       </q-item>
     </template>
@@ -36,6 +48,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'SessionMetricSelector',
   model: {
@@ -43,7 +57,7 @@ export default {
     event: 'change'
   },
   props: {
-    modelValue: String,
+    modelValue: [String, Array],
     options: {
       type: Array,
       default: () => []
@@ -51,9 +65,20 @@ export default {
     customClass: {
       type: String,
       default: ''
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    useChips: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
+    ...mapState('stats', [
+      'availableMetrics'
+    ]),
     localValue: {
       get () {
         return this.modelValue
@@ -61,6 +86,9 @@ export default {
       set (val) {
         this.$emit('change', val)
       }
+    },
+    placeholder () {
+      return this.localValue?.length > 0 ? '' : 'Select Metrics'
     }
   },
   data () {

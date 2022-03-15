@@ -11,6 +11,8 @@
       <q-card-section class="p-0">
         <ContactInfo
           :has-expanded="false" />
+        <ContactSaveBar
+          v-if="isValidResource" />
       </q-card-section>
       <!-- <q-card-section
         v-for="(f, i) in form"
@@ -53,12 +55,13 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 // import InputField from 'components/contacts/contact-input-field'
 // import SelectField from 'components/generic-selectors/user-selector'
 // import SelectStateField from 'src/components/contacts/location-state-selector'
 // import SelectCountryField from 'src/components/contacts/location-country-selector'
 import ContactInfo from 'components/contacts/contact-information'
+import ContactSaveBar from 'components/contacts/contact-save-bar'
 
 export default {
   name: 'DetailsForm',
@@ -73,15 +76,23 @@ export default {
     // SelectField,
     // SelectStateField,
     // SelectCountryField,
+    ContactSaveBar,
     ContactInfo
   },
   computed: {
     ...mapGetters('powerDialer', [
       'sessionLoader'
     ]),
+    ...mapState('contacts', [
+      'contact',
+      'contactClone'
+    ]),
     localResource () {
       let res = { ...this.resources }
       return res
+    },
+    isValidResource () {
+      return this.contact.id === this.contactClone.id
     }
   },
   data () {

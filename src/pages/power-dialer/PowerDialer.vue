@@ -1,41 +1,67 @@
 <template>
   <div
     v-if="authenticated"
-    class="row mx-0 content-row d-flex overflow-hidden h-100">
+    class="contacts mx-0 content-row d-flex overflow-hidden h-100">
 
     <div
-      v-show="!isStartingDial"
-      class="col-2 pt-0 pl-0 pr-0 mb-0 h-100 bordered-right">
+      v-show="!hasSessions"
+      class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
       <PowerDialerSidebar />
     </div>
-    <div :class="`${isStartingDial ? 'col-12' : 'col-10 main'} px-0 pr-1 mb-0`">
+    <div
+      class="px-0 mb-0 main flex-1"
+      :class="mainClass">
       <!-- Router Here -->
-      <router-view></router-view>
+      <router-view
+        :list="list"
+        :is-loading-disabled="isLoadingDisabled"
+        :is-start-state="isStartState"
+        :is-editable="isEditable"
+        :search="search"
+        :is-my-contacts-view="isMyContactsView"
+        :is-loading="isLoading"
+        :columns="columns"
+        :is-empty="isEmpty"
+        :is-loading-more="isLoadingMore"
+        :filters-count="filtersCount"
+        :selected-list-id="id"
+        @search="onSearch"
+        @checkboxChanged="onFetchMyContacts"
+        @sort="onSortByField"
+        @paginated="onPaginate"
+        @loadMore="onLoadMore"
+        @onFiltersCount="getFiltersCount">
+      </router-view>
     </div>
 
-    <MoveDialog
-      :is-contact-module-type="false" />
-    <CreateDialog />
-    <ColumnHeaders
-      :predefined-id="myQueueId"
-      v-if="isActive" />
-    <RemoveListModal v-if="isActive" />
-    <RemoveListConfirmation v-if="isActive" />
-    <RemoveContact
-      :is-contact-module-type="false"
-      v-if="isActive" />
-    <RemoveContactConfirmation
-      @on-remove-contacts="updateList"
-      v-if="isActive" />
-    <RemoveFolderDialog
-      :is-contact-module-type="false" />
-    <CreateListModal :is-default="false" />
+    <template v-if="!hasSessions">
+      <MoveDialog
+        :is-contact-module-type="false" />
+      <CreateDialog />
+      <ColumnHeaders
+        :predefined-id="myQueueId"
+        v-if="isActive" />
+      <RemoveListModal
+        @on-clear-list="onClear"
+        v-if="isActive" />
+      <RemoveListConfirmation v-if="isActive" />
+      <RemoveContact
+        :is-contact-module-type="false"
+        v-if="isActive" />
+      <RemoveContactConfirmation
+        @on-remove-contacts="updateList"
+        v-if="isActive" />
+      <RemoveFolderDialog
+        :is-contact-module-type="false" />
+      <CreateListModal :is-default="false" />
+    </template>
 
   </div>
 </template>
 
 <script>
 
+import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
 import MoveDialog from 'components/move-dialog'
@@ -48,11 +74,11 @@ import RemoveContact from 'components/remove-contact'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import ColumnHeaders from 'components/column-headers'
 import powermixin from 'src/plugins/mixins/power-dialer'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
 import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
+import sessionsMixins from 'src/plugins/mixins/sessions-engine'
 import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 
 export default {
   name: 'PowerDialer',
@@ -68,8 +94,22 @@ export default {
     RemoveFolderDialog,
     CreateListModal
   },
-  mixins: [powermixin, contactsMixins, pdMixin],
+  mixins: [
+    powermixin,
+    ContactsMixins,
+    pdMixin,
+    sessionsMixins
+  ],
+  provide () {
+    return {
+      contactsData: this.contactsData
+    }
+  },
   computed: {
+    ...mapState(['isMobile']),
+    ...mapFields('powerDialer', [
+      'activeMetrics'
+    ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
       'isStartingDial',
@@ -77,9 +117,25 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'listItems',
-      'lists'
+      'lists',
+      'selectedList'
     ]),
     ...mapState(['currentRoute']),
+    mainClass () {
+      if (this.$route.name === 'Contact') {
+        return 'w-100'
+      }
+
+      if (this.$route.meta.id === 'power-dialer-session') {
+        return 'w-100'
+      }
+
+      if (!this.$q.screen.lt.md) {
+        return ''
+      }
+
+      return !this.showContactsListSidebar ? 'w-100 no-min-max-width' : 'w-0'
+    },
     filterKeys () {
       let filterKeys = []
       let keys = DEFAULT_FILTER_LIST
@@ -97,31 +153,51 @@ export default {
     isActive () {
       return this.$route.name === 'Power Dialer'
     },
-    myQueueId () {
-      return this.selectedList.type === 0 ? this.selectedList.id : null
+    hasSessions () {
+      return this.$route.meta.id === 'power-dialer-session'
     }
   },
   async mounted () {
     this.START_DIAL_TOGGLE(false)
-    // await this.initialize()
+    // // await this.initialize()
     await this.setFilterParams(this.$route.params)
+
+    this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
+      this.activeMetrics = sessionMetrics.session_metrics_calculations
+    })
+    this.$VueEvent.listen('contact_list_item_created', async (task) => {
+      console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+      if (this.hasSessions) {
+        await this.fetchInQueueTasks(task)
+      }
+    })
+    this.$VueEvent.listen('contact_list_item_updated', (task) => {
+      if (this.hasSessions) {
+        this.updateTaskStatus(task)
+      }
+    })
+    this.$VueEvent.listen('contact_list_item_deleting', (task) => {
+      console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
+    })
+    this.$VueEvent.listen('contact_list_bulk_created', (task) => {
+      console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
+    })
   },
   beforeRouteUpdate (to, from, next) {
-    if (to.meta !== 'Power Dialer Session') {
-      this.START_DIAL_TOGGLE(false)
-    } else {
+    if (to.meta !== 'Power Dialer Sessions') {
       this.START_DIAL_TOGGLE(true)
+    } else {
+      this.START_DIAL_TOGGLE(false)
     }
     next()
   },
-  data () {
-    return {
-      id: ''
-    }
-  },
   methods: {
     ...mapActions('contacts', [
-      'contactsLoaded'
+      // 'contactsLoaded',
+      'clearList'
+    ]),
+    ...mapActions('powerDialer', [
+      'getSessionMetricsOptions'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
@@ -140,10 +216,10 @@ export default {
         if (isEmpty(this.id)) {
           await this.fetchApi(params)
         } else {
-          this.contactsLoaded({
-            id: this.tempId,
-            ...DEFAULT_LIST_ITEMS
-          })
+          // this.contactsLoaded({
+          //   id: this.tempId,
+          //   ...DEFAULT_LIST_ITEMS
+          // })
           await this.fetchApi(params)
         }
       } else {
@@ -154,10 +230,10 @@ export default {
     },
     async fetchApi (params) {
       switch (this.$route.meta.id) {
-        case 'power-dialer':
+        case 'power-dialer-queue-filter':
           this.processFetch(params, false, true)
           break
-        case 'power-dialer-list':
+        case 'power-dialer-list-filter':
           this.processFetch(params, false, false)
           break
         default:
@@ -166,14 +242,14 @@ export default {
     },
     async initialize () {
       let route = this.$route.params
-      if (this.$route.name !== 'Power Dialer Session') {
+      if (this.$route.name !== 'Power Dialer Sessions') {
         this.START_DIAL_TOGGLE(false)
       }
       if (!route.id && this.$route.name === 'Power Dialer') {
-        route.id = 'in-queue'
-        this.id = 'in-queue'
+        // route.id = 'in-queue'
+        // this.id = 'in-queue'
       } else if (route.id && this.$route.name === 'Power Dialer') {
-        this.id = route.id
+        // this.id = route.id
       }
       await this.fetchContacts()
     },
@@ -216,6 +292,9 @@ export default {
     },
     async updateList (data) {
       await this.loadList(data.id)
+    },
+    onClear () {
+      this.clearList()
     }
   },
   watch: {

@@ -1,22 +1,28 @@
 import { mapActions } from 'vuex'
-import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
+import { mapFields } from 'vuex-map-fields'
+// import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
+  computed: {
+    ...mapFields('powerDialer', [
+      'activeMetrics'
+    ])
+  },
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
-      'contactsLoaded',
+      // 'contactsLoaded',
       'setCurrentListFilters',
-      'setSelectedList',
       'resetSearch'
     ]),
+    ...mapActions('powerDialer', [
+      'setSelectedPDList'
+    ]),
     async loadList (id) {
-      console.log('Selecting list............')
       if (!id) {
         id = 'my-queue'
       }
-
       let stringId = String(id)
 
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
@@ -24,18 +30,17 @@ export default {
       }
 
       if (!this.listItems[stringId]) {
-        this.contactsLoaded({
-          id: stringId,
-          ...DEFAULT_LIST_ITEMS
-        })
+        // this.contactsLoaded({
+        //   id: stringId,
+        //   ...DEFAULT_LIST_ITEMS
+        // })
       }
-
       this.$axios
         .get('/api/v2/power-dialer-lists/' + stringId)
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: stringId })
-          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
           let filters = {
             contact_lists: {
               operator: 1,
@@ -43,6 +48,7 @@ export default {
             }
           }
           this.setCurrentListFilters(filters)
+          this.activeMetrics = response.session_metrics
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)

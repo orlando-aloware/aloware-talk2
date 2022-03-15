@@ -6,6 +6,7 @@
             input-debounce="0"
             ref="contactDispositionSelect"
             use-input
+            use-chips
             :emit-value="emitValue"
             map-options
             dense
@@ -113,6 +114,11 @@ export default {
       type: Boolean,
       default: true
     }
+  },
+
+  model: {
+    prop: 'value',
+    event: 'change'
   },
 
   data () {

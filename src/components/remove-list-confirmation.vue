@@ -54,6 +54,9 @@ export default {
       'pinnedLists',
       'pinned'
     ]),
+    ...mapGetters('powerDialer', [
+      'activeFilter'
+    ]),
     title () {
       return `Delete ${this.listToRemove.name} list?`
     },
@@ -118,14 +121,13 @@ export default {
           if (this.$route.name === 'Contacts') {
             if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {
               this.$router.push('/contacts/')
-            } else {
-              this.$router.push(this.$router.history.current.path)
             }
           } else {
-            if (this.$router.history.current.path === `/power-dialer/list/${this.listToRemove.id}`) {
+            console.log('50 :>> ', this.activeFilter)
+            console.log('100 :>> ', this.$router.history.current.path)
+            console.log('200 :>> ', `/power-dialer/list/${this.listToRemove.id}/${this.activeFilter}`)
+            if (this.$router.history.current.path === `/power-dialer/list/${this.listToRemove.id}/${this.activeFilter}`) {
               this.$router.push('/power-dialer/')
-            } else {
-              this.$router.push(this.$router.history.current.path)
             }
           }
         })

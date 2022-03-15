@@ -319,6 +319,54 @@ export default {
             this.$VueEvent.fire('new_desktop_fax', event.communication)
           }
         })
+
+        /**
+         * ------------------------------------
+         * Power Dialer Session Tasks
+         * ------------------------------------
+         */
+        .listen('.user.contact_list_item.created', (event) => {
+          let contactListItem = event.contact_list_item
+          if (event.contact) {
+            contactListItem.contact = event.contact
+          }
+          if (event.communication) {
+            contactListItem.communication = event.communication
+            if (contactListItem.contact) {
+              contactListItem.communication.contact = contactListItem.contact
+            }
+          }
+          window.VueEvent.fire('contact_list_item_created', contactListItem)
+        })
+        .listen('.user.contact_list_item.updated', (event) => {
+          let contactListItem = event.contact_list_item
+          if (event.contact) {
+            contactListItem.contact = event.contact
+          }
+          if (event.communication) {
+            contactListItem.communication = event.communication
+            if (contactListItem.contact) {
+              contactListItem.communication.contact = contactListItem.contact
+            }
+          }
+          window.VueEvent.fire('contact_list_item_updated', contactListItem)
+        })
+        .listen('.user.contact_list_item.deleting', (event) => {
+          window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
+        })
+        .listen('.user.session_metrics_calculation', (event) => {
+          window.VueEvent.fire('metric_sessions_update', event)
+        })
+        .listen('.bulk_contact_list_items.created', (event) => {
+          window.VueEvent.fire('contact_list_bulk_created', event)
+        })
+        .listen('.export-events', (event) => {
+          window.VueEvent.fire('export_event_updates', event)
+        })
+        /**
+         * End of Power Dialer Session Tasks
+         */
+
         .notification((notification) => {
           if (!this.profile.sleep_mode) {
             switch (notification.type) {

@@ -88,6 +88,7 @@ export default {
   },
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
+    // commit('powerDialer/SET_SELECTED_PD_LIST', payload, { root: true })
   },
 
   setSelectedListContactCount: ({ commit }, count) => {
@@ -284,6 +285,9 @@ export default {
   },
   setActiveFolder: ({ commit }, value) => {
     commit('SET_ACTIVE_FOLDER', value)
+  },
+  clearList: ({ commit }) => {
+    commit('CLEAR_LIST')
   },
   setPinnedListsLoaded: ({ commit }, value) => {
     commit('SET_PINNED_LISTS_LOADED', value)

@@ -1,7 +1,7 @@
 <template>
   <div>
     <PowerDialerView
-      :id="id"
+      :pd-id="pdId"
       :name="name"
       @on-list-update="updateList" />
   </div>
@@ -25,21 +25,24 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'listItems',
-      'lists',
-      'selectedList'
+      'lists'
     ]),
     objId () {
       return this.$route
     },
-    id () {
+    pdId () {
       let id = this.$route.params.id
       return !isNaN(id) ? id : 'my-queue'
     }
   },
   async mounted () {
-    console.log('555 :>> ', 555)
     this.resetSearch()
-    await this.fetchResources()
+    await this.myQueueList()
+    await this.loadList(this.pdId)
+    // export_event_updates
+    this.$VueEvent.listen('export_event_updates', (task) => {
+      console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
+    })
   },
   data () {
     return {
@@ -49,27 +52,26 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'resetSearch',
-      'setSelectedList',
       'listLoaded'
     ]),
     ...mapActions('powerDialer', [
-      'getMyQueueList'
+      'getMyQueueList',
+      'setSelectedPDList'
     ]),
     async updateList (data) {
-      await this.loadList(data.id)
+      await this.loadList(data.pdId)
     },
     async fetchResources () {
-      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
-        let response = await this.getMyQueueList()
-        this.listLoaded({ ...response.data, id: 'my-queue' })
-        this.setSelectedList({
-          id: response.data.id,
-          name: response.data.name,
-          type: response.data.type
-        })
+      if (this.$route.meta.id === 'power-dialer-queue-filter') {
+        await this.myQueueList()
+        await this.loadList('my-queue')
       } else {
-        await this.loadList(this.id)
+        await this.loadList(this.pdId)
       }
+    },
+    async myQueueList () {
+      let response = await this.getMyQueueList()
+      this.listLoaded({ ...response.data, id: 'my-queue' })
     }
   },
   watch: {
@@ -81,7 +83,7 @@ export default {
     },
     'objId': async function (val) {
       if (val.name === 'Power Dialer') {
-        await this.fetchResources()
+        // await this.fetchResources()
       }
     }
   }

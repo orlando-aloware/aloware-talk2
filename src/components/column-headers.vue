@@ -320,7 +320,11 @@ export default {
 
       const item = { i: 0 }
       for (item.i = 0; item.i < COLUMN_CATEGORIES.length; item.i++) {
-        columns[item.i] = matches.filter((c) => c.category === item.i)
+        if (this.endpointUrl === 'contacts-list') {
+          columns[item.i] = matches.filter((c) => c.category === item.i && c.name !== 'task_status')
+        } else {
+          columns[item.i] = matches.filter((c) => c.category === item.i)
+        }
         results.data = results.data + columns[item.i].length
       }
 

@@ -343,10 +343,16 @@ export default {
       } else {
         if (this.contactList.id === 'my-queue') {
           return {
+            // allow_international_phone_numbers: 1,
+            // multiple_phone_numbers: 1,
+            // future_scheduled_time: '2022-03-09T14:41:36.296Z',
             contact_ids: this.checkedItemIds
           }
         }
         return {
+          // allow_international_phone_numbers: 1,
+          // multiple_phone_numbers: 1,
+          // future_scheduled_time: '2022-03-09T14:41:36.296Z',
           contact_list_id: this.contactList.id,
           contact_ids: this.checkedItemIds
         }

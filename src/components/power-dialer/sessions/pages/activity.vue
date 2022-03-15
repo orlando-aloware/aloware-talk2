@@ -51,7 +51,7 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import ContactActivities from 'src/components/contacts/contact-activities'
@@ -90,6 +90,18 @@ export default {
       'isSidebarCollapsed',
       'changingSelectedContact'
     ]),
+    ...mapState([
+      'contactDetailsDrawer',
+      'campaignsIsLoading',
+      'usersIsLoading',
+      'tagsFullyLoaded',
+      'campaigns',
+      'users',
+      'tags'
+    ]),
+    isInbox () {
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
+    },
     widthClass () {
       if (this.isInbox) {
         return 'w-less-330px'
@@ -117,12 +129,25 @@ export default {
     ]),
     fetchContact () {
       this.selectedContactChanging(true)
-      this.processFetchContactInfo((contact) => {
-        this.setContact(contact)
-        this.setContactClone(contact)
+      this.processFetchContactInfo((selectedContact) => {
+        this.setContact(selectedContact)
+        this.setContactClone(selectedContact)
         this.resetChangedContactProperties([])
         this.selectedContactChanging(false)
       })
+    },
+    toggleDrawer () {
+      this.drawer = !this.drawer
+      this.setContactDetailsDrawer(this.drawer)
+    },
+    toggleDetails () {
+      this.detailsOpen = !this.detailsOpen
+    },
+    toggleContactListSidebar (isOpen) {
+      this.contactListSidebarOpen = isOpen
+      if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
+        this.$refs.contactListSidebar.onSidebarToggle()
+      }
     },
     prepareActivities () {
       this.contactId = this.contact.id
@@ -130,23 +155,16 @@ export default {
       if (this.authenticated) {
         this.fetchContact()
       }
-    },
-    toggleDrawer () {
-      this.drawer = !this.drawer
-    },
-    toggleDetails () {
-      this.detailsOpen = !this.detailsOpen
     }
   },
   watch: {
-    contact (val) {
-      if (val?.id) {
+    contact (newVal, oldVal) {
+      if (newVal?.id !== oldVal?.id) {
         if (this.flagged) {
+          this.flagged = false
           this.prepareActivities()
+          this.flagged = true
         }
-        // this.setContact(this.contact)
-        // this.flagged = true
-        // this.fetchContact()
       }
     }
   },

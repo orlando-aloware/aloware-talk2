@@ -217,6 +217,7 @@ export default function () {
     showContactsListSidebar: false,
     unsavedList: null,
     activeFolder: '',
+    clearList: false,
     pinnedListsLoaded: false,
     publicListsLoaded: false,
     myListsLoaded: false,
