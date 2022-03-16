@@ -197,9 +197,6 @@ export default {
       // 'contactsLoaded',
       'clearList'
     ]),
-    ...mapActions('powerDialer', [
-      'getSessionMetricsOptions'
-    ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
       'TOGGLE_TABLE_LOADER',
