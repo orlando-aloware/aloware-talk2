@@ -355,6 +355,9 @@ export default {
   SET_UNSAVED_LIST: (state, data) => {
     state.unsavedList = data
   },
+  SET_UNSAVED_LIST_NAME: (state, name) => {
+    state.unsavedList = { ...state.unsavedList, ...{ name: name } }
+  },
   SET_ACTIVE_FOLDER: (state, value) => {
     state.activeFolder = value
   },
