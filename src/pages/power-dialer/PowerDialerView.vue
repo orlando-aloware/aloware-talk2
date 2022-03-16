@@ -143,7 +143,7 @@
       <BulkActionMenu
         v-if="checked.length > 0"
         :id="filteredSelectedListId"
-        @moved-contacts="fetch({}, false)" />
+        @moved-contacts="onFetch({}, false)" />
     </template>
 
     <template slot="table">
@@ -337,6 +337,7 @@ import { isEqual, isEmpty, get } from 'lodash'
 export default {
   name: 'PowerDialerView',
   props: {
+    onFetch: Function,
     list: {
       type: Object,
       default: () => {}
@@ -671,11 +672,11 @@ export default {
         if (this.list.type === this.ContactListTypes.STATIC) {
           talk2Api.V2.contactListItem.addContact(this.selectedListId, [contact]).then(res => {
             this.setShouldUpdateSelectedListContactCount(true)
-            this.fetch()
+            this.onFetch()
             this.$generalNotification('Selected contacts were successfully added')
           })
         } else {
-          this.fetch({
+          this.onFetch({
             page: this.listItems[this.selectedListId].current_page
           })
         }
@@ -740,7 +741,7 @@ export default {
       handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.fetch(params, this.hasFilters)
+          this.onFetch(params, this.hasFilters)
           this.$emit('onFiltersCount', this.currentListFilters)
           // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
@@ -751,7 +752,7 @@ export default {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
     },
     clearList (value) {
-      this.fetch()
+      this.onFetch()
     },
     checked: function (value) {
       const elem = document.querySelector('.data-table-check-all')

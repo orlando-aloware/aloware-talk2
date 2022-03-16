@@ -25,6 +25,7 @@
         :is-loading-more="isLoadingMore"
         :filters-count="filtersCount"
         :selected-list-id="id"
+        :onFetch="fetch"
         @search="onSearch"
         @checkboxChanged="onFetchMyContacts"
         @sort="onSortByField"
