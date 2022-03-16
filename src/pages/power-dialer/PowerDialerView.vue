@@ -739,6 +739,7 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
+        this.$VueEvent.fire('clearContacts')
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.onFetch(params, this.hasFilters)
