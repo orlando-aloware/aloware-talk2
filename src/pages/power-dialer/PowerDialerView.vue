@@ -624,18 +624,12 @@ export default {
     },
     onCheckAllItems (checked) {
       let items = []
-      let _this = this
-      document
-        .querySelectorAll('.checker')
-        .forEach(function (checkbox) {
-          if (checked) {
-            items.push(_this.listItems[_this.selectedListId].data.find(item => item.id === Number(checkbox.value)))
-          } else {
-            items = items.filter(item => item.id !== Number(checkbox.value))
-          }
-        })
-
-      this.setListSelectedContacts({ id: this.selectedListId, contacts: items })
+      if (checked) {
+        items = this.fixedContactsDataItems
+      } else {
+        items = []
+      }
+      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: items })
     },
     onRemoveList () {
       this.removeListClose()
