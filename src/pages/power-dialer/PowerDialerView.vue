@@ -142,7 +142,7 @@
     <template slot="actions">
       <BulkActionMenu
         v-if="checked.length > 0"
-        :id="selectedListId"
+        :id="filteredSelectedListId"
         @moved-contacts="fetch({}, false)" />
     </template>
 
@@ -332,7 +332,7 @@ import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { isEqual, isEmpty } from 'lodash'
+import { isEqual, isEmpty, get } from 'lodash'
 
 export default {
   name: 'PowerDialerView',
@@ -525,6 +525,18 @@ export default {
     },
     fixedContactsDataItems () {
       return this.fixedContactsData.data
+    },
+    listItemsDataCount () {
+      const total = get(this.fixedContactsData, 'data.length', null)
+      return total !== null ? total : 0
+    },
+    filteredSelectedListId () {
+      let route = this.$route.meta.id
+      let id = route === 'power-dialer-queue-filter' ? this.myQueue?.id : this.selectedListId
+      return id
+    },
+    checked () {
+      return this.selectedContacts[this.filteredSelectedListId] || []
     }
   },
   data () {
@@ -607,8 +619,8 @@ export default {
     processedLink (id = '') {
       return `${this.activeRoute.fullPath}/${id}`
     },
-    onCheckboxCheck (data) {
-      this.setListSelectedContacts({ id: this.selectedListId, contacts: data })
+    onCheckboxCheck (obj) {
+      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: obj.data })
     },
     onCheckAllItems (checked) {
       let items = []
@@ -746,6 +758,12 @@ export default {
     },
     clearList (value) {
       this.fetch()
+    },
+    checked: function (value) {
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
     }
   }
 }

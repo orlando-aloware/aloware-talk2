@@ -41,7 +41,7 @@ export default {
   name: 'bulk-action-menu',
   props: {
     id: {
-      type: String,
+      type: [Number, String],
       required: true
     }
   },
