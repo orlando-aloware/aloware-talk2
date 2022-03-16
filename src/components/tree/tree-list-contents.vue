@@ -15,13 +15,13 @@
       :hasDelete="hasDelete"
     />
     <tree-list-item
+      v-if="hasUnsavedRootList || (hasUnsavedList && isDirectChild)"
       class="flex-grow-1 w-100"
       :name="unsavedList.name"
       :layer="layer"
       :type="unsavedList.type"
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
-      v-if="hasUnsavedRootList || (hasUnsavedList && isDirectChild)"
     />
     <!-- <tree-list-item
       class="flex-grow-1 w-100"
