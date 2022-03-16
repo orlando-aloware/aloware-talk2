@@ -193,15 +193,15 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         break
       case 422:
         message.data = ''
-        for (error.data of response.data.errors) {
-          message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
-        }
+        const keys = Object.keys(response.data.errors)
+        keys.forEach((value) => {
+          message.data += `<p class="pt-1 pb-1">- ${response.data.errors[value]}</p>`
+        })
         break
       case 500:
         message.data = 'Oops! We are having some problems right now, please try again later.'
-        break
     }
-    this.$generalNotification(message.data, 'error')
+    this.$generalNotification(message.data, 'error', 5000, true)
   }
 }
 
@@ -226,7 +226,7 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err.data)
 }
 
-Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000) {
+Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false) {
   const colorClass = { data: '' }
   switch (type) {
     case 'updated':
@@ -246,6 +246,7 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     timeout: timeout,
     message: message,
     position: 'bottom-left',
+    html: html,
     actions: [{ icon: 'close', color: 'black', class: 'close-button' }]
   })
 }
