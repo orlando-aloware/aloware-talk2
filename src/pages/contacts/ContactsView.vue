@@ -1501,16 +1501,6 @@ export default {
           this.setSelectedListContactCount(value[this.id])
         }
       }
-    },
-    'columns': {
-      deep: true,
-      handler (value) {
-        // we need to reload contacts data to include relations data
-        const relations = value.filter(item => ['broadcasts', 'tags', 'campaigns', 'ring_groups', 'contact_lists'].includes(item.name))
-        if (relations.length) {
-          this.$VueEvent.fire('fetchContacts')
-        }
-      }
     }
   }
 }
