@@ -325,6 +325,25 @@
                   </div>
                 </div>
               </td>
+              <td
+                v-else-if="column.name === 'contact_owner'"
+                class="datatable-row__name"
+                :key="`c-${colIndx}`">
+                <div class="d-flex align-items-center">
+                  <div class="flex-grow-1">
+                    <div v-if="contact.user_id">
+                      <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                        {{ (getUserName(contact.user_id)) | ucwords }}
+                      </div>
+                    </div>
+                    <div v-else>
+                      <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                        No Name
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
 
               <td
                 v-else-if="column.name === 'phone_number'"
@@ -1109,6 +1128,11 @@ export default {
       const found = this.campaigns.find(campaign => campaign.id === id)
       return found ? found.name : '-'
     },
+    getUserName (userId) {
+      const user = this.users.find(item => item.id === userId)
+
+      return user ? user.name : '-'
+    },
     onCheckerClicked (contact) {
       const items = { data: [] }
       const found = this.checked.find(item => item.id === contact.id)
@@ -1285,7 +1309,8 @@ export default {
     ]),
     ...mapState([
       'isTabletOrMobile',
-      'campaigns'
+      'campaigns',
+      'users'
     ]),
     ...mapState('auth', [
       'profile'
@@ -1474,6 +1499,16 @@ export default {
       handler (value) {
         if (value.hasOwnProperty(this.id)) {
           this.setSelectedListContactCount(value[this.id])
+        }
+      }
+    },
+    'columns': {
+      deep: true,
+      handler (value) {
+        // we need to reload contacts data to include relations data
+        const relations = value.filter(item => ['broadcasts', 'tags', 'campaigns', 'ring_groups', 'contact_lists'].includes(item.name))
+        if (relations.length) {
+          this.$VueEvent.fire('fetchContacts')
         }
       }
     }
