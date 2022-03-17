@@ -23,9 +23,10 @@ export default {
       if (!id) {
         id = 'my-queue'
       }
+      let route = this.$route.meta.id
       let stringId = String(id)
 
-      if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
+      if (route === 'power-dialer-queue-filter') {
         stringId = 'my-queue'
       }
 
@@ -35,29 +36,31 @@ export default {
         //   ...DEFAULT_LIST_ITEMS
         // })
       }
-      this.$axios
-        .get('/api/v2/power-dialer-lists/' + stringId)
-        .then((response) => response.data)
-        .then((response) => {
-          this.listLoaded({ ...response, id: stringId })
-          this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
-          let filters = {
-            contact_lists: {
-              operator: 1,
-              value: [stringId]
+      if (route) {
+        this.$axios
+          .get('/api/v2/power-dialer-lists/' + stringId)
+          .then((response) => response.data)
+          .then((response) => {
+            this.listLoaded({ ...response, id: stringId })
+            this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
+            let filters = {
+              contact_lists: {
+                operator: 1,
+                value: [stringId]
+              }
             }
-          }
-          this.setCurrentListFilters(filters)
-          this.activeMetrics = response.session_metrics
-        })
-        .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-          if (this.$route.name === 'Power Dialer') {
-            this.$router.replace('/power-dialer/')
-          }
-        })
+            this.setCurrentListFilters(filters)
+            this.activeMetrics = response.session_metrics
+          })
+          .catch((error) => {
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+            if (this.$route.name === 'Power Dialer') {
+              this.$router.replace('/power-dialer/')
+            }
+          })
+      }
     }
   }
 }

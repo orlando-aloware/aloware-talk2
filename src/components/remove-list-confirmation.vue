@@ -123,9 +123,6 @@ export default {
               this.$router.push('/contacts/')
             }
           } else {
-            console.log('50 :>> ', this.activeFilter)
-            console.log('100 :>> ', this.$router.history.current.path)
-            console.log('200 :>> ', `/power-dialer/list/${this.listToRemove.id}/${this.activeFilter}`)
             if (this.$router.history.current.path === `/power-dialer/list/${this.listToRemove.id}/${this.activeFilter}`) {
               this.$router.push('/power-dialer/')
             }

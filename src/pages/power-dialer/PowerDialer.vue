@@ -25,12 +25,14 @@
         :is-loading-more="isLoadingMore"
         :filters-count="filtersCount"
         :selected-list-id="id"
+        :onFetch="fetch"
         @search="onSearch"
         @checkboxChanged="onFetchMyContacts"
         @sort="onSortByField"
         @paginated="onPaginate"
         @loadMore="onLoadMore"
-        @onFiltersCount="getFiltersCount">
+        @onFiltersCount="getFiltersCount"
+        @on-list-update="updateList">
       </router-view>
     </div>
 
@@ -195,9 +197,6 @@ export default {
     ...mapActions('contacts', [
       // 'contactsLoaded',
       'clearList'
-    ]),
-    ...mapActions('powerDialer', [
-      'getSessionMetricsOptions'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',

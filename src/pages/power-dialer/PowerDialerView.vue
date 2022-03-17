@@ -1,7 +1,7 @@
 <template>
   <PowerDialerViewScreen
     v-if="list"
-    :loading="isLoading">dsd
+    :loading="isLoading">
 
     <template slot="title">
       <Breadcrumbs :directory-list="folders" />
@@ -142,8 +142,8 @@
     <template slot="actions">
       <BulkActionMenu
         v-if="checked.length > 0"
-        :id="selectedListId"
-        @moved-contacts="fetch({}, false)" />
+        :id="filteredSelectedListId"
+        @moved-contacts="onFetch({}, false)" />
     </template>
 
     <template slot="table">
@@ -332,11 +332,12 @@ import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { isEqual, isEmpty } from 'lodash'
+import { isEqual, isEmpty, get } from 'lodash'
 
 export default {
   name: 'PowerDialerView',
   props: {
+    onFetch: Function,
     list: {
       type: Object,
       default: () => {}
@@ -438,7 +439,6 @@ export default {
       'activeFilter'
     ]),
     ...mapGetters('contacts', [
-      'contact',
       'folders',
       'lists',
       'listItems',
@@ -498,10 +498,10 @@ export default {
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
-      return `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${this.selectedItem.contact_list_item_id}`
+      return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
-      return this.selectedListId === 'my-queue'
+      return isNaN(this.selectedListId)
     },
     filteredList () {
       if (this.selectedListId === 'my-queue') {
@@ -509,6 +509,12 @@ export default {
         // return this.lists['my-queue']
       }
       return this.list
+    },
+    filteredListId () {
+      if (this.filteredList.id === 'my-queue') {
+        return this.myQueue.id
+      }
+      return this.filteredList.id
     },
     hasMore () {
       return (this.fixedContactsData?.next_page_url &&
@@ -525,6 +531,18 @@ export default {
     },
     fixedContactsDataItems () {
       return this.fixedContactsData.data
+    },
+    listItemsDataCount () {
+      const total = get(this.fixedContactsData, 'data.length', null)
+      return total !== null ? total : 0
+    },
+    filteredSelectedListId () {
+      let route = this.$route.meta.id
+      let id = route === 'power-dialer-queue-filter' ? this.myQueue?.id : this.selectedListId
+      return id
+    },
+    checked () {
+      return this.selectedContacts[this.filteredSelectedListId] || []
     }
   },
   data () {
@@ -583,9 +601,9 @@ export default {
       console.log('CSV response :>> ', response)
     },
     async beginDial () {
+      // this.setContact(this.contact)
+      this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
       this.START_DIAL_TOGGLE(true)
-      this.setContact(this.contact)
-      this.$router.push(`/power-dialer/list/${this.filteredList.id}/sessions`)
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
@@ -607,23 +625,17 @@ export default {
     processedLink (id = '') {
       return `${this.activeRoute.fullPath}/${id}`
     },
-    onCheckboxCheck (data) {
-      this.setListSelectedContacts({ id: this.selectedListId, contacts: data })
+    onCheckboxCheck (obj) {
+      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: obj.data })
     },
     onCheckAllItems (checked) {
       let items = []
-      let _this = this
-      document
-        .querySelectorAll('.checker')
-        .forEach(function (checkbox) {
-          if (checked) {
-            items.push(_this.listItems[_this.selectedListId].data.find(item => item.id === Number(checkbox.value)))
-          } else {
-            items = items.filter(item => item.id !== Number(checkbox.value))
-          }
-        })
-
-      this.setListSelectedContacts({ id: this.selectedListId, contacts: items })
+      if (checked) {
+        items = this.fixedContactsDataItems
+      } else {
+        items = []
+      }
+      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: items })
     },
     onRemoveList () {
       this.removeListClose()
@@ -665,11 +677,11 @@ export default {
         if (this.list.type === this.ContactListTypes.STATIC) {
           talk2Api.V2.contactListItem.addContact(this.selectedListId, [contact]).then(res => {
             this.setShouldUpdateSelectedListContactCount(true)
-            this.fetch()
+            this.onFetch()
             this.$generalNotification('Selected contacts were successfully added')
           })
         } else {
-          this.fetch({
+          this.onFetch({
             page: this.listItems[this.selectedListId].current_page
           })
         }
@@ -682,7 +694,7 @@ export default {
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
-          this.$emit('on-list-update', this.selectedList)
+          this.$emit('on-list-update', { id: this.filteredListId })
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
@@ -713,7 +725,6 @@ export default {
   watch: {
     '$route.params': {
       handler (params) {
-        console.log('PARAMS have changed!', params)
         // if (params.filter) {
         //   this.init()
         // }
@@ -732,9 +743,10 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
+        this.$VueEvent.fire('clearContacts')
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.fetch(params, this.hasFilters)
+          this.onFetch(params, this.hasFilters)
           this.$emit('onFiltersCount', this.currentListFilters)
           // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
@@ -745,7 +757,13 @@ export default {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
     },
     clearList (value) {
-      this.fetch()
+      this.onFetch()
+    },
+    checked: function (value) {
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
     }
   }
 }

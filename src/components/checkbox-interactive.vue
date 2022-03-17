@@ -4,6 +4,7 @@
       type="checkbox"
       class="checker"
       :value="resource.id"
+      v-model="isChecked"
       :checked="checked"
       @change="onCheckerClicked" />
     <span class="checkmark"></span>
@@ -43,7 +44,17 @@ export default {
         items.data = [...this.checkedItems]
         items.data.push(this.resource)
       }
-      this.$emit('checked', items.data)
+      this.$emit('checked', { data: items.data, checked: this.isChecked })
+    }
+  },
+  watch: {
+    checkedItems (arr) {
+      const found = this.checkedItems.find(item => item.id === this.resource.id)
+      if (found) {
+        this.isChecked = true
+      } else {
+        this.isChecked = false
+      }
     }
   }
 }

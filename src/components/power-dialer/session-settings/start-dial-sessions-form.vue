@@ -65,7 +65,6 @@
           <ScriptSelector
             v-else-if="cform.name === 'script_id'"
             v-model="resources[cform.name]"
-            :communication="contact"
             :disable="disabled"
             class="w-100"></ScriptSelector>
 
@@ -135,7 +134,7 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import WarmupPeriodSelector from 'components/generic-selectors/warmup-period-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
-import ScriptSelector from 'components/generic-selectors/script-selector'
+import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
