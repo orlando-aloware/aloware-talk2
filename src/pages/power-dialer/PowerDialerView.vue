@@ -439,7 +439,6 @@ export default {
       'activeFilter'
     ]),
     ...mapGetters('contacts', [
-      'contact',
       'folders',
       'lists',
       'listItems',
@@ -510,6 +509,12 @@ export default {
         // return this.lists['my-queue']
       }
       return this.list
+    },
+    filteredListId () {
+      if (this.filteredList.id === 'my-queue') {
+        return this.myQueue.id
+      }
+      return this.filteredList.id
     },
     hasMore () {
       return (this.fixedContactsData?.next_page_url &&
@@ -597,8 +602,8 @@ export default {
     },
     async beginDial () {
       this.START_DIAL_TOGGLE(true)
-      this.setContact(this.contact)
-      this.$router.push(`/power-dialer/list/${this.filteredList.id}/sessions`)
+      // this.setContact(this.contact)
+      this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
@@ -720,7 +725,6 @@ export default {
   watch: {
     '$route.params': {
       handler (params) {
-        console.log('PARAMS have changed!', params)
         // if (params.filter) {
         //   this.init()
         // }

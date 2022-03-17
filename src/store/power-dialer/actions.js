@@ -30,7 +30,6 @@ export default {
   },
   getPowerDialerList: async ({ commit }, id = '') => {
     let res = await window.axios.get(`api/v2/power-dialer-lists/${id}`)
-    console.log('res res res------------- :>> ', res)
     if (res.status === 200) {
       commit('SET_SELECTED_PD_LIST',
         {

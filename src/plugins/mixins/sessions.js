@@ -69,7 +69,6 @@ export default {
       let res = null
       res = await this.getContact({ id: taskId })
       if (!this.flagged) {
-        console.log('FETCHING CONTACT...', res)
         this.activeTask = res
         this.flagged = true
       }

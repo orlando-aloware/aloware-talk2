@@ -354,7 +354,8 @@ export default {
     ...mapFields('powerDialer', [
       'sessionSettings',
       'dialerSessionSettings',
-      'activeList'
+      'activeList',
+      'myQueue'
     ]),
     ...mapGetters('powerDialer', [
       'personalSessionSettings',
@@ -375,6 +376,12 @@ export default {
     },
     isCompanyScope () {
       return this.selectedItem?.is_company_scope === 1
+    },
+    listId () {
+      if (this.list.id === 'my-queue') {
+        return this.myQueue.id
+      }
+      return this.list.id
     }
   },
   async mounted () {
@@ -440,13 +447,13 @@ export default {
         let newSettings = { ...this.selectedItem }
         let res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
-          contact_list_id: this.list.id,
+          contact_list_id: this.listId,
           name: `${this.list.name}-${new Date().valueOf()}`
         })
         if (res?.id) {
           await this.getDialerSessionSettings()
           newList = await this.updateContactsList({
-            id: this.list.id,
+            id: this.listId,
             dialer_session_id: null
           })
           this.SET_SESSION_SETTINGS(this.selectedItem)
@@ -455,7 +462,7 @@ export default {
         let { id } = this.selectedItem
         // this.activeSessionSettingId = id
         newList = await this.updateContactsList({
-          id: this.list.id,
+          id: this.listId,
           dialer_session_id: id
         })
         this.SET_SESSION_SETTINGS(this.selectedItem)
@@ -472,7 +479,7 @@ export default {
       if (data?.id) {
         res = await this.getSessionSetting(data.id)
       } else {
-        res = await this.getTemporarySessionSetting(this.list.id)
+        res = await this.getTemporarySessionSetting(this.listId)
         // this.resetDefaults(false)
       }
       // this.sessionSettings = res
@@ -500,7 +507,7 @@ export default {
       )
       if (res?.data) {
         if (this.sessionSettings.id === res.data.id) {
-          await this.getPowerDialerList(this.list.id)
+          await this.getPowerDialerList(this.listId)
         }
         this.$generalNotification(`Dialer Session Setting has been updated!`)
       }
@@ -576,7 +583,7 @@ export default {
       if (val) {
         this.loading = true
         await this.getDialerSessionSettings()
-        let temporarySetting = await this.getTemporarySessionSetting(this.list?.id)
+        let temporarySetting = await this.getTemporarySessionSetting(this.listId)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list?.dialer_session_id
         let fetchedSettings = this.dialerSessionSettings.find((setting) => {
