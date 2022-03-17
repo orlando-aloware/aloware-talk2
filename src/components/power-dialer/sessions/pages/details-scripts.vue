@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     changeScript (val) {
-      console.log('val :>> ', val)
       this.script = val
     }
   }

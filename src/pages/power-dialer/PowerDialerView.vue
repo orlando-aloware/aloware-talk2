@@ -501,7 +501,7 @@ export default {
       return `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
-      return this.selectedListId === 'my-queue'
+      return isNaN(this.selectedListId)
     },
     filteredList () {
       if (this.selectedListId === 'my-queue') {
