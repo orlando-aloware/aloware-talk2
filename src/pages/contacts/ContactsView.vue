@@ -1286,7 +1286,9 @@ export default {
     },
     setDataCount (data) {
       this.getListDataCount({ filters: JSON.stringify(data) }).then(response => {
-        this.setSelectedListContactCount(response.data.count)
+        const count = response.data.count
+        this.setSelectedListContactCount(count)
+        this.$VueEvent.fire('listCountUpdated', { list: this.list, count: count })
       })
     }
   },
@@ -1450,6 +1452,23 @@ export default {
     // force close filter
     this.closeFilters()
     this.folderPath = this.generateFolderPath(this.folders)
+    const _this = this
+
+    this.$VueEvent.listen('shouldUpdateListCount', function () {
+      _this.setDataCount(
+        _this.list.type === _this.ContactListTypes.DYNAMIC ? _this.list.filters : {
+          0: {
+            filters: {
+              contact_lists: {
+                operator: 1,
+                value: [_this.list.id]
+              }
+            },
+            is_conjunction: true
+          }
+        }
+      )
+    })
   },
 
   watch: {

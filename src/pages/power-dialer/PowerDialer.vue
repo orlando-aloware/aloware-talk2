@@ -49,7 +49,7 @@
         :is-contact-module-type="false"
         v-if="isActive" />
       <RemoveContactConfirmation
-        @on-remove-contacts="updateList"
+        @contactsRemoved="updateList"
         v-if="isActive" />
       <RemoveFolderDialog
         :is-contact-module-type="false" />

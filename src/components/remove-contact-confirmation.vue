@@ -4,6 +4,7 @@
     :title="title"
     @close="removeContactClose"
     @hide="onHide"
+    @shown="onShown"
   >
     <div slot="content">
       <div class="text-left">
@@ -11,6 +12,7 @@
           Type the number of contacts below to delete
           <input type="text"
                  class="form-control form-control-search"
+                 ref="contactsToDeleteInput"
                  :placeholder="contactToDeleteCount"
                  v-model="contactsToDelete"/>
         </div>
@@ -122,6 +124,9 @@ export default {
     onHide () {
       this.contactsToDelete = null
     },
+    onShown () {
+      this.$refs.contactsToDeleteInput.focus()
+    },
     handleSingleDeletion () {
       const url = { data: null }
       switch (this.removeContactActionType) {
@@ -172,7 +177,7 @@ export default {
       return this.$axios
         .delete(url.data, { params: params })
         .then(() => {
-          this.$emit('on-remove-contacts', this.selectedList)
+          this.$emit('contactsRemoved', this.selectedList)
           this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {

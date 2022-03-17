@@ -50,7 +50,7 @@ export default {
     state.isFiltersOpen = true
   },
   PINNED_COUNT_LOADED: (state, payload) => {
-    state.pinnedCounts[payload.id] = payload.count
+    Vue.set(state.pinnedCounts, payload.id, payload.count)
   },
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
