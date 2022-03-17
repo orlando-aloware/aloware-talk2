@@ -31,7 +31,8 @@
         @sort="onSortByField"
         @paginated="onPaginate"
         @loadMore="onLoadMore"
-        @onFiltersCount="getFiltersCount">
+        @onFiltersCount="getFiltersCount"
+        @on-list-update="updateList">
       </router-view>
     </div>
 
