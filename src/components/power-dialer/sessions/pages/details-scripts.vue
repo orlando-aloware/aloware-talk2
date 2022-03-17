@@ -6,13 +6,12 @@
     <q-card-section class="px-0" style="overflow:auto;">
 
       <ScriptSelector
-        :communication="contact"
         v-model="scriptId"
         class="px-3 w-100"
-        @change="changeScript" />
+        @on-change="changeScript" />
 
       <div
-        v-html="resources.message"
+        v-html="scriptText"
         class="t-scroll-y2 py-3 px-3"
         style="overflow:auto;">
       </div>
@@ -24,7 +23,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import ScriptSelector from 'components/generic-selectors/script-selector'
+import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
 
 export default {
   name: 'DetailsScripts',
@@ -42,18 +41,34 @@ export default {
       'contact'
     ]),
     ...mapGetters('powerDialer', [
-      'sessionLoader'
-    ])
+      'sessionLoader',
+      'sessionSettings'
+    ]),
+    scriptText () {
+      return this.script?.text
+    },
+    selectedScript: {
+      get () {
+        return this.scriptId
+      },
+      set (val) {
+        this.$emit('change', val)
+      }
+    }
+  },
+  mounted () {
+    this.scriptId = this.sessionSettings.script_id
   },
   data () {
     return {
       scriptId: null,
-      communication: {}
+      script: ''
     }
   },
   methods: {
-    changeScript () {
-      console.log('Calling scripts...')
+    changeScript (val) {
+      console.log('val :>> ', val)
+      this.script = val
     }
   }
 }

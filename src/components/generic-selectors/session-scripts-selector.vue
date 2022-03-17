@@ -164,6 +164,7 @@ export default {
   watch: {
     localValue (val) {
       this.prepareOptions(val)
+      this.$emit('on-change', this.selectedScriptObj)
     },
 
     scriptId (val) {
@@ -174,6 +175,12 @@ export default {
 
     scriptsOptions () {
       this.prepareOptions(this.localValue)
+    },
+
+    selectedScriptObj (obj) {
+      if (obj?.id) {
+        this.$emit('on-change', this.selectedScriptObj)
+      }
     }
   }
 }
