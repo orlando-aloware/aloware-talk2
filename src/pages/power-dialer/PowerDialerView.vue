@@ -1,7 +1,7 @@
 <template>
   <PowerDialerViewScreen
     v-if="list"
-    :loading="isLoading">dsd
+    :loading="isLoading">
 
     <template slot="title">
       <Breadcrumbs :directory-list="folders" />
@@ -601,9 +601,9 @@ export default {
       console.log('CSV response :>> ', response)
     },
     async beginDial () {
-      this.START_DIAL_TOGGLE(true)
       // this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
+      this.START_DIAL_TOGGLE(true)
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
