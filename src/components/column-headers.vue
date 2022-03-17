@@ -217,6 +217,12 @@ export default {
         headers: this.currentColumns
       })
       this.columnsClose()
+
+      // we need to reload contacts data to include relations data
+      const relations = this.currentColumns.filter(item => ['broadcasts', 'tags', 'campaigns', 'ring_groups', 'contact_lists'].includes(item.name))
+      if (relations.length) {
+        this.$VueEvent.fire('fetchContacts')
+      }
     },
     closeAndReset () {
       this.columnsUpdated({
