@@ -294,6 +294,7 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
+      this.destroySubmenu()
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false

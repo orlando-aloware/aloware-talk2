@@ -1134,6 +1134,7 @@ export default {
       return user ? user.name : '-'
     },
     onCheckerClicked (contact) {
+      console.log(this.checked)
       const items = { data: [] }
       const found = this.checked.find(item => item.id === contact.id)
       if (found) {

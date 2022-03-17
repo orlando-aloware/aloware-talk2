@@ -58,8 +58,8 @@ export default {
       'getMyQueueList',
       'setSelectedPDList'
     ]),
-    async updateList (data) {
-      await this.loadList(data.pdId)
+    async updateList (id) {
+      await this.loadList(id)
     },
     async fetchResources () {
       if (this.$route.meta.id === 'power-dialer-queue-filter') {

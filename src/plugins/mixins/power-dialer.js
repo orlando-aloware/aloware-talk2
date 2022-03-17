@@ -30,9 +30,6 @@ export default {
       }
       return this.id
     },
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
     totalList () {
       return this.listItems[this.id]?.total || 0
     },

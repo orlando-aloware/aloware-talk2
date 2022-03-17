@@ -36,11 +36,11 @@ export default {
       default: ''
     },
     id: {
-      type: String,
+      type: [Number, String],
       default: ''
     },
     filter: {
-      type: String,
+      type: [Number, String],
       default: 'in-queue'
     },
     listData: {

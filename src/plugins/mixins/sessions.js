@@ -69,7 +69,6 @@ export default {
       let res = null
       res = await this.getContact({ id: taskId })
       if (!this.flagged) {
-        console.log('FETCHING CONTACT...', res)
         this.activeTask = res
         this.flagged = true
       }
@@ -87,7 +86,7 @@ export default {
       console.log(data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        this.$VueEvent.fire('makeCall', data)
+        // this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')

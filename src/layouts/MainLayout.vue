@@ -1828,11 +1828,6 @@ export default {
         this.metricsDataLoaded = true
       }
 
-      if (to.name === 'Power Dialer') {
-        this.getAvailableMetrics()
-        this.getMetricGroups()
-      }
-
       if (!this.isMobile) {
         this.setShowContactsHeader(true)
       }
