@@ -215,6 +215,7 @@ export default function () {
     showMenu: false,
     showContactsHeader: true,
     showContactsListSidebar: false,
+    showMyContacts: false,
     unsavedList: null,
     activeFolder: '',
     clearList: false,
