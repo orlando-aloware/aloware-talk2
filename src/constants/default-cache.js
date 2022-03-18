@@ -4,6 +4,7 @@ export const DEFAULT_STATE = {
     'auth.profile',
     'contacts.lists',
     'powerDialer.sessionSettings',
-    'powerDialer.selectedList'
+    'powerDialer.selectedList',
+    'contacts.showMyContacts'
   ]
 }
