@@ -10,7 +10,7 @@ export const DEFAULT_STATE = {
     all: {
       id: 'all',
       headers: DEFAULT_COLUMNS,
-      filters: {},
+      filters: [],
       type: 2,
       module_type: 0,
       name: 'All Contacts'

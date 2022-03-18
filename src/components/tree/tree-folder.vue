@@ -138,6 +138,9 @@ export default {
     id: {
       type: Number
     },
+    parentId: {
+      type: [Number, null]
+    },
 
     name: {
       type: String
@@ -304,7 +307,7 @@ export default {
       if (this.isRenaming) return
       this.isRenaming = true
 
-      return this.updateFolderRequest(this.id, { name, order: this.order }).then(response => {
+      return this.updateFolderRequest(this.id, { name, order: this.order, parent_id: this.parentId }).then(response => {
         this.$generalNotification('Folder updated.')
         this.reloadFolders()
       }).finally(() => {

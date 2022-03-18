@@ -233,8 +233,10 @@ export default {
       this.selectedTags = this.value
       this.$refs.tagSelect.focus()
       setTimeout(() => {
-        this.$refs.tagSelect.blur()
-        this.$refs.tagSelect.hidePopup()
+        if (this.$refs.tagSelect) {
+          this.$refs.tagSelect.blur()
+          this.$refs.tagSelect.hidePopup()
+        }
       }, 200)
     },
     selectedTags (val) {

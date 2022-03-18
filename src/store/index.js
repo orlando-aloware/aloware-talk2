@@ -489,7 +489,6 @@ export default function (/* { ssrContext } */) {
 
         // reset all others
         if (value.includes('all')) {
-          console.log('here!')
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
         }
