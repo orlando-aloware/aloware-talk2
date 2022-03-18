@@ -805,6 +805,7 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
       'pinnedCountLoaded',
+      'setShowMyContacts',
       'setShowContactsListSidebar',
       'createListClose',
       'foldersLoaded',
@@ -817,6 +818,7 @@ export default {
       this.$emit('search', searchText)
     },
     onFetchMyContacts (checked) {
+      this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
     onSortByField (sorts) {
@@ -1298,6 +1300,7 @@ export default {
       'folders',
       'showContactsListSidebar',
       'shouldUpdateSelectedListContactCount',
+      'showMyContacts',
       'pinnedCounts'
     ]),
     ...mapGetters('contacts', [
@@ -1454,6 +1457,8 @@ export default {
     this.folderPath = this.generateFolderPath(this.folders)
     const _this = this
 
+    this.myContacts = this.showMyContacts
+
     this.$VueEvent.listen('shouldUpdateListCount', function () {
       _this.setDataCount(
         _this.list.type === _this.ContactListTypes.DYNAMIC ? _this.list.filters : {
@@ -1485,7 +1490,7 @@ export default {
       if (this.$route.name === 'Contacts') {
         this.resetFilters()
         this.initialListFilters = this.currentListFilters
-        this.myContacts = false
+        this.myContacts = this.showMyContacts
         this.setShouldUpdateSelectedListContactCount(true)
       }
     },

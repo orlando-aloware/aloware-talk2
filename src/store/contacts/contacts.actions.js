@@ -280,6 +280,9 @@ export default {
   setShowContactsListSidebar: ({ commit }, value) => {
     commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
   },
+  setShowMyContacts: ({ commit }, value) => {
+    commit('SET_SHOW_MY_CONTACTS', value)
+  },
   setUnsavedList: ({ commit }, data) => {
     commit('SET_UNSAVED_LIST', data)
   },

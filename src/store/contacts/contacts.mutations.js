@@ -352,6 +352,9 @@ export default {
   SET_SHOW_CONTACTS_LIST_SIDEBAR: (state, value) => {
     state.showContactsListSidebar = value
   },
+  SET_SHOW_MY_CONTACTS: (state, value) => {
+    state.showMyContacts = value
+  },
   SET_UNSAVED_LIST: (state, data) => {
     state.unsavedList = data
   },
