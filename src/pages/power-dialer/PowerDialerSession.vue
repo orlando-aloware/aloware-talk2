@@ -79,9 +79,6 @@ export default {
         return false
       }
       return this.selectedList.name.length > 0
-    },
-    test () {
-      return this.$route
     }
   },
   async mounted () {
@@ -134,7 +131,7 @@ export default {
     },
     redirectRoute (route) {
       let routePath = '/power-dialer'
-      if (route.name !== 'My Queue' && !isEmpty(route.name)) {
+      if ((route.name !== 'My Queue' && !isNaN(route.name)) && !isEmpty(route.name)) {
         routePath += `/list/${route.id}`
       }
       this.$router.push(routePath)

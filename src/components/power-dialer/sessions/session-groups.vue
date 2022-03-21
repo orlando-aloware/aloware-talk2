@@ -57,23 +57,24 @@
                 v-if="group.length > 0"
                 class="px-2 pb-2"
                 @mouseleave="onLeave">
-                <template v-for="(item, i) in group">
+                <template v-for="(itm, i) in group">
                   <q-item
                     :key="`acc-item-${i}`"
-                    :class="{ active: item?.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }"
+                    v-if="itm"
+                    :class="{ active: itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }"
                     class="t-expansion-panel px-2">
                     <div class="py-2">
                       <q-avatar size="30px" color="grey">
-                        {{ avatarName(item.first_name, item.last_name) }}
+                        {{ avatarName(itm.first_name, itm.last_name) }}
                       </q-avatar>
                     </div>
                     <q-item-section class="pl-2">
-                      <q-item-label>{{ item.first_name }} {{ item.last_name }}</q-item-label>
-                      <q-item-label caption lines="2">{{ item.phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
-                      <q-item-label caption lines="2">{{ item.company_name }}</q-item-label>
+                      <q-item-label>{{ itm.first_name }} {{ itm.last_name }}</q-item-label>
+                      <q-item-label caption lines="2">{{ itm.phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
+                      <q-item-label caption lines="2">{{ itm.company_name }}</q-item-label>
                     </q-item-section>
                     <q-item-section
-                      v-if="!item?.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'"
+                      v-if="!itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'"
                       class="t-item-icon"
                       side top>
                       <q-avatar color="red" size="md">
@@ -94,35 +95,35 @@
                       <template>
                         <b-dropdown-item
                           v-if="key === 'in_queue'"
-                          @click="moveTask(item, moveDirection.top)"
+                          @click="moveTask(itm, moveDirection.top)"
                           href="#">
                           <ArrowUpIcon height="16px" width="16px" />
                           Move to Top
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-if="key === 'in_queue'"
-                          @click="moveTask(item, moveDirection.bottom)"
+                          @click="moveTask(itm, moveDirection.bottom)"
                           href="#">
                           <ArrowDownIcon height="15px" width="15px" />
                           Move to Bottom
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-if="key !== 'in_queue'"
-                          @click="addTask(item, moveDirection.top)"
+                          @click="addTask(itm, moveDirection.top)"
                           href="#">
                           <ArrowUpIcon height="16px" width="16px" />
                           Add to Top of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-if="key !== 'in_queue'"
-                          @click="addTask(item, moveDirection.bottom)"
+                          @click="addTask(itm, moveDirection.bottom)"
                           href="#">
                           <ArrowDownIcon height="15px" width="15px" />
                           Add to Bottom of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-if="key === 'in_queue'"
-                          @click="onDeleteTask(item)"
+                          @click="onDeleteTask(itm)"
                           href="#">
                           <TrashIcon />
                           Remove from List
@@ -133,7 +134,7 @@
                       class="dropdown t-btn-floater t-btn-floater__bottom"
                       ref="returnToQueue">
                       <q-btn
-                        @click="moveToInQueue(item)"
+                        @click="moveToInQueue(itm)"
                         size="xs" flat round>
                         <q-avatar size="15px">
                           <!-- <img src="icons/refresh-call.png"> -->
@@ -346,17 +347,6 @@ export default {
           ]
       }
     }
-    // makeACall () {
-    //   let data = {
-    //     currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.activeTask?.id}`), // we know this already based on the list (Required)
-    //     outboundCampaignId: '535', // this.session.campaignId, // ID of the line that you are calling from (Required)
-    //     contactName: `${this.activeTask.first_name} ${this.activeTask.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
-    //     companyName: this.activeTask.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
-    //     contactId: this.activeTask.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
-    //   }
-    //   console.log('data :>> ', data)
-    //   // this.$VueEvent.fire('makeCall', data)
-    // }
   },
   data () {
     return {

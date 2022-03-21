@@ -398,6 +398,12 @@ export default {
     if (this.campaings) {
       this.findDefaultOutboundCampaign()
     }
+    setTimeout(() => {
+      if (!this.hasQueuedTaskLists) {
+        this.$generalNotification('Stopping PowerDialer: No more tasks found. You\'ve been redirected to PowerDialer main page.', 'error')
+        this.reRoute()
+      }
+    }, 2000)
   },
   methods: {
     ...mapActions(['setShowPhone']),
@@ -649,8 +655,11 @@ export default {
         if (this.timerIsOver && !this.statusCallConnected) {
           if (this.toggleEnd) {
             this.reRoute()
-          } else {
+          }
+          if (this.hasQueuedTaskLists) {
             this.prepareNextContact()
+          } else {
+            this.reRoute()
           }
         }
         if (this.timerIsOver) {
