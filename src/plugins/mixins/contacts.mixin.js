@@ -627,8 +627,9 @@ export default {
     $route (to, from) {
       this.isNavigated = true
 
-      if (to.name === 'Contacts' || to.name === 'Power Dialer') {
+      if ((from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) || to.name === 'Power Dialer') {
         this.init()
+        return
       }
 
       if (from.name === 'Contact' && to.name === 'Contacts') {
@@ -639,6 +640,8 @@ export default {
       if ((from.name === 'Contacts' && to.name === 'Contacts') || (from.name === 'Power Dialer' && to.name === 'Power Dialer')) {
         this.isNavigated = false
       }
+
+      this.init()
     }
   },
 

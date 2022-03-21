@@ -242,7 +242,6 @@
       <datatable
         :stickyHeaders="true"
         :columns="columns"
-        :hasMore="hasMore"
         :isEmpty="isEmpty || isStartState"
         :isLoadingMore="isLoadingMore"
         :is-loading="isLoading"
@@ -353,6 +352,23 @@
                   v-if="contact.phone_number"
                   :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                   {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+                </div>
+                <div
+                  v-else
+                  class="ml-1 text-grey-7 text-center "
+                  :class="`${column.draggable ? 'col-indented' : ''}`">
+                  -
+                </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'contact_owner'"
+                class="datatable-row__phone"
+                :key="`c-${colIndx}`">
+                <div
+                  v-if="contact.user_id"
+                  :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ getOwnerName(contact.user_id) }}
                 </div>
                 <div
                   v-else
@@ -785,6 +801,7 @@ export default {
         'outbound_communications_count',
         'communications_count'
       ],
+      hasNextPage: false,
       ContactListTypes
     }
   },
@@ -1292,6 +1309,14 @@ export default {
         this.setSelectedListContactCount(count)
         this.$VueEvent.fire('listCountUpdated', { list: this.list, count: count })
       })
+    },
+    getOwnerName (userId) {
+      if (!userId) {
+        return ''
+      }
+
+      const owner = this.users.find(user => user.id === userId)
+      return owner ? owner.name : ''
     }
   },
 
@@ -1428,14 +1453,14 @@ export default {
       }
       return newItems
     },
+    computedStyle () {
+      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
+    },
     hasMore () {
-      return (this.fixedContactsData?.next_page_url &&
+      return (this.hasNextPage &&
           !this.isLoadingMore &&
           !this.isLoading) ||
         false
-    },
-    computedStyle () {
-      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     }
   },
 
@@ -1524,6 +1549,12 @@ export default {
         if (value.hasOwnProperty(this.id)) {
           this.setSelectedListContactCount(value[this.id])
         }
+      }
+    },
+    'fixedContactsData': {
+      deep: true,
+      handler: function () {
+        this.hasNextPage = !_.isEmpty(this.fixedContactsData.next_page_url)
       }
     }
   }

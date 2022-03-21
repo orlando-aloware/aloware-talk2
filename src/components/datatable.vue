@@ -308,7 +308,8 @@ export default {
   methods: {
     ...mapActions(['setDefaultDateFilter']),
     handleScroll: function (element) {
-      if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= (element.srcElement.scrollHeight + 5)) {
+      // if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= (element.srcElement.scrollHeight + 5)) {
+      if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= element.srcElement.scrollHeight) {
         this.onVisibilityChanged(true)
       } else if (this.isLoaderVisible) {
         this.onVisibilityChanged(false)
