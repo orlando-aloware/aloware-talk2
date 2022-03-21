@@ -398,12 +398,6 @@ export default {
     if (this.campaings) {
       this.findDefaultOutboundCampaign()
     }
-    setTimeout(() => {
-      if (!this.hasQueuedTaskLists) {
-        this.$generalNotification('Stopping PowerDialer: No more tasks found. You\'ve been redirected to PowerDialer main page.', 'error')
-        this.reRoute()
-      }
-    }, 2000)
   },
   methods: {
     ...mapActions(['setShowPhone']),
@@ -711,6 +705,12 @@ export default {
         this.shouldRedirect = false
         this.initialize()
       }
+      // setTimeout(() => {
+      //   if (!this.hasQueuedTaskLists) {
+      //     this.$generalNotification('Stopping PowerDialer: No more tasks found. You\'ve been redirected to PowerDialer main page.', 'error')
+      //     this.reRoute()
+      //   }
+      // }, 2000)
     },
     currentSessionStatus (status) {
       // console.log(' %c CURRENT SESSION STATUS : ', 'background: red; color: white;', status)

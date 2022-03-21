@@ -217,6 +217,10 @@ export default {
             type: list.type
           })
 
+          if (!isContactModule) {
+            this.listDetails = data
+          }
+
           this.markCheckedAll()
         })
         .finally(() => {
