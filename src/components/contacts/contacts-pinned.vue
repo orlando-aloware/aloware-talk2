@@ -46,7 +46,7 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile', 'authenticated']),
-    ...mapGetters('contacts', ['pinnedLists', 'pinned']),
+    ...mapGetters('contacts', ['pinnedLists', 'pinned', 'pinnedCounts']),
     loading () {
       return this.loadingDefaultCounts || this.loadingPinned
     }
@@ -56,6 +56,32 @@ export default {
     this.init()
     this.$VueEvent.listen('fetchContactsLists', () => {
       this.init()
+    })
+
+    this.$VueEvent.listen('getListCount', (list) => {
+      if (list.type === this.ContactListTypes.DYNAMIC && list.id !== 'my-contacts') {
+        this.loadDynamicListPinnedCount(list)
+      }
+
+      if (list.type === this.ContactListTypes.DYNAMIC && list.id === 'my-contacts') {
+        this.loadMyContactsCount()
+      }
+
+      if (list.type === this.ContactListTypes.STATIC) {
+        this.loadPinnedCount(list.id)
+      }
+    })
+
+    this.$VueEvent.listen('listCountUpdated', (data) => {
+      const isPinned = this.pinnedLists.find(item => item.id.toString() === data.list.id.toString())
+      if (!isPinned) {
+        return
+      }
+
+      this.pinnedCountLoaded({
+        id: data.list.id,
+        count: data.count
+      })
     })
   },
 
@@ -134,7 +160,12 @@ export default {
           }]
         },
         paramsSerializer: qs.stringify
-      }).then((response) => response.data.count)
+      }).then((response) => {
+        this.pinnedCountLoaded({
+          id: 'my-contacts',
+          count: response.data.count
+        })
+      })
     },
 
     loadStatusCounts () {

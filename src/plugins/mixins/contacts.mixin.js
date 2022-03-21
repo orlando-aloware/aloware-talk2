@@ -89,9 +89,13 @@ export default {
     init: _.debounce(function () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
-      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
-      this.initialListFilters = defaultFilters
-      this.filtersCount = this.getFiltersCount(defaultFilters)
+      if (this.showMyContacts && this.$route.name === 'Contacts') {
+        this.onFetchMyContacts(true)
+      } else {
+        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
+        this.initialListFilters = defaultFilters
+        this.filtersCount = this.getFiltersCount(defaultFilters)
+      }
     }, 200),
     onSortByField (sorts) {
       this.isLoaded = false
@@ -455,7 +459,7 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount']),
+    ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount', 'showMyContacts']),
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList', 'contact']),
     ...mapState('cache', ['currentCompany']),

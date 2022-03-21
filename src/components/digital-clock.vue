@@ -24,6 +24,12 @@ export default {
     }
   },
 
+  computed: {
+    tz () {
+      return this.timezone || 'America/Los_Angeles'
+    }
+  },
+
   mounted () {
     this.updateTime()
     this.interval = setInterval(this.updateTime, 1000)
@@ -31,7 +37,7 @@ export default {
 
   methods: {
     updateTime () {
-      this.date = window.moment().tz(this.timezone)
+      this.date = window.moment().tz(this.tz)
       this.time = this.date.format('hh:mm A z')
     }
   },

@@ -50,7 +50,7 @@ export default {
     state.isFiltersOpen = true
   },
   PINNED_COUNT_LOADED: (state, payload) => {
-    state.pinnedCounts[payload.id] = payload.count
+    Vue.set(state.pinnedCounts, payload.id, payload.count)
   },
   FOLDERS_LOADED: (state, folders) => {
     state.folders = folders
@@ -351,6 +351,9 @@ export default {
   },
   SET_SHOW_CONTACTS_LIST_SIDEBAR: (state, value) => {
     state.showContactsListSidebar = value
+  },
+  SET_SHOW_MY_CONTACTS: (state, value) => {
+    state.showMyContacts = value
   },
   SET_UNSAVED_LIST: (state, data) => {
     state.unsavedList = data

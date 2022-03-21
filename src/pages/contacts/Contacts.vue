@@ -36,7 +36,8 @@
     <remove-folder-dialog v-if="isActive" />
     <column-headers v-if="isActive" />
     <remove-contact v-if="isActive" />
-    <remove-contact-confirmation v-if="isActive" />
+    <remove-contact-confirmation v-if="isActive"
+                                 @contactsRemoved="onRemoveContacts" />
     <move-dialog v-if="isActive" />
     <create-list-modal v-if="isActive" />
     <select-list-modal v-if="isActive" />
@@ -146,6 +147,11 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    onRemoveContacts () {
+      this.clearContacts()
+      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('shouldUpdateListCount')
     }
   },
 
