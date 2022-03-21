@@ -3,6 +3,11 @@ import { mapGetters, mapActions } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
 
+const DIRECTION = {
+  top: 1,
+  bottom: 2
+}
+
 // import { isEmpty } from 'lodash'
 export default {
   data () {
@@ -53,10 +58,17 @@ export default {
         default:
           return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
       }
+    },
+    moveDirection () {
+      return DIRECTION
     }
   },
   methods: {
     ...mapActions(['setShowPhone']),
+    ...mapActions('powerDialer', [
+      'moveContactItems',
+      'getSessionTaskByFilter'
+    ]),
     async nextContact () {
       this.$VueEvent.fire('hangupCall')
     },
@@ -94,6 +106,7 @@ export default {
         // TODOs:
         // Implement: Should skip single task
         this.skipSingleTask(this.taskToCall, 'Task is skipped because timezone has not been set for this contact. Pushed the task to the bottom of the list.')
+        this.moveTask(this.taskToCall, moveDirection.bottom)
         return
       }
       // Check if it's outside working hours or not
@@ -109,6 +122,7 @@ export default {
           // TODOs:
           // Implement: Should skip single task
           this.skipSingleTask(this.taskToCall, 'Task is skipped because it\'s outside day times. Pushed the task to the bottom of the list.')
+          this.moveTask(this.taskToCall, moveDirection.bottom)
           return
         }
       }
@@ -142,6 +156,25 @@ export default {
           // this.loading_skip = false
           return Promise.reject(err)
         })
+    },
+    async moveTask (item = {}, direction = this.moveDirection.top) {
+      const res = await this.moveContactItems({
+        id: this.item.id,
+        params: {
+          contact_list_item_ids: [item.contact_list_item_id],
+          direction: direction
+        }
+      })
+      if (res.status === 200) {
+        let res = await this.getSessionTaskByFilter({
+          id: this.selectedList.id,
+          task_status: 1
+        })
+        this.powerDialerTasks['in_queue'] = res.data.data
+        this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
+      } else {
+        this.$generalNotification(`Unable to move item to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'error')
+      }
     },
     skipTask () {
       if (!this.activeTask) {
