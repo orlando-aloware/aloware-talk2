@@ -15,7 +15,8 @@
           </div>
           <div class="col-5 p-0">
             <CallStatus
-              @on-redirect="redirectRoute" />
+              @on-redirect="redirectRoute"
+              @no-tasks-found="onNoTasksFound" />
           </div>
         </div>
 
@@ -28,7 +29,7 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
@@ -84,6 +85,7 @@ export default {
     }
   },
   async mounted () {
+    this.TOGGLE_SESSION_LOADER(true)
     this.resetPowerDialerTasks()
     await this.fetchTasks()
   },
@@ -94,7 +96,10 @@ export default {
       'getPowerDialerList',
       'setSelectedPDList'
     ]),
-    async fetchTasks () {
+    ...mapMutations('powerDialer', [
+      'TOGGLE_SESSION_LOADER'
+    ]),
+    async fetchTasks (status) {
       await this.fetchCurrentList()
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
         let params = {}
@@ -133,6 +138,9 @@ export default {
         routePath += `/list/${route.id}`
       }
       this.$router.push(routePath)
+    },
+    onNoTasksFound () {
+      this.$generalNotification('Stopping PowerDialer: No more tasks found', 'warning')
     }
   }
 }

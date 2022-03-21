@@ -73,7 +73,6 @@ export default {
         this.flagged = true
       }
       console.log(` %c Fetching contact for current task ${taskId} : `, 'color:yellow;background:black;', res)
-      this.TOGGLE_SESSION_LOADER(false)
     },
     async runTask () {
       let data = {
@@ -83,7 +82,7 @@ export default {
         companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       }
-      console.log(data)
+      console.log('RUNNING TASK : ', data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
         this.$VueEvent.fire('makeCall', data)

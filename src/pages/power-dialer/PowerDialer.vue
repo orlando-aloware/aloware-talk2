@@ -174,6 +174,7 @@ export default {
       }
     })
     this.$VueEvent.listen('contact_list_item_updated', (task) => {
+      console.log('this.hasSessions ---------:>> ', this.hasSessions)
       if (this.hasSessions) {
         this.updateTaskStatus(task)
       }
