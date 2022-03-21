@@ -9,7 +9,7 @@ export const DATE_RANGES = [
   },
   {
     id: 3,
-    label: 'This Week So Far'
+    label: 'Last 7 days'
   },
   {
     id: 4,
