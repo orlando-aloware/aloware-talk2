@@ -103,7 +103,7 @@
             height="18px"
             class="mr-0 py-0"
             style="position:relative;top:-2px;" />
-          {{ address }} - {{ taskCreatedAt | fixTime }}
+          {{ timezone }} - {{ getTimeZone }}
         </div>
         <!-- <q-btn
           @click="onToggleMute"
@@ -204,6 +204,7 @@ import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import sessionsMixins from 'src/plugins/mixins/sessions'
 import { isEmpty } from 'lodash'
+import moment from 'moment-timezone'
 
 export default {
   name: 'SessionCallStatus',
@@ -358,8 +359,14 @@ export default {
     phoneNumber () {
       return this.taskToCall?.phone_number || ''
     },
-    taskCreatedAt () {
-      return this.taskToCall?.created_at || ''
+    timezone () {
+      return this.taskToCall?.timezone
+    },
+    getTimeZone () {
+      let timezone = this.taskToCall?.timezone
+      const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('HH:mm')
+      // const contactLocalTime = moment().tz(timezone).format('HH:mm:ss')
+      return contactLocalTime
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
