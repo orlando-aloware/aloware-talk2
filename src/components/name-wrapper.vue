@@ -46,7 +46,11 @@ export default {
     name () {
       const { computedResource } = this
       if (computedResource.first_name && computedResource.last_name) {
-        return `${computedResource.first_name} ${computedResource.last_name}`
+        return `${computedResource.first_name} ${computedResource.last_name}`.trim()
+      } else if (!computedResource.first_name && computedResource.last_name) {
+        return `${computedResource.last_name}`.trim()
+      } else if (computedResource.first_name && !computedResource.last_name) {
+        return `${computedResource.first_name}`.trim()
       }
       return ''
     }

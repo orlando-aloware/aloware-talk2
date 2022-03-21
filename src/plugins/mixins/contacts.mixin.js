@@ -35,7 +35,6 @@ export default {
 
   created () {
     this.init()
-
     const hasOrder = { data: null }
     const params = { data: null }
     this.$VueEvent.listen('fetchContacts', (data) => {
@@ -83,15 +82,20 @@ export default {
       'setContact'
     ]),
     ...mapActions('powerDialer', [
-      'updateMyQueueListData'
+      'updateMyQueueListData',
+      'setSelectedPDList'
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init: _.debounce(function () {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
-      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
-      this.initialListFilters = defaultFilters
-      this.filtersCount = this.getFiltersCount(defaultFilters)
+      if (this.showMyContacts && this.$route.name === 'Contacts') {
+        this.onFetchMyContacts(true)
+      } else {
+        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
+        this.initialListFilters = defaultFilters
+        this.filtersCount = this.getFiltersCount(defaultFilters)
+      }
     }, 200),
     onSortByField (sorts) {
       this.isLoaded = false
@@ -189,7 +193,6 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
-
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: this.buildQueryString(params, isContactModule),
@@ -201,11 +204,19 @@ export default {
           this.setListContactsLoaded(true)
 
           if (this.apiEndpoint(queued).includes('my-queue')) {
+            // TODOs: Use vuex for storing filtered power dialer contact lists
             this.updateMyQueueListData(data.data)
           }
 
-          const list = _.get(this.lists, this.id, { id: null, name: '', type: null })
-          this.setSelectedList({ id: list.id, name: list.name, type: list.type })
+          let listId = this.id === 'my-queue' ? this.myQueue?.id : this.id
+          const list = _.get(this.lists, listId, { id: null, name: '', type: null })
+
+          this.setSelectedList({
+            id: listId,
+            name: list.name,
+            type: list.type
+          })
+
           this.markCheckedAll()
         })
         .finally(() => {
@@ -235,10 +246,10 @@ export default {
       if (typeof this.isPowerDialer !== 'undefined') {
         // the variable is defined
         switch (this.$route.meta.id) {
-          case 'power-dialer':
+          case 'power-dialer-queue-filter':
             this.processFetch(params, false, true)
             break
-          case 'power-dialer-list':
+          case 'power-dialer-list-filter':
             this.processFetch(params, false, false)
             break
           default:
@@ -308,7 +319,7 @@ export default {
         }
       }
 
-      if (params.sort) {
+      if (params?.sort) {
         query.sort = params.sort
         query.order = params.order ? params.order : 'asc'
         powerQuery.sort_by = params.sort
@@ -439,11 +450,16 @@ export default {
       this.contactsData = {
         data: []
       }
+    },
+    stopEvents () {
+      this.$VueEvent.stop('fetchContacts')
+      this.$VueEvent.stop('clearContacts')
+      this.$VueEvent.stop('onLoadMoreContacts')
     }
   },
 
   computed: {
-    ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount']),
+    ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount', 'showMyContacts']),
     ...mapGetters('auth', ['profile']),
     ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList', 'contact']),
     ...mapState('cache', ['currentCompany']),
@@ -454,9 +470,16 @@ export default {
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return this.$route.params.id
+      } else if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
+        return this.$route.params.id
+      } else if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
+        return this.$route.params.id
       }
 
       return 'all'
+    },
+    myQueueId () {
+      return this.selectedList.type ? null : this.selectedList.id
     },
     defaultContactDateFilter () {
       if (this.currentCompany && this.defaultDateFilter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
@@ -556,6 +579,9 @@ export default {
       if (!this.id) {
         return this.lists['all']
       }
+      if (this.myQueueId) {
+        return this.lists['my-queue']
+      }
 
       return this.lists[this.id]
     },
@@ -595,7 +621,7 @@ export default {
       }
     },
     $route (to, from) {
-      if (from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) {
+      if ((from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) || to.name === 'Power Dialer') {
         this.isNavigated = true
         this.init()
         return
@@ -606,7 +632,7 @@ export default {
         return
       }
 
-      if (from.name === 'Contacts' && to.name === 'Contacts') {
+      if ((from.name === 'Contacts' && to.name === 'Contacts') || (from.name === 'Power Dialer' && to.name === 'Power Dialer')) {
         this.isNavigated = false
         this.init()
       }
@@ -614,8 +640,8 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('fetchContacts')
-    this.$VueEvent.stop('clearContacts')
-    this.$VueEvent.stop('onLoadMoreContacts')
+    if (!(this.$route.meta.id === 'power-dialer-queue-filter' || this.$route.meta.id === 'power-dialer-list-filter')) {
+      this.stopEvents()
+    }
   }
 }

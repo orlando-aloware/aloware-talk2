@@ -1,5 +1,6 @@
 <template>
   <b-modal size="md"
+           no-close-on-backdrop
            no-close-on-esc
            v-model="isOpen"
            :title="title"
@@ -12,7 +13,9 @@
       <b-form-group
         label="Name"
         description="">
-        <b-input v-model="template.name" placeholder="Template name"></b-input>
+        <b-input  placeholder="Template name"
+                  ref="templateName"
+                  v-model="template.name"></b-input>
       </b-form-group>
 
       <b-form-group label="Template Body">
@@ -131,6 +134,11 @@ export default {
     ...mapActions('contacts', ['setSmsTemplateModal']),
     ...mapActions(['setTemplates']),
     onHidden () {
+      this.template = {
+        id: '',
+        name: '',
+        body: ''
+      }
       this.setSmsTemplateModal({
         isOpen: false
       })
@@ -140,6 +148,8 @@ export default {
       if (this.smsTemplateModal.template) {
         this.template = { ...this.template, body: this.smsTemplateModal.template.body, name: this.smsTemplateModal.template.name, id: this.smsTemplateModal.template.id }
       }
+
+      this.$refs.templateName.focus()
     },
 
     variableSelected (variable) {

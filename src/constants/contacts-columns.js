@@ -332,18 +332,6 @@ export const ALL_COLUMNS = [
     name: 'unread_missed_calls_count',
     label: 'Unread Missed Calls',
     category: 3,
-    order: 30,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: true,
-    maxWidth: 190,
-    minWidth: 190
-  },
-  {
-    name: 'unread_missed_calls_count',
-    label: 'Unread Missed Calls',
-    category: 3,
     order: 31,
     sortable: false,
     draggable: true,

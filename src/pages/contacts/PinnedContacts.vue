@@ -98,7 +98,7 @@ export default {
     TableRow
   },
   methods: {
-    ...mapActions('contacts', ['openFilters', 'contactsLoaded']),
+    ...mapActions('contacts', ['openFilters']),
     onSortByField (nextSorts) {
       console.log(nextSorts)
     },
@@ -141,11 +141,11 @@ export default {
           search_text: this.searchText
         })
           .then((data) => {
-            this.contactsLoaded({
-              id: this.$route.params.id,
-              append: true,
-              ...data
-            })
+            // this.contactsLoaded({
+            //   id: this.$route.params.id,
+            //   append: true,
+            //   ...data
+            // })
           })
           .finally(() => {
             this.isLoadingMore = false

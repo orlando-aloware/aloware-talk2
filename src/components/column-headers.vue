@@ -217,6 +217,12 @@ export default {
         headers: this.currentColumns
       })
       this.columnsClose()
+
+      // we need to reload contacts data to include relations data
+      const relations = this.currentColumns.filter(item => ['broadcasts', 'tags', 'campaigns', 'ring_groups', 'contact_lists'].includes(item.name))
+      if (relations.length) {
+        this.$VueEvent.fire('fetchContacts')
+      }
     },
     closeAndReset () {
       this.columnsUpdated({
@@ -320,7 +326,11 @@ export default {
 
       const item = { i: 0 }
       for (item.i = 0; item.i < COLUMN_CATEGORIES.length; item.i++) {
-        columns[item.i] = matches.filter((c) => c.category === item.i)
+        if (this.endpointUrl === 'contacts-list') {
+          columns[item.i] = matches.filter((c) => c.category === item.i && c.name !== 'task_status')
+        } else {
+          columns[item.i] = matches.filter((c) => c.category === item.i)
+        }
         results.data = results.data + columns[item.i].length
       }
 

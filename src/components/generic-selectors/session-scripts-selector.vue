@@ -5,17 +5,18 @@
             :disable="disable || loadingScripts"
             :class="[ prepend ? 'with-prepend' : '' ]"
             class="padded-container"
-            v-model="scriptId"
+            v-model="localValue"
             options-selected-class="text-primary"
             color="primary"
+            option-label="text"
             option-value="id"
-            option-label="title"
             input-debounce="0"
             use-input
-            emit-value
+            :emit-value="true"
             map-options
             outlined
             dense
+            :display-value="scriptTitle"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -47,14 +48,14 @@ import _ from 'lodash'
 export default {
   name: 'script-selector',
 
-  props: {
-    communication: {
-      required: true
-    },
+  model: {
+    prop: 'modelValue',
+    event: 'change'
+  },
 
-    value: {
-      required: false
-    },
+  props: {
+
+    modelValue: [Number, String],
 
     disable: {
       type: Boolean,
@@ -70,17 +71,27 @@ export default {
 
   data () {
     return {
-      scriptId: this.value,
+      scriptId: this.modelValue,
       scripts: [],
       scriptsOptions: [],
-      loadingScripts: false
+      loadingScripts: false,
+      selectedScriptObj: null
     }
   },
 
   computed: {
 
+    localValue: {
+      get () {
+        return `${this.modelValue || ''}`
+      },
+      set (val) {
+        this.$emit('change', val)
+      }
+    },
+
     placeholder () {
-      if (this.scriptId) {
+      if (this.modelValue) {
         return ''
       }
 
@@ -97,6 +108,10 @@ export default {
       }
 
       return []
+    },
+
+    scriptTitle () {
+      return this.selectedScriptObj?.title || ''
     }
   },
 
@@ -109,7 +124,7 @@ export default {
   methods: {
     fetchScripts () {
       this.loadingScripts = true
-      return this.$axios.get('/api/v1/communication/' + this.communication.id + '/scripts').then(res => {
+      return this.$axios.get('/api/v1/script').then(res => {
         this.loadingScripts = false
         this.scripts = res.data
         return Promise.resolve()
@@ -139,17 +154,32 @@ export default {
         const needle = val.toLowerCase()
         this.scriptsOptions = this.scriptsAlphabeticalOrder.filter(script => script.title.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    prepareOptions (val) {
+      this.selectedScriptObj = this.scriptsOptions.find(script => script.id === parseInt(val))
     }
   },
 
   watch: {
-    value () {
-      this.scriptId = this.value
+    localValue (val) {
+      this.prepareOptions(val)
+      this.$emit('on-change', this.selectedScriptObj)
     },
 
     scriptId (val) {
       if (this.scriptId !== this.value) {
         this.$emit('change', this.scripts.find(script => script.id === val))
+      }
+    },
+
+    scriptsOptions () {
+      this.prepareOptions(this.localValue)
+    },
+
+    selectedScriptObj (obj) {
+      if (obj?.id) {
+        this.$emit('on-change', this.selectedScriptObj)
       }
     }
   }

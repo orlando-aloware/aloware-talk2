@@ -23,6 +23,12 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'PowerDialerQueueList',
+  props: {
+    activeCount: {
+      type: [String, Number],
+      default: 0
+    }
+  },
   components: {
     QueueListItem
   },
@@ -32,7 +38,7 @@ export default {
     ]),
     filteredList () {
       return {
-        count: this.myQueue.items.length,
+        count: this.activeCount,
         id: this.myQueue.id,
         link: '/power-dialer/list/',
         name: 'My Queue',

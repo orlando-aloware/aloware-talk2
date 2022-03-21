@@ -8,7 +8,8 @@ const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
 const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
 const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
-const PowerDialerBase = () => import('src/pages/power-dialer/PowerDialerBase')
+const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
+// const PowerDialerBase = () => import('src/pages/power-dialer/PowerDialerBase')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
 const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
 const Stats = () => import('pages/stats/Stats.vue')
@@ -174,7 +175,7 @@ const routes = [
             redirect: {
               path: 'in-queue'
             },
-            component: PowerDialerBase
+            component: PowerDialerView
           },
           {
             name: 'Power Dialer',
@@ -183,7 +184,16 @@ const routes = [
               id: 'power-dialer-queue-filter'
             },
             path: ':id(in-queue|called|failed|scheduled|all)+',
-            component: PowerDialerBase
+            component: PowerDialerView
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Sessions',
+              id: 'power-dialer-session'
+            },
+            path: 'list/:id(\\d+)+/sessions',
+            component: () => import('src/pages/power-dialer/PowerDialerSession')
           },
           {
             name: 'Power Dialer',
@@ -195,7 +205,7 @@ const routes = [
             redirect: {
               path: 'list/:id(\\d+)+/in-queue'
             },
-            component: PowerDialerBase,
+            component: PowerDialerView,
             children: [
               {
                 name: 'Power Dialer',
@@ -204,7 +214,7 @@ const routes = [
                   id: 'power-dialer-list-filter'
                 },
                 path: ':filter(in-queue|called|failed|scheduled|all)+',
-                component: PowerDialerBase
+                component: PowerDialerView
               }
             ]
           },

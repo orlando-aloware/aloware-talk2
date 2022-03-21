@@ -14,7 +14,8 @@
             <CallDisposition />
           </div>
           <div class="col-5 p-0">
-            <CallStatus />
+            <CallStatus
+              @on-redirect="redirectRoute" />
           </div>
         </div>
 
@@ -27,11 +28,17 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import CallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionPage from 'src/components/power-dialer/sessions/session-main-page'
+import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
+import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import sessionsMixins from 'src/plugins/mixins/sessions'
+import broadcast from 'src/plugins/mixins/broadcast.mixin'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -41,15 +48,114 @@ export default {
     CallStatus,
     SessionPage
   },
+  mixins: [
+    sessionsMixins,
+    broadcast
+  ],
   computed: {
+    ...mapGetters('contacts', [
+      'listItems',
+      'contact',
+      'selectedList'
+    ]),
     ...mapGetters('powerDialer', [
-      'isStartingDial',
-      'sessionSidebarExpanded'
-    ])
+      'sessionSidebarExpanded',
+      'selectedPdList'
+    ]),
+    ...mapFields('powerDialer', [
+      'powerDialerTasks',
+      'activeList',
+      'activeMetrics'
+    ]),
+    list () {
+      return this.listItems[this.selectedList.id].data || []
+    },
+    listFilters () {
+      return DEFAULT_FILTER_LIST
+    },
+    isValidList () {
+      if (this.selectedList.id !== this.$route.params.id) {
+        return false
+      }
+      return this.selectedList.name.length > 0
+    },
+    test () {
+      return this.$route
+    }
   },
-  created () {
-    if (!this.isStartingDial) {
-      this.$router.push({ name: 'Power Dialer' })
+  async mounted () {
+    this.resetPowerDialerTasks()
+    // this.$VueEvent.listen('contact_list_item_created', async (task) => {
+    //   console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+    //   await this.fetchInQueueTasks(task)
+    //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+    //   //   this.handleDesktopVoicemailNotification(task)
+    //   // }
+    // })
+    // this.$VueEvent.listen('contact_list_item_updated', (task) => {
+    //   console.log(' %c TASK was UPDATED : ', 'background: green; color: #000;', task)
+    //   this.updateTaskStatus(task)
+    //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+    //   //   this.handleDesktopVoicemailNotification(task)
+    //   // }
+    // })
+    // this.$VueEvent.listen('contact_list_item_deleting', (task) => {
+    //   console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
+    //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
+    //   //   this.handleDesktopVoicemailNotification(task)
+    //   // }
+    // })
+    // this.$VueEvent.listen('contact_list_bulk_created', (task) => {
+    //   console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
+    // })
+    await this.fetchTasks()
+  },
+  methods: {
+    ...mapActions('powerDialer', [
+      'resetPowerDialerTasks',
+      'getSessionTaskByFilter',
+      'getPowerDialerList',
+      'setSelectedPDList'
+    ]),
+    async fetchTasks () {
+      await this.fetchCurrentList()
+      Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
+        let params = {}
+        let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+        if (stat === 'all') {
+          params = { id: this.selectedList.id }
+        } else {
+          params = { id: this.selectedList.id, task_status: taskStatus }
+        }
+        let res = await this.getSessionTaskByFilter(params)
+        this.powerDialerTasks[stat] = res.data.data
+      })
+    },
+    async fetchCurrentList () {
+      let response = null
+      let id = ''
+      if (this.isValidList) {
+        id = this.selectedList.id
+        response = await this.getPowerDialerList(id)
+      } else {
+        id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
+        response = await this.getPowerDialerList(this.$route.params.id)
+      }
+      this.activeList = response
+      this.activeMetrics = response.session_metrics
+      this.setSelectedPDList({
+        id: response.id,
+        name: response.name,
+        type: response.type
+      })
+      // console.log('RES -------- :>> ', res)
+    },
+    redirectRoute (route) {
+      let routePath = '/power-dialer'
+      if (route.name !== 'My Queue' && !isEmpty(route.name)) {
+        routePath += `/list/${route.id}`
+      }
+      this.$router.push(routePath)
     }
   }
 }

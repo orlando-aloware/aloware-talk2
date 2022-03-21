@@ -19,7 +19,6 @@ export default function () {
     powerDialerListItems: {
       'all': DEFAULT_CONTACT_LIST_ITEMS,
       'my-queue': DEFAULT_CONTACT_LIST_ITEMS,
-      'in-queue': DEFAULT_CONTACT_LIST_ITEMS,
       'called': DEFAULT_CONTACT_LIST_ITEMS,
       'failed': DEFAULT_CONTACT_LIST_ITEMS,
       'scheduled': DEFAULT_CONTACT_LIST_ITEMS
@@ -139,10 +138,32 @@ export default function () {
     currentListFilters: [],
     datatableLoader: false,
     search: '',
-    // contact: null,
+    contact: null,
     sessionLoader: false,
     sessionSidebarExpanded: false,
+    sessionSettings: {},
+    dialerSessionSettings: [],
     changingSelectedContact: false,
-    activeFilter: ''
+    activeFilter: '',
+    sessionSettingGroups: {
+      personal: [],
+      company: []
+    },
+    warmupDurations: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
+    powerDialerTasks: {
+      in_queue: [],
+      called: [],
+      failed: [],
+      scheduled: [],
+      all: []
+    },
+    activeTask: {},
+    selectedDialerSessionId: null,
+    sessionPaused: false,
+    selectedPdList: {},
+    metrics: [],
+    activeMetrics: [],
+    activeList: {},
+    hubspot: {}
   }
 }

@@ -12,7 +12,7 @@
 
 import { mapGetters, mapActions } from 'vuex'
 import PowerDialerAddItems from 'src/pages/contacts/ContactsAddItemsStatic.vue'
-import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
+// import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
@@ -24,7 +24,7 @@ export default {
     this.loadList(this.$route.params.id)
   },
   computed: {
-    ...mapGetters('powerDialer', ['powerDialerListItems']),
+    // ...mapGetters('powerDialer', ['powerDialerListItems']),
     ...mapGetters('contacts', ['lists', 'listItems']),
     contactList () {
       return this.lists[this.id]
@@ -38,14 +38,14 @@ export default {
       }
       return false
     },
-    powerDialerList () {
-      return this.powerDialerListItems[String(this.$route.params.id)]
-    },
+    // powerDialerList () {
+    //   return this.powerDialerListItems[String(this.$route.params.id)]
+    // },
     id () {
       if (this.$route.meta.id === 'power-dialer-add-queue-list') {
         return 'my-queue'
       }
-      return this.$route.params.id || 'all'
+      return this.$route.params.id || 'my-queue'
     },
     filteredName () {
       return this.contactList?.name || ''
@@ -59,7 +59,7 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
-      'contactsLoaded',
+      // 'contactsLoaded',
       'openFilters'
     ]),
     loadList (id) {
@@ -74,10 +74,10 @@ export default {
       }
 
       if (!this.listItems[stringId]) {
-        this.contactsLoaded({
-          id: stringId,
-          ...DEFAULT_CONTACT_LIST_ITEMS
-        })
+        // this.contactsLoaded({
+        //   id: stringId,
+        //   ...DEFAULT_CONTACT_LIST_ITEMS
+        // })
       }
 
       this.$axios

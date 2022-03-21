@@ -88,10 +88,10 @@ export default {
   },
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
+    // commit('powerDialer/SET_SELECTED_PD_LIST', payload, { root: true })
   },
 
   setSelectedListContactCount: ({ commit }, count) => {
-    console.trace(count)
     commit('SET_SELECTED_LIST_CONTACT_COUNT', count)
   },
   setShouldUpdateSelectedListContactCount: ({ commit }, shouldUpdate) => {
@@ -280,11 +280,20 @@ export default {
   setShowContactsListSidebar: ({ commit }, value) => {
     commit('SET_SHOW_CONTACTS_LIST_SIDEBAR', value)
   },
+  setShowMyContacts: ({ commit }, value) => {
+    commit('SET_SHOW_MY_CONTACTS', value)
+  },
   setUnsavedList: ({ commit }, data) => {
     commit('SET_UNSAVED_LIST', data)
   },
+  setUnsavedListName: ({ commit }, name) => {
+    commit('SET_UNSAVED_LIST_NAME', name)
+  },
   setActiveFolder: ({ commit }, value) => {
     commit('SET_ACTIVE_FOLDER', value)
+  },
+  clearList: ({ commit }) => {
+    commit('CLEAR_LIST')
   },
   setPinnedListsLoaded: ({ commit }, value) => {
     commit('SET_PINNED_LISTS_LOADED', value)

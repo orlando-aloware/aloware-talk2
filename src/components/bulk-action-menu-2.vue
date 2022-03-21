@@ -41,7 +41,7 @@ export default {
   name: 'bulk-action-menu',
   props: {
     id: {
-      type: String,
+      type: [Number, String],
       required: true
     }
   },
@@ -52,7 +52,7 @@ export default {
       return this.selectedContacts[this.id].length || 0
     },
     selectedContactIds () {
-      return this.selectedContacts[this.id].map(contact => contact.id)
+      return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
     },
     isMyQueue () {
       return this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter'
@@ -81,17 +81,19 @@ export default {
       const res = await this.moveContactItems({
         id: this.isMyQueue ? this.myQueue.id : this.id,
         params: {
-          contact_ids: this.selectedContactIds,
+          // contact_ids: this.selectedContactIds,
+          contact_list_item_ids: this.selectedContactIds,
           direction: direction
         }
       })
       this.setListSelectedContacts({ id: this.id, contacts: [] })
 
-      if (res.data.message) {
+      if (res.data?.message) {
+        this.$VueEvent.fire('clearContacts')
         this.$emit('moved-contacts', true)
       }
       this.$generalNotification(
-        res.data.message,
+        res?.data?.message || 'Error in moving contact list items.',
         res?.data ? 'success' : 'error'
       )
     }

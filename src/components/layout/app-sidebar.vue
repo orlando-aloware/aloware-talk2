@@ -78,7 +78,6 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Power Dialer')"
-           v-if="!isProd"
            flat>
       <q-tooltip
         anchor="center right"
@@ -94,7 +93,6 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer')"
-           v-if="!isProd"
            flat>
       <q-tooltip
         anchor="center right"

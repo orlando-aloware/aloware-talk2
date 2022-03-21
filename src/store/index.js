@@ -239,7 +239,8 @@ export default function (/* { ssrContext } */) {
       contactNotifiedDesktop: [],
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
-      defaultDateFilter: null
+      defaultDateFilter: null,
+      sessionPhoneExpansion: ''
     },
 
     getters: {
@@ -488,7 +489,6 @@ export default function (/* { ssrContext } */) {
 
         // reset all others
         if (value.includes('all')) {
-          console.log('here!')
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
         }
@@ -705,7 +705,6 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_CURRENT_STATUS (state, status) {
         state.dialer.currentStatus = status
-        console.log('Dialer current status: ', this.state.dialer.currentStatus)
       },
 
       SET_DIALER_COMMUNICATION (state, communication) {

@@ -6,7 +6,6 @@ export default {
   data () {
     return {
       isOpen: false,
-      isLoading: false,
       selectedItem: { id: '' },
       filterParams: {
         'page': 1,
@@ -31,9 +30,6 @@ export default {
       }
       return this.id
     },
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
     totalList () {
       return this.listItems[this.id]?.total || 0
     },
@@ -49,7 +45,7 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'contactsLoaded'
+      // 'contactsLoaded'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_TABLE_LOADER'
@@ -62,11 +58,11 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
-          this.contactsLoaded({
-            id: this.tempId || '',
-            append: false,
-            ...data
-          })
+          // this.contactsLoaded({
+          //   id: this.tempId || '',
+          //   append: false,
+          //   ...data
+          // })
           this.TOGGLE_TABLE_LOADER(false)
         })
     }, 1000),
@@ -132,8 +128,7 @@ export default {
       const order = get(params, 'order', 'desc')
       params.sort = sort
       params.order = order
-      this.isLoading = true
-      this.processFetch2(params)
+      // this.processFetch2(params)
     },
     onSortByField (sorts) {
       this.TOGGLE_TABLE_LOADER(true)

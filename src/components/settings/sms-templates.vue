@@ -186,8 +186,10 @@ export default {
             .then(response => {
               if (response.status === 204) {
                 this.templates = this.templates.filter(item => item.id !== template.id)
+                this.$generalNotification(`SMS template has been successfully deleted.`, 'success')
               }
-            }).finally(() => {
+            }).catch(() => {
+              this.$generalNotification(`Error while deleting selected template.`, 'error')
             })
         }
       })

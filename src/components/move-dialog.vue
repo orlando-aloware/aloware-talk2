@@ -1,5 +1,6 @@
 <template>
-  <div class="move-dialog shadow-sm" ref="moveDialog">
+  <div class="move-dialog shadow-sm"
+       ref="moveDialog">
     <div class="move-dialog-input">
       <div>
         <search
@@ -52,11 +53,13 @@ export default {
       default: true
     }
   },
+
   components: {
     MoveFolderItem,
     Search,
     CompactBtn
   },
+
   data () {
     return {
       searchValue: '',
@@ -65,6 +68,7 @@ export default {
       popperInstance: null
     }
   },
+
   computed: {
     ...mapGetters('contacts', ['moveDialog', 'folders']),
     searchedItemsList () {
@@ -91,6 +95,7 @@ export default {
       return this.isContactModuleType ? '/api/v2/contacts-list' : '/api/v2/power-dialer-lists'
     }
   },
+
   methods: {
     ...mapActions('contacts', ['closeMoveDialog', 'foldersLoaded']),
     onConfirmMove () {
@@ -229,12 +234,32 @@ export default {
         this.closeMoveDialog()
         document.body.removeEventListener('click', this.handleClick)
       }
+    },
+    loadDirectories () {
+      const itemsList = { data: [] }
+      if (this.folders?.length) {
+        const value = this.folders[0].child_folders
+        itemsList.data = this.createFolders('', [
+          {
+            id: 0,
+            name: 'Root Folder',
+            child_folders: value
+          }
+        ])
+      }
+      this.itemsList = itemsList.data
     }
   },
+
+  mounted () {
+    this.loadDirectories()
+  },
+
   beforeDestroy () {
     document.body.removeEventListener('focus', this.handleClick)
     this.destroyDialogInstance()
   },
+
   watch: {
     moveDialog: function ({ open, ...state }) {
       if (open) {
@@ -245,19 +270,11 @@ export default {
         this.destroyDialogInstance(state)
       }
     },
-    folders: function (value) {
-      const itemsList = { data: [] }
-      if (value?.length) {
-        value = value[0].child_folders
-        itemsList.data = this.createFolders('', [
-          {
-            id: 0,
-            name: 'Root Folder',
-            child_folders: value
-          }
-        ])
+    folders: {
+      deep: true,
+      handler () {
+        this.loadDirectories()
       }
-      this.itemsList.data = itemsList.data
     }
   }
 }

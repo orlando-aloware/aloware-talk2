@@ -12,7 +12,7 @@
             {{ lsFilter.name }}
           </div>
           <div :class="`t__badge ${id === lsFilter.id ? 'active' : ''}`">
-            {{ contactListCount(lsFilter.id) }}
+            <span>{{ filtersCounter[lsFilter.meta] }}</span>
           </div>
         </div>
       </router-link>
@@ -26,6 +26,7 @@
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { POWER_DIALER_FILTERS } from 'src/constants/power-dialer/power-dialer'
 import { mapGetters } from 'vuex'
+// import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerFilters',
@@ -35,12 +36,16 @@ export default {
       default: ''
     },
     id: {
-      type: String,
+      type: [Number, String],
       default: ''
     },
     filter: {
-      type: String,
+      type: [Number, String],
       default: 'in-queue'
+    },
+    listData: {
+      type: Object,
+      default: null
     }
   },
   computed: {
@@ -48,26 +53,23 @@ export default {
       'activeFilter',
       'filteredEndpoint'
     ]),
-    ...mapGetters('contacts', [
-      'listItems'
-    ]),
+    hasValidData () {
+      return this.listData.path !== undefined
+    },
     activeFilters () {
       return POWER_DIALER_FILTERS
     },
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
-    currentList () {
-      return this.listItems?.[this.id]?.data || []
-    },
-    listResources () {
-      return this.listItems?.[this.id]
-    },
     filterKey () {
       if (this.id === 'my-queue') {
         return this.filter
       }
       return isNaN(this.id) ? this.id : this.filter
+    },
+    list () {
+      return this.listData
     }
   },
   methods: {
@@ -76,27 +78,33 @@ export default {
         return `/power-dialer/${listFilter.id}`
       }
       return `/power-dialer/list/${this.id}/${listFilter.id}`
-    },
-    contactListCount (filterId) {
-      return filterId === 'all' ? this.getListWithFilter() || 0 : this.listResources?.[this.filters?.[filterId]] || 0
-    },
-    getListWithFilter () {
-      let ctr = 0
-      Object.keys(this.filters).forEach(f => {
-        ctr += f !== 'all' ? this.listResources?.[this.filters?.[f]] : 0
-      })
-      return ctr
+    }
+  },
+  watch: {
+    'listData': {
+      handler (val) {
+        if (val.path) {
+          this.filtersCounter = {
+            in_queue: val.total_queued || 0,
+            called: val.total_called || 0,
+            failed: val.total_failed || 0,
+            scheduled: val.total_scheduled || 0,
+            all: val.total_items || 0
+          }
+        }
+      },
+      deep: true
     }
   },
   data () {
     return {
       valid: true,
-      filters: {
-        'in-queue': 'total_queued',
-        'called': 'total_called',
-        'failed': 'total_failed',
-        'scheduled': 'total_scheduled',
-        'all': 'total'
+      filtersCounter: {
+        in_queue: 0,
+        called: 0,
+        failed: 0,
+        scheduled: 0,
+        all: 0
       }
     }
   }

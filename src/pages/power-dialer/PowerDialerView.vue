@@ -1,5 +1,6 @@
 <template>
   <PowerDialerViewScreen
+    v-if="list"
     :loading="isLoading">
 
     <template slot="title">
@@ -8,9 +9,11 @@
 
     <template slot="options">
       <div class="text-13 pr-3 border-right right-spacing-2">
-        {{ numberOfContacts }}
+        {{ numberOfContacts }} Contacts
       </div>
       <StartDialing
+        :disabled-trigger="numberOfContacts === 0"
+        :list="filteredList"
         @start="beginDial" />
     </template>
 
@@ -24,8 +27,8 @@
             <b-col cols="12">
               <div class="d-flex">
                 <PowerDialerFilter
-                  v-if="activeRoute"
-                  :id="id"
+                  :list-data="fixedContactsData"
+                  :id="selectedListId"
                   :filter="filter"
                   :active-route="activeRoute" />
               </div>
@@ -36,8 +39,8 @@
               <div class="d-flex">
 
                 <SearchList
-                  @search="onSearch"
                   :search="search"
+                  @search="onSearch"
                   class="width-250" />
 
               </div>
@@ -47,8 +50,8 @@
               v-if="$q.screen.name === 'lg'">
               <div class="d-flex">
                 <PowerDialerFilter
-                  v-if="activeRoute"
-                  :id="id"
+                  :list-data="fixedContactsData"
+                  :id="selectedListId"
                   :filter="filter"
                   :active-route="activeRoute" />
               </div>
@@ -107,13 +110,23 @@
                     <i class="fa fa-bars mr-1"></i>
                     Edit Columns
                   </b-dropdown-item>
-                  <b-dropdown-item href="#">
+                  <b-dropdown-item
+                    href="#"
+                    @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    @click="onRemoveList">
+                    @click="onClearList"
+                    v-if="isMyQueue">
+                    <i class="fa fa-trash-alt mr-1 text-red"></i>
+                    <span class="text-red">Clear</span>
+                  </b-dropdown-item>
+                  <b-dropdown-item
+                    href="#"
+                    @click="onRemoveList"
+                    v-else>
                     <i class="fa fa-trash-alt mr-1 text-red"></i>
                     <span class="text-red">Delete</span>
                   </b-dropdown-item>
@@ -129,8 +142,8 @@
     <template slot="actions">
       <BulkActionMenu
         v-if="checked.length > 0"
-        :id="id"
-        @moved-contacts="fetch({}, false)" />
+        :id="filteredSelectedListId"
+        @moved-contacts="onFetch({}, false)" />
     </template>
 
     <template slot="table">
@@ -141,8 +154,8 @@
         :is-empty="isEmpty || isStartState"
         :is-loading-more="isLoadingMore"
         :is-loading="isLoading"
-        :contact-list-id="id"
-        :paginated="true"
+        :contact-list-id="selectedListId"
+        :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
         :total-rows="totalRows"
@@ -155,12 +168,12 @@
         @more="onLoadMore">
         <template slot="tbody">
           <TableRow
-            v-for="(contact, nkey) in activeList"
+            v-for="(contact, nkey) in fixedContactsDataItems"
             :key="`${contact.id}-${nkey}`"
             :contact="contact"
             :columns="filteredColumns"
             :checked="checked"
-            :contactListId="id"
+            :contactListId="selectedListId"
             :custom-row-content="true"
             @checked="onCheckedRows">
             <template slot="custom-content">
@@ -171,7 +184,7 @@
                 <td
                   v-if="column.name === 'checkbox'"
                   :key="key"
-                  class="p-0">
+                  class="p-0 text-left pull-left datatable-row__checkbox">
                   <CheckBox
                     :resource="contact"
                     :checked-items="checked"
@@ -297,38 +310,93 @@
 <script>
 
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
-import PowerDialerViewScreen from './power-dialer-view-screen'
-import PowerDialerFilter from './details/power-dialer-filters'
-import SummaryInfoLabels from './details/summary-info-labels'
+import PowerDialerViewScreen from 'src/components/power-dialer/power-dialer-view-screen'
+import PowerDialerFilter from 'src/components/power-dialer/details/power-dialer-filters'
+import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-labels'
 import Datatable from 'src/components/datatable'
 import TableRow from 'src/components/table-row'
 import SearchList from 'src/components/search'
-import StartDialing from './session-settings/start-dial-sessions-settings'
-import StatusChip from '../status-chip'
-import TagPopover from '../tag-popover'
-import CheckBox from '../checkbox-interactive'
-import NameWrapper from '../name-wrapper'
+import StartDialing from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
+import StatusChip from 'src/components/status-chip'
+import TagPopover from 'src/components/tag-popover'
+import CheckBox from 'src/components/checkbox-interactive'
+import NameWrapper from 'src/components/name-wrapper'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
+// import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { isEmpty } from 'lodash'
+import { isEqual, isEmpty, get } from 'lodash'
 
 export default {
   name: 'PowerDialerView',
   props: {
-    id: {
+    onFetch: Function,
+    list: {
+      type: Object,
+      default: () => {}
+    },
+    isLoadingDisabled: {
+      type: Boolean,
+      default: false
+    },
+    isStartState: {
+      type: Boolean,
+      default: false
+    },
+    isEditable: {
+      type: Boolean,
+      default: false
+    },
+    search1: {
       type: String,
-      required: true
+      default: ''
+    },
+    isMyContactsView: {
+      type: Boolean,
+      default: false
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
+    },
+    columns: {
+      type: Array,
+      default: () => []
+    },
+    isEmpty: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingMore: {
+      type: Boolean,
+      default: false
+    },
+    filtersCount: {
+      type: Number,
+      default: 0
+    },
+    customRowContent: {
+      type: Boolean,
+      default: false
+    },
+    selectedListId: {
+      type: [String, Number],
+      default: null
     }
   },
-  mixins: [powermixin, contactsMixins],
+  mixins: [powermixin, pdMixin],
+
+  inject: [
+    'contactsData'
+  ],
+
   components: {
     PowerDialerViewScreen,
     PowerDialerFilter,
@@ -347,30 +415,38 @@ export default {
     ContactCreateModal,
     BulkActionMenu
   },
-  mounted () {
+  async mounted () {
     this.removeListClose()
+    await this.myQueueList()
+    this.init()
+    // this.loadList(this.selectedListId)
+
+    this.$VueEvent.listen('export_event_updates', (task) => {
+      console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
+    })
   },
   computed: {
     ...mapState(['prevRoute']),
+    ...mapState('powerDialer', [
+      'metrics'
+    ]),
     ...mapGetters('powerDialer', [
       'contactResources',
       'powerDialerLists',
-      'powerDialerListItems',
       'powerDialerDirectoryList',
-      'datatableLoader'
+      'datatableLoader',
+      'myQueue',
+      'activeFilter'
     ]),
     ...mapGetters('contacts', [
-      'contact',
       'folders',
       'lists',
       'listItems',
       'selectedContacts',
-      'isFiltersOpen',
       'selectedList',
-      'currentListFilters'
-    ]),
-    ...mapGetters('powerDialer', [
-      'activeFilter'
+      'isFiltersOpen',
+      'currentListFilters',
+      'clearList'
     ]),
     filter () {
       return this.activeFilter
@@ -392,10 +468,10 @@ export default {
       }
     },
     numberOfContacts () {
-      return `${this.activeList.length} Contacts`
+      return this.fixedContactsData?.data.length
     },
     activeList () {
-      return this.listItems[this.id]?.data || []
+      return this.listItems[this.selectedListId]?.data || []
     },
     hasContacts () {
       return this.activeList.length > 0
@@ -410,33 +486,75 @@ export default {
       return this.pdColumns
     },
     totalRows () {
-      return this.listItems?.[this.id]?.total || 0
+      return this.listItems?.[this.selectedListId]?.total || 0
     },
     currentPage () {
-      return this.listItems?.[this.id]?.current_page || 1
+      return this.listItems?.[this.selectedListId]?.current_page || 1
     },
     lastPage () {
-      return this.listItems?.[this.id]?.last_page || 0
+      return this.listItems?.[this.selectedListId]?.last_page || 0
     },
     fullname () {
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
-      return `/api/v2/power-dialer-list-items/${this.selectedList.id}/items/${this.selectedItem.id}`
+      return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
+    },
+    isMyQueue () {
+      return isNaN(this.selectedListId)
+    },
+    filteredList () {
+      if (this.selectedListId === 'my-queue') {
+        return this.myQueue
+        // return this.lists['my-queue']
+      }
+      return this.list
+    },
+    filteredListId () {
+      if (this.filteredList.id === 'my-queue') {
+        return this.myQueue.id
+      }
+      return this.filteredList.id
+    },
+    hasMore () {
+      return (this.fixedContactsData?.next_page_url &&
+          !this.isLoadingMore &&
+          !this.isLoading) ||
+        false
+    },
+    fixedContactsData () {
+      if (isEqual(this.$parent.$data.contactsData, this.contactsData)) {
+        return this.contactsData
+      }
+
+      return this.$parent.$data.contactsData
+    },
+    fixedContactsDataItems () {
+      return this.fixedContactsData.data
+    },
+    listItemsDataCount () {
+      const total = get(this.fixedContactsData, 'data.length', null)
+      return total !== null ? total : 0
+    },
+    filteredSelectedListId () {
+      let route = this.$route.meta.id
+      let id = route === 'power-dialer-queue-filter' ? this.myQueue?.id : this.selectedListId
+      return id
+    },
+    checked () {
+      return this.selectedContacts[this.filteredSelectedListId] || []
     }
   },
   data () {
     return {
-      selectedItem: null
+      selectedItem: null,
+      hasFilters: false
     }
   },
   methods: {
     ...mapMutations('powerDialer', [
       'SET_LIST_SELECTED_CONTACTS',
       'START_DIAL_TOGGLE'
-    ]),
-    ...mapActions('inbox', [
-      'setSelectedContact'
     ]),
     ...mapActions('contacts', [
       'setContact',
@@ -445,22 +563,47 @@ export default {
       'closeFilters',
       'columnsReordered',
       'setListSelectedContacts',
-      'setSelectedList',
       'createListOpen',
       'removeListClose',
       'setCurrentListFilters',
       'removeListOpen',
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
-      'setSelectedListContactCount',
+      'listLoaded',
       'pinnedCountLoaded'
     ]),
-
-    beginDial () {
+    ...mapActions('powerDialer', [
+      'updateContactsList',
+      'getMyQueueList',
+      'exportCsv'
+    ]),
+    async myQueueList () {
+      let response = await this.getMyQueueList()
+      this.listLoaded({ ...response.data, id: 'my-queue' })
+    },
+    onSearch (searchText) {
+      this.$emit('search', searchText)
+    },
+    onFetchMyContacts (checked) {
+      this.$emit('checkboxChanged', checked)
+    },
+    onSortByField (sorts) {
+      this.$emit('sort', sorts)
+    },
+    onPaginate (params) {
+      this.$emit('paginated', params)
+    },
+    onLoadMore () {
+      this.$emit('loadMore')
+    },
+    async exportAsCsv () {
+      let response = await this.exportCsv(this.selectedList.id)
+      console.log('CSV response :>> ', response)
+    },
+    async beginDial () {
+      // this.setContact(this.contact)
+      this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
       this.START_DIAL_TOGGLE(true)
-      this.setSelectedContact({})
-      this.setContact(this.contact)
-      this.$router.push({ name: 'Power Dialer Session' })
     },
     onAddContactsToList () {
       if (this.$route.meta.id === 'power-dialer' || this.$route.meta.id === 'power-dialer-queue-filter') {
@@ -471,7 +614,7 @@ export default {
     },
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
-        id: this.id,
+        id: this.selectedListId,
         headers: nextColumns
       })
     },
@@ -482,51 +625,66 @@ export default {
     processedLink (id = '') {
       return `${this.activeRoute.fullPath}/${id}`
     },
-    onCheckboxCheck (data) {
-      this.setListSelectedContacts({ id: this.id, contacts: data })
+    onCheckboxCheck (obj) {
+      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: obj.data })
     },
     onCheckAllItems (checked) {
       let items = []
-      let _this = this
-      document
-        .querySelectorAll('.checker')
-        .forEach(function (checkbox) {
-          if (checked) {
-            items.push(_this.listItems[_this.id].data.find(item => item.id === Number(checkbox.value)))
-          } else {
-            items = items.filter(item => item.id !== Number(checkbox.value))
-          }
-        })
-
-      this.setListSelectedContacts({ id: this.id, contacts: items })
+      if (checked) {
+        items = this.fixedContactsDataItems
+      } else {
+        items = []
+      }
+      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: items })
     },
     onRemoveList () {
       this.removeListClose()
       setTimeout(() => {
-        // this.removeListOpen({ id: this.id, name: this.name })
+        // this.removeListOpen({ id: this.selectedListId, name: this.name })
         this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
       }, 10)
     },
+    onClearList () {
+      this.removeListClose()
+      setTimeout(() => {
+        // this.removeListOpen({ id: this.selectedListId, name: this.name })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name, clear: true })
+      }, 10)
+    },
     onCheckedRows (checked) {
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
+      this.setListSelectedContacts({ id: this.selectedListId, contacts: checked })
     },
     onEditColumnsClicked () {
       this.columnsOpen({
-        id: this.id,
+        id: this.selectedListId,
         headers: this.columns,
         name: this.list?.name
       })
     },
+    generateParams (contact) {
+      if (this.selectedList.name === 'My Queue') {
+        return {
+          contact_ids: [contact.id]
+        }
+      }
+      return {
+        contact_list_id: this.selectedList.id,
+        contact_ids: [contact.id]
+      }
+    },
     onContactCreated (contact) {
       if (this.list.type === this.ContactListTypes.STATIC) {
-        talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
-          this.setShouldUpdateSelectedListContactCount(true)
-          this.fetch()
-        })
-      } else {
-        this.fetch({
-          page: this.listItems[this.id].current_page
-        })
+        if (this.list.type === this.ContactListTypes.STATIC) {
+          talk2Api.V2.contactListItem.addContact(this.selectedListId, [contact]).then(res => {
+            this.setShouldUpdateSelectedListContactCount(true)
+            this.onFetch()
+            this.$generalNotification('Selected contacts were successfully added')
+          })
+        } else {
+          this.onFetch({
+            page: this.listItems[this.selectedListId].current_page
+          })
+        }
       }
     },
     onDeleteContact (data) {
@@ -536,7 +694,7 @@ export default {
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
-          this.$emit('on-list-update', this.selectedList)
+          this.$emit('on-list-update', { id: this.filteredListId })
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
@@ -547,21 +705,65 @@ export default {
     },
     saveFilterButtonCustomClass () {
       return !this.filterHasChanges ? 'button-disabled' : ''
+    },
+    resetFilters (resetSearch = false) {
+      // const defaultFilters = this.fixDefaultFilters()
+      // this.setCurrentListFilters(defaultFilters)
+      if (resetSearch) {
+        this.resetSearch()
+      }
+      this.$VueEvent.fire('filters-reset')
+      this.filterHasChanges = false
+    },
+    init () {
+      this.resetFilters()
+      this.$VueEvent.fire('clearContacts')
+      this.initialListFilters = this.currentListFilters
+      this.loadList(this.selectedListId)
     }
   },
   watch: {
+    '$route.params': {
+      handler (params) {
+        // if (params.filter) {
+        //   this.init()
+        // }
+        this.init()
+      },
+      deep: true
+    },
+    // '$route.params.id': function (value) {
+    //   console.log('100 :>> ', value)
+    //   this.init()
+    // },
+    // '$route.params.filter': function (value) {
+    //   console.log('200 :>> ', value)
+    //   this.init()
+    // },
     currentListFilters: {
       deep: true,
-      handler: function () {
+      handler: function (val) {
+        this.$VueEvent.fire('clearContacts')
         if (this.$route.name === 'Power Dialer') {
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.fetch(params)
-          this.filtersCount = this.getFiltersCount(this.currentListFilters)
+          this.onFetch(params, this.hasFilters)
+          this.$emit('onFiltersCount', this.currentListFilters)
+          // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
+        // this.isLoading = false
       }
     },
     selectedList (value) {
       this.setListSelectedContacts({ id: value.id, contacts: [] })
+    },
+    clearList (value) {
+      this.onFetch()
+    },
+    checked: function (value) {
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
     }
   }
 }

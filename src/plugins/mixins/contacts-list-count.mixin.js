@@ -3,10 +3,12 @@ import qs from 'qs'
 export default {
   methods: {
     getListDataCount (data) {
-      return this.$axios.get(`api/v2/contacts/count`, { params: this.buildQueryString(JSON.parse(data.filters)), paramsSerializer: qs.stringify })
+      return this.$axios.get(`api/v2/contacts/count`, {
+        params: this.buildQueryString(typeof data.filters === 'object' ? data.filters : JSON.parse(data.filters)),
+        paramsSerializer: qs.stringify
+      })
     },
     buildQueryString (filters) {
-      console.log(filters)
       const query = {}
 
       const keys = Object.keys(filters)
@@ -18,7 +20,6 @@ export default {
           }
         })
       }
-
       return query
     }
   }

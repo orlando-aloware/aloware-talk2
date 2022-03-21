@@ -441,7 +441,7 @@ export default {
         'ContactId': contactId ? contactId.toString() : ''
       }
 
-      console.log('Making call', params)
+      console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
 
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])

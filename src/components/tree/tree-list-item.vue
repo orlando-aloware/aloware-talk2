@@ -75,16 +75,17 @@
           :target="folderId"
           v-if="folderExists">
           <list-actions
+            :list-id="id"
             :type="type"
+            :hasEdit="hasEdit"
+            :hasDelete="hasDelete"
+            :isPinned="isPinned"
             @remove="onRemoveList"
             @rename="onRenameList"
             @pin="onPin"
             @move="onMove"
             @duplicate="onDuplicate"
-            @clonestatic="onCloneStatic"
-            :hasEdit="hasEdit"
-            :hasDelete="hasDelete"
-            :isPinned="isPinned"/>
+            @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
     </router-link>
@@ -228,6 +229,7 @@ export default {
       'openMoveDialog',
       'pinnedCountLoaded',
       'setUnsavedList',
+      'setUnsavedListName',
       'setShowContactsListSidebar'
     ]),
     onDuplicate () {
@@ -337,6 +339,11 @@ export default {
     updateListName (name) {
       if (this.isRenaming) return
       this.isRenaming = true
+      if (!this.id) {
+        this.setUnsavedListName(name)
+        return
+      }
+
       this.updateListRequest(this.id, { name, order: this.order })
         .then(response => {
           this.listLoaded(response.data.data)
@@ -385,6 +392,12 @@ export default {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
     onRemoveList () {
+      if (!this.id) {
+        this.setUnsavedList(null)
+        this.$router.push('/contacts')
+        return
+      }
+
       this.removeListClose()
       setTimeout(() => {
         this.removeListOpen({ id: this.id, name: this.name })
