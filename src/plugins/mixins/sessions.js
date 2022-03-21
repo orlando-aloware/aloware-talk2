@@ -106,7 +106,7 @@ export default {
         // TODOs:
         // Implement: Should skip single task
         this.skipSingleTask(this.taskToCall, 'Task is skipped because timezone has not been set for this contact. Pushed the task to the bottom of the list.')
-        this.moveTask(this.taskToCall, moveDirection.bottom)
+        this.moveTask(this.taskToCall, this.moveDirection.bottom)
         return
       }
       // Check if it's outside working hours or not
@@ -122,7 +122,7 @@ export default {
           // TODOs:
           // Implement: Should skip single task
           this.skipSingleTask(this.taskToCall, 'Task is skipped because it\'s outside day times. Pushed the task to the bottom of the list.')
-          this.moveTask(this.taskToCall, moveDirection.bottom)
+          this.moveTask(this.taskToCall, this.moveDirection.bottom)
           return
         }
       }
