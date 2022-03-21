@@ -46,10 +46,8 @@
                 class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
                 <div class="text-13">
                   {{ listFilters[key.toUpperCase()].name }}
-                  <!-- - {{ key.toUpperCase() }} -->
                   <q-chip size="xs" square class="p-0">
                     {{ group.length || 0 }}
-                    <!-- {{ totalCount(key) }} -->
                   </q-chip>
                 </div>
               </q-item-section>

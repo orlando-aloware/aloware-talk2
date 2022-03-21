@@ -30,7 +30,7 @@ export default {
       this.powerDialerTasks['in_queue'] = res.data.data
     },
     updateTaskStatus (task) {
-      console.log(` %c TASK UPDATED : ${task.status} `, 'background:red;color:white;', task)
+      console.log(` %c TASK UPDATED : ${task.task_status} `, 'background:red;color:white;', task)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           this.onStatusInProgress(task)
