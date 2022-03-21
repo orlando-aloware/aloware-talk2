@@ -9,6 +9,7 @@
     :title="title"
     :hide-header="hideHeader"
     :hide-footer="hideFooter"
+    @shown="onShown"
     @hide="onHide">
     <slot name="content" />
     <template slot="modal-footer">
@@ -61,6 +62,9 @@ export default {
   methods: {
     onHide () {
       this.$emit('hide')
+    },
+    onShown () {
+      this.$emit('shown')
     }
   }
 }
