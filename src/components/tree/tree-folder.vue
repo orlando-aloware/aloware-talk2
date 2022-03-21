@@ -49,7 +49,7 @@
       <button
         class="folder__option btn btn-link p-0 shadow-0"
         :class="{ 'folder__option--hide': isEditing }"
-        :data-popper-target="'folder-' + id"
+        :data-popper-target="folderId"
         :id="folderId"
         :ref="folderId"
       >
@@ -199,7 +199,8 @@ export default {
       isCreatingFolder: false,
       isEditing: false,
       isRenaming: false,
-      inputTimeout: null
+      inputTimeout: null,
+      isReferenceExists: false
     }
   },
 
@@ -226,11 +227,11 @@ export default {
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-option-${module}-${this.id}`
-    },
-
-    isReferenceExists () {
-      return document.getElementById(this.folderId)
     }
+  },
+
+  mounted () {
+    this.isReferenceExists = typeof this.$refs[this.folderId] !== 'undefined'
   },
 
   methods: {

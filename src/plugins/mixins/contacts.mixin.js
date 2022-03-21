@@ -595,10 +595,10 @@ export default {
       }
     },
     $route (to, from) {
-      this.isNavigated = true
-
-      if (to.name === 'Contacts') {
+      if (from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) {
+        this.isNavigated = true
         this.init()
+        return
       }
 
       if (from.name === 'Contact' && to.name === 'Contacts') {
@@ -606,10 +606,9 @@ export default {
         return
       }
 
-      console.log('from.name: ', from.name)
-      console.log('to.name: ', to.name)
       if (from.name === 'Contacts' && to.name === 'Contacts') {
         this.isNavigated = false
+        this.init()
       }
     }
   },

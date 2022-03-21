@@ -448,7 +448,7 @@ export const ALL_COLUMNS = [
     minWidth: 150
   },
   {
-    name: 'task_status',
+    name: 'task_status_name',
     relationName: 'taskStatus',
     label: 'Task Status',
     category: 2,
@@ -468,5 +468,5 @@ export const STATIC_COLUMNS = ALL_COLUMNS.filter(
 )
 
 export const POWER_DIALER_DEFAULT_COLUMNS = ALL_COLUMNS.filter(
-  (c) => ['checkbox', 'name', 'phone_number', 'created_at', 'tags', 'task_status', 'actions'].includes(c.name)
+  (c) => ['checkbox', 'name', 'phone_number', 'created_at', 'tags', 'task_status_name', 'actions'].includes(c.name)
 )
