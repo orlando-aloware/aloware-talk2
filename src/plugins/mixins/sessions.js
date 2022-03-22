@@ -97,8 +97,7 @@ export default {
         companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       }
-      console.log('TIMEZONE : ', timezone)
-
+      console.log(`TIMEZONE (shouldSkip === ${this.shouldSkip}): `, timezone)
       // If there is no contact TZ then
       // Use the company TZ
       if (this.shouldSkip && !timezone) {
@@ -130,7 +129,7 @@ export default {
       console.log('RUNNING TASK : ', data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        // this.$VueEvent.fire('makeCall', data)
+        this.$VueEvent.fire('makeCall', data)
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -139,7 +138,7 @@ export default {
     },
     skipSingleTask (autoDialTask, message, skipTask = false) {
       this.loading_skip = true
-      return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.id}/skip`)
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
         .then(res => {
           console.log('SKIP: res :>> ', res)
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
@@ -159,7 +158,7 @@ export default {
     },
     async moveTask (item = {}, direction = this.moveDirection.top) {
       const res = await this.moveContactItems({
-        id: this.item.id,
+        id: this.selectedList.id,
         params: {
           contact_list_item_ids: [item.contact_list_item_id],
           direction: direction
