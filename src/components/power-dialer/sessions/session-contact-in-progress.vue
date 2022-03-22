@@ -19,7 +19,10 @@
         <q-item-section
           class="t-item-icon"
           side top>
-          <q-avatar color="red" size="md">
+          <q-avatar
+            @click="endCurrentCall"
+            color="red"
+            size="md">
             <PhoneIcon color="white" />
           </q-avatar>
         </q-item-section>
@@ -65,6 +68,9 @@ export default {
     }
   },
   methods: {
+    endCurrentCall () {
+      this.$VueEvent.fire('hangupCall')
+    },
     avatarName (fname, lname) {
       return `${fname?.[0]}${lname?.[0]}`
     }
