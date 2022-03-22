@@ -185,7 +185,7 @@ export default {
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
-      if (this.$route.name === 'Contacts') {
+      if (this.$route.name === 'Contacts' || this.$route.meta.id === 'power-dialer-add-queue-list') {
         params.relations = this.contactsRelations
       }
       if (this.$route.name === 'Power Dialer') {
