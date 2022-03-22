@@ -17,6 +17,7 @@
         </q-item-section>
 
         <q-item-section
+          v-if="statusCallConnected"
           class="t-item-icon"
           side top>
           <q-avatar
@@ -40,6 +41,7 @@
 <script>
 
 import { mapFields } from 'vuex-map-fields'
+import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
 
 export default {
@@ -51,6 +53,7 @@ export default {
     ...mapFields('powerDialer', [
       'activeTask'
     ]),
+    ...mapState(['dialer']),
     firstname () {
       return this.activeTask?.first_name
     },
@@ -65,6 +68,9 @@ export default {
     },
     activeTaskId () {
       return this.activeTask?.id
+    },
+    statusCallConnected () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED'
     }
   },
   methods: {

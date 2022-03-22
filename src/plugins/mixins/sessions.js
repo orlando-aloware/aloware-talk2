@@ -90,18 +90,10 @@ export default {
     },
     async runTask () {
       let timezone = this.taskToCall?.timezone
-      let data = {
-        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
-        outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
-        contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
-        companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
-        contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
-      }
       console.log(`TIMEZONE (shouldSkip === ${this.shouldSkip}): `, timezone)
       // If there is no contact TZ then
       // Use the company TZ
       if (this.shouldSkip && !timezone) {
-        console.log(`Skipped Task #${this.taskToCall.id} because contact did not have timezone.`)
         // TODOs:
         // Implement: Should skip single task
         this.skipSingleTask(this.taskToCall, 'Task is skipped because timezone has not been set for this contact. Pushed the task to the bottom of the list.')
@@ -115,7 +107,6 @@ export default {
         const endDay = moment.tz(this.powerDialerSettings.close_time, 'HH:mm:ss', timezone)
         const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone)
 
-        console.log('contactLocalTime :>> ', contactLocalTime.isBetween(startDay, endDay))
         if (contactLocalTime.isBetween(startDay, endDay)) {
           console.log(`Skipped task #${this.taskToCall.id} in ${timezone} timezone because it was outside day times. ` + contactLocalTime.format('h:mm a') + ' is not in between ' + startDay.format('h:mm a') + ' - ' + endDay.format('h:mm a'))
           // TODOs:
@@ -126,10 +117,15 @@ export default {
         }
       }
 
-      console.log('RUNNING TASK : ', data)
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        this.$VueEvent.fire('makeCall', data)
+        // this.$VueEvent.fire('makeCall', {
+        //   currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
+        //   outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
+        //   contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
+        //   companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
+        //   contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
+        // })
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -164,6 +160,7 @@ export default {
           direction: direction
         }
       })
+      console.log('MOVING TASK :>> ', res)
       if (res.status === 200) {
         let res = await this.getSessionTaskByFilter({
           id: this.selectedList.id,
