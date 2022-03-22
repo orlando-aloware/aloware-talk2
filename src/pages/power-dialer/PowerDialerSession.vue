@@ -15,7 +15,8 @@
           </div>
           <div class="col-5 p-0">
             <CallStatus
-              @on-redirect="redirectRoute" />
+              @on-redirect="redirectRoute"
+              @no-tasks-found="onNoTasksFound" />
           </div>
         </div>
 
@@ -28,7 +29,7 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
@@ -78,36 +79,11 @@ export default {
         return false
       }
       return this.selectedList.name.length > 0
-    },
-    test () {
-      return this.$route
     }
   },
   async mounted () {
+    this.TOGGLE_SESSION_LOADER(true)
     this.resetPowerDialerTasks()
-    // this.$VueEvent.listen('contact_list_item_created', async (task) => {
-    //   console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
-    //   await this.fetchInQueueTasks(task)
-    //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
-    //   //   this.handleDesktopVoicemailNotification(task)
-    //   // }
-    // })
-    // this.$VueEvent.listen('contact_list_item_updated', (task) => {
-    //   console.log(' %c TASK was UPDATED : ', 'background: green; color: #000;', task)
-    //   this.updateTaskStatus(task)
-    //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
-    //   //   this.handleDesktopVoicemailNotification(task)
-    //   // }
-    // })
-    // this.$VueEvent.listen('contact_list_item_deleting', (task) => {
-    //   console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
-    //   // if (this.checkCommunicationMatchesUserAccessibility(task)) {
-    //   //   this.handleDesktopVoicemailNotification(task)
-    //   // }
-    // })
-    // this.$VueEvent.listen('contact_list_bulk_created', (task) => {
-    //   console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
-    // })
     await this.fetchTasks()
   },
   methods: {
@@ -117,7 +93,10 @@ export default {
       'getPowerDialerList',
       'setSelectedPDList'
     ]),
-    async fetchTasks () {
+    ...mapMutations('powerDialer', [
+      'TOGGLE_SESSION_LOADER'
+    ]),
+    async fetchTasks (status) {
       await this.fetchCurrentList()
       Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
         let params = {}
@@ -152,10 +131,13 @@ export default {
     },
     redirectRoute (route) {
       let routePath = '/power-dialer'
-      if (route.name !== 'My Queue' && !isEmpty(route.name)) {
+      if ((route.name !== 'My Queue' && !isNaN(route.name)) && !isEmpty(route.name)) {
         routePath += `/list/${route.id}`
       }
       this.$router.push(routePath)
+    },
+    onNoTasksFound () {
+      this.$generalNotification('Stopping PowerDialer: No more tasks found', 'warning')
     }
   }
 }

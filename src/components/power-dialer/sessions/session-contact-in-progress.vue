@@ -2,7 +2,7 @@
   <q-card class="t-cards pt-2">
     <q-list class="px-2 pb-2">
       <q-item
-        v-if="activeTask.id"
+        v-if="activeTaskId"
         class="active t-expansion-panel px-2">
         <div class="py-2">
           <q-avatar size="30px" color="grey">
@@ -19,7 +19,10 @@
         <q-item-section
           class="t-item-icon"
           side top>
-          <q-avatar color="red" size="md">
+          <q-avatar
+            @click="endCurrentCall"
+            color="red"
+            size="md">
             <PhoneIcon color="white" />
           </q-avatar>
         </q-item-section>
@@ -59,9 +62,15 @@ export default {
     },
     company_name () {
       return this.activeTask?.company_name
+    },
+    activeTaskId () {
+      return this.activeTask?.id
     }
   },
   methods: {
+    endCurrentCall () {
+      this.$VueEvent.fire('hangupCall')
+    },
     avatarName (fname, lname) {
       return `${fname?.[0]}${lname?.[0]}`
     }

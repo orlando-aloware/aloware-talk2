@@ -231,24 +231,5 @@ export default {
         // { name: 'Cold Leads', id: 6 }
       ]
     })
-    // return window.$axios.get(`api/v2/power-dialer-session-settings`,
-    //   params
-    // ).then((res) => {
-    //   commit('SET_SESSION_SETTING_GROUPS', {
-    //     personal: [
-    //       { name: 'Personal Sales', id: 1 },
-    //       { name: 'Leads 101', id: 2 },
-    //       { name: 'Leads 203', id: 3 }
-    //     ],
-    //     company: [
-    //       { name: 'HVAC Sales', id: 4 },
-    //       { name: 'Warm Leads', id: 5 },
-    //       { name: 'Cold Leads', id: 6 }
-    //     ]
-    //   })
-    //   return res
-    // }).catch((err) => {
-    //   return err
-    // })
   }
 }

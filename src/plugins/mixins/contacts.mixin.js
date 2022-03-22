@@ -1,4 +1,5 @@
 import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
@@ -208,14 +209,25 @@ export default {
             this.updateMyQueueListData(data.data)
           }
 
-          let listId = this.id === 'my-queue' ? this.myQueue?.id : this.id
+          let listId = this.id === 'my-queue' || this.id === 'in-queue' ? this.myQueue?.id : this.id
           const list = _.get(this.lists, listId, { id: null, name: '', type: null })
+          console.log('101 :>> ',
+            {
+              id: listId,
+              name: list.name,
+              type: list.type
+            }
+          )
 
           this.setSelectedList({
             id: listId,
             name: list.name,
             type: list.type
           })
+
+          if (!isContactModule) {
+            this.listDetails = data
+          }
 
           this.markCheckedAll()
         })
@@ -466,6 +478,9 @@ export default {
     ...mapState(['defaultDateFilter']),
     ...mapGetters('powerDialer', [
       'activeFilter'
+    ]),
+    ...mapFields('powerDialer', [
+      'myQueue'
     ]),
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
