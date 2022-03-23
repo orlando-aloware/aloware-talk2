@@ -288,6 +288,11 @@ export default {
         return window.axios.delete(`${suffixV2}power-dialer-folders/${id}`)
       }
     },
+    powerDialerListItem: {
+      add (params = {}) {
+        return window.axios.post(`${suffixV2}power-dialer-list-items`, params)
+      }
+    },
     contactListItem: {
       addContact (contactListId, contacts = []) {
         return window.axios.post(`${suffixV2}contact-list-items`, {

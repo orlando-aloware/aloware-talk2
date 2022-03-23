@@ -577,6 +577,9 @@ export default {
       'getMyQueueList',
       'exportCsv'
     ]),
+    createNewPowerDialerContact (contact) {
+      console.log('PD contact to create : ', contact)
+    },
     async myQueueList () {
       let response = await this.getMyQueueList()
       this.listLoaded({ ...response.data, id: 'my-queue' })
@@ -674,19 +677,19 @@ export default {
       }
     },
     onContactCreated (contact) {
-      if (this.list.type === this.ContactListTypes.STATIC) {
-        if (this.list.type === this.ContactListTypes.STATIC) {
-          talk2Api.V2.contactListItem.addContact(this.selectedListId, [contact]).then(res => {
-            this.setShouldUpdateSelectedListContactCount(true)
-            this.onFetch()
-            this.$generalNotification('Selected contacts were successfully added')
-          })
-        } else {
-          this.onFetch({
-            page: this.listItems[this.selectedListId].current_page
-          })
-        }
+      // https://app.alodev.org/api/v2/power-dialer-list-items
+      // contact_ids contact_list_id
+      let params = {
+        contact_ids: [contact.id]
       }
+      if (this.selectedList.name) {
+        params.contact_list_id = this.filteredSelectedListId
+      }
+      talk2Api.V2.powerDialerListItem.add(params).then(res => {
+        this.setShouldUpdateSelectedListContactCount(true)
+        this.onFetch()
+        this.$generalNotification('Selected contacts were successfully added')
+      })
     },
     onDeleteContact (data) {
       return this.$axios
