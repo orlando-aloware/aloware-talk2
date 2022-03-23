@@ -113,6 +113,7 @@ export default {
         .then(() => {
           this.reloadFolders()
           this.isMoving = false
+          this.$generalNotification('You have successfully moved a folder!', 'success')
         })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
@@ -126,6 +127,7 @@ export default {
         .then(() => {
           this.reloadFolders()
           this.isMoving = false
+          this.$generalNotification('You have successfully moved a list!', 'success')
         })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)

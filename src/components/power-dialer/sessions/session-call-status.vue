@@ -103,7 +103,7 @@
             height="18px"
             class="mr-0 py-0"
             style="position:relative;top:-2px;" />
-          {{ address }} - {{ taskCreatedAt | fixTime }}
+          {{ timezone }} - {{ getTimeZone }}
         </div>
         <!-- <q-btn
           @click="onToggleMute"
@@ -201,8 +201,10 @@ import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
+import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import sessionsMixins from 'src/plugins/mixins/sessions'
 import { isEmpty } from 'lodash'
+import moment from 'moment-timezone'
 
 export default {
   name: 'SessionCallStatus',
@@ -239,6 +241,12 @@ export default {
       'campaigns',
       'dialer'
     ]),
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+    ...mapState('auth', [
+      'profile'
+    ]),
     ...mapGetters('powerDialer', [
       'sessionLoader',
       'sessionSettings'
@@ -250,6 +258,9 @@ export default {
     ]),
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
+    },
+    shouldSkip () {
+      return this.sessionSettings.skip_outside_daytime_hours === 1
     },
     address () {
       let { taskToCall } = this
@@ -271,9 +282,6 @@ export default {
     },
     list () {
       return this.listObject.data || []
-    },
-    hasExistingTaskList () {
-      return this.powerDialerTasks.in_queue.length > 0
     },
     companyName () {
       return this.taskToCall?.company_name || 'Company: N/A'
@@ -351,8 +359,14 @@ export default {
     phoneNumber () {
       return this.taskToCall?.phone_number || ''
     },
-    taskCreatedAt () {
-      return this.taskToCall?.created_at || ''
+    timezone () {
+      return this.taskToCall?.timezone
+    },
+    getTimeZone () {
+      let timezone = this.taskToCall?.timezone
+      const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('HH:mm')
+      // const contactLocalTime = moment().tz(timezone).format('HH:mm:ss')
+      return contactLocalTime
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
@@ -365,6 +379,31 @@ export default {
     },
     integrationsHubspot () {
       return this.activeTask?.integrations?.hubspot
+    },
+    options () {
+      return this.$options.auto_dialer_interval
+    },
+    powerDialerSettings () {
+      let settings = this.profile.company.power_dialer_settings
+      if (settings !== null && settings.open_time && settings.close_time) {
+        return settings
+      }
+
+      return {
+        open_time: '09:00:00',
+        close_time: '18:00:00'
+      }
+    },
+    hasQueuedTaskLists () {
+      return this.powerDialerTasks.in_queue.length > 0
+    }
+  },
+  created () {
+    if (!this.profile.auto_dialer_enabled) {
+      this.reRoute()
+    }
+    if (this.campaings) {
+      this.findDefaultOutboundCampaign()
     }
   },
   methods: {
@@ -378,8 +417,44 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
+    checkAutoDialer () {
+      // fdsfds
+    },
+    findDefaultOutboundCampaign () {
+      this.autoDialer.outbound_campaign_id = null
+
+      // Default PowerDialer outbound line
+      if (this.currentCompany && this.currentCompany.default_power_dialer_campaign_id) {
+        this.auto_dialer.outbound_campaign_id = this.currentCompany.default_power_dialer_campaign_id
+        return
+      }
+
+      // Force outbound line on all users
+      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.currentCompany.force_outbound_line) {
+        this.auto_dialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
+        return
+      }
+
+      // Outbound line is set to use account default and account has a default
+      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
+        this.auto_dialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
+        return
+      }
+
+      // User has a default outbound line
+      if (this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        this.auto_dialer.outbound_campaign_id = this.profile.default_outbound_campaign_id
+        return
+      }
+
+      // User has to choose outbound line every time
+      if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+        this.auto_dialer.outbound_campaign_id = null
+      }
+    },
+
     async tickTimer () {
-      if (this.hasExistingTaskList) {
+      if (this.hasQueuedTaskLists) {
         if (this.timerCount > 0) {
           setTimeout(() => {
             this.timerCount--
@@ -405,14 +480,34 @@ export default {
         }, 1000)
       }
     },
-    initialize () {
-      this.TOGGLE_SESSION_LOADER(false)
-      if (this.hasExistingTaskList) {
+    runTimer () {
+      setInterval(() => {
+        if (this.timerCount > 0) {
+          this.timerCount--
+        }
+      }, 1000)
+    },
+    async initialize () {
+      this.TOGGLE_SESSION_LOADER(true)
+      if (!this.statusCallConnected && this.hasQueuedTaskLists) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
+        await this.fetchContact(this.taskToCall.id)
+        if (!this.wrapUp) {
+          this.resetTimer()
+          setTimeout(() => {
+            this.runTimer()
+          }, 2000)
+        }
+      }
+
+      if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
+        this.reRoute()
+        this.$emit('no-tasks-found')
       }
       // if (!this.togglePause) {
       //   this.resetTimer()
       // }
+      this.TOGGLE_SESSION_LOADER(false)
     },
     onToggleMute () {
       this.$VueEvent.fire('toggleMute')
@@ -519,50 +614,86 @@ export default {
       // }, 50)
     }
   },
+  mounted () {
+    this.$options.auto_dialer_interval = 'lfdsfsd'
+  },
   watch: {
-    async taskToCall (task) {
-      if (task?.id) {
-        await this.fetchContact(this.taskToCall?.id)
-        if (!this.wrapUp) {
-          this.resetTimer()
-        }
-      }
-      this.setContactClone(task)
-    },
-    async activeTask (task) {
-      if (!task && this.togglePause) {
-        this.sessionPaused = true
-      }
-      if (!task?.id && !this.hasExistingTaskList) {
-        this.reRoute()
+    currentCompany () {
+      if (!this.autoDialer.outbound_campaign_id && this.togglePause) {
+        // find default outbound campaign
+        this.findDefaultOutboundCampaign()
       }
     },
+    autoDialerTimerEnabled (val) {
+      if (this.autoDialerTimerEnabled === true) {
+        this.checkAutoDialer()
+        // Check every 2 seconds
+        this.$options.auto_dialer_interval = setInterval(this.checkAutoDialer, 2000)
+      } else {
+        clearInterval(this.$options.auto_dialer_interval)
+      }
+    },
+
+    // async taskToCall (task) {
+    //   if (task?.id) {
+    //     await this.fetchContact(this.taskToCall?.id)
+    //     if (!this.wrapUp) {
+    //       this.resetTimer()
+    //     }
+    //   }
+    //   // this.setContactClone(task)
+    // },
+    // async activeTask (task) {
+    //   if (!task && this.togglePause) {
+    //     this.sessionPaused = true
+    //   }
+    //   if (!task?.id && !this.hasQueuedTaskLists) {
+    //     this.reRoute()
+    //   }
+    // },
     timerCount: {
       async handler (value) {
         if (this.timerIsOver && !this.statusCallConnected) {
           if (this.toggleEnd) {
             this.reRoute()
-          } else {
-            this.prepareNextContact()
-            await this.tickTimer()
           }
-        } else if (value > 0) {
-          await this.tickTimer()
+          if (this.hasQueuedTaskLists) {
+            this.prepareNextContact()
+          } else {
+            this.reRoute()
+          }
+        }
+        if (this.timerIsOver) {
+          if (this.togglePause) {
+            this.sessionPaused = true
+          }
+          if (this.wrapUp) {
+            this.wrapUp = false
+            this.resetTimer()
+          } else if (!this.togglePause) {
+            setTimeout(async () => {
+              await this.runTask()
+              this.$VueEvent.fire('togglePhone')
+              this.setShowPhone(false)
+            })
+          }
         }
       },
       deep: true
       // immediate: true // This ensures the watcher is triggered upon creation
     },
-    // async hasExistingTaskList (isTrue) {
+    // async hasQueuedTaskLists (isTrue) {
     //   if (isTrue) {
     //     await this.tickTimer()
     //   }
     // },
     togglePause (value) {
       if (!value) {
-        this.sessionPaused = false
         if (this.timerIsOver) {
-          this.resetTimer()
+          setTimeout(() => {
+            this.sessionPaused = false
+            this.resetTimer()
+          }, 1000)
         }
       }
     },
@@ -581,6 +712,12 @@ export default {
         this.shouldRedirect = false
         this.initialize()
       }
+      // setTimeout(() => {
+      //   if (!this.hasQueuedTaskLists) {
+      //     this.$generalNotification('Stopping PowerDialer: No more tasks found. You\'ve been redirected to PowerDialer main page.', 'error')
+      //     this.reRoute()
+      //   }
+      // }, 2000)
     },
     currentSessionStatus (status) {
       // console.log(' %c CURRENT SESSION STATUS : ', 'background: red; color: white;', status)
@@ -599,6 +736,7 @@ export default {
   },
   data () {
     return {
+      autoDialerTimerEnabled: false,
       prevRoute: null,
       shouldRedirect: false,
       wrapUp: false,
@@ -624,7 +762,11 @@ export default {
         line: 'Bently Personal'
       },
       taskToCall: {},
-      flagged: false
+      flagged: false,
+      autoDialer: {
+        outbound_campaign_id: null,
+        ratio: 1
+      }
     }
   }
 }
