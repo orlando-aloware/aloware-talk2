@@ -247,6 +247,7 @@ export default {
       this.updateFormValidity()
     }
   },
+
   mounted () {
     this.showOutboundLineSelector = this.user.outbound_calling_selector === 1
   }
