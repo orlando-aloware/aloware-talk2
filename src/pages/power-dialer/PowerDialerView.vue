@@ -501,7 +501,7 @@ export default {
       return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
-      return isNaN(this.selectedListId)
+      return !isNaN(this.selectedListId)
     },
     filteredList () {
       if (this.selectedListId === 'my-queue') {
@@ -655,9 +655,10 @@ export default {
       this.setListSelectedContacts({ id: this.selectedListId, contacts: checked })
     },
     onEditColumnsClicked () {
+      let listIdentity = this.selectedList.type === null ? 'my-queue' : this.selectedListId
       this.columnsOpen({
-        id: this.selectedListId,
-        headers: this.columns,
+        id: listIdentity,
+        headers: this.filteredColumns,
         name: this.list?.name
       })
     },

@@ -544,10 +544,11 @@ export default {
         .concat(['static'])
     },
     columns () {
+      let id = isNaN(this.id) ? 'my-queue' : this.id
       try {
         const headers = { data: [] }
-        if (this.lists[this.id] && this.lists[this.id].headers) {
-          headers.data = this.lists[this.id].headers
+        if (this.lists[id] && this.lists[id].headers) {
+          headers.data = this.lists[id].headers
           if (typeof headers === 'string') {
             headers.data = JSON.parse(headers.data)
           }
