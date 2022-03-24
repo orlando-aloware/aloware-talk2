@@ -185,7 +185,7 @@ export default {
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
-      if (this.$route.name === 'Contacts') {
+      if (this.$route.name === 'Contacts' || this.$route.meta.id === 'power-dialer-add-queue-list') {
         params.relations = this.contactsRelations
       }
       if (this.$route.name === 'Power Dialer') {
@@ -211,23 +211,12 @@ export default {
 
           let listId = this.id === 'my-queue' || this.id === 'in-queue' ? this.myQueue?.id : this.id
           const list = _.get(this.lists, listId, { id: null, name: '', type: null })
-          console.log('101 :>> ',
-            {
-              id: listId,
-              name: list.name,
-              type: list.type
-            }
-          )
 
           this.setSelectedList({
             id: listId,
             name: list.name,
             type: list.type
           })
-
-          if (!isContactModule) {
-            this.listDetails = data
-          }
 
           this.markCheckedAll()
         })
@@ -419,6 +408,15 @@ export default {
       const item = { data: null }
       const currentPage = _.get(listData, 'current_page', 0)
 
+      if (this.isPowerDialer) {
+        let newList = []
+        listData.data.forEach(dat => {
+          newList.push(dat)
+        })
+        this.powerDialerActiveList = { ...listData }
+        this.powerDialerActiveList.data = [ ...newList ]
+      }
+
       if (!_.isEmpty(this.contactsData.data)) {
         for (item.data in this.contactsData.data) {
           found.data = listData.data.find(contact => contact.id === this.contactsData.data[item.data].id)
@@ -544,10 +542,11 @@ export default {
         .concat(['static'])
     },
     columns () {
+      let id = isNaN(this.id) ? 'my-queue' : this.id
       try {
         const headers = { data: [] }
-        if (this.lists[this.id] && this.lists[this.id].headers) {
-          headers.data = this.lists[this.id].headers
+        if (this.lists[id] && this.lists[id].headers) {
+          headers.data = this.lists[id].headers
           if (typeof headers === 'string') {
             headers.data = JSON.parse(headers.data)
           }

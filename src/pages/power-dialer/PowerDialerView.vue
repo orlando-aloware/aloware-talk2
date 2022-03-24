@@ -149,7 +149,7 @@
     <template slot="table">
       <Datatable
         :stickyHeaders="true"
-        :columns="filteredColumns"
+        :columns="columns"
         :has-more="hasMore"
         :is-empty="isEmpty || isStartState"
         :is-loading-more="isLoadingMore"
@@ -230,7 +230,7 @@
                 </td>
                 <!-- COLUMN: Status -->
                 <td
-                  v-else-if="column.name === 'task_status'"
+                  v-else-if="column.name === 'task_status_name'"
                   :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
                   :key="key">
                   <StatusChip
@@ -501,7 +501,7 @@ export default {
       return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
-      return isNaN(this.selectedListId)
+      return !isNaN(this.selectedListId)
     },
     filteredList () {
       if (this.selectedListId === 'my-queue') {
@@ -577,6 +577,9 @@ export default {
       'getMyQueueList',
       'exportCsv'
     ]),
+    createNewPowerDialerContact (contact) {
+      console.log('PD contact to create : ', contact)
+    },
     async myQueueList () {
       let response = await this.getMyQueueList()
       this.listLoaded({ ...response.data, id: 'my-queue' })
@@ -613,8 +616,10 @@ export default {
       }
     },
     onColumnsReordered (nextColumns) {
+      let id = this.selectedList.name ? this.selectedListId : 'my-queue'
+      console.log('id selected to re-order :>> ', id)
       this.columnsReordered({
-        id: this.selectedListId,
+        id: id,
         headers: nextColumns
       })
     },
@@ -655,9 +660,10 @@ export default {
       this.setListSelectedContacts({ id: this.selectedListId, contacts: checked })
     },
     onEditColumnsClicked () {
+      let listIdentity = this.selectedList.type === null ? 'my-queue' : this.selectedListId
       this.columnsOpen({
-        id: this.selectedListId,
-        headers: this.columns,
+        id: listIdentity,
+        headers: this.filteredColumns,
         name: this.list?.name
       })
     },
@@ -673,19 +679,19 @@ export default {
       }
     },
     onContactCreated (contact) {
-      if (this.list.type === this.ContactListTypes.STATIC) {
-        if (this.list.type === this.ContactListTypes.STATIC) {
-          talk2Api.V2.contactListItem.addContact(this.selectedListId, [contact]).then(res => {
-            this.setShouldUpdateSelectedListContactCount(true)
-            this.onFetch()
-            this.$generalNotification('Selected contacts were successfully added')
-          })
-        } else {
-          this.onFetch({
-            page: this.listItems[this.selectedListId].current_page
-          })
-        }
+      // https://app.alodev.org/api/v2/power-dialer-list-items
+      // contact_ids contact_list_id
+      let params = {
+        contact_ids: [contact.id]
       }
+      if (this.selectedList.name) {
+        params.contact_list_id = this.filteredSelectedListId
+      }
+      talk2Api.V2.powerDialerListItem.add(params).then(res => {
+        this.setShouldUpdateSelectedListContactCount(true)
+        this.onFetch()
+        this.$generalNotification('Selected contacts were successfully added')
+      })
     },
     onDeleteContact (data) {
       return this.$axios
