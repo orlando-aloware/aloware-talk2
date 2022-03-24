@@ -616,8 +616,10 @@ export default {
       }
     },
     onColumnsReordered (nextColumns) {
+      let id = this.selectedList.name ? this.selectedListId : 'my-queue'
+      console.log('id selected to re-order :>> ', id)
       this.columnsReordered({
-        id: this.selectedListId,
+        id: id,
         headers: nextColumns
       })
     },
