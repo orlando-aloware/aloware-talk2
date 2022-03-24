@@ -131,10 +131,11 @@
                       </template>
                     </b-dropdown>
                     <div
+                      v-if="key === 'in_queue'"
                       class="dropdown t-btn-floater t-btn-floater__bottom"
                       ref="returnToQueue">
                       <q-btn
-                        @click="moveToInQueue(itm)"
+                        @click="moveTask(itm, moveDirection.top)"
                         size="xs" flat round>
                         <q-avatar size="15px">
                           <!-- <img src="icons/refresh-call.png"> -->

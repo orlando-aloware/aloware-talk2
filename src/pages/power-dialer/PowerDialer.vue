@@ -24,7 +24,7 @@
         :is-empty="isEmpty"
         :is-loading-more="isLoadingMore"
         :filters-count="filtersCount"
-        :selected-list-id="id"
+        :selected-list-id="filteredId"
         :onFetch="fetch"
         @search="onSearch"
         @checkboxChanged="onFetchMyContacts"
@@ -104,14 +104,14 @@ export default {
   ],
   provide () {
     return {
-      contactsData: this.contactsData
+      contactsData: this.powerDialerActiveList
     }
   },
   computed: {
     ...mapState(['isMobile']),
     ...mapFields('powerDialer', [
       'activeMetrics',
-      'listDetails'
+      'powerDialerActiveList'
     ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
@@ -158,6 +158,12 @@ export default {
     },
     hasSessions () {
       return this.$route.meta.id === 'power-dialer-session'
+    },
+    filteredId () {
+      if (isNaN(this?.id)) {
+        return this.myQueue?.id || ''
+      }
+      return this.id
     }
   },
   async mounted () {
@@ -303,6 +309,9 @@ export default {
     },
     '$route.params': async function (params) {
       await this.setFilterParams(params)
+    },
+    powerDialerActiveList (newObj) {
+      this.contactsData = newObj
     }
   }
 }
