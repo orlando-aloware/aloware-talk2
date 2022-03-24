@@ -164,6 +164,7 @@ export default function () {
     metrics: [],
     activeMetrics: [],
     activeList: {},
-    hubspot: {}
+    hubspot: {},
+    listDetails: {}
   }
 }

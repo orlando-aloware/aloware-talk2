@@ -253,7 +253,11 @@ export default {
           const data = response.data.data
           const message = response.data.message
 
-          this.$router.push(`/contacts/list/${data.id}`)
+          if (this.isContactsRoute) {
+            this.$router.push(`/contacts/list/${data.id}`)
+          } else {
+            this.$router.push(`/power-dialer/list/${data.id}`)
+          }
 
           this.$generalNotification(message)
 

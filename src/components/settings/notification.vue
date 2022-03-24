@@ -303,6 +303,29 @@
               Text Message
             </b-form-checkbox>
           </b-form-group>
+
+          <b-form-group v-if="textNotifications"
+                        class="form-label ml-5">
+            <b-form-checkbox :value="true"
+                             :unchecked-value="false"
+                             v-model="setCustomNotificationPhoneNumber"
+                             @change="onChangeCustomNotificationPhoneNumber">
+              Send text to custom number
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group v-if="textNotifications && setCustomNotificationPhoneNumber"
+                        class="form-label ml-5">
+            <b-form-input
+              type="text"
+              ref="notificationPhoneNumberInput"
+              placeholder="(123) 456-7890"
+              v-model.trim="$v.user.notification_phone_number.$model"
+              :state="validateState('notification_phone_number')"
+              @input="(eventPayload) => onUpdateFields(eventPayload, 'notification_phone_number')">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter notification phone number.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
+          </b-form-group>
         </b-col>
       </b-form-row>
     </b-form>
@@ -313,14 +336,14 @@
 import LineSelector from 'components/generic-selectors/line-selector'
 import { mapActions } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
-import { settingsMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import { required } from 'vuelidate/lib/validators'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'notification-settings',
 
-  mixins: [settingsMixin],
+  mixins: [aclMixin, settingsMixin],
 
   components: { InformationCircleIcon, LineSelector },
 
@@ -341,7 +364,6 @@ export default {
     hasAdminRole () {
       return this.user && (this.isCompanyAdmin || this.isBillingAdmin)
     },
-
     rules () {
       const rulesObject = { data: {} }
 
@@ -349,6 +371,15 @@ export default {
         rulesObject.data = { ...rulesObject.data,
           observing_campaigns: {
             required
+          }
+        }
+      }
+
+      if (this.setCustomNotificationPhoneNumber) {
+        rulesObject.data = { ...rulesObject.data,
+          notification_phone_number: {
+            required,
+            validPhone: (value) => this.$options.filters.fixPhone(value) !== false
           }
         }
       }
@@ -418,7 +449,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('settings', ['updateChangedUserProperties']),
+    ...mapActions('settings', ['updateChangedUserProperties', 'setFormValidity']),
     onUpdateFields (value, prop) {
       if (!['shouldObserve', 'myCalls', 'myTexts', 'myVoicemails', 'myContacts', 'myAppointments', 'myFaxes', 'myReminders', 'myMentions'].includes(prop)) {
         this.user[prop] = value
@@ -441,12 +472,17 @@ export default {
         'desktopNotifications',
         'mobileNotifications',
         'emailNotifications',
-        'textNotifications'
+        'textNotifications',
+        'notification_phone_number'
       ].includes(prop)) {
         this.updateChangedUserProperties({
           name: prop,
           value: value
         })
+
+        if (prop === 'textNotifications' && !value) {
+          this.setCustomNotificationPhoneNumber = false
+        }
 
         this.user.calls_inapp_notifs = this.inAppNotifications && this.myCalls
         this.user.calls_desktop_notifs = this.desktopNotifications && this.myCalls
@@ -495,11 +531,27 @@ export default {
         this.user.mentions_text_notifs = this.textNotifications && this.myMentions
       }
       this.updateFormValidity()
+    },
+
+    onChangeCustomNotificationPhoneNumber () {
+      this.user.notification_phone_number = !this.setCustomNotificationPhoneNumber ? null : this.userClone.notification_phone_number
+      this.updateChangedUserProperties({
+        name: 'notification_phone_number',
+        value: this.userClone.secondary_phone_number
+      })
+
+      if (this.setCustomNotificationPhoneNumber) {
+        this.$refs.notificationPhoneNumberInput.focus()
+      }
+
+      this.updateFormValidity()
     }
   },
 
   mounted () {
     this.shouldObserve = !!this.user.observing_campaigns.length
+
+    this.setCustomNotificationPhoneNumber = !!this.user.notification_phone_number
 
     this.myCalls = this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs
     this.myTexts = this.user.texts_inapp_notifs || this.user.texts_desktop_notifs || this.user.texts_push_notifs || this.user.texts_email_notifs || this.user.texts_text_notifs
@@ -531,6 +583,9 @@ export default {
       this.mobileNotifications = this.user.calls_push_notifs || this.user.texts_push_notifs || this.user.voicemails_push_notifs || this.user.contacts_push_notifs || this.user.appointments_push_notifs || this.user.reminders_push_notifs || this.user.faxes_push_notifs || this.user.mentions_push_notifs
       this.emailNotifications = this.user.calls_email_notifs || this.user.texts_email_notifs || this.user.voicemails_email_notifs || this.user.contacts_email_notifs || this.user.appointments_email_notifs || this.user.reminders_email_notifs || this.user.faxes_email_notifs || this.user.mentions_email_notifs
       this.textNotifications = this.user.calls_text_notifs || this.user.texts_text_notifs || this.user.voicemails_text_notifs || this.user.contacts_text_notifs || this.user.faxes_text_notifs || this.user.mentions_text_notifs
+
+      this.user.notification_phone_number = this.userClone.notification_phone_number
+      this.setCustomNotificationPhoneNumber = !!this.user.notification_phone_number
     })
   }
 }

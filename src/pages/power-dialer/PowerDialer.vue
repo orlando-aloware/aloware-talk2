@@ -110,7 +110,8 @@ export default {
   computed: {
     ...mapState(['isMobile']),
     ...mapFields('powerDialer', [
-      'activeMetrics'
+      'activeMetrics',
+      'listDetails'
     ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [

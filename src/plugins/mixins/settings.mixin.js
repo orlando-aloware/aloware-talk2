@@ -12,6 +12,7 @@ export default {
   data () {
     return {
       loadingOperatingHours: false,
+      setCustomNotificationPhoneNumber: false,
       localUser: null
     }
   },

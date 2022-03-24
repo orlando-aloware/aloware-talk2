@@ -57,8 +57,8 @@
                           :key="groupIndex">
                     <template v-for="(filter, key, index) in group.filters">
                       <b-card class="mb-2 filter-item"
-                              :class="[isDefault(filter) ? 'cursor-default' : '']"
                               role="button"
+                              :class="[isDefault(filter) ? 'cursor-default' : '']"
                               :key="key"
                               @click="selectFilterByKey(filter, groupIndex, group.is_conjunction)">
                         <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
