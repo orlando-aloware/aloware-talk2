@@ -690,6 +690,7 @@ export default {
     togglePause (value) {
       if (!value) {
         if (this.timerIsOver) {
+          console.log('88888 :>> ', 88888)
           setTimeout(() => {
             this.sessionPaused = false
             this.resetTimer()
@@ -736,6 +737,7 @@ export default {
   },
   data () {
     return {
+      skippedTasks: [],
       autoDialerTimerEnabled: false,
       prevRoute: null,
       shouldRedirect: false,

@@ -165,6 +165,6 @@ export default function () {
     activeMetrics: [],
     activeList: {},
     hubspot: {},
-    listDetails: {}
+    powerDialerActiveList: {}
   }
 }

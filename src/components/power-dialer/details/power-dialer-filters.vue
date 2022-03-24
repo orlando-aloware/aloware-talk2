@@ -52,7 +52,7 @@ export default {
   },
   computed: {
     ...mapFields('powerDialer', [
-      'listDetails'
+      'powerDialerActiveList'
     ]),
     ...mapGetters('powerDialer', [
       'activeFilter',
@@ -78,15 +78,15 @@ export default {
     },
     listCounter () {
       return {
-        in_queue: this.listDetails?.total_queued,
-        all: this.listDetails?.total_items,
-        called: this.listDetails?.total_called,
-        failed: this.listDetails?.total_failed,
-        scheduled: this.listDetails?.total_scheduled
+        in_queue: this.powerDialerActiveList?.total_queued,
+        all: this.powerDialerActiveList?.total_items,
+        called: this.powerDialerActiveList?.total_called,
+        failed: this.powerDialerActiveList?.total_failed,
+        scheduled: this.powerDialerActiveList?.total_scheduled
       }
     },
     counterAll () {
-      return this.listDetails?.total_items
+      return this.powerDialerActiveList?.total_items
     }
   },
   methods: {
@@ -98,7 +98,7 @@ export default {
     }
   },
   watch: {
-    listDetails (val) {
+    powerDialerActiveList (val) {
       if (val?.path) {
         this.valid = true
         this.filtersCounter = {

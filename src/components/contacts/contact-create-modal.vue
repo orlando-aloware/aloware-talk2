@@ -242,20 +242,21 @@ export default {
         return
       }
       this.isCreating = true
-      return talk2Api.V1.contact.create(this.contact).then(res => {
-        this.$VueEvent.fire('clearContacts')
-        this.$VueEvent.fire('fetchContacts')
-        this.$VueEvent.fire('shouldUpdateListCount')
-        if (!['my-contacts', 'unassigned'].includes(this.selectedList.id)) {
-          this.$VueEvent.fire('getListCount', this.contact.user_id ? this.lists['my-contacts'] : this.lists['unassigned'])
-        }
+      return talk2Api.V1.contact.create(this.contact)
+        .then(res => {
+          this.$VueEvent.fire('clearContacts')
+          this.$VueEvent.fire('fetchContacts')
+          this.$VueEvent.fire('shouldUpdateListCount')
+          if (!['my-contacts', 'unassigned'].includes(this.selectedList.id)) {
+            this.$VueEvent.fire('getListCount', this.contact.user_id ? this.lists['my-contacts'] : this.lists['unassigned'])
+          }
 
-        this.$generalNotification('Contact created.')
-        this.$emit('created', res.data)
-        this.onReset()
-        this.isCreating = false
-        this.hideModal()
-      })
+          this.$generalNotification('Contact created.')
+          this.$emit('created', res.data)
+          this.onReset()
+          this.isCreating = false
+          this.hideModal()
+        })
     },
 
     onLineSelected (lineId) {
