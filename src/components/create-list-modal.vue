@@ -116,6 +116,7 @@ import {
 
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
+
 export default {
   props: {
     isDefault: {
@@ -128,7 +129,8 @@ export default {
       'createList',
       'currentListFilters',
       'selectedList',
-      'selectedContacts'
+      'selectedContacts',
+      'unsavedList'
     ]),
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
@@ -161,7 +163,8 @@ export default {
     ...mapActions('contacts', [
       'createListClose',
       'foldersLoaded',
-      'setUnsavedList'
+      'setUnsavedList',
+      'setCurrentListFilters'
     ]),
     onClose () {
       if (!this.isLoading) {
@@ -235,18 +238,41 @@ export default {
             this.isLoading = false
           })
       } else {
-        const data = {
-          ...this.defaultTemplateResponse,
-          name: this.getParams().name,
-          contact_folder_id: this.getParams().contact_folder_id,
-          params: this.getParams()
+        if (this.unsavedList) {
+          this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action will overwrite any unsaved data. Do you wish to continue?', {
+            buttonSize: 'sm',
+            okTitle: 'Yes',
+            cancelTitle: 'No',
+            centered: true
+          }).then(confirm => {
+            if (confirm) {
+              this.handleDynamicListCreation()
+            }
+          })
+        } else {
+          this.handleDynamicListCreation()
         }
-
-        this.setUnsavedList(data)
         this.isLoading = false
-        this.createListClose()
+      }
+    },
+
+    handleDynamicListCreation () {
+      const data = {
+        ...this.defaultTemplateResponse,
+        name: this.getParams().name,
+        contact_folder_id: this.getParams().contact_folder_id,
+        params: this.getParams(),
+        filters: []
+      }
+
+      this.setUnsavedList(data)
+      this.isLoading = false
+      this.createListClose()
+      if (this.$route.path !== '/contacts/list/unsaved') {
         this.$router.push(`${this.redirectPath}/unsaved`)
       }
+      this.$VueEvent.fire('resetContactsListFilter')
+      this.setCurrentListFilters({ sort: this.currentListFilters.sort, order: this.currentListFilters.order, search: this.currentListFilters.search, relations: this.currentListFilters.relations })
     },
     loadFolders () {
       this.$axios

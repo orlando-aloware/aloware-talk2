@@ -92,7 +92,7 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['authenticated']),
-    ...mapState('contacts', ['showContactsListSidebar']),
+    ...mapState('contacts', ['showContactsListSidebar', 'unsavedList']),
     ...mapState(['isMobile']),
     mainClass () {
       if (this.$route.name === 'Contact') {
@@ -173,6 +173,25 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('fetchContactsLists')
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.unsavedList) {
+      this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.setUnsavedList(null)
+          next()
+        } else {
+          next(false)
+        }
+      })
+    } else {
+      next()
+    }
   }
 }
 </script>

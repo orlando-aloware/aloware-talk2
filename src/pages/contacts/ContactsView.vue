@@ -1518,6 +1518,13 @@ export default {
         this.myContacts = this.showMyContacts
         this.setShouldUpdateSelectedListContactCount(true)
       }
+
+      if (this.$route.params.id === 'unsaved') {
+        this.getListDataCount({ filters: JSON.stringify(this.list.filters) }).then(response => {
+          const count = response.data.count
+          this.setSelectedListContactCount(count)
+        })
+      }
     },
     selectedList: function (value) {
       if (this.selectedContacts[value.id]) {
