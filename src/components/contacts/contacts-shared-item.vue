@@ -8,7 +8,7 @@
             isExactActive && 'router-link-exact-active'
           ]"
        class="d-flex align-items-center item"
-       @click="toggleSidebar(navigate, $event)">
+       @click="toggleSidebar($event, route)">
       <div class="icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === ContactListTypes.STATIC"></folder-static-icon>
         <folder-dynamic-icon v-if="item.type === ContactListTypes.DYNAMIC || !item.type"></folder-dynamic-icon>
@@ -24,7 +24,7 @@
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'contacts-shared-item',
@@ -43,12 +43,35 @@ export default {
       type: Object
     }
   },
+  computed: {
+    ...mapState('contacts', ['unsavedList'])
+  },
   methods: {
     ...mapActions('contacts', ['setShowContactsListSidebar', 'setUnsavedList']),
-    toggleSidebar (callback, event) {
+    toggleSidebar (event, route) {
+      event.preventDefault()
+      if (this.unsavedList) {
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.handleToggleSidebar(route)
+          }
+        })
+      } else {
+        this.handleToggleSidebar(route)
+      }
+    },
+
+    handleToggleSidebar (route) {
       this.setUnsavedList(null)
-      callback(event)
       this.setShowContactsListSidebar(false)
+      this.$router.push({
+        path: route.path
+      })
     }
   }
 }

@@ -409,6 +409,22 @@ export default {
       this.removeListOpen({ id: this.id, name: this.name })
     },
     toggleSidebar (callback, event) {
+      if (this.unsavedList) {
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.handleToggleSidebar(callback, event)
+          }
+        })
+      } else {
+        this.handleToggleSidebar(callback, event)
+      }
+    },
+    handleToggleSidebar (callback, event) {
       this.setUnsavedList(null)
       this.setShowContactsListSidebar(false)
       if (this.id !== undefined) {

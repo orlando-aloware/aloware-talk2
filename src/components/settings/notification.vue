@@ -303,10 +303,12 @@
               Text Message
             </b-form-checkbox>
           </b-form-group>
+          <hr v-if="textNotifications"/>
 
           <b-form-group v-if="textNotifications"
-                        class="form-label ml-5">
-            <b-form-checkbox :value="true"
+                        class="form-label">
+            <b-form-checkbox switch
+                             :value="true"
                              :unchecked-value="false"
                              v-model="setCustomNotificationPhoneNumber"
                              @change="onChangeCustomNotificationPhoneNumber">
@@ -314,7 +316,7 @@
             </b-form-checkbox>
           </b-form-group>
           <b-form-group v-if="textNotifications && setCustomNotificationPhoneNumber"
-                        class="form-label ml-5">
+                        class="form-label">
             <b-form-input
               type="text"
               ref="notificationPhoneNumberInput"
@@ -323,7 +325,7 @@
               :state="validateState('notification_phone_number')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'notification_phone_number')">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter notification phone number.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter phone number.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
