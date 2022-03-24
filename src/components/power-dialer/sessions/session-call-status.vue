@@ -737,6 +737,7 @@ export default {
   },
   data () {
     return {
+      skippedTasks: [],
       autoDialerTimerEnabled: false,
       prevRoute: null,
       shouldRedirect: false,

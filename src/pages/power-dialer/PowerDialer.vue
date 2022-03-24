@@ -104,14 +104,14 @@ export default {
   ],
   provide () {
     return {
-      contactsData: this.contactsData
+      contactsData: this.powerDialerActiveList
     }
   },
   computed: {
     ...mapState(['isMobile']),
     ...mapFields('powerDialer', [
       'activeMetrics',
-      'listDetails'
+      'powerDialerActiveList'
     ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
@@ -309,6 +309,9 @@ export default {
     },
     '$route.params': async function (params) {
       await this.setFilterParams(params)
+    },
+    powerDialerActiveList (newObj) {
+      this.contactsData = newObj
     }
   }
 }

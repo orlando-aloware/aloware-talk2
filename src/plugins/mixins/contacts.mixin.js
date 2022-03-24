@@ -218,10 +218,6 @@ export default {
             type: list.type
           })
 
-          if (!isContactModule) {
-            this.listDetails = data
-          }
-
           this.markCheckedAll()
         })
         .finally(() => {
@@ -411,6 +407,15 @@ export default {
       const found = { data: null }
       const item = { data: null }
       const currentPage = _.get(listData, 'current_page', 0)
+
+      if (this.isPowerDialer) {
+        let newList = []
+        listData.data.forEach(dat => {
+          newList.push(dat)
+        })
+        this.powerDialerActiveList = { ...listData }
+        this.powerDialerActiveList.data = [ ...newList ]
+      }
 
       if (!_.isEmpty(this.contactsData.data)) {
         for (item.data in this.contactsData.data) {

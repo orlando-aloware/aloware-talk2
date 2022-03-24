@@ -149,7 +149,7 @@
     <template slot="table">
       <Datatable
         :stickyHeaders="true"
-        :columns="filteredColumns"
+        :columns="columns"
         :has-more="hasMore"
         :is-empty="isEmpty || isStartState"
         :is-loading-more="isLoadingMore"
@@ -230,7 +230,7 @@
                 </td>
                 <!-- COLUMN: Status -->
                 <td
-                  v-else-if="column.name === 'task_status'"
+                  v-else-if="column.name === 'task_status_name'"
                   :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
                   :key="key">
                   <StatusChip
