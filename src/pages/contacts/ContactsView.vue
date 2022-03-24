@@ -851,7 +851,8 @@ export default {
       if (!id) {
         id = 'all'
       }
-      this.$VueEvent.fire('clearContacts')
+
+      // this.$VueEvent.fire('clearContacts')
       const stringId = String(id)
 
       this.$axios

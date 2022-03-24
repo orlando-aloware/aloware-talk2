@@ -87,6 +87,10 @@ export default {
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
     init: _.debounce(function () {
+      if (this.$route.name === 'Contact') {
+        this.isLoadingMore = true
+      }
+
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
       if (this.showMyContacts && this.$route.name === 'Contacts') {
@@ -405,6 +409,7 @@ export default {
       const dataLength = listData.data.length
       const found = { data: null }
       const item = { data: null }
+      const childItem = { data: null }
       const currentPage = _.get(listData, 'current_page', 0)
 
       if (!_.isEmpty(this.contactsData.data)) {
@@ -413,7 +418,11 @@ export default {
           found.data = found.data ? listData.data.indexOf(found.data) : null
 
           if (currentPage === 1 && found.data !== -1 && found.data !== null) {
-            this.contactsData.data[item.data] = listData.data[found.data]
+            for (childItem.data in listData.data[found.data]) {
+              if (typeof this.contactsData.data[item.data][childItem.data] !== 'undefined') {
+                this.contactsData.data[item.data][childItem.data] = listData.data[found.data][childItem.data]
+              }
+            }
           }
 
           if (found.data !== -1 && found.data !== null) {
@@ -615,26 +624,30 @@ export default {
         }
       }
     },
-    'list.id': function (value) {
-      if (value && this.$route.name === 'Contacts') {
-        this.clearContacts()
-      }
-    },
+    // 'list.id': function (value) {
+    //   if (value && this.$route.name === 'Contacts') {
+    //     this.clearContacts()
+    //   }
+    // },
     $route (to, from) {
-      this.isNavigated = true
+      this.isNavigated = false
 
-      if ((from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) || to.name === 'Power Dialer') {
-        this.init()
+      if ((from.name === 'Contact' && to.name === 'Contacts') || (from.name === 'Contacts' && to.name === 'Contact')) {
         return
       }
 
-      if (from.name === 'Contact' && to.name === 'Contacts') {
-        this.isNavigated = false
-        return
+      if ((from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) ||
+        (to.name === 'Contacts' && !['Contacts', 'Contact'].includes(from.name)) ||
+        to.name === 'Power Dialer') {
+        this.isNavigated = true
       }
 
-      if ((from.name === 'Contacts' && to.name === 'Contacts') || (from.name === 'Power Dialer' && to.name === 'Power Dialer')) {
-        this.isNavigated = false
+      // if ((from.name === 'Contacts' && to.name === 'Contacts') || (from.name === 'Power Dialer' && to.name === 'Power Dialer')) {
+      //   this.isNavigated = false
+      // }
+
+      if (from.name === 'Contacts' && to.name === 'Contacts' && from.path !== to.path) {
+        this.clearContacts()
       }
 
       this.init()

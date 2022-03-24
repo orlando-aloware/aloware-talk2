@@ -253,9 +253,10 @@ export default {
           name: 'Contacts'
         })
       } else {
-        this.$router.push({
-          path: `list/${this.selectedList.id}`
-        })
+        // this.$router.push({
+        //   path: `list/${this.selectedList.id}`
+        // })
+        this.$router.back()
       }
 
       if (e) {
