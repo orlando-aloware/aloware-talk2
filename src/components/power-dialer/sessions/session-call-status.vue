@@ -97,7 +97,9 @@
         </div>
       </div> -->
       <div class="d-flex align-items-center p-0">
-        <div class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
+        <div
+          v-if="timezone"
+          class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
           <DropIcon
             width="18px"
             height="18px"
@@ -688,10 +690,12 @@ export default {
     //   }
     // },
     togglePause (value) {
+      console.log('value of timer :>> ', value)
       if (!value) {
         if (this.timerIsOver) {
-          console.log('88888 :>> ', 88888)
+          console.log('timer is over :>> ')
           setTimeout(() => {
+            console.log('88888 :>> ', 88888)
             this.sessionPaused = false
             this.resetTimer()
           }, 1000)
@@ -706,7 +710,7 @@ export default {
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
-      if (tasks.length === 0) {
+      if (tasks.length === 0 && !this.togglePause) {
         this.shouldRedirect = true
       }
       if (tasks.length > 0 && !this.flagged) {
