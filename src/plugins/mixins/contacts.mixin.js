@@ -551,12 +551,12 @@ export default {
         .concat(['static'])
     },
     columns () {
-      let id = isNaN(this.id) ? 'my-queue' : this.id
+      const id = isNaN(this.id) && !this.$route.name.includes('Contacts') ? 'my-queue' : this.id
       try {
         const headers = { data: [] }
         if (this.lists[id] && this.lists[id].headers) {
           headers.data = this.lists[id].headers
-          if (typeof headers === 'string') {
+          if (typeof headers.data === 'string') {
             headers.data = JSON.parse(headers.data)
           }
         }
@@ -566,18 +566,21 @@ export default {
         }
 
         const item = { key: null }
+        const found = { data: null }
+        const headerRelation = { data: null }
+        const columnRelation = { data: null }
         for (item.key in headers.data) {
-          const found = ALL_COLUMNS.find(column => column.name === headers.data[item.key].name)
+          found.data = ALL_COLUMNS.find(column => column.name === headers.data[item.key].name)
 
-          if (!found) {
+          if (!found.data) {
             continue
           }
 
-          const headerRelation = _.get(headers.data[item.key], 'relationName', null)
-          const columnRelation = _.get(found, 'relationName', null)
+          headerRelation.data = _.get(headers.data[item.key], 'relationName', null)
+          columnRelation.data = _.get(found.data, 'relationName', null)
 
-          if (columnRelation && columnRelation !== headerRelation) {
-            headers.data[item.key].relationName = columnRelation
+          if (columnRelation.data && columnRelation.data !== headerRelation.data) {
+            headers.data[item.key].relationName = columnRelation.data
           }
         }
 
