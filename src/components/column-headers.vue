@@ -154,7 +154,7 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: JSON.parse(JSON.stringify(this.activeColumns || DEFAULT_COLUMNS))
+      currentColumns: []
     }
   },
   methods: {
@@ -172,6 +172,7 @@ export default {
       if (column.required) {
         return
       }
+
       if (selected) {
         this.currentColumns = this.currentColumns.filter(
           (c) => c.name !== column.name
@@ -179,13 +180,15 @@ export default {
       } else {
         const newItems = JSON.parse(JSON.stringify(this.currentColumns))
         const index = { data: null }
+        const found = { data: null }
 
         // now, check if columns have order property, or
         // check if column is required then update the sortable property.
         for (index.data in newItems) {
-          const found = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
-          if (newItems[index.data].name !== 'checkbox' && typeof newItems[index.data].order === 'undefined' && found) {
-            newItems[index.data].order = found.order
+          found.data = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
+
+          if (newItems[index.data].name !== 'checkbox' && typeof newItems[index.data].order === 'undefined' && found.data) {
+            newItems[index.data].order = found.data.order
           }
         }
 
@@ -204,10 +207,12 @@ export default {
         // correct the actions order, should always be at the last.
         const actions = newItems.find(column => column.label === 'Actions')
         const actionsIndex = actions ? newItems.indexOf(actions) : null
+
         if (actionsIndex !== -1 && actionsIndex !== null && actionsIndex < (newItems.length - 1)) {
           newItems.splice(actionsIndex, 1)
           newItems.splice(actions.order, 0, actions)
         }
+
         this.currentColumns = newItems
       }
     },
@@ -297,6 +302,7 @@ export default {
     },
     onModalShow () {
       this.searchText = ''
+      this.currentColumns = JSON.parse(JSON.stringify(this.activeColumns))
     }
   },
   computed: {
