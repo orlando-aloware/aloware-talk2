@@ -141,7 +141,7 @@ export default {
 
     const index = { data: 0 }
     if (typeof state.metricGroups[metricGroupIndex].agent_metrics === 'undefined') {
-      state.metricGroups[metricGroupIndex].agent_metrics = []
+      Vue.set(state.metricGroups[metricGroupIndex], `agent_metrics`, [])
     }
 
     if (state.metricGroups[metricGroupIndex].agent_metrics.constructor.name === 'Array') {

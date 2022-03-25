@@ -176,7 +176,7 @@ export default {
   },
   beforeRouteLeave (to, from, next) {
     if (this.unsavedList) {
-      this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+      this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may cause your unsaved contact list to be lost. Do you wish to continue?', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'No',

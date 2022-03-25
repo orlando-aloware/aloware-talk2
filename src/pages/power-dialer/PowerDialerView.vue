@@ -734,7 +734,9 @@ export default {
         // if (params.filter) {
         //   this.init()
         // }
-        this.init()
+        if (!this.$route.name.includes('Contact')) {
+          this.init()
+        }
       },
       deep: true
     },

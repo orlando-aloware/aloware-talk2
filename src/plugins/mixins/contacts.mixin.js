@@ -664,6 +664,10 @@ export default {
         this.clearContacts()
       }
 
+      if (to.name === 'Contacts' && this.$options.name === 'PowerDialer') {
+        return
+      }
+
       this.init()
     }
   },
