@@ -152,7 +152,7 @@ export default {
       index.data = Object.keys(state.metricGroups[metricGroupIndex].agent_metrics).length
     }
 
-    const metric = state.availableMetrics.find(metric => metric.metric_id === data.data.metric_id)
+    const metric = state.availableMetrics.find(item => item.metric_id === parseInt(data.data.metric_id))
 
     if (metric) {
       data.data.category = metric.category
