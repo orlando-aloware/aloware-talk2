@@ -37,12 +37,12 @@ export default {
           if (this.sessionPaused) {
             return 'Up Next'
           } else if ((!this.toggleEnd || !this.togglePause) && !this.wrapUp) {
-            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
           } else {
-            return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+            return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
           }
         case 'WRAP_UP':
-          return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+          return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
         case 'MAKING_CALL':
           return `Dialing...`
         case 'ANSWERING_CALL':
@@ -56,7 +56,7 @@ export default {
         case 'CALL_DISCONNECTED':
           return 'Call Disconnected'
         default:
-          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.timerCount >= 0 ? this.timerCount : 0}s</span>`
+          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
       }
     },
     moveDirection () {
@@ -142,6 +142,7 @@ export default {
       return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
         .then(res => {
           console.log('SKIPPED: ', res)
+          this.skippedTasks.push(autoDialTask.contact_list_item_id)
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list
           //   // autoDialTask.direction = PowerDialer.DIRECTION_BOTTOM
@@ -171,8 +172,18 @@ export default {
           id: this.selectedList.id,
           task_status: 1
         })
+        console.log('MOVED TASK : ', this.taskToCall)
         this.powerDialerTasks['in_queue'] = res.data.data
+        this.initialize()
       }
+    },
+
+    clearWarmUpCountDown () {
+      this.countdownStarted = false
+      this.countdownTimer = 0
+
+      clearInterval(this.countdownInterval)
+      console.log('Stopped countdown')
     },
 
     skipTask () {
