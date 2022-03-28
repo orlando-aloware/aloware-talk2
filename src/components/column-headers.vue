@@ -112,9 +112,39 @@
                   size="sm"
                   :disabled="loading"
                   class="font-weight-bold text-danger text-decoration-none"
-                  @click="onResetAllColumns">
+                  @click="confirmedSave = true">
           Reset all columns
         </b-button>
+        <ConfirmDialog
+          :is-open="confirmedSave"
+          size="md"
+          title="Reset Columns"
+          @hide="confirmedSave = false">
+          <div slot="content">
+            <div class="text-left">
+              <div class="text-dark">
+                To confirm, all columns on a selected list will be set to default.
+              </div>
+            </div>
+          </div>
+          <div slot="footer" class="w-100">
+            <div class="d-flex w-100">
+              <div class="flex-grow-1"></div>
+              <button
+                class="btn btn-sm btn-outline-dark mr-2"
+                @click="confirmedSave = false"
+              >
+                Cancel
+              </button>
+              <button
+                class="btn btn-sm btn-danger mr-2"
+                @click="onConfirmSave">
+                <q-spinner-bars color="white" />
+                Yes
+              </button>
+            </div>
+          </div>
+        </ConfirmDialog>
       </div>
     </template>
   </b-modal>
@@ -133,7 +163,7 @@ import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
 import Search from 'src/components/search.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-
+import ConfirmDialog from 'src/components/confirm-dialog'
 const DEFAULT_PINNED_LIST_IDS = Object.keys(DEFAULT_PINNED_LIST).map(
   (i) => DEFAULT_PINNED_LIST[i].id
 )
@@ -146,7 +176,8 @@ export default {
   },
   components: {
     draggable,
-    Search
+    Search,
+    ConfirmDialog
   },
   data () {
     return {
@@ -154,7 +185,8 @@ export default {
       loading: false,
       isOpen: false,
       categories: COLUMN_CATEGORIES,
-      currentColumns: []
+      currentColumns: [],
+      confirmedSave: false
     }
   },
   methods: {
@@ -303,6 +335,10 @@ export default {
     onModalShow () {
       this.searchText = ''
       this.currentColumns = JSON.parse(JSON.stringify(this.activeColumns))
+    },
+    onConfirmSave () {
+      this.confirmedSave = false
+      this.onResetAllColumns()
     }
   },
   computed: {
