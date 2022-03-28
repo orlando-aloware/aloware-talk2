@@ -9,7 +9,7 @@
     tag="ul">
     <transition-group type="transition" name="flip-list">
       <template
-        v-for="(metricGroupResources, key) in metricGroups">
+        v-for="(metricGroupResources, key) in reversedMetricGroups">
         <MetricGroup :key="key"
                      :resources="metricGroupResources"
                      :editMetricGroupId="editGroupId"
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import Draggable from 'vuedraggable'
 import MetricGroup from './metric-group/metric-group'
@@ -62,6 +63,13 @@ export default {
         disabled: false,
         ghostClass: 'ghost'
       }
+    },
+    reversedMetricGroups () {
+      if (_.isEmpty(this.metricGroups)) {
+        return []
+      }
+
+      return JSON.parse(JSON.stringify(this.metricGroups)).sort((a, b) => (b.order > a.order) ? 1 : -1)
     }
   },
   mounted () {
