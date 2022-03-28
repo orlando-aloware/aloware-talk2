@@ -21,7 +21,7 @@ export default {
   selectedPdList: (state) => state.selectedPdList,
   currentListFilters: (state) => state.currentListFilters,
   powerDialerLists: (state) => state.powerDialerLists,
-  powerDialerListItems: (state) => state.powerDialerListItems,
+  // powerDialerListItems: (state) => state.powerDialerListItems,
   powerDialerDirectoryList: (state) => {
     /**
      * TEMPORARY VALUES

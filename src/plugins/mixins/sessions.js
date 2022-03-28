@@ -86,7 +86,7 @@ export default {
       let res = null
       res = await this.getContact({ id: taskId })
       if (!this.flagged) {
-        this.activeTask = res
+        // this.activeTask = res
         this.flagged = true
       }
       console.log(` %c Fetching contact for current task ${taskId} : `, 'color:yellow;background:black;', res)

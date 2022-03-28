@@ -200,7 +200,7 @@ export default {
   computed: {
     ...mapState(['dialer']),
     ...mapGetters('powerDialer', [
-      'powerDialerListItems',
+      // 'powerDialerListItems',
       // 'currentList',
       'sessionLoader'
     ]),

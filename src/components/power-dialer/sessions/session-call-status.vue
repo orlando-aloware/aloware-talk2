@@ -565,7 +565,7 @@ export default {
       }
       if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
-        this.activeTask = this.taskToCall
+        // this.activeTask = this.taskToCall
         await this.fetchContact(this.taskToCall.id)
         if (!this.wrapUp) {
           this.resetTimer()
@@ -698,7 +698,7 @@ export default {
     countdownTimer () {
       if (this.timerIsOver) {
         if (this.wrapUp) {
-          this.resetTimer()
+          this.initialize()
           this.wrapUp = false
         }
         if (this.togglePause) {

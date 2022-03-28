@@ -210,7 +210,7 @@ export default {
 
           if (this.apiEndpoint(queued).includes('my-queue')) {
             // TODOs: Use vuex for storing filtered power dialer contact lists
-            this.updateMyQueueListData(data.data)
+            this.updateMyQueueListData(data)
           }
 
           let listId = this.id === 'my-queue' || this.id === 'in-queue' ? this.myQueue?.id : this.id

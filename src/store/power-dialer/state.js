@@ -10,6 +10,7 @@ export default function () {
   return {
     flaggedCreateExisting: false,
     myQueue: null,
+    myQueueListFilters: null,
     filters: [],
     opened: [],
     folders: [],

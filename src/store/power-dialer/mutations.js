@@ -6,6 +6,9 @@ export default {
   SET_MY_QUEUE_LIST: (state, data) => {
     state.myQueue = data
   },
+  SET_MY_QUEUE_LIST_FILTERS: (state, data) => {
+    state.myQueueListFilters = data
+  },
   SET_MY_QUEUE_LIST_DATA: (state, data) => {
     state.myQueue.items = data
   },
