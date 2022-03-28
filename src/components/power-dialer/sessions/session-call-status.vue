@@ -417,6 +417,7 @@ export default {
       this.findDefaultOutboundCampaign()
     }
     this.$VueEvent.listen('initiate_session', (session) => {
+      console.log('4325435435 :>> ', 4325435435)
       this.initialize()
     })
   },
@@ -552,7 +553,9 @@ export default {
         }
       }, 1000)
     },
+
     async initialize () {
+      console.log('Initializing needed data...')
       this.TOGGLE_SESSION_LOADER(true)
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
@@ -694,7 +697,10 @@ export default {
   watch: {
     countdownTimer () {
       if (this.timerIsOver) {
-        this.wrapUp = false
+        if (this.wrapUp) {
+          this.resetTimer()
+          this.wrapUp = false
+        }
         if (this.togglePause) {
           this.sessionPaused = true
         }

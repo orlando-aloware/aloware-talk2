@@ -42,10 +42,10 @@ export default {
           this.onStatusFailed(task)
           break
         case AutoDialTaskStatus.STATUS_QUEUED:
-          this.onStatusQueued()
+          this.onStatusQueued(task)
           break
         case AutoDialTaskStatus.STATUS_SCHEDULED:
-          this.onStatusScheduled()
+          this.onStatusScheduled(task)
           break
         default:
       }
@@ -57,6 +57,7 @@ export default {
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
     },
     onStatusCompleted (task) {
+      console.log('3333333333 :>> ', 3333333333)
       this.powerDialerTasks.called.push(this.activeTask)
       this.$VueEvent.fire('endWrapUp')
       window.VueEvent.fire('initiate_session', task)
@@ -67,6 +68,11 @@ export default {
     },
     onStatusQueued (task) {
       // Status Queued
+      let taskToMove = this.powerDialerTasks.in_queue.find(lst => lst.id === task.contact_id)
+      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
+      this.powerDialerTasks.in_queue.push(taskToMove)
+      // this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.push(this.powerDialerTasks.in_queue.splice(this.powerDialerTasks.in_queue.indexOf('12'), 1)[0])
+      window.VueEvent.fire('initiate_session', task)
     },
     onStatusScheduled (task) {
       // Status Scheduled

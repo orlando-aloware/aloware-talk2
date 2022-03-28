@@ -111,7 +111,7 @@ export default {
         const endDay = moment.tz(this.powerDialerSettings.close_time, 'HH:mm:ss', timezone)
         const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone)
 
-        if (contactLocalTime.isBetween(startDay, endDay)) {
+        if (!contactLocalTime.isBetween(startDay, endDay)) {
           console.log(`Skipped task #${this.taskToCall.id} in ${timezone} timezone because it was outside day times. ` + contactLocalTime.format('h:mm a') + ' is not in between ' + startDay.format('h:mm a') + ' - ' + endDay.format('h:mm a'))
           // TODOs:
           // Implement: Should skip single task
@@ -142,7 +142,9 @@ export default {
       return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
         .then(res => {
           console.log('SKIPPED: ', res)
-          this.skippedTasks.push(autoDialTask.contact_list_item_id)
+          if (!this.skippedTasks.includes(autoDialTask.contact_list_item_id)) {
+            this.skippedTasks.push(autoDialTask.contact_list_item_id)
+          }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list
           //   // autoDialTask.direction = PowerDialer.DIRECTION_BOTTOM
@@ -160,21 +162,22 @@ export default {
     },
 
     async moveTask (item = {}, direction = this.moveDirection.top) {
-      const res = await this.moveContactItems({
-        id: this.selectedList.id,
-        params: {
-          contact_list_item_ids: [item.contact_list_item_id],
-          direction: direction
-        }
-      })
-      if (res.status === 200) {
-        let res = await this.getSessionTaskByFilter({
-          id: this.selectedList.id,
-          task_status: 1
-        })
-        this.powerDialerTasks['in_queue'] = res.data.data
-        this.initialize()
-      }
+      // const res = await this.moveContactItems({
+      //   id: this.selectedList.id,
+      //   params: {
+      //     contact_list_item_ids: [item.contact_list_item_id],
+      //     direction: direction
+      //   }
+      // })
+      // if (res.status === 200) {
+      //   let res = await this.getSessionTaskByFilter({
+      //     id: this.selectedList.id,
+      //     task_status: 1
+      //   })
+      //   this.powerDialerTasks['in_queue'] = res.data.data
+      //   this.initialize()
+      // }
+      this.initialize()
     },
 
     clearWarmUpCountDown () {
