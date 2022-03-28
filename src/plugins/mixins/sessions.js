@@ -172,7 +172,6 @@ export default {
           id: this.selectedList.id,
           task_status: 1
         })
-        console.log('MOVED TASK : ', this.taskToCall)
         this.powerDialerTasks['in_queue'] = res.data.data
         this.initialize()
       }

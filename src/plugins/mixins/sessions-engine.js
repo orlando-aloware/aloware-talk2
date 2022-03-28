@@ -59,6 +59,7 @@ export default {
     onStatusCompleted (task) {
       this.powerDialerTasks.called.push(this.activeTask)
       this.$VueEvent.fire('endWrapUp')
+      window.VueEvent.fire('initiate_session', task)
     },
     onStatusFailed (task) {
       this.powerDialerTasks.failed.push(this.activeTask)
