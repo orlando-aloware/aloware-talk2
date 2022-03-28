@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     ...mapActions('contacts', ['setShowContactsListSidebar', 'setUnsavedList']),
-    toggleSidebar (event, route) {
+    toggleSidebar (event) {
       event.preventDefault()
       if (this.unsavedList) {
         this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
@@ -58,19 +58,21 @@ export default {
           centered: true
         }).then(confirm => {
           if (confirm) {
-            this.handleToggleSidebar(route)
+            this.handleToggleSidebar()
           }
         })
       } else {
-        this.handleToggleSidebar(route)
+        this.handleToggleSidebar()
       }
     },
 
-    handleToggleSidebar (route) {
+    handleToggleSidebar () {
       this.setUnsavedList(null)
       this.setShowContactsListSidebar(false)
       this.$router.push({
-        path: route.path
+        path: '/contacts/list/' + this.item.id,
+        query: { type: 'public' },
+        meta: { type: 'public' }
       })
     }
   }
