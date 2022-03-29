@@ -117,6 +117,7 @@
         </b-button>
         <ConfirmDialog
           :is-open="confirmedSave"
+          :id="resourceId"
           size="md"
           title="Reset Columns"
           @hide="confirmedSave = false">
@@ -137,9 +138,8 @@
                 Cancel
               </button>
               <button
-                class="btn btn-sm btn-danger mr-2"
+                class="btn btn-sm btn-success mr-2"
                 @click="onConfirmSave">
-                <q-spinner-bars color="white" />
                 Yes
               </button>
             </div>
@@ -344,7 +344,8 @@ export default {
   computed: {
     ...mapGetters('contacts', ['columns']),
     resourceId () {
-      return this.columns.id === 'my-queue' ? this.predefinedId : this.columns.id
+      let id = this.columns?.id === 'my-queue' ? this.predefinedId : this.columns?.id
+      return `${id}`
     },
     title () {
       const title = this.columns?.name || 'My Queue'
