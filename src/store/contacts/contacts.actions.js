@@ -306,5 +306,8 @@ export default {
   },
   setListContactsLoaded: ({ commit }, value) => {
     commit('SET_LIST_CONTACTS_LOADED', value)
+  },
+  setListContactOwner: ({ commit }, ownerId) => {
+    commit('SET_LIST_CONTACT_OWNER', ownerId)
   }
 }

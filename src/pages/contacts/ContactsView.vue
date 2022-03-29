@@ -847,50 +847,53 @@ export default {
     onLoadMore () {
       this.$emit('loadMore')
     },
+    getListData (id) {
+      return this.$axios
+        .get('/api/v2/contacts-list/' + id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
+        .then((response) => response.data)
+        .then((response) => {
+          this.listLoaded({ ...response, id: id })
+          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+        }).catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+          this.$router.replace('/contacts')
+        })
+    },
     loadList (id) {
       if (!id) {
         id = 'all'
       }
 
-      // this.$VueEvent.fire('clearContacts')
       const stringId = String(id)
 
-      this.$axios
-        .get('/api/v2/contacts-list/' + stringId + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
-        .then((response) => response.data)
-        .then((response) => {
-          this.listLoaded({ ...response, id: stringId })
-          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
-          this.name = response.name
-          this.type = response.type
-          const filters = response.type === this.ContactListTypes.DYNAMIC ? response.filters : {
-            contact_lists: {
-              operator: 1,
-              value: [stringId]
-            }
-          }
-          this.setCurrentListFilters(filters)
-          this.setDataCount(
-            response.type === this.ContactListTypes.DYNAMIC ? response.filters : {
-              0: {
-                filters: {
-                  contact_lists: {
-                    operator: 1,
-                    value: [stringId]
-                  }
-                },
-                is_conjunction: true
+      this.name = this.list.name
+      this.type = this.list.type
+
+      const listFilter = typeof this.list.filters === 'string' ? JSON.parse(this.list.filters) : this.list.filters
+
+      const filters = this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
+        contact_lists: {
+          operator: 1,
+          value: [stringId]
+        }
+      }
+      this.setCurrentListFilters(filters)
+
+      this.setDataCount(
+        this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
+          0: {
+            filters: {
+              contact_lists: {
+                operator: 1,
+                value: [stringId]
               }
-            }
-          )
-          return response
-        })
-        .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-          this.$router.replace('/contacts/')
-        })
+            },
+            is_conjunction: true
+          }
+        }
+      )
     },
     setData (id) {
       const list = this.lists[id] || {}
@@ -1563,6 +1566,12 @@ export default {
       deep: true,
       handler: function () {
         this.hasNextPage = !_.isEmpty(this.fixedContactsData.next_page_url)
+      }
+    },
+    list: {
+      deep: true,
+      handler: function () {
+        this.loadList(this.$route.params.id)
       }
     }
   }

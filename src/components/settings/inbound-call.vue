@@ -267,6 +267,7 @@
               placeholder="Enter missed call message here..."
               rows="3"
               max-rows="6"
+              id="ta-text-follow up"
               v-model.trim="$v.user.missed_call_message.$model"
               :state="validateState('missed_call_message')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'missed_call_message')"
@@ -487,12 +488,7 @@ export default {
         this.user[field] += ' ' + template.body
       }
 
-      this.$nextTick(function () {
-        const element = document.getElementById('ta-user-completed-call-message')
-        element.dispatchEvent(new Event('input'))
-        element.focus()
-      })
-
+      this.focusOwnerElement()
       this.$refs.templatesMenu.hide()
     },
     variableSelected (variable, field) {
@@ -502,13 +498,24 @@ export default {
         this.user[field] += ' ' + variable
       }
 
-      this.$nextTick(function () {
-        const element = document.getElementById('ta-user-completed-call-message')
-        element.dispatchEvent(new Event('input'))
-        element.focus()
-      })
-
+      this.focusOwnerElement()
       this.$refs.variablesMenu.hide()
+    },
+    focusOwnerElement () {
+      this.$nextTick(function () {
+        const textAreaCompletedCallElement = document.getElementById('ta-user-completed-call-message')
+        if (textAreaCompletedCallElement) {
+          textAreaCompletedCallElement.dispatchEvent(new Event('input'))
+          textAreaCompletedCallElement.focus()
+        }
+
+        const textAreaFollowUpElement = document.getElementById('ta-text-follow up')
+
+        if (textAreaFollowUpElement) {
+          textAreaFollowUpElement.dispatchEvent(new Event('input'))
+          textAreaFollowUpElement.focus()
+        }
+      })
     },
     playMissedCallVMAudioFile () {
       this.$refs.vmAudio.play()
