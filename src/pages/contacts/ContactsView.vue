@@ -252,6 +252,8 @@
         :current-page="this.fixedContactsData.current_page"
         :last-page="this.fixedContactsData.last_page"
         v-if="listItemsHasData"
+        @mousemove="checkMouseTarget($event)"
+        @mouseleave="checkMouseTarget($event)"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
@@ -1266,9 +1268,16 @@ export default {
 
       return routeData
     },
-    showPopover: _.debounce(function (title, id, index, colName, e) {
+    checkMouseTarget (e) {
       if (this.hoverPopover.currentTarget !== e.target.id) {
         this.hoverPopover.currentTarget = null
+        this.hoverPopover.show = false
+        return false
+      }
+      return true
+    },
+    showPopover: _.debounce(function (title, id, index, colName, e) {
+      if (!this.checkMouseTarget) {
         return
       }
 
@@ -1278,7 +1287,7 @@ export default {
       this.hoverPopover.data = this.fixedContactsData.data[index][colName]
       this.hoverPopover.show = true
       this.hoverPopover.cancelled = false
-    }, 500),
+    }, 200),
     onMouseOverPopover (title, id, index, colName, e) {
       // console.log('over event: ', e)
       this.showPopover(title, id, index, colName, e)

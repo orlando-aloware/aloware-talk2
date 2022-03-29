@@ -121,6 +121,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import {
   ALL_COLUMNS,
@@ -362,7 +363,23 @@ export default {
       return 'power-dialer-lists'
     },
     activeColumns () {
-      return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
+      const columns = this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
+
+      if (_.isEmpty(this.columns.headers)) {
+        return columns
+      }
+
+      const newColumns = JSON.parse(JSON.stringify(this.columns.headers))
+      const index = { data: null }
+      const found = { data: null }
+      for (index.data in columns) {
+        found.data = newColumns.find(item => item.name === columns[index.data].name)
+        if (found.data === undefined) {
+          newColumns.splice((parseInt(index.data) + 1), 0, columns[index.data])
+        }
+      }
+
+      return newColumns
     }
   },
   watch: {
