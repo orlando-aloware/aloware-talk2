@@ -405,7 +405,7 @@
                 <template
                   v-if="Array.isArray(contact.tags) && contact.tags.length">
                   <div
-                    class="d-flex align-items-center contact-tags-item"
+                    class="d-flex align-items-center contact-tags-item popover-items"
                     :id="`pt-${index}-${colIndx}`"
                     v-if="contact.id"
                     @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
@@ -528,11 +528,12 @@
 
                 <div
                   v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length"
-                  class="text-left"
-                  @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${colIndx}`, index, column.name, $event)">
+                  class="text-left">
                   <div
                     v-if="contact[column.name].length > 0"
-                    :id="`ot-${index}-${colIndx}`">
+                    :id="`ot-${index}-${colIndx}`"
+                    class="d-flex align-items-center popover-items"
+                    @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${colIndx}`, index, column.name, $event)">
                     <div
                       v-if="typeof contact[column.name][0].phone_number !== 'undefined'"
                       :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
@@ -641,7 +642,7 @@
           </div>
         </template>
         <span
-          v-if="hoverPopover.dataLength > 10"
+          v-if="hoverPopover.dataLength > 11"
           class="ml-1 text-grey-7">
           +{{ (hoverPopover.dataLength - 11) }} more
         </span>
@@ -1274,8 +1275,8 @@ export default {
       return routeData
     },
     datatableOnMouseMove (e) {
-      if (e.target.closest('.contact-tags-item') !== null) {
-        this.datatableTarget = e.target.closest('.contact-tags-item').getAttribute('id')
+      if (e.target.closest('.popover-items') !== null) {
+        this.datatableTarget = e.target.closest('.popover-items').getAttribute('id')
       } else {
         this.datatableTarget = null
       }
@@ -1287,7 +1288,7 @@ export default {
       }
     },
     showPopover: _.debounce(function (title, id, index, colName, e) {
-      if (id !== e.target.id) {
+      if (this.datatableTarget !== id) {
         this.hoverPopover.target = null
         this.hoverPopover.show = false
         return
