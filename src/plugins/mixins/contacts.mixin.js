@@ -105,6 +105,7 @@ export default {
     onSortByField (sorts) {
       this.isLoaded = false
       this.sorts = sorts
+      this.clearContacts()
       this.fetch({
         search: this.search,
         page: 1,
