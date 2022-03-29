@@ -159,6 +159,7 @@ export default function () {
       all: []
     },
     activeTask: {},
+    taskToCall: {},
     selectedDialerSessionId: null,
     sessionPaused: false,
     selectedPdList: {},

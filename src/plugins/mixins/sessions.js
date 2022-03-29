@@ -177,7 +177,9 @@ export default {
       //   this.powerDialerTasks['in_queue'] = res.data.data
       //   this.initialize()
       // }
-      this.initialize()
+      this.wrapUp()
+      this.resetTimer()
+      // this.initialize()
     },
 
     clearWarmUpCountDown () {

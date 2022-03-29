@@ -240,6 +240,7 @@ export default {
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
+      'taskToCall',
       'hubspot'
     ]),
     ...mapState([
@@ -417,7 +418,6 @@ export default {
       this.findDefaultOutboundCampaign()
     }
     this.$VueEvent.listen('initiate_session', (session) => {
-      console.log('4325435435 :>> ', 4325435435)
       this.initialize()
     })
   },
@@ -459,14 +459,7 @@ export default {
           // if there are no more unskipped tasks
           if (tasks.length === 0) {
             this.fetchAutoDialTasks(AutoDialTaskStatus.STATUS_QUEUED)
-            this.$notify({
-              duration: 5000,
-              offset: 175,
-              title: 'PowerDialer',
-              message: 'All remaining tasks are skipped.',
-              type: 'warning',
-              showClose: true
-            })
+            this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
             this.stop()
             return
           }
@@ -556,7 +549,9 @@ export default {
 
     async initialize () {
       console.log('Initializing needed data...')
-      this.TOGGLE_SESSION_LOADER(true)
+      if (!this.flagged) {
+        this.TOGGLE_SESSION_LOADER(true)
+      }
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
         this.reRoute()
@@ -698,8 +693,8 @@ export default {
     countdownTimer () {
       if (this.timerIsOver) {
         if (this.wrapUp) {
-          this.initialize()
           this.wrapUp = false
+          this.initialize()
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -739,6 +734,7 @@ export default {
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
+      console.log('tasks ------------ :>> ', tasks)
       if (tasks.length === 0 && !this.togglePause) {
         this.shouldRedirect = true
       }
@@ -798,7 +794,6 @@ export default {
         group: 'Google Map List',
         line: 'Bently Personal'
       },
-      taskToCall: {},
       flagged: false,
       autoDialer: {
         outbound_campaign_id: null,
