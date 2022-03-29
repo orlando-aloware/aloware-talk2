@@ -1,7 +1,9 @@
 <template>
   <div
     class="d-flex flex-column"
-    :class="[paginated ? 'paginated' : '']">
+    :class="[paginated ? 'paginated' : '']"
+    @mousemove="$emit('onMouseMove', $event)"
+    @mouseleave="$emit('onMouseLeave', $event)">
     <div
       ref="scrollableArea"
       :class="scrollableAreaClasses"

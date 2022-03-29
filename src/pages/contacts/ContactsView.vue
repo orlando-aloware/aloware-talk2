@@ -252,8 +252,8 @@
         :current-page="this.fixedContactsData.current_page"
         :last-page="this.fixedContactsData.last_page"
         v-if="listItemsHasData"
-        @mousemove="checkMouseTarget($event)"
-        @mouseleave="checkMouseTarget($event)"
+        @onMouseMove="datatableOnMouseMove"
+        @onMouseLeave="datatableOnMouseMove"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
         @sort="onSortByField"
@@ -603,6 +603,7 @@
       </datatable>
 
       <b-popover
+        v-if="hoverPopover.target"
         triggers="hover"
         placement="topright"
         boundary="window"
@@ -639,6 +640,11 @@
             </span>
           </div>
         </template>
+        <span
+          v-if="hoverPopover.dataLength > 10"
+          class="ml-1 text-grey-7">
+          +{{ (hoverPopover.dataLength - 11) }} more
+        </span>
       </b-popover>
     </template>
     <template slot="filters">
@@ -787,10 +793,9 @@ export default {
         target: '',
         show: false,
         data: [],
-        cancelled: false,
-        isOut: false,
-        currentTarget: null
+        dataLength: 0
       },
+      datatableTarget: null,
       countFields: [
         'unread_texts_count',
         'unread_missed_calls_count',
@@ -1268,40 +1273,46 @@ export default {
 
       return routeData
     },
-    checkMouseTarget (e) {
-      if (this.hoverPopover.currentTarget !== e.target.id) {
-        this.hoverPopover.currentTarget = null
+    datatableOnMouseMove (e) {
+      if (e.target.closest('.contact-tags-item') !== null) {
+        this.datatableTarget = e.target.closest('.contact-tags-item').getAttribute('id')
+      } else {
+        this.datatableTarget = null
+      }
+
+      if (this.hoverPopover.target !== this.datatableTarget) {
+        this.hoverPopover.target = null
         this.hoverPopover.show = false
         return false
       }
-      return true
     },
     showPopover: _.debounce(function (title, id, index, colName, e) {
-      if (!this.checkMouseTarget) {
+      if (id !== e.target.id) {
+        this.hoverPopover.target = null
+        this.hoverPopover.show = false
+        return
+      }
+
+      if (this.datatableTarget !== e.target.id) {
         return
       }
 
       this.hoverPopover.key = (this.hoverPopover.key + 1)
       this.hoverPopover.title = title
       this.hoverPopover.target = id
-      this.hoverPopover.data = this.fixedContactsData.data[index][colName]
+      this.hoverPopover.data = this.fixedContactsData.data[index][colName].slice(0, 10)
+      this.hoverPopover.dataLength = this.fixedContactsData.data[index][colName].length
       this.hoverPopover.show = true
-      this.hoverPopover.cancelled = false
     }, 200),
     onMouseOverPopover (title, id, index, colName, e) {
-      // console.log('over event: ', e)
       this.showPopover(title, id, index, colName, e)
     },
     onMouseLeavePopover (e) {
-      this.hoverPopover.target = ''
+      this.hoverPopover.target = null
       this.hoverPopover.title = ''
       this.hoverPopover.show = false
       this.hoverPopover.data = []
-      this.hoverPopover.currentTarget = null
-      const id = _.get(e.target, 'firstElementChild.id', null)
-      if (id) {
-        this.hoverPopover.currentTarget = e.target.firstElementChild.id
-      }
+      this.hoverPopover.dataLength = 0
     },
     onNavigate (contactId, e) {
       e.preventDefault()
