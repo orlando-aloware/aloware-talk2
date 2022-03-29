@@ -8262,6 +8262,10 @@ span.mention {
     padding-top: 20px;
     padding-left: 18px;
   }
+
+  &.public-lists .item-empty {
+    padding-top: 4px;
+  }
 }
 
 .contacts {
