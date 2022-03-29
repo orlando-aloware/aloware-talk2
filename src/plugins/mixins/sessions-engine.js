@@ -53,8 +53,9 @@ export default {
       this.setShowPhone(false)
     },
     onStatusInProgress (task) {
+      console.log('task ========================== :>> ', task)
       this.activeTask = this.powerLists?.find(lst => lst.contact_list_item_id === task.id)
-      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
+      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
     onStatusCompleted (task) {
       console.log('3333333333 :>> ', 3333333333)

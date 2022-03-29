@@ -159,6 +159,7 @@ import {
   DEFAULT_COLUMNS,
   POWER_DIALER_DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
+import { ALL_RELATIONS } from 'src/constants/contacts-default-relations'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
@@ -173,6 +174,12 @@ export default {
   props: {
     predefinedId: {
       default: null
+    },
+    previousRelations: {
+      type: Array,
+      default () {
+        return []
+      }
     }
   },
   components: {
@@ -257,8 +264,9 @@ export default {
       this.columnsClose()
 
       // we need to reload contacts data to include relations data
-      const relations = this.currentColumns.filter(item => ['broadcasts', 'tags', 'campaigns', 'ring_groups', 'contact_lists'].includes(item.name))
-      if (relations.length) {
+      const relations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
+      if (relations.length && this.hasAddedRelation) {
+        this.$VueEvent.fire('clearContacts')
         this.$VueEvent.fire('fetchContacts')
       }
     },
@@ -333,9 +341,29 @@ export default {
 
       // this.closeAndReset()
     },
+    getAllActiveColumns () {
+      const columns = JSON.parse(JSON.stringify(this.activeColumns))
+      const headers = _.get(this.columns, 'headers', [])
+
+      if (_.isEmpty(headers)) {
+        return columns
+      }
+
+      const newColumns = JSON.parse(JSON.stringify(headers))
+      const index = { data: null }
+      const found = { data: null }
+      for (index.data in columns) {
+        found.data = newColumns.find(item => item.name === columns[index.data].name)
+        if (found.data === undefined) {
+          newColumns.splice((parseInt(index.data) + 1), 0, columns[index.data])
+        }
+      }
+
+      return newColumns
+    },
     onModalShow () {
       this.searchText = ''
-      this.currentColumns = JSON.parse(JSON.stringify(this.activeColumns))
+      this.currentColumns = this.getAllActiveColumns()
     },
     onConfirmSave () {
       this.confirmedSave = false
@@ -345,8 +373,8 @@ export default {
   computed: {
     ...mapGetters('contacts', ['columns']),
     resourceId () {
-      let id = this.columns?.id === 'my-queue' ? this.predefinedId : this.columns?.id
-      return `${id}`
+      const columnsId = _.get(this.columns, 'id', '')
+      return columnsId === 'my-queue' ? this.predefinedId : columnsId
     },
     title () {
       const title = this.columns?.name || 'My Queue'
@@ -400,23 +428,11 @@ export default {
       return 'power-dialer-lists'
     },
     activeColumns () {
-      const columns = this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
-
-      if (_.isEmpty(this.columns.headers)) {
-        return columns
-      }
-
-      const newColumns = JSON.parse(JSON.stringify(this.columns.headers))
-      const index = { data: null }
-      const found = { data: null }
-      for (index.data in columns) {
-        found.data = newColumns.find(item => item.name === columns[index.data].name)
-        if (found.data === undefined) {
-          newColumns.splice((parseInt(index.data) + 1), 0, columns[index.data])
-        }
-      }
-
-      return newColumns
+      return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
+    },
+    hasAddedRelation () {
+      const currentRelations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
+      return currentRelations.length > this.previousRelations.length
     }
   },
   watch: {
