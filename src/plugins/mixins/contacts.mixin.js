@@ -30,6 +30,7 @@ export default {
         data: []
       },
       isNavigated: false,
+      previousRelations: [],
       ALL_COLUMNS
     }
   },
@@ -190,9 +191,12 @@ export default {
     processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
+
       if (this.$route.name === 'Contacts' || this.$route.meta.id === 'power-dialer-add-queue-list') {
+        this.previousRelations = this.contactsRelations
         params.relations = this.contactsRelations
       }
+
       if (this.$route.name === 'Power Dialer') {
         this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }

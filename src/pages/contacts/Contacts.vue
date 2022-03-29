@@ -34,7 +34,8 @@
       </router-view>
     </div>
     <remove-folder-dialog v-if="isActive" />
-    <column-headers v-if="isActive" />
+    <column-headers v-if="isActive"
+                    :previousRelations="previousRelations" />
     <remove-contact v-if="isActive" />
     <remove-contact-confirmation v-if="isActive"
                                  @contactsRemoved="onRemoveContacts" />
