@@ -62,7 +62,7 @@
         <q-menu content-class="mx-height-300"
                 no-focus
                 no-parent-event
-                :offset="[360, -76]"
+                :offset="[300, -122]"
                 v-model="showEditForm">
           <div class="row no-wrap q-pa-md">
             <contact-name-form @close="onCloseEditForm"></contact-name-form>
