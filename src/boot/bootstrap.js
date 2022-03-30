@@ -169,15 +169,21 @@ Vue.prototype.$handleErrors = function (response, title = null) {
     const error = { data: null }
     switch (response.status) {
       case 401:
-        if (response.data.error) {
+        if (!response.data.errors.length && response.data.error) {
+          message.data = `${response.data.error}`
+        }
+
+        if (response.data.errors.length && response.data.error) {
           message.data = `<p class="pt-1 pb-1">- ${response.data.error}</p>`
         }
+
         if (response.data.errors.length) {
           response.data.errors = ''
           for (error.data of response.data.errors) {
             message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
           }
         }
+
         break
       case 403:
         message.data = 'You do not have enough permissions to make this request.'
@@ -195,7 +201,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         message.data = ''
         const keys = Object.keys(response.data.errors)
         keys.forEach((value) => {
-          message.data += `<p class="pt-1 pb-1">- ${response.data.errors[value]}</p>`
+          message.data += keys.length > 1 ? `<p class="pt-1 pb-1">- ${response.data.errors[value]}</p>` : response.data.errors[value]
         })
         break
       case 500:
