@@ -62,6 +62,7 @@ export default {
         this.saveChanges(),
         this.disposeContact()
       ]).then(response => {
+        this.$VueEvent.fire('contactUpdated')
         if ((response[0] && response[0].status) || (response[1] && response[1].status)) {
           const contactData = { contact: null }
 

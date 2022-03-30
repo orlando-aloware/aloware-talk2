@@ -1585,6 +1585,11 @@ export default {
       handler: function () {
         this.hasNextPage = !_.isEmpty(this.fixedContactsData.next_page_url)
       }
+    },
+    showMyContacts (value) {
+      if (this.myContacts !== value) {
+        this.myContacts = value
+      }
     }
   }
 }
