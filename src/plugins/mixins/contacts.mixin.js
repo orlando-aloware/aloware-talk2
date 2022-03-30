@@ -241,10 +241,12 @@ export default {
         .finally(() => {
           this.isLoading = false
           this.isLoaded = true
+          this.isLoadingMore = false
         })
         .catch((err) => {
           this.isLoading = false
           this.isLoaded = true
+          this.isLoadingMore = false
           this.setListContactsLoaded(true)
           console.log(err)
         })
