@@ -89,7 +89,8 @@ export default {
       'setSelectedListContactCount',
       'setSelectedList',
       'setListContactsLoaded',
-      'setContact'
+      'setContact',
+      'listLoaded'
     ]),
     ...mapActions('powerDialer', [
       'updateMyQueueListData',
@@ -306,7 +307,7 @@ export default {
 
       query.filter_groups = []
 
-      if (typeof this.lists[this.id] !== 'undefined' && this.lists[this.id].type === ContactListTypes.STATIC) {
+      if (this.list && this.list.type === ContactListTypes.STATIC) {
         query.filter_groups = [
           {
             filters: {
@@ -487,6 +488,24 @@ export default {
       this.$VueEvent.stop('fetchContacts')
       this.$VueEvent.stop('clearContacts')
       this.$VueEvent.stop('onLoadMoreContacts')
+    },
+    getListData () {
+      return this.$axios
+        .get('/api/v2/contacts-list/' + this.id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
+        .then((response) => response.data)
+        .then((response) => {
+          this.listLoaded({ ...response, id: this.id })
+          this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+        })
+    },
+    loadData () {
+      if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all') {
+        this.getListData().then(() => {
+          this.init()
+        })
+      } else {
+        this.init()
+      }
     }
   },
 
@@ -641,24 +660,14 @@ export default {
   },
 
   watch: {
-    // 'list.filters': function () {
-    //   this.init()
-    // },
     currentListFilters: {
       deep: true,
       handler: function () {
         if (this.$route.name === 'Contacts') {
-          // const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          // this.fetch(params)
           this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
       }
     },
-    // 'list.id': function (value) {
-    //   if (value && this.$route.name === 'Contacts') {
-    //     this.clearContacts()
-    //   }
-    // },
     $route (to, from) {
       this.isNavigated = false
 
@@ -672,10 +681,6 @@ export default {
         this.isNavigated = true
       }
 
-      // if ((from.name === 'Contacts' && to.name === 'Contacts') || (from.name === 'Power Dialer' && to.name === 'Power Dialer')) {
-      //   this.isNavigated = false
-      // }
-
       if ((from.name === 'Contact' && to.name === 'Contacts' && this.hasContactsListChanges) ||
         (from.name === 'Contacts' && to.name === 'Contacts' && from.path !== to.path)) {
         this.hasContactsListChanges = false
@@ -686,7 +691,7 @@ export default {
         return
       }
 
-      this.init()
+      this.loadData()
     }
   },
 

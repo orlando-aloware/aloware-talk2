@@ -57,7 +57,6 @@ export default {
     ...mapActions('contacts', ['setShowContactsListSidebar', 'setUnsavedList']),
     toggleSidebar (event, route) {
       event.preventDefault()
-      console.log(route)
       if (this.unsavedList) {
         this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
           buttonSize: 'sm',

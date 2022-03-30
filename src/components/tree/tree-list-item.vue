@@ -1,6 +1,6 @@
 <template>
   <div class="folder d-flex align-items-center"
-       :class="{ 'folder--active': activeFolder && id !== undefined ? true : id === undefined ? true : false }">
+       :class="{ 'folder--active': activeFolder && id !== undefined ? true : id === undefined }">
     <div class="folder__arrow">
       <folder-arrow-close-icon class="transparent">
       </folder-arrow-close-icon>
@@ -104,8 +104,11 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import contactsListCountMixin from 'src/plugins/mixins/contacts-list-count.mixin'
 
 export default {
+  mixins: [contactsListCountMixin],
+
   components: {
     FolderArrowCloseIcon,
     FolderOption,
@@ -115,6 +118,7 @@ export default {
     UnsavedIcon,
     ListActions
   },
+
   props: {
     id: {
       type: Number
@@ -139,6 +143,7 @@ export default {
       type: Number
     }
   },
+
   data () {
     return {
       ContactListTypes,
@@ -149,6 +154,7 @@ export default {
       folderInterval: null
     }
   },
+
   computed: {
     ...mapGetters('contacts', [
       'pinned',
@@ -200,6 +206,7 @@ export default {
       return this.unsavedList?.id || ''
     }
   },
+
   mounted () {
     if (!this.isMobile) {
       this.folderExists = true
@@ -219,6 +226,7 @@ export default {
       }, 500)
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'removeListOpen',
@@ -285,27 +293,45 @@ export default {
         isPinned
       })
 
-      if (isPinned && this.type === ContactListTypes.STATIC) {
-        this.$axios
-          .get(`api/v2/contacts-list/${this.id}/items?per_page=1`)
-          .then((response) => {
-            this.pinnedCountLoaded({
-              id: this.id,
-              count: response.data.total
-            })
+      if (isPinned) {
+        if (this.type === ContactListTypes.STATIC) {
+          this.listLoaded({
+            id: this.id,
+            name: this.name,
+            type: this.type
           })
+          this.setDataCount({ filters: {
+            0: {
+              filters: {
+                contact_lists: {
+                  operator: 1,
+                  value: [this.id]
+                }
+              },
+              is_conjunction: true
+            }
+          } })
+        }
+
+        if (this.type === ContactListTypes.DYNAMIC) {
+          this.getContactList(this.id).then((response) => {
+            this.listLoaded(response)
+            if (this.type === ContactListTypes.DYNAMIC) {
+              this.setDataCount(response)
+            }
+          })
+        }
       }
 
-      this.listLoaded({
-        id: this.id,
-        name: this.name,
-        type: this.type
-      })
-
       this.pinRequest(this.id, isPinned).finally(() => {
-        this.getContactList(this.id).then((response) => {
-          this.listLoaded(response)
-          this.$generalNotification((isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.'))
+        this.$generalNotification((isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.'))
+      })
+    },
+    setDataCount (data) {
+      this.getListDataCount(data).then(response => {
+        this.pinnedCountLoaded({
+          id: this.id,
+          count: response.data.count
         })
       })
     },
@@ -436,6 +462,7 @@ export default {
       }
     }
   },
+
   beforeDestroy () {
     clearTimeout(this.inputTimeout)
     clearInterval(this.folderInterval)

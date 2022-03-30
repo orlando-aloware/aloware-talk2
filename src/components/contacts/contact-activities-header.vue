@@ -5,7 +5,7 @@
                    v-if="$q.screen.lt.md"
                    @click="back"/>
       <div class="contact-name">{{ label }}</div>
-      <b-badge class="d-flex align-items-center font-weight-light badge-task-status"
+      <b-badge class="d-flex align-items-center badge-task-status"
                :variant="resolveVariant"
                v-if="contact.task_status">
         {{ contact.task_status | fixTaskStatusName }}

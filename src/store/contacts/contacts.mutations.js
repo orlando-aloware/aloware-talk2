@@ -425,5 +425,18 @@ export default {
   },
   SET_LIST_CONTACTS_LOADED (state, value) {
     state.listContactsLoaded = value
+  },
+  SET_LIST_CONTACT_OWNER (state, ownerId) {
+    Vue.set(state.lists, `my-contacts`, Object.assign(state.lists['my-contacts'], { filters: {
+      0: {
+        filters: {
+          contact_owner: {
+            operator: 1,
+            value: [ownerId]
+          }
+        },
+        is_conjunction: true
+      }
+    } }))
   }
 }

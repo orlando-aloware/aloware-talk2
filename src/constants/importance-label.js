@@ -1,0 +1,2 @@
+export const IMPORTANCE_C_LEVEL = 1
+export const IMPORTANCE_RESTRICTED = 2

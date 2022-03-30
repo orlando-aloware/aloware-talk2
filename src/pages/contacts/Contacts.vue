@@ -14,7 +14,7 @@
     <div class="px-0 mb-0 main flex-1"
          :class="mainClass">
       <Contact v-if="$route.name === 'Contact'"></Contact>
-      <router-view v-if="$route.name === 'Contacts'"
+      <router-view v-if="$route.name === 'Contacts' && list"
                    :list="list"
                    :is-loading-disabled="isLoadingDisabled"
                    :is-start-state="isStartState"
@@ -59,7 +59,7 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
+import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Contact from 'pages/contacts/Contact'
 
@@ -73,7 +73,7 @@ export default {
   },
 
   mixins: [
-    ContactsMixins
+    contactsMixins
   ],
 
   components: {
@@ -92,7 +92,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated']),
+    ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('contacts', ['showContactsListSidebar', 'unsavedList']),
     ...mapState(['isMobile']),
     mainClass () {
@@ -117,18 +117,25 @@ export default {
     }
   },
 
+  created () {
+    this.setListContactOwner(this.profile.id)
+  },
+
   mounted () {
     this.setShowContactsHeader(true)
     if (this.isMobile) {
       this.toggleSidebar()
     }
+
+    this.loadData()
   },
 
   methods: {
     ...mapActions('contacts', [
       'setShowContactsListSidebar',
       'setShowContactsHeader',
-      'setUnsavedList'
+      'setUnsavedList',
+      'setListContactOwner'
     ]),
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
