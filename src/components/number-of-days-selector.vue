@@ -84,7 +84,7 @@ export default {
     }
   },
   methods: {
-    onSelect (value) {
+    onSelect () {
       this.$emit('select', this.frequenciesValues)
     },
     onRemove () {
