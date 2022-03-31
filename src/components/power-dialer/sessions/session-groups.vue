@@ -228,12 +228,12 @@ export default {
       let { powerDialerTasks, activeTask, taskToCall } = this
       let foundTask = activeTask.id ? activeTask : taskToCall
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        console.log(`${task.contact_list_item_id} === ${foundTask.contact_list_item_id}`)
+        // console.log(`${task.contact_list_item_id} === ${foundTask.contact_list_item_id}`)
         return task.contact_list_item_id !== foundTask.contact_list_item_id
       })
-      console.log('foundTask :>> ', foundTask)
-      console.log('inQueue :>> ', inQueue)
-      console.log('this.powerDialerTasks.in_queue :>> ', this.powerDialerTasks.in_queue)
+      // console.log('foundTask :>> ', foundTask)
+      // console.log('inQueue :>> ', inQueue)
+      // console.log('this.powerDialerTasks.in_queue :>> ', this.powerDialerTasks.in_queue)
       return {
         ...powerDialerTasks,
         in_queue: inQueue
