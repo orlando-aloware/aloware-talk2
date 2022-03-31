@@ -293,7 +293,7 @@ export default {
     },
     isReopened () {
       return this.$route.params.status &&
-        this.$route.params.status !== 'open' &&
+        ['pending', 'closed'].includes(this.$route.params.status) &&
         this.$options.filters.fixTaskStatusName(this.contact.task_status).toLowerCase() === 'open' &&
         !this.loadingContact &&
         !this.isLive

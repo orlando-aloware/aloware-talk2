@@ -87,6 +87,83 @@
         </q-tooltip>
         <call-icon></call-icon>
       </b-button>
+
+      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
+                variant="light"
+                size="sm"
+                class="custom-action-button"
+                :disabled="isProcessingBlock"
+                @click="blockContact">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle">
+          Block
+        </q-tooltip>
+        <i v-if="!isProcessingBlock"
+           class="fa fa-lock">
+        </i>
+        <q-spinner-bars v-if="isProcessingBlock"
+                        class="mr-1"
+                        color="white" />
+      </b-button>
+
+      <b-button v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
+                variant="light"
+                size="sm"
+                class="custom-action-button"
+                :disabled="isProcessingBlock"
+                @click="unBlockContact">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle">
+          Unblock
+        </q-tooltip>
+        <q-spinner-bars v-if="isProcessingBlock"
+                        class="mr-1"
+                        color="white" />
+        <i v-if="!isProcessingBlock"
+           class="fa fa-lock-open">
+        </i>
+      </b-button>
+
+      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_dnc"
+                variant="light"
+                size="sm"
+                class="custom-action-button"
+                :disabled="isProcessingDNC"
+                @click="dncContact">
+        <q-tooltip v-if="!contact.is_dnc"
+                   anchor="bottom middle"
+                   self="center middle">
+          DNC
+        </q-tooltip>
+
+        <q-spinner-bars v-if="isProcessingDNC"
+                        class="mr-1"
+                        color="white" />
+        <i v-if="!isProcessingDNC"
+           class="fa fa-ban">
+        </i>
+      </b-button>
+
+      <b-button v-if="hasRole('Company Admin') && contact.is_dnc && currentCompany && [CompanyImportance.IMPORTANCE_RESTRICTED, CompanyImportance.IMPORTANCE_C_LEVEL].includes(currentCompany.importance)"
+                variant="light"
+                size="sm"
+                class="custom-action-button"
+                :disabled="isProcessingDNC"
+                @click="unDncContact">
+        <q-tooltip v-if="contact.is_dnc"
+                   anchor="bottom middle"
+                   self="center middle">
+          Un-DNC
+        </q-tooltip>
+
+        <q-spinner-bars v-if="isProcessingDNC"
+                        class="mr-1"
+                        color="white" />
+        <i v-if="!isProcessingDNC"
+           class="fa fa-ban">
+        </i>
+      </b-button>
+
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button"
@@ -129,82 +206,6 @@
           Add to power dialer
         </q-tooltip>
         <add-call-icon></add-call-icon>
-      </b-button>
-
-      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="isProcessingBlock"
-                @click="blockContact">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Block
-        </q-tooltip>
-        <i v-if="!isProcessingBlock"
-           class="fa fa-lock">
-        </i>
-        <q-spinner-bars v-if="isProcessingBlock"
-                        class="mr-1"
-                        color="white" />
-      </b-button>
-
-      <b-button v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="isProcessingBlock"
-                @click="unBlockContact">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Unblock
-        </q-tooltip>
-        <q-spinner-bars v-if="isProcessingBlock"
-                        class="mr-1"
-                        color="white" />
-        <i v-if="!isProcessingBlock"
-              class="fa fa-lock-open">
-        </i>
-      </b-button>
-
-      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_dnc"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="isProcessingDNC"
-                @click="dncContact">
-        <q-tooltip v-if="!contact.is_dnc"
-                   anchor="bottom middle"
-                   self="center middle">
-          DNC
-        </q-tooltip>
-
-        <q-spinner-bars v-if="isProcessingDNC"
-                        class="mr-1"
-                        color="white" />
-        <i v-if="!isProcessingDNC"
-           class="fa fa-ban">
-        </i>
-      </b-button>
-
-      <b-button v-if="hasRole('Company Admin') && contact.is_dnc && currentCompany && [CompanyImportance.IMPORTANCE_RESTRICTED, CompanyImportance.IMPORTANCE_C_LEVEL].includes(currentCompany.importance)"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="isProcessingDNC"
-                @click="unDncContact">
-        <q-tooltip v-if="contact.is_dnc"
-                   anchor="bottom middle"
-                   self="center middle">
-          Un-DNC
-        </q-tooltip>
-
-        <q-spinner-bars v-if="isProcessingDNC"
-                        class="mr-1"
-                        color="white" />
-        <i v-if="!isProcessingDNC"
-           class="fa fa-ban">
-        </i>
       </b-button>
     </div>
     <appointment-form-modal :contact="contact"></appointment-form-modal>

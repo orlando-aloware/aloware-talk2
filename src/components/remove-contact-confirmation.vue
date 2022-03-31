@@ -146,6 +146,9 @@ export default {
           url.data
         )
         .then(() => {
+          this.$VueEvent.fire('clearContacts')
+          this.$VueEvent.fire('fetchContacts')
+          this.$VueEvent.fire('shouldUpdateListCount')
           this.$generalNotification('Contact was successfully removed.')
         })
         .catch((_err) => {
@@ -190,7 +193,6 @@ export default {
         })
     },
     onConfirm () {
-      this.setShouldUpdateSelectedListContactCount(true)
       if (this.contactToRemove && !this.isBulkDelete) {
         this.handleSingleDeletion()
       }
