@@ -374,7 +374,7 @@ export default {
     ...mapGetters('contacts', ['columns']),
     resourceId () {
       const columnsId = _.get(this.columns, 'id', '')
-      return columnsId === 'my-queue' ? this.predefinedId : columnsId
+      return columnsId === 'my-queue' ? `${this.predefinedId}` : `${columnsId}`
     },
     title () {
       const title = this.columns?.name || 'My Queue'
