@@ -1,8 +1,8 @@
 <template>
   <div class="t-menu border-top">
-    <contacts-folders
+    <ContactsFolders
       :is-contact-module-type="false">
-    </contacts-folders>
+    </ContactsFolders>
   </div>
 </template>
 

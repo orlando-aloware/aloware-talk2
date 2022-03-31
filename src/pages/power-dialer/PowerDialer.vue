@@ -79,7 +79,7 @@ import powermixin from 'src/plugins/mixins/power-dialer'
 import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
 import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import sessionsMixins from 'src/plugins/mixins/sessions-engine'
-import { isEmpty } from 'lodash'
+// import { isEmpty } from 'lodash'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
@@ -212,25 +212,25 @@ export default {
     ]),
     async fetchContacts () {
       this.TOGGLE_TABLE_LOADER(true)
-      let params = {
-        // 'page': 1,
-        // 'per_page': 25,
-        // 'order': 'desc',
-        // 'sort': 'last_engagement_at'
-      }
-      if (this.listItems[this.id] === undefined) {
-        if (isEmpty(this.id)) {
-          await this.fetchApi(params)
-        } else {
-          // this.contactsLoaded({
-          //   id: this.tempId,
-          //   ...DEFAULT_LIST_ITEMS
-          // })
-          await this.fetchApi(params)
-        }
-      } else {
-        await this.fetchApi(params)
-      }
+      // let params = {
+      //   // 'page': 1,
+      //   // 'per_page': 25,
+      //   // 'order': 'desc',
+      //   // 'sort': 'last_engagement_at'
+      // }
+      // if (this.listItems[this.id] === undefined) {
+      //   if (isEmpty(this.id)) {
+      //     await this.fetchApi(params)
+      //   } else {
+      //     // this.contactsLoaded({
+      //     //   id: this.tempId,
+      //     //   ...DEFAULT_LIST_ITEMS
+      //     // })
+      //     await this.fetchApi(params)
+      //   }
+      // } else {
+      //   await this.fetchApi(params)
+      // }
 
       this.TOGGLE_TABLE_LOADER(false)
     },

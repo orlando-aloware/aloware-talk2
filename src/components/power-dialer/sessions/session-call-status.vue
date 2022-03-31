@@ -7,11 +7,11 @@
             <div
               :class="`text-15 text-lowercase text-capitalize px-2`"
               v-html="statusDisplayButton">
-              <!-- {{ timerCount > 0 ? 'Will call in' : 'Connected: ' }}
+              <!-- {{ countdownTimer > 0 ? 'Will call in' : 'Connected: ' }}
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
-                v-if="timerCount > 0">
-                {{ timerCount }}s
+                v-if="countdownTimer > 0">
+                {{ countdownTimer }}s
               </span>
               <span
                 class="text-weight-bold text-grey-7 text-lowercase"
@@ -97,7 +97,9 @@
         </div>
       </div> -->
       <div class="d-flex align-items-center p-0">
-        <div class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
+        <div
+          v-if="timezone"
+          class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
           <DropIcon
             width="18px"
             height="18px"
@@ -228,6 +230,9 @@ export default {
       vm.prevRoute = from
     })
   },
+  beforeDestroy () {
+    this.clearWarmUpCountDown()
+  },
   computed: {
     ...mapFields([
       'sessionPhoneExpansion'
@@ -235,6 +240,7 @@ export default {
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
+      'taskToCall',
       'hubspot'
     ]),
     ...mapState([
@@ -375,7 +381,7 @@ export default {
       return this.dialer.currentStatus === 'READY'
     },
     timerIsOver () {
-      return this.timerCount === 0 || this.timerCount === -1
+      return this.countdownTimer === 0 || this.countdownTimer === -1
     },
     integrationsHubspot () {
       return this.activeTask?.integrations?.hubspot
@@ -396,6 +402,12 @@ export default {
     },
     hasQueuedTaskLists () {
       return this.powerDialerTasks.in_queue.length > 0
+    },
+    allTasksAreSkipped () {
+      if (this.powerDialerTasks.in_queue.length > 0) {
+        return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
+      }
+      return false
     }
   },
   created () {
@@ -405,6 +417,9 @@ export default {
     if (this.campaings) {
       this.findDefaultOutboundCampaign()
     }
+    this.$VueEvent.listen('initiate_session', (session) => {
+      this.initialize()
+    })
   },
   methods: {
     ...mapActions(['setShowPhone']),
@@ -417,9 +432,60 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
-    checkAutoDialer () {
-      // fdsfds
+    // async checkAutoDialer () {
+    //   console.log('Checking PowerDialer for tasks')
+
+    //   // make sure the dialer is not active before making another call
+    //   if (!this.on_call && !this.is_running) {
+    //     if (this.in_progress_tasks.length < this.auto_dialer.ratio && !this.isPause && this.queued_tasks.length > 0) {
+    //       let numberOfTasks = this.auto_dialer.ratio - this.in_progress_tasks.length
+    //       let tasks = this.queued_tasks.filter(task => !this.isSkipped(task.id)).slice(0, numberOfTasks)
+
+    //       for (let task of tasks) {
+    //         // don't run the same task twice
+    //         if (this.last_task && task.id === this.last_task.id) {
+    //           continue
+    //         }
+
+    //         await this.selectTask(task)
+
+    //         if (this.warm_up_seconds > 0) {
+    //           this.startWarmUpCountDown(task)
+    //         } else {
+    //           this.runTask(task)
+    //         }
+    //       }
+
+    //       // if there are no more unskipped tasks
+    //       if (tasks.length === 0) {
+    //         this.fetchAutoDialTasks(AutoDialTaskStatus.STATUS_QUEUED)
+    //         this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
+    //         this.stop()
+    //         return
+    //       }
+
+    //       return
+    //     }
+    //   }
+
+    //   if (this.queued_tasks.length === 0 && this.in_progress_tasks.length === 0) {
+    //     console.log('Stopping PowerDialer: No more tasks found')
+    //     this.stop()
+    //   }
+    // },
+
+    async selectTask (autoDialTask) {
+      // exit function when autoDialTask is not set
+      if (!autoDialTask) {
+        return
+      }
+      // load selected contact once
+      if (!this.selected_contact || this.selected_contact.id !== autoDialTask.contact_id) {
+        await this.fetchContactInfo(autoDialTask.contact_id)
+      }
+      this.selectedAutoDialTask = autoDialTask
     },
+
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
 
@@ -452,51 +518,56 @@ export default {
         this.auto_dialer.outbound_campaign_id = null
       }
     },
-
-    async tickTimer () {
-      if (this.hasQueuedTaskLists) {
-        if (this.timerCount > 0) {
-          setTimeout(() => {
-            this.timerCount--
-          }, 1000)
-        } else if (this.timerIsOver) {
-          if (this.wrapUp) {
-            this.wrapUp = false
-            this.resetTimer()
-          } else if (!this.togglePause) {
-            setTimeout(async () => {
-              await this.runTask()
-              this.$VueEvent.fire('togglePhone')
-              this.setShowPhone(false)
-            }, 1000)
-          }
-          if (this.togglePause) {
-            this.sessionPaused = true
-          }
-        }
-      } else {
-        setTimeout(() => {
-          this.timerCount--
-        }, 1000)
-      }
-    },
     runTimer () {
-      setInterval(() => {
-        if (this.timerCount > 0) {
-          this.timerCount--
+      if (this.timerIsOver) {
+        clearInterval(this.countdownTimer)
+        return
+      }
+
+      this.countdownTimer = setInterval(() => {
+        this.countdownTimer--
+      }, 1000)
+    },
+    startWarmUpCountDown (task) {
+      if (this.warm_up_seconds === 0 || this.countdownStarted) {
+        return
+      }
+
+      this.countdownStarted = true
+      this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      this.countdownInterval = setInterval(() => {
+        this.countdownTimer--
+        // console.log(`Counting down: ${this.countdownTimer}`)
+        if (this.countdownTimer === 0) {
+          this.clearWarmUpCountDown()
+          if (!this.togglePause) {
+            this.runTask(task)
+          }
         }
       }, 1000)
     },
+
     async initialize () {
-      this.TOGGLE_SESSION_LOADER(true)
-      if (!this.statusCallConnected && this.hasQueuedTaskLists) {
+      console.log('Initializing needed data...')
+      if (!this.flagged) {
+        this.TOGGLE_SESSION_LOADER(true)
+      }
+      if (this.allTasksAreSkipped) {
+        this.clearWarmUpCountDown()
+        this.reRoute()
+        this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
+        return
+      }
+      if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
+        // this.activeTask = this.taskToCall
         await this.fetchContact(this.taskToCall.id)
         if (!this.wrapUp) {
           this.resetTimer()
+          console.log('Resetting timer from init...')
           setTimeout(() => {
-            this.runTimer()
-          }, 2000)
+            this.startWarmUpCountDown()
+          }, 1000)
         }
       }
 
@@ -536,7 +607,7 @@ export default {
     },
     resetTimer () {
       setTimeout(() => {
-        this.timerCount = this.sessionSettings.warmup_period_in_seconds
+        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }, 500)
     },
     reRoute () {
@@ -588,12 +659,7 @@ export default {
           break
       }
     },
-    prepareNextContact () {
-      if (this.statusReady && this.taskToCall?.id !== this.powerDialerTasks.in_queue[0]?.id) {
-        this.taskToCall = this.powerDialerTasks.in_queue[0]
-        this.activeTask = this.taskToCall
-      }
-    },
+
     openAdd () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'add'
@@ -612,88 +678,51 @@ export default {
       // setTimeout(() => {
       //   this.expanded = true
       // }, 50)
+    },
+    async onPreRunTask () {
+      if (this.allTasksAreSkipped) {
+        this.reRoute()
+        return
+      }
+      await this.runTask()
     }
   },
   mounted () {
     this.$options.auto_dialer_interval = 'lfdsfsd'
   },
   watch: {
+    countdownTimer () {
+      if (this.timerIsOver) {
+        if (this.wrapUp) {
+          this.wrapUp = false
+          this.initialize()
+        }
+        if (this.togglePause) {
+          this.sessionPaused = true
+        }
+      }
+    },
     currentCompany () {
       if (!this.autoDialer.outbound_campaign_id && this.togglePause) {
         // find default outbound campaign
         this.findDefaultOutboundCampaign()
       }
     },
-    autoDialerTimerEnabled (val) {
-      if (this.autoDialerTimerEnabled === true) {
-        this.checkAutoDialer()
-        // Check every 2 seconds
-        this.$options.auto_dialer_interval = setInterval(this.checkAutoDialer, 2000)
-      } else {
-        clearInterval(this.$options.auto_dialer_interval)
-      }
-    },
-
-    // async taskToCall (task) {
-    //   if (task?.id) {
-    //     await this.fetchContact(this.taskToCall?.id)
-    //     if (!this.wrapUp) {
-    //       this.resetTimer()
-    //     }
-    //   }
-    //   // this.setContactClone(task)
-    // },
-    // async activeTask (task) {
-    //   if (!task && this.togglePause) {
-    //     this.sessionPaused = true
-    //   }
-    //   if (!task?.id && !this.hasQueuedTaskLists) {
-    //     this.reRoute()
-    //   }
-    // },
-    timerCount: {
-      async handler (value) {
-        if (this.timerIsOver && !this.statusCallConnected) {
-          if (this.toggleEnd) {
-            this.reRoute()
-          }
-          if (this.hasQueuedTaskLists) {
-            this.prepareNextContact()
-          } else {
-            this.reRoute()
-          }
-        }
-        if (this.timerIsOver) {
-          if (this.togglePause) {
-            this.sessionPaused = true
-          }
-          if (this.wrapUp) {
-            this.wrapUp = false
-            this.resetTimer()
-          } else if (!this.togglePause) {
-            setTimeout(async () => {
-              await this.runTask()
-              this.$VueEvent.fire('togglePhone')
-              this.setShowPhone(false)
-            })
-          }
-        }
-      },
-      deep: true
-      // immediate: true // This ensures the watcher is triggered upon creation
-    },
-    // async hasQueuedTaskLists (isTrue) {
-    //   if (isTrue) {
-    //     await this.tickTimer()
+    // autoDialerTimerEnabled (val) {
+    //   if (this.autoDialerTimerEnabled === true) {
+    //     this.checkAutoDialer()
+    //     // Check every 2 seconds
+    //     this.$options.auto_dialer_interval = setInterval(this.checkAutoDialer, 2000)
+    //   } else {
+    //     clearInterval(this.$options.auto_dialer_interval)
     //   }
     // },
     togglePause (value) {
       if (!value) {
         if (this.timerIsOver) {
-          console.log('88888 :>> ', 88888)
           setTimeout(() => {
+            this.initialize()
             this.sessionPaused = false
-            this.resetTimer()
           }, 1000)
         }
       }
@@ -706,7 +735,7 @@ export default {
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
-      if (tasks.length === 0) {
+      if (tasks.length === 0 && !this.togglePause) {
         this.shouldRedirect = true
       }
       if (tasks.length > 0 && !this.flagged) {
@@ -731,18 +760,20 @@ export default {
     },
     wrapUp (value) {
       if (value) {
-
+        this.startWarmUpCountDown()
       }
     }
   },
   data () {
     return {
+      countdownStarted: false,
+      countdownTimer: -1,
+      countdownInterval: null,
       skippedTasks: [],
-      autoDialerTimerEnabled: false,
+      // autoDialerTimerEnabled: false,
       prevRoute: null,
       shouldRedirect: false,
       wrapUp: false,
-      timerCount: -1,
       loading: false,
       statuses: {
         pause: false,
@@ -763,7 +794,6 @@ export default {
         group: 'Google Map List',
         line: 'Bently Personal'
       },
-      taskToCall: {},
       flagged: false,
       autoDialer: {
         outbound_campaign_id: null,

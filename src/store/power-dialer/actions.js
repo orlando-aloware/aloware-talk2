@@ -41,11 +41,13 @@ export default {
     }
     return res.data
   },
-  updateMyQueueListData: ({ commit }, data = []) => {
-    commit('SET_MY_QUEUE_LIST_DATA', data)
+  updateMyQueueListData: ({ commit }, data = {}) => {
+    commit('SET_MY_QUEUE_LIST_DATA', data.data)
+    commit('SET_MY_QUEUE_LIST_FILTERS', data)
   },
   getContact: async ({ commit }, params = {}) => {
     let res = await window.axios.get(`api/v2/contacts/${params.id}`)
+    console.log('res :>> ', res)
     if (res.status === 200) {
       commit('contacts/SET_CONTACT', res.data, { root: true })
       return res.data

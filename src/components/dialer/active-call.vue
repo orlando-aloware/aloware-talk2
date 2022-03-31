@@ -21,7 +21,7 @@
         </template>
         <template v-else>
           <span v-if="dialer.communication">{{ dialer.communication.lead_number | fixPhone }}</span>
-          <span v-else-if="dialer.currentNumber">{{ dialer.currentNumber | fixPhone }}</span>
+          <span v-else-if="dialer.currentNumber">{{ dialerCurrentNumber | fixPhone }}</span>
           <span v-else-if="dialer.parkedCall">{{ dialer.parkedCall.lead_number | fixPhone }}</span>
           <span v-else-if="dialer.call">{{ dialer.call.from | fixPhone }}</span>
           <span class="ml-1 mr-1"
@@ -82,7 +82,8 @@ export default {
     ...mapState('auth', ['profile']),
     ...mapState(['dialer']),
     ...mapFields('powerDialer', [
-      'sessionPaused'
+      'sessionPaused',
+      'activeTask'
     ]),
     phoneStatus () {
       if (!this.dialer.communication) {
@@ -99,6 +100,12 @@ export default {
         default:
           return ''
       }
+    },
+    dialerCurrentNumber () {
+      if (this.dialer.currentNumber.includes('power_dialer')) {
+        return this.activeTask.phone_number
+      }
+      return this.dialer.currentNumber
     }
   },
 
