@@ -491,7 +491,6 @@ export default {
 
   mounted () {
     const _this = this
-    this.setLiveContacts([])
     this.setContacts([])
     this.setStatus()
 

@@ -5,11 +5,11 @@
             option-label="name"
             input-debounce="0"
             ref="contactDispositionSelect"
-            use-input
-            use-chips
-            :emit-value="emitValue"
             map-options
             dense
+            :use-input="useInput"
+            :use-chips="useChips"
+            :emit-value="emitValue"
             :options="contactDispositionsOptions"
             :multiple="multiple"
             :placeholder="placeholder"
@@ -111,6 +111,14 @@ export default {
     },
 
     emitValue: {
+      type: Boolean,
+      default: true
+    },
+    useChips: {
+      type: Boolean,
+      default: true
+    },
+    useInput: {
       type: Boolean,
       default: true
     }

@@ -107,6 +107,11 @@ export default {
           return null
         }
         return window.axios.get(`${suffixV1}contact/${contactId}/integration-data`, params)
+      },
+      unDnc (id, reason) {
+        return window.axios.patch(`${suffixV1}contact/${id}/undnc`, {
+          reason: reason
+        })
       }
     },
     tags: {

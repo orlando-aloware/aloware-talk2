@@ -95,7 +95,7 @@
       class="mr-2 mt-3 p-3"
       variant="success"
       @clicked="applyFilter"
-      :disabled="!validated"
+      :disabled="!isValidated"
     >
       Apply filter
     </compact-btn>
@@ -138,7 +138,7 @@ export default {
         }
       ],
       initialListFilters: [],
-      validated: false,
+      isValidated: false,
       debounceDelay: 0,
       format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' },
       allFilters: []
@@ -230,7 +230,7 @@ export default {
       const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
       const toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
 
-      if (!value.data && currentFilter && !this.validated && toDelete) {
+      if (!value.data && currentFilter && !this.isValidated && toDelete) {
         delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
       } else {
         this.allFilters[this.filterGroupIndex].filters[this.filter.key] = {
@@ -275,14 +275,16 @@ export default {
       this.$refs.filterOperation[0].focus()
     },
     applyFilter () {
-      if (!_.isEqual(this.allFilters, this.currentListFilters)) {
-        this.$VueEvent.fire('clearContacts')
-        this.$VueEvent.fire('fetchContacts')
-      }
-
+      const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.setCurrentListFilters(this.allFilters)
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')
+
+      if (!_.isEqual(this.allFilters, currentListFilters)) {
+        this.setShowMyContacts(false)
+        this.$VueEvent.fire('clearContacts')
+        this.$VueEvent.fire('fetchContacts')
+      }
     },
     getStringValue () {
       return JSON.parse(JSON.stringify(this.filterOperatorValue))
@@ -317,18 +319,21 @@ export default {
         case 'string':
         case 'relation':
         case 'multi_relation':
-          this.validated = this.filterOperator && (!this.hasValue || (this.hasValue && this.filterOperatorValue))
+          this.isValidated = this.filterOperator && (!this.hasValue || (this.hasValue && this.filterOperatorValue))
           break
         case 'number':
-          this.validated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
+          this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
             (this.filterOperatorValue && !this.hasSecondaryOperator) || this.filterOperator === 8
           break
         case 'date':
-          this.validated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
+          this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
             ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
           break
+        case 'boolean':
+          this.isValidated = true
+          break
         default:
-          this.validated = false
+          this.isValidated = false
       }
     },
     resetForm () {
@@ -337,7 +342,11 @@ export default {
         this.filterOperatorValue = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, [])
       })
     },
-    ...mapActions('contacts', [ 'setCurrentListFilters' ])
+    updateIsValidated (value) {
+      this.isValidated = value
+      this.filterOperatorValue = 1
+    },
+    ...mapActions('contacts', [ 'setCurrentListFilters', 'setShowMyContacts' ])
   },
   watch: {
     filterOperator () {

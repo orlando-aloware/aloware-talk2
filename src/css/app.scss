@@ -2089,7 +2089,7 @@ i.option-separator {
 
   .contact-action-button {
     button:not(:last-child) {
-      margin-right: 10px;
+      margin-right: 8px;
     }
 
     .custom-action-button {
@@ -8261,6 +8261,10 @@ span.mention {
   .item-empty {
     padding-top: 20px;
     padding-left: 18px;
+  }
+
+  &.public-lists .item-empty {
+    padding-top: 4px;
   }
 }
 
