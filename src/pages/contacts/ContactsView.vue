@@ -195,7 +195,7 @@
           <b-dropdown-item href="#"
                            @click="onShowCreateContact">
             <plus-icon color="#62666E"></plus-icon>
-            Create New Contact & Add to List
+            Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
           </b-dropdown-item>
         </b-dropdown>
 
@@ -1070,13 +1070,15 @@ export default {
       }
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     },
+
     onContactCreated (contact) {
-      if (this.list.type === this.ContactListTypes.STATIC) {
+      if (this.list.type === this.ContactListTypes.STATIC && !this.list.show_in_public_folder) {
         talk2Api.V2.contactListItem.addContact(this.id, [contact]).then(res => {
-          this.setShouldUpdateSelectedListContactCount(true)
+          this.$VueEvent.fire('shouldUpdateListCount')
           this.$VueEvent.fire('fetchContacts')
         })
       } else {
+        this.$VueEvent.fire('shouldUpdateListCount')
         this.$VueEvent.fire('fetchContacts', {
           params: {
             page: this.fixedContactsData.current_page
@@ -1512,15 +1514,13 @@ export default {
     this.$VueEvent.listen('shouldUpdateListCount', function () {
       _this.setDataCount(
         _this.list.type === _this.ContactListTypes.DYNAMIC ? _this.list.filters : {
-          0: {
-            filters: {
-              contact_lists: {
-                operator: 1,
-                value: [_this.list.id]
-              }
-            },
-            is_conjunction: true
-          }
+          filters: {
+            contact_lists: {
+              operator: 1,
+              value: [_this.list.id]
+            }
+          },
+          is_conjunction: true
         }
       )
     })

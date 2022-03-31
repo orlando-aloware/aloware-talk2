@@ -37,7 +37,6 @@ export default {
   },
 
   created () {
-    this.init()
     const hasOrder = { data: null }
     const params = { data: null }
     this.$VueEvent.listen('fetchContacts', (data) => {
@@ -77,6 +76,10 @@ export default {
       //   this.hasContactsListChanges = true
       // }
     })
+  },
+
+  mounted () {
+    this.loadData()
   },
 
   methods: {

@@ -15,7 +15,7 @@
           <q-tooltip v-if="disableFax"
                      anchor="top middle"
                      self="center middle">
-            Selected line is not capable of sending faxes
+            Selected line is not capable of sending faxes.
           </q-tooltip>
         </b-link>
         <b-link href="#"
@@ -23,6 +23,11 @@
                 :disabled="!contact.email"
                 :class="{ active : messageComposer.mode === 'email' }"
                 @click="setMode('email')">Email
+          <q-tooltip v-if="!contact.email"
+                     anchor="top middle"
+                     self="center middle">
+            This contact doesn't have any valid email address.
+          </q-tooltip>
         </b-link>
         <b-link href="#"
                 :class="{ active : messageComposer.mode === 'note' }"

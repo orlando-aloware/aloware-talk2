@@ -207,7 +207,9 @@ export default {
         user_id: null,
         tag_ids: []
       },
-      isCreating: false
+      isCreating: false,
+      isDupeContact: false,
+      createdContact: null
     }
   },
 
@@ -232,7 +234,7 @@ export default {
         user_id: null,
         tag_ids: []
       }
-
+      this.isDupeContact = false
       this.$v.contact.$reset()
     },
 
@@ -242,11 +244,15 @@ export default {
         return
       }
       this.isCreating = true
+      this.isDupeContact = false
       return talk2Api.V1.contact.create(this.contact)
         .then(res => {
+          if (!res.data.is_newly_added) {
+            this.isCreating = false
+            return this.notifyForExistingContact(res.data)
+          }
           this.$VueEvent.fire('clearContacts')
           this.$VueEvent.fire('fetchContacts')
-          this.$VueEvent.fire('shouldUpdateListCount')
           if (!['my-contacts', 'unassigned'].includes(this.selectedList.id)) {
             this.$VueEvent.fire('getListCount', this.contact.user_id ? this.lists['my-contacts'] : this.lists['unassigned'])
           }
@@ -269,6 +275,36 @@ export default {
 
     onTagsSelected (tags) {
       this.contact.tag_ids = tags
+    },
+    notifyForExistingContact (contact) {
+      const h = this.$createElement
+      const titleVNode = h('div', { domProps: { innerHTML: 'This contact\'s phone number already exists and is assigned to an existing contact, <b>' + contact.name + '</b>.<br><br> This contact requires a unique phone number.' } })
+
+      this.$bvModal.msgBoxConfirm([titleVNode], {
+        title: 'Phone Number Already Exists',
+        size: 'md',
+        buttonSize: 'sm',
+        okVariant: 'primary',
+        okTitle: 'Open ' + contact.name,
+        cancelTitle: 'Go back',
+        footerClass: 'p-2',
+        hideHeaderClose: false,
+        centered: false
+      }).then(value => {
+        if (value) {
+          this.onReset()
+          this.hideModal()
+          this.$router.push({
+            name: 'Contact',
+            params: {
+              id: contact.id
+            }
+          })
+        }
+      }).catch(err => {
+        // An error occurred
+        console.log(err)
+      })
     }
   }
 }

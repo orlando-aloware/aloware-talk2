@@ -126,8 +126,6 @@ export default {
     if (this.isMobile) {
       this.toggleSidebar()
     }
-
-    this.loadData()
   },
 
   methods: {
