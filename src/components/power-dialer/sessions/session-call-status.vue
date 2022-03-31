@@ -432,47 +432,47 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
-    async checkAutoDialer () {
-      console.log('Checking PowerDialer for tasks')
+    // async checkAutoDialer () {
+    //   console.log('Checking PowerDialer for tasks')
 
-      // make sure the dialer is not active before making another call
-      if (!this.on_call && !this.is_running) {
-        if (this.in_progress_tasks.length < this.auto_dialer.ratio && !this.isPause && this.queued_tasks.length > 0) {
-          let numberOfTasks = this.auto_dialer.ratio - this.in_progress_tasks.length
-          let tasks = this.queued_tasks.filter(task => !this.isSkipped(task.id)).slice(0, numberOfTasks)
+    //   // make sure the dialer is not active before making another call
+    //   if (!this.on_call && !this.is_running) {
+    //     if (this.in_progress_tasks.length < this.auto_dialer.ratio && !this.isPause && this.queued_tasks.length > 0) {
+    //       let numberOfTasks = this.auto_dialer.ratio - this.in_progress_tasks.length
+    //       let tasks = this.queued_tasks.filter(task => !this.isSkipped(task.id)).slice(0, numberOfTasks)
 
-          for (let task of tasks) {
-            // don't run the same task twice
-            if (this.last_task && task.id === this.last_task.id) {
-              continue
-            }
+    //       for (let task of tasks) {
+    //         // don't run the same task twice
+    //         if (this.last_task && task.id === this.last_task.id) {
+    //           continue
+    //         }
 
-            await this.selectTask(task)
+    //         await this.selectTask(task)
 
-            if (this.warm_up_seconds > 0) {
-              this.startWarmUpCountDown(task)
-            } else {
-              this.runTask(task)
-            }
-          }
+    //         if (this.warm_up_seconds > 0) {
+    //           this.startWarmUpCountDown(task)
+    //         } else {
+    //           this.runTask(task)
+    //         }
+    //       }
 
-          // if there are no more unskipped tasks
-          if (tasks.length === 0) {
-            this.fetchAutoDialTasks(AutoDialTaskStatus.STATUS_QUEUED)
-            this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
-            this.stop()
-            return
-          }
+    //       // if there are no more unskipped tasks
+    //       if (tasks.length === 0) {
+    //         this.fetchAutoDialTasks(AutoDialTaskStatus.STATUS_QUEUED)
+    //         this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
+    //         this.stop()
+    //         return
+    //       }
 
-          return
-        }
-      }
+    //       return
+    //     }
+    //   }
 
-      if (this.queued_tasks.length === 0 && this.in_progress_tasks.length === 0) {
-        console.log('Stopping PowerDialer: No more tasks found')
-        this.stop()
-      }
-    },
+    //   if (this.queued_tasks.length === 0 && this.in_progress_tasks.length === 0) {
+    //     console.log('Stopping PowerDialer: No more tasks found')
+    //     this.stop()
+    //   }
+    // },
 
     async selectTask (autoDialTask) {
       // exit function when autoDialTask is not set
@@ -564,6 +564,7 @@ export default {
         await this.fetchContact(this.taskToCall.id)
         if (!this.wrapUp) {
           this.resetTimer()
+          console.log('Resetting timer from init...')
           setTimeout(() => {
             this.startWarmUpCountDown()
           }, 1000)
@@ -707,15 +708,15 @@ export default {
         this.findDefaultOutboundCampaign()
       }
     },
-    autoDialerTimerEnabled (val) {
-      if (this.autoDialerTimerEnabled === true) {
-        this.checkAutoDialer()
-        // Check every 2 seconds
-        this.$options.auto_dialer_interval = setInterval(this.checkAutoDialer, 2000)
-      } else {
-        clearInterval(this.$options.auto_dialer_interval)
-      }
-    },
+    // autoDialerTimerEnabled (val) {
+    //   if (this.autoDialerTimerEnabled === true) {
+    //     this.checkAutoDialer()
+    //     // Check every 2 seconds
+    //     this.$options.auto_dialer_interval = setInterval(this.checkAutoDialer, 2000)
+    //   } else {
+    //     clearInterval(this.$options.auto_dialer_interval)
+    //   }
+    // },
     togglePause (value) {
       if (!value) {
         if (this.timerIsOver) {
@@ -734,7 +735,6 @@ export default {
       }
     },
     'powerDialerTasks.in_queue' (tasks) {
-      console.log('tasks ------------ :>> ', tasks)
       if (tasks.length === 0 && !this.togglePause) {
         this.shouldRedirect = true
       }
@@ -770,7 +770,7 @@ export default {
       countdownTimer: -1,
       countdownInterval: null,
       skippedTasks: [],
-      autoDialerTimerEnabled: false,
+      // autoDialerTimerEnabled: false,
       prevRoute: null,
       shouldRedirect: false,
       wrapUp: false,
