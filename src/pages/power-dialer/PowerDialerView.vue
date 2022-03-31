@@ -228,6 +228,62 @@
                   <TagPopover
                     :resource="contact" />
                 </td>
+                <!-- COLUMN: All Phone Numbers -->
+                <td
+                  v-else-if="column.name === 'phone_numbers'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="column.name">
+                  <ChippedItems
+                    :chips="contact[column.name]"
+                    :resource="contact"
+                    key-name="phone_number"
+                    title="Phone Numbers"
+                    meta="phone-numbers" />
+                </td>
+                <!-- COLUMN: Lines -->
+                <td
+                  v-else-if="column.name === 'campaigns'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="column.name">
+                  <ChippedItems
+                    :chips="contact[column.name]"
+                    :resource="contact"
+                    title="Lines"
+                    meta="campaigns" />
+                </td>
+                <!-- COLUMN: Ring Groups -->
+                <td
+                  v-else-if="column.name === 'ring_groups'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="column.name">
+                  <ChippedItems
+                    :chips="contact[column.name]"
+                    :resource="contact"
+                    title="Ring Groups"
+                    meta="ring-groups" />
+                </td>
+                <!-- COLUMN: Broadcasts -->
+                <td
+                  v-else-if="column.name === 'broadcasts'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="column.name">
+                  <ChippedItems
+                    :chips="contact[column.name]"
+                    :resource="contact"
+                    title="Broadcasts"
+                    meta="broadcasts" />
+                </td>
+                <!-- COLUMN: Contact Lists -->
+                <td
+                  v-else-if="column.name === 'contact_lists'"
+                  :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="column.name">
+                  <ChippedItems
+                    :chips="contact[column.name]"
+                    :resource="contact"
+                    title="Contact Lists"
+                    meta="contact-lists" />
+                </td>
                 <!-- COLUMN: Status -->
                 <td
                   v-else-if="column.name === 'task_status_name'"
@@ -249,8 +305,7 @@
                 </td>
                 <td
                   v-else
-                  :key="key"
-                  class="col-indented-2">
+                  :key="key">
                   {{ contact[column.name] }}
                 </td>
               </template>
@@ -319,6 +374,7 @@ import SearchList from 'src/components/search'
 import StartDialing from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
 import StatusChip from 'src/components/status-chip'
 import TagPopover from 'src/components/tag-popover'
+import ChippedItems from 'src/components/chipped-items'
 import CheckBox from 'src/components/checkbox-interactive'
 import NameWrapper from 'src/components/name-wrapper'
 import Breadcrumbs from 'src/components/breadcrumbs'
@@ -328,7 +384,6 @@ import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import powermixin from 'src/plugins/mixins/power-dialer'
 import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
-// import contactsMixins from 'src/plugins/mixins/contacts.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
@@ -407,6 +462,7 @@ export default {
     TableRow,
     StatusChip,
     TagPopover,
+    ChippedItems,
     CheckBox,
     NameWrapper,
     TrashOIcon,
@@ -725,28 +781,20 @@ export default {
       this.$VueEvent.fire('clearContacts')
       this.initialListFilters = this.currentListFilters
       this.loadList(this.selectedListId)
+    },
+    valueIsArray (value) {
+      return Array.isArray(value)
     }
   },
   watch: {
     '$route.params': {
       handler (params) {
-        // if (params.filter) {
-        //   this.init()
-        // }
         if (!this.$route.name.includes('Contact')) {
           this.init()
         }
       },
       deep: true
     },
-    // '$route.params.id': function (value) {
-    //   console.log('100 :>> ', value)
-    //   this.init()
-    // },
-    // '$route.params.filter': function (value) {
-    //   console.log('200 :>> ', value)
-    //   this.init()
-    // },
     currentListFilters: {
       deep: true,
       handler: function (val) {
