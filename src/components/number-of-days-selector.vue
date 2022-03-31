@@ -14,7 +14,7 @@
                      :allow-empty="true"
                      openDirection="top"
                      v-model="frequencies"
-                     @select="onSelect"
+                     @input="onSelect"
                      @remove="onRemove" />
   </div>
 </template>
@@ -76,9 +76,16 @@ export default {
       frequencies: this.multiple ? [] : null
     }
   },
+  computed: {
+    frequenciesValues () {
+      return this.frequencies.map((item) => {
+        return item.value
+      })
+    }
+  },
   methods: {
-    onSelect () {
-      this.$emit('select', this.frequencies)
+    onSelect (value) {
+      this.$emit('select', this.frequenciesValues)
     },
     onRemove () {
       this.$emit('select', this.frequencies)
