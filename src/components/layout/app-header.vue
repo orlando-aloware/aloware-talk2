@@ -49,7 +49,7 @@
 
         <shared-login-menu v-if="!isElectron"></shared-login-menu>
 
-        <profile></profile>
+        <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'"></profile>
 
         <phone v-if="!isMobile"></phone>
 

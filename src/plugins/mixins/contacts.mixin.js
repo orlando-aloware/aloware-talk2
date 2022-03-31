@@ -31,6 +31,7 @@ export default {
       },
       isNavigated: false,
       previousRelations: [],
+      hasContactsListChanges: false,
       ALL_COLUMNS
     }
   },
@@ -50,23 +51,30 @@ export default {
       this.onLoadMore()
     })
 
-    const _this = this
-
-    this.$VueEvent.listen('new_communication', function (communication) {
-      if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(_this.$route.name)) {
+    this.$VueEvent.listen('new_communication', (communication) => {
+      if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name)) {
         return
       }
 
-      const index = _this.contactsData.data.findIndex(item => item.id === communication.contact_id)
+      const index = this.contactsData.data.findIndex(item => item.id === communication.contact_id)
       if (index >= 0) {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-          _this.contactsData.data[index] = response.data
+          this.contactsData.data[index] = response.data
 
-          if (_this.contact.id === communication.contact_id) {
-            _this.setContact(response.data)
+          if (this.contact.id === communication.contact_id) {
+            this.setContact(response.data)
           }
         })
       }
+    })
+
+    this.$VueEvent.listen('contactUpdated', () => {
+      this.hasContactsListChanges = true
+      // const found = this.contactsData.data.find(item => item.id === contact.id)
+      // const filterFound = this.currentListFilters.find(item => typeof item.filters.contact_owner !== 'undefined')
+      // if (found && found.user_id !== contact.user_id && (this.showMyContacts || filterFound)) {
+      //   this.hasContactsListChanges = true
+      // }
     })
   },
 
@@ -236,10 +244,12 @@ export default {
         .finally(() => {
           this.isLoading = false
           this.isLoaded = true
+          this.isLoadingMore = false
         })
         .catch((err) => {
           this.isLoading = false
           this.isLoaded = true
+          this.isLoadingMore = false
           this.setListContactsLoaded(true)
           console.log(err)
         })
@@ -666,7 +676,7 @@ export default {
     $route (to, from) {
       this.isNavigated = false
 
-      if ((from.name === 'Contact' && to.name === 'Contacts') || (from.name === 'Contacts' && to.name === 'Contact')) {
+      if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) || (from.name === 'Contacts' && to.name === 'Contact')) {
         return
       }
 
@@ -676,7 +686,9 @@ export default {
         this.isNavigated = true
       }
 
-      if (from.name === 'Contacts' && to.name === 'Contacts' && from.path !== to.path) {
+      if ((from.name === 'Contact' && to.name === 'Contacts' && this.hasContactsListChanges) ||
+        (from.name === 'Contacts' && to.name === 'Contacts' && from.path !== to.path)) {
+        this.hasContactsListChanges = false
         this.clearContacts()
       }
 

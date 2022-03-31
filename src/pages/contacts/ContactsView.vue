@@ -1594,6 +1594,11 @@ export default {
       handler: function () {
         this.loadList(this.$route.params.id)
       }
+    },
+    showMyContacts (value) {
+      if (this.myContacts !== value) {
+        this.myContacts = value
+      }
     }
   }
 }

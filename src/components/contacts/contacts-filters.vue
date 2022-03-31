@@ -150,7 +150,8 @@
             <div class="filter-contents step-3 p-2 pr-1"
                  v-else-if="step === 3">
               <span class="filter-label">{{ selectedFilter.label }}</span>
-              <contacts-filter-types :filter="selectedFilter"
+              <contacts-filter-types ref="contact-filter-types"
+                                     :filter="selectedFilter"
                                      :filterGroupIndex="filterGroupIndex"
                                      :filterConjunction="filterConjunction"
                                      @filtersApplied="filtersApplied">
@@ -324,6 +325,19 @@ export default {
     selectFilter (filter) {
       this.selectedFilter = filter
       this.step = 3
+
+      this.$nextTick(() => {
+        if (typeof this.$refs['contact-filter-types'] === 'undefined') {
+          return
+        }
+
+        if (filter && filter.type === 'boolean') {
+          this.$refs['contact-filter-types'].updateIsValidated(true)
+          return
+        }
+
+        this.$refs['contact-filter-types'].isValidated = false
+      })
     },
 
     selectFilterByKey (filter, index, conjunction) {
