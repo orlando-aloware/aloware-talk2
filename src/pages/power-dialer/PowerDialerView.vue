@@ -638,7 +638,11 @@ export default {
     },
     async myQueueList () {
       let response = await this.getMyQueueList()
-      this.listLoaded({ ...response.data, id: 'my-queue' })
+      if (response.status === 200) {
+        this.listLoaded({ ...response.data, id: 'my-queue' })
+      } else {
+        this.$generalNotification('My Queue list not found! Please contact administrator.', 'error')
+      }
     },
     onSearch (searchText) {
       this.$emit('search', searchText)
