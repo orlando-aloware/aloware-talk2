@@ -311,7 +311,6 @@ export default {
       return `${fname?.[0]}${lname?.[0]}`
     },
     onOver () {
-      console.log('this.$refs.dropdown.visible :>> ', this.$refs.dropdown.visible)
       this.$refs.dropdown.visible = true
       this.$refs.returnToQueue.visible = true
     },

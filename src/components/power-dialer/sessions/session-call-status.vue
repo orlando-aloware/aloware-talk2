@@ -540,7 +540,7 @@ export default {
         // console.log(`Counting down: ${this.countdownTimer}`)
         if (this.countdownTimer === 0) {
           this.clearWarmUpCountDown()
-          if (!this.togglePause) {
+          if (!this.togglePause && !this.wrapUp) {
             this.runTask(task)
           }
         }
@@ -694,8 +694,8 @@ export default {
     countdownTimer () {
       if (this.timerIsOver) {
         if (this.wrapUp) {
-          this.wrapUp = false
           this.initialize()
+          this.wrapUp = false
         }
         if (this.togglePause) {
           this.sessionPaused = true
