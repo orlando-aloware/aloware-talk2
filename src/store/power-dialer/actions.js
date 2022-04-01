@@ -47,7 +47,6 @@ export default {
   },
   getContact: async ({ commit }, params = {}) => {
     let res = await window.axios.get(`api/v2/contacts/${params.id}`)
-    console.log('res :>> ', res)
     if (res.status === 200) {
       commit('contacts/SET_CONTACT', res.data, { root: true })
       return res.data
