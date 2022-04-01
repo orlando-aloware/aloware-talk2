@@ -4,7 +4,7 @@
                           :buttonText="buttonText"
                           :values="campaignId"
                           :options="campaignsAlphabeticalOrder"
-                          :disable="disable || campaignsIsLoading"
+                          :disable="disabled"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
                           v-if="genericMultiselect"
                           @valuesUpdated="updateLines">
@@ -26,7 +26,7 @@
               :error="hasError"
               :options="campaignOptions"
               :placeholder="placeholder"
-              :disable="disable || campaignsIsLoading"
+              :disable="disabled"
               :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :multiple="multiple"
               :use-chips="useChips"
@@ -159,6 +159,8 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'campaignsIsLoading']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState('auth', ['profile']),
 
     placeholder () {
       switch (true) {
@@ -201,6 +203,10 @@ export default {
       }
 
       return []
+    },
+
+    disabled () {
+      return this.disable || this.campaignsIsLoading
     }
   },
 

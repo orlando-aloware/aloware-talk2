@@ -3856,11 +3856,22 @@ i.option-separator {
       white-space: nowrap;
       text-overflow: ellipsis;
     }
+    span:empty {
+      display: none !important;
+    }
   }
 
   &.with-prepend {
     .q-field__native {
       padding-left: 0 !important;
+    }
+  }
+
+  &:not(.q-field--focused) {
+    span {
+      &:not(:empty) + input {
+        display: none;
+      }
     }
   }
 
