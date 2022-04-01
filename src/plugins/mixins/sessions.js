@@ -83,25 +83,21 @@ export default {
 
     async fetchContact (taskId = '') {
       this.TOGGLE_SESSION_LOADER(true)
-      let res = null
-      res = await this.getContact({ id: taskId })
+      await this.getContact({ id: taskId })
       if (!this.flagged) {
         // this.activeTask = res
         this.flagged = true
       }
-      console.log(` %c Fetching contact for current task ${taskId} : `, 'color:yellow;background:black;', res)
     },
 
     async runTask () {
       let timezone = this.taskToCall?.timezone
-      console.log(`TIMEZONE (shouldSkip === ${this.shouldSkip}): `, timezone)
       // If there is no contact TZ then
       // Use the company TZ
       if (this.shouldSkip && !timezone) {
-        // TODOs:
         // Implement: Should skip single task
         this.skipSingleTask(this.taskToCall, 'Task is skipped because timezone has not been set for this contact. Pushed the task to the bottom of the list.')
-        this.moveTask(this.taskToCall, this.moveDirection.bottom)
+        // this.moveTask(this.taskToCall, this.moveDirection.bottom)
         return
       }
       // Check if it's outside working hours or not
@@ -112,17 +108,16 @@ export default {
         const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone)
 
         if (!contactLocalTime.isBetween(startDay, endDay)) {
-          console.log(`Skipped task #${this.taskToCall.id} in ${timezone} timezone because it was outside day times. ` + contactLocalTime.format('h:mm a') + ' is not in between ' + startDay.format('h:mm a') + ' - ' + endDay.format('h:mm a'))
-          // TODOs:
           // Implement: Should skip single task
           this.skipSingleTask(this.taskToCall, 'Task is skipped because it\'s outside day times. Pushed the task to the bottom of the list.')
-          this.moveTask(this.taskToCall, this.moveDirection.bottom)
+          // this.moveTask(this.taskToCall, this.moveDirection.bottom)
           return
         }
       }
 
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
+        this.activeTask = this.taskToCall
         this.$VueEvent.fire('makeCall', {
           currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
           outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
@@ -141,7 +136,6 @@ export default {
       this.loading_skip = true
       return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
         .then(res => {
-          console.log('SKIPPED: ', res)
           if (!this.skippedTasks.includes(autoDialTask.contact_list_item_id)) {
             this.skippedTasks.push(autoDialTask.contact_list_item_id)
           }
@@ -161,33 +155,11 @@ export default {
         })
     },
 
-    async moveTask (item = {}, direction = this.moveDirection.top) {
-      // const res = await this.moveContactItems({
-      //   id: this.selectedList.id,
-      //   params: {
-      //     contact_list_item_ids: [item.contact_list_item_id],
-      //     direction: direction
-      //   }
-      // })
-      // if (res.status === 200) {
-      //   let res = await this.getSessionTaskByFilter({
-      //     id: this.selectedList.id,
-      //     task_status: 1
-      //   })
-      //   this.powerDialerTasks['in_queue'] = res.data.data
-      //   this.initialize()
-      // }
-      this.wrapUp()
-      this.resetTimer()
-      // this.initialize()
-    },
-
     clearWarmUpCountDown () {
       this.countdownStarted = false
       this.countdownTimer = 0
 
       clearInterval(this.countdownInterval)
-      console.log('Stopped countdown')
     },
 
     skipTask () {

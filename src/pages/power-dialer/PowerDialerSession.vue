@@ -127,7 +127,6 @@ export default {
         name: response.name,
         type: response.type
       })
-      // console.log('RES -------- :>> ', res)
     },
     redirectRoute (route) {
       let routePath = '/power-dialer'

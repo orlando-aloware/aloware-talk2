@@ -225,13 +225,12 @@ export default {
        * Filter and exclude the in-progress task
        * everytime items are displayed
        */
-      let { powerDialerTasks, activeTask, taskToCall } = this
-      let foundTask = activeTask.id ? activeTask : taskToCall
+      let { powerDialerTasks, activeTask } = this
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        // console.log(`${task.contact_list_item_id} === ${foundTask.contact_list_item_id}`)
-        return task.contact_list_item_id !== foundTask.contact_list_item_id
+        // console.log(`${task.contact_list_item_id} === ${activeTask.contact_list_item_id}`)
+        return task.contact_list_item_id !== activeTask.contact_list_item_id
       })
-      // console.log('foundTask :>> ', foundTask)
+      // console.log('activeTask :>> ', activeTask)
       // console.log('inQueue :>> ', inQueue)
       // console.log('this.powerDialerTasks.in_queue :>> ', this.powerDialerTasks.in_queue)
       return {
@@ -311,7 +310,6 @@ export default {
       return `${fname?.[0]}${lname?.[0]}`
     },
     onOver () {
-      console.log('this.$refs.dropdown.visible :>> ', this.$refs.dropdown.visible)
       this.$refs.dropdown.visible = true
       this.$refs.returnToQueue.visible = true
     },
