@@ -30,7 +30,7 @@ export default {
       this.powerDialerTasks['in_queue'] = res.data.data
     },
     updateTaskStatus (task) {
-      console.log(` %c TASK UPDATED : ${task.task_status} `, 'background:red;color:white;', task)
+      // console.log(` %c TASK UPDATED : ${task.task_status} `, 'background:red;color:white;', task)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           this.onStatusInProgress(task)
@@ -67,8 +67,8 @@ export default {
     },
     onStatusQueued (task) {
       // Status Queued
-      let taskToMove = this.powerDialerTasks.in_queue.find(lst => lst.id === task.contact_id)
-      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.id !== task.contact_id)
+      let taskToMove = this.powerDialerTasks.in_queue.find(lst => lst.contact_list_item_id === task.id)
+      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
       this.powerDialerTasks.in_queue.push(taskToMove)
       // this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.push(this.powerDialerTasks.in_queue.splice(this.powerDialerTasks.in_queue.indexOf('12'), 1)[0])
       window.VueEvent.fire('initiate_session', task)
