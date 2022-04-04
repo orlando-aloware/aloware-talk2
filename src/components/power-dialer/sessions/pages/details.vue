@@ -1,5 +1,5 @@
 <template>
-  <div class="row w-100 h-100 d-flex px-2">
+  <div class="w-100 h-100 px-2">
 
     <b-overlay
       class="d-flex"
