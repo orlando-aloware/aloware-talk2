@@ -212,6 +212,7 @@ export default {
       if (this.$route.name === 'Power Dialer') {
         this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
+      // console.log(`${this.apiEndpoint(queued)} :>> `, params)
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
@@ -227,7 +228,7 @@ export default {
 
           if (this.apiEndpoint(queued).includes('my-queue')) {
             // TODOs: Use vuex for storing filtered power dialer contact lists
-            this.updateMyQueueListData(data.data)
+            this.updateMyQueueListData(data)
           }
 
           let listId = this.id === 'my-queue' || this.id === 'in-queue' ? this.myQueue?.id : this.id
@@ -504,7 +505,7 @@ export default {
         })
     },
     loadData () {
-      if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all') {
+      if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
           this.init()
         })

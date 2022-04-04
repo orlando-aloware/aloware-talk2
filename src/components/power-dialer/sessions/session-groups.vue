@@ -200,7 +200,7 @@ export default {
   computed: {
     ...mapState(['dialer']),
     ...mapGetters('powerDialer', [
-      'powerDialerListItems',
+      // 'powerDialerListItems',
       // 'currentList',
       'sessionLoader'
     ]),
@@ -211,7 +211,8 @@ export default {
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',
-      'activeTask'
+      'activeTask',
+      'taskToCall'
     ]),
     moveDirection () {
       return DIRECTION
@@ -226,8 +227,12 @@ export default {
        */
       let { powerDialerTasks, activeTask } = this
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        return task.id !== activeTask.id
+        // console.log(`${task.contact_list_item_id} === ${activeTask.contact_list_item_id}`)
+        return task.contact_list_item_id !== activeTask.contact_list_item_id
       })
+      // console.log('activeTask :>> ', activeTask)
+      // console.log('inQueue :>> ', inQueue)
+      // console.log('this.powerDialerTasks.in_queue :>> ', this.powerDialerTasks.in_queue)
       return {
         ...powerDialerTasks,
         in_queue: inQueue
@@ -305,7 +310,6 @@ export default {
       return `${fname?.[0]}${lname?.[0]}`
     },
     onOver () {
-      console.log('this.$refs.dropdown.visible :>> ', this.$refs.dropdown.visible)
       this.$refs.dropdown.visible = true
       this.$refs.returnToQueue.visible = true
     },

@@ -475,6 +475,13 @@ export default {
       if (value === 'call') {
         this.findDefaultOutboundCampaign()
       }
+    },
+
+    'profile': {
+      deep: true,
+      handler: function () {
+        this.findDefaultOutboundCampaign()
+      }
     }
   },
 

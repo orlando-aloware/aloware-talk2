@@ -316,6 +316,7 @@ export default {
         contact: null,
         user: null
       }
+      this.setSmsReminderBody()
     },
     durationSelected (duration) {
       this.appointment.duration = duration.value

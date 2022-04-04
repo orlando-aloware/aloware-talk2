@@ -17,7 +17,7 @@
             class="cursor-pointer" />
         </div>
         <b-badge class="t-badge t-badge__warning ml-2 text-white p-1">
-          {{ item.count | fixCount }}
+          {{ totalInQueued | fixCount }}
         </b-badge>
       </div>
     </a>
@@ -26,6 +26,7 @@
 
 <script>
 
+import { mapState } from 'vuex'
 import ListIcon from 'components/icons/list-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
 
@@ -39,6 +40,14 @@ export default {
   components: {
     ListIcon,
     AddUserIcon
+  },
+  computed: {
+    ...mapState('powerDialer', [
+      'myQueueListFilters'
+    ]),
+    totalInQueued () {
+      return this.myQueueListFilters?.total_queued || 0
+    }
   },
   data () {
     return {

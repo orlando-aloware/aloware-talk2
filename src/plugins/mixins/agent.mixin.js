@@ -20,9 +20,11 @@ export default {
 
   created () {
     this.$VueEvent.listen('user_updated', (user) => {
-      if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
+      // if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
+      if (this.profile && user.id === this.profile.id) {
         console.log('user_updated', user)
-        this.setAgentStatus(user.agent_status)
+        // this.setAgentStatus(user.agent_status)
+        this.setProfile(user)
         console.log('Changed agent status [event]: ', user.agent_status)
       }
     })
@@ -151,7 +153,7 @@ export default {
     }, 500),
 
     ...mapActions(['setOldAgentStatus']),
-    ...mapActions('auth', ['setAgentStatus'])
+    ...mapActions('auth', ['setAgentStatus', 'setProfile'])
   },
 
   watch: {

@@ -1,9 +1,13 @@
+import Vue from 'vue'
 import _ from 'lodash'
 import * as AuthDefault from 'src/constants/auth-default'
 
 export default {
   SET_PROFILE (state, profile) {
-    state.profile = profile
+    const index = { data: null }
+    for (index.data in profile) {
+      Vue.set(state.profile, index.data, profile[index.data])
+    }
   },
   SET_AGENT_STATUS (state, agentStatus) {
     state.profile.agent_status = agentStatus

@@ -4,7 +4,8 @@
     <b-overlay
       class="d-flex"
       :show="loading"
-      rounded="sm">
+      rounded="sm"
+      style="display:block;width:100% !important;">
       <template #overlay>
         <q-spinner-bars
           color="primary"

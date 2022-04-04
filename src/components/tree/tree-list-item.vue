@@ -49,7 +49,9 @@
               @keydown="onKeyDown"
               autofocus
             />
-            <span @click="toggleSidebar(navigate, $event)" v-if="!isEditing">
+            <span
+              @click="toggleSidebar(navigate, $event)"
+              v-if="!isEditing">
               {{ name }}
             </span>
             <UnsavedIcon

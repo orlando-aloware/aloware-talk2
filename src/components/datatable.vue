@@ -273,8 +273,8 @@ export default {
         `${this.isMobile ? 'mobile-scrollableArea' : ''}`
       ]
     },
-    test () {
-      return this.$route
+    customSortOptions () {
+      return this.$route.meta.title === 'Power Dialer'
     },
     defaultPlaceholderMessage () {
       if (this.$route.name === 'Contacts' || this.$route.name === 'Contact') {
@@ -352,13 +352,30 @@ export default {
       this.$emit('reordered', [...columns])
     },
     onColumnSort (column) {
-      this.$emit('sort', Object.assign({}, this.getColumnSorts(column)))
+      let sorts = Object.assign({}, this.getColumnSorts(column))
+      setTimeout(() => {
+        this.$emit('sort', sorts)
+      }, 100)
     },
     getColumnSorts (column) {
       this.setDefaultDateFilter(column.name)
+      let order = this.sorts.order === 'asc' ? 'desc' : 'asc'
+      if (this.customSortOptions) {
+        switch (this.sorts.order) {
+          case 'asc':
+            order = 'desc'
+            break
+          case 'desc':
+            order = ''
+            break
+          default:
+            order = 'asc'
+            break
+        }
+      }
       this.sorts = {
         orderBy: column.name,
-        order: this.sorts.order === 'asc' ? 'desc' : 'asc'
+        order: order
       }
       return this.sorts
     },
@@ -394,7 +411,7 @@ export default {
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
     this.sorts.orderBy = this.defaultContactDateFilter
-    this.sorts.order = 'desc'
+    this.sorts.order = this.customSortOptions ? '' : 'desc'
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },
@@ -412,6 +429,11 @@ export default {
     },
     perPage: function () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
+    },
+    sorts (newVal, oldVal) {
+      if (newVal.orderBy !== oldVal.orderBy) {
+        this.sorts.order = 'asc'
+      }
     }
   }
 }

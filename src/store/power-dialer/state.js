@@ -10,6 +10,7 @@ export default function () {
   return {
     flaggedCreateExisting: false,
     myQueue: null,
+    myQueueListFilters: null,
     filters: [],
     opened: [],
     folders: [],
@@ -158,6 +159,7 @@ export default function () {
       all: []
     },
     activeTask: {},
+    taskToCall: {},
     selectedDialerSessionId: null,
     sessionPaused: false,
     selectedPdList: {},

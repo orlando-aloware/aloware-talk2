@@ -424,28 +424,28 @@ export const ALL_COLUMNS = [
     default: false
   },
   {
+    name: 'task_status_name',
+    relationName: 'taskStatus',
+    label: 'Task Status',
+    category: 2,
+    order: 39,
+    sortable: false,
+    draggable: true,
+    resizable: true,
+    default: false,
+    minWidth: 170
+  },
+  {
     id: '426108ce-7d6e-43e1-b13e-e406a9362db0',
     label: 'Actions',
     name: 'actions',
-    order: 39,
+    order: 40,
     sortable: false,
     draggable: false,
     resizable: false,
     default: true,
     maxWidth: 150,
     minWidth: 150
-  },
-  {
-    name: 'task_status_name',
-    relationName: 'taskStatus',
-    label: 'Task Status',
-    category: 2,
-    order: 40,
-    sortable: false,
-    draggable: true,
-    resizable: true,
-    default: false,
-    minWidth: 170
   }
 ]
 

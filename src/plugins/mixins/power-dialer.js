@@ -1,6 +1,5 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex'
-import qs from 'qs'
-import { isEmpty, get, debounce } from 'lodash'
+import { get } from 'lodash'
 
 export default {
   data () {
@@ -21,7 +20,7 @@ export default {
     ...mapGetters('powerDialer', [
       'listItems',
       'currentListFilters',
-      'powerDialerListItems',
+      // 'powerDialerListItems',
       'search'
     ]),
     tempId () {
@@ -50,79 +49,79 @@ export default {
     ...mapMutations('powerDialer', [
       'TOGGLE_TABLE_LOADER'
     ]),
-    processFetch2: debounce(function (params = {}) {
-      return this.$axios
-        .get('api/v2/contacts', {
-          params: this.buildQueryString(params),
-          paramsSerializer: qs.stringify
-        })
-        .then((response) => response.data)
-        .then((data) => {
-          // this.contactsLoaded({
-          //   id: this.tempId || '',
-          //   append: false,
-          //   ...data
-          // })
-          this.TOGGLE_TABLE_LOADER(false)
-        })
-    }, 1000),
-    buildQueryString (params) {
-      const query = {
-        page: 1
-      }
+    // processFetch2: debounce(function (params = {}) {
+    //   return this.$axios
+    //     .get('api/v2/contacts', {
+    //       params: this.buildQueryString(params),
+    //       paramsSerializer: qs.stringify
+    //     })
+    //     .then((response) => response.data)
+    //     .then((data) => {
+    //       // this.contactsLoaded({
+    //       //   id: this.tempId || '',
+    //       //   append: false,
+    //       //   ...data
+    //       // })
+    //       this.TOGGLE_TABLE_LOADER(false)
+    //     })
+    // }, 1000),
+    // buildQueryString (params) {
+    //   const query = {
+    //     page: 1
+    //   }
 
-      let filters = {}
+    //   let filters = {}
 
-      if (params.search) {
-        filters.search = {}
-        filters.search.value = params.search
-      }
+    //   if (params.search) {
+    //     filters.search = {}
+    //     filters.search.value = params.search
+    //   }
 
-      if (params.page) {
-        query.page = params.page
-      }
+    //   if (params.page) {
+    //     query.page = params.page
+    //   }
 
-      query.per_page = params.per_page || 25
+    //   query.per_page = params.per_page || 25
 
-      query.filter_groups = []
+    //   query.filter_groups = []
 
-      if (typeof this.powerDialerListItems[this.tempId] !== 'undefined' && this.tempId !== 'all') {
-        query.filter_groups = [
-          {
-            filters: {
-              contact_lists: {
-                value: [this.tempId],
-                operator: 1
-              }
-            },
-            is_conjunction: true
-          }
-        ]
-      }
+    //   if (typeof this.powerDialerListItems[this.tempId] !== 'undefined' && this.tempId !== 'all') {
+    //     query.filter_groups = [
+    //       {
+    //         filters: {
+    //           contact_lists: {
+    //             value: [this.tempId],
+    //             operator: 1
+    //           }
+    //         },
+    //         is_conjunction: true
+    //       }
+    //     ]
+    //   }
 
-      if (!isEmpty(filters)) {
-        query.filter_groups.push({
-          is_conjunction: true,
-          filters: filters
-        })
-      }
+    //   if (!isEmpty(filters)) {
+    //     query.filter_groups.push({
+    //       is_conjunction: true,
+    //       filters: filters
+    //     })
+    //   }
 
-      if (!isEmpty(this.currentListFilters)) {
-        for (let filterIndex of Object.keys(this.currentListFilters)) {
-          // check if filter index is a number
-          if (!isNaN(filterIndex / 1)) {
-            query.filter_groups = query.filter_groups.concat(this.currentListFilters[filterIndex])
-          }
-        }
-      }
+    //   if (!isEmpty(this.currentListFilters)) {
+    //     for (let filterIndex of Object.keys(this.currentListFilters)) {
+    //       // check if filter index is a number
+    //       if (!isNaN(filterIndex / 1)) {
+    //         query.filter_groups = query.filter_groups.concat(this.currentListFilters[filterIndex])
+    //       }
+    //     }
+    //   }
 
-      if (params.sort) {
-        query.sort = params.sort
-        query.order = params.order ? params.order : 'asc'
-      }
+    //   if (params.sort) {
+    //     query.sort = params.sort
+    //     query.order = params.order ? params.order : 'asc'
+    //   }
 
-      return query
-    },
+    //   return query
+    // },
     fetch (params = {}) {
       const sort = get(params, 'sort', 'created-at')
       const order = get(params, 'order', 'desc')
