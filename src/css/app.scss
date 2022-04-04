@@ -11048,3 +11048,11 @@ screen and (max-width: 956px) {
 button.q-field__focusable-action {
   font-size: 16px;
 }
+
+
+h1.contact-list-name-label {
+  width: 12vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
