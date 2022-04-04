@@ -228,7 +228,6 @@ export default {
       if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
-      console.log('Ending wrap up')
       this.backToDial()
     })
 
