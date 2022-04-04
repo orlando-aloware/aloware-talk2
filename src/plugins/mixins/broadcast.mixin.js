@@ -514,6 +514,12 @@ export default {
             this.$VueEvent.fire('delete_contact', event.contact)
           }
         })
+        .listen('.contact_audit.created', (event) => {
+          let contactAudit = event.audit
+          if (contactAudit) {
+            this.$VueEvent.fire('contact_audit_created', contactAudit)
+          }
+        })
         .listen('.filter.created', (event) => {
           if (!this.filters.find((o) => {
             return o.id === event.filter.id

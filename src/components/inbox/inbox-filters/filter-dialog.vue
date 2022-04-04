@@ -130,6 +130,7 @@ import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
 import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
 import _ from 'lodash'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   name: 'filter-dialog',
@@ -387,7 +388,7 @@ export default {
     },
 
     getFilters () {
-      if (![1, 2, 3, 4].includes(this.defaultFilterModel.type)) {
+      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(this.defaultFilterModel.type)) {
         return
       }
 

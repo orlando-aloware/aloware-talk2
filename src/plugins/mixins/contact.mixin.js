@@ -372,7 +372,7 @@ export default {
           this.loadingContact = false
           this.loadingContactCommunications = false
           this.$handleErrors(err.response)
-          console.log(err)
+          this.$router.push({ path: '/contacts' })
         })
       }
       this.loadingContact = false
