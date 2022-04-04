@@ -657,6 +657,7 @@ export default {
         }
         if (this.togglePause) {
           this.sessionPaused = true
+          this.taskToCall = this.powerDialerTasks.in_queue[0]
         }
       }
     },
