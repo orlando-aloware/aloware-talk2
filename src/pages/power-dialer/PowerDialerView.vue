@@ -286,7 +286,7 @@
                 </td>
                 <!-- COLUMN: Status -->
                 <td
-                  v-else-if="column.name === 'task_status_name'"
+                  v-else-if="column.name === 'task_status_name' || column.name === 'task_status'"
                   :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
                   :key="key">
                   <StatusChip
