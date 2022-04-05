@@ -79,7 +79,9 @@ export default {
   },
 
   mounted () {
-    this.loadData()
+    if (!this.isPowerDialer) {
+      this.loadData()
+    }
   },
 
   methods: {
