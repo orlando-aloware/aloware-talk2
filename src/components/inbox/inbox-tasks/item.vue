@@ -1,6 +1,6 @@
 <template>
   <div class="contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative"
-       :class="[activeClass, isParkedCall ? 'item-call-parked' : '', isConnectedCall() ? 'item-call-connected' : '', isLiveCall ? 'item-live-call' : '']"
+       :class="[activeClass, isParkedCall ? 'item-call-parked' : '', isConnectedCall ? 'item-call-connected' : '', isLiveCall ? 'item-live-call' : '']"
        @click="onItemClick(contact)">
     <div class="d-flex justify-content-center avatar-wrapper">
       <div class="avatar d-flex justify-content-center pb-1 position-relative"
@@ -40,15 +40,15 @@
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall()">
+               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </div>
           <div class="truncated-text call-parked-label"
-               v-if="isParkedCall && !isConnectedCall()" >
+               v-if="isParkedCall && !isConnectedCall" >
             Parked Call
           </div>
           <div class="truncated-text call-connected-label"
-               v-if="isConnectedCall() && !isParkedCall">
+               v-if="isConnectedCall && !isParkedCall">
             Connected
           </div>
 
