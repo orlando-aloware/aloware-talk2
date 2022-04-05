@@ -347,6 +347,10 @@ export default {
     },
 
     onToggleStatus () {
+      if (this.statusText === this.$route.params.status) {
+        return
+      }
+
       this.$nextTick(() => {
         this.$refs.taskListScroller.scrollTop = 0
       })

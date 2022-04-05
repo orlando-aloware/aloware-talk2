@@ -52,7 +52,9 @@ export default {
       perPage: 20,
       lineOrRingGroupFilter: null,
       lineOrRingGroupFilteredId: null,
-      contacts: []
+      contacts: [],
+      cancelToken: null,
+      source: null
     }
   },
 
@@ -80,12 +82,14 @@ export default {
       this.page = 1
       this.setContacts([])
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
-        this.gettingContactsList(false)
-        this.setContactsCurrentPage(response.data.current_page)
-        this.setHasMoreContacts(response.data.next_page_url)
-        this.isLoadingMore = false
-        this.isLoaded = true
+        if (response) {
+          this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
+          this.gettingContactsList(false)
+          this.setContactsCurrentPage(response.data.current_page)
+          this.setHasMoreContacts(response.data.next_page_url)
+          this.isLoadingMore = false
+          this.isLoaded = true
+        }
       })
     },
     loadMoreContactTasks () {
@@ -101,7 +105,9 @@ export default {
       })
     },
     getContactsByTaskStatus () {
-      return talk2Api.V2.contacts.list(this.getParameters())
+      this.source.cancel('Loading of contact task operation is canceled by the user.')
+      this.source = this.cancelToken.source()
+      return talk2Api.V2.contacts.list(this.getParameters(), this.source.token)
     },
     getParameters () {
       const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
@@ -152,5 +158,10 @@ export default {
     setContacts (contacts) {
       this.contacts = contacts
     }
+  },
+
+  created () {
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
   }
 }
