@@ -410,7 +410,9 @@ export default {
         filter: [],
         scope: 'user'
       },
-      scrollTimeout: null
+      scrollTimeout: null,
+      cancelToken: null,
+      source: null
     }
   },
 
@@ -717,15 +719,19 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      return api.data.get({ params: params })
+      this.source.cancel('Loading of communications operation is canceled by the user.')
+      this.source = this.cancelToken.source()
+      return api.data.get({ params: params, cancelToken: this.source.token })
         .then(response => {
-          this.gettingTasksList(false)
-          this.setCommunications(response.data.data)
-          this.currentPage = response.data.current_page
-          this.setHasMoreCommunications(response.data.next_page_url)
-          this.isLoaded = true
-          this.pagination = _.clone(response.data)
-          delete this.pagination.data
+          if (response) {
+            this.gettingTasksList(false)
+            this.setCommunications(response.data.data)
+            this.currentPage = response.data.current_page
+            this.setHasMoreCommunications(response.data.next_page_url)
+            this.isLoaded = true
+            this.pagination = _.clone(response.data)
+            delete this.pagination.data
+          }
         })
     },
 
@@ -1012,6 +1018,9 @@ export default {
   },
 
   created () {
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
+
     this.resetFilters()
 
     this.setMentionType()

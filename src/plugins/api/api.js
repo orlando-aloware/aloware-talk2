@@ -195,7 +195,11 @@ export default {
     reports: {
       communications: {
         get (params) {
-          return window.axios.get(`${suffixV1}reports/communications`, params)
+          return window.axios.get(`${suffixV1}reports/communications`, params).catch(function (thrown) {
+            if (window.axios.isCancel(thrown) && thrown) {
+              console.log(thrown.message)
+            }
+          })
         }
       }
     },
