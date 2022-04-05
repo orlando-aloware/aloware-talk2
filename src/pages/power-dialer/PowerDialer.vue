@@ -30,7 +30,7 @@
         @checkboxChanged="onFetchMyContacts"
         @sort="onSortByField"
         @paginated="onPaginate"
-        @loadMore="onLoadMore"
+        @loadMore="onLoadMore(selectedList)"
         @onFiltersCount="getFiltersCount"
         @on-list-update="updateList">
       </router-view>
@@ -297,7 +297,7 @@ export default {
       }
     },
     async updateList (data) {
-      await this.loadList(data.id)
+      // await this.loadList(data.id)
     },
     onClear () {
       this.clearList()

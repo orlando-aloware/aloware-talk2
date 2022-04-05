@@ -127,7 +127,8 @@ export default {
       })
       document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
     },
-    onLoadMore () {
+    onLoadMore (list = null) {
+      let path = 'api/v2/contacts'
       if (this.hasMore) {
         this.setListContactsLoaded(false)
         this.isLoadingMore = true
@@ -136,8 +137,12 @@ export default {
         const sort = (this.sorts) ? this.sorts.orderBy : this.defaultContactDateFilter
         const order = (this.sorts) ? this.sorts.order : 'desc'
 
+        if (list) {
+          path = this.apiEndpoint(this.myQueueId !== null)
+        }
+
         return this.$axios
-          .get('api/v2/contacts', {
+          .get(path, {
             params: this.buildQueryString({
               page: nextPage,
               search: this.search,
@@ -212,7 +217,6 @@ export default {
       if (this.$route.name === 'Power Dialer') {
         this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
-      // console.log(`${this.apiEndpoint(queued)} :>> `, params)
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
@@ -433,19 +437,15 @@ export default {
       const childItem = { data: null }
       const currentPage = _.get(listData, 'current_page', 0)
 
-      if (this.isPowerDialer) {
-        let newList = []
-        listData.data.forEach(dat => {
-          newList.push(dat)
-        })
-        this.powerDialerActiveList = { ...listData }
-        this.powerDialerActiveList.data = [ ...newList ]
-      }
-
       if (!_.isEmpty(this.contactsData.data)) {
         for (item.data in this.contactsData.data) {
-          found.data = listData.data.find(contact => contact.id === this.contactsData.data[item.data].id)
-          found.data = found.data ? listData.data.indexOf(found.data) : null
+          if (this.isPowerDialer) {
+            found.data = listData.data.find(contact => contact.contact_list_item_id === this.contactsData.data[item.data].contact_list_item_id)
+            found.data = found.data ? listData.data.indexOf(found.data) : null
+          } else {
+            found.data = listData.data.find(contact => contact.id === this.contactsData.data[item.data].id)
+            found.data = found.data ? listData.data.indexOf(found.data) : null
+          }
 
           if (currentPage === 1 && found.data !== -1 && found.data !== null) {
             for (childItem.data in listData.data[found.data]) {
@@ -455,8 +455,10 @@ export default {
             }
           }
 
-          if (found.data !== -1 && found.data !== null) {
-            listData.data.splice(found.data, 1)
+          if (!this.isPowerDialer) {
+            if (found.data !== -1 && found.data !== null) {
+              listData.data.splice(found.data, 1)
+            }
           }
         }
       }
@@ -483,6 +485,11 @@ export default {
 
       if (currentPage === 1 && this.contactsData.data.length > dataLength) {
         this.contactsData.data.sort((a, b) => { return moment(b.last_engagement_at).unix() - moment(a.last_engagement_at).unix() })
+      }
+
+      if (this.isPowerDialer) {
+        this.powerDialerActiveList = { ...listData }
+        this.powerDialerActiveList.data = this.contactsData.data
       }
     },
     clearContacts () {
@@ -685,6 +692,14 @@ export default {
         (to.name === 'Contacts' && !['Contacts', 'Contact'].includes(from.name)) ||
         to.name === 'Power Dialer') {
         this.isNavigated = true
+      }
+
+      if (this.isPowerDialer) {
+        if ((from.name === 'Power Dialer' && !['Power Dialer'].includes(to.name)) ||
+          (to.name === 'Power Dialer' && !['Power Dialer'].includes(from.name)) ||
+          to.name === 'Contacts') {
+          this.isNavigated = true
+        }
       }
 
       if ((from.name === 'Contact' && to.name === 'Contacts' && this.hasContactsListChanges) ||
