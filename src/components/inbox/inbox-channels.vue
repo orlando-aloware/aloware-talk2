@@ -166,6 +166,7 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import * as MentionType from 'src/constants/mention-type'
+import * as ChannelType from 'src/constants/inbox-channels'
 import TaskMentionList from 'components/inbox/channel-tasks/task-mention-list'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
@@ -252,13 +253,13 @@ export default {
     channelDefaultFilterModel () {
       const defaultFilterModel = {
         name: '',
-        type: 2,
+        type: ChannelType.CHANNEL_MESSAGES,
         filter: [],
         scope: 'user'
       }
       switch (true) {
         case ['voicemails'].includes(this.$route.params.channel):
-          defaultFilterModel.type = 3
+          defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
           defaultFilterModel.filter = {
             campaigns: Filters.DEFAULT_STATE.filter.campaigns,
             ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
@@ -277,7 +278,7 @@ export default {
           }
           break
         case ['calls'].includes(this.$route.params.channel):
-          defaultFilterModel.type = 1
+          defaultFilterModel.type = ChannelType.CHANNEL_CALLS
           defaultFilterModel.filter = {
             campaigns: Filters.DEFAULT_STATE.filter.campaigns,
             ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
@@ -301,7 +302,7 @@ export default {
           }
           break
         case ['recordings'].includes(this.$route.params.channel):
-          defaultFilterModel.type = 4
+          defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
           defaultFilterModel.filter = {
             campaigns: Filters.DEFAULT_STATE.filter.campaigns,
             ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
@@ -325,7 +326,7 @@ export default {
           }
           break
         case ['mentions'].includes(this.$route.params.channel):
-          defaultFilterModel.type = 5
+          defaultFilterModel.type = ChannelType.CHANNEL_MENTIONS
           defaultFilterModel.filter = {
             users: Filters.DEFAULT_STATE.filter.users,
             contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
@@ -333,7 +334,7 @@ export default {
           break
         case ['messages'].includes(this.$route.params.channel):
         default:
-          defaultFilterModel.type = 2
+          defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
           defaultFilterModel.filter = {
             campaigns: Filters.DEFAULT_STATE.filter.campaigns,
             direction: Filters.DEFAULT_STATE.filter.direction,
@@ -409,7 +410,9 @@ export default {
         filter: [],
         scope: 'user'
       },
-      scrollTimeout: null
+      scrollTimeout: null,
+      cancelToken: null,
+      source: null
     }
   },
 
@@ -716,15 +719,19 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      return api.data.get({ params: params })
+      this.source.cancel('Loading of communications operation is canceled by the user.')
+      this.source = this.cancelToken.source()
+      return api.data.get({ params: params, cancelToken: this.source.token })
         .then(response => {
-          this.gettingTasksList(false)
-          this.setCommunications(response.data.data)
-          this.currentPage = response.data.current_page
-          this.setHasMoreCommunications(response.data.next_page_url)
-          this.isLoaded = true
-          this.pagination = _.clone(response.data)
-          delete this.pagination.data
+          if (response) {
+            this.gettingTasksList(false)
+            this.setCommunications(response.data.data)
+            this.currentPage = response.data.current_page
+            this.setHasMoreCommunications(response.data.next_page_url)
+            this.isLoaded = true
+            this.pagination = _.clone(response.data)
+            delete this.pagination.data
+          }
         })
     },
 
@@ -1011,6 +1018,9 @@ export default {
   },
 
   created () {
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
+
     this.resetFilters()
 
     this.setMentionType()
@@ -1172,18 +1182,19 @@ export default {
 
     this.$VueEvent.listen('contact_updated', (data) => {
       const communications = [...this.communications]
+      if (['calls', 'messages', 'mentions', 'voicemails', 'recordings'].includes(this.$route.params.channel)) {
+        if (this.$route.params.channel === 'mentions') {
+          communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
+            value.mention_subject.contact = data
+          })
+        } else {
+          communications.filter(item => item.contact.id === data.id).forEach((value) => {
+            value.contact = data
+          })
+        }
 
-      if (this.$route.params.channel === 'mentions') {
-        communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
-          value.mention_subject.contact = data
-        })
-      } else {
-        communications.filter(item => item.contact.id === data.id).forEach((value) => {
-          value.contact = data
-        })
+        this.setCommunications(communications)
       }
-
-      this.setCommunications(communications)
     })
 
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {

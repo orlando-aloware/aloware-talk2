@@ -507,6 +507,7 @@ export default {
       }
 
       this.setCurrentListFilters(updatedFilter)
+      this.$VueEvent.fire('shouldUpdateListCount')
       this.$emit('filtersUpdated')
     },
 

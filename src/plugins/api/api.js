@@ -195,7 +195,11 @@ export default {
     reports: {
       communications: {
         get (params) {
-          return window.axios.get(`${suffixV1}reports/communications`, params)
+          return window.axios.get(`${suffixV1}reports/communications`, params).catch(function (thrown) {
+            if (window.axios.isCancel(thrown) && thrown) {
+              console.log(thrown.message)
+            }
+          })
         }
       }
     },
@@ -259,7 +263,7 @@ export default {
       get (id) {
         return window.axios.get(`/api/v2/contacts/${id}`)
       },
-      list (params) {
+      list (params, cancelTokeSource) {
         const relations = _.get(params, 'relations', [
           'lastCommunication',
           'initialCampaign',
@@ -268,7 +272,12 @@ export default {
 
         params.relations = relations
 
-        return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify })
+        return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokeSource })
+          .catch(function (thrown) {
+            if (window.axios.isCancel(thrown) && thrown) {
+              console.log(thrown.message)
+            }
+          })
       },
       inboxCounts () {
         return window.axios.get(`/api/v2/contacts/inbox-counts`)

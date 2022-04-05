@@ -1,5 +1,9 @@
 <template>
-  <h1>{{ title }}</h1>
+  <h1 class="contact-list-name-label">{{ title }}
+    <q-tooltip anchor="bottom middle"
+               self="center middle">
+      {{ title }}
+    </q-tooltip></h1>
 </template>
 
 <script>

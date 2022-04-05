@@ -975,7 +975,6 @@ export default {
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
           .then(() => {
-            this.setSelectedListContactCount(this.listItemsTotalContacts)
             this.initialListFilters = this.currentListFilters
             this.updateFilterHasChanges()
             this.isUpdatingList = false
@@ -1331,7 +1330,7 @@ export default {
       })
     },
     setDataCount (data) {
-      this.getListDataCount({ filters: JSON.stringify(data) }).then(response => {
+      this.getListDataCount({ filters: data }).then(response => {
         const count = response.data.count
         this.setSelectedListContactCount(count)
         this.$VueEvent.fire('listCountUpdated', { list: this.list, count: count })
@@ -1512,8 +1511,10 @@ export default {
     this.myContacts = this.showMyContacts
 
     this.$VueEvent.listen('shouldUpdateListCount', function () {
-      _this.setDataCount(
-        _this.list.type === _this.ContactListTypes.DYNAMIC ? _this.list.filters : {
+      if (_this.list.type === _this.ContactListTypes.DYNAMIC) {
+        _this.setDataCount(!_.isEmpty(_this.currentListFilters) ? _this.currentListFilters : _this.list.filters)
+      } else {
+        _this.setDataCount({
           filters: {
             contact_lists: {
               operator: 1,
@@ -1521,8 +1522,8 @@ export default {
             }
           },
           is_conjunction: true
-        }
-      )
+        })
+      }
     })
   },
 

@@ -347,6 +347,10 @@ export default {
     },
 
     onToggleStatus () {
+      if (this.statusText === this.$route.params.status) {
+        return
+      }
+
       this.$nextTick(() => {
         this.$refs.taskListScroller.scrollTop = 0
       })
@@ -585,7 +589,7 @@ export default {
           this.updateContact(contact)
 
           // check if communication is a live call
-          if (communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND &&
+          if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
             [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
               CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
@@ -665,7 +669,7 @@ export default {
         const liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
         // if type is call and completed/voicemail then remove from live calls
-        if (communication.direction === CommunicationDirections.INBOUND &&
+        if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
           communication.type === CommunicationTypes.CALL &&
           [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
           const contactTaskToRemove = liveContacts[index]

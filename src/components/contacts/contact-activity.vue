@@ -328,6 +328,7 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-types'
+import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import FileIcon from 'components/icons/contact-activity/file-icon'
@@ -383,8 +384,7 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city',
-        'contact_task_status'
+        'cnam_city'
       ],
       general_audit_properties: [
         'disposition_status_id',
@@ -417,7 +417,13 @@ export default {
           'Pending',
           'Closed',
           'Live'
-        ]
+        ],
+        'contact_task_status': {
+          1: 'New',
+          2: 'Open',
+          3: 'Pending',
+          4: 'Closed'
+        }
       },
       getRelativeDateTimeInterval: null,
       getDateTimePassedInterval: null,
@@ -521,6 +527,15 @@ export default {
           ]
           return allowedData.includes((data.from !== null ? parseInt(data.from) : data.from)) ||
             allowedData.includes((data.to !== null ? parseInt(data.to) : data.to))
+        case 'contact_task_status':
+          const allowedStatus = [
+            ContactTaskStatus.STATUS_NEW,
+            ContactTaskStatus.STATUS_OPEN,
+            ContactTaskStatus.STATUS_PENDING,
+            ContactTaskStatus.STATUS_CLOSED
+          ]
+          return allowedStatus.includes((data.from !== null ? parseInt(data.from) : data.from)) ||
+            allowedStatus.includes((data.to !== null ? parseInt(data.to) : data.to))
         default:
           return false
       }
@@ -598,7 +613,7 @@ export default {
     },
 
     generateCustomAuditMessage (communication) {
-      if (['thread_status'].includes(communication.property)) {
+      if (['thread_status', 'contact_task_status'].includes(communication.property)) {
         return this.$options.filters.ucwords(communication.property.replace(/_/g, ' ')) +
           ' has been changed ' +
           (this.custom_audit_messages[communication.property][communication.from] ? `from ${this.custom_audit_messages[communication.property][communication.from]}` : '') +
