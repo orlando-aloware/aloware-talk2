@@ -306,7 +306,14 @@
                 <td
                   v-else
                   :key="key">
-                  {{ contact[column.name] }}
+                  <template>
+                    <span v-if="valueIsObject(contact[column.name])">
+                      {{ contact[column.name].name }}
+                    </span>
+                    <span v-else>
+                      {{ contact[column.name] }}
+                    </span>
+                  </template>
                 </td>
               </template>
             </template>
@@ -788,6 +795,9 @@ export default {
     },
     valueIsArray (value) {
       return Array.isArray(value)
+    },
+    valueIsObject (obj) {
+      return typeof obj === 'object'
     }
   },
   watch: {
