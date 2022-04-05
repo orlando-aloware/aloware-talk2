@@ -39,7 +39,6 @@ import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import sessionsMixins from 'src/plugins/mixins/sessions'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
-import { isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -60,13 +59,13 @@ export default {
       'selectedList'
     ]),
     ...mapGetters('powerDialer', [
-      'sessionSidebarExpanded',
-      'selectedPdList'
+      'sessionSidebarExpanded'
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',
       'activeList',
-      'activeMetrics'
+      'activeMetrics',
+      'myQueue'
     ]),
     list () {
       return this.listItems[this.selectedList.id].data || []
@@ -129,9 +128,9 @@ export default {
       })
     },
     redirectRoute (route) {
-      console.log('route ------------>> ', route)
+      let isMyQueueList = this.selectedList.name === 'My Queue'
       let routePath = '/power-dialer'
-      if ((route.name !== 'My Queue' && !isNaN(route.name)) && !isEmpty(route.name)) {
+      if (!isMyQueueList) {
         routePath += `/list/${route.id}`
       }
       this.$router.push(routePath)

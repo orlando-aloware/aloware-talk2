@@ -714,7 +714,10 @@ export default {
         return
       }
 
-      this.loadData()
+      // this.loadData()
+      if (!this.isPowerDialer) {
+        this.loadData()
+      }
     }
   },
 
