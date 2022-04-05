@@ -1182,18 +1182,19 @@ export default {
 
     this.$VueEvent.listen('contact_updated', (data) => {
       const communications = [...this.communications]
+      if (['calls', 'messages', 'mentions', 'voicemails', 'recordings'].includes(this.$route.params.channel)) {
+        if (this.$route.params.channel === 'mentions') {
+          communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
+            value.mention_subject.contact = data
+          })
+        } else {
+          communications.filter(item => item.contact.id === data.id).forEach((value) => {
+            value.contact = data
+          })
+        }
 
-      if (this.$route.params.channel === 'mentions') {
-        communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
-          value.mention_subject.contact = data
-        })
-      } else {
-        communications.filter(item => item.contact.id === data.id).forEach((value) => {
-          value.contact = data
-        })
+        this.setCommunications(communications)
       }
-
-      this.setCommunications(communications)
     })
 
     if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {

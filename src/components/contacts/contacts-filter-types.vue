@@ -284,6 +284,7 @@ export default {
         this.setShowMyContacts(false)
         this.$VueEvent.fire('clearContacts')
         this.$VueEvent.fire('fetchContacts')
+        this.$VueEvent.fire('shouldUpdateListCount')
       }
     },
     getStringValue () {
