@@ -286,7 +286,7 @@
                 </td>
                 <!-- COLUMN: Status -->
                 <td
-                  v-else-if="column.name === 'task_status_name'"
+                  v-else-if="column.name === 'task_status_name' || column.name === 'task_status'"
                   :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
                   :key="key">
                   <StatusChip
@@ -306,7 +306,14 @@
                 <td
                   v-else
                   :key="key">
-                  {{ contact[column.name] }}
+                  <template>
+                    <span v-if="valueIsObject(contact[column.name])">
+                      {{ contact[column.name].name }}
+                    </span>
+                    <span v-else>
+                      {{ contact[column.name] }}
+                    </span>
+                  </template>
                 </td>
               </template>
             </template>
@@ -788,6 +795,9 @@ export default {
     },
     valueIsArray (value) {
       return Array.isArray(value)
+    },
+    valueIsObject (obj) {
+      return typeof obj === 'object'
     }
   },
   watch: {

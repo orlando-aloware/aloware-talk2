@@ -15,7 +15,8 @@
             <button
               class="btn btn-link btn-sm tooltip-target mr-1"
               :id="folderId"
-              :ref="folderId">
+              :ref="folderId"
+              @click="destroySubmenu">
               <plus-icon
                 color="#256EFF"
                 width="14"
@@ -195,7 +196,8 @@ export default {
     ...mapState('contacts', [
       'folders',
       'removedFolder',
-      'activeFolder'
+      'activeFolder',
+      'createDialog'
     ]),
     ...mapGetters('powerDialer', [
       'datatableLoader'
@@ -284,17 +286,18 @@ export default {
     },
     onCreateFromExistingList () {
       // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
-      this.$root.$emit('bv::hide::popover')
+      this.destroySubmenu()
       this.createPdListOpen({
         id: '',
         type: 'list'
       })
+      this.$root.$emit('bv::hide::popover')
     },
     onCreateByManualSelection () {
+      this.destroySubmenu()
       this.createListOpen({
         contact_folder_id: null
       })
-      this.destroySubmenu()
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false

@@ -30,7 +30,7 @@
         @checkboxChanged="onFetchMyContacts"
         @sort="onSortByField"
         @paginated="onPaginate"
-        @loadMore="onLoadMore"
+        @loadMore="onLoadMore(selectedList)"
         @onFiltersCount="getFiltersCount"
         @on-list-update="updateList">
       </router-view>
@@ -234,18 +234,18 @@ export default {
 
       this.TOGGLE_TABLE_LOADER(false)
     },
-    async fetchApi (params) {
-      switch (this.$route.meta.id) {
-        case 'power-dialer-queue-filter':
-          this.processFetch(params, false, true)
-          break
-        case 'power-dialer-list-filter':
-          this.processFetch(params, false, false)
-          break
-        default:
-          this.processFetch(params, false, false, this.id)
-      }
-    },
+    // async fetchApi (params) {
+    //   switch (this.$route.meta.id) {
+    //     case 'power-dialer-queue-filter':
+    //       this.processFetch(params, false, true)
+    //       break
+    //     case 'power-dialer-list-filter':
+    //       this.processFetch(params, false, false)
+    //       break
+    //     default:
+    //       this.processFetch(params, false, false, this.id)
+    //   }
+    // },
     async initialize () {
       let route = this.$route.params
       if (this.$route.name !== 'Power Dialer Sessions') {
@@ -297,7 +297,7 @@ export default {
       }
     },
     async updateList (data) {
-      await this.loadList(data.id)
+      // await this.loadList(data.id)
     },
     onClear () {
       this.clearList()
