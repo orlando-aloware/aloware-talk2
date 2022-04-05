@@ -242,6 +242,10 @@ export default {
       })
     },
     updateLines (val) {
+      if (!this.genericMultiselect) {
+        this.$refs.lineSelect.blur()
+      }
+
       this.$emit('change', val)
     }
   },
