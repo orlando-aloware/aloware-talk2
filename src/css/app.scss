@@ -3867,6 +3867,16 @@ i.option-separator {
     }
   }
 
+  &.q-field--focused {
+    .q-field__control-container {
+      span {
+        &:not(:empty) {
+          display: none;
+        }
+      }
+    }
+  }
+
   &:not(.q-field--focused) {
     span {
       &:not(:empty) + input {
