@@ -186,6 +186,16 @@
         </q-tooltip>
         <timer-icon></timer-icon>
       </b-button>
+      <b-button variant="light"
+                size="sm"
+                class="custom-action-button"
+                :disabled="true">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle">
+          Add to power dialer
+        </q-tooltip>
+        <add-call-icon></add-call-icon>
+      </b-button>
       <b-button v-if="!contact.is_dnc"
                 variant="light"
                 size="sm"
@@ -196,16 +206,6 @@
           Enroll to sequence
         </q-tooltip>
         <add-sequence-icon></add-sequence-icon>
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="true">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Add to power dialer
-        </q-tooltip>
-        <add-call-icon></add-call-icon>
       </b-button>
     </div>
     <appointment-form-modal :contact="contact"></appointment-form-modal>

@@ -78,6 +78,7 @@ export default {
       this.gettingContactsList(true)
       // always reset page when fresh loading contacts
       this.page = 1
+      this.setContacts([])
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
         this.gettingContactsList(false)

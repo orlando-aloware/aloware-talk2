@@ -299,7 +299,7 @@ export default {
         !this.isLive
     },
     isLive () {
-      return [
+      return this.contact.last_communication && [
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
