@@ -58,6 +58,7 @@ export default {
       }
       return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2)
     },
+
     isCallFishing () {
       if (!this.communication.ring_group_id) {
         return false
@@ -65,7 +66,7 @@ export default {
 
       const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
-      return ringGroup && ringGroup.fishing_mode
+      return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
     },
     isCallFishingMode () {
       if (this.callFishingQueue) {
@@ -131,7 +132,7 @@ export default {
       if (this.communication.ring_group_id) {
         const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
-        if (ringGroup && ringGroup.fishing_mode) {
+        if (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) {
           const data = {
             communication: {
               id: this.communication.id,
@@ -160,7 +161,7 @@ export default {
     },
     onRejectCall (e) {
       this.isRejecting = true
-      if (this.isCallFishingMode) {
+      if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
         const liveContacts = _.cloneDeep(this.liveContacts)
         if (this.liveContacts.find(item => item.id === this.contact.id)) {
@@ -174,6 +175,7 @@ export default {
         }
 
         this.isRejecting = false
+        this.processRemoveFromNotification(this.communication)
         e.stopImmediatePropagation()
         return
       }
@@ -187,6 +189,7 @@ export default {
 
       this.$VueEvent.fire('rejectCall')
       this.isRejecting = false
+      this.processRemoveFromNotification(this.communication)
       e.stopImmediatePropagation()
     },
     onHangUpCall (e) {

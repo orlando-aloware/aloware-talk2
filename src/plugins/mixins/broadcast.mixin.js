@@ -12,7 +12,9 @@ export default {
   methods: {
     ...mapActions([
       'setUserStatus',
-      'updateCampaign',
+      'newRingGroup',
+      'updateRingGroup',
+      'deleteRingGroup',
       'newCampaign',
       'updateCampaign',
       'deleteCampaign',
@@ -427,6 +429,18 @@ export default {
             campaign.incoming_number = event.incoming_number.phone_number
             this.updateCampaign(campaign)
           }
+        })
+        .listen('.ring_group.created', (event) => {
+          this.newRingGroup(event.ring_group)
+          this.$VueEvent.fire('ring_group_created', event.ring_group)
+        })
+        .listen('.ring_group.updated', (event) => {
+          this.updateRingGroup(event.ring_group)
+          this.$VueEvent.fire('ring_group_updated', event.ring_group)
+        })
+        .listen('.ring_group.deleted', (event) => {
+          this.deleteRingGroup(event.ring_group)
+          this.$VueEvent.fire('ring_group_deleted', event.ring_group)
         })
         .listen('.campaign.created', (event) => {
           event.campaign.last_call_datetime = event.last_call_datetime
