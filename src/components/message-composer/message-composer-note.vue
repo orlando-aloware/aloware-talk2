@@ -31,7 +31,8 @@
           <div ref="noteContentEditable"
                id="noteContentEditable"
                placeholder="Type @ to mention someone"
-               contenteditable>
+               contenteditable
+               @keydown="onKeyDown">
           </div>
         </at>
       </form>
@@ -132,6 +133,14 @@ export default {
           clearInterval(this.focustInputInterval)
         }
       }, 250)
+    },
+    onKeyDown (evt) {
+      if (evt.keyCode === 13 && !evt.shiftKey) {
+        if (this.validNote) {
+          this.onAdd()
+        }
+        evt.preventDefault()
+      }
     }
   },
   mounted () {

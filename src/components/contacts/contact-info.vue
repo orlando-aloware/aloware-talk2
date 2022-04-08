@@ -103,7 +103,7 @@
         </i>
         <q-spinner-bars v-if="isProcessingBlock"
                         class="mr-1"
-                        color="white" />
+                        color="blue" />
       </b-button>
 
       <b-button v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
@@ -118,51 +118,14 @@
         </q-tooltip>
         <q-spinner-bars v-if="isProcessingBlock"
                         class="mr-1"
-                        color="white" />
+                        color="blue" />
         <i v-if="!isProcessingBlock"
            class="fa fa-lock-open">
         </i>
       </b-button>
 
-      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_dnc"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="isProcessingDNC"
-                @click="dncContact">
-        <q-tooltip v-if="!contact.is_dnc"
-                   anchor="bottom middle"
-                   self="center middle">
-          DNC
-        </q-tooltip>
-
-        <q-spinner-bars v-if="isProcessingDNC"
-                        class="mr-1"
-                        color="white" />
-        <i v-if="!isProcessingDNC"
-           class="fa fa-ban">
-        </i>
-      </b-button>
-
-      <b-button v-if="hasRole('Company Admin') && contact.is_dnc && currentCompany && [CompanyImportance.IMPORTANCE_RESTRICTED, CompanyImportance.IMPORTANCE_C_LEVEL].includes(currentCompany.importance)"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="isProcessingDNC"
-                @click="unDncContact">
-        <q-tooltip v-if="contact.is_dnc"
-                   anchor="bottom middle"
-                   self="center middle">
-          Un-DNC
-        </q-tooltip>
-
-        <q-spinner-bars v-if="isProcessingDNC"
-                        class="mr-1"
-                        color="white" />
-        <i v-if="!isProcessingDNC"
-           class="fa fa-ban">
-        </i>
-      </b-button>
+      <contact-dnc-actions class="mr-2"
+                           :contact="contact"></contact-dnc-actions>
 
       <b-button variant="light"
                 size="sm"
@@ -196,10 +159,11 @@
         </q-tooltip>
         <add-call-icon></add-call-icon>
       </b-button>
-      <b-button v-if="!contact.is_dnc"
+      <b-button v-if="!contact.is_dnc && hasPermissionTo('update contact')"
                 variant="light"
                 size="sm"
                 class="custom-action-button"
+                :disabled="sequence"
                 @click="openEnrollSequenceModal">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
@@ -231,6 +195,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import * as CompanyImportance from 'src/constants/importance-label'
+import ContactDncActions from 'components/contacts/contact-dnc-actions'
 
 export default {
   name: 'contact-info',
@@ -238,6 +203,7 @@ export default {
   mixins: [aclMixin],
 
   components: {
+    ContactDncActions,
     DigitalClock,
     ContactAddReminderModal,
     EnrollSequenceModal,
@@ -250,6 +216,12 @@ export default {
     AddSequenceIcon,
     Avatar,
     ContactNameForm
+  },
+
+  props: {
+    sequence: {
+      required: false
+    }
   },
 
   computed: {
@@ -345,55 +317,6 @@ export default {
       this.$VueEvent.fire('callContact', data)
     },
 
-    dncContact () {
-      this.$q.dialog({
-        title: '',
-        message: 'DNC will disable all communications to a contact and is irreversible. Do you wish to continue?',
-        persistent: true,
-        ok: {
-          label: 'Yes'
-        },
-        cancel: {
-          label: 'No',
-          color: 'secondary'
-        }
-      }).onOk(() => {
-        this.isProcessingDNC = true
-        talk2Api.V1.contact.update(this.contact.id, { is_dnc: 1 }).then(response => {
-          this.contact.is_dnc = true
-          this.isProcessingDNC = false
-          this.$generalNotification('Contact was successfully DNC.', 'success')
-        })
-      })
-    },
-
-    unDncContact () {
-      this.$q.dialog({
-        title: 'Un-DNC',
-        message: 'Are you sure you want to Un-DNC ' + this.contactName + '?',
-        prompt: {
-          model: '',
-          isValid: val => val.trim().length > 2, // << here is the magic
-          type: 'text' // optional
-        },
-        persistent: true,
-        ok: {
-          label: 'Yes'
-        },
-        cancel: {
-          label: 'No',
-          color: 'secondary'
-        }
-      }).onOk(data => {
-        this.isProcessingDNC = true
-        talk2Api.V1.contact.unDnc(this.contact.id, data).then(() => {
-          this.contact.is_dnc = false
-          this.isProcessingDNC = false
-          this.$generalNotification('Contact was successfully un-DNC.', 'success')
-        })
-      })
-    },
-
     blockContact () {
       this.isProcessingBlock = true
       talk2Api.V1.contact.update(this.contact.id, { is_blocked: 1 }).then(() => {
@@ -402,6 +325,7 @@ export default {
         this.$generalNotification('Contact was successfully blocked.', 'success')
       })
     },
+
     unBlockContact () {
       this.isProcessingBlock = true
       talk2Api.V1.contact.update(this.contact.id, { is_blocked: 0 }).then(() => {

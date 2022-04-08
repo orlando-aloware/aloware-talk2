@@ -43,7 +43,7 @@
                        class="ml-1 fs-12"
                        variant="primary"
                        v-b-modal:inbox-channel-filter-modal>
-                {{ channelChangedFilterFields.length }}
+                {{ changedFilterFieldCount }}
               </b-badge>
             </div>
           </div>
@@ -243,6 +243,13 @@ export default {
         // connected calls
         ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2))
       ]
+    },
+    changedFilterFieldCount () {
+      const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
+      if (dateFieldIndex >= 0) {
+        return this.channelChangedFilterFields.length - 1
+      }
+      return this.channelChangedFilterFields.length
     }
   },
 
@@ -253,13 +260,13 @@ export default {
       previousRoute: null,
       newFilterModel: {
         name: '',
-        type: 5,
+        type: 6,
         filter: [],
         scope: 'user'
       },
       defaultFilterModel: {
         name: '',
-        type: 5,
+        type: 6,
         filter: {
           campaigns: Filters.DEFAULT_STATE.filter.campaigns,
           ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
@@ -579,7 +586,6 @@ export default {
         return
       }
 
-      // TODO issue is selected contact is overridden by contact from new comms
       setTimeout(() => {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
           const contact = response.data

@@ -1,5 +1,7 @@
 <template>
-  <b-button-toolbar class="btn-inbox-list-navigation" key-nav>
+  <b-button-toolbar v-if="isEnabled"
+                    class="btn-inbox-list-navigation"
+                    key-nav>
     <b-button-group class="mx-1">
       <b-button size="sm"
                 variant="light"
@@ -26,6 +28,12 @@ import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'inbox-list-navigation',
+
+  data () {
+    return {
+      isEnabled: false
+    }
+  },
 
   computed: {
     ...mapState('inbox', ['contacts', 'hasMoreContacts']),

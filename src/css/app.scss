@@ -11066,3 +11066,21 @@ h1.contact-list-name-label {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.btn-contact-sequence-enrol {
+  &:hover {
+    svg {
+      path {
+        fill: $white
+      }
+    }
+  }
+
+  svg {
+    margin-top: -4px;
+
+    path {
+      fill : $primary
+    }
+  }
+}
