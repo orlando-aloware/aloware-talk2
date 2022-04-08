@@ -448,9 +448,9 @@ export default {
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
     },
-    getDateRangeInputLabel (data) {
-      if (data.startDate && data.endDate) {
-        return this.$options.filters.date(data.startDate) + ' - ' + this.$options.filters.date(data.endDate)
+    getDateRangeInputLabel () {
+      if (this.dateRange.startDate && this.dateRange.endDate) {
+        return this.$options.filters.date(this.dateRange.startDate) + ' - ' + this.$options.filters.date(this.dateRange.endDate)
       }
       return 'All Time'
     }
