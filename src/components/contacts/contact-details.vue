@@ -14,11 +14,9 @@
     <div class="contact-details-wrapper">
       <div class="details-component-container"
            ref="detailsComponentContainer">
-        <contact-info :sequence="sequence"></contact-info>
+        <contact-info></contact-info>
         <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                          :contact="contact"
-                          @sequenceLoaded="onSequenceLoaded"
-                          @contactDisenrolled="onContactDisenrolled">
+                          :contact="contact">
         </contact-sequence>
         <contact-phones></contact-phones>
         <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
@@ -102,13 +100,6 @@ export default {
     }
   },
 
-  data () {
-    return {
-      sequence: null,
-      workflow: null
-    }
-  },
-
   methods: {
     ...mapActions('contacts', ['setContact', 'updateChangedContactProperties']),
     onNotesInput (value) {
@@ -116,14 +107,6 @@ export default {
         name: 'notes',
         value: value
       })
-    },
-    onSequenceLoaded (data) {
-      this.sequence = data.sequence
-      this.workflow = data.workflow
-    },
-    onContactDisenrolled () {
-      this.sequence = null
-      this.workflow = null
     }
   },
 

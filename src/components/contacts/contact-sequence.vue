@@ -109,6 +109,8 @@ export default {
         this.workflow = response.data.workflow
         this.isBusy = false
         this.$emit('sequenceLoaded', { sequence: this.sequence, workflow: this.workflow })
+      }).catch(() => {
+        this.isBusy = false
       })
     },
     disenrollContact () {
@@ -142,7 +144,10 @@ export default {
         return
       }
 
-      _this.getSequenceInfo()
+      _this.isBusy = true
+      setTimeout(() => {
+        _this.getSequenceInfo()
+      }, 3000)
     })
   },
 

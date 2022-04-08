@@ -159,22 +159,9 @@
         </q-tooltip>
         <add-call-icon></add-call-icon>
       </b-button>
-      <b-button v-if="!contact.is_dnc && hasPermissionTo('update contact')"
-                variant="light"
-                size="sm"
-                class="custom-action-button"
-                :disabled="sequence"
-                @click="openEnrollSequenceModal">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Enroll to sequence
-        </q-tooltip>
-        <add-sequence-icon></add-sequence-icon>
-      </b-button>
     </div>
     <appointment-form-modal :contact="contact"></appointment-form-modal>
     <contact-add-reminder-modal></contact-add-reminder-modal>
-    <enroll-sequence-modal></enroll-sequence-modal>
   </b-card>
 </template>
 
@@ -182,14 +169,12 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import ContactNameForm from 'src/components/forms/contact-name-form'
 import Avatar from 'src/components/avatar'
-import AddSequenceIcon from 'src/components/icons/add-sequence-icon'
 import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
 import CallIcon from 'src/components/icons/call-icon'
 import AddCallIcon from 'src/components/icons/add-call-icon'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
-import EnrollSequenceModal from 'src/components/enroll-sequence-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import { aclMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
@@ -206,22 +191,14 @@ export default {
     ContactDncActions,
     DigitalClock,
     ContactAddReminderModal,
-    EnrollSequenceModal,
     AppointmentFormModal,
     PencilOIcon,
     AddCallIcon,
     CallIcon,
     CalendarIcon,
     TimerIcon,
-    AddSequenceIcon,
     Avatar,
     ContactNameForm
-  },
-
-  props: {
-    sequence: {
-      required: false
-    }
   },
 
   computed: {
@@ -245,7 +222,6 @@ export default {
   data () {
     return {
       showEditForm: false,
-      showEnrollSequenceForm: false,
       isProcessingDNC: false,
       isProcessingBlock: false,
       CompanyImportance
@@ -253,15 +229,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'enrollSequenceOpen', 'addReminderOpen']),
+    ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'addReminderOpen']),
     ...mapActions(['setShowPhone']),
 
     openAddReminderModal () {
       this.addReminderOpen(true)
-    },
-
-    openEnrollSequenceModal () {
-      this.enrollSequenceOpen(true)
     },
 
     openAppointmentModal () {
