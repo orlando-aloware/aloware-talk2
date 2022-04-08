@@ -15,6 +15,9 @@
       <div class="details-component-container"
            ref="detailsComponentContainer">
         <contact-info></contact-info>
+        <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
+                          :contact="contact">
+        </contact-sequence>
         <contact-phones></contact-phones>
         <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
         </contact-information>
@@ -50,19 +53,21 @@ import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-
 import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
 import { mapGetters, mapActions } from 'vuex'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 import _ from 'lodash'
 import Profile from 'components/profile'
+import ContactSequence from 'components/contacts/contact-sequence'
+import { aclMixin, contact } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-details',
 
-  mixins: [contactMixins],
+  mixins: [contact, aclMixin],
 
   components: {
+    ContactSequence,
     Profile,
     ContactSaveBar,
     ContactScheduledMessages,

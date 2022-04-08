@@ -26,7 +26,7 @@
                   :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
                   :opens="opens"
                   :ranges="ranges"
-                  :always-show-calendars="false"
+                  :always-show-calendars="true"
                   :auto-apply="true"
                 >
                   <template v-slot:input="picker" style="min-width: 350px;">
@@ -421,7 +421,14 @@ export default {
       },
       opens: 'right',
       ranges: {
-        'All Time': [null, null]
+        'All Time': [null, null],
+        'Today': [window.moment()._d, window.moment()._d],
+        'Yesterday': [window.moment().subtract(1, 'day')._d, window.moment().subtract(1, 'day')._d],
+        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
+        'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
+        'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
+        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment().subtract(1, 'day')._d],
+        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d]
       },
       rangePicker: null
     }
@@ -441,9 +448,9 @@ export default {
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
     },
-    getDateRangeInputLabel (data) {
-      if (data.startDate && data.endDate) {
-        return this.$options.filters.date(data.startDate) + ' - ' + this.$options.filters.date(data.endDate)
+    getDateRangeInputLabel () {
+      if (this.dateRange.startDate && this.dateRange.endDate) {
+        return this.$options.filters.date(this.dateRange.startDate) + ' - ' + this.$options.filters.date(this.dateRange.endDate)
       }
       return 'All Time'
     }

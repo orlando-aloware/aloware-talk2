@@ -196,7 +196,7 @@ export default {
     async loadDynamicListPinnedCount (data) {
       await this.getListDataCount(data).then((response) => {
         this.pinnedCountLoaded({
-          id: data.contact_list_id,
+          id: data.contact_list_id || data.id,
           count: response.data.count
         })
       }).catch((err) => {

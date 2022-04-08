@@ -78,7 +78,7 @@ export default {
     ...mapState('contacts', ['isAddReminderOpen']),
     ...mapState('auth', ['profile']),
     isValid () {
-      return this.reminder.date && this.reminder.time && this.reminder.note && this.reminder.timezone
+      return this.reminder.date && this.reminder.time && this.reminder.timezone
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
