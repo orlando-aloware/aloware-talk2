@@ -3852,7 +3852,7 @@ i.option-separator {
     span {
       position: relative;
       overflow: hidden;
-      width: 100%;
+      /*width: 100%;*/
       white-space: nowrap;
       text-overflow: ellipsis;
     }
@@ -3864,24 +3864,6 @@ i.option-separator {
   &.with-prepend {
     .q-field__native {
       padding-left: 0 !important;
-    }
-  }
-
-  &.q-field--focused {
-    .q-field__control-container {
-      span {
-        &:not(:empty) {
-          display: none;
-        }
-      }
-    }
-  }
-
-  &:not(.q-field--focused) {
-    span {
-      &:not(:empty) + input {
-        display: none;
-      }
     }
   }
 
