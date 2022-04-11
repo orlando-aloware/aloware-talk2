@@ -809,7 +809,6 @@ export default {
       return typeof obj === 'object'
     },
     getObjectKey (obj, key) {
-      console.log('obj :>> ' + key, obj)
       if (obj?.name) {
         return obj.name
       }
@@ -828,14 +827,12 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
-        this.$VueEvent.fire('clearContacts')
         if (this.$route.name === 'Power Dialer') {
+          this.$VueEvent.fire('clearContacts')
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.onFetch(params, this.hasFilters)
           this.$emit('onFiltersCount', this.currentListFilters)
-          // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
-        // this.isLoading = false
       }
     },
     selectedList (value) {

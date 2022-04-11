@@ -13,15 +13,26 @@
         :key="column.name"
         class="text-left pull-left datatable-row__checkbox">
 
-        <label class="custom-checkbox-container">
+        <label
+          class="custom-checkbox-container">
           <input
             type="checkbox"
             class="checker"
             :value="contact.id"
+            :disabled="contact.is_dnc || contact.is_blocked"
             :checked="checked.find(item => item.id === contact.id)"
             @change="onCheckerClicked" />
           <span class="checkmark"></span>
         </label>
+        <q-tooltip
+          class="bg-purple text-subtitle1"
+          :offset="[0, 0]"
+          anchor="center right"
+          self="center left"
+          v-model="showing"
+          v-if="!hasDefaultContent && (contact.is_dnc || contact.is_blocked)">
+          Unable to add DNC or blocked contacts
+        </q-tooltip>
       </td>
 
       <td
@@ -48,6 +59,17 @@
                 <template v-if="!contact.name"> No Name</template>
               </a>
             </router-link>
+
+            <b-badge v-if="contact.is_dnc"
+              variant="danger"
+              class="badge-phone-info">
+              DNC
+            </b-badge>
+            <b-badge v-if="contact.is_blocked"
+              variant="danger"
+              class="badge-phone-info">
+              blocked
+            </b-badge>
 
           </div>
         </div>
@@ -362,7 +384,8 @@ export default {
         'outbound_texts_count',
         'outbound_communications_count',
         'communications_count'
-      ]
+      ],
+      tooltip: false
     }
   },
 
@@ -389,6 +412,9 @@ export default {
         }
       }
       return newItems
+    },
+    hasDefaultContent () {
+      return this.$route.name === 'Contacts'
     }
   },
 
