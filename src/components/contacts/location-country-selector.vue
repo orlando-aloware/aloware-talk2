@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-select class="inline-select"
+    <q-select class="inline-select q-basic-selector"
               ref="countrySelect"
               use-input
               clearable
@@ -23,9 +23,14 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import * as Countries from 'src/constants/countries'
+import { selectorMixin } from 'src/plugins/mixins'
 export default {
   name: 'location-country-selector',
+  mixins: [
+    selectorMixin
+  ],
   props: {
     contact: {
       type: Object,
@@ -44,32 +49,19 @@ export default {
     return {
       countries: Countries.COUNTRIES,
       options: Countries.COUNTRIES,
-      selectWidth: 0
+      selectedId: _.get(this.contact, 'cnam_country', null),
+      compareProperty: 'code',
+      reference: 'countrySelect',
+      emitEvent: 'select',
+      emitChange: true
     }
   },
   computed: {
-    selectedCountryObject () {
-      return this.countries.find(country => country.code === this.contact.cnam_country)
+    placeholder () {
+      return ''
     }
   },
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.countrySelect.$el.offsetWidth
-    },
-    onFocus () {
-      this.isFocused = true
-      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedCountryObject ? this.selectedCountryObject.name : 'Select country'
-      this.$el.querySelector('.inline-select .q-field__native span').style.display = 'none'
-    },
-    onBlur () {
-      this.isFocused = false
-      this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
-      this.$el.querySelector('.inline-select .q-field__native span').style.display = ''
-    },
-    onInput (val) {
-      this.$el.querySelector('.inline-select .q-field__input').blur()
-      this.$emit('select', val)
-    },
     filterFn (val, update) {
       if (val === '') {
         update(() => {
@@ -82,6 +74,12 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.countries.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
+    }
+  },
+  watch: {
+    'contact.cnam_country': function (value) {
+      this.selectedId = value
+      this.showInputPlaceholder()
     }
   }
 }

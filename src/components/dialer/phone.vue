@@ -63,32 +63,15 @@
 
           <div class="phone-settings">
             <q-item-label class="mb-1">Input device</q-item-label>
-            <q-select :options="inputDevices"
-                      v-model="inputDevice"
-                      class="has-margin-top-5"
-                      option-value="id"
-                      option-label="label"
-                      use-input
-                      emit-value
-                      map-options
-                      outlined
-                      dense
-                      @input="setInputDevice">
-            </q-select>
-
+            <device-selector :options="inputDevices"
+                             v-model="inputDevice"
+                             @input="setInputDevice">
+            </device-selector>
             <q-item-label class="mt-3 mb-1">Output device</q-item-label>
-            <q-select :options="outputDevices"
-                      v-model="outputDevice"
-                      class="has-margin-top-5"
-                      option-value="id"
-                      option-label="label"
-                      use-input
-                      emit-value
-                      map-options
-                      outlined
-                      dense
-                      @input="setOutputDevice">
-            </q-select>
+            <device-selector :options="outputDevices"
+                             v-model="outputDevice"
+                             @input="setOutputDevice">
+            </device-selector>
 
             <q-btn color="primary"
                    class="full-width border-half-rounded mt-2 text-size-sm q-pa-xs"
@@ -1220,6 +1203,7 @@ import * as AnswerTypes from 'src/constants/answer-types'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
+import DeviceSelector from 'components/generic-selectors/device-selector'
 export default {
   name: 'phone',
   components: {
@@ -1262,7 +1246,8 @@ export default {
     PersonIcon,
     AcceptCallIcon,
     CancelCallIcon,
-    ContactIntegrations
+    ContactIntegrations,
+    DeviceSelector
   },
   mixins: [
     communicationInfoMixin,

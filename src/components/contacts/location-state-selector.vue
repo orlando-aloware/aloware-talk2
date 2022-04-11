@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-select class="inline-select"
+    <q-select class="inline-select q-basic-selector"
               ref="stateSelect"
               use-input
               clearable
@@ -18,8 +18,13 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import { selectorMixin } from 'src/plugins/mixins'
 export default {
   name: 'location-state-selector',
+  mixins: [
+    selectorMixin
+  ],
   props: {
     contact: {
       type: Object,
@@ -44,13 +49,8 @@ export default {
       }
       return []
     },
-    selectedState: {
-      get () {
-        return this.state
-      },
-      set (state) {
-        return state
-      }
+    placeholder () {
+      return ''
     }
   },
   data () {
@@ -61,27 +61,14 @@ export default {
         CA: ['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT']
       },
       options: this.states,
-      selectWidth: 0
+      selectedId: _.get(this.contact, 'cnam_state', null),
+      compareProperty: null,
+      reference: 'stateSelect',
+      emitEvent: 'select',
+      emitChange: true
     }
   },
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.stateSelect.$el.offsetWidth
-    },
-    onFocus () {
-      this.isFocused = true
-      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedState ? this.selectedState : 'Select state'
-      this.$el.querySelector('.inline-select .q-field__native span').style.display = 'none'
-    },
-    onBlur () {
-      this.isFocused = false
-      this.$el.querySelector('.inline-select .q-field__input').placeholder = ''
-      this.$el.querySelector('.inline-select .q-field__native span').style.display = ''
-    },
-    onInput (val) {
-      this.$el.querySelector('.inline-select .q-field__input').blur()
-      this.$emit('select', val)
-    },
     filterFn (val, update) {
       if (val === '') {
         update(() => {
@@ -94,6 +81,15 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.states.filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
+    }
+  },
+  watch: {
+    'contact.cnam_state': function (value) {
+      this.selectedId = value
+      this.showInputPlaceholder()
+    },
+    states (value) {
+      this.options = value
     }
   }
 }

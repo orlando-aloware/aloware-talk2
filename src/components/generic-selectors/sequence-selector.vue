@@ -2,6 +2,7 @@
   <div>
     <q-select ref="sequenceSelect"
               options-selected-class="text-primary"
+              class="q-basic-selector"
               color="primary"
               option-value="id"
               option-label="name"
@@ -12,8 +13,8 @@
               map-options
               outlined
               dense
-              v-model="sequence"
-              :options="sequencesOptions"
+              v-model="selectedId"
+              :options="options"
               :placeholder="placeholder"
               :multiple="multiple"
               :disable="disable"
@@ -22,6 +23,9 @@
               :clearable="clearable"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMenu"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
@@ -80,8 +84,13 @@
 import auth from 'boot/auth'
 import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import { selectorMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'sequence-selector',
+  mixins: [
+    selectorMixin
+  ],
   components: { RemoveTagIcon },
   props: {
     value: {
@@ -141,12 +150,12 @@ export default {
     ...mapState('cache', ['currentCompany']),
     placeholder () {
       switch (true) {
-        case this.multiple && this.sequence && this.sequence.length < 1:
+        case this.multiple && this.selectedId && this.selectedId.length < 1:
           return 'Select Sequences'
-        case !this.multiple && !this.sequence:
+        case !this.multiple && !this.selectedId:
           return 'Select Sequence'
-        case this.multiple && this.sequence && this.sequence.length > 0:
-        case !this.multiple && this.sequence:
+        case this.multiple && this.selectedId && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
         default:
           return ''
       }
@@ -190,43 +199,41 @@ export default {
 
   data () {
     return {
-      sequence: null,
+      selectedId: null,
       auth: auth,
       isLoading: false,
-      sequencesOptions: [],
-      selectWidth: 0
+      options: [],
+      reference: 'sequenceSelect'
     }
   },
 
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.sequenceSelect.$el.offsetWidth
-    },
     filterFn (val, update) {
       if (val === '') {
         update(() => {
-          this.sequencesOptions = this.formattedSequences
+          this.options = this.formattedSequences
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.sequencesOptions = this.formattedSequences.filter((sequence) => sequence.name && sequence.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.formattedSequences.filter((sequence) => sequence.name && sequence.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
 
   created () {
-    this.sequencesOptions = this.formattedSequences
+    this.options = this.formattedSequences
   },
 
   watch: {
     value () {
-      this.sequence = this.value
+      this.selectedId = this.value
     },
-    sequence: function (value) {
+    selectedId: function (value) {
       this.$emit('change', value)
+      this.showInputPlaceholder()
     }
   }
 }

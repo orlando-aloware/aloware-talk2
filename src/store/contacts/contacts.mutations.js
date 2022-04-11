@@ -397,6 +397,7 @@ export default {
     const contactsDefaultState = Object.assign({}, ContactsDefault.DEFAULT_STATE)
     if (value.includes('non-cache')) {
       delete contactsDefaultState.lists
+      delete contactsDefaultState.showMyContacts
     }
 
     state = Object.assign(state, contactsDefaultState)

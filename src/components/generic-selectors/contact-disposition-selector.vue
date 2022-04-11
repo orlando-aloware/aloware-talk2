@@ -1,5 +1,6 @@
 <template>
   <q-select options-selected-class="text-primary"
+            class="q-basic-selector"
             color="primary"
             option-value="id"
             option-label="name"
@@ -10,16 +11,19 @@
             :use-input="useInput"
             :use-chips="useChips"
             :emit-value="emitValue"
-            :options="contactDispositionsOptions"
+            :options="options"
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
             :outlined="outlined"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            v-model="contactDispositionId"
+            v-model="selectedId"
             @popup-show="onShowMenu"
-            @filter="filterFn">
+            @filter="filterFn"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput">
     <template v-slot:prepend
               v-if="prepend">
       <span class="text-size-xs text-grey-80">{{ prepend }}</span>
@@ -57,9 +61,14 @@
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-disposition-selector',
+
+  mixins: [
+    selectorMixin
+  ],
 
   props: {
     value: {
@@ -131,9 +140,9 @@ export default {
 
   data () {
     return {
-      contactDispositionId: this.value,
-      contactDispositionsOptions: [],
-      selectWidth: 0
+      selectedId: this.value,
+      options: [],
+      reference: 'contactDispositionSelect'
     }
   },
 
@@ -146,12 +155,12 @@ export default {
       }
 
       switch (true) {
-        case this.multiple && this.contactDispositionId.length < 1:
+        case this.multiple && this.selectedId.length < 1:
           return 'Select Contact Dispositions'
-        case !this.multiple && !this.contactDispositionId:
+        case !this.multiple && !this.selectedId:
           return 'Select Contact Disposition'
-        case this.multiple && this.contactDispositionId.length > 0:
-        case !this.multiple && this.contactDispositionId:
+        case this.multiple && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
         default:
           return ''
       }
@@ -171,47 +180,45 @@ export default {
   },
 
   mounted () {
-    this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder
+    this.options = this.contactDispositionsAlphabeticalOrder
   },
 
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.contactDispositionSelect.$el.offsetWidth
-    },
     filterFn (val, update) {
-      if (this.contactDispositionId && val === this.contactDispositionId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.id === this.contactDispositionId)
+          this.options = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder
+          this.options = this.contactDispositionsAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
 
   watch: {
     value () {
-      this.contactDispositionId = this.value
+      this.selectedId = this.value
     },
 
-    contactDispositionId (val) {
-      if (this.contactDispositionId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', val)
       }
+      this.showInputPlaceholder()
     },
     contactDispositionsAlphabeticalOrder () {
-      this.contactDispositionsOptions = this.contactDispositionsAlphabeticalOrder
+      this.options = this.contactDispositionsAlphabeticalOrder
     }
   }
 }

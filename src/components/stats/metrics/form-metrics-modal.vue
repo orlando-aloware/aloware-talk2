@@ -25,13 +25,16 @@
               input-debounce="0"
               option-value="metric_id"
               option-label="label"
-              class="border-half-rounded"
+              class="border-half-rounded q-basic-selector"
               ref="statsSelectMetrics"
-              v-model="metric"
-              :options="filteredMetricOptions"
+              v-model="selectedId"
+              :options="options"
               :placeholder="placeholder"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMetricsMenu"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
               @filter="filterFn">
               <template v-slot:option="scope">
                 <q-item v-bind="scope.itemProps"
@@ -104,9 +107,13 @@
 import { mapState } from 'vuex'
 import * as MetricOptionColors from 'src/constants/metric-option-colors'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'FormMetricsModal',
+  mixins: [
+    selectorMixin
+  ],
   props: {
     isOpen: {
       type: Boolean,
@@ -137,7 +144,7 @@ export default {
       return false
     },
     validData () {
-      if (!this.color || !this.metric) {
+      if (!this.color || !this.selectedId) {
         return false
       }
       return true
@@ -146,7 +153,7 @@ export default {
   data () {
     return {
       modal: false,
-      metric: null,
+      selectedId: null,
       model: '',
       color: {
         color: 'black',
@@ -154,14 +161,16 @@ export default {
         value: 'black'
       },
       selectWidth: 0,
-      filteredMetricOptions: [],
+      options: [],
       placeholder: 'Add Metric',
+      compareProperty: 'metric_id',
+      textProperty: 'label',
       MetricOptionColors,
       MetricOptionGroups
     }
   },
   mounted () {
-    this.filteredMetricOptions = this.fixedAvailableMetrics()
+    this.options = this.fixedAvailableMetrics()
   },
   watch: {
     isOpen (val) {
@@ -177,31 +186,32 @@ export default {
           this.color = this.colors.find(col => {
             return col.value === color
           })
-          this.metric = metricId
+          this.selectedId = metricId
         }
       }
     },
     availableMetrics: {
       deep: true,
       handler: function () {
-        this.filteredMetricOptions = this.fixedAvailableMetrics()
+        this.options = this.fixedAvailableMetrics()
       }
     },
-    metric () {
-      if (this.metric) {
+    selectedId () {
+      if (this.selectedId) {
         this.placeholder = ''
       } else {
         this.placeholder = 'Add Metric'
       }
+      this.showInputPlaceholder()
     }
   },
   methods: {
     async submit () {
-      const option = this.availableMetrics.find(option => `${option.type}_${option.metric_id}` === this.metric)
+      const option = this.availableMetrics.find(option => `${option.type}_${option.metric_id}` === this.selectedId)
       if (this.actionCreate) {
         this.$emit('update', {
           type: option ? option.type : null,
-          metricId: this.metric,
+          metricId: this.selectedId,
           color: this.color.value
         })
         return
@@ -210,13 +220,13 @@ export default {
         categoryLabel: option ? option.categoryLabel : '',
         label: option ? option.label : '',
         type: option ? option.type : null,
-        metricId: this.metric,
+        metricId: this.selectedId,
         color: this.color.value
       })
       this.modal = true
     },
     resetData () {
-      this.metric = ''
+      this.selectedId = ''
       this.color = {
         color: 'black',
         text: 'Default',
@@ -244,13 +254,13 @@ export default {
       const fixedMetrics = this.fixedAvailableMetrics()
       if (val === '') {
         update(() => {
-          this.filteredMetricOptions = fixedMetrics
+          this.options = fixedMetrics
         })
         return
       }
 
       update(() => {
-        this.filteredMetricOptions = fixedMetrics.filter(metric => metric.label.toLowerCase().indexOf(val.toLowerCase()) !== -1)
+        this.options = fixedMetrics.filter(metric => metric.label.toLowerCase().indexOf(val.toLowerCase()) !== -1)
       })
     },
     pluralizeLabel (label) {

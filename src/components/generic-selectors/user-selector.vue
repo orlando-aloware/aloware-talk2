@@ -1,6 +1,6 @@
 <template>
   <q-select ref="userSelect"
-            class="q-user-selector"
+            class="q-user-selector q-basic-selector"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -11,7 +11,7 @@
             emit-value
             map-options
             dense
-            v-model="userId"
+            v-model="selectedId"
             :hide-dropdown-icon="hideDropdownIcon"
             :clearable="clearable"
             :outlined="outlined"
@@ -94,9 +94,13 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'user-selector',
+  mixins: [
+    selectorMixin
+  ],
   components: { RemoveTagIcon },
   props: {
     value: {
@@ -177,14 +181,18 @@ export default {
   data () {
     return {
       isFocused: false,
-      userId: this.value,
+      selectedId: this.value,
       userOptions: [],
-      selectWidth: 0
+      reference: 'userSelect'
     }
   },
 
   computed: {
     ...mapState(['users', 'usersIsLoading']),
+
+    options () {
+      return this.users
+    },
 
     placeholder () {
       if (!this.showPlaceholder) {
@@ -192,19 +200,19 @@ export default {
       }
 
       switch (true) {
-        case this.multiple && this.userId && this.userId.length < 1:
+        case this.multiple && this.selectedId && this.selectedId.length < 1:
           return this.customPlaceholder || 'Select Users'
-        case !this.multiple && !this.userId:
+        case !this.multiple && !this.selectedId:
           return this.customPlaceholder || 'Select User'
-        case this.multiple && this.userId && this.userId.length > 0:
-        case !this.multiple && this.userId:
+        case this.multiple && this.selectedId && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
         default:
           return ''
       }
     },
 
     availableUsers () {
-      return this.users
+      return this.options
     },
 
     filteredUsers () {
@@ -251,11 +259,11 @@ export default {
     },
 
     userObject () {
-      if (!this.userId) {
+      if (!this.selectedId) {
         return null
       }
 
-      return this.formattedOptions.find(item => item.id === this.userId)
+      return this.formattedOptions.find(item => item.id === this.selectedId)
     }
   },
 
@@ -264,46 +272,10 @@ export default {
   },
 
   methods: {
-
-    onFocus () {
-      this.isFocused = true
-      this.$el.querySelector('.q-user-selector .q-field__input').placeholder = this.userObject ? this.userObject.name : this.placeholder
-      this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'block'
-      if (this.userObject) {
-        this.$el.querySelector('.q-user-selector .q-field__native span').style.display = 'none'
-      }
-    },
-
-    onBlur () {
-      this.isFocused = false
-      this.$el.querySelector('.q-user-selector .q-field__input').placeholder = ''
-      this.showInputPlaceholder()
-      if (this.userObject) {
-        this.$el.querySelector('.q-user-selector .q-field__native span').style.display = ''
-      }
-    },
-
-    showInputPlaceholder () {
-      if (!this.userObject) {
-        this.$el.querySelector('.q-user-selector .q-field__input').placeholder = this.placeholder
-        this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'block'
-      } else {
-        this.$el.querySelector('.q-user-selector .q-field__input').style.display = 'none'
-      }
-    },
-
-    onInput () {
-      this.$el.querySelector('.q-user-selector .q-field__input').blur()
-    },
-
-    onShowMenu () {
-      this.selectWidth = this.$refs.userSelect.$el.offsetWidth
-    },
-
     filterFn (val, update) {
-      if (this.userId && val === this.userId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.userOptions = this.formattedOptions.filter(user => user.id === this.userId)
+          this.userOptions = this.formattedOptions.filter(user => user.id === this.selectedId)
         })
         return
       }
@@ -344,11 +316,11 @@ export default {
 
   watch: {
     value () {
-      this.userId = this.value
+      this.selectedId = this.value
     },
 
-    userId (val) {
-      if (this.userId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', val)
       }
 

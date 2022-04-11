@@ -2,6 +2,7 @@
   <div>
     <q-select ref="wrapUpSelector"
               options-selected-class="text-primary"
+              class="q-basic-selector"
               color="primary"
               option-value="value"
               option-label="label"
@@ -11,7 +12,7 @@
               map-options
               dense
               outlined
-              v-model="model"
+              v-model="selectedId"
               use-input
               :options="options"
               :multiple="multiple"
@@ -20,6 +21,9 @@
               :class="[ highlighted ? highlightedClass : '', customClass]"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               @popup-show="onShowMenu"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
               @filter="filterFn">
 
       <template v-slot:no-option>
@@ -43,11 +47,15 @@
 </template>
 
 <script>
-
 import { mapState } from 'vuex'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'extension-selector',
+
+  mixins: [
+    selectorMixin
+  ],
 
   props: {
     value: {
@@ -81,12 +89,12 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && this.model.length < 1:
+        case this.multiple && (this.selectedId !== null && this.selectedId !== undefined) && this.selectedId.length < 1:
           return 'Select extensions'
-        case !this.multiple && !this.model:
+        case !this.multiple && (this.selectedId === null || this.selectedId === undefined):
           return 'Select extension'
-        case this.multiple && this.model.length > 0:
-        case !this.multiple && this.model:
+        case this.multiple && (this.selectedId !== null && this.selectedId !== undefined) && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
         default:
           return ''
       }
@@ -110,9 +118,10 @@ export default {
 
   data () {
     return {
-      model: this.value,
+      selectedId: this.value,
       options: [],
-      selectWidth: 0
+      reference: 'wrapUpSelector',
+      compareProperty: null
     }
   },
 
@@ -129,9 +138,6 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.availableExtensions.filter(item => item.toLowerCase().indexOf(needle) > -1)
       })
-    },
-    onShowMenu () {
-      this.selectWidth = this.$refs.wrapUpSelector.$el.offsetWidth
     }
   },
   mounted () {
@@ -139,11 +145,12 @@ export default {
   },
   watch: {
     value () {
-      this.model = this.value
+      this.selectedId = this.value
     },
 
-    model (val) {
-      this.$emit('select', this.model ? this.model : 0)
+    selectedId (val) {
+      this.$emit('select', this.selectedId ? this.selectedId : null)
+      this.showInputPlaceholder()
     }
   }
 }

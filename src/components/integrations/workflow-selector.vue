@@ -8,11 +8,11 @@
               ref="workflowSelector"
               option-value="id"
               option-label="name"
+              class="q-selector workflow-selector q-basic-selector"
               :placeholder="placeholder"
-              class="q-selector workflow-selector"
-              v-model="selectedWorkflow"
               :options="options"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              v-model="selectedId"
               @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
@@ -30,65 +30,29 @@
 
 <script>
 import talk2Api from 'src/plugins/api/api'
+import { selectorMixin } from 'src/plugins/mixins'
 export default {
   name: 'workflow-selector',
+  mixins: [
+    selectorMixin
+  ],
   computed: {
     workflowOptions () {
       return this.workflows
-    },
-    selectedWorkflowObject () {
-      if (!this.selectedWorkflow) {
-        return null
-      }
-
-      return this.workflowOptions.find(item => item.id === this.selectedWorkflow)
     }
   },
   data () {
     return {
-      selectedWorkflow: '',
+      selectedId: '',
       isLoadingWorkflow: false,
       isFocused: false,
       workflows: [],
       options: this.workflowOptions,
-      selectWidth: 0,
-      placeholder: 'Select workflow'
+      placeholder: 'Select workflow',
+      reference: 'workflowSelector'
     }
   },
   methods: {
-    onFocus () {
-      this.isFocused = true
-      this.$el.querySelector('.q-selector .q-field__input').placeholder = this.selectedWorkflowObject ? this.selectedWorkflowObject.name : this.placeholder
-      this.$el.querySelector('.q-selector .q-field__input').style.display = 'block'
-      if (this.selectedWorkflowObject) {
-        this.$el.querySelector('.q-selector .q-field__native span').style.display = 'none'
-      }
-    },
-
-    onBlur () {
-      this.isFocused = false
-      this.$el.querySelector('.q-selector .q-field__input').placeholder = ''
-      this.showInputPlaceholder()
-      if (this.selectedWorkflowObject) {
-        this.$el.querySelector('.q-selector .q-field__native span').style.display = ''
-      }
-    },
-    showInputPlaceholder () {
-      if (!this.selectedWorkflowObject) {
-        this.$el.querySelector('.q-selector .q-field__input').placeholder = this.placeholder
-        this.$el.querySelector('.q-selector .q-field__input').style.display = 'block'
-      } else {
-        this.$el.querySelector('.q-selector .q-field__input').style.display = 'none'
-      }
-    },
-
-    onInput () {
-      this.$el.querySelector('.q-selector .q-field__input').blur()
-    },
-    onShowMenu () {
-      this.selectWidth = this.$refs.workflowSelector.$el.offsetWidth
-    },
-
     filterFn (val, update) {
       if (val === '') {
         update(() => {
@@ -121,13 +85,10 @@ export default {
     this.getWorkflows()
   },
   watch: {
-    'selectedWorkflow': function (value) {
+    selectedId (value) {
       this.$emit('onWorkflowSelected', value)
+      this.showInputPlaceholder()
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

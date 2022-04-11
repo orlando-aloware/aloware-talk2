@@ -1,6 +1,18 @@
 <template>
   <q-select ref="vmDropSelect"
-            :options="vmDropOptions"
+            options-selected-class="text-primary"
+            class="q-basic-selector"
+            color="primary"
+            option-value="id"
+            option-label="name"
+            input-debounce="0"
+            style="word-break: break-all;"
+            use-input
+            emit-value
+            map-options
+            outlined
+            dense
+            :options="options"
             :placeholder="placeholderText"
             :loading="loadingVmDrops"
             :disable="disable || loadingVmDrops"
@@ -8,19 +20,11 @@
             :multiple="multiple"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            style="word-break: break-all;"
-            v-model="vmDropId"
-            options-selected-class="text-primary"
-            color="primary"
-            option-value="id"
-            option-label="name"
-            input-debounce="0"
-            use-input
-            emit-value
-            map-options
-            outlined
-            dense
+            v-model="selectedId"
             @popup-show="onShowMenu"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -49,9 +53,14 @@
 <script>
 import { mapGetters } from 'vuex'
 import _ from 'lodash'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'vm-drop-selector',
+
+  mixins: [
+    selectorMixin
+  ],
 
   props: {
     value: {
@@ -104,11 +113,11 @@ export default {
 
   data () {
     return {
-      vmDropId: this.value,
+      selectedId: this.value,
       vmDrops: [],
-      vmDropOptions: [],
+      options: [],
       loadingVmDrops: false,
-      selectWidth: 0
+      reference: 'vmDropSelect'
     }
   },
 
@@ -116,7 +125,7 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     placeholderText () {
-      if (this.vmDropId) {
+      if (this.selectedId) {
         return ''
       }
 
@@ -138,15 +147,11 @@ export default {
 
   created () {
     this.fetchVmDropFiles().then(() => {
-      this.vmDropOptions = this.vmDropAlphabeticalOrder
+      this.options = this.vmDropAlphabeticalOrder
     })
   },
 
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.vmDropSelect.$el.offsetWidth
-    },
-
     fetchVmDropFiles () {
       this.loadingVmDrop = true
       return this.$axios.get('/api/v1/voicemail-drop', {
@@ -165,36 +170,38 @@ export default {
     },
 
     filterFn (val, update) {
-      if (this.vmDropId && val === this.vmDropId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.vmDropOptions = this.vmDropAlphabeticalOrder.filter(vmDrop => vmDrop.id === this.vmDropId)
+          this.options = this.vmDropAlphabeticalOrder.filter(vmDrop => vmDrop.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.vmDropOptions = this.vmDropAlphabeticalOrder
+          this.options = this.vmDropAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.vmDropOptions = this.vmDropAlphabeticalOrder.filter(vmDrop => vmDrop.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.vmDropAlphabeticalOrder.filter(vmDrop => vmDrop.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
 
   watch: {
     value () {
-      this.vmDropId = this.value
+      this.selectedId = this.value
     },
 
-    vmDropId (val) {
-      if (this.vmDropId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === val))
       }
+
+      this.showInputPlaceholder()
     }
   }
 }

@@ -539,10 +539,11 @@ export default {
     },
     onUpdateFields (value, prop) {
       if (!['disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'missed_calls_settings.missed_call_handling_mode', 'operating_states_limit.us', 'operating_states_limit.ca', 'missedCallHandlingMode', 'operatingHours'].includes(prop)) {
-        this.user[prop] = value
+        const newValue = value || this.user[prop]
+        this.user[prop] = newValue
         this.updateChangedUserProperties({
           name: prop,
-          value: value
+          value: newValue
         })
       }
 

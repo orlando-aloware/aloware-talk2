@@ -6,6 +6,7 @@
             dense
             clearable
             options-selected-class="text-primary"
+            class="generic-selector q-basic-selector"
             color="primary"
             option-value="id"
             option-label="name"
@@ -16,9 +17,11 @@
             :loading="loadingUsers"
             :disable="disable || loadingUsers"
             :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
-            v-model="userId"
-            @filter="filterFn">
+            v-model="selectedId"
+            @filter="filterFn"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput">
     <template v-slot:prepend
               v-if="prepend">
       <span class="text-size-xs text-grey-80">{{ prepend }}</span>
@@ -66,9 +69,14 @@
 <script>
 import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'available-user-selector',
+
+  mixins: [
+    selectorMixin
+  ],
 
   props: {
     communication: {
@@ -100,7 +108,7 @@ export default {
   data () {
     return {
       loadingUsers: false,
-      userId: this.value,
+      selectedId: this.value,
       availableUsers: [],
       unavailableUsers: [],
       userOptions: []
@@ -111,7 +119,7 @@ export default {
     ...mapState('auth', ['profile']),
 
     placeholder () {
-      if (this.userId) {
+      if (this.selectedId) {
         return ''
       }
 
@@ -122,13 +130,17 @@ export default {
       return 'Select a user'
     },
 
-    allUsers () {
+    options () {
+      if (!this.availableUsers && !this.unavailableUsers) {
+        return []
+      }
+
       return this.availableUsers.concat(this.unavailableUsers)
     },
 
     filteredUsers () {
-      if (this.allUsers) {
-        return this.allUsers.filter((user) =>
+      if (this.options) {
+        return this.options.filter((user) =>
           !(user.role_names.length === 1 && user.read_only_access) &&
           user.answer_by !== AnswerTypes.BY_NONE
         )
@@ -192,9 +204,9 @@ export default {
     },
 
     filterFn (val, update) {
-      if (this.userId && val === this.userId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.userOptions = this.formattedOptions.filter(user => user.id === this.userId)
+          this.userOptions = this.formattedOptions.filter(user => user.id === this.selectedId)
         })
         return
       }
@@ -235,13 +247,15 @@ export default {
 
   watch: {
     value () {
-      this.userId = this.value
+      this.selectedId = this.value
     },
 
-    userId (val) {
-      if (this.userId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', val)
       }
+
+      this.showInputPlaceholder()
     }
   }
 }

@@ -90,6 +90,23 @@
           option-disable="disabled"
         />
       </template>
+      <template v-if="filter.type === 'boolean'">
+        <div v-show="operator.value">
+          <q-radio v-model="operator.value" :val="true" label="True" />
+          <q-btn-group outline>
+            <q-btn outline color="brown" label="First" />
+            <q-btn outline color="brown" label="Second" icon-right="watch_later" />
+            <q-btn outline color="brown" label="Third" />
+          </q-btn-group>
+        </div>
+        <div v-show="!operator.value">
+          <q-radio v-model="operator.value" :val="false" label="is equal to" />
+          <q-btn-group outline>
+            <q-btn outline label="True" />
+            <q-btn outline label="False" />
+          </q-btn-group>
+        </div>
+      </template>
     </div>
     <compact-btn
       class="mr-2 mt-3 p-3"

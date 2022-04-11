@@ -1,11 +1,5 @@
 <template>
-  <q-select :options="scriptsOptions"
-            :placeholder="placeholder"
-            :loading="loadingScripts"
-            :disable="disable || loadingScripts"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="padded-container"
-            v-model="scriptId"
+  <q-select class="padded-container q-basic-selector"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -16,7 +10,16 @@
             map-options
             outlined
             dense
-            @filter="filterFn">
+            v-model="selectedId"
+            :options="options"
+            :placeholder="placeholder"
+            :loading="loadingScripts"
+            :disable="disable || loadingScripts"
+            :class="[ prepend ? 'with-prepend' : '' ]"
+            @filter="filterFn"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput">
     <template v-slot:prepend
               v-if="prepend">
       <span class="text-size-xs text-grey-80">{{ prepend }}</span>
@@ -43,9 +46,14 @@
 
 <script>
 import _ from 'lodash'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'script-selector',
+
+  mixins: [
+    selectorMixin
+  ],
 
   props: {
     communication: {
@@ -70,17 +78,18 @@ export default {
 
   data () {
     return {
-      scriptId: this.value,
+      selectedId: this.value,
       scripts: [],
-      scriptsOptions: [],
-      loadingScripts: false
+      options: [],
+      loadingScripts: false,
+      textProperty: 'title'
     }
   },
 
   computed: {
 
     placeholder () {
-      if (this.scriptId) {
+      if (this.selectedId) {
         return ''
       }
 
@@ -102,7 +111,7 @@ export default {
 
   created () {
     this.fetchScripts().then(() => {
-      this.scriptsOptions = this.scriptsAlphabeticalOrder
+      this.options = this.scriptsAlphabeticalOrder
     })
   },
 
@@ -121,36 +130,38 @@ export default {
     },
 
     filterFn (val, update) {
-      if (this.scriptId && val === this.scriptId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.scriptsOptions = this.scriptsAlphabeticalOrder.filter(script => script.id === this.scriptId)
+          this.options = this.scriptsAlphabeticalOrder.filter(script => script.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.scriptsOptions = this.scriptsAlphabeticalOrder
+          this.options = this.scriptsAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.scriptsOptions = this.scriptsAlphabeticalOrder.filter(script => script.title.toLowerCase().indexOf(needle) > -1)
+        this.options = this.scriptsAlphabeticalOrder.filter(script => script.title.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
 
   watch: {
     value () {
-      this.scriptId = this.value
+      this.selectedId = this.value
     },
 
-    scriptId (val) {
-      if (this.scriptId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', this.scripts.find(script => script.id === val))
       }
+
+      this.showInputPlaceholder()
     }
   }
 }

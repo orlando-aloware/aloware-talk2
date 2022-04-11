@@ -2,7 +2,7 @@
   <div>
     <generic-multi-select :label="label"
                           buttonText="Ring Groups"
-                          :values="ringGroupId"
+                          :values="selectedId"
                           :options="ringGroupsAlphabeticalOrder"
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
@@ -12,6 +12,7 @@
     <q-select v-else
               ref="ringGroupSelect"
               options-selected-class="text-primary"
+              class="q-basic-selector"
               color="primary"
               option-value="id"
               option-label="name"
@@ -29,10 +30,12 @@
               :disable="disable"
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '', isGenericSelectorStyle ? 'generic-selector': '']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-              v-model="ringGroupId"
-
+              v-model="selectedId"
               @popup-show="onShowMenu"
-              @filter="filterFn">
+              @filter="filterFn"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput">
       <template v-slot:prepend
                 v-if="prepend">
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
@@ -81,13 +84,16 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
   name: 'ring-group-selector',
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    selectorMixin
+  ],
 
   components: {
     RemoveTagIcon,
@@ -139,9 +145,9 @@ export default {
 
   data () {
     return {
-      ringGroupId: this.value,
+      selectedId: this.value,
       ringGroupOptions: [],
-      selectWidth: 0
+      reference: 'ringGroupSelect'
     }
   },
 
@@ -150,12 +156,12 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && this.ringGroupId.length < 1:
+        case this.multiple && this.selectedId.length < 1:
           return 'Select Ring Groups'
-        case !this.multiple && !this.ringGroupId:
+        case !this.multiple && !this.selectedId:
           return 'Select Ring Group'
-        case this.multiple && this.ringGroupId.length > 0:
-        case !this.multiple && this.ringGroupId:
+        case this.multiple && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
         default:
           return ''
       }
@@ -179,14 +185,10 @@ export default {
   },
 
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.ringGroupSelect.$el.offsetWidth
-    },
-
     filterFn (val, update) {
-      if (this.ringGroupId && val === this.ringGroupId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.ringGroupOptions = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.id === this.ringGroupId)
+          this.ringGroupOptions = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.id === this.selectedId)
         })
         return
       }
@@ -210,12 +212,16 @@ export default {
 
   watch: {
     value () {
-      this.ringGroupId = this.value
+      this.selectedId = this.value
     },
 
-    ringGroupId (val) {
-      if (this.ringGroupId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', val)
+      }
+
+      if (!this.genericMultiselect) {
+        this.showInputPlaceholder()
       }
     }
   }

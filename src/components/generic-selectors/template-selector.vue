@@ -1,10 +1,10 @@
 <template>
-  <q-select :options="templatesOptions"
+  <q-select :options="options"
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '' ]"
-            class="generic-selector"
-            v-model="templateId"
+            class="generic-selector q-basic-selector"
+            v-model="selectedId"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -15,6 +15,9 @@
             map-options
             outlined
             dense
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -43,9 +46,14 @@
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'template-selector',
+
+  mixins: [
+    selectorMixin
+  ],
 
   props: {
     value: {
@@ -66,8 +74,8 @@ export default {
 
   data () {
     return {
-      templateId: this.value,
-      templatesOptions: []
+      selectedId: this.value,
+      options: []
     }
   },
 
@@ -75,7 +83,7 @@ export default {
     ...mapState(['templates']),
 
     placeholder () {
-      if (this.templateId) {
+      if (this.selectedId) {
         return ''
       }
 
@@ -96,41 +104,43 @@ export default {
   },
 
   created () {
-    this.templatesOptions = this.templatesAlphabeticalOrder
+    this.options = this.templatesAlphabeticalOrder
   },
 
   methods: {
     filterFn (val, update) {
-      if (this.templateId && val === this.templateId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.templatesOptions = this.templatesAlphabeticalOrder.filter(template => template.id === this.templateId)
+          this.options = this.templatesAlphabeticalOrder.filter(template => template.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.templatesOptions = this.templatesAlphabeticalOrder
+          this.options = this.templatesAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.templatesOptions = this.templatesAlphabeticalOrder.filter(template => template.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.templatesAlphabeticalOrder.filter(template => template.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
 
   watch: {
     value () {
-      this.templateId = this.value
+      this.selectedId = this.value
     },
 
-    templateId (val) {
-      if (this.templateId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', this.templates.find(template => template.id === val))
       }
+
+      this.showInputPlaceholder()
     }
   }
 }

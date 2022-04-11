@@ -2,16 +2,17 @@
   <div>
     <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
-                          :values="campaignId"
+                          :values="selectedId"
                           :options="campaignsAlphabeticalOrder"
                           :disable="disabled"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
                           v-if="genericMultiselect"
-                          @valuesUpdated="updateLines">
+                          @valuesUpdated="onInput">
     </generic-multi-select>
     <q-select v-else
               ref="lineSelect"
               options-selected-class="text-primary"
+              class="q-basic-selector"
               color="primary"
               option-value="id"
               option-label="name"
@@ -24,16 +25,18 @@
               :loading="campaignsIsLoading"
               :use-input="useInput"
               :error="hasError"
-              :options="campaignOptions"
+              :options="options"
               :placeholder="placeholder"
               :disable="disabled"
-              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
+              :class="classes"
               :multiple="multiple"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-              v-model="campaignId"
+              v-model="selectedId"
               @popup-show="onShowMenu"
-              @input="updateLines"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
               @filter="filterFn">
       <template v-slot:prepend
                 v-if="prepend">
@@ -74,13 +77,16 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
   name: 'line-selector',
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    selectorMixin
+  ],
 
   components: {
     RemoveTagIcon,
@@ -151,9 +157,9 @@ export default {
   data () {
     return {
       // campaignId: this.value || null,
-      campaignId: null,
-      campaignOptions: [],
-      selectWidth: 0
+      selectedId: null,
+      options: [],
+      reference: 'lineSelect'
     }
   },
 
@@ -164,12 +170,12 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && this.campaignId && this.campaignId.length < 1:
+        case this.multiple && this.selectedId && this.selectedId.length < 1:
           return 'Select Lines'
-        case !this.multiple && !this.campaignId:
+        case !this.multiple && !this.selectedId:
           return 'Select Line'
-        case this.multiple && this.campaignId && this.campaignId.length > 0:
-        case !this.multiple && this.campaignId:
+        case this.multiple && this.selectedId && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
         default:
           return ''
       }
@@ -207,38 +213,44 @@ export default {
 
     disabled () {
       return this.disable || this.campaignsIsLoading
+    },
+
+    classes () {
+      return [
+        this.prepend ? 'with-prepend' : '',
+        this.genericStyling ? 'generic-selector' : '',
+        this.highlighted ? this.highlightedClass : '',
+        this.specificClass ? this.specificClass : ''
+      ]
     }
   },
 
   created () {
-    this.campaignOptions = this.campaignsAlphabeticalOrder
+    this.options = this.campaignsAlphabeticalOrder
     if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
-      this.campaignId = this.value
+      this.selectedId = this.value
     }
   },
 
   methods: {
-    onShowMenu () {
-      this.selectWidth = this.$refs.lineSelect.$el.offsetWidth
-    },
     filterFn (val, update) {
-      if (this.campaignId && val === this.campaignId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.campaignOptions = this.campaignsAlphabeticalOrder.filter(campaign => campaign.id === this.campaignId)
+          this.options = this.campaignsAlphabeticalOrder.filter(campaign => campaign.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.campaignOptions = this.campaignsAlphabeticalOrder
+          this.options = this.campaignsAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.campaignOptions = this.campaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.campaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     updateLines (val) {
@@ -253,24 +265,28 @@ export default {
   watch: {
     value () {
       if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
-        this.campaignId = this.value
+        this.selectedId = this.value
       }
     },
 
-    campaignId (val) {
-      if (this.campaignId !== this.value) {
+    selectedId (val) {
+      if (this.selectedId !== this.value) {
         this.$emit('change', val)
+      }
+
+      if (!this.genericMultiselect) {
+        this.showInputPlaceholder()
       }
     },
 
     campaignsIsLoading (val) {
       if (val) {
-        this.campaignId = null
+        this.selectedId = null
         return
       }
 
-      this.campaignId = this.value
-      this.campaignOptions = this.campaignsAlphabeticalOrder
+      this.selectedId = this.value
+      this.options = this.campaignsAlphabeticalOrder
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
       }

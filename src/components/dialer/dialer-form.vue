@@ -23,10 +23,11 @@
                         :state="validCampaign"
                         class="mb-1">
             <line-selector class="line-selector"
+                           prepend="From:"
+                           specificClass="dialer-line-selector"
+                           v-model="campaignId"
                            :disable="defaultOutboundCampaignId && mode === 'call'"
                            :generic-multiselect="false"
-                           prepend="From:"
-                           v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>

@@ -1,8 +1,9 @@
 <template>
-  <div class="sms-reminders-wrapper border-0 p-0">
-    <div>
-      <div v-if="campaignId">
-        <q-select class="p-1"
+  <div class="sms-reminders-wrapper border-0 p-0 w-100">
+    <div class="w-100">
+      <div class="w-100"
+           v-if="campaignId">
+        <q-select class="p-1 q-basic-selector w-100"
                   use-input
                   emit-value
                   map-options
@@ -11,9 +12,12 @@
                   label="Send from"
                   option-value="id"
                   option-label="name"
-                  v-model="selectedCampaignId"
-                  :options="filteredCampaigns"
-                  @filter="filterFn">
+                  v-model="selectedId"
+                  :options="options"
+                  @filter="filterFn"
+                  @focus="onFocus"
+                  @blur="onBlur"
+                  @input="onInput">
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="no-results text-grey">
@@ -43,9 +47,13 @@
 <script>
 import auth from 'boot/auth'
 import { mapState } from 'vuex'
+import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'sms-reminders',
+  mixins: [
+    selectorMixin
+  ],
   props: {
     communicationId: {
       required: true
@@ -64,9 +72,9 @@ export default {
     return {
       auth: auth,
       loading: false,
-      selectedCampaignId: this.campaignId,
+      selectedId: this.campaignId,
       recentShowSendSmsReminderButton: false,
-      filteredCampaigns: []
+      options: []
     }
   },
 
@@ -75,7 +83,7 @@ export default {
   },
 
   mounted () {
-    this.filteredCampaigns = this.campaigns
+    this.options = this.campaigns
     this.selectedCampaign = this.campaigns.find(campaign => campaign.id === this.campaignId)
     this.showSendSmsReminderButton()
   },
@@ -88,15 +96,15 @@ export default {
     },
 
     sendDefaultSmsReminder () {
-      if (!this.selectedCampaignId) {
+      if (!this.selectedId) {
         this.$generalNotification('Please select a line where to send from.', 'error')
       }
 
-      if (this.selectedCampaignId) {
+      if (this.selectedId) {
         this.loading = true
         this.$axios
           .post(`/api/v1/communications/${this.communicationId}/send-sms-reminder`, {
-            campaign_id: this.selectedCampaignId
+            campaign_id: this.selectedId
           })
           .then(res => {
             this.loading = false
@@ -116,29 +124,32 @@ export default {
       }
     },
     filterFn (val, update) {
-      if (this.selectedCampaignId && val === this.selectedCampaignId) {
+      if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.filteredCampaigns = this.campaigns.filter(campaign => campaign.id === this.selectedCampaignId)
+          this.options = this.campaigns.filter(campaign => campaign.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.filteredCampaigns = this.campaigns
+          this.options = this.campaigns
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredCampaigns = this.campaigns.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.campaigns.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
   watch: {
     campaignId (value) {
       this.selectedCampaign = this.campaigns.find(campaign => campaign.id === value)
+    },
+    selectedId (val) {
+      this.showInputPlaceholder()
     }
   }
 }
