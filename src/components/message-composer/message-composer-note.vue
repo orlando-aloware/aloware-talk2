@@ -7,18 +7,18 @@
             name-key="full_name"
             v-model="messageComposer.note.body"
             :members="items">
-          <template slot="item" slot-scope="props" >
+          <template slot="item" slot-scope="props">
             <avatar class="contact-avatar mr-2 position-absolute"
                     width="30"
                     height="30"
                     :name="props.item.full_name">
             </avatar>
             <span :data-text="props.item.full_name"
-                  class="at-custom-text">
-              {{ props.item.full_name }}
-              <br>
-              <small>{{ props.item.email }}</small>
-            </span>
+                    class="at-custom-text">
+                {{ props.item.full_name }}
+                <br>
+                <small>{{ props.item.email }}</small>
+              </span>
           </template>
           <template v-slot:embeddedItem="props">
             <span>
@@ -83,7 +83,7 @@ export default {
     return {
       isAdding: false,
       items: [],
-      focustInputInterval: null
+      focusInputInterval: null
     }
   },
   methods: {
@@ -123,14 +123,14 @@ export default {
     },
     focusInput () {
       const counter = { data: 0 }
-      this.focustInputInterval = setInterval(() => {
+      this.focusInputInterval = setInterval(() => {
         if (typeof this.$refs.noteContentEditable !== 'undefined') {
           this.$refs.noteContentEditable.focus()
-          clearInterval(this.focustInputInterval)
+          clearInterval(this.focusInputInterval)
         }
         counter.data++
         if (counter > 180) {
-          clearInterval(this.focustInputInterval)
+          clearInterval(this.focusInputInterval)
         }
       }, 250)
     },
@@ -164,7 +164,7 @@ export default {
     }
   },
   beforeDestroy () {
-    clearInterval(this.focustInputInterval)
+    clearInterval(this.focusInputInterval)
   }
 }
 </script>

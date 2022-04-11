@@ -8,15 +8,19 @@
 
       <div v-if="sequence">
         <b-card-text class="fs-14 mt-3">
-          <h6 class="fs-14">
-            <add-sequence-icon :height="11"
-                               :width="11">
-            </add-sequence-icon>
-            {{ workflow.name }}
-          </h6>
-          <p class="text-muted fs-13 mt-1">
-            #{{sequence.order}} {{ sequence.name }}
-          </p>
+
+          <b-media>
+            <template #aside>
+              <b-img width="34"
+                     alt="The Sequence icon"
+                     :src="getIconUrl(sequence.img_src)"></b-img>
+            </template>
+
+            <h5 class="mt-0">{{ workflow.name }}</h5>
+            <p class="mb-0 text-muted fs-13 mt-1">
+              #{{ sequence.order }} {{ sequence.name }}
+            </p>
+          </b-media>
         </b-card-text>
         <b-button href="#"
                   variant="outline-primary"
@@ -132,6 +136,9 @@ export default {
     resetSequence () {
       this.sequence = null
       this.workflow = null
+    },
+    getIconUrl (src) {
+      return process.env.API_URL + src
     }
   },
 

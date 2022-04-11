@@ -639,7 +639,8 @@ export default {
             }
 
             // only modify order if new contact task === current task
-            if (this.currentTask === contact.task_status) {
+            // only push new non-live comms if no filter is applied
+            if (this.currentTask === contact.task_status && this.channelChangedFilterFields.length < 1) {
               if (!isInLiveContacts) {
                 // if contact is not in the list, then automatically add it to the top
                 if (!isInContacts) {

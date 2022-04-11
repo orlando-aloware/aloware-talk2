@@ -198,7 +198,6 @@
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
               communication.user_id && getUser(communication.user_id).name.length &&
-              communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW &&
               communication.type !== CommunicationTypes.NOTE">
             {{ !communication.campaign_id ? 'By ' : '' }}{{ getUser(communication.user_id).name }}
         </span>

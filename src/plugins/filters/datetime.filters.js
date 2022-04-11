@@ -50,7 +50,6 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
   }
 
   dateTimePassed.text = dateTimePassed.text.split(' ')
-
   if (dateTimePassed.text.length > 0 && ['a', 'an'].includes(dateTimePassed.text[0])) {
     dateTimePassed.text[0] = '1'
   }
@@ -62,7 +61,7 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
   }
 
   if (!replaceAgo) {
-    dateTimePassed.text = dateTimePassed.text.replace('1 few seconds ago', 'Now')
+    dateTimePassed.text = dateTimePassed.text.replace('a few seconds ago', 'Now')
   }
 
   const units = {
@@ -101,7 +100,6 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
  * @returns {string|*}
  */
 export const fixScheduleDate = (dt, format = 'dddd, D MMMM YYYY', timezone) => {
-  console.log(timezone)
   if (dt) {
     if (timezone) {
       return window.moment.utc(dt).tz(timezone).format(format)

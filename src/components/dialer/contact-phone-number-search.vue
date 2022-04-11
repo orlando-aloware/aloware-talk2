@@ -124,13 +124,11 @@ export default {
     },
 
     getContactName (item) {
-      const name = (item.first_name + ' ' + item.last_name).trim()
-
-      if (!name.length) {
+      if (!item.first_name || !item.last_name) {
         return 'No Name'
       }
 
-      return name
+      return (item.first_name + ' ' + item.last_name).trim()
     }
   },
 
