@@ -265,6 +265,7 @@ export default {
 
       // we need to reload contacts data to include relations data
       const relations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
+      console.log('MUTATED :>> ', relations)
       if (relations.length && this.hasAddedRelation) {
         this.$VueEvent.fire('clearContacts')
         this.$VueEvent.fire('fetchContacts')
@@ -282,6 +283,7 @@ export default {
         this.closeAndMutate()
         return
       }
+
       this.loading = true
       this.$axios
         .patch(`/api/v2/${this.endpointUrl}/${this.resourceId}`, {
@@ -433,6 +435,9 @@ export default {
     hasAddedRelation () {
       const currentRelations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
       return currentRelations.length > this.previousRelations.length
+    },
+    currentRelations () {
+      return this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
     }
   },
   watch: {

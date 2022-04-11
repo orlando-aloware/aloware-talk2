@@ -308,10 +308,10 @@
                   :key="key">
                   <template>
                     <span v-if="valueIsObject(contact[column.name])">
-                      {{ contact[column.name].name }}
+                      {{ getObjectKey(contact[column.name], column.name) }}
                     </span>
                     <span v-else>
-                      {{ contact[column.name] }}
+                      {{ contact[column.name] | prefetchValue }}
                     </span>
                   </template>
                 </td>
@@ -477,6 +477,12 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     BulkActionMenu
+  },
+  filters: {
+    prefetchValue (value) {
+      if (!value) return '--'
+      return value
+    }
   },
   async mounted () {
     this.removeListClose()
@@ -797,7 +803,17 @@ export default {
       return Array.isArray(value)
     },
     valueIsObject (obj) {
+      if (!obj) {
+        return false
+      }
       return typeof obj === 'object'
+    },
+    getObjectKey (obj, key) {
+      console.log('obj :>> ' + key, obj)
+      if (obj?.name) {
+        return obj.name
+      }
+      return obj
     }
   },
   watch: {
