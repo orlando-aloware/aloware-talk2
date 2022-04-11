@@ -77,7 +77,7 @@
             v-if="(contact.last_communication.type === CommunicationTypes.CALL &&
             contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
             contact.last_communication.type !== CommunicationTypes.CALL">
-        <task-item-time :from-time="contact.last_communication.created_at"
+        <task-item-time :from-time="contact.last_engagement_at"
                         :update-interval="6000">
         </task-item-time>
       </span>

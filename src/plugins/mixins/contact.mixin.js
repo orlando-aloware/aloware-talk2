@@ -1,15 +1,12 @@
 import _ from 'lodash'
-import auth from '../../boot/auth'
 import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
-// import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
   data () {
     return {
-      auth: auth,
       hasMoreCommunications: true,
       selectedPhoneNumber: null,
       selectedCampaignId: null,
@@ -128,7 +125,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'auth']),
     ...mapState('contacts', ['contact']),
     ...mapState('inbox', { selectContact: 'selectedContact' }),
     ...mapState('cache', ['currentCompany']),
@@ -398,7 +395,7 @@ export default {
       }
 
       // 3. if user has a personal line and contact does not have an initial line
-      const userCampaignId = _.get(this.auth, 'user.profile.campaign_id', null)
+      const userCampaignId = _.get(this.auth, 'profile.campaign_id', null)
       if (!this.selectedCampaign && userCampaignId) {
         this.selectedCampaignId = userCampaignId
       }

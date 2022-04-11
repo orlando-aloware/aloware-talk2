@@ -323,6 +323,11 @@
                         </div>
                       </template>
                     </a>
+                    <b-badge v-if="contact.is_dnc"
+                                 variant="danger"
+                                 class="badge-phone-info">
+                    DNC
+                  </b-badge>
                   </div>
                 </div>
               </td>

@@ -130,7 +130,7 @@ export default {
 
     getNotificationType (ringGroupId) {
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
-      return ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
+      return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
     },
 
     switchCallFishingFromQueue () {
@@ -226,11 +226,11 @@ export default {
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
-          if (ringGroup && ringGroup.fishing_mode && ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT && this.user && this.user.profile && this.user.profile.id !== communication.contact.user_id) {
+          if (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode && ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT && this.user && this.user.profile && this.user.profile.id !== communication.contact.user_id) {
             break
           }
 
-          const callType = ringGroup && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
+          const callType = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)

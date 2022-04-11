@@ -92,7 +92,7 @@
               Reset
             </compact-btn>
             <compact-btn class="btn-secondary"
-                         :disabled="!(filterHasChanges) || ![1,2,3,4, 5].includes(defaultFilterModel.type)"
+                         :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
@@ -254,7 +254,8 @@ export default {
         'from_date',
         'to_date'
       ],
-      inputTimeout: null
+      inputTimeout: null,
+      ChannelType
     }
   },
 

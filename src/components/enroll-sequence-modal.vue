@@ -78,6 +78,7 @@ export default {
       talk2Api.V1.automations.workflows.enroll(this.sequenceId, { id: this.contact.id, model: 'contact' })
         .then(response => {
           this.enrollSequenceOpen(false)
+          this.$VueEvent.fire('contactSequenceEnrolled', this.contact.id)
           this.$generalNotification('Contact has been enrolled to sequence.')
         }).catch(error => {
           console.log(error)

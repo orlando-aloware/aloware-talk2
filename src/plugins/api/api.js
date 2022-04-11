@@ -112,6 +112,15 @@ export default {
         return window.axios.patch(`${suffixV1}contact/${id}/undnc`, {
           reason: reason
         })
+      },
+      getSequenceInfo (id) {
+        return window.axios.get(`${suffixV1}contact/${id}/sequence-info`)
+      },
+      disenrollFromSequence (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/disenroll`)
+      },
+      syncHubspot (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
       }
     },
     tags: {
