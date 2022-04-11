@@ -4,6 +4,14 @@ import * as AuthDefault from 'src/constants/auth-default'
 
 export default {
   SET_PROFILE (state, profile) {
+    if (!profile) {
+      return
+    }
+
+    if (state.profile === null) {
+      state.profile = {}
+    }
+
     const index = { data: null }
     for (index.data in profile) {
       Vue.set(state.profile, index.data, profile[index.data])
