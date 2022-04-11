@@ -939,6 +939,12 @@ export default {
 
   created () {
     this.onActivityHide()
+
+    // make appointments and reminders opened by default
+    if ([CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(this.communication.type)) {
+      this.activeName = true
+      this.activityExpansionClass = ['activity-expanded']
+    }
   },
 
   methods: {
