@@ -20,6 +20,7 @@ export default {
   computed: {
     selectedObject () {
       const id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, null) : this.selectedId
+
       if (!_.isEmpty(this.options) && this.compareProperty) {
         return this.options.find(option => option[this.compareProperty] === id)
       }
@@ -38,13 +39,18 @@ export default {
     onShowMenu () {
       this.selectWidth = this.$refs[this.reference].$el.offsetWidth
     },
-    onFocus () {
+
+    onFocus (event) {
+      this.element = event.srcElement
       if (typeof this.useChips !== 'undefined' && this.useChips) {
         return
       }
 
       this.isFocused = true
+
       if (this.selectedObject !== null && typeof this.selectedObject === 'object') {
+        console.log('this.element: ', this.element)
+        console.log('this.element.querySelector(\'.q-basic-selector .q-field__input\'): ', this.element.querySelector('.q-basic-selector .q-field__input'))
         this.element.querySelector('.q-basic-selector .q-field__input').placeholder = this.alterFunction ? this.alterFunction(this.selectedObject[this.textProperty]) : this.selectedObject[this.textProperty]
       }
 
@@ -63,14 +69,16 @@ export default {
       }
     },
 
-    onBlur () {
+    onBlur (event) {
       if (typeof this.useChips !== 'undefined' && this.useChips) {
         return
       }
 
+      this.element = event.srcElement
       this.isFocused = false
       this.element.querySelector('.q-basic-selector .q-field__input').placeholder = ''
       this.showInputPlaceholder()
+
       if (this.selectedObject) {
         this.element.querySelector('.q-basic-selector .q-field__native span').style.display = ''
       }
@@ -84,9 +92,10 @@ export default {
       if (!this.selectedObject) {
         this.element.querySelector('.q-basic-selector .q-field__input').placeholder = this.placeholder
         this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'block'
-      } else {
-        this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'none'
+        return
       }
+
+      this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'none'
     },
 
     onInput (val) {
@@ -94,6 +103,7 @@ export default {
 
       if (this.isCheckEmit && this.emitChange && val) {
         this.$emit(this.emitEvent, this.emitChangeProperty ? val[this.emitChangeProperty] : val)
+        return
       }
 
       if (this.emitChange) {

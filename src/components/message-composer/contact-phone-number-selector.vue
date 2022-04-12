@@ -67,14 +67,16 @@ export default {
     }
   },
   methods: {
-    onFocusField () {
-      this.$el.querySelector('.selected-option-container').style.display = 'none'
-      this.onFocus()
+    onFocusField (event) {
+      this.element = event.srcElement
+      this.element.querySelector('.selected-option-container').style.display = 'none'
+      this.onFocus(event)
     },
 
-    onBlurField () {
-      this.$el.querySelector('.selected-option-container').style.display = 'block'
-      this.onBlur()
+    onBlurField (event) {
+      this.element = event.srcElement
+      this.element.querySelector('.selected-option-container').style.display = 'block'
+      this.onBlur(event)
     },
 
     filterFn (val, update) {
