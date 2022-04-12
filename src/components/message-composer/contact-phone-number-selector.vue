@@ -67,16 +67,14 @@ export default {
     }
   },
   methods: {
-    onFocusField (event) {
-      this.element = event.srcElement
+    onFocusField () {
       this.element.querySelector('.selected-option-container').style.display = 'none'
-      this.onFocus(event)
+      this.onFocus()
     },
 
-    onBlurField (event) {
-      this.element = event.srcElement
+    onBlurField () {
       this.element.querySelector('.selected-option-container').style.display = 'block'
-      this.onBlur(event)
+      this.onBlur()
     },
 
     filterFn (val, update) {

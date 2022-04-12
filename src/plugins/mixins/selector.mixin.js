@@ -13,7 +13,7 @@ export default {
       emitEvent: 'change',
       alterFunction: null,
       isCheckEmit: false,
-      element: this.$el ? this.$el : document
+      element: null
     }
   },
 
@@ -35,13 +35,16 @@ export default {
     }
   },
 
+  mounted () {
+    this.element = this.$el ? this.$el : document
+  },
+
   methods: {
     onShowMenu () {
       this.selectWidth = this.$refs[this.reference].$el.offsetWidth
     },
 
-    onFocus (event) {
-      this.element = event.srcElement
+    onFocus () {
       if (typeof this.useChips !== 'undefined' && this.useChips) {
         return
       }
@@ -49,8 +52,6 @@ export default {
       this.isFocused = true
 
       if (this.selectedObject !== null && typeof this.selectedObject === 'object') {
-        console.log('this.element: ', this.element)
-        console.log('this.element.querySelector(\'.q-basic-selector .q-field__input\'): ', this.element.querySelector('.q-basic-selector .q-field__input'))
         this.element.querySelector('.q-basic-selector .q-field__input').placeholder = this.alterFunction ? this.alterFunction(this.selectedObject[this.textProperty]) : this.selectedObject[this.textProperty]
       }
 
@@ -69,12 +70,11 @@ export default {
       }
     },
 
-    onBlur (event) {
+    onBlur () {
       if (typeof this.useChips !== 'undefined' && this.useChips) {
         return
       }
 
-      this.element = event.srcElement
       this.isFocused = false
       this.element.querySelector('.q-basic-selector .q-field__input').placeholder = ''
       this.showInputPlaceholder()
