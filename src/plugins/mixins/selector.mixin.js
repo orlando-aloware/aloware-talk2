@@ -19,9 +19,9 @@ export default {
 
   computed: {
     selectedObject () {
-      const id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, null) : this.selectedId
+      const id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, '') : this.selectedId
 
-      if (!_.isEmpty(this.options) && this.compareProperty) {
+      if (!_.isEmpty(this.options) && this.compareProperty && id) {
         return this.options.find(option => option[this.compareProperty] === id)
       }
 
@@ -65,7 +65,7 @@ export default {
 
       this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'block'
 
-      if (this.selectedObject) {
+      if (this.selectedObject && this.element.querySelector('.q-basic-selector .q-field__native span')) {
         this.element.querySelector('.q-basic-selector .q-field__native span').style.display = 'none'
       }
     },
@@ -79,7 +79,7 @@ export default {
       this.element.querySelector('.q-basic-selector .q-field__input').placeholder = ''
       this.showInputPlaceholder()
 
-      if (this.selectedObject) {
+      if (this.selectedObject && this.element.querySelector('.q-basic-selector .q-field__native span')) {
         this.element.querySelector('.q-basic-selector .q-field__native span').style.display = ''
       }
     },
