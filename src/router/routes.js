@@ -220,7 +220,7 @@ const routes = [
           {
             name: 'Power Dialer',
             meta: {
-              title: 'Power Dialer Add-list',
+              title: 'Power Dialer Add List',
               id: 'power-dialer-add-list'
             },
             path: 'list/:id(\\d+)+/add',
@@ -229,7 +229,7 @@ const routes = [
           {
             name: 'Power Dialer',
             meta: {
-              title: 'Power Dialer Add-list',
+              title: 'Power Dialer Add List',
               id: 'power-dialer-add-queue-list'
             },
             path: 'list/add',

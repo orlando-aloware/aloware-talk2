@@ -25,7 +25,7 @@
           <span class="checkmark"></span>
         </label>
         <q-tooltip
-          class="bg-purple text-subtitle1"
+          class="bg-black text-subtitle1"
           :offset="[0, 0]"
           anchor="center right"
           self="center left"
