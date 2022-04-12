@@ -990,6 +990,20 @@ export default {
                 id: this.selectedList.id,
                 count: this.listItems[this.selectedList.id].total
               })
+            } else {
+              if (this.list.type === this.ContactListTypes.DYNAMIC) {
+                this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
+              } else {
+                this.setDataCount({
+                  filters: {
+                    contact_lists: {
+                      operator: 1,
+                      value: [this.list.id]
+                    }
+                  },
+                  is_conjunction: true
+                }, true)
+              }
             }
           })
           .catch((_err) => {
@@ -1058,6 +1072,10 @@ export default {
         this.resetSearch()
       }
       this.$VueEvent.fire('filters-reset')
+
+      this.$VueEvent.fire('clearContacts')
+      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('shouldUpdateListCount')
       this.filterHasChanges = false
     },
     fixDefaultFilters () {
@@ -1334,11 +1352,13 @@ export default {
         path: `/contacts/list/${this.$route.params.id}/add`
       })
     },
-    setDataCount (data) {
+    setDataCount (data, updatePinned = false) {
       this.getListDataCount({ filters: data }).then(response => {
         const count = response.data.count
         this.setSelectedListContactCount(count)
-        this.$VueEvent.fire('listCountUpdated', { list: this.list, count: count })
+        if (updatePinned) {
+          this.$VueEvent.fire('listCountUpdated', { list: this.list, count: count })
+        }
       })
     },
     getOwnerName (userId) {
