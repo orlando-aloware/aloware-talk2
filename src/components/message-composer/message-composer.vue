@@ -103,8 +103,8 @@ export default {
       this.setMessageComposerMode(mode)
     },
     ...mapActions(['setTemplates']),
-    setSelectedPhone (phoneNumber) {
-      this.setMessageComposerSmsPhoneNumber(phoneNumber)
+    setSelectedPhone (phone) {
+      this.setMessageComposerSmsPhoneNumber(phone.phone_number)
     },
 
     getSmsTemplates () {
