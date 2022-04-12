@@ -1060,7 +1060,7 @@
                                  dense>
                         </q-radio>
                       </q-item-section>
-                      <q-item-section>
+                      <q-item-section class="test">
                         <template v-if="transfer.mode === 'ring-group'">
                           <ring-group-selector v-model="transfer.ringGroupId"
                                                :genericMultiselect="false"
@@ -2045,13 +2045,13 @@ export default {
     resetAdd () {
       this.add.introduce = false
       this.add.userId = null
-      this.ringGroupId = null
+      this.add.ringGroupId = null
       this.add.phoneNumber = ''
       this.add.mode = 'user'
     },
     changeAddUser (userId) {
       this.add.phoneNumber = ''
-      this.ringGroupId = null
+      this.add.ringGroupId = null
       this.add.userId = userId
     },
     changeAddRingGroup (ringGroupId) {

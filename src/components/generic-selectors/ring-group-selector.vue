@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-100">
     <generic-multi-select :label="label"
                           buttonText="Ring Groups"
                           :values="selectedId"
