@@ -308,10 +308,10 @@
                   :key="key">
                   <template>
                     <span v-if="valueIsObject(contact[column.name])">
-                      {{ contact[column.name].name }}
+                      {{ getObjectKey(contact[column.name], column.name) }}
                     </span>
                     <span v-else>
-                      {{ contact[column.name] }}
+                      {{ contact[column.name] | prefetchValue }}
                     </span>
                   </template>
                 </td>
@@ -477,6 +477,12 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     BulkActionMenu
+  },
+  filters: {
+    prefetchValue (value) {
+      if (!value) return '--'
+      return value
+    }
   },
   async mounted () {
     this.removeListClose()
@@ -797,7 +803,16 @@ export default {
       return Array.isArray(value)
     },
     valueIsObject (obj) {
+      if (!obj) {
+        return false
+      }
       return typeof obj === 'object'
+    },
+    getObjectKey (obj, key) {
+      if (obj?.name) {
+        return obj.name
+      }
+      return obj
     }
   },
   watch: {
@@ -812,14 +827,12 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function (val) {
-        this.$VueEvent.fire('clearContacts')
         if (this.$route.name === 'Power Dialer') {
+          this.$VueEvent.fire('clearContacts')
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.onFetch(params, this.hasFilters)
           this.$emit('onFiltersCount', this.currentListFilters)
-          // this.filtersCount = this.getFiltersCount(this.currentListFilters)
         }
-        // this.isLoading = false
       }
     },
     selectedList (value) {

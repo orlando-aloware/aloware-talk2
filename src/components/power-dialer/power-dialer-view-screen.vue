@@ -58,7 +58,7 @@ export default {
       return this.$route.meta.title
     },
     isAddList () {
-      if (this.currentRouteMeta === 'Power Dialer Add-list') {
+      if (this.currentRouteMeta === 'Power Dialer Add List') {
         return true
       }
       return false
