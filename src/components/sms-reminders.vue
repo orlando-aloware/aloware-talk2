@@ -3,13 +3,16 @@
     <div class="w-100">
       <div class="w-100"
            v-if="campaignId">
+        <label class="form-control-label mb-1">
+          Send from
+        </label>
         <q-select class="p-1 q-basic-selector w-100"
                   use-input
                   emit-value
                   map-options
                   clearable
+                  dense
                   input-debounce="0"
-                  label="Send from"
                   option-value="id"
                   option-label="name"
                   v-model="selectedId"
