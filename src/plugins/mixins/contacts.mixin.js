@@ -211,7 +211,7 @@ export default {
       this.setListContactsLoaded(false)
       params.search = this.search
 
-      if (this.$route.name === 'Contacts' || this.$route.meta.id === 'power-dialer-add-queue-list') {
+      if (this.$route.name === 'Contacts' || this.$route.name === 'Power Dialer') {
         this.previousRelations = this.contactsRelations
         params.relations = this.contactsRelations
       }

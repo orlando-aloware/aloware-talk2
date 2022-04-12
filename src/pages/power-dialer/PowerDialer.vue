@@ -42,6 +42,7 @@
       <CreateDialog />
       <ColumnHeaders
         :predefined-id="myQueueId"
+        :previousRelations="previousRelations"
         v-if="isActive" />
       <RemoveListModal
         @on-clear-list="onClear"
@@ -212,50 +213,11 @@ export default {
     ]),
     async fetchContacts () {
       this.TOGGLE_TABLE_LOADER(true)
-      // let params = {
-      //   // 'page': 1,
-      //   // 'per_page': 25,
-      //   // 'order': 'desc',
-      //   // 'sort': 'last_engagement_at'
-      // }
-      // if (this.listItems[this.id] === undefined) {
-      //   if (isEmpty(this.id)) {
-      //     await this.fetchApi(params)
-      //   } else {
-      //     // this.contactsLoaded({
-      //     //   id: this.tempId,
-      //     //   ...DEFAULT_LIST_ITEMS
-      //     // })
-      //     await this.fetchApi(params)
-      //   }
-      // } else {
-      //   await this.fetchApi(params)
-      // }
-
       this.TOGGLE_TABLE_LOADER(false)
     },
-    // async fetchApi (params) {
-    //   switch (this.$route.meta.id) {
-    //     case 'power-dialer-queue-filter':
-    //       this.processFetch(params, false, true)
-    //       break
-    //     case 'power-dialer-list-filter':
-    //       this.processFetch(params, false, false)
-    //       break
-    //     default:
-    //       this.processFetch(params, false, false, this.id)
-    //   }
-    // },
     async initialize () {
-      let route = this.$route.params
       if (this.$route.name !== 'Power Dialer Sessions') {
         this.START_DIAL_TOGGLE(false)
-      }
-      if (!route.id && this.$route.name === 'Power Dialer') {
-        // route.id = 'in-queue'
-        // this.id = 'in-queue'
-      } else if (route.id && this.$route.name === 'Power Dialer') {
-        // this.id = route.id
       }
       await this.fetchContacts()
     },
@@ -297,7 +259,8 @@ export default {
       }
     },
     async updateList (data) {
-      // await this.loadList(data.id)
+      console.log('data :>> ', data)
+      await this.loadList(data.id)
     },
     onClear () {
       this.clearList()

@@ -77,18 +77,27 @@
                   :id="'folder-submenu-items-' + rootFolderId"
                   class="folder-submenu-items extended"
                   :class="{ 'd-flex': isMenuOpen }"
-                  @mouseleave="destroySubmenu"
-                  @mouseover="createSubmenu"
-                >
-                  <contact-menu-item @click="onCreateFromExistingList">
+                  @mouseleave="{}"
+                  @mouseover="createSubmenu">
+
+                  <contact-menu-item
+                    style="padding:0 !important"
+                    @click="onCreateFromExistingList">
                     <template slot="title">
-                      <span class="create-item">Create from Existing Contacts List</span>
+                      <span
+                        class="create-item"
+                        style="width:100%;padding:10px;">
+                        Create from Existing Contacts List
+                      </span>
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item @click="onCreateByManualSelection">
+                  <contact-menu-item
+                    @click="onCreateByManualSelection">
                     <template slot="title">
-                      <span class="create-item">Create by Manually Selecting Contacts</span>
+                      <span class="create-item">
+                        Create by Manually Selecting Contacts
+                      </span>
                     </template>
                   </contact-menu-item>
                 </div>
@@ -284,7 +293,7 @@ export default {
         contact_folder_id: null
       })
     },
-    onCreateFromExistingList () {
+    onCreateFromExistingList (data) {
       // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
       this.destroySubmenu()
       this.createPdListOpen({
