@@ -912,6 +912,31 @@
                             dense>
                       <q-item-section avatar>
                         <q-radio v-model="add.mode"
+                                 val="ring-group"
+                                 color="primary"
+                                 size="xs"
+                                 dense>
+                        </q-radio>
+                      </q-item-section>
+                      <q-item-section>
+                        <template v-if="add.mode === 'ring-group'">
+                          <ring-group-selector v-model="add.ringGroupId"
+                                               :genericMultiselect="false"
+                                               :isGenericSelectorStyle="true"
+                                               :clearable="true"
+                                               @change="changeAddRingGroup">
+                          </ring-group-selector>
+                        </template>
+                        <template v-else>
+                          <span class="text-rg text-grey-100">Add Ring Group</span>
+                        </template>
+                      </q-item-section>
+                    </q-item>
+                    <q-item tag="label"
+                            class="pl-0 pr-0"
+                            dense>
+                      <q-item-section avatar>
+                        <q-radio v-model="add.mode"
                                  val="phone-number"
                                  color="primary"
                                  size="xs"
@@ -1329,6 +1354,7 @@ export default {
         introduce: false,
         mode: 'user',
         userId: null,
+        ringGroupId: null,
         phoneNumber: ''
       },
       CommunicationDirection,
@@ -1395,6 +1421,11 @@ export default {
       if (this.add.mode === 'user' && this.add.userId) {
         return true
       }
+
+      if (this.add.mode === 'ring-group' && this.add.ringGroupId) {
+        return true
+      }
+
       if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
         return true
       }
@@ -2014,15 +2045,23 @@ export default {
     resetAdd () {
       this.add.introduce = false
       this.add.userId = null
+      this.ringGroupId = null
       this.add.phoneNumber = ''
       this.add.mode = 'user'
     },
     changeAddUser (userId) {
       this.add.phoneNumber = ''
+      this.ringGroupId = null
       this.add.userId = userId
+    },
+    changeAddRingGroup (ringGroupId) {
+      this.add.phoneNumber = ''
+      this.add.userId = null
+      this.add.ringGroupId = ringGroupId
     },
     changeAddPhoneNumber () {
       this.add.userId = null
+      this.ringGroupId = null
     },
     getUsers () {
       this.add.userId = null

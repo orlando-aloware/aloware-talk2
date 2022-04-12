@@ -39,7 +39,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -862,6 +862,10 @@ export default {
       })
     },
 
+    getRingGroup (id) {
+      return id ? this.ringGroups.find(item => item.id === id) : null
+    },
+
     addParticipant (add) {
       if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
@@ -872,6 +876,7 @@ export default {
         communication_id: this.dialer.communication.id,
         introduce: add.introduce,
         user_id: null,
+        ring_group_id: null,
         phone_number: null,
         type: 'warm'
       }
@@ -881,6 +886,14 @@ export default {
         const user = this.getUser(add.userId)
         if (user) {
           this.setAddedParty(user)
+        }
+      }
+
+      if (add.mode === 'ring-group') {
+        params.ring_group_id = add.ringGroupId
+        const ringGroup = this.getRingGroup(add.ringGroupId)
+        if (ringGroup) {
+          this.setAddedParty(ringGroup)
         }
       }
 
