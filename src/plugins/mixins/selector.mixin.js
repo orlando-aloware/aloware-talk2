@@ -89,7 +89,7 @@ export default {
         return
       }
 
-      if (!this.selectedObject) {
+      if (!this.selectedObject || (this.selectedObject && !this.selectedObject[this.textProperty])) {
         this.element.querySelector('.q-basic-selector .q-field__input').placeholder = this.placeholder
         this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'block'
         return
