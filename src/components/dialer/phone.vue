@@ -1040,6 +1040,7 @@
                           <ring-group-selector v-model="transfer.ringGroupId"
                                                :genericMultiselect="false"
                                                :isGenericSelectorStyle="true"
+                                               :clearable="true"
                                                @change="changeTransferRingGroup">
                           </ring-group-selector>
                         </template>

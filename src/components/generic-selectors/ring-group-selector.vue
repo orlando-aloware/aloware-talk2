@@ -19,12 +19,13 @@
               input-debounce="0"
               style="word-break: break-all;"
               use-input
-              use-chips
               emit-value
               map-options
               outlined
               dense
-              :options="ringGroupOptions"
+              :clearable="clearable"
+              :use-chips="multiple"
+              :options="options"
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
@@ -58,7 +59,8 @@
         </q-item>
       </template>
 
-      <template v-slot:selected-item="scope">
+      <template v-if="multiple"
+                v-slot:selected-item="scope">
         <q-chip
           dense
           :tabindex="scope.tabindex"
@@ -140,13 +142,17 @@ export default {
     isGenericSelectorStyle: {
       type: Boolean,
       default: false
+    },
+    clearable: {
+      type: Boolean,
+      default: false
     }
   },
 
   data () {
     return {
       selectedId: this.value,
-      ringGroupOptions: [],
+      options: [],
       reference: 'ringGroupSelect'
     }
   },
@@ -181,28 +187,28 @@ export default {
   },
 
   created () {
-    this.ringGroupOptions = this.ringGroupsAlphabeticalOrder
+    this.options = this.ringGroupsAlphabeticalOrder
   },
 
   methods: {
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.ringGroupOptions = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.id === this.selectedId)
+          this.options = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.ringGroupOptions = this.ringGroupsAlphabeticalOrder
+          this.options = this.ringGroupsAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.ringGroupOptions = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     updateRingGroups (val) {
