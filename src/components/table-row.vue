@@ -29,7 +29,7 @@
           :offset="[0, 0]"
           anchor="center right"
           self="center left"
-          v-model="showing"
+          v-model="tooltip"
           v-if="!hasDefaultContent && (contact.is_dnc || contact.is_blocked)">
           Unable to add DNC or blocked contacts
         </q-tooltip>
