@@ -91,17 +91,11 @@
         />
       </template>
       <template v-if="filter.type === 'boolean'">
-        <div v-show="operator.value">
-          <q-radio v-model="operator.value" :val="true" label="True" />
-          <q-btn-group outline>
-            <q-btn outline color="brown" label="First" />
-            <q-btn outline color="brown" label="Second" icon-right="watch_later" />
-            <q-btn outline color="brown" label="Third" />
-          </q-btn-group>
-        </div>
-        <div v-show="!operator.value">
-          <q-radio v-model="operator.value" :val="false" label="is equal to" />
-          <q-btn-group outline>
+        <div>
+          <q-radio v-model="filterOperatorValue" :val="operator.value" :label="operator.label" />
+          <q-btn-group v-show="operator.value === filterOperatorValue"
+                       v-model="filterOperator"
+                       outline>
             <q-btn outline label="True" />
             <q-btn outline label="False" />
           </q-btn-group>

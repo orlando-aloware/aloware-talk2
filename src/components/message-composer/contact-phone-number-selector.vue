@@ -68,12 +68,12 @@ export default {
   },
   methods: {
     onFocusField () {
-      this.$el.querySelector('.selected-option-container').style.display = 'none'
+      this.element.querySelector('.selected-option-container').style.display = 'none'
       this.onFocus()
     },
 
     onBlurField () {
-      this.$el.querySelector('.selected-option-container').style.display = 'block'
+      this.element.querySelector('.selected-option-container').style.display = 'block'
       this.onBlur()
     },
 

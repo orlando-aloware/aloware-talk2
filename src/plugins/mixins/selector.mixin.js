@@ -13,13 +13,14 @@ export default {
       emitEvent: 'change',
       alterFunction: null,
       isCheckEmit: false,
-      element: this.$el ? this.$el : document
+      element: null
     }
   },
 
   computed: {
     selectedObject () {
       const id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, null) : this.selectedId
+
       if (!_.isEmpty(this.options) && this.compareProperty) {
         return this.options.find(option => option[this.compareProperty] === id)
       }
@@ -34,16 +35,22 @@ export default {
     }
   },
 
+  mounted () {
+    this.element = this.$el ? this.$el : document
+  },
+
   methods: {
     onShowMenu () {
       this.selectWidth = this.$refs[this.reference].$el.offsetWidth
     },
+
     onFocus () {
       if (typeof this.useChips !== 'undefined' && this.useChips) {
         return
       }
 
       this.isFocused = true
+
       if (this.selectedObject !== null && typeof this.selectedObject === 'object') {
         this.element.querySelector('.q-basic-selector .q-field__input').placeholder = this.alterFunction ? this.alterFunction(this.selectedObject[this.textProperty]) : this.selectedObject[this.textProperty]
       }
@@ -71,6 +78,7 @@ export default {
       this.isFocused = false
       this.element.querySelector('.q-basic-selector .q-field__input').placeholder = ''
       this.showInputPlaceholder()
+
       if (this.selectedObject) {
         this.element.querySelector('.q-basic-selector .q-field__native span').style.display = ''
       }
@@ -84,9 +92,10 @@ export default {
       if (!this.selectedObject) {
         this.element.querySelector('.q-basic-selector .q-field__input').placeholder = this.placeholder
         this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'block'
-      } else {
-        this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'none'
+        return
       }
+
+      this.element.querySelector('.q-basic-selector .q-field__input').style.display = 'none'
     },
 
     onInput (val) {
@@ -94,6 +103,7 @@ export default {
 
       if (this.isCheckEmit && this.emitChange && val) {
         this.$emit(this.emitEvent, this.emitChangeProperty ? val[this.emitChangeProperty] : val)
+        return
       }
 
       if (this.emitChange) {
