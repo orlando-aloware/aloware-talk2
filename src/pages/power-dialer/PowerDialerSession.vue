@@ -83,6 +83,9 @@ export default {
   async mounted () {
     this.TOGGLE_SESSION_LOADER(true)
     this.resetPowerDialerTasks()
+    if (!this.myQueue) {
+      await this.getMyQueueList()
+    }
     await this.fetchTasks()
   },
   methods: {
@@ -90,7 +93,8 @@ export default {
       'resetPowerDialerTasks',
       'getSessionTaskByFilter',
       'getPowerDialerList',
-      'setSelectedPDList'
+      'setSelectedPDList',
+      'getMyQueueList'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'

@@ -212,7 +212,8 @@ export default {
     ...mapFields('powerDialer', [
       'powerDialerTasks',
       'activeTask',
-      'taskToCall'
+      'taskToCall',
+      'myQueue'
     ]),
     moveDirection () {
       return DIRECTION
@@ -227,12 +228,8 @@ export default {
        */
       let { powerDialerTasks, activeTask } = this
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        // console.log(`${task.contact_list_item_id} === ${activeTask.contact_list_item_id}`)
         return task.contact_list_item_id !== activeTask.contact_list_item_id
       })
-      // console.log('activeTask :>> ', activeTask)
-      // console.log('inQueue :>> ', inQueue)
-      // console.log('this.powerDialerTasks.in_queue :>> ', this.powerDialerTasks.in_queue)
       return {
         ...powerDialerTasks,
         in_queue: inQueue
@@ -243,6 +240,9 @@ export default {
     },
     status () {
       return AutoDialTaskStatus.STATUSES
+    },
+    isMyQueue () {
+      return this.selectedList.id === this.myQueue.id
     }
   },
   methods: {
@@ -252,11 +252,15 @@ export default {
       'getSessionTaskByFilter'
     ]),
     addTask (item = {}, direction = this.moveDirection.top) {
+      let params = {
+        contact_ids: [item?.id],
+        direction: direction
+      }
+      if (!this.isMyQueue) {
+        params.contact_list_id = this.selectedList.id
+      }
       return this.$axios
-        .post('api/v2/power-dialer-list-items', {
-          contact_ids: [item?.id],
-          direction: direction
-        })
+        .post('api/v2/power-dialer-list-items', params)
         .then(async () => {
           this.$generalNotification('Task has been successfully moved to In Queue.', 'success')
         })
@@ -336,20 +340,6 @@ export default {
           return detail.total_scheduled
         default:
           return detail.total
-      }
-    },
-    taskGroupMenu (group) {
-      switch (group) {
-        case 'called':
-          return [
-            'Add to Top of In Queue',
-            'Add to Bottom of In Queue',
-            'Remove from List'
-          ]
-        default:
-          return [
-            'Remove from List'
-          ]
       }
     }
   },
