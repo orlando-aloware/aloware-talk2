@@ -372,7 +372,6 @@ export default {
         this.powerDialerTaskFilters[key] = res.data
       }
       this.filterDisabled[key] = false
-      console.log('Loading more lists... :>> ', res)
     },
     chipped (data) {
       return data.length || 0
