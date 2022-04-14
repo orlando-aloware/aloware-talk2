@@ -47,12 +47,28 @@
                 <div class="text-13">
                   {{ listFilters[key.toUpperCase()].name }}
                   <q-chip size="xs" square class="p-0">
-                    {{ group.length || 0 }}
+                    <span v-if="key === 'in_queue'">
+                      {{ totalQueued }}
+                    </span>
+                    <span v-else-if="key === 'called'">
+                      {{ totalCalled }}
+                    </span>
+                    <span v-else-if="key === 'failed'">
+                      {{ totalFailed }}
+                    </span>
+                    <span v-else-if="key === 'scheduled'">
+                      {{ totalScheduled }}
+                    </span>
+                    <span v-else>
+                      {{ totalAll }}
+                    </span>
                   </q-chip>
                 </div>
               </q-item-section>
             </template>
-            <q-card class="t-cards">
+            <q-card
+              :disabled="filterDisabled[key]"
+              class="t-cards">
               <q-list
                 v-if="group.length > 0"
                 class="px-2 pb-2"
@@ -146,9 +162,28 @@
                   </q-item>
                 </template>
               </q-list>
+
               <div v-else class="px-0 pb-1 text-grey">
                 <q-card flat class="bg-grey-50 p-2 mx-3 my-2">
                   <span class="px-2">No task listed</span>
+                </q-card>
+              </div>
+
+              <div v-if="hasMoreItems(group, key)">
+                <q-card flat class="px-1 m-0 p-0">
+                  <q-card-actions
+                    vertical
+                    align="center"
+                    class="pt-0">
+                    <q-btn
+                      size="sm"
+                      class="px-2"
+                      color="primary"
+                      flat
+                      @click="loadMore(key)">
+                      Load More
+                    </q-btn>
+                  </q-card-actions>
                 </q-card>
               </div>
             </q-card>
@@ -211,6 +246,7 @@ export default {
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',
+      'powerDialerTaskFilters',
       'activeTask',
       'taskToCall',
       'myQueue'
@@ -243,6 +279,21 @@ export default {
     },
     isMyQueue () {
       return this.selectedList.id === this.myQueue.id
+    },
+    totalAll () {
+      return this.powerDialerTaskFilters?.all?.total_items
+    },
+    totalQueued () {
+      return this.powerDialerTaskFilters?.in_queue?.total_queued
+    },
+    totalCalled () {
+      return this.powerDialerTaskFilters?.called?.total_called
+    },
+    totalFailed () {
+      return this.powerDialerTaskFilters?.failed?.total_failed
+    },
+    totalScheduled () {
+      return this.powerDialerTaskFilters?.scheduled?.total_scheduled
     }
   },
   methods: {
@@ -307,6 +358,22 @@ export default {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
         })
     },
+    async loadMore (key) {
+      this.filterDisabled[key] = true
+      this.groupPageFilters[key]++
+      let res = await this.getSessionTaskByFilter({
+        id: this.selectedList.id,
+        task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
+        per_page: 20,
+        page: this.groupPageFilters[key]
+      })
+      if (res.status === 200) {
+        this.powerDialerTasks[key] = this.powerDialerTasks[key].concat(res.data.data)
+        this.powerDialerTaskFilters[key] = res.data
+      }
+      this.filterDisabled[key] = false
+      console.log('Loading more lists... :>> ', res)
+    },
     chipped (data) {
       return data.length || 0
     },
@@ -341,11 +408,39 @@ export default {
         default:
           return detail.total
       }
+    },
+    hasMoreItems (group = [], key) {
+      switch (key) {
+        case 'in_queue':
+          return group.length < this.totalQueued
+        case 'called':
+          return group.length < this.totalCalled
+        case 'failed':
+          return group.length < this.totalFailed
+        case 'scheduled':
+          return group.length < this.totalScheduled
+        default:
+          return group.length < this.totalAll
+      }
     }
   },
   data () {
     return {
-      flagged: false
+      flagged: false,
+      groupPageFilters: {
+        in_queue: 1,
+        called: 1,
+        failed: 1,
+        scheduled: 1,
+        all: 1
+      },
+      filterDisabled: {
+        in_queue: false,
+        called: false,
+        failed: false,
+        scheduled: false,
+        all: false
+      }
     }
   }
 }
