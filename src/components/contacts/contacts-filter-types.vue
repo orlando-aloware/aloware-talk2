@@ -335,7 +335,7 @@ export default {
           break
         case 'number':
           this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
-            (this.filterOperatorValue && !this.hasSecondaryOperator) || this.filterOperator === 8
+            (this.filterOperatorValue && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
           break
         case 'date':
           this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
