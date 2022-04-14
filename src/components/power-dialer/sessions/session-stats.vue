@@ -76,10 +76,10 @@ export default {
       'powerDialerTaskFilters'
     ]),
     completedTasks () {
-      return this.powerDialerTaskFilters.all.total_called + this.powerDialerTaskFilters.all.total_failed
+      return this.powerDialerTaskFilters?.all?.total_called || 0 + this.powerDialerTaskFilters?.all?.total_failed || 0
     },
     allTasks () {
-      return this.powerDialerTaskFilters.all.total_queued
+      return this.powerDialerTaskFilters?.all?.total_queued || 0
     },
     timer () {
       return this.totalSeconds
