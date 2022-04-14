@@ -63,6 +63,7 @@ export default {
     ]),
     ...mapFields('powerDialer', [
       'powerDialerTasks',
+      'powerDialerTaskFilters',
       'activeList',
       'activeMetrics',
       'myQueue'
@@ -83,6 +84,9 @@ export default {
   async mounted () {
     this.TOGGLE_SESSION_LOADER(true)
     this.resetPowerDialerTasks()
+    if (!this.myQueue) {
+      await this.getMyQueueList()
+    }
     await this.fetchTasks()
   },
   methods: {
@@ -90,7 +94,8 @@ export default {
       'resetPowerDialerTasks',
       'getSessionTaskByFilter',
       'getPowerDialerList',
-      'setSelectedPDList'
+      'setSelectedPDList',
+      'getMyQueueList'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
@@ -107,6 +112,7 @@ export default {
         }
         let res = await this.getSessionTaskByFilter(params)
         this.powerDialerTasks[stat] = res.data.data
+        this.powerDialerTaskFilters[stat] = res.data
       })
     },
     async fetchCurrentList () {

@@ -72,13 +72,14 @@ export default {
   computed: {
     ...mapFields('powerDialer', [
       'activeList',
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'powerDialerTaskFilters'
     ]),
     completedTasks () {
-      return this.powerDialerTasks.called.length + this.powerDialerTasks.failed.length
+      return this.powerDialerTaskFilters?.all?.total_called || 0 + this.powerDialerTaskFilters?.all?.total_failed || 0
     },
     allTasks () {
-      return this.powerDialerTasks.all.length
+      return this.powerDialerTaskFilters?.all?.total_queued || 0
     },
     timer () {
       return this.totalSeconds

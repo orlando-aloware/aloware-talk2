@@ -158,6 +158,13 @@ export default function () {
       scheduled: [],
       all: []
     },
+    powerDialerTaskFilters: {
+      in_queue: null,
+      called: null,
+      failed: null,
+      scheduled: null,
+      all: null
+    },
     activeTask: {},
     taskToCall: {},
     selectedDialerSessionId: null,
