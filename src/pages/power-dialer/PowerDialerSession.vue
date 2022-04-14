@@ -112,7 +112,6 @@ export default {
         }
         let res = await this.getSessionTaskByFilter(params)
         this.powerDialerTasks[stat] = res.data.data
-        console.log('res.data :>> ', res.data)
         this.powerDialerTaskFilters[stat] = res.data
       })
     },
