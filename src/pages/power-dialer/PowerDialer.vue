@@ -259,10 +259,10 @@ export default {
       }
     },
     async updateList (data) {
-      console.log('data :>> ', data)
       await this.loadList(data.id)
     },
     onClear () {
+      this.powerDialerActiveList.data = []
       this.clearList()
     }
   },
