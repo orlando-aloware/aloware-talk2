@@ -1716,13 +1716,24 @@ export default {
         this.loadingHold = true
       }
       this.$VueEvent.fire('toggleHold')
-      setTimeout(() => {
-        if (this.dialer.isHeld) {
+      this.$options.holdIntervalCount = 0
+      this.$options.holdInterval = setInterval(() => {
+        if (this.loadingHold && this.dialer.isHeld) {
           this.loadingHold = false
-        } else {
-          this.loadingUnhold = false
+          clearInterval(this.$options.holdInterval)
         }
-      }, 1000)
+
+        if (this.loadingUnhold && !this.dialer.isHeld) {
+          this.loadingUnhold = false
+          clearInterval(this.$options.holdInterval)
+        }
+
+        this.$options.holdIntervalCount++
+
+        if (this.$options.holdIntervalCount >= 120) {
+          clearInterval(this.$options.holdInterval)
+        }
+      }, 500)
     },
     openDialpad () {
       this.expansionEnabled = true
@@ -2146,11 +2157,22 @@ export default {
   },
   watch: {
     shouldShow () {
+      this.loadingCommunication = false
+      this.loadingDropThirdParty = false
+      this.loadingToggleRecordingStatus = false
+      this.loadingMerge = false
+      this.loadingHold = false
+      this.loadingUnhold = false
+      this.loadingPark = false
+      this.loadingTransfer = false
+      this.loadingAdd = false
+      this.loadingIntroduce = false
       this.setupDraggable()
       this.setupContactLocalTime()
       this.resetBottomExpansion()
       this.changeScreen('call')
       this.digits = ''
+
       if (!this.shouldShow) {
         this.$emit('onPhoneVisible', false)
       }
@@ -2258,6 +2280,7 @@ export default {
     this.$VueEvent.stop('hidePhone')
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
+    clearInterval(this.$options.holdInterval)
   }
 }
 </script>
