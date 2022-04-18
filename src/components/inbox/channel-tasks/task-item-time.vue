@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span v-html="dateTimePassed"></span>
+    <span v-html="dateTimePassed" class="text-nowrap"></span>
     <q-tooltip content-class="bg-grey-light11"
                anchor="top middle" self="center middle">
       {{ relativeDateTime }}
@@ -31,16 +31,19 @@ export default {
     }
   },
   created () {
-    this.getDateTimePassed()
-    this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, this.updateInterval)
-    this.relativeDateTime = this.$options.filters.fixRelativeDatetimeFormat(this.fromTime)
+    this.init()
   },
   beforeDestroy () {
     clearInterval(this.getDateTimePassedInterval)
   },
   methods: {
+    init () {
+      this.getDateTimePassed()
+      this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, this.updateInterval)
+      this.relativeDateTime = this.$options.filters.fixRelativeDatetimeFormat(this.fromTime)
+    },
     getDateTimePassed () {
-      this.dateTimePassed = this.$options.filters.shortDateTimePassed(this.fromTime)
+      this.dateTimePassed = this.$options.filters.shortDateTimePassedLessThan(this.fromTime)
     }
   }
 }

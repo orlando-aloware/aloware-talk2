@@ -77,7 +77,8 @@
             v-if="(contact.last_communication.type === CommunicationTypes.CALL &&
             contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
             contact.last_communication.type !== CommunicationTypes.CALL">
-        <task-item-time :from-time="contact.last_engagement_at"
+        <task-item-time :key="taskItemKey"
+                        :from-time="lastEngagement"
                         :update-interval="6000">
         </task-item-time>
       </span>
@@ -330,11 +331,19 @@ export default {
     },
     communication () {
       return this.contact.last_communication
+    },
+    lastEngagement () {
+      if (this.communication) {
+        return this.communication.created_at
+      }
+
+      return this.contact.last_engagement_at
     }
   },
 
   data () {
     return {
+      taskItemKey: 0,
       CommunicationTypes,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
@@ -356,6 +365,9 @@ export default {
   },
   watch: {
     isReopened: function () {
+    },
+    'contact.last_communication.id': function () {
+      this.taskItemKey++
     }
   }
 }
