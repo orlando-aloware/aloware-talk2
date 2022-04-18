@@ -19,18 +19,18 @@
 
 <script>
 
-import { mapFields } from 'vuex-map-fields'
+import { mapGetters } from 'vuex'
 
 const DEFAULT_TAB = 1
 
 export default {
   name: 'SessionFilters',
   computed: {
-    ...mapFields('powerDialer', [
-      'activeTask'
+    ...mapGetters('contacts', [
+      'contact'
     ]),
     hasHubspotEnabled () {
-      return this.activeTask?.company?.hubspot_integration_enabled
+      return this.contact?.company?.hubspot_integration_enabled
     },
     tabs () {
       return [
@@ -54,6 +54,7 @@ export default {
   },
   methods: {
     clicked (value, enabled = true) {
+      console.log('enabled :>> ', enabled)
       if (enabled) {
         this.id = value.id
         this.$emit('selected-tab', value)

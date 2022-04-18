@@ -207,8 +207,14 @@ export default {
   },
   async getSessionTaskByFilter ({ commit }, params = {}) {
     // let res = await window.axios.get(`api/v2/power-dialer-lists/${params.id}/itemspage=1&per_page=25&sort_order=desc&task_status=${params.taks_status}`)
-    let endpoint = params?.task_status ? `api/v2/power-dialer-lists/${params.id}/items?task_status=${params.task_status}` : `api/v2/power-dialer-lists/${params.id}/items`
-    let res = await window.axios.get(endpoint)
+    // let endpoint = params?.task_status ? `api/v2/power-dialer-lists/${params.id}/items?task_status=${params.task_status}` : `api/v2/power-dialer-lists/${params.id}/items`
+    let res = await window.axios.get(
+      `api/v2/power-dialer-lists/${params.id}/items`,
+      {
+        params,
+        paramsSerializer: qs.stringify
+      }
+    )
     return res
   },
   resetPowerDialerTasks ({ commit }) {

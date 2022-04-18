@@ -379,7 +379,7 @@ export default {
       this.updateListRequest(this.id, { name, order: this.order })
         .then(response => {
           this.listLoaded(response.data.data)
-          this.$generalNotification('List updated.')
+          this.$generalNotification(response.data.message)
           this.reloadFolders()
         }).finally(() => {
           this.$nextTick(() => {
