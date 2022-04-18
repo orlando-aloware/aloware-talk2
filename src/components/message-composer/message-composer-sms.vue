@@ -165,6 +165,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ScheduledMessage from 'components/message-composer/scheduled-message'
@@ -298,11 +299,19 @@ export default {
       }
     },
     onPaste (e) {
-      const index = { i: 0 }
+      const index = { i: 0, item: null, file: null }
+      const bodyText = e.clipboardData.getData('text')
+
+      if (_.isEmpty(_.omitBy(e.clipboardData.items, _.isEmpty)) && bodyText.length) {
+        this.messageComposer.sms.body = bodyText
+        return
+      }
+
       for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
-        const item = e.clipboardData.items[index.i]
-        if (item.type && item.type.length > 0) {
-          this.processFilesToQueue(item.getAsFile())
+        index.item = e.clipboardData.items[index.i]
+        index.file = index.item.type && index.item.type.length > 0 ? index.item.getAsFile() : null
+        if (index.file) {
+          this.processFilesToQueue(index.file)
         }
       }
     },
