@@ -102,7 +102,6 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
     return 'Now'
   }
 
-  dateTimePassed.text = dateTimePassed.text.replace(' few', '')
   dateTimePassed.text = dateTimePassed.text.split(' ')
   if (dateTimePassed.text.length > 0 && ['a', 'an'].includes(dateTimePassed.text[0])) {
     dateTimePassed.text[0] = '1'
@@ -163,9 +162,6 @@ export const shortDateTimePassedLessThan = (dt, replaceAgo = true) => {
   }
 
   dateTimePassed.num = parseInt(dateTimePassed.text[0])
-
-  const alteredUnits = Object.assign({}, units)
-  delete alteredUnits.few
 
   const unit = { data: null, cond: false }
   for (unit.data in units) {
