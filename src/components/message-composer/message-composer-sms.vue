@@ -8,7 +8,7 @@
     </div>
     <div @dragover.prevent
          @drop.prevent="onDrop"
-         @paste.prevent="onPaste">
+         @paste="onPaste">
       <div class="mb-2 d-inline-flex media-preview-wrapper">
         <div v-for="(file, index) in filesOnQueue"
              :key="index"
@@ -165,7 +165,6 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ScheduledMessage from 'components/message-composer/scheduled-message'
@@ -299,19 +298,20 @@ export default {
       }
     },
     onPaste (e) {
-      const index = { i: 0, item: null, file: null }
-      const bodyText = e.clipboardData.getData('text')
+      const index = { i: 0, item: null, file: null, found: false }
 
-      if (_.isEmpty(_.omitBy(e.clipboardData.items, _.isEmpty)) && bodyText.length) {
-        this.messageComposer.sms.body = bodyText
-        return
-      }
+      if (e.clipboardData.items.length) {
+        for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
+          index.item = e.clipboardData.items[index.i]
+          index.file = index.item.type && index.item.type.length > 0 ? index.item.getAsFile() : null
+          if (index.file) {
+            index.found = true
+            this.processFilesToQueue(index.file)
+          }
+        }
 
-      for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
-        index.item = e.clipboardData.items[index.i]
-        index.file = index.item.type && index.item.type.length > 0 ? index.item.getAsFile() : null
-        if (index.file) {
-          this.processFilesToQueue(index.file)
+        if (index.found) {
+          e.preventDefault()
         }
       }
     },
