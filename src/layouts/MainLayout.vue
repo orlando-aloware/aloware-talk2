@@ -26,9 +26,9 @@
               <template v-if="!loading">
                 <transition :name="transitionName"
                             mode="out-in">
-                  <keep-alive>
+                  <!-- <keep-alive> -->
                     <router-view></router-view>
-                  </keep-alive>
+                  <!-- </keep-alive> -->
                 </transition>
               </template>
               <div class="d-flex justify-content-center align-items-center text-center text-black h-100"

@@ -381,7 +381,7 @@ export default {
       return this.dialer.currentStatus === 'READY'
     },
     timerIsOver () {
-      return this.countdownTimer === 0 || this.countdownTimer === -1
+      return this.countdownTimer === -1
     },
     integrationsHubspot () {
       return this.activeTask?.integrations?.hubspot
@@ -405,7 +405,6 @@ export default {
     },
     allTasksAreSkipped () {
       if (this.powerDialerTasks.in_queue.length > 0) {
-        console.log(`SKIP: ${this.skippedTasks.length} === QUEUED: ${this.powerDialerTasks.in_queue.length}`, this.skippedTasks.length === this.powerDialerTasks.in_queue.length)
         return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
       }
       return false
@@ -493,8 +492,9 @@ export default {
         this.countdownTimer--
       }, 1000)
     },
+
     startWarmUpCountDown (task) {
-      if (this.warm_up_seconds === 0 || this.countdownStarted) {
+      if (this.countdownStarted) {
         return
       }
 
@@ -502,14 +502,26 @@ export default {
       this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
-        // console.log(`Counting down: ${this.countdownTimer}`)
-        if (this.countdownTimer === 0) {
-          this.clearWarmUpCountDown()
-          if (!this.togglePause && !this.wrapUp) {
-            this.runTask(task)
-          }
-        }
+        this.onTimerIsOver(task)
       }, 1000)
+    },
+
+    onTimerIsOver (task) {
+      if (this.timerIsOver) {
+        console.log('TIME IS UP')
+        this.clearWarmUpCountDown()
+        if (!this.togglePause && !this.wrapUp) {
+          this.runTask(task)
+        }
+        if (this.wrapUp) {
+          this.initialize()
+          this.wrapUp = false
+        }
+        if (this.togglePause) {
+          this.sessionPaused = true
+          this.taskToCall = this.powerDialerTasks.in_queue[0]
+        }
+      }
     },
 
     async initialize () {
@@ -646,27 +658,16 @@ export default {
     }
   },
   mounted () {
-    this.$options.auto_dialer_interval = 'lfdsfsd'
+    this.$options.auto_dialer_interval = '0'
   },
   watch: {
-    countdownTimer () {
-      if (this.timerIsOver) {
-        if (this.wrapUp) {
-          this.initialize()
-          this.wrapUp = false
-        }
-        if (this.togglePause) {
-          this.sessionPaused = true
-          this.taskToCall = this.powerDialerTasks.in_queue[0]
-        }
-      }
-    },
     currentCompany () {
       if (!this.autoDialer.outbound_campaign_id && this.togglePause) {
         this.findDefaultOutboundCampaign()
       }
     },
     togglePause (value) {
+      console.log('value pause :>> ', value)
       if (!value) {
         if (this.timerIsOver) {
           setTimeout(() => {

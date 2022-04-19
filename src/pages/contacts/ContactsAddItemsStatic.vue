@@ -383,7 +383,14 @@ export default {
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           if (checked) {
-            this.checked.push(this.contactsData.data.find(item => item.id === Number(checkbox.value)))
+            if (this.isContactModule) {
+              this.checked.push(this.contactsData.data.find(item => item.id === Number(checkbox.value)))
+            } else {
+              let foundContact = this.contactsData.data.find(item => item.id === Number(checkbox.value))
+              if (!(foundContact.is_blocked || foundContact.is_dnc)) {
+                this.checked.push(foundContact)
+              }
+            }
           } else {
             this.checked = this.checked.filter(item => item.id !== Number(checkbox.value))
           }
@@ -437,7 +444,11 @@ export default {
       }
     },
     checkedItemIds: function (value) {
-      document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && value.length === this.contactsData.data.length
+      if (this.isContactModule) {
+        document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && value.length === this.contactsData.data.length
+      } else {
+        document.querySelector('.data-table-check-all').checked = value.length > 0
+      }
     }
   }
 }

@@ -196,7 +196,10 @@ export default {
         }
       })
     } else {
-      next()
+      this.stopEvents()
+      setTimeout(() => {
+        next()
+      }, 100)
     }
   }
 }
