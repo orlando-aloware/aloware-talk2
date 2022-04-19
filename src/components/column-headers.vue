@@ -266,7 +266,7 @@ export default {
       // we need to reload contacts data to include relations data
       const relations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
 
-      if (relations.length && this.hasAddedRelation && this.isContactsRoute) {
+      if (relations.length && this.hasAddedRelation) {
         this.$VueEvent.fire('clearContacts')
         this.$VueEvent.fire('fetchContacts')
       }
