@@ -37,45 +37,7 @@ export default {
   },
 
   created () {
-    const hasOrder = { data: null }
-    const params = { data: null }
-    this.$VueEvent.listen('fetchContacts', (data) => {
-      hasOrder.data = _.get(data, 'hasOrder', true)
-      params.data = _.get(data, 'params', {})
-      this.fetch(params.data, hasOrder.data)
-    })
-    this.$VueEvent.listen('clearContacts', () => {
-      this.clearContacts()
-    })
-    this.$VueEvent.listen('onLoadMoreContacts', () => {
-      this.onLoadMore()
-    })
-
-    this.$VueEvent.listen('new_communication', (communication) => {
-      if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name)) {
-        return
-      }
-
-      const index = this.contactsData.data.findIndex(item => item.id === communication.contact_id)
-      if (index >= 0) {
-        talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-          this.contactsData.data[index] = response.data
-
-          if (this.contact.id === communication.contact_id) {
-            this.setContact(response.data)
-          }
-        })
-      }
-    })
-
-    this.$VueEvent.listen('contactUpdated', () => {
-      this.hasContactsListChanges = true
-      // const found = this.contactsData.data.find(item => item.id === contact.id)
-      // const filterFound = this.currentListFilters.find(item => typeof item.filters.contact_owner !== 'undefined')
-      // if (found && found.user_id !== contact.user_id && (this.showMyContacts || filterFound)) {
-      //   this.hasContactsListChanges = true
-      // }
-    })
+    this.startEvents()
   },
 
   mounted () {
@@ -504,6 +466,42 @@ export default {
       this.$VueEvent.stop('clearContacts')
       this.$VueEvent.stop('onLoadMoreContacts')
     },
+    startEvents () {
+      const hasOrder = { data: null }
+      const params = { data: null }
+      this.$VueEvent.listen('fetchContacts', (data) => {
+        hasOrder.data = _.get(data, 'hasOrder', true)
+        params.data = _.get(data, 'params', {})
+        this.fetch(params.data, hasOrder.data)
+      })
+      this.$VueEvent.listen('clearContacts', () => {
+        this.clearContacts()
+      })
+      this.$VueEvent.listen('onLoadMoreContacts', () => {
+        this.onLoadMore()
+      })
+
+      this.$VueEvent.listen('new_communication', (communication) => {
+        if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name)) {
+          return
+        }
+
+        const index = this.contactsData.data.findIndex(item => item.id === communication.contact_id)
+        if (index >= 0) {
+          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+            this.contactsData.data[index] = response.data
+
+            if (this.contact.id === communication.contact_id) {
+              this.setContact(response.data)
+            }
+          })
+        }
+      })
+
+      this.$VueEvent.listen('contactUpdated', () => {
+        this.hasContactsListChanges = true
+      })
+    },
     getListData () {
       return this.$axios
         .get('/api/v2/contacts-list/' + this.id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
@@ -693,7 +691,12 @@ export default {
       if ((from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) ||
         (to.name === 'Contacts' && !['Contacts', 'Contact'].includes(from.name)) ||
         to.name === 'Power Dialer') {
-        this.isNavigated = true
+        if (this.$route.name === 'Contacts') {
+          this.isNavigated = true
+          setTimeout(() => {
+            this.startEvents()
+          }, 500)
+        }
       }
 
       if (this.isPowerDialer) {
@@ -701,6 +704,9 @@ export default {
           (to.name === 'Power Dialer' && !['Power Dialer'].includes(from.name)) ||
           to.name === 'Contacts') {
           this.isNavigated = true
+          setTimeout(() => {
+            this.startEvents()
+          }, 500)
         }
       }
 

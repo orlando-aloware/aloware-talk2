@@ -193,14 +193,6 @@ export default {
       console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
     })
   },
-  beforeRouteUpdate (to, from, next) {
-    if (to.meta !== 'Power Dialer Sessions') {
-      this.START_DIAL_TOGGLE(true)
-    } else {
-      this.START_DIAL_TOGGLE(false)
-    }
-    next()
-  },
   methods: {
     ...mapActions('contacts', [
       // 'contactsLoaded',
@@ -211,7 +203,7 @@ export default {
       'TOGGLE_TABLE_LOADER',
       'SET_ACTIVE_FILTER'
     ]),
-    async fetchContacts () {
+    async prepareData () {
       this.TOGGLE_TABLE_LOADER(true)
       this.TOGGLE_TABLE_LOADER(false)
     },
@@ -219,7 +211,7 @@ export default {
       if (this.$route.name !== 'Power Dialer Sessions') {
         this.START_DIAL_TOGGLE(false)
       }
-      await this.fetchContacts()
+      await this.prepareData()
     },
     resetValues () {
       // this.RESET_LIST()
@@ -259,10 +251,10 @@ export default {
       }
     },
     async updateList (data) {
-      console.log('data :>> ', data)
       await this.loadList(data.id)
     },
     onClear () {
+      this.powerDialerActiveList.data = []
       this.clearList()
     }
   },
@@ -276,6 +268,20 @@ export default {
     powerDialerActiveList (newObj) {
       this.contactsData = newObj
     }
+  },
+  beforeRouteUpdate (to, from, next) {
+    if (to.meta !== 'Power Dialer Sessions') {
+      this.START_DIAL_TOGGLE(true)
+    } else {
+      this.START_DIAL_TOGGLE(false)
+    }
+    next()
+  },
+  beforeRouteLeave (to, from, next) {
+    this.stopEvents()
+    setTimeout(() => {
+      next()
+    }, 100)
   }
 }
 </script>

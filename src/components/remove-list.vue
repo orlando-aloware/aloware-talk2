@@ -9,7 +9,7 @@
       <div class="text-left">
         <div class="text-dark">
           Are you sure you want to {{ clearable ? 'clear' : 'remove' }}
-          <span class="font-weight-bold">{{ listToRemove.name }}</span>?
+          <span class="font-weight-bold">{{ listName }}</span>?
         </div>
       </div>
     </div>
@@ -78,6 +78,9 @@ export default {
     },
     clearable () {
       return this.listToRemove.clear === true
+    },
+    listName () {
+      return this.listToRemove.name || 'My Queue'
     }
   },
   data () {

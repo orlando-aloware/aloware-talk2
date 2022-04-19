@@ -59,6 +59,33 @@ export default {
         }
       })
     }
+
+    this.$VueEvent.listen('make_new_call', (data) => {
+      window.axios.post('/api/v1/contact', {
+        add_phone_number: this.$options.filters.fixPhone(data.phone_number)
+      }).then(res => {
+        const contact = res.data
+        const callData = {
+          currentNumber: this.$options.filters.fixPhone(data.phone_number),
+          contactName: contact.name,
+          companyName: contact.company_name,
+          contactId: contact.id,
+          contactTimezone: contact.timezone
+        }
+
+        this.$VueEvent.fire('callContact', callData)
+      })
+    })
+
+    this.$VueEvent.listen('add_contact', (data) => {
+      window.axios.post('/api/v1/contact', {
+        add_phone_number: this.$options.filters.fixPhone(data.phone_number)
+      }).then(res => {
+        this.$router.replace('/contacts/' + res.data.id)
+      }).catch(() => {
+        this.$router.replace('/')
+      })
+    })
   },
   methods: {
     async validateCookieUser () {
