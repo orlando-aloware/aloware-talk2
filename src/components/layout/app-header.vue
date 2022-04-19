@@ -314,6 +314,16 @@ export default {
     },
     dialerFormStatus () {
       this.dialerStatus = this.dialerFormStatus
+    },
+    isDialerReady (value) {
+      if (value && this.$route.query && this.$route.query.call) {
+        this.$VueEvent.fire('make_new_call', {
+          phone_number: this.$options.filters.fixPhone(this.$route.query.call)
+        })
+        let query = Object.assign({}, this.$route.query)
+        delete query.call
+        this.$router.replace({ query })
+      }
     }
   }
 }

@@ -26,9 +26,9 @@
               <template v-if="!loading">
                 <transition :name="transitionName"
                             mode="out-in">
-                  <keep-alive>
+                  <!-- <keep-alive> -->
                     <router-view></router-view>
-                  </keep-alive>
+                  <!-- </keep-alive> -->
                 </transition>
               </template>
               <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
@@ -335,6 +335,21 @@ export default {
       if (url.indexOf('tel:') > -1) {
         const phoneNumber = url.replace('tel:', '')
         return this.sendCall(phoneNumber)
+      }
+
+      if (url.indexOf('alowaretalk:') > -1) {
+        if (url.indexOf('contact:') > -1) {
+          const phoneNumber = action.replace('contact:', '')
+          this.$VueEvent.fire('add_contact', {
+            phone_number: this.$options.filters.fixPhone(phoneNumber)
+          })
+          return
+        }
+
+        if (url.indexOf('call:') > -1) {
+          const phoneNumber = action.replace('call:', '')
+          return this.sendCall(phoneNumber)
+        }
       }
 
       if (action.indexOf('call:') > -1) {
@@ -731,12 +746,9 @@ export default {
 
     call (phoneNumber) {
       if (this.authenticated && !this.dialer.call) {
-        // @todo Go to dial page
-        /*
-        this.$router.push({ name: 'Dial', query: { phone_number: phoneNumber } }).catch(err => {
-          console.log(err)
+        this.$VueEvent.fire('make_new_call', {
+          phone_number: this.$options.filters.fixPhone(phoneNumber)
         })
-         */
       }
     },
 

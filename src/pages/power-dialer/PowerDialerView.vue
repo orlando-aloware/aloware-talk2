@@ -570,7 +570,7 @@ export default {
       return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
-      return !isNaN(this.selectedListId)
+      return this.selectedList.name === 'My Queue' || !this.selectedList.name
     },
     filteredList () {
       if (this.selectedListId === 'my-queue') {
@@ -725,7 +725,7 @@ export default {
       this.removeListClose()
       setTimeout(() => {
         // this.removeListOpen({ id: this.selectedListId, name: this.name })
-        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name, clear: true })
+        this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name || 'My Queue', clear: true })
       }, 10)
     },
     onCheckedRows (checked) {

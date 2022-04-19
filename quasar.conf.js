@@ -212,7 +212,7 @@ module.exports = function (/* ctx */) {
         },
         protocols: {
           name: 'Aloware Talk',
-          schemes: ['aloware', 'tel', 'callto']
+          schemes: ['alowaretalk', 'tel', 'callto']
         },
         afterSign: './src-electron/build/afterSignHook.js'
       },

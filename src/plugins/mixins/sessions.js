@@ -157,7 +157,7 @@ export default {
 
     clearWarmUpCountDown () {
       this.countdownStarted = false
-      this.countdownTimer = 0
+      this.countdownTimer = -1
 
       clearInterval(this.countdownInterval)
     },

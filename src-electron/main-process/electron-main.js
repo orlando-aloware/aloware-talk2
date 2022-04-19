@@ -9,7 +9,7 @@ if (process.platform === 'win32') {
     await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities', 'ApplicationName', 'Aloware Talk')
     await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities', 'ApplicationDescription', 'Aloware Talk')
     // aloware
-    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities\\URLAssociations', 'aloware', 'Aloware Talk.aloware')
+    await Registry.set('HKCU\\Software\\Aloware Talk\\Capabilities\\URLAssociations', 'alowaretalk', 'Aloware Talk.aloware')
     await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.aloware\\DefaultIcon', '', process.execPath)
     await Registry.set('HKCU\\Software\\Classes\\Aloware Talk.aloware\\shell\\open\\command', '', `"${process.execPath}" "%1"`)
     // callto
@@ -140,7 +140,7 @@ if (gotTheLock) {
     // Protocol handler for win32
     // argv: An array of the second instance’s (command line / deep linked) arguments
     if (process.platform === 'win32') {
-      let cleanArg = argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('aloware') || arg.startsWith('tel') || arg.startsWith('callto')))
+      let cleanArg = argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('alowaretalk') || arg.startsWith('tel') || arg.startsWith('callto')))
       if (cleanArg.length > 0) {
         // Keep only command line / deep linked arguments
         deepLinkingUrl = cleanArg[0]
@@ -201,9 +201,9 @@ if (gotTheLock) {
   app.quit()
 }
 
-if (!app.isDefaultProtocolClient('aloware')) {
+if (!app.isDefaultProtocolClient('alowaretalk')) {
   // Define custom protocol handler. Deep linking works on packaged versions of the application!
-  app.setAsDefaultProtocolClient('aloware')
+  app.setAsDefaultProtocolClient('alowaretalk')
 }
 
 if (!app.isDefaultProtocolClient('tel')) {
