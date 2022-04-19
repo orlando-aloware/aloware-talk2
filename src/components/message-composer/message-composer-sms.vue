@@ -8,7 +8,7 @@
     </div>
     <div @dragover.prevent
          @drop.prevent="onDrop"
-         @paste.prevent="onPaste">
+         @paste="onPaste">
       <div class="mb-2 d-inline-flex media-preview-wrapper">
         <div v-for="(file, index) in filesOnQueue"
              :key="index"
@@ -298,11 +298,20 @@ export default {
       }
     },
     onPaste (e) {
-      const index = { i: 0 }
-      for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
-        const item = e.clipboardData.items[index.i]
-        if (item.type && item.type.length > 0) {
-          this.processFilesToQueue(item.getAsFile())
+      const index = { i: 0, item: null, file: null, found: false }
+
+      if (e.clipboardData.items.length) {
+        for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
+          index.item = e.clipboardData.items[index.i]
+          index.file = index.item.type && index.item.type.length > 0 ? index.item.getAsFile() : null
+          if (index.file) {
+            index.found = true
+            this.processFilesToQueue(index.file)
+          }
+        }
+
+        if (index.found) {
+          e.preventDefault()
         }
       }
     },

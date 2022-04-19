@@ -1,5 +1,54 @@
 import moment from 'moment'
 
+const units = {
+  ' few': '',
+  ' seconds': 's',
+  ' second': 's',
+  ' minutes': 'm',
+  ' minute': 'm',
+  ' hours': 'h',
+  ' hour': 'h',
+  ' days': 'd',
+  ' day': 'd',
+  ' weeks': 'w',
+  ' week': 'w',
+  ' months': 'mo',
+  ' month': 'mo',
+  ' years': 'y',
+  ' year': 'y'
+}
+
+const future = {
+  's': {
+    'max': 1,
+    'unit': 'm'
+  },
+  'm': {
+    'max': 45,
+    'unit': 'h'
+  },
+  'h': {
+    'max': 22,
+    'unit': 'd'
+  },
+  'd': {
+    'max': 6,
+    'unit': 'w'
+  },
+  'w': {
+    'max': 3,
+    'unit': 'mo'
+  },
+  'mo': {
+    'max': 11,
+    'unit': 'y'
+  },
+  'y': {
+    'max': null,
+    'unit': 'y'
+  }
+}
+
 /**
  * date time passed
  * @param {datetime|string|Moment} dt
@@ -34,19 +83,23 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
   const dateTimePassed = { text: '' }
 
   if (dt && window.timezone) {
-    dateTimePassed.text = window.moment.utc(dt).tz(window.timezone).fromNow()
+    dateTimePassed.text = window.moment.utc(dt).tz(window.timezone).fromNow(replaceAgo)
   }
 
   if (dt && !window.timezone) {
-    dateTimePassed.text = window.moment.utc(dt).local().fromNow()
+    dateTimePassed.text = window.moment.utc(dt).local().fromNow(replaceAgo)
   }
 
   if (!dt && window.timezone) {
-    dateTimePassed.text = window.moment.utc().tz(window.timezone).fromNow()
+    dateTimePassed.text = window.moment.utc().tz(window.timezone).fromNow(replaceAgo)
   }
 
   if (!dt && !window.timezone) {
-    dateTimePassed.text = window.moment.utc().local().fromNow()
+    dateTimePassed.text = window.moment.utc().local().fromNow(replaceAgo)
+  }
+
+  if (dateTimePassed.text.includes('a few seconds')) {
+    return 'Now'
   }
 
   dateTimePassed.text = dateTimePassed.text.split(' ')
@@ -56,32 +109,6 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
 
   dateTimePassed.text = dateTimePassed.text.join(' ')
 
-  if (replaceAgo) {
-    dateTimePassed.text = dateTimePassed.text.replace(' ago', '')
-  }
-
-  if (!replaceAgo) {
-    dateTimePassed.text = dateTimePassed.text.replace('a few seconds ago', 'Now')
-  }
-
-  const units = {
-    ' few': '',
-    ' seconds': 's',
-    ' second': 's',
-    ' minutes': 'm',
-    ' minute': 'm',
-    ' hours': 'h',
-    ' hour': 'h',
-    ' days': 'd',
-    ' day': 'd',
-    ' weeks': 'w',
-    ' week': 'w',
-    ' months': 'mo',
-    ' month': 'mo',
-    ' years': 'y',
-    ' year': 'y'
-  }
-
   const unit = { data: null }
   for (unit.data in units) {
     if (dateTimePassed.text.includes(unit.data)) {
@@ -90,6 +117,64 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
   }
 
   return dateTimePassed.text
+}
+
+/**
+ * shortcut date time passed (less than)
+ * @param {datetime|string|Moment} dt
+ * @returns {string|*}
+ */
+export const shortDateTimePassedLessThan = (dt, replaceAgo = true) => {
+  const dateTimePassed = { text: '', num: 0 }
+
+  moment.relativeTimeThreshold('s', 60)
+  moment.relativeTimeThreshold('m', 60)
+  moment.relativeTimeThreshold('h', 24)
+  moment.relativeTimeThreshold('d', 7)
+  moment.relativeTimeThreshold('w', 4)
+  moment.relativeTimeThreshold('M', 12)
+
+  if (dt && window.timezone) {
+    dateTimePassed.text = moment.utc(dt).tz(window.timezone).fromNow(replaceAgo)
+  }
+
+  if (dt && !window.timezone) {
+    dateTimePassed.text = moment.utc(dt).local().fromNow(replaceAgo)
+  }
+
+  if (!dt && window.timezone) {
+    dateTimePassed.text = moment.utc().tz(window.timezone).fromNow(replaceAgo)
+  }
+
+  if (!dt && !window.timezone) {
+    dateTimePassed.text = moment.utc().local().fromNow(replaceAgo)
+  }
+
+  if (dateTimePassed.text.includes('a few seconds')) {
+    return 'Now'
+  }
+
+  dateTimePassed.text = dateTimePassed.text.replace(' few', '')
+  dateTimePassed.text = dateTimePassed.text.split(' ')
+
+  if (dateTimePassed.text.length > 0 && ['a', 'an'].includes(dateTimePassed.text[0])) {
+    dateTimePassed.text[0] = '1'
+  }
+
+  dateTimePassed.num = parseInt(dateTimePassed.text[0])
+
+  const unit = { data: null, cond: false }
+  for (unit.data in units) {
+    if (dateTimePassed.text[1].trim() === unit.data.trim()) {
+      dateTimePassed.text[1] = dateTimePassed.text[1].trim().replace(unit.data.trim(), units[unit.data])
+      unit.cond = future[dateTimePassed.text[1]].max ? dateTimePassed.num < future[dateTimePassed.text[1]].max : true
+      dateTimePassed.text[0] = unit.cond ? `< ${dateTimePassed.num + 1}` : '< 1'
+      dateTimePassed.text[1] = unit.cond ? dateTimePassed.text[1] : future[dateTimePassed.text[1]].unit
+      break
+    }
+  }
+
+  return dateTimePassed.text.join('')
 }
 
 /**
@@ -437,13 +522,14 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
 }
 
 export const formatTime = (time, formatTo24Hr) => {
-  return moment(time, 'HHmm').format(formatTo24Hr ? 'HH:mm' : 'hh:mm A')
+  return window.moment(time, 'HHmm').format(formatTo24Hr ? 'HH:mm' : 'hh:mm A')
 }
 
 export default ({ Vue }) => {
   const filters = {
     dateTimePassed,
     shortDateTimePassed,
+    shortDateTimePassedLessThan,
     fixScheduleDate,
     fixScheduleTime,
     fixRelativeDatetimeFormat,
