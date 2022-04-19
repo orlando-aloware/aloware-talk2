@@ -334,7 +334,7 @@ export default {
     },
     lastEngagement () {
       if (this.communication) {
-        return this.communication.created_at
+        return window.moment(this.contact.last_engagement_at).isAfter(this.communication.created_at) ? this.contact.last_engagement_at : this.communication.created_at
       }
 
       return this.contact.last_engagement_at
