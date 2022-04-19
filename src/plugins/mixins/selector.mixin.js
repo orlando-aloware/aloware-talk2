@@ -45,7 +45,8 @@ export default {
     },
 
     onFocus () {
-      if (typeof this.useChips !== 'undefined' && this.useChips) {
+      if ((typeof this.useChips !== 'undefined' && this.useChips) ||
+        (typeof this.multiple !== 'undefined' && this.multiple)) {
         return
       }
 
