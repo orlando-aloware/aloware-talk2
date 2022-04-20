@@ -238,5 +238,9 @@ export default {
         // { name: 'Cold Leads', id: 6 }
       ]
     })
+  },
+  async getLastCommunicationScript ({ commit }, id = null) {
+    let res = await window.axios.get(`api/v1/communication/${id}/scripts`)
+    return res
   }
 }

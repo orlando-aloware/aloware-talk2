@@ -5345,6 +5345,15 @@ button#bs-folder-options {
   &.mobile-scrollableArea {
     max-height: calc(100vh - 242px);
   }
+  &.scroll-type-1 {
+    max-height: calc(100vh - 193px);
+    &:not(.mobile-scrollableArea) {
+      max-height: calc(100vh - 193px);
+    }
+    &.mobile-scrollableArea {
+      max-height: calc(100vh - 310);
+    }
+  }
 }
 
 .paginated {
