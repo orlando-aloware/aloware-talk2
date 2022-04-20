@@ -81,6 +81,11 @@ export default {
       })
       this.script = selectedScript
     }
+  },
+  watch: {
+    async activeTask () {
+      await this.changeScript()
+    }
   }
 }
 </script>
