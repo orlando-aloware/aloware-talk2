@@ -166,6 +166,7 @@ export default function () {
       all: null
     },
     activeTask: {},
+    hasActiveTask: false,
     taskToCall: {},
     selectedDialerSessionId: null,
     sessionPaused: false,

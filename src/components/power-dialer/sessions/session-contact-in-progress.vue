@@ -2,7 +2,7 @@
   <q-card class="t-cards pt-2">
     <q-list class="px-2 pb-2">
       <q-item
-        v-if="activeTaskId"
+        v-if="hasActiveTask"
         class="active t-expansion-panel px-2">
         <div class="py-2">
           <q-avatar size="30px" color="grey">
@@ -51,7 +51,8 @@ export default {
   },
   computed: {
     ...mapFields('powerDialer', [
-      'activeTask'
+      'activeTask',
+      'hasActiveTask'
     ]),
     ...mapState(['dialer']),
     firstname () {
