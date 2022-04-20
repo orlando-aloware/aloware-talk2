@@ -266,8 +266,10 @@ export default {
       return 3
     },
     scrollableAreaClasses () {
+      let isDefault = this.$route.name === 'Contacts' || this.$route.name === 'Contact'
+      let optScroll = `scrollableArea ${isDefault ? '' : 'scroll-type-1'} position-relative `
       return [
-        `${this.isScrollable ? 'scrollableArea position-relative ' : ''}d-flex flex-column h-100 w-100 flex-grow-1`,
+        `${this.isScrollable ? optScroll : ' '}d-flex flex-column h-100 w-100 flex-grow-1`,
         this.scrollAreaClass,
         `${this.isEmpty ? 'overflow-hidden' : ''}`,
         `${this.isMobile ? 'mobile-scrollableArea' : ''}`

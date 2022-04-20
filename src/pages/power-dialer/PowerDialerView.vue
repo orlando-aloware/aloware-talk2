@@ -9,7 +9,7 @@
 
     <template slot="options">
       <div class="text-13 pr-3 border-right right-spacing-2">
-        {{ numberOfContacts }} Contacts
+        {{ numberOfContacts }}
       </div>
       <StartDialing
         :disabled-trigger="numberOfContacts === 0"
@@ -371,6 +371,7 @@
 
 <script>
 
+import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerViewScreen from 'src/components/power-dialer/power-dialer-view-screen'
 import PowerDialerFilter from 'src/components/power-dialer/details/power-dialer-filters'
@@ -495,6 +496,9 @@ export default {
     })
   },
   computed: {
+    ...mapFields('powerDialer', [
+      'powerDialerActiveList'
+    ]),
     ...mapState(['prevRoute']),
     ...mapState('powerDialer', [
       'metrics'
@@ -537,7 +541,26 @@ export default {
       }
     },
     numberOfContacts () {
-      return this.fixedContactsData?.data.length
+      let list = this.powerDialerActiveList
+      let total = 0
+      let currentTotal = this.fixedContactsData?.data.length
+      switch (this.filter) {
+        case 'in-queue':
+          total = list.total_queued
+          break
+        case 'called':
+          total = list.total_called
+          break
+        case 'failed':
+          total = list.total_failed
+          break
+        case 'scheduled':
+          total = list.total_scheduled
+          break
+        default:
+          total = list.total_items
+      }
+      return `${currentTotal} of ${total} Contacts`
     },
     activeList () {
       return this.listItems[this.selectedListId]?.data || []

@@ -4,6 +4,7 @@
     flat
     class="p-0">
     <q-card-section class="px-0" style="overflow:auto;">
+      <!-- https://app.alodev.org/api/v1/communication/69352/scripts -->
 
       <ScriptSelector
         v-model="scriptId"
@@ -22,7 +23,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
 
 export default {
@@ -37,6 +38,9 @@ export default {
     }
   },
   computed: {
+    ...mapState('powerDialer', [
+      'activeTask'
+    ]),
     ...mapGetters('contacts', [
       'contact'
     ]),
@@ -66,8 +70,21 @@ export default {
     }
   },
   methods: {
-    changeScript (val) {
-      this.script = val
+    ...mapActions('powerDialer', [
+      'getLastCommunicationScript'
+    ]),
+    async changeScript (val) {
+      let id = this.activeTask.last_communication.id
+      let res = await this.getLastCommunicationScript(id)
+      let selectedScript = res.data.find(script => {
+        return script.id === this.selectedScript
+      })
+      this.script = selectedScript
+    }
+  },
+  watch: {
+    async activeTask () {
+      await this.changeScript()
     }
   }
 }

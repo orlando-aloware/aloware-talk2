@@ -117,7 +117,7 @@ export default {
 
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call
-        this.activeTask = this.taskToCall
+        this.hasActiveTask = true
         this.$VueEvent.fire('makeCall', {
           currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
           outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)

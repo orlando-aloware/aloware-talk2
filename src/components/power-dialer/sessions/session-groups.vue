@@ -27,10 +27,7 @@
               </q-item-section>
             </template>
 
-            <InProgressContact
-              :in-progress-contact="activeTask" />
-            <!-- <InProgressContact
-              :in-progress-contact="{}" /> -->
+            <InProgressContact />
 
           </q-expansion-item>
           <q-separator />

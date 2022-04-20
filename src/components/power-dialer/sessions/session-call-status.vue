@@ -240,6 +240,7 @@ export default {
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
+      'hasActiveTask',
       'taskToCall',
       'hubspot'
     ]),
@@ -419,10 +420,11 @@ export default {
     }
     this.$VueEvent.listen('initiate_session', (session) => {
       this.activeTask = {}
+      this.hasActiveTask = false
       this.initialize()
     })
     this.$VueEvent.listen('initiate_wrapup', (session) => {
-      this.activeTask = {}
+      this.hasActiveTask = false
       this.initialize()
     })
   },
@@ -539,6 +541,7 @@ export default {
       if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
         this.taskToCall = this.powerDialerTasks.in_queue[0]
         // this.activeTask = this.taskToCall
+        this.activeTask = await this.getContact({ id: this.taskToCall.id })
         await this.fetchContact(this.taskToCall.id)
         if (!this.wrapUp) {
           this.resetTimer()
