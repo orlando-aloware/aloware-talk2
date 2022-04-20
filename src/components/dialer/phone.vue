@@ -1523,9 +1523,15 @@ export default {
       if (callFishingCommunication) {
         return true
       }
+
       if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
         return false
       }
+
+      if (['menu', 'wrap-up'].includes(this.screen)) {
+        return true
+      }
+
       return this.dialer && !_.isEmpty(this.dialer.communication)
     },
     iconSizes () {
@@ -1622,6 +1628,10 @@ export default {
     this.setupContactLocalTime()
     this.isVisible = this.$route.meta.id !== 'power-dialer-session'
     this.showLocalTime = true
+
+    if (this.dialer.currentStatus === 'WRAP_UP') {
+      this.changeScreen('wrap-up')
+    }
   },
   methods: {
     setupDraggable () {
@@ -2170,7 +2180,13 @@ export default {
       this.setupDraggable()
       this.setupContactLocalTime()
       this.resetBottomExpansion()
-      this.changeScreen('call')
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.changeScreen('wrap-up')
+      } else {
+        this.changeScreen('call')
+      }
+
       this.digits = ''
 
       if (!this.shouldShow) {
@@ -2195,6 +2211,7 @@ export default {
       switch (this.dialer.currentStatus) {
         case 'READY':
           this.changeScreen('call')
+          this.$emit('onPhoneVisible', false)
           break
         case 'OFFLINE':
           this.changeScreen('call')

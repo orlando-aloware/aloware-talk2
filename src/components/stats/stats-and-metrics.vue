@@ -73,7 +73,7 @@ export default {
     }
   },
   mounted () {
-    this.metricGroupList = JSON.parse(JSON.stringify(this.metricGroups))
+    this.metricGroupList = JSON.parse(JSON.stringify(this.reversedMetricGroups))
   },
   methods: {
     ...mapActions('stats', [
@@ -91,21 +91,21 @@ export default {
         return
       }
 
-      const previousMetricGroups = JSON.parse(JSON.stringify(this.metricGroups))
+      const previousMetricGroups = JSON.parse(JSON.stringify(this.reversedMetricGroups))
 
       const order = previousMetricGroups[newIndex].order
       const step = { data: 0 }
 
       if (newIndex > oldIndex) {
-        step.data = (newIndex - oldIndex)
+        step.data = (newIndex + oldIndex)
       } else {
-        step.data = (oldIndex - newIndex)
+        step.data = (oldIndex + newIndex)
       }
 
       await this.updateMetricGroupOrder({
         metricGroupId: element.id,
         order: order,
-        step: oldIndex > newIndex ? (-1 * step.data) : step.data
+        step: oldIndex > newIndex ? step.data : (-1 * step.data)
       })
 
       await this.$axios.patch(`api/v2/agents/${this.profile.id}/statistics/metric-groups/${element.id}/order`, {
@@ -126,10 +126,10 @@ export default {
     }
   },
   watch: {
-    metricGroups: {
+    reversedMetricGroups: {
       deep: true,
       handler: function () {
-        this.metricGroupList = JSON.parse(JSON.stringify(this.metricGroups))
+        this.metricGroupList = JSON.parse(JSON.stringify(this.reversedMetricGroups))
       }
     }
   }

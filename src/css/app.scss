@@ -4267,7 +4267,7 @@ i.option-separator {
   }
 
   .phone-footer-buttons {
-    z-index: 1;
+    z-index: 3;
     height: 52px;
     box-shadow: 0px 0px 10px rgba(4, 4, 4, 0.2);
     background: $white;
@@ -9981,6 +9981,7 @@ screen and (max-width: 956px) {
         height: 100%;
         overflow-y: scroll;
         border-radius: unset;
+        padding-bottom: 44px;
         .mobile-live-call-bar {
           z-index: 10;
           position: absolute;
@@ -10072,6 +10073,7 @@ screen and (max-width: 956px) {
             padding-bottom: 76px;
           }
           .phone-info {
+            margin-top: 75px;
             width: 100%;
             .q-item__label:first-child {
               margin-top: 25px !important;
@@ -10104,7 +10106,9 @@ screen and (max-width: 956px) {
             height: 92px;
           }
           .phone-avatar {
-            margin-top: 25px;
+            position: fixed;
+            top: 116px;
+            margin-top: unset;
             z-index: 9
           }
         }

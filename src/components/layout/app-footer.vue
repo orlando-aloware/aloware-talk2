@@ -10,9 +10,9 @@
             dense>
       <q-route-tab name="inbox"
                    to="/"
-                   :content-class="isActive('inbox') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :content-class="tab === 'inbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="isActive('inbox')"
+                   :active="tab === 'inbox'"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -23,9 +23,9 @@
       </q-route-tab>
       <q-route-tab name="contacts"
                    to="/contacts"
-                   :content-class="isActive('contacts') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :content-class="tab === 'contacts' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="isActive('contacts')"
+                   :active="tab === 'contacts'"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -38,9 +38,9 @@
                    class="phone-tab"
                    :class="inProgressAndParkedCallClass"
                    to="/phone"
-                   :content-class="isActive('phone') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :content-class="tab === 'phone' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="isActive('phone')"
+                   :active="tab === 'phone'"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -51,9 +51,9 @@
       </q-route-tab>
       <q-route-tab name="power-dialer"
                    to="/power-dialer"
-                   :content-class="isActive('power-dialer') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :content-class="tab === 'power-dialer' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="isActive('power-dialer')"
+                   :active="tab === 'power-dialer'"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -64,9 +64,9 @@
       </q-route-tab>
       <q-route-tab name="stats"
                    to="/stats"
-                   :content-class="isActive('stats') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :content-class="tab === 'stats' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="isActive('stats')"
+                   :active="tab === 'stats'"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -77,9 +77,9 @@
       </q-route-tab>
       <q-route-tab name="settings"
                    to="/settings"
-                   :content-class="isActive('settings') ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text'"
+                   :content-class="tab === 'settings' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="isActive('settings')"
+                   :active="tab === 'settings'"
                    no-caps
                    exact>
         <span class="tab-icon">
@@ -201,8 +201,8 @@ export default {
   },
 
   mounted () {
-    this.updateTab()
-    this.tab = !this.dialer.currentStatus || this.dialer.currentStatus !== 'READY' ? 'phone' : this.tab
+    // this.updateTab()
+    // this.tab = !this.dialer.currentStatus || this.dialer.currentStatus !== 'READY' ? 'phone' : this.tab
   },
 
   methods: {
@@ -246,8 +246,13 @@ export default {
           return 'settings'
       }
     },
-    updateTab () {
-      this.tab = this.getTab()
+    updateTab (forceTab = null) {
+      if (!forceTab) {
+        this.tab = this.getTab()
+      } else {
+        this.tab = forceTab
+      }
+
       if (this.tab !== 'phone' && this.showPhone) {
         this.setShowPhone(false)
       }
@@ -258,7 +263,7 @@ export default {
   },
 
   watch: {
-    'tab': function (newValue, oldValue) {
+    'tab': _.debounce(function (newValue, oldValue) {
       if (!newValue) {
         this.tab = 'inbox'
       }
@@ -280,12 +285,7 @@ export default {
       if (this.tab !== tab) {
         this.tab = tab
       }
-    },
-    'isMobile': function () {
-      if (this.isMobile && (this.dialer.currentStatus && this.dialer.currentStatus !== 'READY')) {
-        this.tab = 'phone'
-      }
-    },
+    }, 100),
     'showPhone': function () {
       if (this.showPhone) {
         this.tab = 'phone'

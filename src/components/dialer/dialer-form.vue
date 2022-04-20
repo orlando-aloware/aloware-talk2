@@ -231,7 +231,8 @@ export default {
       textMessage: '',
       isMakingCall: false,
       isSending: false,
-      hasPhoneNumberSearchResults: false
+      hasPhoneNumberSearchResults: false,
+      previousOutboundCallingMode: null
     }
   },
 
@@ -287,6 +288,10 @@ export default {
       this.showDialer()
     } else {
       this.hideDialer()
+    }
+
+    if (this.profile) {
+      this.previousOutboundCallingMode = this.profile.outbound_calling_mode
     }
   },
 
@@ -363,6 +368,14 @@ export default {
     },
 
     findDefaultOutboundCampaign () {
+      if (this.previousOutboundCallingMode &&
+        this.profile &&
+        this.previousOutboundCallingMode === this.profile.outbound_calling_mode &&
+        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+        return
+      }
+
+      this.previousOutboundCallingMode = this.profile.outbound_calling_mode
       this.campaignId = null
       this.defaultOutboundCampaignId = null
 
@@ -481,6 +494,10 @@ export default {
     'profile': {
       deep: true,
       handler: function () {
+        if (!this.previousOutboundCallingMode) {
+          this.previousOutboundCallingMode = this.profile.outbound_calling_mode
+        }
+
         this.findDefaultOutboundCampaign()
       }
     }

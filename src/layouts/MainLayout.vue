@@ -1751,6 +1751,7 @@ export default {
       window.removeEventListener('online', this.updateOnlineStatus)
       window.removeEventListener('offline', this.updateOnlineStatus)
       clearInterval(window.sessionIntervalId)
+      clearInterval(this.$options.appFooterInterval)
     },
 
     ...mapActions('cache', ['setCurrentCompany']),
@@ -1890,6 +1891,22 @@ export default {
       }
       if (!val && this.$route.name === 'Phone') {
         this.$router.replace({ name: 'Inbox' })
+      }
+
+      if (val) {
+        this.$options.appFooterCounter = 0
+        this.$options.appFooterInterval = setInterval(() => {
+          if (this.$refs.appFooter !== undefined) {
+            this.$refs.appFooter.updateTab(
+              this.dialer.currentStatus && this.dialer.currentStatus !== 'READY' ? 'phone' : null
+            )
+            clearInterval(this.$options.appFooterInterval)
+          }
+          this.$options.appFooterCounter++
+          if (this.$options.appFooterCounter >= 600) {
+            clearInterval(this.$options.appFooterInterval)
+          }
+        }, 100)
       }
     }
   }

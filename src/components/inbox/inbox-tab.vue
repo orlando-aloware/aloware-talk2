@@ -777,7 +777,7 @@ export default {
         if (!this.$route.params.id) {
           this.resetList()
         } else {
-          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+          if ((!this.isSearch && this.previousRoute.name !== 'Inbox') || this.$route.params.id) {
             this.loadContactTasks()
           }
         }
