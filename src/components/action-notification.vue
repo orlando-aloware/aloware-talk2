@@ -10,6 +10,7 @@
            v-show="title.length > 0"
            @hide="clearDateTimeInterval"
            @hidden="onHidden"
+           @show="onShow"
            @shown="autoClose">
     <button
       class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-full-rounded position-absolute call-fishing-clear-queues"
@@ -200,7 +201,8 @@ export default {
   data () {
     return {
       runningDateTime: null,
-      runningDateTimeInterval: null
+      runningDateTimeInterval: null,
+      isValidNotification: false
     }
   },
 
@@ -219,6 +221,10 @@ export default {
 
       if (this.queue) {
         toastClass.data += ' has-clear-queues'
+      }
+
+      if (!this.isValidNotification) {
+        toastClass.data += ' hide'
       }
 
       return toastClass.data
@@ -338,6 +344,9 @@ export default {
 
   methods: {
     ...mapActions(['setNotifications', 'setShowPhone', 'clearCallFishingQueue', 'removeFromCallFishingQueue']),
+    onShow () {
+      this.isValidNotification = false
+    },
     autoClose () {
       this.runDateTimeInterval()
       if ((this.id === 'callFishing' && document.getElementById('callFishing') && !this.isCommunicationInCallFishingQueue) ||
@@ -364,6 +373,7 @@ export default {
         return
       }
 
+      this.isValidNotification = true
       this.playAudio()
     },
     runDateTimeInterval () {
