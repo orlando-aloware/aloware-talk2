@@ -715,6 +715,10 @@ export default {
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
       console.log('Unhold is in progress.')
+
+      if (this.isMobile) {
+        this.$VueEvent.fire('doneUnparkCall')
+      }
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {

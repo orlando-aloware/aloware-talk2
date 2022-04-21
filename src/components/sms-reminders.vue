@@ -2,7 +2,7 @@
   <div class="sms-reminders-wrapper border-0 p-0 w-100">
     <div class="w-100">
       <div class="w-100"
-           v-if="campaignId">
+           v-if="showLineSelector">
         <label class="form-control-label mb-1">
           Send from
         </label>
@@ -63,7 +63,14 @@ export default {
     },
 
     campaignId: {
+      type: Boolean,
       required: true
+    },
+
+    showLineSelector: {
+      type: Boolean,
+      required: false,
+      default: false
     },
 
     appointmentDatetime: {

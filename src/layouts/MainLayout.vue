@@ -1914,7 +1914,9 @@ export default {
       }
     },
     showPhone (value) {
-      this.mobilePhoneDrawer = value
+      if (this.isMobile) {
+        this.mobilePhoneDrawer = value
+      }
     },
     'dialer.currentStatus': function () {
       if (this.isMobile && this.$route.name !== 'Phone' && this.dialer.currentStatus === 'WRAP_UP') {
