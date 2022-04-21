@@ -278,7 +278,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications']),
+    ...mapState(['dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications', 'showPhone']),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
@@ -1856,6 +1856,10 @@ export default {
         this.$router.back()
       }
 
+      if (this.isMobile && !this.mobilePhoneDrawer && to.name === 'Phone') {
+        this.mobilePhoneDrawer = true
+      }
+
       const inboxStatus = _.get(this.$route, 'params.status', null)
       if (inboxStatus) {
         setTimeout(() => {
@@ -1907,6 +1911,17 @@ export default {
             clearInterval(this.$options.appFooterInterval)
           }
         }, 100)
+      }
+    },
+    showPhone (value) {
+      this.mobilePhoneDrawer = value
+    },
+    'dialer.currentStatus': function () {
+      if (this.isMobile && this.$route.name !== 'Phone' && this.dialer.currentStatus === 'WRAP_UP') {
+        this.$router.push({
+          name: 'Phone'
+        })
+        this.mobilePhoneDrawer = true
       }
     }
   }
