@@ -103,21 +103,30 @@ export default {
   created () {
     this.$VueEvent.listen('doneParkAndConnect', () => {
       this.loading = false
-      this.$router.push({
-        name: 'Phone'
-      })
+      if (this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+        this.setShowPhone(true)
+      }
     })
     this.$VueEvent.listen('doneHangupAndConnect', () => {
       this.loading = false
-      this.$router.push({
-        name: 'Phone'
-      })
+      if (this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+        this.setShowPhone(true)
+      }
     })
     this.$VueEvent.listen('doneUnparkCall', () => {
       this.loading = false
-      this.$router.push({
-        name: 'Phone'
-      })
+      if (this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+        this.setShowPhone(true)
+      }
     })
   },
   methods: {
@@ -145,15 +154,20 @@ export default {
 
       this.loading = true
       this.$VueEvent.fire('unparkCall')
-      this.$router.push({
-        name: 'Phone'
-      })
+      if (this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+        this.setShowPhone(true)
+      }
     },
     openPhone () {
       this.setShowPhone(true)
-      this.$router.push({
-        name: 'Phone'
-      })
+      if (this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+      }
     },
     ...mapActions(['setShowPhone'])
   },

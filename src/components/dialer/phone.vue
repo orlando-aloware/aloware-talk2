@@ -2239,6 +2239,7 @@ export default {
           break
         case 'ANSWERING_CALL':
           this.changeScreen('call')
+          this.$emit('onPhoneVisible', true)
           break
         case 'REJECTING_CALL':
           this.changeScreen('call')
