@@ -4,7 +4,7 @@
     :disabled="sessionLoader"
     style="height: 100%;">
     <div
-      v-if="sessionPaused"
+      v-if="!sessionPaused"
       class="text-h6 text-grey-80 full-height fill-width row justify-center items-center">
       Session Paused
     </div>
@@ -89,14 +89,20 @@ export default {
       'sessionSettings'
     ]),
     filteredCallDispositions () {
-      return this.callDispositions.filter(d => {
-        return this.sessionSettings.call_disposition_ids.includes(d.id)
-      })
+      if (this.sessionSettings.call_disposition_ids.length > 0) {
+        return this.callDispositions.filter(d => {
+          return this.sessionSettings.call_disposition_ids.includes(d.id)
+        })
+      }
+      return this.callDispositions
     },
     filteredContactDispositions () {
-      return this.dispositionStatuses.filter(d => {
-        return this.sessionSettings.contact_disposition_ids.includes(d.id)
-      })
+      if (this.sessionSettings.contact_disposition_ids.length > 0) {
+        return this.dispositionStatuses.filter(d => {
+          return this.sessionSettings.contact_disposition_ids.includes(d.id)
+        })
+      }
+      return this.dispositionStatuses
     },
     contactDisposition () {
       return this.contact_disposition || this.contact?.disposition_status_id

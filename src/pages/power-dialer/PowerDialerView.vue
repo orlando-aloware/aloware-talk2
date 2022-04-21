@@ -9,7 +9,7 @@
 
     <template slot="options">
       <div class="text-13 pr-3 border-right right-spacing-2">
-        {{ numberOfContacts }}
+        {{ labelForNumberOfContacts }}
       </div>
       <StartDialing
         :disabled-trigger="numberOfContacts === 0"
@@ -541,6 +541,9 @@ export default {
       }
     },
     numberOfContacts () {
+      return this.fixedContactsData?.data.length
+    },
+    labelForNumberOfContacts () {
       let list = this.powerDialerActiveList
       let total = 0
       let currentTotal = this.fixedContactsData?.data.length

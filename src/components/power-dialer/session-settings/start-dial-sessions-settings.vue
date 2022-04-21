@@ -497,6 +497,7 @@ export default {
       }
 
       if (res.id) {
+        this.sessionSettings = res
         this.dialog = false
       } else {
         this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
