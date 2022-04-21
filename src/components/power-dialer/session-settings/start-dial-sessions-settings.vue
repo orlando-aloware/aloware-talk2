@@ -601,8 +601,7 @@ export default {
       this.setDefaultSettings(params)
     },
     removeEmptyParams (params) {
-      console.log('params :>> ', params)
-      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v !== '' && v !== []))
+      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v.length !== 0))
     },
     isSessionValid (data) {
       return this.selectedItemId === data.id
