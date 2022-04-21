@@ -155,8 +155,7 @@ export default {
       })
     },
     onRemoveContacts () {
-      this.clearContacts()
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$VueEvent.fire('shouldUpdateListCount')
     }
   },

@@ -146,8 +146,7 @@ export default {
           url.data
         )
         .then(() => {
-          this.$VueEvent.fire('clearContacts')
-          this.$VueEvent.fire('fetchContacts')
+          this.$VueEvent.fire('fetchContacts', { clear: true })
           this.$VueEvent.fire('shouldUpdateListCount')
           this.$generalNotification('Contact was successfully removed.')
         })

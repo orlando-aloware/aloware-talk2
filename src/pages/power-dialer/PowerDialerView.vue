@@ -851,9 +851,8 @@ export default {
       deep: true,
       handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
-          this.$VueEvent.fire('clearContacts')
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.onFetch(params, this.hasFilters)
+          this.onFetch(params, this.hasFilters, true)
           this.$emit('onFiltersCount', this.currentListFilters)
         }
       }

@@ -293,8 +293,7 @@ export default {
 
       if (!_.isEqual(this.allFilters, currentListFilters)) {
         this.setShowMyContacts(false)
-        this.$VueEvent.fire('clearContacts')
-        this.$VueEvent.fire('fetchContacts')
+        this.$VueEvent.fire('fetchContacts', { clear: true })
         this.$VueEvent.fire('shouldUpdateListCount')
       }
     },

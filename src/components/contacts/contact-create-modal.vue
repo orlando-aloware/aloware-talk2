@@ -251,8 +251,7 @@ export default {
             this.isCreating = false
             return this.notifyForExistingContact(res.data)
           }
-          this.$VueEvent.fire('clearContacts')
-          this.$VueEvent.fire('fetchContacts')
+          this.$VueEvent.fire('fetchContacts', { clear: true })
           if (!['my-contacts', 'unassigned'].includes(this.selectedList.id)) {
             this.$VueEvent.fire('getListCount', this.contact.user_id ? this.lists['my-contacts'] : this.lists['unassigned'])
           }

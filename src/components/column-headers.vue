@@ -267,8 +267,7 @@ export default {
       const relations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
 
       if (relations.length && this.hasAddedRelation) {
-        this.$VueEvent.fire('clearContacts')
-        this.$VueEvent.fire('fetchContacts')
+        this.$VueEvent.fire('fetchContacts', { clear: true })
       }
     },
     closeAndReset () {

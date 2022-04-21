@@ -1073,8 +1073,7 @@ export default {
       }
       this.$VueEvent.fire('filters-reset')
 
-      this.$VueEvent.fire('clearContacts')
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$VueEvent.fire('shouldUpdateListCount')
       this.filterHasChanges = false
     },
