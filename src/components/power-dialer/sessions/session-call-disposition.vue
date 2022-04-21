@@ -4,7 +4,7 @@
     :disabled="sessionLoader"
     style="height: 100%;">
     <div
-      v-if="!sessionPaused"
+      v-if="sessionPaused"
       class="text-h6 text-grey-80 full-height fill-width row justify-center items-center">
       Session Paused
     </div>
