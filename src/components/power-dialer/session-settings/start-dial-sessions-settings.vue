@@ -370,6 +370,9 @@ export default {
       return this.selectedItem?.name
     },
     hasSelectedTemporarySetting () {
+      if (!this.selectedItem?.id) {
+        return true
+      }
       if (this.temporarySetting?.id) {
         return this.selectedItem.id === this.temporarySetting?.id
       }
