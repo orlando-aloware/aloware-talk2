@@ -1,11 +1,12 @@
 <template>
   <div class="row full-height">
-    <div class="col-12 p-1">
+    <div class="col-12 p-0 px-3 pb-2">
       <iframe
         v-if="hubspotLink"
         :src="hubspotLink"
         frameborder="0"
-        style="height:100%; width:100%;">
+        style="height:100%; width:100%;"
+        id="hubspot-crm">
       </iframe>
       <!-- <q-card flat class="p-3">
         <q-card-section class="p-0">
@@ -19,6 +20,7 @@
           </div>
         </q-card-section>
       </q-card> -->
+      <!-- var pDiv = document.getElementById('hubspot-crm'); -->
     </div>
   </div>
 </template>
@@ -35,7 +37,23 @@ export default {
     ]),
     hubspotLink () {
       return this.hubspot.link
+    },
+    test () {
+      let iframe = document.getElementById('hubspot-crm')
+      let el = iframe.contentWindow
+      return el
+    }
+  },
+  data () {
+    return {
+      sample: ''
     }
   }
 }
 </script>
+
+<style>
+  iframe > * {
+    overflow: hidden;
+  }
+</style>

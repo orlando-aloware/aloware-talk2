@@ -329,7 +329,7 @@
 .t-panel-container {
   height: 100%;
   .q-tab-panels {
-    height: calc(100vh - 335px);
+    height: calc(100vh - 298px);
     .q-panel {
 
     }
@@ -397,4 +397,8 @@
 
 .hidden {
   display: none;
+}
+
+iframe > html {
+  overflow: hidden;
 }

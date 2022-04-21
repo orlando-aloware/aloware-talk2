@@ -74,6 +74,9 @@ export default {
       'getLastCommunicationScript'
     ]),
     async changeScript (val) {
+      if (!this.activeTask.id) {
+        return
+      }
       let id = this.activeTask.last_communication.id
       let res = await this.getLastCommunicationScript(id)
       let selectedScript = res.data.find(script => {
@@ -83,7 +86,7 @@ export default {
     }
   },
   watch: {
-    async activeTask () {
+    async activeTask (value) {
       await this.changeScript()
     }
   }
