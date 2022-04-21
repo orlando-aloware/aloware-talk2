@@ -457,7 +457,7 @@ export default {
       this.dialog = true
     },
     async beginDial () {
-      this.dialog = false
+      var res = null
       /**
        * TODOs
        * Identify first before exiting the component
@@ -466,8 +466,8 @@ export default {
        */
       let newList = null
       if (this.temporarySetting.id === this.selectedItem.id) {
-        let newSettings = { ...this.selectedItem }
-        let res = await this.createDialerSessionSetting({
+        let newSettings = { ...this.filterSelectedItem }
+        res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
           contact_list_id: this.listId,
           name: `${this.list.name}-${new Date().valueOf()}`
@@ -489,10 +489,17 @@ export default {
         })
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
-      if (this.defaultTrigger) {
+
+      if (this.defaultTrigger && res.id) {
         this.$emit('start')
       } else {
         this.$emit('update', newList)
+      }
+
+      if (res.id) {
+        this.dialog = false
+      } else {
+        this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
       }
     },
     async loadSettings (data) {
@@ -594,7 +601,8 @@ export default {
       this.setDefaultSettings(params)
     },
     removeEmptyParams (params) {
-      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v !== ''))
+      console.log('params :>> ', params)
+      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v !== '' && v !== []))
     },
     isSessionValid (data) {
       return this.selectedItemId === data.id
