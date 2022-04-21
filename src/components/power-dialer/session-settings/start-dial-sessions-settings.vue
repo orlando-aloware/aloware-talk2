@@ -235,10 +235,11 @@
               </div>
 
               <SessionsForm
-                v-model="selectedItem"
+                v-model="filterSelectedItem"
                 @valid-form="disabled = false"
                 @invalid-form="disabled = true"
-                :disabled="isCompanyScope" />
+                :disabled="isCompanyScope"
+                :flagged="dialog" />
 
             </q-card>
           </q-card-section>
@@ -382,6 +383,24 @@ export default {
         return this.myQueue.id
       }
       return this.list.id
+    },
+    filterSelectedItem () {
+      if (this.selectedItem?.id) {
+        return this.selectedItem
+      }
+      return {
+        call_disposition_ids: [],
+        campaign_id: null,
+        company_id: null,
+        contact_disposition_ids: [],
+        is_company_scope: 0,
+        metric_options: [],
+        name: null,
+        script_id: null,
+        skip_outside_daytime_hours: 1,
+        user_id: null,
+        warmup_period_in_seconds: 0
+      }
     }
   },
   async mounted () {
