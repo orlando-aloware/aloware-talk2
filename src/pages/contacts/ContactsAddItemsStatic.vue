@@ -271,6 +271,11 @@ export default {
     },
     totalRows () {
       return this.listItems?.[this.id]?.total || 0
+    },
+    noPrimary () {
+      return this.contactsData.data.filter(contact => {
+        return contact.phone_numbers[0].is_primary === false
+      })
     }
   },
   methods: {
