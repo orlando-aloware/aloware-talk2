@@ -670,7 +670,7 @@ export default {
       }
     },
     togglePause (value) {
-      console.log('value pause :>> ', value)
+      // console.log('value pause :>> ', value)
       if (!value) {
         if (this.timerIsOver) {
           setTimeout(() => {

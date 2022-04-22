@@ -74,7 +74,10 @@ export default {
     return res.data
   },
   async updateContactsList ({ commit }, params = {}) {
-    let res = await window.axios.patch(`api/v2/power-dialer-lists/${params.id}`, params)
+    let res = await window.axios.patch(
+      `api/v2/power-dialer-lists/${params.id}`,
+      params
+    )
     return res.data
   },
 

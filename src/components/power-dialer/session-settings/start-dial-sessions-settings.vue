@@ -458,13 +458,13 @@ export default {
     },
     async beginDial () {
       var res = null
+      let newList = null
       /**
        * TODOs
        * Identify first before exiting the component
        * IF selected item is temporary OR
        * IF selected item is personal/company
        */
-      let newList = null
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.filterSelectedItem }
         res = await this.createDialerSessionSetting({
@@ -490,14 +490,14 @@ export default {
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
 
-      if (this.defaultTrigger && res.id) {
+      if (this.defaultTrigger) {
         this.$emit('start')
       } else {
         this.$emit('update', newList)
       }
+      this.sessionSettings = res?.id ? res : this.selectedItem
 
-      if (res.id) {
-        this.sessionSettings = res
+      if (res?.id) {
         this.dialog = false
       } else {
         this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
