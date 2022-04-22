@@ -431,6 +431,12 @@ export default {
         this.rejectCall()
       }
 
+      if (this.isMobile && this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+      }
+      this.$VueEvent.fire('showLoadingPhone')
       const params = {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
         'CampaignId': outboundCampaignId ? outboundCampaignId.toString() : '',
@@ -515,6 +521,11 @@ export default {
       this.clearDialerCallFishing()
 
       if (this.device.activeConnection()) {
+        if (this.isMobile && this.$route.name !== 'Phone') {
+          this.$router.push({
+            name: 'Phone'
+          })
+        }
         // accept the incoming connection and start two-way audio
         this.device.activeConnection().accept()
       }
@@ -1150,26 +1161,34 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      if (this.isMobile && this.$route.name !== 'Phone') {
+        this.$router.push({
+          name: 'Phone'
+        })
+      }
+
       // store temporarily the parked call
       const parkedCall = this.dialer.parkedCall ? JSON.parse(JSON.stringify(this.dialer.parkedCall)) : null
 
-      // park the in-progress call
+      // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
         this.parkCallCombo(true, false, communication)
         return
       }
 
-      // park the in-progress call (switch from already parked call)
+      // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
         this.parkCallCombo(false, true, parkedCall)
         return
       }
 
+      // hang-up the in-progress call and unpark the parked call
       if (shouldHangup && parkedCall) {
         this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
+      // hangup the in-progress call and answer the incoming call
       if (shouldHangup && !parkedCall) {
         this.hangupCallCombo(true, false, communication)
         return
