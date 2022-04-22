@@ -13,7 +13,7 @@
     @shown="onShown">
 
     <div class="modal-body-wrapper d-flex">
-      <div class="left-column-wrapper">
+      <!--div class="left-column-wrapper">
         <span class="filter-type-description">{{ channelFilterName }} Filters</span>
 
         <div class="mt-3">
@@ -68,11 +68,14 @@
             </div>
           </div>
         </div>
-      </div>
+      </div-->
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <div class="w-100 text-center">
+          <!--div class="w-100 text-center">
             <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
+          </div-->
+          <div class="w-100">
+            <span class="filter-type-description">{{ channelFilterName }} Filters</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
                        @clicked="onHide">
@@ -83,24 +86,24 @@
                      :default-filter-model="defaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="container d-flex justify-content-between mt-3 action-option-container">
-          <div>
+        <div class="container d-flex justify-content-end mt-3 action-option-container">
+          <!--div>
             <b-badge v-if="[ChannelType.CHANNEL_INBOX].includes(defaultFilterModel.type)"
                      variant="warning">
               Saving of filters for inbox is not available as of the moment.
             </b-badge>
-          </div>
+          </-div-->
           <div>
             <compact-btn class="mr-3 btn-tertiary"
                          :disabled="!filterHasChanges"
                          @clicked="onResetFilter">
               Reset
             </compact-btn>
-            <compact-btn class="btn-secondary"
+            <!--compact-btn class="btn-secondary"
                          :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
-            </compact-btn>
+            </compact-btn-->
             <compact-btn variant="primary"
                          class="ml-3"
                          :disabled="false"
@@ -131,8 +134,8 @@ import FilterForm from 'components/inbox/inbox-filters/filter-form'
 import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
-import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
-import CheckOIcon from 'components/icons/check-o-icon'
+// import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
+// import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
 import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
@@ -140,7 +143,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 export default {
   name: 'filter-dialog',
 
-  components: { CloseIcon, CheckOIcon, FilterListItems, CompactBtn, FilterForm },
+  components: { CloseIcon, CompactBtn, FilterForm },
 
   props: {
     value: {

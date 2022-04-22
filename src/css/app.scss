@@ -9871,6 +9871,7 @@ screen and (max-width: 956px) {
             .loading-container {
               display: flex;
               justify-content: center;
+              align-items: center;
             }
           }
         }
@@ -10975,7 +10976,7 @@ screen and (max-width: 956px) {
 
 .mobile-live-call-bar {
   .dropdown-menu {
-    z-index: 10;
+    z-index: 9999;
   }
 }
 

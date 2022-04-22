@@ -15,7 +15,7 @@
 
       <q-separator/>
 
-      <q-card-section>
+      <q-card-section v-if="integration_data.properties">
         <p class="mb-0"
            v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
@@ -44,7 +44,8 @@
         </p>
       </q-card-section>
 
-      <q-card-section class="pt-0 pb-0">
+      <q-card-section class="pt-0 pb-0"
+                      v-if="integration_data.properties">
         <q-card class="deals mb-1"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
@@ -118,7 +119,7 @@
       </q-card-section>
 
       <q-card-section
-        v-if="integration_data.properties.email && integration_data.properties.email.value && false">
+        v-if="integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"

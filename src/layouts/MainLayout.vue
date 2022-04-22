@@ -82,11 +82,10 @@
           bordered
           no-swipe-close
           class="mobile-phone-drawer position-relative"
-          :class="{ 'hidden': !mobilePhoneDrawer, 'mobile-phone-visible': isPhoneVisible }"
+          :class="mobilePhoneDrawerClass"
           side="right"
           :breakpoint="789"
           v-model="mobilePhoneDrawer"
-          v-if="isMobile && mobilePhoneDrawer"
           @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-show="!isPhoneVisible">
@@ -95,7 +94,7 @@
                         :title-only="true"/>
           </q-header>
           <phone :isMobile="isMobile"
-                 v-if="mobilePhoneDrawer"
+                 :class="{ 'hidden': mobilePhoneDrawer }"
                  @onPhoneVisible="onPhoneVisible">
           </phone>
           <dialer-form ref="dialerForm"
@@ -309,6 +308,12 @@ export default {
       return {
         'page-container h-100': true,
         'pt-58': this.showContactsHeader
+      }
+    },
+    mobilePhoneDrawerClass () {
+      return {
+        'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.md,
+        'mobile-phone-visible': this.isPhoneVisible
       }
     }
   },
@@ -1801,14 +1806,6 @@ export default {
         return
       }
 
-      if (this.$q.screen.lt.md) {
-        this.$refs.mobilePhone.$el.classList.remove('hidden')
-      }
-
-      if (!this.$q.screen.lt.md && !this.$refs.mobilePhone.$el.classList.contains('hidden')) {
-        this.$refs.mobilePhone.$el.classList.add('hidden')
-      }
-
       if (!this.$q.screen.lt.md) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
@@ -1918,12 +1915,17 @@ export default {
         this.mobilePhoneDrawer = value
       }
     },
-    'dialer.currentStatus': function () {
-      if (this.isMobile && this.$route.name !== 'Phone' && this.dialer.currentStatus === 'WRAP_UP') {
+    'dialer.currentStatus': function (value) {
+      if (this.isMobile && this.$route.name !== 'Phone' && value === 'WRAP_UP') {
         this.$router.push({
           name: 'Phone'
         })
+      }
+
+      if (this.isMobile &&
+        ['WRAP_UP', 'CALL_CONNECTED'].includes(value)) {
         this.mobilePhoneDrawer = true
+        this.isPhoneVisible = true
       }
     }
   }

@@ -95,7 +95,7 @@
             <ignore-call-icon v-if="id === 'callFishing'"/>
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Ignore
+              {{ id === 'incomingCall' ? 'Decline' : 'Ignore' }}
             </q-tooltip>
           </q-btn>
           <q-btn class="height-32"
