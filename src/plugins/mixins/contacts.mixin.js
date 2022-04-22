@@ -82,13 +82,12 @@ export default {
     onSortByField (sorts) {
       this.isLoaded = false
       this.sorts = sorts
-      this.clearContacts()
       this.fetch({
         search: this.search,
         page: 1,
         sort: sorts.orderBy,
         order: sorts.order
-      })
+      }, true, true)
       document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
     },
     onLoadMore (list = null) {
@@ -137,20 +136,18 @@ export default {
     },
     onFetchMyContacts (checked) {
       this.isLoading = true
-      this.$VueEvent.fire('clearContacts')
       this.fetch({
         contact_owner: checked ? this.profile.id : undefined,
         search: this.search,
         page: this.contactsData.page
-      })
+      }, true, true)
     },
     onSearch (searchText) {
       this.isLoaded = false
       this.setSearch(searchText)
-      this.$VueEvent.fire('clearContacts')
       this.fetch({
         search: this.search
-      })
+      }, true, true)
     },
     apiEndpoint (queued) {
       if (!this.isPowerDialer) {
@@ -169,7 +166,7 @@ export default {
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
-    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false) {
+    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, clear = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
 
@@ -191,6 +188,10 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          if (clear) {
+            this.clearContacts()
+          }
+
           this.contactsLoaded(data)
           this.setListContactsLoaded(true)
 
@@ -223,7 +224,7 @@ export default {
           console.log(err)
         })
     }, 1000),
-    fetch (params = {}, hasOrder = true) {
+    fetch (params = {}, hasOrder = true, clear = false) {
       const defaultSort = { data: _.get(params, 'sort', this.defaultContactDateFilter) }
       if (defaultSort.data.constructor !== 'Function') {
         defaultSort.data = this.defaultContactDateFilter
@@ -240,16 +241,16 @@ export default {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
-            this.processFetch(params, false, true)
+            this.processFetch(params, false, true, clear)
             break
           case 'power-dialer-list-filter':
-            this.processFetch(params, false, false)
+            this.processFetch(params, false, false, clear)
             break
           default:
-            this.processFetch(params, false, false)
+            this.processFetch(params, false, false, clear)
         }
       } else {
-        this.processFetch(params)
+        this.processFetch(params, true, false, clear)
       }
     },
     buildQueryString (params, isContactModule = true) {
@@ -467,12 +468,12 @@ export default {
       this.$VueEvent.stop('onLoadMoreContacts')
     },
     startEvents () {
-      const hasOrder = { data: null }
-      const params = { data: null }
+      const fetchData = { hasOrder: null, params: null, clear: null }
       this.$VueEvent.listen('fetchContacts', (data) => {
-        hasOrder.data = _.get(data, 'hasOrder', true)
-        params.data = _.get(data, 'params', {})
-        this.fetch(params.data, hasOrder.data)
+        fetchData.params = _.get(data, 'params', {})
+        fetchData.hasOrder = _.get(data, 'hasOrder', true)
+        fetchData.clear = _.get(data, 'clear', false)
+        this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear)
       })
       this.$VueEvent.listen('clearContacts', () => {
         this.clearContacts()

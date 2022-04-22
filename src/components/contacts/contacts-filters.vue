@@ -502,8 +502,7 @@ export default {
       }
 
       if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
-        this.$VueEvent.fire('clearContacts')
-        this.$VueEvent.fire('fetchContacts')
+        this.$VueEvent.fire('fetchContacts', { clear: true })
       }
 
       this.setCurrentListFilters(updatedFilter)
@@ -523,8 +522,7 @@ export default {
       }
 
       if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
-        this.$VueEvent.fire('clearContacts')
-        this.$VueEvent.fire('fetchContacts')
+        this.$VueEvent.fire('fetchContacts', { clear: true })
       }
 
       this.setCurrentListFilters(updatedFilter)
