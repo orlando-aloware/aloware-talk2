@@ -402,3 +402,10 @@
 iframe > html {
   overflow: hidden;
 }
+
+.session-settings-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 250px;
+}

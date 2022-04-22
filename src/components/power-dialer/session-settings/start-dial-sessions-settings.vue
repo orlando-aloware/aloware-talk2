@@ -192,7 +192,9 @@
                 <div class="col-12">
                   <q-card flat class="p-0">
                     <q-card-actions class="px-0">
-                      <div>{{ selectedItemName }}</div>
+                      <div class="session-settings-title">
+                        {{ selectedItemName }}
+                      </div>
                       <q-space />
                       <q-btn
                         @click="resetDefaults"
