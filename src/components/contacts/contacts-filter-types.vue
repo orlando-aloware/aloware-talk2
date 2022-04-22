@@ -83,11 +83,14 @@
           multiple
           map-options
           emit-value
+          use-input
           input-debounce="0"
           v-if="operator.value === filterOperator && hasValue"
           v-model="filterOperatorValue"
-          :options="filter.options"
+          :options="options"
           option-disable="disabled"
+          @input="onInput"
+          @filter="filterFn"
         />
       </template>
       <template v-if="filter.type === 'boolean'">
@@ -152,7 +155,8 @@ export default {
       isValidated: false,
       debounceDelay: 0,
       format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' },
-      allFilters: []
+      allFilters: [],
+      options: []
     }
   },
   computed: {
@@ -183,6 +187,9 @@ export default {
       }
       return false
     }
+  },
+  created () {
+    this.options = this.filter.options
   },
   mounted () {
     this.debounceDelay = this.filter.type === 'string' ? 10 : 500
@@ -357,6 +364,29 @@ export default {
       this.isValidated = value
       this.filterOperatorValue = 1
     },
+    filterFn (val, update) {
+      if (this.filterOperatorValue && val === this.filterOperatorValue) {
+        update(() => {
+          this.options = this.filter.options.filter(option => option.value === this.filterOperatorValue)
+        })
+        return
+      }
+
+      if (val === '') {
+        update(() => {
+          this.options = this.filter.options
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.filter.options.filter(option => option.label.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    onInput () {
+      this.$refs.filterOperation[0].updateInputValue('')
+    },
     ...mapActions('contacts', [ 'setCurrentListFilters', 'setShowMyContacts' ])
   },
   watch: {
@@ -386,6 +416,9 @@ export default {
       }, this.debounceDelay)
       debounce()
       this.validateValue()
+    },
+    'filter.options': function (value) {
+      this.options = this.filter.options
     }
   },
   beforeDestroy () {
