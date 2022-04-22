@@ -118,7 +118,8 @@ export default {
           .then((response) => response.data)
           .then((data) => {
             this.setListContactsLoaded(true)
-            this.contactsLoaded(data)
+            // Load contacts and force concatenation
+            this.contactsLoaded(data, true)
             this.markCheckedAll()
           })
           .finally(() => {
@@ -395,7 +396,7 @@ export default {
 
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     },
-    contactsLoaded (listData) {
+    contactsLoaded (listData, isConcatenated = false) {
       const dataLength = listData.data.length
       const found = { data: null }
       const item = { data: null }
@@ -454,7 +455,9 @@ export default {
 
       if (this.isPowerDialer) {
         this.powerDialerActiveList = { ...listData }
-        this.powerDialerActiveList.data = this.contactsData.data
+        if (isConcatenated) {
+          this.powerDialerActiveList.data = this.contactsData.data
+        }
       }
     },
     clearContacts () {

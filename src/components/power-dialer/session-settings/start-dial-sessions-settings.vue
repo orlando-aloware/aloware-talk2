@@ -192,7 +192,9 @@
                 <div class="col-12">
                   <q-card flat class="p-0">
                     <q-card-actions class="px-0">
-                      <div>{{ selectedItemName }}</div>
+                      <div class="session-settings-title">
+                        {{ selectedItemName }}
+                      </div>
                       <q-space />
                       <q-btn
                         @click="resetDefaults"
@@ -235,10 +237,11 @@
               </div>
 
               <SessionsForm
-                v-model="selectedItem"
+                v-model="filterSelectedItem"
                 @valid-form="disabled = false"
                 @invalid-form="disabled = true"
-                :disabled="isCompanyScope" />
+                :disabled="isCompanyScope"
+                :flagged="dialog" />
 
             </q-card>
           </q-card-section>
@@ -369,6 +372,9 @@ export default {
       return this.selectedItem?.name
     },
     hasSelectedTemporarySetting () {
+      if (!this.selectedItem?.id) {
+        return true
+      }
       if (this.temporarySetting?.id) {
         return this.selectedItem.id === this.temporarySetting?.id
       }
@@ -382,6 +388,24 @@ export default {
         return this.myQueue.id
       }
       return this.list.id
+    },
+    filterSelectedItem () {
+      if (this.selectedItem?.id) {
+        return this.selectedItem
+      }
+      return {
+        call_disposition_ids: [],
+        campaign_id: null,
+        company_id: null,
+        contact_disposition_ids: [],
+        is_company_scope: 0,
+        metric_options: [],
+        name: null,
+        script_id: null,
+        skip_outside_daytime_hours: 1,
+        user_id: null,
+        warmup_period_in_seconds: 0
+      }
     }
   },
   async mounted () {
@@ -435,17 +459,17 @@ export default {
       this.dialog = true
     },
     async beginDial () {
-      this.dialog = false
+      var res = null
+      let newList = null
       /**
        * TODOs
        * Identify first before exiting the component
        * IF selected item is temporary OR
        * IF selected item is personal/company
        */
-      let newList = null
       if (this.temporarySetting.id === this.selectedItem.id) {
-        let newSettings = { ...this.selectedItem }
-        let res = await this.createDialerSessionSetting({
+        let newSettings = { ...this.filterSelectedItem }
+        res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
           contact_list_id: this.listId,
           name: `${this.list.name}-${new Date().valueOf()}`
@@ -467,10 +491,18 @@ export default {
         })
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
+
       if (this.defaultTrigger) {
         this.$emit('start')
       } else {
         this.$emit('update', newList)
+      }
+      this.sessionSettings = res?.id ? res : this.selectedItem
+
+      if (res?.id) {
+        this.dialog = false
+      } else {
+        this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
       }
     },
     async loadSettings (data) {
@@ -572,7 +604,7 @@ export default {
       this.setDefaultSettings(params)
     },
     removeEmptyParams (params) {
-      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v !== ''))
+      return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v.length !== 0))
     },
     isSessionValid (data) {
       return this.selectedItemId === data.id

@@ -263,7 +263,14 @@ export default {
       this.setFilters(id)
     },
     '$route.params': async function (params) {
+      this.$VueEvent.fire('clearContacts')
       await this.setFilterParams(params)
+    },
+    '$route': {
+      handler (val) {
+        this.isLoading = true
+      },
+      deep: true
     },
     powerDialerActiveList (newObj) {
       this.contactsData = newObj

@@ -146,13 +146,22 @@ export default {
   name: 'StartDialSessionsForm',
   props: {
     value: {
-      type: Object
+      type: Object,
+      default: () => {
+        return {
+          skip_outside_daytime_hours: 1
+        }
+      }
     },
     name: {
       type: String,
       default: ''
     },
     disabled: {
+      type: Boolean,
+      default: false
+    },
+    flagged: {
       type: Boolean,
       default: false
     }
@@ -264,12 +273,12 @@ export default {
       deep: true
     },
     value (val) {
-      // if (isEmpty(val)) {
-      //   this.resources = this.defaultSettings || this.defaultValues
-      // } else {
-      //   this.resources = this.sessionSettings
-      // }
       this.resources = val
+    },
+    flagged (val) {
+      if (val) {
+        this.resources.skip_outside_daytime_hours = 1
+      }
     }
   },
   data () {
