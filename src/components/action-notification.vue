@@ -207,7 +207,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users', 'isMobile']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
     toastClass () {
       const toastClass = { data: 'action-notification notification-border-round' }
 
