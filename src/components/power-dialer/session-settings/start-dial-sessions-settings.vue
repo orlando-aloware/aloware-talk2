@@ -194,6 +194,9 @@
                     <q-card-actions class="px-0">
                       <div class="session-settings-title">
                         {{ selectedItemName }}
+                        <q-tooltip anchor="center right">
+                          {{ selectedItemName }}
+                        </q-tooltip>
                       </div>
                       <q-space />
                       <q-btn
