@@ -14,6 +14,11 @@
                 <close-o-icon></close-o-icon>
               </q-item-section>
             </template>
+            <q-tooltip  anchor="bottom left"
+                        self="bottom left"
+            v-if="!searchText || (searchText && searchText.length < 3)">
+              requires 3 characters
+            </q-tooltip>
           </q-input>
         </q-item-section>
       </q-item>

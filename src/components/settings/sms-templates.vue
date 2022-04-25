@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row class="row-no-padding">
       <b-col sm="12" md="12">
         <div class="d-inline-flex">

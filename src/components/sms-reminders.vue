@@ -35,11 +35,12 @@
                unelevated
                size="md"
                color="primary"
+               class="btn-filter-wrapper"
                :loading="loading"
                :disable="loading"
                v-if="recentShowSendSmsReminderButton"
                @click="sendDefaultSmsReminder">
-          <div class="mx-2 px-1">
+          <div class="mx-2 px-1 text-nowrap">
             Send SMS Reminder
           </div>
         </q-btn>
@@ -63,7 +64,7 @@ export default {
     },
 
     campaignId: {
-      type: Boolean,
+      type: Number,
       required: true
     },
 

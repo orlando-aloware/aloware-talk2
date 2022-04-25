@@ -507,6 +507,12 @@ export default {
         this.dateRange.startDate = window.moment().subtract(1, 'day').format('YYYY-MM-DD')
         this.dateRange.endDate = window.moment().format('YYYY-MM-DD')
       }
+    },
+    'rangePicker.$data.open': function (value) {
+      if (value && this.dateRange.startDate && this.dateRange.endDate) {
+        this.rangePicker.$data.start = window.moment(this.dateRange.startDate)._d
+        this.rangePicker.$data.end = window.moment(this.dateRange.endDate)._d
+      }
     }
   }
 }
