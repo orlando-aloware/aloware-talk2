@@ -49,6 +49,7 @@
         v-if="isActive" />
       <RemoveListConfirmation v-if="isActive" />
       <RemoveContact
+        @on-remove="onRemove"
         :is-contact-module-type="false"
         v-if="isActive" />
       <RemoveContactConfirmation
@@ -80,7 +81,7 @@ import powermixin from 'src/plugins/mixins/power-dialer'
 import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
 import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import sessionsMixins from 'src/plugins/mixins/sessions-engine'
-// import { isEmpty } from 'lodash'
+import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
 export default {
@@ -122,7 +123,11 @@ export default {
     ...mapGetters('contacts', [
       'listItems',
       'lists',
-      'selectedList'
+      'selectedList',
+      'contactToRemove',
+      'isBulkDelete',
+      'selectedContacts',
+      'removeContactActionType'
     ]),
     ...mapState(['currentRoute']),
     mainClass () {
@@ -165,6 +170,9 @@ export default {
         return this.myQueue?.id || ''
       }
       return this.id
+    },
+    listId () {
+      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
     }
   },
   async mounted () {
@@ -203,6 +211,78 @@ export default {
       'TOGGLE_TABLE_LOADER',
       'SET_ACTIVE_FILTER'
     ]),
+    handleSingleDeletion () {
+      const url = { data: null }
+      switch (this.removeContactActionType) {
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
+          url.data = `/api/v2/${this.endpointForList}/` +
+            this.selectedList.id +
+            '/items/' +
+            this.contactToRemove.id
+          break
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
+          url.data = `/api/v2/contacts/${this.contactToRemove.id}`
+          break
+      }
+      this.isBusy = true
+      return this.$axios
+        .delete(
+          url.data
+        )
+        .then(() => {
+          this.$VueEvent.fire('fetchContacts', { clear: true })
+          this.$VueEvent.fire('shouldUpdateListCount')
+          this.$generalNotification('Contact was successfully removed.')
+        })
+        .catch((_err) => {
+          this.$generalNotification('Unable to remove contact please try again.', 'error')
+        }).finally(() => {
+          this.isBusy = false
+          this.contactsToDelete = null
+          this.$bvModal.hide('remove-contact-confirmation-dialog')
+          this.contactsLoaded({
+            id: this.selectedList.id || 'all',
+            append: false,
+            ...this.currentList
+          })
+        })
+    },
+    handleBulkDeletion () {
+      const url = { data: null }
+      switch (this.removeContactActionType) {
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
+          url.data = `/api/v2/power-dialer-list-items/bulk/${this.selectedList.id}`
+          break
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
+          url.data = `/api/v2/contacts/bulk-delete`
+          break
+      }
+      this.isBusy = true
+      const ids = this.selectedContacts[this.listId].map(contact => contact.contact_list_item_id)
+      const params = { contact_list_items: ids }
+      return this.$axios
+        .delete(url.data, { params: params })
+        .then(() => {
+          this.updateList(this.selectedList)
+          this.$generalNotification('Contacts was successfully removed.')
+        })
+        .catch((_err) => {
+          this.$generalNotification('Unable to remove contacts please try again.', 'error')
+        }).finally(() => {
+          this.contactsToDelete = null
+          this.isBusy = false
+          this.removeContactClose()
+        })
+    },
+    onRemove () {
+      if (this.contactToRemove && !this.isBulkDelete) {
+        this.handleSingleDeletion()
+      }
+
+      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
+        this.handleBulkDeletion()
+      }
+    },
     async prepareData () {
       this.TOGGLE_TABLE_LOADER(true)
       this.TOGGLE_TABLE_LOADER(false)
@@ -256,6 +336,11 @@ export default {
     onClear () {
       this.powerDialerActiveList.data = []
       this.clearList()
+    }
+  },
+  data () {
+    return {
+      ContactsListRemoveFromTypes
     }
   },
   watch: {

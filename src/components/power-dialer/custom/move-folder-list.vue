@@ -37,7 +37,9 @@
             :style="indentStyle">
           </div>
 
-          <div class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
+          <div
+            @click="onTarget(item)"
+            class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
             <div class="folder__name pd-name-create">
               <DialIcon
                 color="grey"

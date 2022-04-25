@@ -34,12 +34,16 @@ export default {
     statusDisplayButton () {
       switch (this.dialer?.currentStatus) {
         case 'READY':
+          if (this.timerIsOver) {
+            return 'Ready'
+          }
+          if (this.wrapUp) {
+            return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
+          }
           if (this.sessionPaused) {
             return 'Up Next'
-          } else if ((!this.toggleEnd || !this.togglePause) && !this.wrapUp) {
-            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
           } else {
-            return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
+            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
           }
         case 'WRAP_UP':
           return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
@@ -56,7 +60,7 @@ export default {
         case 'CALL_DISCONNECTED':
           return 'Call Disconnected'
         default:
-          return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
+          return 'Ready'
       }
     },
     moveDirection () {
