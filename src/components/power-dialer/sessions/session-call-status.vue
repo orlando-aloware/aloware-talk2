@@ -20,6 +20,7 @@
               </span> -->
             </div>
           </q-chip>
+          sd<CheckIcon />sss
         </div>
         <q-btn
           @click="onToggleHold"
@@ -132,8 +133,9 @@
         </q-btn>
       </div>
       <div class="d-flex align-items-center p-0 pt-2 pb-2">
-        <div class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
-          {{ selectedListName }}
+        <div
+          class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
+          {{ isEllipsisActive (selectedListName) }} - {{ selectedListName }}
           <span class="text-subtitle2 text-grey"></span>
           <div class="text-10 pt-1">
             <HeadphoneIcon width="12px" height="12px" class="mr-0 py-0" style="position:relative;top:-2px;" />
@@ -202,6 +204,7 @@ import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
+import CheckIcon from 'components/icons/checkbox-full-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import sessionsMixins from 'src/plugins/mixins/sessions'
@@ -222,7 +225,8 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon
+    RecordIcon,
+    CheckIcon
   },
   mixins: [ sessionsMixins ],
   beforeRouteEnter (to, from, next) {
@@ -263,6 +267,15 @@ export default {
       'listItems',
       'selectedList'
     ]),
+    forcedWrapUpAccount () {
+      return this.profile.company.force_wrap_up
+    },
+    wrapUpSeconds () {
+      if (this.forcedWrapUpAccount) {
+        return this.profile.company.wrap_up_seconds
+      }
+      return this.profile.wrap_up_seconds
+    },
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
     },
@@ -457,31 +470,31 @@ export default {
 
       // Default PowerDialer outbound line
       if (this.currentCompany && this.currentCompany.default_power_dialer_campaign_id) {
-        this.auto_dialer.outbound_campaign_id = this.currentCompany.default_power_dialer_campaign_id
+        this.autoDialer.outbound_campaign_id = this.currentCompany.default_power_dialer_campaign_id
         return
       }
 
       // Force outbound line on all users
       if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.currentCompany.force_outbound_line) {
-        this.auto_dialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
+        this.autoDialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
         return
       }
 
       // Outbound line is set to use account default and account has a default
       if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
-        this.auto_dialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
+        this.autoDialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
         return
       }
 
       // User has a default outbound line
       if (this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
-        this.auto_dialer.outbound_campaign_id = this.profile.default_outbound_campaign_id
+        this.autoDialer.outbound_campaign_id = this.profile.default_outbound_campaign_id
         return
       }
 
       // User has to choose outbound line every time
       if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
-        this.auto_dialer.outbound_campaign_id = null
+        this.autoDialer.outbound_campaign_id = null
       }
     },
     runTimer () {
@@ -658,6 +671,10 @@ export default {
         return
       }
       await this.runTask()
+    },
+    isEllipsisActive (e) {
+      console.log('e :>> ', e.offsetWidth)
+      return (e.offsetWidth < e.scrollWidth)
     }
   },
   mounted () {
