@@ -7,8 +7,8 @@
       <settings-side class="settings-side__left"
                      :class="{ 'settings-side__left--closed': isSettingsOpened }">
       </settings-side>
-      <div class="d-flex flex-grow-1 overflow-y-scroll settings-content-wrapper settings-side__right"
-           :class="{ 'settings-side__right--opened': isSettingsOpened }"
+      <div class="flex-grow-1 overflow-y-scroll settings-content-wrapper settings-side__right"
+           :class="{ 'settings-side__right--opened': isSettingsOpened, 'flex' : !['diagnosis', 'sms-templates'].includes($route.params.tab)  }"
            v-if="user">
         <b-row>
           <b-col md="12" class="settings-form-wrapper">

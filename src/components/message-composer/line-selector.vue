@@ -59,7 +59,7 @@ export default {
     formattedLineOptions () {
       const contactLines = { data: [] }
       if (this.contactCampaignsFromCommunications.length > 0) {
-        contactLines.data = [...this.contactCampaignsFromCommunications]
+        contactLines.data = [...this.contactCampaignsFromCommunications.filter(item => item.active === true)]
 
         contactLines.data.unshift({
           group: 'Contact Lines',
@@ -70,7 +70,7 @@ export default {
       const linesArray = { data: contactLines.data }
 
       if (this.otherCampaignsFromCommunications && this.otherCampaignsFromCommunications.length > 0) {
-        const otherLines = [...this.otherCampaignsFromCommunications]
+        const otherLines = [...this.otherCampaignsFromCommunications.filter(item => item.active === true)]
         otherLines.unshift({
           group: 'Other Lines',
           disable: true
