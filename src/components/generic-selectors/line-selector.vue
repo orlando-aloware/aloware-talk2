@@ -3,7 +3,7 @@
     <generic-multi-select :label="`${label}`"
                           :buttonText="buttonText"
                           :values="selectedId"
-                          :options="campaignsAlphabeticalOrder"
+                          :options="activeCampaignsAlphabeticalOrder"
                           :disable="disabled"
                           :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
                           v-if="genericMultiselect"
@@ -226,7 +226,7 @@ export default {
   },
 
   created () {
-    this.options = this.campaignsAlphabeticalOrder
+    this.options = this.activeCampaignsAlphabeticalOrder
     if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
       this.selectedId = this.value
     }
@@ -236,21 +236,21 @@ export default {
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.options = this.campaignsAlphabeticalOrder.filter(campaign => campaign.id === this.selectedId)
+          this.options = this.activeCampaignsAlphabeticalOrder.filter(campaign => campaign.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.options = this.campaignsAlphabeticalOrder
+          this.options = this.activeCampaignsAlphabeticalOrder
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.campaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.activeCampaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     updateLines (val) {

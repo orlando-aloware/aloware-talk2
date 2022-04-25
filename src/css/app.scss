@@ -11029,7 +11029,7 @@ screen and (max-width: 956px) {
 
 .account-level-notification-tooltip-wrapper {
   position: absolute;
-  right: 300px;
+  left: 300px;
   margin-top: -22px;
   z-index: 10;
 }
@@ -11079,4 +11079,12 @@ h1.contact-list-name-label {
       fill : $primary
     }
   }
+}
+
+.contain-text {
+  padding-top: 6px !important;
+}
+
+.mt-n-5 {
+  margin-top: -5px;
 }
