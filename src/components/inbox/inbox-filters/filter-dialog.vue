@@ -482,12 +482,12 @@ export default {
     },
     'filter.from_date': function (value) {
       if (value) {
-        this.filter.from_date = window.tz(window.moment.tz(value, 'YYYY-MM-DD', window.timezone), 'YYYY-MM-DD', 'GMT+0').format('YYYY-MM-DD')
+        this.filter.from_date = window.moment.tz(window.moment.tz(value, 'YYYY-MM-DD', window.timezone), 'YYYY-MM-DD', 'GMT+0').format('YYYY-MM-DD')
       }
     },
     'filter.to_date': function (value) {
       if (value) {
-        this.filter.from_date = window.tz(window.moment.tz(value, 'YYYY-MM-DD', window.timezone), 'YYYY-MM-DD', 'GMT+0').format('YYYY-MM-DD')
+        this.filter.from_date = window.moment.tz(window.moment.tz(value, 'YYYY-MM-DD', window.timezone), 'YYYY-MM-DD', 'GMT+0').format('YYYY-MM-DD')
       }
     }
   },
