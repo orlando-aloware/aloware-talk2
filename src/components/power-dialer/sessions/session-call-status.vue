@@ -20,7 +20,6 @@
               </span> -->
             </div>
           </q-chip>
-          sd<CheckIcon />sss
         </div>
         <q-btn
           @click="onToggleHold"
@@ -204,7 +203,6 @@ import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
-import CheckIcon from 'components/icons/checkbox-full-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import sessionsMixins from 'src/plugins/mixins/sessions'
@@ -225,8 +223,7 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon,
-    CheckIcon
+    RecordIcon
   },
   mixins: [ sessionsMixins ],
   beforeRouteEnter (to, from, next) {
