@@ -567,7 +567,9 @@ export default {
         return
       }
       if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
-        this.taskToCall = this.powerDialerTasks.in_queue[0]
+        if (!this.wrapUp) {
+          this.taskToCall = this.powerDialerTasks.in_queue[0]
+        }
         // this.activeTask = this.taskToCall
         this.activeTask = await this.getContact({ id: this.taskToCall.id })
         await this.fetchContact(this.taskToCall.id)
@@ -615,7 +617,11 @@ export default {
     },
     resetTimer () {
       setTimeout(() => {
-        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+        if (this.wrapUp) {
+          this.countdownTimer = this.wrapUpSeconds
+        } else {
+          this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+        }
       }, 500)
     },
     reRoute () {
@@ -721,7 +727,9 @@ export default {
       }
       if (tasks.length > 0 && !this.flagged) {
         this.shouldRedirect = false
-        this.initialize()
+        if (!this.wrapUp) {
+          this.initialize()
+        }
       }
     },
     currentSessionStatus (status) {
@@ -735,6 +743,8 @@ export default {
     wrapUp (value) {
       if (value) {
         this.startWarmUpCountDown()
+      } else {
+        this.initialize()
       }
     }
   },
