@@ -435,9 +435,10 @@ export default {
     }
   },
 
-  // mounted () {
-  //   this.$options.auto_dialer_interval = '0'
-  // },
+  mounted () {
+    // this.$options.auto_dialer_interval = '0'
+    console.log('8888888888 :>> ', this.skippedTasks)
+  },
 
   created () {
     if (!this.profile.auto_dialer_enabled) {
@@ -560,7 +561,7 @@ export default {
       }
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
-        this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
+        this.$emit('on-all-tasks-are-skipped')
         setTimeout(() => {
           this.reRoute()
         }, 1000)

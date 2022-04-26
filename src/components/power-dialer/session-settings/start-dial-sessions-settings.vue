@@ -470,6 +470,7 @@ export default {
        * IF selected item is temporary OR
        * IF selected item is personal/company
        */
+      this.loading = true
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.filterSelectedItem }
         res = await this.createDialerSessionSetting({
