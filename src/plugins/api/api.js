@@ -272,14 +272,13 @@ export default {
       get (id) {
         return window.axios.get(`/api/v2/contacts/${id}`)
       },
+
       list (params, controllerSignal) {
-        const relations = _.get(params, 'relations', [
+        params.relations = _.get(params, 'relations', [
           'lastCommunication',
           'initialCampaign',
           'dispositionStatus'
         ])
-
-        params.relations = relations
 
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, signal: controllerSignal })
           .catch(thrown => {
@@ -287,6 +286,9 @@ export default {
               console.log('Request canceled', thrown.message)
             }
           })
+      },
+      counts (params, cancelTokenSource) {
+        return window.axios.get(`/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
       inboxCounts () {
         return window.axios.get(`/api/v2/contacts/inbox-counts`)

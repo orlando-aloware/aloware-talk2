@@ -7,6 +7,7 @@ export default {
 
   computed: {
     ...mapState('inbox', ['isFetchingContacts', 'contactsCurrentPage']),
+    ...mapState('auth', ['profile']),
     nextPage () {
       return this.contactsCurrentPage + 1
     }
@@ -54,11 +55,21 @@ export default {
       lineOrRingGroupFilteredId: null,
       contacts: [],
       cancelController: null
+
     }
   },
 
   methods: {
-    ...mapActions('inbox', ['setContact', 'setLiveContacts', 'setSelectedContact', 'setHasMoreContacts', 'gettingContactsList', 'setContactsCurrentPage']),
+    ...mapActions('inbox', [
+      'setContact',
+      'setLiveContacts',
+      'setSelectedContact',
+      'setHasMoreContacts',
+      'gettingContactsList',
+      'setContactsCurrentPage',
+      'setOpenTaskCount',
+      'setPendingTaskCount'
+    ]),
     getNoneLiveCallContactTasks (contacts) {
       return contacts.filter(contact => (contact.last_communication &&
         ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
@@ -80,6 +91,9 @@ export default {
       // always reset page when fresh loading contacts
       this.page = 1
       this.setContacts([])
+      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
+        this.getContactsCountByTaskStatus(this.currentTask)
+      }
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         if (response) {
           this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
@@ -103,20 +117,35 @@ export default {
         this.isLoaded = true
       })
     },
-    getContactsByTaskStatus () {
+    getContactsByTaskStatus (taskId) {
       this.cancelController.abort()
       this.cancelController = new AbortController()
-      return talk2Api.V2.contacts.list(this.getParameters(), this.cancelController.signal)
+      return talk2Api.V2.contacts.list(this.getParameters(taskId), this.cancelController.signal)
     },
-    getParameters () {
-      const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
+    getContactsCountByTaskStatus (taskId) {
+      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true)).then(response => {
+        if (response) {
+          if (taskId === ContactTaskStatus.STATUS_OPEN) {
+            this.setOpenTaskCount(response.data.count)
+          }
+
+          if (taskId === ContactTaskStatus.STATUS_PENDING) {
+            this.setPendingTaskCount(response.data.count)
+          }
+        }
+      })
+    },
+    getParameters (taskId, count = false) {
+      const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
 
       this.resetFilters()
+      query.filter_groups = []
+
       if (this.searchText && this.searchText.trim()) {
         this.filters.search.value = this.searchText
         delete this.filters.contact_task_status
       } else {
-        this.filters.contact_task_status.value = [this.currentTask]
+        this.filters.contact_task_status.value = [taskId]
       }
 
       if (this.filter.campaigns.length) {
@@ -133,15 +162,19 @@ export default {
 
       if (this.filter.my_contact) {
         query.my_contact = this.filter.my_contact
+        this.filters = { ...this.filters, 'contact_owner': { value: [this.profile.id], operator: 1 } }
       }
 
       if (this.filter.from_date && this.filter.to_date) {
         this.filters = { ...this.filters, 'last_engagement_at': { value: [this.filter.from_date, this.filter.to_date], operator: 5 } }
       }
 
-      query.filters = this.filters
+      query.filter_groups.push({ 'filters': this.filters, 'is_conjunction': true })
 
-      query.relations = ['lastCommunication']
+      if (!count) {
+        query.relations = ['lastCommunication']
+      }
+
       return query
     },
     resetFilters () {

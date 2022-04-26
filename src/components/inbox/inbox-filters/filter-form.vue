@@ -485,7 +485,6 @@ export default {
         this.filter.to_date = this.dateRange.endDate ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD') : null
       }
     },
-
     'filter.my_contact': {
       deep: true,
       handler (value) {
