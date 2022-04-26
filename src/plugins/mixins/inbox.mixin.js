@@ -53,8 +53,7 @@ export default {
       lineOrRingGroupFilter: null,
       lineOrRingGroupFilteredId: null,
       contacts: [],
-      cancelToken: null,
-      source: null
+      cancelController: null
     }
   },
 
@@ -105,9 +104,9 @@ export default {
       })
     },
     getContactsByTaskStatus () {
-      this.source.cancel('Loading of contact task operation is canceled by the user.')
-      this.source = this.cancelToken.source()
-      return talk2Api.V2.contacts.list(this.getParameters(), this.source.token)
+      this.cancelController.abort()
+      this.cancelController = new AbortController()
+      return talk2Api.V2.contacts.list(this.getParameters(), this.cancelController.signal)
     },
     getParameters () {
       const query = { page: this.page, sort: this.sorting.sort, order: this.sorting.order }
@@ -161,7 +160,6 @@ export default {
   },
 
   created () {
-    this.cancelToken = window.axios.CancelToken
-    this.source = this.cancelToken.source()
+    this.cancelController = new AbortController()
   }
 }
