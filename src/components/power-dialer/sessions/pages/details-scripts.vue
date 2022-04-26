@@ -22,7 +22,7 @@
 </template>
 
 <script>
-
+import _ from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
 
@@ -74,15 +74,17 @@ export default {
       'getLastCommunicationScript'
     ]),
     async changeScript (val) {
-      if (!this.activeTask.id) {
+      const lastCommunication = { data: null, id: null }
+      lastCommunication.id = _.get(this.activeTask, 'last_communication.id', null)
+
+      if (!lastCommunication.id) {
         return
       }
-      let id = this.activeTask.last_communication.id
-      let res = await this.getLastCommunicationScript(id)
-      let selectedScript = res.data.find(script => {
+
+      lastCommunication.data = await this.getLastCommunicationScript(lastCommunication.id)
+      this.script = lastCommunication.data.data.find(script => {
         return script.id === this.selectedScript
       })
-      this.script = selectedScript
     }
   },
   watch: {
