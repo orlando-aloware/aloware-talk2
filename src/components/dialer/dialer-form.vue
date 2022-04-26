@@ -188,13 +188,15 @@ import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
+import { notificationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
 
   mixins: [
     parkCallMixins,
-    contactMixin
+    contactMixin,
+    notificationMixin
   ],
 
   components: {
@@ -410,6 +412,10 @@ export default {
       if (this.callDisabled) {
         return
       }
+
+      this.setDialerCallFishing({
+        contact: this.contact
+      })
 
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.phoneNumber),
