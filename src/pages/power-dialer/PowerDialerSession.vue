@@ -16,7 +16,8 @@
           <div class="col-5 p-0">
             <CallStatus
               @on-redirect="redirectRoute"
-              @no-tasks-found="onNoTasksFound" />
+              @no-tasks-found="onNoTasksFound"
+              @on-all-tasks-are-skipped="onAllTasksAreSkipped" />
           </div>
         </div>
 
@@ -143,6 +144,9 @@ export default {
     },
     onNoTasksFound () {
       this.$generalNotification('Stopping PowerDialer: No more tasks found', 'warning')
+    },
+    onAllTasksAreSkipped () {
+      this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
     }
   }
 }
