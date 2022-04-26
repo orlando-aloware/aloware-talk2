@@ -37,13 +37,6 @@ export default {
       'activeTask'
     ])
   },
-  mounted () {
-    // this.activeTask = this.powerDialerTasks.in_queue[0]
-    // let { powerDialerTasks } = this
-    // powerDialerTasks.in_queue.shift()
-    // Removing the first element in array
-    console.log('Removing the first element in array :>> ', this.powerDialerTasks.in_queue)
-  },
   data () {
     return {
       isExpanded: true

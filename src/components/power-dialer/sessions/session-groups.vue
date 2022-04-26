@@ -361,7 +361,7 @@ export default {
       let res = await this.getSessionTaskByFilter({
         id: this.selectedList.id,
         task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
-        per_page: 20,
+        per_page: this.itemsPerPage,
         page: this.groupPageFilters[key]
       })
       if (res.status === 200) {
@@ -406,6 +406,9 @@ export default {
       }
     },
     hasMoreItems (group = [], key) {
+      if (group.length < this.itemsPerPage) {
+        return false
+      }
       switch (key) {
         case 'in_queue':
           return group.length < this.totalQueued
@@ -436,7 +439,8 @@ export default {
         failed: false,
         scheduled: false,
         all: false
-      }
+      },
+      itemsPerPage: 20
     }
   }
 }

@@ -78,12 +78,12 @@ export default {
       this.$VueEvent.fire('hangupCall')
     },
 
-    async fetchNextContact () {
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
-      if (this.taskToCall?.id) {
-        await this.fetchContact(this.taskToCall?.id)
-      }
-    },
+    // async fetchNextContact () {
+    //   this.taskToCall = this.powerDialerTasks.in_queue[0]
+    //   if (this.taskToCall?.id) {
+    //     await this.fetchContact(this.taskToCall?.id)
+    //   }
+    // },
 
     async fetchContact (taskId = '') {
       this.TOGGLE_SESSION_LOADER(true)

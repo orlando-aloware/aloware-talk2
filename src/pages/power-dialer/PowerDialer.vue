@@ -211,42 +211,6 @@ export default {
       'TOGGLE_TABLE_LOADER',
       'SET_ACTIVE_FILTER'
     ]),
-    handleSingleDeletion () {
-      const url = { data: null }
-      switch (this.removeContactActionType) {
-        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url.data = `/api/v2/${this.endpointForList}/` +
-            this.selectedList.id +
-            '/items/' +
-            this.contactToRemove.id
-          break
-        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
-          url.data = `/api/v2/contacts/${this.contactToRemove.id}`
-          break
-      }
-      this.isBusy = true
-      return this.$axios
-        .delete(
-          url.data
-        )
-        .then(() => {
-          this.$VueEvent.fire('fetchContacts', { clear: true })
-          this.$VueEvent.fire('shouldUpdateListCount')
-          this.$generalNotification('Contact was successfully removed.')
-        })
-        .catch((_err) => {
-          this.$generalNotification('Unable to remove contact please try again.', 'error')
-        }).finally(() => {
-          this.isBusy = false
-          this.contactsToDelete = null
-          this.$bvModal.hide('remove-contact-confirmation-dialog')
-          this.contactsLoaded({
-            id: this.selectedList.id || 'all',
-            append: false,
-            ...this.currentList
-          })
-        })
-    },
     handleBulkDeletion () {
       const url = { data: null }
       switch (this.removeContactActionType) {
@@ -275,10 +239,6 @@ export default {
         })
     },
     onRemove () {
-      if (this.contactToRemove && !this.isBulkDelete) {
-        this.handleSingleDeletion()
-      }
-
       if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
