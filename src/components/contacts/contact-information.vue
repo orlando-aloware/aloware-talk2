@@ -100,7 +100,25 @@
         </q-timezone-selector>
       </div>
 
-      <div class="d-block">
+      <div class="d-block"
+           @mouseleave="dateOfBirthMouseLeave">
+        <p class="text-muted custom-input-label mb-0">Date of Birth</p>
+        <label class="w-100"
+               @mouseenter="dateOfBirthMouseEnter">
+          <date-selector :class="{ 'contact-info-editable': isEditableBirthDate }"
+                         formatted="YYYY-MM-DD"
+                         v-if="isEditableBirthDate"
+                         v-model="contact.date_of_birth"
+                         @dateSelected="onDateOfBirthSelected">
+          </date-selector>
+          <span class="d-block mb-1"
+               v-if="!isEditableBirthDate">{{ contact.date_of_birth }}
+          </span>
+        </label>
+      </div>
+
+      <div class="d-block"
+           @mouseenter="clearMouseEnter">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
@@ -161,6 +179,7 @@ import ContactInputField from 'src/components/contacts/contact-input-field'
 import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
+import DateSelector from 'components/date-selector'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -172,6 +191,7 @@ export default {
     }
   },
   components: {
+    DateSelector,
     QTimezoneSelector,
     ContactDispositionSelector,
     UserSelector,
@@ -199,21 +219,22 @@ export default {
     },
     expanded () {
       if (this.hasExpanded) {
-        return this.is_expanded
+        return this.isExpanded
       }
       return true
     }
   },
   data () {
     return {
-      is_expanded: false,
+      isExpanded: false,
+      isEditableBirthDate: false,
       attributes: []
     }
   },
   methods: {
     ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties']),
     onExpanded () {
-      this.is_expanded = !this.is_expanded
+      this.isExpanded = !this.isExpanded
     },
     getAttributes () {
       talk2Api.V1.contact.getAttributes(this.contact.id)
@@ -287,6 +308,22 @@ export default {
     computeAndHumanize (duration, field, singular) {
       const temp = Math.floor(duration[field]())
       return `${temp} ${temp > 1 ? field : singular}`
+    },
+    dateOfBirthMouseEnter () {
+      if (this.hasPermissionTo('update contact')) {
+        this.isEditableBirthDate = true
+      }
+    },
+    dateOfBirthMouseLeave () {
+      if (this.hasPermissionTo('update contact')) {
+        this.isEditableBirthDate = false
+      }
+    },
+    clearMouseEnter () {
+      this.isEditableBirthDate = false
+    },
+    onDateOfBirthSelected (value) {
+      this.onUpdateFields(window.moment(value).format('YYYY-MM-DD'), 'date_of_birth')
     }
   }
 }
