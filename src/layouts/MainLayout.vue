@@ -64,7 +64,7 @@
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
-                  v-if="authenticated && isMobile"
+                  v-if="authenticated"
                   :breakpoint="0"
                   class="h-100 sidebar-wrapper d-block"
                   :width="64"
@@ -99,7 +99,7 @@
           </phone>
           <dialer-form ref="dialerForm"
                        class="dialerForm"
-                       :class="{ 'hide': isPhoneVisible }"
+                       :class="{ 'hide': isPhoneVisible || !isMobile }"
                        :isMobile="true"
                        v-model="mobilePhoneDrawer"
                        v-if="mobilePhoneDrawer"
