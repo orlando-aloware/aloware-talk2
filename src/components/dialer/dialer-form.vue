@@ -87,6 +87,7 @@
                            v-model="campaignId"
                            prepend="From:"
                            :generic-multiselect="false"
+                           :useOnlyActives="true"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>
