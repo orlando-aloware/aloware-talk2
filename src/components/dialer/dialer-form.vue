@@ -180,7 +180,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
 import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
@@ -296,8 +296,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setDialerCallFishing']),
-
     showDialer () {
       // find default outbound campaign
       this.findDefaultOutboundCampaign()
@@ -412,10 +410,6 @@ export default {
       if (this.callDisabled) {
         return
       }
-
-      this.setDialerCallFishing({
-        contact: this.contact
-      })
 
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.phoneNumber),
