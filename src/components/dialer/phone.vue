@@ -454,6 +454,7 @@
                 <avatar class="contact-avatar"
                         width="40"
                         height="40"
+                        v-if="contact"
                         :name="contact.name">
                 </avatar>
                 <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">

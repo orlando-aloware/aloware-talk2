@@ -175,6 +175,10 @@ export default {
         this.$nextTick(function () {
           const targetEl = document.querySelector(this.$route.hash + '-container')
 
+          if (!targetEl) {
+            return
+          }
+
           targetEl.classList.add('highlighted')
 
           setTimeout(function () {

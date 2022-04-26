@@ -419,8 +419,7 @@ export default {
         scope: 'user'
       },
       scrollTimeout: null,
-      cancelToken: null,
-      source: null
+      cancelController: null
     }
   },
 
@@ -727,9 +726,9 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      this.source.cancel('Loading of communications operation is canceled by the user.')
-      this.source = this.cancelToken.source()
-      return api.data.get({ params: params, cancelToken: this.source.token })
+      this.cancelController.abort()
+      this.cancelController = new AbortController()
+      return api.data.get({ params: params, signal: this.cancelController.signal })
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
@@ -739,6 +738,10 @@ export default {
             this.isLoaded = true
             this.pagination = _.clone(response.data)
             delete this.pagination.data
+          }
+        }).catch(thrown => {
+          if (window.axios.isCancel(thrown) && thrown) {
+            console.log('Request canceled', thrown.message)
           }
         })
     },
@@ -1026,8 +1029,7 @@ export default {
   },
 
   created () {
-    this.cancelToken = window.axios.CancelToken
-    this.source = this.cancelToken.source()
+    this.cancelController = new AbortController()
 
     this.resetFilters()
 
@@ -1196,7 +1198,7 @@ export default {
             value.mention_subject.contact = data
           })
         } else {
-          communications.filter(item => item.contact.id === data.id).forEach((value) => {
+          communications.filter(item => item.contact && data && item.contact.id === data.id).forEach((value) => {
             value.contact = data
           })
         }

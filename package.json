@@ -22,7 +22,7 @@
     "@popperjs/core": "^2.9.2",
     "@quasar/extras": "^1.9.15",
     "@sentry/vue": "^6.17.3",
-    "axios": "^0.21.2",
+    "axios": "^0.22.0",
     "bootstrap": "^4.6.1",
     "bootstrap-vue": "^2.21.2",
     "bowser": "^2.11.0",

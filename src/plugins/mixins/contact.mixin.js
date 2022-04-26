@@ -111,8 +111,7 @@ export default {
       },
       activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups'],
       contactId: null,
-      CancelToken: null,
-      source: null,
+      cancelController: null,
       contactActivitiesInterval: null,
       containerElInterval: null,
       scrollInterval: null,
@@ -221,9 +220,8 @@ export default {
   },
 
   created () {
+    this.cancelController = new AbortController()
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
-    this.CancelToken = this.$axios.CancelToken
-    this.source = this.CancelToken.source()
 
     if (this.skipComponents.includes(this.$options.name)) {
       return
@@ -442,8 +440,7 @@ export default {
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
-      this.source.cancel('fetchContactCommunications operation canceled by the user.')
-      this.source = this.CancelToken.source()
+      this.cancelController.abort()
       const lastAuditCreatedAt = { data: null }
       const item = { index: null }
       for (item.index in this.communicationsAndAudits) {
@@ -452,13 +449,14 @@ export default {
           break
         }
       }
+      this.cancelController = new AbortController()
       return this.$axios.get(`/api/v1/contact/${contactId}/communications`, {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
           last_audit_created_at: lastAuditCreatedAt.data
         },
-        cancelToken: this.source.token
+        signal: this.cancelController.signal
       }).then(res => {
         if (res.data.data && res.data.data.length) {
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)
@@ -473,6 +471,10 @@ export default {
 
         return res
       }).catch(err => {
+        if (window.axios.isCancel(err)) {
+          console.log('Request canceled', err.message)
+        }
+
         this.$handleErrors(err.response)
         this.loadingContactCommunications = false
         console.log(err)
@@ -548,11 +550,10 @@ export default {
     },
 
     resetSelectedContact () {
-      if (!this.CancelToken) {
-        this.CancelToken = this.$axios.CancelToken
+      if (!this.cancelController) {
+        this.cancelController = new AbortController()
       }
 
-      this.source = this.CancelToken.source()
       this.contactId = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null
@@ -748,7 +749,7 @@ export default {
     },
 
     isCommunicationFound () {
-      return !!this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      return this.$route.params.communicationId && !!this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
     },
 
     isHashActivityType () {

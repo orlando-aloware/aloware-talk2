@@ -369,6 +369,7 @@ export default {
       }
     },
     updateListName (name) {
+      const responseData = { data: null, message: '' }
       if (this.isRenaming) return
       this.isRenaming = true
       if (!this.id) {
@@ -378,8 +379,10 @@ export default {
 
       this.updateListRequest(this.id, { name, order: this.order })
         .then(response => {
-          this.listLoaded(response.data.data)
-          this.$generalNotification(response.data.message)
+          responseData.data = _.get(response.data, 'data', _.get(response, 'data', null))
+          responseData.message = _.get(response.data, 'message', _.get(response, 'message', ''))
+          this.listLoaded(responseData.data)
+          this.$generalNotification(responseData.message)
           this.reloadFolders()
         }).finally(() => {
           this.$nextTick(() => {
