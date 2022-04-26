@@ -1625,7 +1625,8 @@ export default {
   },
   created () {
     this.$VueEvent.listen('showLoadingPhone', () => {
-      this.isVisible = true
+      // Disable phone visibility on power dialer sessions
+      this.isVisible = this.$route.meta.id !== 'power-dialer-session'
       this.loadingPhone = true
       this.$emit('onPhoneVisible', true)
     })
@@ -1646,6 +1647,7 @@ export default {
 
     this.setupDraggable()
     this.setupContactLocalTime()
+    // Disable phone visibility on power dialer sessions
     this.isVisible = this.$route.meta.id !== 'power-dialer-session'
     this.showLocalTime = true
 
