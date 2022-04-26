@@ -70,20 +70,18 @@
         {{ campaignName }}
       </div>
     </div>
-    <div v-if="contact.last_communication"
+    <div v-if="contact.last_communication || lastEngagement"
          class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="(contact.last_communication.type === CommunicationTypes.CALL &&
-            contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
-            contact.last_communication.type !== CommunicationTypes.CALL">
+            v-if="hasRelativeTime">
         <task-item-time :key="taskItemKey"
                         :from-time="lastEngagement"
                         :update-interval="6000">
         </task-item-time>
       </span>
 
-      <div v-if="isLiveCall">
+      <div v-if="contact.last_communication && isLiveCall">
         <!-- Incoming Call-->
         <!-- only show this if call is incoming and is not a parked call-->
         <div class="text-grey-90 d-flex flex-row justify-center"
@@ -338,6 +336,12 @@ export default {
       }
 
       return this.contact.last_engagement_at
+    },
+    hasRelativeTime () {
+      return (this.contact.last_communication && this.contact.last_communication.type === CommunicationTypes.CALL &&
+          this.contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
+        (this.contact.last_communication && this.contact.last_communication.type !== CommunicationTypes.CALL) ||
+        this.lastEngagement
     }
   },
 
