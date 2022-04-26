@@ -111,5 +111,12 @@ export default {
         this.$emit(this.emitEvent, val)
       }
     }
+  },
+  watch: {
+    selectedObject (value) {
+      if (!value) {
+        this.selectedId = null
+      }
+    }
   }
 }
