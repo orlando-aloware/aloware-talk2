@@ -34,7 +34,7 @@
         <div class="flex-grow-1"></div>
         <button
           class="btn btn-sm btn-danger mr-2"
-          @click="onRemoveFromList"
+          @click="onRemoveFromPdList"
         >
           Remove Contact from List
         </button>
@@ -107,6 +107,14 @@ export default {
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$bvModal.hide('remove-contact-dialog')
     },
+
+    onRemoveFromPdList () {
+      this.flag = true
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.hide('remove-contact-dialog')
+      this.$emit('on-remove')
+    },
+
     onRemoveFromContacts () {
       this.flag = true
       this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
