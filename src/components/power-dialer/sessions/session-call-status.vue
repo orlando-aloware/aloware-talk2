@@ -134,12 +134,26 @@
       <div class="d-flex align-items-center p-0 pt-2 pb-2">
         <div
           class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
-          {{ isEllipsisActive (selectedListName) }} - {{ selectedListName }}
+          <div id="session-list-name">
+            {{ selectedListName }}
+          </div>
+
+          <b-popover
+            target="session-list-name"
+            triggers="hover"
+            placement="bottomright">
+            <template #title>
+              Power Dialer list
+            </template>
+            {{ selectedListName }}
+          </b-popover>
+
           <span class="text-subtitle2 text-grey"></span>
           <div class="text-10 pt-1">
             <HeadphoneIcon width="12px" height="12px" class="mr-0 py-0" style="position:relative;top:-2px;" />
             {{ lineName }}
           </div>
+
         </div>
         <q-btn
           v-if="toggleEnd"
