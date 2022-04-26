@@ -525,7 +525,11 @@ export default {
       }
 
       this.countdownStarted = true
-      this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      if (this.wrapUp) {
+        this.countdownTimer = this.wrapUpSeconds
+      } else {
+        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      }
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
         this.onTimerIsOver(task)
@@ -682,10 +686,6 @@ export default {
         return
       }
       await this.runTask()
-    },
-    isEllipsisActive (e) {
-      console.log('e :>> ', e.offsetWidth)
-      return (e.offsetWidth < e.scrollWidth)
     }
   },
   mounted () {
