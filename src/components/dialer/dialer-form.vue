@@ -180,7 +180,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
 import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
@@ -188,15 +188,13 @@ import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
-import { notificationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
 
   mixins: [
     parkCallMixins,
-    contactMixin,
-    notificationMixin
+    contactMixin
   ],
 
   components: {
@@ -298,6 +296,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setDialerCallFishing']),
+
     showDialer () {
       // find default outbound campaign
       this.findDefaultOutboundCampaign()
