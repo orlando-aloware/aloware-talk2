@@ -164,7 +164,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ScheduledMessage from 'components/message-composer/scheduled-message'
@@ -389,13 +388,17 @@ export default {
       const formData = new FormData()
       formData.append('file', file)
 
-      const cancelToken = axios.CancelToken
-      this.filesOnQueueToken[file.name] = cancelToken.source()
+      const cancelController = new AbortController()
+      this.filesOnQueueToken[file.name] = cancelController.signal
 
-      talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, { cancelToken: this.filesOnQueueToken[file.name].token }).then(response => {
+      talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, { signal: this.filesOnQueueToken[file.name].token }).then(response => {
         this.appendMessageComposerSmsAttachments(response.data.uploaded_file)
         this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
       }).catch(error => {
+        if (window.axios.isCancel(error)) {
+          console.log('Request canceled', error.message)
+        }
+
         console.log(error)
         const message = this.filesOnQueue.length > 1 ? 'Error while uploading one of the files.' : 'Error while uploading file.'
         this.$generalNotification(message, 'error')
@@ -404,7 +407,7 @@ export default {
     },
     onRemoveFileInQueue (file) {
       this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
-      this.filesOnQueueToken[file.name].cancel()
+      this.filesOnQueueToken[file.name].abort()
     },
     base64ToBlob (b64Data, contentType, sliceSize) {
       contentType = contentType || ''

@@ -67,6 +67,10 @@ export default {
   methods: {
     ...mapActions('inbox', ['setActiveChannel']),
     onItemClicked (nextActive) {
+      if (!this.activeChannel) {
+        return
+      }
+
       if (this.activeChannel.value === nextActive) {
         this.$q.screen.lt.md && this.$emit('toInbox')
         return

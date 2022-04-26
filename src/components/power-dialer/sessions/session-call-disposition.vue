@@ -89,7 +89,8 @@ export default {
       'sessionSettings'
     ]),
     filteredCallDispositions () {
-      if (this.sessionSettings.call_disposition_ids.length > 0) {
+      if (this.sessionSettings.call_disposition_ids &&
+        this.sessionSettings.call_disposition_ids.length > 0) {
         return this.callDispositions.filter(d => {
           return this.sessionSettings.call_disposition_ids.includes(d.id)
         })
@@ -97,7 +98,8 @@ export default {
       return this.callDispositions
     },
     filteredContactDispositions () {
-      if (this.sessionSettings.contact_disposition_ids.length > 0) {
+      if (this.sessionSettings.contact_disposition_ids &&
+        this.sessionSettings.contact_disposition_ids.length > 0) {
         return this.dispositionStatuses.filter(d => {
           return this.sessionSettings.contact_disposition_ids.includes(d.id)
         })

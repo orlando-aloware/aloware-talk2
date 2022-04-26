@@ -51,7 +51,7 @@
 
         <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'"></profile>
 
-        <phone v-if="!isMobile"></phone>
+        <phone v-if="!titleOnly"></phone>
 
         <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
                      vertical>
@@ -61,7 +61,7 @@
 
         <active-call v-if="!isMobile"></active-call>
 
-        <q-item>
+        <q-item v-if="!titleOnly">
           <q-btn :ripple="false"
                  :icon="dialerIcon"
                  :disable="!isDialerReady"

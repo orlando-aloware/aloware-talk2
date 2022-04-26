@@ -54,9 +54,8 @@ export default {
       lineOrRingGroupFilter: null,
       lineOrRingGroupFilteredId: null,
       contacts: [],
-      cancelToken: null,
-      source: null,
-      countSource: null
+      cancelController: null
+
     }
   },
 
@@ -93,9 +92,7 @@ export default {
       this.page = 1
       this.setContacts([])
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
-        this.countSource.cancel('Loading of contact task count operation is canceled by the user.')
-        this.countSource = this.cancelToken.source()
-        this.getContactsCountByTaskStatus(this.currentTask, this.countSource.token)
+        this.getContactsCountByTaskStatus(this.currentTask)
       }
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         if (response) {
@@ -121,12 +118,12 @@ export default {
       })
     },
     getContactsByTaskStatus (taskId) {
-      this.source.cancel('Loading of contact task operation is canceled by the user.')
-      this.source = this.cancelToken.source()
-      return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
+      this.cancelController.abort()
+      this.cancelController = new AbortController()
+      return talk2Api.V2.contacts.list(this.getParameters(taskId), this.cancelController.signal)
     },
-    getContactsCountByTaskStatus (taskId, cancelToken) {
-      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true), cancelToken).then(response => {
+    getContactsCountByTaskStatus (taskId) {
+      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true)).then(response => {
         if (response) {
           if (taskId === ContactTaskStatus.STATUS_OPEN) {
             this.setOpenTaskCount(response.data.count)
@@ -196,8 +193,6 @@ export default {
   },
 
   created () {
-    this.cancelToken = window.axios.CancelToken
-    this.source = this.cancelToken.source()
-    this.countSource = this.cancelToken.source()
+    this.cancelController = new AbortController()
   }
 }
