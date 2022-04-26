@@ -396,7 +396,6 @@ export default {
     getTimeZone () {
       let timezone = this.taskToCall?.timezone
       const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('HH:mm')
-      // const contactLocalTime = moment().tz(timezone).format('HH:mm:ss')
       return contactLocalTime
     },
     statusCallConnected () {
@@ -435,6 +434,11 @@ export default {
       return false
     }
   },
+
+  // mounted () {
+  //   this.$options.auto_dialer_interval = '0'
+  // },
+
   created () {
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
@@ -452,6 +456,7 @@ export default {
       this.initialize()
     })
   },
+
   methods: {
     ...mapActions(['setShowPhone']),
     ...mapActions('powerDialer', [
@@ -464,17 +469,17 @@ export default {
       'setContactClone'
     ]),
 
-    async selectTask (autoDialTask) {
-      // exit function when autoDialTask is not set
-      if (!autoDialTask) {
-        return
-      }
-      // load selected contact once
-      if (!this.selected_contact || this.selected_contact.id !== autoDialTask.contact_id) {
-        await this.fetchContactInfo(autoDialTask.contact_id)
-      }
-      this.selectedAutoDialTask = autoDialTask
-    },
+    // async selectTask (autoDialTask) {
+    //   // exit function when autoDialTask is not set
+    //   if (!autoDialTask) {
+    //     return
+    //   }
+    //   // load selected contact once
+    //   if (!this.selected_contact || this.selected_contact.id !== autoDialTask.contact_id) {
+    //     await this.fetchContactInfo(autoDialTask.contact_id)
+    //   }
+    //   this.selectedAutoDialTask = autoDialTask
+    // },
 
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
@@ -508,16 +513,16 @@ export default {
         this.autoDialer.outbound_campaign_id = null
       }
     },
-    runTimer () {
-      if (this.timerIsOver) {
-        clearInterval(this.countdownTimer)
-        return
-      }
 
-      this.countdownTimer = setInterval(() => {
-        this.countdownTimer--
-      }, 1000)
-    },
+    // runTimer () {
+    //   if (this.timerIsOver) {
+    //     clearInterval(this.countdownTimer)
+    //     return
+    //   }
+    //   this.countdownTimer = setInterval(() => {
+    //     this.countdownTimer--
+    //   }, 1000)
+    // },
 
     startWarmUpCountDown (task) {
       if (this.countdownStarted) {
@@ -525,11 +530,7 @@ export default {
       }
 
       this.countdownStarted = true
-      if (this.wrapUp) {
-        this.countdownTimer = this.wrapUpSeconds
-      } else {
-        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
-      }
+      this.resetTimer()
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
         this.onTimerIsOver(task)
@@ -538,7 +539,6 @@ export default {
 
     onTimerIsOver (task) {
       if (this.timerIsOver) {
-        console.log('TIME IS UP')
         this.clearWarmUpCountDown()
         if (!this.togglePause && !this.wrapUp) {
           this.runTask(task)
@@ -566,6 +566,7 @@ export default {
         }, 1000)
         return
       }
+
       if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
@@ -585,9 +586,6 @@ export default {
         this.reRoute()
         this.$emit('no-tasks-found')
       }
-      // if (!this.togglePause) {
-      //   this.resetTimer()
-      // }
       this.TOGGLE_SESSION_LOADER(false)
     },
     onToggleMute () {
@@ -616,13 +614,11 @@ export default {
       }
     },
     resetTimer () {
-      setTimeout(() => {
-        if (this.wrapUp) {
-          this.countdownTimer = this.wrapUpSeconds
-        } else {
-          this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
-        }
-      }, 500)
+      if (this.wrapUp) {
+        this.countdownTimer = this.wrapUpSeconds
+      } else {
+        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      }
     },
     reRoute () {
       this.$emit('on-redirect', this.selectedList)
@@ -694,9 +690,6 @@ export default {
       await this.runTask()
     }
   },
-  mounted () {
-    this.$options.auto_dialer_interval = '0'
-  },
   watch: {
     currentCompany () {
       if (!this.autoDialer.outbound_campaign_id && this.togglePause) {
@@ -704,7 +697,6 @@ export default {
       }
     },
     togglePause (value) {
-      // console.log('value pause :>> ', value)
       if (!value) {
         if (this.timerIsOver) {
           setTimeout(() => {
@@ -765,17 +757,6 @@ export default {
         hold: false,
         next: false,
         mute: false
-      },
-      stats: {
-        first_name: 'Jimmy',
-        last_name: 'Raynor',
-        phone_number: '(888) 217 1436',
-        position: 'Sales Manager',
-        company: 'AI Learning',
-        address: 'Albany, New York',
-        time: '6:15 PM',
-        group: 'Google Map List',
-        line: 'Bently Personal'
       },
       flagged: false,
       autoDialer: {
