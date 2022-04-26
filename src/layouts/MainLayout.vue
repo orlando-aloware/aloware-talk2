@@ -99,7 +99,7 @@
           </phone>
           <dialer-form ref="dialerForm"
                        class="dialerForm"
-                       :class="{ 'hide': isPhoneVisible || !isMobile }"
+                       :class="{ 'hide': isPhoneVisible }"
                        :isMobile="true"
                        v-model="mobilePhoneDrawer"
                        v-if="mobilePhoneDrawer"
