@@ -151,6 +151,10 @@ export default {
     hasError: {
       type: Boolean,
       default: false
+    },
+    useOnlyActives: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -183,11 +187,17 @@ export default {
 
     campaignsAlphabeticalOrder () {
       if (this.campaigns) {
-        return _.clone(this.campaigns).sort((a, b) => {
+        let campaigns = _.clone(this.campaigns).sort((a, b) => {
           const textA = a.name.toUpperCase()
           const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
+
+        if (this.useOnlyActives) {
+          campaigns = campaigns.filter(campaign => campaign.active === true)
+        }
+
+        return campaigns
       }
 
       return []
