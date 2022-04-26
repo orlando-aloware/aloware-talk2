@@ -437,13 +437,24 @@ export default {
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
     },
+    loadTaskCounts () {
+      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      }
+
+      if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      }
+    },
     onResetFilter () {
       this.resetFilter()
       this.loadContactTasks()
+      this.loadTaskCounts()
     },
     onApplyFilter (filter) {
       this.filter = filter
       this.loadContactTasks()
+      this.loadTaskCounts()
     },
     onCreateNewFilter (filter) {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }

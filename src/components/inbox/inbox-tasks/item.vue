@@ -70,13 +70,12 @@
         {{ campaignName }}
       </div>
     </div>
-    <div v-if="contact.last_communication"
-         class="actions text-right pb-1">
+    <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="(contact.last_communication.type === CommunicationTypes.CALL &&
+            v-if="contact.last_communication && ((contact.last_communication.type === CommunicationTypes.CALL &&
             contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
-            contact.last_communication.type !== CommunicationTypes.CALL">
+            contact.last_communication.type !== CommunicationTypes.CALL) || !contact.last_communication">
         <task-item-time :key="taskItemKey"
                         :from-time="lastEngagement"
                         :update-interval="6000">
@@ -261,7 +260,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
-    ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts']),
+    ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts', 'channelChangedFilterFields']),
     contactName () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`

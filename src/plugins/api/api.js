@@ -272,16 +272,22 @@ export default {
       get (id) {
         return window.axios.get(`/api/v2/contacts/${id}`)
       },
-      list (params, cancelTokeSource) {
-        const relations = _.get(params, 'relations', [
+      list (params, cancelTokenSource) {
+        params.relations = _.get(params, 'relations', [
           'lastCommunication',
           'initialCampaign',
           'dispositionStatus'
         ])
 
-        params.relations = relations
-
-        return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokeSource })
+        return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
+          .catch(function (thrown) {
+            if (window.axios.isCancel(thrown) && thrown) {
+              console.log(thrown.message)
+            }
+          })
+      },
+      counts (params, cancelTokenSource) {
+        return window.axios.get(`/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
           .catch(function (thrown) {
             if (window.axios.isCancel(thrown) && thrown) {
               console.log(thrown.message)
