@@ -64,7 +64,7 @@
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
-                  v-if="authenticated"
+                  v-if="authenticated && isMobile"
                   :breakpoint="0"
                   class="h-100 sidebar-wrapper d-block"
                   :width="64"
