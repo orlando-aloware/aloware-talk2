@@ -1675,7 +1675,7 @@ export default {
       this.showLocalTime = false
     },
     getContactLocalTime () {
-      const contact = this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
+      const contact = !this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
 
       if (contact && contact.timezone) {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
