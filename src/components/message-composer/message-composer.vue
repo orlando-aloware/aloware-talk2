@@ -104,6 +104,10 @@ export default {
     },
     ...mapActions(['setTemplates']),
     setSelectedPhone (phone) {
+      if (!phone) {
+        return
+      }
+
       this.setMessageComposerSmsPhoneNumber(phone.phone_number)
     },
 

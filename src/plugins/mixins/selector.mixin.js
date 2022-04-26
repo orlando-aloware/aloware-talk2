@@ -100,7 +100,13 @@ export default {
     },
 
     onInput (val) {
-      this.element.querySelector('.q-basic-selector .q-field__input').blur()
+      const element = this.element.querySelector('.q-basic-selector .q-field__input')
+
+      if (!element) {
+        return
+      }
+
+      element.blur()
 
       if (this.isCheckEmit && this.emitChange && val) {
         this.$emit(this.emitEvent, this.emitChangeProperty ? val[this.emitChangeProperty] : val)
