@@ -100,7 +100,30 @@
         </q-timezone-selector>
       </div>
 
-      <div class="d-block">
+      <div class="d-block"
+           @mouseleave="dateOfBirthMouseLeave">
+        <p class="text-muted custom-input-label mb-0">Date of Birth</p>
+        <label class="w-100 position-relative date-of-birth-field"
+               @mouseenter="dateOfBirthMouseEnter">
+          <date-selector formatted="YYYY-MM-DD"
+                         :class="{ 'contact-info-editable': isEditableBirthDate }"
+                         :noDefaultDate="true"
+                         v-if="isEditableBirthDate"
+                         v-model="contact.date_of_birth"
+                         @dateSelected="onDateOfBirthSelected">
+          </date-selector>
+          <pencil-o-icon v-if="isEditableBirthDate && !contact.date_of_birth"
+                         color="#256EFF"
+                         class="edit-icon cursor-pointer text-size-rg position-absolute">
+          </pencil-o-icon>
+          <span class="d-block mb-1"
+               v-if="!isEditableBirthDate">{{ !contact.date_of_birth ? '&nbsp;' : contact.date_of_birth }}
+          </span>
+        </label>
+      </div>
+
+      <div class="d-block"
+           @mouseenter="clearMouseEnter">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
@@ -161,6 +184,8 @@ import ContactInputField from 'src/components/contacts/contact-input-field'
 import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
+import DateSelector from 'components/date-selector'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -172,6 +197,8 @@ export default {
     }
   },
   components: {
+    PencilOIcon,
+    DateSelector,
     QTimezoneSelector,
     ContactDispositionSelector,
     UserSelector,
@@ -199,21 +226,22 @@ export default {
     },
     expanded () {
       if (this.hasExpanded) {
-        return this.is_expanded
+        return this.isExpanded
       }
       return true
     }
   },
   data () {
     return {
-      is_expanded: false,
+      isExpanded: false,
+      isEditableBirthDate: false,
       attributes: []
     }
   },
   methods: {
     ...mapActions('contacts', ['setContactAttributes', 'setContact', 'updateChangedContactProperties']),
     onExpanded () {
-      this.is_expanded = !this.is_expanded
+      this.isExpanded = !this.isExpanded
     },
     getAttributes () {
       talk2Api.V1.contact.getAttributes(this.contact.id)
@@ -287,6 +315,22 @@ export default {
     computeAndHumanize (duration, field, singular) {
       const temp = Math.floor(duration[field]())
       return `${temp} ${temp > 1 ? field : singular}`
+    },
+    dateOfBirthMouseEnter () {
+      if (this.hasPermissionTo('update contact')) {
+        this.isEditableBirthDate = true
+      }
+    },
+    dateOfBirthMouseLeave () {
+      if (this.hasPermissionTo('update contact')) {
+        this.isEditableBirthDate = false
+      }
+    },
+    clearMouseEnter () {
+      this.isEditableBirthDate = false
+    },
+    onDateOfBirthSelected (value) {
+      this.onUpdateFields(window.moment(value).format('YYYY-MM-DD'), 'date_of_birth')
     }
   }
 }
