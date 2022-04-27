@@ -318,7 +318,7 @@ export default {
     },
 
     onResetFilter: function () {
-      // if has selected filter, then use selected filter saved values, otherwise use channel's default filter
+      // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
       const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const item in useFilter) {
