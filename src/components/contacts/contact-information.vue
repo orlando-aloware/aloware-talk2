@@ -105,14 +105,15 @@
         <p class="text-muted custom-input-label mb-0">Date of Birth</p>
         <label class="w-100"
                @mouseenter="dateOfBirthMouseEnter">
-          <date-selector :class="{ 'contact-info-editable': isEditableBirthDate }"
-                         formatted="YYYY-MM-DD"
+          <date-selector formatted="YYYY-MM-DD"
+                         :class="{ 'contact-info-editable': isEditableBirthDate }"
+                         :noDefaultDate="true"
                          v-if="isEditableBirthDate"
                          v-model="contact.date_of_birth"
                          @dateSelected="onDateOfBirthSelected">
           </date-selector>
           <span class="d-block mb-1"
-               v-if="!isEditableBirthDate">{{ contact.date_of_birth }}
+               v-if="!isEditableBirthDate">{{ !contact.date_of_birth ? '&nbsp;' : contact.date_of_birth }}
           </span>
         </label>
       </div>

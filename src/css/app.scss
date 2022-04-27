@@ -11092,39 +11092,37 @@ h1.contact-list-name-label {
 }
 
 .contact-info-editable {
-  .has-value {
-    .field-input {
-      border-top: unset !important;
-      border-right: unset !important;
-      border-left: unset !important;
-      border-bottom: 1px solid #256eff !important;
-      border-radius: 0;
-      height: 25px;
-      min-height: 25px;
-      font-size: 14px !important;
-      padding-left: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      transform: translateY(-1px);
-    }
-    .custom-button.field-clear-button {
+  .field-input {
+    border-top: unset !important;
+    border-right: unset !important;
+    border-left: unset !important;
+    border-bottom: 1px solid #256eff !important;
+    border-radius: 0 !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    font-size: 14px !important;
+    padding-left: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    transform: translateY(-1px) !important;
+  }
+  .custom-button.field-clear-button {
+    -webkit-transition: unset;
+    background: rgb(37, 110, 255) !important;
+    height: 14px;
+    width: 14px;
+    .custom-button-effect {
       -webkit-transition: unset;
-      background: rgb(37, 110, 255) !important;
+      transition: unset;
+    }
+    span {
+      color: #fff !important;
       height: 14px;
       width: 14px;
-      .custom-button-effect {
-        -webkit-transition: unset;
-        transition: unset;
-      }
-      span {
-        color: #fff !important;
-        height: 14px;
-        width: 14px;
-      }
-      .fs-16 {
-        font-size: 8px;
-        font-weight: 700;
-      }
+    }
+    .fs-16 {
+      font-size: 8px;
+      font-weight: 700;
     }
   }
 }
