@@ -304,6 +304,69 @@
                   </button>
                 </td>
                 <td
+                  v-else-if="column.name === 'contact_owner'"
+                  :key="key">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                      <div v-if="contact.user_id">
+                        <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                          {{ (getUserName(contact.user_id)) | ucwords }}
+                        </div>
+                      </div>
+                      <div v-else>
+                        <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                          No Name
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td
+                  v-else-if="column.name === 'initial_campaign_id'"
+                  :key="key">
+                  {{ contact['initial_campaign'].name }}
+                </td>
+                <td
+                  v-else-if="column.name === 'inbound_calls_count'"
+                  :key="key">
+                  {{ contact['inbound_call_count'] }}
+                </td>
+                <td
+                  v-else-if="column.name === 'outbound_calls_count'"
+                  :key="key">
+                  {{ contact['outbound_call_count'] }}
+                </td>
+                <td
+                  v-else-if="column.name === 'inbound_texts_count'"
+                  :key="key">
+                  {{ contact['inbound_sms_count'] }}
+                </td>
+                <td
+                  v-else-if="column.name === 'outbound_texts_count'"
+                  :key="key">
+                  {{ contact['outbound_sms_count'] }}
+                </td>
+                <td
+                  v-else-if="column.name === 'communications_count'"
+                  :key="key">
+                  {{ contact['nb_communications'] }}
+                </td>
+                <td
+                  v-else-if="column.name === 'unread_missed_calls_count'"
+                  :key="key">
+                  {{ contact['unread_missed_call_count'] }}
+                </td>
+                <td
+                  v-else-if="column.name === 'unread_voicemails_count'"
+                  :key="key">
+                  {{ contact['unread_voicemail_count'] }}
+                </td>
+                 <td
+                  v-else-if="column.name === 'unread_texts_count'"
+                  :key="key">
+                  {{ contact['unread_count'] }}
+                </td>
+                <td
                   v-else
                   :key="key">
                   <template>
@@ -311,7 +374,7 @@
                       {{ getObjectKey(contact[column.name], column.name) }}
                     </span>
                     <span v-else>
-                      {{ contact[column.name] | prefetchValue }}
+                      {{ contact[column.name] | prefetchValue }} ({{column.name}})
                     </span>
                   </template>
                 </td>
@@ -481,7 +544,7 @@ export default {
   },
   filters: {
     prefetchValue (value) {
-      if (!value) return '--'
+      if (!value) return '-'
       return value
     }
   },
@@ -499,7 +562,10 @@ export default {
     ...mapFields('powerDialer', [
       'powerDialerActiveList'
     ]),
-    ...mapState(['prevRoute']),
+    ...mapState([
+      'prevRoute',
+      'users'
+    ]),
     ...mapState('powerDialer', [
       'metrics'
     ]),
@@ -839,6 +905,10 @@ export default {
         return obj.name
       }
       return obj
+    },
+    getUserName (userId) {
+      const user = this.users.find(item => item.id === userId)
+      return user ? user.name : '-'
     }
   },
   watch: {
