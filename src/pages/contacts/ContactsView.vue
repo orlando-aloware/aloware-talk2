@@ -1010,35 +1010,34 @@ export default {
             console.log(_err)
             this.$generalNotification('Unable to update contact list.', 'error')
           })
-      } else {
-        console.log('Creating new dynamic list...')
-        // debugger
-        const params = this.unsavedList.params
-        params.filters = this.currentListFilters
-        return this.$axios
-          .post('/api/v2/contacts-list', params)
-          .then((response) => {
-            const data = response.data.data
-            const message = response.data.message
-
-            this.createListClose()
-
-            this.$generalNotification(message)
-
-            this.loadFolders()
-            this.setUnsavedList(null)
-            this.$router.push(`/contacts/list/${data.id}`)
-          })
-          .catch((error) => {
-            const { message, html } = extractErrorMessage(error)
-            console.log(html)
-            this.errorMsg = message
-            this.$generalNotification(message, 'error')
-          })
-          .finally(() => {
-            this.isUpdatingList = false
-          })
       }
+      console.log('Creating new dynamic list...')
+      // debugger
+      const params = this.unsavedList.params
+      params.filters = this.currentListFilters
+      return this.$axios
+        .post('/api/v2/contacts-list', params)
+        .then((response) => {
+          const data = response.data.data
+          const message = response.data.message
+
+          this.createListClose()
+
+          this.$generalNotification(message)
+
+          this.loadFolders()
+          this.setUnsavedList(null)
+          this.$router.push(`/contacts/list/${data.id}`)
+        })
+        .catch((error) => {
+          const { message, html } = extractErrorMessage(error)
+          console.log(html)
+          this.errorMsg = message
+          this.$generalNotification(message, 'error')
+        })
+        .finally(() => {
+          this.isUpdatingList = false
+        })
     },
     loadFolders () {
       this.$axios

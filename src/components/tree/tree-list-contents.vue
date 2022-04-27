@@ -1,19 +1,20 @@
 <template>
   <div
     class="sublists"
-    :class="{'is-root': isRootList}"
-    v-if="lists.length">
-    <tree-list-item
-      class="flex-grow-1 w-100"
-      v-for="list in lists"
-      :name="list.name"
-      :key="list.id"
-      :id="list.id"
-      :layer="layer"
-      :type="list.type"
-      :hasEdit="hasEdit"
-      :hasDelete="hasDelete"
-    />
+    :class="{'is-root': isRootList}">
+    <template v-if="lists.length">
+      <tree-list-item
+        class="flex-grow-1 w-100"
+        v-for="list in lists"
+        :name="list.name"
+        :key="list.id"
+        :id="list.id"
+        :layer="layer"
+        :type="list.type"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
+      />
+    </template>
     <tree-list-item
       v-if="hasUnsavedRootList || (hasUnsavedList && isDirectChild)"
       class="flex-grow-1 w-100"
