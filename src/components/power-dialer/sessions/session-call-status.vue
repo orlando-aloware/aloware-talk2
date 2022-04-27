@@ -81,10 +81,10 @@
       </div>
       <div class="d-flex align-items-center p-0">
         <div
-          class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1"
-          v-html="fullname">
+          class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
+          {{ fullname }}
           <span class="text-15 text-subtitle1">
-            {{ phoneNumber | fixPhone('NATIONAL', true) }}
+            {{ phoneNumber }}
           </span>
         </div>
       </div>
@@ -319,7 +319,10 @@ export default {
     },
     fullname () {
       let { taskToCall } = this
-      return `${taskToCall?.first_name || '&nbsp;'} ${taskToCall?.last_name || '&nbsp;'}`
+      if ((taskToCall.first_name === null || taskToCall.first_name === '') && (taskToCall.last_name === null || taskToCall.last_name === '')) {
+        return `No Name`
+      }
+      return `${taskToCall?.first_name || ''} ${taskToCall?.last_name || ''}`
     },
     keyIndex () {
       let keyCtr = 0
@@ -388,7 +391,7 @@ export default {
       return this.dialer?.communication?.campaign?.name || 'N/A'
     },
     phoneNumber () {
-      return this.taskToCall?.phone_number || ''
+      return this.taskToCall?.phone_number
     },
     timezone () {
       return this.taskToCall?.timezone
