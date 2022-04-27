@@ -886,7 +886,7 @@ export default {
       this.filterHasChanges = false
     },
     init () {
-      this.resetFilters()
+      this.resetFilters(true)
       this.$VueEvent.fire('clearContacts')
       this.initialListFilters = this.currentListFilters
       this.loadList(this.selectedListId)
@@ -915,6 +915,7 @@ export default {
     '$route.params': {
       handler (params) {
         if (!this.$route.name.includes('Contact')) {
+          console.log('Initializing...')
           this.init()
         }
       },
