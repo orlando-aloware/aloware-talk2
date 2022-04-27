@@ -21,11 +21,13 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import contactMixins from 'src/plugins/mixins/contact.mixin'
 import Contact from 'pages/contacts/Contact'
+import { inboxMixin } from 'src/plugins/mixins'
+import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox',
 
-  mixins: [contactMixins],
+  mixins: [contactMixins, inboxMixin],
 
   components: { Contact, InboxSide },
 
@@ -77,6 +79,10 @@ export default {
       }
     },
     fetchTaskCounts () {
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
       return talk2Api.V2.contacts.inboxCounts().then(res => {
         this.setTaskCount({
           new: res.data.open,
@@ -107,7 +113,9 @@ export default {
   mounted () {
     if (this.authenticated) {
       this.setChannel()
-      this.fetchTaskCounts()
+      if (this.$route.params.channel !== 'inbox') {
+        this.fetchTaskCounts()
+      }
     }
   },
 

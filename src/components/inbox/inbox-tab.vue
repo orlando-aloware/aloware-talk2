@@ -70,9 +70,13 @@
                 Open
               </span>
               <div class="text-center task-count ml-1">
-                  <span>
-                    {{ taskCounts.open | numberPlusFormatter(99) }}
-                  </span>
+                <span v-if="isLoadingOpenTaskCount">
+                  <q-spinner-tail size="12px"
+                                color="white" />
+                </span>
+                <span v-if="!isLoadingOpenTaskCount">
+                  {{ taskCounts.open | numberPlusFormatter(99) }}
+                </span>
                 <b-badge v-if="hasIncomingLiveCall"
                          variant="danger"
                          class="live-call-badge d-flex justify-center align-items-center position-absolute"
@@ -88,7 +92,11 @@
                 Pending
               </span>
               <div class="text-center task-count ml-1">
-                <span>
+                 <span v-if="isLoadingPendingTaskCount">
+                  <q-spinner-tail size="12px"
+                                  color="white" />
+                </span>
+                <span v-if="!isLoadingPendingTaskCount">
                   {{ taskCounts.pending | numberPlusFormatter(99) }}
                 </span>
               </div>
@@ -125,6 +133,7 @@
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
+                         @onItemRemoved="onItemRemoved"
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
         <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
@@ -190,7 +199,9 @@ export default {
         'hasMoreContacts',
         'isFetchingContacts',
         'channelChangedFilterFields',
-        'selectedFilter'
+        'selectedFilter',
+        'isLoadingOpenTaskCount',
+        'isLoadingPendingTaskCount'
       ]
     ),
     ...mapState('contacts', ['contact']),
@@ -291,7 +302,14 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterDialog', 'resetChannelChangedFilterFields', 'toggleFilterModelForm', 'setChannelClonedFilter']),
+    ...mapActions('inbox', [
+      'toggleFilterDialog',
+      'resetChannelChangedFilterFields',
+      'toggleFilterModelForm',
+      'setChannelClonedFilter',
+      'setLoadingPendingTaskCount',
+      'setLoadingPendingTaskCount'
+    ]),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -372,6 +390,21 @@ export default {
         console.log(err)
       })
     },
+    onItemRemoved (contact) {
+      const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
+      this.setContacts(filteredContacts)
+      const nextContact = filteredContacts.length > 0 ? filteredContacts[0] : null
+      if (!_.isEmpty(this.selectedContact) && nextContact) {
+        this.$emit('itemSelected', {
+          name: 'Inbox Contact Task',
+          params: {
+            id: nextContact.id.toString(),
+            channel: 'inbox',
+            status: nextContact.task_status ? this.$options.filters.fixTaskStatusName(nextContact.task_status).toLowerCase() : 'all'
+          }
+        })
+      }
+    },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
       const contactId = _.get(contact, 'id', null)
@@ -439,10 +472,12 @@ export default {
     },
     loadTaskCounts () {
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
+        this.setLoadingPendingTaskCount(true)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       }
 
       if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
+        this.setLoadingOpenTaskCount()
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
       }
     },
@@ -520,7 +555,12 @@ export default {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
         // do other possible actions
       } else {
-        this.loadContactTasks().finally(function () {
+        this.setLoadingPendingTaskCount(true)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.setLoadingOpenTaskCount(true)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+
+        this.loadContactTasks(false).finally(function () {
           if (_this.$route.params.id) {
             const id = _this.$route.params.id
             const contact = _this.contactTasks.find(item => item.id.toString() === id)
@@ -645,6 +685,10 @@ export default {
           } else {
             if (isInContacts) {
               const index = contacts.data.findIndex(item => item.id === contact.id)
+              if (contact.task_status !== this.currentTask) {
+                this.onItemRemoved(contact)
+                return
+              }
               contacts.data[index] = contact
               this.setContacts(contacts.data)
             }

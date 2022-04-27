@@ -370,6 +370,10 @@ export default {
   },
   watch: {
     isReopened: function () {
+      const _this = this
+      setTimeout(function () {
+        _this.$emit('onItemRemoved', _this.contact)
+      }, 5000)
     },
     'contact.last_communication.id': function () {
       this.taskItemKey++

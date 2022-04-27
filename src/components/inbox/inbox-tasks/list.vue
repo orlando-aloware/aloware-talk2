@@ -18,6 +18,7 @@
                      :contact="contact"
                      :loading-contact="loadingContacts"
                      :is-search="isSearch"
+                     @onItemRemoved="onItemRemoved"
                      @onItemSelected="onItemSelected">
     </inbox-task-item>
   </div>
@@ -51,6 +52,9 @@ export default {
   methods: {
     onItemSelected (contact) {
       this.$emit('onItemSelected', contact)
+    },
+    onItemRemoved (contact) {
+      this.$emit('onItemRemoved', contact)
     }
   },
   computed: {

@@ -74,5 +74,11 @@ export default {
 
   setSearcherOpen: ({ commit }, isOpen = false) => {
     commit('SET_SEARCHER_OPEN', isOpen)
+  },
+  setLoadingOpenTaskCount: ({ commit }, loading = false) => {
+    commit('SET_LOADING_OPEN_TASK_COUNT', loading)
+  },
+  setLoadingPendingTaskCount: ({ commit }, loading = false) => {
+    commit('SET_LOADING_PENDING_TASK_COUNT', loading)
   }
 }

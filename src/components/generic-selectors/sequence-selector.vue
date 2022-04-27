@@ -199,7 +199,7 @@ export default {
 
   data () {
     return {
-      selectedId: null,
+      selectedId: this.value,
       auth: auth,
       isLoading: false,
       options: [],

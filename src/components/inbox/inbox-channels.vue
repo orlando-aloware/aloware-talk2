@@ -467,7 +467,7 @@ export default {
 
       this.filter.type = this.filterType
       this.filter.answer_status = this.answerStatus
-      this.mentionUserId = null
+      // this.mentionUserId = null
 
       this.filterRight = 'newest'
       this.sorting.order = 'desc'
@@ -1018,6 +1018,17 @@ export default {
       if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value) && !this.$route.params.id) {
         this.resetFilters()
         this.isScrolled = false
+
+        if (this.$route.params.channel === 'mentions' && this.mentionUserId) {
+          if (this.mentionType === MentionType.TYPE_RECEIVED) {
+            this.filter.mentioner_user_id = this.mentionUserId
+          }
+
+          if (this.mentionType === MentionType.TYPE_SENT) {
+            this.filter.mentioned_user_id = this.mentionUserId
+          }
+        }
+
         this.getCommunications(this.filter)
       }
     },

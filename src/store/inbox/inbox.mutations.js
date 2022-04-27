@@ -132,5 +132,11 @@ export default {
     }
 
     state = Object.assign({}, InboxDefault.DEFAULT_STATE)
+  },
+  SET_LOADING_OPEN_TASK_COUNT (state, loading) {
+    state.isLoadingOpenTaskCount = loading
+  },
+  SET_LOADING_PENDING_TASK_COUNT (state, loading) {
+    state.isLoadingPendingTaskCount = loading
   }
 }

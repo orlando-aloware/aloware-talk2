@@ -468,7 +468,13 @@ export default {
         this.filter[prop] = this.selectedFilter.filter[prop]
       }
 
-      this.filter = { ...this.filter, untagged_only: +this.filter.untagged_only, first_time_only: +this.filter.first_time_only, exclude_automated_communications: +this.filter.exclude_automated_communications }
+      this.filter = {
+        ...this.filter,
+        untagged_only: +this.filter.untagged_only,
+        first_time_only: +this.filter.first_time_only,
+        exclude_automated_communications: +this.filter.exclude_automated_communications,
+        my_contact: +this.filter.my_contact
+      }
 
       setTimeout(() => {
         this.refreshTagSelector()

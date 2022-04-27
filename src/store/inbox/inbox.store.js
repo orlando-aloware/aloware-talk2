@@ -85,6 +85,8 @@ export default function () {
     isFilterModelFormShown: false,
     isFilterDialogShown: false,
     selectedFilter: null,
-    appliedFilter: null
+    appliedFilter: null,
+    isLoadingOpenTaskCount: false,
+    isLoadingPendingTaskCount: false
   }
 }

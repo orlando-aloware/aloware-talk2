@@ -68,7 +68,9 @@ export default {
       'gettingContactsList',
       'setContactsCurrentPage',
       'setOpenTaskCount',
-      'setPendingTaskCount'
+      'setPendingTaskCount',
+      'setLoadingOpenTaskCount',
+      'setLoadingPendingTaskCount'
     ]),
     getNoneLiveCallContactTasks (contacts) {
       return contacts.filter(contact => (contact.last_communication &&
@@ -86,12 +88,19 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
     },
-    loadContactTasks () {
+    loadContactTasks (loadCount = true) {
       this.gettingContactsList(true)
       // always reset page when fresh loading contacts
       this.page = 1
       this.setContacts([])
-      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
+      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask) && loadCount) {
+        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+          this.setLoadingOpenTaskCount(true)
+        }
+
+        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+          this.setLoadingPendingTaskCount(true)
+        }
         this.getContactsCountByTaskStatus(this.currentTask)
       }
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
@@ -127,10 +136,20 @@ export default {
         if (response) {
           if (taskId === ContactTaskStatus.STATUS_OPEN) {
             this.setOpenTaskCount(response.data.count)
+            this.setLoadingOpenTaskCount(false)
           }
 
           if (taskId === ContactTaskStatus.STATUS_PENDING) {
             this.setPendingTaskCount(response.data.count)
+            this.setLoadingPendingTaskCount(false)
+          }
+        } else {
+          if (taskId === ContactTaskStatus.STATUS_OPEN) {
+            this.setLoadingOpenTaskCount(false)
+          }
+
+          if (taskId === ContactTaskStatus.STATUS_PENDING) {
+            this.setLoadingPendingTaskCount(false)
           }
         }
       })
@@ -148,24 +167,24 @@ export default {
         this.filters.contact_task_status.value = [taskId]
       }
 
-      if (this.filter.campaigns.length) {
+      if (this.filter && this.filter.campaigns.length) {
         this.filters = { ...this.filters, 'lines': { value: this.filter.campaigns, operator: 1 } }
       }
 
-      if (this.filter.ring_groups.length) {
+      if (this.filter && this.filter.ring_groups.length) {
         this.filters = { ...this.filters, 'ring_groups': { value: this.filter.ring_groups, operator: 1 } }
       }
 
-      if (this.filter.contact_owner.length && !this.filter.my_contact) {
+      if (this.filter && this.filter.contact_owner.length && !this.filter.my_contact) {
         this.filters = { ...this.filters, 'contact_owner': { value: this.filter.contact_owner, operator: 1 } }
       }
 
-      if (this.filter.my_contact) {
+      if (this.filter && this.filter.my_contact) {
         query.my_contact = this.filter.my_contact
         this.filters = { ...this.filters, 'contact_owner': { value: [this.profile.id], operator: 1 } }
       }
 
-      if (this.filter.from_date && this.filter.to_date) {
+      if (this.filter && this.filter.from_date && this.filter.to_date) {
         this.filters = { ...this.filters, 'last_engagement_at': { value: [this.filter.from_date, this.filter.to_date], operator: 5 } }
       }
 

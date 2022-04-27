@@ -34,15 +34,20 @@
         </div>
         <span class="count-label h-100"
               v-if="value === 'inbox'">
-        <span class="open-count border-right pr-1">{{ openCount | numberPlusFormatter(99) }}</span>
-        <span class="pending-count ml-1">{{ pendingCount | numberPlusFormatter(99) }}</span>
-      </span>
-        <!--badge
-          v-if="badge"
-          :color="badgeColor"
-          :value="badgeValue"
-          :closed="closed"
-        /-->
+          <span v-if="isLoadingOpenTaskCount" class="border-right pr-1">
+            <q-spinner-tail size="12px"
+                            color="blue" />
+          </span>
+          <span v-if="!isLoadingOpenTaskCount"
+                class="open-count border-right pr-1">{{ openCount | numberPlusFormatter(99) }}</span>
+
+          <span v-if="isLoadingPendingTaskCount" class="ml-1">
+            <q-spinner-tail size="12px"
+                            color="blue" />
+          </span>
+          <span v-if="!isLoadingPendingTaskCount"
+                class="pending-count ml-1">{{ pendingCount | numberPlusFormatter(99) }}</span>
+        </span>
       </div>
     </a>
     <div v-else
@@ -54,12 +59,17 @@
 
 <script>
 import Icon from './inbox-nav-icon.vue'
+import { mapState } from 'vuex'
 
 export default {
   name: 'inbox-nav-item',
 
   components: {
     Icon
+  },
+
+  computed: {
+    ...mapState('inbox', ['isLoadingOpenTaskCount', 'isLoadingPendingTaskCount'])
   },
 
   props: {
