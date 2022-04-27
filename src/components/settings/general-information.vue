@@ -202,7 +202,7 @@ export default {
     getRingGroupName (id) {
       const ringGroup = this.getRingGroup(id)
 
-      return this.$options.filters.fixName(ringGroup ? ringGroup.name : null)
+      return ringGroup ? this.$options.filters.fixName(ringGroup.name) : null
     }
   }
 }
