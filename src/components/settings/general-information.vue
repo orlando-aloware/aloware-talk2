@@ -46,9 +46,10 @@
               <li v-for="ringGroupId in profile.ring_group_ids"
                   :key="ringGroupId"
                   class="pb-0">
-                  <span class="text-grey-90 _400 fs-12">
+                  <span class="text-grey-90 _400 fs-12" v-if="ringGroups.length > 0">
                       {{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}
                   </span>
+                  <q-skeleton type="text" animation="fade" height="20px" v-else />
               </li>
             </ul>
 
