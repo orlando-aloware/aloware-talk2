@@ -58,7 +58,7 @@
         <trash-icon></trash-icon>
       </template>
       <template slot="title">
-        <span>Delete</span>
+        <span>{{ listId === undefined ? 'Discard' : 'Delete'}}</span>
       </template>
     </contact-menu-item>
   </contact-menu>

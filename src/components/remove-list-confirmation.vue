@@ -117,6 +117,7 @@ export default {
           this.$generalNotification('Contact list was successfully removed.')
           this.removeListFromFolders(this.listToRemove.id, this.folders)
           this.removeListFromPinned(this.listToRemove.id)
+          this.refreshFoldersList()
           // if current route is equals to list page being deleted then redirect to all contacts
           if (this.$route.name === 'Contacts') {
             if (this.$router.history.current.path === `/contacts/list/${this.listToRemove.id}`) {

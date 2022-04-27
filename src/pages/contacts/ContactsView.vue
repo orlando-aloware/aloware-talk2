@@ -228,7 +228,7 @@
                            @click="onRemoveList">
             <delete-red-icon></delete-red-icon>
             <span class="text-danger">
-              Delete
+              {{ unsavedList ? 'Discard' : 'Delete' }}
             </span>
           </b-dropdown-item>
         </b-dropdown>
@@ -1056,7 +1056,25 @@ export default {
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
     },
+    discardList () {
+      this.$bvModal.msgBoxConfirm('Are you sure you want to discard your contact list?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.setUnsavedList(null)
+          this.$router.push(`/contacts`)
+        }
+      })
+    },
     onRemoveList () {
+      if (this.unsavedList) {
+        this.discardList()
+        return
+      }
+
       this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
     },
     hasFilterChanges () {

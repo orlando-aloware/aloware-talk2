@@ -428,8 +428,17 @@ export default {
     },
     onRemoveList () {
       if (!this.id) {
-        this.setUnsavedList(null)
-        this.$router.push('/contacts')
+        this.$bvModal.msgBoxConfirm('Are you sure you want to discard your contact list?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.setUnsavedList(null)
+            this.$router.push(`/contacts`)
+          }
+        })
         return
       }
 
