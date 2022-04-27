@@ -5,7 +5,12 @@
         <span>{{ getSelectedCount }} selected</span>
       </div>
       <div class="items">
-        <a href="#" disabled>
+        <a disabled>
+           <q-tooltip anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
+            In development
+          </q-tooltip>
           <i class="fa fa-layer-group"></i>
           Enroll in Sequence
         </a>
