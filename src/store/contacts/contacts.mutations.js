@@ -359,7 +359,8 @@ export default {
     state.unsavedList = data
   },
   SET_UNSAVED_LIST_NAME: (state, name) => {
-    state.unsavedList = { ...state.unsavedList, ...{ name: name } }
+    Vue.set(state.unsavedList, 'name', name)
+    Vue.set(state.unsavedList.params, 'name', name)
   },
   SET_ACTIVE_FOLDER: (state, value) => {
     state.activeFolder = value

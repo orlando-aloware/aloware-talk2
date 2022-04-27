@@ -452,7 +452,10 @@ export default {
       if (this.isContactModule) {
         document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && value.length === this.contactsData.data.length
       } else {
-        document.querySelector('.data-table-check-all').checked = value.length > 0
+        const filteredContacts = this.contactsData.data.filter(c => {
+          return !c.is_dnc && !c.is_blocked
+        })
+        document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && value.length === filteredContacts.length
       }
     }
   }
