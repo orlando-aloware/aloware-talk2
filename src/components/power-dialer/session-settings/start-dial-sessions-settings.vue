@@ -503,7 +503,7 @@ export default {
       }
       this.sessionSettings = res?.id ? res : this.selectedItem
 
-      if (res?.id) {
+      if (this.sessionSettings?.id) {
         this.dialog = false
       } else {
         this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
