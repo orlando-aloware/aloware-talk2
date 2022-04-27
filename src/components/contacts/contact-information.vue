@@ -103,7 +103,7 @@
       <div class="d-block"
            @mouseleave="dateOfBirthMouseLeave">
         <p class="text-muted custom-input-label mb-0">Date of Birth</p>
-        <label class="w-100"
+        <label class="w-100 position-relative date-of-birth-field"
                @mouseenter="dateOfBirthMouseEnter">
           <date-selector formatted="YYYY-MM-DD"
                          :class="{ 'contact-info-editable': isEditableBirthDate }"
@@ -112,6 +112,10 @@
                          v-model="contact.date_of_birth"
                          @dateSelected="onDateOfBirthSelected">
           </date-selector>
+          <pencil-o-icon v-if="isEditableBirthDate && !contact.date_of_birth"
+                         color="#256EFF"
+                         class="edit-icon cursor-pointer text-size-rg position-absolute">
+          </pencil-o-icon>
           <span class="d-block mb-1"
                v-if="!isEditableBirthDate">{{ !contact.date_of_birth ? '&nbsp;' : contact.date_of_birth }}
           </span>
@@ -181,6 +185,7 @@ import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DateSelector from 'components/date-selector'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -192,6 +197,7 @@ export default {
     }
   },
   components: {
+    PencilOIcon,
     DateSelector,
     QTimezoneSelector,
     ContactDispositionSelector,

@@ -11108,21 +11108,29 @@ h1.contact-list-name-label {
   }
   .custom-button.field-clear-button {
     -webkit-transition: unset;
-    background: rgb(37, 110, 255) !important;
-    height: 14px;
-    width: 14px;
+    background: #7ca8ff !important;
+    height: 14px !important;
+    width: 14px !important;
     .custom-button-effect {
       -webkit-transition: unset;
       transition: unset;
     }
     span {
       color: #fff !important;
-      height: 14px;
-      width: 14px;
+      height: 14px !important;
+      width: 14px !important;
     }
     .fs-16 {
-      font-size: 8px;
+      font-size: 8px !important;
       font-weight: 700;
     }
+  }
+}
+
+.date-of-birth-field {
+  .edit-icon {
+    top: 0;
+    right: 0;
+    margin-right: 8px;
   }
 }
