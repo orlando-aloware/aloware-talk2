@@ -437,7 +437,7 @@ export default {
 
   mounted () {
     // this.$options.auto_dialer_interval = '0'
-    console.log('8888888888 :>> ', this.skippedTasks)
+    // console.log('8888888888 :>> ', this.skippedTasks)
   },
 
   created () {
