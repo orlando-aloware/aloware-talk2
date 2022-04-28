@@ -359,6 +359,7 @@ export default {
           window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
         })
         .listen('.user.session_metrics_calculation', (event) => {
+          console.log('event --------- :>> ', event)
           window.VueEvent.fire('metric_sessions_update', event)
         })
         .listen('.bulk_contact_list_items.created', (event) => {
@@ -367,6 +368,18 @@ export default {
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
         })
+        // .listen('.export.created', (event) => {
+        //   console.log('created export event :>> ', event)
+        //   window.VueEvent.fire('export_event_updates', event)
+        // })
+        // .listen('.export.updated', (event) => {
+        //   console.log('updated export event :>> ', event)
+        //   window.VueEvent.fire('export_event_updates', event)
+        // })
+        // .listen('.export.deleted', (event) => {
+        //   console.log('deleted export event :>> ', event)
+        //   window.VueEvent.fire('export_event_updates', event)
+        // })
         /**
          * End of Power Dialer Session Tasks
          */
@@ -575,6 +588,18 @@ export default {
         .listen('.workflow.deleted', (event) => {
           this.deleteWorkflow(event.workflow)
           this.$VueEvent.fire('workflow_deleted', event.workflow)
+        })
+        .listen('.export-events', (event) => {
+          window.VueEvent.fire('export_event_updates', event)
+        })
+        .listen('.export.created', (event) => {
+          window.VueEvent.fire('export_event_create', event)
+        })
+        .listen('.export.updated', (event) => {
+          window.VueEvent.fire('export_event_update', event)
+        })
+        .listen('.export.deleted', (event) => {
+          window.VueEvent.fire('export_event_delete', event)
         })
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event

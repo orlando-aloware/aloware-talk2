@@ -53,7 +53,7 @@ export default {
     }
   },
   methods: {
-    clicked (value, enabled = true) {
+    clicked (value, enabled = undefined) {
       console.log('enabled :>> ', enabled)
       if (enabled) {
         this.id = value.id
