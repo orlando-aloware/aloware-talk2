@@ -379,6 +379,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { MISSED_CALL_BEHAVIOR_NOTHING, MISSED_CALL_BEHAVIOR_VOICEMAIL } from 'src/constants/missed-call-behavior'
 import ExtensionSelector from 'components/generic-selectors/extension-selector'
 import MessageTemplates from 'components/message-composer/options/message-templates'
@@ -418,7 +419,7 @@ export default {
   },
 
   computed: {
-    ...mapState('settings', ['userClone']),
+    ...mapState('settings', ['userClone', 'changedUserProperties']),
     baseUrl () {
       return window.axios.defaults.baseURL
     },
@@ -549,10 +550,9 @@ export default {
 
       if (prop === 'operating_hours') {
         const key = Object.keys(value)[0]
-        this.user['operating_hours'][key] = value[key]
         this.updateChangedUserProperties({
-          name: 'operating_hours',
-          value: this.user[prop]
+          name: 'operating_hours.' + key,
+          value: value[key]
         })
       }
 
@@ -564,7 +564,7 @@ export default {
         })
       }
 
-      if (prop === 'disableGeoRouting' && value) {
+      if (prop === 'disableGeoRouting') {
         if ([null, 'US'].includes(this.user.country)) {
           this.user.operating_states_limit.us = []
           this.updateChangedUserProperties({
@@ -625,6 +625,13 @@ export default {
       }
 
       this.updateFormValidity()
+    },
+    resetDisableGeoRouting (value) {
+      // If the form is saved without operating_states_limits for any country, return to disabled
+      let country = (this.user.country || 'us').toLowerCase()
+      if (_.get(value, 'operating_states_limit.' + country, []).length === 0) {
+        this.disableGeoRouting = true
+      }
     }
   },
 
@@ -641,6 +648,15 @@ export default {
     },
     'user.missed_calls_settings.missed_call_handling_mode': function (value) {
       this.missedCallHandlingMode = value
+    },
+    'userClone': function (value) {
+      this.resetDisableGeoRouting(value)
+    },
+    'changedUserProperties': function (value) {
+      // Reset disable geoRouting if changes are cancelled
+      if (value.length === 0) {
+        this.resetDisableGeoRouting(this.userClone)
+      }
     }
   },
 

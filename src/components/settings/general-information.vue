@@ -43,12 +43,19 @@
 
             <ul class="list inset mb-0 ring-group-list"
                 v-if="profile.ring_group_ids && profile.ring_group_ids.length > 0">
-              <li v-for="ringGroupId in profile.ring_group_ids"
+              <li class="pb-0"
                   :key="ringGroupId"
-                  class="pb-0">
-                  <span class="text-grey-90 _400 fs-12">
+                  v-for="ringGroupId in profile.ring_group_ids"
+                  >
+                  <span class="text-grey-90 _400 fs-12"
+                      v-if="ringGroups.length > 0">
                       {{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}
                   </span>
+                  <q-skeleton
+                      type="text"
+                      animation="fade"
+                      height="20px"
+                      v-else />
               </li>
             </ul>
 
@@ -201,7 +208,7 @@ export default {
     getRingGroupName (id) {
       const ringGroup = this.getRingGroup(id)
 
-      return this.$options.filters.fixName(ringGroup ? ringGroup.name : null)
+      return ringGroup ? this.$options.filters.fixName(ringGroup.name) : null
     }
   }
 }

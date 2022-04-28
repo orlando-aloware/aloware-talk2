@@ -11107,6 +11107,7 @@ h1.contact-list-name-label {
     }
     &__main button.close-button,
     &__years-content button,
+    &__months-item button,
     &__view .q-date__navigation .relative-position button {
       .q-btn__wrapper {
         padding-top: 0;
@@ -11134,6 +11135,7 @@ h1.contact-list-name-label {
       }
     }
     &__years-content button,
+    &__months-item button,
     &__view .q-date__navigation .relative-position button {
       padding-left: 4px;
       padding-right: 4px;

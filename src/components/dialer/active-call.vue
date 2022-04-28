@@ -20,12 +20,9 @@
           <span>{{ phoneStatus }}</span>
         </template>
         <template v-else>
-          <span v-if="dialer.communication">{{ dialer.communication.lead_number | fixPhone }}</span>
-          <span v-else-if="dialer.currentNumber">{{ dialerCurrentNumber | fixPhone }}</span>
-          <span v-else-if="dialer.parkedCall">{{ dialer.parkedCall.lead_number | fixPhone }}</span>
-          <span v-else-if="dialer.call">{{ dialer.call.from | fixPhone }}</span>
+          <span>{{ activeCallPhoneNumber }}</span>
           <span class="ml-1 mr-1"
-                v-if="dialer.timer || dialer.wrapUpTimer">
+                v-if="activeCallPhoneNumber && (dialer.timer || dialer.wrapUpTimer)">
             ·
           </span>
           <span v-if="dialer.timer">{{ dialer.timer }}</span>
@@ -109,6 +106,25 @@ export default {
       }
 
       return number
+    },
+    activeCallPhoneNumber () {
+      if (this.dialer.communication) {
+        return this.$options.filters.fixPhone(this.dialer.communication.lead_number)
+      }
+
+      if (this.dialer.currentNumber) {
+        return this.$options.filters.fixPhone(this.dialerCurrentNumber)
+      }
+
+      if (this.dialer.parkedCall) {
+        return this.$options.filters.fixPhone(this.dialer.parkedCall.lead_number)
+      }
+
+      if (this.dialer.call) {
+        return this.$options.filters.fixPhone(this.dialer.call.from)
+      }
+
+      return ''
     }
   },
 
