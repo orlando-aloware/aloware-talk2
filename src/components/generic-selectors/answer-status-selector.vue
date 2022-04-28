@@ -90,15 +90,6 @@ export default {
       }
     },
     optionsArray () {
-      if (this.$route.params.channel === 'messages') {
-        return [
-          { value: 'all', label: 'All' },
-          { value: 'answered', label: 'Completed' },
-          { value: 'in-progress', label: 'In Progress' },
-          { value: 'failed', label: 'Failed' }
-        ]
-      }
-
       return [
         { value: 'all', label: 'All' },
         { value: 'live', label: 'Live' },
