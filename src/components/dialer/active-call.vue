@@ -99,10 +99,13 @@ export default {
       }
     },
     dialerCurrentNumber () {
-      if (this.dialer.currentNumber.includes('power_dialer')) {
-        return this.activeTask.phone_number
+      const number = this.dialer.currentNumber.includes('power_dialer') ? this.activeTask.phone_number : this.dialer.currentNumber
+
+      if (/unhold:|call:|hs:/.test(number)) {
+        return ''
       }
-      return this.dialer.currentNumber
+
+      return number
     },
     activeCallPhoneNumber () {
       if (this.dialer.communication) {
