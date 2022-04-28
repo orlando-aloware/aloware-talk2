@@ -393,17 +393,6 @@ export default {
     onItemRemoved (contact) {
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
       this.setContacts(filteredContacts)
-      const nextContact = filteredContacts.length > 0 ? filteredContacts[0] : null
-      if (!_.isEmpty(this.selectedContact) && nextContact) {
-        this.$emit('itemSelected', {
-          name: 'Inbox Contact Task',
-          params: {
-            id: nextContact.id.toString(),
-            channel: 'inbox',
-            status: nextContact.task_status ? this.$options.filters.fixTaskStatusName(nextContact.task_status).toLowerCase() : 'all'
-          }
-        })
-      }
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)

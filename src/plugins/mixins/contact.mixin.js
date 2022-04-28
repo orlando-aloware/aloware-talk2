@@ -153,7 +153,14 @@ export default {
           communications.data = this.communicationsAndAudits.filter(communication => communication.type === this.type)
         }
       }
-      return communications.data
+      return communications.data.reduce((acc, current) => {
+        const x = acc.find(item => item.id === current.id)
+        if (!x) {
+          return acc.concat([current])
+        } else {
+          return acc
+        }
+      }, [])
     },
 
     contactCampaignsFromCommunications () {
@@ -285,7 +292,7 @@ export default {
   },
 
   methods: {
-    addNewCommunication (data) {
+    addNewCommunication: _.debounce(function (data) {
       if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
         return false
       }
@@ -305,7 +312,7 @@ export default {
           this.scrollMessages()
         }
       }
-    },
+    }, 500),
 
     updateCommunication (data) {
       // checks if contact is the same in communication

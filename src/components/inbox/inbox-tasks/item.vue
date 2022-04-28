@@ -74,7 +74,7 @@
          class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="hasRelativeTime">
+            v-if="hasRelativeTime && !isLive">
 
         <task-item-time :key="taskItemKey"
                         :from-time="lastEngagement"
