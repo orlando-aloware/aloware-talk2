@@ -75,16 +75,11 @@ export default {
       type: String,
       required: false,
       default: 'l'
-    },
-    noDefaultDate: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   data () {
     return {
-      date: this.noDefaultDate ? '' : window.moment()
+      date: window.moment()
     }
   },
   methods: {
