@@ -564,7 +564,7 @@ export default {
         })
       }
 
-      if (prop === 'disableGeoRouting' && value) {
+      if (prop === 'disableGeoRouting') {
         if ([null, 'US'].includes(this.user.country)) {
           this.user.operating_states_limit.us = []
           this.updateChangedUserProperties({
