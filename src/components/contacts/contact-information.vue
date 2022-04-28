@@ -100,30 +100,49 @@
         </q-timezone-selector>
       </div>
 
-      <div class="d-block"
-           @mouseleave="dateOfBirthMouseLeave">
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Date of Birth</p>
-        <label class="w-100 position-relative date-of-birth-field"
-               @mouseenter="dateOfBirthMouseEnter">
-          <date-selector formatted="YYYY-MM-DD"
-                         :class="{ 'contact-info-editable': isEditableBirthDate }"
-                         :noDefaultDate="true"
-                         v-if="isEditableBirthDate"
-                         v-model="contact.date_of_birth"
-                         @dateSelected="onDateOfBirthSelected">
-          </date-selector>
-          <pencil-o-icon v-if="isEditableBirthDate && !contact.date_of_birth"
-                         color="#256EFF"
-                         class="edit-icon cursor-pointer text-size-rg position-absolute">
-          </pencil-o-icon>
-          <span class="d-block mb-1"
-               v-if="!isEditableBirthDate">{{ !contact.date_of_birth ? '&nbsp;' : contact.date_of_birth }}
-          </span>
+        <label class="w-100 position-relative date-of-birth-field">
+          <q-input class="inline-input contact-info-editable"
+                   mask="####-##-##"
+                   :disabled="!hasPermissionTo('update contact')"
+                   v-model="contact.date_of_birth"
+                   @input="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
+            <template v-slot:append>
+              <b-button variant="info"
+                        class="q-field__focusable-action bg-transparent border-0"
+                        id="popover-button-sync">
+                <q-icon name="event" />
+              </b-button>
+              <b-popover :show.sync="showDatePicker"
+                         target="popover-button-sync"
+                         placement="bottom"
+                         triggers="focus">
+                <div class="contact-info-popover">
+                  <q-date minimal
+                          mask="YYYY-MM-DD"
+                          v-model="contact.date_of_birth"
+                          @input="onDateOfBirthSelected">
+                    <div class="row items-center justify-end">
+                      <q-btn color="primary"
+                             class="close-button"
+                             no-caps
+                             dense
+                             @click="showDatePicker = false">
+                        <div class="px-1">
+                          Close
+                        </div>
+                      </q-btn>
+                    </div>
+                  </q-date>
+                </div>
+              </b-popover>
+            </template>
+          </q-input>
         </label>
       </div>
 
-      <div class="d-block"
-           @mouseenter="clearMouseEnter">
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
@@ -184,8 +203,6 @@ import ContactInputField from 'src/components/contacts/contact-input-field'
 import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
-import DateSelector from 'components/date-selector'
-import PencilOIcon from 'components/icons/pencil-o-icon'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -197,8 +214,6 @@ export default {
     }
   },
   components: {
-    PencilOIcon,
-    DateSelector,
     QTimezoneSelector,
     ContactDispositionSelector,
     UserSelector,
@@ -234,7 +249,7 @@ export default {
   data () {
     return {
       isExpanded: false,
-      isEditableBirthDate: false,
+      showDatePicker: false,
       attributes: []
     }
   },
@@ -316,21 +331,9 @@ export default {
       const temp = Math.floor(duration[field]())
       return `${temp} ${temp > 1 ? field : singular}`
     },
-    dateOfBirthMouseEnter () {
-      if (this.hasPermissionTo('update contact')) {
-        this.isEditableBirthDate = true
-      }
-    },
-    dateOfBirthMouseLeave () {
-      if (this.hasPermissionTo('update contact')) {
-        this.isEditableBirthDate = false
-      }
-    },
-    clearMouseEnter () {
-      this.isEditableBirthDate = false
-    },
     onDateOfBirthSelected (value) {
       this.onUpdateFields(window.moment(value).format('YYYY-MM-DD'), 'date_of_birth')
+      this.showDatePicker = false
     }
   }
 }
