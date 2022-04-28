@@ -63,6 +63,7 @@
                 </div>
               </q-item-section>
             </template>
+
             <q-card
               :disabled="filterDisabled[key]"
               class="t-cards">
@@ -77,12 +78,21 @@
                     :class="{ active: itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }"
                     class="t-expansion-panel px-2">
                     <div class="py-2">
-                      <q-avatar size="30px" color="grey">
+                      <q-avatar
+                        v-if="avatarName(itm.first_name, itm.last_name)"
+                        size="30px"
+                        color="grey">
                         {{ avatarName(itm.first_name, itm.last_name) }}
+                      </q-avatar>
+                      <q-avatar
+                        v-else
+                        size="30px"
+                        color="grey">
+                        <i class="fa fa-user" aria-hidden="true"></i>
                       </q-avatar>
                     </div>
                     <q-item-section class="pl-2">
-                      <q-item-label>{{ itm.first_name }} {{ itm.last_name }}</q-item-label>
+                      <q-item-label>{{ fetchName(itm) }}</q-item-label>
                       <q-item-label caption lines="2">{{ itm.phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
                       <q-item-label caption lines="2">{{ itm.company_name }}</q-item-label>
                     </q-item-section>
@@ -102,9 +112,11 @@
                       variant="white"
                       ref="dropdown"
                       class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top">
+
                       <template #button-content>
                         <i class="fa fa-ellipsis-h"></i>
                       </template>
+
                       <template>
                         <b-dropdown-item
                           v-if="key === 'in_queue'"
@@ -142,7 +154,9 @@
                           Remove from List
                         </b-dropdown-item>
                       </template>
+
                     </b-dropdown>
+
                     <div
                       v-if="key === 'in_queue'"
                       class="dropdown t-btn-floater t-btn-floater__bottom"
@@ -374,6 +388,11 @@ export default {
       return data.length || 0
     },
     avatarName (fname, lname) {
+      console.log('fname :>> ', fname)
+      console.log('lname :>> ', lname)
+      if (!fname && !lname) {
+        return false
+      }
       return `${fname?.[0]}${lname?.[0]}`
     },
     onOver () {
@@ -421,6 +440,12 @@ export default {
         default:
           return group.length < this.totalAll
       }
+    },
+    fetchName (item) {
+      if ((item.first_name === null || item.first_name === '') && (item.last_name === null || item.last_name === '')) {
+        return `No Name`
+      }
+      return `${item?.first_name || ''} ${item?.last_name || ''}`
     }
   },
   data () {
