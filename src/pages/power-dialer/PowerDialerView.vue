@@ -548,6 +548,7 @@ export default {
       return value
     }
   },
+  // https://app.alodev.org/download/export-867b9478-ea8c-482e-93bf-5097298f1dbd
   async mounted () {
     this.removeListClose()
     await this.myQueueList()
@@ -556,6 +557,24 @@ export default {
 
     this.$VueEvent.listen('export_event_updates', (task) => {
       console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
+    })
+
+    this.$VueEvent.listen('export_event_create', (task) => {
+      console.log(' %c EXPORT EVENT CREATE : ', 'background: green; color: #000;', task)
+    })
+
+    this.$VueEvent.listen('export_event_update', (task) => {
+      console.log(' %c EXPORT EVENT UPDATE : ', 'background: green; color: #000;', task)
+      this.$generalNotification(
+        `Your export is now available. You can now download the file <b><a href="https://app.alodev.org/download/${task.export.uuid}">here</a></b>.`,
+        'success',
+        0,
+        true
+      )
+    })
+
+    this.$VueEvent.listen('export_event_delete', (task) => {
+      console.log(' %c EXPORT EVENT DELETE : ', 'background: green; color: #000;', task)
     })
   },
   computed: {
@@ -767,6 +786,9 @@ export default {
     async exportAsCsv () {
       let response = await this.exportCsv(this.selectedList.id)
       console.log('CSV response :>> ', response)
+      if (response.status === 200) {
+        this.$generalNotification(response.data.message, 'success')
+      }
     },
     async beginDial () {
       // this.setContact(this.contact)
