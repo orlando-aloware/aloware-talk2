@@ -11117,13 +11117,20 @@ h1.contact-list-name-label {
     &__content {
       min-height: unset;
     }
-    &__years-content {
-      justify-content: space-between;
-      padding-top: 10px;
-      padding-left: 0;
-      padding-right: 0;
-      button {
-        margin-bottom: 4px;
+    &__years {
+      &-content {
+        justify-content: space-between;
+        padding-top: 10px;
+        padding-left: 0;
+        padding-right: 0;
+        button {
+          margin-bottom: 4px;
+        }
+      }
+      &-item {
+        button {
+          width: 45px;
+        }
       }
     }
     &__years-content button,
