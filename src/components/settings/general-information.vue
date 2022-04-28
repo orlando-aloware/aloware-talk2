@@ -43,9 +43,10 @@
 
             <ul class="list inset mb-0 ring-group-list"
                 v-if="profile.ring_group_ids && profile.ring_group_ids.length > 0">
-              <li v-for="ringGroupId in profile.ring_group_ids"
+              <li class="pb-0"
                   :key="ringGroupId"
-                  class="pb-0">
+                  v-for="ringGroupId in profile.ring_group_ids"
+                  >
                   <span class="text-grey-90 _400 fs-12"
                       v-if="ringGroups.length > 0">
                       {{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}
