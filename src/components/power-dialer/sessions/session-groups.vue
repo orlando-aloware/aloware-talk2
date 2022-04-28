@@ -388,8 +388,6 @@ export default {
       return data.length || 0
     },
     avatarName (fname, lname) {
-      console.log('fname :>> ', fname)
-      console.log('lname :>> ', lname)
       if (!fname && !lname) {
         return false
       }
