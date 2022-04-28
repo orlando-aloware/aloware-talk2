@@ -112,14 +112,14 @@
           </div>
 
       </div>
-      <q-input ref="smsMessageBody"
-               class="q-input-composer"
+      <q-input class="q-input-composer"
+               borderless
+               autogrow
+               ref="smsMessageBody"
                input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
                type="textarea"
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
-               borderless
-               autogrow
                @keydown="onKeyDown">
       </q-input>
     </div>
