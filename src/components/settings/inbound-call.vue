@@ -419,7 +419,7 @@ export default {
   },
 
   computed: {
-    ...mapState('settings', ['userClone']),
+    ...mapState('settings', ['userClone', 'changedUserProperties']),
     baseUrl () {
       return window.axios.defaults.baseURL
     },
@@ -626,6 +626,13 @@ export default {
       }
 
       this.updateFormValidity()
+    },
+    resetDisableGeoRouting (value) {
+      // If the form is saved without operating_states_limits for any country, return to disabled
+      let country = (this.user.country || 'us').toLowerCase()
+      if (_.get(value, 'operating_states_limit.' + country, []).length === 0) {
+        this.disableGeoRouting = true
+      }
     }
   },
 
@@ -644,10 +651,12 @@ export default {
       this.missedCallHandlingMode = value
     },
     'userClone': function (value) {
-      // If the form is saved without operating_states_limits for any country, return to disabled
-      let country = (this.user.country || 'us').toLowerCase()
-      if (_.get(value, 'operating_states_limit.' + country, []).length === 0) {
-        this.disableGeoRouting = true
+      this.resetDisableGeoRouting(value)
+    },
+    'changedUserProperties': function (value) {
+      // Reset disable geoRouting if changes are cancelled
+      if (value.length === 0) {
+        this.resetDisableGeoRouting(this.userClone)
       }
     }
   },
