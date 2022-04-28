@@ -4,7 +4,6 @@
     flat
     class="p-0">
     <q-card-section class="px-0" style="overflow:auto;">
-      <!-- https://app.alodev.org/api/v1/communication/69352/scripts -->
 
       <ScriptSelector
         v-model="scriptId"
@@ -89,7 +88,9 @@ export default {
   },
   watch: {
     async activeTask (value) {
-      await this.changeScript()
+      if (value.id) {
+        await this.changeScript()
+      }
     }
   }
 }

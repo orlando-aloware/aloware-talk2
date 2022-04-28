@@ -11107,6 +11107,7 @@ h1.contact-list-name-label {
     }
     &__main button.close-button,
     &__years-content button,
+    &__months-item button,
     &__view .q-date__navigation .relative-position button {
       .q-btn__wrapper {
         padding-top: 0;
@@ -11117,16 +11118,24 @@ h1.contact-list-name-label {
     &__content {
       min-height: unset;
     }
-    &__years-content {
-      justify-content: space-between;
-      padding-top: 10px;
-      padding-left: 0;
-      padding-right: 0;
-      button {
-        margin-bottom: 4px;
+    &__years {
+      &-content {
+        justify-content: space-between;
+        padding-top: 10px;
+        padding-left: 0;
+        padding-right: 0;
+        button {
+          margin-bottom: 4px;
+        }
+      }
+      &-item {
+        button {
+          width: 45px;
+        }
       }
     }
     &__years-content button,
+    &__months-item button,
     &__view .q-date__navigation .relative-position button {
       padding-left: 4px;
       padding-right: 4px;

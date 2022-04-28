@@ -548,6 +548,7 @@ export default {
       return value
     }
   },
+
   async mounted () {
     this.removeListClose()
     await this.myQueueList()
@@ -556,6 +557,24 @@ export default {
 
     this.$VueEvent.listen('export_event_updates', (task) => {
       console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
+    })
+
+    this.$VueEvent.listen('export_event_create', (task) => {
+      this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
+    })
+
+    this.$VueEvent.listen('export_event_update', (task) => {
+      console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
+      this.$generalNotification(
+        `Your export is now available. You can now download the file <b><a href="https://app.alodev.org/download/${task.export.uuid}" download>here</a></b>.`,
+        'success',
+        0,
+        true
+      )
+    })
+
+    this.$VueEvent.listen('export_event_delete', (task) => {
+      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
     })
   },
   computed: {
@@ -766,7 +785,9 @@ export default {
     },
     async exportAsCsv () {
       let response = await this.exportCsv(this.selectedList.id)
-      console.log('CSV response :>> ', response)
+      if (response.status === 200) {
+        this.$generalNotification('CSV export request has been sent!', 'success')
+      }
     },
     async beginDial () {
       // this.setContact(this.contact)
@@ -843,8 +864,6 @@ export default {
       }
     },
     onContactCreated (contact) {
-      // https://app.alodev.org/api/v2/power-dialer-list-items
-      // contact_ids contact_list_id
       let params = {
         contact_ids: [contact.id]
       }
