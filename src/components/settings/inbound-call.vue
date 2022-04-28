@@ -379,6 +379,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { MISSED_CALL_BEHAVIOR_NOTHING, MISSED_CALL_BEHAVIOR_VOICEMAIL } from 'src/constants/missed-call-behavior'
 import ExtensionSelector from 'components/generic-selectors/extension-selector'
 import MessageTemplates from 'components/message-composer/options/message-templates'
@@ -641,6 +642,13 @@ export default {
     },
     'user.missed_calls_settings.missed_call_handling_mode': function (value) {
       this.missedCallHandlingMode = value
+    },
+    'userClone': function (value) {
+      // If the form is saved without operating_states_limits for any country, return to disabled
+      let country = (this.user.country || 'us').toLowerCase()
+      if (_.get(value, 'operating_states_limit.' + country, []).length === 0) {
+        this.disableGeoRouting = true
+      }
     }
   },
 
