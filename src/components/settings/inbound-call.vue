@@ -550,10 +550,9 @@ export default {
 
       if (prop === 'operating_hours') {
         const key = Object.keys(value)[0]
-        this.user['operating_hours'][key] = value[key]
         this.updateChangedUserProperties({
-          name: 'operating_hours',
-          value: this.user[prop]
+          name: 'operating_hours.' + key,
+          value: value[key]
         })
       }
 
