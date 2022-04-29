@@ -341,6 +341,10 @@ export default {
       const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const item in useFilter) {
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item)) {
+          this.filter[item] = +useFilter[item]
+          continue
+        }
         this.filter[item] = useFilter[item]
       }
     },
