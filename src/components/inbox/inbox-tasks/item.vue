@@ -75,7 +75,6 @@
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="hasRelativeTime && !isLive">
-
         <task-item-time :key="taskItemKey"
                         :from-time="lastEngagement"
                         :update-interval="6000">

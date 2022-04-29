@@ -75,8 +75,10 @@
     <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
-            v-if="(communication.type === CommunicationTypes.CALL && communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) || communication.type !== CommunicationTypes.CALL">
-        <task-item-time :from-time="communication.created_at" :update-interval="6000"></task-item-time>
+            v-if="communication.created_at">
+        <task-item-time :from-time="communication.created_at"
+                        :update-interval="6000">
+        </task-item-time>
       </span>
       <div v-if="isLiveCall">
         <!-- Incoming Call-->

@@ -37,7 +37,9 @@
     <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
             role="button">
-        <task-item-time :from-time="mention.created_at" :update-interval="6000"></task-item-time>
+        <task-item-time :from-time="mention.created_at"
+                        :update-interval="6000">
+        </task-item-time>
       </span>
     </div>
   </div>
