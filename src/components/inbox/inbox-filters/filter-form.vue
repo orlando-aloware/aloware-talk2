@@ -236,6 +236,21 @@
               </b-form-group>
             </b-col>
 
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
+                <span class="form-label">Creator Type</span>
+                <div>
+                  <creator-type-selector v-model="filter.creator_type"
+                                        custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                                        :highlighted="isChanged('creator_type')"
+                                        :use-input="false"
+                                        @select="(eventPayload) => onFilterChange(eventPayload, 'creator_type')">
+                </creator-type-selector>
+                </div>
+              </b-form-group>
+            </b-col>
+
           </b-form-row>
         </div>
 
@@ -353,6 +368,7 @@ import IncomingNumberSelector from 'components/generic-selectors/incoming-number
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
+import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
 import { mapActions, mapState } from 'vuex'
 
 import DateRangePicker from 'vue2-daterange-picker'
@@ -377,7 +393,8 @@ export default {
     TagSelector,
     CallbackStatusSelector,
     BroadcastSelector,
-    DateRangePicker
+    DateRangePicker,
+    CreatorTypeSelector
   },
 
   props: {
@@ -445,6 +462,7 @@ export default {
     ...mapActions('inbox', ['updateChannelChangedFilterFields']),
     onFilterChange (value, prop) {
       this.filter[prop] = value
+      console.log(this.filter)
     },
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])

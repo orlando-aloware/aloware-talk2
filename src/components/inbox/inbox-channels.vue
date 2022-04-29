@@ -350,7 +350,8 @@ export default {
             contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
             from_date: Filters.DEFAULT_STATE.filter.from_date,
             to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+            creator_type: Filters.DEFAULT_STATE.filter.creator_type
           }
       }
 
