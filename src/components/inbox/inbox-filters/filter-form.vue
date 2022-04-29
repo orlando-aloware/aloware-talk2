@@ -462,7 +462,6 @@ export default {
     ...mapActions('inbox', ['updateChannelChangedFilterFields']),
     onFilterChange (value, prop) {
       this.filter[prop] = value
-      console.log(this.filter)
     },
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
