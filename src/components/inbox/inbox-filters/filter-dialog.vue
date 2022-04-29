@@ -72,11 +72,11 @@
       </div>
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <div class="w-100 text-center"
+          <div class="w-100 text-left"
                v-if="enableSidebarAndSaveFx">
             <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
           </div>
-          <div class="w-100">
+          <div class="w-100" v-if="!enableSidebarAndSaveFx">
             <span class="filter-type-description">{{ channelFilterName }} Filters</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
@@ -160,7 +160,14 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['channelChangedFilterFields', 'selectedFilter', 'isFilterDialogShown', 'channelClonedFilter', 'isFilterModelFormShown']),
+    ...mapState('inbox', [
+      'channelChangedFilterFields',
+      'selectedFilter',
+      'isFilterDialogShown',
+      'channelClonedFilter',
+      'isFilterModelFormShown',
+      'appliedFilter'
+    ]),
     isOpen: {
       get () {
         return this.isFilterDialogShown
@@ -312,6 +319,11 @@ export default {
 
     onShown () {
       this.refreshTagSelector()
+      if (!this.appliedFilter) {
+        this.setSelectedFilter(null)
+        this.filter = { ...this.defaultFilterModel.filter }
+        this.applyFilter()
+      }
     },
 
     refreshTagSelector () {
