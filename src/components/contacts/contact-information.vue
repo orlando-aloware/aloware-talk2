@@ -102,44 +102,14 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Date of Birth</p>
-        <label class="w-100 position-relative date-of-birth-field">
-          <q-input class="inline-input contact-info-editable"
-                   mask="####-##-##"
-                   :disabled="!hasPermissionTo('update contact')"
-                   v-model="contact.date_of_birth"
-                   @input="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
-            <template v-slot:append>
-              <b-button variant="info"
-                        class="q-field__focusable-action bg-transparent border-0"
-                        id="popover-button-sync">
-                <q-icon name="event" />
-              </b-button>
-              <b-popover :show.sync="showDatePicker"
-                         target="popover-button-sync"
-                         placement="bottom"
-                         triggers="focus">
-                <div class="contact-info-popover">
-                  <q-date minimal
-                          mask="YYYY-MM-DD"
-                          v-model="contact.date_of_birth"
-                          @input="onDateOfBirthSelected">
-                    <div class="row items-center justify-end">
-                      <q-btn color="primary"
-                             class="close-button"
-                             no-caps
-                             dense
-                             @click="showDatePicker = false">
-                        <div class="px-1">
-                          Close
-                        </div>
-                      </q-btn>
-                    </div>
-                  </q-date>
-                </div>
-              </b-popover>
-            </template>
-          </q-input>
-        </label>
+        <date-picker-selector v-model="contact.date_of_birth"
+                              wrapperClass="date-of-birth-field"
+                              contentClass="inline-input contact-info-editable"
+                              popoverClass="contact-info-popover"
+                              popoverId="popover-date-picker-sync"
+                              :canEdit="hasPermissionTo('update contact')"
+                              @change="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
+        </date-picker-selector>
       </div>
 
       <div class="d-block">
@@ -203,6 +173,7 @@ import ContactInputField from 'src/components/contacts/contact-input-field'
 import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
+import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -214,6 +185,7 @@ export default {
     }
   },
   components: {
+    DatePickerSelector,
     QTimezoneSelector,
     ContactDispositionSelector,
     UserSelector,
@@ -249,7 +221,6 @@ export default {
   data () {
     return {
       isExpanded: false,
-      showDatePicker: false,
       attributes: []
     }
   },
@@ -330,10 +301,6 @@ export default {
     computeAndHumanize (duration, field, singular) {
       const temp = Math.floor(duration[field]())
       return `${temp} ${temp > 1 ? field : singular}`
-    },
-    onDateOfBirthSelected (value) {
-      this.onUpdateFields(window.moment(value).format('YYYY-MM-DD'), 'date_of_birth')
-      this.showDatePicker = false
     }
   }
 }

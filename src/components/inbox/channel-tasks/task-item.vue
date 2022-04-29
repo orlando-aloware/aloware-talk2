@@ -74,8 +74,7 @@
     </div>
     <div class="actions text-right pb-1">
       <span class="time-passed text-grey-90 mr-2"
-            role="button"
-            v-if="communication.created_at">
+            role="button">
         <task-item-time :from-time="communication.created_at"
                         :update-interval="6000">
         </task-item-time>
