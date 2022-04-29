@@ -4,13 +4,15 @@
       <div class="items">
         <span>{{ getSelectedCount }} selected</span>
       </div>
-      <div class="items">
+      <div class="items"
+           v-if="false">
         <a href="#" disabled>
           <i class="fa fa-layer-group"></i>
           Enroll in Sequence
         </a>
       </div>
-      <div class="items">
+      <div class="items"
+           v-if="false">
         <a href="#" disabled>
           <i class="fa fa-crosshairs"></i>
           Power Dialer

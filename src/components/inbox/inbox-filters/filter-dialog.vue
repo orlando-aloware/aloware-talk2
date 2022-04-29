@@ -274,7 +274,8 @@ export default {
         'contact_owner',
         'my_contact',
         'from_date',
-        'to_date'
+        'to_date',
+        'creator_type'
       ],
       inputTimeout: null,
       ChannelType

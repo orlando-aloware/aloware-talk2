@@ -236,6 +236,21 @@
               </b-form-group>
             </b-col>
 
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
+                <span class="form-label">Creator Type</span>
+                <div>
+                  <creator-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                                         :highlighted="isChanged('creator_type')"
+                                         :use-input="false"
+                                         v-model="filter.creator_type"
+                                         @select="(eventPayload) => onFilterChange(eventPayload, 'creator_type')">
+                  </creator-type-selector>
+                </div>
+              </b-form-group>
+            </b-col>
+
           </b-form-row>
         </div>
 
@@ -353,6 +368,7 @@ import IncomingNumberSelector from 'components/generic-selectors/incoming-number
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
+import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
 import { mapActions, mapState } from 'vuex'
 
 import DateRangePicker from 'vue2-daterange-picker'
@@ -377,7 +393,8 @@ export default {
     TagSelector,
     CallbackStatusSelector,
     BroadcastSelector,
-    DateRangePicker
+    DateRangePicker,
+    CreatorTypeSelector
   },
 
   props: {
@@ -428,7 +445,8 @@ export default {
         'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
         'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
         'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment().subtract(1, 'day')._d],
-        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d]
+        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
+        'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
       rangePicker: null
     }
