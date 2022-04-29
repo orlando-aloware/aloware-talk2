@@ -241,12 +241,12 @@
               <b-form-group>
                 <span class="form-label">Creator Type</span>
                 <div>
-                  <creator-type-selector v-model="filter.creator_type"
-                                        custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
-                                        :highlighted="isChanged('creator_type')"
-                                        :use-input="false"
-                                        @select="(eventPayload) => onFilterChange(eventPayload, 'creator_type')">
-                </creator-type-selector>
+                  <creator-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                                         :highlighted="isChanged('creator_type')"
+                                         :use-input="false"
+                                         v-model="filter.creator_type"
+                                         @select="(eventPayload) => onFilterChange(eventPayload, 'creator_type')">
+                  </creator-type-selector>
                 </div>
               </b-form-group>
             </b-col>
