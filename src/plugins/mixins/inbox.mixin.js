@@ -54,7 +54,8 @@ export default {
       lineOrRingGroupFilter: null,
       lineOrRingGroupFilteredId: null,
       contacts: [],
-      cancelController: null
+      cancelToken: null,
+      source: null
 
     }
   },
@@ -127,9 +128,9 @@ export default {
       })
     },
     getContactsByTaskStatus (taskId) {
-      this.cancelController.abort()
-      this.cancelController = new AbortController()
-      return talk2Api.V2.contacts.list(this.getParameters(taskId), this.cancelController.signal)
+      this.source.cancel('Loading of contact task operation is canceled by the user.')
+      this.source = this.cancelToken.source()
+      return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
     getContactsCountByTaskStatus (taskId) {
       return talk2Api.V2.contacts.counts(this.getParameters(taskId, true)).then(response => {
@@ -212,6 +213,7 @@ export default {
   },
 
   created () {
-    this.cancelController = new AbortController()
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
   }
 }

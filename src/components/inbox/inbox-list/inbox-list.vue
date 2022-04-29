@@ -22,7 +22,8 @@ export default {
   data () {
     return {
       loading: false,
-      cancelController: null,
+      cancelToken: null,
+      source: null,
       pagination: {
         type: Object,
         required: true
@@ -34,7 +35,8 @@ export default {
   },
 
   created () {
-    this.cancelController = new AbortController()
+    this.cancelToken = this.$axios.CancelToken
+    this.source = this.cancelToken.source()
     this.getContacts()
   },
 
@@ -44,15 +46,15 @@ export default {
         return
       }
 
-      this.cancelController.abort()
+      this.source.cancel('Operation canceled by the user.')
+      this.source = this.cancelToken.source()
       this.loading = true
       this.paginationLoading = true
       const params = this.filter
 
-      this.cancelController = new AbortController()
       return this.$axios.get('/api/v1/contact', {
         params: params,
-        signal: this.cancelController.signal
+        cancelToken: this.source.token
       }).then(res => {
         const contacts = []
         const contact = { data: null }

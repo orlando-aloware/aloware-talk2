@@ -111,7 +111,8 @@ export default {
       },
       activeNames: ['phone_numbers', 'about', 'lines', 'ring-groups'],
       contactId: null,
-      cancelController: null,
+      cancelToken: null,
+      source: null,
       contactActivitiesInterval: null,
       containerElInterval: null,
       scrollInterval: null,
@@ -220,8 +221,9 @@ export default {
   },
 
   created () {
-    this.cancelController = new AbortController()
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
+    this.cancelToken = this.$axios.CancelToken
+    this.source = this.cancelToken.source()
 
     if (this.skipComponents.includes(this.$options.name)) {
       return
@@ -440,7 +442,8 @@ export default {
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
-      this.cancelController.abort()
+      this.source.cancel('fetchContactCommunications operation canceled by the user.')
+      this.source = this.cancelToken.source()
       const lastAuditCreatedAt = { data: null }
       const item = { index: null }
       for (item.index in this.communicationsAndAudits) {
@@ -449,14 +452,13 @@ export default {
           break
         }
       }
-      this.cancelController = new AbortController()
       return this.$axios.get(`/api/v1/contact/${contactId}/communications`, {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
           last_audit_created_at: lastAuditCreatedAt.data
         },
-        signal: this.cancelController.signal
+        cancelToken: this.source.token
       }).then(res => {
         if (res.data.data && res.data.data.length) {
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)
@@ -550,10 +552,11 @@ export default {
     },
 
     resetSelectedContact () {
-      if (!this.cancelController) {
-        this.cancelController = new AbortController()
+      if (!this.cancelToken) {
+        this.cancelToken = this.$axios.CancelToken
       }
 
+      this.source = this.cancelToken.source()
       this.contactId = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null

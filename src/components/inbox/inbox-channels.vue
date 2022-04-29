@@ -419,7 +419,8 @@ export default {
         scope: 'user'
       },
       scrollTimeout: null,
-      cancelController: null
+      cancelToken: null,
+      source: null
     }
   },
 
@@ -726,9 +727,9 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      this.cancelController.abort()
-      this.cancelController = new AbortController()
-      return api.data.get({ params: params, signal: this.cancelController.signal })
+      this.source.cancel('Loading of communication operation is canceled by the user.')
+      this.source = this.cancelToken.source()
+      return api.data.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
@@ -1040,7 +1041,8 @@ export default {
   },
 
   created () {
-    this.cancelController = new AbortController()
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
 
     this.resetFilters()
 
