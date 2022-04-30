@@ -1,5 +1,6 @@
 <template>
-  <q-select :options="options"
+  <q-select ref="templateSelector"
+            :options="options"
             :placeholder="placeholder"
             :disable="disable"
             :class="[ prepend ? 'with-prepend' : '' ]"
@@ -75,7 +76,8 @@ export default {
   data () {
     return {
       selectedId: this.value,
-      options: []
+      options: [],
+      reference: 'templateSelector'
     }
   },
 

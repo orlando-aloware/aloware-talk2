@@ -1,5 +1,6 @@
 <template>
-  <q-select class="padded-container q-basic-selector"
+  <q-select ref="scriptSelector"
+            class="padded-container q-basic-selector"
             options-selected-class="text-primary"
             color="primary"
             option-value="id"
@@ -82,7 +83,8 @@ export default {
       scripts: [],
       options: [],
       loadingScripts: false,
-      textProperty: 'title'
+      textProperty: 'title',
+      reference: 'scriptSelector'
     }
   },
 

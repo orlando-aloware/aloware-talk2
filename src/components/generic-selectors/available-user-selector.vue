@@ -1,5 +1,6 @@
 <template>
-  <q-select use-input
+  <q-select ref="availableUserSelector"
+            use-input
             emit-value
             map-options
             outlined
@@ -111,7 +112,8 @@ export default {
       selectedId: this.value,
       availableUsers: [],
       unavailableUsers: [],
-      userOptions: []
+      userOptions: [],
+      reference: 'availableUserSelector'
     }
   },
 

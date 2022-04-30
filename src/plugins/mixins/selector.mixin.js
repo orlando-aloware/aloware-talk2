@@ -19,24 +19,33 @@ export default {
 
   computed: {
     selectedObject () {
-      const id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, '') : this.selectedId
+      const objectData = { id: null, found: null }
+      objectData.id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, '') : this.selectedId
 
-      if (!_.isEmpty(this.options) && this.compareProperty && id) {
-        return this.options.find(option => option[this.compareProperty] === id)
+      if (!_.isEmpty(this.options) && this.compareProperty && objectData.id) {
+        objectData.found = this.options.find(option => option[this.compareProperty] === objectData.id)
+      }
+
+      if (objectData.found) {
+        return objectData.found
       }
 
       if (this.compareProperty) {
         let data = {}
-        data[this.textProperty] = id
+        data[this.textProperty] = ''
+        data[this.compareProperty] = objectData.id
         return data
       }
 
-      return id
+      return objectData.id
     }
   },
 
   mounted () {
     this.element = this.$el ? this.$el : document
+    if (!this.selectedObject) {
+      this.clearInputValue()
+    }
   },
 
   methods: {
@@ -116,13 +125,23 @@ export default {
       if (this.emitChange) {
         this.$emit(this.emitEvent, val)
       }
+    },
+    toggleInputValue (toggle) {
+      if (this.reference && this.$refs[this.reference]) {
+        // this.selectedId = null
+        const element = this.$refs[this.reference].$el.querySelector('.q-field__control-container .q-field__native span')
+        if (element && typeof element !== 'undefined' && toggle) {
+          element.style.display = 'block'
+        }
+        if (element && typeof element !== 'undefined' && !toggle) {
+          element.style.display = 'none'
+        }
+      }
     }
   },
   watch: {
     selectedObject (value) {
-      if (!value) {
-        this.selectedId = null
-      }
+      this.toggleInputValue(value[this.textProperty])
     }
   }
 }
