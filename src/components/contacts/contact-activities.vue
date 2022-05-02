@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="composer-container-wrapper">
-      <message-composer></message-composer>
+      <message-composer :campaignId="campaignId"></message-composer>
     </div>
   </div>
 </template>

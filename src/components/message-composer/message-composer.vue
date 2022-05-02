@@ -52,7 +52,8 @@
       <div class="phone-lines-right">
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
-          <line-selector @change="onLineChange"></line-selector>
+          <line-selector :campaignId="campaignId"
+                         @change="onLineChange"></line-selector>
         </div>
       </div>
     </div>
@@ -74,6 +75,12 @@ export default {
   name: 'message-composer',
 
   mixins: [contactMixin],
+
+  props: {
+    campaignId: {
+      required: false
+    }
+  },
 
   components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, ContactPhoneNumberSelector, MessageComposerSms },
 
