@@ -6,7 +6,8 @@
         <label class="form-control-label mb-1">
           Send from
         </label>
-        <q-select class="p-1 q-basic-selector w-100"
+        <q-select ref="smsReminders"
+                  class="p-1 q-basic-selector w-100"
                   use-input
                   emit-value
                   map-options
@@ -85,7 +86,8 @@ export default {
       loading: false,
       selectedId: this.campaignId,
       recentShowSendSmsReminderButton: false,
-      options: []
+      options: [],
+      reference: 'smsReminders'
     }
   },
 

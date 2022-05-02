@@ -688,7 +688,9 @@ export default {
     $route (to, from) {
       this.isNavigated = false
 
-      if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) || (from.name === 'Contacts' && to.name === 'Contact')) {
+      if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) ||
+        (from.name === 'Contacts' && to.name === 'Contact') ||
+        (from.name === 'Contact' && to.name === 'Contact')) {
         return
       }
 

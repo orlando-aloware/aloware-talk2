@@ -42,6 +42,7 @@ export const DEFAULT_STATE = {
     mentioned_user_id: [],
     owner_id: [],
     my_contact: 0,
-    contact_owner: []
+    contact_owner: [],
+    creator_type: null
   }
 }

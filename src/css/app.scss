@@ -11092,6 +11092,23 @@ h1.contact-list-name-label {
   .q-icon {
     color: var(--q-color-primary);
   }
+  &.inline-input {
+    .q-field__append.q-field__marginal {
+      button {
+        padding: 0;
+        line-height: 0;
+      }
+    }
+  }
+  &.inline-input:focus-within {
+    .q-field__append.q-field__marginal {
+      opacity: 1 !important;
+      button {
+        padding: 0;
+        line-height: 0;
+      }
+    }
+  }
 }
 
 .contact-info-popover {
@@ -11143,5 +11160,4 @@ h1.contact-list-name-label {
       padding: 0 !important;
     }
   }
-
 }

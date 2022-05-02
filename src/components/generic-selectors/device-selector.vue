@@ -1,5 +1,6 @@
 <template>
-  <q-select :options="options"
+  <q-select ref="device-selector"
+            :options="options"
             v-model="selectedId"
             class="has-margin-top-5 q-basic-selector"
             option-value="id"
@@ -37,7 +38,8 @@ export default {
   data () {
     return {
       selectedId: this.value,
-      emitChange: true
+      emitChange: true,
+      reference: 'device-selector'
     }
   },
   watch: {
