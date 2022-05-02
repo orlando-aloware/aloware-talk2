@@ -374,7 +374,7 @@
                       {{ getObjectKey(contact[column.name], column.name) }}
                     </span>
                     <span v-else>
-                      {{ contact[column.name] | prefetchValue }} ({{column.name}})
+                      {{ contact[column.name] | prefetchValue }}
                     </span>
                   </template>
                 </td>
