@@ -587,8 +587,10 @@ export default {
       }
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        this.reRoute()
-        this.$emit('no-tasks-found')
+        if (this.timerIsOver) {
+          this.reRoute()
+          this.$emit('no-tasks-found')
+        }
       }
       this.TOGGLE_SESSION_LOADER(false)
     },
