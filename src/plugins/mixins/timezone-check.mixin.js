@@ -18,7 +18,6 @@ export default {
           .minute(0)
           .second(0)
         const contactLocalTime = moment().tz(contact.timezone)
-        // eslint-disable-next-line no-constant-condition
         if (!contactLocalTime.isBetween(startDay, endDay)) {
           return this.$bvModal.msgBoxConfirm(
             `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
@@ -26,12 +25,14 @@ export default {
             )} for ${name}.`,
             {
               buttonSize: 'sm',
-              okTitle: 'Yes',
-              cancelTitle: 'No',
+              okTitle: 'OK',
+              cancelTitle: 'Cancel',
               centered: true
             }
-          ).then(() => {
-            makeCall()
+          ).then(confirm => {
+            if (confirm) {
+              makeCall()
+            }
           })
         }
       }
