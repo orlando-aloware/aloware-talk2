@@ -359,7 +359,6 @@ export default {
           window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
         })
         .listen('.user.session_metrics_calculation', (event) => {
-          console.log('event --------- :>> ', event)
           window.VueEvent.fire('metric_sessions_update', event)
         })
         .listen('.bulk_contact_list_items.created', (event) => {
