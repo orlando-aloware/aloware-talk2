@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
 import talk2Api from 'src/plugins/api/api'
 
@@ -53,8 +53,23 @@ export default {
 
   mixins: [contactMixin],
 
+  props: {
+    campaignId: {
+      required: false
+    }
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact']),
+    ...mapState(['campaigns']),
+
+    selectedCampaign () {
+      if (this.campaigns) {
+        return this.campaigns.find(campaign => campaign.id === this.campaignId)
+      }
+
+      return null
+    },
 
     formattedLineOptions () {
       const contactLines = { data: [] }
@@ -169,8 +184,7 @@ export default {
       })
     },
 
-    setDefaultLine (contactId) {
-      this.showContactInfo(contactId)
+    setDefaultLine () {
       this.selectedLine = this.selectedCampaign
       if (this.selectedLine && this.contact.id) {
         this.getIncomingNumber()
@@ -187,6 +201,12 @@ export default {
     },
     'selectedLine': function (value) {
       this.$emit('change', value)
+    },
+    'campaignId': function (value) {
+      if (value && this.contact && this.contact.id) {
+        this.setDefaultLine()
+        this.showPlaceholder()
+      }
     }
   }
 }
