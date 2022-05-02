@@ -11,7 +11,7 @@
         </div>
 
         <q-item-section class="pl-2">
-          <q-item-label>{{ firstname }} {{ lastname }}</q-item-label>
+          <q-item-label>{{ fullname }}</q-item-label>
           <q-item-label caption lines="2">{{ phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
           <q-item-label caption lines="2">{{ company_name }}</q-item-label>
         </q-item-section>
@@ -55,6 +55,13 @@ export default {
       'hasActiveTask'
     ]),
     ...mapState(['dialer']),
+    fullname () {
+      let { activeTask } = this
+      if (!activeTask.first_name && !activeTask.last_name) {
+        return 'No Name'
+      }
+      return `${this.activeTask?.first_name} ${this.activeTask?.last_name}`
+    },
     firstname () {
       return this.activeTask?.first_name
     },
