@@ -36,7 +36,7 @@
           class="btn btn-sm btn-danger mr-2"
           @click="onRemoveFromPdList"
         >
-          Remove Contact from List
+          {{ this.hasMultipleSelection ? 'Remove Contacts from List' : 'Remove Contact from List'}}
         </button>
       </div>
     </div>
@@ -66,7 +66,7 @@ export default {
         return 'Remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return `Remove ${this.selectedContacts[this.listId]?.length} contacts?`
+        return `Remove ${this.selectedContacts[this.listId]?.length} contact${this.hasMultipleSelection ? 's' : ''}?`
       }
       return ''
     },
@@ -75,12 +75,15 @@ export default {
         return 'Are you sure you want to remove ' + (this.contactToRemove.name ? this.contactToRemove.name : 'No Name') + '?'
       }
       if (this.selectedContacts[this.selectedList.id]) {
-        return `Are you sure you want to remove <span>${this.selectedContacts[this.listId]?.length}</span> contact${this.selectedContacts[this.listId]?.length > 1 ? 's' : ''}?`
+        return `Are you sure you want to remove <span>${this.selectedContacts[this.listId]?.length}</span> contact${this.hasMultipleSelection ? 's' : ''}?`
       }
       return ''
     },
     listId () {
       return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+    },
+    hasMultipleSelection () {
+      return this.selectedContacts[this.listId]?.length > 1
     }
   },
   data () {
