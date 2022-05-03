@@ -324,6 +324,7 @@ export default {
 
     selectFilter (filter) {
       this.selectedFilter = filter
+      this.filterSearch = ''
       this.step = 3
 
       this.$nextTick(() => {
