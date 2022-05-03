@@ -3,5 +3,6 @@ export const ALL_RELATIONS = [
   'tags',
   'campaigns',
   'ring_groups',
-  'contact_lists'
+  'contact_lists',
+  'disposition_status'
 ]

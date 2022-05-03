@@ -110,12 +110,15 @@ export default {
 
     onInput (val) {
       const element = this.element.querySelector('.q-basic-selector .q-field__input')
+      const isGenericMultiSelect = _.get(this, 'genericMultiselect', null)
 
-      if (!element) {
+      if (!element && !isGenericMultiSelect) {
         return
       }
 
-      element.blur()
+      if (!isGenericMultiSelect) {
+        element.blur()
+      }
 
       if (this.isCheckEmit && this.emitChange && val) {
         this.$emit(this.emitEvent, this.emitChangeProperty ? val[this.emitChangeProperty] : val)
