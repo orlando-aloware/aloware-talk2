@@ -6,7 +6,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 export default {
 
   computed: {
-    ...mapState('inbox', ['isFetchingContacts', 'contactsCurrentPage']),
+    ...mapState('inbox', ['isFetchingContacts', 'contactsCurrentPage', 'liveContacts']),
     ...mapState('auth', ['profile']),
     nextPage () {
       return this.contactsCurrentPage + 1
@@ -74,12 +74,28 @@ export default {
       'setLoadingPendingTaskCount'
     ]),
     getNoneLiveCallContactTasks (contacts) {
-      return contacts.filter(contact => (contact.last_communication &&
-        ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2)) || !contact.last_communication)
+      if (this.liveContacts.length >= 0) {
+        // get all live contacts id
+        const ids = this.liveContacts.map(item => item.id)
+
+        // sift contacts that are not in live calls
+        // we are getting some duplicate records from the api so we implemented reduce and remove those dupes
+        return contacts.filter(item => !ids.includes(item.id)).reduce((acc, current) => {
+          const x = acc.find(item => item.id === current.id)
+          if (!x) {
+            return acc.concat([current])
+          } else {
+            return acc
+          }
+        }, [])
+      } else {
+        return contacts.filter(contact => (contact.last_communication &&
+          ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2)) || !contact.last_communication)
+      }
     },
     getLiveCallContactTasks (contacts) {
       return contacts.filter(contact => contact.last_communication &&

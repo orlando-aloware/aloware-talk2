@@ -348,6 +348,7 @@ export default {
   data () {
     return {
       taskItemKey: 0,
+      previousRoute: null,
       CommunicationTypes,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
@@ -368,11 +369,18 @@ export default {
     }
   },
   watch: {
+    $route (to, from) {
+      this.previousRoute = from
+    },
+
     isReopened: function () {
       const _this = this
+
+      if (this.isSearch || (this.previousRoute && this.previousRoute.name === 'Inbox')) { return }
+
       setTimeout(function () {
         _this.$emit('onItemRemoved', _this.contact)
-      }, 5000)
+      }, 3000)
     },
     'contact.last_communication.id': function () {
       this.taskItemKey++
