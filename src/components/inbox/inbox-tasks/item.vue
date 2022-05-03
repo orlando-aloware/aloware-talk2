@@ -261,11 +261,15 @@ export default {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
     ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts', 'channelChangedFilterFields']),
     contactName () {
+      if (this.contact && this.contact.name) {
+        return _.get(this.contact, 'name', '')
+      }
+
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
 
-      return this.$options.filters.fixPhone(this.contact.phone_number)
+      return 'No Name'
     },
     contactAvatar () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
