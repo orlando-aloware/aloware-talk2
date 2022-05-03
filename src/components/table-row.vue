@@ -331,6 +331,7 @@
 <script>
 
 import moment from 'moment'
+import { timezoneCheckMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Avatar from 'components/avatar'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
@@ -345,6 +346,9 @@ export default {
     CallOIcon,
     Avatar
   },
+  mixins: [
+    timezoneCheckMixin
+  ],
   props: {
     contact: {
       type: Object,
@@ -464,40 +468,7 @@ export default {
     },
 
     onCall () {
-      // check contact has timezone or not
-      if (this.contact.timezone) {
-        // if have timezone check is it day time?
-        const startDay = moment()
-          .tz(this.contact.timezone)
-          .hour(8)
-          .minute(0)
-          .second(0)
-        const endDay = moment()
-          .tz(this.contact.timezone)
-          .hour(18)
-          .minute(0)
-          .second(0)
-        const contactLocalTime = moment().tz(this.contact.timezone)
-        if (!contactLocalTime.isBetween(startDay, endDay)) {
-          return this.$confirm(
-            `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
-              'hh:mm A'
-            )} for ${this.contact.name}.`,
-            'Call Lead',
-            {
-              confirmButtonText: 'OK',
-              cancelButtonText: 'Cancel',
-              customClass: 'width-500 fixed',
-              type: 'warning'
-            }
-          ).then(() => {
-            this.makeCall()
-          }).catch(() => {
-          })
-        }
-      }
-
-      this.makeCall()
+      this.checkContactTimezone(this.contact, this.makeCall)
     },
 
     makeCall () {

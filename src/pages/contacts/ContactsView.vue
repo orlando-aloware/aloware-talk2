@@ -692,14 +692,15 @@ import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
-import { avatarMixin, contactListCountMixin } from 'src/plugins/mixins'
+import { avatarMixin, contactListCountMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contacts-view',
 
   mixins: [
     avatarMixin,
-    contactListCountMixin
+    contactListCountMixin,
+    timezoneCheckMixin
   ],
 
   inject: [
@@ -1233,40 +1234,7 @@ export default {
       this.$router.push(`/contacts/${contactId}`)
     },
     onCall (contact) {
-      // check contact has timezone or not
-      if (contact.timezone) {
-        // if have timezone check is it day time?
-        const startDay = moment()
-          .tz(contact.timezone)
-          .hour(8)
-          .minute(0)
-          .second(0)
-        const endDay = moment()
-          .tz(contact.timezone)
-          .hour(18)
-          .minute(0)
-          .second(0)
-        const contactLocalTime = moment().tz(contact.timezone)
-        if (!contactLocalTime.isBetween(startDay, endDay)) {
-          return this.$confirm(
-            `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
-              'hh:mm A'
-            )} for ${contact.name}.`,
-            'Call Lead',
-            {
-              confirmButtonText: 'OK',
-              cancelButtonText: 'Cancel',
-              customClass: 'width-500 fixed',
-              type: 'warning'
-            }
-          ).then(() => {
-            this.makeCall(contact)
-          }).catch(() => {
-          })
-        }
-      }
-
-      this.makeCall(contact)
+      this.checkContactTimezone(contact, () => { this.makeCall(contact) })
     },
     makeCall (contact) {
       if (this.profile.enabled_two_legged_outbound) {

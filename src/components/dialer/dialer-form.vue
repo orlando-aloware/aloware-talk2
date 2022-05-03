@@ -41,7 +41,7 @@
                                            v-model="phoneNumber"
                                            ref="callContactPhoneNumberSearch"
                                            @change="changePhoneNumber"
-                                           @keyup.enter.native="makeCall"
+                                           @keyup.enter.native="onCall"
                                            @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
@@ -54,7 +54,7 @@
                    padding="none"
                    rounded
                    flat
-                   @click="makeCall">
+                   @click="onCall">
             </q-btn>
           </div>
 
@@ -189,13 +189,15 @@ import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
 import contactMixin from 'src/plugins/mixins/contact.mixin'
+import timezoneCheckMixin from 'src/plugins/mixins/timezone-check.mixin'
 
 export default {
   name: 'dialer-form',
 
   mixins: [
     parkCallMixins,
-    contactMixin
+    contactMixin,
+    timezoneCheckMixin
   ],
 
   components: {
@@ -405,6 +407,14 @@ export default {
 
     setMode (mode) {
       this.mode = mode
+    },
+
+    onCall () {
+      let contact = {
+        timezone: this.contactTimezone,
+        name: this.contactName
+      }
+      this.checkContactTimezone(contact, this.makeCall)
     },
 
     makeCall () {
