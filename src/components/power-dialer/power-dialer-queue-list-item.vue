@@ -43,9 +43,13 @@ export default {
   },
   computed: {
     ...mapState('powerDialer', [
-      'myQueueListFilters'
+      'myQueueListFilters',
+      'myQueue'
     ]),
     totalInQueued () {
+      if (!this.myQueueListFilters) {
+        return this.myQueue.items.length
+      }
       return this.myQueueListFilters?.total_queued || 0
     }
   },
