@@ -63,8 +63,9 @@ export const DEFAULT_STATE = {
       id: 'new-leads',
       headers: DEFAULT_COLUMNS,
       filters: {
-        is_new_contact: {
-          value: 1
+        contact_task_status: {
+          value: [1],
+          operator: 1
         }
       },
       type: 2,
@@ -74,13 +75,10 @@ export const DEFAULT_STATE = {
     'my-queue': {
       id: 'my-queue',
       headers: DEFAULT_COLUMNS,
-      filters: {
-        is_new_contact: {
-          value: 1
-        }
-      },
-      type: 2,
-      module_type: 1,
+      // remove as per Karl
+      filters: {},
+      type: 1,
+      module_type: 2,
       name: 'My Queue'
     },
     static: {

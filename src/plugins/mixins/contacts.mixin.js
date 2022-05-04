@@ -391,7 +391,7 @@ export default {
       }
 
       if (['new-leads'].includes(this.$route.params.id)) {
-        defaultFilters[0].filters.is_new_contact.default = 1
+        defaultFilters[0].filters.contact_task_status.default = 1
       }
 
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
