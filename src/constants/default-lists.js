@@ -76,8 +76,9 @@ export const DEFAULT_STATE = {
       filters: [
         {
           filters: {
-            is_new_contact: {
-              value: 1,
+            contact_task_status: {
+              value: [1],
+              operator: 1,
               default: 1
             }
           },
