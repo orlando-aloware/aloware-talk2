@@ -7,9 +7,9 @@
     <template
       v-if="Array.isArray(computedResource.tags) && computedResource.tags.length">
       <div
-        :id="`popover-tags-${computedResource.id}`"
+        :id="`popover-tags-${computedResource.contact_list_item_id}`"
         class="d-flex align-items-center computedResource-tags-item"
-        v-if="computedResource.id">
+        v-if="computedResource.contact_list_item_id">
         <span
           :style="`color: ${computedResource.tags[0].color};`">
           <i
@@ -35,8 +35,8 @@
         triggers="hover"
         placement="topright"
         boundary="window"
-        :target="`popover-tags-${computedResource.id}`"
-        v-if="computedResource.id">
+        :target="`popover-tags-${computedResource.contact_list_item_id}`"
+        v-if="computedResource.contact_list_item_id">
         <template #title>
           <div
             class="contact-tags-title">

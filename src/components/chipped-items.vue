@@ -7,7 +7,7 @@
     <template
       v-if="Array.isArray(computedResource) && computedResource.length">
       <div
-        :id="`chippped-popover-tags-${resource.id}-${meta}`"
+        :id="`chippped-popover-tags-${resource.contact_list_item_id}-${meta}`"
         class="d-flex align-items-center computedResource-tags-item"
         v-if="resourceHasContent">
         <span>
@@ -31,8 +31,8 @@
         triggers="hover"
         placement="topright"
         boundary="window"
-        :target="`chippped-popover-tags-${resource.id}-${meta}`"
-        v-if="resource.id && resourceHasMoreThanOneContent">
+        :target="`chippped-popover-tags-${resource.contact_list_item_id}-${meta}`"
+        v-if="resource.contact_list_item_id && resourceHasMoreThanOneContent">
         <template #title>
           <div
             class="contact-tags-title">

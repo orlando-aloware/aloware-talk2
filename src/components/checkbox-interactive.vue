@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     checked () {
-      return this.checkedItems.find(item => item.id === this.resource.id)
+      return this.checkedItems.find(item => item.contact_list_item_id === this.resource.contact_list_item_id)
     }
   },
   data () {
@@ -37,9 +37,9 @@ export default {
   methods: {
     onCheckerClicked () {
       const items = { data: [] }
-      const found = this.checkedItems.find(item => item.id === this.resource.id)
+      const found = this.checkedItems.find(item => item.contact_list_item_id === this.resource.contact_list_item_id)
       if (found) {
-        items.data = this.checkedItems.filter(item => item.id !== this.resource.id)
+        items.data = this.checkedItems.filter(item => item.contact_list_item_id !== this.resource.contact_list_item_id)
       } else {
         items.data = [...this.checkedItems]
         items.data.push(this.resource)
@@ -49,7 +49,7 @@ export default {
   },
   watch: {
     checkedItems (arr) {
-      const found = this.checkedItems.find(item => item.id === this.resource.id)
+      const found = this.checkedItems.find(item => item.contact_list_item_id === this.resource.contact_list_item_id)
       if (found) {
         this.isChecked = true
       } else {
