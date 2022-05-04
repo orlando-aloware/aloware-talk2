@@ -991,7 +991,7 @@ export default {
       if (!communicationIncomingNumber) {
         return null
       }
-      const found = this.campaigns.find(campaign => campaign.id === this.campaignId)
+      const found = this.campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return found.name
       }
