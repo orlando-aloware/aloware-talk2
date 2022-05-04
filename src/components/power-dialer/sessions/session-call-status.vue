@@ -141,9 +141,9 @@
           <b-popover
             target="session-list-name"
             triggers="hover"
-            placement="bottomright">
+            placement="left">
             <template #title>
-              Power Dialer list
+              List name
             </template>
             {{ selectedListName }}
           </b-popover>
