@@ -18,3 +18,10 @@ export const STATUSES = {
   scheduled: 'SCHEDULED',
   all: 'ALL'
 }
+
+export const STATUSES_POSTLOAD = {
+  called: 'CALLED',
+  failed: 'FAILED',
+  scheduled: 'SCHEDULED',
+  all: 'ALL'
+}

@@ -82,6 +82,10 @@ export default {
       return this.selectedList.name.length > 0
     }
   },
+  async created () {
+    await this.fetchCurrentList()
+    await this.fetchTasks(1)
+  },
   async mounted () {
     this.TOGGLE_SESSION_LOADER(true)
     this.resetPowerDialerTasks()
@@ -102,19 +106,25 @@ export default {
       'TOGGLE_SESSION_LOADER'
     ]),
     async fetchTasks (status) {
-      await this.fetchCurrentList()
-      Object.keys(AutoDialTaskStatus.STATUSES).forEach(async stat => {
-        let params = {}
-        let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
-        if (stat === 'all') {
-          params = { id: this.selectedList.id }
-        } else {
-          params = { id: this.selectedList.id, task_status: taskStatus }
-        }
-        let res = await this.getSessionTaskByFilter(params)
-        this.powerDialerTasks[stat] = res.data.data
-        this.powerDialerTaskFilters[stat] = res.data
-      })
+      let res = null
+      if (status) {
+        res = await this.getSessionTaskByFilter({ id: this.selectedList.id, task_status: 1 })
+        this.powerDialerTasks['in_queue'] = res.data.data
+        this.powerDialerTaskFilters['in_queue'] = res.data
+      } else {
+        Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(async stat => {
+          let params = {}
+          let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+          if (stat === 'all') {
+            params = { id: this.selectedList.id }
+          } else {
+            params = { id: this.selectedList.id, task_status: taskStatus }
+          }
+          res = await this.getSessionTaskByFilter(params)
+          this.powerDialerTasks[stat] = res.data.data
+          this.powerDialerTaskFilters[stat] = res.data
+        })
+      }
     },
     async fetchCurrentList () {
       let response = null
