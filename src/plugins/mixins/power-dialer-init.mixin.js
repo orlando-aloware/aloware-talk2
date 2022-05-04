@@ -1,4 +1,4 @@
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 // import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -19,6 +19,9 @@ export default {
     ...mapActions('powerDialer', [
       'setSelectedPDList'
     ]),
+    ...mapMutations('powerDialer', [
+      'SET_MY_QUEUE_LIST'
+    ]),
     async loadList (id) {
       if (!id) {
         id = 'my-queue'
@@ -36,6 +39,7 @@ export default {
         //   ...DEFAULT_LIST_ITEMS
         // })
       }
+      console.log('ROUTE---------- :>> ', route)
       if (route) {
         this.$axios
           .get('/api/v2/power-dialer-lists/' + stringId)
@@ -51,6 +55,9 @@ export default {
             }
             this.setCurrentListFilters(filters)
             this.activeMetrics = response.session_metrics
+            if (this.isMyQueue) {
+              this.SET_MY_QUEUE_LIST(response)
+            }
           })
           .catch((error) => {
             const { message, html } = extractErrorMessage(error)
