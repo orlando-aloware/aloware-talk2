@@ -2,25 +2,16 @@
   <q-card flat :disabled="sessionLoader">
     <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-2 pb-0">
+
         <div class="font-weight-bold pl-3 flex-grow-1">
           <q-chip color="grey-50" class="p-0">
             <div
               :class="`text-15 text-lowercase text-capitalize px-2`"
               v-html="statusDisplayButton">
-              <!-- {{ countdownTimer > 0 ? 'Will call in' : 'Connected: ' }}
-              <span
-                class="text-weight-bold text-grey-7 text-lowercase"
-                v-if="countdownTimer > 0">
-                {{ countdownTimer }}s
-              </span>
-              <span
-                class="text-weight-bold text-grey-7 text-lowercase"
-                v-else>
-                {{ dialer.timer }}
-              </span> -->
             </div>
           </q-chip>
         </div>
+
         <q-btn
           @click="onToggleHold"
           no-wrap no-caps size="sm"
@@ -35,6 +26,7 @@
             {{ toggleHold ? 'Unhold' : 'Hold' }}
           </div>
         </q-btn>
+
         <q-btn
           @click="nextContact"
           no-wrap unelevated no-caps
@@ -45,6 +37,7 @@
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
+
         <b-dropdown
           text="..."
           no-caret
@@ -79,6 +72,7 @@
           </b-dropdown-item>
         </b-dropdown>
       </div>
+
       <div class="d-flex align-items-center p-0">
         <div
           class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
@@ -88,14 +82,7 @@
           </span>
         </div>
       </div>
-      <!-- <div class="d-flex align-items-center p-0">
-        <div class="text-14 pl-3 text-subtitle1 text-capitalize">
-          {{ companyName }}
-          <span
-            v-if="companyName"
-            class="text-13 text-subtitle2 text-grey"> | {{ companyName }}</span>
-        </div>
-      </div> -->
+
       <div class="d-flex align-items-center p-0">
         <div
           v-if="timezone"
@@ -107,6 +94,7 @@
             style="position:relative;top:-2px;" />
           {{ timezone }} - {{ getTimeZone }}
         </div>
+
         <!-- <q-btn
           @click="onToggleMute"
           no-wrap outline no-caps
@@ -118,22 +106,34 @@
             {{ toggleMute ? 'Unmute' : 'Mute' }}
           </div>
         </q-btn> -->
+
         <q-btn
           @click="onToggleRecording"
           no-wrap outline no-caps
           size="sm" color="grey-4"
           :disabled="!statusCallConnected"
           class="sessions-button free-width mx-1">
-          <StopIcon v-if="toggleRecording" class="mr-2" color="#62666E" />
-          <RecordIcon v-else class="mr-2" color="red" />
+
+          <StopIcon
+            v-if="toggleRecording"
+            class="mr-2"
+            color="#62666E" />
+
+          <RecordIcon
+            v-else
+            class="mr-2"
+            color="red" />
+
           <div class="text-body2 text-black">
             {{ toggleRecording ? 'Stop Rec.' : 'Record' }}
           </div>
         </q-btn>
       </div>
+
       <div class="d-flex align-items-center p-0 pt-2 pb-2">
         <div
           class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
+
           <div id="session-list-name">
             {{ selectedListName }}
           </div>
@@ -162,13 +162,17 @@
           unelevated
           no-wrap no-caps size="sm"
           class="btn-btn-primary sessions-button free-width mx-1">
+
           <PauseIcon
             class="mr-2"
             color="white" />
+
           <div class="text-body2 text-white">
             Resume
           </div>
+
         </q-btn>
+
         <q-btn
           v-else
           @click="onTogglePause"
@@ -177,21 +181,28 @@
           no-wrap no-caps size="sm"
           :disabled="toggleEnd"
           :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`">
+
           <PauseIcon
             class="mr-2"
             :color="`${sessionPaused ? '#fff' : '#62666E'}`" />
+
           <div
             :class="`text-body2 ${sessionPaused ? 'text-white' : 'text-black'}`">
             {{ togglePause ? sessionPaused ? 'Resume Session' : 'Unpause Session' : 'Pause Session' }}
           </div>
         </q-btn>
+
         <q-btn
           @click="onToggleEnd"
           no-wrap outline no-caps
           size="sm"
           :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
           :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
-          <EndCallIcon class="mr-2" color="#62666E" />
+
+          <EndCallIcon
+            class="mr-2"
+            color="#62666E" />
+
           <div class="text-body2 text-black">
             {{ toggleEnd ? 'Ending Session' : 'End Session'}}
           </div>
