@@ -261,11 +261,15 @@ export default {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
     ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts', 'channelChangedFilterFields']),
     contactName () {
+      if (this.contact && this.contact.name) {
+        return _.get(this.contact, 'name', '')
+      }
+
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
       }
 
-      return this.$options.filters.fixPhone(this.contact.phone_number)
+      return 'No Name'
     },
     contactAvatar () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
@@ -348,6 +352,7 @@ export default {
   data () {
     return {
       taskItemKey: 0,
+      previousRoute: null,
       CommunicationTypes,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
@@ -368,11 +373,18 @@ export default {
     }
   },
   watch: {
+    $route (to, from) {
+      this.previousRoute = from
+    },
+
     isReopened: function () {
       const _this = this
+
+      if (this.isSearch || (this.previousRoute && this.previousRoute.name === 'Inbox')) { return }
+
       setTimeout(function () {
         _this.$emit('onItemRemoved', _this.contact)
-      }, 5000)
+      }, 3000)
     },
     'contact.last_communication.id': function () {
       this.taskItemKey++

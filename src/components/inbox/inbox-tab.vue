@@ -118,7 +118,8 @@
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
-      <div class="w-100 flex-grow-1" v-if="liveCalls.length > 0">
+      <div class="w-100 flex-grow-1"
+           v-if="liveCalls.length > 0 && !isSearch">
         <inbox-task-list :contacts="liveCalls"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
@@ -226,6 +227,9 @@ export default {
       return 'outlined-light'
     },
     contactTasks () {
+      if (this.isSearch) {
+        return [...this.contacts]
+      }
       return [...this.incomingCalls, ...this.contacts]
     },
     hasLiveCall () {
@@ -440,6 +444,18 @@ export default {
       this.setContacts([])
       this.isSearch = false
 
+      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
+        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+          this.setLoadingPendingTaskCount(true)
+          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        }
+
+        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+          this.setLoadingOpenTaskCount(true)
+          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        }
+      }
+
       if (this.$route.params.status === this.statusText || this.$route.name === 'Inbox') {
         this.loadContactTasks()
       }
@@ -610,6 +626,9 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', communication => {
+      if (this.isSearch) {
+        return
+      }
       // Do not alter live contacts if it's in active mode
       const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
         [
@@ -710,7 +729,12 @@ export default {
     })
 
     this.$VueEvent.listen('update_communication', communication => {
-      if (!communication.contact_id) {
+      if (!communication.contact_id || this.isSearch) {
+        return
+      }
+
+      // do not alter when contact is in live call and live comm is different from the one in the dialer
+      if (this.dialer.contact && this.dialer.communication && communication.contact_id === this.dialer.contact.id && this.dialer.communication.id !== communication.id) {
         return
       }
 
@@ -811,6 +835,10 @@ export default {
     },
     '$route.params.status': function () {
       this.setStatus()
+      if (this.isSearch || (this.previousRoute.name === 'Inbox' && this.currentTask === ContactTaskStatus.STATUS_OPEN)) {
+        return
+      }
+
       if (['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name)) {
         if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
           this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
@@ -829,8 +857,14 @@ export default {
     },
     '$route.name': function (value) {
       if (['Inbox'].includes(value)) {
+        this.searchText = ''
+        this.isSearch = false
         this.currentTask = ContactTaskStatus.STATUS_OPEN
         this.resetList()
+        if (this.previousRoute && this.previousRoute.params.status === 'pending') {
+          this.setLoadingPendingTaskCount(true)
+          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        }
       }
     },
     '$route.params.id': function (value) {

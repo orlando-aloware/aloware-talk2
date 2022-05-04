@@ -163,7 +163,8 @@ export default {
       // campaignId: this.value || null,
       selectedId: null,
       options: [],
-      reference: 'lineSelect'
+      reference: 'lineSelect',
+      emitChange: true
     }
   },
 
