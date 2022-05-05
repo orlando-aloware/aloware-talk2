@@ -195,7 +195,10 @@ export default {
         }
       })
     } else {
-      this.stopEvents()
+      if (to.name !== 'Contact') {
+        this.stopEvents()
+      }
+
       setTimeout(() => {
         next()
       }, 100)
