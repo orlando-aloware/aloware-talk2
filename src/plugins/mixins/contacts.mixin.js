@@ -691,6 +691,11 @@ export default {
       if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) ||
         (from.name === 'Contacts' && to.name === 'Contact') ||
         (from.name === 'Contact' && to.name === 'Contact')) {
+        if (this.$route.name === 'Contacts') {
+          setTimeout(() => {
+            this.startEvents()
+          }, 500)
+        }
         return
       }
 

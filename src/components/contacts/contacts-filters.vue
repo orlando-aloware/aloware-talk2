@@ -489,20 +489,22 @@ export default {
 
     onDeleteFilter (index, key) {
       const updatedFilter = _.cloneDeep(JSON.parse(JSON.stringify(this.currentListFilters)))
+      const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
 
-      if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Array') {
+      if (typeof updatedFilter[index] !== 'undefined' &&
+        _.isEmpty(updatedFilter[index].filters) &&
+        updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
-        this.setCurrentListFilters(updatedFilter)
-        this.$emit('filtersUpdated')
-        return
       }
 
-      if (_.isEmpty(updatedFilter[index].filters) && updatedFilter.constructor.name === 'Object') {
+      if (typeof updatedFilter[index] !== 'undefined' &&
+        _.isEmpty(updatedFilter[index].filters) &&
+        updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
       }
 
-      if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
+      if (!_.isEqual(updatedFilter, initialListFilters)) {
         this.$VueEvent.fire('fetchContacts', { clear: true })
       }
 
