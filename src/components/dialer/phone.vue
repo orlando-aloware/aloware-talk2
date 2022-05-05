@@ -269,10 +269,10 @@
                          id="phone-number-clone"/>
                 </q-item-label>
                 <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
-                              v-if="contact && contact.company_name">
-                  <span>{{ contact.company_name }}</span>
+                              v-if="contact && (contact.company_name || currentLocalTime)">
+                  <span v-if="contact.company_name">{{ contact.company_name }}</span>
                   <span class="ml-1 mr-1"
-                        v-if="currentLocalTime">
+                        v-if="contact.company_name && currentLocalTime">
                     ·
                   </span>
                   <span v-if="currentLocalTime">{{ currentLocalTime }}</span>

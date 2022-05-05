@@ -298,7 +298,7 @@ export default {
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')
 
-      if (!_.isEqual(this.allFilters, currentListFilters)) {
+      if (!_.isEqual(this.initialListFilters, currentListFilters)) {
         this.setShowMyContacts(false)
         this.$VueEvent.fire('fetchContacts', { clear: true })
         this.$VueEvent.fire('shouldUpdateListCount')

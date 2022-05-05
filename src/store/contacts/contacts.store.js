@@ -77,8 +77,9 @@ export default function () {
         filters: [
           {
             filters: {
-              is_new_contact: {
-                value: 1
+              contact_task_status: {
+                value: [1],
+                operator: 1
               }
             },
             is_conjunction: true

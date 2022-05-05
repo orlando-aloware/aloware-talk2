@@ -278,7 +278,9 @@ export default {
       this.columnsClose()
     },
     onApplyChanges () {
-      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
+      const typeQuery = _.get(this.$route, 'query.type', null)
+
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) || (typeQuery && typeQuery === 'public')) {
         this.closeAndMutate()
         return
       }

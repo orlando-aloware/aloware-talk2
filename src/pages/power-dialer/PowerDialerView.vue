@@ -551,7 +551,10 @@ export default {
 
   async mounted () {
     this.removeListClose()
-    await this.myQueueList()
+    if (!this.isMyQueue) {
+      await this.myQueueList()
+    }
+    // await this.myQueueList()
     this.init()
     // this.loadList(this.selectedListId)
 
