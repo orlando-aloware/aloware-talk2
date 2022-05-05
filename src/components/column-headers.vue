@@ -400,9 +400,23 @@ export default {
       const item = { i: 0 }
       for (item.i = 0; item.i < COLUMN_CATEGORIES.length; item.i++) {
         if (this.endpointUrl === 'contacts-list') {
-          columns[item.i] = matches.filter((c) => c.category === item.i && c.name !== 'task_status')
+          columns[item.i] = matches.filter((c) => {
+            return c.category === item.i && c.name !== 'task_status'
+          })
         } else {
-          columns[item.i] = matches.filter((c) => c.category === item.i)
+          columns[item.i] = matches.filter((c) => {
+            let field = this.powerDialerDefaultColumns.find(f => f.name === c.name)
+            if (c.category === item.i) {
+              if (field !== undefined) {
+                return field
+              } else {
+                console.log(`NAME: ${c.name}`, c)
+                const item = c
+                item.required = false
+                return item
+              }
+            }
+          })
         }
         results.data = results.data + columns[item.i].length
       }
@@ -437,6 +451,12 @@ export default {
     },
     currentRelations () {
       return this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
+    },
+    defaultColumns () {
+      return DEFAULT_COLUMNS
+    },
+    powerDialerDefaultColumns () {
+      return POWER_DIALER_DEFAULT_COLUMNS
     }
   },
   watch: {
