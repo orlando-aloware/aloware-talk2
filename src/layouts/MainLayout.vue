@@ -213,6 +213,8 @@ import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
+import talk2Api from 'src/plugins/api/api'
+import * as CommunicationDirections from 'src/constants/communication-direction'
 
 export default {
   name: 'MyLayout',
@@ -281,6 +283,7 @@ export default {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
+    ...mapState('inbox', ['selectedContact', 'liveContacts']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -582,22 +585,48 @@ export default {
     })
 
     this.$VueEvent.listen('update_communication', (communication) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
-        return
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        // missed call notification
+        // if (communication.type === CommunicationTypes.CALL &&
+        //   communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
+        //   !this.profile.sleep_mode) {
+        //   this.processActionNotification(communication, 'missed call')
+        // }
+
+        // if disposition status is not in-progress
+        // or current status is not queued / ring all, close call notification
+        if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+          ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
+          this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        }
       }
 
-      // missed call notification
-      // if (communication.type === CommunicationTypes.CALL &&
-      //   communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
-      //   !this.profile.sleep_mode) {
-      //   this.processActionNotification(communication, 'missed call')
-      // }
+      if (this.$route.path.indexOf('channels/inbox') === -1) {
+        if (!communication.contact_id) {
+          return
+        }
 
-      // if disposition status is not in-progress
-      // or current status is not queued / ring all, close call notification
-      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-        ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
-        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+        const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+        if (index >= 0) {
+          const liveContacts = _.cloneDeep(this.liveContacts)
+          liveContacts[index].last_communication = communication
+          this.setLiveContacts(
+            [
+              // connected calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+              // parked calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+              // incoming calls
+              ...liveContacts.filter(item => [
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+              ].includes(item.last_communication.current_status2))
+            ]
+          )
+        }
       }
     })
 
@@ -614,6 +643,75 @@ export default {
       //   type: 'system'
       // }
       // this.$actionNotification(data)
+    })
+
+    this.$VueEvent.listen('contact_updated', (data) => {
+      if (this.$route.path.indexOf('channels/inbox') === -1) {
+        // only fetch the latest contact data when updated contact is also the selected contact
+        // this is to avoid swarm of api request when numbers of contacts get updated
+        if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
+          talk2Api.V2.contacts.get(data.id).then(response => {
+            const contact = response.data
+            // check data loaded
+            this.setSelectedContact(contact)
+          })
+        }
+      }
+    })
+
+    this.$VueEvent.listen('new_communication', (communication) => {
+      if (this.$route.path.indexOf('channels/inbox') === -1) {
+        // Do not alter live contacts if it's in active mode
+        const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+          [
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+          ].includes(item.last_communication.current_status2))
+        if (isActiveInLiveContactsIndex >= 0) {
+          return
+        }
+        setTimeout(() => {
+          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+            const contact = response.data
+            const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+            // check if communication is a live call
+            if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
+              [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+              const liveContacts = _.cloneDeep(this.liveContacts)
+              if (!isInLiveContacts) {
+                liveContacts.push(contact)
+              }
+              this.setLiveContacts(
+                [
+                  // connected calls
+                  ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+                  // parked calls
+                  ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+                  // incoming calls
+                  ...liveContacts.filter(item => [
+                    CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                    CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                    CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                    CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                    CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+                  ].includes(item.last_communication.current_status2))
+                ]
+              )
+            }
+          })
+        }, 1000)
+      }
     })
 
     if (this.$q.platform.is.electron) {
@@ -1797,7 +1895,8 @@ export default {
       logoutUser: 'logout',
       check: 'check'
     }),
-    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups', 'setMetricLoader'])
+    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups', 'setMetricLoader']),
+    ...mapActions('inbox', ['setSelectedContact', 'setLiveContacts'])
   },
 
   watch: {
