@@ -301,7 +301,8 @@ export default {
         my_contact: Filters.DEFAULT_STATE.filter.my_contact
       },
       scrollTimeout: null,
-      CommunicationCurrentStatus
+      CommunicationCurrentStatus,
+      listeners: {}
     }
   },
 
@@ -585,7 +586,7 @@ export default {
       this.onItemSelected(this.selectedContact)
     }
 
-    this.$VueEvent.listen('load_and_navigate_inbox_tab', (lastNavigatedIndex) => {
+    this.listeners.loadAndNavigateInboxTab = (lastNavigatedIndex) => {
       this.page = this.nextPage
       this.loadMoreContactTasks().then(() => {
         const contact = this.contacts[lastNavigatedIndex + 1]
@@ -598,9 +599,9 @@ export default {
 
         this.makeSelectedItemVisible()
       })
-    })
+    }
 
-    this.$VueEvent.listen('navigate_task_tab', (contact) => {
+    this.listeners.navigateTaskTab = (contact) => {
       this.setSelectedContact(contact)
 
       this.$router.push({
@@ -609,9 +610,9 @@ export default {
       })
 
       this.makeSelectedItemVisible()
-    })
+    }
 
-    this.$VueEvent.listen('contact_updated', (data) => {
+    this.listeners.contactUpdated = (data) => {
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
       if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
@@ -623,9 +624,9 @@ export default {
           this.updateContacts(contact)
         })
       }
-    })
+    }
 
-    this.$VueEvent.listen('new_communication', communication => {
+    this.listeners.newCommunication = (communication) => {
       if (this.isSearch) {
         return
       }
@@ -726,9 +727,9 @@ export default {
           }
         })
       }, 1000)
-    })
+    }
 
-    this.$VueEvent.listen('update_communication', communication => {
+    this.listeners.updateCommunication = (communication) => {
       if (!communication.contact_id || this.isSearch) {
         return
       }
@@ -786,9 +787,9 @@ export default {
           this.setContact(contacts[contactIndex])
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+    this.listeners.contactTaskStatusUpdated = (contact) => {
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch) {
         return
       }
@@ -810,7 +811,14 @@ export default {
           contacts[index] = contact
           this.setContacts(contacts)
       }
-    })
+    }
+
+    this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
+    this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
+    this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -823,6 +831,12 @@ export default {
 
   beforeDestroy () {
     this.setSelectedContact({})
+    this.$VueEvent.stop('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
+    this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
+    this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
   },
 
   watch: {
