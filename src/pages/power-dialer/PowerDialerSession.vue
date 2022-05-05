@@ -67,7 +67,8 @@ export default {
       'powerDialerTaskFilters',
       'activeList',
       'activeMetrics',
-      'myQueue'
+      'myQueue',
+      'hasActiveTask'
     ]),
     list () {
       return this.listItems[this.selectedList.id].data || []
@@ -85,6 +86,7 @@ export default {
   async created () {
     await this.fetchCurrentList()
     await this.fetchTasks(1)
+    this.hasActiveTask = false
   },
   async mounted () {
     this.TOGGLE_SESSION_LOADER(true)
