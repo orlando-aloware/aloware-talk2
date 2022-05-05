@@ -549,18 +549,18 @@ export default {
     }
   },
 
+  beforeDestroy () {
+    this.$VueEvent.stop('export_event_create')
+    this.$VueEvent.stop('export_event_update')
+    this.$VueEvent.stop('export_event_delete')
+  },
+
   async mounted () {
     this.removeListClose()
     if (!this.isMyQueue) {
       await this.myQueueList()
     }
-    // await this.myQueueList()
     this.init()
-    // this.loadList(this.selectedListId)
-
-    this.$VueEvent.listen('export_event_updates', (task) => {
-      console.log(' %c EXPORT EVENT : ', 'background: green; color: #000;', task)
-    })
 
     this.$VueEvent.listen('export_event_create', (task) => {
       this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
@@ -790,6 +790,8 @@ export default {
       let response = await this.exportCsv(this.selectedList.id)
       if (response.status === 200) {
         this.$generalNotification('CSV export request has been sent!', 'success')
+      } else {
+        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
       }
     },
     async beginDial () {
