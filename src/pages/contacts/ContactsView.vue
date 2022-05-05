@@ -218,7 +218,10 @@
             <power-dialer-mobile-icon width="14" height="14" color="#62666E"></power-dialer-mobile-icon>
             Power Dialer
           </b-dropdown-item>
-          <b-dropdown-item href="#" :disabled="true">
+          <b-dropdown-item
+            @click="exportAsCsv"
+            href="#"
+            :disabled="hasExport">
             <export-icon></export-icon>
             Export as CSV
           </b-dropdown-item>
@@ -803,6 +806,7 @@ export default {
         dataLength: 0
       },
       datatableTarget: null,
+      hasExport: false,
       countFields: [
         'unread_texts_count',
         'unread_missed_calls_count',
@@ -843,7 +847,8 @@ export default {
       'setUnsavedList',
       'removeContactOpen',
       'setBulkDelete',
-      'setMessageComposerMode'
+      'setMessageComposerMode',
+      'exportCsv'
     ]),
     onSearch (searchText) {
       this.$emit('search', searchText)
@@ -1352,6 +1357,14 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
+    },
+    async exportAsCsv () {
+      let res = await this.exportCsv(this.list.id)
+      if (res.status === 200) {
+        this.$generalNotification(res.data.message, 'success')
+      } else {
+        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+      }
     }
   },
 
