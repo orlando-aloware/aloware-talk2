@@ -292,19 +292,28 @@ export default {
       return this.selectedList.id === this.myQueue.id
     },
     totalAll () {
-      return this.powerDialerTaskFilters?.all?.total_items
+      // return this.powerDialerTaskFilters?.all?.total_items
+      let { called, failed, scheduled } = this.powerDialerTasks
+      return called.length + failed.length + this.powerDialerTasks.in_queue.length + scheduled.length
     },
     totalQueued () {
-      return this.powerDialerTaskFilters?.in_queue?.total_queued
+      // return this.powerDialerTaskFilters?.in_queue?.total_queued
+      return this.powerDialerTasks.in_queue.length
     },
     totalCalled () {
-      return this.powerDialerTaskFilters?.called?.total_called
+      // return this.powerDialerTaskFilters?.called?.total_called
+      let { called } = this.powerDialerTasks
+      return called.length
     },
     totalFailed () {
-      return this.powerDialerTaskFilters?.failed?.total_failed
+      // return this.powerDialerTaskFilters?.failed?.total_failed
+      let { failed } = this.powerDialerTasks
+      return failed.length
     },
     totalScheduled () {
-      return this.powerDialerTaskFilters?.scheduled?.total_scheduled
+      // return this.powerDialerTaskFilters?.scheduled?.total_scheduled
+      let { scheduled } = this.powerDialerTasks
+      return scheduled.length
     }
   },
   methods: {

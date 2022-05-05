@@ -1,4 +1,8 @@
 export default {
+  async exportCsv ({ commit }, id = '') {
+    let response = await window.axios.get(`api/v2/contacts-list/${id}/export-csv`)
+    return response
+  },
   toggleFolder: ({ commit }, id) => {
     commit('TOGGLE_FOLDER', id)
   },

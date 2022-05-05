@@ -33,13 +33,6 @@ export default {
         stringId = 'my-queue'
       }
 
-      if (!this.listItems[stringId]) {
-        // this.contactsLoaded({
-        //   id: stringId,
-        //   ...DEFAULT_LIST_ITEMS
-        // })
-      }
-      console.log('ROUTE---------- :>> ', route)
       if (route) {
         this.$axios
           .get('/api/v2/power-dialer-lists/' + stringId)

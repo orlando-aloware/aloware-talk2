@@ -118,7 +118,6 @@ export default {
           return
         }
       }
-      console.log('this.taskToCall :>> ', this.taskToCall)
 
       if (this.taskToCall?.contact_list_item_id) {
         // Fires an event to make a call

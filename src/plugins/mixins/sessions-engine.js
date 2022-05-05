@@ -12,10 +12,10 @@ export default {
     ]),
     ...mapGetters('contacts', [
       'listItems'
-    ]),
-    powerLists () {
-      return this.listItems[this.selectedList?.id]?.data
-    }
+    ])
+    // powerLists () {
+    //   return this.listItems[this.selectedList?.id]?.data
+    // }
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -54,6 +54,7 @@ export default {
     },
     onStatusInProgress (task) {
       // this.activeTask = this.powerLists?.find(lst => lst.contact_list_item_id === task.id)
+      // Re-assign new items for IN QUEUE and exclude the curernt task
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
     onStatusCompleted (task) {
