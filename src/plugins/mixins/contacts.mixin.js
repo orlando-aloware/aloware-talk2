@@ -476,6 +476,10 @@ export default {
         fetchData.params = _.get(data, 'params', {})
         fetchData.hasOrder = _.get(data, 'hasOrder', true)
         fetchData.clear = _.get(data, 'clear', false)
+
+        // Keeps only user's contacts on list after fetching
+        _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
+
         this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear)
       })
       this.$VueEvent.listen('clearContacts', () => {
