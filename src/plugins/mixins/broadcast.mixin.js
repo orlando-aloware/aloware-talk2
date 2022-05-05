@@ -326,8 +326,6 @@ export default {
          * ------------------------------------
          * Power Dialer Session Tasks
          * ------------------------------------
-         * 257448 257403 ID
-         * 14729 14728 CLID
          */
         .listen('.user.contact_list_item.created', (event) => {
           let contactListItem = event.contact_list_item
