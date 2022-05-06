@@ -114,7 +114,16 @@
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Initial Line</p>
-        <p>{{ contact.initial_campaign.name }}</p>
+        <line-selector v-model="contact.initial_campaign_id"
+                       :genericMultiselect="false"
+                       :genericStyling="false"
+                       :useInput="true"
+                       :clearable="true"
+                       :borderless="true"
+                       :outlined="false"
+                       specificClass="inline-select"
+                       @change="(eventPayload) => onUpdateFields(eventPayload, 'initial_campaign_id')">
+        </line-selector>
       </div>
 
       <div class="d-block">
@@ -179,6 +188,7 @@ import UserSelector from 'components/generic-selectors/user-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
+import LineSelector from 'components/generic-selectors/line-selector'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -196,7 +206,8 @@ export default {
     UserSelector,
     ContactInputField,
     LocationCountrySelector,
-    LocationStateSelector
+    LocationStateSelector,
+    LineSelector
   },
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),
