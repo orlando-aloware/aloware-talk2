@@ -8,6 +8,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import { get } from 'lodash'
 
 export default {
   name: 'contact-app-header',
@@ -15,8 +16,14 @@ export default {
   computed: {
     ...mapGetters('contacts', ['selectedList']),
     ...mapState('contacts', ['search']),
+    previousPage () {
+      return get(this.$route.query, 'previousPage', null)
+    },
 
     title () {
+      if (this.previousPage === 'PowerDialer') {
+        return 'Power Dialer'
+      }
       return this.search && this.search.length > 0 ? 'Search results' : this.selectedList.name
     }
   }

@@ -197,7 +197,8 @@
                   class="datatable-row__name">
                   <NameWrapper
                     :resource="contact"
-                    link-path="/contacts/" />
+                    link-path="/contacts/"
+                    :list="selectedList" />
                 </td>
                 <!-- COLUMN: Phone Number -->
                 <td
