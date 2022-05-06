@@ -590,7 +590,7 @@ export default {
         return this.$route.params.id
       }
 
-      if (this.$route.name !== 'Contacts') {
+      if (this.$route.name !== 'Contacts' && this.$route.name !== 'Power Dialer') {
         return null
       }
 

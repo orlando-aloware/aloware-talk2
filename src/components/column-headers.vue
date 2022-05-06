@@ -412,7 +412,6 @@ export default {
               if (field !== undefined) {
                 return field
               } else {
-                console.log(`NAME: ${c.name}`, c)
                 const item = c
                 item.required = false
                 return item
