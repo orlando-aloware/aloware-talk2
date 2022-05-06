@@ -241,11 +241,14 @@ export default {
 
     navigateBack (e) {
       const previousPage = _.get(this.$route.query, 'previousPage', null)
+      const previousList = _.get(this.$route.query, 'list', null)
 
       if (previousPage === 'PowerDialer') {
-        this.$router.push({
-          path: this.$router.history._startLocation
-        })
+        if (previousList) {
+          this.$router.push(`/power-dialer/list/${previousList}`)
+        } else {
+          this.$router.push(`/power-dialer`)
+        }
       }
 
       if (this.$route.name === 'Settings Tab') {
