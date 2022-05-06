@@ -46,6 +46,7 @@ import ContactPhonesForm from 'src/components/forms/contact-phones-form'
 import PlusCircleIcon from 'components/icons/plus-circle-icon'
 import ContactPhonesListItems from 'src/components/contacts/contact-phones-list-items'
 import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
+import _ from 'lodash'
 
 export default {
   name: 'contact-phones',
@@ -173,11 +174,11 @@ export default {
   },
 
   watch: {
-    'contact.id': function () {
-      if (this.contact && this.contact.id) {
+    'contact.id': _.debounce(function () {
+      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
         this.getPhoneNumbers()
       }
-    }
+    }, 500)
   }
 }
 </script>

@@ -77,6 +77,7 @@ import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import EnrollSequenceModal from 'components/enroll-sequence-modal'
 import { mapActions } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
 
 export default {
   name: 'contact-sequence',
@@ -159,9 +160,11 @@ export default {
   },
 
   watch: {
-    'contact.id': function (value) {
-      this.getSequenceInfo()
-    }
+    'contact.id': _.debounce(function (value) {
+      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+        this.getSequenceInfo()
+      }
+    }, 500)
   }
 }
 </script>
