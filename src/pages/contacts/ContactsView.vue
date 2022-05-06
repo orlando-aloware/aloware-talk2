@@ -162,7 +162,7 @@
         <compact-btn
           variant="primary"
           v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
-          :disabled="!filterHasChanges || defaultIds.includes(this.id) || isUpdatingList || list.show_in_public_folder"
+          :disabled="isDisabledSaveFilter"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
           <q-spinner-bars v-if="isUpdatingList"
@@ -848,7 +848,8 @@ export default {
       'removeContactOpen',
       'setBulkDelete',
       'setMessageComposerMode',
-      'exportCsv'
+      'exportCsv',
+      'updateContactsList'
     ]),
     onSearch (searchText) {
       this.$emit('search', searchText)
@@ -985,7 +986,8 @@ export default {
         console.log('Updating existing dynamic list...')
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
-          .then(() => {
+          .then((res) => {
+            this.updateContactsList(res.data)
             this.initialListFilters = this.currentListFilters
             this.updateFilterHasChanges()
             this.isUpdatingList = false
@@ -1374,7 +1376,8 @@ export default {
       'showContactsListSidebar',
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
-      'pinnedCounts'
+      'pinnedCounts',
+      'previousListFilters'
     ]),
     ...mapGetters('contacts', [
       'lists',
@@ -1430,7 +1433,7 @@ export default {
       return {
         'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
           (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
-            !this.filterHasChanges) ||
+            !this.isFilterHasChanges) ||
           this.defaultIds.includes(this.id)
       }
     },
@@ -1452,16 +1455,16 @@ export default {
       return this.isFiltersOpen ? 'light' : 'primary'
     },
     resetButtonVariant () {
-      return this.filterHasChanges ? 'primary' : 'outlined-light'
+      return this.isFilterHasChanges ? 'primary' : 'outlined-light'
     },
     saveFilterButtonVariant () {
-      return this.filterHasChanges ? 'primary' : 'secondary'
+      return this.isFilterHasChanges ? 'primary' : 'secondary'
     },
     saveFilterButtonCustomClass () {
-      return !this.filterHasChanges ? 'button-disabled' : ''
+      return !this.isFilterHasChanges ? 'button-disabled' : ''
     },
     isResetDisabled () {
-      return !this.filterHasChanges
+      return !this.isFilterHasChanges
     },
     isListDeletable () {
       // eslint-disable-next-line no-unused-vars
@@ -1509,6 +1512,21 @@ export default {
           !this.isLoadingMore &&
           !this.isLoading) ||
         false
+    },
+    isFilterHasChanges () {
+      const previousListFilters = JSON.parse(JSON.stringify(this.previousListFilters))
+
+      if (!this.currentListFilters.search && !previousListFilters.search) {
+        previousListFilters.search = this.currentListFilters.search
+      }
+
+      return this.filterHasChanges || !_.isEqual(this.currentListFilters, previousListFilters)
+    },
+    isDisabledSaveFilter () {
+      return !this.isFilterHasChanges ||
+        this.defaultIds.includes(this.id) ||
+        this.isUpdatingList ||
+        this.list.show_in_public_folder
     }
   },
 

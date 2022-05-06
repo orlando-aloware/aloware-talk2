@@ -32,6 +32,7 @@ export default {
       isNavigated: false,
       previousRelations: [],
       hasContactsListChanges: false,
+      fromContactFilters: false,
       ALL_COLUMNS
     }
   },
@@ -57,7 +58,10 @@ export default {
       'setSelectedList',
       'setListContactsLoaded',
       'setContact',
-      'listLoaded'
+      'listLoaded',
+      'setPreviousListFilters',
+      'setPreviousListId',
+      'updateContactsListFilter'
     ]),
     ...mapActions('powerDialer', [
       'updateMyQueueListData',
@@ -226,6 +230,11 @@ export default {
         })
     }, 1000),
     fetch (params = {}, hasOrder = true, clear = false) {
+      if (!this.fromContactFilters) {
+        this.setPreviousListFilters(params)
+        this.setPreviousListId(this.id)
+      }
+
       const defaultSort = { data: _.get(params, 'sort', this.defaultContactDateFilter) }
       if (defaultSort.data.constructor !== 'Function') {
         defaultSort.data = this.defaultContactDateFilter
@@ -470,17 +479,25 @@ export default {
       this.$VueEvent.stop('clearContacts')
       this.$VueEvent.stop('onLoadMoreContacts')
     },
-    startEvents () {
+    initiateFetch (data) {
       const fetchData = { hasOrder: null, params: null, clear: null }
+      fetchData.params = _.get(data, 'params', {})
+      fetchData.hasOrder = _.get(data, 'hasOrder', true)
+      fetchData.clear = _.get(data, 'clear', false)
+
+      // Keeps only user's contacts on list after fetching
+      _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
+
+      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear)
+    },
+    startEvents () {
+      this.$VueEvent.listen('filteredFetchContacts', (data) => {
+        this.fromContactFilters = true
+        this.initiateFetch(data)
+      })
       this.$VueEvent.listen('fetchContacts', (data) => {
-        fetchData.params = _.get(data, 'params', {})
-        fetchData.hasOrder = _.get(data, 'hasOrder', true)
-        fetchData.clear = _.get(data, 'clear', false)
-
-        // Keeps only user's contacts on list after fetching
-        _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
-
-        this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear)
+        this.fromContactFilters = false
+        this.initiateFetch(data)
       })
       this.$VueEvent.listen('clearContacts', () => {
         this.clearContacts()
@@ -517,6 +534,8 @@ export default {
         .then((response) => {
           this.listLoaded({ ...response, id: this.id })
           this.setSelectedList({ id: response.id, name: response.name, type: response.type })
+          this.setPreviousListFilters(response.filters)
+          this.setPreviousListId(this.id)
         })
     },
     loadData () {
@@ -531,11 +550,31 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['search', 'shouldUpdateSelectedListContactCount', 'showMyContacts']),
-    ...mapGetters('auth', ['profile']),
-    ...mapGetters('contacts', ['lists', 'listItems', 'selectedContacts', 'currentListFilters', 'changingSelectedContact', 'selectedList', 'contact']),
-    ...mapState('cache', ['currentCompany']),
-    ...mapState(['defaultDateFilter']),
+    ...mapState('contacts', [
+      'search',
+      'shouldUpdateSelectedListContactCount',
+      'showMyContacts',
+      'previousListId',
+      'previousListFilters'
+    ]),
+    ...mapGetters('auth', [
+      'profile'
+    ]),
+    ...mapGetters('contacts', [
+      'lists',
+      'listItems',
+      'selectedContacts',
+      'currentListFilters',
+      'changingSelectedContact',
+      'selectedList',
+      'contact'
+    ]),
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+    ...mapState([
+      'defaultDateFilter'
+    ]),
     ...mapGetters('powerDialer', [
       'activeFilter'
     ]),
@@ -549,6 +588,10 @@ export default {
         return this.$route.params.id
       } else if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
         return this.$route.params.id
+      }
+
+      if (this.$route.name !== 'Contacts') {
+        return null
       }
 
       return 'all'
@@ -738,6 +781,14 @@ export default {
       // this.loadData()
       if (!this.isPowerDialer) {
         this.loadData()
+      }
+    },
+    id: function (newValue, oldValue) {
+      if (oldValue !== null && this.$route.name === 'Contacts') {
+        this.updateContactsListFilter({
+          id: this.previousListId,
+          filters: this.previousListFilters
+        })
       }
     }
   },

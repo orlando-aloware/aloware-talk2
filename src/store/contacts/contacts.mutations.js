@@ -70,6 +70,12 @@ export default {
       }
     }
   },
+  UPDATE_LIST: (state, list) => {
+    Vue.set(state.lists, `${list.id}`, list)
+  },
+  UPDATE_LIST_FILTER: (state, payload) => {
+    Vue.set(state.lists[payload.id], 'filters', payload.filters)
+  },
   PINNED_LOADED: (state, pinned) => {
     state.pinned = pinned
   },
@@ -440,5 +446,11 @@ export default {
         is_conjunction: true
       }
     } }))
+  },
+  SET_PREVIOUS_LIST_FILTERS (state, payload) {
+    state.previousListFilters = payload
+  },
+  SET_PREVIOUS_LIST_ID (state, id) {
+    state.previousListId = id
   }
 }
